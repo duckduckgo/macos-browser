@@ -22,18 +22,26 @@ import StoreKit
 @available(macOS 12.0, *)
 public final class PurchaseModel: ObservableObject {
 
-//    @ObservedObject var manager: PurchaseManager
+    @Published var subscriptions: [SubscriptionRowModel] 
 
-    @Published var products: [Product]
-
-    init(products: [Product] = []) {
-//        self.manager = manager
-        self.products = products
+    init(subscriptions: [SubscriptionRowModel] = []) {
+        print(" -- PurchaseModel init --")
+        self.subscriptions = subscriptions
     }
+
+    var hasOngoingPurchase: Bool { subscriptions.reduce(false) { $0 || $1.isBeingPurchased } }
 
     func buy(_ product: Product) {
         print("Buying \(product.displayName)")
-
     }
 
+}
+
+@available(macOS 12.0, *)
+public struct SubscriptionRowModel: Identifiable {
+    public var id: String { product.id + String(isPurchased) + String(isBeingPurchased) }
+
+    public let product: Product
+    public let isPurchased: Bool
+    public let isBeingPurchased: Bool
 }

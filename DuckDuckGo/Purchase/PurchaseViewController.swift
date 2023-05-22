@@ -19,6 +19,7 @@
 import AppKit
 import SwiftUI
 import StoreKit
+import Combine
 
 @available(macOS 12.0, *)
 final class PurchaseViewController: NSViewController {
@@ -26,11 +27,13 @@ final class PurchaseViewController: NSViewController {
     private let manager = PurchaseManager.shared
     private let model = PurchaseModel()
 
+    private var cancellables = Set<AnyCancellable>()
+
     override func loadView() {
         view = NSView(frame: NSRect(x: 0, y: 0, width: 600, height: 600))
 
         let purchaseView = PurchaseView(manager: PurchaseManager.shared,
-                                        model: model,
+                                        model: self.model,
                                         dismissAction: { [weak self] in
             self?.dismiss()
         })
@@ -41,27 +44,33 @@ final class PurchaseViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-//        PurchaseManager.shared.$purchasedProductIDs.
-
         Task {
-
-            await manager.updateAvailableProducts()
-            self.model.products = manager.availableProducts.sorted(by: { $0.price > $1.price })
-
             await manager.updatePurchasedProducts()
-
+            await manager.updateAvailableProducts()
         }
+
+        manager.$availableProducts.combineLatest(manager.$purchasedProducts, manager.$purchaseQueue).receive(on: RunLoop.main).sink { [weak self] availableProducts, purchasedProducts, purchaseQueue in
+            print(" -- got combineLatest -")
+            print(" -- got combineLatest - availableProducts: \(availableProducts.map { $0.id }.joined(separator: ","))")
+            print(" -- got combineLatest - purchasedProducts: \(purchasedProducts.map { $0.id }.joined(separator: ","))")
+            print(" -- got combineLatest -     purchaseQueue: \(purchaseQueue.map { $0.id }.joined(separator: ","))")
+
+            let sortedProducts = availableProducts.sorted(by: { $0.price > $1.price })
+
+            self?.model.subscriptions = sortedProducts.map {
+                print("purchaseQueue.contains($0) == \(purchaseQueue.contains($0))")
+
+                return SubscriptionRowModel(product: $0,
+                                            isPurchased: purchasedProducts.contains($0),
+                                            isBeingPurchased: purchaseQueue.contains($0)) }
+
+        }.store(in: &cancellables)
+
     }
 
     override func viewDidAppear() {
         super.viewDidAppear()
-
 //        Task {
-//            let productIdentifiers = ["001", "monthly.subscription", "monthly1"]
-//            let appProducts = try await Product.products(for: productIdentifiers)
-//
-//            print(appProducts)
-//
 //            let storefront = await Storefront.current
 //            print(storefront ?? "")
 //        }

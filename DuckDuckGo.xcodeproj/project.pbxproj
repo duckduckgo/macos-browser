@@ -3089,8 +3089,8 @@
 			children = (
 				1E73C7C62A163A8900B7BBA0 /* PurchaseManager.swift */,
 				1E53D72A2A0CD00700D977A4 /* PurchaseViewController.swift */,
-				1E53D7262A0CCFCD00D977A4 /* PurchaseView.swift */,
 				1E73C7C32A138B6000B7BBA0 /* PurchaseModel.swift */,
+				1E53D7262A0CCFCD00D977A4 /* PurchaseView.swift */,
 				1E73C7C52A162B5B00B7BBA0 /* EarlyTestingProductsDebug.storekit */,
 				1E73C7C82A17A33F00B7BBA0 /* SyncedWithAppStoreConnect.storekit */,
 			);

@@ -8,14 +8,13 @@
   ],
   "settings" : {
     "_applicationInternalID" : "6448958455",
-    "_billingIssuesEnabled" : true,
+    "_billingIssuesEnabled" : false,
     "_compatibilityTimeRate" : {
-      "3" : 6,
-      "5" : 1004
+      "3" : 6
     },
     "_developerTeamID" : "HKE973VLUW",
-    "_lastSynchronizedDate" : 706192195.39571702,
-    "_timeRate" : 1005
+    "_lastSynchronizedDate" : 706435680.47196102,
+    "_timeRate" : 13
   },
   "subscriptionGroups" : [
     {

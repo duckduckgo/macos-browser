@@ -31,7 +31,7 @@ struct PurchaseView: View {
         ZStack {
             closeButtonOverlay
             Spacer()
-            if model.products.isEmpty {
+            if model.subscriptions.isEmpty {
                 SpinnerView()
             } else {
                 subscriptionsList
@@ -56,23 +56,23 @@ struct PurchaseView: View {
             Text("Subscriptions")
                 .font(.largeTitle)
 
-            Text("Purchased: \(manager.purchasedProducts.map { $0.id }.joined(separator: ","))")
-
-            if let subscriptionGroupStatus = manager.subscriptionGroupStatus {
-                switch subscriptionGroupStatus {
-                case .subscribed:
-                    Text("Subscribed")
-                case .expired:
-                    Text("Expired")
-                case .inBillingRetryPeriod:
-                    Text("inBillingRetryPeriod")
-                case .inGracePeriod:
-                    Text("inGracePeriod")
-                case .revoked:
-                    Text("Revoked")
-                default:
-                    Text("Unknown state")
-                }
+//            Text("Purchased: \(manager.purchasedProducts.map { $0.id }.joined(separator: ","))")
+//
+//            if let subscriptionGroupStatus = manager.subscriptionGroupStatus {
+//                switch subscriptionGroupStatus {
+//                case .subscribed:
+//                    Text("Subscribed")
+//                case .expired:
+//                    Text("Expired")
+//                case .inBillingRetryPeriod:
+//                    Text("inBillingRetryPeriod")
+//                case .inGracePeriod:
+//                    Text("inGracePeriod")
+//                case .revoked:
+//                    Text("Revoked")
+//                default:
+//                    Text("Unknown state")
+//                }
 
 //                if subscriptionGroupStatus == .expired || subscriptionGroupStatus == .revoked {
 //                    Text("Welcome Back! \nHead over to the shop to get started!")
@@ -81,20 +81,36 @@ struct PurchaseView: View {
 //                    //from your app to https://apps.apple.com/account/billing.
 //                    Text("Please verify your billing details.")
 //                }
-            } else {
-                Text("You don't own any subscriptions. \nHead over to the shop to get started!")
-            }
+//            } else {
+//                Text("You don't own any subscriptions. \nHead over to the shop to get started!")
+//            }
 
             ScrollView {
-                VStack(spacing: 16) {
-                    ForEach(model.products) { product in
-                        SubscriptionRow(product: product,
-                                        buyButtonAction: { manager.buy(product) })
+                VStack(spacing: 24) {
+                    ForEach(model.subscriptions, id: \.id) { rowModel in
+                        SubscriptionRow(product: rowModel.product,
+                                        isPurchased: rowModel.isPurchased,
+                                        isBeingPurchased: rowModel.isBeingPurchased,
+                                        buyButtonAction: { manager.buy(rowModel.product) })
                     }
                 }
             }
+            .disabled(model.hasOngoingPurchase)
+            .opacity(model.hasOngoingPurchase ? 0.5 : 1.0)
 
             Spacer()
+
+            Button {
+                Task {
+                    do {
+                        try await AppStore.sync()
+                    } catch {
+                        print(error)
+                    }
+                }
+            } label: {
+                Text("Restore Purchases")
+            }
         }
         .padding(.all, 32)
     }
@@ -120,6 +136,9 @@ struct PurchaseView: View {
 struct SubscriptionRow: View {
 
     var product: Product
+    @State var isPurchased: Bool = false
+    @State var isBeingPurchased: Bool = false
+
     var buyButtonAction: () -> Void
 
     var body: some View {
@@ -139,15 +158,23 @@ struct SubscriptionRow: View {
             Button {
                 buyButtonAction()
             } label: {
-                Text("Buy")
+                if isPurchased {
+                    Text(Image(systemName: "checkmark"))
+                        .bold()
+                        .foregroundColor(.white)
+                } else if isBeingPurchased {
+                    ActivityIndicator(isAnimating: .constant(true), style: .spinning)
+                } else {
+                    Text("Buy")
+                        .bold()
+                        .foregroundColor(.white)
+                }
+
             }
-            .buttonStyle(CapsuleButton())
+            .buttonStyle(BuyButtonStyle(isPurchased: isPurchased))
 
         }
-        .padding(33)
-        .background(RoundedRectangle(cornerRadius: 10).foregroundColor(.black.opacity(0.12)))
-        .disabled(!product.isSubscription)
-        .opacity(product.isSubscription ? 1.0 : 0.5)
+        .disabled(isPurchased)
     }
 }
 
@@ -177,5 +204,26 @@ extension String: Identifiable {
     public typealias ID = Int
     public var id: Int {
         return hash
+    }
+}
+
+@available(macOS 12.0, *)
+struct BuyButtonStyle: ButtonStyle {
+    let isPurchased: Bool
+
+    init(isPurchased: Bool = false) {
+        self.isPurchased = isPurchased
+    }
+
+    func makeBody(configuration: Self.Configuration) -> some View {
+        var bgColor: Color = isPurchased ? Color.green : Color.blue
+        bgColor = configuration.isPressed ? bgColor.opacity(0.7) : bgColor.opacity(1)
+
+        return configuration.label
+            .frame(width: 50)
+            .padding(10)
+            .background(bgColor)
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
     }
 }

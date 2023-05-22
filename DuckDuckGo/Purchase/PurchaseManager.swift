@@ -41,7 +41,8 @@ final class PurchaseManager: ObservableObject {
     static let shared = PurchaseManager()
 
     @Published private(set) var availableProducts: [Product] = []
-    @Published private(set) var purchasedProducts: [Product] = []
+    @Published private(set) var purchasedProductIDs: [Product] = []
+    @Published private(set) var purchaseQueue: [Product] = []
 
     @Published private(set) var subscriptionGroupStatus: RenewalState?
 
@@ -49,6 +50,10 @@ final class PurchaseManager: ObservableObject {
 
     init() {
         updates = observeTransactionUpdates()
+
+        Task {
+            await updatePurchasedProducts()
+        }
     }
 
     deinit {
@@ -75,7 +80,6 @@ final class PurchaseManager: ObservableObject {
         for await result in Transaction.currentEntitlements {
             do {
                 let transaction = try checkVerified(result)
-                print(" --                 - productID: \(transaction.productID) (\(transaction.productType)")
 
                 guard transaction.productType == .autoRenewable else { continue }
 
@@ -90,15 +94,20 @@ final class PurchaseManager: ObservableObject {
         print(" -- [PurchaseManager] updatePurchasedProducts(): have \(purchasedSubscriptions.count) active subscriptions")
         self.purchasedProducts = purchasedSubscriptions
         subscriptionGroupStatus = try? await availableProducts.first?.subscription?.status.first?.state
-
-        print(" -- subscriptionGroupStatus: \(subscriptionGroupStatus)")
     }
 
+    @MainActor
     func buy(_ product: Product) {
         print(" -- [PurchaseManager] buy: \(product.displayName)")
 
+        purchaseQueue.append(product)
+
         Task {
+            print(" -- [PurchaseManager] starting await task")
             let result = try await product.purchase()
+
+            print(" -- [PurchaseManager] receiving await task result")
+            purchaseQueue.removeAll()
 
             switch result {
             case let .success(.verified(transaction)):
