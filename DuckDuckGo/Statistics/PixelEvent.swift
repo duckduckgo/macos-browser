@@ -224,6 +224,7 @@ extension Pixel {
 
             // Errors from Sync Metadata Module
             case syncMetadataCouldNotLoadDatabase
+            case syncBookmarksFailed
 
             case invalidPayload(Configuration)
 
@@ -497,6 +498,7 @@ extension Pixel.Event.Debug {
         case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
 
         case .syncMetadataCouldNotLoadDatabase: return "sync_metadata_could_not_load_database"
+        case .syncBookmarksFailed: return "sync_bookmarks_failed"
 
         case .invalidPayload(let configuration): return "m_d_\(configuration.rawValue)_invalid_payload".lowercased()
 
