@@ -71,7 +71,6 @@ extension HomePage.Models {
         private var shouldShowCookieSetting: Bool
 
         var isMoreOrLessButtonNeeded: Bool {
-            print(featuresMatrix.count)
             return featuresMatrix.count > 1
         }
 
