@@ -22,7 +22,8 @@ import StoreKit
 @available(macOS 12.0, *)
 public final class PurchaseModel: ObservableObject {
 
-    @Published var subscriptions: [SubscriptionRowModel] 
+    @Published var subscriptions: [SubscriptionRowModel]
+    @Published var storefrontCountry: String = ""
 
     init(subscriptions: [SubscriptionRowModel] = []) {
         print(" -- PurchaseModel init --")
@@ -34,7 +35,12 @@ public final class PurchaseModel: ObservableObject {
     func buy(_ product: Product) {
         print("Buying \(product.displayName)")
     }
-
+    
+    @MainActor
+    func loadStorefrontCountry() async {
+        storefrontCountry = "Loading..."
+        storefrontCountry = await Storefront.current?.countryCode ?? "<unknown>"
+    }
 }
 
 @available(macOS 12.0, *)

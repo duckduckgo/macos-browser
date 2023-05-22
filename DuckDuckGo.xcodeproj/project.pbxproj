@@ -70,6 +70,8 @@
 		1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E3E2912A10D0051A99B /* ContentBlocking */; };
 		1E950E412912A10D0051A99B /* PrivacyDashboard in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E402912A10D0051A99B /* PrivacyDashboard */; };
 		1E950E432912A10D0051A99B /* UserScript in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E422912A10D0051A99B /* UserScript */; };
+		1EB78A9A2A1B918F00274FCE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1EB78A992A1B90A000274FCE /* Images.xcassets */; };
+		1EB78A9B2A1B919000274FCE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1EB78A992A1B90A000274FCE /* Images.xcassets */; };
 		3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */; };
 		310E79BF294A19A8007C49E8 /* FireproofingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */; };
 		311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B262628E73E0A00FD181A /* TabShadowConfig.swift */; };
@@ -1958,6 +1960,7 @@
 		1E7E2E8F29029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockingRulesUpdateObserver.swift; sourceTree = "<group>"; };
 		1E7E2E9129029F9B00C01B54 /* WebsiteBreakageReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteBreakageReporter.swift; sourceTree = "<group>"; };
 		1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPermissionHandler.swift; sourceTree = "<group>"; };
+		1EB78A992A1B90A000274FCE /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionViewController.swift; sourceTree = "<group>"; };
 		310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofingReferenceTests.swift; sourceTree = "<group>"; };
 		311B262628E73E0A00FD181A /* TabShadowConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowConfig.swift; sourceTree = "<group>"; };
@@ -3087,6 +3090,7 @@
 		1E53D7252A0CCEF900D977A4 /* Purchase */ = {
 			isa = PBXGroup;
 			children = (
+				1EB78A992A1B90A000274FCE /* Images.xcassets */,
 				1E73C7C62A163A8900B7BBA0 /* PurchaseManager.swift */,
 				1E53D72A2A0CD00700D977A4 /* PurchaseViewController.swift */,
 				1E73C7C32A138B6000B7BBA0 /* PurchaseModel.swift */,
@@ -6150,6 +6154,7 @@
 				3706FCB6293F65D500E42796 /* dark-shield-dot-mouse-over.json in Resources */,
 				3706FCB7293F65D500E42796 /* 01_Fire_really_small.json in Resources */,
 				3706FCB8293F65D500E42796 /* Onboarding.storyboard in Resources */,
+				1EB78A9B2A1B919000274FCE /* Images.xcassets in Resources */,
 				3706FCB9293F65D500E42796 /* FireproofDomains.storyboard in Resources */,
 				3706FCBA293F65D500E42796 /* clickToLoadConfig.json in Resources */,
 				3706FCBB293F65D500E42796 /* Downloads.storyboard in Resources */,
@@ -6266,6 +6271,7 @@
 				AA7EB6ED27E880B600036718 /* dark-shield-dot-mouse-over.json in Resources */,
 				8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */,
 				85B7184A27677C2D00B4277F /* Onboarding.storyboard in Resources */,
+				1EB78A9A2A1B918F00274FCE /* Images.xcassets in Resources */,
 				4B0511C3262CAA5A00F6079C /* FireproofDomains.storyboard in Resources */,
 				EA477680272A21B700419EDA /* clickToLoadConfig.json in Resources */,
 				B6B1E88226D5DAC30062C350 /* Downloads.storyboard in Resources */,

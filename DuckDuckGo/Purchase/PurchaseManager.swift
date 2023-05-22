@@ -41,25 +41,40 @@ final class PurchaseManager: ObservableObject {
     static let shared = PurchaseManager()
 
     @Published private(set) var availableProducts: [Product] = []
-    @Published private(set) var purchasedProductIDs: [Product] = []
-    @Published private(set) var purchaseQueue: [Product] = []
+    @Published private(set) var purchasedProductIDs: [String] = []
+    @Published private(set) var purchaseQueue: [String] = []
 
     @Published private(set) var subscriptionGroupStatus: RenewalState?
 
-    private var updates: Task<Void, Never>?
+    private var transactionUpdates: Task<Void, Never>?
+    private var storefrontChanges: Task<Void, Never>?
 
     init() {
-        updates = observeTransactionUpdates()
-
-        Task {
-            await updatePurchasedProducts()
-        }
+        transactionUpdates = observeTransactionUpdates()
+        storefrontChanges = observeStorefrontChanges()
     }
 
     deinit {
-        updates?.cancel()
+        transactionUpdates?.cancel()
+        storefrontChanges?.cancel()
     }
 
+    @MainActor
+    func restorePurchases()  {
+        Task {
+            do {
+                purchaseQueue.removeAll()
+
+                try await AppStore.sync()
+                await updatePurchasedProducts()
+                await updateAvailableProducts()
+            } catch {
+                print(error)
+            }
+        }
+    }
+
+    @MainActor
     func updateAvailableProducts() async {
         print(" -- [PurchaseManager] updateAvailableProducts()")
 
@@ -75,16 +90,17 @@ final class PurchaseManager: ObservableObject {
     func updatePurchasedProducts() async {
         print(" -- [PurchaseManager] updatePurchasedProducts()")
 
-        var purchasedSubscriptions: [Product] = []
+        var purchasedSubscriptions: [String] = []
 
         for await result in Transaction.currentEntitlements {
             do {
                 let transaction = try checkVerified(result)
 
                 guard transaction.productType == .autoRenewable else { continue }
+                guard transaction.revocationDate == nil else { continue }
 
-                if let subscription = availableProducts.first(where: { $0.id == transaction.productID }) {
-                    purchasedSubscriptions.append(subscription)
+                if let expirationDate = transaction.expirationDate, expirationDate > .now {
+                    purchasedSubscriptions.append(transaction.productID)
                 }
             } catch {
                 print("Error updating purchased products: \(error)")
@@ -92,7 +108,7 @@ final class PurchaseManager: ObservableObject {
         }
 
         print(" -- [PurchaseManager] updatePurchasedProducts(): have \(purchasedSubscriptions.count) active subscriptions")
-        self.purchasedProducts = purchasedSubscriptions
+        self.purchasedProductIDs = purchasedSubscriptions
         subscriptionGroupStatus = try? await availableProducts.first?.subscription?.status.first?.state
     }
 
@@ -100,11 +116,12 @@ final class PurchaseManager: ObservableObject {
     func buy(_ product: Product) {
         print(" -- [PurchaseManager] buy: \(product.displayName)")
 
-        purchaseQueue.append(product)
+        purchaseQueue.append(product.id)
 
         Task {
             print(" -- [PurchaseManager] starting await task")
             let result = try await product.purchase()
+//            let x = Product.PurchaseOption.
 
             print(" -- [PurchaseManager] receiving await task result")
             purchaseQueue.removeAll()
@@ -153,6 +170,17 @@ final class PurchaseManager: ObservableObject {
                 }
 
                 await self.updatePurchasedProducts()
+            }
+        }
+    }
+
+    private func observeStorefrontChanges() -> Task<Void, Never> {
+
+        Task.detached { [unowned self] in
+            for await result in Storefront.updates {
+                print(" -- [PurchaseManager] observeStorefrontChanges(): \(result.countryCode)")
+                await updatePurchasedProducts()
+                await updateAvailableProducts()
             }
         }
     }

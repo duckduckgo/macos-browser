@@ -49,20 +49,17 @@ final class PurchaseViewController: NSViewController {
             await manager.updateAvailableProducts()
         }
 
-        manager.$availableProducts.combineLatest(manager.$purchasedProducts, manager.$purchaseQueue).receive(on: RunLoop.main).sink { [weak self] availableProducts, purchasedProducts, purchaseQueue in
+        manager.$availableProducts.combineLatest(manager.$purchasedProductIDs, manager.$purchaseQueue).receive(on: RunLoop.main).sink { [weak self] availableProducts, purchasedProductIDs, purchaseQueue in
             print(" -- got combineLatest -")
             print(" -- got combineLatest - availableProducts: \(availableProducts.map { $0.id }.joined(separator: ","))")
-            print(" -- got combineLatest - purchasedProducts: \(purchasedProducts.map { $0.id }.joined(separator: ","))")
-            print(" -- got combineLatest -     purchaseQueue: \(purchaseQueue.map { $0.id }.joined(separator: ","))")
+            print(" -- got combineLatest - purchasedProducts: \(purchasedProductIDs.joined(separator: ","))")
+            print(" -- got combineLatest -     purchaseQueue: \(purchaseQueue.joined(separator: ","))")
 
             let sortedProducts = availableProducts.sorted(by: { $0.price > $1.price })
 
-            self?.model.subscriptions = sortedProducts.map {
-                print("purchaseQueue.contains($0) == \(purchaseQueue.contains($0))")
-
-                return SubscriptionRowModel(product: $0,
-                                            isPurchased: purchasedProducts.contains($0),
-                                            isBeingPurchased: purchaseQueue.contains($0)) }
+            self?.model.subscriptions = sortedProducts.map { SubscriptionRowModel(product: $0,
+                                                                                  isPurchased: purchasedProductIDs.contains($0.id),
+                                                                                  isBeingPurchased: purchaseQueue.contains($0.id)) }
 
         }.store(in: &cancellables)
 

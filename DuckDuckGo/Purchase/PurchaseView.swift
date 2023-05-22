@@ -25,6 +25,9 @@ struct PurchaseView: View {
     @ObservedObject var manager: PurchaseManager
     @ObservedObject var model: PurchaseModel
 
+    @State private var showingAlert = false
+    @State private var input = ""
+
     public let dismissAction: () -> Void
 
     var body: some View {
@@ -53,40 +56,17 @@ struct PurchaseView: View {
 
     private var subscriptionsList: some View {
         VStack {
+//            Image("dax-shape")
+//                .resizable()
+//                .frame(width: 32, height: 32)
+
             Text("Subscriptions")
                 .font(.largeTitle)
 
-//            Text("Purchased: \(manager.purchasedProducts.map { $0.id }.joined(separator: ","))")
-//
-//            if let subscriptionGroupStatus = manager.subscriptionGroupStatus {
-//                switch subscriptionGroupStatus {
-//                case .subscribed:
-//                    Text("Subscribed")
-//                case .expired:
-//                    Text("Expired")
-//                case .inBillingRetryPeriod:
-//                    Text("inBillingRetryPeriod")
-//                case .inGracePeriod:
-//                    Text("inGracePeriod")
-//                case .revoked:
-//                    Text("Revoked")
-//                default:
-//                    Text("Unknown state")
-//                }
-
-//                if subscriptionGroupStatus == .expired || subscriptionGroupStatus == .revoked {
-//                    Text("Welcome Back! \nHead over to the shop to get started!")
-//                } else if subscriptionGroupStatus == .inBillingRetryPeriod {
-//                    //The best practice for subscriptions in the billing retry state is to provide a deep link
-//                    //from your app to https://apps.apple.com/account/billing.
-//                    Text("Please verify your billing details.")
-//                }
-//            } else {
-//                Text("You don't own any subscriptions. \nHead over to the shop to get started!")
-//            }
+            Spacer(minLength: 32)
 
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: 32) {
                     ForEach(model.subscriptions, id: \.id) { rowModel in
                         SubscriptionRow(product: rowModel.product,
                                         isPurchased: rowModel.isPurchased,
@@ -101,18 +81,14 @@ struct PurchaseView: View {
             Spacer()
 
             Button {
-                Task {
-                    do {
-                        try await AppStore.sync()
-                    } catch {
-                        print(error)
-                    }
-                }
+                manager.restorePurchases()
             } label: {
                 Text("Restore Purchases")
             }
+
+            Spacer()
         }
-        .padding(.all, 32)
+        .padding(.all, 48)
     }
 
     private var closeButtonOverlay: some View {
@@ -128,7 +104,115 @@ struct PurchaseView: View {
                 .buttonStyle(.borderless)
             }
             Spacer()
+            HStack {
+                Spacer()
+
+                Button {
+                    showingAlert = true
+                } label: {
+                    Image("dax-shape")
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                        .opacity(0.3)
+                }
+                .buttonStyle(.borderless)
+                .sheet(isPresented: $showingAlert) {
+                    debugView
+                }
+
+                Spacer()
+            }
         }
+    }
+
+    private var debugView: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Spacer()
+                Text("Magic Menu")
+                    .font(.largeTitle)
+                Text("(∩｀-´)⊃━☆ﾟ.*･｡ﾟ")
+                    .font(.title)
+                Spacer()
+            }
+            HStack {
+                Text("Current App Store Country:")
+                Text(model.storefrontCountry)
+                    .task {
+                        await model.loadStorefrontCountry()
+                    }
+            }
+
+            Divider()
+
+            HStack {
+                Text("Purchased items: \(manager.purchasedProductIDs.joined(separator: ","))")
+            }
+
+            Divider()
+
+            HStack {
+                Group {
+                    Text("Subscription state:")
+
+                    if let subscriptionGroupStatus = manager.subscriptionGroupStatus {
+                        switch subscriptionGroupStatus {
+                        case .subscribed:
+                            Text("Subscribed")
+                        case .expired:
+                            Text("Expired")
+                        case .inBillingRetryPeriod:
+                            Text("In Billing Retry Period")
+                        case .inGracePeriod:
+                            Text("In Grace Period")
+                        case .revoked:
+                            Text("Revoked")
+                        default:
+                            Text("Unknown state")
+                        }
+
+                        //                    if subscriptionGroupStatus == .expired || subscriptionGroupStatus == .revoked {
+                        //                        Text("Welcome Back! \nHead over to the shop to get started!")
+                        //                    } else if subscriptionGroupStatus == .inBillingRetryPeriod {
+                        //                        //The best practice for subscriptions in the billing retry state is to provide a deep link
+                        //                        //from your app to https://apps.apple.com/account/billing.
+                        //                        Text("Please verify your billing details.")
+                        //                    }
+                    } else {
+                        Text("No active subscription or not signed in. \nIf expecting to have subscriptions use 'Restore purchases' button.")
+                    }
+                }
+            }
+
+            Divider()
+
+            Group {
+                HStack {
+                    Text("UUID:")
+                    TextField("00000000-0000-0000-0000-000000000000", text: $input)
+                }
+                HStack {
+                    Spacer()
+                    Button("UUID #1") { input = "11111111-1111-1111-1111-111111111111" }
+                    Button("UUID #2") { input = "22222222-2222-2222-2222-222222222222" }
+                    Button("Clear UUID") { input = "" }
+                    Button("Test UUID") {
+                        let u = UUID(uuidString: input)
+                        print("uuid: \(u)")
+
+                    }
+                }
+            }
+
+            Spacer()
+            Group {
+                HStack {
+                    Spacer()
+                    Button("OK") { showingAlert = false }
+                    Spacer()
+                }
+            }
+        }.padding(16)
     }
 }
 
