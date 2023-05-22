@@ -730,11 +730,11 @@ struct UserText {
     // Set Up
     static let newTabSetUpSectionTitle = NSLocalizedString("newTab.setup.section.title", value: "Make DuckDuckGo Yours", comment: "Title of the Set Up section in the home page")
 
-    static let newTabSetUpDefaultBrowserCardTitle = NSLocalizedString("newTab.setup.default.browser.title", value: "Make DuckDuckGo your default", comment: "Title of the Default Browser card of the Set Up section in the home page")
-    static let newTabSetUpImportCardTitle = NSLocalizedString("newTab.setup.import.title", value: "Import Bookmarks and Passwords", comment: "Title of the Import card of the Set Up section in the home page")
-    static let newTabSetUpDuckPlayerCardTitle = NSLocalizedString("newTab.setup.duck.player.title", value: "Escape targeted ads on YouTube", comment: "Title of the Duck Player card of the Set Up section in the home page")
-    static let newTabSetUpEmailProtectionCardTitle = NSLocalizedString("newTab.setup.email.protection.title", value: "Hide your email and block trackers", comment: "Title of the Email Protection card of the Set Up section in the home page")
-    static let newTabSetUpCookieManagerCardTitle = NSLocalizedString("newTab.setup.cookie.manager.title", value: "Banish annoying cookie pop-ups", comment: "Title of the Cookie Manager card of the Set Up section in the home page")
+    static let newTabSetUpDefaultBrowserCardTitle = NSLocalizedString("newTab.setup.default.browser.title", value: "Default to Privacy", comment: "Title of the Default Browser card of the Set Up section in the home page")
+    static let newTabSetUpImportCardTitle = NSLocalizedString("newTab.setup.import.title", value: "Bring Your Stuff", comment: "Title of the Import card of the Set Up section in the home page")
+    static let newTabSetUpDuckPlayerCardTitle = NSLocalizedString("newTab.setup.duck.player.title", value: "Make Youtube Palatable", comment: "Title of the Duck Player card of the Set Up section in the home page")
+    static let newTabSetUpEmailProtectionCardTitle = NSLocalizedString("newTab.setup.email.protection.title", value: "Protect your email", comment: "Title of the Email Protection card of the Set Up section in the home page")
+    static let newTabSetUpCookieManagerCardTitle = NSLocalizedString("newTab.setup.cookie.manager.title", value: "Banish cookie pop-ups", comment: "Title of the Cookie Manager card of the Set Up section in the home page")
 
     static let newTabSetUpDefaultBrowserAction = NSLocalizedString("newTab.setup.default.browser.action", value: "Change Your Default Browser", comment: "Action title on the action menu of the Default Browser card")
     static let newTabSetUpImportAction = NSLocalizedString("newTab.setup.Import.action", value: "Import Browser Data", comment: "Action title on the action menu of the Import card of the Set Up section in the home page")

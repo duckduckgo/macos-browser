@@ -24,24 +24,41 @@ extension HomePage.Views {
         @Binding var isExpanded: Bool
 
         var body: some View {
-            HStack {
-                Text(isExpanded ? UserText.moreOrLessCollapse : UserText.moreOrLessExpand)
-                Group {
-                    if #available(macOS 11.0, *) {
-                        Image("HomeArrowUp")
-                    } else {
-                        Text("^")
+
+            HStack(spacing: 20) {
+
+                VStack {
+                    Divider()
+                        .foregroundColor(Color("HomePageMoreOrLessTextColor"))
+                }.frame(maxWidth: .infinity)
+
+                HStack {
+                    Text(isExpanded ? UserText.moreOrLessCollapse : UserText.moreOrLessExpand)
+                    Group {
+                        if #available(macOS 11.0, *) {
+                            Image("HomeArrowUp")
+                        } else {
+                            Text("^")
+                        }
                     }
+                    .rotationEffect(.degrees(isExpanded ? 0 : 180))
                 }
-                .rotationEffect(.degrees(isExpanded ? 0 : 180))
+                .foregroundColor(Color("HomePageMoreOrLessTextColor"))
+
+                VStack {
+                    Divider()
+                        .foregroundColor(Color("HomePageMoreOrLessTextColor"))
+                }.frame(maxWidth: .infinity)
             }
-            .foregroundColor(Color("HomePageMoreOrLessTextColor"))
             .font(.system(size: 11))
             .link {
                 withAnimation {
                     isExpanded = !isExpanded
                 }
             }
+
         }
+
     }
+
 }

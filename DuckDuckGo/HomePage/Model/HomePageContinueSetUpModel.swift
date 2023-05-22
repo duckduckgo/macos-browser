@@ -27,7 +27,7 @@ extension HomePage.Models {
         let itemHeight = FeaturesGridDimensions.itemHeight
         let horizontalSpacing = FeaturesGridDimensions.horizontalSpacing
         let verticalSpacing = FeaturesGridDimensions.verticalSpacing
-        let itemsPerRow = HomePage.featuresPerRow
+        let itemsPerRow = 2
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
 
@@ -71,6 +71,7 @@ extension HomePage.Models {
         private var shouldShowCookieSetting: Bool
 
         var isMoreOrLessButtonNeeded: Bool {
+            print(featuresMatrix.count)
             return featuresMatrix.count > 1
         }
 
@@ -211,7 +212,7 @@ extension HomePage.Models {
                     }
                 }
             }
-            featuresMatrix = features.chunked(into: HomePage.featuresPerRow)
+            featuresMatrix = features.chunked(into: itemsPerRow)
         }
         // swiftlint:enable cyclomatic_complexity
 
@@ -275,6 +276,36 @@ extension HomePage.Models {
             }
         }
 
+        var summary: String {
+            switch self {
+            case .defaultBrowser:
+                return "We automatically block trackers as you browse. It's privacy, simplified."
+            case .importBookmarksAndPasswords:
+                return "Import all your bookmarks and passwords for a smooth transition."
+            case .duckplayer:
+                return UserText.newTabSetUpDuckPlayerCardTitle
+            case .emailProtection:
+                return UserText.newTabSetUpEmailProtectionCardTitle
+            case .cookiePopUp:
+                return UserText.newTabSetUpCookieManagerCardTitle
+            }
+        }
+
+        var action: String {
+            switch self {
+            case .defaultBrowser:
+                return "Set as Default"
+            case .importBookmarksAndPasswords:
+                return "Import Now"
+            case .duckplayer:
+                return UserText.newTabSetUpDuckPlayerCardTitle
+            case .emailProtection:
+                return UserText.newTabSetUpEmailProtectionCardTitle
+            case .cookiePopUp:
+                return UserText.newTabSetUpCookieManagerCardTitle
+            }
+        }
+
         var icon: NSImage {
             let iconSize = NSSize(width: 28, height: 28)
 
@@ -294,10 +325,10 @@ extension HomePage.Models {
     }
 
     enum FeaturesGridDimensions {
-        static let itemWidth: CGFloat = 160
-        static let itemHeight: CGFloat = 64
+        static let itemWidth: CGFloat = 240
+        static let itemHeight: CGFloat = 113
         static let verticalSpacing: CGFloat = 10
-        static let horizontalSpacing: CGFloat = 12
+        static let horizontalSpacing: CGFloat = 24
 
         static let width: CGFloat = (itemWidth + horizontalSpacing) * CGFloat(HomePage.featuresPerRow) - horizontalSpacing
 

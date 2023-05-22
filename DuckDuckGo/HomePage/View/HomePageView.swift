@@ -45,13 +45,13 @@ extension HomePage.Views {
                     ScrollView {
                         VStack(spacing: 0) {
                             Group {
-                                Favorites()
-                                    .padding(.top, 72)
-                                    .visibility(model.isFavouriteVisible ? .visible : .gone)
-
                                 ContinueSetUpView()
                                     .padding(.top, 72)
                                     .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+
+                                Favorites()
+                                    .padding(.top, 72)
+                                    .visibility(model.isFavouriteVisible ? .visible : .gone)
 
                                 RecentlyVisited()
                                     .padding(.top, 66)

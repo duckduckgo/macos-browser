@@ -24,25 +24,22 @@ extension HomePage.Views {
     struct ContinueSetUpView: View {
 
         @EnvironmentObject var model: HomePage.Models.ContinueSetUpModel
-
         @State var isHovering = false {
             didSet {
                 moreOrLessButtonVisibility = isHovering && model.isMoreOrLessButtonNeeded ? .visible : .invisible
             }
         }
-
         @State private var moreOrLessButtonVisibility: ViewVisibility = .invisible
 
         var body: some View {
             VStack(spacing: 20) {
-                SectionTitleView(titleText: model.title, isExpanded: $model.shouldShowAllFeatures, isMoreOrLessButtonVisibility: $moreOrLessButtonVisibility)
                 if #available(macOS 12.0, *) {
                     LazyVStack(spacing: 4) {
-                        FeaturesGrid()
+                        FeaturesGrid(isHovering: $isHovering, moreOrLessButtonVisibility: $moreOrLessButtonVisibility)
                     }
                     .frame(maxWidth: .infinity)
                 } else {
-                    FeaturesGrid()
+                    FeaturesGrid(isHovering: $isHovering, moreOrLessButtonVisibility: $moreOrLessButtonVisibility)
                 }
             }
             .onHover { isHovering in
@@ -54,6 +51,9 @@ extension HomePage.Views {
         struct FeaturesGrid: View {
 
             @EnvironmentObject var model: HomePage.Models.ContinueSetUpModel
+
+            @Binding var isHovering: Bool
+            @Binding var moreOrLessButtonVisibility: ViewVisibility
 
             var body: some View {
                 if #available(macOS 12.0, *) {
@@ -76,6 +76,10 @@ extension HomePage.Views {
                         .frame(maxWidth: model.gridWidth, alignment: .leading)
                     }
                 }
+
+                MoreOrLess(isExpanded: $model.shouldShowAllFeatures)
+                    .padding(.top, 2)
+                    .visibility(moreOrLessButtonVisibility)
             }
         }
 
@@ -98,9 +102,10 @@ extension HomePage.Views {
             var body: some View {
                 let icon = {
                     Image(nsImage: featureType.icon)
+                        .frame(width: 24, height: 24)
                 }
                 ZStack {
-                    CardTemplate(title: featureType.title, icon: icon, width: model.itemWidth, height: model.itemHeight)
+                    CardTemplate(title: featureType.title, summary: featureType.summary, action: featureType.action, icon: icon, width: model.itemWidth, height: model.itemHeight)
                         .contextMenu(ContextMenu(menuItems: {
                             Button(model.actionTitle(for: featureType), action: { model.performAction(for: featureType) })
                             Divider()

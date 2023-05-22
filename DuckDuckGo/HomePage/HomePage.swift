@@ -39,35 +39,76 @@ struct HomePage {
 // MARK: ReusableViews
 extension HomePage.Views {
 
-    struct SectionTitleView: View {
-        let titleText: String
-        @Binding var isExpanded: Bool
-        @Binding var isMoreOrLessButtonVisibility: ViewVisibility
-
-        var body: some View {
-            HStack {
-                Text(titleText)
-                    .frame(alignment: .leading)
-                    .font(.system(size: 17, weight: .bold, design: .default))
-                    .foregroundColor(Color("HomeFeedTitleColor"))
-                Spacer()
-                MoreOrLess(isExpanded: $isExpanded)
-                    .padding(.top, 2)
-                    .visibility(isMoreOrLessButtonVisibility)
-            }
-        }
-    }
+//    struct SectionTitleView: View {
+//        let titleText: String
+//        @Binding var isExpanded: Bool
+//        @Binding var isMoreOrLessButtonVisibility: ViewVisibility
+//
+//        var body: some View {
+//            HStack {
+//                Text(titleText)
+//                    .frame(alignment: .leading)
+//                    .font(.system(size: 17, weight: .bold, design: .default))
+//                    .foregroundColor(Color("HomeFeedTitleColor"))
+//                Spacer()
+//                MoreOrLess(isExpanded: $isExpanded)
+//                    .padding(.top, 2)
+//                    .visibility(isMoreOrLessButtonVisibility)
+//            }
+//        }
+//    }
 
     /// Shows a card with gray background which changes color on hovering.
     /// Can have title and icon, just title or just icon
     /// To not have an icon use an EmptyView() in the view builder
+    //    struct CardTemplate<Content: View>: View {
+    //
+    //        var title: String?
+    //        @ViewBuilder var icon: Content
+    //        let width: CGFloat
+    //        let height: CGFloat
+    //        let foregroundColor: Color = Color("HomeFavoritesBackgroundColor")
+    //        let foregroundColorOnHover: Color = Color("HomeFavoritesHoverColor")
+    //
+    //        @State var isHovering = false
+    //
+    //        var body: some View {
+    //            ZStack(alignment: .center) {
+    //                RoundedRectangle(cornerRadius: 12)
+    //                    .foregroundColor(isHovering ? foregroundColorOnHover : foregroundColor)
+    //                HStack(spacing: 10) {
+    //                    if let title {
+    //                        Text(title)
+    //                            .frame(width: 100, alignment: .leading)
+    //                            .multilineTextAlignment(.leading)
+    //                            .lineLimit(2)
+    //                            .font(.system(size: 11))
+    //                    }
+    //                    icon
+    //                        .frame(alignment: .trailing)
+    //                }
+    //            }
+    //            .frame(width: width, height: height)
+    //            .onHover { isHovering in
+    //                self.isHovering = isHovering
+    //                if isHovering {
+    //                    NSCursor.pointingHand.push()
+    //                } else {
+    //                    NSCursor.pointingHand.pop()
+    //                }
+    //            }
+    //        }
+    //    }
+
     struct CardTemplate<Content: View>: View {
 
-        var title: String?
+        var title: String
+        var summary: String
+        var action: String
         @ViewBuilder var icon: Content
         let width: CGFloat
         let height: CGFloat
-        let foregroundColor: Color = Color("HomeFavoritesBackgroundColor")
+        let foregroundColor: Color = .clear
         let foregroundColorOnHover: Color = Color("HomeFavoritesHoverColor")
 
         @State var isHovering = false
@@ -75,26 +116,35 @@ extension HomePage.Views {
         var body: some View {
             ZStack(alignment: .center) {
                 RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.0))
                     .foregroundColor(isHovering ? foregroundColorOnHover : foregroundColor)
-                HStack(spacing: 10) {
-                    if let title {
+                VStack {
+                    icon
+                        .frame(alignment: .center)
+                    VStack(spacing: 4) {
                         Text(title)
-                            .frame(width: 100, alignment: .leading)
-                            .multilineTextAlignment(.leading)
+                            .font(.system(size: 13))
+                            .bold()
+                        Text(summary)
+                            .frame(width: 216, alignment: .center)
+                            .multilineTextAlignment(.center)
                             .lineLimit(2)
                             .font(.system(size: 11))
+                            .foregroundColor(.gray)
+                        Text(action)
+                            .font(.system(size: 11))
+                            .foregroundColor(.blue)
                     }
-                    icon
-                        .frame(alignment: .trailing)
                 }
-            }
-            .frame(width: width, height: height)
-            .onHover { isHovering in
-                self.isHovering = isHovering
-                if isHovering {
-                    NSCursor.pointingHand.push()
-                } else {
-                    NSCursor.pointingHand.pop()
+                .frame(width: width, height: height)
+                .padding(6)
+                .onHover { isHovering in
+                    self.isHovering = isHovering
+                    if isHovering {
+                        NSCursor.pointingHand.push()
+                    } else {
+                        NSCursor.pointingHand.pop()
+                    }
                 }
             }
         }
