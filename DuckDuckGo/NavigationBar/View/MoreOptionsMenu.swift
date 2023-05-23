@@ -99,7 +99,7 @@ final class MoreOptionsMenu: NSMenu {
         addPageItems()
 
         if #available(macOS 12.0, *) {
-            addItem(withTitle: "Purchase", action: #selector(openPurchaseView(_:)), keyEquivalent: "")
+            addItem(withTitle: "Subscription", action: #selector(openPurchaseView(_:)), keyEquivalent: "")
                 .targetting(self)
                 .withImage(NSImage(systemSymbolName: "creditcard", accessibilityDescription: nil))
         }

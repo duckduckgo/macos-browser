@@ -101,6 +101,10 @@ final class PurchaseManager: ObservableObject {
 
                 if let expirationDate = transaction.expirationDate, expirationDate > .now {
                     purchasedSubscriptions.append(transaction.productID)
+
+                    if let token = transaction.appAccountToken {
+                        print(" -- [PurchaseManager] updatePurchasedProducts(): \(transaction.productID) -- custom UUID: \(token)" )
+                    }
                 }
             } catch {
                 print("Error updating purchased products: \(error)")
@@ -113,15 +117,22 @@ final class PurchaseManager: ObservableObject {
     }
 
     @MainActor
-    func buy(_ product: Product) {
-        print(" -- [PurchaseManager] buy: \(product.displayName)")
+    func buy(_ product: Product, customUUID: String) {
+        print(" -- [PurchaseManager] buy: \(product.displayName) (customUUID: \(customUUID))")
 
         purchaseQueue.append(product.id)
 
         Task {
             print(" -- [PurchaseManager] starting await task")
-            let result = try await product.purchase()
-//            let x = Product.PurchaseOption.
+
+            var options: Set<Product.PurchaseOption> = Set()
+
+            if let token = UUID(uuidString: customUUID) {
+                options.insert(.appAccountToken(token))
+            }
+
+            let result = try await product.purchase(options: options)
+
 
             print(" -- [PurchaseManager] receiving await task result")
             purchaseQueue.removeAll()

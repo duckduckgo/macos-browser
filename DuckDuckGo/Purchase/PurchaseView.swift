@@ -26,7 +26,7 @@ struct PurchaseView: View {
     @ObservedObject var model: PurchaseModel
 
     @State private var showingAlert = false
-    @State private var input = ""
+    @State private var customUUID = ""
 
     public let dismissAction: () -> Void
 
@@ -56,10 +56,6 @@ struct PurchaseView: View {
 
     private var subscriptionsList: some View {
         VStack {
-//            Image("dax-shape")
-//                .resizable()
-//                .frame(width: 32, height: 32)
-
             Text("Subscriptions")
                 .font(.largeTitle)
 
@@ -71,7 +67,7 @@ struct PurchaseView: View {
                         SubscriptionRow(product: rowModel.product,
                                         isPurchased: rowModel.isPurchased,
                                         isBeingPurchased: rowModel.isBeingPurchased,
-                                        buyButtonAction: { manager.buy(rowModel.product) })
+                                        buyButtonAction: { manager.buy(rowModel.product, customUUID: customUUID) })
                     }
                 }
             }
@@ -170,14 +166,6 @@ struct PurchaseView: View {
                         default:
                             Text("Unknown state")
                         }
-
-                        //                    if subscriptionGroupStatus == .expired || subscriptionGroupStatus == .revoked {
-                        //                        Text("Welcome Back! \nHead over to the shop to get started!")
-                        //                    } else if subscriptionGroupStatus == .inBillingRetryPeriod {
-                        //                        //The best practice for subscriptions in the billing retry state is to provide a deep link
-                        //                        //from your app to https://apps.apple.com/account/billing.
-                        //                        Text("Please verify your billing details.")
-                        //                    }
                     } else {
                         Text("No active subscription or not signed in. \nIf expecting to have subscriptions use 'Restore purchases' button.")
                     }
@@ -189,18 +177,13 @@ struct PurchaseView: View {
             Group {
                 HStack {
                     Text("UUID:")
-                    TextField("00000000-0000-0000-0000-000000000000", text: $input)
+                    TextField("00000000-0000-0000-0000-000000000000", text: $customUUID)
                 }
                 HStack {
                     Spacer()
-                    Button("UUID #1") { input = "11111111-1111-1111-1111-111111111111" }
-                    Button("UUID #2") { input = "22222222-2222-2222-2222-222222222222" }
-                    Button("Clear UUID") { input = "" }
-                    Button("Test UUID") {
-                        let u = UUID(uuidString: input)
-                        print("uuid: \(u)")
-
-                    }
+                    Button("UUID #1") { customUUID = "11111111-1111-1111-1111-111111111111" }
+                    Button("UUID #2") { customUUID = "22222222-2222-2222-2222-222222222222" }
+                    Button("Clear UUID") { customUUID = "" }
                 }
             }
 
