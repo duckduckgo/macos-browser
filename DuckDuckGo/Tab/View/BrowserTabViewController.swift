@@ -137,6 +137,9 @@ final class BrowserTabViewController: NSViewController {
         }
         if self.previouslySelectedTab != nil {
             tabCollectionViewModel.select(tab: self.previouslySelectedTab!)
+            if #available(macOS 11.0, *) {
+                self.previouslySelectedTab!.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
+            }
             self.previouslySelectedTab = nil
         }
     }
