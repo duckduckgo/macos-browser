@@ -240,8 +240,6 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
     /// Retrieves the first cached server that's registered with the specified key pair.
     ///
     private func cachedServer(registeredWith keyPair: KeyPair) throws -> NetworkProtectionServer {
-        os_log("Returning first cached server", log: .networkProtectionPixel)
-
         do {
             guard let server = try serverListStore.storedNetworkProtectionServerList().first(where: { $0.isRegistered(with: keyPair.publicKey) }) else {
                 errorEvents?.fire(NetworkProtectionError.noServerListFound)
