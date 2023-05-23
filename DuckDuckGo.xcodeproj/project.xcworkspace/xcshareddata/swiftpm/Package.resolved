@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "b19b5e4383a7fdae5e69f1ecbf64ee8f5dbb4a55",
-        "version" : "57.6.0"
+        "branch" : "autofill/anya/password-generation",
+        "revision" : "35b7f5c7703a3dfcb019ef039b03bad4c7239001"
       }
     },
     {

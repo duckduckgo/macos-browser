@@ -219,7 +219,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         return true
     }
 
-    public func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData, generatedPassword: Bool, trigger: AutofillUserScript.GetTriggerType?) {
+    public func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData, hasGeneratedPassword generatedPassword: Bool, withTrigger trigger: AutofillUserScript.GetTriggerType?) {
         // No-op, the content overlay view controller should not be prompting the user to store data
     }
 
@@ -231,15 +231,21 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         // no-op on macOS
     }
 
+    public func secureVaultManager(_: SecureVaultManager,
+                                   promptUserWithGeneratedPassword password: String,
+                                   completionHandler: @escaping (Bool) -> Void) {
+        // no-op on macOS
+    }
+
     public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
     }
 
-    public func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager, generatedPassword: Bool) -> Bool {
+    public func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager, shouldSilentlySave: Bool) -> Bool {
         return true
     }
 
-    public func secureVaultManagerShouldAutomaticallySaveGeneratedPassword(_: SecureVaultManager) -> Bool {
+    public func secureVaultManagerShouldSilentlySaveGeneratedPassword(_: SecureVaultManager) -> Bool {
         return false
     }
 
