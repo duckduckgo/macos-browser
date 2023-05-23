@@ -54,6 +54,7 @@ public enum NetworkProtectionError: LocalizedError {
     case failedToRedeemInviteCode(Error?)
     case failedToParseRedeemResponse(Error)
     case invalidAuthToken
+    case serverListInconsistency
 
     // Server list store errors
     case failedToEncodeServerList(Error)
@@ -62,7 +63,6 @@ public enum NetworkProtectionError: LocalizedError {
     case noServerListFound
     case couldNotCreateServerListDirectory(Error)
     case failedToReadServerList(Error)
-    case serverListInconsistency
 
     // Keychain errors
     case failedToCastKeychainValueToData(field: String)
@@ -155,64 +155,7 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
     ///
     public func generateTunnelConfiguration(selectionMethod: NetworkProtectionServerSelectionMethod) async throws -> (TunnelConfiguration, NetworkProtectionServerInfo) {
 
-        let selectedServerName: String?
-        let excludedServerName: String?
-
-        switch selectionMethod {
-        case .automatic:
-            selectedServerName = nil
-            excludedServerName = nil
-        case .preferredServer(let serverName):
-            selectedServerName = serverName
-            excludedServerName = nil
-        case .avoidServer(let serverToAvoid):
-            selectedServerName = nil
-            excludedServerName = serverToAvoid
-        }
-
-        guard let token = tokenStore.fetchToken() else {
-            throw NetworkProtectionError.noAuthTokenFound
-        }
-
-        var keyPair = keyStore.currentKeyPair()
-
-        let registeredServersResult = await networkClient.register(authToken: token, publicKey: keyPair.publicKey, withServerNamed: selectedServerName)
-
-        let selectedServer: NetworkProtectionServer
-
-        switch registeredServersResult {
-        case .success(let registeredServers):
-            guard let registeredServer = registeredServers.first(where: { $0.serverName != excludedServerName }) else {
-                // If we selected the server from the stored list, and after registering it and updating that list
-                // with the server reply we can't find it, something's quite wrong.
-                errorEvents?.fire(NetworkProtectionError.serverListInconsistency)
-                throw NetworkProtectionError.serverListInconsistency
-            }
-
-            selectedServer = registeredServer
-
-            // We should not need this IF condition here, because we know registered servers will give us an expiration date,
-            // but since the structure we're currently using makes the expiration date optional we need to have it.
-            // We should consider changing our server structure to not allow a missing expiration date here.
-            if let serverExpirationDate = selectedServer.expirationDate {
-                if keyPair.expirationDate > serverExpirationDate {
-                    keyPair = keyStore.updateCurrentKeyPair(newExpirationDate: serverExpirationDate)
-                }
-            }
-
-            do {
-                try serverListStore.updateServerListCache(with: registeredServers)
-            } catch let error as NetworkProtectionServerListStoreError {
-                errorEvents?.fire(error.networkProtectionError)
-                // Intentionally not rethrowing, as this failure is not critical for this method
-            } catch {
-                errorEvents?.fire(.unhandledError(function: #function, line: #line, error: error))
-                // Intentionally not rethrowing, as this failure is not critical for this method
-            }
-        case .failure(let error):
-            handle(clientError: error)
-            throw error
-        }
+        let (selectedServer, keyPair) = try await register(selectionMethod: selectionMethod)
 
         do {
             let configuration = try tunnelConfiguration(interfacePrivateKey: keyPair.privateKey, server: selectedServer)
@@ -226,6 +169,15 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
         }
     }
 
+    /// Registers the client with a server following the specified server selection method.  Returns the precise server that was selected and the keyPair to use
+    /// for the tunnel configuration.
+    ///
+    /// - Parameters:
+    ///     - selectionMethod: the server selection method
+    ///     - keyPair: the key pair that was used to register with the server, and that should be used to configure the tunnel
+    ///
+    /// - Throws:`NetworkProtectionError`
+    ///
     private func register(selectionMethod: NetworkProtectionServerSelectionMethod) async throws -> (server: NetworkProtectionServer, keyPair: KeyPair) {
 
         let selectedServerName: String?
@@ -254,18 +206,23 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
         switch registeredServersResult {
         case .success(let registeredServers):
             guard let registeredServer = registeredServers.first(where: { $0.serverName != excludedServerName }) else {
-                // If we selected the server from the stored list, and after registering it and updating that list
-                // with the server reply we can't find it, something's quite wrong.
+                // If we're looking to exclude a server we should have a few other options available.  If we can't find any
+                // then it means theres an inconsistency in the server list that was returned.
                 errorEvents?.fire(NetworkProtectionError.serverListInconsistency)
 
                 do {
                     guard let server = try serverListStore.storedNetworkProtectionServerList().first(where: { $0.isRegistered(with: keyPair.publicKey) }) else {
-                        return
+                        errorEvents?.fire(NetworkProtectionError.noServerListFound)
+                        throw NetworkProtectionError.noServerListFound
                     }
 
                     return (server: server, keyPair: keyPair)
+                } catch let error as NetworkProtectionError {
+                    errorEvents?.fire(error)
+                    throw error
                 } catch {
-                    throw NetworkProtectionError.serverListInconsistency
+                    errorEvents?.fire(NetworkProtectionError.unhandledError(function: #function, line: #line, error: error))
+                    throw NetworkProtectionError.unhandledError(function: #function, line: #line, error: error)
                 }
             }
 
@@ -289,6 +246,8 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
                 errorEvents?.fire(.unhandledError(function: #function, line: #line, error: error))
                 // Intentionally not rethrowing, as this failure is not critical for this method
             }
+
+            return (selectedServer, keyPair)
         case .failure(let error):
             handle(clientError: error)
             throw error
