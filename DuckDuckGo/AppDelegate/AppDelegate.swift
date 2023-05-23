@@ -256,6 +256,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         guard networkProtectionFeatureVisibility.isFeatureActivated else {
             disableNetworkProtectionMenuAndNotificationsAgent()
+            LocalPinningManager.shared.unpin(.networkProtection)
             return
         }
 

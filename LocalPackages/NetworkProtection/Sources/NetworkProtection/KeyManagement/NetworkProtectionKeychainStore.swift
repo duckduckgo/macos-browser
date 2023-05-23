@@ -37,12 +37,15 @@ enum NetworkProtectionKeychainStoreError: Error, NetworkProtectionErrorConvertib
 
 /// General Keychain access helper class for the NetworkProtection module. Should be used for specific KeychainStore types.
 final class NetworkProtectionKeychainStore {
+    private let label: String
     private let serviceName: String
     private let useSystemKeychain: Bool
 
-    init(serviceName: String,
+    init(label: String,
+         serviceName: String,
          useSystemKeychain: Bool) {
 
+        self.label = label
         self.serviceName = serviceName
         self.useSystemKeychain = useSystemKeychain
     }
@@ -75,7 +78,6 @@ final class NetworkProtectionKeychainStore {
     func writeData(_ data: Data, named name: String) throws {
         var query = defaultAttributes()
         query[kSecAttrAccount as String] = name
-        query[kSecAttrService as String] = serviceName
         query[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
         query[kSecValueData as String] = data
 
@@ -88,7 +90,6 @@ final class NetworkProtectionKeychainStore {
 
     func deleteAll() throws {
         var query = defaultAttributes()
-        query[kSecAttrService as String] = serviceName
         query[kSecMatchLimit as String] = kSecMatchLimitAll
 
         let status = SecItemDelete(query as CFDictionary)
@@ -104,7 +105,9 @@ final class NetworkProtectionKeychainStore {
         return [
             kSecClass: kSecClassGenericPassword,
             kSecUseDataProtectionKeychain: !useSystemKeychain,
-            kSecAttrSynchronizable: false
+            kSecAttrSynchronizable: false,
+            kSecAttrLabel: label,
+            kSecAttrService: serviceName
         ] as [String: Any]
     }
 }
