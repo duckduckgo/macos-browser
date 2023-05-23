@@ -173,6 +173,10 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
     ///
     private func register(selectionMethod: NetworkProtectionServerSelectionMethod) async throws -> (server: NetworkProtectionServer, keyPair: KeyPair) {
 
+        guard let token = tokenStore.fetchToken() else {
+            throw NetworkProtectionError.noAuthTokenFound
+        }
+
         let selectedServerName: String?
         let excludedServerName: String?
 
@@ -188,35 +192,29 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
             excludedServerName = serverToAvoid
         }
 
-        guard let token = tokenStore.fetchToken() else {
-            throw NetworkProtectionError.noAuthTokenFound
-        }
-
         var keyPair = keyStore.currentKeyPair()
         let registeredServersResult = await networkClient.register(authToken: token, publicKey: keyPair.publicKey, withServerNamed: selectedServerName)
         let selectedServer: NetworkProtectionServer
 
         switch registeredServersResult {
         case .success(let registeredServers):
+            do {
+                try serverListStore.store(serverList: registeredServers)
+            } catch let error as NetworkProtectionServerListStoreError {
+                errorEvents?.fire(error.networkProtectionError)
+                // Intentionally not rethrowing, as this failure is not critical for this method
+            } catch {
+                errorEvents?.fire(.unhandledError(function: #function, line: #line, error: error))
+                // Intentionally not rethrowing, as this failure is not critical for this method
+            }
+
             guard let registeredServer = registeredServers.first(where: { $0.serverName != excludedServerName }) else {
                 // If we're looking to exclude a server we should have a few other options available.  If we can't find any
                 // then it means theres an inconsistency in the server list that was returned.
                 errorEvents?.fire(NetworkProtectionError.serverListInconsistency)
 
-                do {
-                    guard let server = try serverListStore.storedNetworkProtectionServerList().first(where: { $0.isRegistered(with: keyPair.publicKey) }) else {
-                        errorEvents?.fire(NetworkProtectionError.noServerListFound)
-                        throw NetworkProtectionError.noServerListFound
-                    }
-
-                    return (server: server, keyPair: keyPair)
-                } catch let error as NetworkProtectionError {
-                    errorEvents?.fire(error)
-                    throw error
-                } catch {
-                    errorEvents?.fire(NetworkProtectionError.unhandledError(function: #function, line: #line, error: error))
-                    throw NetworkProtectionError.unhandledError(function: #function, line: #line, error: error)
-                }
+                let cachedServer = try cachedServer(registeredWith: keyPair)
+                return (cachedServer, keyPair)
             }
 
             selectedServer = registeredServer
@@ -230,20 +228,33 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
                 }
             }
 
-            do {
-                try serverListStore.updateServerListCache(with: registeredServers)
-            } catch let error as NetworkProtectionServerListStoreError {
-                errorEvents?.fire(error.networkProtectionError)
-                // Intentionally not rethrowing, as this failure is not critical for this method
-            } catch {
-                errorEvents?.fire(.unhandledError(function: #function, line: #line, error: error))
-                // Intentionally not rethrowing, as this failure is not critical for this method
-            }
-
             return (selectedServer, keyPair)
         case .failure(let error):
             handle(clientError: error)
+
+            let cachedServer = try cachedServer(registeredWith: keyPair)
+            return (cachedServer, keyPair)
+        }
+    }
+
+    /// Retrieves the first cached server that's registered with the specified key pair.
+    ///
+    private func cachedServer(registeredWith keyPair: KeyPair) throws -> NetworkProtectionServer {
+        os_log("Returning first cached server", log: .networkProtectionPixel)
+
+        do {
+            guard let server = try serverListStore.storedNetworkProtectionServerList().first(where: { $0.isRegistered(with: keyPair.publicKey) }) else {
+                errorEvents?.fire(NetworkProtectionError.noServerListFound)
+                throw NetworkProtectionError.noServerListFound
+            }
+
+            return server
+        } catch let error as NetworkProtectionError {
+            errorEvents?.fire(error)
             throw error
+        } catch {
+            errorEvents?.fire(NetworkProtectionError.unhandledError(function: #function, line: #line, error: error))
+            throw NetworkProtectionError.unhandledError(function: #function, line: #line, error: error)
         }
     }
 

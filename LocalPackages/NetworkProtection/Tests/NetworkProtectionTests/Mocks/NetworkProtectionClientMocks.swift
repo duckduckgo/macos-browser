@@ -21,7 +21,6 @@ import XCTest
 @testable import NetworkProtection
 
 final class NetworkProtectionMockClient: NetworkProtectionClient {
-
     var redeemReturnValue: Result<String, NetworkProtection.NetworkProtectionClientError>
     var redeemCalled = false
 
@@ -51,7 +50,7 @@ final class NetworkProtectionMockClient: NetworkProtectionClient {
 
     func register(authToken: String,
                   publicKey: PublicKey,
-                  withServer: NetworkProtectionServerInfo) async -> Result<[NetworkProtectionServer], NetworkProtectionClientError> {
+                  withServerNamed serverName: String?) async -> Result<[NetworkProtectionServer], NetworkProtectionClientError> {
         registerCalled = true
         return registerServersReturnValue
     }

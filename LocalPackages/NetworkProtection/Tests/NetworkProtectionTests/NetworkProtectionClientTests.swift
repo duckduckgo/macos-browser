@@ -50,7 +50,7 @@ final class NetworkProtectionClientTests: XCTestCase {
         MockURLProtocol.stubs[client.redeemURL] = (response: HTTPURLResponse(url: client.registerKeyURL, statusCode: 401)!,
                                                    .success(emptyData))
 
-        let result = await client.register(authToken: "anAuthToken", publicKey: .testData, withServer: .hostNameOnly)
+        let result = await client.register(authToken: "anAuthToken", publicKey: .testData, withServerNamed: "Mock Server")
 
         guard case .failure(let error) = result, case .invalidAuthToken = error else {
             XCTFail("Expected an invalidAuthToken error to be thrown")
