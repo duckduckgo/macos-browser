@@ -1,7 +1,7 @@
 //
-//  NSRectExtension.swift
+//  FaviconManagerTests.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,17 +16,15 @@
 //  limitations under the License.
 //
 
-import Foundation
+import XCTest
+import Combine
+@testable import DuckDuckGo_Privacy_Browser
 
-extension NSRect {
+class FaviconManagerTests: XCTestCase {
 
-    var center: CGPoint {
-        CGPoint(x: midX, y: midY)
+    func testWhenFaviconManagerIsInMemory_ThenItMustInitNullStore() {
+        let faviconManager = FaviconManager(cacheType: .inMemory)
+        XCTAssertNotNil(faviconManager.store as? FaviconNullStore)
     }
-
-    // Apply an offset so that we don't get caught by the "Line of Death" https://textslashplain.com/2017/01/14/the-line-of-death/
-    func insetFromLineOfDeath() -> NSRect {
-        return insetBy(dx: 0, dy: -15)
-    }
-
+    
 }
