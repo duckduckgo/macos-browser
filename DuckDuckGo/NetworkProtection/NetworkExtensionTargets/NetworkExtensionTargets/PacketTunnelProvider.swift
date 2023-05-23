@@ -842,11 +842,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 #if DEBUG
         // Makes sure we see the assertion failure in the yellow NetP alert.
         self.controllerErrorStore.lastErrorMessage = "[Debug] Error event: \(event.localizedDescription)"
-
-        guard !event.asserts else {
-            assertionFailure(event.localizedDescription)
-            return
-        }
 #endif
 
         switch event {

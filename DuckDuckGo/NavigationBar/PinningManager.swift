@@ -58,6 +58,22 @@ final class LocalPinningManager: PinningManager {
         ])
     }
 
+    /// Do not call this for user-initiated toggling.  This is only meant to be used for scenarios in which certain conditions
+    /// may require a view to be unpinned.
+    ///
+    func unpin(_ view: PinnableView) {
+        guard isPinned(view) else {
+            return
+        }
+
+        pinnedViewStrings.removeAll(where: { $0 == view.rawValue })
+
+        NotificationCenter.default.post(name: .PinnedViewsChanged, object: nil, userInfo: [
+            Self.pinnedViewChangedNotificationViewTypeKey: view.rawValue
+        ])
+    }
+
+
     func isPinned(_ view: PinnableView) -> Bool {
         return pinnedViewStrings.contains(view.rawValue)
     }

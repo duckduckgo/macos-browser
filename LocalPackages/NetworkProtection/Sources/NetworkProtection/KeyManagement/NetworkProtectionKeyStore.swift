@@ -52,7 +52,8 @@ public final class NetworkProtectionKeychainKeyStore: NetworkProtectionKeyStore 
     private let errorEvents: EventMapping<NetworkProtectionError>?
 
     private struct Defaults {
-        static let serviceName = "DuckDuckGo Network Protection Private Key"
+        static let label = "DuckDuckGo Network Protection Private Key"
+        static let service = "\(Bundle.main.bundleIdentifier!).privateKey"
         static let validityInterval = TimeInterval.day
     }
 
@@ -61,13 +62,12 @@ public final class NetworkProtectionKeychainKeyStore: NetworkProtectionKeyStore 
         static let currentPublicKey = "com.duckduckgo.network-protection.NetworkProtectionKeychainStore.UserDefaultKeys.currentPublicKeyBase64"
     }
 
-    public init(serviceName: String? = nil,
-                useSystemKeychain: Bool,
+    public init(useSystemKeychain: Bool,
                 userDefaults: UserDefaults = .standard,
                 errorEvents: EventMapping<NetworkProtectionError>?) {
 
-        let keychainServiceName = serviceName ?? Defaults.serviceName
-        keychainStore = NetworkProtectionKeychainStore(serviceName: keychainServiceName,
+        keychainStore = NetworkProtectionKeychainStore(label: Defaults.label,
+                                                       serviceName: Defaults.service,
                                                        useSystemKeychain: useSystemKeychain)
         self.userDefaults = userDefaults
         self.errorEvents = errorEvents

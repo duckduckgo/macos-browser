@@ -41,13 +41,15 @@ public final class NetworkProtectionKeychainTokenStore: NetworkProtectionTokenSt
     private let errorEvents: EventMapping<NetworkProtectionError>?
 
     private struct Defaults {
-        static let tokenStoreService = "DuckDuckGo Network Protection Auth Token"
+        static let tokenStoreEntryLabel = "DuckDuckGo Network Protection Auth Token"
+        static let tokenStoreService = "\(Bundle.main.bundleIdentifier!).authToken"
         static let tokenStoreName = "com.duckduckgo.networkprotection.token"
     }
 
     public init(useSystemKeychain: Bool,
                 errorEvents: EventMapping<NetworkProtectionError>?) {
-        keychainStore = NetworkProtectionKeychainStore(serviceName: Defaults.tokenStoreService,
+        keychainStore = NetworkProtectionKeychainStore(label: Defaults.tokenStoreEntryLabel,
+                                                       serviceName: Defaults.tokenStoreService,
                                                        useSystemKeychain: useSystemKeychain)
         self.errorEvents = errorEvents
     }
