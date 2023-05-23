@@ -37,12 +37,14 @@ CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
-CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Release.entitlements
 CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
 CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Debug.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Release.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Release.entitlements
 
+PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Debug][sdk=macosx*] = macOS NetP System Extension - Debug
+PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS NetP System Extension - Review
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS NetP System Extension - Release
 
 // This is necessary for the sysex validation

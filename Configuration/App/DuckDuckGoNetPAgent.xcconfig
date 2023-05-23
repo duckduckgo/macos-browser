@@ -44,6 +44,7 @@ CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
 PRODUCT_NAME = DuckDuckGoAgent
 
+PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS Network Protection Agent App Product Review
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS Network Protection Agent App (Distribution)
 
 NETP_EXTRA_FLAGS = NETP_SYSTEM_EXTENSION
@@ -51,5 +52,6 @@ NETP_EXTRA_FLAGS = NETP_SYSTEM_EXTENSION
 ENABLE_APP_SANDBOX = YES
 SWIFT_OBJC_BRIDGING_HEADER =
 SKIP_INSTALL = YES
+ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME =
 
 #include? "../../LocalOverrides.xcconfig"

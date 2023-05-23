@@ -6550,7 +6550,7 @@
 				4B2D06352A11CFBA00DE1F49 /* Sources */,
 				4B2D06362A11CFBA00DE1F49 /* Frameworks */,
 				4B2D06372A11CFBA00DE1F49 /* Resources */,
-				4B2D065C2A11D23600DE1F49 /* ShellScript */,
+				4B2D065C2A11D23600DE1F49 /* Copy Assets */,
 			);
 			buildRules = (
 			);
@@ -7178,8 +7178,9 @@
 			shellPath = /bin/sh;
 			shellScript = "if [[ \"${CONFIGURATION}\" == \"Release\" && \"${PRODUCT_NAME}\" != \"DuckDuckGo\" ]]; then\n    echo \"PRODUCT_NAME must be equal to \\\"DuckDuckGo\\\" (is \\\"${PRODUCT_NAME}\\\")\"\n    echo \"See ManualAppStoreRelease.xcconfig for instructions.\"\n    exit 1\nfi\n";
 		};
-		4B2D065C2A11D23600DE1F49 /* ShellScript */ = {
+		4B2D065C2A11D23600DE1F49 /* Copy Assets */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -7187,6 +7188,7 @@
 			);
 			inputPaths = (
 			);
+			name = "Copy Assets";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -7229,7 +7231,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"Replace and Sign\" # for easier build log search\n\n# startVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/DuckDuckGo.app/Contents/Resources/startVPN.app/Contents/MacOS\"\nrm ./startVPN\nln -s \"../../../../MacOS/DuckDuckGo\" ./startVPN\npopd\n\n# stopVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/DuckDuckGo.app/Contents/Resources/stopVPN.app/Contents/MacOS\"\nrm ./stopVPN\nln -s \"../../../../MacOS/DuckDuckGo\" ./stopVPN\ncd ../../.. \npopd\n";
+			shellScript = "echo \"Replace and Sign\" # for easier build log search\n\n# startVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/startVPN.app/Contents/MacOS\"\nrm ./startVPN\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./startVPN\npopd\n\n# stopVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/stopVPN.app/Contents/MacOS\"\nrm ./stopVPN\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./stopVPN\ncd ../../.. \npopd\n";
 		};
 		4B5F15022A1559E60060320F /* Replace VPN controller apps with symlink */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -7251,6 +7253,7 @@
 		};
 		7B6469992A165AE00095095A /* Embed System Network Extension */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -9607,7 +9610,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -9689,7 +9691,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -9764,7 +9765,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -9839,7 +9839,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -9914,7 +9913,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -9995,7 +9993,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -10069,7 +10066,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -10143,7 +10139,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -10295,7 +10290,6 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
 				MACOSX_DEPLOYMENT_TARGET = 10.15.4;
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "macOS Browser Product Review";
 			};
 			name = Review;
 		};
