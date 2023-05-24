@@ -38,7 +38,9 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("UpdateController.swift", .source),
         .init("LegacyWebKitDownloadDelegate.swift", .source),
         .init("WKProcessPool+DownloadDelegate.swift", .source),
-        .init("_WKDownload+WebKitDownload.swift", .source)
+        .init("_WKDownload+WebKitDownload.swift", .source),
+        .init("PFMoveApplication.m", .source),
+        .init("MoveApplication.strings", .resource)
     ],
 
     "Unit Tests": [
