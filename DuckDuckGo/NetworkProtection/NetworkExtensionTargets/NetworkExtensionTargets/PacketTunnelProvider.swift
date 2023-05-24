@@ -454,10 +454,11 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             completionHandler(error)
         }
 
+        // when activated by system "on-demand" the option is set
         let isOnDemand = options?["is-on-demand"] as? Bool == true
         let isActivatedFromSystemSettings = options?["activationAttemptId"] == nil && !isOnDemand
         if isActivatedFromSystemSettings {
-            // ask the Main App to reconfigure&start with on-demand rule when requested from System Settings
+            // ask the Main App to reconfigure & restart with on-demand rule “on” - when connection triggered from System Settings
             Task {
                 await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .startVPN)
             }

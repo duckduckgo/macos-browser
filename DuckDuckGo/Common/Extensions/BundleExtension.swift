@@ -33,4 +33,8 @@ extension Bundle {
             object(forInfoDictionaryKey: Keys.name) as? String
     }
 
+    var versionNumber: String? {
+        object(forInfoDictionaryKey: Keys.versionNumber) as? String
+    }
+
 }

@@ -27,16 +27,24 @@ extension URL {
         return Bundle(for: BundleHelper.self).bundleURL
 
 #elseif NETP_SYSTEM_EXTENSION // for the System Extension (Developer ID)
-        var mainAppUrls: [URL] {
+        // find an appropriate main App as we‘re running alone from /Library/SystemExtensions
+        let mainAppUrls: [URL] = { () -> [URL] in
             if #available(macOS 12.0, *) {
                 return NSWorkspace.shared.urlsForApplications(withBundleIdentifier: Bundle.main.mainAppBundleIdentifier)
             }
             return LSCopyApplicationURLsForBundleIdentifier(Bundle.main.mainAppBundleIdentifier as CFString, nil)?.takeRetainedValue() as? [URL] ?? []
+        }().filter { appUrl in
+            // filter out apps removed to Trash
+            !appUrl.path.contains("/.Trash/") // no, FileManager.urls(for: .trashDirectory) doesn‘t work in SysExt
         }
 
-        let applicationsPath = (FileManager.default.urls(for: .applicationDirectory, in: .localDomainMask).first?.path ?? "") + "/"
-        // if multiple apps found prefer the one in the /Applications dir
-        return mainAppUrls.sorted(by: { (url, _) in url.path.hasPrefix(applicationsPath) }).first!
+        let version = Bundle.main.versionNumber
+
+        // first try getting an app with matching version
+        return mainAppUrls.first(where: { Bundle(url: $0)?.versionNumber == version })
+            // try getting an app from /Applications folder
+            ?? mainAppUrls.first(where: { $0.path.hasPrefix("/Applications") })
+            ?? mainAppUrls.first! // crash if not found
 
 #else // for the AppEx (App Store)
         // Peel off 3 components from /Applications/DuckDuckGo.app/Contents/PlugIns/NetworkProtectionAppExtension.appex
