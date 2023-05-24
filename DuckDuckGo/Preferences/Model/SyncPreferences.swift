@@ -155,17 +155,17 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     }
 
     func refreshDevices() {
-        if syncService.account != nil {
-            Task { @MainActor in
-                do {
-                    let registeredDevices = try await syncService.fetchDevices()
-                    mapDevices(registeredDevices)
-                } catch {
-                    print("error", error.localizedDescription)
-                }
-            }
-        } else {
+        guard syncService.account != nil else {
             devices = []
+            return
+        }
+        Task { @MainActor in
+            do {
+                let registeredDevices = try await syncService.fetchDevices()
+                mapDevices(registeredDevices)
+            } catch {
+                print("error", error.localizedDescription)
+            }
         }
     }
 
