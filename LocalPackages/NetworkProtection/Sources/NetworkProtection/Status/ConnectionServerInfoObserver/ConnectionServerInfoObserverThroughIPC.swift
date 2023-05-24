@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if os(macOS)
+
 import Combine
 import Foundation
 import Common
@@ -62,3 +64,5 @@ public class ConnectionServerInfoObserverThroughIPC: ConnectionServerInfoObserve
         publisher.send(serverInfo)
     }
 }
+
+#endif

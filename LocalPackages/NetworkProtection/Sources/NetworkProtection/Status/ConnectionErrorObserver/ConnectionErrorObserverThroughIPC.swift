@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if os(macOS)
+
 import Combine
 import Foundation
 import NetworkExtension
@@ -62,3 +64,5 @@ public class ConnectionErrorObserverThroughIPC: ConnectionErrorObserver {
         }
     }
 }
+
+#endif

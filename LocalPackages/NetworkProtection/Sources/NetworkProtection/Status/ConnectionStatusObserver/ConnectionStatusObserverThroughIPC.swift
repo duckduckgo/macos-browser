@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if os(macOS)
+
 import Combine
 import Foundation
 import NetworkExtension
@@ -112,3 +114,5 @@ public class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver {
         os_log("%{public}@: connection status is now %{public}@", log: log, type: .debug, String(describing: self), String(describing: status))
     }
 }
+
+#endif

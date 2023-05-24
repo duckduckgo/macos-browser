@@ -51,6 +51,8 @@ public struct NetworkProtectionStatusServerInfo: Codable, Equatable {
     }
 }
 
+#if os(macOS)
+
 /// This is the default status reporter.
 ///
 public final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStatusReporter {
@@ -182,3 +184,5 @@ public final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStat
         }
     }
 }
+
+#endif

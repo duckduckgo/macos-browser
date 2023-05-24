@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if os(macOS)
+
 import Foundation
 import Common
 
@@ -77,3 +79,5 @@ public enum DistributedNotificationName: String {
     }
 
 }
+
+#endif
