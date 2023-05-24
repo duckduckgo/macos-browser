@@ -70,6 +70,7 @@ fastlane/test_output
 vendor
 
 .DS_Store
+default.profraw
 node_modules/
 
 # Release build script
