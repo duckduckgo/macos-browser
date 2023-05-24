@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import NetworkProtection
 
 public final class AppLaunchingController: TunnelController {
     private let appLauncher: AppLauncher
@@ -29,7 +30,7 @@ public final class AppLaunchingController: TunnelController {
         await appLauncher.launchApp(withCommand: .startVPN)
     }
 
-    public func stop() async {
+    public func stop() async throws {
         await appLauncher.launchApp(withCommand: .stopVPN)
     }
 }

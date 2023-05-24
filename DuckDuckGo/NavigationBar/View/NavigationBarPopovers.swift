@@ -268,7 +268,8 @@ final class NavigationBarPopovers {
         let statusReporter = DefaultNetworkProtectionStatusReporter(
             statusObserver: ConnectionStatusObserverThroughSession(),
             serverInfoObserver: ConnectionServerInfoObserverThroughSession(),
-            connectionErrorObserver: ConnectionErrorObserverThroughSession())
+            connectionErrorObserver: ConnectionErrorObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
+                                                                           platformDidWakeNotification: NSWorkspace.didWakeNotification))
 
         let menuItems = [
             NetworkProtectionStatusView.Model.MenuItem(

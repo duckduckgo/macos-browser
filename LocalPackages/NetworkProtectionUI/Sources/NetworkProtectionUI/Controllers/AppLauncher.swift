@@ -108,3 +108,15 @@ public final class AppLauncher {
     }
 
 }
+
+extension URL {
+
+    func appending(_ path: String) -> URL {
+        if #available(macOS 13.0, *) {
+            return appending(path: path)
+        } else {
+            return appendingPathComponent(path)
+        }
+    }
+
+}

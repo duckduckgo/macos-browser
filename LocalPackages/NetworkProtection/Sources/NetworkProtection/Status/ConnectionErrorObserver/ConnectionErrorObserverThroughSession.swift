@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-import AppKit
 import Combine
 import Foundation
 import NetworkExtension
@@ -31,7 +30,8 @@ public class ConnectionErrorObserverThroughSession: ConnectionErrorObserver {
     // MARK: - Notifications
 
     private let notificationCenter: NotificationCenter
-    private let workspaceNotificationCenter: NotificationCenter
+    private let platformNotificationCenter: NotificationCenter
+    private let platformDidWakeNotification: Notification.Name
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Logging
@@ -41,11 +41,13 @@ public class ConnectionErrorObserverThroughSession: ConnectionErrorObserver {
     // MARK: - Initialization
 
     public init(notificationCenter: NotificationCenter = .default,
-                workspaceNotificationCenter: NotificationCenter = NSWorkspace.shared.notificationCenter,
+                platformNotificationCenter: NotificationCenter,
+                platformDidWakeNotification: Notification.Name,
                 log: OSLog = .networkProtection) {
 
         self.notificationCenter = notificationCenter
-        self.workspaceNotificationCenter = workspaceNotificationCenter
+        self.platformNotificationCenter = platformNotificationCenter
+        self.platformDidWakeNotification = platformDidWakeNotification
         self.log = log
 
         start()
@@ -56,7 +58,7 @@ public class ConnectionErrorObserverThroughSession: ConnectionErrorObserver {
             self?.handleStatusChangeNotification(notification)
         }.store(in: &cancellables)
 
-        workspaceNotificationCenter.publisher(for: NSWorkspace.didWakeNotification).sink { [weak self] notification in
+        workspaceNotificationCenter.publisher(for: platformDidWakeNotification).sink { [weak self] notification in
             self?.handleDidWake(notification)
         }.store(in: &cancellables)
     }

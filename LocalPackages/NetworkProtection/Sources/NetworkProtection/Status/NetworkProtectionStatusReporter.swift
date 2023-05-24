@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-import AppKit
 import Combine
 import NetworkExtension
 import Common

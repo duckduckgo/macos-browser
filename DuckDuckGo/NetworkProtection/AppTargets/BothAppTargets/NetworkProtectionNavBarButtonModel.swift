@@ -73,7 +73,9 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         self.networkProtectionStatusReporter = statusReporter ?? DefaultNetworkProtectionStatusReporter(
             statusObserver: ConnectionStatusObserverThroughSession(),
             serverInfoObserver: ConnectionServerInfoObserverThroughSession(),
-            connectionErrorObserver: ConnectionErrorObserverThroughSession())
+            connectionErrorObserver: ConnectionErrorObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
+                                                                           platformDidWakeNotification: NSWorkspace.didWakeNotification)
+        )
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, isForStatusBar: false)
         self.popovers = popovers
         self.pinningManager = pinningManager
