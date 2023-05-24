@@ -22,6 +22,8 @@ struct SyncedDevicesView<ViewModel>: View where ViewModel: ManagementViewModel {
 
     @EnvironmentObject var model: ViewModel
 
+    @State var isVisible = false
+
     let timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
 
     var body: some View {
@@ -29,7 +31,14 @@ struct SyncedDevicesView<ViewModel>: View where ViewModel: ManagementViewModel {
                           presentDeviceDetails: model.presentDeviceDetails,
                           presentRemoveDevice: model.presentRemoveDevice)
         .onReceive(timer) { _ in
+            guard isVisible else { return }
             model.refreshDevices()
+        }
+        .onAppear {
+            isVisible = true
+        }
+        .onDisappear {
+            isVisible = false
         }
     }
 }
