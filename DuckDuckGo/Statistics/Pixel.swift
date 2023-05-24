@@ -33,10 +33,18 @@ final class Pixel {
     }
 
     private var dryRun: Bool
+    static var isNewUser: Bool {
+        let oneWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())!
+        return firstLaunchDate >= oneWeekAgo.timeIntervalSince1970
+    }
 
     init(dryRun: Bool) {
         self.dryRun = dryRun
     }
+
+    // Temporary for activation pixels
+    @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Double(Int.min))
+    static var firstLaunchDate: Double
 
     func fire(pixelNamed pixelName: String,
               withAdditionalParameters params: [String: String]? = nil,
