@@ -55,7 +55,7 @@ enum NetworkProtectionBundle {
             fatalError("🔵 Failed to get the contents of \(url.absoluteString): \(error.localizedDescription)")
         }
 
-        // - TODO: fix this to work well with other extensions
+        // This should be updated to work well with other extensions
         guard let extensionURL = extensionURLs.first else {
             fatalError("🔵 Failed to find any system extensions")
         }
@@ -67,7 +67,6 @@ enum NetworkProtectionBundle {
         return extensionBundle
     }
 
-    // - TODO: should probably be relocated
     static func usesSystemKeychain() -> Bool {
 #if NETP_SYSTEM_EXTENSION
         true

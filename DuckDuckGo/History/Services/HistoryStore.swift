@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
 import CoreData
 import Combine
-import os.log
 
 protocol HistoryStoring {
 
@@ -319,6 +319,7 @@ fileprivate extension HistoryEntry {
         guard let url = historyEntryMO.urlEncrypted as? URL,
               let identifier = historyEntryMO.identifier,
               let lastVisit = historyEntryMO.lastVisit else {
+            Pixel.fire(.debug(event: .historyEntryDecryptionFailed))
             assertionFailure("HistoryEntry: Failed to init HistoryEntry from HistoryEntryManagedObject")
             return nil
         }

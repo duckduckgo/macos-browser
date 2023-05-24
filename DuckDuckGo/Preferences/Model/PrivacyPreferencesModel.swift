@@ -40,6 +40,7 @@ final class PrivacyPreferencesModel: ObservableObject {
         }
     }
 
+    @MainActor
     func presentManageFireproofSitesDialog() {
         let fireproofDomainsWindowController = FireproofDomainsViewController.create().wrappedInWindowController()
 
@@ -53,6 +54,7 @@ final class PrivacyPreferencesModel: ObservableObject {
         parentWindowController.window?.beginSheet(fireproofDomainsWindow)
     }
 
+    @MainActor
     func openURL(_ url: URL) {
         WindowControllersManager.shared.show(url: url, newTab: true)
     }

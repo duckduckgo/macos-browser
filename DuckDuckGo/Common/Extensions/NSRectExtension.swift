@@ -20,9 +20,13 @@ import Foundation
 
 extension NSRect {
 
+    var center: CGPoint {
+        CGPoint(x: midX, y: midY)
+    }
+
     // Apply an offset so that we don't get caught by the "Line of Death" https://textslashplain.com/2017/01/14/the-line-of-death/
     func insetFromLineOfDeath() -> NSRect {
-        return insetBy(dx: 0, dy: -5)
+        return insetBy(dx: 0, dy: -15)
     }
 
 }

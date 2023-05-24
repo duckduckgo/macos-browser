@@ -1,11 +1,29 @@
+//
+//  PacketTunnelProvider.swift
+//
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
 // SPDX-License-Identifier: MIT
 // Copyright © 2018-2021 WireGuard LLC. All Rights Reserved.
 
 import Common
+import Networking
 import Foundation
 import NetworkExtension
 import NetworkProtection
-import os
 import PixelKit
 import UserNotifications
 
@@ -349,17 +367,16 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         dryRun = false
 #endif
 
-        Pixel.setUp(dryRun: dryRun, appVersion: AppVersion.shared.versionNumber, defaultHeaders: defaultHeaders, log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], allowedQueryReservedCharacters: CharacterSet?, callBackOnMainThread: Bool, onComplete: @escaping (Error?) -> Void) in
+        Pixel.setUp(dryRun: dryRun,
+                    appVersion: AppVersion.shared.versionNumber,
+                    defaultHeaders: defaultHeaders,
+                    log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
+            let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: headers)
+            let request = APIRequest(configuration: configuration)
 
-            APIRequest.request(
-                url: url,
-                parameters: parameters,
-                allowedQueryReservedCharacters: allowedQueryReservedCharacters,
-                headers: headers,
-                callBackOnMainThread: callBackOnMainThread
-            ) { (_, error) in
+            request.fetch { _, error in
                 onComplete(error)
             }
         }
@@ -839,11 +856,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 #if DEBUG
         // Makes sure we see the assertion failure in the yellow NetP alert.
         self.controllerErrorStore.lastErrorMessage = "[Debug] Error event: \(event.localizedDescription)"
-
-        guard !event.asserts else {
-            assertionFailure(event.localizedDescription)
-            return
-        }
 #endif
 
         switch event {
@@ -879,10 +891,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         case .invalidAuthToken:
             domainEvent = .networkProtectionClientInvalidAuthToken
         case .serverListInconsistency:
-            // - TODO: not sure what to do here
             return
-
-            // NetworkProtectionServerListStoreError
 
         case .failedToEncodeServerList:
             domainEvent = .networkProtectionServerListStoreFailedToEncodeServerList
@@ -916,17 +925,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
         Pixel.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
 
-    }
-}
-
-extension WireGuardLogLevel {
-    var osLogLevel: OSLogType {
-        switch self {
-        case .verbose:
-            return .debug
-        case .error:
-            return .error
-        }
     }
 }
 

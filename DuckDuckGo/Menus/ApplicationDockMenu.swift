@@ -17,12 +17,19 @@
 //
 
 import AppKit
+import BrowserServicesKit
 
 final class ApplicationDockMenu: NSMenu {
 
-    init() {
+    init(internalUserDecider: InternalUserDecider) {
         super.init(title: "")
+        // New Window
         addItem(withTitle: UserText.newWindowMenuItem, action: #selector(AppDelegate.newWindow), keyEquivalent: "")
+
+        // New Burner Window
+        if internalUserDecider.isInternalUser {
+            addItem(withTitle: UserText.newBurnerWindowMenuItem, action: #selector(AppDelegate.newBurnerWindow), keyEquivalent: "")
+        }
     }
 
     required init(coder: NSCoder) {

@@ -4,5 +4,7 @@
 <dict>
 	<key>NETP_APP_GROUP</key>
 	<string>$(NETP_APP_GROUP)</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.productivity</string>
 </dict>
 </plist>

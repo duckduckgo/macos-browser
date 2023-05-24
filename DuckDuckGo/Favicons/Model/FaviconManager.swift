@@ -20,7 +20,7 @@ import Cocoa
 import Combine
 import BrowserServicesKit
 
-protocol FaviconManagement {
+protocol FaviconManagement: AnyObject {
 
     var areFaviconsLoaded: Bool { get }
 
@@ -34,17 +34,37 @@ protocol FaviconManagement {
 
     func getCachedFavicon(for host: String, sizeCategory: Favicon.SizeCategory) -> Favicon?
 
-    func burnExcept(fireproofDomains: FireproofDomains, bookmarkManager: BookmarkManager, completion: @escaping () -> Void)
+    func burnExcept(fireproofDomains: FireproofDomains, bookmarkManager: BookmarkManager, savedLogins: Set<String>, completion: @escaping () -> Void)
 
-    func burnDomains(_ domains: Set<String>, except bookmarkManager: BookmarkManager, completion: @escaping () -> Void)
+    func burnDomains(_ domains: Set<String>, exceptBookmarks bookmarkManager: BookmarkManager, exceptSavedLogins: Set<String>, completion: @escaping () -> Void)
 
 }
 
 final class FaviconManager: FaviconManagement {
 
-    static let shared = FaviconManager()
+    static let shared = FaviconManager(cacheType: .standard)
 
-    private lazy var store: FaviconStoring = FaviconStore()
+    enum CacheType {
+        case standard
+        case inMemory
+    }
+
+    init(cacheType: CacheType) {
+        switch cacheType {
+        case .standard:
+            store = FaviconStore()
+        case .inMemory:
+            store = FaviconNullStore()
+        }
+        imageCache = FaviconImageCache(faviconStoring: store)
+        referenceCache = FaviconReferenceCache(faviconStoring: store)
+
+        if case .inMemory = cacheType {
+            loadFavicons()
+        }
+    }
+
+    private(set) var store: FaviconStoring
 
     private let faviconURLSession = URLSession(configuration: .ephemeral)
 
@@ -69,8 +89,8 @@ final class FaviconManager: FaviconManagement {
 
     // MARK: - Fetching & Cache
 
-    private lazy var imageCache = FaviconImageCache(faviconStoring: store)
-    private lazy var referenceCache = FaviconReferenceCache(faviconStoring: store)
+    private var imageCache: FaviconImageCache
+    private var referenceCache: FaviconReferenceCache
 
     func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink],
                             documentUrl: URL,
@@ -185,21 +205,25 @@ final class FaviconManager: FaviconManagement {
 
     func burnExcept(fireproofDomains: FireproofDomains,
                     bookmarkManager: BookmarkManager,
+                    savedLogins: Set<String> = [],
                     completion: @escaping () -> Void) {
         self.referenceCache.burnExcept(fireproofDomains: fireproofDomains,
-                                       bookmarkManager: bookmarkManager) {
+                                       bookmarkManager: bookmarkManager,
+                                       savedLogins: savedLogins) {
             self.imageCache.burnExcept(fireproofDomains: fireproofDomains,
-                                       bookmarkManager: bookmarkManager) {
+                                       bookmarkManager: bookmarkManager,
+                                       savedLogins: savedLogins) {
                 completion()
             }
         }
     }
 
     func burnDomains(_ domains: Set<String>,
-                     except bookmarkManager: BookmarkManager,
+                     exceptBookmarks bookmarkManager: BookmarkManager,
+                     exceptSavedLogins: Set<String> = [],
                      completion: @escaping () -> Void) {
-        self.referenceCache.burnDomains(domains, except: bookmarkManager) {
-            self.imageCache.burnDomains(domains, except: bookmarkManager) {
+        self.referenceCache.burnDomains(domains, exceptBookmarks: bookmarkManager, exceptSavedLogins: exceptSavedLogins) {
+            self.imageCache.burnDomains(domains, exceptBookmarks: bookmarkManager, exceptSavedLogins: exceptSavedLogins) {
                 DispatchQueue.main.async {
                     completion()
                 }

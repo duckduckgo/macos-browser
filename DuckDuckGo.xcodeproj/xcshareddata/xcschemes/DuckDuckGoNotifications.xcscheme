@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "7B83057C29ABCCCE00663EAF"
+               BlueprintIdentifier = "4B4BEC1F2A11B4E2001D9AC5"
                BuildableName = "DuckDuckGo Notifications.app"
                BlueprintName = "DuckDuckGoNotifications"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
@@ -44,7 +44,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "7B83057C29ABCCCE00663EAF"
+            BlueprintIdentifier = "4B4BEC1F2A11B4E2001D9AC5"
             BuildableName = "DuckDuckGo Notifications.app"
             BlueprintName = "DuckDuckGoNotifications"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
@@ -61,7 +61,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "7B83057C29ABCCCE00663EAF"
+            BlueprintIdentifier = "4B4BEC1F2A11B4E2001D9AC5"
             BuildableName = "DuckDuckGo Notifications.app"
             BlueprintName = "DuckDuckGoNotifications"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">

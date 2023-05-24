@@ -14,19 +14,22 @@
 //
 
 #include "ExtensionBase.xcconfig"
-#include "../NetPIDs.xcconfig"
+#include "../DeveloperID.xcconfig"
 #include "../NetPOverrides.xcconfig"
 
-PRODUCT_NAME = com.duckduckgo.macos.browser.network-protection.system-extension.extension
+PRODUCT_NAME[sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+PRODUCT_NAME[config=CI][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+PRODUCT_NAME[config=Review][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+PRODUCT_NAME[config=Debug][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+PRODUCT_NAME[config=Release][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
 
 // Since we're using nonstandard bundle IDs we'll just define them here, but we should consider
 // standardizing the bundle IDs so we can just define BUNDLE_IDENTIFIER_PREFIX
-//BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.macos.browser.network-protection.debug.network-extension
-PRODUCT_BUNDLE_IDENTIFIER[sdk=*] =
-PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] =
-PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] =
-PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = com.duckduckgo.macos.browser.network-protection.system-extension.extension
-PRODUCT_BUNDLE_IDENTIFIER[config=Release][sdk=*] = com.duckduckgo.macos.browser.network-protection.system-extension.extension
+PRODUCT_BUNDLE_IDENTIFIER[sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+PRODUCT_BUNDLE_IDENTIFIER[config=Release][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
 
 INFOPLIST_FILE = NetworkProtectionSystemExtension/Info.plist
 
@@ -34,15 +37,15 @@ CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
-// Left empty intentionally as we currently only support debug and release builds
-CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] =
 CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
 CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Debug.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Release.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Release.entitlements
 
-PROVISIONING_PROFILE_SPECIFIER[config=Debug][sdk=macosx*] = Mac Browser NetP Developer ID Extension
-PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = Mac Browser NetP Developer ID Ext. (Distribution)
-
+PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
+PROVISIONING_PROFILE_SPECIFIER[config=Debug][sdk=macosx*] = macOS NetP System Extension - Debug
+PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS NetP System Extension - Review
+PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS NetP System Extension - Release
 
 // This is necessary for the sysex validation
 INFOPLIST_KEY_NSSystemExtensionUsageDescription = Network Protection
