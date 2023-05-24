@@ -18,6 +18,7 @@
 
 import Common
 import Foundation
+import NetworkProtection
 
 @MainActor
 final class URLEventHandler {
@@ -95,7 +96,23 @@ final class URLEventHandler {
     }
 
     private static func openURL(_ url: URL) {
-        WindowControllersManager.shared.show(url: url, newTab: true)
+        if url.scheme == "networkprotection" {
+            handleNetworkProtectionURL(url)
+        } else {
+            WindowControllersManager.shared.show(url: url, newTab: true)
+        }
     }
 
+    /// Handles NetP URLs
+    ///
+    private static func handleNetworkProtectionURL(_ url: URL) {
+        switch url {
+        case AppLauncher.Command.showStatus.launchURL:
+            Task {
+                await WindowControllersManager.shared.showNetworkProtectionStatus()
+            }
+        default:
+            return
+        }
+    }
 }

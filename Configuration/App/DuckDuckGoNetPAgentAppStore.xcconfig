@@ -27,6 +27,7 @@ PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).re
 
 INFOPLIST_FILE = DuckDuckGoAgent/Info-AppStore.plist
 GENERATE_INFOPLIST_FILE = YES
+INFOPLIST_KEY_LSUIElement = YES
 
 // Just make sure to override anything set by the AppTargetBase.xcconfig
 //CODE_SIGN_STYLE[config=Debug][sdk=*] = Manual
