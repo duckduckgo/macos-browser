@@ -36,9 +36,11 @@ extension Bundle {
         return machServiceName
     }
 
-    static let mainAppBundleIdentifier: String = {
-        // NEMachServiceName dropping team identifier
-        String(NetworkProtectionBundle.extensionBundle().machServiceName.split(separator: ".", maxSplits: 1).last!)
-    }()
+    var mainAppBundleIdentifier: String {
+        guard let mainAppBundleIdentifier = self.networkExtension["MAIN_BUNDLE_IDENTIFIER"] as? String else {
+            fatalError("mainAppBundleIdentifier is missing from the Info.plist")
+        }
+        return mainAppBundleIdentifier
+    }
 
 }

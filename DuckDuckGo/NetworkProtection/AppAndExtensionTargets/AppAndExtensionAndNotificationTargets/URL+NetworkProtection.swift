@@ -29,9 +29,9 @@ extension URL {
 #elseif NETP_SYSTEM_EXTENSION // for the System Extension (Developer ID)
         var mainAppUrls: [URL] {
             if #available(macOS 12.0, *) {
-                return NSWorkspace.shared.urlsForApplications(withBundleIdentifier: Bundle.mainAppBundleIdentifier)
+                return NSWorkspace.shared.urlsForApplications(withBundleIdentifier: Bundle.main.mainAppBundleIdentifier)
             }
-            return LSCopyApplicationURLsForBundleIdentifier(Bundle.mainAppBundleIdentifier as CFString, nil)?.takeRetainedValue() as? [URL] ?? []
+            return LSCopyApplicationURLsForBundleIdentifier(Bundle.main.mainAppBundleIdentifier as CFString, nil)?.takeRetainedValue() as? [URL] ?? []
         }
 
         let applicationsPath = (FileManager.default.urls(for: .applicationDirectory, in: .localDomainMask).first?.path ?? "") + "/"

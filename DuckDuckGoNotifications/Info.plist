@@ -6,6 +6,8 @@
 	<string>$(NETP_APP_GROUP)</string>
 	<key>SYSEX_MACH_SERVICE_NAME</key>
 	<string>$(SYSEX_MACH_SERVICE_NAME)</string>
+	<key>MAIN_BUNDLE_IDENTIFIER</key>
+	<string>$(MAIN_BUNDLE_IDENTIFIER)</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
 </dict>

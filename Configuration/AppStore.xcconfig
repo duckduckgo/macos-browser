@@ -16,6 +16,13 @@
 
 #include "AppStoreBuildNumber.xcconfig"
 
+MAIN_BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.mobile.ios
+
+MAIN_BUNDLE_IDENTIFIER[sdk=*] = $(MAIN_BUNDLE_IDENTIFIER_PREFIX)
+MAIN_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(MAIN_BUNDLE_IDENTIFIER_PREFIX).debug
+MAIN_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(MAIN_BUNDLE_IDENTIFIER_PREFIX).debug
+MAIN_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(MAIN_BUNDLE_IDENTIFIER_PREFIX).review
+
 GCC_PREPROCESSOR_DEFINITIONS[arch=*][sdk=*] = APPSTORE=1
 GCC_PREPROCESSOR_DEFINITIONS[config=CI][arch=*][sdk=*] = APPSTORE=1 DEBUG=1 CI=1 $(inherited)
 GCC_PREPROCESSOR_DEFINITIONS[config=Debug][arch=*][sdk=*] = APPSTORE=1 DEBUG=1 $(inherited)

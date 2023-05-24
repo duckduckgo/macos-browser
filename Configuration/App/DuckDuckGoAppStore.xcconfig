@@ -17,7 +17,7 @@
 #include "../AppStore.xcconfig"
 #include "ManualAppStoreRelease.xcconfig"
 
-BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.mobile.ios
+PRODUCT_BUNDLE_IDENTIFIER = $(MAIN_BUNDLE_IDENTIFIER)
 
 CODE_SIGN_ENTITLEMENTS = DuckDuckGo/DuckDuckGoAppStore.entitlements
 CODE_SIGN_ENTITLEMENTS[config=CI][arch=*][sdk=*] = DuckDuckGo/DuckDuckGoAppStoreCI.entitlements
