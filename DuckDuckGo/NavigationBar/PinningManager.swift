@@ -73,7 +73,6 @@ final class LocalPinningManager: PinningManager {
         ])
     }
 
-
     func isPinned(_ view: PinnableView) -> Bool {
         return pinnedViewStrings.contains(view.rawValue)
     }
