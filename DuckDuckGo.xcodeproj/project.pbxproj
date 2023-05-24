@@ -5883,6 +5883,7 @@
 				CBCCF59F2996681700C02DFE /* Assert Xcode version */,
 				378E2798296F6D1D00FCADA2 /* Validate PRODUCT_NAME */,
 				3706FA79293F65D500E42796 /* Check Embedded Config URLs */,
+				B6B67B202A1DCA8E00AFE251 /* Sourcery code generation from Templates */,
 				3706FA7A293F65D500E42796 /* Sources */,
 				3706FCA5293F65D500E42796 /* Swift Lint */,
 				3706FCA6293F65D500E42796 /* Frameworks */,
@@ -5891,6 +5892,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B6B67B222A1DCAA300AFE251 /* PBXTargetDependency */,
 				3799999429705E1F003318B1 /* PBXTargetDependency */,
 			);
 			name = "DuckDuckGo Privacy Browser App Store";
@@ -6459,6 +6461,24 @@
 			shellScript = "./lint.sh\n";
 		};
 		B6B67B082A1D41B800AFE251 /* Sourcery code generation from Templates */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Sourcery code generation from Templates";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "${BUILT_PRODUCTS_DIR}/sourcery\n";
+		};
+		B6B67B202A1DCA8E00AFE251 /* Sourcery code generation from Templates */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -8253,6 +8273,10 @@
 			isa = PBXTargetDependency;
 			productRef = B6B67B142A1DC10400AFE251 /* sourcery */;
 		};
+		B6B67B222A1DCAA300AFE251 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B6B67B212A1DCAA300AFE251 /* sourcery */;
+		};
 		B6EC37F229B5DA8F001ACE79 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = B6EC37E729B5DA2A001ACE79 /* tests-server */;
@@ -8925,6 +8949,11 @@
 			productName = OHHTTPStubsSwift;
 		};
 		B6B67B142A1DC10400AFE251 /* sourcery */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6B67B112A1DC02F00AFE251 /* XCRemoteSwiftPackageReference "Sourcery" */;
+			productName = sourcery;
+		};
+		B6B67B212A1DCAA300AFE251 /* sourcery */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B6B67B112A1DC02F00AFE251 /* XCRemoteSwiftPackageReference "Sourcery" */;
 			productName = sourcery;
