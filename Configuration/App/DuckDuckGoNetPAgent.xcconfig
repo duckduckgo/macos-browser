@@ -45,6 +45,7 @@ CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
 PRODUCT_NAME = DuckDuckGoAgent
 
+PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS Network Protection Agent App Product Review
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS Network Protection Agent App (Distribution)
 

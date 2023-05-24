@@ -43,6 +43,7 @@ CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 PRODUCT_NAME_PREFIX = DuckDuckGo Notifications
 PRODUCT_NAME[config=Review][arch=*][sdk=*] = DuckDuckGo Notifications
 
+PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = MacOS Browser NetP Notifications Product Review
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = Mac Browser NetP Developer ID Not. (Distribution)
 
