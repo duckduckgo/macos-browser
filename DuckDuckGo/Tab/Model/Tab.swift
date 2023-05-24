@@ -40,7 +40,7 @@ protocol NewWindowPolicyDecisionMaker {
 }
 
 // swiftlint:disable:next type_body_length
-@dynamicMemberLookup final class Tab: NSObject, Identifiable, ObservableObject {
+@dynamicMemberLookup final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
 
     enum TabContent: Equatable {
         case homePage
@@ -188,7 +188,9 @@ protocol NewWindowPolicyDecisionMaker {
 
     private let statisticsLoader: StatisticsLoader?
     private let internalUserDecider: InternalUserDecider?
-    let pinnedTabsManager: PinnedTabsManager
+
+    @Injected
+    var pinnedTabsManager: PinnedTabsManager
 
     private let webViewConfiguration: WKWebViewConfiguration
 
