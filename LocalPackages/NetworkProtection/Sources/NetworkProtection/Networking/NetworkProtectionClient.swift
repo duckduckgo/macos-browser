@@ -227,7 +227,7 @@ public final class NetworkProtectionBackendClient: NetworkProtectionClient {
 extension URL {
 
     func appending(_ path: String) -> URL {
-        if #available(macOS 13.0, *) {
+        if #available(macOS 13.0, iOS 16.0, *) {
             return appending(path: path)
         } else {
             return appendingPathComponent(path)
