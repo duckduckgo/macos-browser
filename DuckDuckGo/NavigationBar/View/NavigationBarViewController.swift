@@ -332,11 +332,8 @@ final class NavigationBarViewController: NSViewController {
             else { return }
 
             DispatchQueue.main.async { [weak self] in
-                guard let self = self,
-                      self.tabCollectionViewModel.selectedTabViewModel?.tab.url == topUrl
-                else {
-                    // if the tab is not active, don't show the popup
-                    return
+                guard let self = self, self.tabCollectionViewModel.selectedTabViewModel?.tab.url == topUrl else {
+                    return // if the tab is not active, don't show the popup
                 }
                 let animationType: NavigationBarBadgeAnimationView.AnimationType = isCosmetic ? .cookiePopupHidden : .cookiePopupManaged
                 self.addressBarViewController?.addressBarButtonsViewController?.showBadgeNotification(animationType)
