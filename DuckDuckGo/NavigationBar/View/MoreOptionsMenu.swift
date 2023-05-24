@@ -28,6 +28,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedToggleBookmarksBar(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkImportInterface(_ menu: NSMenu)
+    func optionsButtonMenuRequestedBookmarkExportInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category)
     func optionsButtonMenuRequestedOpenExternalPasswordManager(_ menu: NSMenu)
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu)
@@ -143,6 +144,10 @@ final class MoreOptionsMenu: NSMenu {
 
     @objc func openBookmarkImportInterface(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedBookmarkImportInterface(self)
+    }
+
+    @objc func openBookmarkExportInterface(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedBookmarkExportInterface(self)
     }
 
     @objc func openDownloads(_ sender: NSMenuItem) {
@@ -428,7 +433,8 @@ final class BookmarksSubMenu: NSMenu {
             addItem(NSMenuItem.separator())
         }
 
-        guard let entities = LocalBookmarkManager.shared.list?.topLevelEntities else {
+        let bookmarkManager = LocalBookmarkManager.shared
+        guard let entities = bookmarkManager.list?.topLevelEntities else {
             return
         }
 
@@ -439,8 +445,13 @@ final class BookmarksSubMenu: NSMenu {
 
         addItem(NSMenuItem.separator())
 
-        addItem(withTitle: UserText.importBrowserData, action: #selector(MoreOptionsMenu.openBookmarkImportInterface(_:)), keyEquivalent: "")
+        addItem(withTitle: UserText.importBookmarks, action: #selector(MoreOptionsMenu.openBookmarkImportInterface(_:)), keyEquivalent: "")
             .targetting(target)
+
+        let exportBookmarItem = NSMenuItem(title: UserText.exportBookmarks, action: #selector(MoreOptionsMenu.openBookmarkExportInterface(_:)), keyEquivalent: "")
+        exportBookmarItem.isEnabled = bookmarkManager.list?.totalBookmarks != 0
+        addItem(exportBookmarItem)
+
     }
 
     private func bookmarkMenuItems(from bookmarkViewModels: [BookmarkViewModel], topLevel: Bool = true) -> [NSMenuItem] {
