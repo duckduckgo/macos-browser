@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version: 5.7
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import Foundation
@@ -14,8 +14,8 @@ let package = Package(
         .library(name: "NetworkProtection", targets: ["NetworkProtection"])
     ],
     dependencies: [
-        .package(name: "BrowserServicesKit", url: "https://github.com/duckduckgo/BrowserServicesKit", .exact("57.6.0")),
-        .package(name: "wireguard-apple", url: "https://github.com/samsymons/wireguard-apple", .exact("1.0.0"))
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "57.6.0"),
+        .package(url: "https://github.com/samsymons/wireguard-apple", exact: "1.0.0")
     ],
     targets: [
         .target(
