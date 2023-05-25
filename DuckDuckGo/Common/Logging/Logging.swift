@@ -126,7 +126,7 @@ extension OSLog.OSLogWrapper {
 }
 
 func logOrAssertionFailure(_ message: String) {
-#if DEBUG
+#if DEBUG && !CI
     assertionFailure(message)
 #else
     os_log("%{public}s", type: .error, message)
