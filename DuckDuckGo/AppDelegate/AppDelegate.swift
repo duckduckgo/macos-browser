@@ -51,6 +51,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
     private var fileStore: FileStore!
 
+    private(set) var isShowingMoveAppAlert = false
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
@@ -70,7 +71,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     // swiftlint:disable:next function_body_length
     func applicationWillFinishLaunching(_ notification: Notification) {
 #if !APPSTORE && !DEBUG
-        PFMoveToApplicationsFolderIfNecessary()
+        isShowingMoveAppAlert = true
+        if PFMoveToApplicationsFolderIfNecessary() {
+            isShowingMoveAppAlert = false
+        }
 #endif
 
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
@@ -238,6 +242,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
+        guard !isShowingMoveAppAlert else {
+            return nil
+        }
+
         return ApplicationDockMenu(internalUserDecider: internalUserDecider)
     }
 

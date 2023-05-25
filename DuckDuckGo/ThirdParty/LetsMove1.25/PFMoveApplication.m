@@ -63,7 +63,7 @@ static NSString *ShellQuotedString(NSString *string);
 static void Relaunch(NSString *destinationPath);
 
 // Main worker function
-void PFMoveToApplicationsFolderIfNecessary(void) {
+BOOL PFMoveToApplicationsFolderIfNecessary(void) {
 
 	// Make sure to do our work on the main thread.
 	// Apparently Electron apps need this for things to work properly.
@@ -71,11 +71,11 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 		dispatch_async(dispatch_get_main_queue(), ^{
 			PFMoveToApplicationsFolderIfNecessary();
 		});
-		return;
+		return false;
 	}
 	
 	// Skip if user suppressed the alert before
-	if ([[NSUserDefaults standardUserDefaults] boolForKey:AlertSuppressKey]) return;
+	if ([[NSUserDefaults standardUserDefaults] boolForKey:AlertSuppressKey]) return false;
 
 	// Path of the bundle
 	NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
@@ -85,7 +85,7 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 
 	// Skip if the application is already in some Applications folder,
 	// unless it's inside another app's bundle.
-	if (IsInApplicationsFolder(bundlePath) && !isNestedApplication) return;
+	if (IsInApplicationsFolder(bundlePath) && !isNestedApplication) return false;
 
 	// OK, looks like we'll need to do a move - set the status variable appropriately
 	MoveInProgress = YES;
@@ -162,7 +162,7 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 				if (authorizationCanceled) {
 					NSLog(@"INFO -- Not moving because user canceled authorization");
 					MoveInProgress = NO;
-					return;
+					return true;
 				}
 				else {
 					NSLog(@"ERROR -- Could not copy myself to /Applications with authorization");
@@ -215,12 +215,12 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 		exit(0);
 	}
 	// Save the alert suppress preference if checked
-	else if ([[alert suppressionButton] state] == NSOnState) {
+    else if ([[alert suppressionButton] state] == NSControlStateValueOn) {
 		[[NSUserDefaults standardUserDefaults] setBool:YES forKey:AlertSuppressKey];
 	}
 
 	MoveInProgress = NO;
-	return;
+	return true;
 
 fail:
 	{
@@ -229,6 +229,7 @@ fail:
 		[alert setMessageText:kStrMoveApplicationCouldNotMove];
 		[alert runModal];
 		MoveInProgress = NO;
+        return true;
 	}
 }
 

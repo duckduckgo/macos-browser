@@ -119,6 +119,13 @@ final class MainMenu: NSMenu {
     override func update() {
         super.update()
 
+        // If the app is showing the "Move App" alert, don't update the menu when it's clicked as
+        // the app hasn't been fully initialized yet.
+        guard let appDelegate = NSApplication.shared.delegate as? AppDelegate,
+              !appDelegate.isShowingMoveAppAlert else {
+            return
+        }
+
         // Make sure Spotlight search is part of Help menu
         if NSApplication.shared.helpMenu != helpMenuItem?.submenu {
             NSApplication.shared.helpMenu = helpMenuItem?.submenu

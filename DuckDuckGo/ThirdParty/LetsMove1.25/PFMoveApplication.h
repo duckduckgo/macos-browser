@@ -18,7 +18,7 @@ extern "C" {
  DOES NOT work for sandboxed applications.
  
  Call from \c NSApplication's delegate method \c -applicationWillFinishLaunching: method. */
-void PFMoveToApplicationsFolderIfNecessary(void);
+BOOL PFMoveToApplicationsFolderIfNecessary(void);
 
 /**
  Check whether an app move is currently in progress.
