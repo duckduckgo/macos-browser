@@ -30,7 +30,10 @@ protocol TabExtensionsBuilderProtocol {
 
 /// Tab Extensions registration component
 /// defines intialization order and provides dependencies to the Tab Extensions initalizers
-struct TabExtensionsBuilder: TabExtensionsBuilderProtocol {
+struct TabExtensionsBuilder: TabExtensionsBuilderProtocol, Injectable {
+
+    @Injected
+    var privacyFeatures: PrivacyFeaturesProtocol
 
     static var `default`: TabExtensionsBuilderProtocol {
 #if DEBUG

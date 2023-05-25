@@ -2767,7 +2767,7 @@
 		B6B2400D28083B49001B8F3A /* WebViewContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewContainerView.swift; sourceTree = "<group>"; };
 		B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UTTypeTests.swift; sourceTree = "<group>"; };
 		B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSScreenExtension.swift; sourceTree = "<group>"; };
-		B6B67B0C2A1D421700AFE251 /* Injectable.stencil */ = {isa = PBXFileReference; lastKnownFileType = text; path = Injectable.stencil; sourceTree = "<group>"; };
+		B6B67B0C2A1D421700AFE251 /* Injectable.swifttemplate */ = {isa = PBXFileReference; lastKnownFileType = text; path = Injectable.swifttemplate; sourceTree = "<group>"; };
 		B6B67B172A1DC30000AFE251 /* Injectable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Injectable.swift; sourceTree = "<group>"; };
 		B6B67B1A2A1DC36600AFE251 /* Injected.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Injected.swift; sourceTree = "<group>"; };
 		B6B67B1D2A1DC39A00AFE251 /* Injectable.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Injectable.generated.swift; sourceTree = "<group>"; };
@@ -5697,7 +5697,7 @@
 		B6B67B072A1D41A900AFE251 /* Templates */ = {
 			isa = PBXGroup;
 			children = (
-				B6B67B0C2A1D421700AFE251 /* Injectable.stencil */,
+				B6B67B0C2A1D421700AFE251 /* Injectable.swifttemplate */,
 			);
 			path = Templates;
 			sourceTree = "<group>";

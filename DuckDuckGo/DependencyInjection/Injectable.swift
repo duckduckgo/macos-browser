@@ -18,6 +18,9 @@
 
 import Foundation
 
-protocol Injectable {
+protocol NoDependencies {}
 
+protocol Injectable {
+    associatedtype Dependencies = NoDependencies
+    associatedtype InjectedDependencies = NoDependencies
 }

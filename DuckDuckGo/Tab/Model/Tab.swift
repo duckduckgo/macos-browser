@@ -39,8 +39,16 @@ protocol NewWindowPolicyDecisionMaker {
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision?
 }
 
+final class Subclass: Injectable {
+
+    @Injected var someDelegate: WKNavigationDelegate?
+
+}
+
 // swiftlint:disable:next type_body_length
 @dynamicMemberLookup final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
+
+    typealias InjectedDependencies = TabExtensionsBuilder.Dependencies & Subclass.Dependencies
 
     enum TabContent: Equatable {
         case homePage

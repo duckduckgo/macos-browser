@@ -1,0 +1,135 @@
+//
+//  Injectable.stencil
+//
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+<% for type in types.implementing["Injectable"] { %>
+  // MARK: - <%= type.name %> Injectable
+<%
+// containedType: inheritedTypes = ["TabExtensionsBuilder.Dependencies", "Subclass.Dependencies"]
+  let injectedDependencies = type.containedType["InjectedDependencies"]?.inheritedTypes ?? []
+    ?? type.typealiases["InjectedDependencies"].map { [$0.typeName.description] } ?? []
+  //let injectedDependenciesInjectables = type.typealiases["InjectedDependencies"]!.typeName
+  let injectablesOfInjectedDependencies = injectedDependencies.map {
+    String($0.dropLast(".Dependencies".count))
+  }
+  let dynamicCompositions = injectablesOfInjectedDependencies.map {
+    $0 + ".DynamicDependencyProvider"
+  }.joined(separator: " & ")
+
+  let hasInjectedDependencies = !dynamicCompositions.isEmpty
+  let dynamicCompositionsWithPrefix = hasInjectedDependencies ? "& " + dynamicCompositions : ""
+
+  let vars = type.storedVariables.filter { $0.attributes["Injected"] != nil }
+
+  let dependencyInitArguments = vars.map {
+    "\($0.name): \($0.typeName)"
+  }.joined(separator: ", ")
+
+  let dynamicDependencyProviderInitArguments = dependencyInitArguments
+    + (hasInjectedDependencies ? ", nested nestedProvider: " : "") + dynamicCompositions
+
+  var storageInitLiteral = "[\n" + vars.map {
+    "\\\(type.name)_DependencyProvider.\($0.name): \($0.name)"
+  }.joined(separator: ",\n") + "\n]"
+%>
+
+protocol <%=type.name%>_DependencyProvider {
+  <% for variable in vars { %>
+
+    var <%= variable.name %>: <%= variable.typeName %> { get }
+
+  <% } %>
+}
+
+func <%=type.name%>_DependencyProvider_allKeyPaths() -> Set<AnyKeyPath> {
+    [
+      <% for variable in vars { %>
+        \<%= type.name %>_DependencyProvider.<%= variable.name %>,
+      <% } %>
+    ]
+}
+
+protocol <%=type.name%>_DynamicDependencyProvider {
+    var _storage: [AnyKeyPath: Any] { get set }
+}
+
+extension <%=type.name%> {
+    typealias Dependencies = <%=type.name%>_DependencyProvider<%= hasInjectedDependencies ? " & InjectedDependencies" : "" %>
+    typealias DynamicDependencyProvider = <%= type.name %>_DynamicDependencyProvider <%= dynamicCompositionsWithPrefix %>
+
+    static func getAllDependencyProviderKeyPaths(from dependencyProvider: Dependencies) -> Set<AnyKeyPath> {
+        var result = Set<AnyKeyPath>()
+        result.formUnion(<%=type.name%>_DependencyProvider_allKeyPaths())
+      <% for injectable in injectablesOfInjectedDependencies { %>
+        result.formUnion(<%=injectable%>.getAllDependencyProviderKeyPaths(from: dependencyProvider))
+      <% } %>
+        return result
+    }
+
+    @dynamicMemberLookup
+    struct DynamicDependencies: DynamicDependencyProvider {
+        var _storage: [AnyKeyPath: Any]
+
+        init() {
+            self._storage = <%=type.name%>._currentDependencies._storage
+        }
+        init(_ storage: [AnyKeyPath: Any]) {
+            self._storage = storage
+        }
+        init(_ dependencyProvider: Dependencies) {
+            self._storage = <%=type.name%>.getAllDependencyProviderKeyPaths(from: dependencyProvider).reduce(into: [:]) {
+                $0[$1] = dependencyProvider[keyPath: $1]
+            }
+        }
+        init(_ dependencyProvider: DynamicDependencyProvider) {
+            self._storage = dependencyProvider._storage
+        }
+
+        subscript<T>(dynamicMember keyPath: KeyPath<<%=type.name%>_DependencyProvider, T>) -> T {
+            self._storage[keyPath] as! T
+        }
+    }
+
+    static func makeDependencies(<%= dynamicDependencyProviderInitArguments %>) -> DynamicDependencies {
+        // TODO: initialize all nested properties too
+        DynamicDependencies(<%= storageInitLiteral %>)
+    }
+
+    //let dependencyProvider = DynamicDependencies()
+    var dependencyProvider: DynamicDependencies { fatalError() }
+    @TaskLocal private static var _currentDependencies: DynamicDependencies!
+
+//    static func make(with dependencies: Dependencies, \(paramList)\(paramList.isEmpty ? "" : ",") updateValues: ((MutableDynamicDependencies<<%=type.name%>_DependencyProvider>) throws -> Void)? = nil) rethrows -> Self {
+//        var dependencies = DynamicDependencies(dependencies)
+//        try updateValues?(MutableDynamicDependencies(&dependencies._storage))
+//        return self.$_currentDependencies.withValue(dependencies) {
+//            return self.init(\(raw: initVars))
+//        }
+//    }
+//
+//    static func make(with dependencies: DynamicDependencyProvider, \(paramList)\(paramList.isEmpty ? "" : ",")
+//                     updateValues: ((MutableDynamicDependencies<<%=type.name%>_DependencyProvider>) throws -> Void)? = nil) rethrows -> Self {
+//        var dependencies = DynamicDependencies(dependencies)
+//        try updateValues?(MutableDynamicDependencies(&dependencies._storage))
+//        return self.$_currentDependencies.withValue(dependencies) {
+//            return self.init(\(raw: initVars))
+//        }
+//    }
+
+}
+
+<% } %>
