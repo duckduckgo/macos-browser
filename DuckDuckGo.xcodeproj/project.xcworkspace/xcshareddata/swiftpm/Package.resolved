@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "shane/POC-css",
-        "revision" : "54458ba52685fe3145dbeebd2843445bc802d129"
+        "revision" : "34746649bc3ef115da7bfd46ca41013ecb1b995c",
+        "version" : "57.7.0"
       }
     },
     {
