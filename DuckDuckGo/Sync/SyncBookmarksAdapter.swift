@@ -39,9 +39,17 @@ final class SyncBookmarksAdapter {
 
         syncErrorCancellable = provider.syncErrorPublisher
             .sink { error in
-                let processedErrors = CoreDataErrorsParser.parse(error: error as NSError)
-                let params = processedErrors.errorPixelParameters
-                Pixel.fire(.debug(event: .syncBookmarksFailed, error: error), withAdditionalParameters: params)
+                switch error {
+                case let syncError as SyncError:
+                    Pixel.fire(.debug(event: .syncBookmarksFailed, error: syncError))
+                default:
+                    let nsError = error as NSError
+                    if nsError.domain != NSURLErrorDomain {
+                        let processedErrors = CoreDataErrorsParser.parse(error: error as NSError)
+                        let params = processedErrors.errorPixelParameters
+                        Pixel.fire(.debug(event: .syncBookmarksFailed, error: error), withAdditionalParameters: params)
+                    }
+                }
                 os_log(.error, log: OSLog.sync, "Bookmarks Sync error: %{public}s", String(reflecting: error))
             }
 
