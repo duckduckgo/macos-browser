@@ -101,6 +101,9 @@ public struct UserDefaultsWrapper<T> {
 
         case loggingEnabledDate = "logging.enabled.date"
         case loggingCategories = "logging.categories"
+
+        // Temporary for activetion pixel
+        case firstLaunchDate = "first.app.launch.date"
     }
 
     enum RemovedKeys: String, CaseIterable {

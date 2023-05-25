@@ -115,6 +115,7 @@ extension Pixel {
         case debug(event: Debug, error: Error? = nil)
 
         // Activation Points
+        case newTabInitial
         case emailEnabledInitial
         case cookieManagementEnabledInitial
         case watchInDuckPlayerInitial
@@ -193,6 +194,7 @@ extension Pixel {
 
             case bitwardenNotResponding
             case bitwardenRespondedCannotDecrypt
+            case bitwardenRespondedCannotDecryptUnique(repetition: Repetition = .init(key: "bitwardenRespondedCannotDecryptUnique"))
             case bitwardenHandshakeFailed
             case bitwardenDecryptionOfSharedKeyFailed
             case bitwardenStoringOfTheSharedKeyFailed
@@ -320,6 +322,8 @@ extension Pixel.Event {
             return "m_mac.set-as-default.initial"
         case .importDataInitial:
             return "m_mac.import-data.initial"
+        case .newTabInitial:
+            return "m_mac.new-tab-opened.initial"
         case .networkProtectionSystemExtensionUnknownActivationResult:
             return "m_mac_netp_system_extension_unknown_activation_result"
         }
@@ -463,6 +467,8 @@ extension Pixel.Event.Debug {
             return "bitwarden_not_responding"
         case .bitwardenRespondedCannotDecrypt:
             return "bitwarden_responded_cannot_decrypt"
+        case .bitwardenRespondedCannotDecryptUnique:
+            return "bitwarden_responded_cannot_decrypt_unique"
         case .bitwardenHandshakeFailed:
             return "bitwarden_handshake_failed"
         case .bitwardenDecryptionOfSharedKeyFailed:
