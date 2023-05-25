@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "cbd9ed8c4e1dc16eff27cd526d2eb2972e69e468",
-        "version" : "57.6.2"
+        "branch" : "daniel/autofill-migration-optimization",
+        "revision" : "b0ea72f699522bfb135fbdd3d005735edbd03278"
       }
     },
     {
