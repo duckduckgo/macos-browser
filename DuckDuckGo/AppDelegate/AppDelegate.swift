@@ -255,7 +255,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         let networkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
 
         guard networkProtectionFeatureVisibility.isFeatureActivated else {
-            disableNetworkProtectionMenuAndNotificationsAgent()
+            os_log(.error, log: .networkProtection, "🔴 deactivating netp")
+
+            NetworkProtectionTunnelController.disableLoginItems()
             LocalPinningManager.shared.unpin(.networkProtection)
             return
         }
@@ -271,26 +273,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             versionStore.lastVersionRun = currentVersion
         }
 
-        if let lastVersionRun = versionStore.lastVersionRun,
-           lastVersionRun == currentVersion {
-
+        // should‘ve been run at least once with NetP enabled
+        guard let lastVersionRun = versionStore.lastVersionRun else {
+            os_log(.error, log: .networkProtection, "🔴 running netp for the first time: update not needed")
             return
         }
 
-        updateNetworkProtectionTunnelAndMenu()
-    }
-
-    private func disableNetworkProtectionMenuAndNotificationsAgent() {
-        do {
-            try LoginItem(identifier: .vpnMenu).disable()
-        } catch {
-            os_log("Failed to disable the vpnMenu login item: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
-        }
-
-        do {
-            try LoginItem(identifier: .notificationsAgent).disable()
-        } catch {
-            os_log("Failed to disable the notificationsAgent login item: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
+        if lastVersionRun != currentVersion {
+            os_log(.error, log: .networkProtection, "🟡 App updated from %{public}s to %{public}s: updating", lastVersionRun, currentVersion)
+            updateNetworkProtectionTunnelAndMenu()
+        } else {
+            // If login items failed to launch (e.g. because of the App bundle rename), launch using NSWorkspace
+            NetworkProtectionTunnelController.ensureLoginItemsAreRunning(.ifLoginItemsAreEnabled, after: 1)
         }
     }
 
@@ -303,21 +297,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             }
         }
 
-        resetLoginItemsIfAlreadyRunning()
-    }
-
-    private func resetLoginItemsIfAlreadyRunning() {
-        do {
-            try LoginItem(identifier: .vpnMenu).reset()
-        } catch {
-            os_log("Failed to reset the vpnMenu login item: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
-        }
-
-        do {
-            try LoginItem(identifier: .notificationsAgent).reset()
-        } catch {
-            os_log("Failed to reset the notificationsAgent login item: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
-        }
+        NetworkProtectionTunnelController.resetLoginItems()
     }
 
     /// Fetches a new list of Network Protection servers, and updates the existing set.

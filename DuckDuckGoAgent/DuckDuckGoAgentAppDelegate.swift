@@ -1,5 +1,5 @@
 //
-//  AppDelegate.swift
+//  DuckDuckGoAgentAppDelegate.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,30 @@ import NetworkExtension
 import NetworkProtection
 import NetworkProtectionUI
 
-final class AppDelegate: NSObject, NSApplicationDelegate {
+@objc(Application)
+final class DuckDuckGoAgentApplication: NSApplication {
+    private let _delegate = DuckDuckGoAgentAppDelegate()
+
+    override init() {
+        os_log(.error, log: .networkProtection, "🟢 Status Bar Agent starting: %{public}d", NSRunningApplication.current.processIdentifier)
+
+        // prevent agent from running twice
+        if let anotherInstance = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!).first(where: { $0 != .current }) {
+            os_log(.error, log: .networkProtection, "🔴 Stopping: another instance is running: %{public}d.", anotherInstance.processIdentifier)
+            exit(0)
+        }
+
+        super.init()
+        self.delegate = _delegate
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+@main
+final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
 
     /// The status bar NetworkProtection menu
     ///

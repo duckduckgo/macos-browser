@@ -27,6 +27,7 @@ PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
 INFOPLIST_FILE = DuckDuckGoAgent/Info.plist
 GENERATE_INFOPLIST_FILE = YES
 INFOPLIST_KEY_LSUIElement = YES
+INFOPLIST_KEY_NSPrincipalClass = Application
 
 // Just make sure to override anything set by the AppTargetBase.xcconfig
 //CODE_SIGN_STYLE[config=Debug][sdk=*] = Manual
@@ -42,7 +43,7 @@ CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
-PRODUCT_NAME = DuckDuckGo Agent
+PRODUCT_NAME = $(AGENT_PRODUCT_NAME)
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS Network Protection Agent App Product Review

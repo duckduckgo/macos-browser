@@ -27,7 +27,7 @@ PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
 INFOPLIST_FILE = DuckDuckGoNotifications/Info.plist
 GENERATE_INFOPLIST_FILE = YES
 INFOPLIST_KEY_LSUIElement = YES
-INFOPLIST_KEY_NSPrincipalClass = NSApplication
+INFOPLIST_KEY_NSPrincipalClass = Application
 
 // Left empty intentionally as we currently only support debug and release builds
 CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] =
@@ -39,8 +39,8 @@ CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
-PRODUCT_NAME_PREFIX = DuckDuckGo Notifications
-PRODUCT_NAME[config=Review][arch=*][sdk=*] = DuckDuckGo Notifications
+PRODUCT_NAME_PREFIX = $(NOTIFICATIONS_AGENT_PRODUCT_NAME)
+PRODUCT_NAME[config=Review][arch=*][sdk=*] = $(NOTIFICATIONS_AGENT_PRODUCT_NAME)
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = MacOS Browser NetP Notifications Product Review

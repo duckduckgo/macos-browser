@@ -1,5 +1,5 @@
 //
-//  AppDelegate.swift
+//  DuckDuckGoNotificationsAppDelegate.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -21,7 +21,30 @@ import os.log // swiftlint:disable:this enforce_os_log_wrapper
 import NetworkExtension
 import NetworkProtection
 
-final class AppDelegate: NSObject, NSApplicationDelegate {
+@objc(Application)
+final class DuckDuckGoNotificationsApplication: NSApplication {
+    private let _delegate = DuckDuckGoNotificationsAppDelegate()
+
+    override init() {
+        os_log(.error, log: .networkProtection, "🟢 Notifications Agent starting: %{public}d", ProcessInfo.processInfo.processIdentifier)
+
+        // prevent agent from running twice
+        if let anotherInstance = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!).first(where: { $0 != .current }) {
+            os_log(.error, log: .networkProtection, "🔴 Stopping: another instance is running: %{public}d.", anotherInstance.processIdentifier)
+            exit(0)
+        }
+
+        super.init()
+        self.delegate = _delegate
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+@main
+final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate {
 
     private let notificationsPresenter = {
         let parentBundlePath = "../../../../"
@@ -110,7 +133,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 #if NETP_SYSTEM_EXTENSION
-extension AppDelegate: AppCommunication {
+extension DuckDuckGoNotificationsAppDelegate: AppCommunication {
 
     func reconnected() {
         os_log("Presenting reconnected notification", log: .networkProtection, type: .info)

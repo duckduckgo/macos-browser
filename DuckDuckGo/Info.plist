@@ -86,8 +86,6 @@
 	<string>MainMenu</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allows you to share recordings</string>
-	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
 	<key>NSSupportsAutomaticTermination</key>
 	<false/>
 	<key>NSSupportsSuddenTermination</key>
@@ -108,8 +106,12 @@
 	<false/>
 	<key>NOTIFICATIONS_AGENT_BUNDLE_ID</key>
 	<string>$(NOTIFICATIONS_AGENT_BUNDLE_ID)</string>
+	<key>NOTIFICATIONS_AGENT_PRODUCT_NAME</key>
+	<string>$(NOTIFICATIONS_AGENT_PRODUCT_NAME)</string>
 	<key>AGENT_BUNDLE_ID</key>
 	<string>$(AGENT_BUNDLE_ID)</string>
+	<key>AGENT_PRODUCT_NAME</key>
+	<string>$(AGENT_PRODUCT_NAME)</string>
 	<key>NETP_APP_GROUP</key>
 	<string>$(NETP_APP_GROUP)</string>
 </dict>

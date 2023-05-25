@@ -41,3 +41,5 @@ AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.
 AGENT_BUNDLE_ID[config=CI][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.system-extension.agent.debug
 AGENT_BUNDLE_ID[config=Review][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.system-extension.agent.review
 
+AGENT_PRODUCT_NAME = DuckDuckGo Agent
+NOTIFICATIONS_AGENT_PRODUCT_NAME = DuckDuckGo Notifications
