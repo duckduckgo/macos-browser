@@ -1,15 +1,6 @@
 {
   "pins" : [
     {
-      "identity" : "browserserviceskit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/BrowserServicesKit",
-      "state" : {
-        "branch" : "daniel/autofill-migration-optimization",
-        "revision" : "b0ea72f699522bfb135fbdd3d005735edbd03278"
-      }
-    },
-    {
       "identity" : "content-scope-scripts",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
