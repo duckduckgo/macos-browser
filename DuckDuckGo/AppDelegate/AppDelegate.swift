@@ -165,7 +165,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         _ = RecentlyClosedCoordinator.shared
 
         if LocalStatisticsStore().atb == nil {
-            Pixel.firstLaunchDate = Date().timeIntervalSince1970
+            Pixel.firstLaunchDate = Date()
         }
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
