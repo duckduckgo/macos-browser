@@ -1062,13 +1062,13 @@
 		4B2D065A2A11D19B00DE1F49 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2D06552A11D19B00DE1F49 /* main.swift */; };
 		4B2D065B2A11D1FF00DE1F49 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4BEC322A11B509001D9AC5 /* Logging.swift */; };
 		4B2D065E2A11D2D700DE1F49 /* DuckDuckGo Notifications.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		4B2D065F2A11D2D700DE1F49 /* DuckDuckGoAgent.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 4B2D06392A11CFBB00DE1F49 /* DuckDuckGoAgent.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4B2D065F2A11D2D700DE1F49 /* DuckDuckGo Agent.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 4B2D06392A11CFBB00DE1F49 /* DuckDuckGo Agent.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4B2D06602A12EEDA00DE1F49 /* NetworkProtectionAppExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4B4D603D2A0B290200BCD287 /* NetworkProtectionAppExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4B2D067A2A1333EF00DE1F49 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2D06512A11D19B00DE1F49 /* AppDelegate.swift */; };
 		4B2D067B2A1333F700DE1F49 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2D06552A11D19B00DE1F49 /* main.swift */; };
 		4B2D067C2A13340900DE1F49 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4BEC322A11B509001D9AC5 /* Logging.swift */; };
 		4B2D067F2A1334D700DE1F49 /* NetworkProtectionUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4B2D067E2A1334D700DE1F49 /* NetworkProtectionUI */; };
-		4B2D06812A13359E00DE1F49 /* DuckDuckGoAgentAppStore.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 4B2D06692A13318400DE1F49 /* DuckDuckGoAgentAppStore.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4B2D06812A13359E00DE1F49 /* DuckDuckGo Agent App Store.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 4B2D06692A13318400DE1F49 /* DuckDuckGo Agent App Store.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4B2E7D6326FF9D6500D2DB17 /* PrintingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */; };
 		4B379C1527BD91E3008A968E /* QuartzIdleStateProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1427BD91E3008A968E /* QuartzIdleStateProvider.swift */; };
 		4B379C1E27BDB7FF008A968E /* DeviceAuthenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C1D27BDB7FF008A968E /* DeviceAuthenticator.swift */; };
@@ -2045,7 +2045,7 @@
 			dstPath = Contents/Library/LoginItems;
 			dstSubfolderSpec = 1;
 			files = (
-				4B2D065F2A11D2D700DE1F49 /* DuckDuckGoAgent.app in Embed Login Items */,
+				4B2D065F2A11D2D700DE1F49 /* DuckDuckGo Agent.app in Embed Login Items */,
 				4B2D065E2A11D2D700DE1F49 /* DuckDuckGo Notifications.app in Embed Login Items */,
 			);
 			name = "Embed Login Items";
@@ -2068,7 +2068,7 @@
 			dstPath = Contents/Library/LoginItems;
 			dstSubfolderSpec = 1;
 			files = (
-				4B2D06812A13359E00DE1F49 /* DuckDuckGoAgentAppStore.app in Embed Login Items */,
+				4B2D06812A13359E00DE1F49 /* DuckDuckGo Agent App Store.app in Embed Login Items */,
 			);
 			name = "Embed Login Items";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2322,10 +2322,10 @@
 		4B2537702A11BF8B00610219 /* NetworkProtectionIPCNotificationsPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionIPCNotificationsPresenter.swift; sourceTree = "<group>"; };
 		4B29759628281F0900187C4E /* FirefoxEncryptionKeyReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxEncryptionKeyReader.swift; sourceTree = "<group>"; };
 		4B2975982828285900187C4E /* FirefoxKeyReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxKeyReaderTests.swift; sourceTree = "<group>"; };
-		4B2D06392A11CFBB00DE1F49 /* DuckDuckGoAgent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGoAgent.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B2D06392A11CFBB00DE1F49 /* DuckDuckGo Agent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Agent.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B2D06442A11CFBE00DE1F49 /* DuckDuckGoAgent.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoAgent.entitlements; sourceTree = "<group>"; };
-		4B2D064B2A11D04000DE1F49 /* DuckDuckGoNetPAgent.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNetPAgent.xcconfig; sourceTree = "<group>"; };
-		4B2D064D2A11D04000DE1F49 /* DuckDuckGoNetPAgentAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNetPAgentAppStore.xcconfig; sourceTree = "<group>"; };
+		4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoAgent.xcconfig; sourceTree = "<group>"; };
+		4B2D064D2A11D04000DE1F49 /* DuckDuckGoAgentAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoAgentAppStore.xcconfig; sourceTree = "<group>"; };
 		4B2D06502A11D19B00DE1F49 /* Info-AppStore.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Info-AppStore.plist"; sourceTree = "<group>"; };
 		4B2D06512A11D19B00DE1F49 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4B2D06522A11D19B00DE1F49 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -2333,7 +2333,7 @@
 		4B2D06542A11D19B00DE1F49 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4B2D06552A11D19B00DE1F49 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		4B2D06642A132F3A00DE1F49 /* NetworkProtectionAppExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NetworkProtectionAppExtension.entitlements; sourceTree = "<group>"; };
-		4B2D06692A13318400DE1F49 /* DuckDuckGoAgentAppStore.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGoAgentAppStore.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B2D06692A13318400DE1F49 /* DuckDuckGo Agent App Store.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Agent App Store.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrintingUserScript.swift; sourceTree = "<group>"; };
 		4B379C1427BD91E3008A968E /* QuartzIdleStateProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuartzIdleStateProvider.swift; sourceTree = "<group>"; };
 		4B379C1D27BDB7FF008A968E /* DeviceAuthenticator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAuthenticator.swift; sourceTree = "<group>"; };
@@ -2344,8 +2344,7 @@
 		4B3F641D27A8D3BD00E0C118 /* BrowserProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserProfileTests.swift; sourceTree = "<group>"; };
 		4B43468F285ED7A100177407 /* BookmarksBarViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarViewModelTests.swift; sourceTree = "<group>"; };
 		4B43469428655D1400177407 /* FirefoxDataImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxDataImporterTests.swift; sourceTree = "<group>"; };
-		4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNetPNotifications.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNetPNotifications.xcconfig; sourceTree = "<group>"; };
-		4B4BEC1B2A11B459001D9AC5 /* NetPOverrides.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetPOverrides.xcconfig; sourceTree = "<group>"; };
+		4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNotifications.xcconfig; sourceTree = "<group>"; };
 		4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Notifications.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B4BEC322A11B509001D9AC5 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		4B4BEC332A11B509001D9AC5 /* DuckDuckGoNotifications.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoNotifications.entitlements; sourceTree = "<group>"; };
@@ -2354,8 +2353,8 @@
 		4B4BEC392A11B509001D9AC5 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		4B4D603D2A0B290200BCD287 /* NetworkProtectionAppExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NetworkProtectionAppExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B4D603E2A0B290200BCD287 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
-		4B4D604F2A0B293C00BCD287 /* NetPExtensionSysex.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetPExtensionSysex.xcconfig; sourceTree = "<group>"; };
-		4B4D60502A0B293C00BCD287 /* NetPExtensionAppex.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetPExtensionAppex.xcconfig; sourceTree = "<group>"; };
+		4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionSystemExtension.xcconfig; sourceTree = "<group>"; };
+		4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionAppExtension.xcconfig; sourceTree = "<group>"; };
 		4B4D60512A0B293C00BCD287 /* ExtensionBase.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ExtensionBase.xcconfig; sourceTree = "<group>"; };
 		4B4D60592A0B29FA00BCD287 /* TunnelConfiguration+WgQuickConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TunnelConfiguration+WgQuickConfig.swift"; sourceTree = "<group>"; };
 		4B4D605A2A0B29FA00BCD287 /* String+ArrayConversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+ArrayConversion.swift"; sourceTree = "<group>"; };
@@ -2573,7 +2572,7 @@
 		7B4CE8DE26F02108009134B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B4CE8E626F02134009134B1 /* TabBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarTests.swift; sourceTree = "<group>"; };
 		7B5291882A1697680022E406 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7B5291892A169BC90022E406 /* DeveloperID.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DeveloperID.xcconfig; sourceTree = "<group>"; };
+		7B5291892A169BC90022E406 /* NetworkProtectionDeveloperID.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionDeveloperID.xcconfig; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
 		8511E18325F82B34002F516B /* 01_Fire_really_small.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 01_Fire_really_small.json; sourceTree = "<group>"; };
 		853014D525E671A000FB8205 /* PageObserverUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageObserverUserScript.swift; sourceTree = "<group>"; };
@@ -3590,8 +3589,7 @@
 				378B5887295CF2A4002C0CC0 /* Version.xcconfig */,
 				376CC8B4296EB630006B63A7 /* AppStore.xcconfig */,
 				376CC8B5296EBA8F006B63A7 /* AppStoreBuildNumber.xcconfig */,
-				7B5291892A169BC90022E406 /* DeveloperID.xcconfig */,
-				4B4BEC1B2A11B459001D9AC5 /* NetPOverrides.xcconfig */,
+				7B5291892A169BC90022E406 /* NetworkProtectionDeveloperID.xcconfig */,
 				378C76D8296842FD0092E949 /* App */,
 				4B4D604E2A0B293C00BCD287 /* Extensions */,
 				378C76D92968433B0092E949 /* Tests */,
@@ -3603,12 +3601,9 @@
 		378C76D8296842FD0092E949 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				4B2D064B2A11D04000DE1F49 /* DuckDuckGoNetPAgent.xcconfig */,
-				4B2D064D2A11D04000DE1F49 /* DuckDuckGoNetPAgentAppStore.xcconfig */,
 				378B588B295CF3B9002C0CC0 /* AppTargetsBase.xcconfig */,
 				378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */,
 				37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */,
-				4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNetPNotifications.xcconfig */,
 				378E2799296F6FDE00FCADA2 /* ManualAppStoreRelease.xcconfig */,
 				4B18E3222A1D31E4005D0AAA /* NetworkProtection */,
 			);
@@ -3801,9 +3796,21 @@
 		4B18E3222A1D31E4005D0AAA /* NetworkProtection */ = {
 			isa = PBXGroup;
 			children = (
+				4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */,
+				4B2D064D2A11D04000DE1F49 /* DuckDuckGoAgentAppStore.xcconfig */,
+				4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */,
 				4B18E3272A1D3896005D0AAA /* NetworkProtectionStartStopVPNBase.xcconfig */,
 				4B18E3232A1D32B1005D0AAA /* NetworkProtectionStartVPN.xcconfig */,
 				4B18E3252A1D3581005D0AAA /* NetworkProtectionStopVPN.xcconfig */,
+			);
+			path = NetworkProtection;
+			sourceTree = "<group>";
+		};
+		4B18E32C2A1ECF1F005D0AAA /* NetworkProtection */ = {
+			isa = PBXGroup;
+			children = (
+				4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */,
+				4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */,
 			);
 			path = NetworkProtection;
 			sourceTree = "<group>";
@@ -3897,8 +3904,7 @@
 			isa = PBXGroup;
 			children = (
 				4B4D60512A0B293C00BCD287 /* ExtensionBase.xcconfig */,
-				4B4D604F2A0B293C00BCD287 /* NetPExtensionSysex.xcconfig */,
-				4B4D60502A0B293C00BCD287 /* NetPExtensionAppex.xcconfig */,
+				4B18E32C2A1ECF1F005D0AAA /* NetworkProtection */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -4941,8 +4947,8 @@
 				4B4D603D2A0B290200BCD287 /* NetworkProtectionAppExtension.appex */,
 				4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */,
 				4B25375A2A11BE7300610219 /* com.duckduckgo.macos.browser.debug.network-protection-extension.systemextension */,
-				4B2D06392A11CFBB00DE1F49 /* DuckDuckGoAgent.app */,
-				4B2D06692A13318400DE1F49 /* DuckDuckGoAgentAppStore.app */,
+				4B2D06392A11CFBB00DE1F49 /* DuckDuckGo Agent.app */,
+				4B2D06692A13318400DE1F49 /* DuckDuckGo Agent App Store.app */,
 				4B5F14CB2A14702C0060320F /* startVPN.app */,
 				4B5F14E12A1476BD0060320F /* stopVPN.app */,
 			);
@@ -6576,7 +6582,7 @@
 				4B2D064E2A11D0D000DE1F49 /* NetworkProtectionUI */,
 			);
 			productName = DuckDuckGoAgent;
-			productReference = 4B2D06392A11CFBB00DE1F49 /* DuckDuckGoAgent.app */;
+			productReference = 4B2D06392A11CFBB00DE1F49 /* DuckDuckGo Agent.app */;
 			productType = "com.apple.product-type.application";
 		};
 		4B2D06682A13318400DE1F49 /* DuckDuckGoAgentAppStore */ = {
@@ -6597,7 +6603,7 @@
 				4B2D067E2A1334D700DE1F49 /* NetworkProtectionUI */,
 			);
 			productName = DuckDuckGoAgentAppStore;
-			productReference = 4B2D06692A13318400DE1F49 /* DuckDuckGoAgentAppStore.app */;
+			productReference = 4B2D06692A13318400DE1F49 /* DuckDuckGo Agent App Store.app */;
 			productType = "com.apple.product-type.application";
 		};
 		4B4BEC1F2A11B4E2001D9AC5 /* DuckDuckGoNotifications */ = {
@@ -7251,6 +7257,7 @@
 		};
 		4B5F15022A1559E60060320F /* Replace VPN controller apps with symlink */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -9427,140 +9434,140 @@
 		};
 		4B2537672A11BE7700610219 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetPExtensionSysex.xcconfig */;
+			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
 		};
 		4B2537682A11BE7700610219 /* CI */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetPExtensionSysex.xcconfig */;
+			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */;
 			buildSettings = {
 			};
 			name = CI;
 		};
 		4B2537692A11BE7700610219 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetPExtensionSysex.xcconfig */;
+			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
 		};
 		4B25376A2A11BE7700610219 /* Review */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetPExtensionSysex.xcconfig */;
+			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */;
 			buildSettings = {
 			};
 			name = Review;
 		};
 		4B2D06462A11CFBE00DE1F49 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoNetPAgent.xcconfig */;
+			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
 		};
 		4B2D06472A11CFBE00DE1F49 /* CI */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoNetPAgent.xcconfig */;
+			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
 			};
 			name = CI;
 		};
 		4B2D06482A11CFBE00DE1F49 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoNetPAgent.xcconfig */;
+			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
 		};
 		4B2D06492A11CFBE00DE1F49 /* Review */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoNetPAgent.xcconfig */;
+			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
 			};
 			name = Review;
 		};
 		4B2D06762A13318600DE1F49 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B2D064D2A11D04000DE1F49 /* DuckDuckGoNetPAgentAppStore.xcconfig */;
+			baseConfigurationReference = 4B2D064D2A11D04000DE1F49 /* DuckDuckGoAgentAppStore.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
 		};
 		4B2D06772A13318600DE1F49 /* CI */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B2D064D2A11D04000DE1F49 /* DuckDuckGoNetPAgentAppStore.xcconfig */;
+			baseConfigurationReference = 4B2D064D2A11D04000DE1F49 /* DuckDuckGoAgentAppStore.xcconfig */;
 			buildSettings = {
 			};
 			name = CI;
 		};
 		4B2D06782A13318600DE1F49 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B2D064D2A11D04000DE1F49 /* DuckDuckGoNetPAgentAppStore.xcconfig */;
+			baseConfigurationReference = 4B2D064D2A11D04000DE1F49 /* DuckDuckGoAgentAppStore.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
 		};
 		4B2D06792A13318600DE1F49 /* Review */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B2D064D2A11D04000DE1F49 /* DuckDuckGoNetPAgentAppStore.xcconfig */;
+			baseConfigurationReference = 4B2D064D2A11D04000DE1F49 /* DuckDuckGoAgentAppStore.xcconfig */;
 			buildSettings = {
 			};
 			name = Review;
 		};
 		4B4BEC2D2A11B4E3001D9AC5 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNetPNotifications.xcconfig */;
+			baseConfigurationReference = 4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
 		};
 		4B4BEC2E2A11B4E3001D9AC5 /* CI */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNetPNotifications.xcconfig */;
+			baseConfigurationReference = 4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */;
 			buildSettings = {
 			};
 			name = CI;
 		};
 		4B4BEC2F2A11B4E3001D9AC5 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNetPNotifications.xcconfig */;
+			baseConfigurationReference = 4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
 		};
 		4B4BEC302A11B4E3001D9AC5 /* Review */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNetPNotifications.xcconfig */;
+			baseConfigurationReference = 4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */;
 			buildSettings = {
 			};
 			name = Review;
 		};
 		4B4D60492A0B290300BCD287 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetPExtensionAppex.xcconfig */;
+			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
 		};
 		4B4D604A2A0B290300BCD287 /* CI */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetPExtensionAppex.xcconfig */;
+			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
 			};
 			name = CI;
 		};
 		4B4D604B2A0B290300BCD287 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetPExtensionAppex.xcconfig */;
+			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
 		};
 		4B4D604C2A0B290300BCD287 /* Review */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetPExtensionAppex.xcconfig */;
+			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
 			};
 			name = Review;

@@ -13,9 +13,8 @@
 //  limitations under the License.
 //
 
-
 SYSEX_BUNDLE_ID_BASE[sdk=*] = com.duckduckgo.macos.browser.network-protection-extension
-SYSEX_BUNDLE_ID_BASE[config=CI][sdk=*] =
+SYSEX_BUNDLE_ID_BASE[config=CI][sdk=*] = com.duckduckgo.macos.browser.debug.network-protection-extension
 SYSEX_BUNDLE_ID_BASE[config=Review][sdk=*] = com.duckduckgo.macos.browser.review.network-protection-extension
 SYSEX_BUNDLE_ID_BASE[config=Debug][sdk=*] = com.duckduckgo.macos.browser.debug.network-protection-extension
 SYSEX_BUNDLE_ID_BASE[config=Release][sdk=*] = com.duckduckgo.macos.browser.network-protection-extension

@@ -14,7 +14,7 @@
 //
 
 #include "AppTargetsBase.xcconfig"
-#include "../DeveloperID.xcconfig"
+#include "../NetworkProtectionDeveloperID.xcconfig"
 
 BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.macos.browser
 

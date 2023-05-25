@@ -13,37 +13,33 @@
 //  limitations under the License.
 //
 
-#include "ExtensionBase.xcconfig"
-#include "../NetPOverrides.xcconfig"
+#include "../ExtensionBase.xcconfig"
 
 // Since we're using nonstandard bundle IDs we'll just define them here, but we should consider
 // standardizing the bundle IDs so we can just define BUNDLE_IDENTIFIER_PREFIX
-
 BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.mobile.ios
 
-PRODUCT_BUNDLE_IDENTIFIER[sdk=*] =
-PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] =
-PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).review.network-protection-extension
-PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug.network-protection-extension
-PRODUCT_BUNDLE_IDENTIFIER[config=Release][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).network-protection-extension
-
-INFOPLIST_FILE = NetworkProtectionAppExtension/Info.plist
-
-CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = DuckDuckGo/NetworkProtectionAppExtension.entitlements
 CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
 CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = DuckDuckGo/NetworkProtectionAppExtension.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = DuckDuckGo/NetworkProtectionAppExtension.entitlements
-
+CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = DuckDuckGo/NetworkProtectionAppExtension.entitlements
 CODE_SIGN_STYLE[config=Debug][sdk=*] = Automatic
 
-NETP_EXTRA_FLAGS = NETWORK_EXTENSION
+GENERATE_INFOPLIST_FILE = YES
+INFOPLIST_FILE = NetworkProtectionAppExtension/Info.plist
+INFOPLIST_KEY_NSHumanReadableCopyright = Copyright © 2023 DuckDuckGo. All rights reserved.
+
+FEATURE_FLAGS[arch=*][sdk=*] = NETWORK_EXTENSION
+FEATURE_FLAGS[config=CI][arch=*][sdk=*] = NETWORK_EXTENSION
+FEATURE_FLAGS[config=Debug][arch=*][sdk=*] = NETWORK_EXTENSION
+FEATURE_FLAGS[config=Review][arch=*][sdk=*] = NETWORK_EXTENSION
+
+PRODUCT_BUNDLE_IDENTIFIER[sdk=*] =
+PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] =
+PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug.network-protection-extension
+PRODUCT_BUNDLE_IDENTIFIER[config=Release][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).network-protection-extension
+PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).review.network-protection-extension
 
 SDKROOT = macosx
 SKIP_INSTALL = YES
-INFOPLIST_KEY_NSHumanReadableCopyright = Copyright © 2023 DuckDuckGo. All rights reserved.
-
-// Not sure if the following two are needed but they were set in our targets
 SWIFT_EMIT_LOC_STRINGS = YES
-GENERATE_INFOPLIST_FILE = YES
-
-

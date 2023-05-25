@@ -1,8 +1,0 @@
-CURRENT_PROJECT_VERSION = 1.0.10
-MARKETING_VERSION = 1.0.10
-
-// Override to Common.xcconfig: please review often
-FEATURE_FLAGS[arch=*][sdk=*] = $(NETP_EXTRA_FLAGS)
-FEATURE_FLAGS[config=CI][arch=*][sdk=*] = $(NETP_EXTRA_FLAGS)
-FEATURE_FLAGS[config=Debug][arch=*][sdk=*] = $(NETP_EXTRA_FLAGS)
-FEATURE_FLAGS[config=Review][arch=*][sdk=*] = $(NETP_EXTRA_FLAGS)
