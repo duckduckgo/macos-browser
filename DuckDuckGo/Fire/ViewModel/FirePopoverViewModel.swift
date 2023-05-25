@@ -18,6 +18,7 @@
 
 import Cocoa
 import BrowserServicesKit
+import Common
 
 @MainActor
 final class FirePopoverViewModel {
@@ -50,7 +51,8 @@ final class FirePopoverViewModel {
          historyCoordinating: HistoryCoordinating,
          fireproofDomains: FireproofDomains,
          faviconManagement: FaviconManagement,
-         initialClearingOption: ClearingOption = .allData) {
+         initialClearingOption: ClearingOption = .allData,
+         tld: TLD) {
 
         self.fireViewModel = fireViewModel
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -58,6 +60,7 @@ final class FirePopoverViewModel {
         self.fireproofDomains = fireproofDomains
         self.faviconManagement = faviconManagement
         self.clearingOption = initialClearingOption
+        self.tld = tld
 
         updateAvailableClearingOptions()
         updateItems(for: initialClearingOption)
@@ -76,6 +79,7 @@ final class FirePopoverViewModel {
     private let historyCoordinating: HistoryCoordinating
     private let fireproofDomains: FireproofDomains
     private let faviconManagement: FaviconManagement
+    private let tld: TLD
 
     private(set) var availableClearingOptions = ClearingOption.allCases
     private(set) var hasOnlySingleFireproofDomain: Bool = false
@@ -139,15 +143,16 @@ final class FirePopoverViewModel {
         }
 
         let visitedDomains = visitedDomains(basedOn: clearingOption)
+        let visitedRootDomains = Set(visitedDomains.compactMap { tld.eTLDplus1($0) })
 
-        let fireproofed = visitedDomains
+        let fireproofed = visitedRootDomains
             .filter { domain in
                 fireproofDomains.isFireproof(fireproofDomain: domain)
             }
-        let selectable = visitedDomains
+        let selectable = visitedRootDomains
             .subtracting(fireproofed)
 
-        if visitedDomains.count == 1, let domain = visitedDomains.first, fireproofed.contains(domain) {
+        if visitedRootDomains.count == 1, let domain = visitedRootDomains.first, fireproofed.contains(domain) {
             self.hasOnlySingleFireproofDomain = true
         } else {
             self.hasOnlySingleFireproofDomain = false
