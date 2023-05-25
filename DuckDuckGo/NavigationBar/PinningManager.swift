@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import NetworkProtection
 
 enum PinnableView: String {
     case autofill
@@ -34,7 +35,7 @@ protocol PinningManager {
 
 final class LocalPinningManager: PinningManager {
 
-    static let shared = LocalPinningManager()
+    static let shared = LocalPinningManager(networkProtectionFeatureVisibility: NetworkProtectionKeychainTokenStore())
 
     static let pinnedViewChangedNotificationViewTypeKey = "pinning.pinnedViewChanged.viewType"
 
@@ -43,6 +44,12 @@ final class LocalPinningManager: PinningManager {
 
     @UserDefaultsWrapper(key: .manuallyToggledPinnedViews, defaultValue: [])
     private var manuallyToggledPinnedViewsStrings: [String]
+
+    private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
+
+    init(networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility) {
+        self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility
+    }
 
     func togglePinning(for view: PinnableView) {
         flagAsManuallyToggled(view)
@@ -82,7 +89,12 @@ final class LocalPinningManager: PinningManager {
         case .autofill: return isPinned(.autofill) ? UserText.hideAutofillShortcut : UserText.showAutofillShortcut
         case .bookmarks: return isPinned(.bookmarks) ? UserText.hideBookmarksShortcut : UserText.showBookmarksShortcut
         case .downloads: return isPinned(.downloads) ? UserText.hideDownloadsShortcut : UserText.showDownloadsShortcut
-        case .networkProtection: return isPinned(.networkProtection) ? UserText.hideNetworkProtectionShortcut : UserText.showNetworkProtectionShortcut
+        case .networkProtection:
+            if !networkProtectionFeatureVisibility.isFeatureActivated {
+                assertionFailure("Tried to toggle Network Protection when it was not activated")
+            }
+
+            return isPinned(.networkProtection) ? UserText.hideNetworkProtectionShortcut : UserText.showNetworkProtectionShortcut
         }
     }
 

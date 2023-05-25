@@ -139,6 +139,9 @@ final class MainMenu: NSMenu {
         sharingMenu.title = shareMenuItem.title
         shareMenuItem.submenu = sharingMenu
 
+        // To be safe, hide the NetP shortcut menu item by default.
+        toggleNetworkProtectionShortcutMenuItem?.isHidden = true
+
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
         updateLoggingMenuItems()
@@ -277,7 +280,14 @@ final class MainMenu: NSMenu {
         toggleAutofillShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         toggleBookmarksShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
         toggleDownloadsShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
-        toggleNetworkProtectionShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
+
+        let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
+        if networkProtectionFeatureVisibility.isFeatureActivated {
+            toggleNetworkProtectionShortcutMenuItem?.isHidden = false
+            toggleNetworkProtectionShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
+        } else {
+            toggleNetworkProtectionShortcutMenuItem?.isHidden = true
+        }
     }
 
     private func updateNetworkProtectionServerListMenuItems() {

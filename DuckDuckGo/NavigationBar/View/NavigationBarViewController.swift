@@ -20,7 +20,9 @@ import Cocoa
 import Combine
 import Common
 import BrowserServicesKit
+import NetworkProtection
 
+// swiftlint:disable:next type_body_length
 final class NavigationBarViewController: NSViewController {
 
     enum Constants {
@@ -85,14 +87,17 @@ final class NavigationBarViewController: NSViewController {
     private var networkProtectionCancellable: AnyCancellable?
     private var networkProtectionInterruptionCancellable: AnyCancellable?
 
+    private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
+
     required init?(coder: NSCoder) {
         fatalError("NavigationBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popovers: popovers)
         self.isBurner = isBurner
+        self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
         goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
         super.init(coder: coder)
@@ -663,8 +668,10 @@ extension NavigationBarViewController: NSMenuDelegate {
         let downloadsTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
         menu.addItem(withTitle: downloadsTitle, action: #selector(toggleDownloadsPanelPinning), keyEquivalent: "J")
 
-        let networkProtectionTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
-        menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
+        if networkProtectionFeatureVisibility.isFeatureActivated {
+            let networkProtectionTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
+            menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
+        }
     }
 
     @objc
@@ -712,6 +719,7 @@ extension NavigationBarViewController: NSMenuDelegate {
                 self?.networkProtectionButton.image = image
             }
     }
+
 }
 
 extension NavigationBarViewController: OptionsButtonMenuDelegate {

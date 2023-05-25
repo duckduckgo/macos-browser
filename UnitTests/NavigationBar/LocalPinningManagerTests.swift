@@ -17,7 +17,18 @@
 //
 
 import XCTest
+import NetworkProtection
 @testable import DuckDuckGo_Privacy_Browser
+
+private struct NetworkProtectionFeatureVisibilityMock: NetworkProtectionFeatureVisibility {
+
+    let activated: Bool = true
+
+    var isFeatureActivated: Bool {
+        activated
+    }
+
+}
 
 final class LocalPinningManagerTests: XCTestCase {
 
@@ -32,7 +43,7 @@ final class LocalPinningManagerTests: XCTestCase {
     }
 
     func testWhenTogglingPinningForAView_AndViewIsNotPinned_ThenViewBecomesPinned() {
-        let manager = LocalPinningManager()
+        let manager = LocalPinningManager(networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibilityMock())
 
         XCTAssertFalse(manager.isPinned(.autofill))
         XCTAssertFalse(manager.isPinned(.bookmarks))
@@ -44,7 +55,7 @@ final class LocalPinningManagerTests: XCTestCase {
     }
 
     func testWhenTogglingPinningForAView_AndViewIsAlreadyPinned_ThenViewBecomesUnpinned() {
-        let manager = LocalPinningManager()
+        let manager = LocalPinningManager(networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibilityMock())
 
         XCTAssertFalse(manager.isPinned(.autofill))
         XCTAssertFalse(manager.isPinned(.bookmarks))
@@ -63,7 +74,7 @@ final class LocalPinningManagerTests: XCTestCase {
     func testWhenChangingPinnedViews_ThenNotificationIsPosted() {
         expectation(forNotification: .PinnedViewsChanged, object: nil)
 
-        let manager = LocalPinningManager()
+        let manager = LocalPinningManager(networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibilityMock())
         manager.togglePinning(for: .autofill)
 
         waitForExpectations(timeout: 1.0)

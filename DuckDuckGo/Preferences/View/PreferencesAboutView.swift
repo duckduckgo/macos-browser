@@ -51,7 +51,7 @@ extension Preferences {
 #endif
                             Text(UserText.privacySimplified).font(.privacySimplified)
 
-                            Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber)).onTapGesture(count: 7) {
+                            Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber)).onTapGesture(count: 12) {
                                 model.displayNetPInvite()
                             }
                         }
