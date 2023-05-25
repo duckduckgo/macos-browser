@@ -264,6 +264,9 @@ extension YoutubeOverlayUserScript {
         }
 
         // Temporary pixel for first time user uses Duck Player
+        if !Pixel.isNewUser {
+            return
+        }
         guard let body = message.messageBody as? [String: Any] else {
             return
         }
