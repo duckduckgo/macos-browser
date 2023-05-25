@@ -53,4 +53,9 @@ SYSEX_BUNDLE_ID[config=Review][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
 SYSEX_BUNDLE_ID[config=Debug][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
 SYSEX_BUNDLE_ID[config=Release][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
 
+// Install Developer ID build to /Applications/DEBUG/
+DEPLOYMENT_LOCATION[config=Debug] = YES;
+DSTROOT[config=Debug] = /;
+INSTALL_PATH[config=Debug] = Applications/DEBUG;
+
 #include? "../../LocalOverrides.xcconfig"

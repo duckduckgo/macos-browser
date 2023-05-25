@@ -234,6 +234,105 @@ extension AppDelegate {
         FireCoordinator.fireButtonAction()
     }
 
+    // MARK: - Network Protection Debug
+
+    @IBAction func resetNetworkProtectionState(_ sender: Any?) {
+        Task { @MainActor in
+            guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
+
+            do {
+                try await NetworkProtectionTunnelController.resetAllState()
+            } catch {
+                await NSAlert(error: error).runModal()
+            }
+        }
+    }
+
+    @IBAction func removeNetworkProtectionSystemExtensionAndAgents(_ sender: Any?) {
+        Task { @MainActor in
+            guard case .alertFirstButtonReturn = await NSAlert.removeSystemExtensionAndAgentsAlert().runModal() else { return }
+
+            do {
+                try await NetworkProtectionTunnelController.removeSystemExtensionAndAgents()
+            } catch {
+                await NSAlert(error: error).runModal()
+            }
+        }
+    }
+
+    @IBAction func networkProtectionPreferredServerChanged(_ sender: Any?) {
+        guard let title = (sender as? NSMenuItem)?.title else {
+            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
+            return
+        }
+
+        let selectedServer: SelectedNetworkProtectionServer
+
+        if title == "Automatic" {
+            selectedServer = .automatic
+        } else {
+            let titleComponents = title.components(separatedBy: " ")
+            selectedServer = .endpoint(titleComponents.first!)
+        }
+
+        NetworkProtectionTunnelController.setSelectedServer(selectedServer: selectedServer)
+    }
+
+    @IBAction func networkProtectionExpireRegistrationKeyNow(_ sender: Any?) {
+        Task {
+            try? await NetworkProtectionTunnelController.expireRegistrationKeyNow()
+        }
+    }
+
+    @IBAction func networkProtectionSetRegistrationKeyValidity(_ sender: Any?) {
+        guard let menuItem = sender as? NSMenuItem else {
+            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
+            return
+        }
+
+        // nil means automatic
+        let validity = menuItem.representedObject as? TimeInterval
+
+        Task {
+            do {
+                try await NetworkProtectionTunnelController.setRegistrationKeyValidity(validity)
+            } catch {
+                assertionFailure("Could not override the key validity due to an error: \(error.localizedDescription)")
+                os_log("Could not override the key validity due to an error: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
+            }
+        }
+    }
+
+    @IBAction func networkProtectionSimulateControllerFailure(_ sender: Any?) {
+        guard let menuItem = sender as? NSMenuItem else {
+            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
+            return
+        }
+
+        if menuItem.state == .on {
+            menuItem.state = .off
+        } else {
+            menuItem.state = .on
+        }
+
+        NetworkProtectionTunnelController.simulationOptions.setEnabled(menuItem.state == .on, option: .controllerFailure)
+    }
+
+    @IBAction func networkProtectionSimulateTunnelFailure(_ sender: Any?) {
+        guard let menuItem = sender as? NSMenuItem else {
+            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
+            return
+        }
+
+        if menuItem.state == .on {
+            menuItem.state = .off
+        } else {
+            menuItem.state = .on
+        }
+
+        NetworkProtectionTunnelController.simulationOptions.setEnabled(menuItem.state == .on, option: .tunnelFailure)
+    }
+
 }
 
 extension MainViewController {
@@ -671,95 +770,6 @@ extension MainViewController {
         ConfigurationManager.shared.forceRefresh()
     }
 
-    @IBAction func resetNetworkProtectionState(_ sender: Any?) {
-        guard let window = view.window else {
-            assertionFailure("No window")
-            return
-        }
-
-        let alert = NSAlert.resetNetworkProtectionAlert()
-        alert.beginSheetModal(for: window, completionHandler: { response in
-            guard case .alertFirstButtonReturn = response else {
-                return
-            }
-
-            NetworkProtectionTunnelController.resetAllState()
-        })
-    }
-
-    @IBAction func networkProtectionPreferredServerChanged(_ sender: Any?) {
-        guard let title = (sender as? NSMenuItem)?.title else {
-            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
-            return
-        }
-
-        let selectedServer: SelectedNetworkProtectionServer
-
-        if title == "Automatic" {
-            selectedServer = .automatic
-        } else {
-            let titleComponents = title.components(separatedBy: " ")
-            selectedServer = .endpoint(titleComponents.first!)
-        }
-
-        NetworkProtectionTunnelController.setSelectedServer(selectedServer: selectedServer)
-    }
-
-    @IBAction func networkProtectionExpireRegistrationKeyNow(_ sender: Any?) {
-        Task {
-            try? await NetworkProtectionTunnelController.expireRegistrationKeyNow()
-        }
-    }
-
-    @IBAction func networkProtectionSetRegistrationKeyValidity(_ sender: Any?) {
-        guard let menuItem = sender as? NSMenuItem else {
-            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
-            return
-        }
-
-        // nil means automatic
-        let validity = menuItem.representedObject as? TimeInterval
-
-        Task {
-            do {
-                try await NetworkProtectionTunnelController.setRegistrationKeyValidity(validity)
-            } catch {
-                assertionFailure("Could not override the key validity due to an error: \(error.localizedDescription)")
-                os_log("Could not override the key validity due to an error: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
-            }
-        }
-    }
-
-    @IBAction func networkProtectionSimulateControllerFailure(_ sender: Any?) {
-        guard let menuItem = sender as? NSMenuItem else {
-            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
-            return
-        }
-
-        if menuItem.state == .on {
-            menuItem.state = .off
-        } else {
-            menuItem.state = .on
-        }
-
-        NetworkProtectionTunnelController.simulationOptions.setEnabled(menuItem.state == .on, option: .controllerFailure)
-    }
-
-    @IBAction func networkProtectionSimulateTunnelFailure(_ sender: Any?) {
-        guard let menuItem = sender as? NSMenuItem else {
-            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
-            return
-        }
-
-        if menuItem.state == .on {
-            menuItem.state = .off
-        } else {
-            menuItem.state = .on
-        }
-
-        NetworkProtectionTunnelController.simulationOptions.setEnabled(menuItem.state == .on, option: .tunnelFailure)
-    }
-
     // MARK: - Developer Tools
 
     @IBAction func toggleDeveloperTools(_ sender: Any?) {
@@ -872,53 +882,6 @@ extension MainViewController: NSMenuItemValidation {
 
             return true
 
-        case #selector(MainViewController.networkProtectionPreferredServerChanged(_:)):
-            let selectedServerName = NetworkProtectionTunnelController.selectedServerName()
-
-            switch menuItem.title {
-            case "Automatic":
-                menuItem.state = selectedServerName == nil ? .on : .off
-            default:
-                guard let selectedServerName = selectedServerName else {
-                    menuItem.state = .off
-                    break
-                }
-
-                menuItem.state = (menuItem.title.hasPrefix("\(selectedServerName) ")) ? .on : .off
-            }
-
-            return true
-
-        case #selector(MainViewController.networkProtectionExpireRegistrationKeyNow(_:)):
-            return true
-
-        case #selector(MainViewController.networkProtectionSetRegistrationKeyValidity(_:)):
-            let selectedValidity = NetworkProtectionTunnelController.registrationKeyValidity()
-
-            switch menuItem.title {
-            case "Automatic":
-                menuItem.state = selectedValidity == nil ? .on : .off
-            default:
-                guard let selectedValidity = selectedValidity,
-                      let menuItemValidity = menuItem.representedObject as? TimeInterval,
-                      selectedValidity == menuItemValidity else {
-
-                    menuItem.state = .off
-                    break
-                }
-
-                menuItem.state =  .on
-            }
-
-            return true
-        case #selector(MainViewController.networkProtectionSimulateControllerFailure(_:)):
-            menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.controllerFailure) ? .on : .off
-            return true
-
-        case #selector(MainViewController.networkProtectionSimulateTunnelFailure(_:)):
-            menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
-            return true
-
         default:
             return true
         }
@@ -929,6 +892,7 @@ extension MainViewController: NSMenuItemValidation {
 
 extension AppDelegate: NSMenuItemValidation {
 
+    // swiftlint:disable:next cyclomatic_complexity
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         switch menuItem.action {
         case #selector(AppDelegate.closeAllWindows(_:)):
@@ -949,6 +913,53 @@ extension AppDelegate: NSMenuItemValidation {
         // Enables and disables export passwords items
         case #selector(AppDelegate.openExportLogins(_:)):
             return areTherePasswords
+
+        case #selector(AppDelegate.networkProtectionPreferredServerChanged(_:)):
+            let selectedServerName = NetworkProtectionTunnelController.selectedServerName()
+
+            switch menuItem.title {
+            case "Automatic":
+                menuItem.state = selectedServerName == nil ? .on : .off
+            default:
+                guard let selectedServerName = selectedServerName else {
+                    menuItem.state = .off
+                    break
+                }
+
+                menuItem.state = (menuItem.title.hasPrefix("\(selectedServerName) ")) ? .on : .off
+            }
+
+            return true
+
+        case #selector(AppDelegate.networkProtectionExpireRegistrationKeyNow(_:)):
+            return true
+
+        case #selector(AppDelegate.networkProtectionSetRegistrationKeyValidity(_:)):
+            let selectedValidity = NetworkProtectionTunnelController.registrationKeyValidity()
+
+            switch menuItem.title {
+            case "Automatic":
+                menuItem.state = selectedValidity == nil ? .on : .off
+            default:
+                guard let selectedValidity = selectedValidity,
+                      let menuItemValidity = menuItem.representedObject as? TimeInterval,
+                      selectedValidity == menuItemValidity else {
+
+                    menuItem.state = .off
+                    break
+                }
+
+                menuItem.state =  .on
+            }
+
+            return true
+        case #selector(AppDelegate.networkProtectionSimulateControllerFailure(_:)):
+            menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.controllerFailure) ? .on : .off
+            return true
+
+        case #selector(AppDelegate.networkProtectionSimulateTunnelFailure(_:)):
+            menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
+            return true
 
         default:
             return true

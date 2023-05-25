@@ -396,33 +396,39 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     // MARK: - Debug commands for the extension
 
-    static func resetAllState() {
-        Task {
-
-            if let activeSession = try? await ConnectionSessionUtilities.activeSession() {
-                try? activeSession.sendProviderMessage(Data([ExtensionMessage.resetAllState.rawValue])) { _ in
-                    os_log("Status was reset in the extension", log: .networkProtection)
-                }
+    static func resetAllState() async throws {
+        if let activeSession = try? await ConnectionSessionUtilities.activeSession() {
+            try? activeSession.sendProviderMessage(Data([ExtensionMessage.resetAllState.rawValue])) { _ in
+                os_log("Status was reset in the extension", log: .networkProtection)
             }
-
-            // ☝️ Take care of resetting all state within the extension first, and wait half a second
-            try? await Task.sleep(interval: 0.5)
-            // 👇 And only afterwards turn off the tunnel and removing it from prefernces
-
-            let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
-
-            if let tunnels = tunnels {
-                for tunnel in tunnels {
-                    tunnel.connection.stopVPNTunnel()
-                    try? await tunnel.removeFromPreferences()
-                }
-            }
-
-            loginItems.forEach { loginItem in
-                try? loginItem.disable()
-            }
-            NetworkProtectionSelectedServerUserDefaultsStore().reset()
         }
+
+        // ☝️ Take care of resetting all state within the extension first, and wait half a second
+        try? await Task.sleep(interval: 0.5)
+        // 👇 And only afterwards turn off the tunnel and removing it from prefernces
+
+        let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
+
+        if let tunnels = tunnels {
+            for tunnel in tunnels {
+                tunnel.connection.stopVPNTunnel()
+                try? await tunnel.removeFromPreferences()
+            }
+        }
+
+        NetworkProtectionSelectedServerUserDefaultsStore().reset()
+
+        try await removeSystemExtensionAndAgents()
+    }
+
+    static func removeSystemExtensionAndAgents() async throws {
+        loginItems.forEach { loginItem in
+            try? loginItem.disable()
+        }
+
+#if NETP_SYSTEM_EXTENSION
+        try await SystemExtensionManager.shared.deactivate()
+#endif
     }
 
     static func setSelectedServer(selectedServer: SelectedNetworkProtectionServer) {
