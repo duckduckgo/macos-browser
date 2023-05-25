@@ -40,6 +40,21 @@ final class PrivacySecurityPreferences {
     // - true: Enabled by the user
     // - false: Disabled by the user
     @UserDefaultsWrapper(key: .autoconsentEnabled, defaultValue: nil)
-    public var autoconsentEnabled: Bool?
+    public var autoconsentEnabled: Bool? {
+        didSet {
+            // Temporary pixel for first time user enables cookies management
+#if DEBUG
+            if NSApp.isRunningUnitTests {
+                return
+            }
+#endif
+            if Pixel.isNewUser && autoconsentEnabled ?? false {
+                let repetition = Pixel.Event.Repetition(key: Pixel.Event.cookieManagementEnabledInitial.name)
+                if repetition == .initial {
+                    Pixel.fire(.cookieManagementEnabledInitial)
+                }
+            }
+        }
+    }
 
 }

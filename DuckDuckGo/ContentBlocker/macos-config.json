@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1684132954110,
+    "version": 1684763820272,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -244,6 +244,10 @@
                 {
                     "domain": "duckduckgo.com",
                     "reason": "Warnings are already displayed before embedded YouTube videos are loaded."
+                },
+                {
+                    "domain": "khanacademy.org",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/945"
                 },
                 {
                     "domain": "www.google.ad",
@@ -1021,7 +1025,7 @@
                 }
             },
             "state": "disabled",
-            "hash": "f11fc2358f1247ac76cfe80efe796173"
+            "hash": "3349c86ccf4e47d5f620006a29700f69"
         },
         "clickToPlay": {
             "exceptions": [],
@@ -2633,16 +2637,24 @@
         "referrer": {
             "exceptions": [
                 {
+                    "domain": "learning.edx.org",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/934"
+                },
+                {
                     "domain": "canadapost-postescanada.ca",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/647"
                 },
                 {
                     "domain": "player.vimeo.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/931"
+                },
+                {
+                    "domain": "xcelenergy.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/941"
                 }
             ],
             "state": "enabled",
-            "hash": "8263144efa8090aa8543dec928198e9a"
+            "hash": "1ed2336bb12ce5218b091ee5f33bf4c0"
         },
         "requestFilterer": {
             "state": "disabled",
@@ -3398,6 +3410,37 @@
                                     "seattletimes.com"
                                 ],
                                 "reason": "corriere.it - ,Example URL: https://www.corriere.it/video-articoli/2022/07/13/missione-wwf-liberare-mare-plastica/9abb64de-029d-11ed-a0cc-ad3c68cacbae.shtml;,Clicking on the video to play causes a still frame to show and the video does not continue.,eurogamer.net, seattletimes.com - An unskippable adwall appears which prevents interaction with the page."
+                            }
+                        ]
+                    },
+                    "amazon.dev": {
+                        "rules": [
+                            {
+                                "rule": "prime.amazon.dev",
+                                "domains": [
+                                    "amazon.ae",
+                                    "amazon.ca",
+                                    "amazon.cn",
+                                    "amazon.co.jp",
+                                    "amazon.co.uk",
+                                    "amazon.com",
+                                    "amazon.com.au",
+                                    "amazon.com.be",
+                                    "amazon.com.br",
+                                    "amazon.com.mx",
+                                    "amazon.com.tr",
+                                    "amazon.eg",
+                                    "amazon.es",
+                                    "amazon.fr",
+                                    "amazon.in",
+                                    "amazon.it",
+                                    "amazon.nl",
+                                    "amazon.pl",
+                                    "amazon.sa",
+                                    "amazon.se",
+                                    "amazon.sg"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/943"
                             }
                         ]
                     },
@@ -4603,7 +4646,7 @@
                             {
                                 "rule": "optimizely.com/datafiles/",
                                 "domains": [
-                                    "nike.com"
+                                    "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/916"
                             }
@@ -13516,7 +13559,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "6b8decfad7206ae05e5ba7f4a47d55cc"
+            "hash": "241325e7cd1a0ed069f7e13c6f8783e5"
         },
         "trackingCookies1p": {
             "settings": {

@@ -111,6 +111,14 @@ extension Pixel {
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
         case debug(event: Debug, error: Error? = nil)
 
+        // Activation Points
+        case newTabInitial
+        case emailEnabledInitial
+        case cookieManagementEnabledInitial
+        case watchInDuckPlayerInitial
+        case setAsDefaultInitial
+        case importDataInitial
+
         enum Debug {
 
             case assertionFailure(message: String, file: StaticString, line: UInt)
@@ -183,6 +191,7 @@ extension Pixel {
 
             case bitwardenNotResponding
             case bitwardenRespondedCannotDecrypt
+            case bitwardenRespondedCannotDecryptUnique(repetition: Repetition = .init(key: "bitwardenRespondedCannotDecryptUnique"))
             case bitwardenHandshakeFailed
             case bitwardenDecryptionOfSharedKeyFailed
             case bitwardenStoringOfTheSharedKeyFailed
@@ -290,6 +299,18 @@ extension Pixel.Event {
             } else {
                 return "m_mac_\(pixel.pixelName)"
             }
+        case .emailEnabledInitial:
+            return "m_mac.enable-email-protection.initial"
+        case .cookieManagementEnabledInitial:
+            return "m_mac.cookie-management-enabled.initial"
+        case .watchInDuckPlayerInitial:
+            return "m_mac.watch-in-duckplayer.initial"
+        case .setAsDefaultInitial:
+            return "m_mac.set-as-default.initial"
+        case .importDataInitial:
+            return "m_mac.import-data.initial"
+        case .newTabInitial:
+            return "m_mac.new-tab-opened.initial"
         }
     }
 }
@@ -431,6 +452,8 @@ extension Pixel.Event.Debug {
             return "bitwarden_not_responding"
         case .bitwardenRespondedCannotDecrypt:
             return "bitwarden_responded_cannot_decrypt"
+        case .bitwardenRespondedCannotDecryptUnique:
+            return "bitwarden_responded_cannot_decrypt_unique"
         case .bitwardenHandshakeFailed:
             return "bitwarden_handshake_failed"
         case .bitwardenDecryptionOfSharedKeyFailed:

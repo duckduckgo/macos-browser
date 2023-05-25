@@ -815,9 +815,41 @@ extension AppDelegate: NSMenuItemValidation {
         case #selector(AppDelegate.reopenAllWindowsFromLastSession(_:)):
             return stateRestorationManager.canRestoreLastSessionState
 
+        // Enables and disables export bookmarks itemz
+        case #selector(AppDelegate.openExportBookmarks(_:)):
+            return bookmarksManager.list?.totalBookmarks != 0
+
+        // Enables and disables export passwords items
+        case #selector(AppDelegate.openExportLogins(_:)):
+            return areTherePasswords
+
         default:
             return true
         }
+    }
+
+    private var areTherePasswords: Bool {
+        let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        guard let vault else {
+            return false
+        }
+        let accounts = (try? vault.accounts()) ?? []
+        if !accounts.isEmpty {
+            return true
+        }
+        let cards = (try? vault.creditCards()) ?? []
+        if !cards.isEmpty {
+            return true
+        }
+        let notes = (try? vault.notes()) ?? []
+        if !notes.isEmpty {
+            return true
+        }
+        let identities = (try? vault.identities()) ?? []
+        if !identities.isEmpty {
+            return true
+        }
+        return false
     }
 
 }

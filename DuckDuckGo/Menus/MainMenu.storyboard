@@ -7,7 +7,11 @@
         <!--Application-->
         <scene sceneID="JPo-4y-FX3">
             <objects>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <connections>
+                        <outlet property="exportBookmarksMenuItem" destination="3K6-pB-Kea" id="0aB-uI-R6L"/>
+                    </connections>
+                </customObject>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <customObject id="WIK-gq-Ncg" customClass="CopyHandler" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
@@ -126,7 +130,7 @@
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Export" id="SGe-jt-1so">
                                                 <items>
-                                                    <menuItem title="Logins..." id="raM-fX-nRg">
+                                                    <menuItem title="Passwords..." id="raM-fX-nRg">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="openExportLogins:" target="Ady-hI-5gd" id="MLl-kw-Su4"/>
@@ -544,10 +548,16 @@ CA
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="aPG-H0-BrG"/>
-                                        <menuItem title="Import Bookmarks and Passwords..." id="tNX-Bv-yM3" userLabel="Import Bookmarks...">
+                                        <menuItem title="Import Bookmarks…" id="tNX-Bv-yM3" userLabel="Import Bookmarks...">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="openImportBrowserDataWindow:" target="Ady-hI-5gd" id="NdE-Lt-CL5"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Export Bookmarks…" enabled="NO" id="3K6-pB-Kea">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="openExportBookmarks:" target="Ady-hI-5gd" id="h3L-FO-yq9"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="xsn-Ak-LSd"/>
@@ -829,6 +839,7 @@ CQ
                             <outlet property="closeTabMenuItem" destination="DVo-aG-piG" id="Hr0-hn-2p1"/>
                             <outlet property="closeWindowMenuItem" destination="CzI-4o-2re" id="32H-X4-8Ub"/>
                             <outlet property="debugMenuItem" destination="ilv-5f-YpZ" id="4F7-9b-Mve"/>
+                            <outlet property="exportBookmarksMenuItem" destination="3K6-pB-Kea" id="LbP-Ft-aAT"/>
                             <outlet property="favoriteThisPageMenuItem" destination="cHZ-Fb-aKU" id="uPM-LY-AmL"/>
                             <outlet property="favoritesMenuItem" destination="Y9I-ZC-gGg" id="zk1-XL-x3e"/>
                             <outlet property="forwardMenuItem" destination="Gbj-sV-aI3" id="54P-Ym-Ic2"/>

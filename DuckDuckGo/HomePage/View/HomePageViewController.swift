@@ -89,6 +89,14 @@ final class HomePageViewController: NSViewController {
 
         subscribeToBookmarks()
         subscribeToBurningData()
+
+        // Temporary pixel for first time user sees the new tab
+        if Pixel.isNewUser {
+            let repetition = Pixel.Event.Repetition(key: Pixel.Event.newTabInitial.name)
+            if repetition == .initial {
+                Pixel.fire(.newTabInitial)
+            }
+        }
     }
 
     override func viewWillAppear() {

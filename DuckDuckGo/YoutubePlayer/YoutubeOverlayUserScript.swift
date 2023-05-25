@@ -259,28 +259,23 @@ extension YoutubeOverlayUserScript: WKScriptMessageHandler {
 
 extension YoutubeOverlayUserScript {
     func handleSendJSPixel(_ message: UserScriptMessage, replyHandler: @escaping MessageReplyHandler) {
-//<<<<<<< HEAD
-//        defer {
-//            replyHandler(nil)
-//        }
-//
-//        guard let body = message.messageBody as? [String: Any],
-//              let pixelName = body["pixelName"] as? String,
-//              let knownPixel = JSPixel(rawValue: pixelName) else {
-//            assertionFailure("Not accepting an unknown pixel name")
-//            return
-//        }
-//
-//        if pixelName == JSPixel.playUse.rawValue || pixelName == JSPixel.playDoNotUse.rawValue {
-//            duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
-//        }
-//
-//        let pixelParameters = body["params"] as? [String: String]
-//
-//        Pixel.fire(.duckPlayerJSPixel(knownPixel), withAdditionalParameters: pixelParameters)
-//=======
-        // pixels no longer used
-        replyHandler(nil)
-//>>>>>>> develop
+        defer {
+            replyHandler(nil)
+        }
+
+        // Temporary pixel for first time user uses Duck Player
+        if !Pixel.isNewUser {
+            return
+        }
+        guard let body = message.messageBody as? [String: Any] else {
+            return
+        }
+        let pixelName = body["pixelName"] as? String
+        if pixelName == "play.use" {
+            let repetition = Pixel.Event.Repetition(key: Pixel.Event.watchInDuckPlayerInitial.name)
+            if repetition == .initial {
+                Pixel.fire(.watchInDuckPlayerInitial)
+            }
+        }
     }
 }
