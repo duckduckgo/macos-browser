@@ -14,7 +14,9 @@ let package = Package(
         .library(name: "NetworkProtection", targets: ["NetworkProtection"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "58.0.0"),
+        // If you are updating the BSK dependency in the main app, this version will need to be updated to match.
+        // There is work underway to move this package into BSK itself, after which this will not be required.
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "58.1.1"),
         .package(url: "https://github.com/duckduckgo/wireguard-apple", exact: "1.0.0")
     ],
     targets: [
