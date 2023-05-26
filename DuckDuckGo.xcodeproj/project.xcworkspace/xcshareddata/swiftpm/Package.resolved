@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "daniel/autofill-hash-migration-updates",
-        "revision" : "62dd4032cb4f3c7aa0065d2eee9f5214c3cd4cc7"
+        "revision" : "4af75edf84c18453b010096c2a9796df1a3ae708",
+        "version" : "57.6.3"
       }
     },
     {
