@@ -120,7 +120,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
       "state" : {
         "revision" : "4684440d03304e7638a2c8086895367e90987463",
         "version" : "1.2.1"
@@ -129,7 +129,7 @@
     {
       "identity" : "wireguard-apple",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/DuckDuckGo/wireguard-apple",
+      "location" : "https://github.com/duckduckgo/wireguard-apple",
       "state" : {
         "revision" : "156abe15063b35b633363ec33fc2c040f81f9326",
         "version" : "1.0.0"
