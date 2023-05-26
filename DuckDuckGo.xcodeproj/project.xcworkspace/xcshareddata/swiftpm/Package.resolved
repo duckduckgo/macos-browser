@@ -129,9 +129,9 @@
     {
       "identity" : "wireguard-apple",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/samsymons/wireguard-apple",
+      "location" : "https://github.com/DuckDuckGo/wireguard-apple",
       "state" : {
-        "revision" : "cb79342aa2fe8fffa0bd5fc8f1616b7de4258b67",
+        "revision" : "156abe15063b35b633363ec33fc2c040f81f9326",
         "version" : "1.0.0"
       }
     }

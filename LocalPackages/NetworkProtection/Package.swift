@@ -15,7 +15,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "57.6.0"),
-        .package(url: "https://github.com/samsymons/wireguard-apple", exact: "1.0.0")
+        .package(url: "https://github.com/duckduckgo/wireguard-apple", exact: "1.0.0")
     ],
     targets: [
         .target(
