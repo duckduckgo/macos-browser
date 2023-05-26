@@ -49,6 +49,22 @@ on:
         required: true
       RELEASE_PROVISION_PROFILE_BASE64:
         required: true
+      NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64:
+        required: true
+      NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64:
+        required: true
+      NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64:
+        required: true
+      NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64:
+        required: true
+      NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64:
+        required: true
+      NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64:
+        required: true
+      NETP_START_VPN_PROVISION_PROFILE_BASE64:
+        required: true
+      NETP_STOP_VPN_PROVISION_PROFILE_BASE64:
+        required: true
       SSH_PRIVATE_KEY_FIND_IN_PAGE:
         required: true
       APPLE_API_KEY_BASE64:
