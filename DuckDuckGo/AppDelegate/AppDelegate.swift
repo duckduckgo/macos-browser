@@ -26,6 +26,7 @@ import Networking
 import Bookmarks
 import DDGSync
 import ServiceManagement
+import SyncDataProviders
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -61,8 +62,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var internalUserDecider: InternalUserDecider!
     private(set) var featureFlagger: FeatureFlagger!
     private var appIconChanger: AppIconChanger!
+
+    private(set) var syncDataProviders: SyncDataProviders!
     private(set) var syncService: DDGSyncing!
-    private(set) var syncPersistence: SyncDataPersistor!
+    private var syncStateCancellable: AnyCancellable?
+    private var bookmarksSyncErrorCancellable: AnyCancellable?
     let bookmarksManager = LocalBookmarkManager.shared
 
 #if !APPSTORE
@@ -152,8 +156,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
-        syncPersistence = SyncDataPersistor()
-        syncService = DDGSync(persistence: syncPersistence)
+
+        syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
+        syncService = DDGSync(dataProvidersSource: syncDataProviders, log: OSLog.sync)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -203,6 +208,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #if NETWORK_PROTECTION
         startupNetworkProtection()
 #endif
+
+        syncStateCancellable = syncService.authStatePublisher
+            .prepend(syncService.authState)
+            .map { $0 == .inactive }
+            .removeDuplicates()
+            .sink { isSyncDisabled in
+                LocalBookmarkManager.shared.updateBookmarkDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
+            }
+    }
+
+    func applicationDidBecomeActive(_ notification: Notification) {
+        syncService.scheduler.notifyAppLifecycleEvent()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
