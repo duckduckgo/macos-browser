@@ -72,9 +72,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     func applicationWillFinishLaunching(_ notification: Notification) {
 #if !APPSTORE && !DEBUG
         isShowingMoveAppAlert = true
-        if PFMoveToApplicationsFolderIfNecessary() {
-            isShowingMoveAppAlert = false
-        }
+        PFMoveToApplicationsFolderIfNecessary()
+        isShowingMoveAppAlert = false
 #endif
 
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
