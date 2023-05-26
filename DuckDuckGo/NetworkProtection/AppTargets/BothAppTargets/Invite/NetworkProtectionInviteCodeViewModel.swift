@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import Combine
 import NetworkProtection
 
@@ -75,3 +77,5 @@ final class NetworkProtectionInviteViewModel: ObservableObject {
         currentDialog = nil
     }
 }
+
+#endif

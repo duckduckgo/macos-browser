@@ -19,7 +19,10 @@
 import AppKit
 import Foundation
 import Common
+
+#if NETWORK_PROTECTION
 import NetworkProtection
+#endif
 
 extension Bundle {
     static var mainURL: URL!
@@ -36,6 +39,7 @@ final class AppMain {
     }
 
     static func main() async throws {
+#if NETWORK_PROTECTION
         switch (CommandLine.arguments.first! as NSString).lastPathComponent {
         case "startVPN":
             swizzleMainBundle()
@@ -58,6 +62,7 @@ final class AppMain {
         default:
             break
         }
+#endif
 
         _ = NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)
     }

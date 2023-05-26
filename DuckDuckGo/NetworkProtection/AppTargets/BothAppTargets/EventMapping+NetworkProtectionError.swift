@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import Foundation
 import NetworkProtection
 import Common
@@ -74,3 +76,5 @@ extension EventMapping where Event == NetworkProtectionError {
         Pixel.fire(.debug(event: domainEvent))
     }
 }
+
+#endif

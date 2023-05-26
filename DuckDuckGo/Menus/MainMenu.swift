@@ -21,7 +21,10 @@ import Combine
 import OSLog // swiftlint:disable:this enforce_os_log_wrapper
 import WebKit
 import BrowserServicesKit
+
+#if NETWORK_PROTECTION
 import NetworkProtection
+#endif
 
 final class MainMenu: NSMenu {
 
@@ -81,6 +84,7 @@ final class MainMenu: NSMenu {
     // MARK: - Debug
 
     @IBOutlet weak var debugMenuItem: NSMenuItem?
+    @IBOutlet weak var networkProtectionMenuItem: NSMenuItem?
 
     private func setupDebugMenuItem(with featureFlagger: FeatureFlagger) {
         guard let debugMenuItem else {
@@ -99,6 +103,11 @@ final class MainMenu: NSMenu {
         if debugMenuItem.submenu?.items.contains(loggingMenuItem) == false {
             debugMenuItem.submenu!.addItem(loggingMenuItem)
         }
+
+#if !NETWORK_PROTECTION
+        // Hide the entire NetP debug menu when the feature is disabled:
+        networkProtectionMenuItem?.removeFromParent()
+#endif
     }
 
     @IBOutlet weak var networkProtectionPreferredServerLocationItem: NSMenuItem?
@@ -146,8 +155,11 @@ final class MainMenu: NSMenu {
         updateShortcutMenuItems()
         updateLoggingMenuItems()
         updateBurnerWindowMenuItem()
+
+#if NETWORK_PROTECTION
         updateNetworkProtectionServerListMenuItems()
         updateNetworkProtectionRegistrationKeyValidityMenuItems()
+#endif
     }
 
     @MainActor
@@ -281,6 +293,7 @@ final class MainMenu: NSMenu {
         toggleBookmarksShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
         toggleDownloadsShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
 
+#if NETWORK_PROTECTION
         let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
         if networkProtectionFeatureVisibility.isFeatureActivated {
             toggleNetworkProtectionShortcutMenuItem?.isHidden = false
@@ -288,8 +301,12 @@ final class MainMenu: NSMenu {
         } else {
             toggleNetworkProtectionShortcutMenuItem?.isHidden = true
         }
+#else
+        toggleNetworkProtectionShortcutMenuItem?.isHidden = true
+#endif
     }
 
+#if NETWORK_PROTECTION
     private func updateNetworkProtectionServerListMenuItems() {
         guard let submenu = networkProtectionPreferredServerLocationItem?.submenu, let automaticItem = submenu.items.first else {
             assertionFailure("\(#function): Failed to get submenu")
@@ -360,6 +377,7 @@ final class MainMenu: NSMenu {
         validityMenu.isHidden = true
         #endif
     }
+#endif
 
     @MainActor
     private func updateBurnerWindowMenuItem() {

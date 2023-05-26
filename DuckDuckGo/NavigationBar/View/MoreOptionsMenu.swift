@@ -19,7 +19,10 @@
 import Cocoa
 import Common
 import BrowserServicesKit
+
+#if NETWORK_PROTECTION
 import NetworkProtection
+#endif
 
 protocol OptionsButtonMenuDelegate: AnyObject {
 
@@ -47,13 +50,17 @@ final class MoreOptionsMenu: NSMenu {
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
     private let passwordManagerCoordinator: PasswordManagerCoordinating
-    private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
     private let internalUserDecider: InternalUserDecider
+
+#if NETWORK_PROTECTION
+    private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
+#endif
 
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
     }
 
+#if NETWORK_PROTECTION
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
@@ -72,6 +79,24 @@ final class MoreOptionsMenu: NSMenu {
 
         setupMenuItems()
     }
+#else
+    init(tabCollectionViewModel: TabCollectionViewModel,
+         emailManager: EmailManager = EmailManager(),
+         passwordManagerCoordinator: PasswordManagerCoordinator,
+         internalUserDecider: InternalUserDecider) {
+
+        self.tabCollectionViewModel = tabCollectionViewModel
+        self.emailManager = emailManager
+        self.passwordManagerCoordinator = passwordManagerCoordinator
+        self.internalUserDecider = internalUserDecider
+
+        super.init(title: "")
+
+        self.emailManager.requestDelegate = self
+
+        setupMenuItems()
+    }
+#endif
 
     let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "")
 
@@ -100,11 +125,13 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "OptionsButtonMenuEmail"))
             .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
+#if NETWORK_PROTECTION
         if networkProtectionFeatureVisibility.isFeatureActivated {
             addItem(withTitle: UserText.networkProtection, action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
                 .targetting(self)
                 .withImage(.image(for: .vpnIcon))
         }
+#endif
 
         addItem(NSMenuItem.separator())
 

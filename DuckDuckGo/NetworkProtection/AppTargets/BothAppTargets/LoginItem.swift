@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import AppKit
 import Common
 import Foundation
@@ -112,7 +114,7 @@ struct LoginItem {
     func reset() throws {
         guard [.enabled, .requiresApproval].contains(status) else {
             os_log("🟢 reset not needed for login item %{public}@", log: .networkProtection, self.debugDescription)
-            throw NSError(domain: ServiceManagement.errorDomain, code: kSMErrorJobNotFound)
+            return
         }
         try? disable()
         try enable()
@@ -161,4 +163,7 @@ private struct SM: ServiceManagementProtocol {
     }
 
 }
+
 private var ServiceManagement: ServiceManagementProtocol { SM() } // swiftlint:disable:this identifier_name
+
+#endif

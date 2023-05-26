@@ -26,7 +26,10 @@ import Networking
 import Bookmarks
 import DDGSync
 import ServiceManagement
+
+#if NETWORK_PROTECTION
 import NetworkProtection
+#endif
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
@@ -197,7 +200,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
+#if NETWORK_PROTECTION
         startupNetworkProtection()
+#endif
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -253,6 +258,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     // MARK: - Network Protection
+
+#if NETWORK_PROTECTION
 
     private func startupNetworkProtection() {
         let networkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
@@ -317,6 +324,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             os_log("Successfully updated Network Protection servers; total server count = %{public}d", log: .networkProtection, serverCount)
         }
     }
+
+#endif
 
     private func subscribeToEmailProtectionStatusNotifications() {
         NotificationCenter.default.addObserver(self,

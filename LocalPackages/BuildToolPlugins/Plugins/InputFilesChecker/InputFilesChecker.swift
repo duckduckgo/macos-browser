@@ -41,13 +41,12 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("_WKDownload+WebKitDownload.swift", .source),
         .init("SystemExtensionManager.swift", .source),
         .init("DuckDuckGo Agent.app", .unknown),
-        .init("DuckDuckGo Notifications.app", .unknown)
+        .init("DuckDuckGo Notifications.app", .unknown),
+        .init("startVPN.app", .unknown),
+        .init("stopVPN.app", .unknown)
     ],
 
-    "DuckDuckGo Privacy Browser App Store": [
-        .init("DuckDuckGo Agent App Store.app", .unknown),
-        .init("NetworkProtectionAppExtension.appex", .unknown)
-    ],
+    "DuckDuckGo Privacy Browser App Store": [],
 
     "Unit Tests": [
         .init("BWEncryptionTests.swift", .source),
