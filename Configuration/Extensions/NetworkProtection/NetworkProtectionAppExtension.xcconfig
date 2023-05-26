@@ -43,3 +43,5 @@ PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).re
 SDKROOT = macosx
 SKIP_INSTALL = YES
 SWIFT_EMIT_LOC_STRINGS = YES
+
+LD_RUNPATH_SEARCH_PATHS = @executable_path/../Frameworks @executable_path/../../../../Frameworks
