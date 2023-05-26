@@ -49,11 +49,7 @@ AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.
 AGENT_BUNDLE_ID[config=CI][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.system-extension.agent.debug
 AGENT_BUNDLE_ID[config=Review][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.system-extension.agent.review
 
-SYSEX_BUNDLE_ID[sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
-SYSEX_BUNDLE_ID[config=CI][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
-SYSEX_BUNDLE_ID[config=Review][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
-SYSEX_BUNDLE_ID[config=Debug][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
-SYSEX_BUNDLE_ID[config=Release][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
+SYSEX_BUNDLE_ID = $(SYSEX_BUNDLE_ID_BASE).systemextension
 
 // Install Developer ID build to /Applications/DEBUG/
 DEPLOYMENT_LOCATION[config=Debug] = YES;
