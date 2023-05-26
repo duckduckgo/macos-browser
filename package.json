@@ -2,7 +2,7 @@
   "name": "macos-browser",
   "version": "1.0.0",
   "config": {
-    "yt_inject_bundle": "DuckDuckGo/Youtube Player/Resources/youtube-inject-bundle.js"
+    "yt_inject_bundle": "DuckDuckGo/YoutubePlayer/Resources/youtube-inject-bundle.js"
   },
   "scripts": {
     "test": "echo 'no test required'",

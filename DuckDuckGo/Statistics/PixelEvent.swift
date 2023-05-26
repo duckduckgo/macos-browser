@@ -112,6 +112,7 @@ extension Pixel {
         case debug(event: Debug, error: Error? = nil)
 
         // Activation Points
+        case newTabInitial
         case emailEnabledInitial
         case cookieManagementEnabledInitial
         case watchInDuckPlayerInitial
@@ -314,6 +315,8 @@ extension Pixel.Event {
             return "m_mac.set-as-default.initial"
         case .importDataInitial:
             return "m_mac.import-data.initial"
+        case .newTabInitial:
+            return "m_mac.new-tab-opened.initial"
         }
     }
 }
