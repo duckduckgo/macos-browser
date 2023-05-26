@@ -127,10 +127,10 @@ extension OSLog.OSLogWrapper {
 
 }
 
-func logOrAssertionFailure(_ message: StaticString, args: CVarArg...) {
-#if DEBUG
-    assertionFailure("\(message)")
+func logOrAssertionFailure(_ message: String) {
+#if DEBUG && !CI
+    assertionFailure(message)
 #else
-    os_log("BWManager: Wrong handler", type: .error)
+    os_log("%{public}s", type: .error, message)
 #endif
 }
