@@ -88,6 +88,12 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
         showNotification(content)
     }
 
+    func showSupercededNotification() {
+        let content = notificationContent(title: UserText.networkProtectioSupercededNotificationTitle,
+                                          subtitle: UserText.networkProtectionSupercededNotificationSubtitle)
+        showNotification(content)
+    }
+
     private func showNotification(_ content: UNNotificationContent) {
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: .none)
 
