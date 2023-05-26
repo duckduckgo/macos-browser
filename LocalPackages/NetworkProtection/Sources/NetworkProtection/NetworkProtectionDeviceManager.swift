@@ -108,7 +108,7 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
     /// This method will return the remote server list if available, or the local server list if there was a problem with the service call.
     ///
     public func refreshServerList() async throws -> [NetworkProtectionServer] {
-        guard let token = tokenStore.fetchToken() else {
+        guard let token = try? tokenStore.fetchToken() else {
             throw NetworkProtectionError.noAuthTokenFound
         }
         let servers = await networkClient.getServers(authToken: token)
@@ -179,7 +179,7 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
         var keyPair = keyStore.currentKeyPair()
 
         if !selectedServer.isRegistered(with: keyPair.publicKey) {
-            guard let token = tokenStore.fetchToken() else {
+            guard let token = try? tokenStore.fetchToken() else {
                 throw NetworkProtectionError.noAuthTokenFound
             }
             let registeredServersResult = await networkClient.register(authToken: token, publicKey: keyPair.publicKey, withServer: selectedServer.serverInfo)
@@ -324,7 +324,7 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
 
     private func handle(clientError: NetworkProtectionClientError) {
         if case .invalidAuthToken = clientError {
-            tokenStore.deleteToken()
+            try? tokenStore.deleteToken()
         }
         errorEvents?.fire(clientError.networkProtectionError)
     }

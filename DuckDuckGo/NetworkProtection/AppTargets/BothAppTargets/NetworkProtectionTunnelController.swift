@@ -369,7 +369,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         var options = [String: NSObject]()
 
         options["activationAttemptId"] = UUID().uuidString as NSString
-        options["authToken"] = tokenStore.fetchToken() as NSString?
+        options["authToken"] = try tokenStore.fetchToken() as NSString?
         options["selectedServer"] = Self.selectedServerName() as NSString?
         options["keyValidity"] = Self.registrationKeyValidity().map(String.init(describing:)) as NSString?
 

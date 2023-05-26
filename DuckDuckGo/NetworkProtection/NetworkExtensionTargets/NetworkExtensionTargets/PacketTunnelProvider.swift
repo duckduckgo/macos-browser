@@ -386,7 +386,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         protocolConfiguration as? NETunnelProviderProtocol
     }
 
-    private func load(options: [String: NSObject]?) {
+    private func load(options: [String: NSObject]?) throws {
         guard let options = options else {
             os_log("🔵 Tunnel options are not set", log: .networkProtection)
             return
@@ -394,7 +394,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
         loadKeyValidity(from: options)
         loadSelectedServer(from: options)
-        loadAuthToken(from: options)
+        try loadAuthToken(from: options)
     }
 
     private func loadVendorOptions(from provider: NETunnelProviderProtocol?) {
@@ -435,28 +435,40 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         selectedServerStore.selectedServer = .endpoint(serverName)
     }
 
-    private func loadAuthToken(from options: [String: AnyObject]) {
+    private func loadAuthToken(from options: [String: AnyObject]) throws {
         guard let authToken = options["authToken"] as? String else {
             return
         }
 
-        tokenStore.store(authToken)
+        try tokenStore.store(authToken)
     }
 
     override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         connectionStatus = .connecting
 
+        // when activated by system "on-demand" the option is set
+        let isOnDemand = options?["is-on-demand"] as? Bool == true
+        let isActivatedFromSystemSettings = options?["activationAttemptId"] == nil && !isOnDemand
+
         let internalCompletionHandler = { (error: Error?) in
             if error != nil {
                 self.connectionStatus = .disconnected
+
+                // if connection is failing when activated by system on-demand
+                // ask the Main App to disable the on-demand rule to prevent activation loop
+                // To be reconsidered for the Kill Switch
+                if isOnDemand {
+                    Task {
+                        await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+                        completionHandler(error)
+                    }
+                    return
+                }
             }
 
             completionHandler(error)
         }
 
-        // when activated by system "on-demand" the option is set
-        let isOnDemand = options?["is-on-demand"] as? Bool == true
-        let isActivatedFromSystemSettings = options?["activationAttemptId"] == nil && !isOnDemand
         if isActivatedFromSystemSettings {
             // ask the Main App to reconfigure & restart with on-demand rule “on” - when connection triggered from System Settings
             Task {
@@ -478,10 +490,14 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             return
         }
 
-        load(options: options)
-        os_log("🔵 Done!", log: .networkProtection, type: .info)
+        do {
+            try load(options: options)
+        } catch {
+            internalCompletionHandler(NEVPNError(.configurationInvalid))
+            return
+        }
 
-        os_log("🔵 Starting tunnel from the %{public}@", log: .networkProtection, type: .info, (isActivatedFromSystemSettings ? "settings" : (isOnDemand ? "on-demand" : "app")))
+        os_log("🔵 Done! Starting tunnel from the %{public}@", log: .networkProtection, type: .info, (isActivatedFromSystemSettings ? "settings" : (isOnDemand ? "on-demand" : "app")))
 
         startTunnel(selectedServer: selectedServerStore.selectedServer, completionHandler: internalCompletionHandler)
     }
@@ -508,7 +524,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
                 controllerErrorStore.lastErrorMessage = error.localizedDescription
 
-                let error = NSError(domain: NEVPNErrorDomain, code: NEVPNError.configurationInvalid.rawValue)
                 completionHandler(error)
             }
         }
