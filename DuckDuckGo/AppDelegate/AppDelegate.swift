@@ -265,8 +265,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         let networkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
 
         guard networkProtectionFeatureVisibility.isFeatureActivated else {
-            os_log(.error, log: .networkProtection, "🔴 deactivating netp")
-
             NetworkProtectionTunnelController.disableLoginItems()
             LocalPinningManager.shared.unpin(.networkProtection)
             return
