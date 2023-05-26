@@ -59,11 +59,6 @@ final class ContinueSetUpModelTests: XCTestCase {
     func testModelReturnsCorrectStrings() {
         XCTAssertEqual(vm.title, UserText.newTabSetUpSectionTitle)
         XCTAssertEqual(vm.deleteActionTitle, UserText.newTabSetUpRemoveItemAction)
-        XCTAssertEqual(vm.actionTitle(for: .defaultBrowser), UserText.newTabSetUpDefaultBrowserAction)
-        XCTAssertEqual(vm.actionTitle(for: .importBookmarksAndPasswords), UserText.newTabSetUpImportAction)
-        XCTAssertEqual(vm.actionTitle(for: .duckplayer), UserText.newTabSetUpDuckPlayerAction)
-        XCTAssertEqual(vm.actionTitle(for: .emailProtection), UserText.newTabSetUpEmailProtectionAction)
-        XCTAssertEqual(vm.actionTitle(for: .cookiePopUp), UserText.newTabSetUpCoockeManagerAction)
     }
 
     func testModelReturnsCorrectDimensions() {
@@ -336,23 +331,6 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertFalse(vm2.shouldShowAllFeatures)
     }
 
-    func testAsDefaultRemoveItemButtonVisibleIsNotVisible() {
-        XCTAssertFalse(vm.isRemoveItemButtonVisible)
-    }
-
-    func testOnShortHoverRemoveItemButtonVisibleIsNotVisible() {
-        vm.isHoveringOverItem = true
-        XCTAssertFalse(vm.isRemoveItemButtonVisible)
-    }
-
-    func testOnLongHoverRemoveItemButtonVisibleIsVisible() {
-        let predicate = NSPredicate(block: { _, _ -> Bool in
-            return self.vm.isRemoveItemButtonVisible == true
-        })
-        let isRemoveItemButtonVisibleExpectation = XCTNSPredicateExpectation(predicate: predicate, object: vm)
-        vm.isHoveringOverItem = true
-        wait(for: [isRemoveItemButtonVisibleExpectation], timeout: 1.1)
-    }
 
     private func expectedFeatureMatrixWithout(type: HomePage.Models.FeatureType) -> [[HomePage.Models.FeatureType]] {
         var features = HomePage.Models.FeatureType.allCases

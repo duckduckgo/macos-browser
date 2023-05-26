@@ -263,15 +263,19 @@ extension YoutubeOverlayUserScript {
             replyHandler(nil)
         }
 
+        guard let body = message.messageBody as? [String: Any] else {
+            return
+        }
+        let message = body["pixelName"] as? String
+        if message == "play.use" || message == "play.do_not_use" {
+            duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
+        }
+
         // Temporary pixel for first time user uses Duck Player
         if !Pixel.isNewUser {
             return
         }
-        guard let body = message.messageBody as? [String: Any] else {
-            return
-        }
-        let pixelName = body["pixelName"] as? String
-        if pixelName == "play.use" {
+        if message == "play.use" {
             let repetition = Pixel.Event.Repetition(key: Pixel.Event.watchInDuckPlayerInitial.name)
             if repetition == .initial {
                 Pixel.fire(.watchInDuckPlayerInitial)

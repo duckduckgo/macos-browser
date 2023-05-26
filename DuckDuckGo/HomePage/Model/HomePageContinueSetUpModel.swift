@@ -84,23 +84,6 @@ extension HomePage.Models {
             }
         }
 
-        private var showRemoveItemButtonTimer: Timer?
-
-        var isHoveringOverItem: Bool = false {
-            didSet {
-                if isHoveringOverItem {
-                    showRemoveItemButtonTimer = Timer.scheduledTimer(withTimeInterval: 0.8, repeats: false, block: { _ in
-                        self.isRemoveItemButtonVisible = true
-                    })
-                } else {
-                    showRemoveItemButtonTimer?.invalidate()
-                    isRemoveItemButtonVisible = false
-                }
-            }
-        }
-
-        @Published var isRemoveItemButtonVisible = false
-
         @Published var visibleFeaturesMatrix: [[FeatureType]] = [[]]
 
         init(defaultBrowserProvider: DefaultBrowserProvider,
@@ -118,21 +101,6 @@ extension HomePage.Models {
             self.cookieConsentPopoverManager = cookieConsentPopoverManager
             self.duckPlayerPreferences = duckPlayerPreferences
             refreshFeaturesMatrix()
-        }
-
-        func actionTitle(for featureType: FeatureType) -> String {
-            switch featureType {
-            case .defaultBrowser:
-                return UserText.newTabSetUpDefaultBrowserAction
-            case .importBookmarksAndPasswords:
-                return UserText.newTabSetUpImportAction
-            case .duckplayer:
-                return UserText.newTabSetUpDuckPlayerAction
-            case .emailProtection:
-                return UserText.newTabSetUpEmailProtectionAction
-            case .cookiePopUp:
-                return UserText.newTabSetUpCoockeManagerAction
-            }
         }
 
         @MainActor func performAction(for featureType: FeatureType) {
@@ -211,6 +179,7 @@ extension HomePage.Models {
                     }
                 }
             }
+            features.shuffle()
             featuresMatrix = features.chunked(into: itemsPerRow)
         }
         // swiftlint:enable cyclomatic_complexity
@@ -254,11 +223,11 @@ extension HomePage.Models {
 
     // MARK: Feature Type
     enum FeatureType: CaseIterable {
-        case defaultBrowser
-        case importBookmarksAndPasswords
+        case cookiePopUp
         case duckplayer
         case emailProtection
-        case cookiePopUp
+        case defaultBrowser
+        case importBookmarksAndPasswords
 
         var title: String {
             switch self {
@@ -278,54 +247,54 @@ extension HomePage.Models {
         var summary: String {
             switch self {
             case .defaultBrowser:
-                return "We automatically block trackers as you browse. It's privacy, simplified."
+                return UserText.newTabSetUpDefaultBrowserSummary
             case .importBookmarksAndPasswords:
-                return "Import all your bookmarks and passwords for a smooth transition."
+                return UserText.newTabSetUpImportSummary
             case .duckplayer:
-                return UserText.newTabSetUpDuckPlayerCardTitle
+                return UserText.newTabSetUpDuckPlayerSummary
             case .emailProtection:
-                return UserText.newTabSetUpEmailProtectionCardTitle
+                return UserText.newTabSetUpEmailProtectionSummary
             case .cookiePopUp:
-                return UserText.newTabSetUpCookieManagerCardTitle
+                return UserText.newTabSetUpCookieManagerSummary
             }
         }
 
         var action: String {
             switch self {
             case .defaultBrowser:
-                return "Set as Default"
+                return UserText.newTabSetUpDefaultBrowserAction
             case .importBookmarksAndPasswords:
-                return "Import Now"
+                return UserText.newTabSetUpImportAction
             case .duckplayer:
-                return UserText.newTabSetUpDuckPlayerCardTitle
+                return UserText.newTabSetUpDuckPlayerAction
             case .emailProtection:
-                return UserText.newTabSetUpEmailProtectionCardTitle
+                return UserText.newTabSetUpEmailProtectionAction
             case .cookiePopUp:
-                return UserText.newTabSetUpCookieManagerCardTitle
+                return UserText.newTabSetUpCookieManagerAction
             }
         }
 
         var icon: NSImage {
-            let iconSize = NSSize(width: 28, height: 28)
+            let iconSize = NSSize(width: 64, height: 48)
 
             switch self {
             case .defaultBrowser:
-                return NSImage(named: "DefaultBrowser")!.resized(to: iconSize)!
+                return NSImage(named: "Default-App-128")!.resized(to: iconSize)!
             case .importBookmarksAndPasswords:
-                return NSImage(named: "Bookmark-Import-Multicolor")!.resized(to: iconSize)!
+                return NSImage(named: "Import-128")!.resized(to: iconSize)!
             case .duckplayer:
-                return NSImage(named: "VideoPlayer-Multicolor")!.resized(to: iconSize)!
+                return NSImage(named: "Clean-Tube-128")!.resized(to: iconSize)!
             case .emailProtection:
-                return NSImage(named: "Email-Protection-Multicolor")!.resized(to: iconSize)!
+                return NSImage(named: "inbox-128")!.resized(to: iconSize)!
             case .cookiePopUp:
-                return NSImage(named: "Cookie-Multicolor")!.resized(to: iconSize)!
+                return NSImage(named: "Cookie-Popups-128")!.resized(to: iconSize)!
             }
         }
     }
 
     enum FeaturesGridDimensions {
         static let itemWidth: CGFloat = 240
-        static let itemHeight: CGFloat = 113
+        static let itemHeight: CGFloat = 160
         static let verticalSpacing: CGFloat = 10
         static let horizontalSpacing: CGFloat = 24
 
