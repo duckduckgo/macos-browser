@@ -79,7 +79,8 @@ final class FirePopoverViewController: NSViewController {
                                                          tabCollectionViewModel: tabCollectionViewModel,
                                                          historyCoordinating: historyCoordinating,
                                                          fireproofDomains: fireproofDomains,
-                                                         faviconManagement: faviconManagement, tld: ContentBlocking.shared.tld)
+                                                         faviconManagement: faviconManagement,
+                                                         tld: ContentBlocking.shared.tld)
 
         super.init(coder: coder)
     }

@@ -17,24 +17,25 @@
 //
 
 import Foundation
+import Common
 
 protocol RecentlyClosedCacheItem: AnyObject, RecentlyClosedCacheItemBurning {}
 
 protocol RecentlyClosedCacheItemBurning {
-    func burned(for domains: Set<String>) -> Self?
+    func burned(for baseDomains: Set<String>, tld: TLD) -> Self?
 }
 
 extension RecentlyClosedTab: RecentlyClosedCacheItemBurning {
-    func burned(for domains: Set<String>) -> RecentlyClosedTab? {
-        if contentContainsDomains(domains) {
+    func burned(for baseDomains: Set<String>, tld: TLD) -> RecentlyClosedTab? {
+        if contentContainsDomains(baseDomains, tld: tld) {
             return nil
         }
         interactionData = nil
         return self
     }
 
-    private func contentContainsDomains(_ domains: Set<String>) -> Bool {
-        if let host = tabContent.url?.host, domains.contains(host) {
+    private func contentContainsDomains(_ baseDomains: Set<String>, tld: TLD) -> Bool {
+        if let host = tabContent.url?.host, let baseDomain = tld.eTLDplus1(host), baseDomains.contains(baseDomain) {
             return true
         } else {
             return false
@@ -43,14 +44,14 @@ extension RecentlyClosedTab: RecentlyClosedCacheItemBurning {
 }
 
 extension RecentlyClosedWindow: RecentlyClosedCacheItemBurning {
-    func burned(for domains: Set<String>) -> RecentlyClosedWindow? {
-        tabs = tabs.compactMap { $0.burned(for: domains) }
+    func burned(for baseDomains: Set<String>, tld: TLD) -> RecentlyClosedWindow? {
+        tabs = tabs.compactMap { $0.burned(for: baseDomains, tld: tld) }
         return tabs.isEmpty ? nil : self
     }
 }
 
 extension Array where Element == RecentlyClosedCacheItem {
-    mutating func burn(for domains: Set<String>) {
-        self = compactMap { $0.burned(for: domains) }
+    mutating func burn(for baseDomains: Set<String>, tld: TLD) {
+        self = compactMap { $0.burned(for: baseDomains, tld: tld) }
     }
 }

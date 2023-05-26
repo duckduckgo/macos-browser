@@ -24,7 +24,7 @@ import XCTest
 final class WebCacheManagerMock: WebCacheManager {
 
     var clearCalled = false
-    override func clear(domains: Set<String>? = nil) async {
+    override func clear(baseDomains: Set<String>? = nil) async {
         clearCalled = true
     }
 

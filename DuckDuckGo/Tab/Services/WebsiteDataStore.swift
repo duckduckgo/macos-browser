@@ -40,14 +40,17 @@ internal class WebCacheManager {
 
     private let fireproofDomains: FireproofDomains
     private let websiteDataStore: WebsiteDataStore
+    private let tld: TLD
 
     init(fireproofDomains: FireproofDomains = FireproofDomains.shared,
-         websiteDataStore: WebsiteDataStore = WKWebsiteDataStore.default()) {
+         websiteDataStore: WebsiteDataStore = WKWebsiteDataStore.default(),
+         tld: TLD = ContentBlocking.shared.tld) {
         self.fireproofDomains = fireproofDomains
         self.websiteDataStore = websiteDataStore
+        self.tld = tld
     }
 
-    func clear(domains: Set<String>? = nil) async {
+    func clear(baseDomains: Set<String>? = nil) async {
         // first cleanup ~/Library/Caches
         await clearFileCache()
 
@@ -57,7 +60,7 @@ internal class WebCacheManager {
 
         await removeLocalStorageAndIndexedDBForNonFireproofDomains()
 
-        await removeCookies(forDomains: domains)
+        await removeCookies(for: baseDomains)
 
         await self.removeResourceLoadStatisticsDatabase()
     }
@@ -135,17 +138,15 @@ internal class WebCacheManager {
     }
 
     @MainActor
-    private func removeCookies(forDomains domains: Set<String>? = nil) async {
+    private func removeCookies(for baseDomains: Set<String>? = nil) async {
         guard let cookieStore = websiteDataStore.cookieStore else { return }
         var cookies = await cookieStore.allCookies()
 
-        if let domains = domains {
+        if let baseDomains = baseDomains {
             // If domains are specified, clear just their cookies
             cookies = cookies.filter { cookie in
-                domains.contains {
-                    $0 == cookie.domain
-                        || ".\($0)" == cookie.domain
-                        || (cookie.domain.hasPrefix(".") && $0.hasSuffix(cookie.domain))
+                baseDomains.contains {
+                    cookie.belongs(toETLDPlus1Domain: $0)
                 }
             }
         }

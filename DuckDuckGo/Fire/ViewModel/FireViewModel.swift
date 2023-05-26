@@ -42,7 +42,7 @@ final class FireViewModel {
 
     @MainActor
     init() {
-        fire = Fire()
+        fire = Fire(tld: ContentBlocking.shared.tld)
     }
 
 }

@@ -97,6 +97,7 @@ final class Fire {
     let pinnedTabsManager: PinnedTabsManager
     let tabsCleaner = TabDataCleaner()
     let secureVaultFactory: SecureVaultFactory
+    let tld: TLD
 
     enum BurningData: Equatable {
         case specificDomains(_ domains: Set<String>)
@@ -116,7 +117,8 @@ final class Fire {
          stateRestorationManager: AppStateRestorationManager? = nil,
          recentlyClosedCoordinator: RecentlyClosedCoordinating? = RecentlyClosedCoordinator.shared,
          pinnedTabsManager: PinnedTabsManager? = nil,
-         secureVaultFactory: SecureVaultFactory = SecureVaultFactory.default
+         secureVaultFactory: SecureVaultFactory = SecureVaultFactory.default,
+         tld: TLD
     ) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
@@ -127,6 +129,7 @@ final class Fire {
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
         self.pinnedTabsManager = pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager
         self.secureVaultFactory = secureVaultFactory
+        self.tld = tld
 
         if #available(macOS 11, *), autoconsentManagement == nil {
             self.autoconsentManagement = AutoconsentManagement.shared
@@ -145,31 +148,23 @@ final class Fire {
 
     @MainActor
     // swiftlint:disable:next function_body_length
-    func burnDomains(_ domains: Set<String>,
+    func burnDomains(_ baseDomains: Set<String>,
                      includingHistory: Bool = true,
                      completion: (() -> Void)? = nil) {
         os_log("Fire started", log: .fire)
 
         burnLastSessionState()
 
-        burningData = .specificDomains(domains)
+        burningData = .specificDomains(baseDomains)
 
-        // Add www prefixes
-        let wwwDomains = Set(domains.map { domain -> String in
-            if !domain.hasPrefix("www.") {
-                return "www.\(domain)"
-            }
-            return domain
-        })
-        let burningDomains = domains.union(wwwDomains)
-        let collectionsCleanupInfo = tabViewModelsFor(domains: burningDomains)
+        let collectionsCleanupInfo = tabViewModelsFor(baseDomains: baseDomains)
 
         // Prepare all Tabs that are going to be burned
         let tabsToRemove = collectionsCleanupInfo.values.flatMap { tabViewModelsCleanupInfo in
             tabViewModelsCleanupInfo.filter({ $0.action == .burn }).compactMap { $0.tabViewModel }
         }
 
-        let pinnedTabsViewModels = pinnedTabViewModels(for: burningDomains)
+        let pinnedTabsViewModels = pinnedTabViewModels(for: baseDomains)
 
         tabsCleaner.prepareTabsForCleanup(tabsToRemove) {
 
@@ -177,37 +172,37 @@ final class Fire {
 
             group.enter()
             self.burnTabsFrom(collectionViewModels: collectionsCleanupInfo,
-                              relatedToDomains: burningDomains) {
+                              relatedTo: baseDomains) {
                 group.leave()
             }
 
             group.enter()
-            self.burnPinnedTabs(pinnedTabsViewModels, onlyRelatedToDomains: domains) {
+            self.burnPinnedTabs(pinnedTabsViewModels, onlyRelatedToDomains: baseDomains) {
                 group.leave()
             }
 
             group.enter()
             Task {
-                await self.burnWebCache(domains: burningDomains)
+                await self.burnWebCache(baseDomains: baseDomains)
                 group.leave()
             }
 
             if includingHistory {
                 group.enter()
-                self.burnHistory(of: burningDomains, completion: {
-                    self.burnFavicons(for: burningDomains) {
+                self.burnHistory(of: baseDomains, completion: {
+                    self.burnFavicons(for: baseDomains) {
                         group.leave()
                     }
                 })
             }
 
             group.enter()
-            self.burnPermissions(of: burningDomains, completion: {
-                self.burnDownloads(of: burningDomains)
+            self.burnPermissions(of: baseDomains, completion: {
+                self.burnDownloads(of: baseDomains)
                 group.leave()
             })
 
-            self.burnRecentlyClosed(domains: burningDomains)
+            self.burnRecentlyClosed(baseDomains: baseDomains)
             self.burnAutoconsentCache()
 
             group.notify(queue: .main) {
@@ -314,9 +309,9 @@ final class Fire {
         os_log("WebsiteDataStore completed cookie deletion", log: .fire)
     }
 
-    private func burnWebCache(domains: Set<String>? = nil) async {
+    private func burnWebCache(baseDomains: Set<String>? = nil) async {
         os_log("WebsiteDataStore began cookie deletion", log: .fire)
-        await webCacheManager.clear(domains: domains)
+        await webCacheManager.clear(baseDomains: baseDomains)
         os_log("WebsiteDataStore completed cookie deletion", log: .fire)
     }
 
@@ -326,8 +321,8 @@ final class Fire {
         self.historyCoordinating.burn(except: FireproofDomains.shared, completion: completion)
     }
 
-    private func burnHistory(of domains: Set<String>, completion: @escaping () -> Void) {
-        self.historyCoordinating.burnDomains(domains, completion: completion)
+    private func burnHistory(of baseDomains: Set<String>, completion: @escaping () -> Void) {
+        self.historyCoordinating.burnDomains(baseDomains, tld: ContentBlocking.shared.tld, completion: completion)
     }
 
     // MARK: - Permissions
@@ -336,8 +331,8 @@ final class Fire {
         self.permissionManager.burnPermissions(except: FireproofDomains.shared, completion: completion)
     }
 
-    private func burnPermissions(of domains: Set<String>, completion: @escaping () -> Void) {
-        self.permissionManager.burnPermissions(of: domains, completion: completion)
+    private func burnPermissions(of baseDomains: Set<String>, completion: @escaping () -> Void) {
+        self.permissionManager.burnPermissions(of: baseDomains, tld: tld, completion: completion)
     }
 
     // MARK: - Downloads
@@ -348,8 +343,8 @@ final class Fire {
     }
 
     @MainActor
-    private func burnDownloads(of domains: Set<String>) {
-        self.downloadListCoordinator.cleanupInactiveDownloads(for: domains)
+    private func burnDownloads(of baseDomains: Set<String>) {
+        self.downloadListCoordinator.cleanupInactiveDownloads(for: baseDomains, tld: tld)
     }
 
     // MARK: - Favicons
@@ -370,11 +365,12 @@ final class Fire {
                                           completion: completion)
     }
 
-    private func burnFavicons(for domains: Set<String>, completion: @escaping () -> Void) {
+    private func burnFavicons(for baseDomains: Set<String>, completion: @escaping () -> Void) {
         let autofillDomains = autofillDomains()
-        self.faviconManagement.burnDomains(domains,
+        self.faviconManagement.burnDomains(baseDomains,
                                            exceptBookmarks: LocalBookmarkManager.shared,
                                            exceptSavedLogins: autofillDomains,
+                                           tld: tld,
                                            completion: completion)
     }
 
@@ -410,19 +406,21 @@ final class Fire {
         // Close tabs where specified domains are currently loaded
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             let keyWindow = self?.windowControllerManager.lastKeyMainWindowController
-            keyWindow?.mainViewController.tabCollectionViewModel.clearPinnedTabsData(cleanupInfo, onlyForDomains: domains)
+            keyWindow?.mainViewController.tabCollectionViewModel.burnPinnedTabs(cleanupInfo, onlyForDomains: domains)
 
             completion()
         }
     }
 
     private func burnTabsFrom(collectionViewModels: TabCollectionsCleanupInfo,
-                              relatedToDomains domains: Set<String>,
+                              relatedTo baseDomains: Set<String>,
                               completion: @escaping () -> Void) {
         // Close tabs where specified domains are currently loaded
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self else { return }
+
             for (tabCollectionViewModel, tabsCleanupInfo) in collectionViewModels {
-                tabCollectionViewModel.clearData(tabsCleanupInfo, forDomains: domains)
+                tabCollectionViewModel.burnTabCollection(tabsCleanupInfo, forDomains: baseDomains, tld: self.tld)
             }
 
             completion()
@@ -447,8 +445,8 @@ final class Fire {
     // MARK: - Burn Recently Closed
 
     @MainActor
-    private func burnRecentlyClosed(domains: Set<String>? = nil) {
-        recentlyClosedCoordinator?.burnCache(domains: domains)
+    private func burnRecentlyClosed(baseDomains: Set<String>? = nil) {
+        recentlyClosedCoordinator?.burnCache(baseDomains: baseDomains, tld: tld)
     }
 }
 
@@ -457,25 +455,25 @@ final class Fire {
 extension Fire {
 
     @MainActor
-    private func pinnedTabViewModels(for domains: Set<String>? = nil) -> [TabCollectionViewModel.TabCleanupInfo] {
-        guard let domains = domains else {
+    private func pinnedTabViewModels(for baseDomains: Set<String>? = nil) -> [TabCollectionViewModel.TabCleanupInfo] {
+        guard let baseDomains = baseDomains else {
             return pinnedTabsManager.tabViewModels.values.map { tabViewModel in
                 TabCollectionViewModel.TabCleanupInfo.init(tabViewModel: tabViewModel, action: .replace)
             }
         }
 
-        return prepareCleanupInfo(for: pinnedTabsManager.tabViewModels, relatedToDomains: domains)
+        return prepareCleanupInfo(for: pinnedTabsManager.tabViewModels, relatedToDomains: baseDomains)
     }
 
     @MainActor
-    private func tabViewModelsFor(domains: Set<String>) -> TabCollectionsCleanupInfo {
+    private func tabViewModelsFor(baseDomains: Set<String>) -> TabCollectionsCleanupInfo {
         var collectionsCleanupInfo = TabCollectionsCleanupInfo()
         for window in windowControllerManager.mainWindowControllers {
             let tabCollectionViewModel = window.mainViewController.tabCollectionViewModel
 
             collectionsCleanupInfo[tabCollectionViewModel] = prepareCleanupInfo(
                 for: tabCollectionViewModel.tabViewModels,
-                relatedToDomains: domains
+                relatedToDomains: baseDomains
             )
         }
 
@@ -484,13 +482,13 @@ extension Fire {
 
     private func prepareCleanupInfo(
         for tabViewModels: [Tab: TabViewModel],
-        relatedToDomains domains: Set<String>
+        relatedToDomains baseDomains: Set<String>
     ) -> [TabCollectionViewModel.TabCleanupInfo] {
 
         var result = [TabCollectionViewModel.TabCleanupInfo]()
 
         for (tab, tabViewModel) in tabViewModels {
-            let action = tab.fireAction(for: domains)
+            let action = tab.fireAction(for: baseDomains, tld: tld)
             switch action {
             case .none: continue
             case .replace, .burn:
@@ -510,7 +508,7 @@ fileprivate extension TabCollectionViewModel {
     }
 
     // Burns data related to domains from the collection of tabs
-    func clearData(_ cleanupInfo: [TabCleanupInfo], forDomains domains: Set<String>) {
+    func burnTabCollection(_ cleanupInfo: [TabCleanupInfo], forDomains baseDomains: Set<String>, tld: TLD) {
         // Go one by one and execute the fire action
         var toRemove = IndexSet()
         for tabCleanupInfo in cleanupInfo {
@@ -530,11 +528,14 @@ fileprivate extension TabCollectionViewModel {
         removeTabsAndAppendNew(at: toRemove, forceChange: true)
 
         // Clean local history of closed tabs
-        tabCollection.localHistoryOfRemovedTabs.subtract(domains)
+        tabCollection.localHistoryOfRemovedTabs = tabCollection.localHistoryOfRemovedTabs.filter { localHistoryDomain in
+            let localHistoryBaseDomain = tld.eTLDplus1(localHistoryDomain) ?? ""
+            return !baseDomains.contains(localHistoryBaseDomain)
+        }
     }
 
     // Burns data from the collection of pinned tabs, optionally limited to the set of domains
-    func clearPinnedTabsData(_ cleanupInfo: [TabCleanupInfo], onlyForDomains domains: Set<String>? = nil) {
+    func burnPinnedTabs(_ cleanupInfo: [TabCleanupInfo], onlyForDomains domains: Set<String>? = nil) {
         guard let pinnedTabsManager = pinnedTabsManager else {
             return
         }
@@ -577,15 +578,21 @@ fileprivate extension Tab {
 
     // Burns data related to domains from the tab
     // Returns true if the tab should be closed because it remained empty after burning
-    func fireAction(for domains: Set<String>) -> FireAction {
-        // If currently visited website belongs to one of domains, burn
-        if let host = webView.url?.host, domains.contains(host) {
+    func fireAction(for baseDomains: Set<String>, tld: TLD) -> FireAction {
+        guard let host = webView.url?.host, let baseDomain = tld.eTLDplus1(host) else {
+            assertionFailure("Failed to get base domain")
+            return .burn
+        }
+
+        // If currently visited website belongs to one of base domains, burn
+        if baseDomains.contains(baseDomain) {
             return .burn
         }
 
         // If tab visited one of domains in past, replace (to clean internal data)
         if localHistory.contains(where: { visitedDomain in
-            domains.contains(visitedDomain)
+            let visitedBaseDomain = tld.eTLDplus1(visitedDomain) ?? ""
+            return baseDomains.contains(visitedBaseDomain)
         }) {
             return .replace
         }
