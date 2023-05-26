@@ -18,7 +18,10 @@
 
 import Common
 import Foundation
+
+#if NETWORK_PROTECTION
 import NetworkProtection
+#endif
 
 @MainActor
 final class URLEventHandler {
@@ -96,12 +99,18 @@ final class URLEventHandler {
     }
 
     private static func openURL(_ url: URL) {
+#if NETWORK_PROTECTION
         if url.scheme == "networkprotection" {
             handleNetworkProtectionURL(url)
         } else {
             WindowControllersManager.shared.show(url: url, newTab: true)
         }
+#else
+        WindowControllersManager.shared.show(url: url, newTab: true)
+#endif
     }
+
+#if NETWORK_PROTECTION
 
     /// Handles NetP URLs
     ///
@@ -115,4 +124,7 @@ final class URLEventHandler {
             return
         }
     }
+
+#endif
+
 }

@@ -29,14 +29,16 @@ public protocol NetworkProtectionCodeRedeeming {
 public final class NetworkProtectionCodeRedemptionCoordinator: NetworkProtectionCodeRedeeming {
     private let networkClient: NetworkProtectionClient
     private let tokenStore: NetworkProtectionTokenStore
-
+    private let versionStore: NetworkProtectionLastVersionRunStore
     private let errorEvents: EventMapping<NetworkProtectionError>
 
     public init(networkClient: NetworkProtectionClient = NetworkProtectionBackendClient(),
                 tokenStore: NetworkProtectionTokenStore,
+                versionStore: NetworkProtectionLastVersionRunStore = .init(),
                 errorEvents: EventMapping<NetworkProtectionError>) {
         self.networkClient = networkClient
         self.tokenStore = tokenStore
+        self.versionStore = versionStore
         self.errorEvents = errorEvents
     }
 
@@ -45,6 +47,9 @@ public final class NetworkProtectionCodeRedemptionCoordinator: NetworkProtection
         switch result {
         case .success(let token):
             tokenStore.store(token)
+            // enable version checker on next run
+            versionStore.lastVersionRun = AppVersion.shared.versionNumber
+
         case .failure(let error):
             errorEvents.fire(error.networkProtectionError)
             throw error

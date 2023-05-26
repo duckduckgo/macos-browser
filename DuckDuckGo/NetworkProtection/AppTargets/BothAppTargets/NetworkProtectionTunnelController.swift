@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import Foundation
 import Combine
 import SwiftUI
@@ -231,11 +233,15 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     // MARK: - Ensure things are working
 
-    private static let vpnMenuLoginItem = LoginItem(identifier: .vpnMenu)
+    private static var loginItems: [LoginItem] {
+#if NETP_SYSTEM_EXTENSION
+        [.notificationsAgent, .vpnMenu]
+#else
+        [.vpnMenu]
+#endif
+    }
 
 #if NETP_SYSTEM_EXTENSION
-    private static let notificationsAgentLoginItem = LoginItem(identifier: .notificationsAgent)
-
     /// - Returns: `true` if the system extension and the background agent were activated successfully
     ///
     private func ensureSystemExtensionIsActivated() async throws -> Bool {
@@ -251,40 +257,67 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 #endif
 
-    private static func ensureLoginItemsAreEnabled() async {
-#if NETP_SYSTEM_EXTENSION
-        do {
-            try notificationsAgentLoginItem.enable()
-        } catch {
-            let error = StartError.couldNotEnableLoginItems(error: error)
+    static func enableLoginItems() {
+        updateLoginItems("enable", using: LoginItem.enable)
+        ensureLoginItemsAreRunning()
+    }
 
-            // A failure to enable the agent should not prevent NetP from working in release builds,
-            // but we want to catch the error in debug builds.
-            assertionFailure("Could not enable the Login Items: \(error.localizedDescription)")
+    static func resetLoginItems() {
+        updateLoginItems("reset", using: LoginItem.reset)
+        ensureLoginItemsAreRunning(.ifLoginItemsAreEnabled)
+    }
+
+    static func disableLoginItems() {
+        updateLoginItems("disable", using: LoginItem.disable)
+    }
+
+    private static func updateLoginItems(_ whatAreWeDoing: String, using enable: (LoginItem) -> () throws -> Void) {
+        for item in loginItems {
+            do {
+                try enable(item)()
+            } catch let error as NSError {
+                logOrAssertionFailure("🔴 Could not \(whatAreWeDoing) \(item): \(error.debugDescription)")
+            }
         }
-#endif
+    }
 
-        do {
-            try vpnMenuLoginItem.enable()
-        } catch {
-            let error = StartError.couldNotEnableLoginItems(error: error)
+    enum LoginItemCheckCondition {
+        case none
+        case ifLoginItemsAreEnabled
 
-            // A failure to enable the agent should not prevent NetP from working in release builds,
-            // but we want to catch the error in debug builds.
-            assertionFailure("Could not enable the Login Items: \(error.localizedDescription)")
+        var shouldIgnoreItemStatus: Bool {
+            self == .none
+        }
+    }
+    static func ensureLoginItemsAreRunning(_ condition: LoginItemCheckCondition = .none, after interval: TimeInterval = .seconds(5)) {
+        Task {
+            try await Task.sleep(interval: interval)
+
+            os_log(.error, log: .networkProtection, "🟢 checking login agents")
+            for item in Self.loginItems {
+                guard !item.isRunning && (condition.shouldIgnoreItemStatus || item.status.isEnabled) else {
+                    os_log(.error, log: .networkProtection, "🟢 %{public}s: ok", item.debugDescription)
+                    continue
+                }
+                os_log(.error, log: .networkProtection, "🔴 %{public}s is not running, launching manually", item.debugDescription)
+
+                do {
+                    try await item.launch()
+                    os_log("🔴 launched %{public}s", item.debugDescription)
+                } catch {
+                    os_log(.error, log: .networkProtection, "🔴 %{public}s could not be launched. %{public}s", item.debugDescription, "\(error)")
+                }
+            }
         }
     }
 
     // MARK: - Starting & Stopping the VPN
 
     enum StartError: LocalizedError {
-        case couldNotEnableLoginItems(error: Error)
         case simulateControllerFailureError
 
         var errorDescription: String? {
             switch self {
-            case .couldNotEnableLoginItems(let error):
-                return "Failed to enable login items: \(error.localizedDescription)"
             case .simulateControllerFailureError:
                 return "Simulated a controller error as requested"
             }
@@ -301,7 +334,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         controllerErrorStore.lastErrorMessage = nil
 
         if enableLoginItems {
-            await Self.ensureLoginItemsAreEnabled()
+            Self.enableLoginItems()
         }
 
 #if NETP_SYSTEM_EXTENSION
@@ -381,34 +414,39 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     // MARK: - Debug commands for the extension
 
-    static func resetAllState() {
-        Task {
-
-            if let activeSession = try? await ConnectionSessionUtilities.activeSession() {
-                try? activeSession.sendProviderMessage(Data([ExtensionMessage.resetAllState.rawValue])) { _ in
-                    os_log("Status was reset in the extension", log: .networkProtection)
-                }
+    static func resetAllState() async throws {
+        if let activeSession = try? await ConnectionSessionUtilities.activeSession() {
+            try? activeSession.sendProviderMessage(Data([ExtensionMessage.resetAllState.rawValue])) { _ in
+                os_log("Status was reset in the extension", log: .networkProtection)
             }
+        }
 
-            // ☝️ Take care of resetting all state within the extension first, and wait half a second
-            try? await Task.sleep(interval: 0.5)
-            // 👇 And only afterwards turn off the tunnel and removing it from prefernces
+        // ☝️ Take care of resetting all state within the extension first, and wait half a second
+        try? await Task.sleep(interval: 0.5)
+        // 👇 And only afterwards turn off the tunnel and removing it from prefernces
 
-            let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
+        let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
 
-            if let tunnels = tunnels {
-                for tunnel in tunnels {
-                    tunnel.connection.stopVPNTunnel()
-                    try? await tunnel.removeFromPreferences()
-                }
+        if let tunnels = tunnels {
+            for tunnel in tunnels {
+                tunnel.connection.stopVPNTunnel()
+                try? await tunnel.removeFromPreferences()
             }
+        }
+
+        NetworkProtectionSelectedServerUserDefaultsStore().reset()
+
+        try await removeSystemExtensionAndAgents()
+    }
+
+    static func removeSystemExtensionAndAgents() async throws {
+        loginItems.forEach { loginItem in
+            try? loginItem.disable()
+        }
 
 #if NETP_SYSTEM_EXTENSION
-            try? notificationsAgentLoginItem.disable()
+        try await SystemExtensionManager.shared.deactivate()
 #endif
-            try? vpnMenuLoginItem.disable()
-            NetworkProtectionSelectedServerUserDefaultsStore().reset()
-        }
     }
 
     static func setSelectedServer(selectedServer: SelectedNetworkProtectionServer) {
@@ -487,3 +525,5 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
 }
+
+#endif

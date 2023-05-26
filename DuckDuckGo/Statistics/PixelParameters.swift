@@ -30,7 +30,6 @@ extension Pixel {
         static let underlyingErrorDesc = "ud"
         static let underlyingErrorSQLiteCode = "sqlrc"
         static let underlyingErrorSQLiteExtendedCode = "sqlerc"
-
         static let keychainErrorCode = "keychain_error_code"
 
         static let emailCohort = "cohort"
@@ -111,6 +110,7 @@ extension Pixel.Event {
              .watchInDuckPlayerInitial,
              .setAsDefaultInitial,
              .importDataInitial,
+             .newTabInitial,
              .networkProtectionSystemExtensionUnknownActivationResult:
 
             return nil

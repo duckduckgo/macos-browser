@@ -17,7 +17,12 @@
 #include "../AppStore.xcconfig"
 #include "ManualAppStoreRelease.xcconfig"
 
-PRODUCT_BUNDLE_IDENTIFIER = $(MAIN_BUNDLE_IDENTIFIER)
+AGENT_BUNDLE_ID[sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.agent
+AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.agent.debug
+AGENT_BUNDLE_ID[config=CI][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.agent.debug
+AGENT_BUNDLE_ID[config=Review][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.agent.review
+
+BUNDLE_IDENTIFIER_PREFIX = $(MAIN_BUNDLE_IDENTIFIER)
 
 CODE_SIGN_ENTITLEMENTS = DuckDuckGo/DuckDuckGoAppStore.entitlements
 CODE_SIGN_ENTITLEMENTS[config=CI][arch=*][sdk=*] = DuckDuckGo/DuckDuckGoAppStoreCI.entitlements
@@ -39,10 +44,5 @@ PROVISIONING_PROFILE_SPECIFIER[config=Debug][sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios macos
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = Sandbox MacOS Browser Product Review
-
-AGENT_BUNDLE_ID[sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent
-AGENT_BUNDLE_ID[config=Debug][sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent.debug
-AGENT_BUNDLE_ID[config=CI][sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent.debug
-AGENT_BUNDLE_ID[config=Review][sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent.review
 
 #include? "../../LocalOverridesAppStore.xcconfig"

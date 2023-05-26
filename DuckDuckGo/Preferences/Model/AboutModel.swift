@@ -21,11 +21,18 @@ import Common
 
 final class AboutModel: ObservableObject {
     let appVersion = AppVersion()
-    private let netPInvitePresenter: NetworkProtectionInvitePresenting
 
+#if NETWORK_PROTECTION
+    private let netPInvitePresenter: NetworkProtectionInvitePresenting
+#endif
+
+#if NETWORK_PROTECTION
     init(netPInvitePresenter: NetworkProtectionInvitePresenting) {
         self.netPInvitePresenter = netPInvitePresenter
     }
+#else
+    init() {}
+#endif
 
     let displayableAboutURL: String = URL.aboutDuckDuckGo
         .toString(decodePunycode: false, dropScheme: true, needsWWW: false, dropTrailingSlash: false)
@@ -40,7 +47,9 @@ final class AboutModel: ObservableObject {
         FeedbackPresenter.presentFeedbackForm()
     }
 
+#if NETWORK_PROTECTION
     func displayNetPInvite() {
         netPInvitePresenter.present()
     }
+#endif
 }

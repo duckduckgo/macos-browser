@@ -14,7 +14,7 @@
 //
 
 #include "AppTargetsBase.xcconfig"
-#include "../DeveloperID.xcconfig"
+#include "../NetworkProtectionDeveloperID.xcconfig"
 
 PRODUCT_BUNDLE_IDENTIFIER = $(MAIN_BUNDLE_IDENTIFIER)
 
@@ -25,6 +25,8 @@ CODE_SIGN_ENTITLEMENTS[config=CI][arch=*][sdk=*] = DuckDuckGo/DuckDuckGoCI.entit
 CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
+
+FEATURE_FLAGS = FEEDBACK NETWORK_PROTECTION
 
 PRODUCT_NAME_PREFIX = DuckDuckGo
 
@@ -52,5 +54,10 @@ SYSEX_BUNDLE_ID[config=CI][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
 SYSEX_BUNDLE_ID[config=Review][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
 SYSEX_BUNDLE_ID[config=Debug][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
 SYSEX_BUNDLE_ID[config=Release][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
+
+// Install Developer ID build to /Applications/DEBUG/
+DEPLOYMENT_LOCATION[config=Debug] = YES;
+DSTROOT[config=Debug] = /;
+INSTALL_PATH[config=Debug] = Applications/DEBUG;
 
 #include? "../../LocalOverrides.xcconfig"

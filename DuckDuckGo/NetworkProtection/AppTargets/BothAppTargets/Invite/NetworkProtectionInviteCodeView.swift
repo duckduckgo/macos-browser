@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import SwiftUI
 import NetworkProtection
 import SwiftUIExtensions
@@ -64,3 +66,5 @@ struct NetworkProtectionInviteCodeView_Previews: PreviewProvider {
         NetworkProtectionInviteCodeView(model: NetworkProtectionInviteViewModel(delegate: NetworkProtectionInvitePresenter(), redemptionCoordinator: NetworkProtectionCodeRedemptionCoordinator()))
     }
 }
+
+#endif

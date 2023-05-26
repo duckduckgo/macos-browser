@@ -16,46 +16,79 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
+import AppKit
+import Common
 import Foundation
 import ServiceManagement
 
-/// Extensible enum for login item identifiers
-///
-struct LoginItemIdentifier: RawRepresentable {
-    /// Holds the key for the field from this target's Info.plist file that stores the string value
-    /// of the Bundle ID of the login item that this identifier represents.
-    ///
-    var rawValue: String
+extension LoginItem {
 
-    init(_ rawValue: String) {
-        self.rawValue = rawValue
-    }
+    static let vpnMenu = LoginItem(bundleId: Bundle.main.vpnMenuAgentBundleId, url: Bundle.main.vpnMenuAgentURL)
+#if NETP_SYSTEM_EXTENSION
+    static let notificationsAgent = LoginItem(bundleId: Bundle.main.notificationsAgentBundleId, url: Bundle.main.notificationsAgentURL)
+#endif
 
-    init?(rawValue: String) {
-        self.rawValue = rawValue
-    }
 }
 
 /// Takes care of enabling and disabling a login item.
 ///
-final class LoginItem {
-    private static let resetDelay = 200
+struct LoginItem {
 
     let agentBundleID: String
+    let url: URL
 
-    convenience init(identifier: LoginItemIdentifier) {
-        guard let agentBundleID = Bundle.main.object(forInfoDictionaryKey: identifier.rawValue) as? String else {
-            fatalError("Please make sure that this target has key \(identifier.rawValue) in its Info.plist file.")
-        }
-
-        self.init(agentBundleID: agentBundleID)
+    var isRunning: Bool {
+        !runningApplications.isEmpty
     }
 
-    init(agentBundleID: String) {
-        self.agentBundleID = agentBundleID
+    private var runningApplications: [NSRunningApplication] {
+        NSRunningApplication.runningApplications(withBundleIdentifier: agentBundleID)
+    }
+
+    enum Status {
+        case notRegistered
+        case enabled
+        case requiresApproval
+        case notFound
+
+        var isEnabled: Bool {
+            self == .enabled
+        }
+
+        @available(macOS 13.0, *)
+        public init(_ status: SMAppService.Status) {
+            switch status {
+            case .notRegistered: self = .notRegistered
+            case .enabled: self = .enabled
+            case .requiresApproval: self = .requiresApproval
+            case .notFound: self = .notFound
+            @unknown default: self = .notFound
+            }
+        }
+    }
+
+    var status: Status {
+        guard #available(macOS 13.0, *) else {
+            guard let job = ServiceManagement.copyAllJobDictionaries(kSMDomainUserLaunchd).first(where: {
+                $0["Label"] as? String == agentBundleID
+            }) else { return .notRegistered }
+
+            os_log("🟢 found login item job: %{public}@", log: .networkProtection, job.debugDescription)
+            return job["OnDemand"] as? Bool == true ? .enabled : .requiresApproval
+        }
+        return Status(SMAppService.loginItem(identifier: agentBundleID).status)
+    }
+
+    init(bundleId: String, url: URL) {
+        self.agentBundleID = bundleId
+        self.url = url
     }
 
     func enable() throws {
+        os_log("🟢 registering login item %{public}@", log: .networkProtection, self.debugDescription)
+
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).register()
         } else {
@@ -64,21 +97,14 @@ final class LoginItem {
     }
 
     func disable() throws {
+        os_log("🟢 unregistering login item %{public}@", log: .networkProtection, self.debugDescription)
+
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).unregister()
         } else {
             SMLoginItemSetEnabled(agentBundleID as CFString, false)
         }
-    }
-
-    func isRunning() -> Bool {
-        let workspace = NSWorkspace.shared
-        let runningApps = workspace.runningApplications
-
-        for app in runningApps where app.bundleIdentifier == agentBundleID {
-            return true
-        }
-        return false
+        stop()
     }
 
     /// Resets a login item.
@@ -86,7 +112,58 @@ final class LoginItem {
     /// This call will only enable the login item if it was enabled to begin with.
     ///
     func reset() throws {
-        try disable()
+        guard [.enabled, .requiresApproval].contains(status) else {
+            os_log("🟢 reset not needed for login item %{public}@", log: .networkProtection, self.debugDescription)
+            return
+        }
+        try? disable()
         try enable()
     }
+
+    func launch() async throws {
+        os_log("🟢 launching login item %{public}@", log: .networkProtection, self.debugDescription)
+        _=try await NSWorkspace.shared.openApplication(at: url, configuration: .init())
+    }
+
+    private func stop() {
+        let runningApplications = runningApplications
+        os_log("🟢 stopping %{public}@", log: .networkProtection, runningApplications.map { $0.processIdentifier }.description)
+        runningApplications.forEach { $0.terminate() }
+    }
+
 }
+
+extension LoginItem: CustomDebugStringConvertible {
+
+    var debugDescription: String {
+        "<LoginItem \(agentBundleID) isEnabled: \(status) isRunning: \(isRunning)>"
+    }
+
+}
+
+private protocol ServiceManagementProtocol {
+    func copyAllJobDictionaries(_ domain: CFString!) -> [[String: Any]]
+    var errorDomain: String { get }
+}
+private struct SM: ServiceManagementProtocol {
+
+    // suppress SMCopyAllJobDictionaries deprecation warning
+    @available(macOS, introduced: 10.6, deprecated: 10.10)
+    func copyAllJobDictionaries(_ domain: CFString!) -> [[String: Any]] {
+        SMCopyAllJobDictionaries(domain).takeRetainedValue() as? [[String: Any]] ?? []
+    }
+
+    @available(macOS, introduced: 10.6, deprecated: 10.10)
+    var errorDomain: String {
+        if #available(macOS 13.0, *) {
+            return "SMAppServiceErrorDomain"
+        } else {
+            return kSMErrorDomainLaunchd as String
+        }
+    }
+
+}
+
+private var ServiceManagement: ServiceManagementProtocol { SM() } // swiftlint:disable:this identifier_name
+
+#endif

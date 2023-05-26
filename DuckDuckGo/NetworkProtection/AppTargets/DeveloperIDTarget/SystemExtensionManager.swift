@@ -27,10 +27,10 @@ final actor SystemExtensionManager: NSObject {
     }
 
     final class RequestDelegate: NSObject, OSSystemExtensionRequestDelegate {
-        private let waitingForUserApprovalHandler: () -> Void
+        private let waitingForUserApprovalHandler: (() -> Void)?
         private let completionHandler: (RequestDelegate, Result<RequestResult, Error>) -> Void
 
-        init(waitingForUserApprovalHandler: @escaping () -> Void, completionHandler: @escaping (RequestDelegate, Result<RequestResult, Error>) -> Void) {
+        init(waitingForUserApprovalHandler: (() -> Void)? = nil, completionHandler: @escaping (RequestDelegate, Result<RequestResult, Error>) -> Void) {
             self.waitingForUserApprovalHandler = waitingForUserApprovalHandler
             self.completionHandler = completionHandler
         }
@@ -41,7 +41,7 @@ final actor SystemExtensionManager: NSObject {
         }
 
         func requestNeedsUserApproval(_ request: OSSystemExtensionRequest) {
-            waitingForUserApprovalHandler()
+            waitingForUserApprovalHandler?()
         }
 
         func request(_ request: OSSystemExtensionRequest, didFinishWithResult result: OSSystemExtensionRequest.Result) {
@@ -87,12 +87,12 @@ final actor SystemExtensionManager: NSObject {
         }
     }
 
-    func deactivate(waitingForUserApprovalHandler: @Sendable @escaping () -> Void) async throws -> RequestResult {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<RequestResult, Error>) in
+    func deactivate() async throws {
+        try await withCheckedThrowingContinuation { continuation in
             let activationRequest = OSSystemExtensionRequest.deactivationRequest(forExtensionWithIdentifier: bundleID, queue: .main)
 
-            let requestDelegate = RequestDelegate(waitingForUserApprovalHandler: waitingForUserApprovalHandler) { request, result in
-                continuation.resume(with: result)
+            let requestDelegate = RequestDelegate { request, result in
+                continuation.resume(with: result.map { _ in () })
 
                 // Intentionally retaining self until this closure is executed
                 self.requests.remove(request)

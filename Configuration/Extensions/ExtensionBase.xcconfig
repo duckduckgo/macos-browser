@@ -36,4 +36,4 @@ INFOPLIST_KEY_CFBundleDisplayName = $(TARGET_NAME)
 
 SWIFT_OBJC_BRIDGING_HEADER =
 
-LD_RUNPATH_SEARCH_PATHS = @executable_path/../Frameworks @executable_path/../../../../Frameworks
+SWIFT_STRICT_CONCURRENCY = minimal; // Temporarily disabled to expedite the NetP merge

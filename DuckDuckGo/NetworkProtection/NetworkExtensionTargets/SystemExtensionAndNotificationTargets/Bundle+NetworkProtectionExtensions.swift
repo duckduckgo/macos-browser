@@ -20,6 +20,10 @@ import Foundation
 
 extension Bundle {
 
+    var versionNumber: String? {
+        object(forInfoDictionaryKey: kCFBundleVersionKey as String) as? String
+    }
+
     var networkExtension: [String: Any] {
         guard let networkExtensionDict = self.infoDictionary!["NetworkExtension"] as? [String: Any] else {
             fatalError("NetworkExtension dict is missing in Info.plist")

@@ -17,7 +17,11 @@
 //
 
 import XCTest
+
+#if NETWORK_PROTECTION
 import NetworkProtection
+#endif
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @MainActor
@@ -27,20 +31,32 @@ final class MoreOptionsMenuTests: XCTestCase {
     var passwordManagerCoordinator: PasswordManagerCoordinator!
     var capturingActionDelegate: CapturingOptionsButtonMenuDelegate!
     var moreOptionMenu: MoreOptionsMenu!
-    var networkProtectionVisibilityMock: NetworkProtectionVisibilityMock!
     var internalUserDecider: InternalUserDeciderMock!
+
+#if NETWORK_PROTECTION
+    var networkProtectionVisibilityMock: NetworkProtectionVisibilityMock!
+#endif
 
     override func setUp() {
         super.setUp()
         tabCollectionViewModel = TabCollectionViewModel()
         passwordManagerCoordinator = PasswordManagerCoordinator()
         capturingActionDelegate = CapturingOptionsButtonMenuDelegate()
-        networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(activated: false)
         internalUserDecider = InternalUserDeciderMock()
+
+#if NETWORK_PROTECTION
+        networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(activated: false)
+
         moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                          passwordManagerCoordinator: passwordManagerCoordinator,
                                          networkProtectionFeatureVisibility: networkProtectionVisibilityMock,
                                          internalUserDecider: internalUserDecider)
+#else
+        moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
+                                         passwordManagerCoordinator: passwordManagerCoordinator,
+                                         internalUserDecider: internalUserDecider)
+#endif
+
         moreOptionMenu.actionDelegate = capturingActionDelegate
     }
 
@@ -53,10 +69,16 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
     func testThatMoreOptionMenuHasTheExpectedItems_WhenNetworkProtectionIsEnabled() {
+#if NETWORK_PROTECTION
         let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                              passwordManagerCoordinator: passwordManagerCoordinator,
                                              networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(activated: true),
                                              internalUserDecider: internalUserDecider)
+#else
+        let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
+                                             passwordManagerCoordinator: passwordManagerCoordinator,
+                                             internalUserDecider: internalUserDecider)
+#endif
 
         XCTAssertEqual(moreOptionMenu.items[0].title, "Send Feedback")
         XCTAssertTrue(moreOptionMenu.items[1].isSeparatorItem)
@@ -76,10 +98,16 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
     func testThatMoreOptionMenuHasTheExpectedItems_WhenNetworkProtectionIsDisabled() {
+#if NETWORK_PROTECTION
         let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                              passwordManagerCoordinator: passwordManagerCoordinator,
                                              networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(activated: false),
                                              internalUserDecider: internalUserDecider)
+#else
+        let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
+                                             passwordManagerCoordinator: passwordManagerCoordinator,
+                                             internalUserDecider: internalUserDecider)
+#endif
 
         XCTAssertEqual(moreOptionMenu.items[0].title, "Send Feedback")
         XCTAssertTrue(moreOptionMenu.items[1].isSeparatorItem)
@@ -121,6 +149,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
 }
 
+#if NETWORK_PROTECTION
 final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility {
 
     var activated: Bool
@@ -134,3 +163,4 @@ final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility 
     }
 
 }
+#endif
