@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import CoreGraphics
 
 extension NSImage {
@@ -57,6 +57,11 @@ extension NSImage {
         image.unlockFocus()
 
         return image
+    }
+
+    func ciImage(with size: NSSize?) -> CIImage {
+        var rect = NSRect(origin: .zero, size: size ?? self.size)
+        return CIImage(cgImage: self.cgImage(forProposedRect: &rect, context: nil, hints: nil)!)
     }
 
 }

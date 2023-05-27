@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1683825973772,
+    "version": 1685127174107,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -244,6 +244,10 @@
                 {
                     "domain": "duckduckgo.com",
                     "reason": "Warnings are already displayed before embedded YouTube videos are loaded."
+                },
+                {
+                    "domain": "khanacademy.org",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/945"
                 },
                 {
                     "domain": "www.google.ad",
@@ -1021,7 +1025,7 @@
                 }
             },
             "state": "disabled",
-            "hash": "f11fc2358f1247ac76cfe80efe796173"
+            "hash": "3349c86ccf4e47d5f620006a29700f69"
         },
         "clickToPlay": {
             "exceptions": [],
@@ -2392,6 +2396,10 @@
                     "reason": "After filling out flight information and clicking 'Search flights', a blank page is shown for several seconds before the page redirects."
                 },
                 {
+                    "domain": "fedex.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/927"
+                },
+                {
                     "domain": "gynzykids.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/908"
                 },
@@ -2453,7 +2461,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "5b7f10de57b33f98eaa24b973822ff98"
+            "hash": "4c075ddba8002cc00985a3b97cf6814a"
         },
         "fingerprintingHardware": {
             "settings": {
@@ -2487,6 +2495,10 @@
                     "reason": "After entering login details and clicking to log in, the site shows an adwall and prevents login."
                 },
                 {
+                    "domain": "fedex.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/927"
+                },
+                {
                     "domain": "realestate.com.au",
                     "reason": "Site loads blank and does not proceed."
                 },
@@ -2500,7 +2512,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "f0e6ee95d8545c25b32d64a28dee44e2"
+            "hash": "a3562f7dffdc029972063ad15db3112f"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -2523,6 +2535,10 @@
             },
             "exceptions": [
                 {
+                    "domain": "fedex.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/927"
+                },
+                {
                     "domain": "gamestop.com",
                     "reason": "Clicking 'add to cart' causes a spinner to load briefly, and the item doesn't get added to the cart."
                 },
@@ -2540,12 +2556,17 @@
                 }
             ],
             "state": "enabled",
-            "hash": "7d4ea2f0c3583b807e930b1397e82ba3"
+            "hash": "e1ffe29047b2f96b52fd59399b7f034b"
         },
         "fingerprintingTemporaryStorage": {
-            "exceptions": [],
+            "exceptions": [
+                {
+                    "domain": "fedex.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/927"
+                }
+            ],
             "state": "disabled",
-            "hash": "728493ef7a1488e4781656d3f9db84aa"
+            "hash": "1eef757cc0e540cea990f140a8def7cf"
         },
         "googleRejected": {
             "exceptions": [],
@@ -2616,12 +2637,24 @@
         "referrer": {
             "exceptions": [
                 {
+                    "domain": "learning.edx.org",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/934"
+                },
+                {
                     "domain": "canadapost-postescanada.ca",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/647"
+                },
+                {
+                    "domain": "player.vimeo.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/931"
+                },
+                {
+                    "domain": "xcelenergy.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/941"
                 }
             ],
             "state": "enabled",
-            "hash": "118f6c323fac42ad0ab7ac4c7ac8a93d"
+            "hash": "1ed2336bb12ce5218b091ee5f33bf4c0"
         },
         "requestFilterer": {
             "state": "disabled",
@@ -2649,6 +2682,10 @@
                 {
                     "domain": "rbs.co.uk",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/902"
+                },
+                {
+                    "domain": "panomax.com",
+                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/2007"
                 },
                 {
                     "domain": "ally.com",
@@ -3189,7 +3226,7 @@
                     }
                 }
             },
-            "hash": "abc848e219c9cb434cb1eeb033f9459a"
+            "hash": "4dba07c489c54e78a0f4651e4ca5b3d5"
         },
         "serviceworkerInitiatedRequests": {
             "exceptions": [],
@@ -3377,6 +3414,37 @@
                                     "seattletimes.com"
                                 ],
                                 "reason": "corriere.it - ,Example URL: https://www.corriere.it/video-articoli/2022/07/13/missione-wwf-liberare-mare-plastica/9abb64de-029d-11ed-a0cc-ad3c68cacbae.shtml;,Clicking on the video to play causes a still frame to show and the video does not continue.,eurogamer.net, seattletimes.com - An unskippable adwall appears which prevents interaction with the page."
+                            }
+                        ]
+                    },
+                    "amazon.dev": {
+                        "rules": [
+                            {
+                                "rule": "prime.amazon.dev",
+                                "domains": [
+                                    "amazon.ae",
+                                    "amazon.ca",
+                                    "amazon.cn",
+                                    "amazon.co.jp",
+                                    "amazon.co.uk",
+                                    "amazon.com",
+                                    "amazon.com.au",
+                                    "amazon.com.be",
+                                    "amazon.com.br",
+                                    "amazon.com.mx",
+                                    "amazon.com.tr",
+                                    "amazon.eg",
+                                    "amazon.es",
+                                    "amazon.fr",
+                                    "amazon.in",
+                                    "amazon.it",
+                                    "amazon.nl",
+                                    "amazon.pl",
+                                    "amazon.sa",
+                                    "amazon.se",
+                                    "amazon.sg"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/943"
                             }
                         ]
                     },
@@ -3766,9 +3834,10 @@
                                 "rule": "securepubads.g.doubleclick.net/pagead/ppub_config",
                                 "domains": [
                                     "rocketnews24.com",
-                                    "weather.com"
+                                    "weather.com",
+                                    "wunderground.com"
                                 ],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/415,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846"
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/415,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846,wunderground.com - https://github.com/duckduckgo/privacy-configuration/issues/956"
                             },
                             {
                                 "rule": "doubleclick.net",
@@ -4177,6 +4246,13 @@
                     "googletagmanager.com": {
                         "rules": [
                             {
+                                "rule": "googletagmanager.com/gtag/js",
+                                "domains": [
+                                    "abril.com.br"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/929"
+                            },
+                            {
                                 "rule": "googletagmanager.com/gtm.js",
                                 "domains": [
                                     "ah.nl",
@@ -4246,6 +4322,18 @@
                                     "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/760"
+                            }
+                        ]
+                    },
+                    "impervadns.net": {
+                        "rules": [
+                            {
+                                "rule": "e9pkvlf.impervadns.net",
+                                "domains": [
+                                    "cox.com",
+                                    "cox.net"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/948"
                             }
                         ]
                     },
@@ -4492,14 +4580,7 @@
                     "nuance.com": {
                         "rules": [
                             {
-                                "rule": "nuance.com/media/launch",
-                                "domains": [
-                                    "<all>"
-                                ],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/479"
-                            },
-                            {
-                                "rule": "nuance.com/media/sites",
+                                "rule": "nuance.com",
                                 "domains": [
                                     "<all>"
                                 ],
@@ -4582,7 +4663,7 @@
                             {
                                 "rule": "optimizely.com/datafiles/",
                                 "domains": [
-                                    "nike.com"
+                                    "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/916"
                             }
@@ -5113,6 +5194,17 @@
                             }
                         ]
                     },
+                    "wpadmngr.com": {
+                        "rules": [
+                            {
+                                "rule": "js.wpadmngr.com/static/adManager.js",
+                                "domains": [
+                                    "luscious.net"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/958"
+                            }
+                        ]
+                    },
                     "yandex.ru": {
                         "rules": [
                             {
@@ -5311,6 +5403,32 @@
                                     "thetrainline.com"
                                 ],
                                 "reason": "CNAME ENTRY GENERATED FROM: datadome.co"
+                            }
+                        ]
+                    },
+                    "cox.com": {
+                        "rules": [
+                            {
+                                "rule": "webcdn.cox.com",
+                                "domains": [
+                                    "cox.com",
+                                    "cox.net"
+                                ],
+                                "reason": "CNAME ENTRY GENERATED FROM: e9pkvlf.impervadns.net"
+                            },
+                            {
+                                "rule": "smetrics.cox.com",
+                                "domains": [
+                                    "pizzahut.com"
+                                ],
+                                "reason": "CNAME ENTRY GENERATED FROM: omtrdc.net"
+                            },
+                            {
+                                "rule": "target.cox.com",
+                                "domains": [
+                                    "pizzahut.com"
+                                ],
+                                "reason": "CNAME ENTRY GENERATED FROM: omtrdc.net"
                             }
                         ]
                     },
@@ -8857,24 +8975,6 @@
                         "rules": [
                             {
                                 "rule": "smetrics.countryfinancial.com",
-                                "domains": [
-                                    "pizzahut.com"
-                                ],
-                                "reason": "CNAME ENTRY GENERATED FROM: omtrdc.net"
-                            }
-                        ]
-                    },
-                    "cox.com": {
-                        "rules": [
-                            {
-                                "rule": "smetrics.cox.com",
-                                "domains": [
-                                    "pizzahut.com"
-                                ],
-                                "reason": "CNAME ENTRY GENERATED FROM: omtrdc.net"
-                            },
-                            {
-                                "rule": "target.cox.com",
                                 "domains": [
                                     "pizzahut.com"
                                 ],
@@ -13495,7 +13595,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "fce96ce0e3882819ed5d437c544759ba"
+            "hash": "c3ee2629131e6839426e32bb485bf63d"
         },
         "trackingCookies1p": {
             "settings": {

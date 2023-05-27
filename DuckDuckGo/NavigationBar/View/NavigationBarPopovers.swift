@@ -20,6 +20,11 @@ import Foundation
 import BrowserServicesKit
 import AppKit
 
+#if NETWORK_PROTECTION
+import NetworkProtection
+import NetworkProtectionUI
+#endif
+
 final class NavigationBarPopovers {
 
     enum Constants {
@@ -32,6 +37,10 @@ final class NavigationBarPopovers {
     private(set) var savePaymentMethodPopover: SavePaymentMethodPopover?
     private(set) var passwordManagementPopover: PasswordManagementPopover?
     private(set) var downloadsPopover: DownloadsPopover?
+
+#if NETWORK_PROTECTION
+    private(set) var networkProtectionPopover: NetworkProtectionPopover?
+#endif
 
     var passwordManagementDomain: String? {
         didSet {
@@ -55,6 +64,15 @@ final class NavigationBarPopovers {
         passwordManagementPopover?.isShown ?? false
     }
 
+    @MainActor
+    var isNetworkProtectionPopoverShown: Bool {
+#if NETWORK_PROTECTION
+        networkProtectionPopover?.isShown ?? false
+#else
+        return false
+#endif
+    }
+
     var bookmarkListPopoverShown: Bool {
         bookmarkListPopover?.isShown ?? false
     }
@@ -73,6 +91,17 @@ final class NavigationBarPopovers {
         } else {
             showPasswordManagementPopover(selectedCategory: nil, usingView: view, withDelegate: delegate)
         }
+    }
+
+    func toggleNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
+#if NETWORK_PROTECTION
+        if let networkProtectionPopover = networkProtectionPopover,
+           networkProtectionPopover.isShown {
+            networkProtectionPopover.close()
+        } else {
+            showNetworkProtectionPopover(usingView: view, withDelegate: delegate)
+        }
+#endif
     }
 
     func toggleDownloadsPopover(usingView view: NSView, popoverDelegate: NSPopoverDelegate, downloadsDelegate: DownloadsViewControllerDelegate) {
@@ -152,6 +181,7 @@ final class NavigationBarPopovers {
 
         let popover = passwordManagementPopover ?? PasswordManagementPopover()
         passwordManagementPopover = popover
+        popover.viewController.domain = passwordManagementDomain
         popover.delegate = delegate
         show(popover: popover, usingView: view)
         popover.select(category: selectedCategory)
@@ -225,7 +255,35 @@ final class NavigationBarPopovers {
 
     private func show(popover: NSPopover, usingView view: NSView, preferredEdge edge: NSRectEdge = .minY) {
         view.isHidden = false
+
         popover.show(relativeTo: view.bounds.insetFromLineOfDeath(), of: view, preferredEdge: edge)
     }
+
+    // MARK: - Network Protection
+
+#if NETWORK_PROTECTION
+    func showNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
+        let controller = NetworkProtectionTunnelController()
+        let statusReporter = DefaultNetworkProtectionStatusReporter(
+            statusObserver: ConnectionStatusObserverThroughSession(),
+            serverInfoObserver: ConnectionServerInfoObserverThroughSession(),
+            connectionErrorObserver: ConnectionErrorObserverThroughSession())
+
+        let menuItems = [
+            NetworkProtectionStatusView.Model.MenuItem(
+                name: UserText.networkProtectionNavBarStatusViewShareFeedback,
+                action: {
+                    let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
+                    await appLauncher.launchApp(withCommand: .shareFeedback)
+            })
+        ]
+
+        let popover = NetworkProtectionPopover(controller: controller, statusReporter: statusReporter, menuItems: menuItems)
+        popover.delegate = delegate
+
+        networkProtectionPopover = popover
+        show(popover: popover, usingView: view, preferredEdge: .maxY)
+    }
+#endif
 
 }
