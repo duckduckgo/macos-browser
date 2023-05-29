@@ -8248,7 +8248,6 @@
 				4B4BEC3F2A11B5AE001D9AC5 /* IPCConnection.swift in Sources */,
 				4B4BEC422A11B5C7001D9AC5 /* NetworkProtectionSharedState.swift in Sources */,
 				B602E8222A1E2603006D261F /* Bundle+NetworkProtectionExtensions.swift in Sources */,
-				4B4BEC402A11B5B5001D9AC5 /* NetworkProtectionExtensionMachService.swift in Sources */,
 				B602E81A2A1E2570006D261F /* URL+NetworkProtection.swift in Sources */,
 				4B4BEC402A11B5B5001D9AC5 /* NetworkProtectionExtensionMachService.swift in Sources */,
 			);
