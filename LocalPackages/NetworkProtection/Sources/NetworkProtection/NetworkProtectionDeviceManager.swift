@@ -137,8 +137,6 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
         return completeServerList
     }
 
-    // swiftlint:disable function_body_length
-    // swiftlint:disable cyclomatic_complexity
     /// Registers the device with the Network Protection backend.
     ///
     /// The flow for registration is as follows:
