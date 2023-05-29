@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version: 5.7
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import Foundation
@@ -14,22 +14,21 @@ let package = Package(
         .library(name: "NetworkProtection", targets: ["NetworkProtection"])
     ],
     dependencies: [
-        .package(name: "BrowserServicesKit", url: "https://github.com/duckduckgo/BrowserServicesKit", .exact("57.6.0"))
+        // If you are updating the BSK dependency in the main app, this version will need to be updated to match.
+        // There is work underway to move this package into BSK itself, after which this will not be required.
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "58.1.1"),
+        .package(url: "https://github.com/duckduckgo/wireguard-apple", exact: "1.0.0")
     ],
     targets: [
         .target(
             name: "NetworkProtection",
             dependencies: [
                 .target(name: "WireGuardC"),
-                .target(name: "WireGuard"),
+                .product(name: "WireGuard", package: "wireguard-apple"),
                 .product(name: "Common", package: "BrowserServicesKit")
             ]
             ),
         .target(name: "WireGuardC"),
-        .binaryTarget(
-            name: "WireGuard",
-            path: "./Binaries/WireGuard.xcframework"
-            ),
 
         // MARK: - Test targets
 

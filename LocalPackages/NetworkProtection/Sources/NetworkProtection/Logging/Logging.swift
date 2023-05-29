@@ -66,33 +66,33 @@ struct Logging {
 
     static let subsystem = Bundle.main.bundleIdentifier ?? "DuckDuckGo"
 
-    fileprivate static let networkProtectionLoggingEnabled = true
+    fileprivate static let networkProtectionLoggingEnabled = false
     fileprivate static let networkProtection: OSLog = OSLog(subsystem: subsystem, category: "Network Protection")
 
-    fileprivate static let networkProtectionBandwidthAnalysisLoggingEnabled = true
+    fileprivate static let networkProtectionBandwidthAnalysisLoggingEnabled = false
     fileprivate static let networkProtectionBandwidthAnalysis: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Bandwidth Analysis")
 
-    fileprivate static let networkProtectionConnectionTesterLoggingEnabled = true
+    fileprivate static let networkProtectionConnectionTesterLoggingEnabled = false
     fileprivate static let networkProtectionConnectionTesterLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Connection Tester")
 
-    fileprivate static let networkProtectionDistributedNotificationsLoggingEnabled = true
+    fileprivate static let networkProtectionDistributedNotificationsLoggingEnabled = false
     fileprivate static let networkProtectionDistributedNotificationsLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Distributed Notifications")
 
-    fileprivate static let networkProtectionIPCLoggingEnabled = true
+    fileprivate static let networkProtectionIPCLoggingEnabled = false
     fileprivate static let networkProtectionIPCLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: IPC")
 
-    fileprivate static let networkProtectionKeyManagementLoggingEnabled = true
+    fileprivate static let networkProtectionKeyManagementLoggingEnabled = false
     fileprivate static let networkProtectionKeyManagement: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Key Management")
 
-    fileprivate static let networkProtectionMemoryLoggingEnabled = true
+    fileprivate static let networkProtectionMemoryLoggingEnabled = false
     fileprivate static let networkProtectionMemoryLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Memory")
 
-    fileprivate static let networkProtectionPixelLoggingEnabled = true
+    fileprivate static let networkProtectionPixelLoggingEnabled = false
     fileprivate static let networkProtectionPixel: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Pixel")
 
-    fileprivate static let networkProtectionStatusReporterLoggingEnabled = true
+    fileprivate static let networkProtectionStatusReporterLoggingEnabled = false
     fileprivate static let networkProtectionStatusReporterLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Status Reporter")
 
-    fileprivate static let networkProtectionSleepLoggingEnabled = true
+    fileprivate static let networkProtectionSleepLoggingEnabled = false
     fileprivate static let networkProtectionSleepLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Sleep and Wake")
 }

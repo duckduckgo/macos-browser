@@ -18,6 +18,10 @@
 
 import Foundation
 
+#if NETWORK_PROTECTION
+import NetworkProtection
+#endif
+
 enum PinnableView: String {
     case autofill
     case bookmarks
@@ -34,7 +38,11 @@ protocol PinningManager {
 
 final class LocalPinningManager: PinningManager {
 
+#if NETWORK_PROTECTION
+    static let shared = LocalPinningManager(networkProtectionFeatureVisibility: NetworkProtectionKeychainTokenStore())
+#else
     static let shared = LocalPinningManager()
+#endif
 
     static let pinnedViewChangedNotificationViewTypeKey = "pinning.pinnedViewChanged.viewType"
 
@@ -43,6 +51,14 @@ final class LocalPinningManager: PinningManager {
 
     @UserDefaultsWrapper(key: .manuallyToggledPinnedViews, defaultValue: [])
     private var manuallyToggledPinnedViewsStrings: [String]
+
+#if NETWORK_PROTECTION
+    private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
+
+    init(networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility) {
+        self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility
+    }
+#endif
 
     func togglePinning(for view: PinnableView) {
         flagAsManuallyToggled(view)
@@ -73,7 +89,6 @@ final class LocalPinningManager: PinningManager {
         ])
     }
 
-
     func isPinned(_ view: PinnableView) -> Bool {
         return pinnedViewStrings.contains(view.rawValue)
     }
@@ -83,7 +98,16 @@ final class LocalPinningManager: PinningManager {
         case .autofill: return isPinned(.autofill) ? UserText.hideAutofillShortcut : UserText.showAutofillShortcut
         case .bookmarks: return isPinned(.bookmarks) ? UserText.hideBookmarksShortcut : UserText.showBookmarksShortcut
         case .downloads: return isPinned(.downloads) ? UserText.hideDownloadsShortcut : UserText.showDownloadsShortcut
-        case .networkProtection: return isPinned(.networkProtection) ? UserText.hideNetworkProtectionShortcut : UserText.showNetworkProtectionShortcut
+        case .networkProtection:
+#if NETWORK_PROTECTION
+            if !networkProtectionFeatureVisibility.isFeatureActivated {
+                assertionFailure("Tried to toggle Network Protection when it was not activated")
+            }
+
+            return isPinned(.networkProtection) ? UserText.hideNetworkProtectionShortcut : UserText.showNetworkProtectionShortcut
+#else
+            fatalError("Tried to get Network Protection interface title when NetP was disabled")
+#endif
         }
     }
 

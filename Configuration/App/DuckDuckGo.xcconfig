@@ -14,7 +14,7 @@
 //
 
 #include "AppTargetsBase.xcconfig"
-#include "../DeveloperID.xcconfig"
+#include "../NetworkProtectionDeveloperID.xcconfig"
 
 BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.macos.browser
 
@@ -25,6 +25,8 @@ CODE_SIGN_ENTITLEMENTS[config=CI][arch=*][sdk=*] = DuckDuckGo/DuckDuckGoCI.entit
 CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
+
+FEATURE_FLAGS = FEEDBACK NETWORK_PROTECTION
 
 PRODUCT_NAME_PREFIX = DuckDuckGo
 
@@ -47,10 +49,18 @@ AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.
 AGENT_BUNDLE_ID[config=CI][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.system-extension.agent.debug
 AGENT_BUNDLE_ID[config=Review][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.system-extension.agent.review
 
+// We could be tempted to use SYSEX_BUNDLE_ID = $(SYSEX_BUNDLE_ID_BASE).systemextension
+// but Xcode is currently not expanding it well.  You can check this in the project build
+// settings.
 SYSEX_BUNDLE_ID[sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
 SYSEX_BUNDLE_ID[config=CI][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
 SYSEX_BUNDLE_ID[config=Review][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
 SYSEX_BUNDLE_ID[config=Debug][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
 SYSEX_BUNDLE_ID[config=Release][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
+
+// Install Developer ID build to /Applications/DEBUG/
+DEPLOYMENT_LOCATION[config=Debug] = YES;
+DSTROOT[config=Debug] = /;
+INSTALL_PATH[config=Debug] = Applications/DEBUG;
 
 #include? "../../LocalOverrides.xcconfig"

@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import SwiftUI
 import NetworkProtection
 
@@ -34,10 +36,10 @@ struct NetworkProtectionInviteDialog: View {
     }
 }
 
-// C9NBNK6E
-
 struct NetworkProtectionInviteDialog_Previews: PreviewProvider {
     static var previews: some View {
         NetworkProtectionInviteDialog(model: NetworkProtectionInviteViewModel(delegate: NetworkProtectionInvitePresenter(), redemptionCoordinator: NetworkProtectionCodeRedemptionCoordinator()))
     }
 }
+
+#endif

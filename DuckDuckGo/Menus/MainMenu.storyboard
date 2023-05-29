@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
     </dependencies>
     <scenes>
@@ -806,6 +805,12 @@ CQ
                                                             <action selector="resetNetworkProtectionState:" target="Ady-hI-5gd" id="mIO-RZ-oSp"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Remove System Extension and Login Items" id="bKT-dU-DaE" userLabel="Remove System Extension">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="removeNetworkProtectionSystemExtensionAndAgents:" target="Ady-hI-5gd" id="S7i-iV-WN0"/>
+                                                        </connections>
+                                                    </menuItem>
                                                     <menuItem isSeparatorItem="YES" id="FSc-gX-vGh"/>
                                                     <menuItem title="Preferred Server Location" id="Zh6-DO-H1c">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
@@ -922,6 +927,7 @@ CQ
                             <outlet property="importBookmarksMenuItem" destination="tNX-Bv-yM3" id="NI1-on-lCU"/>
                             <outlet property="importBrowserDataMenuItem" destination="gTV-od-6G5" id="2R0-Pa-qG4"/>
                             <outlet property="manageBookmarksMenuItem" destination="BaO-sP-wbQ" id="rn7-HX-04s"/>
+                            <outlet property="networkProtectionMenuItem" destination="Dt6-sj-4hn" id="rwK-fl-TRh"/>
                             <outlet property="networkProtectionPreferredServerLocationItem" destination="Zh6-DO-H1c" id="3wy-2a-ACt"/>
                             <outlet property="networkProtectionRegistrationKeyValidityMenuItem" destination="iPz-EO-Nv6" id="Sw3-Bt-aZt"/>
                             <outlet property="networkProtectionRegistrationKeyValidityMenuSeparatorItem" destination="MEg-4g-gji" id="yWq-Rz-B9B"/>

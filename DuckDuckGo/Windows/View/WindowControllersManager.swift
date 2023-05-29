@@ -188,6 +188,7 @@ extension WindowControllersManager {
 
     // MARK: - Network Protection
 
+#if NETWORK_PROTECTION
     @MainActor
     func showNetworkProtectionStatus(retry: Bool = false) async {
         guard let windowController = mainWindowControllers.first else {
@@ -205,6 +206,8 @@ extension WindowControllersManager {
 
         windowController.mainViewController.navigationBarViewController.showNetworkProtectionStatus()
     }
+#endif
+
 }
 
 extension Tab {

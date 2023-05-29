@@ -26,7 +26,11 @@ import Networking
 import Bookmarks
 import DDGSync
 import ServiceManagement
+import SyncDataProviders
+
+#if NETWORK_PROTECTION
 import NetworkProtection
+#endif
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
@@ -58,8 +62,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var internalUserDecider: InternalUserDecider!
     private(set) var featureFlagger: FeatureFlagger!
     private var appIconChanger: AppIconChanger!
+
+    private(set) var syncDataProviders: SyncDataProviders!
     private(set) var syncService: DDGSyncing!
-    private(set) var syncPersistence: SyncDataPersistor!
+    private var syncStateCancellable: AnyCancellable?
+    private var bookmarksSyncErrorCancellable: AnyCancellable?
     let bookmarksManager = LocalBookmarkManager.shared
 
 #if !APPSTORE
@@ -149,8 +156,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
-        syncPersistence = SyncDataPersistor()
-        syncService = DDGSync(persistence: syncPersistence)
+
+        syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
+        syncService = DDGSync(dataProvidersSource: syncDataProviders, log: OSLog.sync)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -165,6 +173,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 
+        if LocalStatisticsStore().atb == nil {
+            Pixel.firstLaunchDate = Date()
+        }
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
             // MARK: perform first time launch logic here
@@ -194,7 +205,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
+#if NETWORK_PROTECTION
         startupNetworkProtection()
+#endif
+
+        syncStateCancellable = syncService.authStatePublisher
+            .prepend(syncService.authState)
+            .map { $0 == .inactive }
+            .removeDuplicates()
+            .sink { isSyncDisabled in
+                LocalBookmarkManager.shared.updateBookmarkDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
+            }
+    }
+
+    func applicationDidBecomeActive(_ notification: Notification) {
+        syncService.scheduler.notifyAppLifecycleEvent()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -251,11 +276,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     // MARK: - Network Protection
 
+#if NETWORK_PROTECTION
+
     private func startupNetworkProtection() {
         let networkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
 
         guard networkProtectionFeatureVisibility.isFeatureActivated else {
-            disableNetworkProtectionMenuAndNotificationsAgent()
+            NetworkProtectionTunnelController.disableLoginItems()
             LocalPinningManager.shared.unpin(.networkProtection)
             return
         }
@@ -271,26 +298,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             versionStore.lastVersionRun = currentVersion
         }
 
-        if let lastVersionRun = versionStore.lastVersionRun,
-           lastVersionRun == currentVersion {
-
+        // should‘ve been run at least once with NetP enabled
+        guard let lastVersionRun = versionStore.lastVersionRun else {
+            os_log(.error, log: .networkProtection, "🔴 running netp for the first time: update not needed")
             return
         }
 
-        updateNetworkProtectionTunnelAndMenu()
-    }
-
-    private func disableNetworkProtectionMenuAndNotificationsAgent() {
-        do {
-            try LoginItem(identifier: .vpnMenu).disable()
-        } catch {
-            os_log("Failed to disable the vpnMenu login item: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
-        }
-
-        do {
-            try LoginItem(identifier: .notificationsAgent).disable()
-        } catch {
-            os_log("Failed to disable the notificationsAgent login item: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
+        if lastVersionRun != currentVersion {
+            os_log(.error, log: .networkProtection, "🟡 App updated from %{public}s to %{public}s: updating", lastVersionRun, currentVersion)
+            updateNetworkProtectionTunnelAndMenu()
+        } else {
+            // If login items failed to launch (e.g. because of the App bundle rename), launch using NSWorkspace
+            NetworkProtectionTunnelController.ensureLoginItemsAreRunning(.ifLoginItemsAreEnabled, after: 1)
         }
     }
 
@@ -303,21 +322,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             }
         }
 
-        resetLoginItemsIfAlreadyRunning()
-    }
-
-    private func resetLoginItemsIfAlreadyRunning() {
-        do {
-            try LoginItem(identifier: .vpnMenu).reset()
-        } catch {
-            os_log("Failed to reset the vpnMenu login item: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
-        }
-
-        do {
-            try LoginItem(identifier: .notificationsAgent).reset()
-        } catch {
-            os_log("Failed to reset the notificationsAgent login item: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
-        }
+        NetworkProtectionTunnelController.resetLoginItems()
     }
 
     /// Fetches a new list of Network Protection servers, and updates the existing set.
@@ -334,6 +339,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             os_log("Successfully updated Network Protection servers; total server count = %{public}d", log: .networkProtection, serverCount)
         }
     }
+
+#endif
 
     private func subscribeToEmailProtectionStatusNotifications() {
         NotificationCenter.default.addObserver(self,
@@ -354,7 +361,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         Pixel.fire(.emailEnabled)
         let repetition = Pixel.Event.Repetition(key: Pixel.Event.emailEnabledInitial.name)
         // Temporary pixel for first time user enables email protection
-        if repetition == .initial {
+        if Pixel.isNewUser && repetition == .initial {
             Pixel.fire(.emailEnabledInitial)
         }
     }
@@ -366,7 +373,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     @objc private func dataImportCompleteNotification(_ notification: Notification) {
         // Temporary pixel for first time user import data
         let repetition = Pixel.Event.Repetition(key: Pixel.Event.importDataInitial.name)
-        if repetition == .initial {
+        if Pixel.isNewUser && repetition == .initial {
             Pixel.fire(.importDataInitial)
         }
     }

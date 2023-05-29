@@ -18,9 +18,12 @@
 
 import Foundation
 import BrowserServicesKit
+import AppKit
+
+#if NETWORK_PROTECTION
 import NetworkProtection
 import NetworkProtectionUI
-import AppKit
+#endif
 
 final class NavigationBarPopovers {
 
@@ -34,7 +37,10 @@ final class NavigationBarPopovers {
     private(set) var savePaymentMethodPopover: SavePaymentMethodPopover?
     private(set) var passwordManagementPopover: PasswordManagementPopover?
     private(set) var downloadsPopover: DownloadsPopover?
+
+#if NETWORK_PROTECTION
     private(set) var networkProtectionPopover: NetworkProtectionPopover?
+#endif
 
     var passwordManagementDomain: String? {
         didSet {
@@ -60,7 +66,11 @@ final class NavigationBarPopovers {
 
     @MainActor
     var isNetworkProtectionPopoverShown: Bool {
+#if NETWORK_PROTECTION
         networkProtectionPopover?.isShown ?? false
+#else
+        return false
+#endif
     }
 
     var bookmarkListPopoverShown: Bool {
@@ -84,12 +94,14 @@ final class NavigationBarPopovers {
     }
 
     func toggleNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
+#if NETWORK_PROTECTION
         if let networkProtectionPopover = networkProtectionPopover,
            networkProtectionPopover.isShown {
             networkProtectionPopover.close()
         } else {
             showNetworkProtectionPopover(usingView: view, withDelegate: delegate)
         }
+#endif
     }
 
     func toggleDownloadsPopover(usingView view: NSView, popoverDelegate: NSPopoverDelegate, downloadsDelegate: DownloadsViewControllerDelegate) {
@@ -249,6 +261,7 @@ final class NavigationBarPopovers {
 
     // MARK: - Network Protection
 
+#if NETWORK_PROTECTION
     func showNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         let controller = NetworkProtectionTunnelController()
         let statusReporter = DefaultNetworkProtectionStatusReporter(
@@ -271,4 +284,6 @@ final class NavigationBarPopovers {
         networkProtectionPopover = popover
         show(popover: popover, usingView: view, preferredEdge: .maxY)
     }
+#endif
+
 }

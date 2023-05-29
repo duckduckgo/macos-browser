@@ -81,6 +81,8 @@ ONLY_ACTIVE_ARCH[config=CI][arch=*][sdk=*] = YES
 
 SDKROOT = macosx
 
+SWIFT_VERSION = 5.0
+
 SWIFT_OPTIMIZATION_LEVEL = -O
 SWIFT_OPTIMIZATION_LEVEL[config=CI][arch=*][sdk=*] = -Onone
 SWIFT_OPTIMIZATION_LEVEL[config=Debug][arch=*][sdk=*] = -Onone
@@ -89,4 +91,7 @@ SWIFT_COMPILATION_MODE = wholemodule
 SWIFT_COMPILATION_MODE[config=CI][arch=*][sdk=*] =
 SWIFT_COMPILATION_MODE[config=Debug][arch=*][sdk=*] =
 
-SWIFT_STRICT_CONCURRENCY = targeted;
+// This is temporarily set back to its default value, as a part of merging Network Protection. There are a small number of warnings introduced in
+// that feature, and more time is needed to address them. To avoid bothering other developers, this is being disabled and a task to fix it will be
+// prioritized.
+SWIFT_STRICT_CONCURRENCY = minimal;

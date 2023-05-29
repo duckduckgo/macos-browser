@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import Foundation
 import NetworkProtection
 import Common
@@ -49,3 +51,5 @@ extension NetworkProtectionKeychainKeyStore {
                   errorEvents: .networkProtectionAppDebugEvents)
     }
 }
+
+#endif
