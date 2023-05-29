@@ -236,6 +236,7 @@ extension Pixel {
             case missingParent
             case bookmarksSaveFailed
             case bookmarksSaveFailedOnImport
+            case bookmarksCleanupFailed
 
             case bookmarksCouldNotLoadDatabase
             case bookmarksCouldNotPrepareDatabase
@@ -244,6 +245,11 @@ extension Pixel {
             case bookmarksMigrationCouldNotPrepareDatabase
             case bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration
             case bookmarksMigrationCouldNotRemoveOldStore
+
+            // Errors from Sync Metadata Module
+            case syncMetadataCouldNotLoadDatabase
+            case syncBookmarksProviderInitializationFailed
+            case syncBookmarksFailed
 
             case invalidPayload(Configuration)
 
@@ -544,6 +550,7 @@ extension Pixel.Event.Debug {
         case .missingParent: return "bookmark_missing_parent"
         case .bookmarksSaveFailed: return "bookmarks_save_failed"
         case .bookmarksSaveFailedOnImport: return "bookmarks_save_failed_on_import"
+        case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
 
         case .bookmarksCouldNotLoadDatabase: return "bookmarks_could_not_load_database"
         case .bookmarksCouldNotPrepareDatabase: return "bookmarks_could_not_prepare_database"
@@ -553,6 +560,10 @@ extension Pixel.Event.Debug {
         case .bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration:
             return "bookmarks_migration_could_not_prepare_database_on_failed_migration"
         case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
+
+        case .syncMetadataCouldNotLoadDatabase: return "sync_metadata_could_not_load_database"
+        case .syncBookmarksProviderInitializationFailed: return "sync_bookmarks_provider_initialization_failed"
+        case .syncBookmarksFailed: return "sync_bookmarks_failed"
 
         case .invalidPayload(let configuration): return "m_d_\(configuration.rawValue)_invalid_payload".lowercased()
 

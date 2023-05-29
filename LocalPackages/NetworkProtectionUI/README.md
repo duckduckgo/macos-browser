@@ -1,3 +1,3 @@
 # NetworkProtectionUI
 
-A description of this package.
+UI elements used in Network Protection that are reusable across build targets.

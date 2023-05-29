@@ -268,7 +268,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     static func disableLoginItems() {
-        updateLoginItems("disable", using: LoginItem.disable)
+        for item in loginItems {
+            try? item.disable()
+        }
     }
 
     private static func updateLoginItems(_ whatAreWeDoing: String, using enable: (LoginItem) -> () throws -> Void) {

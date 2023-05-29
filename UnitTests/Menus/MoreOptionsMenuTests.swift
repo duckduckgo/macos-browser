@@ -92,9 +92,15 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertEqual(moreOptionMenu.items[9].title, UserText.passwordManagement)
         XCTAssertTrue(moreOptionMenu.items[10].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[11].title, UserText.emailOptionsMenuItem)
+
+#if NETWORK_PROTECTION
         XCTAssertEqual(moreOptionMenu.items[12].title, UserText.networkProtection)
         XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[14].title, UserText.settings)
+#else
+        XCTAssertTrue(moreOptionMenu.items[12].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[13].title, UserText.settings)
+#endif
     }
 
     func testThatMoreOptionMenuHasTheExpectedItems_WhenNetworkProtectionIsDisabled() {

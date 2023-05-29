@@ -91,4 +91,7 @@ SWIFT_COMPILATION_MODE = wholemodule
 SWIFT_COMPILATION_MODE[config=CI][arch=*][sdk=*] =
 SWIFT_COMPILATION_MODE[config=Debug][arch=*][sdk=*] =
 
-SWIFT_STRICT_CONCURRENCY = targeted;
+// This is temporarily set back to its default value, as a part of merging Network Protection. There are a small number of warnings introduced in
+// that feature, and more time is needed to address them. To avoid bothering other developers, this is being disabled and a task to fix it will be
+// prioritized.
+SWIFT_STRICT_CONCURRENCY = minimal;

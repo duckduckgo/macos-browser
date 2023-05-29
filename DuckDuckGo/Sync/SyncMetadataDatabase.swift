@@ -1,5 +1,5 @@
 //
-//  SyncDataPersistor.swift
+//  SyncMetadataDatabase.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -17,15 +17,26 @@
 //
 
 import Foundation
+import CoreData
 import DDGSync
+import Persistence
 
-final class SyncDataPersistor: LocalDataPersisting {
-    private(set) var bookmarksLastModified: String?
+public final class SyncMetadataDatabase {
 
-    func updateBookmarksLastModified(_ lastModified: String?) {
-        bookmarksLastModified = lastModified
+    public let db: CoreDataDatabase
+
+    init(db: CoreDataDatabase = make(location: URL.sandboxApplicationSupportURL)) {
+        self.db = db
     }
 
-    func persistEvents(_ events: [SyncEvent]) async throws {
+    public static func make(location: URL) -> CoreDataDatabase {
+        let bundle = DDGSync.bundle
+        guard let model = CoreDataDatabase.loadModel(from: bundle, named: "SyncMetadata") else {
+            fatalError("Failed to load model")
+        }
+
+        return CoreDataDatabase(name: "SyncMetadata",
+                                containerLocation: location,
+                                model: model)
     }
 }
