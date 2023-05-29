@@ -17,7 +17,8 @@
 //
 
 import Cocoa
-import os.log // swiftlint:disable:this enforce_os_log_wrapper
+import Combine
+import Common
 import NetworkExtension
 import NetworkProtection
 
@@ -67,7 +68,7 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
 
     // MARK: - Notifications: Observation Tokens
 
-    private var observationTokens = [NotificationToken]()
+    private var cancellables = Set<AnyCancellable>()
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         os_log("Login item finished launching", log: .networkProtectionLoginItemLog, type: .info)
@@ -80,17 +81,17 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
     private func startObservingVPNStatusChanges() {
         os_log("Register with sysex")
 
-        observationTokens.append(distributedNotificationCenter.addObserver(for: .ipcListenerStarted, object: nil, queue: .main) { [weak self] _ in
+        distributedNotificationCenter.publisher(for: .ipcListenerStarted)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                os_log("Got notification: listener started")
+                self?.registerConnection(listenerStarted: true)
+            }.store(in: &cancellables)
 
-            os_log("Got notification: listener started")
-            self?.registerConnection(listenerStarted: true)
-        })
-
-        observationTokens.append(distributedNotificationCenter.addObserver(for: .serverSelected, object: nil, queue: nil) { [weak self] _ in
-
+        distributedNotificationCenter.publisher(for: .serverSelected).sink { [weak self] _ in
             os_log("Got notification: listener started")
             self?.notificationsPresenter.requestAuthorization()
-        })
+        }.store(in: &cancellables)
     }
 
     private var machServiceName: String {

@@ -19,6 +19,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright © 2018-2021 WireGuard LLC. All Rights Reserved.
 
+import Combine
 import Common
 import Networking
 import Foundation
@@ -78,7 +79,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         get {
             super.reasserting
         }
-
         set {
             if newValue {
                 connectionStatus = .reasserting
@@ -333,7 +333,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - Notifications: Observation Tokens
 
-    private var observationTokens = [NotificationToken]()
+    private var requestStatusUpdateCancellable: AnyCancellable!
 
     // MARK: - Initializers
 
@@ -346,11 +346,10 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         ipcConnection.startListener()
         #endif
 
-        observationTokens.append(distributedNotificationCenter.addObserver(for: .requestStatusUpdate, object: nil, queue: nil) { [weak self] _ in
-
+        requestStatusUpdateCancellable = distributedNotificationCenter.publisher(for: .requestStatusUpdate).sink { [weak self] _ in
             self?.broadcastConnectionStatus()
             self?.broadcastLastSelectedServerInfo()
-        })
+        }
 
         connectionStatus = .disconnected
     }

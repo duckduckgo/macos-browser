@@ -68,7 +68,7 @@ public final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStat
 
     // MARK: - Notifications: Observation Tokens
 
-    private var observationTokens = [NotificationToken]()
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Publishers
 
@@ -107,27 +107,23 @@ public final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStat
     // MARK: - Starting & Stopping
 
     private func start() {
-        observationTokens.append(distributedNotificationCenter.addObserver(for: .controllerErrorChanged, object: nil, queue: nil) { [weak self] notification in
-
+        distributedNotificationCenter.publisher(for: .controllerErrorChanged).sink { [weak self] notification in
             self?.handleControllerErrorStatusChanged(notification)
-        })
+        }.store(in: &cancellables)
 
-        // swiftlint:disable:next unused_capture_list
-        observationTokens.append(distributedNotificationCenter.addObserver(for: .issuesStarted, object: nil, queue: nil) { [weak self] _ in
-
+        distributedNotificationCenter.publisher(for: .issuesStarted).sink { [weak self] _ in
             guard let self else { return }
 
             logIssuesChanged(isHavingIssues: true)
             connectivityIssuesPublisher.send(true)
-        })
+        }.store(in: &cancellables)
 
-        // swiftlint:disable:next unused_capture_list
-        observationTokens.append(distributedNotificationCenter.addObserver(for: .issuesResolved, object: nil, queue: nil) { [weak self] _ in
+        distributedNotificationCenter.publisher(for: .issuesResolved).sink { [weak self] _ in
             guard let self else { return }
 
             logIssuesChanged(isHavingIssues: false)
             connectivityIssuesPublisher.send(false)
-        })
+        }.store(in: &cancellables)
 
         forceRefresh()
     }

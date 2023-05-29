@@ -30,7 +30,7 @@ public class ConnectionErrorObserverThroughIPC: ConnectionErrorObserver {
     // MARK: - Notifications
 
     private let distributedNotificationCenter: DistributedNotificationCenter
-    private var observationTokens = [NotificationToken]()
+    private var tunnelErrorChangedCancellable: AnyCancellable!
 
     // MARK: - Logging
 
@@ -48,10 +48,9 @@ public class ConnectionErrorObserverThroughIPC: ConnectionErrorObserver {
     }
 
     func start() {
-        observationTokens.append(distributedNotificationCenter.addObserver(for: .tunnelErrorChanged, object: nil, queue: nil) { [weak self] notification in
-
+        tunnelErrorChangedCancellable = distributedNotificationCenter.publisher(for: .tunnelErrorChanged).sink { [weak self] notification in
             self?.handleTunnelErrorStatusChanged(notification)
-        })
+        }
     }
 
     // MARK: - Handling Notifications
