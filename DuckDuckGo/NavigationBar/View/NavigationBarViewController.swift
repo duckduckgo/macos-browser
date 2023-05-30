@@ -241,9 +241,15 @@ final class NavigationBarViewController: NSViewController {
     // swiftlint:disable force_cast
     @IBAction func optionsButtonAction(_ sender: NSButton) {
 
+        guard let internalUserDecider = (NSApp.delegate as! AppDelegate).internalUserDecider else {
+            assertionFailure("\(className): internalUserDecider is nil")
+            os_log("%s: internalUserDecider is nil", type: .error, className)
+            return
+        }
+
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
-                                   internalUserDecider: (NSApp.delegate as! AppDelegate).internalUserDecider)
+                                   internalUserDecider: internalUserDecider)
         menu.actionDelegate = self
         menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height + 4), in: sender)
     }

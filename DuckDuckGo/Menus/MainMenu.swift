@@ -382,7 +382,8 @@ final class MainMenu: NSMenu {
     @MainActor
     private func updateBurnerWindowMenuItem() {
         if let appDelegate = NSApplication.shared.delegate as? AppDelegate,
-           !appDelegate.internalUserDecider.isInternalUser {
+           let internalUserDecider = appDelegate.internalUserDecider,
+           !internalUserDecider.isInternalUser {
             newBurnerWindowMenuItem.isHidden = true
         }
     }
