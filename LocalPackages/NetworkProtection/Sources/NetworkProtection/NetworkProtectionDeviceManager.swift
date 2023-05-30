@@ -221,10 +221,10 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
             // We should not need this IF condition here, because we know registered servers will give us an expiration date,
             // but since the structure we're currently using makes the expiration date optional we need to have it.
             // We should consider changing our server structure to not allow a missing expiration date here.
-            if let serverExpirationDate = selectedServer.expirationDate {
-                if keyPair.expirationDate > serverExpirationDate {
-                    keyPair = keyStore.updateCurrentKeyPair(newExpirationDate: serverExpirationDate)
-                }
+            if let serverExpirationDate = selectedServer.expirationDate,
+               keyPair.expirationDate > serverExpirationDate {
+
+                keyPair = keyStore.updateCurrentKeyPair(newExpirationDate: serverExpirationDate)
             }
 
             return (selectedServer, keyPair)
