@@ -36,7 +36,6 @@ struct ExtractedProfile {
 
 extension ExtractedProfile: Equatable {
     static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.dateCreated == rhs.dateCreated &&
         lhs.name == rhs.name
     }
 }

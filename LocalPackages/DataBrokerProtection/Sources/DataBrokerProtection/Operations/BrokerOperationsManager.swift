@@ -38,24 +38,29 @@ class BrokerOperationsManager: OperationsManager {
     required init(profileQuery: ProfileQuery, dataBroker: DataBroker, database: DataBase) {
         self.database = database
 
-        if let queryData = database.brokerProfileQueryData(for: profileQuery, dataBroker: dataBroker) {
+        if let queryData = database.brokerProfileQueryData(for: profileQuery,
+                                                           dataBroker: dataBroker) {
             brokerProfileQueryData = queryData
         } else {
-            brokerProfileQueryData = BrokerProfileQueryData(id: UUID(), profileQuery: profileQuery, dataBroker: dataBroker)
+            brokerProfileQueryData = BrokerProfileQueryData(id: UUID(),
+                                                            profileQuery: profileQuery,
+                                                            dataBroker: dataBroker)
         }
     }
 
     func runScanOperation(on runner: OperationRunner) async throws {
         let profiles = try await runner.scan(brokerProfileQueryData)
-        brokerProfileQueryData.extractedProfiles.append(contentsOf: profiles)
 
         if profiles.count > 0 {
             profiles.forEach {
                 let event = HistoryEvent(type: .matchFound(profileID: $0.id))
-                brokerProfileQueryData.scanOperationData.addHistoryEvent(event)
+                brokerProfileQueryData.addHistoryEvent(event, for: brokerProfileQueryData.scanData)
             }
+            brokerProfileQueryData.updateExtractedProfiles(profiles)
         } else {
-            brokerProfileQueryData.scanOperationData.addHistoryEvent(.init(type: .noMatchFound))
+            let event = HistoryEvent(type: .noMatchFound)
+            brokerProfileQueryData.addHistoryEvent(event, for: brokerProfileQueryData.scanData)
+
         }
     }
 
@@ -68,4 +73,37 @@ class BrokerOperationsManager: OperationsManager {
         fatalError("no op")
     }
 
+}
+
+struct ExtractedProfileHandler {
+
+
+    func getUniqueItems<T: Equatable>(newList: [T], oldList: [T]) -> [T] {
+        var uniqueItems: [T] = []
+
+        for item in newList {
+            if !oldList.contains(item) {
+                uniqueItems.append(item)
+            }
+        }
+
+        return uniqueItems
+    }
+
+    /*
+
+     func getUniqueItems<T: Equatable>(newList: [T], oldList: [T]) -> [T] {
+         let oldSet = Set(oldList)
+         var uniqueItems: [T] = []
+
+         for item in newList {
+             if !oldSet.contains(item) {
+                 uniqueItems.append(item)
+             }
+         }
+
+         return uniqueItems
+     }
+
+     */
 }

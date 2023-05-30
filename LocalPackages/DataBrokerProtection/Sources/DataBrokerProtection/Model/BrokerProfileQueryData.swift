@@ -28,8 +28,8 @@ class BrokerProfileQueryData {
     public let dataBroker: DataBroker
 
     public var extractedProfiles: [ExtractedProfile] = [ExtractedProfile]()
-    public var scanOperationData: ScanOperationData
-    public var optOutOperationsDate: [OptOutOperationData] = [OptOutOperationData]()
+    public var scanData: ScanOperationData
+    public var optOutsData: [OptOutOperationData] = [OptOutOperationData]()
 
     internal init(id: UUID,
                   profileQuery: ProfileQuery,
@@ -42,16 +42,21 @@ class BrokerProfileQueryData {
         self.profileQuery = profileQuery
         self.dataBroker = dataBroker
         self.extractedProfiles = extractedProfiles
-        self.optOutOperationsDate = optOutOperationsDate
+        self.optOutsData = optOutOperationsDate
 
         if let scanData = scanOperationData {
-            self.scanOperationData = scanData
+            self.scanData = scanData
         } else {
-            self.scanOperationData = ScanOperationData(brokerProfileQueryID: id, preferredRunDate: Date(), historyEvents: [HistoryEvent]())
+            self.scanData = ScanOperationData(brokerProfileQueryID: id, preferredRunDate: Date(), historyEvents: [HistoryEvent]())
         }
     }
 
     func updateExtractedProfiles(_ extractedProfiles: [ExtractedProfile]) {
 
+    }
+
+    func addHistoryEvent(_ event: HistoryEvent, for operation: BrokerOperationData) {
+        var op = operation
+        op.addHistoryEvent(event)
     }
 }
