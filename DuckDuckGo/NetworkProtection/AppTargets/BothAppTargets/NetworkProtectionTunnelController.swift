@@ -235,11 +235,17 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// - Returns: `true` if the system extension and the background agent were activated successfully
     ///
     private func ensureSystemExtensionIsActivated() async throws -> Bool {
-        if case .willActivateAfterReboot = try await SystemExtensionManager.shared.activate(waitingForUserApprovalHandler: { [weak self] in
-            self?.controllerErrorStore.lastErrorMessage = "Go to Security & Privacy in System Settings to allow Network Protection to activate"
-        }) {
-            controllerErrorStore.lastErrorMessage = "Please reboot to activate Network Protection"
-            return false
+        for try await event in SystemExtensionManager().activate() {
+            switch event {
+            case .waitingForUserApproval:
+                self.controllerErrorStore.lastErrorMessage = "Go to Security & Privacy in System Settings to allow Network Protection to activate"
+            case .activated:
+                self.controllerErrorStore.lastErrorMessage = nil
+                return true
+            case .willActivateAfterReboot:
+                controllerErrorStore.lastErrorMessage = "Please reboot to activate Network Protection"
+                return false
+            }
         }
 
         controllerErrorStore.lastErrorMessage = nil
@@ -385,7 +391,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     /// Stops the VPN connection used for Network Protection
     ///
-    func stop() async throws {
+    func stop() async {
         guard let tunnelManager = await tunnelManager else {
             return
         }
@@ -431,7 +437,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }
 
 #if NETP_SYSTEM_EXTENSION
-        try await SystemExtensionManager.shared.deactivate()
+        try await SystemExtensionManager().deactivate()
 #endif
     }
 

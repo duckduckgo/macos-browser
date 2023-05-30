@@ -53,12 +53,8 @@ final class AppMain {
         case "stopVPN":
             swizzleMainBundle()
 
-            do {
-                try await NetworkProtectionTunnelController().stop()
-                exit(0)
-            } catch {
-                throw LaunchError.stopVPNFailed(error)
-            }
+            await NetworkProtectionTunnelController().stop()
+            exit(0)
         default:
             break
         }
