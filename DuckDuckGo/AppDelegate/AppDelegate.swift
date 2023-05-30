@@ -59,7 +59,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
-    private(set) var internalUserDecider: InternalUserDecider!
+    private(set) var internalUserDecider: InternalUserDecider?
     private(set) var featureFlagger: FeatureFlagger!
     private var appIconChanger: AppIconChanger!
 
@@ -132,7 +132,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
 
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
-        internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
+        let internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
+        self.internalUserDecider = internalUserDecider
 
 #if DEBUG
         func mock<T>(_ className: String) -> T {
@@ -256,6 +257,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
+        guard let internalUserDecider else {
+            return nil
+        }
+
         return ApplicationDockMenu(internalUserDecider: internalUserDecider)
     }
 
