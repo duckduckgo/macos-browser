@@ -32,6 +32,7 @@ import Common
     func reconnecting()
     func connectionFailure()
     func statusChanged(status: NEVPNStatus)
+    func superceded()
 }
 
 /// The IPCConnection class is used by both the app and the system extension to communicate with each other
@@ -121,13 +122,14 @@ final class IPCConnection: NSObject {
         providerProxy.register(completionHandler)
     }
 
-    func test() {
+    private func appProxy() -> AppCommunication? {
         guard let connection = currentConnection else {
             os_log("The app isn't registered for the IPCConnection", log: log, type: .error)
-            return
+            return nil
         }
 
-        guard let appProxy = connection.remoteObjectProxyWithErrorHandler({ promptError in
+        guard let appProxy = connection.remoteObjectProxyWithErrorHandler({ [weak self] promptError in
+            guard let self else { return }
             os_log("IPCConnection error: %@", log: self.log, type: .error, promptError.localizedDescription)
             self.currentConnection = nil
         }) as? AppCommunication else {
@@ -135,60 +137,26 @@ final class IPCConnection: NSObject {
             fatalError("Failed to create a remote object proxy for the app")
         }
 
-        appProxy.reconnected()
+        return appProxy
     }
 
     func reconnected() {
-        guard let connection = currentConnection else {
-            os_log("The app isn't registered for the IPCConnection", log: log, type: .error)
-            return
-        }
-
-        guard let appProxy = connection.remoteObjectProxyWithErrorHandler({ promptError in
-            os_log("IPCConnection error: %@", log: self.log, type: .error, promptError.localizedDescription)
-            self.currentConnection = nil
-        }) as? AppCommunication else {
-            os_log("Failed to create a remote object proxy for the app", log: log, type: .error)
-            fatalError("Failed to create a remote object proxy for the app")
-        }
-
-        appProxy.reconnected()
+        appProxy()?.reconnected()
     }
 
     func reconnecting() {
-        guard let connection = currentConnection else {
-            os_log("The app isn't registered for the IPCConnection", log: log, type: .error)
-            return
-        }
-
-        guard let appProxy = connection.remoteObjectProxyWithErrorHandler({ promptError in
-            os_log("IPCConnection error: %@", log: self.log, type: .error, promptError.localizedDescription)
-            self.currentConnection = nil
-        }) as? AppCommunication else {
-            os_log("Failed to create a remote object proxy for the app", log: log, type: .error)
-            fatalError("Failed to create a remote object proxy for the app")
-        }
-
         os_log("IPC requesting proxy reconnecting notification", log: log, type: .info)
-        appProxy.reconnecting()
+        appProxy()?.reconnecting()
     }
 
     func connectionFailure() {
-        guard let connection = currentConnection else {
-            os_log("The app isn't registered for the IPCConnection", log: log, type: .error)
-            return
-        }
-
-        guard let appProxy = connection.remoteObjectProxyWithErrorHandler({ promptError in
-            os_log("IPCConnection error: %{public}@", log: self.log, type: .error, promptError.localizedDescription)
-            self.currentConnection = nil
-        }) as? AppCommunication else {
-            os_log("Failed to create a remote object proxy for the app", log: log, type: .error)
-            fatalError("Failed to create a remote object proxy for the app")
-        }
-
-        appProxy.connectionFailure()
+        appProxy()?.connectionFailure()
     }
+
+    func superceded() {
+        appProxy()?.superceded()
+    }
+
 }
 
 extension IPCConnection: NSXPCListenerDelegate {
@@ -200,24 +168,20 @@ extension IPCConnection: NSXPCListenerDelegate {
 
         // The exported object is this IPCConnection instance.
         newConnection.exportedInterface = NSXPCInterface(with: ProviderCommunication.self)
-        newConnection.exportedObject = self
+        newConnection.exportedObject = IPCConnectionExportedObject(delegate: self)
 
         // The remote object is the delegate of the app's IPCConnection instance.
         newConnection.remoteObjectInterface = NSXPCInterface(with: AppCommunication.self)
 
         newConnection.invalidationHandler = { [weak self] in
-            guard let self = self else {
-                return
-            }
+            guard let self = self else { return }
 
             os_log("Connection invalidated", log: self.log, type: .debug)
             self.currentConnection = nil
         }
 
         newConnection.interruptionHandler = { [weak self] in
-            guard let self = self else {
-                return
-            }
+            guard let self = self else { return }
 
             os_log("Connection interrupted", log: self.log, type: .debug)
             self.currentConnection = nil
@@ -228,6 +192,7 @@ extension IPCConnection: NSXPCListenerDelegate {
 
         return true
     }
+
 }
 
 extension IPCConnection: ProviderCommunication {
@@ -238,4 +203,20 @@ extension IPCConnection: ProviderCommunication {
         os_log("App registered", log: log, type: .debug)
         completionHandler(true)
     }
+}
+
+final class IPCConnectionExportedObject: NSObject, ProviderCommunication {
+
+    weak var delegate: ProviderCommunication?
+
+    init(delegate: ProviderCommunication) {
+        self.delegate = delegate
+    }
+
+    // MARK: ProviderCommunication
+
+    func register(_ completionHandler: @escaping (Bool) -> Void) {
+        delegate?.register(completionHandler) ?? completionHandler(false)
+    }
+
 }
