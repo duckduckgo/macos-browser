@@ -39,3 +39,26 @@ struct HistoryEvent {
         self.type = type
     }
 }
+
+extension HistoryEvent.EventType: Equatable {
+    static func == (lhs: HistoryEvent.EventType, rhs: HistoryEvent.EventType) -> Bool {
+        switch (lhs, rhs) {
+        case (.noMatchFound, .noMatchFound):
+            return true
+        case let (.matchFound(profileID: lhsProfileID), .matchFound(profileID: rhsProfileID)):
+            return lhsProfileID == rhsProfileID
+        case (.error, .error):
+            return true
+        case let (.optOutRequested(profileID: lhsProfileID), .optOutRequested(profileID: rhsProfileID)):
+            return lhsProfileID == rhsProfileID
+        case let (.optOutConfirmed(profileID: lhsProfileID), .optOutConfirmed(profileID: rhsProfileID)):
+            return lhsProfileID == rhsProfileID
+        case (.scanFinished, .scanFinished):
+            return true
+        case (.scanStarted, .scanStarted):
+            return true
+        default:
+            return false
+        }
+    }
+}

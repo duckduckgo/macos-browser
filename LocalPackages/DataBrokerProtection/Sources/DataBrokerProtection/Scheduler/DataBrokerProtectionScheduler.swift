@@ -32,7 +32,7 @@ class DataBrokerProtectionScheduler {
     private func setupManagers() {
         let brokersProfileData = database.fetchAllBrokerProfileQueryData()
         operationManagers = brokersProfileData.map {
-            BrokerOperationsManager(brokerProfileQueryData: $0, database: database)
+            BrokerOperationsManager(profileQuery: $0.profileQuery, dataBroker: $0.dataBroker, database: database)
         }
     }
 }

@@ -48,7 +48,12 @@ class ScanOperationData: BrokerOperationData {
 }
 
 class OptOutOperationData: BrokerOperationData {
-    internal init(brokerProfileQueryID: UUID, preferredRunDate: Date, historyEvents: [HistoryEvent], lastRunDate: Date? = nil, brokerProfile: BrokerProfileQueryData, extractedProfile: ExtractedProfile) {
+    internal init(brokerProfileQueryID: UUID,
+                  preferredRunDate: Date,
+                  historyEvents: [HistoryEvent],
+                  lastRunDate: Date? = nil,
+                  extractedProfile: ExtractedProfile) {
+
         self.brokerProfileQueryID = brokerProfileQueryID
         self.preferredRunDate = preferredRunDate
         self.historyEvents = historyEvents
@@ -79,25 +84,5 @@ extension ScanOperationData {
         let scan2 = ScanOperationData(brokerProfileQueryID: id2, preferredRunDate: preferredRunDate, historyEvents: historyEvents, lastRunDate: preferredRunDate)
 
         return [scan1, scan2]
-    }
-}
-
-//TODO: Remove later
-extension OptOutOperationData {
-    static func createTestScenarios() -> [OptOutOperationData] {
-        // Create test data
-        let id1 = UUID()
-        let id2 = UUID()
-        let preferredRunDate = Date()
-        let historyEvents: [HistoryEvent] = []
-        let brokerProfile = BrokerProfileQueryData.createTestScenario()
-        let extractedProfile1 = ExtractedProfile(name: "John Doe")
-        let extractedProfile2 = ExtractedProfile(name: "Jane Smith")
-
-        let optOut1 = OptOutOperationData(brokerProfileQueryID: id1, preferredRunDate: preferredRunDate, historyEvents: historyEvents, lastRunDate: nil, brokerProfile: brokerProfile, extractedProfile: extractedProfile1)
-
-        let optOut2 = OptOutOperationData(brokerProfileQueryID: id2, preferredRunDate: preferredRunDate, historyEvents: historyEvents, lastRunDate: preferredRunDate, brokerProfile: brokerProfile, extractedProfile: extractedProfile2)
-
-        return [optOut1, optOut2]
     }
 }

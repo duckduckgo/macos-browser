@@ -19,17 +19,22 @@
 import Foundation
 
 protocol DataBase {
+    func brokerProfileQueryData(for profileQuery: ProfileQuery, dataBroker: DataBroker) -> BrokerProfileQueryData?
     func saveOperationData(_ data: BrokerOperationData)
     func scanOperationData(for profileQueryID: UUID) -> ScanOperationData
     func optOutOperationData(for profileQueryID: UUID) -> [OptOutOperationData]
-    func brokerProfileQueryData(for id: UUID) -> BrokerProfileQueryData
     func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData]
+    func brokerProfileQueryData(for id: UUID) -> BrokerProfileQueryData?
 }
 
 class DataBrokerProtectionDataBase: DataBase {
 
-    func brokerProfileQueryData(for id: UUID) -> BrokerProfileQueryData {
-        return BrokerProfileQueryData.createTestScenario()
+    func brokerProfileQueryData(for profileQuery: ProfileQuery, dataBroker: DataBroker) -> BrokerProfileQueryData? {
+        return BrokerProfileQueryData(id: UUID(), profileQuery: profileQuery, dataBroker: dataBroker)
+    }
+
+    func brokerProfileQueryData(for id: UUID) -> BrokerProfileQueryData? {
+        BrokerProfileQueryData(id: UUID(), profileQuery: ProfileQuery(name: "potato"), dataBroker: DataBroker(name: "batata"))
     }
 
     func saveOperationData(_ data: BrokerOperationData) {
@@ -37,7 +42,6 @@ class DataBrokerProtectionDataBase: DataBase {
     }
 
     func scanOperationData(for profileQueryID: UUID) -> ScanOperationData {
-        let profileQuery = brokerProfileQueryData(for: profileQueryID)
 
         return ScanOperationData(brokerProfileQueryID: profileQueryID,
                                  preferredRunDate: Date(),
@@ -45,18 +49,16 @@ class DataBrokerProtectionDataBase: DataBase {
     }
 
     func optOutOperationData(for profileQueryID: UUID) -> [OptOutOperationData] {
-        let profileQuery = brokerProfileQueryData(for: profileQueryID)
         let extractedProfile = ExtractedProfile(name: "Duck")
         let data = OptOutOperationData(brokerProfileQueryID: profileQueryID,
                                        preferredRunDate: Date(),
                                        historyEvents: [HistoryEvent](),
-                                       brokerProfile: profileQuery,
                                        extractedProfile: extractedProfile)
         return [data]
     }
 
     func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
-        let data = BrokerProfileQueryData.createTestScenario()
+        let data = BrokerProfileQueryData(id: UUID(), profileQuery: ProfileQuery(name: "potato"), dataBroker: DataBroker(name: "batata"))
 
         return [data]
     }

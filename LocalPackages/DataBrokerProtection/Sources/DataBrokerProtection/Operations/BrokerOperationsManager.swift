@@ -19,9 +19,10 @@
 import Foundation
 
 protocol OperationsManager {
-    init(brokerProfileQueryData: BrokerProfileQueryData, database: DataBase)
+     init(profileQuery: ProfileQuery, dataBroker: DataBroker, database: DataBase)
 
-    func saveExtractedProfiles(_ profiles: [ExtractedProfile])
+    func runScanOperation(on runner: OperationRunner) async throws
+    func runOptOutOperation(for extractedProfile: ExtractedProfile, on runner: OperationRunner) async throws
 }
 
 /*
@@ -34,20 +35,35 @@ class BrokerOperationsManager: OperationsManager {
     let brokerProfileQueryData: BrokerProfileQueryData
     let database: DataBase
 
-    required init(brokerProfileQueryData: BrokerProfileQueryData, database: DataBase) {
-        self.brokerProfileQueryData = brokerProfileQueryData
+    required init(profileQuery: ProfileQuery, dataBroker: DataBroker, database: DataBase) {
         self.database = database
+
+        if let queryData = database.brokerProfileQueryData(for: profileQuery, dataBroker: dataBroker) {
+            brokerProfileQueryData = queryData
+        } else {
+            brokerProfileQueryData = BrokerProfileQueryData(id: UUID(), profileQuery: profileQuery, dataBroker: dataBroker)
+        }
     }
 
     func runScanOperation(on runner: OperationRunner) async throws {
         let profiles = try await runner.scan(brokerProfileQueryData)
+        brokerProfileQueryData.extractedProfiles.append(contentsOf: profiles)
+
+        if profiles.count > 0 {
+            profiles.forEach {
+                let event = HistoryEvent(type: .matchFound(profileID: $0.id))
+                brokerProfileQueryData.scanOperationData.addHistoryEvent(event)
+            }
+        } else {
+            brokerProfileQueryData.scanOperationData.addHistoryEvent(.init(type: .noMatchFound))
+        }
     }
 
     func runOptOutOperation(for extractedProfile: ExtractedProfile, on runner: OperationRunner) async throws {
         try await runner.optOut(extractedProfile)
     }
 
-    func saveExtractedProfiles(_ profiles: [ExtractedProfile]) {
+    private func saveExtractedProfiles(_ profiles: [ExtractedProfile]) {
         //TODO: Compare old and new profiles, set dateCreated on tem
         fatalError("no op")
     }

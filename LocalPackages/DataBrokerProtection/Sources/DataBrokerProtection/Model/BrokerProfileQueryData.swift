@@ -23,65 +23,35 @@ import Foundation
  It has a set of optOutOperationsData and a single scanOperationData
  */
 class BrokerProfileQueryData {
+    public let id: UUID
+    public let profileQuery: ProfileQuery
+    public let dataBroker: DataBroker
 
-    let id: UUID
-    var extractedProfiles: [ExtractedProfile]
-    let profileQuery: ProfileQuery
-    let dataBroker: DataBroker
-
-    let scanOperationData: BrokerOperationData
-    let optOutOperationsDate: [BrokerOperationData]
+    public var extractedProfiles: [ExtractedProfile] = [ExtractedProfile]()
+    public var scanOperationData: ScanOperationData
+    public var optOutOperationsDate: [OptOutOperationData] = [OptOutOperationData]()
 
     internal init(id: UUID,
-                  extractedProfiles: [ExtractedProfile],
                   profileQuery: ProfileQuery,
                   dataBroker: DataBroker,
-                  scanOperationData: BrokerOperationData,
-                  optOutOperationsDate: [BrokerOperationData]) {
+                  extractedProfiles: [ExtractedProfile] = [ExtractedProfile](),
+                  scanOperationData: ScanOperationData? = nil,
+                  optOutOperationsDate: [OptOutOperationData] = [OptOutOperationData]()) {
 
         self.id = id
-        self.extractedProfiles = extractedProfiles
         self.profileQuery = profileQuery
         self.dataBroker = dataBroker
-        self.scanOperationData = scanOperationData
+        self.extractedProfiles = extractedProfiles
         self.optOutOperationsDate = optOutOperationsDate
-    }
 
+        if let scanData = scanOperationData {
+            self.scanOperationData = scanData
+        } else {
+            self.scanOperationData = ScanOperationData(brokerProfileQueryID: id, preferredRunDate: Date(), historyEvents: [HistoryEvent]())
+        }
+    }
 
     func updateExtractedProfiles(_ extractedProfiles: [ExtractedProfile]) {
 
-    }
-}
-
-//TODO: Remove later
-extension BrokerProfileQueryData {
-    static func createTestScenario() -> BrokerProfileQueryData {
-        // Create test data
-        let id = UUID()
-        let profileQuery = ProfileQuery(name: "Test Query")
-        let dataBroker = DataBroker(name: "Test Broker")
-        let scanOperationData = ScanOperationData(brokerProfileQueryID: id, preferredRunDate: Date(), historyEvents: [], lastRunDate: nil)
-        let optOutOperationsDate: [OptOutOperationData] = []
-
-        // Create extracted profiles for different scenarios
-        let profile1 = ExtractedProfile(name: "John Doe")
-        let profile2 = ExtractedProfile(name: "Jane Smith")
-        let profile3 = ExtractedProfile(name: "Alice Johnson")
-
-        // Create the BrokerProfileQueryData with different scenarios
-        var brokerProfileQueryData = BrokerProfileQueryData(id: id,
-                                                            extractedProfiles: [],
-                                                            profileQuery: profileQuery,
-                                                            dataBroker: dataBroker,
-                                                            scanOperationData: scanOperationData,
-                                                            optOutOperationsDate: optOutOperationsDate)
-
-      //  brokerProfileQueryData.extractedProfiles = []
-
-        brokerProfileQueryData.extractedProfiles = [profile1]
-
-      //  brokerProfileQueryData.extractedProfiles = [profile1, profile2, profile3]
-
-        return brokerProfileQueryData
     }
 }
