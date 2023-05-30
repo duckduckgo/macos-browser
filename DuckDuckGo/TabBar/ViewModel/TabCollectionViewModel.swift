@@ -175,8 +175,7 @@ final class TabCollectionViewModel: NSObject {
     }
 
     @discardableResult func select(tab: Tab, forceChange: Bool = false) -> Bool {
-        guard let index = tabCollection.tabs.firstIndex(where: { $0 == tab })
-        else {
+        guard let index = tabCollection.tabs.firstIndex(where: { $0 == tab }) else {
             return false
         }
 
