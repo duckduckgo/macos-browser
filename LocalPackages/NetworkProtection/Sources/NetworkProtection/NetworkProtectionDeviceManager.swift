@@ -108,7 +108,7 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
     /// This method will return the remote server list if available, or the local server list if there was a problem with the service call.
     ///
     public func refreshServerList() async throws -> [NetworkProtectionServer] {
-        guard let token = tokenStore.fetchToken() else {
+        guard let token = try? tokenStore.fetchToken() else {
             throw NetworkProtectionError.noAuthTokenFound
         }
         let servers = await networkClient.getServers(authToken: token)
@@ -160,7 +160,6 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
         }
     }
 
-    // swiftlint:disable cyclomatic_complexity
     /// Registers the client with a server following the specified server selection method.  Returns the precise server that was selected and the keyPair to use
     /// for the tunnel configuration.
     ///
@@ -172,9 +171,7 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
     ///
     private func register(selectionMethod: NetworkProtectionServerSelectionMethod) async throws -> (server: NetworkProtectionServer, keyPair: KeyPair) {
 
-        guard let token = tokenStore.fetchToken() else {
-            throw NetworkProtectionError.noAuthTokenFound
-        }
+        guard let token = try? tokenStore.fetchToken() else { throw NetworkProtectionError.noAuthTokenFound }
 
         let selectedServerName: String?
         let excludedServerName: String?
@@ -235,7 +232,6 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
             return (cachedServer, keyPair)
         }
     }
-    // swiftlint:enable cyclomatic_complexity
 
     /// Retrieves the first cached server that's registered with the specified key pair.
     ///
@@ -317,7 +313,7 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
 
     private func handle(clientError: NetworkProtectionClientError) {
         if case .invalidAuthToken = clientError {
-            tokenStore.deleteToken()
+            try? tokenStore.deleteToken()
         }
         errorEvents?.fire(clientError.networkProtectionError)
     }

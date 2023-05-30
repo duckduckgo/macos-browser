@@ -25,11 +25,7 @@ final class NetworkProtectionExtensionMachService {
     /// Retrieves the mach service name from a network extension bundle.
     ///
     static func serviceName() -> String {
-        guard let networkExtensionKeys = NetworkProtectionBundle.extensionBundle().object(forInfoDictionaryKey: "NetworkExtension") as? [String: Any],
-              let machServiceName = networkExtensionKeys["NEMachServiceName"] as? String else {
-            fatalError("Mach service name is missing from the Info.plist")
-        }
-
-        return machServiceName
+        NetworkProtectionBundle.extensionBundle().machServiceName
     }
+
 }

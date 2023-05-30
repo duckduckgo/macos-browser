@@ -13,6 +13,8 @@
 			<key>com.apple.networkextension.packet-tunnel</key>
 			<string>$(PRODUCT_MODULE_NAME).PacketTunnelProvider</string>
 		</dict>
+		<key>MAIN_BUNDLE_IDENTIFIER</key>
+		<string>$(MAIN_BUNDLE_IDENTIFIER)</string>
 	</dict>
 </dict>
 </plist>
