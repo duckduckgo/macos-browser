@@ -145,9 +145,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - User Notifications
 
-    private lazy var notificationsPresenter: NetworkProtectionNotificationsPresenter = {
+    private let notificationsPresenter: NetworkProtectionNotificationsPresenter = {
 #if NETP_SYSTEM_EXTENSION
-        NetworkProtectionIPCNotificationsPresenter(ipcConnection: self.ipcConnection)
+        NetworkProtectionIPCNotificationsPresenter(ipcConnection: PacketTunnelProvider.ipcConnection)
 #else
         let parentBundlePath = "../../../"
         let mainAppURL: URL
@@ -266,7 +266,11 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     // MARK: - IPC
 
 #if NETP_SYSTEM_EXTENSION
-    let ipcConnection = IPCConnection(log: .networkProtectionIPCLog, memoryManagementLog: .networkProtectionMemoryLog)
+    static let ipcConnection = {
+        let connection = IPCConnection(log: .networkProtectionIPCLog, memoryManagementLog: .networkProtectionMemoryLog)
+        connection.startListener()
+        return connection
+    }()
 #endif
 
     // MARK: - Connection tester
@@ -341,10 +345,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         os_log("[+] PacketTunnelProvider", log: .networkProtectionMemoryLog, type: .debug)
 
         super.init()
-
-        #if NETP_SYSTEM_EXTENSION
-        ipcConnection.startListener()
-        #endif
 
         observationTokens.append(distributedNotificationCenter.addObserver(for: .requestStatusUpdate, object: nil, queue: nil) { [weak self] _ in
 
@@ -556,10 +556,18 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             Task {
                 await self.handleAdapterStopped()
 
-                // we can‘t prevent a respawn with on-demand rule ON
-                // request the main app to reconfigure when stop requested by user from System Settings
-                if case .userInitiated = reason {
+                switch reason {
+                case .userInitiated:
+                    // stop requested by user from System Settings
+                    // we can‘t prevent a respawn with on-demand rule ON
+                    // request the main app to reconfigure with on-demand OFF
                     await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+
+                case .superceded:
+                    self.notificationsPresenter.showSupercededNotification()
+
+                default:
+                    break
                 }
 
                 completionHandler()
