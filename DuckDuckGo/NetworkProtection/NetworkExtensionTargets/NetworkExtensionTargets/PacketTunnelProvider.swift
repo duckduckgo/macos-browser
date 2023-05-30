@@ -473,9 +473,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             // ask the Main App to reconfigure & restart with on-demand rule “on” - when connection triggered from System Settings
             Task {
                 await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .startVPN)
+                internalCompletionHandler(NEVPNError(.configurationStale))
             }
-
-            internalCompletionHandler(NEVPNError(.configurationStale))
             return
         }
 
