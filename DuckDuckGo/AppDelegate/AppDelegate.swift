@@ -64,7 +64,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var appIconChanger: AppIconChanger!
 
     private(set) var syncDataProviders: SyncDataProviders!
-    private(set) var syncService: DDGSyncing!
+    private(set) var syncService: DDGSyncing?
     private var syncStateCancellable: AnyCancellable?
     private var bookmarksSyncErrorCancellable: AnyCancellable?
     let bookmarksManager = LocalBookmarkManager.shared
@@ -209,17 +209,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         startupNetworkProtection()
 #endif
 
-        syncStateCancellable = syncService.authStatePublisher
-            .prepend(syncService.authState)
-            .map { $0 == .inactive }
-            .removeDuplicates()
-            .sink { isSyncDisabled in
-                LocalBookmarkManager.shared.updateBookmarkDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
-            }
+        startupSync()
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
-        syncService.scheduler.notifyAppLifecycleEvent()
+        syncService?.scheduler.notifyAppLifecycleEvent()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -272,6 +266,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private func applyPreferredTheme() {
         let appearancePreferences = AppearancePreferences()
         appearancePreferences.updateUserInterfaceStyle()
+    }
+
+    // MARK: - Sync
+
+    private func startupSync() {
+        guard let syncService else {
+            fatalError("Unexpectedly found syncService to be nil")
+        }
+
+        syncStateCancellable = syncService.authStatePublisher
+            .prepend(syncService.authState)
+            .map { $0 == .inactive }
+            .removeDuplicates()
+            .sink { isSyncDisabled in
+                LocalBookmarkManager.shared.updateBookmarkDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
+            }
+
+        // This is also called in applicationDidBecomeActive, but we're also calling it here, since
+        // syncService can be nil when applicationDidBecomeActive is called during startup, if a modal
+        // alert is shown before it's instantiated.  In any case it should be safe to call this here,
+        // since the scheduler debounces calls to notifyAppLifecycleEvent().
+        //
+        syncService.scheduler.notifyAppLifecycleEvent()
     }
 
     // MARK: - Network Protection
