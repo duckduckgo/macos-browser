@@ -52,7 +52,7 @@ class BrokerProfileQueryData {
     }
 
     func updateExtractedProfiles(_ extractedProfiles: [ExtractedProfile]) {
-
+        self.extractedProfiles.append(contentsOf: extractedProfiles)
     }
 
     func addHistoryEvent(_ event: HistoryEvent, for operation: BrokerOperationData) {

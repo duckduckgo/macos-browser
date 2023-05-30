@@ -49,18 +49,25 @@ class BrokerOperationsManager: OperationsManager {
     }
 
     func runScanOperation(on runner: OperationRunner) async throws {
-        let profiles = try await runner.scan(brokerProfileQueryData)
-
-        if profiles.count > 0 {
-            profiles.forEach {
-                let event = HistoryEvent(type: .matchFound(profileID: $0.id))
+        do {
+            let profiles = try await runner.scan(brokerProfileQueryData)
+            
+            if profiles.count > 0 {
+                profiles.forEach {
+                    let event = HistoryEvent(type: .matchFound(profileID: $0.id))
+                    brokerProfileQueryData.addHistoryEvent(event, for: brokerProfileQueryData.scanData)
+                }
+                brokerProfileQueryData.updateExtractedProfiles(profiles)
+            } else {
+                let event = HistoryEvent(type: .noMatchFound)
                 brokerProfileQueryData.addHistoryEvent(event, for: brokerProfileQueryData.scanData)
+                
             }
-            brokerProfileQueryData.updateExtractedProfiles(profiles)
-        } else {
-            let event = HistoryEvent(type: .noMatchFound)
+        } catch {
+            let event = HistoryEvent(type: .error)
             brokerProfileQueryData.addHistoryEvent(event, for: brokerProfileQueryData.scanData)
-
+            print("ERROR \(error)")
+            throw error
         }
     }
 
