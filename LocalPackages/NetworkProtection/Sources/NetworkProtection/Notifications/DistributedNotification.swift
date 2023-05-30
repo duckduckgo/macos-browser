@@ -16,10 +16,10 @@
 //  limitations under the License.
 //
 
-#if os(macOS)
-
 import Foundation
 import Common
+
+#if os(macOS)
 
 extension DistributedNotificationCenter.CenterType {
     public static let networkProtection = DistributedNotificationCenter.CenterType("com.duckduckgo.DistributedNotificationCenter.CenterType.networkProtection")
@@ -52,8 +52,16 @@ extension DistributedNotificationCenter {
 
 }
 
-public enum DistributedNotificationName: String {
+#endif
 
+extension NotificationCenter {
+    public func addObserver(for networkProtectionNotification: DistributedNotification, object: Any?, queue: OperationQueue?, using block: @escaping @Sendable (Notification) -> Void) -> NSObjectProtocol {
+
+        addObserver(forName: networkProtectionNotification.name, object: object, queue: queue, using: block)
+    }
+}
+
+public enum DistributedNotificationName: String {
     // Tunnel Status
     case statusDidChange = "com.duckduckgo.network-protection.NetworkProtectionNotification.statusDidChange"
 
@@ -79,5 +87,3 @@ public enum DistributedNotificationName: String {
     }
 
 }
-
-#endif
