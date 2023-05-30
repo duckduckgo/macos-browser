@@ -59,7 +59,12 @@ extension Preferences {
                             case .duckPlayer:
                                 DuckPlayerView(model: .shared)
                             case .about:
-                                AboutView(model: .init())
+#if NETWORK_PROTECTION
+                                let netPInvitePresenter = NetworkProtectionInvitePresenter()
+                                AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter))
+#else
+                                AboutView(model: AboutModel())
+#endif
                             }
                         }
                         .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)

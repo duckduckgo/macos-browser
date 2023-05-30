@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 
 final class VisitMenuItem: NSMenuItem {
 

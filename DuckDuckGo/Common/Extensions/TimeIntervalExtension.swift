@@ -19,7 +19,21 @@
 import Foundation
 
 extension TimeInterval {
+    static let day = days(1)
 
-    static let day: TimeInterval = 60 * 60 * 24
+    static func seconds(_ amount: Int) -> TimeInterval {
+        TimeInterval(amount)
+    }
 
+    static func minutes(_ amount: Int) -> TimeInterval {
+        .seconds(60) * TimeInterval(amount)
+    }
+
+    static func hours(_ amount: Int) -> TimeInterval {
+        .minutes(60) * TimeInterval(amount)
+    }
+
+    static func days(_ amount: Int) -> TimeInterval {
+        .hours(24) * TimeInterval(amount)
+    }
 }
