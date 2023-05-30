@@ -18,8 +18,11 @@
 
 import Cocoa
 import Common
-import WebKit
 import BrowserServicesKit
+
+#if NETWORK_PROTECTION
+import NetworkProtection
+#endif
 
 protocol OptionsButtonMenuDelegate: AnyObject {
 
@@ -31,6 +34,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedBookmarkExportInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category)
     func optionsButtonMenuRequestedOpenExternalPasswordManager(_ menu: NSMenu)
+    func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu)
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu)
     func optionsButtonMenuRequestedPreferences(_ menu: NSMenu)
@@ -48,10 +52,34 @@ final class MoreOptionsMenu: NSMenu {
     private let passwordManagerCoordinator: PasswordManagerCoordinating
     private let internalUserDecider: InternalUserDecider
 
+#if NETWORK_PROTECTION
+    private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
+#endif
+
     required init(coder: NSCoder) {
         fatalError("MoreOptionsMenu: Bad initializer")
     }
 
+#if NETWORK_PROTECTION
+    init(tabCollectionViewModel: TabCollectionViewModel,
+         emailManager: EmailManager = EmailManager(),
+         passwordManagerCoordinator: PasswordManagerCoordinator,
+         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore(),
+         internalUserDecider: InternalUserDecider) {
+
+        self.tabCollectionViewModel = tabCollectionViewModel
+        self.emailManager = emailManager
+        self.passwordManagerCoordinator = passwordManagerCoordinator
+        self.networkProtectionFeatureVisibility =  networkProtectionFeatureVisibility
+        self.internalUserDecider = internalUserDecider
+
+        super.init(title: "")
+
+        self.emailManager.requestDelegate = self
+
+        setupMenuItems()
+    }
+#else
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
@@ -61,12 +89,14 @@ final class MoreOptionsMenu: NSMenu {
         self.emailManager = emailManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
         self.internalUserDecider = internalUserDecider
+
         super.init(title: "")
 
         self.emailManager.requestDelegate = self
 
         setupMenuItems()
     }
+#endif
 
     let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "")
 
@@ -95,6 +125,14 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "OptionsButtonMenuEmail"))
             .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
+#if NETWORK_PROTECTION
+        if networkProtectionFeatureVisibility.isFeatureActivated {
+            addItem(withTitle: UserText.networkProtection, action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
+                .targetting(self)
+                .withImage(.image(for: .vpnIcon))
+        }
+#endif
+
         addItem(NSMenuItem.separator())
 
         addPageItems()
@@ -103,6 +141,10 @@ final class MoreOptionsMenu: NSMenu {
             .targetting(self)
             .withImage(NSImage(named: "Preferences"))
         addItem(preferencesItem)
+    }
+
+    @objc func showNetworkProtectionStatus(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedNetworkProtectionPopover(self)
     }
 
     @objc func newTab(_ sender: NSMenuItem) {

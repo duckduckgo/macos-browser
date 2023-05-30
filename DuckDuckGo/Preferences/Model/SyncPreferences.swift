@@ -112,7 +112,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         self.managementDialogModel = ManagementDialogModel()
         self.managementDialogModel.delegate = self
 
-        syncService.isAuthenticatedPublisher
+        syncService.authStatePublisher
             .removeDuplicates()
             .asVoid()
             .receive(on: DispatchQueue.main)

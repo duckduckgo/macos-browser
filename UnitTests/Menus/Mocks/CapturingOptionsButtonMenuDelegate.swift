@@ -72,4 +72,8 @@ class CapturingOptionsButtonMenuDelegate: OptionsButtonMenuDelegate {
 
     }
 
+    func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {
+
+    }
+
 }

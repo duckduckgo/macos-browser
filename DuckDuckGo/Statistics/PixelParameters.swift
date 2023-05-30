@@ -110,7 +110,8 @@ extension Pixel.Event {
              .watchInDuckPlayerInitial,
              .setAsDefaultInitial,
              .importDataInitial,
-             .newTabInitial:
+             .newTabInitial,
+             .networkProtectionSystemExtensionUnknownActivationResult:
 
             return nil
         }
