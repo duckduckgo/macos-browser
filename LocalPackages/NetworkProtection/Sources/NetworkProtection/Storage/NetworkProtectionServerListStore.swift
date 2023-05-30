@@ -61,7 +61,7 @@ public enum NetworkProtectionServerListStoreError: Error, NetworkProtectionError
 public class NetworkProtectionServerListFileSystemStore: NetworkProtectionServerListStore {
 
     enum Constants {
-        static let defaultFileDir = "com.duckduckgo.network-protection"
+        static let defaultFileDir = "\(Bundle.main.bundleIdentifier!)/NetworkProtectionServers"
         static let defaultFileName = "network_protection_servers.json"
     }
 
@@ -115,10 +115,10 @@ public class NetworkProtectionServerListFileSystemStore: NetworkProtectionServer
             }
 
             serverListMap[existingServer.serverName] = NetworkProtectionServer(
-                registeredPublicKey: existingServer.registeredPublicKey,
-                allowedIPs: existingServer.allowedIPs,
+                registeredPublicKey: incomingServer.registeredPublicKey ?? existingServer.registeredPublicKey,
+                allowedIPs: incomingServer.allowedIPs ?? existingServer.allowedIPs,
                 serverInfo: incomingServer.serverInfo,
-                expirationDate: incomingServer.expirationDate
+                expirationDate: incomingServer.expirationDate ?? existingServer.expirationDate
             )
         }
 

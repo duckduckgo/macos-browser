@@ -54,6 +54,7 @@ public enum NetworkProtectionError: LocalizedError {
     case failedToRedeemInviteCode(Error?)
     case failedToParseRedeemResponse(Error)
     case invalidAuthToken
+    case serverListInconsistency
 
     // Server list store errors
     case failedToEncodeServerList(Error)
@@ -62,7 +63,6 @@ public enum NetworkProtectionError: LocalizedError {
     case noServerListFound
     case couldNotCreateServerListDirectory(Error)
     case failedToReadServerList(Error)
-    case serverListInconsistency
 
     // Keychain errors
     case failedToCastKeychainValueToData(field: String)
@@ -137,8 +137,6 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
         return completeServerList
     }
 
-    // swiftlint:disable function_body_length
-    // swiftlint:disable cyclomatic_complexity
     /// Registers the device with the Network Protection backend.
     ///
     /// The flow for registration is as follows:
@@ -148,83 +146,7 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
     ///
     public func generateTunnelConfiguration(selectionMethod: NetworkProtectionServerSelectionMethod) async throws -> (TunnelConfiguration, NetworkProtectionServerInfo) {
 
-        let servers: [NetworkProtectionServer]
-
-        do {
-            servers = try await refreshServerList()
-        } catch let error as NetworkProtectionServerListStoreError {
-            errorEvents?.fire(error.networkProtectionError)
-            throw error
-        } catch {
-            errorEvents?.fire(.unhandledError(function: #function, line: #line, error: error))
-            throw error
-        }
-
-        let closestServer: NetworkProtectionServer?
-
-        switch selectionMethod {
-        case .automatic:
-            closestServer = self.closestServer(from: servers)
-        case .preferredServer(let serverName):
-            closestServer = server(in: servers, matching: serverName) ?? self.closestServer(from: servers)
-        case .avoidServer(let serverToAvoid):
-            closestServer = self.closestServer(from: servers.filter({ $0.serverName != serverToAvoid }))
-        }
-
-        guard var selectedServer = closestServer else {
-            errorEvents?.fire(NetworkProtectionError.couldNotSelectClosestServer)
-            throw NetworkProtectionError.couldNotSelectClosestServer
-        }
-
-        var keyPair = keyStore.currentKeyPair()
-
-        if !selectedServer.isRegistered(with: keyPair.publicKey) {
-            guard let token = tokenStore.fetchToken() else {
-                throw NetworkProtectionError.noAuthTokenFound
-            }
-            let registeredServersResult = await networkClient.register(authToken: token, publicKey: keyPair.publicKey, withServer: selectedServer.serverInfo)
-
-            let registeredServers: [NetworkProtectionServer]
-
-            switch registeredServersResult {
-            case .success(let servers):
-                registeredServers = servers
-
-                guard let registeredServer = servers.first(where: { $0.serverName == selectedServer.serverName }) else {
-                    // If we selected the server from the stored list, and after registering it and updating that list
-                    // with the server reply we can't find it, something's quite wrong.
-                    assertionFailure("There's an inconsistency with the list of servers returned by the endpoint")
-                    errorEvents?.fire(NetworkProtectionError.serverListInconsistency)
-                    throw NetworkProtectionError.serverListInconsistency
-                }
-
-                selectedServer = registeredServer
-
-                // We should not need this IF condition here, because we know registered servers will give us an expiration date,
-                // but since the structure we're currently using makes the expiration date optional we need to have it.
-                // We should consider changing our server structure to not allow a missing expiration date here.
-                if let serverExpirationDate = selectedServer.expirationDate {
-                    if keyPair.expirationDate > serverExpirationDate {
-                        keyPair = keyStore.updateCurrentKeyPair(newExpirationDate: serverExpirationDate)
-                    }
-                }
-            case .failure(let error):
-                handle(clientError: error)
-                throw error
-            }
-
-            // Persist the server list:
-
-            do {
-                try serverListStore.updateServerListCache(with: registeredServers)
-            } catch let error as NetworkProtectionServerListStoreError {
-                errorEvents?.fire(error.networkProtectionError)
-                // Intentionally not rethrowing, as this failure is not critical for this method
-            } catch {
-                errorEvents?.fire(.unhandledError(function: #function, line: #line, error: error))
-                // Intentionally not rethrowing, as this failure is not critical for this method
-            }
-        }
+        let (selectedServer, keyPair) = try await register(selectionMethod: selectionMethod)
 
         do {
             let configuration = try tunnelConfiguration(interfacePrivateKey: keyPair.privateKey, server: selectedServer)
@@ -237,8 +159,102 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
             throw error
         }
     }
-    // swiftlint:enable function_body_length
+
+    // swiftlint:disable cyclomatic_complexity
+    /// Registers the client with a server following the specified server selection method.  Returns the precise server that was selected and the keyPair to use
+    /// for the tunnel configuration.
+    ///
+    /// - Parameters:
+    ///     - selectionMethod: the server selection method
+    ///     - keyPair: the key pair that was used to register with the server, and that should be used to configure the tunnel
+    ///
+    /// - Throws:`NetworkProtectionError`
+    ///
+    private func register(selectionMethod: NetworkProtectionServerSelectionMethod) async throws -> (server: NetworkProtectionServer, keyPair: KeyPair) {
+
+        guard let token = tokenStore.fetchToken() else {
+            throw NetworkProtectionError.noAuthTokenFound
+        }
+
+        let selectedServerName: String?
+        let excludedServerName: String?
+
+        switch selectionMethod {
+        case .automatic:
+            selectedServerName = nil
+            excludedServerName = nil
+        case .preferredServer(let serverName):
+            selectedServerName = serverName
+            excludedServerName = nil
+        case .avoidServer(let serverToAvoid):
+            selectedServerName = nil
+            excludedServerName = serverToAvoid
+        }
+
+        var keyPair = keyStore.currentKeyPair()
+        let registeredServersResult = await networkClient.register(authToken: token, publicKey: keyPair.publicKey, withServerNamed: selectedServerName)
+        let selectedServer: NetworkProtectionServer
+
+        switch registeredServersResult {
+        case .success(let registeredServers):
+            do {
+                try serverListStore.store(serverList: registeredServers)
+            } catch let error as NetworkProtectionServerListStoreError {
+                errorEvents?.fire(error.networkProtectionError)
+                // Intentionally not rethrowing, as this failure is not critical for this method
+            } catch {
+                errorEvents?.fire(.unhandledError(function: #function, line: #line, error: error))
+                // Intentionally not rethrowing, as this failure is not critical for this method
+            }
+
+            guard let registeredServer = registeredServers.first(where: { $0.serverName != excludedServerName }) else {
+                // If we're looking to exclude a server we should have a few other options available.  If we can't find any
+                // then it means theres an inconsistency in the server list that was returned.
+                errorEvents?.fire(NetworkProtectionError.serverListInconsistency)
+
+                let cachedServer = try cachedServer(registeredWith: keyPair)
+                return (cachedServer, keyPair)
+            }
+
+            selectedServer = registeredServer
+
+            // We should not need this IF condition here, because we know registered servers will give us an expiration date,
+            // but since the structure we're currently using makes the expiration date optional we need to have it.
+            // We should consider changing our server structure to not allow a missing expiration date here.
+            if let serverExpirationDate = selectedServer.expirationDate,
+               keyPair.expirationDate > serverExpirationDate {
+
+                keyPair = keyStore.updateCurrentKeyPair(newExpirationDate: serverExpirationDate)
+            }
+
+            return (selectedServer, keyPair)
+        case .failure(let error):
+            handle(clientError: error)
+
+            let cachedServer = try cachedServer(registeredWith: keyPair)
+            return (cachedServer, keyPair)
+        }
+    }
     // swiftlint:enable cyclomatic_complexity
+
+    /// Retrieves the first cached server that's registered with the specified key pair.
+    ///
+    private func cachedServer(registeredWith keyPair: KeyPair) throws -> NetworkProtectionServer {
+        do {
+            guard let server = try serverListStore.storedNetworkProtectionServerList().first(where: { $0.isRegistered(with: keyPair.publicKey) }) else {
+                errorEvents?.fire(NetworkProtectionError.noServerListFound)
+                throw NetworkProtectionError.noServerListFound
+            }
+
+            return server
+        } catch let error as NetworkProtectionError {
+            errorEvents?.fire(error)
+            throw error
+        } catch {
+            errorEvents?.fire(NetworkProtectionError.unhandledError(function: #function, line: #line, error: error))
+            throw NetworkProtectionError.unhandledError(function: #function, line: #line, error: error)
+        }
+    }
 
     // MARK: - Internal
 
@@ -252,29 +268,6 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
         }
 
         return matchingServer
-    }
-
-    /// The app currently has no way to tell which server is most appropriate for the user.
-    /// For now, use the time zone to determine which one is more likely to be closest.
-    /// This will be addressed by a backend project later.
-    nonisolated func closestServer(from servers: [NetworkProtectionServer], timeZone: TimeZone = .current) -> NetworkProtectionServer? {
-        let deviceDifferenceFromGMT = timeZone.secondsFromGMT()
-        var currentBestDistanceToServer = Int.max
-        var closestServers: [NetworkProtectionServer] = []
-
-        for server in servers {
-            let serverDifferenceFromGMT = server.serverInfo.attributes.timezoneOffset
-            let distanceToServer = abs(deviceDifferenceFromGMT - serverDifferenceFromGMT)
-
-            if distanceToServer < currentBestDistanceToServer {
-                currentBestDistanceToServer = distanceToServer
-                closestServers = [server]
-            } else if distanceToServer == currentBestDistanceToServer {
-                closestServers.append(server)
-            }
-        }
-
-        return closestServers.randomElement()
     }
 
     func tunnelConfiguration(interfacePrivateKey: PrivateKey,
