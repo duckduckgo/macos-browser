@@ -21,7 +21,6 @@ import Foundation
 import Common
 import Network
 import NetworkProtection
-import PixelKit
 
 protocol LatencyMeasurer: Sendable {
     func ping() async -> Result<Pinger.PingResult, Pinger.PingError>

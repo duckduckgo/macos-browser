@@ -17,10 +17,6 @@
 //
 
 import Foundation
-import UserNotifications
-import Common
-import AppKit
-import AppIntents
 
 /// Notifications presenter for the system extension.  This really just asks for the running agent to present a notification using
 /// the established IPC connection.
