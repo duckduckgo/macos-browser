@@ -20,6 +20,7 @@ CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
 CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Debug.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Release.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Release.entitlements
+CODE_SIGN_STYLE[config=Debug][sdk=*] = Automatic
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
@@ -48,7 +49,6 @@ PRODUCT_NAME[config=Release][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
 PRODUCT_NAME[config=Review][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
 
 PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
-PROVISIONING_PROFILE_SPECIFIER[config=Debug][sdk=macosx*] = macOS NetP System Extension - Debug
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS NetP System Extension - Release
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS NetP System Extension - Review
 
