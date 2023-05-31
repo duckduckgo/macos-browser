@@ -21,13 +21,15 @@ import BrowserServicesKit
 
 extension ContentScopeFeatureToggles {
 
-    static let supportedFeaturesOnMacOS = ContentScopeFeatureToggles(emailProtection: true,
-                                                                     emailProtectionIncontextSignup: true,
-                                                                     credentialsAutofill: true,
-                                                                     identitiesAutofill: true,
-                                                                     creditCardsAutofill: true,
-                                                                     credentialsSaving: true,
-                                                                     passwordGeneration: true,
-                                                                     inlineIconCredentials: true,
-                                                                     thirdPartyCredentialsProvider: true)
+    static func supportedFeaturesOnMacOS(_ privacyConfig: PrivacyConfiguration) -> ContentScopeFeatureToggles {
+        return ContentScopeFeatureToggles(emailProtection: true,
+                                          emailProtectionIncontextSignup: privacyConfig.isEnabled(featureKey: .incontextSignup),
+                                          credentialsAutofill: true,
+                                          identitiesAutofill: true,
+                                          creditCardsAutofill: true,
+                                          credentialsSaving: true,
+                                          passwordGeneration: true,
+                                          inlineIconCredentials: true,
+                                          thirdPartyCredentialsProvider: true)
+    }
 }
