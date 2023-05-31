@@ -18,6 +18,7 @@
 
 import Foundation
 import Common
+import Combine
 
 /// This class provides a mechanism to store and announce errors with the tunnel.
 /// The reason this class is necessary is because we need to store and share failures across different UI elements.  As an example
@@ -25,14 +26,15 @@ import Common
 /// the app.
 ///
 final class NetworkProtectionTunnelErrorStore {
+    public let errorPublisher: AnyPublisher<String?, Never>
+
+    private let errorSubject = PassthroughSubject<String?, Never>()
     private static let lastErrorMessageKey = "com.duckduckgo.NetworkProtectionTunnelErrorStore.lastErrorMessage"
     private let userDefaults: UserDefaults
-    private let distributedNotificationCenter: DistributedNotificationCenter
 
-    init(userDefaults: UserDefaults = .standard,
-         distributedNotificationCenter: DistributedNotificationCenter = .forType(.networkProtection)) {
+    init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
-        self.distributedNotificationCenter = distributedNotificationCenter
+        errorPublisher = errorSubject.eraseToAnyPublisher()
     }
 
     var lastErrorMessage: String? {
@@ -42,13 +44,7 @@ final class NetworkProtectionTunnelErrorStore {
 
         set {
             userDefaults.set(newValue, forKey: Self.lastErrorMessageKey)
-            postLastErrorMessageChangedNotification(newValue)
+            errorSubject.send(newValue)
         }
-    }
-
-    // MARK: - Posting Notifications
-
-    private func postLastErrorMessageChangedNotification(_ errorMessage: String?) {
-        distributedNotificationCenter.post(.tunnelErrorChanged, object: errorMessage)
     }
 }
