@@ -54,24 +54,28 @@ final class DownloadsTabExtension: NSObject {
     }
 
     func saveWebViewContentAs(_ webView: WKWebView) {
-        webView.getMimeType { [weak webView, weak self] mimeType in
-            guard let self, let webView else { return }
-            guard case .some(.html) = mimeType.flatMap(UTType.init(mimeType:)) else {
-                if let url = webView.url {
-                    webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
-                        self.downloadManager.add(download,
-                                                 fromBurnerWindow: self.isBurner,
-                                                 delegate: self, location: .prompt)
-                    }
-                }
-                return
-            }
+        Task { @MainActor in
+            await saveWebViewContentAs(webView)
+        }
+    }
 
-            let parameters = SavePanelParameters(suggestedFilename: webView.suggestedFilename, fileTypes: [.html, .webArchive, .pdf])
-            self.savePanelDialogRequest = SavePanelDialogRequest(parameters) { result in
-                guard let (url, fileType) = try? result.get() else { return }
-                webView.exportWebContent(to: url, as: fileType.flatMap(WKWebView.ContentExportType.init) ?? .html)
+    @MainActor
+    private func saveWebViewContentAs(_ webView: WKWebView) async {
+        guard case .some(.html) = await webView.mimeType.flatMap(UTType.init(mimeType:)) else {
+            if let url = webView.url {
+                webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
+                    self.downloadManager.add(download,
+                                             fromBurnerWindow: self.isBurner,
+                                             delegate: self, location: .prompt)
+                }
             }
+            return
+        }
+
+        let parameters = SavePanelParameters(suggestedFilename: webView.suggestedFilename, fileTypes: [.html, .webArchive, .pdf])
+        self.savePanelDialogRequest = SavePanelDialogRequest(parameters) { result in
+            guard let (url, fileType) = try? result.get() else { return }
+            webView.exportWebContent(to: url, as: fileType.flatMap(WKWebView.ContentExportType.init) ?? .html)
         }
     }
 

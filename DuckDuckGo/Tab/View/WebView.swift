@@ -193,37 +193,41 @@ final class WebView: WKWebView {
     }
     private var findInPageCompletionHandler: ((FindResult) -> Void)?
 
-    func find(_ string: String, with options: _WKFindOptions, maxCount: UInt, completionHandler: ((FindResult) -> Void)? = nil) {
+    @MainActor
+    func find(_ string: String, with options: _WKFindOptions, maxCount: UInt) async -> FindResult {
         assert(!string.isEmpty)
 
         // native WKWebView find
-        if self.responds(to: Selector.findString) {
-            _=Self.swizzleFindStringOnce
-            // receive _WKFindDelegate calls and call completion handler
-            NSException.try {
-                self.setValue(self, forKey: "findDelegate")
-            }
-            if let findInPageCompletionHandler {
-                self.findInPageCompletionHandler = nil
-                findInPageCompletionHandler(.cancelled)
-            }
-            self.findInPageCompletionHandler = completionHandler
-            self.find(string, with: options, maxCount: maxCount)
+        guard self.responds(to: Selector.findString) else {
+            guard #available(macOS 11.0, *) else { fatalError("find in page should be available in X̴P̴ Catalina ( °-° )") }
 
-        } else if #available(macOS 11.0, *) {
             // fallback to official `findSting:`
             let config = WKFindConfiguration()
             config.backwards = options.contains(.backwards)
             config.caseSensitive = !options.contains(.caseInsensitive)
             config.wraps = options.contains(.wrapAround)
 
-            self.find(string, configuration: config) { result in
-                if result.matchFound {
-                    completionHandler?(.found(matches: nil))
-                } else {
-                    completionHandler?(.notFound)
+            return await withCheckedContinuation { continuation in
+                self.find(string, configuration: config) { result in
+                    continuation.resume(returning: result.matchFound ? .found(matches: nil) : .notFound)
                 }
             }
+        }
+
+        _=Self.swizzleFindStringOnce
+
+        // receive _WKFindDelegate calls and call completion handler
+        NSException.try {
+            self.setValue(self, forKey: "findDelegate")
+        }
+        if let findInPageCompletionHandler {
+            self.findInPageCompletionHandler = nil
+            findInPageCompletionHandler(.cancelled)
+        }
+
+        return await withCheckedContinuation { continuation in
+            self.findInPageCompletionHandler = continuation.resume
+            self.find(string, with: options, maxCount: maxCount)
         }
     }
 
@@ -257,17 +261,15 @@ final class WebView: WKWebView {
 extension WebView /* _WKFindDelegate */ {
 
     @objc(_webView:didFindMatches:forString:withMatchIndex:)
-    func webView(_ webView: WKWebView, didFind matchesFound: UInt, for string: String, withMatchIndex matchIndex: Int) {
-        Swift.print("didFind", matchesFound, string, matchIndex)
+    func webView(_ webView: WKWebView, didFind matchesFound: UInt, for string: String, withMatchIndex _: Int) {
         if let findInPageCompletionHandler {
             self.findInPageCompletionHandler = nil
-            findInPageCompletionHandler(.found(matches: matchesFound))
+            findInPageCompletionHandler(.found(matches: matchesFound)) // matchIndex is broken in WebKit
         }
     }
 
     @objc(_webView:didFailToFindString:)
     func webView(_ webView: WKWebView, didFailToFind string: String) {
-        Swift.print("didFailToFind", string)
         if let findInPageCompletionHandler {
             self.findInPageCompletionHandler = nil
             findInPageCompletionHandler(.notFound)
