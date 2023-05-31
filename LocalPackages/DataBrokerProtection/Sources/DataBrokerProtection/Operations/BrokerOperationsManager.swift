@@ -18,6 +18,10 @@
 
 import Foundation
 
+enum OperationsError: Error {
+    case noOperationDataForExtractedProfile
+}
+
 protocol OperationsManager {
      init(profileQuery: ProfileQuery, dataBroker: DataBroker, database: DataBase)
 
@@ -75,7 +79,7 @@ class BrokerOperationsManager: OperationsManager {
     func runOptOutOperation(for extractedProfile: ExtractedProfile, on runner: OperationRunner) async throws {
         guard let data = brokerProfileQueryData.optOutsData.filter({ $0.extractedProfile.id == extractedProfile.id }).first else {
             //TODO: Fix error, send pixel
-            throw NSError(domain: "OptOutDataNotFound", code: 123)
+            throw OperationsError.noOperationDataForExtractedProfile
         }
 
         data.lastRunDate = Date()
