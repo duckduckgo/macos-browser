@@ -36,13 +36,13 @@ class BrokerProfileQueryData {
                   dataBroker: DataBroker,
                   extractedProfiles: [ExtractedProfile] = [ExtractedProfile](),
                   scanOperationData: ScanOperationData? = nil,
-                  optOutOperationsDate: [OptOutOperationData] = [OptOutOperationData]()) {
+                  optOutOperationsData: [OptOutOperationData] = [OptOutOperationData]()) {
 
         self.id = id
         self.profileQuery = profileQuery
         self.dataBroker = dataBroker
         self.extractedProfiles = extractedProfiles
-        self.optOutsData = optOutOperationsDate
+        self.optOutsData = optOutOperationsData
 
         if let scanData = scanOperationData {
             self.scanData = scanData

@@ -19,6 +19,7 @@
 import Foundation
 
 protocol BrokerOperationData {
+    var id: UUID { get set }
     var brokerProfileQueryID: UUID { get set }
     var preferredRunDate: Date { get set }
     var historyEvents: [HistoryEvent] { get set }
@@ -34,13 +35,20 @@ extension BrokerOperationData {
 }
 
 class ScanOperationData: BrokerOperationData {
-    internal init(brokerProfileQueryID: UUID, preferredRunDate: Date, historyEvents: [HistoryEvent], lastRunDate: Date? = nil) {
+    internal init(id: UUID = UUID(),
+                  brokerProfileQueryID: UUID,
+                  preferredRunDate: Date,
+                  historyEvents: [HistoryEvent],
+                  lastRunDate: Date? = nil) {
+
+        self.id = id
         self.brokerProfileQueryID = brokerProfileQueryID
         self.preferredRunDate = preferredRunDate
         self.historyEvents = historyEvents
         self.lastRunDate = lastRunDate
     }
 
+    var id: UUID
     var brokerProfileQueryID: UUID
     var preferredRunDate: Date
     var historyEvents: [HistoryEvent]
@@ -48,19 +56,21 @@ class ScanOperationData: BrokerOperationData {
 }
 
 class OptOutOperationData: BrokerOperationData {
-    internal init(brokerProfileQueryID: UUID,
+    internal init(id: UUID = UUID(),
+                  brokerProfileQueryID: UUID,
                   preferredRunDate: Date,
                   historyEvents: [HistoryEvent],
                   lastRunDate: Date? = nil,
                   extractedProfile: ExtractedProfile) {
 
+        self.id = id
         self.brokerProfileQueryID = brokerProfileQueryID
         self.preferredRunDate = preferredRunDate
         self.historyEvents = historyEvents
         self.lastRunDate = lastRunDate
         self.extractedProfile = extractedProfile
     }
-
+    var id: UUID
     var brokerProfileQueryID: UUID
     var preferredRunDate: Date
     var historyEvents: [HistoryEvent]
