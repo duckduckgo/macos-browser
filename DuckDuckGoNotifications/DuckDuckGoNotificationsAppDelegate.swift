@@ -56,7 +56,7 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
             mainAppURL = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
         }
 
-        return NetworkProtectionUNNotificationsPresenter(mainAppURL: mainAppURL)
+        return NetworkProtectionUNNotificationsPresenter(appLauncher: AppLauncher(appBundleURL: mainAppURL))
     }()
 
 #if NETP_SYSTEM_EXTENSION
