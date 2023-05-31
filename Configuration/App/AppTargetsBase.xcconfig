@@ -33,6 +33,7 @@ CURRENT_PROJECT_VERSION = $(MARKETING_VERSION)
 ENABLE_HARDENED_RUNTIME = YES
 
 INFOPLIST_FILE = DuckDuckGo/Info.plist
+INFOPLIST_KEY_NSPrincipalClass = NSApplication
 
 LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks
 
