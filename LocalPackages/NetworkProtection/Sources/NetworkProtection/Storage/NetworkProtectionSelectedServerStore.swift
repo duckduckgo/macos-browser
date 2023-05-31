@@ -16,10 +16,7 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
-import NetworkProtection
 
 protocol NetworkProtectionSelectedServerStore: AnyObject {
 
@@ -27,11 +24,11 @@ protocol NetworkProtectionSelectedServerStore: AnyObject {
     func reset()
 }
 
-enum SelectedNetworkProtectionServer: Equatable {
+public enum SelectedNetworkProtectionServer: Equatable {
     case automatic
     case endpoint(String)
 
-    var stringValue: String? {
+    public var stringValue: String? {
         switch self {
         case .automatic: return nil
         case .endpoint(let endpoint): return endpoint
@@ -39,7 +36,7 @@ enum SelectedNetworkProtectionServer: Equatable {
     }
 }
 
-final class NetworkProtectionSelectedServerUserDefaultsStore: NetworkProtectionSelectedServerStore {
+public final class NetworkProtectionSelectedServerUserDefaultsStore: NetworkProtectionSelectedServerStore {
 
     private enum Constants {
         static let selectedServerKey = "network-protection.selected-server-endpoint"
@@ -51,7 +48,7 @@ final class NetworkProtectionSelectedServerUserDefaultsStore: NetworkProtectionS
     ///
     /// - Note: This value may be out of sync with the real set of available backend endpoints.
     ///         Any callers that use this value will need to check the known source of truth before proceeding to use the endpoint.
-    var selectedServer: SelectedNetworkProtectionServer {
+    public var selectedServer: SelectedNetworkProtectionServer {
         get {
             guard let selectedEndpoint = self.userDefaults.string(forKey: Constants.selectedServerKey) else {
                 return .automatic
@@ -72,14 +69,12 @@ final class NetworkProtectionSelectedServerUserDefaultsStore: NetworkProtectionS
 
     private let userDefaults: UserDefaults
 
-    init(userDefaults: UserDefaults = .standard) {
+    public init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
     }
 
-    func reset() {
+    public func reset() {
         userDefaults.removeObject(forKey: Constants.selectedServerKey)
     }
 
 }
-
-#endif

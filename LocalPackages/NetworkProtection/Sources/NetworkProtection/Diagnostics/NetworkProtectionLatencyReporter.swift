@@ -20,7 +20,6 @@ import Combine
 import Foundation
 import Common
 import Network
-import NetworkProtection
 
 protocol LatencyMeasurer: Sendable {
     func ping() async -> Result<Pinger.PingResult, Pinger.PingError>

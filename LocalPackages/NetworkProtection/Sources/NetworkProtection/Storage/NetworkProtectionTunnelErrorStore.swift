@@ -25,19 +25,19 @@ import Combine
 /// we may need to show these errors in the status menu (which will eventually be run in its own agent), and in the status view within
 /// the app.
 ///
-final class NetworkProtectionTunnelErrorStore {
+public final class NetworkProtectionTunnelErrorStore {
     public let errorPublisher: AnyPublisher<String?, Never>
 
     private let errorSubject = PassthroughSubject<String?, Never>()
     private static let lastErrorMessageKey = "com.duckduckgo.NetworkProtectionTunnelErrorStore.lastErrorMessage"
     private let userDefaults: UserDefaults
 
-    init(userDefaults: UserDefaults = .standard) {
+    public init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
         errorPublisher = errorSubject.eraseToAnyPublisher()
     }
 
-    var lastErrorMessage: String? {
+    public var lastErrorMessage: String? {
         get {
             userDefaults.string(forKey: Self.lastErrorMessageKey)
         }

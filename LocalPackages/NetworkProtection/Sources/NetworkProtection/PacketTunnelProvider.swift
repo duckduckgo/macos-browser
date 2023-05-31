@@ -23,7 +23,6 @@ import Combine
 import Common
 import Foundation
 import NetworkExtension
-import NetworkProtection
 import UserNotifications
 import Combine
 
@@ -38,7 +37,7 @@ public protocol PacketTunnelProviderDelegate: AnyObject {
 }
 
 // swiftlint:disable:next type_body_length
-final class PacketTunnelProvider: NEPacketTunnelProvider {
+public final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - Error Handling
 
@@ -82,7 +81,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - Status
 
-    override var reasserting: Bool {
+    public override var reasserting: Bool {
         get {
             super.reasserting
         }
@@ -332,10 +331,10 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     private let useSystemKeychain: Bool
     private let debugEvents: EventMapping<NetworkProtectionError>?
 
-    init(notificationCenter: NotificationCenter,
-         createNotificationsPresenter: @autoclosure @escaping () -> NetworkProtectionNotificationsPresenter,
-         useSystemKeychain: Bool,
-         debugEvents: EventMapping<NetworkProtectionError>?) {
+    public init(notificationCenter: NotificationCenter,
+                createNotificationsPresenter: @autoclosure @escaping () -> NetworkProtectionNotificationsPresenter,
+                useSystemKeychain: Bool,
+                debugEvents: EventMapping<NetworkProtectionError>?) {
         os_log("[+] PacketTunnelProvider", log: .networkProtectionMemoryLog, type: .debug)
         self.notificationCenter = notificationCenter
         self.createNotificationsPresenter = createNotificationsPresenter
@@ -400,7 +399,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         try tokenStore.store(authToken)
     }
 
-    override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
+    public override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         connectionStatus = .connecting
 
         // when activated by system "on-demand" the option is set
@@ -501,7 +500,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
-    override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
+    public override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
         connectionStatus = .disconnecting
         os_log("Stopping tunnel with reason %{public}@", log: .networkProtection, type: .info, String(describing: reason))
 
@@ -640,7 +639,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - App Messages
 
-    override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
+    public override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
         guard let message = ExtensionMessage(rawValue: messageData[0]) else {
             completionHandler?(nil)
             return
@@ -810,13 +809,13 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - Computer sleeping
 
-    override func sleep() async {
+    public override func sleep() async {
         os_log("Sleep", log: .networkProtectionSleepLog, type: .info)
 
         await connectionTester.stop()
     }
 
-    override func wake() {
+    public override func wake() {
         os_log("Wake up", log: .networkProtectionSleepLog, type: .info)
 
         Task {

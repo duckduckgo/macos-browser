@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import NetworkProtection
 
 /// Notifications presenter for the system extension.  This really just asks for the running agent to present a notification using
 /// the established IPC connection.
