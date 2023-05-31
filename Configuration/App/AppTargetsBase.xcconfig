@@ -38,6 +38,7 @@ PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug
 PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).review
 
 INFOPLIST_FILE = DuckDuckGo/Info.plist
+INFOPLIST_KEY_NSPrincipalClass = NSApplication
 
 LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks
 
