@@ -259,7 +259,23 @@ extension YoutubeOverlayUserScript: WKScriptMessageHandler {
 
 extension YoutubeOverlayUserScript {
     func handleSendJSPixel(_ message: UserScriptMessage, replyHandler: @escaping MessageReplyHandler) {
-        // pixels no longer used
-        replyHandler(nil)
+        defer {
+            replyHandler(nil)
+        }
+
+        // Temporary pixel for first time user uses Duck Player
+        if !Pixel.isNewUser {
+            return
+        }
+        guard let body = message.messageBody as? [String: Any] else {
+            return
+        }
+        let pixelName = body["pixelName"] as? String
+        if pixelName == "play.use" {
+            let repetition = Pixel.Event.Repetition(key: Pixel.Event.watchInDuckPlayerInitial.name)
+            if repetition == .initial {
+                Pixel.fire(.watchInDuckPlayerInitial)
+            }
+        }
     }
 }

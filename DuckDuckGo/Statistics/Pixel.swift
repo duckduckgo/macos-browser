@@ -33,10 +33,19 @@ final class Pixel {
     }
 
     private var dryRun: Bool
+    static var isNewUser: Bool {
+        let oneWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())!
+        return firstLaunchDate >= oneWeekAgo
+    }
 
     init(dryRun: Bool) {
         self.dryRun = dryRun
     }
+
+    // Temporary for activation pixels
+    static private var aMonthAgo = Calendar.current.date(byAdding: .month, value: -1, to: Date())!
+    @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: aMonthAgo)
+    static var firstLaunchDate: Date
 
     func fire(pixelNamed pixelName: String,
               withAdditionalParameters params: [String: String]? = nil,
@@ -59,7 +68,6 @@ final class Pixel {
         guard !dryRun else {
             let params = params?.filter { key, _ in !["appVersion", "test"].contains(key) } ?? [:]
             os_log(.debug, log: .pixel, "%@ %@", pixelName.replacingOccurrences(of: "_", with: "."), params)
-
             // simulate server response time for Dry Run mode
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 onComplete(nil)

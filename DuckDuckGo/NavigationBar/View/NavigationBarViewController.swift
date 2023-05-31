@@ -21,6 +21,11 @@ import Combine
 import Common
 import BrowserServicesKit
 
+#if NETWORK_PROTECTION
+import NetworkProtection
+#endif
+
+// swiftlint:disable:next type_body_length
 final class NavigationBarViewController: NSViewController {
 
     enum Constants {
@@ -35,6 +40,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var bookmarkListButton: MouseOverButton!
     @IBOutlet weak var passwordManagementButton: MouseOverButton!
     @IBOutlet weak var downloadsButton: MouseOverButton!
+    @IBOutlet weak var networkProtectionButton: MouseOverButton!
     @IBOutlet weak var navigationButtons: NSView!
     @IBOutlet weak var addressBarContainer: NSView!
     @IBOutlet weak var daxLogo: NSImageView!
@@ -80,11 +86,29 @@ final class NavigationBarViewController: NSViewController {
     private var pinnedViewsNotificationCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
     private var downloadsCancellables = Set<AnyCancellable>()
+    private var networkProtectionCancellable: AnyCancellable?
+    private var networkProtectionInterruptionCancellable: AnyCancellable?
+
+#if NETWORK_PROTECTION
+    private let networkProtectionButtonModel: NetworkProtectionNavBarButtonModel
+    private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
+#endif
 
     required init?(coder: NSCoder) {
         fatalError("NavigationBarViewController: Bad initializer")
     }
 
+#if NETWORK_PROTECTION
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()) {
+        self.tabCollectionViewModel = tabCollectionViewModel
+        self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popovers: popovers)
+        self.isBurner = isBurner
+        self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility
+        goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
+        goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
+        super.init(coder: coder)
+    }
+#else
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = isBurner
@@ -92,6 +116,7 @@ final class NavigationBarViewController: NSViewController {
         goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
         super.init(coder: coder)
     }
+#endif
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -114,8 +139,16 @@ final class NavigationBarViewController: NSViewController {
         optionsButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.sendAction(on: .leftMouseDown)
         downloadsButton.sendAction(on: .leftMouseDown)
+        networkProtectionButton.sendAction(on: .leftMouseDown)
+        passwordManagementButton.sendAction(on: .leftMouseDown)
 
         optionsButton.toolTip = UserText.applicationMenuTooltip
+
+        networkProtectionButton.toolTip = UserText.networkProtectionButtonTooltip
+
+#if NETWORK_PROTECTION
+        setupNetworkProtectionButton()
+#endif
 
 #if DEBUG || REVIEW
         addDebugNotificationListeners()
@@ -208,9 +241,15 @@ final class NavigationBarViewController: NSViewController {
     // swiftlint:disable force_cast
     @IBAction func optionsButtonAction(_ sender: NSButton) {
 
+        guard let internalUserDecider = (NSApp.delegate as! AppDelegate).internalUserDecider else {
+            assertionFailure("\(className): internalUserDecider is nil")
+            os_log("%s: internalUserDecider is nil", type: .error, className)
+            return
+        }
+
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
-                                   internalUserDecider: (NSApp.delegate as! AppDelegate).internalUserDecider)
+                                   internalUserDecider: internalUserDecider)
         menu.actionDelegate = self
         menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height + 4), in: sender)
     }
@@ -224,6 +263,12 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
         popovers.passwordManagementButtonPressed(usingView: passwordManagementButton, withDelegate: self)
+    }
+
+    @IBAction func networkProtectionButtonAction(_ sender: NSButton) {
+#if NETWORK_PROTECTION
+        popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
+#endif
     }
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
@@ -261,6 +306,12 @@ final class NavigationBarViewController: NSViewController {
                     self.updateBookmarksButton()
                 case .downloads:
                     self.updateDownloadsButton(updatingFromPinnedViewsNotification: true)
+                case .networkProtection:
+#if NETWORK_PROTECTION
+                    networkProtectionButtonModel.isPinned = LocalPinningManager.shared.isPinned(.networkProtection)
+#else
+                    assertionFailure("Tried to toggle NetP when the feature was disabled")
+#endif
                 }
             } else {
                 assertionFailure("Failed to get changed pinned view type")
@@ -316,11 +367,8 @@ final class NavigationBarViewController: NSViewController {
             else { return }
 
             DispatchQueue.main.async { [weak self] in
-                guard let self = self,
-                      self.tabCollectionViewModel.selectedTabViewModel?.tab.url == topUrl
-                else {
-                    // if the tab is not active, don't show the popup
-                    return
+                guard let self = self, self.tabCollectionViewModel.selectedTabViewModel?.tab.url == topUrl else {
+                    return // if the tab is not active, don't show the popup
                 }
                 let animationType: NavigationBarBadgeAnimationView.AnimationType = isCosmetic ? .cookiePopupHidden : .cookiePopupManaged
                 self.addressBarViewController?.addressBarButtonsViewController?.showBadgeNotification(animationType)
@@ -621,7 +669,6 @@ final class NavigationBarViewController: NSViewController {
             }
             .store(in: &navigationButtonsCancellables)
     }
-
 }
 
 extension NavigationBarViewController: MouseOverViewDelegate {
@@ -650,6 +697,13 @@ extension NavigationBarViewController: NSMenuDelegate {
 
         let downloadsTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
         menu.addItem(withTitle: downloadsTitle, action: #selector(toggleDownloadsPanelPinning), keyEquivalent: "J")
+
+#if NETWORK_PROTECTION
+        if networkProtectionFeatureVisibility.isFeatureActivated {
+            let networkProtectionTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
+            menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
+        }
+#endif
     }
 
     @objc
@@ -671,6 +725,34 @@ extension NavigationBarViewController: NSMenuDelegate {
     private func toggleDownloadsPanelPinning(_ sender: NSMenuItem) {
         LocalPinningManager.shared.togglePinning(for: .downloads)
     }
+
+    @objc
+    private func toggleNetworkProtectionPanelPinning(_ sender: NSMenuItem) {
+        LocalPinningManager.shared.togglePinning(for: .networkProtection)
+    }
+
+    // MARK: - Network Protection
+
+#if NETWORK_PROTECTION
+    func showNetworkProtectionStatus() {
+        popovers.showNetworkProtectionPopover(usingView: networkProtectionButton,
+                                              withDelegate: networkProtectionButtonModel)
+    }
+
+    private func setupNetworkProtectionButton() {
+        networkProtectionCancellable = networkProtectionButtonModel.$showButton
+            .receive(on: RunLoop.main)
+            .sink { [weak self] show in
+                self?.networkProtectionButton.isHidden = !show
+        }
+
+        networkProtectionInterruptionCancellable = networkProtectionButtonModel.$buttonImage
+            .receive(on: RunLoop.main)
+            .sink { [weak self] image in
+                self?.networkProtectionButton.image = image
+            }
+    }
+#endif
 
 }
 
@@ -703,10 +785,22 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         DataImportViewController.show()
     }
 
+    func optionsButtonMenuRequestedBookmarkExportInterface(_ menu: NSMenu) {
+        NSApp.sendAction(#selector(AppDelegate.openExportBookmarks(_:)), to: nil, from: nil)
+    }
+
     func optionsButtonMenuRequestedLoginsPopover(_ menu: NSMenu, selectedCategory: SecureVaultSorting.Category) {
         popovers.showPasswordManagementPopover(selectedCategory: selectedCategory,
                                                usingView: passwordManagementButton,
                                                withDelegate: self)
+    }
+
+    func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {
+#if NETWORK_PROTECTION
+        showNetworkProtectionStatus()
+#else
+        fatalError("Tried to open Network Protection when it was disabled")
+#endif
     }
 
     func optionsButtonMenuRequestedDownloadsPopover(_ menu: NSMenu) {
@@ -726,6 +820,8 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
 }
+
+// MARK: - NSPopoverDelegate
 
 extension NavigationBarViewController: NSPopoverDelegate {
 
