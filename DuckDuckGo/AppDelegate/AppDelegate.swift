@@ -276,9 +276,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     // MARK: - Sync
 
     private func startupSync() {
-        guard let syncService else {
-            fatalError("Unexpectedly found syncService to be nil")
-        }
+        let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
+        let syncService = DDGSync(dataProvidersSource: syncDataProviders, log: OSLog.sync)
 
         syncStateCancellable = syncService.authStatePublisher
             .prepend(syncService.authState)
@@ -294,6 +293,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         // since the scheduler debounces calls to notifyAppLifecycleEvent().
         //
         syncService.scheduler.notifyAppLifecycleEvent()
+
+        self.syncDataProviders = syncDataProviders
+        self.syncService = syncService
     }
 
     // MARK: - Network Protection
