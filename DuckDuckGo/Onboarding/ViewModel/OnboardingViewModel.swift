@@ -55,10 +55,13 @@ final class OnboardingViewModel: ObservableObject {
     @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
     private(set) var onboardingFinished: Bool
 
+    private let statisticsLoader: StatisticsLoader?
+
     weak var delegate: OnboardingDelegate?
 
-    init(delegate: OnboardingDelegate? = nil) {
+    init(delegate: OnboardingDelegate? = nil, statisticsLoader: StatisticsLoader = StatisticsLoader.shared) {
         self.delegate = delegate
+        self.statisticsLoader = (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)
         self.state = onboardingFinished ? .startBrowsing : .startFlow
     }
 
@@ -67,6 +70,7 @@ final class OnboardingViewModel: ObservableObject {
     }
 
     func onStartPressed() {
+        statisticsLoader?.load()
         state = .importData
     }
 
