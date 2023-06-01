@@ -32,7 +32,7 @@ public class ConnectionStatusObserverThroughSession: ConnectionStatusObserver {
 
     private let notificationCenter: NotificationCenter
     private let workspaceNotificationCenter: NotificationCenter
-    private var observationTokens = [NotificationToken]()
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Logging
 
@@ -52,20 +52,20 @@ public class ConnectionStatusObserverThroughSession: ConnectionStatusObserver {
     }
 
     private func start() {
+        startObservers()
         Task {
             await loadInitialStatus()
-            startObservers()
         }
     }
 
     private func startObservers() {
-        observationTokens.append(notificationCenter.addObserver(for: .NEVPNStatusDidChange, object: nil, queue: nil) { [weak self] notification in
+        notificationCenter.publisher(for: .NEVPNStatusDidChange).sink { [weak self] notification in
             self?.handleStatusChangeNotification(notification)
-        })
+        }.store(in: &cancellables)
 
-        observationTokens.append(workspaceNotificationCenter.addObserver(for: NSWorkspace.didWakeNotification, object: nil, queue: nil) { [weak self] notification in
+        workspaceNotificationCenter.publisher(for: NSWorkspace.didWakeNotification).sink { [weak self] notification in
             self?.handleDidWake(notification)
-        })
+        }.store(in: &cancellables)
     }
 
     private func loadInitialStatus() async {

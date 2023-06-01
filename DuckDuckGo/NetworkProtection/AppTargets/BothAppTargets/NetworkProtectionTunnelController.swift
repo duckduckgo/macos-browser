@@ -48,20 +48,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     private let controllerErrorStore = NetworkProtectionControllerErrorStore()
 
-    // MARK: - Notifications & Observers
-
-    /// The notification center to use to observe tunnel change notifications.
-    ///
-    private let notificationCenter: NotificationCenter
-
     // MARK: - VPN Tunnel & Configuration
 
     /// Auth token store
     private let tokenStore: NetworkProtectionTokenStore
-
-    /// The observer token for VPN configuration changes,
-    ///
-    private var configChangeObserverToken: NSObjectProtocol?
 
     /// The actual storage for our tunnel manager.
     ///
@@ -105,14 +95,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         try await tunnelManager.loadFromPreferences()
     }
 
-    // MARK: - Initialization & Deinitialization
-
-    convenience init() {
-        let tokenStore = NetworkProtectionKeychainTokenStore()
-        self.init(notificationCenter: .default,
-                  tokenStore: tokenStore,
-                  logger: DefaultNetworkProtectionLogger())
-    }
+    // MARK: - Initialization
 
     /// Default initializer
     ///
@@ -120,15 +103,14 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///         - notificationCenter: (meant for testing) the notification center that this object will use.
     ///         - logger: (meant for testing) the logger that this object will use.
     ///
-    init(notificationCenter: NotificationCenter,
-         tokenStore: NetworkProtectionTokenStore,
-         logger: NetworkProtectionLogger) {
+    init(notificationCenter: NotificationCenter = .default,
+         tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
+         logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
 
         self.logger = logger
-        self.notificationCenter = notificationCenter
         self.tokenStore = tokenStore
 
-        startObservingNotifications()
+        startObservingVPNConfigChanges(notificationCenter: notificationCenter)
 
         Task {
             // Make sure the tunnel is loaded
@@ -136,42 +118,14 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }
     }
 
-    deinit {
-        stopObservingNotifications()
-    }
+    // MARK: - VPN Config Change Notifications
 
-    // MARK: - Observing VPN Notifications
+    private var configChangeCancellable: AnyCancellable?
 
-    private func startObservingNotifications() {
-        startObservingVPNConfigChanges()
-    }
-
-    private func startObservingVPNConfigChanges() {
-        guard configChangeObserverToken == nil else {
-            return
-        }
-
-        configChangeObserverToken = notificationCenter.addObserver(forName: .NEVPNConfigurationChange, object: nil, queue: nil) { [weak self] notification in
-            guard let self = self,
-                let manager = notification.object as? NETunnelProviderManager else {
-                return
-            }
-
-            self.internalTunnelManager = manager
-        }
-    }
-
-    private func stopObservingNotifications() {
-        stopObservingVPNConfigChanges()
-    }
-
-    private func stopObservingVPNConfigChanges() {
-        guard let token = configChangeObserverToken else {
-            return
-        }
-
-        notificationCenter.removeObserver(token)
-        configChangeObserverToken = nil
+    private func startObservingVPNConfigChanges(notificationCenter: NotificationCenter) {
+        configChangeCancellable = notificationCenter.publisher(for: .NEVPNConfigurationChange)
+            .compactMap { $0.object as? NETunnelProviderManager }
+            .assign(to: \.internalTunnelManager, onWeaklyHeld: self)
     }
 
     // MARK: - Tunnel Configuration
