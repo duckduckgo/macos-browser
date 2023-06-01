@@ -323,7 +323,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             let provider = NetworkProtectionTunnelController()
 
             if await provider.isConnected() {
-                try? await provider.stop()
+                await provider.stop()
             }
         }
 
