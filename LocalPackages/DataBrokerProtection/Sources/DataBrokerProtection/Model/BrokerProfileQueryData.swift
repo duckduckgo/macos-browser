@@ -18,10 +18,6 @@
 
 import Foundation
 
-/*
- This is the profileQueryData
- It has a set of optOutOperationsData and a single scanOperationData
- */
 class BrokerProfileQueryData {
     public let id: UUID
     public let profileQuery: ProfileQuery
@@ -57,7 +53,12 @@ class BrokerProfileQueryData {
     func updateExtractedProfiles(_ extractedProfiles: [ExtractedProfile]) {
 
         extractedProfiles.forEach { extractedProfile in
-            let isExistingProfile = optOutsData.contains { $0.extractedProfile == extractedProfile }
+
+            // If the profile was already removed, we create a new one even if we find it again
+            let isExistingProfile = optOutsData.contains {
+                $0.extractedProfile == extractedProfile && $0.extractedProfile.removedDate == nil
+            }
+
             if !isExistingProfile {
                 let optOutOperationData = OptOutOperationData(brokerProfileQueryID: id,
                                                               preferredRunDate: Date(),

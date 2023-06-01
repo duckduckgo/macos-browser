@@ -29,12 +29,7 @@ protocol OperationsManager {
     func runOptOutOperation(for extractedProfile: ExtractedProfile, on runner: OperationRunner) async throws
 }
 
-/*
- This will run the operations
- Handle its data updates
- Expose its data for the Scheduler
- BrokerProfileQueryData being the main model
- */
+
 class BrokerOperationsManager: OperationsManager {
     let brokerProfileQueryData: BrokerProfileQueryData
     let database: DataBase
@@ -55,6 +50,8 @@ class BrokerOperationsManager: OperationsManager {
     func runScanOperation(on runner: OperationRunner) async throws {
 
         do {
+            brokerProfileQueryData.addHistoryEvent(.init(type: .scanStarted), for: brokerProfileQueryData.scanData)
+
             let profiles = try await runner.scan(brokerProfileQueryData)
 
             if profiles.count > 0 {
@@ -85,6 +82,8 @@ class BrokerOperationsManager: OperationsManager {
 
 
         do {
+            brokerProfileQueryData.addHistoryEvent(.init(type: .optOutStarted(profileID: extractedProfile.id)), for: data)
+
             try await runner.optOut(extractedProfile)
 
             let event = HistoryEvent(type: .optOutRequested(profileID: extractedProfile.id))

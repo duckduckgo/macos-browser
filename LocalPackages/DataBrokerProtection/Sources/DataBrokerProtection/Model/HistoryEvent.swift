@@ -23,9 +23,9 @@ struct HistoryEvent {
         case noMatchFound
         case matchFound(profileID: UUID)
         case error
+        case optOutStarted(profileID: UUID)
         case optOutRequested(profileID: UUID)
         case optOutConfirmed(profileID: UUID)
-        case scanFinished
         case scanStarted
     }
 
@@ -37,28 +37,5 @@ struct HistoryEvent {
         self.id = UUID()
         self.date = Date()
         self.type = type
-    }
-}
-
-extension HistoryEvent.EventType: Equatable {
-    static func == (lhs: HistoryEvent.EventType, rhs: HistoryEvent.EventType) -> Bool {
-        switch (lhs, rhs) {
-        case (.noMatchFound, .noMatchFound):
-            return true
-        case let (.matchFound(profileID: lhsProfileID), .matchFound(profileID: rhsProfileID)):
-            return lhsProfileID == rhsProfileID
-        case (.error, .error):
-            return true
-        case let (.optOutRequested(profileID: lhsProfileID), .optOutRequested(profileID: rhsProfileID)):
-            return lhsProfileID == rhsProfileID
-        case let (.optOutConfirmed(profileID: lhsProfileID), .optOutConfirmed(profileID: rhsProfileID)):
-            return lhsProfileID == rhsProfileID
-        case (.scanFinished, .scanFinished):
-            return true
-        case (.scanStarted, .scanStarted):
-            return true
-        default:
-            return false
-        }
     }
 }
