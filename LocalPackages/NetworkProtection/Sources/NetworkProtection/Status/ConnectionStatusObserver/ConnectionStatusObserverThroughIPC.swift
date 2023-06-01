@@ -32,11 +32,12 @@ public class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver {
     private static let monitorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtection.ConnectionStatusObserverThroughIPC.monitorDispatchQueue", qos: .background)
     private let monitor = NWPathMonitor()
     private static let timeoutOnNetworkChanges: TimeInterval = .seconds(3)
-    private var lastUpdate: Date = Date()
+    private var lastStatusResponse = Date()
+    private var lastStatusChangeTimestamp: Date?
 
     // MARK: - Notifications: Decoding
 
-    private let connectionStatusDecoder = ConnectionStatusDecoder()
+    private let connectionStatusDecoder = ConnectionStatusChangeDecoder()
 
     // MARK: - Notifications
 
@@ -77,11 +78,17 @@ public class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver {
     }
 
     private func handleDistributedStatusChangeNotification(_ notification: Notification) {
-        let connectionStatus = connectionStatusDecoder.decode(notification.object)
-        logStatusChanged(status: connectionStatus)
-        lastUpdate = Date()
+        let statusChange = connectionStatusDecoder.decode(notification.object)
+        lastStatusResponse = Date()
 
-        publisher.send(connectionStatus)
+        guard shouldProcessStatusChange(statusChange) else {
+            return
+        }
+
+        lastStatusChangeTimestamp = statusChange.timestamp
+        logStatusChanged(status: statusChange.status)
+
+        publisher.send(statusChange.status)
     }
 
     private func handleDidWake(_ notification: Notification) {
@@ -89,6 +96,14 @@ public class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver {
     }
 
     // MARK: - Requesting Status Updates
+
+    private func shouldProcessStatusChange(_ change: ConnectionStatusChange) -> Bool {
+        guard let lastStatusChangeTimestamp else {
+            return true
+        }
+
+        return publisher.value != change.status || lastStatusChangeTimestamp < change.timestamp
+    }
 
     /// Requests a status update and updates the status to disconnected if we don't hear back within a certain time.
     /// The timeout is currently set to 3 seconds.
@@ -100,7 +115,7 @@ public class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver {
         Task {
             try? await Task.sleep(interval: Self.timeoutOnNetworkChanges)
 
-            if lastUpdate < requestDate {
+            if lastStatusResponse < requestDate {
                 publisher.send(.disconnected)
             }
         }

@@ -27,3 +27,13 @@ public enum ConnectionStatus: Codable, Equatable {
     case reasserting
     case unknown
 }
+
+public struct ConnectionStatusChange: Codable {
+    let status: ConnectionStatus
+    let timestamp: Date
+
+    public init(status: ConnectionStatus, timestamp: Date = Date()) {
+        self.status = status
+        self.timestamp = timestamp
+    }
+}

@@ -18,13 +18,13 @@
 
 import Foundation
 
-public class ConnectionStatusEncoder {
+public class ConnectionStatusChangeEncoder {
     public init() {}
 
-    public func encode(_ connectionStatus: ConnectionStatus) -> String? {
+    public func encode(_ change: ConnectionStatusChange) -> String? {
         do {
             let encoder = JSONEncoder()
-            let jsonData = try encoder.encode(connectionStatus)
+            let jsonData = try encoder.encode(change)
 
             return String(data: jsonData, encoding: DistributedNotificationCenter.preferredStringEncoding)
         } catch {
@@ -33,27 +33,27 @@ public class ConnectionStatusEncoder {
     }
 }
 
-public class ConnectionStatusDecoder {
+public class ConnectionStatusChangeDecoder {
     public init() {}
 
-    public func decode(_ object: Any?) -> ConnectionStatus {
+    public func decode(_ object: Any?) -> ConnectionStatusChange {
         guard let payload = object as? String else {
-            return .unknown
+            return ConnectionStatusChange(status: .unknown)
         }
 
         guard let jsonData = payload.data(using: DistributedNotificationCenter.preferredStringEncoding) else {
-            return .unknown
+            return ConnectionStatusChange(status: .unknown)
         }
 
         let jsonDecoder = JSONDecoder()
-        let connectionStatus: ConnectionStatus
+        let change: ConnectionStatusChange
 
         do {
-            connectionStatus = try jsonDecoder.decode(ConnectionStatus.self, from: jsonData)
+            change = try jsonDecoder.decode(ConnectionStatusChange.self, from: jsonData)
         } catch {
-            return .unknown
+            return ConnectionStatusChange(status: .unknown)
         }
 
-        return connectionStatus
+        return change
     }
 }

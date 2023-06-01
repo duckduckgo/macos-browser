@@ -90,16 +90,19 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
+    private var lastStatusChange = ConnectionStatusChange(status: .unknown)
+
     private var connectionStatus: ConnectionStatus = .disconnected {
         didSet {
             if oldValue != connectionStatus {
+                lastStatusChange = ConnectionStatusChange(status: connectionStatus)
                 broadcastConnectionStatus()
             }
         }
     }
 
     private func broadcastConnectionStatus() {
-        let data = ConnectionStatusEncoder().encode(connectionStatus)
+        let data = ConnectionStatusChangeEncoder().encode(lastStatusChange)
         distributedNotificationCenter.post(.statusDidChange, object: data)
     }
 
