@@ -29,9 +29,9 @@ extension DistributedNotificationCenter {
 
     static let preferredStringEncoding = String.Encoding.utf8
 
-    public func publisher(for networkProtectionNotification: DistributedNotificationName, object: AnyObject? = nil) -> NotificationCenter.Publisher {
-        self.publisher(for: networkProtectionNotification.notificationName)
-    }
+//    public func publisher(for networkProtectionNotification: DistributedNotificationName, object: AnyObject? = nil) -> NotificationCenter.Publisher {
+//        self.publisher(for: networkProtectionNotification.notificationName)
+//    }
 
     public func post(_ networkProtectionNotification: DistributedNotificationName, object: String? = nil, log: OSLog = .networkProtectionDistributedNotificationsLog) {
         logPost(networkProtectionNotification, object: object, log: log)
@@ -55,9 +55,13 @@ extension DistributedNotificationCenter {
 #endif
 
 extension NotificationCenter {
-    public func addObserver(for networkProtectionNotification: DistributedNotification, object: Any?, queue: OperationQueue?, using block: @escaping @Sendable (Notification) -> Void) -> NSObjectProtocol {
+    public func addObserver(for networkProtectionNotification: DistributedNotificationName, object: Any?, queue: OperationQueue?, using block: @escaping @Sendable (Notification) -> Void) -> NSObjectProtocol {
 
-        addObserver(forName: networkProtectionNotification.name, object: object, queue: queue, using: block)
+        addObserver(forName: networkProtectionNotification.notificationName, object: object, queue: queue, using: block)
+    }
+
+    public func publisher(for networkProtectionNotification: DistributedNotificationName, object: AnyObject? = nil) -> NotificationCenter.Publisher {
+        self.publisher(for: networkProtectionNotification.notificationName)
     }
 }
 

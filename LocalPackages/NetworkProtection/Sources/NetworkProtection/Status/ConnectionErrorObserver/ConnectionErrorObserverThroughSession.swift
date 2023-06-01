@@ -58,7 +58,7 @@ public class ConnectionErrorObserverThroughSession: ConnectionErrorObserver {
             self?.handleStatusChangeNotification(notification)
         }.store(in: &cancellables)
 
-        workspaceNotificationCenter.publisher(for: platformDidWakeNotification).sink { [weak self] notification in
+        platformNotificationCenter.publisher(for: platformDidWakeNotification).sink { [weak self] notification in
             self?.handleDidWake(notification)
         }.store(in: &cancellables)
     }

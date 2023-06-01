@@ -415,7 +415,7 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
                 // To be reconsidered for the Kill Switch
                 if isOnDemand {
                     Task {
-                        await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+                        // await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN) TODO: Deal with this
                         completionHandler(error)
                     }
                     return
@@ -428,7 +428,7 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
         if isActivatedFromSystemSettings {
             // ask the Main App to reconfigure & restart with on-demand rule “on” - when connection triggered from System Settings
             Task {
-                await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .startVPN)
+                // await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .startVPN) TODO: Deal with this
                 internalCompletionHandler(NEVPNError(.configurationStale))
             }
             return
@@ -447,7 +447,7 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
 
         do {
             try load(options: options)
-            loadVendorOptions(from: tunnelProviderProtocol)
+            // loadVendorOptions(from: tunnelProviderProtocol) TODO: Deal with this
         } catch {
             internalCompletionHandler(NEVPNError(.configurationInvalid))
             return
@@ -517,7 +517,9 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
                     // stop requested by user from System Settings
                     // we can‘t prevent a respawn with on-demand rule ON
                     // request the main app to reconfigure with on-demand OFF
-                    await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+
+                    // await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN) TODO: Deal with this
+                    break
 
                 case .superceded:
                     self.notificationsPresenter.showSupercededNotification()
