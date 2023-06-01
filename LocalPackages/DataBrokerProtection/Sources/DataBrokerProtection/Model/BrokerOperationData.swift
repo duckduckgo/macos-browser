@@ -32,6 +32,10 @@ extension BrokerOperationData {
     mutating func addHistoryEvent(_ historyEvent: HistoryEvent) {
         self.historyEvents.append(historyEvent)
     }
+
+    var lastRunDate: Date? {
+        return historyEvents.last?.date
+    }
 }
 
 class ScanOperationData: BrokerOperationData {
@@ -77,22 +81,4 @@ class OptOutOperationData: BrokerOperationData {
     var lastRunDate: Date?
 
     let extractedProfile: ExtractedProfile
-}
-
-//TODO: Remove later
-extension ScanOperationData {
-    static func createTestScenarios() -> [ScanOperationData] {
-
-        let id1 = UUID()
-        let id2 = UUID()
-        let preferredRunDate = Date()
-        let historyEvents: [HistoryEvent] = []
-
-
-        let scan1 = ScanOperationData(brokerProfileQueryID: id1, preferredRunDate: preferredRunDate, historyEvents: historyEvents, lastRunDate: nil)
-
-        let scan2 = ScanOperationData(brokerProfileQueryID: id2, preferredRunDate: preferredRunDate, historyEvents: historyEvents, lastRunDate: preferredRunDate)
-
-        return [scan1, scan2]
-    }
 }

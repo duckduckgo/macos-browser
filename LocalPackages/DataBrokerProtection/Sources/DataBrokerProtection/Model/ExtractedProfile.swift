@@ -18,12 +18,12 @@
 
 import Foundation
 
-struct ExtractedProfile {
+class ExtractedProfile {
     let id: UUID
     let name: String?
     let phoneNumber: String?
     let dateCreated: Date?
-    let removedDate: Date?
+    var removedDate: Date?
 
     init(name: String) {
         self.id = UUID()
@@ -35,7 +35,7 @@ struct ExtractedProfile {
 }
 
 extension ExtractedProfile: Equatable {
-    static func == (lhs: Self, rhs: Self) -> Bool {
+    static func == (lhs: ExtractedProfile, rhs: ExtractedProfile) -> Bool {
         lhs.name == rhs.name
     }
 }

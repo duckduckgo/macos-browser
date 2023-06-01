@@ -27,33 +27,59 @@ class BrokerProfileQueryData {
     public let profileQuery: ProfileQuery
     public let dataBroker: DataBroker
 
-    public var extractedProfiles: [ExtractedProfile] = [ExtractedProfile]()
     public var scanData: ScanOperationData
     public var optOutsData: [OptOutOperationData] = [OptOutOperationData]()
+
+    var extractedProfiles: [ExtractedProfile] {
+        optOutsData.map { $0.extractedProfile }
+    }
 
     internal init(id: UUID,
                   profileQuery: ProfileQuery,
                   dataBroker: DataBroker,
-                  extractedProfiles: [ExtractedProfile] = [ExtractedProfile](),
                   scanOperationData: ScanOperationData? = nil,
                   optOutOperationsData: [OptOutOperationData] = [OptOutOperationData]()) {
 
         self.id = id
         self.profileQuery = profileQuery
         self.dataBroker = dataBroker
-        self.extractedProfiles = extractedProfiles
         self.optOutsData = optOutOperationsData
 
         if let scanData = scanOperationData {
             self.scanData = scanData
         } else {
-            self.scanData = ScanOperationData(brokerProfileQueryID: id, preferredRunDate: Date(), historyEvents: [HistoryEvent]())
+            self.scanData = ScanOperationData(brokerProfileQueryID: id,
+                                              preferredRunDate: Date(),
+                                              historyEvents: [HistoryEvent]())
         }
     }
 
     func updateExtractedProfiles(_ extractedProfiles: [ExtractedProfile]) {
-        self.extractedProfiles.append(contentsOf: extractedProfiles)
+
+        extractedProfiles.forEach { extractedProfile in
+            let isExistingProfile = optOutsData.contains { $0.extractedProfile == extractedProfile }
+            if !isExistingProfile {
+                let optOutOperationData = OptOutOperationData(brokerProfileQueryID: id,
+                                                              preferredRunDate: Date(),
+                                                              historyEvents: [HistoryEvent](),
+                                                              extractedProfile: extractedProfile)
+                optOutsData.append(optOutOperationData)
+            }
+        }
+
+
+        // Check for removed profiles
+        let removedProfilesData = optOutsData.filter { !extractedProfiles.contains($0.extractedProfile) }
+        for removedProfileData in removedProfilesData {
+            let event = HistoryEvent(type: .optOutConfirmed(profileID: removedProfileData.extractedProfile.id))
+            addHistoryEvent(event, for: removedProfileData)
+            removedProfileData.extractedProfile.removedDate = Date()
+            print("Profile removed from optOutsData: \(removedProfileData.extractedProfile)")
+
+        }
+
     }
+
 
     func addHistoryEvent(_ event: HistoryEvent, for operation: BrokerOperationData) {
         var op = operation
