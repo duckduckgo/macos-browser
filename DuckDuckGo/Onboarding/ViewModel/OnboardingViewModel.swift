@@ -59,7 +59,7 @@ final class OnboardingViewModel: ObservableObject {
 
     weak var delegate: OnboardingDelegate?
 
-    init(delegate: OnboardingDelegate? = nil, statisticsLoader: StatisticsLoader = StatisticsLoader.shared) {
+    init(delegate: OnboardingDelegate? = nil, statisticsLoader: StatisticsLoader? = nil) {
         self.delegate = delegate
         self.statisticsLoader = (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)
         self.state = onboardingFinished ? .startBrowsing : .startFlow
