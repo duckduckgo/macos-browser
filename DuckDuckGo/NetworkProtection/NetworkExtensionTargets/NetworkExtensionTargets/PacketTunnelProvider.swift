@@ -145,9 +145,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - User Notifications
 
-    private lazy var notificationsPresenter: NetworkProtectionNotificationsPresenter = {
+    private let notificationsPresenter: NetworkProtectionNotificationsPresenter = {
 #if NETP_SYSTEM_EXTENSION
-        NetworkProtectionIPCNotificationsPresenter(ipcConnection: self.ipcConnection)
+        NetworkProtectionIPCNotificationsPresenter(ipcConnection: PacketTunnelProvider.ipcConnection)
 #else
         let parentBundlePath = "../../../"
         let mainAppURL: URL
@@ -266,7 +266,11 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     // MARK: - IPC
 
 #if NETP_SYSTEM_EXTENSION
-    let ipcConnection = IPCConnection(log: .networkProtectionIPCLog, memoryManagementLog: .networkProtectionMemoryLog)
+    static let ipcConnection = {
+        let connection = IPCConnection(log: .networkProtectionIPCLog, memoryManagementLog: .networkProtectionMemoryLog)
+        connection.startListener()
+        return connection
+    }()
 #endif
 
     // MARK: - Connection tester
@@ -342,10 +346,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
         super.init()
 
-        #if NETP_SYSTEM_EXTENSION
-        ipcConnection.startListener()
-        #endif
-
         requestStatusUpdateCancellable = distributedNotificationCenter.publisher(for: .requestStatusUpdate).sink { [weak self] _ in
             self?.broadcastConnectionStatus()
             self?.broadcastLastSelectedServerInfo()
@@ -385,7 +385,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         protocolConfiguration as? NETunnelProviderProtocol
     }
 
-    private func load(options: [String: NSObject]?) {
+    private func load(options: [String: NSObject]?) throws {
         guard let options = options else {
             os_log("🔵 Tunnel options are not set", log: .networkProtection)
             return
@@ -393,7 +393,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
         loadKeyValidity(from: options)
         loadSelectedServer(from: options)
-        loadAuthToken(from: options)
+        try loadAuthToken(from: options)
     }
 
     private func loadVendorOptions(from provider: NETunnelProviderProtocol?) {
@@ -434,28 +434,48 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         selectedServerStore.selectedServer = .endpoint(serverName)
     }
 
-    private func loadAuthToken(from options: [String: AnyObject]) {
+    private func loadAuthToken(from options: [String: AnyObject]) throws {
         guard let authToken = options["authToken"] as? String else {
             return
         }
 
-        tokenStore.store(authToken)
+        try tokenStore.store(authToken)
     }
 
     override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         connectionStatus = .connecting
 
+        // when activated by system "on-demand" the option is set
+        let isOnDemand = options?["is-on-demand"] as? Bool == true
+        let isActivatedFromSystemSettings = options?["activationAttemptId"] == nil && !isOnDemand
+
         let internalCompletionHandler = { (error: Error?) in
             if error != nil {
                 self.connectionStatus = .disconnected
+
+                // if connection is failing when activated by system on-demand
+                // ask the Main App to disable the on-demand rule to prevent activation loop
+                // To be reconsidered for the Kill Switch
+                if isOnDemand {
+                    Task {
+                        await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+                        completionHandler(error)
+                    }
+                    return
+                }
             }
 
             completionHandler(error)
         }
 
-        loadVendorOptions(from: tunnelProviderProtocol)
-
-        let activationAttemptId = options?["activationAttemptId"] as? String
+        if isActivatedFromSystemSettings {
+            // ask the Main App to reconfigure & restart with on-demand rule “on” - when connection triggered from System Settings
+            Task {
+                await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .startVPN)
+                internalCompletionHandler(NEVPNError(.configurationStale))
+            }
+            return
+        }
 
         tunnelHealth.isHavingConnectivityIssues = false
         controllerErrorStore.lastErrorMessage = nil
@@ -468,10 +488,15 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             return
         }
 
-        load(options: options)
-        os_log("🔵 Done!", log: .networkProtection, type: .info)
+        do {
+            try load(options: options)
+            loadVendorOptions(from: tunnelProviderProtocol)
+        } catch {
+            internalCompletionHandler(NEVPNError(.configurationInvalid))
+            return
+        }
 
-        os_log("🔵 Starting tunnel from the %{public}@", log: .networkProtection, type: .info, activationAttemptId == nil ? "OS directly, rather than the app" : "app")
+        os_log("🔵 Done! Starting tunnel from the %{public}@", log: .networkProtection, type: .info, (isActivatedFromSystemSettings ? "settings" : (isOnDemand ? "on-demand" : "app")))
 
         startTunnel(selectedServer: selectedServerStore.selectedServer, completionHandler: internalCompletionHandler)
     }
@@ -498,7 +523,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
                 controllerErrorStore.lastErrorMessage = error.localizedDescription
 
-                let error = NSError(domain: NEVPNErrorDomain, code: NEVPNError.configurationInvalid.rawValue)
                 completionHandler(error)
             }
         }
@@ -524,13 +548,27 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         os_log("Stopping tunnel with reason %{public}@", log: .networkProtection, type: .info, String(describing: reason))
 
         adapter.stop { error in
-            if let error = error {
+            if let error {
                 os_log("🔵 Failed to stop WireGuard adapter: %{public}@", log: .networkProtection, type: .info, error.localizedDescription)
-                return
             }
 
             Task {
                 await self.handleAdapterStopped()
+
+                switch reason {
+                case .userInitiated:
+                    // stop requested by user from System Settings
+                    // we can‘t prevent a respawn with on-demand rule ON
+                    // request the main app to reconfigure with on-demand OFF
+                    await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+
+                case .superceded:
+                    self.notificationsPresenter.showSupercededNotification()
+
+                default:
+                    break
+                }
+
                 completionHandler()
             }
         }

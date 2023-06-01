@@ -154,5 +154,11 @@ extension DuckDuckGoNotificationsAppDelegate: AppCommunication {
     func statusChanged(status: NEVPNStatus) {
         os_log("Status changed", log: .networkProtection, type: .info)
     }
+
+    func superceded() {
+        os_log("Presenting Superceded notification", log: .networkProtection, type: .info)
+        notificationsPresenter.showSupercededNotification()
+    }
+
 }
 #endif

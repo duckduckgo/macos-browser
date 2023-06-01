@@ -96,49 +96,13 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
 
         XCTAssertNil(try? keyStore.storedPrivateKey())
         XCTAssertEqual(try? serverListStore.storedNetworkProtectionServerList(), [])
-        XCTAssertFalse(networkClient.getServersCalled)
         XCTAssertFalse(networkClient.registerCalled)
 
         _ = try? await manager.generateTunnelConfiguration(selectionMethod: .automatic)
 
         XCTAssertNotNil(try? keyStore.storedPrivateKey())
         XCTAssertEqual(try? serverListStore.storedNetworkProtectionServerList(), [registeredServer])
-        XCTAssertTrue(networkClient.getServersCalled)
         XCTAssertTrue(networkClient.registerCalled)
-    }
-
-    func testWhenGeneratingTunnelConfig_AndRegisteredServerIsFound_ThenRegisterEndpointIsNotCalled() async throws {
-        let keyPair = keyStore.currentKeyPair()
-
-        let server = NetworkProtectionServer.registeredServer(named: "Some Server", withPublicKey: keyPair.publicKey.base64Key)
-
-        try serverListStore.store(serverList: [server])
-
-        let networkClient = NetworkProtectionMockClient(
-            getServersReturnValue: .success([server]),
-            registerServersReturnValue: .success([server]),
-            redeemReturnValue: .success("IamANauthTOKEN")
-        )
-
-        let manager = NetworkProtectionDeviceManager(
-            networkClient: networkClient,
-            tokenStore: tokenStore,
-            keyStore: keyStore,
-            serverListStore: serverListStore,
-            errorEvents: nil
-        )
-
-        XCTAssertNotNil(try? keyStore.storedPrivateKey())
-        XCTAssertEqual(try? serverListStore.storedNetworkProtectionServerList(), [server])
-        XCTAssertFalse(networkClient.getServersCalled)
-        XCTAssertFalse(networkClient.registerCalled)
-
-        _ = try? await manager.generateTunnelConfiguration(selectionMethod: .automatic)
-
-        XCTAssertNotNil(try? keyStore.storedPrivateKey())
-        XCTAssertEqual(try? serverListStore.storedNetworkProtectionServerList(), [server])
-        XCTAssertTrue(networkClient.getServersCalled)
-        XCTAssertFalse(networkClient.registerCalled)
     }
 
     func testWhenGeneratingTunnelConfig_storedAuthTokenIsInvalidOnGettingServers_deletesToken() async {
@@ -148,7 +112,7 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
         let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
         let networkClient = NetworkProtectionMockClient(
             getServersReturnValue: .failure(.invalidAuthToken),
-            registerServersReturnValue: .success([server]),
+            registerServersReturnValue: .failure(.invalidAuthToken),
             redeemReturnValue: .success("IamANauthTOKEN")
         )
 
@@ -191,69 +155,6 @@ final class NetworkProtectionDeviceManagerTests: XCTestCase {
         _ = try? await manager.generateTunnelConfiguration(selectionMethod: .automatic)
 
         XCTAssertNil(tokenStore.token)
-    }
-
-    func testGettingClosestServerUsingTimeZone() async throws {
-        let server = NetworkProtectionServer.mockRegisteredServer
-        let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
-        let networkClient = NetworkProtectionMockClient(
-            getServersReturnValue: .success([]),
-            registerServersReturnValue: .success([server]),
-            redeemReturnValue: .success("IamANauthTOKEN")
-        )
-
-        let manager = NetworkProtectionDeviceManager(
-            networkClient: networkClient,
-            tokenStore: tokenStore,
-            keyStore: keyStore,
-            serverListStore: serverListStore,
-            errorEvents: nil
-        )
-
-        let servers = try JSONDecoder().decode([NetworkProtectionServer].self, from: TestData.mockServers)
-
-        XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "PST")!)!.serverName.hasPrefix("egress.usw"))
-        XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "PDT")!)!.serverName.hasPrefix("egress.usw"))
-        XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "MST")!)!.serverName.hasPrefix("egress.usw"))
-        XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "MDT")!)!.serverName.hasPrefix("egress.use"))
-        XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "CST")!)!.serverName.hasPrefix("egress.use"))
-        XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "CDT")!)!.serverName.hasPrefix("egress.use"))
-        XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "EST")!)!.serverName.hasPrefix("egress.use"))
-        XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "EDT")!)!.serverName.hasPrefix("egress.use"))
-        XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "CET")!)!.serverName.hasPrefix("egress.euw"))
-        XCTAssertTrue(manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "CEST")!)!.serverName.hasPrefix("egress.euw"))
-    }
-
-    func testWhenGettingClosestServer_AndMultipleServersAreAvailable_ThenARandomServerIsReturnedEachTime() throws {
-        let server = NetworkProtectionServer.mockRegisteredServer
-        let keyStore = NetworkProtectionKeyStoreMock()
-        let temporaryURL = temporaryFileURL()
-        let serverListStore = NetworkProtectionServerListFileSystemStore(fileURL: temporaryURL, errorEvents: nil)
-        let networkClient = NetworkProtectionMockClient(
-            getServersReturnValue: .success([]),
-            registerServersReturnValue: .success([server]),
-            redeemReturnValue: .success("IamANauthTOKEN")
-        )
-
-        let manager = NetworkProtectionDeviceManager(
-            networkClient: networkClient,
-            tokenStore: tokenStore,
-            keyStore: keyStore,
-            serverListStore: serverListStore,
-            errorEvents: nil
-        )
-
-        let servers = try JSONDecoder().decode([NetworkProtectionServer].self, from: TestData.mockServers)
-
-        var serverNames = Set<String>()
-
-        // Iterate 100 times to try to have covered all possible choices
-        for _ in 0...100 {
-            let name = manager.closestServer(from: servers, timeZone: TimeZone(abbreviation: "PST")!)!.serverName
-            serverNames.insert(name)
-        }
-
-        XCTAssertEqual(serverNames, ["egress.usw.1", "egress.usw.2"])
     }
 
     func testDecodingServers() throws {

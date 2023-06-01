@@ -23,8 +23,7 @@ public protocol NetworkProtectionClient {
     func getServers(authToken: String) async -> Result<[NetworkProtectionServer], NetworkProtectionClientError>
     func register(authToken: String,
                   publicKey: PublicKey,
-                  withServer: NetworkProtectionServerInfo) async -> Result<[NetworkProtectionServer], NetworkProtectionClientError>
-
+                  withServerNamed serverName: String?) async -> Result<[NetworkProtectionServer], NetworkProtectionClientError>
 }
 
 public enum NetworkProtectionClientError: Error, NetworkProtectionErrorConvertible {
@@ -57,9 +56,9 @@ public enum NetworkProtectionClientError: Error, NetworkProtectionErrorConvertib
 
 struct RegisterKeyRequestBody: Encodable {
     let publicKey: String
-    let server: String
+    let server: String?
 
-    init(publicKey: PublicKey, server: String ) {
+    init(publicKey: PublicKey, server: String?) {
         self.publicKey = publicKey.base64Key
         self.server = server
     }
@@ -145,8 +144,8 @@ public final class NetworkProtectionBackendClient: NetworkProtectionClient {
 
     public func register(authToken: String,
                          publicKey: PublicKey,
-                         withServer server: NetworkProtectionServerInfo) async -> Result<[NetworkProtectionServer], NetworkProtectionClientError> {
-        let requestBody = RegisterKeyRequestBody(publicKey: publicKey, server: server.name)
+                         withServerNamed serverName: String? = nil) async -> Result<[NetworkProtectionServer], NetworkProtectionClientError> {
+        let requestBody = RegisterKeyRequestBody(publicKey: publicKey, server: serverName)
         let requestBodyData: Data
 
         do {

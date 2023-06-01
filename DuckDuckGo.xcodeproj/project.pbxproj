@@ -1611,6 +1611,15 @@
 		B31055C427A1BA1D001AC618 /* AutoconsentUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = B31055BC27A1BA1D001AC618 /* AutoconsentUserScript.swift */; };
 		B31055C627A1BA1D001AC618 /* userscript.js in Resources */ = {isa = PBXBuildFile; fileRef = B31055BE27A1BA1D001AC618 /* userscript.js */; };
 		B31055CB27A1BA1D001AC618 /* autoconsent-bundle.js in Resources */ = {isa = PBXBuildFile; fileRef = B31055C327A1BA1D001AC618 /* autoconsent-bundle.js */; };
+		B602E8162A1E2570006D261F /* URL+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B602E8152A1E2570006D261F /* URL+NetworkProtection.swift */; };
+		B602E8172A1E2570006D261F /* URL+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B602E8152A1E2570006D261F /* URL+NetworkProtection.swift */; };
+		B602E8182A1E2570006D261F /* URL+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B602E8152A1E2570006D261F /* URL+NetworkProtection.swift */; };
+		B602E8192A1E2570006D261F /* URL+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B602E8152A1E2570006D261F /* URL+NetworkProtection.swift */; };
+		B602E81A2A1E2570006D261F /* URL+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B602E8152A1E2570006D261F /* URL+NetworkProtection.swift */; };
+		B602E81D2A1E25B1006D261F /* NEOnDemandRuleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B602E81C2A1E25B0006D261F /* NEOnDemandRuleExtension.swift */; };
+		B602E81E2A1E25B1006D261F /* NEOnDemandRuleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B602E81C2A1E25B0006D261F /* NEOnDemandRuleExtension.swift */; };
+		B602E8222A1E2603006D261F /* Bundle+NetworkProtectionExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B602E81F2A1E2603006D261F /* Bundle+NetworkProtectionExtensions.swift */; };
+		B602E8232A1E260E006D261F /* Bundle+NetworkProtectionExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B602E81F2A1E2603006D261F /* Bundle+NetworkProtectionExtensions.swift */; };
 		B603971029B9D67E00902A34 /* PublishersExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603970F29B9D67E00902A34 /* PublishersExtensions.swift */; };
 		B603971129B9D67E00902A34 /* PublishersExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603970F29B9D67E00902A34 /* PublishersExtensions.swift */; };
 		B603971229B9D67E00902A34 /* PublishersExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603970F29B9D67E00902A34 /* PublishersExtensions.swift */; };
@@ -2807,6 +2816,9 @@
 		B31055BC27A1BA1D001AC618 /* AutoconsentUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoconsentUserScript.swift; sourceTree = "<group>"; };
 		B31055BE27A1BA1D001AC618 /* userscript.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = userscript.js; sourceTree = "<group>"; };
 		B31055C327A1BA1D001AC618 /* autoconsent-bundle.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "autoconsent-bundle.js"; sourceTree = "<group>"; };
+		B602E8152A1E2570006D261F /* URL+NetworkProtection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "URL+NetworkProtection.swift"; sourceTree = "<group>"; };
+		B602E81C2A1E25B0006D261F /* NEOnDemandRuleExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NEOnDemandRuleExtension.swift; sourceTree = "<group>"; };
+		B602E81F2A1E2603006D261F /* Bundle+NetworkProtectionExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Bundle+NetworkProtectionExtensions.swift"; sourceTree = "<group>"; };
 		B603970F29B9D67E00902A34 /* PublishersExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublishersExtensions.swift; sourceTree = "<group>"; };
 		B603972B29BEDF2100902A34 /* ExpectedNavigationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpectedNavigationExtension.swift; sourceTree = "<group>"; };
 		B603973329BEF86200902A34 /* HTTPSUpgradeIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPSUpgradeIntegrationTests.swift; sourceTree = "<group>"; };
@@ -3896,6 +3908,7 @@
 			children = (
 				4B4D605E2A0B29FA00BCD287 /* NetworkProtectionBundle.swift */,
 				4B4D605F2A0B29FA00BCD287 /* NetworkProtectionSharedState.swift */,
+				B602E8152A1E2570006D261F /* URL+NetworkProtection.swift */,
 			);
 			path = AppAndExtensionAndNotificationTargets;
 			sourceTree = "<group>";
@@ -3921,6 +3934,7 @@
 			isa = PBXGroup;
 			children = (
 				4B4D60642A0B29FA00BCD287 /* LoginItem.swift */,
+				B602E81C2A1E25B0006D261F /* NEOnDemandRuleExtension.swift */,
 				4B4D60652A0B29FA00BCD287 /* NetworkProtectionNavBarButtonModel.swift */,
 				4B8F52402A18326600BE7131 /* NetworkProtectionTunnelController.swift */,
 				4B4D60692A0B29FA00BCD287 /* NetworkProtection+ConvenienceInitializers.swift */,
@@ -3965,6 +3979,7 @@
 		4B4D60772A0B29FA00BCD287 /* SystemExtensionAndNotificationTargets */ = {
 			isa = PBXGroup;
 			children = (
+				B602E81F2A1E2603006D261F /* Bundle+NetworkProtectionExtensions.swift */,
 				4B4D60782A0B29FA00BCD287 /* NetworkProtectionExtensionMachService.swift */,
 				4B4D60792A0B29FA00BCD287 /* IPCConnection.swift */,
 			);
@@ -7645,6 +7660,7 @@
 				3706FBC3293F65D500E42796 /* EdgeDataImporter.swift in Sources */,
 				3706FBC5293F65D500E42796 /* CallToAction.swift in Sources */,
 				3706FBC6293F65D500E42796 /* MouseOverView.swift in Sources */,
+				B602E81E2A1E25B1006D261F /* NEOnDemandRuleExtension.swift in Sources */,
 				3706FBC7293F65D500E42796 /* HistoryStore.swift in Sources */,
 				3706FBC8293F65D500E42796 /* FirePopoverCollectionViewItem.swift in Sources */,
 				3706FBC9293F65D500E42796 /* ArrayExtension.swift in Sources */,
@@ -7883,6 +7899,7 @@
 				3706FC9E293F65D500E42796 /* PreferencesAppearanceView.swift in Sources */,
 				3706FC9F293F65D500E42796 /* NSMenuItemExtension.swift in Sources */,
 				3706FCA0293F65D500E42796 /* ContiguousBytesExtension.swift in Sources */,
+				B602E8172A1E2570006D261F /* URL+NetworkProtection.swift in Sources */,
 				3706FCA1293F65D500E42796 /* AdjacentItemEnumerator.swift in Sources */,
 				3706FCA2293F65D500E42796 /* ChromiumKeychainPrompt.swift in Sources */,
 				3707C71E294B5D2900682A9F /* URLRequestExtension.swift in Sources */,
@@ -8179,6 +8196,7 @@
 				4B25377E2A11C07600610219 /* NetworkProtectionTunnelHealthStore.swift in Sources */,
 				4B2D06262A11C0C500DE1F49 /* String+ArrayConversion.swift in Sources */,
 				4B2D062D2A11C12300DE1F49 /* Logging.swift in Sources */,
+				B602E8232A1E260E006D261F /* Bundle+NetworkProtectionExtensions.swift in Sources */,
 				4B2537842A11C07600610219 /* PacketTunnelProvider.swift in Sources */,
 				4B25377D2A11C07600610219 /* NetworkProtectionConnectionTester.swift in Sources */,
 				4B2537822A11C07600610219 /* NetworkProtectionTunnelErrorStore.swift in Sources */,
@@ -8187,6 +8205,7 @@
 				4B2D06272A11C0C500DE1F49 /* TunnelConfiguration+WgQuickConfig.swift in Sources */,
 				4B2D062A2A11C0C900DE1F49 /* NetworkProtectionSharedState.swift in Sources */,
 				4B2537732A11BF8C00610219 /* NetworkProtectionIPCNotificationsPresenter.swift in Sources */,
+				B602E8192A1E2570006D261F /* URL+NetworkProtection.swift in Sources */,
 				4B2D06322A11C1D300DE1F49 /* NSApplicationExtension.swift in Sources */,
 				4B2D06332A11C1E300DE1F49 /* OptionalExtension.swift in Sources */,
 				4B2537782A11C00F00610219 /* NetworkProtectionExtensionMachService.swift in Sources */,
@@ -8228,6 +8247,8 @@
 				4B4BEC452A11B5EE001D9AC5 /* UserText+NetworkProtectionExtensions.swift in Sources */,
 				4B4BEC3F2A11B5AE001D9AC5 /* IPCConnection.swift in Sources */,
 				4B4BEC422A11B5C7001D9AC5 /* NetworkProtectionSharedState.swift in Sources */,
+				B602E8222A1E2603006D261F /* Bundle+NetworkProtectionExtensions.swift in Sources */,
+				B602E81A2A1E2570006D261F /* URL+NetworkProtection.swift in Sources */,
 				4B4BEC402A11B5B5001D9AC5 /* NetworkProtectionExtensionMachService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8240,6 +8261,7 @@
 				4B4D609F2A0B2C7300BCD287 /* Logging.swift in Sources */,
 				4B4D608B2A0B2A3700BCD287 /* NetworkProtectionTunnelErrorStore.swift in Sources */,
 				4B4D60A12A0B2D6100BCD287 /* NetworkProtectionSharedState.swift in Sources */,
+				B602E8182A1E2570006D261F /* URL+NetworkProtection.swift in Sources */,
 				4B4D60892A0B2A1C00BCD287 /* NetworkProtectionUNNotificationsPresenter.swift in Sources */,
 				4B4D60A62A0B2ECC00BCD287 /* String+ArrayConversion.swift in Sources */,
 				4B4D60942A0B2A3700BCD287 /* NetworkProtectionConnectionBandwidthAnalyzer.swift in Sources */,
@@ -8539,6 +8561,7 @@
 				9826B0A22747DFEB0092F683 /* AppPrivacyConfigurationDataProvider.swift in Sources */,
 				B6B1E88B26D774090062C350 /* LinkButton.swift in Sources */,
 				4BBF0915282DD40100EE1418 /* TemporaryFileHandler.swift in Sources */,
+				B602E8162A1E2570006D261F /* URL+NetworkProtection.swift in Sources */,
 				CB6BCDF927C6BEFF00CC76DC /* PrivacyFeatures.swift in Sources */,
 				B693954D26F04BEB0015B914 /* MouseClickView.swift in Sources */,
 				378F44EB29B4C73E00899924 /* View+RoundedCorners.swift in Sources */,
@@ -8792,6 +8815,7 @@
 				B6A9E47F26146A800067D1B9 /* PixelArguments.swift in Sources */,
 				37BF3F21286F0A7A00BD9014 /* PinnedTabsViewModel.swift in Sources */,
 				AAC5E4D225D6A709007F5990 /* BookmarkList.swift in Sources */,
+				B602E81D2A1E25B1006D261F /* NEOnDemandRuleExtension.swift in Sources */,
 				4B9292D12667123700AD2C21 /* BookmarkTableRowView.swift in Sources */,
 				85589E9427BFE1E70038AD11 /* FavoritesView.swift in Sources */,
 				85AC7ADB27BD628400FFB69B /* HomePage.swift in Sources */,

@@ -23,15 +23,15 @@ public protocol NetworkProtectionTokenStore {
 
     /// Store an oAuth token.
     ///
-    func store(_ token: String)
+    func store(_ token: String) throws
 
     /// Obtain the current oAuth token.
     ///
-    func fetchToken() -> String?
+    func fetchToken() throws -> String?
 
     /// Obtain the stored oAuth token.
     ///
-    func deleteToken()
+    func deleteToken() throws
 }
 
 /// Store an oAuth token for NetworkProtection on behalf of the user. This key is then used to authenticate requests for registration and server fetches from the Network Protection backend servers.
@@ -54,32 +54,37 @@ public final class NetworkProtectionKeychainTokenStore: NetworkProtectionTokenSt
         self.errorEvents = errorEvents
     }
 
-    public func store(_ token: String) {
+    public func store(_ token: String) throws {
         let data = token.data(using: .utf8)!
         do {
-            try keychainStore.deleteAll()
+            try (try? keychainStore.deleteAll()) ?? {
+                // sometimes it fails from the first try: retry once
+                try keychainStore.deleteAll()
+            }()
             try keychainStore.writeData(data, named: Defaults.tokenStoreName)
         } catch {
             handle(error)
+            throw error
         }
     }
 
-    public func fetchToken() -> String? {
+    public func fetchToken() throws -> String? {
         do {
             return try keychainStore.readData(named: Defaults.tokenStoreName).flatMap {
                 String(data: $0, encoding: .utf8)
             }
         } catch {
             handle(error)
-            return nil
+            throw error
         }
     }
 
-    public func deleteToken() {
+    public func deleteToken() throws {
         do {
             try keychainStore.deleteAll()
         } catch {
             handle(error)
+            throw error
         }
     }
 

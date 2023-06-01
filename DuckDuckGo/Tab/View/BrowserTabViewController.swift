@@ -559,7 +559,6 @@ extension BrowserTabViewController: TabDelegate {
         setFirstResponderIfNeeded()
         guard let tabViewModel = tabViewModel else { return }
 
-        tabViewModel.closeFindInPage()
         tab.permissions.tabDidStartNavigation()
         if !tabViewModel.isLoading,
            tabViewModel.tab.webView.isLoading {
