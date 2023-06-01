@@ -22,7 +22,7 @@ import Common
 
 /// Launches the main App
 ///
-open class AppLauncher {
+public final class AppLauncher {
 
     public enum Command: Codable {
         case justOpen
