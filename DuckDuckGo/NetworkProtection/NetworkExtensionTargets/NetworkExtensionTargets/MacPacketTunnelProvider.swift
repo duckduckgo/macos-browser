@@ -44,10 +44,14 @@ final class MacPacketTunnelProvider: NEPacketTunnelProvider, PacketTunnelProvide
 #endif
     }()
 
-    private lazy var genericPacketTunnelProvider = PacketTunnelProvider(notificationCenter: distributedNotificationCenter,
-                                                                        createNotificationsPresenter: self.notificationsPresenter,
-                                                                        useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
-                                                                        debugEvents: networkProtectionDebugEvents)
+    private lazy var genericPacketTunnelProvider: PacketTunnelProvider = {
+        let packetTunnelProvider = PacketTunnelProvider(notificationCenter: distributedNotificationCenter,
+                                                        createNotificationsPresenter: self.notificationsPresenter,
+                                                        useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
+                                                        debugEvents: networkProtectionDebugEvents)
+        packetTunnelProvider.delegate = self
+        return packetTunnelProvider
+    }()
 
     // MARK: - Pixels
 
