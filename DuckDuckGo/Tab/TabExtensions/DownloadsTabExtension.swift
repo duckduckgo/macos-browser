@@ -61,7 +61,7 @@ final class DownloadsTabExtension: NSObject {
 
     @MainActor
     private func saveWebViewContentAs(_ webView: WKWebView) async {
-        guard case .some(.html) = await webView.mimeType.flatMap(UTType.init(mimeType:)) else {
+        guard await webView.mimeType == UTType.html.mimeType else {
             if let url = webView.url {
                 webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
                     self.downloadManager.add(download,

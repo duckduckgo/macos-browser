@@ -57,11 +57,12 @@ final class FindInPageTabExtension: TabExtension {
     @MainActor
     private func showFindInPage() async {
         guard !model.isVisible else {
-            // Find In Page already active
-            guard !model.text.isEmpty, !isPdf else { return }
+            // Find In Page is already active
+            guard !model.text.isEmpty,
+                  // would just find next for PDF
+                  !isPdf else { return }
 
             // re-highlight the same result when Find In Page is already active
-            // reset text selection to the start so Find In Page finds the same result
             await find(model.text, with: [.noIndexChange, .determineMatchIndex, .showOverlay])
             return
         }
@@ -75,7 +76,7 @@ final class FindInPageTabExtension: TabExtension {
         await doItOneMoreTimeForPdf(with: model.text)
     }
 
-    /// cleart Find In Page state
+    /// clear Find In Page state
     @MainActor
     private func reset() async {
         model.update(currentSelection: nil, matchesFound: nil)
@@ -102,15 +103,16 @@ final class FindInPageTabExtension: TabExtension {
         }
 
         await find(string, with: options)
-        await doItOneMoreTimeForPdf(with: string, options: [.showOverlay, .noIndexChange], oldValue: oldValue)
+        await doItOneMoreTimeForPdf(with: string, oldValue: oldValue)
     }
 
+    /// PDF would find the first match 2 times, the ghosty result won‘t be there when going round
+    /// same is actual for Safari (but not the Preview.app)
     @MainActor
-    private func doItOneMoreTimeForPdf(with string: String, options: _WKFindOptions = [], oldValue: String? = nil) async {
+    private func doItOneMoreTimeForPdf(with string: String, options: _WKFindOptions = .noIndexChange, oldValue: String? = nil) async {
         guard isPdf, oldValue != string else { return }
-
         // hit me webvie one more time ¯\_(ツ)_/¯
-        await find(string, with: options.union(.noIndexChange /* don‘t increase search index */))
+        await find(string, with: options)
     }
 
     @MainActor
@@ -120,7 +122,7 @@ final class FindInPageTabExtension: TabExtension {
             return
         }
 
-        // reset text selection to the start so Find In Page finds the same result
+        // reset text selection to the selection start so Find In Page finds the same result
         if options.contains(.noIndexChange) {
             try? await webView?.collapsSelectionToStart()
         }
@@ -161,20 +163,20 @@ final class FindInPageTabExtension: TabExtension {
     }
 
     private func calculateCurrentIndex(with options: _WKFindOptions, matchesFound: UInt) -> UInt {
-        // indeed it will keep the same index for a modified search string even if it's became the first search result
+        // indeed it will keep the same index > 1 for a shortened search term even if it's became the first search result
         // the same is actual for Safari
         guard let currentIndex = model.currentSelection else { return 1 }
 
-        // keeping current result index
         if options.contains(.noIndexChange) {
+            // keeping current result index
             return currentIndex
 
-            // searching backwards
         } else if options.contains(.backwards) {
+            // searching backwards
             return currentIndex > 1 ? currentIndex - 1 : matchesFound
 
-            // searching forward
         } else if currentIndex < matchesFound {
+            // searching forward
             return currentIndex + 1
         }
         return 1
