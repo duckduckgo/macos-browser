@@ -90,7 +90,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
-    private var lastStatusChange = ConnectionStatusChange(status: .unknown)
+    private var lastStatusChange = ConnectionStatusChange(status: .disconnected)
 
     private var connectionStatus: ConnectionStatus = .disconnected {
         didSet {
