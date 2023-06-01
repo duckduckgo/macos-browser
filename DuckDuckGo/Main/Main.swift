@@ -35,7 +35,6 @@ extension Bundle {
 final class AppMain {
     private enum LaunchError: Error {
         case startVPNFailed(_ error: Error)
-        case stopVPNFailed(_ error: Error)
     }
 
     static func main() async throws {

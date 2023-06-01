@@ -73,7 +73,7 @@ final class SystemExtensionRequest: NSObject {
     }
 
     /// submitting the request returns an Async Iterator providing the OSSystemExtensionRequest state change events
-    /// until `activated`/`failed`/`willActivateAfterReboot` event is received
+    /// until an `ActivationRequestEvent` event is received.
     func submit() -> AsyncThrowingStream<Event, Error> {
         assert(continuation == nil, "Request can only be submitted once")
 
