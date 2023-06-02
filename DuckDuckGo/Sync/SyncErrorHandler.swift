@@ -24,8 +24,7 @@ public class SyncErrorHandler: EventMapping<SyncError> {
 
     public init() {
         super.init { event, _, _, _ in
-            let domainEvent = Pixel.Event.syncSentUnauthenticatedRequest
-            Pixel.fire(pixel: domainEvent, error: event)
+            Pixel.fire(.debug(event: .syncSentUnauthenticatedRequest, error: event))
         }
     }
 
