@@ -157,9 +157,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
-
-        syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
-        syncService = DDGSync(dataProvidersSource: syncDataProviders, log: OSLog.sync)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
