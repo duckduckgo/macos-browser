@@ -24,7 +24,6 @@ import Common
 import Foundation
 import NetworkExtension
 import UserNotifications
-import Combine
 
 public protocol PacketTunnelProviderDelegate: AnyObject {
     func connectionStatusDidChange(_ data: String?)
@@ -34,10 +33,24 @@ public protocol PacketTunnelProviderDelegate: AnyObject {
     func didCompleteRekey()
     func tunnelDidError(_ errorMessage: String?)
     func tunnelIsHavingIssue(_ isHavingIssue: Bool)
+    func connectionDidFailWhenOnActivationBySystemOnDemand(_ completion: () -> Void)
+    func didStartFromSystemSettings(_ completion: () -> Void)
+    func userTriggeredStopFromSystemSettings(_ completion: () -> Void)
+}
+
+public protocol PlatformNotificationDispatcher {
+    func connectionStatusDidChange(_ data: String?)
+    func lastSelectedServerInfoDidChange(_ payload: String?)
 }
 
 // swiftlint:disable:next type_body_length
 public final class PacketTunnelProvider: NEPacketTunnelProvider {
+
+    enum Event {
+        case userBecameActive
+        case reportLatency(ms: Int, server: String, networkType: NetworkConnectionType)
+        case rekeyCompleted
+    }
 
     // MARK: - Error Handling
 
