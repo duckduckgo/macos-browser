@@ -314,6 +314,65 @@ final class OperationsTests: XCTestCase {
         XCTAssertNil(optOutOperationData.extractedProfile.removedDate)
     }
 
+    func testOptOutConfirmationRemovedOnSomeProfiles() async throws {
+        let profileQuery = ProfileQuery(name: "Test Query")
+        let dataBroker = DataBroker(name: "Test Broker")
+
+        let extractedProfile1 = ExtractedProfile(name: "John")
+
+        let optOutOperationData1 = OptOutOperationData(brokerProfileQueryID: UUID(),
+                                                      preferredRunDate: Date(),
+                                                      historyEvents: [HistoryEvent](),
+                                                      extractedProfile: extractedProfile1)
+
+        let extractedProfile2 = ExtractedProfile(name: "John2")
+
+        let optOutOperationData2 = OptOutOperationData(brokerProfileQueryID: UUID(),
+                                                      preferredRunDate: Date(),
+                                                      historyEvents: [HistoryEvent](),
+                                                      extractedProfile: extractedProfile2)
+
+        let profileQueryData = BrokerProfileQueryData(id: UUID(),
+                                                      profileQuery: profileQuery,
+                                                      dataBroker: dataBroker,
+                                                      optOutOperationsData: [optOutOperationData1, optOutOperationData2])
+
+
+        let database = MockDataBase(mockBrokerProfileQueryData: profileQueryData)
+
+        let operationsManager = BrokerOperationsManager(profileQuery: profileQuery,
+                                                        dataBroker: dataBroker,
+                                                        database: database)
+
+
+        let expectedExtractedProfiles = [extractedProfile1]
+
+        let runner = MockRunner(optOutAction: nil,
+                                scanAction: nil,
+                                scanResults: expectedExtractedProfiles)
+
+
+        try await operationsManager.runScanOperation(on: runner)
+        let data = operationsManager.brokerProfileQueryData
+
+        let scanExpectedHistoryTypes: [HistoryEvent.EventType] = [.scanStarted, .matchFound(profileID: extractedProfile1.id)]
+        let optOut1ExpectedHistoryTypes: [HistoryEvent.EventType] = []
+        let optOut2ExpectedHistoryTypes: [HistoryEvent.EventType] = [.optOutConfirmed(profileID: extractedProfile2.id)]
+
+
+        XCTAssertEqual(data.scanData.historyEvents.count, scanExpectedHistoryTypes.count)
+        XCTAssertEqual(data.scanData.historyEvents.map { $0.type }, scanExpectedHistoryTypes)
+
+        XCTAssertEqual(optOutOperationData1.historyEvents.count, optOut1ExpectedHistoryTypes.count)
+        XCTAssertEqual(optOutOperationData1.historyEvents.map{ $0.type }, optOut1ExpectedHistoryTypes)
+
+        XCTAssertEqual(optOutOperationData2.historyEvents.count, optOut2ExpectedHistoryTypes.count)
+        XCTAssertEqual(optOutOperationData2.historyEvents.map{ $0.type }, optOut2ExpectedHistoryTypes)
+
+        XCTAssertNil(optOutOperationData1.extractedProfile.removedDate)
+        XCTAssertNotNil(optOutOperationData2.extractedProfile.removedDate)
+    }
+
 
     func areDatesEqualIgnoringSeconds(date1: Date, date2: Date) -> Bool {
         let calendar = Calendar.current
