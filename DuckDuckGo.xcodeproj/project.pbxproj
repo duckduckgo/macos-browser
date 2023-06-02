@@ -1000,6 +1000,8 @@
 		37F19A6728E1B43200740DC6 /* DuckPlayerPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6628E1B43200740DC6 /* DuckPlayerPreferences.swift */; };
 		37F19A6A28E2F2D000740DC6 /* DuckPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6928E2F2D000740DC6 /* DuckPlayer.swift */; };
 		37F44A5F298C17830025E7FE /* Navigation in Frameworks */ = {isa = PBXBuildFile; productRef = 37F44A5E298C17830025E7FE /* Navigation */; };
+		37FD78112A29EBD100B36DB1 /* SyncErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD78102A29EBD100B36DB1 /* SyncErrorHandler.swift */; };
+		37FD78122A29EBD100B36DB1 /* SyncErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD78102A29EBD100B36DB1 /* SyncErrorHandler.swift */; };
 		4B0135CE2729F1AA00D54834 /* NSPasteboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */; };
 		4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */; };
 		4B02198A25E05FAC00ED7DEA /* FireproofDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B02198125E05FAC00ED7DEA /* FireproofDomains.swift */; };
@@ -2246,6 +2248,7 @@
 		37F19A6428E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesDuckPlayerView.swift; sourceTree = "<group>"; };
 		37F19A6628E1B43200740DC6 /* DuckPlayerPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerPreferences.swift; sourceTree = "<group>"; };
 		37F19A6928E2F2D000740DC6 /* DuckPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayer.swift; sourceTree = "<group>"; };
+		37FD78102A29EBD100B36DB1 /* SyncErrorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncErrorHandler.swift; sourceTree = "<group>"; };
 		4B0135CD2729F1AA00D54834 /* NSPasteboardExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPasteboardExtension.swift; sourceTree = "<group>"; };
 		4B02197F25E05FAC00ED7DEA /* FireproofingURLExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofingURLExtensions.swift; sourceTree = "<group>"; };
 		4B02198125E05FAC00ED7DEA /* FireproofDomains.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofDomains.swift; sourceTree = "<group>"; };
@@ -3526,6 +3529,7 @@
 				373D9B4729EEAC1B00381FDD /* SyncMetadataDatabase.swift */,
 				37445F982A1566420029F789 /* SyncDataProviders.swift */,
 				37445F9B2A1569F00029F789 /* SyncBookmarksAdapter.swift */,
+				37FD78102A29EBD100B36DB1 /* SyncErrorHandler.swift */,
 			);
 			path = Sync;
 			sourceTree = "<group>";
@@ -7565,6 +7569,7 @@
 				3706FB75293F65D500E42796 /* WebsiteBreakageSender.swift in Sources */,
 				3707C72A294B5D2900682A9F /* URLExtension.swift in Sources */,
 				3706FB76293F65D500E42796 /* ASN1Parser.swift in Sources */,
+				37FD78122A29EBD100B36DB1 /* SyncErrorHandler.swift in Sources */,
 				987799F42999993C005D8EB6 /* LegacyBookmarksStoreMigration.swift in Sources */,
 				3706FB7A293F65D500E42796 /* FileDownloadManager.swift in Sources */,
 				3706FB7B293F65D500E42796 /* BookmarkImport.swift in Sources */,
@@ -8900,6 +8905,7 @@
 				37AFCE8B27DB69BC00471A10 /* PreferencesGeneralView.swift in Sources */,
 				37BF3F22286F0A7A00BD9014 /* PinnedTabsView.swift in Sources */,
 				4B02198B25E05FAC00ED7DEA /* FireproofInfoViewController.swift in Sources */,
+				37FD78112A29EBD100B36DB1 /* SyncErrorHandler.swift in Sources */,
 				AA8EDF2424923E980071C2E8 /* URLExtension.swift in Sources */,
 				B634DBDF293C8F7F00C3C99E /* Tab+UIDelegate.swift in Sources */,
 				31A031A6288191230090F792 /* CookieConsentAnimationView.swift in Sources */,
@@ -9941,8 +9947,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 58.1.1;
+				branch = "dominik/sync-error-reporting";
+				kind = branch;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {

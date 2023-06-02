@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "e1e50bab938c9722d1cf4f8b1f28a31308b14167",
-        "version" : "58.1.1"
+        "branch" : "dominik/sync-error-reporting",
+        "revision" : "871cb3f23044adeb4c3acaa949856ea350726e21"
       }
     },
     {
@@ -120,7 +120,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
       "state" : {
         "revision" : "4684440d03304e7638a2c8086895367e90987463",
         "version" : "1.2.1"
