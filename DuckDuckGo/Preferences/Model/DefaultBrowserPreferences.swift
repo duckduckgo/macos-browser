@@ -79,11 +79,12 @@ final class DefaultBrowserPreferences: ObservableObject {
                 return
             }
 #endif
-            if isDefault {
+            if Pixel.isNewUser && isDefault {
                 let repetition = Pixel.Event.Repetition(key: Pixel.Event.setAsDefaultInitial.name)
                 if repetition == .initial {
                     Pixel.fire(.setAsDefaultInitial)
                 }
+
             }
         }
     }

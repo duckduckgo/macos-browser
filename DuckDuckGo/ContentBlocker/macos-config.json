@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1684763820272,
+    "version": 1685634378621,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -105,6 +105,34 @@
             "exceptions": [
                 {
                     "domain": "autotrader.co.uk",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
+                },
+                {
+                    "domain": "bild.de",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
+                },
+                {
+                    "domain": "derstandard.de",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
+                },
+                {
+                    "domain": "duden.de",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
+                },
+                {
+                    "domain": "ksta.de",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
+                },
+                {
+                    "domain": "t-online.de",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
+                },
+                {
+                    "domain": "tomsguide.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
+                },
+                {
+                    "domain": "welt.de",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
                 },
                 {
@@ -223,7 +251,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "93e29befa2970c33ca5d6022559a79b3"
+            "hash": "7025ef66138fdc1da20b9237088fd3ab"
         },
         "autofill": {
             "exceptions": [
@@ -242,12 +270,24 @@
         "clickToLoad": {
             "exceptions": [
                 {
+                    "domain": "beatsense.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/950"
+                },
+                {
+                    "domain": "discogs.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/950"
+                },
+                {
                     "domain": "duckduckgo.com",
                     "reason": "Warnings are already displayed before embedded YouTube videos are loaded."
                 },
                 {
                     "domain": "khanacademy.org",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/945"
+                },
+                {
+                    "domain": "last.fm",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/950"
                 },
                 {
                     "domain": "www.google.ad",
@@ -1025,7 +1065,7 @@
                 }
             },
             "state": "disabled",
-            "hash": "3349c86ccf4e47d5f620006a29700f69"
+            "hash": "bdd03f498600884dbe0ad7d255e1169b"
         },
         "clickToPlay": {
             "exceptions": [],
@@ -1112,6 +1152,10 @@
                 {
                     "domain": "bild.de",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/589"
+                },
+                {
+                    "domain": "foxnews.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/965"
                 },
                 {
                     "domain": "kbb.com",
@@ -2345,7 +2389,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "dbc87b28841e4bd4165eb00544406300"
+            "hash": "ac3f70712d976394a4733aa538295ce0"
         },
         "exceptionHandler": {
             "exceptions": [],
@@ -2382,6 +2426,10 @@
                 {
                     "domain": "att.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
+                },
+                {
+                    "domain": "bloomingdales.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/379"
                 },
                 {
                     "domain": "capitalone.com",
@@ -2461,7 +2509,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "4c075ddba8002cc00985a3b97cf6814a"
+            "hash": "7c8803f9143020f92738cd83d614f9c5"
         },
         "fingerprintingHardware": {
             "settings": {
@@ -2682,6 +2730,14 @@
                 {
                     "domain": "rbs.co.uk",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/902"
+                },
+                {
+                    "domain": "panomax.com",
+                    "reason": "https://github.com/duckduckgo/duckduckgo-privacy-extension/issues/2007"
+                },
+                {
+                    "domain": "wikimedia.org",
+                    "reason": "https://github.com/duckduckgo/content-scope-scripts/issues/540"
                 },
                 {
                     "domain": "ally.com",
@@ -3222,7 +3278,7 @@
                     }
                 }
             },
-            "hash": "abc848e219c9cb434cb1eeb033f9459a"
+            "hash": "f13b818922efaec9eb14c72ae58523e8"
         },
         "serviceworkerInitiatedRequests": {
             "exceptions": [],
@@ -3458,7 +3514,7 @@
                     "aticdn.net": {
                         "rules": [
                             {
-                                "rule": "tag.aticdn.net/piano-analytics.js",
+                                "rule": "tag.aticdn.net",
                                 "domains": [
                                     "<all>"
                                 ],
@@ -3571,6 +3627,17 @@
                                     "aternos.org"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/328"
+                            }
+                        ]
+                    },
+                    "civiccomputing.com": {
+                        "rules": [
+                            {
+                                "rule": "civiccomputing\\.com\\/9\\/cookieControl-9\\.x\\.min\\.js",
+                                "domains": [
+                                    "collisionconf.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/979"
                             }
                         ]
                     },
@@ -3830,9 +3897,10 @@
                                 "rule": "securepubads.g.doubleclick.net/pagead/ppub_config",
                                 "domains": [
                                     "rocketnews24.com",
-                                    "weather.com"
+                                    "weather.com",
+                                    "wunderground.com"
                                 ],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/415,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846"
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/415,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846,wunderground.com - https://github.com/duckduckgo/privacy-configuration/issues/956"
                             },
                             {
                                 "rule": "doubleclick.net",
@@ -3848,6 +3916,7 @@
                             {
                                 "rule": "cdn.dynamicyield.com/api/",
                                 "domains": [
+                                    "asics.com",
                                     "brooklinen.com",
                                     "carters.com",
                                     "seatosummit.com"
@@ -4250,7 +4319,10 @@
                             {
                                 "rule": "googletagmanager.com/gtm.js",
                                 "domains": [
+                                    "aeromexico.com",
                                     "ah.nl",
+                                    "al.com",
+                                    "bbcgoodfood.com",
                                     "dailyherald.com",
                                     "emirates.com",
                                     "iltalehti.fi",
@@ -4258,7 +4330,7 @@
                                     "pickfu.com",
                                     "rbcroyalbank.com"
                                 ],
-                                "reason": "ah.nl - 'Bonus offer' elements do not render and are not clickable.,dailyherald.com - Article images render as grey boxes.,emirates.com - After filling out login details and clicking to proceed, a loading spinners shows on the proceed button and the login does not progress.,iltalehti.fi - Article video renders as a blank box.,kingarthurbaking.com - https://github.com/duckduckgo/privacy-configuration/issues/348,pickfu.com - https://github.com/duckduckgo/privacy-configuration/issues/346,rbcroyalbank.com - Investments page renders blank."
+                                "reason": "ah.nl - 'Bonus offer' elements do not render and are not clickable.,aeromexico.com, al.com, bbcgoodfood.com - https://github.com/duckduckgo/privacy-configuration/issues/921,dailyherald.com - Article images render as grey boxes.,emirates.com - After filling out login details and clicking to proceed, a loading spinners shows on the proceed button and the login does not progress.,iltalehti.fi - Article video renders as a blank box.,kingarthurbaking.com - https://github.com/duckduckgo/privacy-configuration/issues/348,pickfu.com - https://github.com/duckduckgo/privacy-configuration/issues/346,rbcroyalbank.com - Investments page renders blank."
                             }
                         ]
                     },
@@ -4317,6 +4389,18 @@
                                     "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/760"
+                            }
+                        ]
+                    },
+                    "impervadns.net": {
+                        "rules": [
+                            {
+                                "rule": "e9pkvlf.impervadns.net",
+                                "domains": [
+                                    "cox.com",
+                                    "cox.net"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/948"
                             }
                         ]
                     },
@@ -4863,6 +4947,35 @@
                             }
                         ]
                     },
+                    "reddit.com": {
+                        "rules": [
+                            {
+                                "rule": "embed.reddit.com/widgets.js",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/369"
+                            },
+                            {
+                                "rule": "embed.reddit.com/r/",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/369"
+                            }
+                        ]
+                    },
+                    "redditstatic.com": {
+                        "rules": [
+                            {
+                                "rule": "redditstatic.com/shreddit/",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/369"
+                            }
+                        ]
+                    },
                     "rncdn7.com": {
                         "rules": [
                             {
@@ -5177,6 +5290,17 @@
                             }
                         ]
                     },
+                    "wpadmngr.com": {
+                        "rules": [
+                            {
+                                "rule": "js.wpadmngr.com/static/adManager.js",
+                                "domains": [
+                                    "luscious.net"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/958"
+                            }
+                        ]
+                    },
                     "yandex.ru": {
                         "rules": [
                             {
@@ -5375,6 +5499,32 @@
                                     "thetrainline.com"
                                 ],
                                 "reason": "CNAME ENTRY GENERATED FROM: datadome.co"
+                            }
+                        ]
+                    },
+                    "cox.com": {
+                        "rules": [
+                            {
+                                "rule": "webcdn.cox.com",
+                                "domains": [
+                                    "cox.com",
+                                    "cox.net"
+                                ],
+                                "reason": "CNAME ENTRY GENERATED FROM: e9pkvlf.impervadns.net"
+                            },
+                            {
+                                "rule": "smetrics.cox.com",
+                                "domains": [
+                                    "pizzahut.com"
+                                ],
+                                "reason": "CNAME ENTRY GENERATED FROM: omtrdc.net"
+                            },
+                            {
+                                "rule": "target.cox.com",
+                                "domains": [
+                                    "pizzahut.com"
+                                ],
+                                "reason": "CNAME ENTRY GENERATED FROM: omtrdc.net"
                             }
                         ]
                     },
@@ -8921,24 +9071,6 @@
                         "rules": [
                             {
                                 "rule": "smetrics.countryfinancial.com",
-                                "domains": [
-                                    "pizzahut.com"
-                                ],
-                                "reason": "CNAME ENTRY GENERATED FROM: omtrdc.net"
-                            }
-                        ]
-                    },
-                    "cox.com": {
-                        "rules": [
-                            {
-                                "rule": "smetrics.cox.com",
-                                "domains": [
-                                    "pizzahut.com"
-                                ],
-                                "reason": "CNAME ENTRY GENERATED FROM: omtrdc.net"
-                            },
-                            {
-                                "rule": "target.cox.com",
                                 "domains": [
                                     "pizzahut.com"
                                 ],
@@ -13559,7 +13691,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "241325e7cd1a0ed069f7e13c6f8783e5"
+            "hash": "a50ed9745933dd73cd2243d0c1d686e5"
         },
         "trackingCookies1p": {
             "settings": {
@@ -13942,5 +14074,10 @@
             "hash": "728493ef7a1488e4781656d3f9db84aa"
         }
     },
-    "unprotectedTemporary": []
+    "unprotectedTemporary": [
+        {
+            "domain": "fidelity.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
+        }
+    ]
 }

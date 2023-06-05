@@ -1,0 +1,52 @@
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+MAIN_BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.macos.browser
+
+MAIN_BUNDLE_IDENTIFIER[sdk=*] = $(MAIN_BUNDLE_IDENTIFIER_PREFIX)
+MAIN_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(MAIN_BUNDLE_IDENTIFIER_PREFIX).debug
+MAIN_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(MAIN_BUNDLE_IDENTIFIER_PREFIX).debug
+MAIN_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(MAIN_BUNDLE_IDENTIFIER_PREFIX).review
+
+SYSEX_BUNDLE_ID_BASE[sdk=*] = com.duckduckgo.macos.browser.network-protection-extension
+SYSEX_BUNDLE_ID_BASE[config=CI][sdk=*] = com.duckduckgo.macos.browser.debug.network-protection-extension
+SYSEX_BUNDLE_ID_BASE[config=Review][sdk=*] = com.duckduckgo.macos.browser.review.network-protection-extension
+SYSEX_BUNDLE_ID_BASE[config=Debug][sdk=*] = com.duckduckgo.macos.browser.debug.network-protection-extension
+SYSEX_BUNDLE_ID_BASE[config=Release][sdk=*] = com.duckduckgo.macos.browser.network-protection-extension
+
+NETP_BASE_APP_GROUP = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.system-extension
+NETP_APP_GROUP[config=CI][sdk=*] = $(NETP_BASE_APP_GROUP).debug
+NETP_APP_GROUP[config=Review][sdk=*] = $(NETP_BASE_APP_GROUP).review
+NETP_APP_GROUP[config=Debug][sdk=*] = $(NETP_BASE_APP_GROUP).debug
+NETP_APP_GROUP[config=Release][sdk=*] = $(NETP_BASE_APP_GROUP)
+
+SYSEX_MACH_SERVICE_NAME[sdk=*] = $(NETP_APP_GROUP).ipc
+SYSEX_MACH_SERVICE_NAME[config=CI][sdk=*] = $(NETP_APP_GROUP).ipc
+SYSEX_MACH_SERVICE_NAME[config=Review][sdk=*] = $(NETP_APP_GROUP).ipc
+SYSEX_MACH_SERVICE_NAME[config=Debug][sdk=*] = $(NETP_APP_GROUP).ipc
+SYSEX_MACH_SERVICE_NAME[config=Release][sdk=*] = $(NETP_APP_GROUP).ipc
+
+NOTIFICATIONS_AGENT_BUNDLE_ID[sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.notifications
+NOTIFICATIONS_AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.notifications.debug
+NOTIFICATIONS_AGENT_BUNDLE_ID[config=CI][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.notifications.debug
+NOTIFICATIONS_AGENT_BUNDLE_ID[config=Review][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.notifications.review
+
+AGENT_BUNDLE_ID[sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.system-extension.agent
+AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.system-extension.agent.debug
+AGENT_BUNDLE_ID[config=CI][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.system-extension.agent.debug
+AGENT_BUNDLE_ID[config=Review][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.system-extension.agent.review
+
+AGENT_PRODUCT_NAME = DuckDuckGo Agent
+NOTIFICATIONS_AGENT_PRODUCT_NAME = DuckDuckGo Notifications
