@@ -33,6 +33,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var onSaveRequested: (SecureVaultModels.WebsiteCredentials) -> Void
     var onDeleteRequested: (SecureVaultModels.WebsiteCredentials) -> Void
     var urlMatcher: AutofillUrlMatcher
+    var emailManager: EmailManager
 
     func setSecureVaultModel<Model>(_ modelObject: Model) {
         guard let modelObject = modelObject as? SecureVaultModels.WebsiteCredentials else {
@@ -70,12 +71,33 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var lastUpdatedDate: String = ""
     var createdDate: String = ""
 
+    // MARK: Private Emaill Addres Variables
+    @Published var privateEmailRequestInProgress: Bool = false
+
+    var privateEmailActive: Bool {
+        return false
+    }
+
+    var duckAddress: String {
+        return emailManager.userEmail ?? ""
+    }
+
+    var privateEmailMessage: String {
+        var message = String(format: UserText.pmEmailMessageActive, duckAddress)
+        if !privateEmailActive {
+            message = String(format: UserText.pmEmailMessageInactive, duckAddress)
+        }
+        return message
+    }
+
     init(onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
          onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
-         urlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher()) {
+         urlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher(),
+         emailManager: EmailManager = EmailManager()) {
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested
         self.urlMatcher = urlMatcher
+        self.emailManager = emailManager
     }
 
     func copy(_ value: String) {
@@ -115,6 +137,25 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         isEditing = true
     }
 
+    func isValidPrivateEmail(_ email: String) async -> Bool {
+        guard emailManager.isSignedIn,
+              !emailManager.isPrivateEmail(email: email) else {
+            return false
+        }
+
+        var result = false
+        if !privateEmailRequestInProgress {
+            do {
+                await MainActor.run { privateEmailRequestInProgress = true }
+                result = try await emailManager.getStatusFor(email: duckAddress)
+                await MainActor.run { privateEmailRequestInProgress = false }
+            } catch {
+                await MainActor.run { privateEmailRequestInProgress = false }
+            }
+        }
+        return result
+    }
+
     @MainActor
     func openURL(_ url: URL) {
         WindowControllersManager.shared.show(url: url, newTab: true)
@@ -138,6 +179,9 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
             lastUpdatedDate = Self.dateFormatter.string(from: date)
         } else {
             lastUpdatedDate = ""
+        }
+        Task {
+            await isValidPrivateEmail(username)
         }
     }
 }
