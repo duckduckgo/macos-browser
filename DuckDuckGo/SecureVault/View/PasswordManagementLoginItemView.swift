@@ -135,8 +135,8 @@ private struct Buttons: View {
 private struct UsernameView: View {
 
     @EnvironmentObject var model: PasswordManagementLoginModel
-
     @State var isHovering = false
+    @State var isValidPrivateEmail = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -146,34 +146,76 @@ private struct UsernameView: View {
                 .padding(.bottom, itemSpacing)
 
             if model.isEditing || model.isNew {
-
-                 TextField("", text: $model.username)
+                TextField("", text: $model.username)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.bottom, interItemSpacing)
 
             } else {
-
-                HStack(spacing: 6) {
-                    Text(model.username)
-
-                    if isHovering {
-                        Button {
-                            model.copy(model.username)
-                        } label: {
-                            Image("Copy")
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .tooltip(UserText.copyUsernameTooltip)
+                VStack(alignment: .leading) {
+                    UsernameLabel(isValidPrivateEmail: $isValidPrivateEmail, isHovering: $isHovering)
+                    if isValidPrivateEmail && !model.privateEmailRequestInProgress {
+                        PrivateEmailActivationButton()
                     }
-
-                    Spacer()
                 }
                 .padding(.bottom, interItemSpacing)
-            }
 
+            }
         }
         .onHover {
             isHovering = $0
+        }
+    }
+
+}
+
+private struct UsernameLabel: View {
+
+    @EnvironmentObject var model: PasswordManagementLoginModel
+    @Binding var isValidPrivateEmail: Bool
+    @Binding var isHovering: Bool
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 6) {
+            if isValidPrivateEmail && !model.privateEmailRequestInProgress {
+                if model.privateEmailActive {
+                    Image("OptionsButtonMenuEmail")
+                } else {
+                    Image("OptionsButtonMenuEmailDisabled")
+                }
+            }
+            Text(model.username)
+
+            if isHovering {
+                Button {
+                    model.copy(model.username)
+                } label: {
+                    Image("Copy")
+                }
+                .buttonStyle(PlainButtonStyle())
+                .tooltip(UserText.copyUsernameTooltip)
+            }
+        }
+    }
+}
+
+private struct PrivateEmailActivationButton: View {
+
+    @EnvironmentObject var model: PasswordManagementLoginModel
+
+    var body: some View {
+
+        VStack(alignment: .leading) {
+            Button(model.privateEmailActive ? UserText.pmDeactivate : UserText.pmActivate ) {
+                model.privateEmailActive ? model.requestDelete() : model.requestDelete()
+            }
+            .buttonStyle(StandardButtonStyle())
+
+            Text(model.privateEmailMessage)
+                .font(.caption)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+                .multilineTextAlignment(.leading)
+
         }
     }
 
