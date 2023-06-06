@@ -90,18 +90,22 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
-    private var lastStatusChange = ConnectionStatusChange(status: .disconnected)
+    /// Holds the date when the status was last changed so we can send it out as additional information
+    /// in our status-change notifications.
+    ///
+    private var lastStatusChangeDate = Date()
 
     private var connectionStatus: ConnectionStatus = .disconnected {
         didSet {
             if oldValue != connectionStatus {
-                lastStatusChange = ConnectionStatusChange(status: connectionStatus)
+                lastStatusChangeDate = Date()
                 broadcastConnectionStatus()
             }
         }
     }
 
     private func broadcastConnectionStatus() {
+        let lastStatusChange = ConnectionStatusChange(status: connectionStatus, on: lastStatusChangeDate)
         let data = ConnectionStatusChangeEncoder().encode(lastStatusChange)
         distributedNotificationCenter.post(.statusDidChange, object: data)
     }

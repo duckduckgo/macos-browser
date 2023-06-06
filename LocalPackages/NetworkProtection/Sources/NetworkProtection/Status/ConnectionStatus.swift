@@ -38,7 +38,7 @@ public struct ConnectionStatusChange: Codable {
     let status: ConnectionStatus
     let timestamp: Date
 
-    public init(status: ConnectionStatus, timestamp: Date = Date()) {
+    public init(status: ConnectionStatus, on timestamp: Date) {
         self.status = status
         self.timestamp = timestamp
     }

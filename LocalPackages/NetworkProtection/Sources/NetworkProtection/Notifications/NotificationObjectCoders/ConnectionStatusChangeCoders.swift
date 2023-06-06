@@ -18,7 +18,7 @@
 
 import Foundation
 
-public class ConnectionStatusChangeEncoder {
+public struct ConnectionStatusChangeEncoder {
     public init() {}
 
     public func encode(_ change: ConnectionStatusChange) -> String? {
@@ -33,16 +33,16 @@ public class ConnectionStatusChangeEncoder {
     }
 }
 
-public class ConnectionStatusChangeDecoder {
+public struct ConnectionStatusChangeDecoder {
     public init() {}
 
     public func decode(_ object: Any?) -> ConnectionStatusChange {
         guard let payload = object as? String else {
-            return ConnectionStatusChange(status: .unknown)
+            return ConnectionStatusChange(status: .unknown, on: Date())
         }
 
         guard let jsonData = payload.data(using: DistributedNotificationCenter.preferredStringEncoding) else {
-            return ConnectionStatusChange(status: .unknown)
+            return ConnectionStatusChange(status: .unknown, on: Date())
         }
 
         let jsonDecoder = JSONDecoder()
@@ -51,7 +51,7 @@ public class ConnectionStatusChangeDecoder {
         do {
             change = try jsonDecoder.decode(ConnectionStatusChange.self, from: jsonData)
         } catch {
-            return ConnectionStatusChange(status: .unknown)
+            return ConnectionStatusChange(status: .unknown, on: Date())
         }
 
         return change
