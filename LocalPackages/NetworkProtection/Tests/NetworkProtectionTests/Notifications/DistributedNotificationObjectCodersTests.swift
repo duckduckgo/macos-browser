@@ -33,7 +33,7 @@ class DistributedNotificationObjectCoders: XCTestCase {
     func testSimpleEncodingDecoding() throws {
         let inputObject = TestObject(string: "test", timestamp: Date(), value: 1)
 
-        let payload = try TestEncoder().encode(inputObject)
+        let payload = TestEncoder().encode(inputObject)
         let outputObject = try TestDecoder().decode(payload)
 
         XCTAssertEqual(inputObject, outputObject)

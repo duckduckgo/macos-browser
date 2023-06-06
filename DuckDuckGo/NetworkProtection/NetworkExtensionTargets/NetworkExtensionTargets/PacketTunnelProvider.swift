@@ -106,14 +106,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     private func broadcastConnectionStatus() {
         let lastStatusChange = ConnectionStatusChange(status: connectionStatus, on: lastStatusChangeDate)
-        let payload: String
-
-        do {
-            payload = try ConnectionStatusChangeEncoder().encode(lastStatusChange)
-        } catch {
-            os_log("Error encoding lastStatusChange: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
-            return
-        }
+        let payload = ConnectionStatusChangeEncoder().encode(lastStatusChange)
 
         distributedNotificationCenter.post(.statusDidChange, object: payload)
     }
@@ -134,14 +127,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
 
         let serverStatusInfo = NetworkProtectionStatusServerInfo(serverLocation: serverInfo.serverLocation, serverAddress: serverInfo.endpoint?.description)
-        let payload: String
-
-        do {
-            payload = try ServerSelectedNotificationObjectEncoder().encode(serverStatusInfo)
-        } catch {
-            os_log("Error encoding serverInfo to Data: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
-            return
-        }
+        let payload = ServerSelectedNotificationObjectEncoder().encode(serverStatusInfo)
 
         distributedNotificationCenter.post(.serverSelected, object: payload)
     }

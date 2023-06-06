@@ -33,28 +33,11 @@ public typealias ServerSelectedNotificationObjectDecoder = DistributedNotificati
 /// This encoder converts the given object to a JSON string that can be sent in notifications.
 ///
 public struct DistributedNotificationObjectEncoder<T: Encodable> {
-    enum EncoderError: Error {
-        case encodeFailed(_ error: Error)
-        case couldNotDecodePayload
-    }
-
     public init() {}
 
-    public func encode(_ object: T) throws -> String {
-        let encoder = JSONEncoder()
-        let jsonData: Data
-
-        do {
-            jsonData = try encoder.encode(object)
-        } catch {
-            throw EncoderError.encodeFailed(error)
-        }
-
-        guard let string = String(data: jsonData, encoding: defaultJSONEncoding) else {
-            throw EncoderError.couldNotDecodePayload
-        }
-
-        return string
+    public func encode(_ object: T) -> String {
+        let jsonData = (try? JSONEncoder().encode(object))!
+        return String(data: jsonData, encoding: defaultJSONEncoding)!
     }
 }
 
@@ -63,7 +46,6 @@ public struct DistributedNotificationObjectEncoder<T: Encodable> {
 public struct DistributedNotificationObjectDecoder<T: Decodable> {
     enum DecodeError: Error {
         case couldNotCastNotificationObjectToString
-        case couldNotEncodePayload
         case decodeFailed(_ error: Error)
     }
 
@@ -82,15 +64,11 @@ public struct DistributedNotificationObjectDecoder<T: Decodable> {
     /// Decodes the object from a Network Protection distributed notification.
     ///
     public func decode(_ payload: String) throws -> T {
-        guard let jsonData = payload.data(using: defaultJSONEncoding) else {
-            throw DecodeError.couldNotEncodePayload
-        }
-
-        let jsonDecoder = JSONDecoder()
+        let jsonData = payload.data(using: defaultJSONEncoding)!
         let object: T
 
         do {
-            object = try jsonDecoder.decode(T.self, from: jsonData)
+            object = try JSONDecoder().decode(T.self, from: jsonData)
         } catch {
             throw DecodeError.decodeFailed(error)
         }
