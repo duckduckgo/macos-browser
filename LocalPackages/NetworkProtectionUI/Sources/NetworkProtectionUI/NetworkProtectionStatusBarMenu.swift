@@ -46,7 +46,7 @@ public final class StatusBarMenu {
                 statusReporter: NetworkProtectionStatusReporter? = nil) {
 
         let statusReporter = statusReporter ?? DefaultNetworkProtectionStatusReporter(
-            statusObserver: ConnectionStatusObserverThroughIPC(),
+            statusObserver: ConnectionStatusObserverThroughDistributedNotifications(),
             serverInfoObserver: ConnectionServerInfoObserverThroughIPC(),
             connectionErrorObserver: ConnectionErrorObserverThroughIPC())
 

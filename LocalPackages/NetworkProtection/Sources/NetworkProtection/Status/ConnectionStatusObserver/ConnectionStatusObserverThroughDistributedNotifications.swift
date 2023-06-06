@@ -1,5 +1,5 @@
 //
-//  ConnectionStatusObserverThroughIPC.swift
+//  ConnectionStatusObserverThroughDistributedNotifications.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,14 +22,14 @@ import NetworkExtension
 import NotificationCenter
 import Common
 
-/// Observes the tunnel status through Distributed Notifications and an IPC connection.
+/// Observes the tunnel status through Distributed Notifications.
 ///
-public class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver {
+public class ConnectionStatusObserverThroughDistributedNotifications: ConnectionStatusObserver {
     public let publisher = CurrentValueSubject<ConnectionStatus, Never>(.unknown)
 
     // MARK: - Network Path Monitoring
 
-    private static let monitorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtection.ConnectionStatusObserverThroughIPC.monitorDispatchQueue", qos: .background)
+    private static let monitorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtection.ConnectionStatusObserverThroughDistributedNotifications.monitorDispatchQueue", qos: .background)
     private let monitor = NWPathMonitor()
     private static let timeoutOnNetworkChanges: TimeInterval = .seconds(3)
     private var lastStatusResponse = Date()
