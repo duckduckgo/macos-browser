@@ -106,8 +106,16 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     private func broadcastConnectionStatus() {
         let lastStatusChange = ConnectionStatusChange(status: connectionStatus, on: lastStatusChangeDate)
-        let data = ConnectionStatusChangeEncoder().encode(lastStatusChange)
-        distributedNotificationCenter.post(.statusDidChange, object: data)
+        let payload: String
+
+        do {
+            payload = try ConnectionStatusChangeEncoder().encode(lastStatusChange)
+        } catch {
+            os_log("Error encoding lastStatusChange: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
+            return
+        }
+
+        distributedNotificationCenter.post(.statusDidChange, object: payload)
     }
 
     // MARK: - Server Selection
@@ -126,28 +134,16 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
 
         let serverStatusInfo = NetworkProtectionStatusServerInfo(serverLocation: serverInfo.serverLocation, serverAddress: serverInfo.endpoint?.description)
-        let payload: String?
+        let payload: String
 
         do {
-            let encoder = JSONEncoder()
-            let jsonData = try encoder.encode(serverStatusInfo)
-
-            payload = String(data: jsonData, encoding: .utf8)
-
-            if payload == nil {
-                os_log("Error encoding serverInfo Data to String: %{public}@", log: .networkProtection, type: .error, String(describing: jsonData))
-                // Continue anyway, we'll just update the UI to show "Unknown" server info, which is better
-                // than showing the info from the previous server.
-            }
+            payload = try ServerSelectedNotificationObjectEncoder().encode(serverStatusInfo)
         } catch {
             os_log("Error encoding serverInfo to Data: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
-            // Continue anyway, we'll just update the UI to show "Unknown" server info, which is better
-            // than showing the info from the previous server.
-            payload = nil
+            return
         }
 
         distributedNotificationCenter.post(.serverSelected, object: payload)
-        // Update shared userdefaults
     }
 
     // MARK: - User Notifications

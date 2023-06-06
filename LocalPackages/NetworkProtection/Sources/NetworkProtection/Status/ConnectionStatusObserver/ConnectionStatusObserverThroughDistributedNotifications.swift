@@ -32,7 +32,7 @@ public class ConnectionStatusObserverThroughDistributedNotifications: Connection
     private static let monitorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtection.ConnectionStatusObserverThroughDistributedNotifications.monitorDispatchQueue", qos: .background)
     private let monitor = NWPathMonitor()
     private static let timeoutOnNetworkChanges: TimeInterval = .seconds(3)
-    private var lastStatusResponse = Date()
+    private var lastStatusResponseTimestamp = Date()
     private var lastStatusChangeTimestamp: Date?
 
     // MARK: - Notifications
@@ -74,8 +74,16 @@ public class ConnectionStatusObserverThroughDistributedNotifications: Connection
     }
 
     private func handleDistributedStatusChangeNotification(_ notification: Notification) {
-        let statusChange = ConnectionStatusChangeDecoder().decode(notification.object)
-        lastStatusResponse = Date()
+        lastStatusResponseTimestamp = Date()
+        let statusChange: ConnectionStatusChange
+
+        do {
+            statusChange = try ConnectionStatusChangeDecoder().decodeObject(from: notification)
+        } catch {
+            os_log("Could not decode .statusDidChange distributed notification object: %{public}@", log: log, type: .error, String(describing: notification.object))
+            assertionFailure("Could not decode .statusDidChange distributed notification object: \(String(describing: notification.object))")
+            return
+        }
 
         guard shouldProcessStatusChange(statusChange) else {
             return
@@ -111,7 +119,7 @@ public class ConnectionStatusObserverThroughDistributedNotifications: Connection
         Task {
             try? await Task.sleep(interval: Self.timeoutOnNetworkChanges)
 
-            if lastStatusResponse < requestDate {
+            if lastStatusResponseTimestamp < requestDate {
                 publisher.send(.disconnected)
             }
         }

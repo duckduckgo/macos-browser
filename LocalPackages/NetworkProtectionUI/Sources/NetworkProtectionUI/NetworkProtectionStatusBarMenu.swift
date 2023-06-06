@@ -47,8 +47,8 @@ public final class StatusBarMenu {
 
         let statusReporter = statusReporter ?? DefaultNetworkProtectionStatusReporter(
             statusObserver: ConnectionStatusObserverThroughDistributedNotifications(),
-            serverInfoObserver: ConnectionServerInfoObserverThroughIPC(),
-            connectionErrorObserver: ConnectionErrorObserverThroughIPC())
+            serverInfoObserver: ConnectionServerInfoObserverThroughDistributedNotifications(),
+            connectionErrorObserver: ConnectionErrorObserverThroughDistributedNotifications())
 
         self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter, isForStatusBar: true)
