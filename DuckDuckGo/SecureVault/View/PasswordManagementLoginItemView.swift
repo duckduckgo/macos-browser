@@ -136,7 +136,6 @@ private struct UsernameView: View {
 
     @EnvironmentObject var model: PasswordManagementLoginModel
     @State var isHovering = false
-    @State var isValidPrivateEmail = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -152,8 +151,8 @@ private struct UsernameView: View {
 
             } else {
                 VStack(alignment: .leading) {
-                    UsernameLabel(isValidPrivateEmail: $isValidPrivateEmail, isHovering: $isHovering)
-                    if isValidPrivateEmail && !model.privateEmailRequestInProgress {
+                    UsernameLabel(isValidPrivateEmail: $model.hasValidPrivateEmail, isHovering: $isHovering)
+                    if model.hasValidPrivateEmail && !model.privateEmailRequestInProgress {
                         PrivateEmailActivationButton()
                     }
                 }
