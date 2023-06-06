@@ -32,7 +32,6 @@ public class ConnectionStatusObserverThroughDistributedNotifications: Connection
     private static let monitorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtection.ConnectionStatusObserverThroughDistributedNotifications.monitorDispatchQueue", qos: .background)
     private let monitor = NWPathMonitor()
     private static let timeoutOnNetworkChanges: TimeInterval = .seconds(3)
-    private var lastStatusResponseTimestamp = Date()
     private var lastStatusChangeTimestamp: Date?
 
     // MARK: - Notifications
@@ -74,7 +73,6 @@ public class ConnectionStatusObserverThroughDistributedNotifications: Connection
     }
 
     private func handleDistributedStatusChangeNotification(_ notification: Notification) {
-        lastStatusResponseTimestamp = Date()
         let statusChange: ConnectionStatusChange
 
         do {
@@ -101,28 +99,44 @@ public class ConnectionStatusObserverThroughDistributedNotifications: Connection
 
     // MARK: - Requesting Status Updates
 
+    /// This method checks if we should process a status change notification, or if it has already been processed and there's
+    /// no need to do it again.
+    ///
+    /// We should process the received status change if any of the following conditions is true:
+    ///     - We have never processed a status change before; or
+    ///     - The last status change we recorded was prior to the newly received change.
+    ///
+    /// - Parameters:
+    ///     - change: a change that we want to know if we need to process or not.
+    ///
     private func shouldProcessStatusChange(_ change: ConnectionStatusChange) -> Bool {
         guard let lastStatusChangeTimestamp else {
             return true
         }
 
-        return publisher.value != change.status || lastStatusChangeTimestamp < change.timestamp
+        return lastStatusChangeTimestamp < change.timestamp
     }
 
     /// Requests a status update and updates the status to disconnected if we don't hear back within a certain time.
     /// The timeout is currently set to 3 seconds.
     ///
     private func requestStatusUpdate() {
-        let requestDate = Date()
         distributedNotificationCenter.post(.requestStatusUpdate)
 
-        Task {
-            try? await Task.sleep(interval: Self.timeoutOnNetworkChanges)
+        var cancellable: AnyCancellable!
 
-            if lastStatusResponseTimestamp < requestDate {
-                publisher.send(.disconnected)
-            }
-        }
+        cancellable = publisher
+            .dropFirst()
+            .timeout(.seconds(Self.timeoutOnNetworkChanges), scheduler: DispatchQueue.main)
+            .sink(receiveCompletion: { [weak publisher] completion in
+                if case .failure = completion {
+                    publisher?.send(.disconnected)
+                }
+
+                cancellable.cancel()
+            }, receiveValue: { _ in
+                cancellable.cancel()
+            })
     }
 
     // MARK: - Logging
