@@ -35,10 +35,6 @@ public class ConnectionStatusObserverThroughDistributedNotifications: Connection
     private var lastStatusResponse = Date()
     private var lastStatusChangeTimestamp: Date?
 
-    // MARK: - Notifications: Decoding
-
-    private let connectionStatusDecoder = ConnectionStatusChangeDecoder()
-
     // MARK: - Notifications
 
     private let distributedNotificationCenter: DistributedNotificationCenter
@@ -78,7 +74,7 @@ public class ConnectionStatusObserverThroughDistributedNotifications: Connection
     }
 
     private func handleDistributedStatusChangeNotification(_ notification: Notification) {
-        let statusChange = connectionStatusDecoder.decode(notification.object)
+        let statusChange = ConnectionStatusChangeDecoder().decode(notification.object)
         lastStatusResponse = Date()
 
         guard shouldProcessStatusChange(statusChange) else {
