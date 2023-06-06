@@ -58,11 +58,15 @@ public class ConnectionStatusObserverThroughDistributedNotifications: Connection
     }
 
     func start() {
-        distributedNotificationCenter.publisher(for: .statusDidChange).sink { [weak self] notification in
+        distributedNotificationCenter.publisher(for: .statusDidChange)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
             self?.handleDistributedStatusChangeNotification(notification)
         }.store(in: &cancellables)
 
-        workspaceNotificationCenter.publisher(for: NSWorkspace.didWakeNotification).sink { [weak self] notification in
+        workspaceNotificationCenter.publisher(for: NSWorkspace.didWakeNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
             self?.handleDidWake(notification)
         }.store(in: &cancellables)
 
