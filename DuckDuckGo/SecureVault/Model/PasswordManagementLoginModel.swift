@@ -73,19 +73,17 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     // MARK: Private Emaill Addres Variables
     @Published var privateEmailRequestInProgress: Bool = false
+    @Published var hasValidPrivateEmail: Bool = false
+    @Published var privateEmailActive: Bool = false
 
-    var privateEmailActive: Bool {
-        return false
-    }
-
-    var duckAddress: String {
+    var userDuckAddress: String {
         return emailManager.userEmail ?? ""
     }
 
     var privateEmailMessage: String {
-        var message = String(format: UserText.pmEmailMessageActive, duckAddress)
+        var message = String(format: UserText.pmEmailMessageActive, userDuckAddress)
         if !privateEmailActive {
-            message = String(format: UserText.pmEmailMessageInactive, duckAddress)
+            message = String(format: UserText.pmEmailMessageInactive, userDuckAddress)
         }
         return message
     }
@@ -98,6 +96,8 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         self.onDeleteRequested = onDeleteRequested
         self.urlMatcher = urlMatcher
         self.emailManager = emailManager
+        self.emailManager.requestDelegate = self
+
     }
 
     func copy(_ value: String) {
@@ -137,25 +137,6 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         isEditing = true
     }
 
-    func isValidPrivateEmail(_ email: String) async -> Bool {
-        guard emailManager.isSignedIn,
-              !emailManager.isPrivateEmail(email: email) else {
-            return false
-        }
-
-        var result = false
-        if !privateEmailRequestInProgress {
-            do {
-                await MainActor.run { privateEmailRequestInProgress = true }
-                result = try await emailManager.getStatusFor(email: duckAddress)
-                await MainActor.run { privateEmailRequestInProgress = false }
-            } catch {
-                await MainActor.run { privateEmailRequestInProgress = false }
-            }
-        }
-        return result
-    }
-
     @MainActor
     func openURL(_ url: URL) {
         WindowControllersManager.shared.show(url: url, newTab: true)
@@ -169,6 +150,11 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         domain =  urlMatcher.normalizeUrlForWeb(credentials?.account.domain ?? "")
         isNew = credentials?.account.id == nil
 
+        Task {
+            let emailStatus = try? await getPrivateEmailStatus(username)
+            await setValidPrivateEmail(emailStatus ?? false)
+        }
+
         if let date = credentials?.account.created {
             createdDate = Self.dateFormatter.string(from: date)
         } else {
@@ -180,8 +166,51 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         } else {
             lastUpdatedDate = ""
         }
-        Task {
-            await isValidPrivateEmail(username)
-        }
+
     }
+
+    private func getPrivateEmailStatus(_ email: String) async throws -> Bool {
+        guard email != "",
+              emailManager.isSignedIn,
+              emailManager.isPrivateEmail(email: email) else {
+            throw AliasRequestError.signedOut
+        }
+
+        guard email != "",
+              emailManager.isPrivateEmail(email: email) else {
+            throw AliasRequestError.notFound
+        }
+
+        if !privateEmailRequestInProgress {
+            do {
+                await setLoadingStatus(true)
+                let result = try await emailManager.getStatusFor(email: email)
+                await setLoadingStatus(false)
+                return result
+            }
+            catch {
+                await setLoadingStatus(false)
+                throw AliasRequestError.notFound
+            }
+        }
+        return false
+    }
+
+    @MainActor
+    private func setValidPrivateEmail(_ status: Bool) {
+        hasValidPrivateEmail = status
+    }
+
+    @MainActor
+    private func setPrivateImageActive(_ active: Bool) {
+        privateEmailActive = active
+    }
+
+    @MainActor
+    private func setLoadingStatus(_ status: Bool) {
+        privateEmailRequestInProgress = status
+    }
+
 }
+
+extension PasswordManagementLoginModel: EmailManagerRequestDelegate {}
