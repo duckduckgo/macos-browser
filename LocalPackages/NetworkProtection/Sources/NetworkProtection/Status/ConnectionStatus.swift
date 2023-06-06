@@ -28,6 +28,12 @@ public enum ConnectionStatus: Codable, Equatable {
     case unknown
 }
 
+/// This struct represents a status change and holds the new status and a timestamp registering when
+/// the change happened.
+///
+/// This is useful to know whether we have processed or still need to process the status, in case the notification
+/// is sent out more than once.
+///
 public struct ConnectionStatusChange: Codable {
     let status: ConnectionStatus
     let timestamp: Date
