@@ -19,9 +19,29 @@
 import Foundation
 import Combine
 import Common
+//import MacroLib
 
+
+//@attached(member, names: named(Dependencies), named(DynamicDependencies), named(DependencyProvider), named(DynamicDependencyProvider), named(dependencyProvider), named(_currentDependencies), named(getAllDependencyProviderKeyPaths(from:)), named(makeDependencies), named(make))
+//@attached(memberAttribute)
+//@attached(peer, names: suffixed(_DependencyProvider), suffixed(_DependencyProvider_allKeyPaths), suffixed(_DynamicDependencyProvider))
+//public macro Injectable() = #externalMacro(module: "DuckMacroPlugin", type: "InjectableMacro")
+//
+//@attached(accessor)
+//public macro Injected() = #externalMacro(module: "DuckMacroPlugin", type: "InjectedMacro")
+//
+////@freestanding(declaration, names: arbitrary)
+////public macro InjectedDependencies(for type: Any.Type) = #externalMacro(module: "DuckMacroPlugin", type: "InjectedDependenciesMacro")
+//@attached(conformance)
+//@attached(member, names: arbitrary)
+//public macro InjectedDependencies(for type: Any.Type...) = #externalMacro(module: "DuckMacroPlugin", type: "InjectedDependenciesMacro")
+
+//@Injectable
 @MainActor
-final class AppStateRestorationManager: NSObject {
+final class AppStateRestorationManager: NSObject/*, Injectable*/ {
+
+//    typealias InjectedDependencies = WindowManagerStateRestoration.Dependencies
+    //@Injected var a: Int
     static let fileName = "persistentState"
 
     private let service: StatePersistenceService
@@ -58,9 +78,14 @@ final class AppStateRestorationManager: NSObject {
     func restoreLastSessionState(interactive: Bool) {
         do {
             let isCalledAtStartup = !interactive
-            try service.restoreState(using: { coder in
-                try WindowsManager.restoreState(from: coder, includePinnedTabs: isCalledAtStartup)
-            })
+//            let dd: DD = self.dependencyProvider
+//            let a: AppStateRestorationManager.DynamicDependencyProvider = dd
+//            let b: WindowManagerStateRestoration.DynamicDependencyProvider = a
+//            let d: Subclass.DynamicDependencyProvider = dd
+            fatalError()
+//            try service.restoreState(using: { coder in
+//                try WindowsManager.restoreState(from: coder, dependencyProvider: b, includePinnedTabs: isCalledAtStartup)
+//            })
             clearLastSessionState()
         } catch CocoaError.fileReadNoSuchFile {
             // ignore
@@ -114,9 +139,10 @@ final class AppStateRestorationManager: NSObject {
     @MainActor
     private func restorePinnedTabs() {
         do {
-            try service.restoreState(using: { coder in
-                try WindowsManager.restoreState(from: coder, includeWindows: false)
-            })
+            fatalError()
+//            try service.restoreState(using: { coder in
+//                try WindowsManager.restoreState(from: coder, dependencyProvider: self.dependencyProvider, includeWindows: false)
+//            })
         } catch CocoaError.fileReadNoSuchFile {
             // ignore
         } catch {

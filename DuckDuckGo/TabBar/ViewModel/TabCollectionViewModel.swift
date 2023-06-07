@@ -36,8 +36,10 @@ protocol TabCollectionViewModelDelegate: AnyObject {
 
 }
 
+//@Injectable
 @MainActor
-final class TabCollectionViewModel: NSObject {
+final class TabCollectionViewModel: NSObject/*, Injectable*/ {
+//    typealias InjectedDependencies = Tab.Dependencies
 
     weak var delegate: TabCollectionViewModelDelegate?
 

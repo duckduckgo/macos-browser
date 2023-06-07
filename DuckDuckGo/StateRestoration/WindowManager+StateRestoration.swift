@@ -18,10 +18,11 @@
 
 import Cocoa
 import Common
+//import MacroLib
 
 extension WindowsManager {
 
-    class func restoreState(from coder: NSCoder, includePinnedTabs: Bool = true, includeWindows: Bool = true) throws {
+    class func restoreState(from coder: NSCoder, /*dependencyProvider: WindowManagerStateRestoration.DynamicDependencyProvider,*/ includePinnedTabs: Bool = true, includeWindows: Bool = true) throws {
         guard let state = coder.decodeObject(of: WindowManagerStateRestoration.self,
                                              forKey: NSKeyedArchiveRootObjectKey) else {
             throw coder.error ?? NSError(domain: "WindowsManagerStateRestoration", code: -1, userInfo: nil)
@@ -71,8 +72,12 @@ extension WindowControllersManager {
 
 }
 
+//@Injectable
 @objc(WMState)
-final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
+final class WindowManagerStateRestoration: NSObject, NSSecureCoding/*, Injectable*/ {
+
+//    typealias InjectedDependencies = WindowRestorationItem.Dependencies
+
     private enum NSSecureCodingKeys {
         static let controllers = "ctrls"
         static let keyWindowIndex = "key_idx"
@@ -128,12 +133,15 @@ final class WindowManagerStateRestoration: NSObject, NSSecureCoding {
     }
 }
 
+//@Injectable
 @objc(WR)
-final class WindowRestorationItem: NSObject, NSSecureCoding {
+final class WindowRestorationItem: NSObject, NSSecureCoding/*, Injectable*/ {
+
+//    typealias InjectedDependencies = TabCollectionViewModel.Dependencies
+
     private enum NSSecureCodingKeys {
         static let frame = "frame"
         static let model = "model"
-
     }
 
     let model: TabCollectionViewModel

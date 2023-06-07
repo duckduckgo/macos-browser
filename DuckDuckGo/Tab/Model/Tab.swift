@@ -24,6 +24,7 @@ import Foundation
 import Navigation
 import UserScript
 import WebKit
+import DependencyInjection
 
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
@@ -39,16 +40,21 @@ protocol NewWindowPolicyDecisionMaker {
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision?
 }
 
+//@Injectable
 final class Subclass: Injectable {
 
     @Injected var someDelegate: WKNavigationDelegate?
 
+    init() {
+
+    }
 }
 
-// swiftlint:disable:next type_body_length
-@dynamicMemberLookup final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
+@dynamicMemberLookup
+//@Injectable
+final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
 
-    typealias InjectedDependencies = TabExtensionsBuilder.Dependencies & Subclass.Dependencies
+//    typealias InjectedDependencies = TabExtensionsBuilder.Dependencies & Subclass.Dependencies
 
     enum TabContent: Equatable {
         case homePage
@@ -187,11 +193,12 @@ final class Subclass: Injectable {
         var downloadManager: FileDownloadManagerProtocol
     }
 
+    // "protected" properties
     fileprivate weak var delegate: TabDelegate?
     func setDelegate(_ delegate: TabDelegate) { self.delegate = delegate }
+    fileprivate let navigationDelegate = DistributedNavigationDelegate(log: .navigation)
+    fileprivate var newWindowPolicyDecisionMakers: [NewWindowPolicyDecisionMaker]?
 
-    private let navigationDelegate = DistributedNavigationDelegate(log: .navigation)
-    private var newWindowPolicyDecisionMakers: [NewWindowPolicyDecisionMaker]?
     private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
 
     private let statisticsLoader: StatisticsLoader?
@@ -206,13 +213,14 @@ final class Subclass: Injectable {
     // accesing TabExtensions‘ Public Protocols projecting tab.extensions.extensionName to tab.extensionName
     // allows extending Tab functionality while maintaining encapsulation
     subscript<Extension>(dynamicMember keyPath: KeyPath<TabExtensions, Extension?>) -> Extension? {
-        self.extensions[keyPath: keyPath]
+        return self.extensions[keyPath: keyPath]
     }
 
     @Published
     private(set) var userContentController: UserContentController?
 
     @MainActor
+//    @available(macOS 11, *)
     convenience init(content: TabContent,
                      faviconManagement: FaviconManagement = FaviconManager.shared,
                      webCacheManager: WebCacheManager = WebCacheManager.shared,
@@ -311,7 +319,7 @@ final class Subclass: Injectable {
 
         self.content = content
         self.faviconManagement = faviconManagement
-        self.pinnedTabsManager = pinnedTabsManager
+//        _=self.pinnedTabsManager.didUnpinTabPublisher // = pinnedTabsManager
         self.statisticsLoader = statisticsLoader
         self.internalUserDecider = internalUserDecider
         self.title = title
@@ -382,6 +390,9 @@ final class Subclass: Injectable {
                                                object: nil)
 
         addDeallocationChecks(for: webView)
+
+//        let dd: DD = self.dependencyProvider
+//        Subclass.make(with: dd)
     }
 
 #if DEBUG
@@ -1133,25 +1144,25 @@ extension Tab: TabDataClearing {
     }
 }
 
-// "protected" properties meant to access otherwise private properties from Tab extensions
-extension Tab {
+@dynamicMemberLookup
+struct Protected<T> {
 
-    static var objcDelegateKeyPath: String { #keyPath(objcDelegate) }
-    @objc private var objcDelegate: Any? { delegate }
+    let object: T
 
-    static var objcNavigationDelegateKeyPath: String { #keyPath(objcNavigationDelegate) }
-    @objc private var objcNavigationDelegate: Any? { navigationDelegate }
+    init(_ object: T) {
+        self.object = object
+    }
 
-    static var objcNewWindowPolicyDecisionMakersKeyPath: String { #keyPath(objcNewWindowPolicyDecisionMakers) }
-    @objc private var objcNewWindowPolicyDecisionMakers: Any? {
+    subscript<P>(dynamicMember keyPath: KeyPath<T, P>) -> P {
+        object[keyPath: keyPath]
+    }
+
+    subscript<P>(dynamicMember keyPath: ReferenceWritableKeyPath<T, P>) -> P {
         get {
-            newWindowPolicyDecisionMakers
+            object[keyPath: keyPath]
         }
-        set {
-            newWindowPolicyDecisionMakers = newValue as? [NewWindowPolicyDecisionMaker] ?? {
-                assertionFailure("\(String(describing: newValue)) is not [NewWindowPolicyDecisionMaker]")
-                return nil
-            }()
+        nonmutating set {
+            object[keyPath: keyPath] = newValue
         }
     }
 

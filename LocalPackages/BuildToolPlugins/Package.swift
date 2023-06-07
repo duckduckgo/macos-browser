@@ -27,13 +27,27 @@ let package = Package(
       .plugin(
         name: "InputFilesChecker",
         targets: ["InputFilesChecker"]
-      )
+      ),
+      .plugin(
+        name: "InjectableMacrosPlugin",
+        targets: ["InjectableMacrosPlugin"]
+      ),
     ],
-    dependencies: [],
+    dependencies: [
+        // pre Xcode 15 macros
+        .package(path: "../DependencyInjection")
+    ],
     targets: [
         .plugin(
             name: "InputFilesChecker",
             capability: .buildTool()
-        )
+        ),
+        .plugin(
+            name: "InjectableMacrosPlugin",
+            capability: .buildTool(),
+            dependencies: [
+                .product(name: "DependencyInjectionMacros", package: "DependencyInjection")
+            ]
+        ),
     ]
 )

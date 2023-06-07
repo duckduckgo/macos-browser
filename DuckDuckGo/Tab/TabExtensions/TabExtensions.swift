@@ -96,7 +96,7 @@ extension TabExtensionsBuilder {
     /// ` add { MyOtherExtension(with: myExtension.resultPublisher) }
     /// Note: Extensions with state restoration support should conform to `NSCodingExtension`
     @MainActor
-    mutating func registerExtensions(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) {
+    func registerExtensions(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) {
         let userScripts = args.userScriptsPublisher
 
         let httpsUpgrade = add {
