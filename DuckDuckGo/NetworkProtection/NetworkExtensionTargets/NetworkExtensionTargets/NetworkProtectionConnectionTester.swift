@@ -250,7 +250,7 @@ final class NetworkProtectionConnectionTester {
 
         connection.stateUpdateHandler = { state in
             if case .ready = state {
-                didConnect = true
+//                didConnect = true
             }
         }
 

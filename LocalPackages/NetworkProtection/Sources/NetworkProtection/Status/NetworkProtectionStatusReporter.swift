@@ -114,15 +114,15 @@ public final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStat
         distributedNotificationCenter.publisher(for: .issuesStarted).sink { [weak self] _ in
             guard let self else { return }
 
-            logIssuesChanged(isHavingIssues: true)
-            connectivityIssuesPublisher.send(true)
+            self.logIssuesChanged(isHavingIssues: true)
+            self.connectivityIssuesPublisher.send(true)
         }.store(in: &cancellables)
 
         distributedNotificationCenter.publisher(for: .issuesResolved).sink { [weak self] _ in
             guard let self else { return }
 
-            logIssuesChanged(isHavingIssues: false)
-            connectivityIssuesPublisher.send(false)
+            self.logIssuesChanged(isHavingIssues: false)
+            self.connectivityIssuesPublisher.send(false)
         }.store(in: &cancellables)
 
         forceRefresh()

@@ -99,7 +99,7 @@ public class ConnectionErrorObserverThroughSession: ConnectionErrorObserver {
             }
 
             guard let data = data else {
-                publisher.send(nil)
+                self.publisher.send(nil)
                 return
             }
 

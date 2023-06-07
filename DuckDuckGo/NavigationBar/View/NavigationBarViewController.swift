@@ -308,7 +308,7 @@ final class NavigationBarViewController: NSViewController {
                     self.updateDownloadsButton(updatingFromPinnedViewsNotification: true)
                 case .networkProtection:
 #if NETWORK_PROTECTION
-                    networkProtectionButtonModel.isPinned = LocalPinningManager.shared.isPinned(.networkProtection)
+                    self.networkProtectionButtonModel.isPinned = LocalPinningManager.shared.isPinned(.networkProtection)
 #else
                     assertionFailure("Tried to toggle NetP when the feature was disabled")
 #endif
