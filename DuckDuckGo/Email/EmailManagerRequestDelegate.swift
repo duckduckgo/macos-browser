@@ -42,19 +42,9 @@ extension EmailManagerRequestDelegate {
             throw EmailManagerRequestDelegateError.serverError(statusCode: httpResponse.statusCode)
         }
 
-        guard let decodedData = try? decodeData(data) else {
-            throw EmailManagerRequestDelegateError.decodingError
-        }
-
-        return decodedData
-    }
-    // swiftlint:enable function_parameter_count
-
-    private func decodeData(_ data: Data) throws -> Data {
-        // Your decoding logic here
-        // Example: return try JSONDecoder().decode(Data.self, from: data)
         return data
     }
+    // swiftlint:enable function_parameter_count
 
     public func emailManagerKeychainAccessFailed(accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
         var parameters = [
