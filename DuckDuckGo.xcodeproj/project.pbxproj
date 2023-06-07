@@ -472,7 +472,6 @@
 		3706FC19293F65D500E42796 /* NSNotificationName+Favicons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBD3BFF285ACE090047A89D /* NSNotificationName+Favicons.swift */; };
 		3706FC1A293F65D500E42796 /* PinningManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0DB5E428BD9D08007DD239 /* PinningManager.swift */; };
 		3706FC1B293F65D500E42796 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68458BF25C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift */; };
-		3706FC1D293F65D500E42796 /* EmailManagerRequestDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85378DA1274E7F25007C5CBF /* EmailManagerRequestDelegate.swift */; };
 		3706FC1E293F65D500E42796 /* ApplicationVersionReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB35292ACE690065E5D6 /* ApplicationVersionReader.swift */; };
 		3706FC1F293F65D500E42796 /* BookmarksBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD18EFF283F0BC500058124 /* BookmarksBarViewController.swift */; };
 		3706FC20293F65D500E42796 /* PreferencesAutofillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */; };
@@ -1339,7 +1338,6 @@
 		85378D9C274E61B8007C5CBF /* MessageViews.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85378D9B274E61B8007C5CBF /* MessageViews.storyboard */; };
 		85378D9E274E664C007C5CBF /* PopoverMessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85378D9D274E664C007C5CBF /* PopoverMessageViewController.swift */; };
 		85378DA0274E6F42007C5CBF /* NSNotificationName+EmailManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85378D9F274E6F42007C5CBF /* NSNotificationName+EmailManager.swift */; };
-		85378DA2274E7F25007C5CBF /* EmailManagerRequestDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85378DA1274E7F25007C5CBF /* EmailManagerRequestDelegate.swift */; };
 		8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8546DE6125C03056000CA5E1 /* UserAgentTests.swift */; };
 		85480F8A25CDC360009424E3 /* MainMenu.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85480F8925CDC360009424E3 /* MainMenu.storyboard */; };
 		85480FCF25D1AA22009424E3 /* ConfigurationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85480FCE25D1AA22009424E3 /* ConfigurationStore.swift */; };
@@ -1948,6 +1946,8 @@
 		CBC83E3629B63D380008E19C /* Configuration in Frameworks */ = {isa = PBXBuildFile; productRef = CBC83E3529B63D380008E19C /* Configuration */; };
 		CBDD5DE329A67F2700832877 /* MockConfigurationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */; };
 		CBDD5DE429A6800300832877 /* MockConfigurationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */; };
+		D6BDEB682A30E961008569EB /* EmailManagerRequestDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6BDEB672A30E961008569EB /* EmailManagerRequestDelegate.swift */; };
+		D6BDEB692A30E961008569EB /* EmailManagerRequestDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6BDEB672A30E961008569EB /* EmailManagerRequestDelegate.swift */; };
 		EA0BA3A9272217E6002A0B6C /* ClickToLoadUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */; };
 		EA18D1CA272F0DC8006DC101 /* social_images in Resources */ = {isa = PBXBuildFile; fileRef = EA18D1C9272F0DC8006DC101 /* social_images */; };
 		EA1E52B52798CF98002EC53C /* ClickToLoadModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1E52B42798CF98002EC53C /* ClickToLoadModelTests.swift */; };
@@ -2541,7 +2541,6 @@
 		85378D9B274E61B8007C5CBF /* MessageViews.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MessageViews.storyboard; sourceTree = "<group>"; };
 		85378D9D274E664C007C5CBF /* PopoverMessageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverMessageViewController.swift; sourceTree = "<group>"; };
 		85378D9F274E6F42007C5CBF /* NSNotificationName+EmailManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotificationName+EmailManager.swift"; sourceTree = "<group>"; };
-		85378DA1274E7F25007C5CBF /* EmailManagerRequestDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailManagerRequestDelegate.swift; sourceTree = "<group>"; };
 		8546DE6125C03056000CA5E1 /* UserAgentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgentTests.swift; sourceTree = "<group>"; };
 		85480F8925CDC360009424E3 /* MainMenu.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainMenu.storyboard; sourceTree = "<group>"; };
 		85480FCE25D1AA22009424E3 /* ConfigurationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationStore.swift; sourceTree = "<group>"; };
@@ -3072,6 +3071,7 @@
 		CB6BCDF827C6BEFF00CC76DC /* PrivacyFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyFeatures.swift; sourceTree = "<group>"; };
 		CBDD5DE229A67F2700832877 /* MockConfigurationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockConfigurationStore.swift; sourceTree = "<group>"; };
 		D68ABCE22A29E86500A8C739 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
+		D6BDEB672A30E961008569EB /* EmailManagerRequestDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailManagerRequestDelegate.swift; sourceTree = "<group>"; };
 		EA0BA3A8272217E6002A0B6C /* ClickToLoadUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClickToLoadUserScript.swift; sourceTree = "<group>"; };
 		EA18D1C9272F0DC8006DC101 /* social_images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = social_images; sourceTree = "<group>"; };
 		EA1E52B42798CF98002EC53C /* ClickToLoadModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToLoadModelTests.swift; sourceTree = "<group>"; };
@@ -4076,7 +4076,7 @@
 			children = (
 				4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */,
 				85378D9F274E6F42007C5CBF /* NSNotificationName+EmailManager.swift */,
-				85378DA1274E7F25007C5CBF /* EmailManagerRequestDelegate.swift */,
+				D6BDEB672A30E961008569EB /* EmailManagerRequestDelegate.swift */,
 			);
 			path = Email;
 			sourceTree = "<group>";
@@ -7739,6 +7739,7 @@
 				1DCFBC8B29ADF32B00313531 /* BurnerHomePageView.swift in Sources */,
 				3706FC06293F65D500E42796 /* OnboardingViewModel.swift in Sources */,
 				3706FC07293F65D500E42796 /* ScriptSourceProviding.swift in Sources */,
+				D6BDEB692A30E961008569EB /* EmailManagerRequestDelegate.swift in Sources */,
 				3706FC08293F65D500E42796 /* CoreDataBookmarkImporter.swift in Sources */,
 				3706FC09293F65D500E42796 /* SuggestionViewModel.swift in Sources */,
 				3706FC0A293F65D500E42796 /* BookmarkManagedObject.swift in Sources */,
@@ -7762,7 +7763,6 @@
 				3706FC19293F65D500E42796 /* NSNotificationName+Favicons.swift in Sources */,
 				3706FC1A293F65D500E42796 /* PinningManager.swift in Sources */,
 				3706FC1B293F65D500E42796 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */,
-				3706FC1D293F65D500E42796 /* EmailManagerRequestDelegate.swift in Sources */,
 				3706FC1E293F65D500E42796 /* ApplicationVersionReader.swift in Sources */,
 				3706FC1F293F65D500E42796 /* BookmarksBarViewController.swift in Sources */,
 				3706FC20293F65D500E42796 /* PreferencesAutofillView.swift in Sources */,
@@ -8699,6 +8699,7 @@
 				1D2DC00B290167EC008083A1 /* RunningApplicationCheck.swift in Sources */,
 				B6A5A27125B9377300AA7ADA /* StatePersistenceService.swift in Sources */,
 				B68458B025C7E76A00DC17B6 /* WindowManager+StateRestoration.swift in Sources */,
+				D6BDEB682A30E961008569EB /* EmailManagerRequestDelegate.swift in Sources */,
 				B68458C525C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift in Sources */,
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
 				9812D895276CEDA5004B6181 /* ContentBlockerRulesLists.swift in Sources */,
@@ -8777,7 +8778,6 @@
 				373D9B4829EEAC1B00381FDD /* SyncMetadataDatabase.swift in Sources */,
 				B68458C025C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */,
 				AA8EDF2724923EC70071C2E8 /* StringExtension.swift in Sources */,
-				85378DA2274E7F25007C5CBF /* EmailManagerRequestDelegate.swift in Sources */,
 				1D43EB36292ACE690065E5D6 /* ApplicationVersionReader.swift in Sources */,
 				4BD18F01283F0BC500058124 /* BookmarksBarViewController.swift in Sources */,
 				379DE4BD27EA31AC002CC3DE /* PreferencesAutofillView.swift in Sources */,

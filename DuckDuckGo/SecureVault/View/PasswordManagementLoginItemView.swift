@@ -133,13 +133,11 @@ private struct Buttons: View {
 // MARK: - Login Views
 
 private struct UsernameView: View {
-
     @EnvironmentObject var model: PasswordManagementLoginModel
-    @State var isHovering = false
+    @State private var isHovering = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-
             Text(UserText.pmUsername)
                 .bold()
                 .padding(.bottom, itemSpacing)
@@ -148,52 +146,57 @@ private struct UsernameView: View {
                 TextField("", text: $model.username)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.bottom, interItemSpacing)
-
             } else {
                 VStack(alignment: .leading) {
-                    UsernameLabel(isValidPrivateEmail: $model.hasValidPrivateEmail, isHovering: $isHovering)
+                    UsernameLabel(isHovering: $isHovering)
                     if model.hasValidPrivateEmail && !model.privateEmailRequestInProgress {
                         PrivateEmailActivationButton()
                     }
                 }
                 .padding(.bottom, interItemSpacing)
-
             }
         }
-        .onHover {
-            isHovering = $0
+        .onHover { hovering in
+            isHovering = hovering
         }
     }
-
 }
 
 private struct UsernameLabel: View {
 
     @EnvironmentObject var model: PasswordManagementLoginModel
-    @Binding var isValidPrivateEmail: Bool
     @Binding var isHovering: Bool
 
     var body: some View {
         HStack(alignment: .center, spacing: 6) {
-            if isValidPrivateEmail && !model.privateEmailRequestInProgress {
-                if model.privateEmailActive {
-                    Image("OptionsButtonMenuEmail")
-                } else {
-                    Image("OptionsButtonMenuEmailDisabled")
-                }
-            }
-            Text(model.username)
 
-            if isHovering {
-                Button {
-                    model.copy(model.username)
-                } label: {
-                    Image("Copy")
-                }
-                .buttonStyle(PlainButtonStyle())
-                .tooltip(UserText.copyUsernameTooltip)
+            if model.usernameIsPrivateEmail {
+                PrivateEmailImage()
             }
-        }
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 5) {
+                    Text(model.username)
+
+                    if isHovering {
+                        Button {
+                            model.copy(model.username)
+                        } label: {
+                            Image("Copy")
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .tooltip(UserText.copyUsernameTooltip)
+                    }
+                }
+                if model.hasValidPrivateEmail && model.privateEmailMessage != "" {
+                    Text(model.privateEmailMessage)
+                        .font(.caption)
+                        .lineLimit(nil)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }.frame(minHeight: 35)
     }
 }
 
@@ -202,22 +205,50 @@ private struct PrivateEmailActivationButton: View {
     @EnvironmentObject var model: PasswordManagementLoginModel
 
     var body: some View {
-
-        VStack(alignment: .leading) {
-            Button(model.privateEmailActive ? UserText.pmDeactivate : UserText.pmActivate ) {
-                model.privateEmailActive ? model.requestDelete() : model.requestDelete()
+        let status = model.privateEmailStatus
+        if status == .active || status == .inactive {
+            VStack(alignment: .leading) {
+                Button(status == .active ? UserText.pmDeactivate : UserText.pmActivate ) {
+                    status == .active ? model.requestDelete() : model.requestDelete()
+                }
+                .buttonStyle(StandardButtonStyle())
             }
-            .buttonStyle(StandardButtonStyle())
-
-            Text(model.privateEmailMessage)
-                .font(.caption)
-                .lineLimit(nil)
-                .fixedSize(horizontal: false, vertical: true)
-                .multilineTextAlignment(.leading)
-
         }
     }
 
+}
+
+private struct PrivateEmailImage: View {
+
+    @EnvironmentObject var model: PasswordManagementLoginModel
+
+    var image: NSImage {
+        switch model.privateEmailStatus {
+        case .active:
+            return NSImage(imageLiteralResourceName: "OptionsButtonMenuEmail")
+        case .inactive:
+            return NSImage(imageLiteralResourceName: "OptionsButtonMenuEmailDisabled")
+        case .notFound:
+            return NSImage(imageLiteralResourceName: "WarningColored")
+        default:
+            return NSImage(imageLiteralResourceName: "Error")
+        }
+    }
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 4)
+                .fill(Color("BlackWhite100").opacity(0.06))
+                .frame(width: 24, height: 24)
+
+            if model.privateEmailRequestInProgress {
+                ActivityIndicator(isAnimating: $model.privateEmailRequestInProgress, style: .spinning)
+            } else {
+                Image(nsImage: image)
+                    .aspectRatio(contentMode: .fit)
+            }
+        }
+    }
 }
 
 private struct PasswordView: View {
