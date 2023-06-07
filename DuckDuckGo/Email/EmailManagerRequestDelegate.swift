@@ -1,7 +1,7 @@
 //
 //  EmailManagerRequestDelegate.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Foundation
 import BrowserServicesKit
 
 extension EmailManagerRequestDelegate {
@@ -28,7 +29,6 @@ extension EmailManagerRequestDelegate {
     // swiftlint:disable function_parameter_count
     func emailManager(_ emailManager: EmailManager, requested url: URL, method: String, headers: [String: String], parameters: [String: String]?, httpBody: Data?, timeoutInterval: TimeInterval) async throws -> Data {
         let finalURL = url.appendingParameters(parameters ?? [:])
-
         var request = URLRequest(url: finalURL, timeoutInterval: timeoutInterval)
         request.allHTTPHeaderFields = headers
         request.httpMethod = method
@@ -36,11 +36,26 @@ extension EmailManagerRequestDelegate {
 
         activeTask?.cancel() // Cancel active request (if any)
 
-        let (data, _) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await URLSession.shared.data(for: request)
         activeTask = URLSession.shared.dataTask(with: request)
-        return data
+
+        if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode >= 300 {
+            throw EmailManagerRequestDelegateError.serverError(statusCode: httpResponse.statusCode)
+        }
+
+        guard let decodedData = try? decodeData(data) else {
+            throw EmailManagerRequestDelegateError.decodingError
+        }
+
+        return decodedData
     }
     // swiftlint:enable function_parameter_count
+
+    private func decodeData(_ data: Data) throws -> Data {
+        // Your decoding logic here
+        // Example: return try JSONDecoder().decode(Data.self, from: data)
+        return data
+    }
 
     public func emailManagerKeychainAccessFailed(accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
         var parameters = [

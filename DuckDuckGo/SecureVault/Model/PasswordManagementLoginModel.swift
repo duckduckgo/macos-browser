@@ -72,18 +72,30 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var createdDate: String = ""
 
     // MARK: Private Emaill Addres Variables
-    @Published var privateEmailRequestInProgress: Bool = false
+    @Published var privateEmailRequestInProgress: Bool = false {
+        didSet {
+            print("privateEmailRequestInProgress set to \(privateEmailRequestInProgress)")
+        }
+    }
+    @Published var usernameIsPrivateEmail: Bool = false
     @Published var hasValidPrivateEmail: Bool = false
-    @Published var privateEmailActive: Bool = false
+    @Published var privateEmailStatus: EmailAliasStatus = .unknown
 
     var userDuckAddress: String {
         return emailManager.userEmail ?? ""
     }
 
     var privateEmailMessage: String {
-        var message = String(format: UserText.pmEmailMessageActive, userDuckAddress)
-        if !privateEmailActive {
-            message = String(format: UserText.pmEmailMessageInactive, userDuckAddress)
+        var message: String
+        switch privateEmailStatus {
+            case .inactive:
+            message = UserText.pmEmailMessageInactive
+            case .notFound:
+            message = UserText.pmEmailMessageNotAllowed
+            case .error:
+            message = UserText.pmEmailMessageError
+            default:
+            message = ""
         }
         return message
     }
@@ -150,9 +162,17 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         domain =  urlMatcher.normalizeUrlForWeb(credentials?.account.domain ?? "")
         isNew = credentials?.account.id == nil
 
-        Task {
-            let emailStatus = try? await getPrivateEmailStatus(username)
-            await setValidPrivateEmail(emailStatus ?? false)
+        // Determine Private Email Status when required
+        usernameIsPrivateEmail = emailManager.isPrivateEmail(email: username)
+        if usernameIsPrivateEmail {
+            Task {
+                do {
+                    try await getPrivateEmailStatus(username)
+
+                } catch let e {
+                    print(e)
+                }
+            }
         }
 
         if let date = credentials?.account.created {
@@ -169,10 +189,8 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     }
 
-    private func getPrivateEmailStatus(_ email: String) async throws -> Bool {
-        guard email != "",
-              emailManager.isSignedIn,
-              emailManager.isPrivateEmail(email: email) else {
+    private func getPrivateEmailStatus(_ email: String) async throws {
+        guard emailManager.isSignedIn else {
             throw AliasRequestError.signedOut
         }
 
@@ -181,29 +199,21 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
             throw AliasRequestError.notFound
         }
 
-        if !privateEmailRequestInProgress {
-            do {
-                await setLoadingStatus(true)
-                let result = try await emailManager.getStatusFor(email: email)
-                await setLoadingStatus(false)
-                return result
-            }
-            catch {
-                await setLoadingStatus(false)
-                throw AliasRequestError.notFound
-            }
+        do {
+            await setLoadingStatus(true)
+            let result = try await emailManager.getStatusFor(email: email)
+            await setLoadingStatus(false)
+            await setPrivateEmailStatus(result)
+        } catch {
+            await setLoadingStatus(false)
+            await setPrivateEmailStatus(.error)
         }
-        return false
     }
 
     @MainActor
-    private func setValidPrivateEmail(_ status: Bool) {
-        hasValidPrivateEmail = status
-    }
-
-    @MainActor
-    private func setPrivateImageActive(_ active: Bool) {
-        privateEmailActive = active
+    private func setPrivateEmailStatus(_ status: EmailAliasStatus) {
+        hasValidPrivateEmail = true
+        privateEmailStatus = status        
     }
 
     @MainActor
