@@ -6,15 +6,16 @@ import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
 
 #if swift(>=5.9)
+
 @main
 struct DependencyInjectionPlugin: CompilerPlugin {
 
     let providingMacros: [Macro.Type] = [
-        //        StringifyMacro.self,
         InjectableMacro.self
     ]
 
 }
+
 #else
 
 struct ListItem: Codable {
@@ -142,9 +143,3 @@ struct DependencyInjectionPlugin {
 }
 
 #endif
-
-extension String {
-    func dropping(prefix: String) -> String {
-        return hasPrefix(prefix) ? String(dropFirst(prefix.count)) : self
-    }
-}

@@ -367,3 +367,8 @@ extension InjectableMacro: PeerMacro {
 
 }
 
+extension String {
+    func dropping(prefix: String) -> String {
+        return hasPrefix(prefix) ? String(dropFirst(prefix.count)) : self
+    }
+}

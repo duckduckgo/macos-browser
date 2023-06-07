@@ -20,6 +20,25 @@
 
 import PackageDescription
 
+let packageDependencies: [PackageDescription.Package.Dependency]
+#if swift(>=5.9)
+packageDependencies = []
+#else
+packageDependencies = [
+    // pre Xcode 15 macros
+    .package(path: "../DependencyInjection")
+]
+#endif
+
+let dependencies: [PackageDescription.Target.Dependency]
+#if swift(>=5.9)
+dependencies = []
+#else
+dependencies = [
+    .product(name: "DependencyInjectionMacros", package: "DependencyInjection")
+]
+#endif
+
 let package = Package(
     name: "BuildToolPlugins",
     platforms: [ .macOS(.v12) ],
@@ -33,10 +52,7 @@ let package = Package(
         targets: ["InjectableMacrosPlugin"]
       ),
     ],
-    dependencies: [
-        // pre Xcode 15 macros
-        .package(path: "../DependencyInjection")
-    ],
+    dependencies: packageDependencies,
     targets: [
         .plugin(
             name: "InputFilesChecker",
@@ -45,9 +61,7 @@ let package = Package(
         .plugin(
             name: "InjectableMacrosPlugin",
             capability: .buildTool(),
-            dependencies: [
-                .product(name: "DependencyInjectionMacros", package: "DependencyInjection")
-            ]
+            dependencies: dependencies
         ),
     ]
 )

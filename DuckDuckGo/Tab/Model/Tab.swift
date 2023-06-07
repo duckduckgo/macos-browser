@@ -50,6 +50,8 @@ final class Subclass: Injectable {
     }
 }
 
+// swiftlint:disable type_body_length
+
 @dynamicMemberLookup
 //@Injectable
 final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
@@ -1144,25 +1146,25 @@ extension Tab: TabDataClearing {
     }
 }
 
-@dynamicMemberLookup
-struct Protected<T> {
+// "protected" properties meant to access otherwise private properties from Tab extensions
+extension Tab {
 
-    let object: T
+    static var objcDelegateKeyPath: String { #keyPath(objcDelegate) }
+    @objc private var objcDelegate: Any? { delegate }
 
-    init(_ object: T) {
-        self.object = object
-    }
+    static var objcNavigationDelegateKeyPath: String { #keyPath(objcNavigationDelegate) }
+    @objc private var objcNavigationDelegate: Any? { navigationDelegate }
 
-    subscript<P>(dynamicMember keyPath: KeyPath<T, P>) -> P {
-        object[keyPath: keyPath]
-    }
-
-    subscript<P>(dynamicMember keyPath: ReferenceWritableKeyPath<T, P>) -> P {
+    static var objcNewWindowPolicyDecisionMakersKeyPath: String { #keyPath(objcNewWindowPolicyDecisionMakers) }
+    @objc private var objcNewWindowPolicyDecisionMakers: Any? {
         get {
-            object[keyPath: keyPath]
+            newWindowPolicyDecisionMakers
         }
-        nonmutating set {
-            object[keyPath: keyPath] = newValue
+        set {
+            newWindowPolicyDecisionMakers = newValue as? [NewWindowPolicyDecisionMaker] ?? {
+                assertionFailure("\(String(describing: newValue)) is not [NewWindowPolicyDecisionMaker]")
+                return nil
+            }()
         }
     }
 

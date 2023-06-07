@@ -51,6 +51,12 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
     }
 
     func createBuildCommands(context: XcodePluginContext, target: XcodeTarget) throws -> [Command] {
+#if swift(>=5.9)
+
+        return []
+
+#else
+
         let workDir = context.pluginWorkDirectory.appending("gen-\(UUID().uuidString)")
 
         for file in (try? FileManager.default.contentsOfDirectory(atPath: context.pluginWorkDirectory.string)) ?? [] {
@@ -84,6 +90,8 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
             .prebuildCommand(displayName: "Build DependencyInjectionMacros", executable: try context.tool(named: "sh").path, arguments: ["-c", "export HOME=\(home) && source ~/.bashrc && swift build --package-path '\(packagePath)'"], outputFilesDirectory: context.pluginWorkDirectory),
             .prebuildCommand(displayName: "Run DependencyInjectionMacros", executable: try context.tool(named: "sh").path, arguments: ["-c", "cd \(workDir) && find '\(packagePath)/.build' -type f -name DependencyInjectionMacros -exec {} \(fileListPath) \\;"], outputFilesDirectory: workDir)
         ]
+
+#endif
     }
 
 }
