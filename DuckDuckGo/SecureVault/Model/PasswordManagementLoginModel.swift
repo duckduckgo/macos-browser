@@ -72,11 +72,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var createdDate: String = ""
 
     // MARK: Private Emaill Addres Variables
-    @Published var privateEmailRequestInProgress: Bool = false {
-        didSet {
-            print("privateEmailRequestInProgress set to \(privateEmailRequestInProgress)")
-        }
-    }
+    @Published var privateEmailRequestInProgress: Bool = false
     @Published var usernameIsPrivateEmail: Bool = false
     @Published var hasValidPrivateEmail: Bool = false
     @Published var privateEmailStatus: EmailAliasStatus = .unknown
@@ -88,14 +84,14 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var privateEmailMessage: String {
         var message: String
         switch privateEmailStatus {
-            case .inactive:
-            message = UserText.pmEmailMessageInactive
-            case .notFound:
-            message = UserText.pmEmailMessageNotAllowed
-            case .error:
-            message = UserText.pmEmailMessageError
-            default:
-            message = ""
+        case .inactive:
+        message = UserText.pmEmailMessageInactive
+        case .notFound:
+        message = UserText.pmEmailMessageNotAllowed
+        case .error:
+        message = UserText.pmEmailMessageError
+        default:
+        message = ""
         }
         return message
     }
@@ -165,14 +161,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         // Determine Private Email Status when required
         usernameIsPrivateEmail = emailManager.isPrivateEmail(email: username)
         if usernameIsPrivateEmail {
-            Task {
-                do {
-                    try await getPrivateEmailStatus(username)
-
-                } catch let e {
-                    print(e)
-                }
-            }
+            Task { try? await getPrivateEmailStatus(username) }
         }
 
         if let date = credentials?.account.created {

@@ -133,25 +133,34 @@ private struct Buttons: View {
 // MARK: - Login Views
 
 private struct UsernameView: View {
+
     @EnvironmentObject var model: PasswordManagementLoginModel
+
     @State private var isHovering = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
+
             Text(UserText.pmUsername)
                 .bold()
                 .padding(.bottom, itemSpacing)
 
             if model.isEditing || model.isNew {
+
                 TextField("", text: $model.username)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.bottom, interItemSpacing)
+
             } else {
+
                 VStack(alignment: .leading) {
+
                     UsernameLabel(isHovering: $isHovering)
+
                     if model.hasValidPrivateEmail && !model.privateEmailRequestInProgress {
                         PrivateEmailActivationButton()
                     }
+
                 }
                 .padding(.bottom, interItemSpacing)
             }
@@ -175,7 +184,9 @@ private struct UsernameLabel: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
+
                 HStack(spacing: 5) {
+
                     Text(model.username)
 
                     if isHovering {
@@ -188,6 +199,7 @@ private struct UsernameLabel: View {
                         .tooltip(UserText.copyUsernameTooltip)
                     }
                 }
+
                 if model.hasValidPrivateEmail && model.privateEmailMessage != "" {
                     Text(model.privateEmailMessage)
                         .font(.caption)
@@ -237,6 +249,7 @@ private struct PrivateEmailImage: View {
 
     var body: some View {
         ZStack {
+
             RoundedRectangle(cornerRadius: 4)
                 .fill(Color("BlackWhite100").opacity(0.06))
                 .frame(width: 24, height: 24)
