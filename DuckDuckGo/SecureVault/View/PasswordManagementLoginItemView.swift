@@ -91,7 +91,6 @@ struct PasswordManagementLoginItemView: View {
                 )
             }
         }
-
     }
 
 }

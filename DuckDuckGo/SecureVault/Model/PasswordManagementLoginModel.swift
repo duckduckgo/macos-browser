@@ -165,6 +165,14 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         WindowControllersManager.shared.show(url: url, newTab: true)
     }
 
+    func confirmPrivateEmailStatusUpdate() {
+        shouldConfirmPrivateEmailUpdate = true
+    }
+
+    func togglePrivateEmailStatus() {
+        Task { try await togglePrivateEmailStatus() }
+    }
+
     private func populateViewModelFromCredentials() {
         let titleString = credentials?.account.title ?? ""
         title = titleString
@@ -176,7 +184,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         // Determine Private Email Status when required
         usernameIsPrivateEmail = emailManager.isPrivateEmail(email: username)
         if usernameIsPrivateEmail {
-            Task { try? await getPrivateEmailStatus(username) }
+            Task { try? await getPrivateEmailStatus() }
         }
 
         if let date = credentials?.account.created {
@@ -193,19 +201,19 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     }
 
-    private func getPrivateEmailStatus(_ email: String) async throws {
+    private func getPrivateEmailStatus() async throws {
         guard emailManager.isSignedIn else {
             throw AliasRequestError.signedOut
         }
 
-        guard email != "",
-              emailManager.isPrivateEmail(email: email) else {
+        guard username != "",
+              emailManager.isPrivateEmail(email: username) else {
             throw AliasRequestError.notFound
         }
 
         do {
             await setLoadingStatus(true)
-            let result = try await emailManager.getStatusFor(email: email)
+            let result = try await emailManager.getStatusFor(email: username)
             await setLoadingStatus(false)
             await setPrivateEmailStatus(result)
         } catch {
@@ -214,12 +222,30 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         }
     }
 
-    func confirmPrivateEmailStatusUpdate() {
-        shouldConfirmPrivateEmailUpdate = true
-    }
+    private func togglePrivateEmailStatus() async throws {
+        guard emailManager.isSignedIn else {
+            throw AliasRequestError.signedOut
+        }
 
-    func togglePrivateEmailStatus() {
-        
+        guard username != "",
+              emailManager.isPrivateEmail(email: username) else {
+            throw AliasRequestError.notFound
+        }
+        do {
+            await setLoadingStatus(true)
+            var result: EmailAliasStatus
+            if privateEmailStatus == .active {
+                result = try await emailManager.setStatusFor(email: username, active: false)
+            } else {
+                result = try await emailManager.setStatusFor(email: username, active: true)
+            }
+            await setPrivateEmailStatus(result)
+            await setLoadingStatus(false)
+        } catch {
+            await setLoadingStatus(false)
+            await setPrivateEmailStatus(.error)
+        }
+
     }
 
     @MainActor
