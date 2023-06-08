@@ -76,7 +76,21 @@ struct PasswordManagementLoginItemView: View {
 
             }
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
-
+            .alert(isPresented: $model.shouldConfirmPrivateEmailUpdate) {
+                // Todo.  Maybe we don't need a destructive button, so this needs cleaning?
+                let btnLabel = Text(model.toggleConfirmationAlert.button)
+                let btnAction = model.togglePrivateEmailStatus
+                var button = Alert.Button.default(btnLabel, action: btnAction)
+                if model.toggleConfirmationAlert.destructive == true {
+                    button = Alert.Button.default(btnLabel, action: btnAction)
+                }
+                return Alert(
+                    title: Text(model.toggleConfirmationAlert.title),
+                    message: Text(model.toggleConfirmationAlert.message),
+                    primaryButton: button,
+                    secondaryButton: .cancel(Text("Cancel"))
+                )
+            }
         }
 
     }
@@ -137,6 +151,7 @@ private struct UsernameView: View {
     @EnvironmentObject var model: PasswordManagementLoginModel
 
     @State private var isHovering = false
+    @State private var isShowingPrivateEmailToggleConfirmDialog = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -220,8 +235,8 @@ private struct PrivateEmailActivationButton: View {
         let status = model.privateEmailStatus
         if status == .active || status == .inactive {
             VStack(alignment: .leading) {
-                Button(status == .active ? UserText.pmDeactivate : UserText.pmActivate ) {
-                    status == .active ? model.requestDelete() : model.requestDelete()
+                Button(status == .active ? UserText.pmDeactivateAddress : UserText.pmActivateAddress ) {
+                    model.shouldConfirmPrivateEmailUpdate = true
                 }
                 .buttonStyle(StandardButtonStyle())
             }

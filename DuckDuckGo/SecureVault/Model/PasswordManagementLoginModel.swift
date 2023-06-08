@@ -76,6 +76,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     @Published var usernameIsPrivateEmail: Bool = false
     @Published var hasValidPrivateEmail: Bool = false
     @Published var privateEmailStatus: EmailAliasStatus = .unknown
+    @Published var shouldConfirmPrivateEmailUpdate: Bool = false
 
     var userDuckAddress: String {
         return emailManager.userEmail ?? ""
@@ -95,6 +96,20 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         }
         return message
     }
+
+    var toggleConfirmationAlert: (title: String, message: String, button: String, destructive: Bool) {
+        if privateEmailStatus == .active {
+            return (title: UserText.pmEmailDeactivateConfirmTitle,
+                    message: UserText.pmEmailDeactivateConfirmContent,
+                    button: UserText.pmDeactivate,
+                    destructive: true)
+        }
+        return (title: UserText.pmEmailActivateConfirmContent,
+                message: UserText.pmEmailActivateConfirmContent,
+                button: UserText.pmActivate,
+                destructive: false)
+    }
+
 
     init(onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
          onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
@@ -197,6 +212,14 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
             await setLoadingStatus(false)
             await setPrivateEmailStatus(.error)
         }
+    }
+
+    func confirmPrivateEmailStatusUpdate() {
+        shouldConfirmPrivateEmailUpdate = true
+    }
+
+    func togglePrivateEmailStatus() {
+        
     }
 
     @MainActor
