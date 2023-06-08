@@ -77,18 +77,17 @@ struct PasswordManagementLoginItemView: View {
             }
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
             .alert(isPresented: $model.shouldConfirmPrivateEmailUpdate) {
-                // Todo.  Maybe we don't need a destructive button, so this needs cleaning?
                 let btnLabel = Text(model.toggleConfirmationAlert.button)
                 let btnAction = model.togglePrivateEmailStatus
                 var button = Alert.Button.default(btnLabel, action: btnAction)
                 if model.toggleConfirmationAlert.destructive == true {
-                    button = Alert.Button.default(btnLabel, action: btnAction)
+                    button = Alert.Button.destructive(btnLabel, action: btnAction)
                 }
                 return Alert(
                     title: Text(model.toggleConfirmationAlert.title),
                     message: Text(model.toggleConfirmationAlert.message),
                     primaryButton: button,
-                    secondaryButton: .cancel(Text("Cancel"))
+                    secondaryButton: .cancel(Text(UserText.cancel))
                 )
             }
         }
