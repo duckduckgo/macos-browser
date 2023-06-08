@@ -22,8 +22,8 @@ import SwiftUI
 import BrowserServicesKit
 import SwiftUIExtensions
 
-private let interItemSpacing: CGFloat = 23
-private let itemSpacing: CGFloat = 13
+private let interItemSpacing: CGFloat = 18
+private let itemSpacing: CGFloat = 10
 
 struct PasswordManagementLoginItemView: View {
 
@@ -208,7 +208,7 @@ private struct UsernameLabel: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-        }.frame(minHeight: 35)
+        }.frame(minHeight: 30)
     }
 }
 
@@ -237,13 +237,13 @@ private struct PrivateEmailImage: View {
     var image: NSImage {
         switch model.privateEmailStatus {
         case .active:
-            return NSImage(imageLiteralResourceName: "OptionsButtonMenuEmail")
+            return NSImage(imageLiteralResourceName: "Email-16")
         case .inactive:
-            return NSImage(imageLiteralResourceName: "OptionsButtonMenuEmailDisabled")
+            return NSImage(imageLiteralResourceName: "Email-Deactivate-16")
         case .notFound:
-            return NSImage(imageLiteralResourceName: "WarningColored")
+            return NSImage(imageLiteralResourceName: "Email-Warning-16")
         default:
-            return NSImage(imageLiteralResourceName: "Error")
+            return NSImage(imageLiteralResourceName: "Alert-Color-16")
         }
     }
 
