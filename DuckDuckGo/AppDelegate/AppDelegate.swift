@@ -274,7 +274,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     private func startupSync() {
         let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
-        let syncService = DDGSync(dataProvidersSource: syncDataProviders, log: OSLog.sync)
+        let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync)
 
         syncStateCancellable = syncService.authStatePublisher
             .prepend(syncService.authState)
