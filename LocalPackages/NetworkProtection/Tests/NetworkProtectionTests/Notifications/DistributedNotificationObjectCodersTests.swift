@@ -19,7 +19,7 @@
 import XCTest
 @testable import NetworkProtection
 
-class DistributedNotificationObjectCoders: XCTestCase {
+final class DistributedNotificationObjectCoders: XCTestCase {
 
     private struct TestObject: Codable, Equatable {
         let string: String
