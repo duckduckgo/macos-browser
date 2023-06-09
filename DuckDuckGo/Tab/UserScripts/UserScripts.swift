@@ -44,10 +44,11 @@ final class UserScripts: UserScriptsProvider {
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
         let privacySettings = PrivacySecurityPreferences.shared
+        let privacyConfig = sourceProvider.privacyConfigurationManager.privacyConfig
         let sessionKey = sourceProvider.sessionKey ?? ""
         let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled,
                                                 sessionKey: sessionKey,
-                                                featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS)
+                                                featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfig))
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
         autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
         if #available(macOS 11, *) {

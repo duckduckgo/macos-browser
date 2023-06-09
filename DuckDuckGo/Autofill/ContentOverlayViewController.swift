@@ -211,6 +211,10 @@ extension ContentOverlayViewController: OverlayAutofillUserScriptPresentationDel
     public func overlayAutofillUserScript(_ overlayAutofillUserScript: OverlayAutofillUserScript, requestResizeToSize: CGSize) {
         self.requestResizeToSize(requestResizeToSize)
     }
+
+    public func closeContentOverlayPopover() {
+        self.topAutofillUserScript?.closeAutofillParent()
+    }
 }
 
 extension ContentOverlayViewController: SecureVaultManagerDelegate {
