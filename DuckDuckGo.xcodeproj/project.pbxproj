@@ -9947,8 +9947,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "daniel/macos-incontext-signup-updates";
-				kind = branch;
+				kind = exactVersion;
+				version = 59.1.0;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
