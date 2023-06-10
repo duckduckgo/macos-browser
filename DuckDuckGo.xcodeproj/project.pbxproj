@@ -1700,6 +1700,8 @@
 		B630E80029C887ED00363609 /* NSErrorAdditionalInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630E7FD29C887ED00363609 /* NSErrorAdditionalInfo.swift */; };
 		B630E80129C887ED00363609 /* NSErrorAdditionalInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630E7FD29C887ED00363609 /* NSErrorAdditionalInfo.swift */; };
 		B630E80229C887ED00363609 /* NSErrorAdditionalInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630E7FD29C887ED00363609 /* NSErrorAdditionalInfo.swift */; };
+		B63155262A338FA6008F881E /* SafeUnarchiverHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = B63155252A338FA6008F881E /* SafeUnarchiverHelper.m */; };
+		B63155272A338FA6008F881E /* SafeUnarchiverHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = B63155252A338FA6008F881E /* SafeUnarchiverHelper.m */; };
 		B634DBDF293C8F7F00C3C99E /* Tab+UIDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBDE293C8F7F00C3C99E /* Tab+UIDelegate.swift */; };
 		B634DBE1293C8FD500C3C99E /* Tab+Dialogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBE0293C8FD500C3C99E /* Tab+Dialogs.swift */; };
 		B634DBE3293C900000C3C99E /* UserDialogRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBE2293C8FFF00C3C99E /* UserDialogRequest.swift */; };
@@ -2877,6 +2879,8 @@
 		B630793926731F2600DCEE41 /* FileDownloadManagerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileDownloadManagerTests.swift; sourceTree = "<group>"; };
 		B630794126731F5400DCEE41 /* WKDownloadMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKDownloadMock.swift; sourceTree = "<group>"; };
 		B630E7FD29C887ED00363609 /* NSErrorAdditionalInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSErrorAdditionalInfo.swift; sourceTree = "<group>"; };
+		B63155252A338FA6008F881E /* SafeUnarchiverHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SafeUnarchiverHelper.m; sourceTree = "<group>"; };
+		B63155282A338FAF008F881E /* SafeUnarchiverHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SafeUnarchiverHelper.h; sourceTree = "<group>"; };
 		B634DBDE293C8F7F00C3C99E /* Tab+UIDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tab+UIDelegate.swift"; sourceTree = "<group>"; };
 		B634DBE0293C8FD500C3C99E /* Tab+Dialogs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tab+Dialogs.swift"; sourceTree = "<group>"; };
 		B634DBE2293C8FFF00C3C99E /* UserDialogRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDialogRequest.swift; sourceTree = "<group>"; };
@@ -6173,6 +6177,8 @@
 				B68458BF25C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift */,
 				B684590725C9027900DC17B6 /* AppStateChangedPublisher.swift */,
 				B684592E25C93FBF00DC17B6 /* AppStateRestorationManager.swift */,
+				B63155252A338FA6008F881E /* SafeUnarchiverHelper.m */,
+				B63155282A338FAF008F881E /* SafeUnarchiverHelper.h */,
 			);
 			path = StateRestoration;
 			sourceTree = "<group>";
@@ -7491,6 +7497,7 @@
 				3706FB17293F65D500E42796 /* FirePopoverCollectionViewHeader.swift in Sources */,
 				3706FB19293F65D500E42796 /* FireViewController.swift in Sources */,
 				4B4D60D42A0C84F700BCD287 /* UserText+NetworkProtection.swift in Sources */,
+				B63155272A338FA6008F881E /* SafeUnarchiverHelper.m in Sources */,
 				3707C71F294B5D2900682A9F /* WKUserContentControllerExtension.swift in Sources */,
 				3706FB1A293F65D500E42796 /* OutlineSeparatorViewCell.swift in Sources */,
 				3706FB1B293F65D500E42796 /* SafariDataImporter.swift in Sources */,
@@ -8691,6 +8698,7 @@
 				4B59023E26B35F3600489384 /* ChromiumLoginReader.swift in Sources */,
 				B67A9BC92A3049F5006B3711 /* Main.swift in Sources */,
 				85D885B326A5A9DE0077C374 /* NSAlert+PasswordManager.swift in Sources */,
+				B63155262A338FA6008F881E /* SafeUnarchiverHelper.m in Sources */,
 				983DFB2528B67036006B7E34 /* UserContentUpdating.swift in Sources */,
 				4B7A57CF279A4EF300B1C70E /* ChromePreferences.swift in Sources */,
 				AA6AD95B2704B6DB00159F8A /* FirePopoverViewController.swift in Sources */,

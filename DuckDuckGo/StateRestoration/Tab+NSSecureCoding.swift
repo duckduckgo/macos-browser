@@ -18,7 +18,7 @@
 
 import Foundation
 
-extension Tab: NSSecureCoding {
+extension Tab {
     // MARK: - Coding
 
     private enum NSSecureCodingKeys {
@@ -37,7 +37,7 @@ extension Tab: NSSecureCoding {
     static var supportsSecureCoding: Bool { true }
 
     @MainActor
-    convenience init?(coder decoder: NSCoder) {
+    convenience init?(coder decoder: SafeUnarchiver) {
         let url: URL? = decoder.decodeIfPresent(at: NSSecureCodingKeys.url)
         let videoID: String? = decoder.decodeIfPresent(at: NSSecureCodingKeys.videoID)
         let videoTimestamp: String? = decoder.decodeIfPresent(at: NSSecureCodingKeys.videoTimestamp)

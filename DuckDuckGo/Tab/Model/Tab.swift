@@ -40,23 +40,16 @@ protocol NewWindowPolicyDecisionMaker {
     func decideNewWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision?
 }
 
-//@Injectable
-final class Subclass: Injectable {
-
-    @Injected var someDelegate: WKNavigationDelegate?
-
-    init() {
-
-    }
-}
-
 // swiftlint:disable type_body_length
 
+// TODO: Implement UnsafeInjectable
 @dynamicMemberLookup
-//@Injectable
+#if swift(>=5.9)
+@Injectable
+#endif
 final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
 
-//    typealias InjectedDependencies = TabExtensionsBuilder.Dependencies & Subclass.Dependencies
+//    typealias InjectedDependencies = TabExtensionsBuilder.Dependencies
 
     enum TabContent: Equatable {
         case homePage
@@ -222,7 +215,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
     private(set) var userContentController: UserContentController?
 
     @MainActor
-//    @available(macOS 11, *)
+    @available(*, deprecated, message: "use Tab.make")
     convenience init(content: TabContent,
                      faviconManagement: FaviconManagement = FaviconManager.shared,
                      webCacheManager: WebCacheManager = WebCacheManager.shared,
@@ -290,6 +283,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
     }
 
     @MainActor
+    @available(*, deprecated, message: "use Tab.make")
     // swiftlint:disable:next function_body_length
     init(content: TabContent,
          faviconManagement: FaviconManagement,
@@ -321,7 +315,6 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
 
         self.content = content
         self.faviconManagement = faviconManagement
-//        _=self.pinnedTabsManager.didUnpinTabPublisher // = pinnedTabsManager
         self.statisticsLoader = statisticsLoader
         self.internalUserDecider = internalUserDecider
         self.title = title
@@ -392,9 +385,6 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
                                                object: nil)
 
         addDeallocationChecks(for: webView)
-
-//        let dd: DD = self.dependencyProvider
-//        Subclass.make(with: dd)
     }
 
 #if DEBUG
@@ -429,7 +419,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
     @inlinable func addDeallocationChecks(for webView: WKWebView) {}
 #endif
 
-    override func awakeAfter(using decoder: NSCoder) -> Any? {
+    func awakeAfter(using decoder: SafeUnarchiver) -> Any? {
         for tabExtension in self.extensions {
             (tabExtension as? (any NSCodingExtension))?.awakeAfter(using: decoder)
         }

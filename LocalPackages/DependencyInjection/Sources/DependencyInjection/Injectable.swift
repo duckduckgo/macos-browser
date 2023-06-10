@@ -20,68 +20,40 @@ import Foundation
 
 public protocol NoDependencies {}
 
-public protocol Injectable: AnyObject {
+public protocol Injectable {
     associatedtype Dependencies = NoDependencies
     associatedtype InjectedDependencies = NoDependencies
 
     associatedtype DynamicDependencyProvider
-    associatedtype DD //: DynamicDependenciesProtocol // auto-generated struct
-    var dependencyProvider: DD { get } // auto-generated
+    associatedtype DynamicDependencies: DynamicDependenciesProtocol
+#if swift(>=5.9)
+    var dependencyProvider: DynamicDependencies { get } // auto-generated
+#endif
+
+    static var _currentDependencies: DynamicDependencies! { get } // swiftlint:disable:this identifier_name
+    static func getAllDependencyProviderKeyPaths(from dependencyProvider: Dependencies) -> Set<AnyKeyPath>
 }
 
 public protocol DynamicDependenciesProtocol {
-    init()
-
     var _storage: [AnyKeyPath: Any] { get } // swiftlint:disable:this identifier_name
 }
 
+#if swift(<5.9)
+
 private let dependencyProviderKey = UnsafeRawPointer(bitPattern: "dependencyProvider".hashValue)!
-//extension Injectable {
+public extension Injectable where Self: AnyObject {
 
-//    var dependencyProvider: DynamicDependencies {
-//        get {
-//            if let dependencyProvider = objc_getAssociatedObject(self, dependencyProviderKey) as? DynamicDependencies {
-//                return dependencyProvider
-//            }
-//            let dependencyProvider = DynamicDependencies.init()
-//            objc_setAssociatedObject(self, dependencyProviderKey, dependencyProvider, .OBJC_ASSOCIATION_RETAIN)
-//
-//            return dependencyProvider
-//        }
-//        set {
-//            objc_setAssociatedObject(self, dependencyProviderKey, newValue, .OBJC_ASSOCIATION_RETAIN)
-//        }
-//    }
+    var dependencyProvider: DynamicDependencies {
+        get {
+            guard let dependencyProvider = objc_getAssociatedObject(self, dependencyProviderKey) as? DynamicDependencies ?? Self._currentDependencies else {
+                fatalError("dependencyProvider not initialized at init")
+            }
+            return dependencyProvider
+        }
+        set {
+            objc_setAssociatedObject(self, dependencyProviderKey, newValue, .OBJC_ASSOCIATION_RETAIN)
+        }
+    }
 
-//}
-
-//@dynamicMemberLookup
-//struct DD_Str<Owner: Injectable> {
-//    var _storage: [AnyKeyPath: Any]
-//
-//    init() {
-//        self._storage = [:] //AppStateRestorationManager_Injected_Helpers._currentDependencies._storage
-//    }
-//    init(_ storage: [AnyKeyPath: Any]) {
-//        self._storage = storage
-//    }
-//    init(_ emptyArrayLiteral: [Any]) {
-//        assert(emptyArrayLiteral.isEmpty)
-//        self.init()
-//    }
-//    init(_ dependencyProvider: Owner.Dependencies) {
-//        self._storage = [:]
-////        AppStateRestorationManager_Injected_Helpers.getAllDependencyProviderKeyPaths(from: dependencyProvider).reduce(into: [:]) {
-////            $0[$1] = dependencyProvider[keyPath: $1]
-////        }
-//    }
-//    init(_ dependencyProvider: Owner.DynamicDependencyProvider) {
-//        self._storage = [:] //dependencyProvider._storage
-//    }
-//
-//    subscript<T>(dynamicMember keyPath: KeyPath<Owner.Dependencies, T>) -> T {
-//        self._storage[keyPath] as! T // swiftlint:disable force_cast
-//    }
-//}
-
-
+}
+#endif

@@ -18,40 +18,51 @@
 
 import Foundation
 
-@propertyWrapper
-public struct Injected<Value>: @unchecked Sendable {
+#if swift(<5.9)
 
-//    let wrappedValue: Value
+@propertyWrapper
+public struct ClassInjectedValue<Value>: @unchecked Sendable {
 
     public init() {
-//        fatalError("not implemented")
     }
 
-//    init(wrappedValue: Value) {
-//        self.wrappedValue = wrappedValue
-//    }
-
-    @available(*, unavailable, message: "@Injected is only available on properties of classes")
+    @available(*, unavailable, message: "@ClassInjectedValue is only available on properties of classes")
     public var wrappedValue: Value {
         fatalError()
     }
-    public static subscript<Owner: Injectable>(_enclosingInstance owner: Owner,
-                                               wrapped propertyKeyPath: KeyPath<Owner, Value>,
-                                               storage selfKeyPath: KeyPath<Owner, Self>) -> Value {
-//        owner.dependencyProvider._storage[propertyKeyPath] as! Value // swiftlint:disable:this force_cast
-//        owner[keyPath: selfKeyPath].getSubject(withOwner: owner).value
-        fatalError()
+
+    public static subscript<Owner: Injectable & AnyObject>(_enclosingInstance owner: Owner,
+                                                           wrapped propertyKeyPath: KeyPath<Owner, Value>,
+                                                           storage selfKeyPath: KeyPath<Owner, Self>) -> Value {
+        owner.dependencyProvider._storage[propertyKeyPath] as! Value // swiftlint:disable:this force_cast
     }
 
-//    @available(*, unavailable, message: "@Injected is only available on properties of classes")
-//    var projectedValue: Injected<Value> {
-//        fatalError()
-//    }
-//    static subscript<Owner: Injectable>(_enclosingInstance owner: Owner,
-//                                        projected _: KeyPath<Owner, Injected<Value>>,
-//                                        storage selfKeyPath: ReferenceWritableKeyPath<Owner, Self>) -> Injected<Value> {
-////        owner[keyPath: selfKeyPath].getSubject(withOwner: owner).eraseToAnyPublisher()
-//        fatalError()
-//    }
+}
+
+public enum StructInjectedKeyPathsStorage {
+
+    @TaskLocal public static var keyPaths: UnsafeMutablePointer<[AnyKeyPath]>!
 
 }
+
+public struct OwnedInjectedStruct<Owner: Injectable> {
+
+    @propertyWrapper
+    public struct StructInjectedValue<Value>: @unchecked Sendable {
+
+        var storage: [AnyKeyPath: Any]!
+        var keyPath: AnyKeyPath!
+
+        public init() {
+            self.keyPath = StructInjectedKeyPathsStorage.keyPaths.pointee.removeFirst()
+            self.storage = Owner._currentDependencies!._storage
+        }
+
+        public var wrappedValue: Value {
+            storage[keyPath] as! Value // swiftlint:disable:this force_cast
+        }
+
+    }
+}
+
+#endif

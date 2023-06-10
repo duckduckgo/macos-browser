@@ -7,6 +7,7 @@
 
 #import "WKWebView+Private.h"
 #import "NSException+Catch.h"
+#import "SafeUnarchiverHelper.h"
 #import "WKNavigationAction+Private.h"
 
 #import "WKGeolocationProvider.h"

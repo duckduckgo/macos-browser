@@ -58,7 +58,7 @@ extension TabExtension {
 // Implement these methods for Extension State Restoration
 protocol NSCodingExtension: TabExtension {
     func encode(using coder: NSCoder)
-    func awakeAfter(using decoder: NSCoder)
+    func awakeAfter(using decoder: SafeUnarchiver)
 }
 
 // Define dependencies used to instantiate TabExtensions here:
@@ -96,7 +96,7 @@ extension TabExtensionsBuilder {
     /// ` add { MyOtherExtension(with: myExtension.resultPublisher) }
     /// Note: Extensions with state restoration support should conform to `NSCodingExtension`
     @MainActor
-    func registerExtensions(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) {
+    mutating func registerExtensions(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) {
         let userScripts = args.userScriptsPublisher
 
         let httpsUpgrade = add {

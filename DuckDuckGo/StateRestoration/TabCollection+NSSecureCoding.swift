@@ -18,14 +18,14 @@
 
 import Foundation
 
-extension TabCollection: NSSecureCoding {
+extension TabCollection {
 
     static var supportsSecureCoding: Bool { true }
 
-    convenience init?(coder decoder: NSCoder) {
-        guard let tabs = decoder.decodeObject(of: [NSArray.self, Tab.self],
-                                              forKey: NSKeyedArchiveRootObjectKey) as? [Tab] else {
-            return nil
+    @MainActor
+    convenience init(coder decoder: SafeUnarchiver) throws {
+        let tabs = try decoder.decodeArray(forKey: NSKeyedArchiveRootObjectKey) { coder in
+            try Tab(coder: coder) ?? { throw DecodingError.valueNotFound(Tab.self, .init(codingPath: [], debugDescription: "")) }()
         }
         self.init(tabs: tabs)
     }

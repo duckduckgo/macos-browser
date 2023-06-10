@@ -20,6 +20,7 @@ import Combine
 import Foundation
 import AppKit
 import Common
+import DependencyInjection
 
 protocol TabExtensionsBuilderProtocol {
     @MainActor
@@ -30,15 +31,15 @@ protocol TabExtensionsBuilderProtocol {
 
 /// Tab Extensions registration component
 /// defines intialization order and provides dependencies to the Tab Extensions initalizers
+//#if swift(>=5.9)
 //@Injectable
-final class TabExtensionsBuilder: TabExtensionsBuilderProtocol/*, Injectable*/ {
+//#endif
+struct TabExtensionsBuilder: TabExtensionsBuilderProtocol { // , Injectable {
 
-//    @Injected
-    var privacyFeatures: PrivacyFeaturesProtocol!
 
-    init() {
-//        _=privacyFeatures.contentBlocking
-    }
+//    @available(*, deprecated, message: "use TabExtensionsBuilder.make")
+//    init() {
+//    }
 
     static var `default`: TabExtensionsBuilderProtocol {
 #if DEBUG
@@ -53,7 +54,7 @@ final class TabExtensionsBuilder: TabExtensionsBuilderProtocol/*, Injectable*/ {
     /// collect Tab Extensions instantiation blocks (`add { }` method calls)
     /// lazy for Unit Tests builds and non-lazy in Production
     @discardableResult
-    func add<Extension: TabExtension>(_ makeTabExtension: @escaping () -> Extension) -> TabExtensionBuildingBlock<Extension.PublicProtocol> {
+    mutating func add<Extension: TabExtension>(_ makeTabExtension: @escaping () -> Extension) -> TabExtensionBuildingBlock<Extension.PublicProtocol> {
         let buildingBlock = TabExtensionBuildingBlock(makeTabExtension)
         components.append( (protocolType: Extension.PublicProtocol.self, buildingBlock: buildingBlock) )
         return buildingBlock

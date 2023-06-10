@@ -21,6 +21,7 @@ import Common
 import ContentBlocking
 import Foundation
 import Navigation
+import WebKit
 
 final class HistoryTabExtension: NSObject {
 
@@ -137,9 +138,9 @@ extension HistoryTabExtension: NSCodingExtension {
         static let visitedDomains = "visitedDomains"
     }
 
-    func awakeAfter(using decoder: NSCoder) {
-        let visitedDomains = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
-        self.localHistory = Set(visitedDomains)
+    func awakeAfter(using decoder: SafeUnarchiver) {
+//        let visitedDomains = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
+        self.localHistory = [] //Set(visitedDomains)
     }
 
     func encode(using coder: NSCoder) {

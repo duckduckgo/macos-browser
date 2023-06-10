@@ -18,7 +18,7 @@
 
 import Foundation
 
-extension TabCollectionViewModel: NSSecureCoding {
+extension TabCollectionViewModel {
     private enum NSSecureCodingKeys {
         static let tabCollection = "tabs"
         static let selectionIndex = "idx"
@@ -26,9 +26,9 @@ extension TabCollectionViewModel: NSSecureCoding {
 
     static var supportsSecureCoding: Bool { true }
 
-    convenience init?(coder: NSCoder) {
-        guard let tabCollection = coder.decodeObject(of: TabCollection.self, forKey: NSSecureCodingKeys.tabCollection) else {
-            return nil
+    convenience init(coder: SafeUnarchiver) throws {
+        let tabCollection = try coder.decodeObject(forKey: NSSecureCodingKeys.tabCollection) { coder in
+            try TabCollection(coder: coder)
         }
         let index = coder.decodeIfPresent(at: NSSecureCodingKeys.selectionIndex) ?? 0
         // Burner tabs aren't stored

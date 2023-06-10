@@ -19,29 +19,17 @@
 import Foundation
 import Combine
 import Common
-//import MacroLib
+import DependencyInjection
 
-
-//@attached(member, names: named(Dependencies), named(DynamicDependencies), named(DependencyProvider), named(DynamicDependencyProvider), named(dependencyProvider), named(_currentDependencies), named(getAllDependencyProviderKeyPaths(from:)), named(makeDependencies), named(make))
-//@attached(memberAttribute)
-//@attached(peer, names: suffixed(_DependencyProvider), suffixed(_DependencyProvider_allKeyPaths), suffixed(_DynamicDependencyProvider))
-//public macro Injectable() = #externalMacro(module: "DuckMacroPlugin", type: "InjectableMacro")
-//
-//@attached(accessor)
-//public macro Injected() = #externalMacro(module: "DuckMacroPlugin", type: "InjectedMacro")
-//
-////@freestanding(declaration, names: arbitrary)
-////public macro InjectedDependencies(for type: Any.Type) = #externalMacro(module: "DuckMacroPlugin", type: "InjectedDependenciesMacro")
-//@attached(conformance)
-//@attached(member, names: arbitrary)
-//public macro InjectedDependencies(for type: Any.Type...) = #externalMacro(module: "DuckMacroPlugin", type: "InjectedDependenciesMacro")
-
-//@Injectable
+#if swift(>=5.9)
+@Injectable
+#endif
 @MainActor
-final class AppStateRestorationManager: NSObject/*, Injectable*/ {
+final class AppStateRestorationManager: NSObject, Injectable {
 
-//    typealias InjectedDependencies = WindowManagerStateRestoration.Dependencies
-    //@Injected var a: Int
+    typealias InjectedDependencies = WindowManagerStateRestoration.Dependencies
+    @Injected var a: Int
+
     static let fileName = "persistentState"
 
     private let service: StatePersistenceService
@@ -52,11 +40,13 @@ final class AppStateRestorationManager: NSObject/*, Injectable*/ {
     private var appIsRelaunchingAutomatically: Bool
     private let shouldRestorePreviousSession: Bool
 
+    @available(*, deprecated, message: "use AppStateRestorationManager.make")
     convenience init(fileStore: FileStore) {
         let service = StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName)
         self.init(service: service)
     }
 
+    @available(*, deprecated, message: "use AppStateRestorationManager.make")
     init(
         service: StatePersistenceService,
         shouldRestorePreviousSession: Bool = StartupPreferences().restorePreviousSession
@@ -78,14 +68,14 @@ final class AppStateRestorationManager: NSObject/*, Injectable*/ {
     func restoreLastSessionState(interactive: Bool) {
         do {
             let isCalledAtStartup = !interactive
-//            let dd: DD = self.dependencyProvider
+//            let dd: DynamicDependencies = self.dependencyProvider
 //            let a: AppStateRestorationManager.DynamicDependencyProvider = dd
 //            let b: WindowManagerStateRestoration.DynamicDependencyProvider = a
 //            let d: Subclass.DynamicDependencyProvider = dd
-            fatalError()
-//            try service.restoreState(using: { coder in
-//                try WindowsManager.restoreState(from: coder, dependencyProvider: b, includePinnedTabs: isCalledAtStartup)
-//            })
+//            fatalError()
+            try service.restoreState(using: { coder in
+                try WindowsManager.restoreState(from: coder, /*dependencyProvider: b,*/ includePinnedTabs: isCalledAtStartup)
+            })
             clearLastSessionState()
         } catch CocoaError.fileReadNoSuchFile {
             // ignore
@@ -139,10 +129,9 @@ final class AppStateRestorationManager: NSObject/*, Injectable*/ {
     @MainActor
     private func restorePinnedTabs() {
         do {
-            fatalError()
-//            try service.restoreState(using: { coder in
-//                try WindowsManager.restoreState(from: coder, dependencyProvider: self.dependencyProvider, includeWindows: false)
-//            })
+            try service.restoreState(using: { coder in
+                try WindowsManager.restoreState(from: coder, /*dependencyProvider: self.dependencyProvider,*/ includeWindows: false)
+            })
         } catch CocoaError.fileReadNoSuchFile {
             // ignore
         } catch {
