@@ -760,6 +760,12 @@ CQ
                                                             <action selector="resetDuckPlayerOverlayInteractions:" target="Ady-hI-5gd" id="Tr1-yK-ayF"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Reset Email Protection InContext Prompt" id="jSt-Yy-xOA">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetEmailProtectionInContextPrompt:" target="Ady-hI-5gd" id="aB4-ox-qKt"/>
+                                                        </connections>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>

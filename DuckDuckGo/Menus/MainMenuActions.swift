@@ -783,6 +783,10 @@ extension MainViewController {
         #endif
     }
 
+    @IBAction func resetEmailProtectionInContextPrompt(_ sender: Any?) {
+        EmailManager().resetEmailProtectionInContextPrompt()
+    }
+
     @IBAction func fetchConfigurationNow(_ sender: Any?) {
         ConfigurationManager.shared.forceRefresh()
     }
