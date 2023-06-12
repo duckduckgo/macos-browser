@@ -58,8 +58,9 @@ extension UserText {
     static let pmEmailActivateConfirmContent = NSLocalizedString("pm.private.email.mesage.activate.confirm.content", value: "You will start receiving emails sent to this address.", comment: "Text for the confirmation message displayed when a user tries activate a Private Email Address")
     static let pmEmailDeactivateConfirmTitle = NSLocalizedString("pm.private.email.mesage.deactivate.confirm.title", value: "Deactivate this Private Duck Address?.", comment: "Title for the confirmation message displayed when a user tries deactivate a Private Email Address")
     static let pmEmailDeactivateConfirmContent = NSLocalizedString("pm.private.email.mesage.deactivate.confirm.content", value: "You will stop receiving emails sent to this address.", comment: "Text for the confirmation message displayed when a user tries deactivate a Private Email Address")
-
-
+    static let pmRemovedDuckAddressTitle = NSLocalizedString("pm.removed.duck.address.title", value: "This username is no longer a Private Duck Address.", comment: "Title for the alert dialog telling the user an updated username is no longer a private email address")
+    static let pmRemovedDuckAddressContent = NSLocalizedString("pm.removed.duck.address.content", value: "You can still manage this Duck Address from emails that land in your inbox", comment: "Content for the alert dialog telling the user an updated username is no longer a private email address")
+    static let pmRemovedDuckAddressButton = NSLocalizedString("pm.removed.duck.address.button", value: "Got It", comment: "Button text for the alert dialog telling the user an updated username is no longer a private email address")
 
     static let pmCardNumber = NSLocalizedString("pm.card.number", value: "Card Number", comment: "Label for card number title")
     static let pmCardholderName = NSLocalizedString("pm.card.cardholder-name", value: "Cardholder Name", comment: "Label for cardholder name title")
