@@ -76,7 +76,7 @@ struct PasswordManagementLoginItemView: View {
 
             }
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
-            .alert(isPresented: $model.shouldConfirmPrivateEmailUpdate) {
+            .background(EmptyView().alert(isPresented: $model.isShowingAddressUpdateConfirmAlert) {
                 let btnLabel = Text(model.toggleConfirmationAlert.button)
                 let btnAction = model.togglePrivateEmailStatus
                 var button = Alert.Button.default(btnLabel, action: btnAction)
@@ -89,14 +89,14 @@ struct PasswordManagementLoginItemView: View {
                     primaryButton: button,
                     secondaryButton: .cancel(Text(UserText.cancel))
                 )
-            }
-            .alert(isPresented: $model.isShowingDuckRemovalAlert) {
+            })
+            .background(EmptyView().alert(isPresented: $model.isShowingDuckRemovalAlert) {
                 Alert(
                     title: Text(UserText.pmRemovedDuckAddressTitle),
                     message: Text(UserText.pmRemovedDuckAddressContent),
                     dismissButton: .default(Text(UserText.pmRemovedDuckAddressButton))
                 )
-            }
+            })
         }
     }
 
@@ -241,7 +241,7 @@ private struct PrivateEmailActivationButton: View {
         if status == .active || status == .inactive {
             VStack(alignment: .leading) {
                 Button(status == .active ? UserText.pmDeactivateAddress : UserText.pmActivateAddress ) {
-                    model.shouldConfirmPrivateEmailUpdate = true
+                    model.isShowingAddressUpdateConfirmAlert = true
                 }
                 .buttonStyle(StandardButtonStyle())
             }
