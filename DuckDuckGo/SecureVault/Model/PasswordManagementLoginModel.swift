@@ -35,18 +35,6 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var urlMatcher: AutofillUrlMatcher
     var emailManager: EmailManager
 
-    func setSecureVaultModel<Model>(_ modelObject: Model) {
-        guard let modelObject = modelObject as? SecureVaultModels.WebsiteCredentials else {
-            return
-        }
-
-        credentials = modelObject
-    }
-
-    func clearSecureVaultModel() {
-        credentials = nil
-    }
-
     var isEditingPublisher: Published<Bool>.Publisher {
         return $isEditing
     }
@@ -71,12 +59,13 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var lastUpdatedDate: String = ""
     var createdDate: String = ""
 
-    // MARK: Private Emaill Addres Variables
+    // MARK: Private Emaill Address Variables
     @Published var privateEmailRequestInProgress: Bool = false
     @Published var usernameIsPrivateEmail: Bool = false
     @Published var hasValidPrivateEmail: Bool = false
     @Published var privateEmailStatus: EmailAliasStatus = .unknown
     @Published var shouldConfirmPrivateEmailUpdate: Bool = false
+    @Published var isShowingDuckRemovalAlert: Bool = false
 
     var userDuckAddress: String {
         return emailManager.userEmail ?? ""
@@ -110,6 +99,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
                 destructive: false)
     }
 
+    private var previousUsername: String = ""
 
     init(onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
          onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
@@ -123,6 +113,18 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     }
 
+    func setSecureVaultModel<Model>(_ modelObject: Model) {
+        guard let modelObject = modelObject as? SecureVaultModels.WebsiteCredentials else {
+            return
+        }
+
+        credentials = modelObject
+    }
+
+    func clearSecureVaultModel() {
+        credentials = nil
+    }
+
     func copy(_ value: String) {
         NSPasteboard.general.copy(value)
     }
@@ -133,7 +135,11 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         credentials.account.username = username
         credentials.account.domain = urlMatcher.normalizeUrlForWeb(domain)
         credentials.password = password.data(using: .utf8)! // let it crash?
-        onSaveRequested(credentials)
+        hasValidPrivateEmail = emailManager.isPrivateEmail(email: username)
+        onSaveRequested(credentials)        
+        if emailManager.isPrivateEmail(email: previousUsername) && !hasValidPrivateEmail {
+            isShowingDuckRemovalAlert = true
+        }
     }
 
     func requestDelete() {
@@ -142,6 +148,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     }
 
     func edit() {
+        previousUsername = username
         isEditing = true
     }
 

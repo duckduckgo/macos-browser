@@ -1,15 +1,6 @@
 {
   "pins" : [
     {
-      "identity" : "browserserviceskit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/BrowserServicesKit",
-      "state" : {
-        "revision" : "2e90e6c20d6f6efe9ce0431ec764475242bee588",
-        "version" : "59.1.0"
-      }
-    },
-    {
       "identity" : "content-scope-scripts",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",

@@ -90,6 +90,13 @@ struct PasswordManagementLoginItemView: View {
                     secondaryButton: .cancel(Text(UserText.cancel))
                 )
             }
+            .alert(isPresented: $model.isShowingDuckRemovalAlert) {
+                Alert(
+                    title: Text(UserText.pmRemovedDuckAddressTitle),
+                    message: Text(UserText.pmRemovedDuckAddressContent),
+                    dismissButton: .default(Text(UserText.pmRemovedDuckAddressButton))
+                )
+            }
         }
     }
 
