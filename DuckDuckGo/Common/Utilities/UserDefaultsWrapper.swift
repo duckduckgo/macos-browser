@@ -33,6 +33,7 @@ public struct UserDefaultsWrapper<T> {
         case configFBConfigEtag = "config.storage.fbconfig.etag"
 
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
+        case areDomainsMigratedToETLDPlus1 = "com.duckduckgo.are-domains-migrated-to-etldplus1"
         case unprotectedDomains = "com.duckduckgo.contentblocker.unprotectedDomains"
         case contentBlockingRulesCache = "com.duckduckgo.contentblocker.rules.cache"
 

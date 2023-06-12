@@ -28,11 +28,16 @@ internal class FireproofDomains {
         static let newFireproofDomainKey = "newFireproofDomainKey"
     }
 
-    static let shared = FireproofDomains()
+    static let shared = FireproofDomains(tld: ContentBlocking.shared.tld)
     private let store: FireproofDomainsStore
+
+    let tld: TLD
 
     @UserDefaultsWrapper(key: .fireproofDomains, defaultValue: nil)
     private var legacyUserDefaultsFireproofDomains: [String]?
+
+    @UserDefaultsWrapper(key: .areDomainsMigratedToETLDPlus1, defaultValue: false)
+    private var areDomainsMigratedToETLDPlus1: Bool
 
     private lazy var container: FireproofDomainsContainer = loadFireproofDomains() {
         didSet {
@@ -44,8 +49,11 @@ internal class FireproofDomains {
         container.domains
     }
 
-    init(store: FireproofDomainsStore = FireproofDomainsStore(tableName: "FireproofDomains")) {
+    init(store: FireproofDomainsStore = FireproofDomainsStore(tableName: "FireproofDomains"), tld: TLD) {
         self.store = store
+        self.tld = tld
+
+        migrateFireproofDomainsToETLDPlus1()
     }
 
     private func loadFireproofDomains() -> FireproofDomainsContainer {
@@ -74,6 +82,20 @@ internal class FireproofDomains {
         }
     }
 
+    private func migrateFireproofDomainsToETLDPlus1() {
+        // Perform migration to eTLD+1
+        if !areDomainsMigratedToETLDPlus1 {
+            for domain in container.domains {
+                if let eTLDPlus1Domain = tld.eTLDplus1(domain),
+                   domain != eTLDPlus1Domain {
+                    remove(domain: domain, changeToETLDPlus1: false)
+                    add(domain: eTLDPlus1Domain, notify: false)
+                }
+            }
+            areDomainsMigratedToETLDPlus1 = true
+        }
+    }
+
     func toggle(domain: String) -> Bool {
         dispatchPrecondition(condition: .onQueue(.main))
         if isFireproof(fireproofDomain: domain) {
@@ -86,31 +108,47 @@ internal class FireproofDomains {
 
     func add(domain: String, notify: Bool = true) {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard !isFireproof(fireproofDomain: domain) else {
-            // submodains also?
+
+        guard let eTLDPlus1Domain = tld.eTLDplus1(domain) else {
+            assertionFailure("eTLD+1 domain not available")
+            return
+        }
+        guard !isFireproof(fireproofDomain: eTLDPlus1Domain) else {
             return
         }
 
-        let domainWithoutWWW = domain.droppingWwwPrefix()
         do {
-            let id = try store.add(domainWithoutWWW)
-            try container.add(domain: domainWithoutWWW, withId: id)
+            let id = try store.add(eTLDPlus1Domain)
+            try container.add(domain: eTLDPlus1Domain, withId: id)
         } catch {
-            assertionFailure("could not add fireproof domain \(domain): \(error)")
+            assertionFailure("could not add fireproof domain \(eTLDPlus1Domain): \(error)")
             return
         }
 
         if notify {
             NotificationCenter.default.post(name: Constants.newFireproofDomainNotification, object: self, userInfo: [
-                Constants.newFireproofDomainKey: domainWithoutWWW
+                Constants.newFireproofDomainKey: eTLDPlus1Domain
             ])
         }
     }
 
-    func remove(domain: String) {
+    func remove(domain: String, changeToETLDPlus1: Bool = true) {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard let id = container.remove(domain: domain) else {
-            assertionFailure("fireproof domain \(domain) not found")
+
+        let newDomain: String
+        if changeToETLDPlus1 {
+            guard let eTLDPlus1Domain = tld.eTLDplus1(domain) else {
+                assertionFailure("eTLD+1 domain not available")
+                return
+            }
+
+            newDomain = eTLDPlus1Domain
+        } else {
+            newDomain = domain
+        }
+
+        guard let id = container.remove(domain: newDomain) else {
+            assertionFailure("fireproof domain \(newDomain) not found")
             return
         }
 
@@ -130,12 +168,20 @@ internal class FireproofDomains {
 
     func isFireproof(cookieDomain: String) -> Bool {
         let domainWithoutDotPrefix = cookieDomain.dropping(prefix: ".")
-        return container.contains(domain: domainWithoutDotPrefix, includingSuperdomains: false)
-            || (cookieDomain.hasPrefix(".") && container.contains(superdomain: domainWithoutDotPrefix))
+        guard let eTLDPlus1Domain = tld.eTLDplus1(domainWithoutDotPrefix) else {
+            assertionFailure("eTLD+1 domain not available")
+            return false
+        }
+
+        return container.contains(domain: eTLDPlus1Domain)
     }
 
     func isFireproof(fireproofDomain domain: String) -> Bool {
-        return container.contains(domain: domain)
+        guard let eTLDPlus1Domain = tld.eTLDplus1(domain) else {
+            assertionFailure("eTLD+1 domain not available")
+            return false
+        }
+        return container.contains(domain: eTLDPlus1Domain)
     }
 
     func isURLFireproof(url: URL) -> Bool {

@@ -147,7 +147,6 @@ final class Fire {
     }
 
     @MainActor
-    // swiftlint:disable:next function_body_length
     func burnDomains(_ baseDomains: Set<String>,
                      includingHistory: Bool = true,
                      completion: (() -> Void)? = nil) {
