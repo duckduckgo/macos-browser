@@ -46,6 +46,7 @@ final class BrowserTabViewController: NSViewController {
     private var keyWindowSelectedTabCancellable: AnyCancellable?
     private var alertCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
+    private var previouslySelectedTab: Tab?
 
     private var hoverLabelWorkItem: DispatchWorkItem?
 
@@ -104,11 +105,43 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(windowWillClose(_:)),
                                                name: NSWindow.willCloseNotification,
                                                object: self.view.window)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onDuckDuckGoEmailIncontextSignup),
+                                               name: .emailDidIncontextSignup,
+                                               object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onCloseDuckDuckGoEmailProtection),
+                                               name: .emailDidCloseEmailProtection,
+                                               object: nil)
     }
 
     @objc
     private func windowWillClose(_ notification: NSNotification) {
         self.removeWebViewFromHierarchy()
+    }
+
+    @objc
+    private func onDuckDuckGoEmailIncontextSignup(_ notification: Notification) {
+        self.previouslySelectedTab = tabCollectionViewModel.selectedTab
+        let tab = Tab(content: .url(EmailUrls().emailProtectionInContextSignupLink), shouldLoadInBackground: true)
+        tabCollectionViewModel.append(tab: tab)
+    }
+
+    @objc
+    private func onCloseDuckDuckGoEmailProtection(_ notification: Notification) {
+        guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab else { return }
+        if activeTab.url != nil && EmailUrls().isDuckDuckGoEmailProtection(url: activeTab.url!) {
+            self.closeTab(activeTab)
+        }
+        if let previouslySelectedTab = self.previouslySelectedTab {
+            tabCollectionViewModel.select(tab: previouslySelectedTab)
+            if #available(macOS 11.0, *) {
+                previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
+            }
+            self.previouslySelectedTab = nil
+        }
     }
 
     private func subscribeToSelectedTabViewModel() {
@@ -470,7 +503,7 @@ final class BrowserTabViewController: NSViewController {
             self.contentOverlayPopover = overlayPopover
             WindowControllersManager.shared.stateChanged
                 .sink { [weak overlayPopover] _ in
-                    overlayPopover?.websiteAutofillUserScriptCloseOverlay(nil)
+                    overlayPopover?.viewController.closeContentOverlayPopover()
                 }.store(in: &self.cancellables)
             return overlayPopover
         }()
