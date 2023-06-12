@@ -64,7 +64,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     @Published var usernameIsPrivateEmail: Bool = false
     @Published var hasValidPrivateEmail: Bool = false
     @Published var privateEmailStatus: EmailAliasStatus = .unknown
-    @Published var shouldConfirmPrivateEmailUpdate: Bool = false
+    @Published var isShowingAddressUpdateConfirmAlert: Bool = false
     @Published var isShowingDuckRemovalAlert: Bool = false
 
     var userDuckAddress: String {
@@ -172,10 +172,6 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     @MainActor
     func openURL(_ url: URL) {
         WindowControllersManager.shared.show(url: url, newTab: true)
-    }
-
-    func confirmPrivateEmailStatusUpdate() {
-        shouldConfirmPrivateEmailUpdate = true
     }
 
     func togglePrivateEmailStatus() {
