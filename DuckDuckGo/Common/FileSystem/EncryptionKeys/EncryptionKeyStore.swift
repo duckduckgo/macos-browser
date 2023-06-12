@@ -56,6 +56,7 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
     private let generator: EncryptionKeyGenerating
     private let account: String
 
+    /// Needed to change how we save the key to be removed in the future
     @UserDefaultsWrapper(key: .isEncryptionKeyResaved, defaultValue: false)
     private var isEncryptionKeyResaved: Bool
 
@@ -92,18 +93,21 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
          guard status == errSecSuccess else {
              throw EncryptionKeyStoreError.storageFailed(status)
          }
+        /// Needed to change how we save the key to be removed in the future
+        isEncryptionKeyResaved = true
      }
 
     func readKey() throws -> SymmetricKey {
+        /// Needed to change how we save the key to be removed in the future
         if !isEncryptionKeyResaved {
             try resaveKey()
         }
+
         if let key = try readBase64KeyFromKeychain(account: account) {
             return key
         } else {
             let generatedKey = generator.randomKey()
             try store(key: generatedKey)
-            isEncryptionKeyResaved = true
             return generatedKey
         }
     }
@@ -120,14 +124,15 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
 
     // MARK: - Private
 
+    /// To be removed in the future
     private func resaveKey() throws {
         if let key = try readKeyFromKeychain(account: account) {
             try deleteKey()
             try store(key: key)
-            isEncryptionKeyResaved = true
         }
     }
 
+    /// Deprecated (To be removed in the future)
     private func readKeyFromKeychain(account: String) throws -> SymmetricKey? {
         var query = defaultKeychainQueryAttributes
         query[kSecReturnData as String] = true
