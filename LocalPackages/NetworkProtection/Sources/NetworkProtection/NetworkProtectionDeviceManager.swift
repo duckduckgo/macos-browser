@@ -160,7 +160,6 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
         }
     }
 
-    // swiftlint:disable cyclomatic_complexity
     /// Registers the client with a server following the specified server selection method.  Returns the precise server that was selected and the keyPair to use
     /// for the tunnel configuration.
     ///
@@ -235,7 +234,6 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
             return (cachedServer, keyPair)
         }
     }
-    // swiftlint:enable cyclomatic_complexity
 
     /// Retrieves the first cached server that's registered with the specified key pair.
     ///
