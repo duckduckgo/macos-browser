@@ -136,7 +136,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         credentials.account.domain = urlMatcher.normalizeUrlForWeb(domain)
         credentials.password = password.data(using: .utf8)! // let it crash?
         hasValidPrivateEmail = emailManager.isPrivateEmail(email: username)
-        onSaveRequested(credentials)        
+        onSaveRequested(credentials)
         if emailManager.isPrivateEmail(email: previousUsername) && !hasValidPrivateEmail {
             isShowingDuckRemovalAlert = true
         }
@@ -258,7 +258,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     @MainActor
     private func setPrivateEmailStatus(_ status: EmailAliasStatus) {
         hasValidPrivateEmail = true
-        privateEmailStatus = status        
+        privateEmailStatus = status
     }
 
     @MainActor
