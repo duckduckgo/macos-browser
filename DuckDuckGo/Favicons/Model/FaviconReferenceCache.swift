@@ -26,10 +26,10 @@ final class FaviconReferenceCache {
     private let storing: FaviconStoring
 
     // References to favicon URLs for whole domains
-    private var hostReferences = [String: FaviconHostReference]()
+    private(set) var hostReferences = [String: FaviconHostReference]()
 
     // References to favicon URLs for special URLs
-    private var urlReferences = [URL: FaviconUrlReference]()
+    private(set) var urlReferences = [URL: FaviconUrlReference]()
 
     private var cancellables = Set<AnyCancellable>()
 

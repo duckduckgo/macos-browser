@@ -138,31 +138,32 @@ final class FirePopoverViewModel {
 
                 return tabCollectionViewModel.localHistory
             case .allData:
-                return historyCoordinating.history?.visitedDomains ?? Set<String>()
+                return (historyCoordinating.history?.visitedDomains ?? Set<String>())
+                    .union(tabCollectionViewModel?.localHistory ?? Set<String>())
             }
         }
 
         let visitedDomains = visitedDomains(basedOn: clearingOption)
-        let visitedRootDomains = Set(visitedDomains.compactMap { tld.eTLDplus1($0) })
+        let visitedETLDPlus1Domains = Set(visitedDomains.compactMap { tld.eTLDplus1($0) })
 
-        let fireproofed = visitedRootDomains
+        let fireproofed = visitedETLDPlus1Domains
             .filter { domain in
                 fireproofDomains.isFireproof(fireproofDomain: domain)
             }
-        let selectable = visitedRootDomains
+        let selectable = visitedETLDPlus1Domains
             .subtracting(fireproofed)
 
-        if visitedRootDomains.count == 1, let domain = visitedRootDomains.first, fireproofed.contains(domain) {
+        if visitedETLDPlus1Domains.count == 1, let domain = visitedETLDPlus1Domains.first, fireproofed.contains(domain) {
             self.hasOnlySingleFireproofDomain = true
         } else {
             self.hasOnlySingleFireproofDomain = false
         }
 
         self.selectable = selectable
-            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, sizeCategory: .small)?.image) }
+            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(forDomainOrAnySubdomain: $0, sizeCategory: .small)?.image) }
             .sorted { $0.domain < $1.domain }
         self.fireproofed = fireproofed
-            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, sizeCategory: .small)?.image) }
+            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(forDomainOrAnySubdomain: $0, sizeCategory: .small)?.image) }
             .sorted { $0.domain < $1.domain }
 
         selectAll()

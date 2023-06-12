@@ -35,6 +35,8 @@ protocol FaviconManagement: AnyObject {
 
     func getCachedFavicon(for host: String, sizeCategory: Favicon.SizeCategory) -> Favicon?
 
+    func getCachedFavicon(forDomainOrAnySubdomain domain: String, sizeCategory: Favicon.SizeCategory) -> Favicon?
+
     func burnExcept(fireproofDomains: FireproofDomains, bookmarkManager: BookmarkManager, savedLogins: Set<String>, completion: @escaping () -> Void)
 
     func burnDomains(_ domains: Set<String>, exceptBookmarks bookmarkManager: BookmarkManager, exceptSavedLogins: Set<String>, tld: TLD, completion: @escaping () -> Void)
@@ -200,6 +202,22 @@ final class FaviconManager: FaviconManagement {
         }
 
         return imageCache.get(faviconUrl: faviconUrl)
+    }
+
+    func getCachedFavicon(forDomainOrAnySubdomain domain: String, sizeCategory: Favicon.SizeCategory) -> Favicon? {
+        if let favicon = getCachedFavicon(for: domain, sizeCategory: sizeCategory) {
+            return favicon
+        }
+
+        let availableSubdomains = referenceCache.hostReferences.keys + referenceCache.urlReferences.keys.compactMap { $0.host }
+        let subdomain = availableSubdomains.first { subdomain in
+            subdomain.hasSuffix(domain)
+        }
+
+        if let subdomain {
+            return getCachedFavicon(for: subdomain, sizeCategory: sizeCategory)
+        }
+        return nil
     }
 
     // MARK: - Burning
