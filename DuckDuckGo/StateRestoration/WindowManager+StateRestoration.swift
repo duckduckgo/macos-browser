@@ -22,9 +22,9 @@ import DependencyInjection
 
 extension WindowsManager {
 
-    class func restoreState(from coder: SafeUnarchiver, /*dependencyProvider: WindowManagerStateRestoration.Dependencies,*/ includePinnedTabs: Bool = true, includeWindows: Bool = true) throws {
-        let state = try coder.decodeObject(forKey: NSKeyedArchiveRootObjectKey) { coder in
-            try WindowManagerStateRestoration(coder: coder)
+    class func restoreState(from coder: NSCoder, dependencyProvider: TabCollectionViewModel.DynamicDependencyProvider, includePinnedTabs: Bool = true, includeWindows: Bool = true) throws {
+        let state = try coder.decode(at: NSKeyedArchiveRootObjectKey) { coder in
+            try WindowManagerStateRestoration(coder: coder, dependencies: dependencyProvider)
         }
 
         if let pinnedTabsCollection = state.pinnedTabs {
@@ -75,9 +75,7 @@ extension WindowControllersManager {
 @Injectable
 #endif
 @objc(WMState)
-final class WindowManagerStateRestoration: NSObject, Injectable {
-
-    typealias InjectedDependencies = WindowRestorationItem.Dependencies
+final class WindowManagerStateRestoration: NSObject {
 
     private enum NSSecureCodingKeys {
         static let controllers = "ctrls"
@@ -92,17 +90,16 @@ final class WindowManagerStateRestoration: NSObject, Injectable {
     let pinnedTabs: TabCollection?
 
     @MainActor
-    @available(*, deprecated, message: "use WindowManagerStateRestoration.make")
-    init(coder: SafeUnarchiver) throws {
-        let restorationArray = try coder.decodeArray(forKey: NSSecureCodingKeys.controllers) { coder in
-            try WindowRestorationItem(coder: coder)
+    init(coder: NSCoder, dependencies: TabCollectionViewModel.DynamicDependencyProvider) throws {
+        let restorationArray = try coder.decodeArray(at: NSSecureCodingKeys.controllers) { coder in
+            try WindowRestorationItem(coder: coder, dependencies: dependencies)
         }
 
         self.windows = restorationArray
         self.keyWindowIndex = coder.decodeIfPresent(at: NSSecureCodingKeys.keyWindowIndex)
-        self.pinnedTabs = try? coder.decodeObject(forKey: NSSecureCodingKeys.pinnedTabs) { coder -> TabCollection in
-            try TabCollection(coder: coder)
-        }
+        self.pinnedTabs = try? (coder.decode(at: NSSecureCodingKeys.pinnedTabs) { coder -> TabCollection in
+            try TabCollection(coder: coder, dependencies: dependencies)
+        } as TabCollection)
 
         super.init()
     }
@@ -136,7 +133,7 @@ final class WindowManagerStateRestoration: NSObject, Injectable {
 @Injectable
 #endif
 @objc(WR)
-final class WindowRestorationItem: NSObject, Injectable {
+final class WindowRestorationItem: NSObject {
 
     typealias InjectedDependencies = TabCollectionViewModel.Dependencies
 
@@ -148,7 +145,6 @@ final class WindowRestorationItem: NSObject, Injectable {
     let model: TabCollectionViewModel
     let frame: NSRect
 
-    @available(*, deprecated, message: "use WindowRestorationItem.make")
     @MainActor
     init?(windowController: MainWindowController) {
         guard !windowController.mainViewController.tabCollectionViewModel.isBurner else {
@@ -163,13 +159,12 @@ final class WindowRestorationItem: NSObject, Injectable {
     static var supportsSecureCoding: Bool { true }
 
     @MainActor
-    @available(*, deprecated, message: "use WindowRestorationItem.make")
-    required init(coder: SafeUnarchiver) throws {
-        let model = try coder.decodeObject(forKey: NSSecureCodingKeys.model) { coder in
-            try TabCollectionViewModel(coder: coder)
+    required init(coder: NSCoder, dependencies: TabCollectionViewModel.DynamicDependencyProvider) throws {
+        let model = try coder.decode(at: NSSecureCodingKeys.model) { coder in
+            try TabCollectionViewModel.make(with: coder, dependencies: dependencies)
         }
         self.model = model
-        self.frame = .zero // coder.decodeRect(forKey: NSSecureCodingKeys.frame)
+        self.frame = coder.decodeRect(forKey: NSSecureCodingKeys.frame)
     }
 
     func encode(with coder: NSCoder) {

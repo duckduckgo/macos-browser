@@ -113,7 +113,7 @@ final class Fire {
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          permissionManager: PermissionManagerProtocol = PermissionManager.shared,
          downloadListCoordinator: DownloadListCoordinator = DownloadListCoordinator.shared,
-         windowControllerManager: WindowControllersManager = WindowControllersManager.shared,
+         windowControllerManager: WindowControllersManager? = nil,
          faviconManagement: FaviconManagement = FaviconManager.shared,
          autoconsentManagement: AutoconsentManagement? = nil,
          stateRestorationManager: AppStateRestorationManager? = nil,
@@ -127,7 +127,7 @@ final class Fire {
         self.historyCoordinating = historyCoordinating
         self.permissionManager = permissionManager
         self.downloadListCoordinator = downloadListCoordinator
-        self.windowControllerManager = windowControllerManager
+        self.windowControllerManager = windowControllerManager ?? WindowControllersManager.shared
         self.faviconManagement = faviconManagement
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
         self.pinnedTabsManager = pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager

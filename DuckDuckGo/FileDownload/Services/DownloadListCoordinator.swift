@@ -23,7 +23,7 @@ import Navigation
 
 @MainActor
 private func getFirstAvailableWebView() -> WKWebView? {
-    let wcm = WindowControllersManager.shared
+    let wcm = WindowControllersManager.shared!
     if wcm.lastKeyMainWindowController?.mainViewController.browserTabViewController == nil {
         WindowsManager.openNewWindow(isBurner: false)
     }

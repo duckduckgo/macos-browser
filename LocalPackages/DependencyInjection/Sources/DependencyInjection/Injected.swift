@@ -34,7 +34,9 @@ public struct ClassInjectedValue<Value>: @unchecked Sendable {
     public static subscript<Owner: Injectable & AnyObject>(_enclosingInstance owner: Owner,
                                                            wrapped propertyKeyPath: KeyPath<Owner, Value>,
                                                            storage selfKeyPath: KeyPath<Owner, Self>) -> Value {
-        owner.dependencyProvider._storage[propertyKeyPath] as! Value // swiftlint:disable:this force_cast
+        owner.dependencyProvider._storage.first { (keyPath, value) in
+            type(of: keyPath).valueType == Value.self && "\(keyPath)".split(separator: ".").last == "\(propertyKeyPath)".split(separator: ".").last
+        }!.value as! Value // swiftlint:disable:this force_cast
     }
 
 }

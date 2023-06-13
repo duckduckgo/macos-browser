@@ -45,9 +45,13 @@ public extension Injectable where Self: AnyObject {
 
     var dependencyProvider: DynamicDependencies {
         get {
-            guard let dependencyProvider = objc_getAssociatedObject(self, dependencyProviderKey) as? DynamicDependencies ?? Self._currentDependencies else {
+            if let dependencyProvider = objc_getAssociatedObject(self, dependencyProviderKey) as? DynamicDependencies {
+                return dependencyProvider
+            }
+            guard let dependencyProvider = Self._currentDependencies else {
                 fatalError("dependencyProvider not initialized at init")
             }
+            self.dependencyProvider = dependencyProvider
             return dependencyProvider
         }
         set {

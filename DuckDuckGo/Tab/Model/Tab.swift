@@ -221,7 +221,6 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
                      webCacheManager: WebCacheManager = WebCacheManager.shared,
                      webViewConfiguration: WKWebViewConfiguration? = nil,
                      historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-                     pinnedTabsManager: PinnedTabsManager? = nil,
                      workspace: Workspace = NSWorkspace.shared,
                      privacyFeatures: AnyPrivacyFeatures? = nil,
                      duckPlayer: DuckPlayer? = nil,
@@ -259,7 +258,6 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
                   webCacheManager: webCacheManager,
                   webViewConfiguration: webViewConfiguration,
                   historyCoordinating: historyCoordinating,
-                  pinnedTabsManager: pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager,
                   workspace: workspace,
                   privacyFeatures: privacyFeatures,
                   duckPlayer: duckPlayer,
@@ -290,7 +288,6 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
          webCacheManager: WebCacheManager,
          webViewConfiguration: WKWebViewConfiguration?,
          historyCoordinating: HistoryCoordinating,
-         pinnedTabsManager: PinnedTabsManager,
          workspace: Workspace,
          privacyFeatures: AnyPrivacyFeatures,
          duckPlayer: DuckPlayer,
@@ -349,7 +346,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
         var tabGetter: () -> Tab? = { nil }
         self.extensions = extensionsBuilder
             .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
-                          isTabPinned: { tabGetter().map { tab in pinnedTabsManager.isTabPinned(tab) } ?? false },
+                          isTabPinned: { tabGetter().map { tab in Self._currentDependencies.pinnedTabsManager.isTabPinned(tab) } ?? false },
                           isTabBurner: isBurner,
                           contentPublisher: _content.projectedValue.eraseToAnyPublisher(),
                           titlePublisher: _title.projectedValue.eraseToAnyPublisher(),
@@ -419,7 +416,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
     @inlinable func addDeallocationChecks(for webView: WKWebView) {}
 #endif
 
-    func awakeAfter(using decoder: SafeUnarchiver) -> Any? {
+    override func awakeAfter(using decoder: NSCoder) -> Any? {
         for tabExtension in self.extensions {
             (tabExtension as? (any NSCodingExtension))?.awakeAfter(using: decoder)
         }

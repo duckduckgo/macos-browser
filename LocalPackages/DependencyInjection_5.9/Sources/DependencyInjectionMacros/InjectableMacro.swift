@@ -385,7 +385,9 @@ public struct InjectableMacro: MemberMacro {
                     var dependencies = DynamicDependencies(dependencies)
                     try updateValues?(MutableDynamicDependencies(&dependencies._storage))
                     return \(raw: tryKeyword)self.$_currentDependencies.withValue(dependencies) {
-                      \(raw: tryKeyword)\(raw: initCall)
+                      let instance = \(raw: tryKeyword)\(raw: initCall)
+                      \(raw: declaration.isStruct ? "" : "// initialize dynamic dependency provider\n  _=instance.dependencyProvider")
+                      return instance
                     }
                     """
                 },
@@ -396,7 +398,9 @@ public struct InjectableMacro: MemberMacro {
                     var dependencies = DynamicDependencies(dependencies._storage)
                     try updateValues?(MutableDynamicDependencies(&dependencies._storage))
                     return \(raw: tryKeyword)self.$_currentDependencies.withValue(dependencies) {
-                      \(raw: tryKeyword)\(raw: initCall)
+                      let instance = \(raw: tryKeyword)\(raw: initCall)
+                      \(raw: declaration.isStruct ? "" : "// initialize dynamic dependency provider\n  _=instance.dependencyProvider")
+                      return instance
                     }
                     """
                 }

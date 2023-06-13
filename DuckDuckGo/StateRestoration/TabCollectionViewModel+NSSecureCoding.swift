@@ -26,14 +26,14 @@ extension TabCollectionViewModel {
 
     static var supportsSecureCoding: Bool { true }
 
-    convenience init(coder: SafeUnarchiver) throws {
-        let tabCollection = try coder.decodeObject(forKey: NSSecureCodingKeys.tabCollection) { coder in
-            try TabCollection(coder: coder)
+    static func make(with coder: NSCoder, dependencies: TabCollectionViewModel.DynamicDependencyProvider) throws -> TabCollectionViewModel {
+        let tabCollection = try coder.decode(at: NSSecureCodingKeys.tabCollection) { coder in
+            try TabCollection(coder: coder, dependencies: dependencies)
         }
         let index = coder.decodeIfPresent(at: NSSecureCodingKeys.selectionIndex) ?? 0
         // Burner tabs aren't stored
         let isBurner = false
-        self.init(tabCollection: tabCollection, selectionIndex: index, isBurner: isBurner)
+        return self.make(with: dependencies, tabCollection: tabCollection, selectionIndex: index, isBurner: isBurner)
     }
 
     func encode(with coder: NSCoder) {

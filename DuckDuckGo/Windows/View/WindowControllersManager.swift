@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import Common
+import DependencyInjection
 
 @MainActor
 protocol WindowControllersManagerProtocol {
@@ -34,16 +35,22 @@ protocol WindowControllersManagerProtocol {
 }
 
 @MainActor
-final class WindowControllersManager: WindowControllersManagerProtocol {
+final class WindowControllersManager: WindowControllersManagerProtocol, Injectable {
 
-    static let shared = WindowControllersManager()
+    static var shared: WindowControllersManager!
 
     /**
      * _Initial_ meaning a single window with a single home page tab.
      */
     @Published private(set) var isInInitialState: Bool = true
     @Published private(set) var mainWindowControllers = [MainWindowController]()
-    private(set) var pinnedTabsManager = PinnedTabsManager()
+
+    @Injected
+    var pinnedTabsManager: PinnedTabsManager
+
+    @available(*, deprecated, message: "use WindowControllersManager.make")
+    init() {
+    }
 
     weak var lastKeyMainWindowController: MainWindowController? {
         didSet {

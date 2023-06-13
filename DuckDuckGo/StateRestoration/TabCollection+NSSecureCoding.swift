@@ -23,9 +23,9 @@ extension TabCollection {
     static var supportsSecureCoding: Bool { true }
 
     @MainActor
-    convenience init(coder decoder: SafeUnarchiver) throws {
-        let tabs = try decoder.decodeArray(forKey: NSKeyedArchiveRootObjectKey) { coder in
-            try Tab(coder: coder) ?? { throw DecodingError.valueNotFound(Tab.self, .init(codingPath: [], debugDescription: "")) }()
+    convenience init(coder decoder: NSCoder, dependencies: Tab.DynamicDependencyProvider) throws {
+        let tabs = try decoder.decodeArray(at: NSKeyedArchiveRootObjectKey) { coder in
+            try Tab.make(with: coder, dependencies: dependencies) ?? { throw DecodingError.valueNotFound(Tab.self, .init(codingPath: [], debugDescription: "")) }()
         }
         self.init(tabs: tabs)
     }

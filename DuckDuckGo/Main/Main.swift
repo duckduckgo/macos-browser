@@ -58,6 +58,8 @@ final class AppMain {
             break
         }
 #endif
+        let pinnedTabsManager = PinnedTabsManager()
+        WindowControllersManager.shared = WindowControllersManager.make(with: WindowControllersManager.makeDependencies(pinnedTabsManager: pinnedTabsManager))
 
         _ = NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)
     }

@@ -27,12 +27,14 @@ import DependencyInjection
 @MainActor
 final class AppStateRestorationManager: NSObject, Injectable {
 
-    typealias InjectedDependencies = WindowManagerStateRestoration.Dependencies
-    @Injected var a: Int
+    typealias InjectedDependencies = TabCollectionViewModel.Dependencies
 
     static let fileName = "persistentState"
 
-    private let service: StatePersistenceService
+    @Injected
+    var statePersistenceService: StatePersistenceService
+    private var service: StatePersistenceService { statePersistenceService }
+
     private var appWillRelaunchCancellable: AnyCancellable?
     private var stateChangedCancellable: AnyCancellable?
 
@@ -41,17 +43,7 @@ final class AppStateRestorationManager: NSObject, Injectable {
     private let shouldRestorePreviousSession: Bool
 
     @available(*, deprecated, message: "use AppStateRestorationManager.make")
-    convenience init(fileStore: FileStore) {
-        let service = StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName)
-        self.init(service: service)
-    }
-
-    @available(*, deprecated, message: "use AppStateRestorationManager.make")
-    init(
-        service: StatePersistenceService,
-        shouldRestorePreviousSession: Bool = StartupPreferences().restorePreviousSession
-    ) {
-        self.service = service
+    init(shouldRestorePreviousSession: Bool) {
         self.shouldRestorePreviousSession = shouldRestorePreviousSession
     }
 
@@ -68,13 +60,8 @@ final class AppStateRestorationManager: NSObject, Injectable {
     func restoreLastSessionState(interactive: Bool) {
         do {
             let isCalledAtStartup = !interactive
-//            let dd: DynamicDependencies = self.dependencyProvider
-//            let a: AppStateRestorationManager.DynamicDependencyProvider = dd
-//            let b: WindowManagerStateRestoration.DynamicDependencyProvider = a
-//            let d: Subclass.DynamicDependencyProvider = dd
-//            fatalError()
             try service.restoreState(using: { coder in
-                try WindowsManager.restoreState(from: coder, /*dependencyProvider: b,*/ includePinnedTabs: isCalledAtStartup)
+                try WindowsManager.restoreState(from: coder, dependencyProvider: dependencyProvider, includePinnedTabs: isCalledAtStartup)
             })
             clearLastSessionState()
         } catch CocoaError.fileReadNoSuchFile {
@@ -130,7 +117,7 @@ final class AppStateRestorationManager: NSObject, Injectable {
     private func restorePinnedTabs() {
         do {
             try service.restoreState(using: { coder in
-                try WindowsManager.restoreState(from: coder, /*dependencyProvider: self.dependencyProvider,*/ includeWindows: false)
+                try WindowsManager.restoreState(from: coder, dependencyProvider: self.dependencyProvider, includeWindows: false)
             })
         } catch CocoaError.fileReadNoSuchFile {
             // ignore

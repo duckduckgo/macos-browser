@@ -129,7 +129,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             os_log("App Encryption Key could not be read: %s", "\(error)")
             fileStore = EncryptedFileStore()
         }
-        stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
+
+        struct Dependencies: AppStateRestorationManager.Dependencies {
+            let pinnedTabsManager: PinnedTabsManager
+            let statePersistenceService: StatePersistenceService
+        }
+
+        let dependencies = Dependencies(pinnedTabsManager: WindowControllersManager.shared.pinnedTabsManager,
+                                        statePersistenceService: StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName))
+        stateRestorationManager = AppStateRestorationManager.make(with: dependencies, shouldRestorePreviousSession: StartupPreferences().restorePreviousSession)
 
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         let internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)

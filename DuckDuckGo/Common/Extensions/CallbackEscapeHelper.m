@@ -1,5 +1,5 @@
 //
-//  SafeUnarchiverHelper.h
+//  CallbackEscapeHelper.m
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,15 +16,17 @@
 //  limitations under the License.
 //
 
-#ifndef SafeUnarchiverHelper_h
-#define SafeUnarchiverHelper_h
+#import <Foundation/Foundation.h>
+#import "CallbackEscapeHelper.h"
 
-@interface SafeUnarchiverHelper : NSObject <NSSecureCoding>
+@implementation CallbackEscapeHelper
 
-typedef void (^Callback)(NSCoder * _Nonnull);
-typedef void (^Job)(Callback _Nonnull);
-+ (void)withNonescapingCallback:(NS_NOESCAPE Callback _Nonnull )callback do:(Job _Nonnull)job;
++ (void)withNonescapingCallback:(NS_NOESCAPE Callback)callback do:(NS_NOESCAPE Job)job {
+    void *callbackRef = (__bridge void *)callback;
+    job(^void (void) {
+        Callback callback = (__bridge Callback)callbackRef;
+        callback();
+    });
+}
 
 @end
-
-#endif /* SafeUnarchiverHelper_h */

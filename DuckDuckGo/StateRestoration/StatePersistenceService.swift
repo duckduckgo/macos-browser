@@ -67,8 +67,7 @@ final class StatePersistenceService {
         lastSessionStateArchive = nil
     }
 
-    @MainActor
-    func restoreState(using restore: @escaping @MainActor (SafeUnarchiver) throws -> Void) throws {
+    func restoreState(using restore: (NSCoder) throws -> Void) throws {
         guard let encryptedData = lastSessionStateArchive ?? loadStateFromFile() else {
             throw CocoaError(.fileReadNoSuchFile)
         }
@@ -100,175 +99,12 @@ final class StatePersistenceService {
         fileStore.loadData(at: URL.persistenceLocation(for: self.fileName), decryptIfNeeded: false)
     }
 
-    @MainActor
-    private func restoreState(from archive: Data, using restore: @escaping @MainActor (SafeUnarchiver) throws -> Void) throws {
+    private func restoreState(from archive: Data, using restore: (NSCoder) throws -> Void) throws {
         guard let data = fileStore.decrypt(archive) else {
             throw CocoaError(.fileReadNoSuchFile)
         }
-        let unarchiver = try SafeUnarchiverImp(forReadingFrom: data)
+        let unarchiver = try NSKeyedUnarchiver(forReadingFrom: data)
         try restore(unarchiver)
-    }
-
-}
-
-protocol SafeUnarchiver: AnyObject {
-    func decodeObject<T>(forKey key: String, using creator: @escaping ((SafeUnarchiver) throws -> T)) throws -> T
-    func decodeObject<T>(forKey key: String, using creator: @escaping ((SafeUnarchiver) throws -> T?)) throws -> T?
-
-    func decodeArray<T>(forKey key: String, using creator: @escaping ((SafeUnarchiver) throws -> T)) throws -> [T]
-    func decodeArrayOfOptionals<T>(forKey key: String, using creator: @escaping ((SafeUnarchiver) throws -> T?)) throws -> [T]
-
-    func decodeIfPresent(at key: String) -> Int?
-    func decodeIfPresent<T: NSObject>(at key: String) -> T? where T: NSSecureCoding
-    func decodeIfPresent<T: _ObjectiveCBridgeable>(at key: String) -> T? where T._ObjectiveCType: NSObject, T._ObjectiveCType: NSSecureCoding
-
-    func decode(at key: String) throws -> Int
-    func decode<T: NSObject>(at key: String) throws -> T where T: NSSecureCoding
-    func decode<T: _ObjectiveCBridgeable>(at key: String) throws -> T? where T._ObjectiveCType: NSObject, T._ObjectiveCType: NSSecureCoding
-
-}
-final class SafeUnarchiverImp: NSKeyedUnarchiver, SafeUnarchiver {
-
-    func decode(at key: String) throws -> Int {
-        try NSException.catch {
-            self.decodeInteger(forKey: key)
-        }
-    }
-
-    func decode<T: NSObject>(at key: String) throws -> T where T: NSSecureCoding {
-        return try decodeObject(of: T.self, forKey: key) ?? {
-            throw self.error!
-        }()
-    }
-
-    func decode<T: _ObjectiveCBridgeable>(at key: String) throws -> T? where T._ObjectiveCType: NSObject, T._ObjectiveCType: NSSecureCoding {
-        guard let obj = decodeObject(of: T._ObjectiveCType.self, forKey: key) else {
-            throw self.error!
-        }
-        return T._unconditionallyBridgeFromObjectiveC(obj)
-    }
-
-    public func decodeObject<T>(forKey key: String, using creator: ((SafeUnarchiver) throws -> T)) throws -> T {
-        // encoded object name, also allowing coding non-objects
-        let className = (T.self as? AnyClass).map(NSStringFromClass) ?? "\(T.self)"
-        // collect the creator callback result
-        var result: Result<T, Error>?
-        let callback = { (coder: NSCoder) in
-            do {
-                result = .success(try creator(coder as! SafeUnarchiver)) // swiftlint:disable:this force_cast
-            } catch {
-                result = .failure(error)
-            }
-        }
-        // allow the creator callback to escape to pass it into a Task-local $callback storage
-        SafeUnarchiverHelper.withNonescapingCallback(callback) { callback in
-            // set Task-local storage
-            SafeUnarchiverHelper.$callback.withValue(callback) {
-                // highjack the object instantiation with SafeUnarchiverHelper that will call the creator callback
-                self.setClass(SafeUnarchiverHelper.self, forClassName: className)
-                _=self.decodeObject(of: [SafeUnarchiverHelper.self], forKey: key)
-                // cleanup
-                self.setClass(nil, forClassName: className)
-            }
-        }
-
-        return try result?.get() ?? { throw self.error ?? DecodingError.keyNotFound(key.codingKey, .init(codingPath: [key.codingKey], debugDescription: "key not found")) }()
-    }
-
-    public func decodeObject<T>(forKey key: String, using creator: ((SafeUnarchiver) throws -> T?)) throws -> T? {
-        let className = (T.self as? AnyClass).map(NSStringFromClass) ?? "\(T.self)"
-        var result: Result<T?, Error>?
-        let callback = { (coder: NSCoder) in
-            do {
-                result = .success(try creator(coder as! SafeUnarchiver)) // swiftlint:disable:this force_cast
-            } catch {
-                result = .failure(error)
-            }
-        }
-        SafeUnarchiverHelper.withNonescapingCallback(callback) { callback in
-            SafeUnarchiverHelper.$callback.withValue(callback) {
-                self.setClass(SafeUnarchiverHelper.self, forClassName: className)
-                _=self.decodeObject(of: [SafeUnarchiverHelper.self], forKey: key)
-                self.setClass(nil, forClassName: className)
-            }
-        }
-        if let error = self.error {
-            throw error
-        }
-        return try result?.get() ?? { throw self.error ?? DecodingError.keyNotFound(key.codingKey, .init(codingPath: [key.codingKey], debugDescription: "key not found")) }()
-    }
-
-    public func decodeArray<T>(forKey key: String, using creator: ((SafeUnarchiver) throws -> T)) throws -> [T] {
-        let className = (T.self as? AnyClass).map(NSStringFromClass) ?? "\(T.self)"
-        var result: Result<[T], Error>?
-        let callback = { (coder: NSCoder) in
-            do {
-                if case .failure = result { return }
-                let item = try creator(coder as! SafeUnarchiver) // swiftlint:disable:this force_cast
-                switch result {
-                case .none:
-                    result = .success([item])
-                case .success(var items):
-                    items.append(item)
-                    result = .success(items)
-                case .failure: break
-                }
-            } catch {
-                result = .failure(error)
-                self.finishDecoding()
-            }
-        }
-        SafeUnarchiverHelper.withNonescapingCallback(callback) { callback in
-            SafeUnarchiverHelper.$callback.withValue(callback) {
-                self.setClass(SafeUnarchiverHelper.self, forClassName: className)
-                _=self.decodeObject(of: [NSArray.self, SafeUnarchiverHelper.self], forKey: key)
-                self.setClass(nil, forClassName: className)
-            }
-        }
-        _=callback
-        return try result?.get() ?? { throw self.error ?? DecodingError.keyNotFound(key.codingKey, .init(codingPath: [key.codingKey], debugDescription: "key not found")) }()
-    }
-
-    func decodeArrayOfOptionals<T>(forKey key: String, using creator: ((SafeUnarchiver) throws -> T?)) throws -> [T] {
-        let className = (T.self as? AnyClass).map(NSStringFromClass) ?? "\(T.self)"
-        var result: Result<[T], Error>?
-        let callback = { (coder: NSCoder) in
-            do {
-                if case .failure = result { return }
-                guard let item = try creator(coder as! SafeUnarchiver) else { return } // swiftlint:disable:this force_cast
-                switch result {
-                case .none:
-                    result = .success([item])
-                case .success(var items):
-                    items.append(item)
-                    result = .success(items)
-                case .failure: break
-                }
-            } catch {
-                result = .failure(error)
-                self.finishDecoding()
-            }
-        }
-        SafeUnarchiverHelper.withNonescapingCallback(callback) { callback in
-            SafeUnarchiverHelper.$callback.withValue(callback) {
-                self.setClass(SafeUnarchiverHelper.self, forClassName: className)
-                _=self.decodeObject(of: [NSArray.self, SafeUnarchiverHelper.self], forKey: key)
-                self.setClass(nil, forClassName: className)
-            }
-        }
-        _=callback
-        return try result?.get() ?? { throw self.error ?? DecodingError.keyNotFound(key.codingKey, .init(codingPath: [key.codingKey], debugDescription: "key not found")) }()
-    }
-
-}
-
-extension SafeUnarchiverHelper {
-
-    @TaskLocal static var callback: ((NSCoder) -> Void)?
-    public static var supportsSecureCoding: Bool { true }
-
-    @objc func delegatedInitWithCoder(_ coder: NSCoder) {
-        Self.callback!(coder)
     }
 
 }

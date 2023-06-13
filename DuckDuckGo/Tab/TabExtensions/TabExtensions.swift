@@ -58,7 +58,7 @@ extension TabExtension {
 // Implement these methods for Extension State Restoration
 protocol NSCodingExtension: TabExtension {
     func encode(using coder: NSCoder)
-    func awakeAfter(using decoder: SafeUnarchiver)
+    func awakeAfter(using decoder: NSCoder)
 }
 
 // Define dependencies used to instantiate TabExtensions here:
