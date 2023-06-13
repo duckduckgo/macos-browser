@@ -19,6 +19,7 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 import Combine
+import Common
 
 final class PermissionManagerMock: PermissionManagerProtocol {
 
@@ -50,7 +51,7 @@ final class PermissionManagerMock: PermissionManagerProtocol {
     }
 
     var burnPermissionsOfDomainsCalled = false
-    func burnPermissions(of domains: Set<String>, completion: @escaping () -> Void) {
+    func burnPermissions(of baseDomains: Set<String>, tld: Common.TLD, completion: @escaping () -> Void) {
         burnPermissionsOfDomainsCalled = true
         completion()
     }

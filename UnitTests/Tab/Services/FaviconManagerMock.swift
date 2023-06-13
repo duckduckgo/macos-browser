@@ -19,6 +19,7 @@
 import XCTest
 import Combine
 import BrowserServicesKit
+import Common
 @testable import DuckDuckGo_Privacy_Browser
 
 final class FaviconManagerMock: FaviconManagement {
@@ -42,11 +43,15 @@ final class FaviconManagerMock: FaviconManagement {
         return nil
     }
 
+    func getCachedFavicon(forDomainOrAnySubdomain host: String, sizeCategory: Favicon.SizeCategory) -> Favicon? {
+        return nil
+    }
+
     func burnExcept(fireproofDomains: DuckDuckGo_Privacy_Browser.FireproofDomains, bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, savedLogins: Set<String>, completion: @escaping () -> Void) {
         completion()
     }
 
-    func burnDomains(_ domains: Set<String>, exceptBookmarks bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, exceptSavedLogins: Set<String>, completion: @escaping () -> Void) {
+    func burnDomains(_ domains: Set<String>, exceptBookmarks bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, exceptSavedLogins: Set<String>, tld: Common.TLD, completion: @escaping () -> Void) {
         completion()
     }
 }

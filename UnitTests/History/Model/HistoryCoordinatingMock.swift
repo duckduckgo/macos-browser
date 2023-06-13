@@ -18,6 +18,7 @@
 
 import XCTest
 import BrowserServicesKit
+import Common
 @testable import DuckDuckGo_Privacy_Browser
 
 final class HistoryCoordinatingMock: HistoryCoordinating {
@@ -53,7 +54,7 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
     }
 
     var burnDomainsCalled = false
-    func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
+    func burnDomains(_ baseDomains: Set<String>, tld: Common.TLD, completion: @escaping () -> Void) {
         burnDomainsCalled = true
         completion()
     }

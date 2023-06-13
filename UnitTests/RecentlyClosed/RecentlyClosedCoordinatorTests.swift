@@ -37,7 +37,7 @@ final class RecentlyClosedCoordinatorTests: XCTestCase {
             ])
         ]
 
-        cache.burn(for: ["site1.com", "site3.com"])
+        cache.burn(for: ["site1.com", "site3.com"], tld: ContentBlocking.shared.tld)
 
         XCTAssertEqual(cache.count, 2)
         let tab = try XCTUnwrap(cache[0] as? RecentlyClosedTab)
@@ -58,7 +58,7 @@ final class RecentlyClosedCoordinatorTests: XCTestCase {
             ])
         ]
 
-        cache.burn(for: ["unrelatedsite1.com", "unrelatedsite2.com"])
+        cache.burn(for: ["unrelatedsite1.com", "unrelatedsite2.com"], tld: ContentBlocking.shared.tld)
 
         XCTAssertEqual(cache.count, 3)
 

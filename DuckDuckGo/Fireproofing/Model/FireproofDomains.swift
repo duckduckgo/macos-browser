@@ -49,7 +49,7 @@ internal class FireproofDomains {
         container.domains
     }
 
-    init(store: FireproofDomainsStore = FireproofDomainsStore(tableName: "FireproofDomains"), tld: TLD) {
+    init(store: FireproofDomainsStore = FireproofDomainsStore(tableName: "FireproofDomains"), tld: TLD = ContentBlocking.shared.tld) {
         self.store = store
         self.tld = tld
 
@@ -110,7 +110,7 @@ internal class FireproofDomains {
         dispatchPrecondition(condition: .onQueue(.main))
 
         guard let eTLDPlus1Domain = tld.eTLDplus1(domain) else {
-            assertionFailure("eTLD+1 domain not available")
+            // eTLD+1 domain not available, domain is probably invalid
             return
         }
         guard !isFireproof(fireproofDomain: eTLDPlus1Domain) else {
@@ -138,7 +138,7 @@ internal class FireproofDomains {
         let newDomain: String
         if changeToETLDPlus1 {
             guard let eTLDPlus1Domain = tld.eTLDplus1(domain) else {
-                assertionFailure("eTLD+1 domain not available")
+                // eTLD+1 domain not available, domain is probably invalid
                 return
             }
 
@@ -169,7 +169,7 @@ internal class FireproofDomains {
     func isFireproof(cookieDomain: String) -> Bool {
         let domainWithoutDotPrefix = cookieDomain.dropping(prefix: ".")
         guard let eTLDPlus1Domain = tld.eTLDplus1(domainWithoutDotPrefix) else {
-            assertionFailure("eTLD+1 domain not available")
+            // eTLD+1 domain not available, domain is probably invalid
             return false
         }
 
@@ -178,7 +178,7 @@ internal class FireproofDomains {
 
     func isFireproof(fireproofDomain domain: String) -> Bool {
         guard let eTLDPlus1Domain = tld.eTLDplus1(domain) else {
-            assertionFailure("eTLD+1 domain not available")
+            // eTLD+1 domain not available, domain is probably invalid
             return false
         }
         return container.contains(domain: eTLDPlus1Domain)

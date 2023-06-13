@@ -36,7 +36,8 @@ final class FireTests: XCTestCase {
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
                         permissionManager: permissionManager,
-                        faviconManagement: faviconManager)
+                        faviconManagement: faviconManager,
+                        tld: ContentBlocking.shared.tld)
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
 
         let burningExpectation = expectation(description: "Burning")
@@ -67,7 +68,8 @@ final class FireTests: XCTestCase {
                         historyCoordinating: historyCoordinator,
                         permissionManager: permissionManager,
                         faviconManagement: faviconManager,
-                        pinnedTabsManager: pinnedTabsManager)
+                        pinnedTabsManager: pinnedTabsManager,
+                        tld: ContentBlocking.shared.tld)
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel(with: pinnedTabsManager)
 
         let burningExpectation = expectation(description: "Burning")
@@ -93,7 +95,8 @@ final class FireTests: XCTestCase {
                         historyCoordinating: historyCoordinator,
                         permissionManager: permissionManager,
                         faviconManagement: faviconManager,
-                        recentlyClosedCoordinator: recentlyClosedCoordinator)
+                        recentlyClosedCoordinator: recentlyClosedCoordinator,
+                        tld: ContentBlocking.shared.tld)
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
 
         let finishedBurningExpectation = expectation(description: "Finished burning")
@@ -117,7 +120,8 @@ final class FireTests: XCTestCase {
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
                         permissionManager: permissionManager,
-                        faviconManagement: faviconManager)
+                        faviconManagement: faviconManager,
+                        tld: ContentBlocking.shared.tld)
 
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
 
@@ -144,7 +148,8 @@ final class FireTests: XCTestCase {
         let appStateRestorationManager = AppStateRestorationManager(service: service, shouldRestorePreviousSession: false)
         appStateRestorationManager.applicationDidFinishLaunching()
 
-        let fire = Fire(stateRestorationManager: appStateRestorationManager)
+        let fire = Fire(stateRestorationManager: appStateRestorationManager,
+                        tld: ContentBlocking.shared.tld)
 
         XCTAssertTrue(appStateRestorationManager.canRestoreLastSessionState)
         fire.burnAll(tabCollectionViewModel: .makeTabCollectionViewModel())
@@ -158,7 +163,8 @@ final class FireTests: XCTestCase {
         let appStateRestorationManager = AppStateRestorationManager(service: service, shouldRestorePreviousSession: false)
         appStateRestorationManager.applicationDidFinishLaunching()
 
-        let fire = Fire(stateRestorationManager: appStateRestorationManager)
+        let fire = Fire(stateRestorationManager: appStateRestorationManager,
+                        tld: ContentBlocking.shared.tld)
 
         XCTAssertTrue(appStateRestorationManager.canRestoreLastSessionState)
         fire.burnDomains(["https://example.com"])

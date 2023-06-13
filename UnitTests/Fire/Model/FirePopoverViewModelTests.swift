@@ -82,7 +82,8 @@ final class FirePopoverViewModelTests: XCTestCase {
             tabCollectionViewModel: tabCollectionViewModel,
             historyCoordinating: HistoryCoordinatingMock(),
             fireproofDomains: FireproofDomains(store: FireproofDomainsStoreMock()),
-            faviconManagement: FaviconManagerMock()
+            faviconManagement: FaviconManagerMock(),
+            tld: ContentBlocking.shared.tld
         )
     }
 }
