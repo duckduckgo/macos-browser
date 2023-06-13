@@ -37,6 +37,7 @@ final class DuckPlayerTabExtension {
     private weak var webView: WKWebView? {
         didSet {
             youtubeOverlayScript?.webView = webView
+            youtubePlayerScript?.webView = webView
         }
     }
     private weak var youtubeOverlayScript: YoutubeOverlayUserScript?
@@ -58,6 +59,7 @@ final class DuckPlayerTabExtension {
         scriptsPublisher.sink { [weak self] scripts in
             self?.youtubeOverlayScript = scripts.youtubeOverlayScript
             self?.youtubePlayerScript = scripts.youtubePlayerUserScript
+            self?.youtubePlayerScript?.webView = self?.webView
             self?.youtubeOverlayScript?.delegate = self
             self?.youtubeOverlayScript?.webView = self?.webView
 
@@ -81,16 +83,15 @@ final class DuckPlayerTabExtension {
             }
         }()
 
-        if let hostname = url?.host,
-           let origins = self.youtubeOverlayScript?.allowedOrigins {
-            if origins.contains(hostname) && canPushMessagesToJS {
+        if let hostname = url?.host, let script = youtubeOverlayScript {
+            if script.messageOriginPolicy.isAllowed(hostname) && canPushMessagesToJS {
                 duckPlayer.$mode
                         .dropFirst()
                         .sink { [weak self] playerMode in
                             guard let self = self else {
                                 return
                             }
-                            let userValues = YoutubeOverlayUserScript.UserValues(
+                            let userValues = UserValues(
                                     duckPlayerMode: playerMode,
                                     overlayInteracted: self.duckPlayer.overlayInteracted
                             )
@@ -105,12 +106,16 @@ final class DuckPlayerTabExtension {
 
             if canPushMessagesToJS {
                 duckPlayer.$mode
-                    .map { $0 == .enabled }
-                    .sink { [weak self] shouldAlwaysOpenDuckPlayer in
+                    .dropFirst()
+                    .sink { [weak self] playerMode in
                         guard let self = self else {
                             return
                         }
-                        self.youtubeOverlayScript?.setAlwaysOpenInDuckPlayer(shouldAlwaysOpenDuckPlayer)
+                        let userValues = UserValues(
+                                duckPlayerMode: playerMode,
+                                overlayInteracted: self.duckPlayer.overlayInteracted
+                        )
+                        self.youtubePlayerScript?.userValuesUpdated(userValues: userValues)
                     }
                     .store(in: &youtubePlayerCancellables)
             }
@@ -192,6 +197,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         }
 
         // Don't allow loading Private Player HTML directly
+        // todo(shane): Ensure this restriction still works
         if navigationAction.url.path == YoutubePlayerNavigationHandler.htmlTemplatePath {
             return .cancel
         }
