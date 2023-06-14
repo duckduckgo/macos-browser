@@ -93,7 +93,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
                     button: UserText.pmDeactivate,
                     destructive: true)
         }
-        return (title: UserText.pmEmailActivateConfirmContent,
+        return (title: UserText.pmEmailActivateConfirmTitle,
                 message: UserText.pmEmailActivateConfirmContent,
                 button: UserText.pmActivate,
                 destructive: false)
