@@ -44,6 +44,7 @@ final class FireproofingReferenceTests: XCTestCase {
         referenceTests.removeAll()
     }
 
+    /// Test disabled until Privacy Reference Tests contain the new Fire Button and Fireproofing logic
     func testFireproofing() throws {
         referenceTests = testData.fireButtonFireproofing.tests.filter {
             $0.exceptPlatforms.contains("macos-browser") == false

@@ -21,9 +21,9 @@ import XCTest
 
 final class WebCacheManagerTests: XCTestCase {
 
-    func testWhenCookiesHaveSubDomainsOnSubDomainsAndWildcardsThenOnlyMatchingCookiesRetained() {
+    func testWhenCookiesHaveSubDomainsOnSubDomainsAndWildcardsThenAllCookiesRetained() {
         let logins = MockPreservedLogins(domains: [
-            "mobile.twitter.com"
+            "twitter.com"
         ])
 
         let cookieStore = MockHTTPCookieStore(cookies: [
@@ -50,9 +50,12 @@ final class WebCacheManagerTests: XCTestCase {
         }
         wait(for: [expect], timeout: 15.0)
 
-        XCTAssertEqual(cookieStore.cookies.count, 2)
-        XCTAssertEqual(cookieStore.cookies[0].domain, ".twitter.com")
-        XCTAssertEqual(cookieStore.cookies[1].domain, "mobile.twitter.com")
+        XCTAssertEqual(cookieStore.cookies.count, 5)
+        XCTAssertEqual(cookieStore.cookies[0].domain, "twitter.com")
+        XCTAssertEqual(cookieStore.cookies[1].domain, ".twitter.com")
+        XCTAssertEqual(cookieStore.cookies[2].domain, "mobile.twitter.com")
+        XCTAssertEqual(cookieStore.cookies[3].domain, "fake.mobile.twitter.com")
+        XCTAssertEqual(cookieStore.cookies[4].domain, ".fake.mobile.twitter.com")
     }
 
     func testWhenClearedThenCookiesWithParentDomainsAreRetained() {
@@ -140,7 +143,6 @@ final class WebCacheManagerTests: XCTestCase {
 
         XCTAssertEqual(cookieStore.cookies.count, 1)
         XCTAssertEqual(cookieStore.cookies[0].domain, "www.example.com")
-
     }
 
     func testWhenClearIsCalledThenCompletionIsCalled() {
