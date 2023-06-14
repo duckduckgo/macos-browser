@@ -88,6 +88,8 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
         content.subtitle = subtitle
         if let category {
             content.categoryIdentifier = category.identifier
+            // take maximum possible number of lines so the button doesn‘t overlap the text
+            content.subtitle += "\n\n\n"
         }
 
         if #available(macOS 12, *) {
