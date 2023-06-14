@@ -24,3 +24,30 @@ protocol OperationRunner {
     func optOut(_ extractedProfile: ExtractedProfile) async throws
 }
 
+//TODO: Remove this
+import WebKit
+
+class TestOperationRunner: OperationRunner {
+
+    let webView: WKWebView
+
+    internal init() {
+        self.webView = WKWebView(frame: .init(x: 0, y: 0, width: 100, height: 100))
+    }
+
+
+    func scan(_ profileQuery: BrokerProfileQueryData) async throws -> [ExtractedProfile] {
+        let extractedProfile = ExtractedProfile(name: "John")
+        return [extractedProfile]
+
+    }
+
+    func optOut(_ extractedProfile: ExtractedProfile) async throws {
+        print("Fake opt out")
+    }
+
+    deinit {
+        print("DEINIT")
+    }
+
+}

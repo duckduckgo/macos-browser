@@ -26,7 +26,7 @@ final class OperationsTests: XCTestCase {
         let dataBroker = DataBroker(name: "Test Broker")
         let database = MockDataBase()
 
-        let operationsManager = BrokerOperationsManager(profileQuery: profileQuery,
+        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
                                                         dataBroker: dataBroker,
                                                         database: database)
 
@@ -56,7 +56,7 @@ final class OperationsTests: XCTestCase {
         let dataBroker = DataBroker(name: "Test Broker")
         let database = MockDataBase()
 
-        let operationsManager = BrokerOperationsManager(profileQuery: profileQuery,
+        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
                                                         dataBroker: dataBroker,
                                                         database: database)
 
@@ -77,7 +77,7 @@ final class OperationsTests: XCTestCase {
         try await operationsManager.runScanOperation(on: runner)
         let data = operationsManager.brokerProfileQueryData
 
-        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: data.scanData.lastRunDate!, date2: Date()))
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: data.scanData.lastRunDate, date2: Date()))
         XCTAssertEqual(expectedExtractedProfiles, data.extractedProfiles)
         XCTAssertEqual(data.scanData.historyEvents.count, expectedEvents.count)
         XCTAssertEqual(expectedEvents, data.scanData.historyEvents.map{$0.type})
@@ -88,7 +88,7 @@ final class OperationsTests: XCTestCase {
         let dataBroker = DataBroker(name: "Test Broker")
         let database = MockDataBase()
 
-        let operationsManager = BrokerOperationsManager(profileQuery: profileQuery,
+        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
                                                         dataBroker: dataBroker,
                                                         database: database)
 
@@ -108,7 +108,7 @@ final class OperationsTests: XCTestCase {
             try await operationsManager.runScanOperation(on: runner)
         } catch {
             let data = operationsManager.brokerProfileQueryData
-            XCTAssertNil(data.scanData.lastRunDate)
+            XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: data.scanData.lastRunDate, date2: Date()))
             XCTAssertEqual(expectedExtractedProfiles, data.extractedProfiles)
             XCTAssertEqual(data.scanData.historyEvents.count, expectedHistoryTypes.count)
             XCTAssertEqual(data.scanData.historyEvents.map { $0.type }, expectedHistoryTypes)
@@ -133,7 +133,7 @@ final class OperationsTests: XCTestCase {
 
         let database = MockDataBase(mockBrokerProfileQueryData: profileQueryData)
 
-        let operationsManager = BrokerOperationsManager(profileQuery: profileQuery,
+        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
                                                         dataBroker: dataBroker,
                                                         database: database)
 
@@ -149,7 +149,7 @@ final class OperationsTests: XCTestCase {
         let expectedHistoryTypes: [HistoryEvent.EventType] = [.optOutStarted(profileID: extractedProfile.id), .optOutRequested(profileID: extractedProfile.id)]
 
         XCTAssertNotNil(optOutDataOperationData)
-        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: optOutDataOperationData!.lastRunDate!, date2: Date()))
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: optOutDataOperationData!.lastRunDate, date2: Date()))
         XCTAssertEqual(optOutDataOperationData?.historyEvents.count, expectedHistoryTypes.count)
         XCTAssertEqual(optOutDataOperationData?.historyEvents.map { $0.type }, expectedHistoryTypes)
     }
@@ -172,7 +172,7 @@ final class OperationsTests: XCTestCase {
 
         let database = MockDataBase(mockBrokerProfileQueryData: profileQueryData)
 
-        let operationsManager = BrokerOperationsManager(profileQuery: profileQuery,
+        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
                                                         dataBroker: dataBroker,
                                                         database: database)
 
@@ -190,7 +190,7 @@ final class OperationsTests: XCTestCase {
         let expectedHistoryTypes: [HistoryEvent.EventType] = [.optOutStarted(profileID: extractedProfile.id), .error]
 
         XCTAssertNotNil(optOutDataOperationData)
-        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: optOutDataOperationData!.lastRunDate!, date2: Date()))
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: optOutDataOperationData!.lastRunDate, date2: Date()))
         XCTAssertEqual(optOutDataOperationData?.historyEvents.count, expectedHistoryTypes.count)
         XCTAssertEqual(optOutDataOperationData?.historyEvents.map { $0.type }, expectedHistoryTypes)
     }
@@ -202,7 +202,7 @@ final class OperationsTests: XCTestCase {
 
         let database = MockDataBase()
 
-        let operationsManager = BrokerOperationsManager(profileQuery: profileQuery,
+        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
                                                         dataBroker: dataBroker,
                                                         database: database)
 
@@ -237,7 +237,7 @@ final class OperationsTests: XCTestCase {
 
         let database = MockDataBase(mockBrokerProfileQueryData: profileQueryData)
 
-        let operationsManager = BrokerOperationsManager(profileQuery: profileQuery,
+        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
                                                         dataBroker: dataBroker,
                                                         database: database)
 
@@ -290,7 +290,7 @@ final class OperationsTests: XCTestCase {
         let database = MockDataBase(mockBrokerProfileQueryData: profileQueryData)
 
 
-        let operationsManager = BrokerOperationsManager(profileQuery: profileQuery,
+        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
                                                         dataBroker: dataBroker,
                                                         database: database)
 
@@ -340,7 +340,7 @@ final class OperationsTests: XCTestCase {
 
         let database = MockDataBase(mockBrokerProfileQueryData: profileQueryData)
 
-        let operationsManager = BrokerOperationsManager(profileQuery: profileQuery,
+        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
                                                         dataBroker: dataBroker,
                                                         database: database)
 
@@ -374,7 +374,13 @@ final class OperationsTests: XCTestCase {
     }
 
 
-    func areDatesEqualIgnoringSeconds(date1: Date, date2: Date) -> Bool {
+    func areDatesEqualIgnoringSeconds(date1: Date?, date2: Date?) -> Bool {
+        if date1 == date2 {
+            return true
+        }
+        guard let date1 = date1, let date2 = date2 else {
+            return false
+        }
         let calendar = Calendar.current
         let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
 

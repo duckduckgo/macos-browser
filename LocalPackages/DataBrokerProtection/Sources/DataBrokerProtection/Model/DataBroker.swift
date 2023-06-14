@@ -21,3 +21,14 @@ import Foundation
 struct DataBroker {
     let name: String
 }
+
+extension DataBroker: Hashable {
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+    }
+
+    static func ==(lhs: DataBroker, rhs: DataBroker) -> Bool {
+        return lhs.name == rhs.name
+    }
+}

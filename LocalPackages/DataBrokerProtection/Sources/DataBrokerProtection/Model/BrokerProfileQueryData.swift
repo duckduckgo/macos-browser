@@ -78,9 +78,7 @@ class BrokerProfileQueryData {
             print("Profile removed from optOutsData: \(removedProfileData.extractedProfile)")
 
         }
-
     }
-
 
     func addHistoryEvent(_ event: HistoryEvent, for operation: BrokerOperationData) {
         var op = operation

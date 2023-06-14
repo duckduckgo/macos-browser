@@ -1,5 +1,5 @@
 //
-//  BrokerOperationsManager.swift
+//  BrokerProfileQueryOperationsManager.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -23,19 +23,25 @@ enum OperationsError: Error {
 }
 
 protocol OperationsManager {
-     init(profileQuery: ProfileQuery, dataBroker: DataBroker, database: DataBase)
+    init(profileQuery: ProfileQuery, dataBroker: DataBroker, database: DataBase, notificationCenter: NotificationCenter)
 
     func runScanOperation(on runner: OperationRunner) async throws
     func runOptOutOperation(for extractedProfile: ExtractedProfile, on runner: OperationRunner) async throws
+    func runOptOutOperations(on runner: OperationRunner) async throws
 }
 
-
-class BrokerOperationsManager: OperationsManager {
+class BrokerProfileQueryOperationsManager: OperationsManager {
     let brokerProfileQueryData: BrokerProfileQueryData
     let database: DataBase
+    let notificationCenter: NotificationCenter
 
-    required init(profileQuery: ProfileQuery, dataBroker: DataBroker, database: DataBase) {
+    required init(profileQuery: ProfileQuery,
+                  dataBroker: DataBroker,
+                  database: DataBase,
+                  notificationCenter: NotificationCenter = NotificationCenter.default) {
+
         self.database = database
+        self.notificationCenter = notificationCenter
 
         if let queryData = database.brokerProfileQueryData(for: profileQuery,
                                                            dataBroker: dataBroker) {
@@ -48,7 +54,10 @@ class BrokerOperationsManager: OperationsManager {
     }
 
     func runScanOperation(on runner: OperationRunner) async throws {
-
+        defer {
+            brokerProfileQueryData.scanData.lastRunDate = Date()
+            notificationCenter.post(name: DataBrokerNotifications.didFinishScan, object: brokerProfileQueryData.dataBroker.name)
+        }
         do {
             brokerProfileQueryData.addHistoryEvent(.init(type: .scanStarted), for: brokerProfileQueryData.scanData)
 
@@ -72,6 +81,13 @@ class BrokerOperationsManager: OperationsManager {
             print("ERROR \(error)")
             throw error
         }
+
+    }
+
+    func runOptOutOperations(on runner: OperationRunner) async throws {
+        for extractedProfile in self.brokerProfileQueryData.extractedProfiles {
+            try await runOptOutOperation(for: extractedProfile, on: runner)
+        }
     }
 
     func runOptOutOperation(for extractedProfile: ExtractedProfile, on runner: OperationRunner) async throws {
@@ -80,6 +96,15 @@ class BrokerOperationsManager: OperationsManager {
             throw OperationsError.noOperationDataForExtractedProfile
         }
 
+        guard extractedProfile.removedDate == nil else {
+            print("Profile already extracted")
+            return
+        }
+
+        defer {
+            data.lastRunDate = Date()
+            notificationCenter.post(name: DataBrokerNotifications.didFinishOptOut, object: brokerProfileQueryData.dataBroker.name)
+        }
 
         do {
             brokerProfileQueryData.addHistoryEvent(.init(type: .optOutStarted(profileID: extractedProfile.id)), for: data)
@@ -94,13 +119,8 @@ class BrokerOperationsManager: OperationsManager {
             print("ERROR \(error)")
             throw error
         }
-    }
 
-    private func saveExtractedProfiles(_ profiles: [ExtractedProfile]) {
-        //TODO: Compare old and new profiles, set dateCreated on tem
-        fatalError("no op")
     }
-
 }
 
 struct ExtractedProfileHandler {
