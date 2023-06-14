@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import Common
 
 extension HomePage.Models {
 
@@ -30,6 +31,7 @@ extension HomePage.Models {
         let itemsPerRow = 2
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
+        let queue: DispatchQueue = DispatchQueue(label: "ContinueSetUp")
 
         let privacyConfig = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
         var duckPlayerURL: String {
@@ -70,6 +72,9 @@ extension HomePage.Models {
         @UserDefaultsWrapper(key: .homePageShowCookie, defaultValue: true)
         private var shouldShowCookieSetting: Bool
 
+        @UserDefaultsWrapper(key: .homePageShowAddToDock, defaultValue: true)
+        private var shouldShowAddToDockSetting: Bool
+
         @UserDefaultsWrapper(key: .homePageIsFirstSession, defaultValue: true)
         private var isFirstSession: Bool
 
@@ -80,6 +85,8 @@ extension HomePage.Models {
         var hasContent: Bool {
             return !featuresMatrix.isEmpty
         }
+
+        private var wasAddedToDockInThisSession = false
 
         lazy var listOfFeatures = isFirstSession ? FeatureType.allCases: randomiseFeatures()
 
@@ -139,6 +146,10 @@ extension HomePage.Models {
                     })
                     cookiePopUpVisible = true
                 }
+            case .addToDock:
+                queue.async {
+                    self.addToDock()
+                }
             }
         }
 
@@ -154,6 +165,8 @@ extension HomePage.Models {
                 shouldShowEmailProtectionSetting = false
             case .cookiePopUp:
                 shouldShowCookieSetting = false
+            case .addToDock:
+                shouldShowAddToDockSetting = false
             }
             refreshFeaturesMatrix()
         }
@@ -184,6 +197,12 @@ extension HomePage.Models {
                     if shouldCookieCardBeVisible {
                         features.append(feature)
                     }
+                case .addToDock:
+#if !APPSTORE
+                    if shouldAddToDockCardBeVisible {
+                        features.append(feature)
+                    }
+#endif
                 }
             }
             featuresMatrix = features.chunked(into: itemsPerRow)
@@ -235,6 +254,12 @@ extension HomePage.Models {
             privacyPreferences.autoconsentEnabled != true
         }
 
+        private var shouldAddToDockCardBeVisible: Bool {
+            shouldShowAddToDockSetting &&
+            !isAppKeptInDock &&
+            !wasAddedToDockInThisSession
+        }
+
     }
 
     // MARK: Feature Type
@@ -244,6 +269,7 @@ extension HomePage.Models {
         case emailProtection
         case defaultBrowser
         case importBookmarksAndPasswords
+        case addToDock
 
         var title: String {
             switch self {
@@ -257,6 +283,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionCardTitle
             case .cookiePopUp:
                 return UserText.newTabSetUpCookieManagerCardTitle
+            case .addToDock:
+                return UserText.newTabAddToDockCardTitle
             }
         }
 
@@ -272,6 +300,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionSummary
             case .cookiePopUp:
                 return UserText.newTabSetUpCookieManagerSummary
+            case .addToDock:
+                return UserText.newTabAddToDockSummary
             }
         }
 
@@ -287,6 +317,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionAction
             case .cookiePopUp:
                 return UserText.newTabSetUpCookieManagerAction
+            case .addToDock:
+                return UserText.newTabSetUpAddToDockAction
             }
         }
 
@@ -304,6 +336,8 @@ extension HomePage.Models {
                 return NSImage(named: "inbox-128")!.resized(to: iconSize)!
             case .cookiePopUp:
                 return NSImage(named: "Cookie-Popups-128")!.resized(to: iconSize)!
+            case .addToDock:
+                return NSImage(named: "Dock-128")!.resized(to: iconSize)!
             }
         }
     }
@@ -331,4 +365,58 @@ extension HomePageViewController: ContinueSetUpVewModelDelegate {
     func showCookieConsentPopUp(manager: CookieConsentPopoverManager, completion: ((Bool) -> Void)?) {
         manager.show(on: self.view, animated: true, type: .setUp, result: completion)
     }
+}
+
+// MARK: Add to dock methods
+extension HomePage.Models.ContinueSetUpModel {
+    private var isAppKeptInDock: Bool {
+        let bundleIdentifier = Bundle.main.bundleIdentifier
+        let preferencesPath = "\(NSHomeDirectory())/Library/Preferences/com.apple.dock.plist"
+
+        if let dockPreferences = NSDictionary(contentsOfFile: preferencesPath),
+           let persistentApps = dockPreferences["persistent-apps"] as? [NSDictionary] {
+            for app in persistentApps {
+                if let tileData = app["tile-data"] as? NSDictionary,
+                   let appBundleIdentifier = tileData["bundle-identifier"] as? String,
+                   appBundleIdentifier == bundleIdentifier {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    private func addToDock() {
+        let script = """
+        on run
+          set myapp to "\(Bundle.main.bundlePath)"
+          try
+            tell application "Dock" to quit
+          end try
+          do shell script "defaults write com.apple.dock persistent-apps -array-add '<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>" & myapp & "</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>'"
+          try
+            tell application "Dock" to activate
+          end try
+        end run
+        """
+
+        if let appleScript = NSAppleScript(source: script) {
+            var errorInfo: NSDictionary?
+            _ = appleScript.executeAndReturnError(&errorInfo)
+
+            if let error = errorInfo {
+                let errorString = "Add to dock; script execution error: \(error)"
+                os_log(.error, log: .default, "%{public}@", errorString)
+            } else {
+                self.wasAddedToDockInThisSession = true
+                DispatchQueue.main.async {
+                    self.refreshFeaturesMatrix()
+                }
+            }
+        } else {
+            let errorString = "Add to dock; failed to create NSAppleScript instance"
+            os_log(.error, log: .default, "%{public}@", errorString)
+        }
+    }
+
 }

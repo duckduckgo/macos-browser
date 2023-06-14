@@ -293,11 +293,14 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     func testThtatWhenIfAllFeatureActiveThenVisibleMatrixIsEmpty() {
+        var homePageShowAddToDock = UserDefaultsWrapper<Bool>(key: .homePageShowAddToDock, defaultValue: true)
+        homePageShowAddToDock.wrappedValue = false
         capturingDefaultBrowserProvider.isDefault = true
         emailStorage.isEmailProtectionEnabled = true
         privacyPreferences.autoconsentEnabled = true
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
         capturingDataImportProvider.didImport = true
+
         vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences)
 
         XCTAssertEqual(vm.visibleFeaturesMatrix, [[]])
@@ -320,6 +323,9 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm.removeItem(for: .cookiePopUp)
         XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.cookiePopUp))
+
+        vm.removeItem(for: .addToDock)
+        XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.addToDock))
 
         let vm2 = HomePage.Models.ContinueSetUpModel.fixture()
         XCTAssertTrue(vm2.visibleFeaturesMatrix.flatMap { $0 }.isEmpty)
