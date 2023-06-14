@@ -48,6 +48,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBOutlet var addressBarLeftToNavButtonsConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarProportionalWidthConstraint: NSLayoutConstraint!
+    @IBOutlet var navigationBarButtonsLeadingConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarTopConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarBottomConstraint: NSLayoutConstraint!
     @IBOutlet var buttonsTopConstraint: NSLayoutConstraint!
@@ -169,6 +170,7 @@ final class NavigationBarViewController: NSViewController {
             addressBarBottomConstraint.constant = 0
             addressBarLeftToNavButtonsConstraint.isActive = false
             addressBarProportionalWidthConstraint.isActive = false
+            navigationBarButtonsLeadingConstraint.isActive = false
 
             // This pulls the dashboard button to the left for the popup
             NSLayoutConstraint.activate(addressBarStack.addConstraints(to: view, [
