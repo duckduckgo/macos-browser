@@ -19,8 +19,11 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-
 class MockBookmarkManager: BookmarkManager {
+    func cleanUpBookmarksDatabase() {}
+
+    func updateBookmarkDatabaseCleanupSchedule(shouldEnable: Bool) {}
+
     func isUrlFavorited(url: URL) -> Bool {
         return false
     }

@@ -24,12 +24,6 @@ extension HomePage.Views {
     struct ContinueSetUpView: View {
 
         @EnvironmentObject var model: HomePage.Models.ContinueSetUpModel
-        @State var isHovering = false {
-            didSet {
-                moreOrLessButtonVisibility = isHovering && model.isMoreOrLessButtonNeeded ? .visible : .invisible
-            }
-        }
-        @State private var moreOrLessButtonVisibility: ViewVisibility = .invisible
 
         var body: some View {
             ZStack {
@@ -45,15 +39,12 @@ extension HomePage.Views {
                 VStack(spacing: 20) {
                     if #available(macOS 12.0, *) {
                         LazyVStack(spacing: 4) {
-                            FeaturesGrid(isHovering: $isHovering, moreOrLessButtonVisibility: $moreOrLessButtonVisibility)
+                            FeaturesGrid()
                         }
                         .frame(maxWidth: .infinity)
                     } else {
-                        FeaturesGrid(isHovering: $isHovering, moreOrLessButtonVisibility: $moreOrLessButtonVisibility)
+                        FeaturesGrid()
                     }
-                }
-                .onHover { isHovering in
-                    self.isHovering = isHovering
                 }
             }
             .visibility(model.hasContent ? .visible : .gone)
@@ -62,9 +53,6 @@ extension HomePage.Views {
         struct FeaturesGrid: View {
 
             @EnvironmentObject var model: HomePage.Models.ContinueSetUpModel
-
-            @Binding var isHovering: Bool
-            @Binding var moreOrLessButtonVisibility: ViewVisibility
 
             var body: some View {
                 if #available(macOS 12.0, *) {
@@ -90,7 +78,7 @@ extension HomePage.Views {
 
                 MoreOrLess(isExpanded: $model.shouldShowAllFeatures)
                     .padding(.top, 2)
-                    .visibility(moreOrLessButtonVisibility)
+                    .visibility(model.isMoreOrLessButtonNeeded ? .visible : .invisible)
             }
         }
 

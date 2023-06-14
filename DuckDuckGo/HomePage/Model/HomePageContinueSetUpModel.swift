@@ -70,6 +70,9 @@ extension HomePage.Models {
         @UserDefaultsWrapper(key: .homePageShowCookie, defaultValue: true)
         private var shouldShowCookieSetting: Bool
 
+        @UserDefaultsWrapper(key: .homePageIsFirstSession, defaultValue: true)
+        private var isFirstSession: Bool
+
         var isMoreOrLessButtonNeeded: Bool {
             return featuresMatrix.count > 1
         }
@@ -77,6 +80,8 @@ extension HomePage.Models {
         var hasContent: Bool {
             return !featuresMatrix.isEmpty
         }
+
+        lazy var listOfFeatures = isFirstSession ? FeatureType.allCases: randomiseFeatures()
 
         private var featuresMatrix: [[FeatureType]] = [[]] {
             didSet {
@@ -100,7 +105,8 @@ extension HomePage.Models {
             self.privacyPreferences = privacyPreferences
             self.cookieConsentPopoverManager = cookieConsentPopoverManager
             self.duckPlayerPreferences = duckPlayerPreferences
-            refreshFeaturesMatrix()
+            refreshFeaturesMatrix(isNewInstance: true)
+            isFirstSession = false
         }
 
         @MainActor func performAction(for featureType: FeatureType) {
@@ -112,7 +118,7 @@ extension HomePage.Models {
                     defaultBrowserProvider.openSystemPreferences()
                 }
             case .importBookmarksAndPasswords:
-                dataImportProvider.showImportWindow(completion: refreshFeaturesMatrix)
+                dataImportProvider.showImportWindow(completion: {self.refreshFeaturesMatrix()})
             case .duckplayer:
                 if let videoUrl = URL(string: duckPlayerURL) {
                     let tab = Tab(content: .url(videoUrl), shouldLoadInBackground: true)
@@ -153,9 +159,10 @@ extension HomePage.Models {
         }
 
         // swiftlint:disable cyclomatic_complexity
-        func refreshFeaturesMatrix() {
+        func refreshFeaturesMatrix(isNewInstance: Bool = false) {
             var features: [FeatureType] = []
-            for feature in FeatureType.allCases {
+
+            for feature in listOfFeatures {
                 switch feature {
                 case .defaultBrowser:
                     if shouldMakeDefaultCardBeVisible {
@@ -179,12 +186,21 @@ extension HomePage.Models {
                     }
                 }
             }
-            features.shuffle()
             featuresMatrix = features.chunked(into: itemsPerRow)
         }
         // swiftlint:enable cyclomatic_complexity
 
         // Helper Functions
+        private func randomiseFeatures() -> [FeatureType] {
+            var features = FeatureType.allCases
+            features.shuffle()
+            for (index, feature) in features.enumerated() where feature == .defaultBrowser {
+                features.remove(at: index)
+                features.insert(feature, at: 0)
+            }
+            return features
+        }
+
         private func updateVisibleMatrix() {
             guard !featuresMatrix.isEmpty else {
                 visibleFeaturesMatrix = [[]]
@@ -223,8 +239,8 @@ extension HomePage.Models {
 
     // MARK: Feature Type
     enum FeatureType: CaseIterable {
-        case cookiePopUp
         case duckplayer
+        case cookiePopUp
         case emailProtection
         case defaultBrowser
         case importBookmarksAndPasswords

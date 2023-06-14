@@ -67,7 +67,7 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertEqual(vm.horizontalSpacing, HomePage.Models.FeaturesGridDimensions.horizontalSpacing)
         XCTAssertEqual(vm.verticalSpacing, HomePage.Models.FeaturesGridDimensions.verticalSpacing)
         XCTAssertEqual(vm.gridWidth, HomePage.Models.FeaturesGridDimensions.width)
-        XCTAssertEqual(vm.itemsPerRow, HomePage.featuresPerRow)
+        XCTAssertEqual(vm.itemsPerRow, 2)
     }
 
     @MainActor func testIsMoreOrLessButtonNeededReturnTheExpectedValue() {
@@ -75,15 +75,26 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         capturingDefaultBrowserProvider.isDefault = true
         capturingDataImportProvider.didImport = true
-        vm = HomePage.Models.ContinueSetUpModel.fixture(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider)
-
+        duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
+        privacyPreferences.autoconsentEnabled = true
+        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences)
+        print(vm.visibleFeaturesMatrix)
         XCTAssertFalse(vm.isMoreOrLessButtonNeeded)
     }
 
-    func testWhenInitialisedTheMatrixHasAllElements() {
-        let expectedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: HomePage.featuresPerRow)
+    func testWhenInitialisedForTheFirstTimeTheMatrixHasAllElementsInTheRightOrder() {
+        let expectedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: vm.itemsPerRow)
 
         XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
+    }
+
+    @MainActor func testWhenInitialisedNotForTheFirstTimeTheMatrixHasAllElementsInTheRightOrder() {
+        var homePageIsFirstSession = UserDefaultsWrapper<Bool>(key: .homePageIsFirstSession, defaultValue: true)
+        homePageIsFirstSession.wrappedValue = false
+        vm = HomePage.Models.ContinueSetUpModel.fixture()
+
+        XCTAssertEqual(vm.visibleFeaturesMatrix[0][0], HomePage.Models.FeatureType.defaultBrowser)
+        XCTAssertEqual(vm.visibleFeaturesMatrix.reduce([], +).count, HomePage.Models.FeatureType.allCases.count)
     }
 
     func testWhenTogglingShowAllFeatureTheCorrectElementsAreVisible() {
@@ -91,13 +102,12 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm.shouldShowAllFeatures = true
 
-        XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
+        XCTAssertTrue(doTheyContainTheSameElements(matrix1: vm.visibleFeaturesMatrix, matrix2: expectedMatrix))
 
         vm.shouldShowAllFeatures = false
 
         XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
-        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
-        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
+        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= vm.itemsPerRow)
     }
 
     @MainActor func testWhenAskedToPerformActionFotDefaultBrowserCardThenItPresentsTheDefaultBrowserPrompt() {
@@ -123,13 +133,12 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm.shouldShowAllFeatures = true
 
-        XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
+        XCTAssertTrue(doTheyContainTheSameElements(matrix1: vm.visibleFeaturesMatrix, matrix2: expectedMatrix))
 
         vm.shouldShowAllFeatures = false
 
         XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
-        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
-        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
+        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= vm.itemsPerRow)
     }
 
     @MainActor func testWhenAskedToPerformActionForImportPromptThrowsThenItOpensImportWindow() {
@@ -152,13 +161,12 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm.shouldShowAllFeatures = true
 
-        XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
+        XCTAssertTrue(doTheyContainTheSameElements(matrix1: vm.visibleFeaturesMatrix, matrix2: expectedMatrix))
 
         vm.shouldShowAllFeatures = false
 
         XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
-        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
-        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
+        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= vm.itemsPerRow)
     }
 
     @MainActor func testWhenAskedToPerformActionForEmailProtectionThenItOpensEmailProtectionSite() {
@@ -175,13 +183,12 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm.shouldShowAllFeatures = true
 
-        XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
+        XCTAssertTrue(doTheyContainTheSameElements(matrix1: vm.visibleFeaturesMatrix, matrix2: expectedMatrix))
 
         vm.shouldShowAllFeatures = false
 
         XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
-        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
-        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
+        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= vm.itemsPerRow)
     }
 
     @MainActor func testWhenAskedToPerformActionForCookieConsentThenShowsCookiePopUp() {
@@ -203,13 +210,12 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm.shouldShowAllFeatures = true
 
-        XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
+        XCTAssertTrue(doTheyContainTheSameElements(matrix1: vm.visibleFeaturesMatrix, matrix2: expectedMatrix))
 
         vm.shouldShowAllFeatures = false
 
         XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
-        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
-        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
+        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= vm.itemsPerRow)
     }
 
     @MainActor func testWhenAskedToPerformActionForDuckPlayerThenItOpensYoutubeVideo() {
@@ -227,13 +233,12 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm.shouldShowAllFeatures = true
 
-        XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
+        XCTAssertTrue(doTheyContainTheSameElements(matrix1: vm.visibleFeaturesMatrix, matrix2: expectedMatrix))
 
         vm.shouldShowAllFeatures = false
 
         XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
-        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
-        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
+        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= vm.itemsPerRow)
     }
 
     @MainActor func testWhenUserHasDuckPlayerDisabledAndOverlayButtonNotPressedTheCorrectElementsAreVisible() {
@@ -245,13 +250,12 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm.shouldShowAllFeatures = true
 
-        XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
+        XCTAssertTrue(doTheyContainTheSameElements(matrix1: vm.visibleFeaturesMatrix, matrix2: expectedMatrix))
 
         vm.shouldShowAllFeatures = false
 
         XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
-        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
-        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
+        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= vm.itemsPerRow)
     }
 
     @MainActor func testWhenUserHasDuckPlayerOnAlwaysAskAndOverlayButtonNotPressedTheCorrectElementsAreVisible() {
@@ -263,13 +267,12 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm.shouldShowAllFeatures = true
 
-        XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
+        XCTAssertTrue(doTheyContainTheSameElements(matrix1: vm.visibleFeaturesMatrix, matrix2: expectedMatrix))
 
         vm.shouldShowAllFeatures = false
 
         XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
-        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
-        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
+        XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= vm.itemsPerRow)
     }
 
     @MainActor func testWhenUserHasDuckPlayerOnAlwaysAskAndOverlayButtonIsPressedTheCorrectElementsAreVisible() {
@@ -281,13 +284,12 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm.shouldShowAllFeatures = true
 
-        XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
+        XCTAssertTrue(doTheyContainTheSameElements(matrix1: vm.visibleFeaturesMatrix, matrix2: expectedMatrix))
 
         vm.shouldShowAllFeatures = false
 
         XCTAssertEqual(vm.visibleFeaturesMatrix.count, 1)
         XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
-        XCTAssertEqual(vm.visibleFeaturesMatrix, [expectedMatrix[0]])
     }
 
     func testThtatWhenIfAllFeatureActiveThenVisibleMatrixIsEmpty() {
@@ -302,7 +304,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testDismissedItemsAreRemovedFromVisibleMatrixAndChoicesArePersisted() {
-        XCTAssertEqual(HomePage.Models.FeatureType.allCases.chunked(into: HomePage.featuresPerRow), vm.visibleFeaturesMatrix)
+        XCTAssertEqual(HomePage.Models.FeatureType.allCases.chunked(into: vm.itemsPerRow), vm.visibleFeaturesMatrix)
 
         vm.removeItem(for: .defaultBrowser)
         XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.defaultBrowser))
@@ -331,7 +333,17 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertFalse(vm2.shouldShowAllFeatures)
     }
 
-
+    private func doTheyContainTheSameElements(matrix1: [[HomePage.Models.FeatureType]], matrix2: [[HomePage.Models.FeatureType]]) -> Bool {
+        var features1 = matrix1.reduce([], +)
+        var features2 = matrix2.reduce([], +)
+        if features1.count != features2.count {
+            return false
+        }
+        for feature in features1 where !features2.contains(feature) {
+            return false
+        }
+        return true
+    }
     private func expectedFeatureMatrixWithout(type: HomePage.Models.FeatureType) -> [[HomePage.Models.FeatureType]] {
         var features = HomePage.Models.FeatureType.allCases
         let indexToRemove = features.firstIndex(of: type)!
