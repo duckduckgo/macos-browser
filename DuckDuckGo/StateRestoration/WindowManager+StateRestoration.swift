@@ -74,8 +74,7 @@ extension WindowControllersManager {
 #if swift(>=5.9)
 @Injectable
 #endif
-@objc(WMState)
-final class WindowManagerStateRestoration: NSObject {
+struct WindowManagerStateRestoration: NSSecureEncodable {
 
     private enum NSSecureCodingKeys {
         static let controllers = "ctrls"
@@ -89,6 +88,8 @@ final class WindowManagerStateRestoration: NSObject {
     let keyWindowIndex: Int?
     let pinnedTabs: TabCollection?
 
+    static var className: String? { "WMState" }
+
     @MainActor
     init(coder: NSCoder, dependencies: TabCollectionViewModel.DynamicDependencyProvider) throws {
         let restorationArray = try coder.decodeArray(at: NSSecureCodingKeys.controllers) { coder in
@@ -100,11 +101,8 @@ final class WindowManagerStateRestoration: NSObject {
         self.pinnedTabs = try? (coder.decode(at: NSSecureCodingKeys.pinnedTabs) { coder -> TabCollection in
             try TabCollection(coder: coder, dependencies: dependencies)
         } as TabCollection)
-
-        super.init()
     }
 
-    @available(*, deprecated, message: "use WindowManagerStateRestoration.make")
     @MainActor
     init(windowControllersManager: WindowControllersManager) {
         self.windows = windowControllersManager.mainWindowControllers
@@ -123,17 +121,16 @@ final class WindowManagerStateRestoration: NSObject {
     }
 
     func encode(with coder: NSCoder) {
-        coder.encode(windows as NSArray, forKey: NSSecureCodingKeys.controllers)
+        coder.encode(windows, forKey: NSSecureCodingKeys.controllers)
         keyWindowIndex.map(coder.encode(forKey: NSSecureCodingKeys.keyWindowIndex))
-        coder.encode(pinnedTabs, forKey: NSSecureCodingKeys.pinnedTabs)
+        pinnedTabs.map(coder.encode(forKey: NSSecureCodingKeys.pinnedTabs))
     }
 }
 
 #if swift(>=5.9)
 @Injectable
 #endif
-@objc(WR)
-final class WindowRestorationItem: NSObject {
+struct WindowRestorationItem: NSSecureEncodable {
 
     typealias InjectedDependencies = TabCollectionViewModel.Dependencies
 
@@ -156,10 +153,10 @@ final class WindowRestorationItem: NSObject {
         self.model = windowController.mainViewController.tabCollectionViewModel
     }
 
-    static var supportsSecureCoding: Bool { true }
+    static var className: String? { "WR" }
 
     @MainActor
-    required init(coder: NSCoder, dependencies: TabCollectionViewModel.DynamicDependencyProvider) throws {
+    init(coder: NSCoder, dependencies: TabCollectionViewModel.DynamicDependencyProvider) throws {
         let model = try coder.decode(at: NSSecureCodingKeys.model) { coder in
             try TabCollectionViewModel.make(with: coder, dependencies: dependencies)
         }
@@ -171,4 +168,5 @@ final class WindowRestorationItem: NSObject {
         coder.encode(frame, forKey: NSSecureCodingKeys.frame)
         coder.encode(model, forKey: NSSecureCodingKeys.model)
     }
+
 }

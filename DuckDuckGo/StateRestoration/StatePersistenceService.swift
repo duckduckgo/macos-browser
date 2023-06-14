@@ -36,8 +36,7 @@ final class StatePersistenceService {
         lastSessionStateArchive != nil
     }
 
-    @MainActor
-    func persistState(using encoder: @escaping @MainActor (NSCoder) -> Void, sync: Bool = false) {
+    func persistState(using encoder: (NSCoder) -> Void, sync: Bool = false) {
         dispatchPrecondition(condition: .onQueue(.main))
 
         let data = archive(using: encoder)
@@ -76,8 +75,7 @@ final class StatePersistenceService {
 
     // MARK: - Private
 
-    @MainActor
-    private func archive(using encoder: @escaping @MainActor (NSCoder) -> Void) -> Data {
+    private func archive(using encoder: (NSCoder) -> Void) -> Data {
         let archiver = NSKeyedArchiver(requiringSecureCoding: true)
         encoder(archiver)
         return archiver.encodedData

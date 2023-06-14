@@ -18,9 +18,7 @@
 
 import Foundation
 
-extension TabCollection {
-
-    static var supportsSecureCoding: Bool { true }
+extension TabCollection: NSSecureEncodable {
 
     @MainActor
     convenience init(coder decoder: NSCoder, dependencies: Tab.DynamicDependencyProvider) throws {

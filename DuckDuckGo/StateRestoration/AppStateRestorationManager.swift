@@ -127,8 +127,8 @@ final class AppStateRestorationManager: NSObject, Injectable {
         }
     }
 
-    @MainActor
     private func persistAppState(sync: Bool = false) {
         service.persistState(using: WindowControllersManager.shared.encodeState(with:), sync: sync)
     }
+
 }

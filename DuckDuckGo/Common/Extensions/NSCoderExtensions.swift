@@ -18,7 +18,63 @@
 
 import Foundation
 
+protocol NSSecureEncodable {
+    static var className: String? { get }
+    func encode(with coder: NSCoder)
+}
+extension NSSecureEncodable {
+    static var className: String? { nil }
+}
+
 extension NSCoder {
+
+    enum CodingKey: Swift.CodingKey {
+        case string(String)
+        case int(Int)
+
+        var intValue: Int? {
+            if case .int(let value) = self { return value }
+            return nil
+        }
+
+        var stringValue: String {
+            switch self {
+            case .string(let value):
+                return value
+            case .int(let value):
+                return String(value)
+            }
+        }
+
+        init(intValue: Int) {
+            self = .int(intValue)
+        }
+
+        init(stringValue: String) {
+            self = .string(stringValue)
+        }
+
+        static let rootObject = CodingKey(stringValue: NSKeyedArchiveRootObjectKey)
+    }
+
+    fileprivate static func className(for type: Any.Type) -> String {
+        (type as? NSSecureEncodable.Type)?.className
+            ?? String(((type as? AnyClass).map(NSStringFromClass) ?? "\(type)").split(separator: ".").last!)
+    }
+
+    func encode<T: NSSecureEncodable>(_ value: T, forKey key: String) {
+        let archiver = self as! NSKeyedArchiver // swiftlint:disable:this force_cast
+
+        let helper = ArchiverHelper(value: value)
+        archiver.encode(helper, forKey: key)
+    }
+
+    func encode<T: NSSecureEncodable>(_ array: [T], forKey key: String) {
+        let archiver = self as! NSKeyedArchiver // swiftlint:disable:this force_cast
+
+        let array = array.map(ArchiverHelper.init(value:)) as NSArray
+        archiver.encode(array, forKey: key)
+    }
 
     func encode<T: NSObject>(forKey key: String) -> (T) -> Void where T: NSSecureCoding {
         return { object in
@@ -26,8 +82,20 @@ extension NSCoder {
         }
     }
 
+    func encode<T: NSSecureEncodable>(forKey key: String) -> (T) -> Void {
+        return { object in
+            self.encode(object, forKey: key)
+        }
+    }
+
+    func encode<T: NSSecureEncodable>(forKey key: String) -> ([T]) -> Void {
+        return { array in
+            self.encode(array, forKey: key)
+        }
+    }
+
     func encode<T: _ObjectiveCBridgeable>(forKey key: String) -> (T) -> Void
-        where T._ObjectiveCType: NSObject, T._ObjectiveCType: NSSecureCoding {
+    where T._ObjectiveCType: NSObject, T._ObjectiveCType: NSSecureCoding {
 
         return { object in
             self.encode(object._bridgeToObjectiveC(), forKey: key)
@@ -51,10 +119,10 @@ extension NSCoder {
     }
 
     func decodeIfPresent<T: _ObjectiveCBridgeable>(at key: String) -> T?
-        where T._ObjectiveCType: NSObject, T._ObjectiveCType: NSSecureCoding {
+    where T._ObjectiveCType: NSObject, T._ObjectiveCType: NSSecureCoding {
 
         guard containsValue(forKey: key),
-            let obj = decodeObject(of: T._ObjectiveCType.self, forKey: key)
+              let obj = decodeObject(of: T._ObjectiveCType.self, forKey: key)
         else {
             return nil
         }
@@ -70,7 +138,7 @@ extension NSCoder {
         }) { callback in
             withCallback(callback) {
                 withSafeUnarchiverHelperReplacement(for: T.self) {
-                    _=decodeObject(of: [NSArray.self, SafeUnarchiverHelper.self], forKey: key)
+                    _=decodeObject(of: [SafeUnarchiverHelper.self], forKey: key)
                 }
             }
         }
@@ -87,7 +155,7 @@ extension NSCoder {
         }) { callback in
             withCallback(callback) {
                 withSafeUnarchiverHelperReplacement(for: T.self) {
-                    _=decodeObject(of: [NSArray.self, SafeUnarchiverHelper.self], forKey: key)
+                    _=decodeObject(of: [SafeUnarchiverHelper.self], forKey: key)
                 }
             }
         }
@@ -109,7 +177,7 @@ extension NSCoder {
 
             } catch {
                 result = .failure(error)
-                (self as? NSKeyedUnarchiver)?.finishDecoding()
+                (self as? NSKeyedUnarchiver)?.failWithError(error)
             }
 
         }) { callback in
@@ -120,24 +188,16 @@ extension NSCoder {
             }
         }
 
-        return try result?.get() ?? { throw errorOrKeyNotFound(key) }()
+        return try result?.get() ?? []
     }
 
     private func errorOrKeyNotFound(_ key: String) -> Error {
-        struct StringKey: CodingKey {
-            var intValue: Int? { nil }
-            init?(intValue: Int) { fatalError() }
-
-            let stringValue: String
-            init(stringValue: String) {
-                self.stringValue = stringValue
-            }
-        }
-        return self.error ?? DecodingError.keyNotFound(StringKey(stringValue: key), .init(codingPath: [StringKey(stringValue: key)], debugDescription: "key not found"))
+        let key = CodingKey(stringValue: key)
+        return self.error ?? DecodingError.keyNotFound(key, .init(codingPath: [key], debugDescription: "key not found"))
     }
 
     private func withSafeUnarchiverHelperReplacement<T>(for _: T.Type, do job: () -> Void) {
-        let className = (T.self as? AnyClass).map(NSStringFromClass) ?? "\(T.self)"
+        let className = Self.className(for: T.self)
         let unarchiver = self as! NSKeyedUnarchiver // swiftlint:disable:this force_cast
 
         unarchiver.setClass(SafeUnarchiverHelper.self, forClassName: className)
@@ -164,6 +224,32 @@ extension NSCoder {
         }
 
         func encode(with coder: NSCoder) {
+        }
+
+    }
+
+    @objc(ArchiverHelper)
+    final private class ArchiverHelper: NSObject, NSSecureCoding {
+        let value: NSSecureEncodable
+        public static var supportsSecureCoding: Bool { true }
+
+        override var classForCoder: AnyClass {
+            let className = NSCoder.className(for: type(of: value))
+            if let cls = NSClassFromString(className) {
+                return cls
+            }
+            return objc_allocateClassPair(ArchiverHelper.self, className, 0) ?? ArchiverHelper.self
+        }
+        init(value: NSSecureEncodable) {
+            self.value = value
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError()
+        }
+
+        func encode(with coder: NSCoder) {
+            value.encode(with: coder)
         }
 
     }

@@ -18,13 +18,12 @@
 
 import Foundation
 
-extension TabCollectionViewModel {
+extension TabCollectionViewModel: NSSecureEncodable {
+
     private enum NSSecureCodingKeys {
         static let tabCollection = "tabs"
         static let selectionIndex = "idx"
     }
-
-    static var supportsSecureCoding: Bool { true }
 
     static func make(with coder: NSCoder, dependencies: TabCollectionViewModel.DynamicDependencyProvider) throws -> TabCollectionViewModel {
         let tabCollection = try coder.decode(at: NSSecureCodingKeys.tabCollection) { coder in

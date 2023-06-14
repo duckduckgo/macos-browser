@@ -18,7 +18,7 @@
 
 import Foundation
 
-extension Tab {
+extension Tab: NSSecureEncodable {
     // MARK: - Coding
 
     private enum NSSecureCodingKeys {
@@ -33,8 +33,6 @@ extension Tab {
         static let preferencePane = "preferencePane"
         static let lastSelectedAt = "lastSelectedAt"
     }
-
-    static var supportsSecureCoding: Bool { true }
 
     @MainActor
     static func make(with decoder: NSCoder, dependencies: Tab.DynamicDependencyProvider) -> Tab? {
@@ -60,7 +58,7 @@ extension Tab {
                       shouldLoadFromCache: true,
                       lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt))
 
-        tab.awakeAfter(using: decoder)
+        _=tab.awakeAfter(using: decoder)
 
         return tab
     }
