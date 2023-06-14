@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 
 @propertyWrapper
@@ -95,11 +96,15 @@ public struct UserDefaultsWrapper<T> {
         case lastBookmarksBarUsagePixelSendDate = "bookmarks.bar.last-usage-pixel-send-date"
 
         case pinnedViews = "pinning.pinned-views"
+        case manuallyToggledPinnedViews = "pinning.manually-toggled-pinned-views"
 
         case lastDatabaseFactoryFailurePixelDate = "last.database.factory.failure.pixel.date"
 
         case loggingEnabledDate = "logging.enabled.date"
         case loggingCategories = "logging.categories"
+
+        // Temporary for activetion pixel
+        case firstLaunchDate = "first.app.launch.date"
     }
 
     enum RemovedKeys: String, CaseIterable {

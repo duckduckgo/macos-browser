@@ -33,7 +33,8 @@ final class WebViewExtensionTests: XCTestCase {
         waitForExpectations(timeout: 5.0)
 
         let e = expectation(description: "mimeType callback")
-        webView.getMimeType { mimeType in
+        Task {
+            let mimeType = await webView.mimeType
             XCTAssertEqual(mimeType, UTType.html.mimeType!)
             e.fulfill()
         }
@@ -54,7 +55,8 @@ final class WebViewExtensionTests: XCTestCase {
         }
 
         let e = expectation(description: "mimeType callback")
-        webView.getMimeType { mimeType in
+        Task {
+            let mimeType = await webView.mimeType
             XCTAssertEqual(mimeType, UTType.jpeg.mimeType!)
             e.fulfill()
         }

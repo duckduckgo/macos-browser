@@ -19,6 +19,7 @@
 import Common
 import Foundation
 import BrowserServicesKit
+import DDGSync
 import PrivacyDashboard
 import WebKit
 
@@ -95,6 +96,8 @@ final class Fire {
     let stateRestorationManager: AppStateRestorationManager?
     let recentlyClosedCoordinator: RecentlyClosedCoordinating?
     let pinnedTabsManager: PinnedTabsManager
+    let bookmarkManager: BookmarkManager
+    let syncService: DDGSyncing?
     let tabsCleaner = TabDataCleaner()
     let secureVaultFactory: SecureVaultFactory
     let tld: TLD
@@ -117,8 +120,10 @@ final class Fire {
          stateRestorationManager: AppStateRestorationManager? = nil,
          recentlyClosedCoordinator: RecentlyClosedCoordinating? = RecentlyClosedCoordinator.shared,
          pinnedTabsManager: PinnedTabsManager? = nil,
-         secureVaultFactory: SecureVaultFactory = SecureVaultFactory.default,
-         tld: TLD
+         tld: TLD,
+         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+         syncService: DDGSyncing? = nil,
+         secureVaultFactory: SecureVaultFactory = SecureVaultFactory.default
     ) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
@@ -128,6 +133,8 @@ final class Fire {
         self.faviconManagement = faviconManagement
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
         self.pinnedTabsManager = pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager
+        self.bookmarkManager = bookmarkManager
+        self.syncService = syncService ?? (NSApp.delegate as? AppDelegate)?.syncService
         self.secureVaultFactory = secureVaultFactory
         self.tld = tld
 
@@ -153,6 +160,7 @@ final class Fire {
         os_log("Fire started", log: .fire)
 
         burnLastSessionState()
+        burnDeletedBookmarks()
 
         burningData = .specificDomains(baseDomains)
 
@@ -219,12 +227,14 @@ final class Fire {
         burningData = .all
 
         burnLastSessionState()
+        burnDeletedBookmarks()
 
         let pinnedTabsViewModels = pinnedTabViewModels()
 
         tabsCleaner.prepareTabsForCleanup(allTabViewModels()) {
             let group = DispatchGroup()
             group.enter()
+
             Task {
                 await self.burnWebCache()
                 group.leave()
@@ -446,6 +456,14 @@ final class Fire {
     @MainActor
     private func burnRecentlyClosed(baseDomains: Set<String>? = nil) {
         recentlyClosedCoordinator?.burnCache(baseDomains: baseDomains, tld: tld)
+    }
+
+    // MARK: - Bookmarks cleanup
+
+    private func burnDeletedBookmarks() {
+        if syncService?.authState == .inactive {
+            LocalBookmarkManager.shared.cleanUpBookmarksDatabase()
+        }
     }
 }
 

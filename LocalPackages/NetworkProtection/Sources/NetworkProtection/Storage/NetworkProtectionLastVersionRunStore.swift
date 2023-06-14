@@ -1,5 +1,5 @@
 //
-//  SyncDataPersistor.swift
+//  NetworkProtectionLastVersionRunStore.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -17,15 +17,23 @@
 //
 
 import Foundation
-import DDGSync
 
-final class SyncDataPersistor: LocalDataPersisting {
-    private(set) var bookmarksLastModified: String?
+public final class NetworkProtectionLastVersionRunStore {
+    private let userDefaults: UserDefaults
 
-    func updateBookmarksLastModified(_ lastModified: String?) {
-        bookmarksLastModified = lastModified
+    static let lastVersionRunKey = "com.duckduckgo.network-protection.NetworkProtectionVersionStore.lastVersionRunKey"
+
+    public init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
     }
 
-    func persistEvents(_ events: [SyncEvent]) async throws {
+    public var lastVersionRun: String? {
+        get {
+            userDefaults.string(forKey: Self.lastVersionRunKey)
+        }
+
+        set {
+            userDefaults.set(newValue, forKey: Self.lastVersionRunKey)
+        }
     }
 }
