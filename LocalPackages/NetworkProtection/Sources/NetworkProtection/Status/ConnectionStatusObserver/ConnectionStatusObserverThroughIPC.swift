@@ -42,7 +42,7 @@ public class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver {
 
     private let distributedNotificationCenter: DistributedNotificationCenter
     private let workspaceNotificationCenter: NotificationCenter
-    private var observationTokens = [NotificationToken]()
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Logging
 
@@ -62,21 +62,16 @@ public class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver {
     }
 
     func start() {
-        observationTokens.append(distributedNotificationCenter.addObserver(for: .statusDidChange, object: nil, queue: nil) { [weak self] notification in
+        distributedNotificationCenter.publisher(for: .statusDidChange).sink { [weak self] notification in
             self?.handleDistributedStatusChangeNotification(notification)
-        })
+        }.store(in: &cancellables)
 
-        observationTokens.append(workspaceNotificationCenter.addObserver(for: NSWorkspace.didWakeNotification, object: nil, queue: nil) { [weak self] notification in
+        workspaceNotificationCenter.publisher(for: NSWorkspace.didWakeNotification).sink { [weak self] notification in
             self?.handleDidWake(notification)
-        })
+        }.store(in: &cancellables)
 
-        // swiftlint:disable:next unused_capture_list
         monitor.pathUpdateHandler = { [weak self] _ in
-            guard let self else {
-                return
-            }
-
-            requestStatusUpdate()
+            self?.requestStatusUpdate()
         }
         monitor.start(queue: Self.monitorDispatchQueue)
     }

@@ -13,6 +13,13 @@
 //  limitations under the License.
 //
 
+MAIN_BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.macos.browser
+
+MAIN_BUNDLE_IDENTIFIER[sdk=*] = $(MAIN_BUNDLE_IDENTIFIER_PREFIX)
+MAIN_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(MAIN_BUNDLE_IDENTIFIER_PREFIX).debug
+MAIN_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(MAIN_BUNDLE_IDENTIFIER_PREFIX).debug
+MAIN_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(MAIN_BUNDLE_IDENTIFIER_PREFIX).review
+
 SYSEX_BUNDLE_ID_BASE[sdk=*] = com.duckduckgo.macos.browser.network-protection-extension
 SYSEX_BUNDLE_ID_BASE[config=CI][sdk=*] = com.duckduckgo.macos.browser.debug.network-protection-extension
 SYSEX_BUNDLE_ID_BASE[config=Review][sdk=*] = com.duckduckgo.macos.browser.review.network-protection-extension

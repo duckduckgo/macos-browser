@@ -21,7 +21,6 @@
 import Darwin
 import Foundation
 import Common
-import os // swift:disable:this enforce_os_log_wrapper
 import Network
 import QuartzCore
 

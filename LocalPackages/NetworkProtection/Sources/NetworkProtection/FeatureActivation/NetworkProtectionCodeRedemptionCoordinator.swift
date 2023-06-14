@@ -46,7 +46,7 @@ public final class NetworkProtectionCodeRedemptionCoordinator: NetworkProtection
         let result = await networkClient.redeem(inviteCode: code)
         switch result {
         case .success(let token):
-            tokenStore.store(token)
+            try tokenStore.store(token)
             // enable version checker on next run
             versionStore.lastVersionRun = AppVersion.shared.versionNumber
 
