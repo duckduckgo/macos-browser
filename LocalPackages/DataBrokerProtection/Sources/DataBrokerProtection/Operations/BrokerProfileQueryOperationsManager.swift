@@ -23,6 +23,7 @@ enum OperationsError: Error {
 }
 
 protocol OperationsManager {
+    var brokerProfileQueryData: BrokerProfileQueryData { get }
 
     init(brokerProfileQueryData: BrokerProfileQueryData,
                   database: DataBase,
@@ -116,37 +117,4 @@ class BrokerProfileQueryOperationsManager: OperationsManager {
         }
 
     }
-}
-
-struct ExtractedProfileHandler {
-
-
-    func getUniqueItems<T: Equatable>(newList: [T], oldList: [T]) -> [T] {
-        var uniqueItems: [T] = []
-
-        for item in newList {
-            if !oldList.contains(item) {
-                uniqueItems.append(item)
-            }
-        }
-
-        return uniqueItems
-    }
-
-    /*
-
-     func getUniqueItems<T: Equatable>(newList: [T], oldList: [T]) -> [T] {
-         let oldSet = Set(oldList)
-         var uniqueItems: [T] = []
-
-         for item in newList {
-             if !oldSet.contains(item) {
-                 uniqueItems.append(item)
-             }
-         }
-
-         return uniqueItems
-     }
-
-     */
 }
