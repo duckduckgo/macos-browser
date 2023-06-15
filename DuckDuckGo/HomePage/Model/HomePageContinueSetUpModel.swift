@@ -364,7 +364,7 @@ extension HomePage.Models {
     enum FeaturesGridDimensions {
         static let itemWidth: CGFloat = 240
         static let itemHeight: CGFloat = 160
-        static let verticalSpacing: CGFloat = 10
+        static let verticalSpacing: CGFloat = 16
         static let horizontalSpacing: CGFloat = 24
 
         static let width: CGFloat = (itemWidth + horizontalSpacing) * CGFloat(HomePage.featuresPerRow) - horizontalSpacing

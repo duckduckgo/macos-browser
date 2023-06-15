@@ -50,6 +50,7 @@ extension HomePage.Views {
                         .foregroundColor(Color("HomePageMoreOrLessTextColor"))
                 }.frame(maxWidth: .infinity)
             }
+            .frame(height: 32)
             .font(.system(size: 11))
             .link {
                 withAnimation {
