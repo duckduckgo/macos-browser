@@ -267,9 +267,6 @@ final class TabCollectionViewModel: NSObject {
         if selectDisplayableTabIfPresent(content) {
             return
         }
-        if content == .homePage {
-            NotificationCenter.default.post(name: HomePage.Models.newHomePageTabOpen, object: nil)
-        }
         append(tab: Tab(content: content, shouldLoadInBackground: true, isBurner: isBurner), selected: selected, forceChange: forceChange)
     }
 
@@ -277,6 +274,9 @@ final class TabCollectionViewModel: NSObject {
         guard changesEnabled || forceChange else { return }
 
         tabCollection.append(tab: tab)
+        if tab.content == .homePage {
+            NotificationCenter.default.post(name: HomePage.Models.newHomePageTabOpen, object: nil)
+        }
 
         if selected {
             selectUnpinnedTab(at: tabCollection.tabs.count - 1, forceChange: forceChange)
