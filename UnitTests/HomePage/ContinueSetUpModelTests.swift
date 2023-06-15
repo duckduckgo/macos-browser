@@ -47,6 +47,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     override func tearDown() {
+        UserDefaultsWrapper<Any>.clearAll()
         capturingDefaultBrowserProvider = nil
         capturingDataImportProvider = nil
         tabCollectionVM = nil
@@ -82,7 +83,13 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     func testWhenInitialisedForTheFirstTimeTheMatrixHasAllElementsInTheRightOrder() {
-        let expectedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: vm.itemsPerRow)
+        var expectedMatrix = [[HomePage.Models.FeatureType.duckplayer, HomePage.Models.FeatureType.cookiePopUp]]
+
+        XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
+
+        vm.shouldShowAllFeatures = true
+
+        expectedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: vm.itemsPerRow)
 
         XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
     }
@@ -91,13 +98,14 @@ final class ContinueSetUpModelTests: XCTestCase {
         var homePageIsFirstSession = UserDefaultsWrapper<Bool>(key: .homePageIsFirstSession, defaultValue: true)
         homePageIsFirstSession.wrappedValue = false
         vm = HomePage.Models.ContinueSetUpModel.fixture()
+        vm.shouldShowAllFeatures = true
 
         XCTAssertEqual(vm.visibleFeaturesMatrix[0][0], HomePage.Models.FeatureType.defaultBrowser)
         XCTAssertEqual(vm.visibleFeaturesMatrix.reduce([], +).count, HomePage.Models.FeatureType.allCases.count)
     }
 
     func testWhenTogglingShowAllFeatureTheCorrectElementsAreVisible() {
-        let expectedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: HomePage.featuresPerRow)
+        let expectedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: vm.itemsPerRow)
 
         vm.shouldShowAllFeatures = true
 
@@ -306,6 +314,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testDismissedItemsAreRemovedFromVisibleMatrixAndChoicesArePersisted() {
+        vm.shouldShowAllFeatures = true
         XCTAssertEqual(HomePage.Models.FeatureType.allCases.chunked(into: vm.itemsPerRow), vm.visibleFeaturesMatrix)
 
         vm.removeItem(for: .defaultBrowser)
@@ -323,8 +332,10 @@ final class ContinueSetUpModelTests: XCTestCase {
         vm.removeItem(for: .cookiePopUp)
         XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.cookiePopUp))
 
+#if !APPSTORE
         vm.removeItem(for: .addToDock)
         XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.addToDock))
+#endif
 
         let vm2 = HomePage.Models.ContinueSetUpModel.fixture()
         XCTAssertTrue(vm2.visibleFeaturesMatrix.flatMap { $0 }.isEmpty)

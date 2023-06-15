@@ -22,6 +22,8 @@ import Common
 
 extension HomePage.Models {
 
+    static let newHomePageTabOpen = Notification.Name("newHomePageAppOpen")
+
     final class ContinueSetUpModel: ObservableObject {
         let itemWidth = FeaturesGridDimensions.itemWidth
         let itemHeight = FeaturesGridDimensions.itemHeight
@@ -49,7 +51,7 @@ extension HomePage.Models {
 
         weak var delegate: ContinueSetUpVewModelDelegate?
 
-        @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: true)
+        @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false)
         var shouldShowAllFeatures: Bool {
             didSet {
                 updateVisibleMatrix()
@@ -111,7 +113,8 @@ extension HomePage.Models {
             self.privacyPreferences = privacyPreferences
             self.cookieConsentPopoverManager = cookieConsentPopoverManager
             self.duckPlayerPreferences = duckPlayerPreferences
-            refreshFeaturesMatrix(isNewInstance: true)
+            refreshFeaturesMatrix()
+            NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
             isFirstSession = false
         }
 
@@ -145,10 +148,12 @@ extension HomePage.Models {
                     })
                     cookiePopUpVisible = true
                 }
+#if !APPSTORE
             case .addToDock:
                 queue.async {
                     self.addToDock()
                 }
+#endif
             }
         }
 
@@ -164,14 +169,16 @@ extension HomePage.Models {
                 shouldShowEmailProtectionSetting = false
             case .cookiePopUp:
                 shouldShowCookieSetting = false
+#if !APPSTORE
             case .addToDock:
                 shouldShowAddToDockSetting = false
+#endif
             }
             refreshFeaturesMatrix()
         }
 
         // swiftlint:disable cyclomatic_complexity
-        func refreshFeaturesMatrix(isNewInstance: Bool = false) {
+        func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
 
             for feature in listOfFeatures {
@@ -196,8 +203,8 @@ extension HomePage.Models {
                     if shouldCookieCardBeVisible {
                         features.append(feature)
                     }
-                case .addToDock:
 #if !APPSTORE
+                case .addToDock:
                     if shouldAddToDockCardBeVisible {
                         features.append(feature)
                     }
@@ -209,6 +216,10 @@ extension HomePage.Models {
         // swiftlint:enable cyclomatic_complexity
 
         // Helper Functions
+        @objc private func newTabOpenNotification(_ notification: Notification) {
+            listOfFeatures = randomiseFeatures()
+        }
+
         private func randomiseFeatures() -> [FeatureType] {
             var features = FeatureType.allCases
             features.shuffle()
@@ -268,8 +279,9 @@ extension HomePage.Models {
         case emailProtection
         case defaultBrowser
         case importBookmarksAndPasswords
+#if !APPSTORE
         case addToDock
-
+#endif
         var title: String {
             switch self {
             case .defaultBrowser:
@@ -282,8 +294,10 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionCardTitle
             case .cookiePopUp:
                 return UserText.newTabSetUpCookieManagerCardTitle
+#if !APPSTORE
             case .addToDock:
                 return UserText.newTabAddToDockCardTitle
+#endif
             }
         }
 
@@ -299,8 +313,10 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionSummary
             case .cookiePopUp:
                 return UserText.newTabSetUpCookieManagerSummary
+#if !APPSTORE
             case .addToDock:
                 return UserText.newTabAddToDockSummary
+#endif
             }
         }
 
@@ -316,8 +332,10 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionAction
             case .cookiePopUp:
                 return UserText.newTabSetUpCookieManagerAction
+#if !APPSTORE
             case .addToDock:
                 return UserText.newTabSetUpAddToDockAction
+#endif
             }
         }
 
@@ -335,8 +353,10 @@ extension HomePage.Models {
                 return NSImage(named: "inbox-128")!.resized(to: iconSize)!
             case .cookiePopUp:
                 return NSImage(named: "Cookie-Popups-128")!.resized(to: iconSize)!
+#if !APPSTORE
             case .addToDock:
                 return NSImage(named: "Dock-128")!.resized(to: iconSize)!
+#endif
             }
         }
     }

@@ -267,6 +267,9 @@ final class TabCollectionViewModel: NSObject {
         if selectDisplayableTabIfPresent(content) {
             return
         }
+        if content == .homePage {
+            NotificationCenter.default.post(name: HomePage.Models.newHomePageTabOpen, object: nil)
+        }
         append(tab: Tab(content: content, shouldLoadInBackground: true, isBurner: isBurner), selected: selected, forceChange: forceChange)
     }
 
