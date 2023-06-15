@@ -52,9 +52,11 @@ extension NSApplication {
         return false
     }
 
+#if !NETWORK_EXTENSION
     var mainMenuTyped: MainMenu {
         return mainMenu as! MainMenu // swiftlint:disable:this force_cast
     }
+#endif
 
     var isCommandPressed: Bool {
         currentEvent?.modifierFlags.contains(.command) ?? false

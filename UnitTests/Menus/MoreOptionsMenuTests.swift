@@ -17,6 +17,11 @@
 //
 
 import XCTest
+
+#if NETWORK_PROTECTION
+import NetworkProtection
+#endif
+
 @testable import DuckDuckGo_Privacy_Browser
 
 @MainActor
@@ -28,13 +33,30 @@ final class MoreOptionsMenuTests: XCTestCase {
     var moreOptionMenu: MoreOptionsMenu!
     var internalUserDecider: InternalUserDeciderMock!
 
+#if NETWORK_PROTECTION
+    var networkProtectionVisibilityMock: NetworkProtectionVisibilityMock!
+#endif
+
     override func setUp() {
         super.setUp()
         tabCollectionViewModel = TabCollectionViewModel()
         passwordManagerCoordinator = PasswordManagerCoordinator()
         capturingActionDelegate = CapturingOptionsButtonMenuDelegate()
         internalUserDecider = InternalUserDeciderMock()
-        moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel, passwordManagerCoordinator: passwordManagerCoordinator, internalUserDecider: internalUserDecider)
+
+#if NETWORK_PROTECTION
+        networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(activated: false)
+
+        moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
+                                         passwordManagerCoordinator: passwordManagerCoordinator,
+                                         networkProtectionFeatureVisibility: networkProtectionVisibilityMock,
+                                         internalUserDecider: internalUserDecider)
+#else
+        moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
+                                         passwordManagerCoordinator: passwordManagerCoordinator,
+                                         internalUserDecider: internalUserDecider)
+#endif
+
         moreOptionMenu.actionDelegate = capturingActionDelegate
     }
 
@@ -46,7 +68,53 @@ final class MoreOptionsMenuTests: XCTestCase {
         super.tearDown()
     }
 
-    func testThatMoreOptionMenuHasTheExpectedItems() {
+    func testThatMoreOptionMenuHasTheExpectedItems_WhenNetworkProtectionIsEnabled() {
+#if NETWORK_PROTECTION
+        let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
+                                             passwordManagerCoordinator: passwordManagerCoordinator,
+                                             networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(activated: true),
+                                             internalUserDecider: internalUserDecider)
+#else
+        let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
+                                             passwordManagerCoordinator: passwordManagerCoordinator,
+                                             internalUserDecider: internalUserDecider)
+#endif
+
+        XCTAssertEqual(moreOptionMenu.items[0].title, "Send Feedback")
+        XCTAssertTrue(moreOptionMenu.items[1].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
+        XCTAssertEqual(moreOptionMenu.items[3].title, UserText.newWindowMenuItem)
+        XCTAssertTrue(moreOptionMenu.items[4].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[5].title, UserText.zoom)
+        XCTAssertTrue(moreOptionMenu.items[6].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[7].title, UserText.bookmarks)
+        XCTAssertEqual(moreOptionMenu.items[8].title, UserText.downloads)
+        XCTAssertEqual(moreOptionMenu.items[9].title, UserText.passwordManagement)
+        XCTAssertTrue(moreOptionMenu.items[10].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[11].title, UserText.emailOptionsMenuItem)
+
+#if NETWORK_PROTECTION
+        XCTAssertEqual(moreOptionMenu.items[12].title, UserText.networkProtection)
+        XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[14].title, UserText.settings)
+#else
+        XCTAssertTrue(moreOptionMenu.items[12].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[13].title, UserText.settings)
+#endif
+    }
+
+    func testThatMoreOptionMenuHasTheExpectedItems_WhenNetworkProtectionIsDisabled() {
+#if NETWORK_PROTECTION
+        let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
+                                             passwordManagerCoordinator: passwordManagerCoordinator,
+                                             networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(activated: false),
+                                             internalUserDecider: internalUserDecider)
+#else
+        let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
+                                             passwordManagerCoordinator: passwordManagerCoordinator,
+                                             internalUserDecider: internalUserDecider)
+#endif
+
         XCTAssertEqual(moreOptionMenu.items[0].title, "Send Feedback")
         XCTAssertTrue(moreOptionMenu.items[1].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
@@ -86,3 +154,19 @@ final class MoreOptionsMenuTests: XCTestCase {
     }
 
 }
+
+#if NETWORK_PROTECTION
+final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility {
+
+    var activated: Bool
+
+    init(activated: Bool) {
+        self.activated = activated
+    }
+
+    var isFeatureActivated: Bool {
+        return activated
+    }
+
+}
+#endif

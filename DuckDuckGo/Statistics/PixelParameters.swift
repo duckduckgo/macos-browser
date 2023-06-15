@@ -109,7 +109,9 @@ extension Pixel.Event {
              .cookieManagementEnabledInitial,
              .watchInDuckPlayerInitial,
              .setAsDefaultInitial,
-             .importDataInitial:
+             .importDataInitial,
+             .newTabInitial,
+             .networkProtectionSystemExtensionUnknownActivationResult:
 
             return nil
         }
