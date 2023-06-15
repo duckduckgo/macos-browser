@@ -34,18 +34,30 @@ extension HomePage.Models {
         @Published var isFavouriteVisible: Bool {
             didSet {
                 homePagePreferencesPersistor.isFavouriteVisible = isFavouriteVisible
+                // Temporary Pixel
+                if !isFavouriteVisible {
+                    Pixel.fire(.favoriteSectionHidden)
+                }
             }
         }
 
         @Published var isContinueSetUpVisible: Bool {
             didSet {
                 homePagePreferencesPersistor.isContinueSetUpVisible = isContinueSetUpVisible
+                // Temporary Pixel
+                if !isContinueSetUpVisible {
+                    Pixel.fire(.continueSetUpSectionHidden)
+                }
             }
         }
 
         @Published var isRecentActivityVisible: Bool {
             didSet {
                 homePagePreferencesPersistor.isRecentActivityVisible = isRecentActivityVisible
+                // Temporary Pixel
+                if !isRecentActivityVisible {
+                    Pixel.fire(.recentActivitySectionHidden)
+                }
             }
         }
 

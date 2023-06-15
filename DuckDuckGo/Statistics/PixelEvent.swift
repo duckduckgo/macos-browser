@@ -122,6 +122,11 @@ extension Pixel {
         case setAsDefaultInitial
         case importDataInitial
 
+        // New Tab section removed
+        case favoriteSectionHidden
+        case recentActivitySectionHidden
+        case continueSetUpSectionHidden
+
         enum Debug {
 
             case assertionFailure(message: String, file: StaticString, line: UInt)
@@ -334,6 +339,12 @@ extension Pixel.Event {
             return "m_mac.new-tab-opened.initial"
         case .networkProtectionSystemExtensionUnknownActivationResult:
             return "m_mac_netp_system_extension_unknown_activation_result"
+        case .favoriteSectionHidden:
+            return "m_mac.favorite-section-hidden"
+        case .recentActivitySectionHidden:
+            return "m_mac.recent-activity-section-hidden"
+        case .continueSetUpSectionHidden:
+            return "m_mac.continue-setup-section-hidden"
         }
     }
 }

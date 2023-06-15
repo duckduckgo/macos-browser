@@ -23,7 +23,6 @@ import Common
 extension HomePage.Models {
 
     final class ContinueSetUpModel: ObservableObject {
-        let title = UserText.newTabSetUpSectionTitle
         let itemWidth = FeaturesGridDimensions.itemWidth
         let itemHeight = FeaturesGridDimensions.itemHeight
         let horizontalSpacing = FeaturesGridDimensions.horizontalSpacing
