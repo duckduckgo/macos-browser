@@ -202,12 +202,12 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         for try await event in SystemExtensionManager().activate() {
             switch event {
             case .waitingForUserApproval:
-                self.controllerErrorStore.lastErrorMessage = "Go to Security & Privacy in System Settings to allow Network Protection to activate"
+                self.controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
             case .activated:
                 self.controllerErrorStore.lastErrorMessage = nil
                 return true
             case .willActivateAfterReboot:
-                controllerErrorStore.lastErrorMessage = "Please reboot to activate Network Protection"
+                controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseReboot
                 return false
             }
         }
