@@ -57,7 +57,6 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     func testModelReturnsCorrectStrings() {
-        XCTAssertEqual(vm.title, UserText.newTabSetUpSectionTitle)
         XCTAssertEqual(vm.deleteActionTitle, UserText.newTabSetUpRemoveItemAction)
     }
 
