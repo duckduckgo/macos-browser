@@ -720,7 +720,18 @@ struct UserText {
     }
 
     static let noAccessToDownloadsFolderHeader = NSLocalizedString("no.access.to.downloads.folder.header", value: "DuckDuckGo needs permission to access your Downloads folder", comment: "Header of the alert dialog informing user about failed download")
-    static let noAccessToDownloadsFolder = NSLocalizedString("no.access.to.downloads.folder", value: "Grant access in Security & Privacy preferences in System Settings.", comment: "Alert presented to user if the app doesn't have rights to access Downloads folder")
+
+    private static let noAccessToDownloadsFolderLegacy = NSLocalizedString("no.access.to.downloads.folder.legacy", value: "Grant access in Security & Privacy preferences in System Settings.", comment: "Alert presented to user if the app doesn't have rights to access Downloads folder. This is used for macOS version 12 and below")
+    private static let noAccessToDownloadsFolderModern = NSLocalizedString("no.access.to.downloads.folder.modern", value: "Grant access in Privacy & Security preferences in System Settings.", comment: "Alert presented to user if the app doesn't have rights to access Downloads folder. This is used for macOS version 13 and above")
+
+    static var noAccessToDownloadsFolder: String {
+        if #available(macOS 13.0, *) {
+            return noAccessToDownloadsFolderModern
+        } else {
+            return noAccessToDownloadsFolderLegacy
+        }
+    }
+
     static let noAccessToSelectedFolderHeader = NSLocalizedString("no.access.to.selected.folder.header", value: "DuckDuckGo needs permission to access selected folder", comment: "Header of the alert dialog informing user about failed download")
     static let noAccessToSelectedFolder = NSLocalizedString("no.access.to.selected.folder", value: "Grant access to the location of download.", comment: "Alert presented to user if the app doesn't have rights to access selected folder")
 
