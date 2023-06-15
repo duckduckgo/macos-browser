@@ -40,6 +40,10 @@ extension Bundle {
             object(forInfoDictionaryKey: Keys.name) as? String
     }
 
+    var versionNumber: String? {
+        object(forInfoDictionaryKey: Keys.versionNumber) as? String
+    }
+
     var vpnMenuAgentBundleId: String {
         guard let bundleID = object(forInfoDictionaryKey: Keys.vpnMenuAgentBundleId) as? String else {
             fatalError("Info.plist is missing \(Keys.vpnMenuAgentBundleId)")

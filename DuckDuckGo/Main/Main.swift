@@ -35,7 +35,6 @@ extension Bundle {
 final class AppMain {
     private enum LaunchError: Error {
         case startVPNFailed(_ error: Error)
-        case stopVPNFailed(_ error: Error)
     }
 
     static func main() async throws {
@@ -53,12 +52,8 @@ final class AppMain {
         case "stopVPN":
             swizzleMainBundle()
 
-            do {
-                try await NetworkProtectionTunnelController().stop()
-                exit(0)
-            } catch {
-                throw LaunchError.stopVPNFailed(error)
-            }
+            await NetworkProtectionTunnelController().stop()
+            exit(0)
         default:
             break
         }

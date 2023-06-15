@@ -22,11 +22,11 @@ import WebKit
 final class FindInPageModel {
 
     @Published private(set) var text: String = ""
-    @Published private(set) var currentSelection: Int?
+    @Published private(set) var currentSelection: UInt?
     @Published private(set) var matchesFound: UInt?
     @Published private(set) var isVisible: Bool = false
 
-    func update(currentSelection: Int?, matchesFound: UInt?) {
+    func update(currentSelection: UInt?, matchesFound: UInt?) {
         self.currentSelection = currentSelection
         self.matchesFound = matchesFound
     }

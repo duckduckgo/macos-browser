@@ -48,6 +48,7 @@ final class NavigationBarViewController: NSViewController {
 
     @IBOutlet var addressBarLeftToNavButtonsConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarProportionalWidthConstraint: NSLayoutConstraint!
+    @IBOutlet var navigationBarButtonsLeadingConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarTopConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarBottomConstraint: NSLayoutConstraint!
     @IBOutlet var buttonsTopConstraint: NSLayoutConstraint!
@@ -169,6 +170,7 @@ final class NavigationBarViewController: NSViewController {
             addressBarBottomConstraint.constant = 0
             addressBarLeftToNavButtonsConstraint.isActive = false
             addressBarProportionalWidthConstraint.isActive = false
+            navigationBarButtonsLeadingConstraint.isActive = false
 
             // This pulls the dashboard button to the left for the popup
             NSLayoutConstraint.activate(addressBarStack.addConstraints(to: view, [
@@ -241,9 +243,15 @@ final class NavigationBarViewController: NSViewController {
     // swiftlint:disable force_cast
     @IBAction func optionsButtonAction(_ sender: NSButton) {
 
+        guard let internalUserDecider = (NSApp.delegate as! AppDelegate).internalUserDecider else {
+            assertionFailure("\(className): internalUserDecider is nil")
+            os_log("%s: internalUserDecider is nil", type: .error, className)
+            return
+        }
+
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
-                                   internalUserDecider: (NSApp.delegate as! AppDelegate).internalUserDecider)
+                                   internalUserDecider: internalUserDecider)
         menu.actionDelegate = self
         menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height + 4), in: sender)
     }
@@ -693,7 +701,9 @@ extension NavigationBarViewController: NSMenuDelegate {
         menu.addItem(withTitle: downloadsTitle, action: #selector(toggleDownloadsPanelPinning), keyEquivalent: "J")
 
 #if NETWORK_PROTECTION
-        if networkProtectionFeatureVisibility.isFeatureActivated {
+        let isPopUpWindow = view.window?.isPopUpWindow ?? false
+
+        if !isPopUpWindow && networkProtectionFeatureVisibility.isFeatureActivated {
             let networkProtectionTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
         }
@@ -737,7 +747,8 @@ extension NavigationBarViewController: NSMenuDelegate {
         networkProtectionCancellable = networkProtectionButtonModel.$showButton
             .receive(on: RunLoop.main)
             .sink { [weak self] show in
-                self?.networkProtectionButton.isHidden = !show
+                let isPopUpWindow = self?.view.window?.isPopUpWindow ?? false
+                self?.networkProtectionButton.isHidden =  isPopUpWindow || !show
         }
 
         networkProtectionInterruptionCancellable = networkProtectionButtonModel.$buttonImage

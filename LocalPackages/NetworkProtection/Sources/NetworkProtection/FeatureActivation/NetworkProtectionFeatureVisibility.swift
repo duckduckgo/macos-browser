@@ -27,6 +27,10 @@ public protocol NetworkProtectionFeatureVisibility {
 
 extension NetworkProtectionKeychainTokenStore: NetworkProtectionFeatureVisibility {
     public var isFeatureActivated: Bool {
-        fetchToken() != nil
+        do {
+            return try fetchToken() != nil
+        } catch {
+            return false
+        }
     }
 }

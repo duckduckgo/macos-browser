@@ -34,7 +34,7 @@ public class ConnectionServerInfoObserverThroughIPC: ConnectionServerInfoObserve
     // MARK: - Notifications
 
     private let distributedNotificationCenter: DistributedNotificationCenter
-    private var observationTokens = [NotificationToken]()
+    private var serverSelectedCancellable: AnyCancellable!
 
     // MARK: - Logging
 
@@ -52,9 +52,9 @@ public class ConnectionServerInfoObserverThroughIPC: ConnectionServerInfoObserve
     }
 
     func start() {
-        observationTokens.append(distributedNotificationCenter.addObserver(for: .serverSelected, object: nil, queue: nil) { [weak self] notification in
+        serverSelectedCancellable = distributedNotificationCenter.publisher(for: .serverSelected).sink { [weak self] notification in
             self?.handleServerSelected(notification)
-        })
+        }
     }
 
     private func handleServerSelected(_ notification: Notification) {

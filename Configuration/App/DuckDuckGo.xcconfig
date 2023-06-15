@@ -16,7 +16,7 @@
 #include "AppTargetsBase.xcconfig"
 #include "../NetworkProtectionDeveloperID.xcconfig"
 
-BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.macos.browser
+PRODUCT_BUNDLE_IDENTIFIER = $(MAIN_BUNDLE_IDENTIFIER)
 
 CODE_SIGN_ENTITLEMENTS = DuckDuckGo/DuckDuckGo.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Debug][arch=*][sdk=*] = DuckDuckGo/DuckDuckGoDebug.entitlements

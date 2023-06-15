@@ -38,7 +38,7 @@ class HistoryIntegrationTests: XCTestCase {
     @MainActor
     override func setUp() async throws {
         await withCheckedContinuation { continuation in
-            HistoryCoordinator.shared.burn(except: FireproofDomains(), completion: {
+            HistoryCoordinator.shared.burn(except: FireproofDomains(store: FireproofDomainsStoreMock()), completion: {
                 continuation.resume(returning: ())
             })
         }

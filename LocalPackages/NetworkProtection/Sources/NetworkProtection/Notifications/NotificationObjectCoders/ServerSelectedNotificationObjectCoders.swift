@@ -24,7 +24,7 @@ public class ServerSelectedNotificationObjectEncoder {
             let encoder = JSONEncoder()
             let jsonData = try encoder.encode(serverInfo)
 
-            return String(data: jsonData, encoding: DistributedNotification.preferredStringEncoding)
+            return String(data: jsonData, encoding: DistributedNotificationCenter.preferredStringEncoding)
         } catch {
             return nil
         }
@@ -37,7 +37,7 @@ public class ServerSelectedNotificationObjectDecoder {
             return .unknown
         }
 
-        guard let jsonData = payload.data(using: DistributedNotification.preferredStringEncoding) else {
+        guard let jsonData = payload.data(using: DistributedNotificationCenter.preferredStringEncoding) else {
             return .unknown
         }
 
