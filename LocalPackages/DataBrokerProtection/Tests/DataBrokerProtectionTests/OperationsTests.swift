@@ -21,14 +21,33 @@ import XCTest
 
 final class OperationsTests: XCTestCase {
 
+    private func brokerProfileQueryData(for profileQuery: ProfileQuery,
+                                        dataBroker: DataBroker,
+                                        database: DataBase) -> BrokerProfileQueryData {
+        if let queryData = database.brokerProfileQueryData(for: profileQuery,
+                                                           dataBroker: dataBroker) {
+            return queryData
+        } else {
+            return BrokerProfileQueryData(id: UUID(),
+                                          profileQuery: profileQuery,
+                                          dataBroker: dataBroker)
+        }
+    }
+
     func testCleanScanOperationNoResults() async throws {
+
         let profileQuery = ProfileQuery(name: "Test Query")
+
         let dataBroker = DataBroker(name: "Test Broker")
+
         let database = MockDataBase()
 
-        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
-                                                        dataBroker: dataBroker,
-                                                        database: database)
+        let brokerProfileQueryData = brokerProfileQueryData(for: profileQuery,
+                                                            dataBroker: dataBroker,
+                                                            database: database)
+
+        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
+                                                                    database: database)
 
 
         let expectedExtractedProfiles = [ExtractedProfile]()
@@ -56,9 +75,12 @@ final class OperationsTests: XCTestCase {
         let dataBroker = DataBroker(name: "Test Broker")
         let database = MockDataBase()
 
-        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
-                                                        dataBroker: dataBroker,
-                                                        database: database)
+        let brokerProfileQueryData = brokerProfileQueryData(for: profileQuery,
+                                                            dataBroker: dataBroker,
+                                                            database: database)
+
+        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
+                                                                    database: database)
 
 
 
@@ -88,9 +110,12 @@ final class OperationsTests: XCTestCase {
         let dataBroker = DataBroker(name: "Test Broker")
         let database = MockDataBase()
 
-        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
-                                                        dataBroker: dataBroker,
-                                                        database: database)
+        let brokerProfileQueryData = brokerProfileQueryData(for: profileQuery,
+                                                            dataBroker: dataBroker,
+                                                            database: database)
+
+        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
+                                                                    database: database)
 
 
 
@@ -133,9 +158,12 @@ final class OperationsTests: XCTestCase {
 
         let database = MockDataBase(mockBrokerProfileQueryData: profileQueryData)
 
-        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
-                                                        dataBroker: dataBroker,
-                                                        database: database)
+        let brokerProfileQueryData = brokerProfileQueryData(for: profileQuery,
+                                                            dataBroker: dataBroker,
+                                                            database: database)
+
+        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
+                                                                    database: database)
 
         let runner = MockRunner(optOutAction: nil,
                                 scanAction: nil,
@@ -172,9 +200,12 @@ final class OperationsTests: XCTestCase {
 
         let database = MockDataBase(mockBrokerProfileQueryData: profileQueryData)
 
-        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
-                                                        dataBroker: dataBroker,
-                                                        database: database)
+        let brokerProfileQueryData = brokerProfileQueryData(for: profileQuery,
+                                                            dataBroker: dataBroker,
+                                                            database: database)
+
+        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
+                                                                    database: database)
 
         let runner = MockRunner(optOutAction: {
             throw NSError(domain: "test", code: 123)
@@ -202,9 +233,12 @@ final class OperationsTests: XCTestCase {
 
         let database = MockDataBase()
 
-        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
-                                                        dataBroker: dataBroker,
-                                                        database: database)
+        let brokerProfileQueryData = brokerProfileQueryData(for: profileQuery,
+                                                            dataBroker: dataBroker,
+                                                            database: database)
+
+        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
+                                                                    database: database)
 
         let runner = MockRunner(optOutAction: nil,
                                 scanAction: nil,
@@ -237,9 +271,12 @@ final class OperationsTests: XCTestCase {
 
         let database = MockDataBase(mockBrokerProfileQueryData: profileQueryData)
 
-        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
-                                                        dataBroker: dataBroker,
-                                                        database: database)
+        let brokerProfileQueryData = brokerProfileQueryData(for: profileQuery,
+                                                            dataBroker: dataBroker,
+                                                            database: database)
+
+        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
+                                                                    database: database)
 
 
         let expectedExtractedProfiles = [extractedProfile]
@@ -289,10 +326,12 @@ final class OperationsTests: XCTestCase {
 
         let database = MockDataBase(mockBrokerProfileQueryData: profileQueryData)
 
+        let brokerProfileQueryData = brokerProfileQueryData(for: profileQuery,
+                                                            dataBroker: dataBroker,
+                                                            database: database)
 
-        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
-                                                        dataBroker: dataBroker,
-                                                        database: database)
+        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
+                                                                    database: database)
 
 
         let expectedExtractedProfiles = [extractedProfile]
@@ -340,10 +379,12 @@ final class OperationsTests: XCTestCase {
 
         let database = MockDataBase(mockBrokerProfileQueryData: profileQueryData)
 
-        let operationsManager = BrokerProfileQueryOperationsManager(profileQuery: profileQuery,
-                                                        dataBroker: dataBroker,
-                                                        database: database)
+        let brokerProfileQueryData = brokerProfileQueryData(for: profileQuery,
+                                                            dataBroker: dataBroker,
+                                                            database: database)
 
+        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
+                                                                    database: database)
 
         let expectedExtractedProfiles = [extractedProfile1]
 

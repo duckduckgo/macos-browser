@@ -28,6 +28,7 @@ struct DataBrokerProtectionSchedulerConfig: SchedulerConfig {
    var runFrequency: Int = 4
    var concurrentOperationsPerBroker: Int = 1
    var concurrentOperationsDifferentBrokers: Int = 2
+    var intervalBetweenSameBrokerOperations: Int = 10 //min
 }
 
 protocol OperationRunnerProvider {
@@ -92,10 +93,10 @@ class DataBrokerProtectionScheduler {
         // Create a DataBrokerOperationManagerCollection for each data broker
         for (dataBroker, brokerProfileQueryDataList) in groupedData {
             let operationManagers = brokerProfileQueryDataList.map {
-                BrokerProfileQueryOperationsManager(profileQuery: $0.profileQuery,
-                                                    dataBroker: dataBroker,
+                BrokerProfileQueryOperationsManager(brokerProfileQueryData: $0,
                                                     database: database,
                                                     notificationCenter: notificationCenter)
+
             }
             let dataBrokerOperationManagerCollection = DataBrokerOperationManagerCollection(dataBroker: dataBroker,
                                                                                             operationManagers: operationManagers)
@@ -121,6 +122,7 @@ struct DataBrokerOperationManagerCollection {
 
     func runScan(on runner: OperationRunner) async throws {
         for manager in operationManagers {
+            // check for preferredRunDate/ lastRanDate and intervalBetweenSameBrokerOperations
             try await manager.runScanOperation(on: runner)
         }
     }

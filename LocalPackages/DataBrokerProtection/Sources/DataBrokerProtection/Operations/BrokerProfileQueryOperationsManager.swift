@@ -23,7 +23,10 @@ enum OperationsError: Error {
 }
 
 protocol OperationsManager {
-    init(profileQuery: ProfileQuery, dataBroker: DataBroker, database: DataBase, notificationCenter: NotificationCenter)
+
+    init(brokerProfileQueryData: BrokerProfileQueryData,
+                  database: DataBase,
+                  notificationCenter: NotificationCenter)
 
     func runScanOperation(on runner: OperationRunner) async throws
     func runOptOutOperation(for extractedProfile: ExtractedProfile, on runner: OperationRunner) async throws
@@ -35,26 +38,18 @@ class BrokerProfileQueryOperationsManager: OperationsManager {
     let database: DataBase
     let notificationCenter: NotificationCenter
 
-    required init(profileQuery: ProfileQuery,
-                  dataBroker: DataBroker,
+    required init(brokerProfileQueryData: BrokerProfileQueryData,
                   database: DataBase,
                   notificationCenter: NotificationCenter = NotificationCenter.default) {
 
-        self.database = database
+        self.brokerProfileQueryData = brokerProfileQueryData
         self.notificationCenter = notificationCenter
-
-        if let queryData = database.brokerProfileQueryData(for: profileQuery,
-                                                           dataBroker: dataBroker) {
-            brokerProfileQueryData = queryData
-        } else {
-            brokerProfileQueryData = BrokerProfileQueryData(id: UUID(),
-                                                            profileQuery: profileQuery,
-                                                            dataBroker: dataBroker)
-        }
+        self.database = database
     }
 
     func runScanOperation(on runner: OperationRunner) async throws {
         defer {
+            database.saveOperationData(brokerProfileQueryData.scanData)
             brokerProfileQueryData.scanData.lastRunDate = Date()
             notificationCenter.post(name: DataBrokerNotifications.didFinishScan, object: brokerProfileQueryData.dataBroker.name)
         }
@@ -81,7 +76,6 @@ class BrokerProfileQueryOperationsManager: OperationsManager {
             print("ERROR \(error)")
             throw error
         }
-
     }
 
     func runOptOutOperations(on runner: OperationRunner) async throws {
@@ -102,6 +96,7 @@ class BrokerProfileQueryOperationsManager: OperationsManager {
         }
 
         defer {
+            database.saveOperationData(data)
             data.lastRunDate = Date()
             notificationCenter.post(name: DataBrokerNotifications.didFinishOptOut, object: brokerProfileQueryData.dataBroker.name)
         }
