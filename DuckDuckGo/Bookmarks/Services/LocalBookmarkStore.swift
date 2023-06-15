@@ -114,7 +114,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
     private func reportOrphanedBookmarksIfNeeded() {
         Task { @MainActor in
-            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService, syncService.authState != .inactive else {
+            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService, syncService.authState == .inactive else {
                 return
             }
             Pixel.fire(.debug(event: .orphanedBookmarksPresent))
