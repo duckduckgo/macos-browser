@@ -19,6 +19,7 @@
 import Common
 import Foundation
 import CoreData
+import DDGSync
 import Bookmarks
 import Cocoa
 
@@ -92,7 +93,7 @@ final class LocalBookmarkStore: BookmarkStore {
                     let rootFolder = BookmarkUtils.fetchRootFolder(self.context)
                     let orphanedEntities = BookmarkUtils.fetchOrphanedEntities(self.context)
                     if !orphanedEntities.isEmpty {
-                        Pixel.fire(.debug(event: .orphanedBookmarksPresent))
+                        self.reportOrphanedBookmarksIfNeeded()
                     }
                     results = (rootFolder?.childrenArray ?? []) + orphanedEntities
                 case .favorites:
@@ -108,6 +109,15 @@ final class LocalBookmarkStore: BookmarkStore {
             } catch let error {
                 completion(nil, error)
             }
+        }
+    }
+
+    private func reportOrphanedBookmarksIfNeeded() {
+        Task { @MainActor in
+            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService, syncService.authState != .inactive else {
+                return
+            }
+            Pixel.fire(.debug(event: .orphanedBookmarksPresent))
         }
     }
 
