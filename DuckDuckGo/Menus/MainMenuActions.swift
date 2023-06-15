@@ -533,7 +533,7 @@ extension MainViewController {
             guard case .alertFirstButtonReturn = response, let self = self else {
                 return
             }
-            FireCoordinator.fireViewModel.fire.burnAll(tabCollectionViewModel: self.tabCollectionViewModel)
+            FireCoordinator.fireViewModel.fire.burnAll(tabCollectionViewModel: self.tabCollectionViewModel, eraseFullHistory: true)
         })
     }
 

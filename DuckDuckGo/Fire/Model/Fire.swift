@@ -222,7 +222,7 @@ final class Fire {
     }
 
     @MainActor
-    func burnAll(tabCollectionViewModel: TabCollectionViewModel, completion: (() -> Void)? = nil) {
+    func burnAll(tabCollectionViewModel: TabCollectionViewModel, eraseFullHistory: Bool, completion: (() -> Void)? = nil) {
         os_log("Fire started", log: .fire)
         burningData = .all
 
@@ -246,7 +246,7 @@ final class Fire {
             }
 
             group.enter()
-            self.burnHistory {
+            self.burnHistory(keepFireproofDomains: !eraseFullHistory) {
                 self.burnPermissions {
                     self.burnFavicons {
                         self.burnDownloads()
@@ -326,12 +326,16 @@ final class Fire {
 
     // MARK: - History
 
-    private func burnHistory(completion: @escaping () -> Void) {
-        self.historyCoordinating.burn(except: FireproofDomains.shared, completion: completion)
+    private func burnHistory(keepFireproofDomains: Bool, completion: @escaping () -> Void) {
+        if keepFireproofDomains {
+            historyCoordinating.burn(except: FireproofDomains.shared, completion: completion)
+        } else {
+            historyCoordinating.burnAll(completion: completion)
+        }
     }
 
     private func burnHistory(of baseDomains: Set<String>, completion: @escaping () -> Void) {
-        self.historyCoordinating.burnDomains(baseDomains, tld: ContentBlocking.shared.tld, completion: completion)
+        historyCoordinating.burnDomains(baseDomains, tld: ContentBlocking.shared.tld, completion: completion)
     }
 
     // MARK: - Permissions

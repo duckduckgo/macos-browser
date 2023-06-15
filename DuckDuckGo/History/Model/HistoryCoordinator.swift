@@ -37,6 +37,7 @@ protocol HistoryCoordinating: AnyObject {
 
     func title(for url: URL) -> String?
 
+    func burnAll(completion: @escaping () -> Void)
     func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void)
     func burnDomains(_ baseDomains: Set<String>, tld: TLD, completion: @escaping () -> Void)
     func burnVisits(_ visits: [Visit], completion: @escaping () -> Void)
@@ -45,7 +46,6 @@ protocol HistoryCoordinating: AnyObject {
 
 /// Coordinates access to History. Uses its own queue with high qos for all operations.
 final class HistoryCoordinator: HistoryCoordinating {
-
     static let shared = HistoryCoordinator()
 
     private init() {}
@@ -151,6 +151,16 @@ final class HistoryCoordinator: HistoryCoordinating {
         }
 
         return historyEntry.title
+    }
+
+    func burnAll(completion: @escaping () -> Void) {
+        guard let historyDictionary = historyDictionary else { return }
+
+        let entries = Array(historyDictionary.values)
+
+        removeEntries(entries, completionHandler: { _ in
+            completion()
+        })
     }
 
     func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {

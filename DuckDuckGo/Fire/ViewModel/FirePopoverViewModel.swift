@@ -239,7 +239,7 @@ final class FirePopoverViewModel {
         if clearingOption == .allData && areAllSelected {
             if let tabCollectionViewModel = tabCollectionViewModel {
                 // Burn everything
-                fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
+                fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel, eraseFullHistory: false)
             }
         } else {
             // Burn selected domains
