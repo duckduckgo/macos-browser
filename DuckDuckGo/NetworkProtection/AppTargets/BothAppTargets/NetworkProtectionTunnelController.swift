@@ -255,19 +255,21 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         Task {
             try await Task.sleep(interval: interval)
 
-            os_log(.error, log: .networkProtection, "🟢 checking login agents")
+            os_log(.info, log: .networkProtection, "Checking whether login agents are enabled and running")
+
             for item in Self.loginItems {
                 guard !item.isRunning && (condition.shouldIgnoreItemStatus || item.status.isEnabled) else {
-                    os_log(.error, log: .networkProtection, "🟢 %{public}s: ok", item.debugDescription)
+                    os_log(.info, log: .networkProtection, "Login item with ID '%{public}s': ok", item.debugDescription)
                     continue
                 }
-                os_log(.error, log: .networkProtection, "🔴 %{public}s is not running, launching manually", item.debugDescription)
+
+                os_log(.error, log: .networkProtection, "%{public}s is not running, launching manually", item.debugDescription)
 
                 do {
                     try await item.launch()
-                    os_log("🔴 launched %{public}s", item.debugDescription)
+                    os_log(.info, log: .networkProtection, "Launched login item with ID '%{public}s'", item.debugDescription)
                 } catch {
-                    os_log(.error, log: .networkProtection, "🔴 %{public}s could not be launched. %{public}s", item.debugDescription, "\(error)")
+                    os_log(.error, log: .networkProtection, "Login item with ID '%{public}s' could not be launched. Error: %{public}s", item.debugDescription, "\(error)")
                 }
             }
         }
