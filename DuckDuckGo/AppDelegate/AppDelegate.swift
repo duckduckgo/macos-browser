@@ -321,12 +321,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         // should‘ve been run at least once with NetP enabled
         guard let lastVersionRun = versionStore.lastVersionRun else {
-            os_log(.error, log: .networkProtection, "🔴 running netp for the first time: update not needed")
+            os_log(.info, log: .networkProtection, "No last version found for the NetP login items, skipping update")
             return
         }
 
         if lastVersionRun != currentVersion {
-            os_log(.error, log: .networkProtection, "🟡 App updated from %{public}s to %{public}s: updating", lastVersionRun, currentVersion)
+            os_log(.info, log: .networkProtection, "App updated from %{public}s to %{public}s: updating login items", lastVersionRun, currentVersion)
             updateNetworkProtectionTunnelAndMenu()
         } else {
             // If login items failed to launch (e.g. because of the App bundle rename), launch using NSWorkspace
