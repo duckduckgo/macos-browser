@@ -91,6 +91,9 @@ final class LocalBookmarkStore: BookmarkStore {
                     // will return the children of the root folder, as the root folder is an implementation detail of the bookmarks store.
                     let rootFolder = BookmarkUtils.fetchRootFolder(self.context)
                     let orphanedEntities = BookmarkUtils.fetchOrphanedEntities(self.context)
+                    if !orphanedEntities.isEmpty {
+                        Pixel.fire(.debug(event: .orphanedBookmarksPresent))
+                    }
                     results = (rootFolder?.childrenArray ?? []) + orphanedEntities
                 case .favorites:
                     results = self.favoritesFolder?.favoritesArray ?? []
