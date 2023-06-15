@@ -26,7 +26,6 @@ extension OSLog {
         case atb = "ATB"
         case config = "Configuration Downloading"
         case fire = "Fire"
-        case passwordManager = "Password Manager"
         case history = "History"
         case dataImportExport = "Data Import/Export"
         case pixel = "Pixel"
