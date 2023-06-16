@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "browserserviceskit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/BrowserServicesKit",
+      "state" : {
+        "branch" : "daniel/manage-private-duck-address",
+        "revision" : "134a7df48334e8efc5c28f693712e1111eca3980"
+      }
+    },
+    {
       "identity" : "content-scope-scripts",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
