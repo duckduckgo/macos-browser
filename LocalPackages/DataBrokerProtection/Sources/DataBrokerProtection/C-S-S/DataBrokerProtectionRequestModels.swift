@@ -122,7 +122,10 @@ public struct ExtractAction: Action {
     }
 }
 
+import Foundation
+
 public struct ExtractedProfile: Codable, Sendable {
+    let id: UUID
     let name: String?
     let alternativeNamesList: String?
     let addressFull: String?
@@ -134,6 +137,7 @@ public struct ExtractedProfile: Codable, Sendable {
     let profileUrl: String?
     let reportId: String?
     let age: String?
+    var removedDate: Date?
 
     public init(name: String? = nil,
                 alternativeNamesList: String? = nil,
@@ -145,7 +149,8 @@ public struct ExtractedProfile: Codable, Sendable {
                 relativesList: String? = nil,
                 profileUrl: String? = nil,
                 reportId: String? = nil,
-                age: String? = nil) {
+                age: String? = nil,
+                removedDate: Date? = nil) {
         self.name = name
         self.alternativeNamesList = alternativeNamesList
         self.addressFull = addressFull
@@ -157,6 +162,14 @@ public struct ExtractedProfile: Codable, Sendable {
         self.profileUrl = profileUrl
         self.reportId = reportId
         self.age = age
+        self.removedDate = removedDate
+        self.id = UUID()
+    }
+}
+
+extension ExtractedProfile: Equatable {
+    public static func == (lhs: ExtractedProfile, rhs: ExtractedProfile) -> Bool {
+        lhs.name == rhs.name
     }
 }
 
