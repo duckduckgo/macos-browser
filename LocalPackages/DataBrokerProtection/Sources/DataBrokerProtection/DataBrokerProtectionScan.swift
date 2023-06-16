@@ -60,6 +60,7 @@ public class DataBrokerProtectionScan: DataBrokerProtectionScanOperation {
             await executeNextStep()
         } catch {
             scanActiveContinuation?.resume(throwing: error)
+            scanActiveContinuation = nil
         }
     }
 
@@ -83,13 +84,17 @@ extension DataBrokerProtectionScan: CSSCommunicationDelegate {
 
     func extractedProfiles(profiles: [ExtractedProfile]) {
         scanActiveContinuation?.resume(returning: profiles)
+        scanActiveContinuation = nil
+
         Task {
             await executeNextStep()
         }
+
     }
 
     func onError(error: DataBrokerProtectionError) {
         scanActiveContinuation?.resume(throwing: error)
+        scanActiveContinuation = nil
         Task {
             await handler?.finish()
         }
