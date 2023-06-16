@@ -22,6 +22,29 @@ import AppKit
 import AppIntents
 import NetworkProtection
 
+extension UNNotificationAction {
+
+    enum Identifier: String {
+        case reconnect = "action.reconnect"
+    }
+
+    /// "Reconnect" notification action button
+    static let reconnectAction = UNNotificationAction(identifier: Identifier.reconnect.rawValue,
+                                                      title: UserText.networkProtectionSupercededReconnectActionTitle,
+                                                      options: [.authenticationRequired])
+
+}
+
+extension UNNotificationCategory {
+
+    /// Actions for `superceded` (by another app) notification category
+    static let superceded = UNNotificationCategory(identifier: "supercededActionCategory",
+                                                   actions: [.reconnectAction],
+                                                   intentIdentifiers: [],
+                                                   options: [])
+
+}
+
 /// This class takes care of requesting the presentation of notifications using UNNotificationCenter
 ///
 final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtectionNotificationsPresenter {
@@ -30,8 +53,8 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
     private let appLauncher: AppLauncher
     private let userNotificationCenter: UNUserNotificationCenter
 
-    init(mainAppURL: URL, userNotificationCenter: UNUserNotificationCenter = .current()) {
-        self.appLauncher = AppLauncher(appBundleURL: mainAppURL)
+    init(appLauncher: AppLauncher, userNotificationCenter: UNUserNotificationCenter = .current()) {
+        self.appLauncher = appLauncher
         self.userNotificationCenter = userNotificationCenter
 
         super.init()
@@ -44,6 +67,10 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
         requestAlertAuthorization()
     }
 
+    private lazy var registerNotificationCategoriesOnce: Void = {
+        userNotificationCenter.setNotificationCategories([.superceded])
+    }()
+
     // MARK: - Notification Utility methods
 
     private func requestAlertAuthorization(completionHandler: ((Bool) -> Void)? = nil) {
@@ -54,11 +81,16 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
         }
     }
 
-    private func notificationContent(title: String, subtitle: String) -> UNNotificationContent {
+    private func notificationContent(title: String, subtitle: String, category: UNNotificationCategory? = nil) -> UNNotificationContent {
         let content = UNMutableNotificationContent()
         content.threadIdentifier = Self.threadIdentifier
         content.title = title
         content.subtitle = subtitle
+        if let category {
+            content.categoryIdentifier = category.identifier
+            // take maximum possible number of lines so the button doesn‘t overlap the text
+            content.subtitle += "\n\n\n"
+        }
 
         if #available(macOS 12, *) {
             content.interruptionLevel = .timeSensitive
@@ -90,7 +122,8 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
 
     func showSupercededNotification() {
         let content = notificationContent(title: UserText.networkProtectioSupercededNotificationTitle,
-                                          subtitle: UserText.networkProtectionSupercededNotificationSubtitle)
+                                          subtitle: UserText.networkProtectionSupercededNotificationSubtitle,
+                                          category: .superceded)
         showNotification(content)
     }
 
@@ -102,9 +135,11 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
                 return
             }
 
+            _=self.registerNotificationCategoriesOnce
             self.userNotificationCenter.add(request)
         }
     }
+
 }
 
 extension NetworkProtectionUNNotificationsPresenter: UNUserNotificationCenterDelegate {
@@ -119,7 +154,13 @@ extension NetworkProtectionUNNotificationsPresenter: UNUserNotificationCenterDel
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
+        switch UNNotificationAction.Identifier(rawValue: response.actionIdentifier) {
+        case .reconnect:
+            await appLauncher.launchApp(withCommand: .startVPN)
 
-        await appLauncher.launchApp(withCommand: .showStatus)
+        case .none:
+            await appLauncher.launchApp(withCommand: .showStatus)
+        }
     }
+
 }
