@@ -1,5 +1,5 @@
 //
-//  MutableDynamicDependencies.swift
+//  MutableDependencyStorage.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,9 +18,9 @@
 
 /// helper struct used for resolving the dependencies
 @dynamicMemberLookup
-public struct MutableDynamicDependencies<Root> {
+public struct MutableDependencyStorage<Root> {
 
-    var storagePtr: UnsafeMutablePointer<[AnyKeyPath: Any]>
+    private var storagePtr: UnsafeMutablePointer<[AnyKeyPath: Any]>
 
     public init(_ storagePtr: UnsafeMutablePointer<[AnyKeyPath: Any]>) {
         self.storagePtr = storagePtr

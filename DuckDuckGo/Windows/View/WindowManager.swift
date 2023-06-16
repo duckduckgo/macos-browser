@@ -1,5 +1,5 @@
 //
-//  WindowControllersManager.swift
+//  WindowManager.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,7 @@ import Common
 import DependencyInjection
 
 @MainActor
-protocol WindowControllersManagerProtocol {
+protocol WindowManagerProtocol {
 
     var pinnedTabsManager: PinnedTabsManager { get }
 
@@ -34,10 +34,14 @@ protocol WindowControllersManagerProtocol {
 
 }
 
+#if swift(>=5.9)
+@Injectable
+#endif
 @MainActor
-final class WindowControllersManager: WindowControllersManagerProtocol, Injectable {
+final class WindowManager: WindowManagerProtocol, Injectable {
 
-    static var shared: WindowControllersManager!
+    let dependencies: DynamicDependencies
+    typealias InjectedDependencies = Tab.Dependencies & TabCollectionViewModel.Dependencies & MainViewController.Dependencies
 
     /**
      * _Initial_ meaning a single window with a single home page tab.
@@ -48,8 +52,8 @@ final class WindowControllersManager: WindowControllersManagerProtocol, Injectab
     @Injected
     var pinnedTabsManager: PinnedTabsManager
 
-    @available(*, deprecated, message: "use WindowControllersManager.make")
-    init() {
+    init(dependencyProvider: some DynamicDependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
     }
 
     weak var lastKeyMainWindowController: MainWindowController? {
@@ -89,7 +93,7 @@ final class WindowControllersManager: WindowControllersManagerProtocol, Injectab
 
     func unregister(_ windowController: MainWindowController) {
         guard let idx = mainWindowControllers.firstIndex(of: windowController) else {
-            os_log("WindowControllersManager: Window Controller not registered", type: .error)
+            os_log("WindowManager: Window Controller not registered", type: .error)
             return
         }
         mainWindowControllers.remove(at: idx)
@@ -109,11 +113,135 @@ final class WindowControllersManager: WindowControllersManagerProtocol, Injectab
         }
     }
 
+    var windows: [NSWindow] {
+        return NSApplication.shared.windows
+    }
+
+    func closeWindows(except window: NSWindow? = nil) {
+        for controller in mainWindowControllers where controller.window !== window {
+            controller.close()
+        }
+    }
+
+    @discardableResult
+    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
+                       isBurner: Bool = false,
+                       droppingPoint: NSPoint? = nil,
+                       contentSize: NSSize? = nil,
+                       showWindow: Bool = true,
+                       popUp: Bool = false,
+                       lazyLoadTabs: Bool = false) -> MainWindow? {
+        let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel,
+                                                 popUp: popUp,
+                                                 isBurner: isBurner)
+
+        if let droppingPoint = droppingPoint {
+            mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
+        }
+        if let contentSize = contentSize {
+            let frame = NSRect(origin: droppingPoint ?? CGPoint.zero,
+                               size: contentSize)
+            mainWindowController.window?.setFrame(frame, display: true)
+        }
+        if showWindow {
+            mainWindowController.showWindow(self)
+            if !NSApp.isActive {
+                NSApp.activate(ignoringOtherApps: true)
+            }
+        } else {
+            mainWindowController.orderWindowBack(self)
+        }
+
+        if lazyLoadTabs {
+            mainWindowController.mainViewController.tabCollectionViewModel.setUpLazyLoadingIfNeeded()
+        }
+
+        return mainWindowController.window as? MainWindow
+    }
+
+    @discardableResult
+    func openNewWindow(with tab: Tab, isBurner: Bool = false, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, showWindow: Bool = true, popUp: Bool = false) -> MainWindow? {
+        let tabCollection = TabCollection()
+        tabCollection.append(tab: tab)
+
+        let tabCollectionViewModel: TabCollectionViewModel = popUp
+            ? TabCollectionViewModel(tabCollection: tabCollection, isBurner: isBurner, dependencyProvider: dependencies)
+            : TabCollectionViewModel(tabCollection: tabCollection,
+                                     isBurner: isBurner,
+                                     dependencyProvider: TabCollectionViewModel.makeDependencies(pinnedTabsManager: nil, nested: dependencies))
+
+        return openNewWindow(with: tabCollectionViewModel,
+                             isBurner: isBurner,
+                             droppingPoint: droppingPoint,
+                             contentSize: contentSize,
+                             showWindow: showWindow,
+                             popUp: popUp)
+    }
+
+    // TODO: when isBurner no pinned manager
+    func openNewWindow(with initialUrl: URL, isBurner: Bool, parentTab: Tab? = nil) {
+        //        openNewWindow(with: Tab(content: .contentFromURL(initialUrl), parentTab: parentTab, shouldLoadInBackground: true, isBurner: isBurner), isBurner: isBurner)
+    }
+
+    func openNewWindow(with tabCollection: TabCollection, isBurner: Bool, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) {
+        //        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isBurner: isBurner)
+        //        openNewWindow(with: tabCollectionViewModel,
+        //                      isBurner: isBurner,
+        //                      droppingPoint: droppingPoint,
+        //                      contentSize: contentSize,
+        //                      popUp: popUp)
+        //        tabCollectionViewModel.setUpLazyLoadingIfNeeded()
+    }
+
+    func openPopUpWindow(with tab: Tab, isBurner: Bool, contentSize: NSSize?) {
+        //        if let mainWindowController = WindowManager.shared.lastKeyMainWindowController,
+        //           mainWindowController.window?.styleMask.contains(.fullScreen) == true,
+        //           mainWindowController.window?.isPopUpWindow == false {
+        //            mainWindowController.mainViewController.tabCollectionViewModel.insert(tab, selected: true)
+        //        } else {
+        //            self.openNewWindow(with: tab, isBurner: isBurner, contentSize: contentSize, popUp: true)
+        //        }
+    }
+
+    private func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil,
+                               contentSize: NSSize? = nil,
+                               popUp: Bool = false,
+                               isBurner: Bool) -> MainWindowController {
+        let mainViewController: MainViewController
+        do {
+            mainViewController = try NSException.catch {
+                NSStoryboard(name: "Main", bundle: .main)
+                    .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
+                        let model = tabCollectionViewModel ?? TabCollectionViewModel(isBurner: isBurner, dependencyProvider: self.dependencies)
+                        assert(model.isBurner == isBurner)
+                        return MainViewController(coder: coder, tabCollectionViewModel: model, dependencyProvider: self.dependencies)
+                    }
+            }
+        } catch {
+#if DEBUG
+            fatalError("WindowsManager.makeNewWindow: \(error)")
+#else
+            fatalError("WindowsManager.makeNewWindow: the App Bundle seems to be removed")
+#endif
+        }
+
+        var contentSize = contentSize ?? NSSize(width: 1024, height: 790)
+        contentSize.width = min(NSScreen.main?.frame.size.width ?? 1024, max(contentSize.width, 300))
+        contentSize.height = min(NSScreen.main?.frame.size.height ?? 790, max(contentSize.height, 300))
+        mainViewController.view.frame = NSRect(origin: .zero, size: contentSize)
+
+        return MainWindowController(mainViewController: mainViewController, popUp: popUp)
+    }
+
+}
+
+fileprivate extension NSStoryboard.SceneIdentifier {
+    static let mainViewController = NSStoryboard.SceneIdentifier("mainViewController")
 }
 
 // MARK: - Opening a url from the external event
 
-extension WindowControllersManager {
+extension WindowManager {
 
     func showBookmarksTab() {
         showTab(with: .bookmarks)
@@ -128,7 +256,7 @@ extension WindowControllersManager {
         guard let url = bookmark.urlObject else { return }
 
         if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            WindowsManager.openNewWindow(with: url, isBurner: false)
+            openNewWindow(with: url, isBurner: false)
         } else if mainWindowController?.mainViewController.view.window?.isPopUpWindow ?? false {
             show(url: url, newTab: true)
         } else if NSApplication.shared.isCommandPressed {
@@ -157,9 +285,10 @@ extension WindowControllersManager {
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
                 tab.setContent(url.map { .url($0) } ?? .homePage)
             } else {
-                let newTab = Tab(content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
-                newTab.setContent(url.map { .url($0) } ?? .homePage)
-                tabCollectionViewModel.append(tab: newTab)
+                fatalError()
+//                let newTab = Tab(dependencyProvider: dependencies, content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
+//                newTab.setContent(url.map { .url($0) } ?? .homePage)
+//                tabCollectionViewModel.append(tab: newTab)
             }
         }
 
@@ -178,9 +307,9 @@ extension WindowControllersManager {
 
         // Open a new window
         if let url = url {
-            WindowsManager.openNewWindow(with: url, isBurner: false)
+            openNewWindow(with: url, isBurner: false)
         } else {
-            WindowsManager.openNewWindow(isBurner: false)
+            openNewWindow(isBurner: false)
         }
     }
 
@@ -219,6 +348,6 @@ extension WindowControllersManager {
 
 extension Tab {
     var isPinned: Bool {
-        return self.pinnedTabsManager.isTabPinned(self)
+        self.pinnedTabsManager?.isTabPinned(self) ?? false
     }
 }
