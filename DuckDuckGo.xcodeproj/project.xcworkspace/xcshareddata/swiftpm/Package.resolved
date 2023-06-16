@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "bartek/sync-tweaks",
-        "revision" : "f7dec867f10010e93dbe1932dc75cbabb89be04b"
+        "revision" : "a2f73428e6827c9b1210351d000595dc0d2e8525",
+        "version" : "60.1.0"
       }
     },
     {
@@ -120,7 +120,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
       "state" : {
         "revision" : "4684440d03304e7638a2c8086895367e90987463",
         "version" : "1.2.1"
