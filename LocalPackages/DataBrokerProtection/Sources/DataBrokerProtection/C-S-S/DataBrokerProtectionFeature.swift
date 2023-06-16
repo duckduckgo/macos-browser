@@ -41,7 +41,7 @@ struct DataBrokerProtectionFeature: Subfeature {
     var featureName: String = "brokerProtection"
     var broker: UserScriptMessageBroker?
 
-    let delegate: CSSCommunicationDelegate
+    weak var delegate: CSSCommunicationDelegate?
 
     init(delegate: CSSCommunicationDelegate) {
         self.delegate = delegate
@@ -69,7 +69,7 @@ struct DataBrokerProtectionFeature: Subfeature {
     func parseActionCompleted(params: Any) {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(CSSResult.self, from: data) else {
-            delegate.onError(error: .parsingErrorObjectFailed)
+            delegate?.onError(error: .parsingErrorObjectFailed)
             return
         }
 
@@ -78,7 +78,7 @@ struct DataBrokerProtectionFeature: Subfeature {
             parseSuccess(success: successResponse)
         case .error(let error):
             let dataBrokerError: DataBrokerProtectionError = .actionFailed(actionID: error.actionID, message: error.message)
-            delegate.onError(error: dataBrokerError)
+            delegate?.onError(error: dataBrokerError)
         }
     }
 
@@ -86,19 +86,19 @@ struct DataBrokerProtectionFeature: Subfeature {
         switch success.response {
         case .navigate(let navigate):
             if let url = URL(string: navigate.url) {
-                delegate.loadURL(url: url)
+                delegate?.loadURL(url: url)
             } else {
-                delegate.onError(error: .malformedURL)
+                delegate?.onError(error: .malformedURL)
             }
         case .extract(let profiles):
-            delegate.extractedProfiles(profiles: profiles)
+            delegate?.extractedProfiles(profiles: profiles)
         default: return
         }
     }
 
     func onActionError(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let error = DataBrokerProtectionError.parse(params: params)
-        delegate.onError(error: error)
+        delegate?.onError(error: error)
         return nil
     }
 
@@ -108,7 +108,7 @@ struct DataBrokerProtectionFeature: Subfeature {
 
     func pushAction(method: CSSSubscribeActionName, webView: WKWebView, params: Encodable) {
         guard let broker = broker else {
-            delegate.onError(error: .userScriptMessageBrokerNotSet)
+            delegate?.onError(error: .userScriptMessageBrokerNotSet)
             assertionFailure("Cannot continue without broker instance")
             return
         }
