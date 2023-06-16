@@ -262,7 +262,7 @@ extension HomePage.Views {
                 HStack(spacing: 0) {
                     Image("NextStepsLeft")
                         .frame(width: 12, height: 5)
-                        .padding(.top, 9)
+                        .padding(.top, 5)
                     ZStack {
                         Rectangle()
                             .fill(HomePage.homePageBlue)
