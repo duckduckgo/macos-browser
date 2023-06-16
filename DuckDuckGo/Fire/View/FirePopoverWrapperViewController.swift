@@ -16,9 +16,18 @@
 //  limitations under the License.
 //
 
+import AppKit
+import DependencyInjection
 import Foundation
 
-final class FirePopoverWrapperViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class FirePopoverWrapperViewController: NSViewController, Injectable {
+
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = FirePopoverViewController.Dependencies
 
     @IBOutlet weak var infoView: NSView!
     @IBOutlet weak var popoverView: NSView!
@@ -26,17 +35,17 @@ final class FirePopoverWrapperViewController: NSViewController {
     @UserDefaultsWrapper(key: .fireInfoPresentedOnce, defaultValue: false)
     var infoPresentedOnce: Bool
 
-    private let fireViewModel: FireViewModel
     private weak var tabCollectionViewModel: TabCollectionViewModel?
 
     required init?(coder: NSCoder) {
-        fatalError("FirePopoverWrapperViewController: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     init?(coder: NSCoder,
-          fireViewModel: FireViewModel,
-          tabCollectionViewModel: TabCollectionViewModel) {
-        self.fireViewModel = fireViewModel
+          tabCollectionViewModel: TabCollectionViewModel,
+          dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         self.tabCollectionViewModel = tabCollectionViewModel
 
         super.init(coder: coder)
@@ -49,8 +58,8 @@ final class FirePopoverWrapperViewController: NSViewController {
         }
 
         let firePopoverViewController = FirePopoverViewController(coder: coder,
-                                                                  fireViewModel: fireViewModel,
-                                                                  tabCollectionViewModel: tabCollectionViewModel)
+                                                                  tabCollectionViewModel: tabCollectionViewModel,
+                                                                  dependencyProvider: dependencies)
         firePopoverViewController?.delegate = self
         return firePopoverViewController
     }

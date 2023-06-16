@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Common
-import BrowserServicesKit
+import DependencyInjection
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -42,36 +43,48 @@ protocol OptionsButtonMenuDelegate: AnyObject {
 
 }
 
+#if swift(>=5.9)
+@Injectable
+#endif
 @MainActor
-final class MoreOptionsMenu: NSMenu {
+final class MoreOptionsMenu: NSMenu, Injectable {
+
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+
+    @Injected
+    var emailManager: EmailManager
+
+    @Injected
+    var passwordManagerCoordinator: PasswordManagerCoordinating
+
+    @Injected
+    var internalUserDecider: InternalUserDecider
+
+    typealias InjectedDependencies = EmailOptionsButtonSubMenu.Dependencies & SharingMenu.Dependencies
 
     weak var actionDelegate: OptionsButtonMenuDelegate?
 
     private let tabCollectionViewModel: TabCollectionViewModel
-    private let emailManager: EmailManager
-    private let passwordManagerCoordinator: PasswordManagerCoordinating
-    private let internalUserDecider: InternalUserDecider
 
 #if NETWORK_PROTECTION
     private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
 #endif
 
     required init(coder: NSCoder) {
-        fatalError("MoreOptionsMenu: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
 #if NETWORK_PROTECTION
     init(tabCollectionViewModel: TabCollectionViewModel,
-         emailManager: EmailManager = EmailManager(),
-         passwordManagerCoordinator: PasswordManagerCoordinator,
          networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore(),
-         internalUserDecider: InternalUserDecider) {
+         dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
 
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.emailManager = emailManager
-        self.passwordManagerCoordinator = passwordManagerCoordinator
         self.networkProtectionFeatureVisibility =  networkProtectionFeatureVisibility
-        self.internalUserDecider = internalUserDecider
 
         super.init(title: "")
 
@@ -81,14 +94,10 @@ final class MoreOptionsMenu: NSMenu {
     }
 #else
     init(tabCollectionViewModel: TabCollectionViewModel,
-         emailManager: EmailManager = EmailManager(),
-         passwordManagerCoordinator: PasswordManagerCoordinator,
-         internalUserDecider: InternalUserDecider) {
+         dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
 
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.emailManager = emailManager
-        self.passwordManagerCoordinator = passwordManagerCoordinator
-        self.internalUserDecider = internalUserDecider
 
         super.init(title: "")
 
@@ -123,7 +132,7 @@ final class MoreOptionsMenu: NSMenu {
 
         addItem(withTitle: UserText.emailOptionsMenuItem, action: nil, keyEquivalent: "")
             .withImage(NSImage(named: "OptionsButtonMenuEmail"))
-            .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
+            .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, dependencyProvider: dependencies))
 
 #if NETWORK_PROTECTION
         if networkProtectionFeatureVisibility.isFeatureActivated {
@@ -152,11 +161,11 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @objc func newWindow(_ sender: NSMenuItem) {
-        WindowsManager.openNewWindow(isBurner: false)
+        windowManager.openNewWindow(isBurner: false)
     }
 
     @objc func newBurnerWindow(_ sender: NSMenuItem) {
-        WindowsManager.openNewWindow(isBurner: true)
+        windowManager.openNewWindow(isBurner: true)
     }
 
     @objc func toggleFireproofing(_ sender: NSMenuItem) {
@@ -302,7 +311,7 @@ final class MoreOptionsMenu: NSMenu {
         addItem(withTitle: UserText.shareMenuItem, action: nil, keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "Share"))
-            .withSubmenu(SharingMenu())
+            .withSubmenu(SharingMenu(dependencyProvider: dependencies))
 
         addItem(withTitle: UserText.printMenuItem, action: #selector(doPrint(_:)), keyEquivalent: "")
             .targetting(self)
@@ -314,15 +323,24 @@ final class MoreOptionsMenu: NSMenu {
 
 }
 
+#if swift(>=5.9)
+@Injectable
+#endif
 @MainActor
-final class EmailOptionsButtonSubMenu: NSMenu {
+final class EmailOptionsButtonSubMenu: NSMenu, Injectable {
+
+    let dependencies: DependencyStorage
+
+    @Injected
+    var emailManager: EmailManager
+
+    typealias InjectedDependencies = Tab.Dependencies
 
     private let tabCollectionViewModel: TabCollectionViewModel
-    private let emailManager: EmailManager
 
-    init(tabCollectionViewModel: TabCollectionViewModel, emailManager: EmailManager) {
+    init(tabCollectionViewModel: TabCollectionViewModel, dependencyProvider: DependencyProvider) {
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.emailManager = emailManager
+        self.dependencies = .init(dependencyProvider)
         super.init(title: UserText.emailOptionsMenuItem)
 
         updateMenuItems()
@@ -338,7 +356,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     required init(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     private func updateMenuItems() {
@@ -385,7 +403,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
-        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
+        let tab = Tab(dependencyProvider: dependencies, content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
         tabCollectionViewModel.append(tab: tab)
     }
 
@@ -398,6 +416,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 }
 
+@MainActor
 final class ZoomSubMenu: NSMenu {
 
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
@@ -407,7 +426,7 @@ final class ZoomSubMenu: NSMenu {
     }
 
     required init(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel, targetting target: AnyObject) {
@@ -445,7 +464,7 @@ final class BookmarksSubMenu: NSMenu {
     }
 
     required init(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel, target: AnyObject) {
@@ -539,7 +558,7 @@ final class LoginsSubMenu: NSMenu {
     }
 
     required init(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     private func updateMenuItems(with target: AnyObject) {

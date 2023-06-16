@@ -18,6 +18,7 @@
 
 import AppKit
 import Combine
+import DependencyInjection
 
 protocol BookmarkManagementDetailViewControllerDelegate: AnyObject {
 
@@ -30,7 +31,16 @@ private struct EditedBookmarkMetadata {
     let index: Int
 }
 
-final class BookmarkManagementDetailViewController: NSViewController, NSMenuItemValidation {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class BookmarkManagementDetailViewController: NSViewController, NSMenuItemValidation, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+
+    typealias InjectedDependencies = Tab.Dependencies
 
     fileprivate enum Constants {
         static let bookmarkCellIdentifier = NSUserInterfaceItemIdentifier(rawValue: "BookmarksCellIdentifier")
@@ -79,6 +89,15 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         self.selectionState = selectionState
     }
 
+    init(coder: NSCoder, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+        super.init(coder: coder)!
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -125,7 +144,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     @IBAction func onImportClicked(_ sender: NSButton) {
-        DataImportViewController.show()
+        DataImportViewController.show(using: windowManager)
     }
 
     @IBAction func handleDoubleClick(_ sender: NSTableView) {
@@ -145,11 +164,11 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
         if let url = (entity as? Bookmark)?.urlObject {
             if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-                WindowsManager.openNewWindow(with: url, isBurner: false)
+                windowManager.openNewWindow(with: url, isBurner: false)
             } else if NSApplication.shared.isCommandPressed {
-                WindowControllersManager.shared.show(url: url, newTab: true)
+                windowManager.show(url: url, newTab: true)
             } else {
-                WindowControllersManager.shared.show(url: url, newTab: true)
+                windowManager.show(url: url, newTab: true)
             }
         } else if let folder = entity as? BookmarkFolder {
             resetSelections()
@@ -478,13 +497,14 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     }
 
     fileprivate func openBookmarksInNewTabs(_ bookmarks: [Bookmark]) {
-        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel else {
+        guard let tabCollection = windowManager.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel else {
             assertionFailure("Cannot open in new tabs")
             return
         }
 
         let tabs = bookmarks.compactMap { $0.urlObject }.map {
-            Tab(content: .url($0),
+            Tab(dependencyProvider: dependencies,
+                content: .url($0),
                 shouldLoadInBackground: true,
                 isBurner: tabCollection.isBurner)
         }
@@ -637,7 +657,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        WindowControllersManager.shared.show(url: url, newTab: true)
+        windowManager.show(url: url, newTab: true)
     }
 
     func openBookmarkInNewWindow(_ sender: NSMenuItem) {
@@ -647,7 +667,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        WindowsManager.openNewWindow(with: url, isBurner: false)
+        windowManager.openNewWindow(with: url, isBurner: false)
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {

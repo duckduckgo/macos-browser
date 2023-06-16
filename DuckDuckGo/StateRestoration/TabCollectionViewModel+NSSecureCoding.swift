@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import DependencyInjection
 import Foundation
 
 extension TabCollectionViewModel: NSSecureEncodable {
@@ -25,14 +26,15 @@ extension TabCollectionViewModel: NSSecureEncodable {
         static let selectionIndex = "idx"
     }
 
-    static func make(with coder: NSCoder, dependencies: TabCollectionViewModel.DynamicDependencyProvider) throws -> TabCollectionViewModel {
+    convenience init(coder: NSCoder, dependencyProvider: DependencyProvider) throws {
         let tabCollection = try coder.decode(at: NSSecureCodingKeys.tabCollection) { coder in
-            try TabCollection(coder: coder, dependencies: dependencies)
+            try TabCollection(coder: coder, dependencyProvider: dependencyProvider)
         }
         let index = coder.decodeIfPresent(at: NSSecureCodingKeys.selectionIndex) ?? 0
         // Burner tabs aren't stored
         let isBurner = false
-        return self.make(with: dependencies, tabCollection: tabCollection, selectionIndex: index, isBurner: isBurner)
+
+        self.init(tabCollection: tabCollection, selectionIndex: index, isBurner: isBurner, dependencyProvider: dependencyProvider)
     }
 
     func encode(with coder: NSCoder) {

@@ -16,13 +16,21 @@
 //  limitations under the License.
 //
 
-import Cocoa
-import WebKit
-import Combine
 import BrowserServicesKit
+import Cocoa
+import Combine
+import DependencyInjection
 import PrivacyDashboard
+import WebKit
 
-final class PrivacyDashboardViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class PrivacyDashboardViewController: NSViewController, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
 
     struct Constants {
         static let initialContentHeight: CGFloat = 499
@@ -64,6 +72,16 @@ final class PrivacyDashboardViewController: NSViewController {
         permissionHandler.updateTabViewModel(tabViewModel) { [weak self] allowedPermissions in
             self?.privacyDashboardController.allowedPermissions = allowedPermissions
         }
+    }
+
+    init?(coder: NSCoder, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
+        super.init(coder: coder)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
     }
 
     public override func viewDidLoad() {
@@ -188,7 +206,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
     }
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didRequestOpenUrlInNewTab url: URL) {
-        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
+        guard let tabCollection = windowManager.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
         else {
             assertionFailure("could not access shared tabCollectionViewModel")
             return
@@ -198,7 +216,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController,
                                     didRequestOpenSettings target: PrivacyDashboard.PrivacyDashboardOpenSettingsTarget) {
-        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
+        guard let tabCollection = windowManager.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel
         else {
             assertionFailure("could not access shared tabCollectionViewModel")
             return

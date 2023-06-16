@@ -19,12 +19,21 @@
 import Cocoa
 import Combine
 import Common
+import DependencyInjection
 
+#if swift(>=5.9)
+@Injectable
+#endif
 @MainActor
-final class MainWindowController: NSWindowController {
+final class MainWindowController: NSWindowController, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+    @Injected
+    var fireViewModel: FireViewModel
 
     private static let windowFrameSaveName = "MainWindow"
-    private var fireViewModel: FireViewModel
     private static var knownFullScreenMouseDetectionWindows = Set<NSValue>()
 
     var mainViewController: MainViewController {
@@ -37,7 +46,9 @@ final class MainWindowController: NSWindowController {
         return window?.standardWindowButton(.closeButton)?.superview
     }
 
-    init(mainViewController: MainViewController, popUp: Bool, fireViewModel: FireViewModel? = nil) {
+    init(mainViewController: MainViewController, popUp: Bool, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         let size = mainViewController.view.frame.size
         let moveToCenter = CGAffineTransform(translationX: ((NSScreen.main?.frame.width ?? 1024) - size.width) / 2,
                                              y: ((NSScreen.main?.frame.height ?? 790) - size.height) / 2)
@@ -46,7 +57,6 @@ final class MainWindowController: NSWindowController {
 
         let window = popUp ? PopUpWindow(frame: frame) : MainWindow(frame: frame)
         window.contentViewController = mainViewController
-        self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
 
         super.init(window: window)
 
@@ -58,7 +68,7 @@ final class MainWindowController: NSWindowController {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     deinit {
@@ -186,7 +196,7 @@ final class MainWindowController: NSWindowController {
     }
 
     private func register() {
-        WindowControllersManager.shared.register(self)
+        windowManager.register(self)
     }
 
 }
@@ -197,7 +207,7 @@ extension MainWindowController: NSWindowDelegate {
         mainViewController.windowDidBecomeMain()
 
         if (notification.object as? NSWindow)?.isPopUpWindow == false {
-            WindowControllersManager.shared.lastKeyMainWindowController = self
+            windowManager.lastKeyMainWindowController = self
         }
     }
 
@@ -265,7 +275,7 @@ extension MainWindowController: NSWindowDelegate {
         // Unregistering triggers deinitialization of this object.
         // Because it's also the delegate, deinit within this method caused crash
         DispatchQueue.main.async {
-            WindowControllersManager.shared.unregister(self)
+            self.windowManager.unregister(self)
         }
     }
 

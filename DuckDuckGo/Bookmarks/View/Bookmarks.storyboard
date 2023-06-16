@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22113.1" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22113.1"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -10,10 +10,6 @@
         <scene sceneID="q4A-kX-Gcw">
             <objects>
                 <splitViewController title="Bookmarks" storyboardIdentifier="BookmarkManagementSplitViewController" id="cTg-Rr-Tjp" customClass="BookmarkManagementSplitViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <splitViewItems>
-                        <splitViewItem holdingPriority="255" behavior="contentList" id="Gzb-7F-4E7"/>
-                        <splitViewItem id="Z59-qq-Yho"/>
-                    </splitViewItems>
                     <splitView key="splitView" dividerStyle="thin" vertical="YES" id="2T2-t4-KZZ">
                         <rect key="frame" x="0.0" y="0.0" width="618" height="351"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -28,8 +24,6 @@
                     </splitView>
                     <connections>
                         <outlet property="splitView" destination="2T2-t4-KZZ" id="J8S-Ps-o2H"/>
-                        <segue destination="cOb-MX-4XZ" kind="relationship" relationship="splitItems" id="AOY-HD-7cC"/>
-                        <segue destination="nlv-9S-Ioa" kind="relationship" relationship="splitItems" id="A8B-Ny-wEZ"/>
                     </connections>
                 </splitViewController>
                 <customObject id="5Sa-aZ-qTG" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -39,7 +33,7 @@
         <!--Bookmark Management Sidebar View Controller-->
         <scene sceneID="kSB-yp-ZWy">
             <objects>
-                <viewController id="cOb-MX-4XZ" customClass="BookmarkManagementSidebarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="BookmarkManagementSidebarViewController" id="cOb-MX-4XZ" customClass="BookmarkManagementSidebarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="oQD-6b-AhT">
                         <rect key="frame" x="0.0" y="0.0" width="258" height="500"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -99,9 +93,6 @@
                             </scrollView>
                             <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="oJB-Na-CzV">
                                 <rect key="frame" x="18" y="422" width="217" height="60"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="60" id="gqw-kD-NlW"/>
-                                </constraints>
                                 <popUpButtonCell key="cell" type="bevel" title="Bookmarks" bezelStyle="rounded" alignment="left" controlSize="large" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" selectedItem="Pxw-Jh-Zh0" id="Hfh-Gh-9qt">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system" size="22"/>
@@ -111,6 +102,9 @@
                                         </items>
                                     </menu>
                                 </popUpButtonCell>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="gqw-kD-NlW"/>
+                                </constraints>
                             </popUpButton>
                         </subviews>
                         <constraints>
@@ -145,7 +139,7 @@
         <!--Bookmark Management Detail View Controller-->
         <scene sceneID="6Fs-Ad-ECj">
             <objects>
-                <viewController id="nlv-9S-Ioa" customClass="BookmarkManagementDetailViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="BookmarkManagementDetailViewController" id="nlv-9S-Ioa" customClass="BookmarkManagementDetailViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="0G1-O6-fPI">
                         <rect key="frame" x="0.0" y="0.0" width="676" height="629"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -220,7 +214,7 @@
                                         </constraints>
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="BookmarksEmpty" id="OUR-i6-oZZ"/>
                                     </imageView>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LTY-g7-MLc">
+                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LTY-g7-MLc">
                                         <rect key="frame" x="14" y="95" width="196" height="19"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="192" id="2hn-g3-ubB"/>
@@ -231,7 +225,7 @@
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NwF-DN-Ena">
+                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NwF-DN-Ena">
                                         <rect key="frame" x="14" y="39" width="196" height="48"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="192" id="UWK-SS-qdF"/>
@@ -266,17 +260,17 @@
                                     <constraint firstItem="LTY-g7-MLc" firstAttribute="top" secondItem="mrh-3F-46f" secondAttribute="bottom" constant="8" id="xB2-zS-Uxz"/>
                                 </constraints>
                             </customView>
-                            <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nQu-I8-OqK" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <button imageHugsTitle="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nQu-I8-OqK" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="194" y="573" width="110" height="24"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="110" id="fCv-XV-yrO"/>
-                                    <constraint firstAttribute="height" constant="24" id="ys9-mF-qNi"/>
-                                </constraints>
                                 <buttonCell key="cell" type="square" title="  New Folder" bezelStyle="shadowlessSquare" image="AddFolder" imagePosition="leading" alignment="center" inset="2" id="luj-VO-HpO">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <color key="contentTintColor" name="ButtonColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="110" id="fCv-XV-yrO"/>
+                                    <constraint firstAttribute="height" constant="24" id="ys9-mF-qNi"/>
+                                </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                         <color key="value" name="ButtonMouseOverColor"/>
@@ -292,17 +286,17 @@
                                     <action selector="presentAddFolderModal:" target="nlv-9S-Ioa" id="Dv0-j9-4ha"/>
                                 </connections>
                             </button>
-                            <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="96h-Ck-yux" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <button imageHugsTitle="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="96h-Ck-yux" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="48" y="573" width="130" height="24"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="24" id="CKf-3f-aSt"/>
-                                    <constraint firstAttribute="width" constant="130" id="hTU-md-bGM"/>
-                                </constraints>
                                 <buttonCell key="cell" type="square" title="  New Bookmark" bezelStyle="shadowlessSquare" image="AddBookmark" imagePosition="leading" alignment="center" inset="2" id="hNH-Va-fKg">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <color key="contentTintColor" name="ButtonColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="24" id="CKf-3f-aSt"/>
+                                    <constraint firstAttribute="width" constant="130" id="hTU-md-bGM"/>
+                                </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                         <color key="value" name="ButtonMouseOverColor"/>
@@ -377,7 +371,7 @@
                                 </view>
                                 <color key="fillColor" name="PopoverBackgroundColor"/>
                             </box>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="b7R-iD-UcK">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="b7R-iD-UcK">
                                 <rect key="frame" x="17" y="189" width="266" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Bookmark added" id="zKL-Gb-RmD">
                                     <font key="font" metaFont="systemBold"/>
@@ -385,7 +379,7 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ich-82-cIb">
+                            <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ich-82-cIb">
                                 <rect key="frame" x="19" y="144" width="262" height="22"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" bezelStyle="round" id="mXp-oh-9G8">
                                     <font key="font" metaFont="system"/>
@@ -443,7 +437,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0eB-pX-cZ5">
-                                <rect key="frame" x="143" y="12" width="83" height="32"/>
+                                <rect key="frame" x="142" y="12" width="84" height="32"/>
                                 <buttonCell key="cell" type="push" title="Remove" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="IZ6-xl-fw6">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -494,7 +488,7 @@ DQ
                         <rect key="frame" x="0.0" y="0.0" width="437" height="164"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oOL-3u-yUF">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oOL-3u-yUF">
                                 <rect key="frame" x="18" y="128" width="100" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="New Bookmark" id="xc7-ad-mGJ">
                                     <font key="font" metaFont="systemSemibold" size="13"/>
@@ -503,7 +497,7 @@ DQ
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dgc-zb-fvL">
-                                <rect key="frame" x="365" y="13" width="59" height="32"/>
+                                <rect key="frame" x="364" y="13" width="60" height="32"/>
                                 <buttonCell key="cell" type="push" title="Add" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ZPL-TO-ALm">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -516,7 +510,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HgR-2u-c44">
-                                <rect key="frame" x="291" y="13" width="76" height="32"/>
+                                <rect key="frame" x="290" y="13" width="76" height="32"/>
                                 <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="9NB-Ry-DvI">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -528,7 +522,7 @@ Gw
                                     <action selector="cancel:" target="iFE-Lt-gjz" id="sba-5b-PVC"/>
                                 </connections>
                             </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Rch-BQ-Djd" userLabel="Address Text Field">
+                            <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Rch-BQ-Djd" userLabel="Address Text Field">
                                 <rect key="frame" x="90" y="60" width="327" height="22"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" bezelStyle="round" id="TxQ-jc-7Zj">
                                     <font key="font" metaFont="system"/>
@@ -539,7 +533,7 @@ Gw
                                     <outlet property="delegate" destination="iFE-Lt-gjz" id="TER-qt-SeX"/>
                                 </connections>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ryO-Do-ov5">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ryO-Do-ov5">
                                 <rect key="frame" x="18" y="63" width="58" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Address:" id="py7-ho-J5N">
                                     <font key="font" metaFont="system"/>
@@ -547,7 +541,7 @@ Gw
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="wUW-im-K6u">
+                            <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="wUW-im-K6u">
                                 <rect key="frame" x="90" y="90" width="327" height="22"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" bezelStyle="round" id="faG-U3-7h9">
                                     <font key="font" metaFont="system"/>
@@ -558,7 +552,7 @@ Gw
                                     <outlet property="delegate" destination="iFE-Lt-gjz" id="bag-UZ-NsA"/>
                                 </connections>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ifb-uf-I6q">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ifb-uf-I6q">
                                 <rect key="frame" x="18" y="93" width="35" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Title:" id="GDn-BD-1AO">
                                     <font key="font" metaFont="system"/>
@@ -606,7 +600,7 @@ Gw
                         <rect key="frame" x="0.0" y="0.0" width="450" height="131"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5aD-5k-Z0e">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5aD-5k-Z0e">
                                 <rect key="frame" x="18" y="95" width="76" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="New Folder" id="0xR-b3-mfS">
                                     <font key="font" metaFont="systemSemibold" size="13"/>
@@ -615,7 +609,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XHD-7s-IQg">
-                                <rect key="frame" x="378" y="13" width="59" height="32"/>
+                                <rect key="frame" x="377" y="13" width="60" height="32"/>
                                 <buttonCell key="cell" type="push" title="Add" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0CD-Rj-MZj">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -628,7 +622,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NPt-pY-c7a">
-                                <rect key="frame" x="304" y="13" width="76" height="32"/>
+                                <rect key="frame" x="303" y="13" width="76" height="32"/>
                                 <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="DRk-3p-Es5">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -640,7 +634,7 @@ Gw
                                     <action selector="cancel:" target="6vl-fZ-16D" id="QjB-a8-G7w"/>
                                 </connections>
                             </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="S5h-FN-E1I" userLabel="Address Text Field">
+                            <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="S5h-FN-E1I" userLabel="Address Text Field">
                                 <rect key="frame" x="76" y="60" width="354" height="22"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" bezelStyle="round" id="LYP-a3-C7P">
                                     <font key="font" metaFont="system"/>
@@ -651,7 +645,7 @@ Gw
                                     <outlet property="delegate" destination="6vl-fZ-16D" id="IAT-Vo-RCQ"/>
                                 </connections>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ydi-WQ-mDx">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ydi-WQ-mDx">
                                 <rect key="frame" x="18" y="63" width="44" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Name:" id="Rp2-5r-NVK">
                                     <font key="font" metaFont="system"/>
@@ -702,7 +696,7 @@ Gw
                                 </view>
                                 <color key="fillColor" name="PopoverBackgroundColor"/>
                             </box>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TJx-89-ls4">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TJx-89-ls4">
                                 <rect key="frame" x="13" y="421" width="90" height="20"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Bookmarks" id="HqW-8W-PJu">
                                     <font key="font" metaFont="system" size="17"/>
@@ -718,15 +712,15 @@ Gw
                                 <subviews>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="qBa-rT-8sF" userLabel="New Bookmark Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="28" id="9mk-iy-mXT"/>
-                                            <constraint firstAttribute="width" constant="28" id="kiL-Lk-pWq"/>
-                                        </constraints>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="AddBookmark" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="KBc-mO-g1J">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
                                         <color key="contentTintColor" name="ButtonColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="9mk-iy-mXT"/>
+                                            <constraint firstAttribute="width" constant="28" id="kiL-Lk-pWq"/>
+                                        </constraints>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                                 <color key="value" name="ButtonMouseOverColor"/>
@@ -744,15 +738,15 @@ Gw
                                     </button>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="xMD-lr-ArK" userLabel="New Folder Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="32" y="0.0" width="28" height="28"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="28" id="BWu-UC-Ow7"/>
-                                            <constraint firstAttribute="width" constant="28" id="wml-gt-OK1"/>
-                                        </constraints>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="AddFolder" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="EkA-sE-QuN">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
                                         <color key="contentTintColor" name="ButtonColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="BWu-UC-Ow7"/>
+                                            <constraint firstAttribute="width" constant="28" id="wml-gt-OK1"/>
+                                        </constraints>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                                 <color key="value" name="ButtonMouseOverColor"/>
@@ -777,14 +771,14 @@ Gw
                                     </box>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="pTk-xE-OqR" userLabel="Show Management UI Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="81" y="0.0" width="16" height="28"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="28" id="rgG-V6-CDn"/>
-                                        </constraints>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Expand" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="jdG-cU-IZR">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
                                         <color key="contentTintColor" name="ButtonColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="rgG-V6-CDn"/>
+                                        </constraints>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                                 <color key="value" name="ButtonMouseOverColor"/>
@@ -872,7 +866,7 @@ Gw
                                         </constraints>
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="BookmarksEmpty" id="HE9-Wu-hju"/>
                                     </imageView>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1ce-Da-33o">
+                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1ce-Da-33o">
                                         <rect key="frame" x="73" y="166" width="196" height="19"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="192" id="wey-FY-4Ip"/>
@@ -883,7 +877,7 @@ Gw
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1Te-SN-ek2">
+                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1Te-SN-ek2">
                                         <rect key="frame" x="73" y="110" width="196" height="48"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="192" id="CsZ-nA-pG6"/>

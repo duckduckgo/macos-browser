@@ -132,7 +132,7 @@ public final class CookieConsentPopover {
     }
 
     public required init?(coder: NSCoder) {
-        fatalError("CookieConsentPopover: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 }
 

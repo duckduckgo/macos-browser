@@ -121,51 +121,6 @@ extension Pixel.Event {
         }
     }
 
-    enum BurnedTabs: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case lessThan6 = "burn-less-than-6-tabs"
-        case moreThan6 = "burn-more-than-6-tabs"
-
-        init(_ tabs: Int) {
-            if tabs >= 6 {
-                self = .moreThan6
-                return
-            }
-            self = .lessThan6
-        }
-
-        @MainActor
-        init() {
-            let tabCount = WindowControllersManager.shared.mainWindowControllers
-                .reduce(0) { $0 + $1.mainViewController.tabCollectionViewModel.tabCollection.tabs.count }
-            self.init(tabCount)
-        }
-
-    }
-
-    enum BurnedWindows: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case one = "burn-1-window"
-        case moreThan1 = "burn-more-than-1-window"
-
-        init(_ windows: Int) {
-            if windows <= 1 {
-                self = .one
-                return
-            }
-            self = .moreThan1
-        }
-
-        @MainActor
-        init() {
-            let windowCount = WindowControllersManager.shared.mainWindowControllers.count
-            self.init(windowCount)
-        }
-
-    }
-
     enum FireproofKind: String, CustomStringConvertible {
         var description: String { rawValue }
 

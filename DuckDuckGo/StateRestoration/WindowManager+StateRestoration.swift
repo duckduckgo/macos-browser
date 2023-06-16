@@ -20,22 +20,22 @@ import Cocoa
 import Common
 import DependencyInjection
 
-extension WindowsManager {
+extension WindowManager {
 
-    class func restoreState(from coder: NSCoder, dependencyProvider: TabCollectionViewModel.DynamicDependencyProvider, includePinnedTabs: Bool = true, includeWindows: Bool = true) throws {
+    func restoreState(from coder: NSCoder, dependencyProvider: TabCollectionViewModel.DependencyProvider, includePinnedTabs: Bool = true, includeWindows: Bool = true) throws {
         let state = try coder.decode(at: NSKeyedArchiveRootObjectKey) { coder in
-            try WindowManagerStateRestoration(coder: coder, dependencies: dependencyProvider)
+            try WindowManagerStateRestoration(dependencyProvider: dependencyProvider, coder: coder)
         }
 
         if let pinnedTabsCollection = state.pinnedTabs {
-            WindowControllersManager.shared.restorePinnedTabs(pinnedTabsCollection)
+            restorePinnedTabs(pinnedTabsCollection)
         }
         if includeWindows {
             restoreWindows(from: state)
         }
     }
 
-    private class func restoreWindows(from state: WindowManagerStateRestoration) {
+    private func restoreWindows(from state: WindowManagerStateRestoration) {
         for item in state.windows.reversed() {
             setUpWindow(from: item)
         }
@@ -49,19 +49,15 @@ extension WindowsManager {
         }
     }
 
-    private class func setUpWindow(from item: WindowRestorationItem) {
+    private func setUpWindow(from item: WindowRestorationItem) {
         guard let window = openNewWindow(with: item.model, isBurner: false, showWindow: true) else { return }
         window.setContentSize(item.frame.size)
         window.setFrameOrigin(item.frame.origin)
     }
 
-}
-
-extension WindowControllersManager {
-
     @MainActor
     func encodeState(with coder: NSCoder) {
-        coder.encode(WindowManagerStateRestoration(windowControllersManager: self),
+        coder.encode(WindowManagerStateRestoration(windowManager: self),
                      forKey: NSKeyedArchiveRootObjectKey)
     }
 
@@ -71,9 +67,6 @@ extension WindowControllersManager {
 
 }
 
-#if swift(>=5.9)
-@Injectable
-#endif
 struct WindowManagerStateRestoration: NSSecureEncodable {
 
     private enum NSSecureCodingKeys {
@@ -91,21 +84,21 @@ struct WindowManagerStateRestoration: NSSecureEncodable {
     static var className: String? { "WMState" }
 
     @MainActor
-    init(coder: NSCoder, dependencies: TabCollectionViewModel.DynamicDependencyProvider) throws {
+    init(dependencyProvider: TabCollectionViewModel.DependencyProvider, coder: NSCoder) throws {
         let restorationArray = try coder.decodeArray(at: NSSecureCodingKeys.controllers) { coder in
-            try WindowRestorationItem(coder: coder, dependencies: dependencies)
+            try WindowRestorationItem(dependencyProvider: dependencyProvider, coder: coder)
         }
 
         self.windows = restorationArray
         self.keyWindowIndex = coder.decodeIfPresent(at: NSSecureCodingKeys.keyWindowIndex)
         self.pinnedTabs = try? (coder.decode(at: NSSecureCodingKeys.pinnedTabs) { coder -> TabCollection in
-            try TabCollection(coder: coder, dependencies: dependencies)
+            try TabCollection(coder: coder, dependencyProvider: dependencyProvider)
         } as TabCollection)
     }
 
     @MainActor
-    init(windowControllersManager: WindowControllersManager) {
-        self.windows = windowControllersManager.mainWindowControllers
+    init(windowManager: WindowManager) {
+        self.windows = windowManager.mainWindowControllers
             .filter { $0.window?.isPopUpWindow == false }
             .sorted { (lhs, rhs) in
                 let leftIndex = lhs.window?.orderedIndex ?? Int.min
@@ -113,11 +106,11 @@ struct WindowManagerStateRestoration: NSSecureEncodable {
                 return leftIndex < rightIndex
             }
             .compactMap { WindowRestorationItem(windowController: $0) }
-        self.keyWindowIndex = windowControllersManager.lastKeyMainWindowController.flatMap {
-            windowControllersManager.mainWindowControllers.firstIndex(of: $0)
+        self.keyWindowIndex = windowManager.lastKeyMainWindowController.flatMap {
+            windowManager.mainWindowControllers.firstIndex(of: $0)
         }
 
-        self.pinnedTabs = windowControllersManager.pinnedTabsManager.tabCollection
+        self.pinnedTabs = windowManager.pinnedTabsManager.tabCollection
     }
 
     func encode(with coder: NSCoder) {
@@ -127,12 +120,7 @@ struct WindowManagerStateRestoration: NSSecureEncodable {
     }
 }
 
-#if swift(>=5.9)
-@Injectable
-#endif
 struct WindowRestorationItem: NSSecureEncodable {
-
-    typealias InjectedDependencies = TabCollectionViewModel.Dependencies
 
     private enum NSSecureCodingKeys {
         static let frame = "frame"
@@ -156,9 +144,9 @@ struct WindowRestorationItem: NSSecureEncodable {
     static var className: String? { "WR" }
 
     @MainActor
-    init(coder: NSCoder, dependencies: TabCollectionViewModel.DynamicDependencyProvider) throws {
+    init(dependencyProvider: TabCollectionViewModel.DependencyProvider, coder: NSCoder) throws {
         let model = try coder.decode(at: NSSecureCodingKeys.model) { coder in
-            try TabCollectionViewModel.make(with: coder, dependencies: dependencies)
+            try TabCollectionViewModel(coder: coder, dependencyProvider: dependencyProvider)
         }
         self.model = model
         self.frame = coder.decodeRect(forKey: NSSecureCodingKeys.frame)

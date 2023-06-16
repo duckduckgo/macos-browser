@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import Common
+import DependencyInjection
 
 protocol FirePopoverViewControllerDelegate: AnyObject {
 
@@ -27,7 +28,14 @@ protocol FirePopoverViewControllerDelegate: AnyObject {
 
 }
 
-final class FirePopoverViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class FirePopoverViewController: NSViewController, Injectable {
+
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = FirePopoverViewModel.Dependencies
 
     struct Constants {
         static let maximumContentHeight: CGFloat = 42 + 230 + 32
@@ -38,7 +46,6 @@ final class FirePopoverViewController: NSViewController {
 
     weak var delegate: FirePopoverViewControllerDelegate?
 
-    private let fireViewModel: FireViewModel
     private var firePopoverViewModel: FirePopoverViewModel
     private let historyCoordinating: HistoryCoordinating
 
@@ -64,22 +71,23 @@ final class FirePopoverViewController: NSViewController {
     private var areOtherTabsInfluencedCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
-        fatalError("FirePopoverViewController: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     init?(coder: NSCoder,
-          fireViewModel: FireViewModel,
           tabCollectionViewModel: TabCollectionViewModel,
           historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
           fireproofDomains: FireproofDomains = FireproofDomains.shared,
-          faviconManagement: FaviconManagement = FaviconManager.shared) {
-        self.fireViewModel = fireViewModel
+          faviconManagement: FaviconManagement = FaviconManager.shared,
+          dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         self.historyCoordinating = historyCoordinating
-        self.firePopoverViewModel = FirePopoverViewModel(fireViewModel: fireViewModel,
-                                                         tabCollectionViewModel: tabCollectionViewModel,
+        self.firePopoverViewModel = FirePopoverViewModel(tabCollectionViewModel: tabCollectionViewModel,
                                                          historyCoordinating: historyCoordinating,
                                                          fireproofDomains: fireproofDomains,
-                                                         faviconManagement: faviconManagement)
+                                                         faviconManagement: faviconManagement,
+                                                         dependencyProvider: dependencies)
 
         super.init(coder: coder)
     }

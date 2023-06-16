@@ -24,6 +24,7 @@ import BrowserServicesKit
 protocol AddressBarTextFieldDelegate: AnyObject {
 
     func adressBarTextField(_ addressBarTextField: AddressBarTextField, didChangeValue value: AddressBarTextField.Value)
+    func adressBarTextField(_ addressBarTextField: AddressBarTextField, didRequestNewTabWith content: Tab.TabContent, selected: Bool)
 
 }
 
@@ -307,11 +308,7 @@ final class AddressBarTextField: NSTextField {
             os_log("%s: Making url from address bar string failed", type: .error, className)
             return
         }
-
-        let tab = Tab(content: .url(url, userEntered: userEnteredValue),
-                      shouldLoadInBackground: true,
-                      isBurner: isBurner)
-        tabCollectionViewModel.append(tab: tab, selected: selected)
+        addressBarTextFieldDelegate?.adressBarTextField(self, didRequestNewTabWith: .url(url, userEntered: userEnteredValue), selected: selected)
     }
 
     private func openNewTab(selected: Bool, suggestion: Suggestion?) {
@@ -581,9 +578,13 @@ final class AddressBarTextField: NSTextField {
         static let padding = CGPoint(x: -20, y: 1)
     }
 
+    private enum Constants {
+        static let suggestionStoryboard = "Suggestion"
+    }
+
     @objc dynamic private var suggestionWindowController: NSWindowController?
     private(set) lazy var suggestionViewController: SuggestionViewController = {
-        NSStoryboard.suggestion.instantiateController(identifier: "SuggestionViewController") { coder in
+        NSStoryboard(name: Constants.suggestionStoryboard, bundle: .main).instantiateController(identifier: "SuggestionViewController") { coder in
             let suggestionViewController = SuggestionViewController(coder: coder,
                                                                     suggestionContainerViewModel: self.suggestionContainerViewModel!,
                                                                     isBurner: self.isBurner)
@@ -593,7 +594,7 @@ final class AddressBarTextField: NSTextField {
     }()
 
     private func initSuggestionWindow() {
-        let windowController = NSStoryboard.suggestion
+        let windowController = NSStoryboard(name: Constants.suggestionStoryboard, bundle: .main)
             .instantiateController(withIdentifier: "SuggestionWindowController") as? NSWindowController
 
         windowController?.contentViewController = suggestionViewController
@@ -1124,8 +1125,4 @@ final class AddressBarTextFieldCell: NSTextFieldCell {
     override func fieldEditor(for controlView: NSView) -> NSTextView? {
         return customEditor
     }
-}
-
-fileprivate extension NSStoryboard {
-    static let suggestion = NSStoryboard(name: "Suggestion", bundle: .main)
 }

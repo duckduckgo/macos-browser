@@ -20,23 +20,11 @@ import Combine
 import Common
 import Foundation
 import Navigation
-
-@MainActor
-private func getFirstAvailableWebView() -> WKWebView? {
-    let wcm = WindowControllersManager.shared!
-    if wcm.lastKeyMainWindowController?.mainViewController.browserTabViewController == nil {
-        WindowsManager.openNewWindow(isBurner: false)
-    }
-
-    guard let tab = wcm.lastKeyMainWindowController?.mainViewController.browserTabViewController.tabViewModel?.tab else {
-        assertionFailure("Expected to have an open window")
-        return nil
-    }
-    return tab.webView
-}
+import WebKit
 
 final class DownloadListCoordinator {
-    static let shared = DownloadListCoordinator()
+
+    let windowManager: WindowManagerProtocol
 
     private let store: DownloadListStoring
     private let downloadManager: FileDownloadManagerProtocol
@@ -58,11 +46,13 @@ final class DownloadListCoordinator {
 
     let progress = Progress()
 
-    init(store: DownloadListStoring = DownloadListStore(),
+    init(windowManager: WindowManagerProtocol,
+         store: DownloadListStoring = DownloadListStore(),
          downloadManager: FileDownloadManagerProtocol = FileDownloadManager.shared,
          clearItemsOlderThan clearDate: Date = .daysAgo(2),
          webViewProvider: (() -> WKWebView?)? = nil) {
 
+        self.windowManager = windowManager
         self.store = store
         self.downloadManager = downloadManager
         self.webViewProvider = webViewProvider
@@ -274,6 +264,19 @@ final class DownloadListCoordinator {
             let request = item.createRequest()
             webView.startDownload(request, completionHandler: self.downloadRestartedCallback(for: item, webView: webView))
         }
+    }
+
+    @MainActor
+    private func getFirstAvailableWebView() -> WKWebView? {
+        if windowManager.lastKeyMainWindowController?.mainViewController.browserTabViewController == nil {
+            windowManager.openNewWindow(isBurner: false)
+        }
+
+        guard let tab = windowManager.lastKeyMainWindowController?.mainViewController.browserTabViewController.tabViewModel?.tab else {
+            assertionFailure("Expected to have an open window")
+            return nil
+        }
+        return tab.webView
     }
 
     @MainActor

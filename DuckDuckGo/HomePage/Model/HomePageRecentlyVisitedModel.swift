@@ -54,9 +54,9 @@ final class RecentlyVisitedModel: ObservableObject {
     let open: (URL) -> Void
 
     @MainActor
-    init(open: @escaping (URL) -> Void, fire: Fire? = nil) {
+    init(fire: Fire, open: @escaping (URL) -> Void) {
         self.open = open
-        self.fire = fire ?? FireCoordinator.fireViewModel.fire
+        self.fire = fire
         showPagesOnHover = Self.showPagesOnHoverSetting
         showRecentlyVisited = Self.showRecentlyVisitedSetting
     }

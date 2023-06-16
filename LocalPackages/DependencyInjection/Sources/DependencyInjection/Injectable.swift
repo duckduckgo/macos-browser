@@ -24,40 +24,30 @@ public protocol Injectable {
     associatedtype Dependencies = NoDependencies
     associatedtype InjectedDependencies = NoDependencies
 
-    associatedtype DynamicDependencyProvider
-    associatedtype DynamicDependencies: DynamicDependenciesProtocol
-#if swift(>=5.9)
-    var dependencyProvider: DynamicDependencies { get } // auto-generated
-#endif
+    associatedtype DependencyProvider
+    associatedtype DependencyStorage: DependencyStorageProtocol
 
-    static var _currentDependencies: DynamicDependencies! { get } // swiftlint:disable:this identifier_name
-    static func getAllDependencyProviderKeyPaths(from dependencyProvider: Dependencies) -> Set<AnyKeyPath>
+    static func getAllDependencyProviderKeyPaths() -> Set<AnyKeyPath>
+
+    var dependencies: DependencyStorage { get }
 }
 
-public protocol DynamicDependenciesProtocol {
+public protocol DependencyStorageProtocol {
     var _storage: [AnyKeyPath: Any] { get } // swiftlint:disable:this identifier_name
 }
 
-#if swift(<5.9)
+public struct DependencyInjectionHelper {
+    @TaskLocal public static var collectKeyPaths: (@Sendable () -> Set<AnyKeyPath>)!
+}
 
-private let dependencyProviderKey = UnsafeRawPointer(bitPattern: "dependencyProvider".hashValue)!
-public extension Injectable where Self: AnyObject {
+public protocol DependenciesProtocol {
+    var _storage: [AnyKeyPath: Any] { get } // swiftlint:disable:this identifier_name
+}
 
-    var dependencyProvider: DynamicDependencies {
-        get {
-            if let dependencyProvider = objc_getAssociatedObject(self, dependencyProviderKey) as? DynamicDependencies {
-                return dependencyProvider
-            }
-            guard let dependencyProvider = Self._currentDependencies else {
-                fatalError("dependencyProvider not initialized at init")
-            }
-            self.dependencyProvider = dependencyProvider
-            return dependencyProvider
-        }
-        set {
-            objc_setAssociatedObject(self, dependencyProviderKey, newValue, .OBJC_ASSOCIATION_RETAIN)
+public extension DependenciesProtocol {
+    var _storage: [AnyKeyPath: Any] { // swiftlint:disable:this identifier_name
+        DependencyInjectionHelper.collectKeyPaths().reduce(into: [:]) {
+            $0[$1] = self[keyPath: $1]
         }
     }
-
 }
-#endif

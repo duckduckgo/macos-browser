@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import DependencyInjection
 import SwiftUI
 import SwiftUIExtensions
 import SyncUI
@@ -27,15 +28,39 @@ fileprivate extension Preferences.Const {
     static let panePaddingVertical: CGFloat = 40
 }
 
+#if swift(>=5.9)
+@Injectable
+#endif
+
+final class AbstractRootViewDependencies: Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+
+    typealias InjectedDependencies = AutofillPreferencesModel.Dependencies & PrivacyPreferencesModel.Dependencies & SyncPreferences.Dependencies
+
+    init() {
+        fatalError("\(Self.self) should not be instantiated")
+    }
+}
+
 extension Preferences {
 
     struct RootView: View {
 
         @ObservedObject var model: PreferencesSidebarModel
 
+        let dependencies: AbstractRootViewDependencies.DependencyStorage
+
+        init(model: PreferencesSidebarModel, dependencyProvider: AbstractRootViewDependencies.DependencyProvider) {
+            self.dependencies = .init(dependencyProvider)
+            self.model = model
+        }
+
         var body: some View {
             HStack(spacing: 0) {
-                Sidebar().environmentObject(model).frame(width: Const.sidebarWidth)
+                Preferences.Sidebar().environmentObject(model).frame(width: Const.sidebarWidth)
 
                 Color(NSColor.separatorColor).frame(width: 1)
 
@@ -45,25 +70,25 @@ extension Preferences {
 
                             switch model.selectedPane {
                             case .general:
-                                GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences())
+                                Preferences.GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences())
                             case .sync:
-                                SyncView()
+                                SyncView(dependencyProvider: dependencies)
                             case .appearance:
-                                AppearanceView(model: .shared)
+                                Preferences.AppearanceView(model: .shared)
                             case .privacy:
-                                PrivacyView(model: PrivacyPreferencesModel())
+                                Preferences.PrivacyView(model: PrivacyPreferencesModel(dependencyProvider: dependencies))
                             case .autofill:
-                                AutofillView(model: AutofillPreferencesModel())
+                                Preferences.AutofillView(model: AutofillPreferencesModel(dependencyProvider: dependencies))
                             case .downloads:
-                                DownloadsView(model: DownloadsPreferences())
+                                Preferences.DownloadsView(model: DownloadsPreferences())
                             case .duckPlayer:
-                                DuckPlayerView(model: .shared)
+                                Preferences.DuckPlayerView(model: .shared)
                             case .about:
 #if NETWORK_PROTECTION
                                 let netPInvitePresenter = NetworkProtectionInvitePresenter()
-                                AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter))
+                                Preferences.AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter, windowManager: dependencies.windowManager))
 #else
-                                AboutView(model: AboutModel())
+                                Preferences.AboutView(model: AboutModel(windowManager: dependencies.windowManager))
 #endif
                             }
                         }
@@ -80,14 +105,19 @@ extension Preferences {
             .background(Color("InterfaceBackgroundColor"))
         }
     }
-
 }
 
 struct SyncView: View {
 
+    let dependencies: SyncPreferences.DependencyStorage
+
+    init(dependencyProvider: SyncPreferences.DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+    }
+
     var body: some View {
-        if let syncService = (NSApp.delegate as? AppDelegate)?.syncService {
-            SyncUI.ManagementView(model: SyncPreferences(syncService: syncService))
+        if (NSApp.delegate as? AppDelegate)?.syncService != nil {
+            SyncUI.ManagementView(model: SyncPreferences(dependencyProvider: dependencies))
         } else {
             FailedAssertionView("Failed to initialize Sync Management View")
         }

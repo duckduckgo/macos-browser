@@ -26,7 +26,7 @@ final class RecentlyClosedMenu: NSMenu {
     }
 
     required init(coder: NSCoder) {
-        fatalError("RecentlyClosedMenu: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     init(recentlyClosedCoordinator: RecentlyClosedCoordinating) {

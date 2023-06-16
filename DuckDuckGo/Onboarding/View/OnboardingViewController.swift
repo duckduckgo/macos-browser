@@ -22,12 +22,12 @@ import SwiftUI
 
 final class OnboardingViewController: NSViewController {
 
-    static func create(withDelegate delegate: OnboardingDelegate) -> Self {
+    static func create(withDelegate delegate: OnboardingDelegate) -> OnboardingViewController {
         let storyboard = NSStoryboard(name: "Onboarding", bundle: nil)
-        // swiftlint:disable force_cast
-        let controller = storyboard.instantiateController(withIdentifier: "Onboarding") as! Self
+        let controller = storyboard.instantiateController(identifier: "Onboarding") { coder in
+            OnboardingViewController.init(coder: coder)
+        }
         controller.delegate = delegate
-        // swiftlint:enable force_cast
         return controller
     }
 

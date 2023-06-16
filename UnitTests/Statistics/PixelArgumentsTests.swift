@@ -228,23 +228,4 @@ class PixelArgumentsTests: XCTestCase {
         XCTAssertEqual(Pixel.Event.AverageTabsCount(avgTabs: 20), .moreThan6)
     }
 
-    func testBurnedTabs() {
-        XCTAssertEqual(Pixel.Event.BurnedTabs(-1), .lessThan6)
-        XCTAssertEqual(Pixel.Event.BurnedTabs(0), .lessThan6)
-        XCTAssertEqual(Pixel.Event.BurnedTabs(2), .lessThan6)
-        XCTAssertEqual(Pixel.Event.BurnedTabs(5), .lessThan6)
-        XCTAssertEqual(Pixel.Event.BurnedTabs(6), .moreThan6)
-        XCTAssertEqual(Pixel.Event.BurnedTabs(20), .moreThan6)
-    }
-
-    func testBurnedWindows() {
-        XCTAssertEqual(Pixel.Event.BurnedWindows(-1), .one)
-        XCTAssertEqual(Pixel.Event.BurnedWindows(0), .one)
-        XCTAssertEqual(Pixel.Event.BurnedWindows(1), .one)
-        XCTAssertEqual(Pixel.Event.BurnedWindows(2), .moreThan1)
-        XCTAssertEqual(Pixel.Event.BurnedWindows(5), .moreThan1)
-        XCTAssertEqual(Pixel.Event.BurnedWindows(6), .moreThan1)
-        XCTAssertEqual(Pixel.Event.BurnedWindows(20), .moreThan1)
-    }
-
 }

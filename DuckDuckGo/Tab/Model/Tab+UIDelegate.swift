@@ -144,7 +144,8 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     private func createWebView(from webView: WKWebView, with configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, of kind: NewWindowPolicy) -> WKWebView? {
         guard let delegate else { return nil }
 
-        let tab = Tab(content: .none,
+        let tab = Tab(dependencyProvider: dependencies,
+                      content: .none,
                       webViewConfiguration: configuration,
                       parentTab: self,
                       isBurner: isBurner,

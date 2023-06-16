@@ -16,9 +16,17 @@
 //  limitations under the License.
 //
 
+import DependencyInjection
 import Foundation
 
-final class AutofillPreferencesModel: ObservableObject {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class AutofillPreferencesModel: ObservableObject, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
 
     @Published var askToSaveUsernamesAndPasswords: Bool {
         didSet {
@@ -108,17 +116,18 @@ final class AutofillPreferencesModel: ObservableObject {
 
     @MainActor
     func showAutofillPopover(_ selectedCategory: SecureVaultSorting.Category = .allItems) {
-        guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
+        guard let parentWindowController = windowManager.lastKeyMainWindowController else { return }
         guard let navigationViewController = parentWindowController.mainViewController.navigationBarViewController else { return }
         navigationViewController.showPasswordManagerPopover(selectedCategory: selectedCategory)
     }
 
     @MainActor
-    init(
-        persistor: AutofillPreferencesPersistor = AutofillPreferences(),
-        userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared,
-        bitwardenInstallationService: BWInstallationService = LocalBitwardenInstallationService()
-    ) {
+    init(persistor: AutofillPreferencesPersistor = AutofillPreferences(),
+         userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared,
+         bitwardenInstallationService: BWInstallationService = LocalBitwardenInstallationService(),
+         dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         self.persistor = persistor
         self.userAuthenticator = userAuthenticator
         self.bitwardenInstallationService = bitwardenInstallationService
@@ -147,7 +156,7 @@ final class AutofillPreferencesModel: ObservableObject {
         }
 
         guard let connectBitwardenWindow = connectBitwardenWindowController.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+              let parentWindowController = windowManager.lastKeyMainWindowController
         else {
             assertionFailure("Privacy Preferences: Failed to present ConnectBitwardenViewController")
             return

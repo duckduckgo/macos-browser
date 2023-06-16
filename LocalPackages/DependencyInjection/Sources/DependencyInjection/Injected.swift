@@ -21,12 +21,12 @@ import Foundation
 #if swift(<5.9)
 
 @propertyWrapper
-public struct ClassInjectedValue<Value>: @unchecked Sendable {
+public struct Injected<Value>: @unchecked Sendable {
 
     public init() {
     }
 
-    @available(*, unavailable, message: "@ClassInjectedValue is only available on properties of classes")
+    @available(*, unavailable, message: "@Injected is only available on properties of classes")
     public var wrappedValue: Value {
         fatalError()
     }
@@ -34,37 +34,9 @@ public struct ClassInjectedValue<Value>: @unchecked Sendable {
     public static subscript<Owner: Injectable & AnyObject>(_enclosingInstance owner: Owner,
                                                            wrapped propertyKeyPath: KeyPath<Owner, Value>,
                                                            storage selfKeyPath: KeyPath<Owner, Self>) -> Value {
-        owner.dependencyProvider._storage.first { (keyPath, value) in
-            type(of: keyPath).valueType == Value.self && "\(keyPath)".split(separator: ".").last == "\(propertyKeyPath)".split(separator: ".").last
-        }!.value as! Value // swiftlint:disable:this force_cast
+        owner.dependencies._storage[keyPath] as! Value // swiftlint:disable:this force_cast
     }
 
-}
-
-public enum StructInjectedKeyPathsStorage {
-
-    @TaskLocal public static var keyPaths: UnsafeMutablePointer<[AnyKeyPath]>!
-
-}
-
-public struct OwnedInjectedStruct<Owner: Injectable> {
-
-    @propertyWrapper
-    public struct StructInjectedValue<Value>: @unchecked Sendable {
-
-        var storage: [AnyKeyPath: Any]!
-        var keyPath: AnyKeyPath!
-
-        public init() {
-            self.keyPath = StructInjectedKeyPathsStorage.keyPaths.pointee.removeFirst()
-            self.storage = Owner._currentDependencies!._storage
-        }
-
-        public var wrappedValue: Value {
-            storage[keyPath] as! Value // swiftlint:disable:this force_cast
-        }
-
-    }
 }
 
 #endif

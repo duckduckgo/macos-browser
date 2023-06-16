@@ -16,10 +16,11 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
-import SwiftUI
 import BrowserServicesKit
+import Combine
+import DependencyInjection
+import Foundation
+import SwiftUI
 
 protocol PasswordManagementDelegate: AnyObject {
 
@@ -28,15 +29,25 @@ protocol PasswordManagementDelegate: AnyObject {
 
 }
 
+#if swift(>=5.9)
+@Injectable
+#endif
 // swiftlint:disable:next type_body_length
-final class PasswordManagementViewController: NSViewController {
+final class PasswordManagementViewController: NSViewController, Injectable {
 
-    static func create() -> Self {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+
+    typealias InjectedDependencies = PasswordManagementLoginModel.Dependencies
+
+    static func create(dependencyProvider: DependencyProvider) -> PasswordManagementViewController {
         let storyboard = NSStoryboard(name: "PasswordManager", bundle: nil)
-        // swiftlint:disable force_cast
-        let controller: Self = storyboard.instantiateController(withIdentifier: "PasswordManagement") as! Self
+        let controller = storyboard.instantiateController(identifier: "PasswordManagement") { coder in
+            PasswordManagementViewController(coder: coder, dependencyProvider: dependencyProvider)
+        }
         controller.loadView()
-        // swiftlint:enable force_cast
         return controller
     }
 
@@ -145,6 +156,16 @@ final class PasswordManagementViewController: NSViewController {
 
     private let passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
 
+    init?(coder: NSCoder, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
+        super.init(coder: coder)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         createListView()
@@ -251,7 +272,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     @IBAction func openAutofillPreferences(_ sender: Any) {
-        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .autofill)
+        windowManager.showPreferencesTab(withSelectedPane: .autofill)
         self.dismiss()
     }
 
@@ -267,7 +288,7 @@ final class PasswordManagementViewController: NSViewController {
 
     @IBAction func onImportClicked(_ sender: NSButton) {
         self.dismiss()
-        DataImportViewController.show()
+        DataImportViewController.show(using: windowManager)
     }
 
     @IBAction func deviceAuthenticationRequested(_ sender: NSButton) {
@@ -369,7 +390,7 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCredentials(credentials)
         }, onDeleteRequested: { [weak self] credentials in
             self?.promptToDelete(credentials: credentials)
-        })
+        }, dependencyProvider: dependencies)
 
         self.itemModel = itemModel
 
@@ -693,7 +714,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func displayExternalPasswordManagerView() {
-        let passwordManagerView = PasswordManagementBitwardenItemView(manager: PasswordManagerCoordinator.shared) { [weak self] in
+        let passwordManagerView = PasswordManagementBitwardenItemView(manager: PasswordManagerCoordinator.shared, windowManager: windowManager) { [weak self] in
             self?.dismiss()
         }
 
@@ -939,7 +960,7 @@ extension PasswordManagementViewController: NSTextViewDelegate {
 
     func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
         if let link = link as? URL, let pane = PreferencePaneIdentifier(url: link) {
-            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: pane)
+            windowManager.showPreferencesTab(withSelectedPane: pane)
             self.dismiss()
         }
 

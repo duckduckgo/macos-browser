@@ -31,21 +31,20 @@ final class PermissionAuthorizationPopover: NSPopover {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("PermissionAuthorizationPopover: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     // swiftlint:disable force_cast
     var viewController: PermissionAuthorizationViewController { contentViewController as! PermissionAuthorizationViewController }
     // swiftlint:enable force_cast
 
-    // swiftlint:disable force_cast
     private func setupContentController() {
         let storyboard = NSStoryboard(name: "PermissionAuthorization", bundle: nil)
-        let controller = storyboard
-            .instantiateController(withIdentifier: "PermissionAuthorizationViewController") as! PermissionAuthorizationViewController
+        let controller = storyboard.instantiateController(identifier: "PermissionAuthorizationViewController") { coder in
+            PermissionAuthorizationViewController(coder: coder)
+        }
         contentViewController = controller
     }
-    // swiftlint:enable force_cast
 
 }
 

@@ -16,10 +16,11 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Combine
+import Common
 import Network
 import NetworkExtension
-import Common
+import Foundation
 
 /// This class takes care of testing whether the Network Protection connection is working or not.  Results are handled by
 /// an injected object that implements ``NetworkProtectionConnectionTestResultsHandler``.
@@ -245,20 +246,35 @@ final class NetworkProtectionConnectionTester {
     }
 
     private static func testConnection(name: String, parameters: NWParameters) async -> Bool {
-        let connection = NWConnection(to: Self.endpoint, using: parameters)
-        var didConnect = false
-
-        connection.stateUpdateHandler = { state in
-            if case .ready = state {
-//                didConnect = true
+        struct TimeoutError: Error {}
+        let connectedEventStream = AsyncThrowingStream<Bool, Error> { [connectionTimeout] continuation in
+            let connection = NWConnection(to: Self.endpoint, using: parameters)
+            let timeoutJob = DispatchWorkItem {
+                continuation.finish(throwing: TimeoutError())
             }
+
+            connection.stateUpdateHandler = { state in
+                if case .ready = state {
+                    continuation.yield(true)
+                }
+            }
+
+            continuation.onTermination = { _ in
+                connection.cancel()
+                timeoutJob.cancel()
+            }
+
+            connection.start(queue: Self.connectionTestQueue)
+            Self.connectionTestQueue.asyncAfter(deadline: .now() + connectionTimeout, execute: timeoutJob)
         }
 
-        connection.start(queue: Self.connectionTestQueue)
-        try? await Task.sleep(interval: connectionTimeout)
-        connection.cancel()
+        do {
+            for try await didConnect in connectedEventStream {
+                return didConnect
+            }
+        } catch {}
 
-        return didConnect
+        return false
     }
 
     // MARK: - Result handling

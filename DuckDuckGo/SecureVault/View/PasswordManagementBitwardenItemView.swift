@@ -20,6 +20,7 @@ import SwiftUI
 
 struct PasswordManagementBitwardenItemView: View {
     var manager: PasswordManagerCoordinator
+    let windowManager: WindowManagerProtocol?
     let didFinish: () -> Void
 
     var body: some View {
@@ -31,7 +32,7 @@ struct PasswordManagementBitwardenItemView: View {
                 HStack (spacing: 3) {
                     Text(UserText.passwordManagerPopoverChangeInSettingsLabel)
                     Button {
-                        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .autofill)
+                        windowManager?.showPreferencesTab(withSelectedPane: .autofill)
                         didFinish()
                     } label: {
                         Text(UserText.passwordManagerPopoverSettingsButton)
@@ -56,6 +57,6 @@ struct PasswordManagementBitwardenItemView: View {
 
 struct PasswordManagementBitwardenItemView_Previews: PreviewProvider {
     static var previews: some View {
-        PasswordManagementBitwardenItemView(manager: PasswordManagerCoordinator.shared, didFinish: {})
+        PasswordManagementBitwardenItemView(manager: PasswordManagerCoordinator.shared, windowManager: nil, didFinish: {})
     }
 }

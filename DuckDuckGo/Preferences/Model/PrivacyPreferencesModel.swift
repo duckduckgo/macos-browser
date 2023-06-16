@@ -16,9 +16,17 @@
 //  limitations under the License.
 //
 
+import DependencyInjection
 import Foundation
 
-final class PrivacyPreferencesModel: ObservableObject {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class PrivacyPreferencesModel: ObservableObject, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
 
     @Published
     var isLoginDetectionEnabled: Bool {
@@ -45,7 +53,7 @@ final class PrivacyPreferencesModel: ObservableObject {
         let fireproofDomainsWindowController = FireproofDomainsViewController.create().wrappedInWindowController()
 
         guard let fireproofDomainsWindow = fireproofDomainsWindowController.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+              let parentWindowController = windowManager.lastKeyMainWindowController
         else {
             assertionFailure("Privacy Preferences: Failed to present FireproofDomainsViewController")
             return
@@ -56,10 +64,13 @@ final class PrivacyPreferencesModel: ObservableObject {
 
     @MainActor
     func openURL(_ url: URL) {
-        WindowControllersManager.shared.show(url: url, newTab: true)
+        windowManager.show(url: url, newTab: true)
     }
 
-    init(privacySecurityPreferences: PrivacySecurityPreferences = .shared) {
+    init(privacySecurityPreferences: PrivacySecurityPreferences = .shared,
+         dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         self.privacySecurityPreferences = privacySecurityPreferences
         isLoginDetectionEnabled = privacySecurityPreferences.loginDetectionEnabled
         isGPCEnabled = privacySecurityPreferences.gpcEnabled

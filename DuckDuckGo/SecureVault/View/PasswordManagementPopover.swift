@@ -18,11 +18,20 @@
 
 import AppKit
 import BrowserServicesKit
+import DependencyInjection
 import SwiftUI
 
-final class PasswordManagementPopover: NSPopover {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class PasswordManagementPopover: NSPopover, Injectable {
+    let dependencies: DependencyStorage
 
-    override init() {
+    typealias InjectedDependencies = PasswordManagementViewController.Dependencies
+
+    init(dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         super.init()
 
         self.animates = false
@@ -48,7 +57,7 @@ final class PasswordManagementPopover: NSPopover {
     }
 
     private func setupContentController() {
-        let controller = PasswordManagementViewController.create()
+        let controller = PasswordManagementViewController.create(dependencyProvider: dependencies)
         contentViewController = controller
     }
 

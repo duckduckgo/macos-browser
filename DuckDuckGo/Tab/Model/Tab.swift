@@ -42,14 +42,13 @@ protocol NewWindowPolicyDecisionMaker {
 
 // swiftlint:disable type_body_length
 
-// TODO: Implement UnsafeInjectable
 @dynamicMemberLookup
 #if swift(>=5.9)
 @Injectable
 #endif
 final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
 
-//    typealias InjectedDependencies = TabExtensionsBuilder.Dependencies
+    let dependencies: DependencyStorage
 
     enum TabContent: Equatable {
         case homePage
@@ -200,7 +199,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
     private let internalUserDecider: InternalUserDecider?
 
     @Injected
-    var pinnedTabsManager: PinnedTabsManager
+    var pinnedTabsManager: PinnedTabsManager?
 
     private let webViewConfiguration: WKWebViewConfiguration
 
@@ -215,8 +214,8 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
     private(set) var userContentController: UserContentController?
 
     @MainActor
-    @available(*, deprecated, message: "use Tab.make")
-    convenience init(content: TabContent,
+    convenience init(dependencyProvider: DependencyProvider,
+                     content: TabContent,
                      faviconManagement: FaviconManagement = FaviconManager.shared,
                      webCacheManager: WebCacheManager = WebCacheManager.shared,
                      webViewConfiguration: WKWebViewConfiguration? = nil,
@@ -253,7 +252,8 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
             faviconManager = FaviconManager(cacheType: .inMemory)
         }
 
-        self.init(content: content,
+        self.init(dependencyProvider: dependencyProvider,
+                  content: content,
                   faviconManagement: faviconManager,
                   webCacheManager: webCacheManager,
                   webViewConfiguration: webViewConfiguration,
@@ -281,9 +281,9 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
     }
 
     @MainActor
-    @available(*, deprecated, message: "use Tab.make")
     // swiftlint:disable:next function_body_length
-    init(content: TabContent,
+    init(dependencyProvider: DependencyProvider,
+         content: TabContent,
          faviconManagement: FaviconManagement,
          webCacheManager: WebCacheManager,
          webViewConfiguration: WKWebViewConfiguration?,
@@ -310,6 +310,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
          webViewSize: CGSize
     ) {
 
+        self.dependencies = .init(dependencyProvider)
         self.content = content
         self.faviconManagement = faviconManagement
         self.statisticsLoader = statisticsLoader
@@ -346,7 +347,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
         var tabGetter: () -> Tab? = { nil }
         self.extensions = extensionsBuilder
             .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
-                          isTabPinned: { tabGetter().map { tab in Self._currentDependencies.pinnedTabsManager.isTabPinned(tab) } ?? false },
+                          isTabPinned: { [dependencies] in tabGetter().map { tab in dependencies.pinnedTabsManager?.isTabPinned(tab) == true } ?? false },
                           isTabBurner: isBurner,
                           contentPublisher: _content.projectedValue.eraseToAnyPublisher(),
                           titlePublisher: _title.projectedValue.eraseToAnyPublisher(),
@@ -957,6 +958,8 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
     }
 
 }
+
+// swiftlint:enable type_body_length
 
 extension Tab: UserContentControllerDelegate {
 

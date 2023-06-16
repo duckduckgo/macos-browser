@@ -28,21 +28,21 @@ final class BookmarkPopover: NSPopover {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("BookmarksPopover: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     // swiftlint:disable force_cast
     var viewController: BookmarkPopoverViewController { contentViewController as! BookmarkPopoverViewController }
     // swiftlint:enable force_cast
 
-    // swiftlint:disable force_cast
     private func setupContentController() {
         let storyboard = NSStoryboard(name: "Bookmarks", bundle: nil)
-        let controller = storyboard.instantiateController(withIdentifier: "BookmarkPopoverViewController") as! BookmarkPopoverViewController
+        let controller = storyboard.instantiateController(identifier: "BookmarkPopoverViewController") { coder in
+            BookmarkPopoverViewController(coder: coder)
+        }
         controller.delegate = self
         contentViewController = controller
     }
-    // swiftlint:enable force_cast
 
 }
 

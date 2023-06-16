@@ -18,6 +18,7 @@
 
 import Cocoa
 import Combine
+import DependencyInjection
 
 protocol DownloadsViewControllerDelegate: AnyObject {
 
@@ -25,14 +26,23 @@ protocol DownloadsViewControllerDelegate: AnyObject {
 
 }
 
-final class DownloadsViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class DownloadsViewController: NSViewController, Injectable {
+    let dependencies: DependencyStorage
 
-    static func create() -> Self {
+    @Injected
+    var windowManager: WindowManagerProtocol
+    @Injected
+    var downloadListCoordinator: DownloadListCoordinator
+
+    static func create(dependencyProvider: DependencyProvider) -> DownloadsViewController {
         let storyboard = NSStoryboard(name: "Downloads", bundle: nil)
-        // swiftlint:disable force_cast
-        let controller = storyboard.instantiateInitialController() as! Self
+        let controller = storyboard.instantiateInitialController { coder in
+            DownloadsViewController(coder: coder, dependencyProvider: dependencyProvider)
+        }!
         controller.loadView()
-        // swiftlint:enable force_cast
         return controller
     }
 
@@ -46,8 +56,19 @@ final class DownloadsViewController: NSViewController {
 
     weak var delegate: DownloadsViewControllerDelegate?
 
-    var viewModel = DownloadListViewModel()
+    var viewModel: DownloadListViewModel
     var downloadsCancellable: AnyCancellable?
+
+    init(coder: NSCoder, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+        self.viewModel = DownloadListViewModel(coordinator: dependencies.downloadListCoordinator)
+
+        super.init(coder: coder)!
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -183,7 +204,7 @@ final class DownloadsViewController: NSViewController {
         else { return }
 
         self.dismiss()
-        WindowControllersManager.shared.show(url: url, newTab: true)
+        windowManager.show(url: url, newTab: true)
     }
 
     @IBAction func doubleClickAction(_ sender: Any) {

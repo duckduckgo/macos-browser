@@ -16,10 +16,11 @@
 //  limitations under the License.
 //
 
-import Common
-import Foundation
 import BrowserServicesKit
+import Common
 import DDGSync
+import DependencyInjection
+import Foundation
 import PrivacyDashboard
 import WebKit
 
@@ -77,7 +78,23 @@ final class TabDataCleaner: NSObject, WKNavigationDelegate {
     }
 }
 
-final class Fire {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class Fire: Injectable {
+
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+    @Injected
+    var pinnedTabsManager: PinnedTabsManager
+    @Injected
+    var downloadListCoordinator: DownloadListCoordinator
+    @Injected
+    var recentlyClosedCoordinator: RecentlyClosedCoordinating
+
+    typealias InjectedDependencies = Tab.Dependencies
 
     // Drop www prefixes to produce list of burning domains
     static func getBurningDomain(from url: URL) -> String? {
@@ -89,13 +106,9 @@ final class Fire {
     let webCacheManager: WebCacheManager
     let historyCoordinating: HistoryCoordinating
     let permissionManager: PermissionManagerProtocol
-    let downloadListCoordinator: DownloadListCoordinator
-    let windowControllerManager: WindowControllersManager
     let faviconManagement: FaviconManagement
     let autoconsentManagement: AutoconsentManagement?
     let stateRestorationManager: AppStateRestorationManager?
-    let recentlyClosedCoordinator: RecentlyClosedCoordinating?
-    let pinnedTabsManager: PinnedTabsManager
     let bookmarkManager: BookmarkManager
     let syncService: DDGSyncing?
     let tabsCleaner = TabDataCleaner()
@@ -112,25 +125,20 @@ final class Fire {
     init(cacheManager: WebCacheManager = WebCacheManager.shared,
          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          permissionManager: PermissionManagerProtocol = PermissionManager.shared,
-         downloadListCoordinator: DownloadListCoordinator = DownloadListCoordinator.shared,
-         windowControllerManager: WindowControllersManager? = nil,
          faviconManagement: FaviconManagement = FaviconManager.shared,
          autoconsentManagement: AutoconsentManagement? = nil,
          stateRestorationManager: AppStateRestorationManager? = nil,
-         recentlyClosedCoordinator: RecentlyClosedCoordinating? = RecentlyClosedCoordinator.shared,
-         pinnedTabsManager: PinnedTabsManager? = nil,
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
          syncService: DDGSyncing? = nil,
-         secureVaultFactory: SecureVaultFactory = SecureVaultFactory.default
+         secureVaultFactory: SecureVaultFactory = SecureVaultFactory.default,
+         dependencyProvider: DependencyProvider
     ) {
+        self.dependencies = .init(dependencyProvider)
+
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
         self.permissionManager = permissionManager
-        self.downloadListCoordinator = downloadListCoordinator
-        self.windowControllerManager = windowControllerManager ?? WindowControllersManager.shared
         self.faviconManagement = faviconManagement
-        self.recentlyClosedCoordinator = recentlyClosedCoordinator
-        self.pinnedTabsManager = pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager
         self.bookmarkManager = bookmarkManager
         self.syncService = syncService ?? (NSApp.delegate as? AppDelegate)?.syncService
         self.secureVaultFactory = secureVaultFactory
@@ -308,7 +316,7 @@ final class Fire {
     @MainActor
     private func allTabViewModels() -> [TabViewModel] {
         var allTabViewModels = [TabViewModel] ()
-        for window in windowControllerManager.mainWindowControllers {
+        for window in windowManager.mainWindowControllers {
             let tabCollectionViewModel = window.mainViewController.tabCollectionViewModel
 
             allTabViewModels.append(contentsOf: tabCollectionViewModel.tabViewModels.values)
@@ -393,7 +401,7 @@ final class Fire {
     @MainActor
     private func burnWindows(exceptOwnerOf tabCollectionViewModel: TabCollectionViewModel, completion: @escaping () -> Void) {
         // Close windows except the burning one
-        for mainWindowController in windowControllerManager.mainWindowControllers {
+        for mainWindowController in windowManager.mainWindowControllers {
             guard mainWindowController.mainViewController.tabCollectionViewModel != tabCollectionViewModel else {
                 continue
             }
@@ -419,7 +427,7 @@ final class Fire {
                                 completion: @escaping () -> Void) {
         // Close tabs where specified domains are currently loaded
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            let keyWindow = self?.windowControllerManager.lastKeyMainWindowController
+            let keyWindow = self?.windowManager.lastKeyMainWindowController
             keyWindow?.mainViewController.tabCollectionViewModel.clearPinnedTabsData(cleanupInfo, onlyForDomains: domains)
 
             completion()
@@ -458,7 +466,7 @@ final class Fire {
 
     @MainActor
     private func burnRecentlyClosed(domains: Set<String>? = nil) {
-        recentlyClosedCoordinator?.burnCache(domains: domains)
+        recentlyClosedCoordinator.burnCache(domains: domains)
     }
 
     // MARK: - Bookmarks cleanup
@@ -488,7 +496,7 @@ extension Fire {
     @MainActor
     private func tabViewModelsFor(domains: Set<String>) -> TabCollectionsCleanupInfo {
         var collectionsCleanupInfo = TabCollectionsCleanupInfo()
-        for window in windowControllerManager.mainWindowControllers {
+        for window in windowManager.mainWindowControllers {
             let tabCollectionViewModel = window.mainViewController.tabCollectionViewModel
 
             collectionsCleanupInfo[tabCollectionViewModel] = prepareCleanupInfo(
@@ -539,7 +547,7 @@ fileprivate extension TabCollectionViewModel {
             switch tabCleanupInfo.action {
             case .none: continue
             case .replace:
-                let tab = Tab(content: tabCleanupInfo.tabViewModel.tab.content, shouldLoadInBackground: true, isBurner: false, shouldLoadFromCache: true)
+                let tab = Tab(dependencyProvider: dependencies, content: tabCleanupInfo.tabViewModel.tab.content, shouldLoadInBackground: true, isBurner: false, shouldLoadFromCache: true)
                 replaceTab(at: .unpinned(tabIndex), with: tab, forceChange: true)
             case .burn:
                 toRemove.insert(tabIndex)
@@ -567,7 +575,7 @@ fileprivate extension TabCollectionViewModel {
             case .none: continue
             case .replace, .burn:
                 // Burning does not ever close pinned tabs, so treat burning as replacing
-                let tab = Tab(content: tabCleanupInfo.tabViewModel.tab.content, shouldLoadInBackground: true, isBurner: false, shouldLoadFromCache: true)
+                let tab = Tab(dependencyProvider: dependencies, content: tabCleanupInfo.tabViewModel.tab.content, shouldLoadInBackground: true, isBurner: false, shouldLoadFromCache: true)
                 replaceTab(at: .pinned(tabIndex), with: tab, forceChange: true)
             }
         }

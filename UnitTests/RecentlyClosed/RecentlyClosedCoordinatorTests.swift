@@ -87,7 +87,7 @@ private extension RecentlyClosedWindow {
     }
 }
 
-private final class WindowControllersManagerMock: WindowControllersManagerProtocol {
+private final class WindowManagerMock: WindowManagerProtocol {
 
     var pinnedTabsManager = PinnedTabsManager(tabCollection: .init())
 

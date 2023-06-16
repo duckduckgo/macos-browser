@@ -43,9 +43,9 @@ extension MainWindowController {
     }
 }
 
-extension WindowControllersManager {
+extension WindowManagerProtocol {
     var stateChanged: AnyPublisher<Void, Never> {
-        $mainWindowControllers.nestedObjectChanges(\.stateChanged)
+        mainWindowControllersPublisher.nestedObjectChanges(\.stateChanged)
             .handleEvents(receiveOutput: { [unowned self] in
                 self.updateIsInInitialState()
             })

@@ -19,9 +19,25 @@
 import Cocoa
 import Combine
 import Common
+import DependencyInjection
 
+#if swift(>=5.9)
+@Injectable
+#endif
 @MainActor
-final class HistoryMenu: NSMenu {
+final class HistoryMenu: NSMenu, Injectable {
+    static var dependencyProvider: DependencyProvider!
+    let dependencies: DependencyStorage
+
+    @Injected
+    var recentlyClosedCoordinator: RecentlyClosedCoordinator
+
+    required init(coder: NSCoder) {
+        self.dependencies = .init(Self.dependencyProvider)
+        Self.dependencyProvider = nil
+
+        super.init(coder: coder)
+    }
 
     @IBOutlet weak var recentlyClosedMenuItem: NSMenuItem?
     @IBOutlet weak var reopenLastClosedMenuItem: NSMenuItem? {
@@ -64,17 +80,16 @@ final class HistoryMenu: NSMenu {
     // MARK: - Last Closed & Recently Closed
 
     private func updateReopenLastClosedMenuItem() {
-        switch RecentlyClosedCoordinator.shared.cache.last {
+        switch recentlyClosedCoordinator.cache.last {
         case is RecentlyClosedWindow:
             reopenLastClosedMenuItem?.title = UserText.reopenLastClosedWindow
         default:
             reopenLastClosedMenuItem?.title = UserText.reopenLastClosedTab
         }
-
     }
 
     private func updateRecentlyClosedMenu() {
-        recentlyClosedMenu = RecentlyClosedMenu(recentlyClosedCoordinator: RecentlyClosedCoordinator.shared)
+        recentlyClosedMenu = RecentlyClosedMenu(recentlyClosedCoordinator: recentlyClosedCoordinator)
         recentlyClosedMenuItem?.submenu = recentlyClosedMenu
         recentlyClosedMenuItem?.isEnabled = !(recentlyClosedMenu?.items ?? [] ).isEmpty
     }
@@ -244,7 +259,7 @@ extension HistoryMenu {
             static let modifierMask = NSEvent.ModifierFlags.command
         }
 
-        init(isInInitialStatePublisher: Published<Bool>.Publisher, canRestoreLastSessionState: @escaping @autoclosure () -> Bool) {
+        init(isInInitialStatePublisher: some Publisher<Bool, Never>, canRestoreLastSessionState: @escaping @autoclosure () -> Bool) {
             self.canRestoreLastSessionState = canRestoreLastSessionState
             self.isInInitialStateCancellable = isInInitialStatePublisher
                 .dropFirst()
@@ -256,7 +271,7 @@ extension HistoryMenu {
 
         @MainActor
         convenience init() {
-            self.init(isInInitialStatePublisher: WindowControllersManager.shared.$isInInitialState, canRestoreLastSessionState: NSApp.canRestoreLastSessionState)
+            self.init(isInInitialStatePublisher: Just(false) /*WindowManager.shared.$isInInitialState*/, canRestoreLastSessionState: NSApp.canRestoreLastSessionState)
         }
 
         private weak var currentlyAssignedMenuItem: NSMenuItem?
@@ -285,7 +300,7 @@ extension HistoryMenu {
 private extension NSApplication {
 
     var canRestoreLastSessionState: Bool {
-        (delegate as? AppDelegate)?.stateRestorationManager?.canRestoreLastSessionState ?? false
+        (delegate as? AppDelegate)!.stateRestorationManager.canRestoreLastSessionState
     }
 
 }

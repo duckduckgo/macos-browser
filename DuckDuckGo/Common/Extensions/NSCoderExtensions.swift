@@ -58,8 +58,10 @@ extension NSCoder {
     }
 
     fileprivate static func className(for type: Any.Type) -> String {
-        (type as? NSSecureEncodable.Type)?.className
+        let className = (type as? NSSecureEncodable.Type)?.className
             ?? String(((type as? AnyClass).map(NSStringFromClass) ?? "\(type)").split(separator: ".").last!)
+        assert(!className.hasPrefix("Optional<"))
+        return className
     }
 
     func encode<T: NSSecureEncodable>(_ value: T, forKey key: String) {
@@ -130,65 +132,71 @@ extension NSCoder {
     }
 
     public func decode<T>(at key: String, using creator: ((NSCoder) throws -> T)) throws -> T {
-        var result: Result<T, Error>?
-        CallbackEscapeHelper.withNonescapingCallback({
-            result = Result {
-                try creator(self)
-            }
-        }) { callback in
-            withCallback(callback) {
-                withSafeUnarchiverHelperReplacement(for: T.self) {
-                    _=decodeObject(of: [SafeUnarchiverHelper.self], forKey: key)
+        try autoreleasepool {
+            var result: Result<T, Error>?
+            CallbackEscapeHelper.withNonescapingCallback({
+                result = Result {
+                    try creator(self)
+                }
+            }) { callback in
+                withCallback(callback) {
+                    withSafeUnarchiverHelperReplacement(for: T.self) {
+                        _=decodeObject(of: [SafeUnarchiverHelper.self], forKey: key)
+                    }
                 }
             }
-        }
 
-        return try result?.get() ?? { throw errorOrKeyNotFound(key) }()
+            return try result?.get() ?? { throw errorOrKeyNotFound(key) }()
+        }
     }
 
     public func decodeIfPresent<T>(at key: String, using creator: ((NSCoder) throws -> T?)) throws -> T? {
-        var result: Result<T?, Error>?
-        CallbackEscapeHelper.withNonescapingCallback({
-            result = Result {
-                try creator(self)
-            }
-        }) { callback in
-            withCallback(callback) {
-                withSafeUnarchiverHelperReplacement(for: T.self) {
-                    _=decodeObject(of: [SafeUnarchiverHelper.self], forKey: key)
+        try autoreleasepool {
+            var result: Result<T?, Error>?
+            CallbackEscapeHelper.withNonescapingCallback({
+                result = Result {
+                    try creator(self)
+                }
+            }) { callback in
+                withCallback(callback) {
+                    withSafeUnarchiverHelperReplacement(for: T.self) {
+                        _=decodeObject(of: [SafeUnarchiverHelper.self], forKey: key)
+                    }
                 }
             }
-        }
 
-        return try result?.get() ?? { throw errorOrKeyNotFound(key) }()
+            return try result?.get() ?? { throw errorOrKeyNotFound(key) }()
+        }
     }
 
     func decodeArray<T>(at key: String, using creator: ((NSCoder) throws -> T?)) throws -> [T] {
-        var result: Result<[T], Error>?
-        CallbackEscapeHelper.withNonescapingCallback({
-            do {
-                guard let item = try creator(self) else { return }
+        try autoreleasepool {
+            var result: Result<[T], Error>?
+            CallbackEscapeHelper.withNonescapingCallback({
+                do {
+                    guard let item = try creator(self) else { return }
 
-                var items: [T] = try result?.get() ?? []
-                result = nil
-                items.append(item)
+                    var items: [T] = try result?.get() ?? []
+                    result = nil
+                    items.append(item)
 
-                result = .success(items)
+                    result = .success(items)
 
-            } catch {
-                result = .failure(error)
-                (self as? NSKeyedUnarchiver)?.failWithError(error)
-            }
+                } catch {
+                    result = .failure(error)
+                    (self as? NSKeyedUnarchiver)?.failWithError(error)
+                }
 
-        }) { callback in
-            withCallback(callback) {
-                withSafeUnarchiverHelperReplacement(for: T.self) {
-                    _=decodeObject(of: [NSArray.self, SafeUnarchiverHelper.self], forKey: key)
+            }) { callback in
+                withCallback(callback) {
+                    withSafeUnarchiverHelperReplacement(for: T.self) {
+                        _=decodeObject(of: [NSArray.self, SafeUnarchiverHelper.self], forKey: key)
+                    }
                 }
             }
-        }
 
-        return try result?.get() ?? []
+            return try result?.get() ?? []
+        }
     }
 
     private func errorOrKeyNotFound(_ key: String) -> Error {
@@ -220,7 +228,6 @@ extension NSCoder {
 
         required init?(coder: NSCoder) {
             Self.callback!.run()
-            return nil
         }
 
         func encode(with coder: NSCoder) {
@@ -232,13 +239,16 @@ extension NSCoder {
     final private class ArchiverHelper: NSObject, NSSecureCoding {
         let value: NSSecureEncodable
         public static var supportsSecureCoding: Bool { true }
+        private static var classCache = [String: AnyClass]()
 
         override var classForCoder: AnyClass {
             let className = NSCoder.className(for: type(of: value))
-            if let cls = NSClassFromString(className) {
+            if let cls = NSClassFromString(className) ?? Self.classCache[className] {
                 return cls
             }
-            return objc_allocateClassPair(ArchiverHelper.self, className, 0) ?? ArchiverHelper.self
+            let cls: AnyClass = objc_allocateClassPair(ArchiverHelper.self, className, 0) ?? ArchiverHelper.self
+            Self.classCache[className] = cls
+            return cls
         }
         init(value: NSSecureEncodable) {
             self.value = value

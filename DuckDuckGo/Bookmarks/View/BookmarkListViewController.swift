@@ -18,6 +18,7 @@
 
 import AppKit
 import Combine
+import DependencyInjection
 
 protocol BookmarkListViewControllerDelegate: AnyObject {
 
@@ -26,16 +27,27 @@ protocol BookmarkListViewControllerDelegate: AnyObject {
 
 }
 
-final class BookmarkListViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class BookmarkListViewController: NSViewController, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+
+    typealias InjectedDependencies = Tab.Dependencies
 
     private enum Constants {
         static let storyboardName = "Bookmarks"
         static let identifier = "BookmarkListViewController"
     }
 
-    static func create() -> BookmarkListViewController {
+    static func create(dependencyProvider: DependencyProvider) -> BookmarkListViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
-        return storyboard.instantiateController(identifier: Constants.identifier)
+        return storyboard.instantiateController(identifier: Constants.identifier) { coder in
+            BookmarkListViewController(coder: coder, dependencyProvider: dependencyProvider)
+        }
     }
 
     weak var delegate: BookmarkListViewControllerDelegate?
@@ -72,6 +84,15 @@ final class BookmarkListViewController: NSViewController {
             return nodes
         }
         return [BookmarkNode]()
+    }
+
+    init(coder: NSCoder, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+        super.init(coder: coder)!
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
     }
 
     override func viewDidLoad() {
@@ -123,7 +144,7 @@ final class BookmarkListViewController: NSViewController {
         newBookmarkViewController.delegate = self
 
         delegate?.popover(shouldPreventClosure: true)
-        beginSheetFromMainWindow(newBookmarkViewController)
+        windowManager.beginSheetFromMainWindow(newBookmarkViewController)
     }
 
     @IBAction func newFolderButtonClicked(_ sender: AnyObject) {
@@ -131,11 +152,11 @@ final class BookmarkListViewController: NSViewController {
         newFolderViewController.delegate = self
 
         delegate?.popover(shouldPreventClosure: true)
-        beginSheetFromMainWindow(newFolderViewController)
+        windowManager.beginSheetFromMainWindow(newFolderViewController)
     }
 
     @IBAction func openManagementInterface(_ sender: NSButton) {
-        WindowControllersManager.shared.showBookmarksTab()
+        windowManager.showBookmarksTab()
         delegate?.popoverShouldClose(self)
     }
 
@@ -145,7 +166,7 @@ final class BookmarkListViewController: NSViewController {
         let item = sender.item(atRow: sender.clickedRow)
         if let node = item as? BookmarkNode,
            let bookmark = node.representedObject as? Bookmark {
-            WindowControllersManager.shared.open(bookmark: bookmark)
+            windowManager.open(bookmark: bookmark)
             delegate?.popoverShouldClose(self)
         } else {
             if outlineView.isItemExpanded(item) {
@@ -157,7 +178,7 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @IBAction func onImportClicked(_ sender: NSButton) {
-        DataImportViewController.show()
+        DataImportViewController.show(using: windowManager)
     }
 
     // MARK: NSOutlineView Configuration
@@ -233,7 +254,6 @@ final class BookmarkListViewController: NSViewController {
         print(buttonWidth)
         manageBookmarksButton.translatesAutoresizingMaskIntoConstraints = false
         let widthConstraint = NSLayoutConstraint(item: manageBookmarksButton!, attribute: NSLayoutConstraint.Attribute.width, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: buttonWidth)
-//        let heightConstraint = NSLayoutConstraint(item: manageBookmarksButton!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 28)
         NSLayoutConstraint.activate([widthConstraint])
     }
 }
@@ -316,7 +336,7 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        WindowControllersManager.shared.show(url: bookmark.urlObject, newTab: true)
+        windowManager.show(url: bookmark.urlObject, newTab: true)
     }
 
     func openBookmarkInNewWindow(_ sender: NSMenuItem) {
@@ -327,7 +347,7 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
         guard let urlObject = bookmark.urlObject else {
             return
         }
-        WindowsManager.openNewWindow(with: urlObject, isBurner: false)
+        windowManager.openNewWindow(with: urlObject, isBurner: false)
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
@@ -389,7 +409,7 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
         let addFolderViewController = AddFolderModalViewController.create()
         addFolderViewController.edit(folder: folder)
         addFolderViewController.delegate = self
-        beginSheetFromMainWindow(addFolderViewController)
+        windowManager.beginSheetFromMainWindow(addFolderViewController)
     }
 
     func deleteFolder(_ sender: NSMenuItem) {
@@ -402,13 +422,15 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
     }
 
     func openInNewTabs(_ sender: NSMenuItem) {
-        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
+        guard let tabCollection = windowManager.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
               let children = (sender.representedObject as? BookmarkFolder)?.children else {
             assertionFailure("Cannot open in new tabs")
             return
         }
 
-        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, isBurner: tabCollection.isBurner) }
+        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map {
+            Tab(dependencyProvider: dependencies, content: .url($0), shouldLoadInBackground: true, isBurner: tabCollection.isBurner)
+        }
         tabCollection.append(tabs: tabs)
     }
 
@@ -416,9 +438,17 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
 
 // MARK: - BookmarkListPopover
 
-final class BookmarkListPopover: NSPopover {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class BookmarkListPopover: NSPopover, Injectable {
+    let dependencies: DependencyStorage
 
-    override init() {
+    typealias InjectedDependencies = BookmarkListViewController.Dependencies
+
+    init(dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         super.init()
 
         self.animates = false
@@ -428,14 +458,14 @@ final class BookmarkListPopover: NSPopover {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("BookmarkListPopover: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     // swiftlint:disable:next force_cast
     var viewController: BookmarkListViewController { contentViewController as! BookmarkListViewController }
 
     private func setupContentController() {
-        let controller = BookmarkListViewController.create()
+        let controller = BookmarkListViewController.create(dependencyProvider: dependencies)
         controller.delegate = self
         contentViewController = controller
     }

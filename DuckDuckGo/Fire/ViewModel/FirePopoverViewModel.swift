@@ -16,11 +16,22 @@
 //  limitations under the License.
 //
 
-import Cocoa
 import BrowserServicesKit
+import Cocoa
+import DependencyInjection
 
+#if swift(>=5.9)
+@Injectable
+#endif
 @MainActor
-final class FirePopoverViewModel {
+final class FirePopoverViewModel: Injectable {
+
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+    @Injected
+    var fireViewModel: FireViewModel
 
     enum ClearingOption: Int, CaseIterable {
 
@@ -45,14 +56,14 @@ final class FirePopoverViewModel {
         var favicon: NSImage?
     }
 
-    init(fireViewModel: FireViewModel,
-         tabCollectionViewModel: TabCollectionViewModel,
+    init(tabCollectionViewModel: TabCollectionViewModel,
          historyCoordinating: HistoryCoordinating,
          fireproofDomains: FireproofDomains,
          faviconManagement: FaviconManagement,
-         initialClearingOption: ClearingOption = .allData) {
+         initialClearingOption: ClearingOption = .allData,
+         dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
 
-        self.fireViewModel = fireViewModel
         self.tabCollectionViewModel = tabCollectionViewModel
         self.historyCoordinating = historyCoordinating
         self.fireproofDomains = fireproofDomains
@@ -71,7 +82,6 @@ final class FirePopoverViewModel {
 
     private(set) var shouldShowPinnedTabsInfo: Bool = false
 
-    private let fireViewModel: FireViewModel
     private weak var tabCollectionViewModel: TabCollectionViewModel?
     private let historyCoordinating: HistoryCoordinating
     private let fireproofDomains: FireproofDomains
@@ -212,7 +222,7 @@ final class FirePopoverViewModel {
 
     private func updateAreOtherTabsInfluenced() {
         let selectedTab = tabCollectionViewModel?.selectedTabViewModel?.tab
-        var allTabs = WindowControllersManager.shared.mainWindowControllers.flatMap {
+        var allTabs = windowManager.mainWindowControllers.flatMap {
             $0.mainViewController.tabCollectionViewModel.tabCollection.tabs
         }
         if let pinnedTabs = tabCollectionViewModel?.pinnedTabsManager?.tabCollection.tabs {

@@ -36,7 +36,7 @@ final class PermissionContextMenu: NSMenu {
     weak var actionDelegate: PermissionContextMenuDelegate?
 
     required init(coder: NSCoder) {
-        fatalError("PermissionContextMenu: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     init(permissions: [(key: PermissionType, value: PermissionState)],

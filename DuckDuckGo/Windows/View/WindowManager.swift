@@ -1,7 +1,7 @@
 //
 //  WindowManager.swift
 //
-//  Copyright © 2020 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -22,16 +22,110 @@ import Common
 import DependencyInjection
 
 @MainActor
-protocol WindowManagerProtocol {
+protocol WindowManagerProtocol: AnyObject {
 
-    var pinnedTabsManager: PinnedTabsManager { get }
+    var windows: [NSWindow] { get }
 
     var didRegisterWindowController: PassthroughSubject<(MainWindowController), Never> { get }
     var didUnregisterWindowController: PassthroughSubject<(MainWindowController), Never> { get }
 
+    var lastKeyMainWindowController: MainWindowController? { get set }
+
+    var mainWindowControllers: [MainWindowController] { get }
+    var mainWindowControllersPublisher: AnyPublisher<[MainWindowController], Never> { get }
+
+    var didChangeKeyWindowController: AnyPublisher<Void, Never> { get }
+
     func register(_ windowController: MainWindowController)
     func unregister(_ windowController: MainWindowController)
 
+    @discardableResult
+    func openNewWindow(isBurner: Bool, lazyLoadTabs: Bool) -> MainWindow?
+    @discardableResult
+    func openNewWindow(with tab: Tab, isBurner: Bool, droppingPoint: NSPoint?, contentSize: NSSize?, showWindow: Bool, popUp: Bool) -> MainWindow?
+    func openNewWindow(with initialUrl: URL, isBurner: Bool, parentTab: Tab?)
+    @discardableResult
+    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel?,
+                       isBurner: Bool,
+                       droppingPoint: NSPoint?,
+                       contentSize: NSSize?,
+                       showWindow: Bool,
+                       popUp: Bool,
+                       lazyLoadTabs: Bool) -> MainWindow?
+
+    func openNewWindow(with tabCollection: TabCollection, isBurner: Bool, droppingPoint: NSPoint?, contentSize: NSSize?, popUp: Bool)
+
+    func openPopUpWindow(with tab: Tab, isBurner: Bool, contentSize: NSSize?)
+    func beginSheetFromMainWindow(_ viewController: NSViewController)
+
+    func showTab(with content: Tab.TabContent)
+    func showBookmarksTab()
+    func showPreferencesTab(withSelectedPane pane: PreferencePaneIdentifier?)
+    func open(bookmark: Bookmark)
+
+    func show(url: URL?, newTab: Bool)
+
+    func closeWindows(except window: NSWindow?)
+
+    var isInInitialState: Bool { get }
+    func updateIsInInitialState()
+}
+
+extension WindowManagerProtocol {
+
+    @discardableResult
+    func openNewWindow(isBurner: Bool = false) -> MainWindow? {
+        openNewWindow(isBurner: isBurner, lazyLoadTabs: false)
+    }
+
+    @discardableResult
+    func openNewWindow(with tab: Tab, isBurner: Bool, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, showWindow: Bool = true) -> MainWindow? {
+        self.openNewWindow(with: tab, isBurner: isBurner, droppingPoint: nil, contentSize: contentSize, showWindow: showWindow, popUp: false)
+    }
+
+    @discardableResult
+    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel?,
+                       isBurner: Bool = false,
+                       droppingPoint: NSPoint? = nil,
+                       contentSize: NSSize? = nil,
+                       showWindow: Bool = true,
+                       popUp: Bool = false) -> MainWindow? {
+        openNewWindow(with: tabCollectionViewModel, isBurner: isBurner, droppingPoint: droppingPoint, contentSize: contentSize, showWindow: showWindow, popUp: popUp, lazyLoadTabs: false)
+    }
+
+    func openNewWindow(with tabCollection: TabCollection, isBurner: Bool, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil) {
+        openNewWindow(with: tabCollection, isBurner: isBurner, droppingPoint: droppingPoint, contentSize: contentSize, popUp: false)
+    }
+
+    func show(url: URL?) {
+        show(url: url, newTab: false)
+    }
+
+    func openNewWindow(with initialUrl: URL, isBurner: Bool) {
+        openNewWindow(with: initialUrl, isBurner: isBurner, parentTab: nil)
+    }
+
+    func showPreferencesTab() {
+        showPreferencesTab(withSelectedPane: nil)
+    }
+
+    func closeWindows() {
+        closeWindows(except: nil)
+    }
+
+}
+
+#if swift(>=5.9)
+@Injectable
+#endif
+final class AbstractWindowManagerNestedDependencies: Injectable {
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = Tab.Dependencies & TabCollectionViewModel.Dependencies & MainWindowController.Dependencies & MainViewController.Dependencies
+
+    init() {
+        fatalError("\(Self.self) should not be instantiated")
+    }
 }
 
 #if swift(>=5.9)
@@ -40,8 +134,12 @@ protocol WindowManagerProtocol {
 @MainActor
 final class WindowManager: WindowManagerProtocol, Injectable {
 
-    let dependencies: DynamicDependencies
-    typealias InjectedDependencies = Tab.Dependencies & TabCollectionViewModel.Dependencies & MainViewController.Dependencies
+    let dependencies: DependencyStorage
+
+    @Injected
+    var pinnedTabsManager: PinnedTabsManager
+
+    private var nestedDependencies: AbstractWindowManagerNestedDependencies.DependencyStorage!
 
     /**
      * _Initial_ meaning a single window with a single home page tab.
@@ -49,17 +147,19 @@ final class WindowManager: WindowManagerProtocol, Injectable {
     @Published private(set) var isInInitialState: Bool = true
     @Published private(set) var mainWindowControllers = [MainWindowController]()
 
-    @Injected
-    var pinnedTabsManager: PinnedTabsManager
+    var mainWindowControllersPublisher: AnyPublisher<[MainWindowController], Never> {
+        $mainWindowControllers.eraseToAnyPublisher()
+    }
 
-    init(dependencyProvider: some DynamicDependencyProvider) {
+    init(dependencyProvider: DependencyProvider, nestedDependencyProvider: (WindowManager) -> AbstractWindowManagerNestedDependencies.DependencyProvider) {
         self.dependencies = .init(dependencyProvider)
+        self.nestedDependencies = .init(nestedDependencyProvider(self))
     }
 
     weak var lastKeyMainWindowController: MainWindowController? {
         didSet {
             if lastKeyMainWindowController != oldValue {
-                didChangeKeyWindowController.send(())
+                _didChangeKeyWindowController.send(())
             }
         }
     }
@@ -77,7 +177,10 @@ final class WindowManager: WindowManagerProtocol, Injectable {
         return mainWindowController?.mainViewController.tabCollectionViewModel.selectedTab
     }
 
-    let didChangeKeyWindowController = PassthroughSubject<Void, Never>()
+    private let _didChangeKeyWindowController = PassthroughSubject<Void, Never>()
+    var didChangeKeyWindowController: AnyPublisher<Void, Never> {
+        _didChangeKeyWindowController.eraseToAnyPublisher()
+    }
     let didRegisterWindowController = PassthroughSubject<(MainWindowController), Never>()
     let didUnregisterWindowController = PassthroughSubject<(MainWindowController), Never>()
 
@@ -117,14 +220,19 @@ final class WindowManager: WindowManagerProtocol, Injectable {
         return NSApplication.shared.windows
     }
 
-    func closeWindows(except window: NSWindow? = nil) {
+    func closeWindows(except window: NSWindow?) {
         for controller in mainWindowControllers where controller.window !== window {
             controller.close()
         }
     }
 
     @discardableResult
-    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
+    func openNewWindow(isBurner: Bool, lazyLoadTabs: Bool) -> MainWindow? {
+        openNewWindow(with: nil)
+    }
+
+    @discardableResult
+    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel?,
                        isBurner: Bool = false,
                        droppingPoint: NSPoint? = nil,
                        contentSize: NSSize? = nil,
@@ -165,10 +273,10 @@ final class WindowManager: WindowManagerProtocol, Injectable {
         tabCollection.append(tab: tab)
 
         let tabCollectionViewModel: TabCollectionViewModel = popUp
-            ? TabCollectionViewModel(tabCollection: tabCollection, isBurner: isBurner, dependencyProvider: dependencies)
+            ? TabCollectionViewModel(tabCollection: tabCollection, isBurner: isBurner, dependencyProvider: nestedDependencies)
             : TabCollectionViewModel(tabCollection: tabCollection,
                                      isBurner: isBurner,
-                                     dependencyProvider: TabCollectionViewModel.makeDependencies(pinnedTabsManager: nil, nested: dependencies))
+                                     dependencyProvider: TabCollectionViewModel.makeDependencies(pinnedTabsManager: nil, nested: nestedDependencies))
 
         return openNewWindow(with: tabCollectionViewModel,
                              isBurner: isBurner,
@@ -178,29 +286,28 @@ final class WindowManager: WindowManagerProtocol, Injectable {
                              popUp: popUp)
     }
 
-    // TODO: when isBurner no pinned manager
-    func openNewWindow(with initialUrl: URL, isBurner: Bool, parentTab: Tab? = nil) {
-        //        openNewWindow(with: Tab(content: .contentFromURL(initialUrl), parentTab: parentTab, shouldLoadInBackground: true, isBurner: isBurner), isBurner: isBurner)
+    func openNewWindow(with initialUrl: URL, isBurner: Bool, parentTab: Tab?) {
+        openNewWindow(with: Tab(dependencyProvider: nestedDependencies, content: .contentFromURL(initialUrl), parentTab: parentTab, shouldLoadInBackground: true, isBurner: isBurner), isBurner: isBurner)
     }
 
     func openNewWindow(with tabCollection: TabCollection, isBurner: Bool, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) {
-        //        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isBurner: isBurner)
-        //        openNewWindow(with: tabCollectionViewModel,
-        //                      isBurner: isBurner,
-        //                      droppingPoint: droppingPoint,
-        //                      contentSize: contentSize,
-        //                      popUp: popUp)
-        //        tabCollectionViewModel.setUpLazyLoadingIfNeeded()
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isBurner: isBurner, dependencyProvider: nestedDependencies)
+        openNewWindow(with: tabCollectionViewModel,
+                      isBurner: isBurner,
+                      droppingPoint: droppingPoint,
+                      contentSize: contentSize,
+                      popUp: popUp)
+        tabCollectionViewModel.setUpLazyLoadingIfNeeded()
     }
 
     func openPopUpWindow(with tab: Tab, isBurner: Bool, contentSize: NSSize?) {
-        //        if let mainWindowController = WindowManager.shared.lastKeyMainWindowController,
-        //           mainWindowController.window?.styleMask.contains(.fullScreen) == true,
-        //           mainWindowController.window?.isPopUpWindow == false {
-        //            mainWindowController.mainViewController.tabCollectionViewModel.insert(tab, selected: true)
-        //        } else {
-        //            self.openNewWindow(with: tab, isBurner: isBurner, contentSize: contentSize, popUp: true)
-        //        }
+        if let mainWindowController = self.lastKeyMainWindowController,
+           mainWindowController.window?.styleMask.contains(.fullScreen) == true,
+           mainWindowController.window?.isPopUpWindow == false {
+            mainWindowController.mainViewController.tabCollectionViewModel.insert(tab, selected: true)
+        } else {
+            self.openNewWindow(with: tab, isBurner: isBurner, contentSize: contentSize, popUp: true)
+        }
     }
 
     private func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil,
@@ -212,9 +319,9 @@ final class WindowManager: WindowManagerProtocol, Injectable {
             mainViewController = try NSException.catch {
                 NSStoryboard(name: "Main", bundle: .main)
                     .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
-                        let model = tabCollectionViewModel ?? TabCollectionViewModel(isBurner: isBurner, dependencyProvider: self.dependencies)
+                        let model = tabCollectionViewModel ?? TabCollectionViewModel(isBurner: isBurner, dependencyProvider: self.nestedDependencies)
                         assert(model.isBurner == isBurner)
-                        return MainViewController(coder: coder, tabCollectionViewModel: model, dependencyProvider: self.dependencies)
+                        return MainViewController(coder: coder, tabCollectionViewModel: model, dependencyProvider: self.nestedDependencies)
                     }
             }
         } catch {
@@ -230,7 +337,7 @@ final class WindowManager: WindowManagerProtocol, Injectable {
         contentSize.height = min(NSScreen.main?.frame.size.height ?? 790, max(contentSize.height, 300))
         mainViewController.view.frame = NSRect(origin: .zero, size: contentSize)
 
-        return MainWindowController(mainViewController: mainViewController, popUp: popUp)
+        return MainWindowController(mainViewController: mainViewController, popUp: popUp, dependencyProvider: nestedDependencies)
     }
 
 }
@@ -268,7 +375,7 @@ extension WindowManager {
         }
     }
 
-    func show(url: URL?, newTab: Bool = false) {
+    func show(url: URL?, newTab: Bool) {
 
         func show(url: URL?, in windowController: MainWindowController) {
             let viewController = windowController.mainViewController
@@ -285,10 +392,9 @@ extension WindowManager {
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
                 tab.setContent(url.map { .url($0) } ?? .homePage)
             } else {
-                fatalError()
-//                let newTab = Tab(dependencyProvider: dependencies, content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
-//                newTab.setContent(url.map { .url($0) } ?? .homePage)
-//                tabCollectionViewModel.append(tab: newTab)
+                let newTab = Tab(dependencyProvider: nestedDependencies, content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
+                newTab.setContent(url.map { .url($0) } ?? .homePage)
+                tabCollectionViewModel.append(tab: newTab)
             }
         }
 
@@ -320,6 +426,17 @@ extension WindowManager {
         let tabCollectionViewModel = viewController.tabCollectionViewModel
         tabCollectionViewModel.appendNewTab(with: content)
         windowController.window?.orderFront(nil)
+    }
+
+    func beginSheetFromMainWindow(_ viewController: NSViewController) {
+        let newWindowController = viewController.wrappedInWindowController()
+        guard let newWindow = newWindowController.window,
+              let parentWindowController = self.lastKeyMainWindowController
+        else {
+            assertionFailure("Failed to present \(viewController)")
+            return
+        }
+        parentWindowController.window?.beginSheet(newWindow)
     }
 
     // MARK: - Network Protection

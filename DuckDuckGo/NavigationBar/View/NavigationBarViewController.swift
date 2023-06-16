@@ -20,13 +20,26 @@ import Cocoa
 import Combine
 import Common
 import BrowserServicesKit
+import DependencyInjection
 
 #if NETWORK_PROTECTION
 import NetworkProtection
 #endif
 
-// swiftlint:disable:next type_body_length
-final class NavigationBarViewController: NSViewController {
+// swiftlint:disable type_body_length
+#if swift(>=5.9)
+@Injectable
+#endif
+final class NavigationBarViewController: NSViewController, Injectable {
+
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+    @Injected
+    var downloadListCoordinator: DownloadListCoordinator
+
+    typealias InjectedDependencies = Tab.Dependencies & MoreOptionsMenu.Dependencies & NavigationBarPopovers.Dependencies & AddressBarViewController.Dependencies
 
     enum Constants {
         static let downloadsButtonAutoHidingInterval: TimeInterval = 5 * 60
@@ -74,7 +87,7 @@ final class NavigationBarViewController: NSViewController {
     private let goForwardButtonMenuDelegate: NavigationButtonMenuDelegate
     // swiftlint:enable weak_delegate
 
-    private var popovers = NavigationBarPopovers()
+    private let popovers: NavigationBarPopovers
     var isDownloadsPopoverShown: Bool {
         popovers.isDownloadsPopoverShown
     }
@@ -95,11 +108,14 @@ final class NavigationBarViewController: NSViewController {
 #endif
 
     required init?(coder: NSCoder) {
-        fatalError("NavigationBarViewController: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
 #if NETWORK_PROTECTION
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore(), dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
+        self.popovers = NavigationBarPopovers(dependencyProvider: dependencies)
         self.tabCollectionViewModel = tabCollectionViewModel
         self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popovers: popovers)
         self.isBurner = isBurner
@@ -109,7 +125,10 @@ final class NavigationBarViewController: NSViewController {
         super.init(coder: coder)
     }
 #else
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
+        self.popovers = NavigationBarPopovers(dependencyProvider: dependencies)
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = isBurner
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
@@ -180,7 +199,8 @@ final class NavigationBarViewController: NSViewController {
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
         guard let addressBarViewController = AddressBarViewController(coder: coder,
                                                                       tabCollectionViewModel: tabCollectionViewModel,
-                                                                      isBurner: isBurner) else {
+                                                                      isBurner: isBurner,
+                                                                      dependencyProvider: dependencies) else {
             fatalError("NavigationBarViewController: Failed to init AddressBarViewController")
         }
 
@@ -221,7 +241,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func openNewChildTab(with url: URL) {
-        let tab = Tab(content: .url(url), parentTab: tabCollectionViewModel.selectedTabViewModel?.tab, shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
+        let tab = Tab(dependencyProvider: dependencies, content: .url(url), parentTab: tabCollectionViewModel.selectedTabViewModel?.tab, shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
         tabCollectionViewModel.insert(tab, selected: false)
     }
 
@@ -238,22 +258,11 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
-    // swiftlint:disable force_cast
     @IBAction func optionsButtonAction(_ sender: NSButton) {
-
-        guard let internalUserDecider = (NSApp.delegate as! AppDelegate).internalUserDecider else {
-            assertionFailure("\(className): internalUserDecider is nil")
-            os_log("%s: internalUserDecider is nil", type: .error, className)
-            return
-        }
-
-        let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
-                                   passwordManagerCoordinator: PasswordManagerCoordinator.shared,
-                                   internalUserDecider: internalUserDecider)
+        let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel, dependencyProvider: dependencies)
         menu.actionDelegate = self
         menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height + 4), in: sender)
     }
-    // swiftlint:enable force_cast
 
     @IBAction func bookmarksButtonAction(_ sender: NSButton) {
         popovers.bookmarksButtonPressed(anchorView: bookmarkListButton,
@@ -454,7 +463,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToDownloads() {
-        DownloadListCoordinator.shared.updates
+        downloadListCoordinator.updates
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] update in
                 guard let self = self else { return }
@@ -463,7 +472,7 @@ final class NavigationBarViewController: NSViewController {
                     && update.item.destinationURL != nil
                     && update.item.tempURL == nil
                     && !update.item.isBurner
-                    && WindowControllersManager.shared.lastKeyMainWindowController?.window === self.downloadsButton.window
+                    && windowManager.lastKeyMainWindowController?.window === self.downloadsButton.window
 
                 if shouldShowPopover {
                     self.popovers.showDownloadsPopoverAndAutoHide(usingView: self.downloadsButton,
@@ -478,11 +487,11 @@ final class NavigationBarViewController: NSViewController {
                 self.updateDownloadsButton()
             }
             .store(in: &downloadsCancellables)
-        DownloadListCoordinator.shared.progress
+        downloadListCoordinator.progress
             .publisher(for: \.fractionCompleted)
             .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
-            .map { _ in
-                let progress = DownloadListCoordinator.shared.progress
+            .map { [weak self] _ in
+                let progress = self?.downloadListCoordinator.progress ?? Progress()
                 return progress.fractionCompleted == 1.0 || progress.totalUnitCount == 0 ? nil : progress.fractionCompleted
             }
             .assign(to: \.progress, onWeaklyHeld: downloadsProgressView)
@@ -542,7 +551,7 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        let hasActiveDownloads = DownloadListCoordinator.shared.hasActiveDownloads
+        let hasActiveDownloads = downloadListCoordinator.hasActiveDownloads
         downloadsButton.image = hasActiveDownloads ? Self.activeDownloadsImage : Self.inactiveDownloadsImage
         let isTimerActive = downloadsButtonHidingTimer != nil
 
@@ -584,7 +593,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func hideDownloadButtonIfPossible() {
         if LocalPinningManager.shared.isPinned(.downloads) ||
-            DownloadListCoordinator.shared.hasActiveDownloads ||
+            downloadListCoordinator.hasActiveDownloads ||
             popovers.isDownloadsPopoverShown { return }
 
         downloadsButton.isHidden = true
@@ -670,6 +679,7 @@ final class NavigationBarViewController: NSViewController {
             .store(in: &navigationButtonsCancellables)
     }
 }
+// swiftlint:enable type_body_length
 
 extension NavigationBarViewController: MouseOverViewDelegate {
 
@@ -778,11 +788,11 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu) {
-        WindowControllersManager.shared.showBookmarksTab()
+        windowManager.showBookmarksTab()
     }
 
     func optionsButtonMenuRequestedBookmarkImportInterface(_ menu: NSMenu) {
-        DataImportViewController.show()
+        DataImportViewController.show(using: windowManager)
     }
 
     func optionsButtonMenuRequestedBookmarkExportInterface(_ menu: NSMenu) {
@@ -808,15 +818,15 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu) {
-        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.printWebView(self)
+        windowManager.lastKeyMainWindowController?.mainViewController.printWebView(self)
     }
 
     func optionsButtonMenuRequestedPreferences(_ menu: NSMenu) {
-        WindowControllersManager.shared.showPreferencesTab()
+        windowManager.showPreferencesTab()
     }
 
     func optionsButtonMenuRequestedAppearancePreferences(_ menu: NSMenu) {
-        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .appearance)
+        windowManager.showPreferencesTab(withSelectedPane: .appearance)
     }
 
 }

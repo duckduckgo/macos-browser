@@ -39,11 +39,10 @@ struct InjectedMacro: AccessorMacro {
             return []
         }
 
-
         return [
           """
             get {
-              dependencyProvider.\(raw: identifier.text)
+              dependencies.\(raw: identifier.text)
             }
           """
         ]

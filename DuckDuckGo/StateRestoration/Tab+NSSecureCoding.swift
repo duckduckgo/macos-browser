@@ -35,7 +35,7 @@ extension Tab: NSSecureEncodable {
     }
 
     @MainActor
-    static func make(with decoder: NSCoder, dependencies: Tab.DynamicDependencyProvider) -> Tab? {
+    convenience init?(dependencyProvider: DependencyProvider, coder decoder: NSCoder) {
         let url: URL? = decoder.decodeIfPresent(at: NSSecureCodingKeys.url)
         let videoID: String? = decoder.decodeIfPresent(at: NSSecureCodingKeys.videoID)
         let videoTimestamp: String? = decoder.decodeIfPresent(at: NSSecureCodingKeys.videoTimestamp)
@@ -49,18 +49,17 @@ extension Tab: NSSecureEncodable {
 
         let interactionStateData: Data? = decoder.decodeIfPresent(at: NSSecureCodingKeys.interactionStateData) ?? decoder.decodeIfPresent(at: NSSecureCodingKeys.sessionStateData)
 
-        let tab = Tab.make(with: dependencies, content: content,
-                      title: decoder.decodeIfPresent(at: NSSecureCodingKeys.title),
-                      favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
-                      interactionStateData: interactionStateData,
-                      shouldLoadInBackground: false,
-                      isBurner: false,
-                      shouldLoadFromCache: true,
-                      lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt))
+        self.init(dependencyProvider: dependencyProvider,
+                  content: content,
+                  title: decoder.decodeIfPresent(at: NSSecureCodingKeys.title),
+                  favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
+                  interactionStateData: interactionStateData,
+                  shouldLoadInBackground: false,
+                  isBurner: false,
+                  shouldLoadFromCache: true,
+                  lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt))
 
-        _=tab.awakeAfter(using: decoder)
-
-        return tab
+        _=self.awakeAfter(using: decoder)
     }
 
     func encode(with coder: NSCoder) {

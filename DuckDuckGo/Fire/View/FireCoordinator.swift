@@ -17,25 +17,41 @@
 //
 
 import Cocoa
+import DependencyInjection
 
+#if swift(>=5.9)
+@Injectable
+#endif
 @MainActor
-final class FireCoordinator {
+final class FireCoordinator: Injectable {
 
-    static var fireViewModel = FireViewModel()
+    let dependencies: DependencyStorage
 
-    static var firePopover: FirePopover?
+    @Injected
+    var windowManager: WindowManagerProtocol
 
-    static func fireButtonAction() {
+    @Injected
+    var fireViewModel: FireViewModel
+
+    typealias InjectedDependencies = FirePopover.Dependencies
+
+    private var firePopover: FirePopover?
+
+    init(dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+    }
+
+    func fireButtonAction() {
         let burningWindow: NSWindow
         let waitForOpening: Bool
 
-        if let lastKeyWindow = WindowControllersManager.shared.lastKeyMainWindowController?.window,
+        if let lastKeyWindow = windowManager.lastKeyMainWindowController?.window,
            lastKeyWindow.isVisible {
             burningWindow = lastKeyWindow
             burningWindow.makeKeyAndOrderFront(nil)
             waitForOpening = false
         } else {
-            burningWindow = WindowsManager.openNewWindow(isBurner: false)!
+            burningWindow = windowManager.openNewWindow(isBurner: false)!
             waitForOpening = true
         }
 
@@ -46,8 +62,8 @@ final class FireCoordinator {
 
         if waitForOpening {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1/3) {
-                showFirePopover(relativeTo: mainViewController.tabBarViewController.fireButton,
-                                tabCollectionViewModel: mainViewController.tabCollectionViewModel)
+                self.showFirePopover(relativeTo: mainViewController.tabBarViewController.fireButton,
+                                     tabCollectionViewModel: mainViewController.tabCollectionViewModel)
             }
         } else {
             showFirePopover(relativeTo: mainViewController.tabBarViewController.fireButton,
@@ -55,9 +71,9 @@ final class FireCoordinator {
         }
     }
 
-    static func showFirePopover(relativeTo positioningView: NSView, tabCollectionViewModel: TabCollectionViewModel) {
+    func showFirePopover(relativeTo positioningView: NSView, tabCollectionViewModel: TabCollectionViewModel) {
         if !(firePopover?.isShown ?? false) {
-            firePopover = FirePopover(fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
+            firePopover = FirePopover(tabCollectionViewModel: tabCollectionViewModel, dependencyProvider: dependencies)
             firePopover?.showBelow(positioningView)
         }
     }

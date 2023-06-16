@@ -26,6 +26,7 @@ import DependencyInjection
 #endif
 @MainActor
 final class AppStateRestorationManager: NSObject, Injectable {
+    let dependencies: DependencyStorage
 
     typealias InjectedDependencies = TabCollectionViewModel.Dependencies
 
@@ -33,6 +34,10 @@ final class AppStateRestorationManager: NSObject, Injectable {
 
     @Injected
     var statePersistenceService: StatePersistenceService
+
+    @Injected
+    var windowManager: WindowManager
+
     private var service: StatePersistenceService { statePersistenceService }
 
     private var appWillRelaunchCancellable: AnyCancellable?
@@ -42,8 +47,8 @@ final class AppStateRestorationManager: NSObject, Injectable {
     private var appIsRelaunchingAutomatically: Bool
     private let shouldRestorePreviousSession: Bool
 
-    @available(*, deprecated, message: "use AppStateRestorationManager.make")
-    init(shouldRestorePreviousSession: Bool) {
+    init(dependencyProvider: DependencyProvider, shouldRestorePreviousSession: Bool) {
+        self.dependencies = .init(dependencyProvider)
         self.shouldRestorePreviousSession = shouldRestorePreviousSession
     }
 
@@ -61,7 +66,7 @@ final class AppStateRestorationManager: NSObject, Injectable {
         do {
             let isCalledAtStartup = !interactive
             try service.restoreState(using: { coder in
-                try WindowsManager.restoreState(from: coder, dependencyProvider: dependencyProvider, includePinnedTabs: isCalledAtStartup)
+                try windowManager.restoreState(from: coder, dependencyProvider: dependencies, includePinnedTabs: isCalledAtStartup)
             })
             clearLastSessionState()
         } catch CocoaError.fileReadNoSuchFile {
@@ -84,7 +89,7 @@ final class AppStateRestorationManager: NSObject, Injectable {
         appIsRelaunchingAutomatically = false
         readLastSessionState(restoreWindows: shouldRestorePreviousSession || isRelaunchingAutomatically)
 
-        stateChangedCancellable = WindowControllersManager.shared.stateChanged
+        stateChangedCancellable = windowManager.stateChanged
             .debounce(for: .seconds(1), scheduler: RunLoop.main)
             // There is a favicon assignment after a restored tab loads that triggered unnecessary
             // saving of the state
@@ -96,7 +101,7 @@ final class AppStateRestorationManager: NSObject, Injectable {
 
     func applicationWillTerminate() {
         stateChangedCancellable?.cancel()
-        if WindowControllersManager.shared.isInInitialState {
+        if windowManager.isInInitialState {
             service.clearState(sync: true)
         } else {
             persistAppState(sync: true)
@@ -110,14 +115,14 @@ final class AppStateRestorationManager: NSObject, Injectable {
         } else {
             restorePinnedTabs()
         }
-        WindowControllersManager.shared.updateIsInInitialState()
+        windowManager.updateIsInInitialState()
     }
 
     @MainActor
     private func restorePinnedTabs() {
         do {
             try service.restoreState(using: { coder in
-                try WindowsManager.restoreState(from: coder, dependencyProvider: self.dependencyProvider, includeWindows: false)
+                try windowManager.restoreState(from: coder, dependencyProvider: dependencies, includeWindows: false)
             })
         } catch CocoaError.fileReadNoSuchFile {
             // ignore
@@ -128,7 +133,7 @@ final class AppStateRestorationManager: NSObject, Injectable {
     }
 
     private func persistAppState(sync: Bool = false) {
-        service.persistState(using: WindowControllersManager.shared.encodeState(with:), sync: sync)
+        service.persistState(using: windowManager.encodeState(with:), sync: sync)
     }
 
 }

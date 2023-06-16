@@ -18,15 +18,25 @@
 
 import Cocoa
 import Combine
+import DependencyInjection
 import SwiftUI
 
+#if swift(>=5.9)
+@Injectable
+#endif
 @MainActor
-final class HomePageViewController: NSViewController {
+final class HomePageViewController: NSViewController, Injectable {
+
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+    @Injected
+    var fireViewModel: FireViewModel
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private var bookmarkManager: BookmarkManager
     private let historyCoordinating: HistoryCoordinating
-    private let fireViewModel: FireViewModel
 
     private weak var host: NSView?
 
@@ -39,19 +49,19 @@ final class HomePageViewController: NSViewController {
     var defaultBrowserDismissed: Bool
 
     required init?(coder: NSCoder) {
-        fatalError("HomePageViewController: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     init?(coder: NSCoder,
           tabCollectionViewModel: TabCollectionViewModel,
           bookmarkManager: BookmarkManager,
           historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-          fireViewModel: FireViewModel? = nil) {
+          dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
         self.historyCoordinating = historyCoordinating
-        self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
 
         super.init(coder: coder)
     }
@@ -132,7 +142,7 @@ final class HomePageViewController: NSViewController {
     }
 
     func createRecentlyVisitedModel() -> HomePage.Models.RecentlyVisitedModel {
-        return .init { [weak self] url in
+        return .init(fire: fireViewModel.fire) { [weak self] url in
             self?.openUrl(url)
         }
     }
@@ -196,7 +206,7 @@ final class HomePageViewController: NSViewController {
 
     private func openUrl(_ url: URL, target: HomePage.Models.FavoritesModel.OpenTarget? = nil) {
         if target == .newWindow || NSApplication.shared.isCommandPressed && NSApplication.shared.isOptionPressed {
-            WindowsManager.openNewWindow(with: url, isBurner: tabCollectionViewModel.isBurner)
+            windowManager.openNewWindow(with: url, isBurner: tabCollectionViewModel.isBurner)
             return
         }
 
@@ -215,7 +225,7 @@ final class HomePageViewController: NSViewController {
 
     private func showAddEditController(for bookmark: Bookmark? = nil) {
         // swiftlint:disable force_cast
-        let windowController = NSStoryboard.homePage.instantiateController(withIdentifier: "AddEditFavoriteWindowController") as! NSWindowController
+        let windowController = NSStoryboard(name: "HomePage", bundle: .main).instantiateController(withIdentifier: "AddEditFavoriteWindowController") as! NSWindowController
         // swiftlint:enable force_cast
 
         guard let window = windowController.window as? AddEditFavoriteWindow else {
@@ -261,11 +271,5 @@ final class HomePageViewController: NSViewController {
                 self?.refreshModels()
             }
     }
-
-}
-
-fileprivate extension NSStoryboard {
-
-    static let homePage = NSStoryboard(name: "HomePage", bundle: .main)
 
 }

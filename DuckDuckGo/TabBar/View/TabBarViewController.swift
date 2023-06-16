@@ -19,10 +19,23 @@
 import Cocoa
 import Combine
 import Common
+import DependencyInjection
 import Lottie
 import SwiftUI
 
-final class TabBarViewController: NSViewController {
+// swiftlint:disable type_body_length
+
+#if swift(>=5.9)
+@Injectable
+#endif
+final class TabBarViewController: NSViewController, Injectable {
+
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+
+    typealias InjectedDependencies = Tab.Dependencies
 
     enum HorizontalSpace: CGFloat {
         case pinnedTabsScrollViewPadding = 76
@@ -72,10 +85,11 @@ final class TabBarViewController: NSViewController {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("TabBarViewController: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
         self.tabCollectionViewModel = tabCollectionViewModel
         if !tabCollectionViewModel.isBurner, let pinnedTabCollection = tabCollectionViewModel.pinnedTabsManager?.tabCollection {
             let pinnedTabsViewModel = PinnedTabsViewModel(collection: pinnedTabCollection)
@@ -404,7 +418,7 @@ final class TabBarViewController: NSViewController {
 
         let tab = tabViewModel.tab
         tabCollectionViewModel.remove(at: .unpinned(index), published: false)
-        WindowsManager.openNewWindow(with: tab, isBurner: burner, droppingPoint: droppingPoint)
+        windowManager.openNewWindow(with: tab, isBurner: burner, droppingPoint: droppingPoint)
     }
 
     // MARK: - Mouse Monitor
@@ -585,8 +599,9 @@ final class TabBarViewController: NSViewController {
 
     private var tabPreviewWindowController: TabPreviewWindowController = {
         let storyboard = NSStoryboard(name: "TabPreview", bundle: nil)
-        // swiftlint:disable:next force_cast
-        return storyboard.instantiateController(withIdentifier: "TabPreviewWindowController") as! TabPreviewWindowController
+        return storyboard.instantiateController(identifier: "TabPreviewWindowController") { coder in
+            TabPreviewWindowController(coder: coder)
+        }
     }()
 
     private func showTabPreview(for tabBarViewItem: TabBarViewItem) {
@@ -636,6 +651,8 @@ final class TabBarViewController: NSViewController {
     }
 
 }
+
+// swiftlint:enable type_body_length
 
 extension TabBarViewController: TabCollectionViewModelDelegate {
 
@@ -944,7 +961,8 @@ extension TabBarViewController: NSCollectionViewDelegate {
         let newIndex = min(indexPath.item + 1, tabCollectionViewModel.tabCollection.tabs.count)
         if let url = draggingInfo.draggingPasteboard.url {
             // dropping URL or file
-            tabCollectionViewModel.insert(Tab(content: .url(url),
+            tabCollectionViewModel.insert(Tab(dependencyProvider: dependencies,
+                                              content: .url(url),
                                               isBurner: tabCollectionViewModel.isBurner),
                                           at: .unpinned(newIndex),
                                           selected: true)

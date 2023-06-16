@@ -31,15 +31,7 @@ protocol TabExtensionsBuilderProtocol {
 
 /// Tab Extensions registration component
 /// defines intialization order and provides dependencies to the Tab Extensions initalizers
-//#if swift(>=5.9)
-//@Injectable
-//#endif
-struct TabExtensionsBuilder: TabExtensionsBuilderProtocol { // , Injectable {
-
-
-//    @available(*, deprecated, message: "use TabExtensionsBuilder.make")
-//    init() {
-//    }
+struct TabExtensionsBuilder: TabExtensionsBuilderProtocol {
 
     static var `default`: TabExtensionsBuilderProtocol {
 #if DEBUG

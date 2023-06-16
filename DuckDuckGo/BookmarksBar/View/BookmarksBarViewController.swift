@@ -16,11 +16,19 @@
 //  limitations under the License.
 //
 
-import Foundation
 import AppKit
 import Combine
+import DependencyInjection
+import Foundation
 
-final class BookmarksBarViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class BookmarksBarViewController: NSViewController, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
 
     @IBOutlet private var bookmarksBarCollectionView: NSCollectionView!
     @IBOutlet private var clippedItemsIndicator: NSButton!
@@ -36,7 +44,9 @@ final class BookmarksBarViewController: NSViewController {
         return view.frame.width - viewWidthWithoutClipIndicator - 3
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         self.tabCollectionViewModel = tabCollectionViewModel
         self.viewModel = BookmarksBarViewModel(bookmarkManager: LocalBookmarkManager.shared, tabCollectionViewModel: tabCollectionViewModel)
 
@@ -44,7 +54,7 @@ final class BookmarksBarViewController: NSViewController {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("TabBarViewController: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     // MARK: - View Lifecycle
@@ -206,9 +216,9 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             tabCollectionViewModel.appendNewTab(with: .url(url), selected: true)
         case .openInNewWindow:
             guard let url = bookmark.urlObject else { return }
-            WindowsManager.openNewWindow(with: url, isBurner: false)
-        case .clickItem:
-            WindowControllersManager.shared.open(bookmark: bookmark)
+            windowManager.openNewWindow(with: url, isBurner: false)
+        case .clickItem: break
+            windowManager.open(bookmark: bookmark)
         case .addToFavorites:
             bookmark.isFavorite = true
             bookmarkManager.update(bookmark: bookmark)

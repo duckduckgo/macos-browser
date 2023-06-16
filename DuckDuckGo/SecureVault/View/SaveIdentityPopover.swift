@@ -18,10 +18,20 @@
 
 import AppKit
 import BrowserServicesKit
+import DependencyInjection
 
-final class SaveIdentityPopover: NSPopover {
+#if swift(>=5.9)
+@Injectable
+#endif
+@MainActor
+final class SaveIdentityPopover: NSPopover, Injectable {
+    let dependencies: DependencyStorage
 
-    override init() {
+    typealias InjectedDependencies = SaveIdentityViewController.Dependencies
+
+    init(dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         super.init()
 
         self.animates = false
@@ -39,7 +49,7 @@ final class SaveIdentityPopover: NSPopover {
     // swiftlint:enable force_cast
 
     private func setupContentController() {
-        let controller = SaveIdentityViewController.create()
+        let controller = SaveIdentityViewController.create(dependencyProvider: dependencies)
         controller.delegate = self
         contentViewController = controller
     }

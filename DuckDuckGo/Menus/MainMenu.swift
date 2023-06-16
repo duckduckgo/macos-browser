@@ -18,15 +18,35 @@
 
 import Cocoa
 import Combine
-import OSLog // swiftlint:disable:this enforce_os_log_wrapper
+// swiftlint:disable:next enforce_os_log_wrapper
+import OSLog
 import WebKit
 import BrowserServicesKit
+import DependencyInjection
 
 #if NETWORK_PROTECTION
 import NetworkProtection
 #endif
 
-final class MainMenu: NSMenu {
+#if swift(>=5.9)
+@Injectable
+#endif
+@MainActor
+final class MainMenu: NSMenu, Injectable {
+
+    static var dependencyProvider: DependencyProvider!
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = SharingMenu.Dependencies
+
+    required init(coder: NSCoder) {
+        self.dependencies = .init(Self.dependencyProvider)
+        Self.dependencyProvider = nil
+
+        self.sharingMenu = SharingMenu(dependencyProvider: dependencies)
+
+        super.init(coder: coder)
+    }
 
     enum Constants {
         static let maxTitleLength = 55
@@ -38,6 +58,8 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var preferencesMenuItem: NSMenuItem!
 
     // MARK: - File
+    let sharingMenu: SharingMenu
+
     @IBOutlet weak var newWindowMenuItem: NSMenuItem!
     @IBOutlet weak var newBurnerWindowMenuItem: NSMenuItem!
     @IBOutlet weak var newTabMenuItem: NSMenuItem!
@@ -126,8 +148,6 @@ final class MainMenu: NSMenu {
         sendFeedbackMenuItem.isHidden = true
 #endif
     }
-
-    let sharingMenu = SharingMenu()
 
     // MARK: - Lifecycle
 
@@ -381,9 +401,7 @@ final class MainMenu: NSMenu {
 
     @MainActor
     private func updateBurnerWindowMenuItem() {
-        if let appDelegate = NSApplication.shared.delegate as? AppDelegate,
-           let internalUserDecider = appDelegate.internalUserDecider,
-           !internalUserDecider.isInternalUser {
+        if !(NSApp.delegate as? AppDelegate)!.internalUserDecider.isInternalUser {
             newBurnerWindowMenuItem.isHidden = true
         }
     }

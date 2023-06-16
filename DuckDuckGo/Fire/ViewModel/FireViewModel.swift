@@ -40,9 +40,4 @@ final class FireViewModel {
         self.fire = fire
     }
 
-    @MainActor
-    init() {
-        fire = Fire()
-    }
-
 }

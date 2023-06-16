@@ -16,14 +16,15 @@
 //  limitations under the License.
 //
 
-import Foundation
-import DDGSync
 import Combine
-import SystemConfiguration
-import SyncUI
-import SwiftUI
-import PDFKit
+import DDGSync
+import DependencyInjection
+import Foundation
 import Navigation
+import PDFKit
+import SyncUI
+import SystemConfiguration
+import SwiftUI
 
 extension SyncDevice {
     init(_ account: SyncAccount) {
@@ -36,7 +37,17 @@ extension SyncDevice {
     }
 }
 
-final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+
+    @Injected
+    var syncService: DDGSyncing
 
     var isSyncEnabled: Bool {
         syncService.account != nil
@@ -107,8 +118,9 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         }
     }
 
-    init(syncService: DDGSyncing) {
-        self.syncService = syncService
+    init(dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         self.managementDialogModel = ManagementDialogModel()
         self.managementDialogModel.delegate = self
 
@@ -182,7 +194,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         let syncWindowController = syncViewController.wrappedInWindowController()
 
         guard let syncWindow = syncWindowController.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+              let parentWindowController = windowManager.lastKeyMainWindowController
         else {
             assertionFailure("Sync: Failed to present SyncManagementDialogViewController")
             return
@@ -204,7 +216,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     private var onEndFlow: () -> Void = {}
 
-    private let syncService: DDGSyncing
     private var cancellables = Set<AnyCancellable>()
     private var connector: RemoteConnecting?
 }

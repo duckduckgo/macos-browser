@@ -41,7 +41,7 @@ final class NetworkProtectionInvitePresenter: NetworkProtectionInvitePresenting,
         let newWindowController = hostingVC.wrappedInWindowController()
 
         guard let newWindow = newWindowController.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+              let parentWindowController = WindowManager.shared.lastKeyMainWindowController
         else {
             assertionFailure("Failed to present \(hostingVC)")
             return
@@ -58,7 +58,7 @@ final class NetworkProtectionInvitePresenter: NetworkProtectionInvitePresenting,
 
     func didCompleteInviteFlow() {
         Task {
-            await WindowControllersManager.shared.showNetworkProtectionStatus()
+            await WindowManager.shared.showNetworkProtectionStatus()
         }
         presentedViewController?.dismiss()
         presentedViewController = nil

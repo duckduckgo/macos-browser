@@ -106,6 +106,7 @@ struct DependencyInjectionPlugin {
         }
     }
 
+    // swiftlint:disable:next function_body_length
     static func worker() throws {
         let fm = FileManager.default
         let formatter = ISO8601DateFormatter()
@@ -129,8 +130,23 @@ struct DependencyInjectionPlugin {
                 var output = "// \(formatter.string(from: modified))"
 
                 if !visitor.output.isEmpty {
-                    output.append(visitor.imports.map { $0.description }.joined(separator: "\n"))
-                    output.append(visitor.imports.contains(where: { $0.path.description.trimmingCharacters(in: .whitespaces) == .DependencyInjection }) ? "" : "import " + .DependencyInjection)
+                    output.append(visitor.imports.map {
+                        let name = $0.path.description.trimmingCharacters(in: .whitespaces)
+                        if Set(["Foundation", "Combine", "AppKit", "Cocoa", "DependencyInjection", "Common", "WebKit"]).contains(name) {
+                            return $0.description
+                        }
+                        return """
+
+                        #if canImport(\(name))
+                        \($0.description.trimmingCharacters(in: .whitespacesAndNewlines))
+                        #endif
+
+                        """
+                    }.joined())
+
+                    if !visitor.imports.contains(where: { $0.path.description.trimmingCharacters(in: .whitespaces) == .DependencyInjection }) {
+                        output.append("import " + .DependencyInjection)
+                    }
 
                     for result in visitor.output {
                         output += """
@@ -145,6 +161,13 @@ struct DependencyInjectionPlugin {
                     }
                 }
 
+                let data = output.data(using: .utf8)!
+                if data.count == (try? fm.attributesOfItem(atPath: outputPath)[.size]) as? Int,
+                    let oldData = try? Data(contentsOf: URL(fileURLWithPath: outputPath)),
+                    oldData == data {
+
+                    return
+                }
                 try output.write(toFile: outputPath, atomically: false, encoding: .utf8)
             }
 

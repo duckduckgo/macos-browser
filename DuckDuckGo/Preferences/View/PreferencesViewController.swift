@@ -17,10 +17,18 @@
 //
 
 import AppKit
-import SwiftUI
 import Combine
+import DependencyInjection
+import SwiftUI
 
-final class PreferencesViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class PreferencesViewController: NSViewController, Injectable {
+
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = AutofillPreferencesModel.Dependencies & AbstractRootViewDependencies.Dependencies
 
     weak var delegate: BrowserTabSelectionDelegate?
 
@@ -30,6 +38,16 @@ final class PreferencesViewController: NSViewController {
 
     private var bitwardenManager: BWManagement = BWManager.shared
 
+    init(dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
+
     override func loadView() {
         view = NSView()
     }
@@ -37,7 +55,7 @@ final class PreferencesViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let host = NSHostingView(rootView: Preferences.RootView(model: model))
+        let host = NSHostingView(rootView: Preferences.RootView(model: model, dependencyProvider: dependencies))
         view.addAndLayout(host)
     }
 

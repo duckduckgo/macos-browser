@@ -16,10 +16,20 @@
 //  limitations under the License.
 //
 
-import Combine
 import BrowserServicesKit
+import Combine
+import DependencyInjection
 
-final class PasswordManagementLoginModel: ObservableObject, PasswordManagementItemModel {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class PasswordManagementLoginModel: ObservableObject, PasswordManagementItemModel, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+    @Injected
+    var urlMatcher: AutofillUrlMatcher
 
     typealias Model = SecureVaultModels.WebsiteCredentials
 
@@ -32,7 +42,6 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     var onSaveRequested: (SecureVaultModels.WebsiteCredentials) -> Void
     var onDeleteRequested: (SecureVaultModels.WebsiteCredentials) -> Void
-    var urlMatcher: AutofillUrlMatcher
 
     func setSecureVaultModel<Model>(_ modelObject: Model) {
         guard let modelObject = modelObject as? SecureVaultModels.WebsiteCredentials else {
@@ -72,10 +81,11 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     init(onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
          onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
-         urlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher()) {
+         dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested
-        self.urlMatcher = urlMatcher
     }
 
     func copy(_ value: String) {
@@ -117,7 +127,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     @MainActor
     func openURL(_ url: URL) {
-        WindowControllersManager.shared.show(url: url, newTab: true)
+        windowManager.show(url: url, newTab: true)
     }
 
     private func populateViewModelFromCredentials() {
@@ -140,4 +150,5 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
             lastUpdatedDate = ""
         }
     }
+
 }

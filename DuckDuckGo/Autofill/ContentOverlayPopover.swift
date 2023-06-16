@@ -19,19 +19,29 @@
 import Cocoa
 import WebKit
 import BrowserServicesKit
-
+import DependencyInjection
+#if swift(>=5.9)
+@Injectable
+#endif
 @MainActor
-public final class ContentOverlayPopover {
+final class ContentOverlayPopover: Injectable {
+    let dependencies: DependencyStorage
 
-    public var zoomFactor: CGFloat?
-    public weak var currentTabView: NSView?
+    typealias InjectedDependencies = ContentOverlayViewController.Dependencies
 
-    public var viewController: ContentOverlayViewController
-    public var windowController: NSWindowController
+    var zoomFactor: CGFloat?
+    weak var currentTabView: NSView?
 
-    public init(currentTabView: NSView) {
+    var viewController: ContentOverlayViewController
+    var windowController: NSWindowController
+
+    init(currentTabView: NSView, dependencyProvider: DependencyProvider) {
+        dependencies = .init(dependencyProvider)
+
         let storyboard = NSStoryboard(name: "ContentOverlay", bundle: Bundle.main)
-        viewController = storyboard.instantiateController(identifier: "ContentOverlayViewController")
+        viewController = storyboard.instantiateController(identifier: "ContentOverlayViewController") { [dependencies] coder in
+            ContentOverlayViewController(coder: coder, dependencyProvider: dependencies)
+        }
         windowController = storyboard.instantiateController(identifier: "ContentOverlayWindowController")
         windowController.contentViewController = viewController
         windowController.window?.hasShadow = true
@@ -48,11 +58,14 @@ public final class ContentOverlayPopover {
         viewController.view.window?.backgroundColor = .clear
         viewController.view.window?.acceptsMouseMovedEvents = true
         viewController.view.window?.ignoresMouseEvents = false
+
+        windowController.contentViewController = viewController
+
         self.currentTabView = currentTabView
     }
 
-    public required init?(coder: NSCoder) {
-        fatalError("ContentOverlayPopover: Bad initializer")
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
     }
 }
 

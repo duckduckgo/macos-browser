@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import ApplicationServices
 import Common
 import Foundation
 
@@ -26,13 +27,16 @@ import NetworkProtection
 @MainActor
 final class URLEventHandler {
 
+    let windowManager: WindowManagerProtocol
+
     private let handler: @MainActor (URL) -> Void
 
     private var didFinishLaunching = false
     private var urlsToOpen = [URL]()
 
-    init(handler: ((URL) -> Void)? = nil) {
-        self.handler = handler ?? Self.openURL
+    init(windowManager: WindowManagerProtocol, handler: ((URL) -> Void)? = nil) {
+        self.windowManager = windowManager
+        self.handler = handler ?? Self.openURL(using: windowManager)
 
         NSAppleEventManager.shared().setEventHandler(
             self,
@@ -98,16 +102,18 @@ final class URLEventHandler {
         }
     }
 
-    private static func openURL(_ url: URL) {
+    private static func openURL(using windowManager: WindowManagerProtocol) -> (URL) -> Void {
+        { url in
 #if NETWORK_PROTECTION
-        if url.scheme == "networkprotection" {
-            handleNetworkProtectionURL(url)
-        } else {
-            WindowControllersManager.shared.show(url: url, newTab: true)
-        }
+            if url.scheme == "networkprotection" {
+                handleNetworkProtectionURL(url)
+            } else {
+                windowManager.show(url: url, newTab: true)
+            }
 #else
-        WindowControllersManager.shared.show(url: url, newTab: true)
+            windowManager.show(url: url, newTab: true)
 #endif
+        }
     }
 
 #if NETWORK_PROTECTION
@@ -117,8 +123,8 @@ final class URLEventHandler {
     private static func handleNetworkProtectionURL(_ url: URL) {
         switch url {
         case AppLauncher.Command.showStatus.launchURL:
-            Task {
-                await WindowControllersManager.shared.showNetworkProtectionStatus()
+            Task { [windowManager] in
+                await windowManager.shared.showNetworkProtectionStatus()
             }
         default:
             return

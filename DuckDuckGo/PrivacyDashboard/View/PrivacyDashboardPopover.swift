@@ -17,10 +17,18 @@
 //
 
 import Cocoa
+import DependencyInjection
 
-final class PrivacyDashboardPopover: NSPopover {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class PrivacyDashboardPopover: NSPopover, Injectable {
+    let dependencies: DependencyStorage
 
-    override init() {
+    typealias InjectedDependencies = PrivacyDashboardViewController.Dependencies
+
+    init(dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
         super.init()
 
 #if DEBUG
@@ -33,21 +41,20 @@ final class PrivacyDashboardPopover: NSPopover {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("PrivacyDashboardPopover: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     // swiftlint:disable force_cast
     var viewController: PrivacyDashboardViewController { contentViewController as! PrivacyDashboardViewController }
     // swiftlint:enable force_cast
 
-    // swiftlint:disable force_cast
     private func setupContentController() {
         let storyboard = NSStoryboard(name: "PrivacyDashboard", bundle: nil)
-        let controller = storyboard
-            .instantiateController(withIdentifier: "PrivacyDashboardViewController") as! PrivacyDashboardViewController
+        let controller = storyboard.instantiateController(identifier: "PrivacyDashboardViewController") { [dependencies] coder in
+            PrivacyDashboardViewController(coder: coder, dependencyProvider: dependencies)
+        }
         contentViewController = controller
     }
-    // swiftlint:enable force_cast
 
     func setPreferredMaxHeight(_ height: CGFloat) {
         viewController.setPreferredMaxHeight(height - 40) // Account for popover arrow height

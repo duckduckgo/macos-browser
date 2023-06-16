@@ -28,17 +28,16 @@ final class PopupBlockedPopover: NSPopover {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("PopupBlockedPopover: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
-    // swiftlint:disable force_cast
     private func setupContentController() {
         let storyboard = NSStoryboard(name: "PermissionAuthorization", bundle: nil)
-        let controller = storyboard
-            .instantiateController(withIdentifier: "PopupBlockedViewController") as! PopupBlockedViewController
+        let controller = storyboard.instantiateController(identifier: "PopupBlockedViewController") { coder in
+            PopupBlockedViewController(coder: coder)
+        }
         contentViewController = controller
     }
-    // swiftlint:enable force_cast
 
 }
 

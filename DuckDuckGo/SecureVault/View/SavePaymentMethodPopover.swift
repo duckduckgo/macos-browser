@@ -18,10 +18,20 @@
 
 import AppKit
 import BrowserServicesKit
+import DependencyInjection
 
-final class SavePaymentMethodPopover: NSPopover {
+#if swift(>=5.9)
+@Injectable
+#endif
+@MainActor
+final class SavePaymentMethodPopover: NSPopover, Injectable {
+    let dependencies: DependencyStorage
 
-    override init() {
+    typealias InjectedDependencies = SavePaymentMethodViewController.Dependencies
+
+    init(dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         super.init()
 
         self.animates = false
@@ -39,7 +49,7 @@ final class SavePaymentMethodPopover: NSPopover {
     // swiftlint:enable force_cast
 
     private func setupContentController() {
-        let controller = SavePaymentMethodViewController.create()
+        let controller = SavePaymentMethodViewController.create(dependencyProvider: dependencies)
         controller.delegate = self
         contentViewController = controller
     }

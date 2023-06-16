@@ -18,9 +18,17 @@
 
 import Cocoa
 import Combine
+import DependencyInjection
 import Lottie
 
-final class AddressBarViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+@MainActor
+final class AddressBarViewController: NSViewController, Injectable {
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = Tab.Dependencies & AddressBarButtonsViewController.Dependencies
 
     @IBOutlet weak var addressBarTextField: AddressBarTextField!
     @IBOutlet weak var passiveTextField: NSTextField!
@@ -79,10 +87,12 @@ final class AddressBarViewController: NSViewController {
     private var mouseUpMonitor: Any?
 
     required init?(coder: NSCoder) {
-        fatalError("AddressBarViewController: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         self.tabCollectionViewModel = tabCollectionViewModel
         self.suggestionContainerViewModel = SuggestionContainerViewModel(
             isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage,
@@ -177,7 +187,8 @@ final class AddressBarViewController: NSViewController {
 
     @IBSegueAction func createAddressBarButtonsViewController(_ coder: NSCoder) -> AddressBarButtonsViewController? {
         let controller = AddressBarButtonsViewController(coder: coder,
-                                                         tabCollectionViewModel: tabCollectionViewModel)
+                                                         tabCollectionViewModel: tabCollectionViewModel,
+                                                         dependencyProvider: dependencies)
 
         self.addressBarButtonsViewController = controller
         controller?.delegate = self
@@ -501,6 +512,11 @@ extension AddressBarViewController: AddressBarTextFieldDelegate {
         updateMode(value: value)
         addressBarButtonsViewController?.textFieldValue = value
         updateView()
+    }
+
+    func adressBarTextField(_ addressBarTextField: AddressBarTextField, didRequestNewTabWith content: Tab.TabContent, selected: Bool) {
+        let tab = Tab(dependencyProvider: dependencies, content: content, shouldLoadInBackground: true, isBurner: isBurner)
+        tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 
 }

@@ -44,6 +44,8 @@ protocol TabCollectionViewModelDelegate: AnyObject {
 final class TabCollectionViewModel: NSObject, Injectable {
     typealias InjectedDependencies = Tab.Dependencies
 
+    let dependencies: DependencyStorage
+
     weak var delegate: TabCollectionViewModelDelegate?
 
     /// Local tabs collection
@@ -70,7 +72,8 @@ final class TabCollectionViewModel: NSObject, Injectable {
 
     var changesEnabled = true
 
-    private(set) var pinnedTabsManager: PinnedTabsManager?
+    @Injected
+    var pinnedTabsManager: PinnedTabsManager?
 
     /**
      * Contains view models for local tabs
@@ -103,15 +106,13 @@ final class TabCollectionViewModel: NSObject, Injectable {
 
     private var cancellables = Set<AnyCancellable>()
 
-    @available(*, deprecated, message: "use TabCollectionViewModel.make")
-    init(
-        tabCollection: TabCollection,
-        selectionIndex: Int = 0,
-        pinnedTabsManager: PinnedTabsManager?,
-        isBurner: Bool = false
-    ) {
+    init(tabCollection: TabCollection,
+         selectionIndex: Int = 0,
+         isBurner: Bool = false,
+         dependencyProvider: DependencyProvider) {
+
+        self.dependencies = .init(dependencyProvider)
         self.tabCollection = tabCollection
-        self.pinnedTabsManager = pinnedTabsManager
         self.isBurner = isBurner
         super.init()
 
@@ -124,22 +125,10 @@ final class TabCollectionViewModel: NSObject, Injectable {
         self.selectionIndex = .unpinned(selectionIndex)
     }
 
-    @available(*, deprecated, message: "use TabCollectionViewModel.make")
-    convenience init(tabCollection: TabCollection,
-                     selectionIndex: Int = 0,
-                     isBurner: Bool = false) {
-        self.init(tabCollection: tabCollection,
-                  selectionIndex: selectionIndex,
-                  pinnedTabsManager: WindowControllersManager.shared.pinnedTabsManager,
-                  isBurner: isBurner)
-    }
-
-    @available(*, deprecated, message: "use TabCollectionViewModel.make")
-    convenience init(isBurner: Bool = false) {
-        let tabCollection = TabCollection()
-        self.init(tabCollection: tabCollection,
-                  pinnedTabsManager: WindowControllersManager.shared.pinnedTabsManager,
-                  isBurner: isBurner)
+    convenience init(isBurner: Bool = false, dependencyProvider: DependencyProvider) {
+        self.init(tabCollection: TabCollection(),
+                  isBurner: isBurner,
+                  dependencyProvider: dependencyProvider)
     }
 
     func setUpLazyLoadingIfNeeded() {
@@ -267,7 +256,7 @@ final class TabCollectionViewModel: NSObject, Injectable {
         if selectDisplayableTabIfPresent(content) {
             return
         }
-        append(tab: Tab(content: content, shouldLoadInBackground: true, isBurner: isBurner), selected: selected, forceChange: forceChange)
+        append(tab: Tab(dependencyProvider: dependencies, content: content, shouldLoadInBackground: true, isBurner: isBurner), selected: selected, forceChange: forceChange)
     }
 
     func append(tab: Tab, selected: Bool = true, forceChange: Bool = false) {
@@ -460,7 +449,7 @@ final class TabCollectionViewModel: NSObject, Injectable {
     func removeAllTabsAndAppendNew(forceChange: Bool = false) {
         guard changesEnabled || forceChange else { return }
 
-        tabCollection.removeAll(andAppend: Tab.make(with: dependencyProvider, content: .homePage, isBurner: isBurner))
+        tabCollection.removeAll(andAppend: Tab(dependencyProvider: dependencies, content: .homePage, isBurner: isBurner))
         selectUnpinnedTab(at: 0, forceChange: forceChange)
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
@@ -475,7 +464,7 @@ final class TabCollectionViewModel: NSObject, Injectable {
 
         tabCollection.removeTabs(at: indexSet)
         if tabCollection.tabs.isEmpty {
-            tabCollection.append(tab: Tab.make(with: dependencyProvider, content: .homePage, isBurner: isBurner))
+            tabCollection.append(tab: Tab(dependencyProvider: dependencies, content: .homePage, isBurner: isBurner))
             selectUnpinnedTab(at: 0, forceChange: forceChange)
         } else {
             let selectionDiff = indexSet.reduce(0) { result, index in
@@ -512,7 +501,7 @@ final class TabCollectionViewModel: NSObject, Injectable {
             return
         }
 
-        let tabCopy = Tab.make(with: dependencyProvider, content: tab.content, favicon: tab.favicon, interactionStateData: tab.getActualInteractionStateData(), shouldLoadInBackground: true, isBurner: isBurner, shouldLoadFromCache: true)
+        let tabCopy = Tab(dependencyProvider: dependencies, content: tab.content, favicon: tab.favicon, interactionStateData: tab.getActualInteractionStateData(), shouldLoadInBackground: true, isBurner: isBurner, shouldLoadFromCache: true)
         let newIndex = tabIndex.makeNext()
 
         tabCollection(for: tabIndex)?.insert(tabCopy, at: newIndex.item)

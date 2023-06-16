@@ -17,23 +17,36 @@
 //
 
 import Cocoa
-@preconcurrency import Lottie
 import Combine
+import DependencyInjection
+@preconcurrency import Lottie
 
+#if swift(>=5.9)
+@Injectable
+#endif
 @MainActor
-final class FireViewController: NSViewController {
+final class FireViewController: NSViewController, Injectable {
 
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+    @Injected
+    var fireViewModel: FireViewModel
+
+    typealias InjectedDependencies = FirePopoverViewController.Dependencies
     enum Const {
         static let animationName = "01_Fire_really_small"
     }
 
-    private var fireViewModel: FireViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
     private var cancellables = Set<AnyCancellable>()
 
     private lazy var fireDialogViewController: FirePopoverViewController = {
         let storyboard = NSStoryboard(name: "Fire", bundle: nil)
-        return storyboard.instantiateController(identifier: "FirePopoverViewController")
+        return storyboard.instantiateController(identifier: "FirePopoverViewController") { [tabCollectionViewModel, dependencies] coder in
+            FirePopoverViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel, dependencyProvider: dependencies)
+        }
     }()
 
     @IBOutlet weak var fakeFireButton: NSButton!
@@ -44,14 +57,14 @@ final class FireViewController: NSViewController {
     private var fireAnimationViewLoadingTask: Task<(), Never>?
 
     required init?(coder: NSCoder) {
-        fatalError("TabBarViewController: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     init?(coder: NSCoder,
           tabCollectionViewModel: TabCollectionViewModel,
-          fireViewModel: FireViewModel? = nil) {
+          dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
 
         super.init(coder: coder)
     }
@@ -162,7 +175,7 @@ final class FireViewController: NSViewController {
         var playFireAnimation = true
 
         // Don't animate on other windows
-        let lastKeyWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        let lastKeyWindowController = windowManager.lastKeyMainWindowController
         if view.window?.windowController !== lastKeyWindowController {
             playFireAnimation = false
         }

@@ -41,29 +41,29 @@ extension AppDelegate {
     // MARK: - File
 
     @IBAction func newWindow(_ sender: Any?) {
-        WindowsManager.openNewWindow(isBurner: false)
+        windowManager.openNewWindow(isBurner: false)
     }
 
     @IBAction func newBurnerWindow(_ sender: Any?) {
-        WindowsManager.openNewWindow(isBurner: true)
+        windowManager.openNewWindow(isBurner: true)
     }
 
     @IBAction func newTab(_ sender: Any?) {
-        WindowsManager.openNewWindow(isBurner: false)
+        windowManager.openNewWindow(isBurner: false)
     }
 
     @IBAction func openLocation(_ sender: Any?) {
-        WindowsManager.openNewWindow(isBurner: false)
+        windowManager.openNewWindow(isBurner: false)
     }
 
     @IBAction func closeAllWindows(_ sender: Any?) {
-        WindowsManager.closeWindows()
+        windowManager.closeWindows()
     }
 
     // MARK: - History
 
     @IBAction func reopenLastClosedTab(_ sender: Any?) {
-        RecentlyClosedCoordinator.shared.reopenItem()
+        recentlyClosedCoordinator.reopenItem()
     }
 
     @IBAction func recentlyClosedAction(_ sender: Any?) {
@@ -73,7 +73,7 @@ extension AppDelegate {
                   return
               }
 
-        RecentlyClosedCoordinator.shared.reopenItem(cacheItem)
+        recentlyClosedCoordinator.reopenItem(cacheItem)
     }
 
     @objc func openVisit(_ sender: NSMenuItem) {
@@ -83,11 +83,11 @@ extension AppDelegate {
             return
         }
 
-        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url), shouldLoadInBackground: true, isBurner: false), isBurner: false)
+        windowManager.openNewWindow(with: Tab(dependencyProvider: dependencies, content: .contentFromURL(url), shouldLoadInBackground: true, isBurner: false), isBurner: false)
     }
 
     @IBAction func clearAllHistory(_ sender: NSMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage, isBurner: false), isBurner: false),
+        guard let window = windowManager.openNewWindow(with: Tab(dependencyProvider: dependencies, content: .homePage, isBurner: false), isBurner: false),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -97,7 +97,7 @@ extension AppDelegate {
     }
 
     @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage, isBurner: false), isBurner: false),
+        guard let window = windowManager.openNewWindow(with: Tab(dependencyProvider: dependencies, content: .homePage, isBurner: false), isBurner: false),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -117,7 +117,7 @@ extension AppDelegate {
     #if FEEDBACK
 
     @IBAction func openFeedback(_ sender: Any?) {
-        FeedbackPresenter.presentFeedbackForm()
+        FeedbackPresenter.presentFeedbackForm(using: windowManager)
     }
 
     #endif
@@ -134,21 +134,21 @@ extension AppDelegate {
             return
         }
 
-        let tab = Tab(content: .url(url), shouldLoadInBackground: true, isBurner: false)
-        WindowsManager.openNewWindow(with: tab, isBurner: false)
+        let tab = Tab(dependencyProvider: dependencies, content: .url(url), shouldLoadInBackground: true, isBurner: false)
+        windowManager.openNewWindow(with: tab, isBurner: false)
     }
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks, isBurner: false)])
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isBurner: false)
+        let tabCollection = TabCollection(tabs: [Tab(dependencyProvider: dependencies, content: .bookmarks, isBurner: false)])
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isBurner: false, dependencyProvider: dependencies)
 
-        WindowsManager.openNewWindow(with: tabCollectionViewModel, isBurner: false)
+        windowManager.openNewWindow(with: tabCollectionViewModel, isBurner: false)
     }
 
     @IBAction func openPreferences(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(content: .anyPreferencePane, isBurner: false)])
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isBurner: false)
-        WindowsManager.openNewWindow(with: tabCollectionViewModel, isBurner: false)
+        let tabCollection = TabCollection(tabs: [Tab(dependencyProvider: dependencies, content: .anyPreferencePane, isBurner: false)])
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isBurner: false, dependencyProvider: dependencies)
+        windowManager.openNewWindow(with: tabCollectionViewModel, isBurner: false)
     }
 
     @IBAction func openAbout(_ sender: Any?) {
@@ -161,11 +161,11 @@ extension AppDelegate {
     }
 
     @IBAction func openImportBrowserDataWindow(_ sender: Any?) {
-        DataImportViewController.show()
+        DataImportViewController.show(using: windowManager)
     }
 
     @IBAction func openExportLogins(_ sender: Any?) {
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
+        guard let windowController = windowManager.lastKeyMainWindowController,
               let window = windowController.window else { return }
 
         DeviceAuthenticator.shared.authenticateUser(reason: .exportLogins) { authenticationResult in
@@ -207,7 +207,7 @@ extension AppDelegate {
     }
 
     @IBAction func openExportBookmarks(_ sender: Any?) {
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
+        guard let windowController = windowManager.lastKeyMainWindowController,
               let window = windowController.window,
               let list = LocalBookmarkManager.shared.list else { return }
 
@@ -234,7 +234,7 @@ extension AppDelegate {
     }
 
     @IBAction func fireButtonAction(_ sender: NSButton) {
-        FireCoordinator.fireButtonAction()
+        fireCoordinator.fireButtonAction()
     }
 
     // MARK: - Network Protection Debug
@@ -380,7 +380,7 @@ extension MainViewController {
         // (this is in line with Safari behavior)
         if isHandlingKeyDownEvent, tabCollectionViewModel.selectionIndex?.isPinnedTab == true {
             if tabCollectionViewModel.tabCollection.tabs.isEmpty {
-                tabCollectionViewModel.append(tab: Tab(content: .homePage, isBurner: false), selected: true)
+                tabCollectionViewModel.append(tab: Tab(dependencyProvider: dependencies, content: .homePage, isBurner: false), selected: true)
             } else {
                 tabCollectionViewModel.select(at: .unpinned(0))
             }
@@ -439,11 +439,11 @@ extension MainViewController {
     @IBAction func toggleDownloads(_ sender: Any) {
         var navigationBarViewController = self.navigationBarViewController
         if view.window?.isPopUpWindow == true {
-            if let vc = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.navigationBarViewController {
+            if let vc = windowManager.lastKeyMainWindowController?.mainViewController.navigationBarViewController {
                 navigationBarViewController = vc
             } else {
-                WindowsManager.openNewWindow(with: Tab(content: .homePage, isBurner: false), isBurner: false)
-                guard let wc = WindowControllersManager.shared.mainWindowControllers.first(where: { $0.window?.isPopUpWindow == false }) else {
+                windowManager.openNewWindow(with: Tab(dependencyProvider: dependencies, content: .homePage, isBurner: false), isBurner: false)
+                guard let wc = windowManager.mainWindowControllers.first(where: { $0.window?.isPopUpWindow == false }) else {
                     return
                 }
                 navigationBarViewController = wc.mainViewController.navigationBarViewController
@@ -530,10 +530,9 @@ extension MainViewController {
 
         let alert = NSAlert.clearAllHistoryAndDataAlert()
         alert.beginSheetModal(for: window, completionHandler: { [weak self] response in
-            guard case .alertFirstButtonReturn = response, let self = self else {
-                return
-            }
-            FireCoordinator.fireViewModel.fire.burnAll(tabCollectionViewModel: self.tabCollectionViewModel)
+            guard let self, case .alertFirstButtonReturn = response else { return }
+
+            self.fireCoordinator.fireViewModel.fire.burnAll(tabCollectionViewModel: self.tabCollectionViewModel)
         })
     }
 
@@ -546,11 +545,10 @@ extension MainViewController {
         let dateString = sender.dateString
         let visits = sender.getVisits()
         let alert = NSAlert.clearHistoryAndDataAlert(dateString: dateString)
-        alert.beginSheetModal(for: window, completionHandler: { response in
-            guard case .alertFirstButtonReturn = response else {
-                return
-            }
-            FireCoordinator.fireViewModel.fire.burnVisits(of: visits, except: FireproofDomains.shared)
+        alert.beginSheetModal(for: window, completionHandler: { [weak self] response in
+            guard let self, case .alertFirstButtonReturn = response else { return }
+
+            self.fireCoordinator.fireViewModel.fire.burnVisits(of: visits, except: FireproofDomains.shared)
         })
     }
 
@@ -580,7 +578,7 @@ extension MainViewController {
             return
         }
 
-        WindowControllersManager.shared.open(bookmark: bookmark)
+        windowManager.open(bookmark: bookmark)
     }
 
     @IBAction func openAllInTabs(_ sender: Any?) {
@@ -594,7 +592,8 @@ extension MainViewController {
         }
 
         let tabs = models.compactMap { ($0.entity as? Bookmark)?.urlObject }.map {
-            Tab(content: .url($0),
+            Tab(dependencyProvider: dependencies,
+                content: .url($0),
                 shouldLoadInBackground: true,
                 isBurner: tabCollectionViewModel.isBurner)
         }
@@ -640,7 +639,7 @@ extension MainViewController {
 
         let tab = selectedTabViewModel.tab
         tabCollectionViewModel.removeSelected()
-        WindowsManager.openNewWindow(with: tab, isBurner: tabCollectionViewModel.isBurner)
+        windowManager.openNewWindow(with: tab, isBurner: tabCollectionViewModel.isBurner)
     }
 
     @IBAction func pinOrUnpinTab(_ sender: Any?) {
@@ -658,14 +657,14 @@ extension MainViewController {
     }
 
     @IBAction func mergeAllWindows(_ sender: Any?) {
-        guard let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
-        let otherWindowControllers = WindowControllersManager.shared.mainWindowControllers.filter { $0 !== mainWindowController }
+        guard let mainWindowController = windowManager.lastKeyMainWindowController else { return }
+        let otherWindowControllers = windowManager.mainWindowControllers.filter { $0 !== mainWindowController }
         let otherMainViewControllers = otherWindowControllers.compactMap { $0.mainViewController }
         let otherTabCollectionViewModels = otherMainViewControllers.map { $0.tabCollectionViewModel }
         let otherTabs = otherTabCollectionViewModels.flatMap { $0.tabCollection.tabs }
         let otherLocalHistoryOfRemovedTabs = Set(otherTabCollectionViewModels.flatMap { $0.tabCollection.localHistoryOfRemovedTabs })
 
-        WindowsManager.closeWindows(except: view.window)
+        windowManager.closeWindows(except: view.window)
 
         tabCollectionViewModel.append(tabs: otherTabs)
         tabCollectionViewModel.tabCollection.localHistoryOfRemovedTabs.formUnion(otherLocalHistoryOfRemovedTabs)
@@ -873,7 +872,7 @@ extension MainViewController: NSMenuItemValidation {
 
         // Merge all windows
         case #selector(MainViewController.mergeAllWindows(_:)):
-            return WindowControllersManager.shared.mainWindowControllers.count > 1
+            return windowManager.mainWindowControllers.count > 1
 
         // Move Tab to New Window, Select Next/Prev Tab
         case #selector(MainViewController.moveTabToNewWindow(_:)):
@@ -913,11 +912,11 @@ extension AppDelegate: NSMenuItemValidation {
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         switch menuItem.action {
         case #selector(AppDelegate.closeAllWindows(_:)):
-            return !WindowControllersManager.shared.mainWindowControllers.isEmpty
+            return !windowManager.mainWindowControllers.isEmpty
 
         // Reopen Last Removed Tab
         case #selector(AppDelegate.reopenLastClosedTab(_:)):
-            return RecentlyClosedCoordinator.shared.canReopenRecentlyClosedTab == true
+            return recentlyClosedCoordinator.canReopenRecentlyClosedTab == true
 
         // Reopen All Windows from Last Session
         case #selector(AppDelegate.reopenAllWindowsFromLastSession(_:)):

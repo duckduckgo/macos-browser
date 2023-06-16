@@ -17,15 +17,33 @@
 //
 
 import Cocoa
+import DependencyInjection
 
+#if swift(>=5.9)
+@Injectable
+#endif
 @MainActor
-final class SharingMenu: NSMenu {
+final class SharingMenu: NSMenu, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+
+    init(dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
+        super.init(title: UserText.shareMenuItem)
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
 
     override func update() {
         self.removeAllItems()
         self.autoenablesItems = false
 
-        let isEnabled = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+        let isEnabled = windowManager.lastKeyMainWindowController?.mainViewController
             .tabCollectionViewModel.selectedTabViewModel?.canReload ?? false
 
         // not real sharing URL, used for generating items for NSURL
@@ -74,7 +92,7 @@ final class SharingMenu: NSMenu {
             assertionFailure("representedObject is not NSSharingService")
             return
         }
-        guard let tabViewModel = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+        guard let tabViewModel = windowManager.lastKeyMainWindowController?.mainViewController
                 .tabCollectionViewModel.selectedTabViewModel,
               let url = tabViewModel.tab.content.url
         else {

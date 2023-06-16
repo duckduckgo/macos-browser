@@ -184,7 +184,7 @@ fileprivate extension TabCollectionViewModel {
     @MainActor
     static func makeTabCollectionViewModel(with pinnedTabsManager: PinnedTabsManager? = nil) -> TabCollectionViewModel {
 
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: .init(), pinnedTabsManager: pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager)
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: .init(), pinnedTabsManager: pinnedTabsManager ?? WindowManager.shared.pinnedTabsManager)
         tabCollectionViewModel.appendNewTab()
         tabCollectionViewModel.appendNewTab()
         return tabCollectionViewModel

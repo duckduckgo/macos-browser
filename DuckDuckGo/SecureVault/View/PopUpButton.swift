@@ -40,7 +40,7 @@ final class PopUpButton: NSPopUpButton {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     func addItem(withTitle title: String,

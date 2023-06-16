@@ -16,15 +16,16 @@
 //  limitations under the License.
 //
 
+import Bookmarks
+import BrowserServicesKit
 import Cocoa
 import Combine
 import Common
-import BrowserServicesKit
-import Persistence
 import Configuration
-import Networking
-import Bookmarks
 import DDGSync
+import DependencyInjection
+import Networking
+import Persistence
 import ServiceManagement
 import SyncDataProviders
 
@@ -32,55 +33,14 @@ import SyncDataProviders
 import NetworkProtection
 #endif
 
-@MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
+@objc(Application)
+final class Application: NSApplication {
+    private var _delegate: AppDelegate!
 
-#if DEBUG
-    let disableCVDisplayLinkLogs: Void = {
-        // Disable CVDisplayLink logs
-        CFPreferencesSetValue("cv_note" as CFString,
-                              0 as CFPropertyList,
-                              "com.apple.corevideo" as CFString,
-                              kCFPreferencesCurrentUser,
-                              kCFPreferencesAnyHost)
-        CFPreferencesSynchronize("com.apple.corevideo" as CFString, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
-    }()
-#endif
+    override init() {
+        super.init()
 
-    let urlEventHandler = URLEventHandler()
-
-#if CI
-    private let keyStore = (NSClassFromString("MockEncryptionKeyStore") as? EncryptionKeyStoring.Type)!.init()
-#else
-    private let keyStore = EncryptionKeyStore()
-#endif
-    private var fileStore: FileStore!
-
-    private(set) var stateRestorationManager: AppStateRestorationManager!
-    private var grammarFeaturesManager = GrammarFeaturesManager()
-    private let crashReporter = CrashReporter()
-    private(set) var internalUserDecider: InternalUserDecider?
-    private(set) var featureFlagger: FeatureFlagger!
-    private var appIconChanger: AppIconChanger!
-
-    private(set) var syncDataProviders: SyncDataProviders!
-    private(set) var syncService: DDGSyncing?
-    private var syncStateCancellable: AnyCancellable?
-    private var bookmarksSyncErrorCancellable: AnyCancellable?
-    let bookmarksManager = LocalBookmarkManager.shared
-
-#if !APPSTORE
-    var updateController: UpdateController!
-#endif
-
-    var appUsageActivityMonitor: AppUsageActivityMonitor?
-
-    // swiftlint:disable:next function_body_length
-    func applicationWillFinishLaunching(_ notification: Notification) {
-        APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
-        Configuration.setURLProvider(AppConfigurationURLProvider())
-
-        if !NSApp.isRunningUnitTests {
+        if !isRunningUnitTests {
 #if DEBUG
             Pixel.setUp(dryRun: true)
 #else
@@ -122,26 +82,88 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             }
         }
 
-        do {
-            let encryptionKey = NSApp.isRunningUnitTests ? nil : try keyStore.readKey()
-            fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
-        } catch {
-            os_log("App Encryption Key could not be read: %s", "\(error)")
-            fileStore = EncryptedFileStore()
-        }
+        let appDependencies = AppDependencies(isRunningUnitTests: isRunningUnitTests)
+        _delegate = AppDelegate(dependencyProvider: appDependencies)
+        self.delegate = _delegate
 
-        struct Dependencies: AppStateRestorationManager.Dependencies {
-            let pinnedTabsManager: PinnedTabsManager
-            let statePersistenceService: StatePersistenceService
-        }
+        HistoryMenu.dependencyProvider = appDependencies
+        MainMenu.dependencyProvider = appDependencies
+    }
 
-        let dependencies = Dependencies(pinnedTabsManager: WindowControllersManager.shared.pinnedTabsManager,
-                                        statePersistenceService: StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName))
-        stateRestorationManager = AppStateRestorationManager.make(with: dependencies, shouldRestorePreviousSession: StartupPreferences().restorePreviousSession)
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
+}
 
-        let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
-        let internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
-        self.internalUserDecider = internalUserDecider
+#if swift(>=5.9)
+@Injectable
+#endif
+@MainActor
+final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+
+    @Injected
+    var syncService: DDGSyncing
+
+    @Injected
+    var urlEventHandler: URLEventHandler
+
+    @Injected
+    var internalUserDecider: InternalUserDecider
+
+    @Injected
+    var downloadListCoordinator: DownloadListCoordinator
+
+    @Injected
+    var stateRestorationManager: AppStateRestorationManager
+
+    @Injected
+    var recentlyClosedCoordinator: RecentlyClosedCoordinator
+
+    @Injected
+    var fireCoordinator: FireCoordinator
+
+    typealias InjectedDependencies = TabCollectionViewModel.Dependencies
+
+#if DEBUG
+    let disableCVDisplayLinkLogs: Void = {
+        // Disable CVDisplayLink logs
+        CFPreferencesSetValue("cv_note" as CFString,
+                              0 as CFPropertyList,
+                              "com.apple.corevideo" as CFString,
+                              kCFPreferencesCurrentUser,
+                              kCFPreferencesAnyHost)
+        CFPreferencesSynchronize("com.apple.corevideo" as CFString, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
+    }()
+#endif
+
+    private var grammarFeaturesManager = GrammarFeaturesManager()
+    private let crashReporter = CrashReporter()
+    private(set) var featureFlagger: FeatureFlagger!
+    private var appIconChanger: AppIconChanger!
+
+    private var syncStateCancellable: AnyCancellable?
+    private var bookmarksSyncErrorCancellable: AnyCancellable?
+    let bookmarksManager = LocalBookmarkManager.shared
+
+    init(dependencyProvider: DependencyProvider) {
+        dependencies = .init(dependencyProvider)
+
+        super.init()
+    }
+
+#if !APPSTORE
+    var updateController: UpdateController!
+#endif
+
+    var appUsageActivityMonitor: AppUsageActivityMonitor?
+
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
+        Configuration.setURLProvider(AppConfigurationURLProvider())
 
 #if DEBUG
         func mock<T>(_ className: String) -> T {
@@ -176,8 +198,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         FaviconManager.shared.loadFavicons()
         ConfigurationManager.shared.start()
         FileDownloadManager.shared.delegate = self
-        _ = DownloadListCoordinator.shared
-        _ = RecentlyClosedCoordinator.shared
 
         if LocalStatisticsStore().atb == nil {
             Pixel.firstLaunchDate = Date()
@@ -191,9 +211,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         BWManager.shared.initCommunication()
 
-        if WindowsManager.windows.isEmpty,
+        if windowManager.windows.isEmpty,
            case .normal = NSApp.runType {
-            WindowsManager.openNewWindow(isBurner: false, lazyLoadTabs: true)
+            windowManager.openNewWindow(isBurner: true, lazyLoadTabs: true)
         }
 
         grammarFeaturesManager.manage()
@@ -219,7 +239,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
-        syncService?.scheduler.notifyAppLifecycleEvent()
+        syncService.scheduler.notifyAppLifecycleEvent()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -229,9 +249,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                 return .terminateCancel
             }
             FileDownloadManager.shared.cancelAll(waitUntilDone: true)
-            DownloadListCoordinator.shared.sync()
+            downloadListCoordinator.sync()
         }
-        stateRestorationManager?.applicationWillTerminate()
+        stateRestorationManager.applicationWillTerminate()
 
         return .terminateNow
     }
@@ -254,19 +274,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        if WindowControllersManager.shared.mainWindowControllers.isEmpty {
-            WindowsManager.openNewWindow(isBurner: false)
+        if windowManager.mainWindowControllers.isEmpty {
+            windowManager.openNewWindow(isBurner: false)
             return true
         }
         return true
     }
 
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
-        guard let internalUserDecider else {
-            return nil
-        }
-
-        return ApplicationDockMenu(internalUserDecider: internalUserDecider)
+        ApplicationDockMenu(internalUserDecider: internalUserDecider)
     }
 
     func application(_ sender: NSApplication, openFiles files: [String]) {
@@ -281,9 +297,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     // MARK: - Sync
 
     private func startupSync() {
-        let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
-        let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync)
-
         syncStateCancellable = syncService.authStatePublisher
             .prepend(syncService.authState)
             .map { $0 == .inactive }
@@ -298,9 +311,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         // since the scheduler debounces calls to notifyAppLifecycleEvent().
         //
         syncService.scheduler.notifyAppLifecycleEvent()
-
-        self.syncDataProviders = syncDataProviders
-        self.syncService = syncService
     }
 
     // MARK: - Network Protection
@@ -412,7 +422,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 extension AppDelegate: AppUsageActivityMonitorDelegate {
 
     func countOpenWindowsAndTabs() -> [Int] {
-        return WindowControllersManager.shared.mainWindowControllers
+        return windowManager.mainWindowControllers
             .map { $0.mainViewController.tabCollectionViewModel.tabCollection.tabs.count }
     }
 

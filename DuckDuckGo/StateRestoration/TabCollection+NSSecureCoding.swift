@@ -21,9 +21,9 @@ import Foundation
 extension TabCollection: NSSecureEncodable {
 
     @MainActor
-    convenience init(coder decoder: NSCoder, dependencies: Tab.DynamicDependencyProvider) throws {
+    convenience init(coder decoder: NSCoder, dependencyProvider: Tab.DependencyProvider) throws {
         let tabs = try decoder.decodeArray(at: NSKeyedArchiveRootObjectKey) { coder in
-            try Tab.make(with: coder, dependencies: dependencies) ?? { throw DecodingError.valueNotFound(Tab.self, .init(codingPath: [], debugDescription: "")) }()
+            try Tab(dependencyProvider: dependencyProvider, coder: coder) ?? { throw DecodingError.valueNotFound(Tab.self, .init(codingPath: [], debugDescription: "")) }()
         }
         self.init(tabs: tabs)
     }

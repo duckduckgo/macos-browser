@@ -16,10 +16,13 @@
 //  limitations under the License.
 //
 
-import SwiftUI
 import Common
+import SwiftUI
 
 final class AboutModel: ObservableObject {
+
+    let windowManager: WindowManagerProtocol
+
     let appVersion = AppVersion()
 
 #if NETWORK_PROTECTION
@@ -27,11 +30,15 @@ final class AboutModel: ObservableObject {
 #endif
 
 #if NETWORK_PROTECTION
-    init(netPInvitePresenter: NetworkProtectionInvitePresenting) {
+    init(netPInvitePresenter: NetworkProtectionInvitePresenting, windowManager: WindowManagerProtocol) {
+        self.windowManager = windowManager
+
         self.netPInvitePresenter = netPInvitePresenter
     }
 #else
-    init() {}
+    init(windowManager: WindowManagerProtocol) {
+        self.windowManager = windowManager
+    }
 #endif
 
     let displayableAboutURL: String = URL.aboutDuckDuckGo
@@ -39,12 +46,12 @@ final class AboutModel: ObservableObject {
 
     @MainActor
     func openURL(_ url: URL) {
-        WindowControllersManager.shared.show(url: url, newTab: true)
+        windowManager.show(url: url, newTab: true)
     }
 
     @MainActor
     func openFeedbackForm() {
-        FeedbackPresenter.presentFeedbackForm()
+        FeedbackPresenter.presentFeedbackForm(using: windowManager)
     }
 
 #if NETWORK_PROTECTION

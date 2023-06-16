@@ -18,8 +18,8 @@
 
 #if swift(>=5.9)
 
-@attached(member, names: named(Dependencies), named(DynamicDependencies), named(DependencyProvider), named(DynamicDependencyProvider), named(dependencyProvider), named(_currentDependencies), named(getAllDependencyProviderKeyPaths(from:)), named(makeDependencies), named(make))
-@attached(peer, names: suffixed(_DependencyProvider), suffixed(_DependencyProvider_allKeyPaths), suffixed(_DynamicDependencyProvider))
+@attached(member, names: named(Dependencies), named(DependencyStorage), named(DependencyProvider), named(getAllDependencyProviderKeyPaths()), named(makeDependencies))
+@attached(peer, names: suffixed(_InjectedVars), suffixed(_OwnedInjectedVars), suffixed(_DependencyProviderProtocol), suffixed(_InjectedVars_allKeyPaths))
 public macro Injectable() = #externalMacro(module: "DependencyInjectionMacros", type: "InjectableMacro")
 
 @attached(accessor)

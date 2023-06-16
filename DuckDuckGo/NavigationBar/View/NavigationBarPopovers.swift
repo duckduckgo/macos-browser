@@ -16,16 +16,24 @@
 //  limitations under the License.
 //
 
-import Foundation
-import BrowserServicesKit
 import AppKit
+import BrowserServicesKit
+import DependencyInjection
+import Foundation
 
 #if NETWORK_PROTECTION
 import NetworkProtection
 import NetworkProtectionUI
 #endif
 
-final class NavigationBarPopovers {
+#if swift(>=5.9)
+@Injectable
+#endif
+@MainActor
+final class NavigationBarPopovers: Injectable {
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = SaveIdentityPopover.Dependencies & SavePaymentMethodPopover.Dependencies & PasswordManagementPopover.Dependencies & DownloadsPopover.Dependencies & BookmarkListPopover.Dependencies
 
     enum Constants {
         static let downloadsPopoverAutoHidingInterval: TimeInterval = 10
@@ -41,6 +49,10 @@ final class NavigationBarPopovers {
 #if NETWORK_PROTECTION
     private(set) var networkProtectionPopover: NetworkProtectionPopover?
 #endif
+
+    init(dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+    }
 
     var passwordManagementDomain: String? {
         didSet {
@@ -64,7 +76,6 @@ final class NavigationBarPopovers {
         passwordManagementPopover?.isShown ?? false
     }
 
-    @MainActor
     var isNetworkProtectionPopoverShown: Bool {
 #if NETWORK_PROTECTION
         networkProtectionPopover?.isShown ?? false
@@ -114,7 +125,7 @@ final class NavigationBarPopovers {
               view.window != nil
         else { return }
 
-        let popover = DownloadsPopover()
+        let popover = DownloadsPopover(dependencyProvider: dependencies)
         popover.delegate = popoverDelegate
         popover.viewController.delegate = downloadsDelegate
         downloadsPopover = popover
@@ -165,7 +176,7 @@ final class NavigationBarPopovers {
     func showBookmarkListPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate, forTab tab: Tab?) {
         guard closeTransientPopovers() else { return }
 
-        let popover = bookmarkListPopover ?? BookmarkListPopover()
+        let popover = bookmarkListPopover ?? BookmarkListPopover(dependencyProvider: dependencies)
         bookmarkListPopover = popover
         popover.delegate = delegate
 
@@ -179,7 +190,7 @@ final class NavigationBarPopovers {
     func showPasswordManagementPopover(selectedCategory: SecureVaultSorting.Category?, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         guard closeTransientPopovers() else { return }
 
-        let popover = passwordManagementPopover ?? PasswordManagementPopover()
+        let popover = passwordManagementPopover ?? PasswordManagementPopover(dependencyProvider: dependencies)
         passwordManagementPopover = popover
         popover.viewController.domain = passwordManagementDomain
         popover.delegate = delegate
@@ -240,14 +251,14 @@ final class NavigationBarPopovers {
     }
 
     private func showSavePaymentMethodPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        let popover = SavePaymentMethodPopover()
+        let popover = SavePaymentMethodPopover(dependencyProvider: dependencies)
         popover.delegate = delegate
         savePaymentMethodPopover = popover
         show(popover: popover, usingView: view)
     }
 
     private func showSaveIdentityPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        let popover = SaveIdentityPopover()
+        let popover = SaveIdentityPopover(dependencyProvider: dependencies)
         popover.delegate = delegate
         saveIdentityPopover = popover
         show(popover: popover, usingView: view)

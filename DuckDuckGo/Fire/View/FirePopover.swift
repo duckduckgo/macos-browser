@@ -17,15 +17,24 @@
 //
 
 import AppKit
+import DependencyInjection
 
-final class FirePopover: NSPopover {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class FirePopover: NSPopover, Injectable {
 
-    init(fireViewModel: FireViewModel, tabCollectionViewModel: TabCollectionViewModel) {
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = FirePopoverWrapperViewController.Dependencies
+
+    init(tabCollectionViewModel: TabCollectionViewModel, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
         super.init()
 
         self.behavior = .transient
 
-        setupContentController(fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
+        setupContentController(tabCollectionViewModel: tabCollectionViewModel)
     }
 
     required init?(coder: NSCoder) {
@@ -36,12 +45,11 @@ final class FirePopover: NSPopover {
     var viewController: FirePopoverWrapperViewController { contentViewController as! FirePopoverWrapperViewController }
     // swiftlint:enable force_cast
 
-    private func setupContentController(fireViewModel: FireViewModel, tabCollectionViewModel: TabCollectionViewModel) {
+    private func setupContentController(tabCollectionViewModel: TabCollectionViewModel) {
         let storyboard = NSStoryboard(name: "Fire", bundle: nil)
-        let controller = storyboard.instantiateController(
-            identifier: "FirePopoverWrapperViewController") { coder -> FirePopoverWrapperViewController? in
-                return FirePopoverWrapperViewController(coder: coder, fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
-            }
+        let controller = storyboard.instantiateController(identifier: "FirePopoverWrapperViewController") { [dependencies] coder in
+            FirePopoverWrapperViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel, dependencyProvider: dependencies)
+        }
         contentViewController = controller
     }
 

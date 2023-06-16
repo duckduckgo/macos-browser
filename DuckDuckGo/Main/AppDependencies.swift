@@ -16,35 +16,219 @@
 //  limitations under the License.
 //
 
+import AppKit
+import BrowserServicesKit
+import Common
+import DDGSync
 import Foundation
+import SyncDataProviders
 
-struct AppDependencies {
+struct WindowManagerDependencies: WindowManager.Dependencies {
 
-    init() {
-        
+    let pinnedTabsManager: PinnedTabsManager
+
+}
+
+struct RecentlyClosedCoordinatorDependencies: RecentlyClosedCoordinator.Dependencies {
+
+    let pinnedTabsManagerValue: PinnedTabsManager
+    @_implements(Tab_InjectedVars, pinnedTabsManager)
+    var tabPinnedTabsManager: PinnedTabsManager? { pinnedTabsManagerValue }
+    var pinnedTabsManager: PinnedTabsManager { pinnedTabsManagerValue }
+
+    let windowManager: WindowManagerProtocol
+
+    init(pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager) {
+        self.pinnedTabsManagerValue = pinnedTabsManager
+        self.windowManager = windowManager
     }
 
-    private func startupSync() {
-        let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
-        let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync)
+}
 
-        syncStateCancellable = syncService.authStatePublisher
-            .prepend(syncService.authState)
-            .map { $0 == .inactive }
-            .removeDuplicates()
-            .sink { isSyncDisabled in
-                LocalBookmarkManager.shared.updateBookmarkDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
-            }
+struct FireDependencies: Fire.Dependencies {
 
-        // This is also called in applicationDidBecomeActive, but we're also calling it here, since
-        // syncService can be nil when applicationDidBecomeActive is called during startup, if a modal
-        // alert is shown before it's instantiated.  In any case it should be safe to call this here,
-        // since the scheduler debounces calls to notifyAppLifecycleEvent().
-        //
-        syncService.scheduler.notifyAppLifecycleEvent()
+    let downloadListCoordinator: DownloadListCoordinator
+    let recentlyClosedCoordinator: RecentlyClosedCoordinating
 
-        self.syncDataProviders = syncDataProviders
+    let pinnedTabsManagerValue: PinnedTabsManager
+    @_implements(Tab_InjectedVars, pinnedTabsManager)
+    var tabPinnedTabsManager: PinnedTabsManager? { pinnedTabsManagerValue }
+    var pinnedTabsManager: PinnedTabsManager { pinnedTabsManagerValue }
+
+    let windowManager: WindowManagerProtocol
+
+    init(downloadListCoordinator: DownloadListCoordinator, recentlyClosedCoordinator: RecentlyClosedCoordinating, pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager) {
+        self.downloadListCoordinator = downloadListCoordinator
+        self.recentlyClosedCoordinator = recentlyClosedCoordinator
+
+        self.pinnedTabsManagerValue = pinnedTabsManager
+        self.windowManager = windowManager
+    }
+
+}
+
+struct FireCoordinatorDependencies: FireCoordinator.Dependencies {
+    let pinnedTabsManagerValue: PinnedTabsManager
+    let downloadListCoordinator: DownloadListCoordinator
+
+    var pinnedTabsManager: PinnedTabsManager? { pinnedTabsManagerValue }
+
+    let windowManager: WindowManagerProtocol
+
+    let fireViewModel: FireViewModel
+
+    @MainActor
+    init(downloadListCoordinator: DownloadListCoordinator, recentlyClosedCoordinator: RecentlyClosedCoordinating, pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager) {
+        let fireDependencies = FireDependencies(downloadListCoordinator: downloadListCoordinator,
+                                                recentlyClosedCoordinator: recentlyClosedCoordinator,
+                                                pinnedTabsManager: pinnedTabsManager,
+                                                windowManager: windowManager)
+        self.fireViewModel = FireViewModel(fire: Fire(dependencyProvider: fireDependencies))
+
+        self.downloadListCoordinator = downloadListCoordinator
+        self.pinnedTabsManagerValue = pinnedTabsManager
+        self.windowManager = windowManager
+    }
+
+}
+
+struct WindowManagerNestedDependencies: AbstractWindowManagerNestedDependencies.Dependencies {
+
+    let emailManager = BrowserServicesKit.EmailManager()
+    let passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator()
+    let urlMatcher: BrowserServicesKit.AutofillUrlMatcher = AutofillDomainNameUrlMatcher()
+    let downloadListCoordinator: DownloadListCoordinator
+
+    let internalUserDecider: BrowserServicesKit.InternalUserDecider
+    let syncService: DDGSyncing
+
+    let fireViewModel: FireViewModel
+    let fireCoordinator: FireCoordinator
+
+    let pinnedTabsManager: PinnedTabsManager?
+
+    let windowManager: WindowManagerProtocol
+
+    @MainActor
+    init(internalUserDecider: BrowserServicesKit.InternalUserDecider,
+         syncService: DDGSyncing,
+         recentlyClosedCoordinator: RecentlyClosedCoordinating,
+         downloadListCoordinator: DownloadListCoordinator,
+         fireViewModel: FireViewModel,
+         fireCoordinator: FireCoordinator,
+         pinnedTabsManager: PinnedTabsManager,
+         windowManager: WindowManager) {
+
+        self.internalUserDecider = internalUserDecider
+        self.downloadListCoordinator = downloadListCoordinator
         self.syncService = syncService
+
+        self.fireViewModel = fireViewModel
+        self.fireCoordinator = fireCoordinator
+
+        self.pinnedTabsManager = pinnedTabsManager
+        self.windowManager = windowManager
+    }
+
+}
+
+struct StateRestorationManagerDependencies: AppStateRestorationManager.Dependencies {
+    let statePersistenceService: StatePersistenceService
+
+    let pinnedTabsManager: PinnedTabsManager?
+
+    let windowManager: WindowManager
+
+    @MainActor
+    init(statePersistenceService: StatePersistenceService, pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager) {
+        self.statePersistenceService = statePersistenceService
+        self.pinnedTabsManager = pinnedTabsManager
+        self.windowManager = windowManager
+    }
+
+}
+
+struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & HistoryMenu.Dependencies & Tab.DependencyProvider {
+
+    let windowManager: WindowManagerProtocol
+    let syncService: DDGSyncing
+    let urlEventHandler: URLEventHandler
+    let internalUserDecider: InternalUserDecider
+    let downloadListCoordinator: DownloadListCoordinator
+    let stateRestorationManager: AppStateRestorationManager
+    let recentlyClosedCoordinator: RecentlyClosedCoordinator
+    let fireCoordinator: FireCoordinator
+
+    let pinnedTabsManagerValue: PinnedTabsManager
+    @_implements(Tab_InjectedVars, pinnedTabsManager)
+    var tabPinnedTabsManager: PinnedTabsManager? { pinnedTabsManagerValue }
+    @_implements(TabCollectionViewModel_InjectedVars, pinnedTabsManager)
+    var tabcvmPinnedTabsManager: PinnedTabsManager? { pinnedTabsManagerValue }
+    var pinnedTabsManager: PinnedTabsManager { pinnedTabsManagerValue }
+
+    @MainActor
+    init(isRunningUnitTests: Bool) { // swiftlint:disable:this function_body_length
+#if CI
+        let keyStore = (NSClassFromString("MockEncryptionKeyStore") as? EncryptionKeyStoring.Type)!.init()
+#else
+        let keyStore = EncryptionKeyStore()
+#endif
+        let fileStore: FileStore
+        do {
+            let encryptionKey = isRunningUnitTests ? nil : try keyStore.readKey()
+            fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
+        } catch {
+            os_log("App Encryption Key could not be read: %s", "\(error)")
+            fileStore = EncryptedFileStore()
+        }
+        let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
+        self.internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
+
+        let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
+        self.syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync)
+
+        let pinnedTabsManager = PinnedTabsManager()
+        let windowManagerDependencies = WindowManagerDependencies(pinnedTabsManager: pinnedTabsManager)
+
+        var recentlyClosedCoordinator: RecentlyClosedCoordinator!
+        var fireCoordinator: FireCoordinator!
+        var downloadListCoordinator: DownloadListCoordinator!
+
+        let windowManager = WindowManager(dependencyProvider: windowManagerDependencies) { [internalUserDecider, syncService] windowManager in
+
+            downloadListCoordinator = DownloadListCoordinator(windowManager: windowManager)
+            let recentlyClosedCoordinatorDependencies = RecentlyClosedCoordinatorDependencies(pinnedTabsManager: pinnedTabsManager, windowManager: windowManager)
+            recentlyClosedCoordinator = RecentlyClosedCoordinator(dependencyProvider: recentlyClosedCoordinatorDependencies)
+
+            let fireCoordinatorDependencies = FireCoordinatorDependencies(downloadListCoordinator: downloadListCoordinator,
+                                                                          recentlyClosedCoordinator: recentlyClosedCoordinator,
+                                                                          pinnedTabsManager: pinnedTabsManager,
+                                                                          windowManager: windowManager)
+            fireCoordinator = FireCoordinator(dependencyProvider: fireCoordinatorDependencies)
+
+            return WindowManagerNestedDependencies(internalUserDecider: internalUserDecider,
+                                                   syncService: syncService,
+                                                   recentlyClosedCoordinator: recentlyClosedCoordinator,
+                                                   downloadListCoordinator: downloadListCoordinator,
+                                                   fireViewModel: fireCoordinatorDependencies.fireViewModel,
+                                                   fireCoordinator: fireCoordinator,
+                                                   pinnedTabsManager: pinnedTabsManager,
+                                                   windowManager: windowManager)
+        }
+        self.windowManager = windowManager
+        self.urlEventHandler = URLEventHandler(windowManager: windowManager)
+
+        let statePersistenceService = StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName)
+        let stateRestorationManagerDependencies = StateRestorationManagerDependencies(statePersistenceService: statePersistenceService,
+                                                                                      pinnedTabsManager: pinnedTabsManager,
+                                                                                      windowManager: windowManager)
+        self.stateRestorationManager = AppStateRestorationManager(dependencyProvider: stateRestorationManagerDependencies,
+                                                                  shouldRestorePreviousSession: StartupPreferences().restorePreviousSession)
+
+        self.recentlyClosedCoordinator = recentlyClosedCoordinator
+        self.fireCoordinator = fireCoordinator
+        self.downloadListCoordinator = downloadListCoordinator
+        self.pinnedTabsManagerValue = pinnedTabsManager
     }
 
 }

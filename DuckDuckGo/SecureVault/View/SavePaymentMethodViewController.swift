@@ -16,10 +16,12 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import BrowserServicesKit
 import Combine
 import Common
+import DependencyInjection
+import Foundation
 
 protocol SavePaymentMethodDelegate: AnyObject {
 
@@ -27,16 +29,26 @@ protocol SavePaymentMethodDelegate: AnyObject {
 
 }
 
-final class SavePaymentMethodViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+@MainActor
+final class SavePaymentMethodViewController: NSViewController, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
 
     enum Constants {
         static let storyboardName = "PasswordManager"
         static let identifier = "SavePaymentMethod"
     }
 
-    static func create() -> SavePaymentMethodViewController {
+    static func create(dependencyProvider: DependencyProvider) -> SavePaymentMethodViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
-        let controller: SavePaymentMethodViewController = storyboard.instantiateController(identifier: Constants.identifier)
+        let controller = storyboard.instantiateController(identifier: Constants.identifier) { coder in
+            SavePaymentMethodViewController.init(coder: coder, dependencyProvider: dependencyProvider)
+        }
         controller.loadView()
 
         return controller
@@ -91,11 +103,21 @@ final class SavePaymentMethodViewController: NSViewController {
     }
 
     @IBAction func onOpenPreferencesClicked(sender: NSButton) {
-        WindowControllersManager.shared.showPreferencesTab()
+        windowManager.showPreferencesTab()
         self.delegate?.shouldCloseSavePaymentMethodViewController(self)
     }
 
     // MARK: -
+
+    init?(coder: NSCoder, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
+        super.init(coder: coder)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()

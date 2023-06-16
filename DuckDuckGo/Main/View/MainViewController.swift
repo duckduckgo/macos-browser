@@ -20,8 +20,22 @@ import Cocoa
 import Carbon.HIToolbox
 import Combine
 import Common
+import DependencyInjection
 
-final class MainViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class MainViewController: NSViewController, Injectable {
+
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+    @Injected
+    var fireCoordinator: FireCoordinator
+
+    typealias InjectedDependencies = TabCollectionViewModel.Dependencies & NavigationBarViewController.Dependencies & TabBarViewController.Dependencies
+        & BrowserTabViewController.Dependencies & BookmarksBarViewController.Dependencies & FireViewController.Dependencies
 
     @IBOutlet weak var tabBarContainerView: NSView!
     @IBOutlet weak var navigationBarContainerView: NSView!
@@ -63,13 +77,11 @@ final class MainViewController: NSViewController {
     }
 
     required init?(coder: NSCoder) {
-        let isBurner = false
-        self.tabCollectionViewModel = TabCollectionViewModel(isBurner: isBurner)
-        self.isBurner = isBurner
-        super.init(coder: coder)
+        fatalError()
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = tabCollectionViewModel.isBurner
         super.init(coder: coder)
@@ -142,7 +154,8 @@ final class MainViewController: NSViewController {
     @IBSegueAction
     func createTabBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> TabBarViewController? {
         guard let tabBarViewController = TabBarViewController(coder: coder,
-                                                              tabCollectionViewModel: tabCollectionViewModel) else {
+                                                              tabCollectionViewModel: tabCollectionViewModel,
+                                                              dependencyProvider: dependencies) else {
             fatalError("MainViewController: Failed to init TabBarViewController")
         }
 
@@ -152,7 +165,7 @@ final class MainViewController: NSViewController {
 
     @IBSegueAction
     func createNavigationBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> NavigationBarViewController? {
-        guard let navigationBarViewController = NavigationBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner) else {
+        guard let navigationBarViewController = NavigationBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, dependencyProvider: dependencies) else {
             fatalError("MainViewController: Failed to init NavigationBarViewController")
         }
 
@@ -163,7 +176,8 @@ final class MainViewController: NSViewController {
     @IBSegueAction
     func createWebViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BrowserTabViewController? {
         guard let browserTabViewController = BrowserTabViewController(coder: coder,
-                                                                      tabCollectionViewModel: tabCollectionViewModel) else {
+                                                                      tabCollectionViewModel: tabCollectionViewModel,
+                                                                      dependencyProvider: dependencies) else {
             fatalError("MainViewController: Failed to init BrowserTabViewController")
         }
 
@@ -182,14 +196,15 @@ final class MainViewController: NSViewController {
     @IBSegueAction
     func createFireViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> FireViewController? {
         let fireViewController = FireViewController(coder: coder,
-                                                    tabCollectionViewModel: tabCollectionViewModel)
+                                                    tabCollectionViewModel: tabCollectionViewModel,
+                                                    dependencyProvider: dependencies)
         self.fireViewController = fireViewController
         return fireViewController
     }
 
     @IBSegueAction
     func createBookmarksBar(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BookmarksBarViewController? {
-        let bookmarksBarViewController = BookmarksBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
+        let bookmarksBarViewController = BookmarksBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel, dependencyProvider: dependencies)
         self.bookmarksBarViewController = bookmarksBarViewController
         return bookmarksBarViewController
     }

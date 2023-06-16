@@ -16,14 +16,25 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
-import WebKit
 import Combine
 import Common
+import DependencyInjection
 import SwiftUI
-import BrowserServicesKit
+import WebKit
 
-final class BrowserTabViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class BrowserTabViewController: NSViewController, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+
+    typealias InjectedDependencies = Tab.Dependencies & PreferencesViewController.Dependencies & HomePageViewController.Dependencies & ContentOverlayPopover.Dependencies & BookmarkManagementSplitViewController.Dependencies
+
     @IBOutlet weak var errorView: NSView!
     @IBOutlet weak var homePageView: NSView!
     @IBOutlet weak var errorMessageLabel: NSTextField!
@@ -56,10 +67,11 @@ final class BrowserTabViewController: NSViewController {
     private var cookieConsentPopoverManager = CookieConsentPopoverManager()
 
     required init?(coder: NSCoder) {
-        fatalError("BrowserTabViewController: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
         self.tabCollectionViewModel = tabCollectionViewModel
 
         super.init(coder: coder)
@@ -68,7 +80,8 @@ final class BrowserTabViewController: NSViewController {
     @IBSegueAction func createHomePageViewController(_ coder: NSCoder) -> NSViewController? {
         guard let controller = HomePageViewController(coder: coder,
                                                       tabCollectionViewModel: tabCollectionViewModel,
-                                                      bookmarkManager: LocalBookmarkManager.shared) else {
+                                                      bookmarkManager: LocalBookmarkManager.shared,
+                                                      dependencyProvider: dependencies) else {
             fatalError("BrowserTabViewController: Failed to init HomePageViewController")
         }
         return controller
@@ -344,11 +357,12 @@ final class BrowserTabViewController: NSViewController {
         // shouldn't open New Tabs in PopUp window
         if view.window?.isPopUpWindow ?? true {
             // Prefer Tab's Parent
-            WindowControllersManager.shared.showTab(with: content)
+            windowManager.showTab(with: content)
             return
         }
 
-        let tab = Tab(content: content,
+        let tab = Tab(dependencyProvider: dependencies,
+                      content: content,
                       shouldLoadInBackground: true,
                       isBurner: tabCollectionViewModel.isBurner,
                       webViewSize: view.frame.size)
@@ -444,7 +458,7 @@ final class BrowserTabViewController: NSViewController {
     var preferencesViewController: PreferencesViewController?
     private func preferencesViewControllerCreatingIfNeeded() -> PreferencesViewController {
         return preferencesViewController ?? {
-            let preferencesViewController = PreferencesViewController()
+            let preferencesViewController = PreferencesViewController(dependencyProvider: dependencies)
             preferencesViewController.delegate = self
             self.preferencesViewController = preferencesViewController
             return preferencesViewController
@@ -456,7 +470,7 @@ final class BrowserTabViewController: NSViewController {
     var bookmarksViewController: BookmarkManagementSplitViewController?
     private func bookmarksViewControllerCreatingIfNeeded() -> BookmarkManagementSplitViewController {
         return bookmarksViewController ?? {
-            let bookmarksViewController = BookmarkManagementSplitViewController.create()
+            let bookmarksViewController = BookmarkManagementSplitViewController.create(dependencyProvider: dependencies)
             bookmarksViewController.delegate = self
             self.bookmarksViewController = bookmarksViewController
             return bookmarksViewController
@@ -466,9 +480,9 @@ final class BrowserTabViewController: NSViewController {
     private var contentOverlayPopover: ContentOverlayPopover?
     private func contentOverlayPopoverCreatingIfNeeded() -> ContentOverlayPopover {
         return contentOverlayPopover ?? {
-            let overlayPopover = ContentOverlayPopover(currentTabView: self.view)
+            let overlayPopover = ContentOverlayPopover(currentTabView: self.view, dependencyProvider: dependencies)
             self.contentOverlayPopover = overlayPopover
-            WindowControllersManager.shared.stateChanged
+            windowManager.stateChanged
                 .sink { [weak overlayPopover] _ in
                     overlayPopover?.websiteAutofillUserScriptCloseOverlay(nil)
                 }.store(in: &self.cancellables)
@@ -524,7 +538,7 @@ extension BrowserTabViewController: NSDraggingDestination {
 
 extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
     public func websiteAutofillUserScriptCloseOverlay(_ websiteAutofillUserScript: WebsiteAutofillUserScript?) {
-        contentOverlayPopoverCreatingIfNeeded().websiteAutofillUserScriptCloseOverlay(websiteAutofillUserScript)
+        contentOverlayPopover?.websiteAutofillUserScriptCloseOverlay(websiteAutofillUserScript)
     }
     public func websiteAutofillUserScript(_ websiteAutofillUserScript: WebsiteAutofillUserScript,
                                           willDisplayOverlayAtClick: NSPoint?,
@@ -569,9 +583,9 @@ extension BrowserTabViewController: TabDelegate {
     func tab(_ parentTab: Tab, createdChild childTab: Tab, of kind: NewWindowPolicy) {
         switch kind {
         case .popup(size: let windowContentSize):
-            WindowsManager.openPopUpWindow(with: childTab, isBurner: parentTab.isBurner, contentSize: windowContentSize)
+            windowManager.openPopUpWindow(with: childTab, isBurner: parentTab.isBurner, contentSize: windowContentSize)
         case .window(active: let active, let isBurner):
-            WindowsManager.openNewWindow(with: childTab, isBurner: isBurner, showWindow: active)
+            windowManager.openNewWindow(with: childTab, isBurner: isBurner, showWindow: active)
         case .tab(selected: let selected, _):
             self.tabCollectionViewModel.insert(childTab, after: parentTab, selected: selected)
         }
@@ -825,7 +839,7 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
 extension BrowserTabViewController: OnboardingDelegate {
 
     func onboardingDidRequestImportData(completion: @escaping () -> Void) {
-        DataImportViewController.show(completion: completion)
+        DataImportViewController.show(using: windowManager, completion: completion)
     }
 
     func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {
@@ -878,9 +892,9 @@ extension BrowserTabViewController {
 extension BrowserTabViewController {
 
     private func subscribeToTabSelectedInCurrentKeyWindow() {
-        let lastKeyWindowOtherThanOurs = WindowControllersManager.shared.didChangeKeyWindowController
-            .map { WindowControllersManager.shared.lastKeyMainWindowController }
-            .prepend(WindowControllersManager.shared.lastKeyMainWindowController)
+        let lastKeyWindowOtherThanOurs = windowManager.didChangeKeyWindowController
+            .map { [windowManager] in windowManager.lastKeyMainWindowController }
+            .prepend(windowManager.lastKeyMainWindowController)
             .compactMap { $0 }
             .filter { [weak self] in $0.window !== self?.view.window }
 

@@ -16,14 +16,21 @@
 //  limitations under the License.
 //
 
-import Cocoa
-import WebKit
-import Combine
-import BrowserServicesKit
 import Autofill
+import BrowserServicesKit
+import Cocoa
+import Combine
+import DependencyInjection
+import WebKit
 
+#if swift(>=5.9)
+@Injectable
+#endif
 @MainActor
-public final class ContentOverlayViewController: NSViewController, EmailManagerRequestDelegate {
+final class ContentOverlayViewController: NSViewController, EmailManagerRequestDelegate, Injectable {
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = AutofillPreferencesModel.Dependencies
 
     @IBOutlet var webView: WKWebView!
     private var topAutofillUserScript: OverlayAutofillUserScript?
@@ -46,9 +53,19 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     }()
 
     lazy var autofillPreferencesModel: AutofillPreferencesModel = {
-        let model = AutofillPreferencesModel()
+        let model = AutofillPreferencesModel(dependencyProvider: dependencies)
         return model
     }()
+
+    init?(coder: NSCoder, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
+        super.init(coder: coder)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
 
     public override func viewDidLoad() {
         initWebView()

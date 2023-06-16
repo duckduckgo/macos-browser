@@ -51,21 +51,34 @@ final class DataImportViewController: NSViewController {
         }
     }
 
-    static func show(completion: (() -> Void)? = nil) {
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
+    let windowManager: WindowManagerProtocol
+
+    static func show(using windowManager: WindowManagerProtocol, completion: (() -> Void)? = nil) {
+        guard let windowController = windowManager.lastKeyMainWindowController,
               windowController.window?.isKeyWindow == true else {
             return
         }
 
-        let viewController = DataImportViewController.create()
+        let viewController = DataImportViewController.create(windowManager: windowManager)
         windowController.mainViewController.beginSheet(viewController) { _ in
             completion?()
         }
     }
 
-    static func create() -> DataImportViewController {
-        let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
-        return storyboard.instantiateController(identifier: Constants.identifier)
+    static func create(windowManager: WindowManagerProtocol) -> DataImportViewController {
+        return NSStoryboard(name: Constants.storyboardName, bundle: nil).instantiateController(identifier: Constants.identifier) { coder in
+            Self.init(coder: coder, windowManager: windowManager)
+        }
+    }
+
+    init?(coder: NSCoder, windowManager: WindowManagerProtocol) {
+        self.windowManager = windowManager
+
+        super.init(coder: coder)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
     }
 
     private func secureVaultImporter() throws -> SecureVaultLoginImporter {
@@ -514,7 +527,7 @@ extension DataImportViewController: NSTextViewDelegate {
         view.window?.endSheet(sheet)
         dismiss()
 
-        FeedbackPresenter.presentFeedbackForm()
+        FeedbackPresenter.presentFeedbackForm(using: windowManager)
 
         return true
     }

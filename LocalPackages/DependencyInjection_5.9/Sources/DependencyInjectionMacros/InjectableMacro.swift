@@ -211,10 +211,10 @@ public struct InjectableMacro: MemberMacro {
             $0 + ".Dependencies"
         }.joined(separator: " & ")
         let dynamicCompositions = injectedDependenciesInjectables.isEmpty ? "" : "& " + injectedDependenciesInjectables.map {
-            $0 + ".DynamicDependencyProvider"
+            $0 + ".DependencyProvider"
         }.joined(separator: " & ")
         let keyPathsGetters = injectedDependenciesInjectables.map {
-            "result.formUnion(\($0).getAllDependencyProviderKeyPaths(from: dependencyProvider))"
+            "result.formUnion(\($0).getAllDependencyProviderKeyPaths())"
         }.joined(separator: "\n")
 
         let vars = injectedVars(of: declaration).map {
@@ -231,184 +231,79 @@ public struct InjectableMacro: MemberMacro {
             "\($0.name): \($0.type)"
         }.joined(separator: ", ")
         let dynamicDependencyProviderInitArguments = dependencyInitArguments
-        + (dynamicCompositions.isEmpty ? "" : "\(dependencyInitArguments.isEmpty ? "" : ",") nested nestedProvider: ") + dynamicCompositions.dropping(prefix: "& ")
+        + (dynamicCompositions.isEmpty ? "" : "\(dependencyInitArguments.isEmpty ? "" : ",") nested nestedProvider: any ") + dynamicCompositions.dropping(prefix: "& ")
         var storageInitLiteral = vars.isEmpty ? "[:]" : ("[\n" + vars.map {
-            "\\\(identifier)_DependencyProvider.\($0.name): \($0.name)"
+            "\\\(identifier).\($0.name): \($0.name)"
         }.joined(separator: ",\n") + "\n]")
         if !dynamicCompositions.isEmpty {
             storageInitLiteral = "nestedProvider._storage.merging(\(storageInitLiteral)) { $1 }"
         }
 
         var result: [DeclSyntax] = [
-            "typealias Dependencies = \(raw: identifier)_DependencyProvider \(raw: compositions)",
-            "typealias DynamicDependencyProvider = \(raw: identifier)_DynamicDependencyProvider \(raw: dynamicCompositions)"
+            "typealias Dependencies = \(raw: identifier)_OwnedInjectedVars & \(raw: identifier)_DependencyProviderProtocol \(raw: compositions)",
+            "typealias DependencyProvider = \(raw: identifier)_DependencyProviderProtocol \(raw: dynamicCompositions)"
         ]
 
-#if swift(<5.9)
-        result.append("typealias Injected = \(declaration.isStruct ? "OwnedInjectedStruct<\(raw: identifier)>.StructInjectedValue" : "ClassInjectedValue")")
-#endif
         result.append(contentsOf: [
             """
 
-            nonisolated static func getAllDependencyProviderKeyPaths(from dependencyProvider: Dependencies) -> Set<AnyKeyPath> {
+            @Sendable
+            nonisolated static func getAllDependencyProviderKeyPaths() -> Set<AnyKeyPath> {
               var result = Set<AnyKeyPath>()
-              result.formUnion(\(raw: identifier)_DependencyProvider_allKeyPaths())
+              result.formUnion(\(raw: identifier)_InjectedVars_allKeyPaths())
               \(raw: keyPathsGetters)
               return result
             }
             """,
             """
 
+            // typealias DependencyStorage = DependencyStorageStruct<\(raw: identifier)>
             @dynamicMemberLookup
-            struct DynamicDependencies: DynamicDependencyProvider, DynamicDependenciesProtocol {
+            struct DependencyStorage: DependencyProvider, DependencyStorageProtocol {
+              typealias Owner = \(raw: identifier)
+
               var _storage: [AnyKeyPath: Any] // swiftlint:disable:this identifier_name
 
               init(_ storage: [AnyKeyPath: Any]) {
                 self._storage = storage
               }
 
-              init(_ dependencyProvider: Dependencies) {
-                self._storage = \(raw: identifier).getAllDependencyProviderKeyPaths(from: dependencyProvider).reduce(into: [:]) {
+              init(_ dependencyProvider: any Dependencies) {
+                self._storage = \(raw: identifier).getAllDependencyProviderKeyPaths().reduce(into: [:]) {
                   $0[$1] = dependencyProvider[keyPath: $1]
                 }
               }
 
-              subscript<T>(dynamicMember keyPath: KeyPath<\(raw: identifier).Dependencies, T>) -> T {
+              init(_ dependencyProvider: any DependencyProvider) {
+                // the dependencyProvider may be either dictionary-backed storage or a conforming struct
+                // if it is a struct, collect all the needed values for all dependency keyPaths providing the keyPaths through the Task Local Storage
+                self._storage = DependencyInjectionHelper.$collectKeyPaths.withValue(Owner.getAllDependencyProviderKeyPaths) {
+                    dependencyProvider._storage
+                }
+              }
+
+              subscript<T>(dynamicMember keyPath: KeyPath<\(raw: identifier)_InjectedVars, T>) -> T {
                 self._storage[keyPath] as! T // swiftlint:disable:this force_cast
+              }
+
+              func mutating(_ transform: (MutableDependencyStorage<\(raw: identifier)_InjectedVars>) throws -> Void) rethrows -> Self {
+                  var storage = _storage
+                  try withUnsafeMutablePointer(to: &storage) { ptr in
+                    let mutableDependencies = MutableDependencyStorage<\(raw: identifier)_InjectedVars>(ptr)
+                    try transform(mutableDependencies)
+                  }
+                  return Self(storage)
               }
             }
             """,
             """
 
-            nonisolated static func makeDependencies(\(raw: dynamicDependencyProviderInitArguments)) -> DynamicDependencies {
-                DynamicDependencies(\(raw: storageInitLiteral))
+            nonisolated static func makeDependencies(\(raw: dynamicDependencyProviderInitArguments)) -> DependencyStorage {
+                DependencyStorage(\(raw: storageInitLiteral))
             }
-
-            @TaskLocal static var _currentDependencies: DynamicDependencies!
 
             """
         ])
-
-#if swift(>=5.9)
-        result.append("let dependencyProvider: DynamicDependencies = \(raw: identifier)._currentDependencies")
-#endif
-
-        result.append(contentsOf: try makers(for: declaration, in: context)
-            .mutating { maker in
-#if swift(<5.9)
-                // hack to hide deprecation warning when using the `make` func but raise a warning when directly calling `init`
-                // we can‘t make Injectable inits private in Xcode 14 since they can‘t be accessed from extensions
-                // to be adjusted for Xcode 15 to require the inits to be private
-                maker.attributes = maker.attributes?.appending(.attribute(deprecatedAttribute(for: identifier).with(\.trailingTrivia, .newline))) ?? [.attribute(deprecatedAttribute(for: identifier).with(\.trailingTrivia, .newline))]
-                maker.identifier = "_\(maker.identifier)"
-#endif
-            }
-            .map { $0.as(DeclSyntax.self)! })
-
-        return result
-    }
-
-    static func makers(for declaration: some InjectableDeclSyntax, in context: some MacroExpansionContext) throws -> [FunctionDeclSyntax] {
-        let identifier = declaration.identifier
-        var result = [FunctionDeclSyntax]()
-
-        let definedTypes: Set<String> = Set(declaration.memberBlock.members.compactMap {
-            if let decl = $0.decl.asTypeDeclSyntax() {
-                guard decl.identifier.text != "InjectedDependencies" else { return nil }
-                return decl.identifier.text
-            }
-            return nil
-        })
-
-        for member in declaration.memberBlock.members {
-            guard let initializer = member.decl.as(InitializerDeclSyntax.self) else { continue }
-
-            //        TODO: let structError = Diagnostic(
-            //                node: attribute, message: MyLibDiagnostic.notAStruct
-            //            )
-            //            context.diagnose(structError)
-            //            return []
-            //      guard initializer.modifiers?.contains(where: { $0.name.text == "private" }) == true else {
-            // TODO: File/Line
-            //        throw CustomError.message("Initializer for @Injectable should be declared `private`")
-
-            //      }
-            //        let modifier = initializer.modifiers!.first(where: { $0.name.text == "private" })!
-            //        let modifier = initializer.modifiers!.first!.name //.as(DeclModifierSyntax.self)!
-            let paramList = FunctionParameterListSyntax(initializer.signature.input.parameterList.mutating {
-                let trimmedType = $0.type.trimmed.description
-                if definedTypes.contains(trimmedType.components(separatedBy: ".")[0]) {
-                    $0.type = "\(identifier).\(raw: trimmedType)"
-                }
-            })
-
-            let initVars = paramList.map {
-                ($0.firstName.isWildcard ? "" : $0.firstName.text + ": ") + ($0.secondName ?? $0.firstName).text
-            }.joined(separator: ", ")
-
-            let deprecationAttribute = initializer.attributes?.first(where: {
-                guard let attribute = $0.as(AttributeSyntax.self) else { return false }
-                return attribute.attributeName.description == "available"
-                && attribute.argument?.as(AvailabilitySpecListSyntax.self)?.contains(where: { $0.entry.as(TokenSyntax.self)?.text == "deprecated" }) == true
-            })
-            guard deprecationAttribute != nil else {
-                throw CustomError.noAttribute(deprecatedAttribute(for: identifier.text), location: context.location(of: initializer, at: .afterLeadingTrivia, filePathMode: .filePath))
-            }
-
-            let actorAttribute = initializer.attributes?.first(where: { $0.as(AttributeSyntax.self)?.attributeName.description == "MainActor" }) != nil ? "@MainActor\n" : nil
-
-            var initCall = "self.init(\(initVars))"
-            if declaration.isStruct {
-                initCall = """
-
-                // This is a little hack allowing us to dynamically provide storage keyPaths to @Injected property wrappers without passing extra init args
-                // Properties in Swift structs (or classes) are initialized in the order they are defined in the code, from top to bottom
-                // We use the TaskLocal mutable keyPath storage to initialize the @Injected properties one after another.
-                var keyPaths = Array(\(identifier.text)_DependencyProvider_allKeyPaths())
-                return withUnsafeMutablePointer(to: &keyPaths) { ptr in
-                  StructInjectedKeyPathsStorage.$keyPaths.withValue(ptr) {
-                    \(initCall)
-                  }
-                }
-
-                """
-            }
-
-            let optionalMark = initializer.optionalMark != nil ? "?" : ""
-            let throwsOrRethrows = initializer.signature.effectSpecifiers?.throwsSpecifier != nil ? "throws" : "rethrows"
-            let tryKeyword = initializer.signature.effectSpecifiers?.throwsSpecifier != nil ? "try " : ""
-            try result.append(contentsOf: [
-                FunctionDeclSyntax("""
-                \(raw: actorAttribute ?? "")static func make(with dependencies: \(identifier).Dependencies, \(paramList)\(paramList.isEmpty ? "" : ",") updateValues: ((MutableDynamicDependencies<\(identifier)_DependencyProvider>) throws -> Void)? = nil) \(raw: throwsOrRethrows) -> \(identifier)\(raw: optionalMark)
-                """) {
-                    """
-                    var dependencies = DynamicDependencies(dependencies)
-                    try updateValues?(MutableDynamicDependencies(&dependencies._storage))
-                    return \(raw: tryKeyword)self.$_currentDependencies.withValue(dependencies) {
-                      let instance = \(raw: tryKeyword)\(raw: initCall)
-                      \(raw: declaration.isStruct ? "" : "// initialize dynamic dependency provider\n  _=instance.dependencyProvider")
-                      return instance
-                    }
-                    """
-                },
-                FunctionDeclSyntax("""
-                \(raw: actorAttribute ?? "")static func make(with dependencies: \(identifier).DynamicDependencyProvider, \(paramList)\(paramList.isEmpty ? "" : ",") updateValues: ((MutableDynamicDependencies<\(identifier)_DependencyProvider>) throws -> Void)? = nil) \(raw: throwsOrRethrows) -> \(identifier)\(raw: optionalMark)
-                """) {
-                    """
-                    var dependencies = DynamicDependencies(dependencies._storage)
-                    try updateValues?(MutableDynamicDependencies(&dependencies._storage))
-                    return \(raw: tryKeyword)self.$_currentDependencies.withValue(dependencies) {
-                      let instance = \(raw: tryKeyword)\(raw: initCall)
-                      \(raw: declaration.isStruct ? "" : "// initialize dynamic dependency provider\n  _=instance.dependencyProvider")
-                      return instance
-                    }
-                    """
-                }
-            ])
-        }
-        if result.isEmpty {
-            throw CustomError.noInit(location: context.location(of: declaration, at: .afterLeadingTrivia, filePathMode: .filePath))
-        }
 
         return result
     }
@@ -417,7 +312,6 @@ public struct InjectableMacro: MemberMacro {
 
 extension InjectableMacro: PeerMacro {
 
-    // swiftlint:disable:next function_body_length
     public static func expansion<Context, Declaration>(of node: AttributeSyntax, providingPeersOf declaration: Declaration, in context: Context) throws -> [DeclSyntax] where Context: MacroExpansionContext, Declaration: DeclSyntaxProtocol {
 
         guard let declaration = declaration.asInjectableDeclSyntax() else {
@@ -430,66 +324,37 @@ extension InjectableMacro: PeerMacro {
             }
 
         let keyPaths = vars.map {
-            "\\" + identifier + "_DependencyProvider." + ($0.bindings.first!.pattern.as(IdentifierPatternSyntax.self)!.identifier.text)
+            "\\" + identifier + "_InjectedVars." + ($0.bindings.first!.pattern.as(IdentifierPatternSyntax.self)!.identifier.text)
         }
 
         var result = [DeclSyntax]()
 
         try result.append(contentsOf: [
-            ProtocolDeclSyntax("protocol \(raw: identifier)_DependencyProvider") {
+            ProtocolDeclSyntax(
+                "protocol \(raw: identifier)_InjectedVars"
+            ) {
                 for vardecl in vars {
                     vardecl.with(\.trailingTrivia, " { get }\n")
                 }
             }.as(DeclSyntax.self)!,
 
-            FunctionDeclSyntax("func \(raw: identifier)_DependencyProvider_allKeyPaths() -> Set<AnyKeyPath>") {"""
+            ProtocolDeclSyntax(
+                "protocol \(raw: identifier)_OwnedInjectedVars: \(raw: identifier)_InjectedVars, DependenciesProtocol"
+            ) {
+                AssociatedtypeDeclSyntax.init(identifier: " Owner = \(raw: identifier)")
+            }.as(DeclSyntax.self)!,
+
+            FunctionDeclSyntax("func \(raw: identifier)_InjectedVars_allKeyPaths() -> Set<AnyKeyPath>") {"""
                 [
                     \(raw: keyPaths.joined(separator: ",\n"))
                 ]
             """}.as(DeclSyntax.self)!,
 
-            """
-
-            protocol \(raw: identifier)_DynamicDependencyProvider {
-              var _storage: [AnyKeyPath: Any] { get set }
-            }
-            """
+            ProtocolDeclSyntax(
+                "protocol \(raw: identifier)_DependencyProviderProtocol: DependencyStorageProtocol"
+            ) {
+            }.as(DeclSyntax.self)!
         ])
-
-#if swift(<5.9)
-        let makers = try makers(for: declaration, in: context)
-
-        // hack to hide deprecation warning when using the `make` func but raise a warning when directly calling `init`:
-        // first add Target_Factory protocol with deprecated `_make` functions declarations,
-        try result.append(ProtocolDeclSyntax("private protocol \(raw: identifier)_Factory") {
-            for functionSyntax in makers.mutating ({ functionSyntax in
-                functionSyntax.identifier = "_\(functionSyntax.identifier)"
-                functionSyntax.signature.input.parameterList = FunctionParameterListSyntax(functionSyntax.signature.input.parameterList.mutating { $0.defaultArgument = nil })
-                functionSyntax.body = nil
-            }) {
-                functionSyntax
-                    .with(\.leadingTrivia, .newline)
-                    .with(\.trailingTrivia, .newline)
-            }
-        }.as(DeclSyntax.self)!)
-
-        // then add an extension of the Target to conform to the protocol and introduce `make` functions calling the deprecated `_make` functions
-        // this wont‘t raise a warning because we‘re calling ourselves using the protocol where the functions are not deprecated
-        try result.append(ExtensionDeclSyntax("extension \(raw: identifier): \(raw: identifier)_Factory") {
-            for functionSyntax in makers.mutating({
-                $0.body = CodeBlockSyntax(statements: [
-                    """
-
-                    try (self as \(raw: identifier)_Factory.Type)._make(\(raw: $0.signature.input.parameterList.map { ($0.firstName.isWildcard ? "" : $0.firstName.text + ": ") + ($0.secondName ?? $0.firstName).text }.joined(separator: ",")))
-
-
-                    """
-                ])
-            }) {
-                functionSyntax.with(\.leadingTrivia, .newline).with(\.trailingTrivia, .newline)
-            }
-        }.as(DeclSyntax.self)!)
-#endif
 
         return result
     }

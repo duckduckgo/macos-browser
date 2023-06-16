@@ -16,8 +16,10 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 import Combine
+import DependencyInjection
 
 protocol BookmarkManagementSidebarViewControllerDelegate: AnyObject {
 
@@ -26,7 +28,17 @@ protocol BookmarkManagementSidebarViewControllerDelegate: AnyObject {
 
 }
 
-final class BookmarkManagementSidebarViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class BookmarkManagementSidebarViewController: NSViewController, Injectable {
+
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+
+    typealias InjectedDependencies = Tab.Dependencies
 
     enum SelectionState: Equatable {
         case empty
@@ -73,6 +85,16 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         } else {
             sender.animator().expandItem(item)
         }
+    }
+
+    init(coder: NSCoder, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
+        super.init(coder: coder)!
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
     }
 
     override func viewDidLoad() {
@@ -243,13 +265,13 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
     }
 
     func openInNewTabs(_ sender: NSMenuItem) {
-        guard let tabCollection = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
+        guard let tabCollection = windowManager.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel,
               let children = (sender.representedObject as? BookmarkFolder)?.children else {
             assertionFailure("Cannot open in new tabs")
             return
         }
 
-        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, isBurner: tabCollection.isBurner) }
+        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(dependencyProvider: dependencies, content: .url($0), shouldLoadInBackground: true, isBurner: tabCollection.isBurner) }
         tabCollection.append(tabs: tabs)
     }
 

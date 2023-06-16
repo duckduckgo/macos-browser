@@ -20,6 +20,7 @@ import AppKit
 import BrowserServicesKit
 import Combine
 import Common
+import DependencyInjection
 
 protocol SaveIdentityDelegate: AnyObject {
 
@@ -27,16 +28,26 @@ protocol SaveIdentityDelegate: AnyObject {
 
 }
 
-final class SaveIdentityViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+@MainActor
+final class SaveIdentityViewController: NSViewController, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
 
     enum Constants {
         static let storyboardName = "PasswordManager"
         static let identifier = "SaveIdentity"
     }
 
-    static func create() -> SaveIdentityViewController {
+    static func create(dependencyProvider: DependencyProvider) -> SaveIdentityViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
-        let controller: SaveIdentityViewController = storyboard.instantiateController(identifier: Constants.identifier)
+        let controller = storyboard.instantiateController(identifier: Constants.identifier) { coder in
+            SaveIdentityViewController.init(coder: coder, dependencyProvider: dependencyProvider)
+        }
         controller.loadView()
 
         return controller
@@ -76,7 +87,7 @@ final class SaveIdentityViewController: NSViewController {
     }
 
     @IBAction func onOpenPreferencesClicked(sender: NSButton) {
-        WindowControllersManager.shared.showPreferencesTab()
+        windowManager.showPreferencesTab()
         self.delegate?.shouldCloseSaveIdentityViewController(self)
     }
 
@@ -89,6 +100,16 @@ final class SaveIdentityViewController: NSViewController {
     }
 
     // MARK: -
+
+    init?(coder: NSCoder, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
+        super.init(coder: coder)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()

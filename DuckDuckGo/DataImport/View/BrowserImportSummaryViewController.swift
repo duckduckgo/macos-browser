@@ -55,7 +55,7 @@ final class BrowserImportSummaryViewController: NSViewController {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     override func viewDidLoad() {

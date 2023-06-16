@@ -17,10 +17,19 @@
 //
 
 import AppKit
+import DependencyInjection
 
-final class DownloadsPopover: NSPopover {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class DownloadsPopover: NSPopover, Injectable {
+    let dependencies: DependencyStorage
 
-    override init() {
+    typealias InjectedDependencies = DownloadsViewController.Dependencies
+
+    init(dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         super.init()
 
         self.behavior = .semitransient
@@ -37,7 +46,7 @@ final class DownloadsPopover: NSPopover {
     // swiftlint:enable force_cast
 
     private func setupContentController() {
-        let controller = DownloadsViewController.create()
+        let controller = DownloadsViewController.create(dependencyProvider: dependencies)
         contentViewController = controller
     }
 

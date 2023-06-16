@@ -21,12 +21,12 @@ import Cocoa
 enum FeedbackPresenter {
 
     @MainActor
-    static func presentFeedbackForm() {
+    static func presentFeedbackForm(using windowManager: WindowManagerProtocol) {
         // swiftlint:disable:next force_cast
-        let windowController = NSStoryboard.feedback.instantiateController(withIdentifier: "FeedbackWindowController") as! NSWindowController
+        let windowController = NSStoryboard(name: "Feedback", bundle: .main).instantiateController(withIdentifier: "FeedbackWindowController") as! NSWindowController
 
         guard let feedbackWindow = windowController.window as? FeedbackWindow,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else {
+              let parentWindowController = windowManager.lastKeyMainWindowController else {
             assertionFailure("FeedbackPresenter: Failed to present FeedbackWindow")
             return
         }
@@ -35,11 +35,5 @@ enum FeedbackPresenter {
             parentWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab
         parentWindowController.window?.beginSheet(feedbackWindow) { _ in }
     }
-
-}
-
-fileprivate extension NSStoryboard {
-
-    static let feedback = NSStoryboard(name: "Feedback", bundle: .main)
 
 }

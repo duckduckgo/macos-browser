@@ -25,13 +25,13 @@ final class DeallocationTests: XCTestCase {
     var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
-        assert(WindowControllersManager.shared.mainWindowControllers.isEmpty)
+        assert(WindowManager.shared.mainWindowControllers.isEmpty)
     }
 
     override func tearDown() {
         WindowsManager.closeWindows()
-        for controller in WindowControllersManager.shared.mainWindowControllers {
-            WindowControllersManager.shared.unregister(controller)
+        for controller in WindowManager.shared.mainWindowControllers {
+            WindowManager.shared.unregister(controller)
         }
     }
 
@@ -61,20 +61,20 @@ final class DeallocationTests: XCTestCase {
             weak var window2: NSWindow! = WindowsManager.openNewWindow(showWindow: false)
 
             for i in 0...1 {
-                WindowControllersManager.shared.mainWindowControllers[i].mainViewController.tabCollectionViewModel
+                WindowManager.shared.mainWindowControllers[i].mainViewController.tabCollectionViewModel
                     .appendNewTab()
 
-                expectDeallocation(of: WindowControllersManager.shared.mainWindowControllers[i])
-                expectDeallocation(of: WindowControllersManager.shared.mainWindowControllers[i].mainViewController)
+                expectDeallocation(of: WindowManager.shared.mainWindowControllers[i])
+                expectDeallocation(of: WindowManager.shared.mainWindowControllers[i].mainViewController)
 
-                expectDeallocation(of: WindowControllersManager.shared.mainWindowControllers[i].mainViewController.tabBarViewController)
-                expectDeallocation(of: WindowControllersManager.shared.mainWindowControllers[i].mainViewController.navigationBarViewController)
-                expectDeallocation(of: WindowControllersManager.shared.mainWindowControllers[i].mainViewController.browserTabViewController)
-                expectDeallocation(of: WindowControllersManager.shared.mainWindowControllers[i].mainViewController.findInPageViewController)
-                expectDeallocation(of: WindowControllersManager.shared.mainWindowControllers[i].mainViewController.fireViewController)
+                expectDeallocation(of: WindowManager.shared.mainWindowControllers[i].mainViewController.tabBarViewController)
+                expectDeallocation(of: WindowManager.shared.mainWindowControllers[i].mainViewController.navigationBarViewController)
+                expectDeallocation(of: WindowManager.shared.mainWindowControllers[i].mainViewController.browserTabViewController)
+                expectDeallocation(of: WindowManager.shared.mainWindowControllers[i].mainViewController.findInPageViewController)
+                expectDeallocation(of: WindowManager.shared.mainWindowControllers[i].mainViewController.fireViewController)
 
-                expectDeallocation(of: WindowControllersManager.shared.mainWindowControllers[i].mainViewController.tabCollectionViewModel)
-                for tab in WindowControllersManager.shared.mainWindowControllers[i].mainViewController.tabCollectionViewModel.tabCollection.tabs {
+                expectDeallocation(of: WindowManager.shared.mainWindowControllers[i].mainViewController.tabCollectionViewModel)
+                for tab in WindowManager.shared.mainWindowControllers[i].mainViewController.tabCollectionViewModel.tabCollection.tabs {
                     expectDeallocation(of: tab)
                     expectDeallocation(of: tab.webView)
                 }

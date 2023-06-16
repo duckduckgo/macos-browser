@@ -28,4 +28,15 @@ extension DispatchQueue {
         }
     }
 
+    static func assumingMainActor<T>(_ job: @MainActor () throws -> T) rethrows -> T {
+        dispatchPrecondition(condition: .onQueue(.main))
+
+        @MainActor(unsafe)
+        func _assumingMainActor(_ job: @MainActor () throws -> T) rethrows -> T {
+            try job()
+        }
+
+        return try _assumingMainActor(job)
+    }
+
 }

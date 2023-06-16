@@ -38,7 +38,7 @@ final class SuggestionViewController: NSViewController {
     let isBurner: Bool
 
     required init?(coder: NSCoder) {
-        fatalError("SuggestionViewController: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     required init?(coder: NSCoder,

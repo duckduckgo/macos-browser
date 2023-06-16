@@ -20,6 +20,7 @@ import Cocoa
 import Combine
 import Common
 import Lottie
+import DependencyInjection
 
 protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 
@@ -27,8 +28,15 @@ protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 
 }
 
-// swiftlint:disable:next type_body_length
-final class AddressBarButtonsViewController: NSViewController {
+// swiftlint:disable type_body_length
+
+#if swift(>=5.9)
+@Injectable
+#endif
+final class AddressBarButtonsViewController: NSViewController, Injectable {
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = PrivacyDashboardPopover.Dependencies
 
     static let homeFaviconImage = NSImage(named: "Search")
     static let searchImage = NSImage(named: "Search")
@@ -71,7 +79,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private var privacyDashboardPopover: PrivacyDashboardPopover?
     private func privacyDashboardPopoverCreatingIfNeeded() -> PrivacyDashboardPopover {
         return privacyDashboardPopover ?? {
-            let popover = PrivacyDashboardPopover()
+            let popover = PrivacyDashboardPopover(dependencyProvider: dependencies)
             popover.delegate = self
             self.privacyDashboardPopover = popover
             self.subscribePrivacyDashboardPendingUpdates(privacyDashboardPopover: popover)
@@ -174,11 +182,14 @@ final class AddressBarButtonsViewController: NSViewController {
     private lazy var buttonsBadgeAnimator = NavigationBarBadgeAnimator()
 
     required init?(coder: NSCoder) {
-        fatalError("AddressBarButtonsViewController: Bad initializer")
+        fatalError("\(Self.self): Bad initializer")
     }
 
     init?(coder: NSCoder,
-          tabCollectionViewModel: TabCollectionViewModel) {
+          tabCollectionViewModel: TabCollectionViewModel,
+          dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         self.tabCollectionViewModel = tabCollectionViewModel
 
         super.init(coder: coder)
@@ -941,6 +952,8 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
 }
+
+// swiftlint:enable type_body_length
 
 extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
 

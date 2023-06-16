@@ -44,7 +44,7 @@ final class OutlineSeparatorViewCell: NSTableCellView {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("\(Self.self): Bad initializer")
     }
 
 }

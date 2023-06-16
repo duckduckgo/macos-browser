@@ -76,14 +76,14 @@ final class WindowManagerStateRestorationTests: XCTestCase {
                 shouldLoadInBackground: false)
         ]
 
-        WindowControllersManager.shared.pinnedTabsManager.setUp(with: .init(tabs: pinnedTabs))
+        WindowManager.shared.pinnedTabsManager.setUp(with: .init(tabs: pinnedTabs))
         let model1 = TabCollectionViewModel(tabCollection: TabCollection(tabs: tabs1), selectionIndex: 0)
         let model2 = TabCollectionViewModel(tabCollection: TabCollection(tabs: tabs2), selectionIndex: 2)
         WindowsManager.openNewWindow(with: model1)
         WindowsManager.openNewWindow(with: model2)
-        WindowControllersManager.shared.lastKeyMainWindowController = WindowControllersManager.shared.mainWindowControllers[1]
+        WindowManager.shared.lastKeyMainWindowController = WindowManager.shared.mainWindowControllers[1]
 
-        let state = WindowManagerStateRestoration(windowControllersManager: WindowControllersManager.shared)
+        let state = WindowManagerStateRestoration(WindowManager: WindowManager.shared)
         let archiver = NSKeyedArchiver(requiringSecureCoding: true)
         state.encode(with: archiver)
         let data = archiver.encodedData

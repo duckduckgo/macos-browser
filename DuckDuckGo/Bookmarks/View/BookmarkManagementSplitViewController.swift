@@ -18,35 +18,60 @@
 
 import AppKit
 import Combine
+import DependencyInjection
 
-final class BookmarkManagementSplitViewController: NSSplitViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class BookmarkManagementSplitViewController: NSSplitViewController, Injectable {
+
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = BookmarkManagementSidebarViewController.Dependencies & BookmarkManagementDetailViewController.Dependencies
 
     private enum Constants {
         static let storyboardName = "Bookmarks"
         static let identifier = "BookmarkManagementSplitViewController"
+        static let detailIdentifier = "BookmarkManagementDetailViewController"
+        static let sidebarIdentifier = "BookmarkManagementSidebarViewController"
     }
 
-    static func create() -> BookmarkManagementSplitViewController {
-        let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
-        return storyboard.instantiateController(identifier: Constants.identifier)
+    static func create(dependencyProvider: DependencyProvider) -> BookmarkManagementSplitViewController {
+        NSStoryboard(name: Constants.storyboardName, bundle: nil).instantiateController(identifier: Constants.identifier) { coder in
+            BookmarkManagementSplitViewController(coder: coder, dependencyProvider: dependencyProvider)
+        }
     }
 
-    // swiftlint:disable force_cast
-    var sidebarViewController: BookmarkManagementSidebarViewController {
-        return splitViewItems[0].viewController as! BookmarkManagementSidebarViewController
-    }
-
-    var detailViewController: BookmarkManagementDetailViewController {
-        return splitViewItems[1].viewController as! BookmarkManagementDetailViewController
-    }
-    // swiftlint:enable force_cast
+    let sidebarViewController: BookmarkManagementSidebarViewController
+    let detailViewController: BookmarkManagementDetailViewController
 
     weak var delegate: BrowserTabSelectionDelegate?
 
     private var selectedTabCancellable: AnyCancellable?
 
+    init(coder: NSCoder, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+        sidebarViewController = NSStoryboard(name: Constants.storyboardName, bundle: nil).instantiateController(identifier: Constants.sidebarIdentifier) { coder in
+            BookmarkManagementSidebarViewController(coder: coder, dependencyProvider: dependencyProvider)
+        }
+        detailViewController = NSStoryboard(name: Constants.storyboardName, bundle: nil).instantiateController(identifier: Constants.detailIdentifier) { coder in
+            BookmarkManagementDetailViewController(coder: coder, dependencyProvider: dependencyProvider)
+        }
+        super.init(coder: coder)!
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        sidebarViewController.loadView()
+        detailViewController.loadView()
+
+        self.addSplitViewItem(NSSplitViewItem(sidebarWithViewController: sidebarViewController))
+        self.addSplitViewItem(NSSplitViewItem(viewController: detailViewController))
 
         splitView.setValue(NSColor(named: "DividerColor"), forKey: "dividerColor")
         sidebarViewController.delegate = self
