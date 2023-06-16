@@ -148,7 +148,12 @@
       return _VideoParams.fromHref(url.href);
     }
     static fromHref(href) {
-      const url = new URL(href);
+      let url;
+      try {
+        url = new URL(href);
+      } catch (e) {
+        return null;
+      }
       const vParam = url.searchParams.get("v");
       const tParam = url.searchParams.get("t");
       let id = null;
@@ -633,15 +638,14 @@
     }
   };
   function captureGlobals() {
-    var _a, _b, _c, _d, _e, _f;
     return {
       window,
-      encrypt: (_a = window.crypto.subtle) == null ? void 0 : _a.encrypt.bind(window.crypto.subtle),
-      decrypt: (_b = window.crypto.subtle) == null ? void 0 : _b.decrypt.bind(window.crypto.subtle),
-      generateKey: (_c = window.crypto.subtle) == null ? void 0 : _c.generateKey.bind(window.crypto.subtle),
-      exportKey: (_d = window.crypto.subtle) == null ? void 0 : _d.exportKey.bind(window.crypto.subtle),
-      importKey: (_e = window.crypto.subtle) == null ? void 0 : _e.importKey.bind(window.crypto.subtle),
-      getRandomValues: (_f = window.crypto.getRandomValues) == null ? void 0 : _f.bind(window.crypto),
+      encrypt: window.crypto.subtle.encrypt.bind(window.crypto.subtle),
+      decrypt: window.crypto.subtle.decrypt.bind(window.crypto.subtle),
+      generateKey: window.crypto.subtle.generateKey.bind(window.crypto.subtle),
+      exportKey: window.crypto.subtle.exportKey.bind(window.crypto.subtle),
+      importKey: window.crypto.subtle.importKey.bind(window.crypto.subtle),
+      getRandomValues: window.crypto.getRandomValues.bind(window.crypto),
       TextEncoder,
       TextDecoder,
       Uint8Array,
@@ -1200,34 +1204,56 @@
       const OpenInDuckPlayer = {
         clickBoundElements: /* @__PURE__ */ new Map(),
         enabled: false,
+        lastMouseOver: null,
         bindEventsToAll: () => {
           if (!OpenInDuckPlayer.enabled) {
             return;
           }
-          let videoLinksAndPreview = Array.from(document.querySelectorAll('a[href^="/watch?v="], #media-container-link')), isValidVideoLinkOrPreview = (element) => {
+          const videoLinksAndPreview = Array.from(document.querySelectorAll('a[href^="/watch?v="], #media-container-link'));
+          const isValidVideoLinkOrPreview = (element) => {
             return VideoThumbnail.isSingleVideoURL(element == null ? void 0 : element.getAttribute("href")) || element.getAttribute("id") === "media-container-link";
-          }, excludeAlreadyBound = (element) => !OpenInDuckPlayer.clickBoundElements.has(element);
-          videoLinksAndPreview.filter(excludeAlreadyBound).forEach((element) => {
-            if (isValidVideoLinkOrPreview(element)) {
-              let onClickOpenDuckPlayer = (event) => {
-                var _a;
-                event.preventDefault();
-                event.stopPropagation();
-                let link = event.target.closest("a");
-                if (link) {
-                  const href = (_a = VideoParams.fromHref(link.href)) == null ? void 0 : _a.toPrivatePlayerUrl();
-                  comms.openInDuckPlayerViaMessage(href);
+          };
+          videoLinksAndPreview.forEach((element) => {
+            if (OpenInDuckPlayer.clickBoundElements.has(element))
+              return;
+            if (!isValidVideoLinkOrPreview(element))
+              return;
+            const handler = {
+              handleEvent(event) {
+                var _a, _b;
+                switch (event.type) {
+                  case "mouseover": {
+                    const href = element instanceof HTMLAnchorElement ? (_a = VideoParams.fromHref(element.href)) == null ? void 0 : _a.toPrivatePlayerUrl() : null;
+                    if (href) {
+                      OpenInDuckPlayer.lastMouseOver = href;
+                    }
+                    break;
+                  }
+                  case "click": {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const link = event.target.closest("a");
+                    const fromClosest = (_b = VideoParams.fromHref(link == null ? void 0 : link.href)) == null ? void 0 : _b.toPrivatePlayerUrl();
+                    if (fromClosest) {
+                      comms.openInDuckPlayerViaMessage(fromClosest);
+                    } else if (OpenInDuckPlayer.lastMouseOver) {
+                      comms.openInDuckPlayerViaMessage(OpenInDuckPlayer.lastMouseOver);
+                    } else {
+                    }
+                    break;
+                  }
                 }
-                return false;
-              };
-              element.addEventListener("click", onClickOpenDuckPlayer, true);
-              OpenInDuckPlayer.clickBoundElements.set(element, onClickOpenDuckPlayer);
-            }
+              }
+            };
+            element.addEventListener("mouseover", handler, true);
+            element.addEventListener("click", handler, true);
+            OpenInDuckPlayer.clickBoundElements.set(element, handler);
           });
         },
         disable: () => {
-          OpenInDuckPlayer.clickBoundElements.forEach((functionToRemove, element) => {
-            element.removeEventListener("click", functionToRemove, true);
+          OpenInDuckPlayer.clickBoundElements.forEach((handler, element) => {
+            element.removeEventListener("mouseover", handler, true);
+            element.removeEventListener("click", handler, true);
             OpenInDuckPlayer.clickBoundElements.delete(element);
           });
           OpenInDuckPlayer.enabled = false;
