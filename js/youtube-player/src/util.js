@@ -214,7 +214,12 @@ export class VideoParams {
      * @returns {VideoParams|null}
      */
     static fromHref(href) {
-        const url = new URL(href);
+        let url
+        try {
+            url = new URL(href)
+        } catch (e) {
+            return null
+        }
         const vParam = url.searchParams.get("v");
         const tParam = url.searchParams.get("t");
 
