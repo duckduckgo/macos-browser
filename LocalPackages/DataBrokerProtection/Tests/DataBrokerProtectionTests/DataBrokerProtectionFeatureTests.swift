@@ -1,4 +1,3 @@
-
 //
 //  DataBrokerProtectionFeatureTests.swift
 //
@@ -20,7 +19,7 @@
 import XCTest
 @testable import DataBrokerProtection
 
-class DataBrokerProtectionFeatureTests: XCTestCase {
+final class DataBrokerProtectionFeatureTests: XCTestCase {
 
     let mockCSSDelegate = MockCSSCommunicationDelegate()
 
@@ -78,7 +77,7 @@ class DataBrokerProtectionFeatureTests: XCTestCase {
     }
 }
 
-class MockCSSCommunicationDelegate: CSSCommunicationDelegate {
+final class MockCSSCommunicationDelegate: CSSCommunicationDelegate {
     var lastError: DataBrokerProtectionError?
     var profiles: [ExtractedProfile]?
     var url: URL?

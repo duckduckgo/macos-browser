@@ -19,7 +19,7 @@
 import XCTest
 @testable import DataBrokerProtection
 
-class DataBrokerProtectionErrorsTests: XCTestCase {
+final class DataBrokerProtectionErrorsTests: XCTestCase {
 
     func testWhenParsingErrorFails_thenCorrectErrorIsReturned() {
         let params = ["something": "unknown"]
