@@ -148,12 +148,12 @@ extension HomePage.Models {
                     })
                     cookiePopUpVisible = true
                 }
-#if !APPSTORE
-            case .addToDock:
-                queue.async {
-                    self.addToDock()
-                }
-#endif
+//#if !APPSTORE
+//            case .addToDock:
+//                queue.async {
+//                    self.addToDock()
+//                }
+//#endif
             }
         }
 
@@ -169,10 +169,10 @@ extension HomePage.Models {
                 shouldShowEmailProtectionSetting = false
             case .cookiePopUp:
                 shouldShowCookieSetting = false
-#if !APPSTORE
-            case .addToDock:
-                shouldShowAddToDockSetting = false
-#endif
+//#if !APPSTORE
+//            case .addToDock:
+//                shouldShowAddToDockSetting = false
+//#endif
             }
             refreshFeaturesMatrix()
         }
@@ -203,12 +203,12 @@ extension HomePage.Models {
                     if shouldCookieCardBeVisible {
                         features.append(feature)
                     }
-#if !APPSTORE
-                case .addToDock:
-                    if shouldAddToDockCardBeVisible {
-                        features.append(feature)
-                    }
-#endif
+// #if !APPSTORE
+//                case .addToDock:
+//                    if shouldAddToDockCardBeVisible {
+//                        features.append(feature)
+//                    }
+// #endif
                 }
             }
             featuresMatrix = features.chunked(into: itemsPerRow)
@@ -279,9 +279,9 @@ extension HomePage.Models {
         case emailProtection
         case defaultBrowser
         case importBookmarksAndPasswords
-#if !APPSTORE
-        case addToDock
-#endif
+// #if !APPSTORE
+//        case addToDock
+// #endif
         var title: String {
             switch self {
             case .defaultBrowser:
@@ -294,10 +294,10 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionCardTitle
             case .cookiePopUp:
                 return UserText.newTabSetUpCookieManagerCardTitle
-#if !APPSTORE
-            case .addToDock:
-                return UserText.newTabAddToDockCardTitle
-#endif
+// #if !APPSTORE
+//            case .addToDock:
+//                return UserText.newTabAddToDockCardTitle
+// #endif
             }
         }
 
@@ -313,10 +313,10 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionSummary
             case .cookiePopUp:
                 return UserText.newTabSetUpCookieManagerSummary
-#if !APPSTORE
-            case .addToDock:
-                return UserText.newTabAddToDockSummary
-#endif
+// #if !APPSTORE
+//            case .addToDock:
+//                return UserText.newTabAddToDockSummary
+// #endif
             }
         }
 
@@ -332,10 +332,10 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionAction
             case .cookiePopUp:
                 return UserText.newTabSetUpCookieManagerAction
-#if !APPSTORE
-            case .addToDock:
-                return UserText.newTabSetUpAddToDockAction
-#endif
+// #if !APPSTORE
+//            case .addToDock:
+//                return UserText.newTabSetUpAddToDockAction
+// #endif
             }
         }
 
@@ -353,10 +353,10 @@ extension HomePage.Models {
                 return NSImage(named: "inbox-128")!.resized(to: iconSize)!
             case .cookiePopUp:
                 return NSImage(named: "Cookie-Popups-128")!.resized(to: iconSize)!
-#if !APPSTORE
-            case .addToDock:
-                return NSImage(named: "Dock-128")!.resized(to: iconSize)!
-#endif
+// #if !APPSTORE
+//            case .addToDock:
+//                return NSImage(named: "Dock-128")!.resized(to: iconSize)!
+// #endif
             }
         }
     }

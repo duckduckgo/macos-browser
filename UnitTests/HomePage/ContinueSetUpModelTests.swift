@@ -332,10 +332,10 @@ final class ContinueSetUpModelTests: XCTestCase {
         vm.removeItem(for: .cookiePopUp)
         XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.cookiePopUp))
 
-#if !APPSTORE
-        vm.removeItem(for: .addToDock)
-        XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.addToDock))
-#endif
+//#if !APPSTORE
+//        vm.removeItem(for: .addToDock)
+//        XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.addToDock))
+//#endif
 
         let vm2 = HomePage.Models.ContinueSetUpModel.fixture()
         XCTAssertTrue(vm2.visibleFeaturesMatrix.flatMap { $0 }.isEmpty)
@@ -350,8 +350,8 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     private func doTheyContainTheSameElements(matrix1: [[HomePage.Models.FeatureType]], matrix2: [[HomePage.Models.FeatureType]]) -> Bool {
-        var features1 = matrix1.reduce([], +)
-        var features2 = matrix2.reduce([], +)
+        let features1 = matrix1.reduce([], +)
+        let features2 = matrix2.reduce([], +)
         if features1.count != features2.count {
             return false
         }
