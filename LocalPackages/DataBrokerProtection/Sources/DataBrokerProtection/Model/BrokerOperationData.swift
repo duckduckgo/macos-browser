@@ -21,7 +21,7 @@ import Foundation
 protocol BrokerOperationData {
     var id: UUID { get set }
     var brokerProfileQueryID: UUID { get set }
-    var preferredRunDate: Date { get set }
+    var preferredRunDate: Date? { get set }
     var historyEvents: [HistoryEvent] { get set }
     var lastRunDate: Date? { get set }
 
@@ -39,9 +39,15 @@ extension BrokerOperationData {
 }
 
 class ScanOperationData: BrokerOperationData {
+    var id: UUID
+    var brokerProfileQueryID: UUID
+    var preferredRunDate: Date?
+    var historyEvents: [HistoryEvent]
+    var lastRunDate: Date?
+
     internal init(id: UUID = UUID(),
                   brokerProfileQueryID: UUID,
-                  preferredRunDate: Date,
+                  preferredRunDate: Date?,
                   historyEvents: [HistoryEvent],
                   lastRunDate: Date? = nil) {
 
@@ -52,17 +58,20 @@ class ScanOperationData: BrokerOperationData {
         self.lastRunDate = lastRunDate
     }
 
-    var id: UUID
-    var brokerProfileQueryID: UUID
-    var preferredRunDate: Date
-    var historyEvents: [HistoryEvent]
-    var lastRunDate: Date?
 }
 
 class OptOutOperationData: BrokerOperationData {
+    var id: UUID
+    var brokerProfileQueryID: UUID
+    var preferredRunDate: Date?
+    var historyEvents: [HistoryEvent]
+    var lastRunDate: Date?
+
+    let extractedProfile: ExtractedProfile
+
     internal init(id: UUID = UUID(),
                   brokerProfileQueryID: UUID,
-                  preferredRunDate: Date,
+                  preferredRunDate: Date?,
                   historyEvents: [HistoryEvent],
                   lastRunDate: Date? = nil,
                   extractedProfile: ExtractedProfile) {
@@ -74,11 +83,4 @@ class OptOutOperationData: BrokerOperationData {
         self.lastRunDate = lastRunDate
         self.extractedProfile = extractedProfile
     }
-    var id: UUID
-    var brokerProfileQueryID: UUID
-    var preferredRunDate: Date
-    var historyEvents: [HistoryEvent]
-    var lastRunDate: Date?
-
-    let extractedProfile: ExtractedProfile
 }

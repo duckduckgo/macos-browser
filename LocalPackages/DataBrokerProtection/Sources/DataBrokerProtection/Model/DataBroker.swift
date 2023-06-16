@@ -18,8 +18,23 @@
 
 import Foundation
 
+struct DataBrokerScheduleConfig {
+    let emailConfirmation: TimeInterval
+    let retryError: TimeInterval
+    let confirmScan: TimeInterval
+}
+
 struct DataBroker {
     let name: String
+    let schedulingConfig: DataBrokerScheduleConfig
+
+    internal init(name: String) {
+        self.name = name
+        self.schedulingConfig = DataBrokerScheduleConfig(emailConfirmation: 10 * 60,
+                                                         retryError: 48 * 60,
+                                                         confirmScan: 72 * 60)
+    }
+
 }
 
 extension DataBroker: Hashable {

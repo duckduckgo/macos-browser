@@ -19,16 +19,17 @@
 import Foundation
 
 protocol SchedulerConfig {
-   var runFrequency: Int { get }
-   var concurrentOperationsPerBroker: Int { get }
-   var concurrentOperationsDifferentBrokers: Int { get }
+   var runFrequency: TimeInterval { get }
+    var concurrentOperationsPerBroker: Int { get }
+    var concurrentOperationsDifferentBrokers: Int { get }
+    var intervalBetweenSameBrokerOperations: TimeInterval { get }
 }
 
 struct DataBrokerProtectionSchedulerConfig: SchedulerConfig {
-   var runFrequency: Int = 4
-   var concurrentOperationsPerBroker: Int = 1
-   var concurrentOperationsDifferentBrokers: Int = 2
-    var intervalBetweenSameBrokerOperations: Int = 10 //min
+    var runFrequency: TimeInterval = 4 * 60 * 60
+    var concurrentOperationsPerBroker: Int = 1
+    var concurrentOperationsDifferentBrokers: Int = 2
+    var intervalBetweenSameBrokerOperations: TimeInterval = 1 * 60
 }
 
 protocol OperationRunnerProvider {
@@ -99,7 +100,8 @@ class DataBrokerProtectionScheduler {
 
             }
             let dataBrokerOperationManagerCollection = DataBrokerOperationManagerCollection(dataBroker: dataBroker,
-                                                                                            operationManagers: operationManagers)
+                                                                                            operationManagers: operationManagers,
+                                                                                            config: config)
 
             dataBrokerOperationManagerCollectionList.append(dataBrokerOperationManagerCollection)
         }
@@ -119,11 +121,14 @@ class DataBrokerProtectionScheduler {
 struct DataBrokerOperationManagerCollection {
     let dataBroker: DataBroker
     let operationManagers: [OperationsManager]
+    let config: SchedulerConfig
 
     func runScan(on runner: OperationRunner) async throws {
         for manager in operationManagers {
             // check for preferredRunDate/ lastRanDate and intervalBetweenSameBrokerOperations
             try await manager.runScanOperation(on: runner)
+            try await Task.sleep(nanoseconds: UInt64(config.intervalBetweenSameBrokerOperations) * 1_000_000_000)
+
         }
     }
 

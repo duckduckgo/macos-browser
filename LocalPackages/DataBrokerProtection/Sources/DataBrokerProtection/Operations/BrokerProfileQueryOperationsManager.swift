@@ -48,10 +48,33 @@ class BrokerProfileQueryOperationsManager: OperationsManager {
         self.database = database
     }
 
+    func updateOperationDataDates(_ operationData: BrokerOperationData) {
+        var data = operationData
+        data.lastRunDate = Date()
+
+        let optOutData = operationData as? OptOutOperationData
+        let scanData = operationData as? ScanOperationData
+
+        if let lastHistoryEvent = data.historyEvents.last {
+            switch lastHistoryEvent.type {
+            case .error:
+                data.preferredRunDate = Date().addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.retryError)
+            case .optOutRequested:
+                optOutData?.preferredRunDate = nil
+                let newDate = Date().addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.confirmScan)
+                if let scanDate = scanData?.preferredRunDate, scanDate > newDate {
+                    scanData?.preferredRunDate = newDate
+                }
+            default:
+                break
+            }
+        }
+    }
+
     func runScanOperation(on runner: OperationRunner) async throws {
         defer {
+            updateOperationDataDates(brokerProfileQueryData.scanData)
             database.saveOperationData(brokerProfileQueryData.scanData)
-            brokerProfileQueryData.scanData.lastRunDate = Date()
             notificationCenter.post(name: DataBrokerNotifications.didFinishScan, object: brokerProfileQueryData.dataBroker.name)
         }
         do {
@@ -97,8 +120,8 @@ class BrokerProfileQueryOperationsManager: OperationsManager {
         }
 
         defer {
+            updateOperationDataDates(data)
             database.saveOperationData(data)
-            data.lastRunDate = Date()
             notificationCenter.post(name: DataBrokerNotifications.didFinishOptOut, object: brokerProfileQueryData.dataBroker.name)
         }
 
