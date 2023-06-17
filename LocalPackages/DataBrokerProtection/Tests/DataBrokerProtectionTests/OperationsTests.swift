@@ -36,7 +36,12 @@ final class OperationsTests: XCTestCase {
 
     func testCleanScanOperationNoResults() async throws {
         let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
-        let dataBroker = DataBroker(name: "Test Broker", steps: [Step]())
+        let dataBroker = DataBroker(name: "Test Broker",
+                                    steps: [Step](),
+                                    schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+                                                                               retryError: 48 * 60 * 60,
+                                                                               confirmOptOutScan: 72 * 60 * 60,
+                                                                               maintenanceScan: 240 * 60 * 60))
 
         let database = MockDataBase()
 
@@ -56,6 +61,9 @@ final class OperationsTests: XCTestCase {
         try await operationsManager.runScanOperation(on: runner)
         let data = operationsManager.brokerProfileQueryData
 
+
+        let expectedPreferredDate = Date().addingTimeInterval(dataBroker.schedulingConfig.maintenanceScan)
+
         let expectedHistoryTypes: [HistoryEvent.EventType] = [.scanStarted, .noMatchFound]
 
         let historyTypes = data.scanData.historyEvents.map { $0.type }
@@ -63,11 +71,17 @@ final class OperationsTests: XCTestCase {
         XCTAssertEqual(expectedExtractedProfiles, data.extractedProfiles)
         XCTAssertEqual(data.scanData.historyEvents.count, expectedHistoryTypes.count)
         XCTAssertEqual(historyTypes, historyTypes)
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: data.scanData.preferredRunDate, date2: expectedPreferredDate))
     }
 
     func testCleanScanOperationWithResults() async throws {
         let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
-        let dataBroker = DataBroker(name: "Test Broker", steps: [Step]())
+        let dataBroker = DataBroker(name: "Test Broker",
+                                    steps: [Step](),
+                                    schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+                                                                               retryError: 48 * 60 * 60,
+                                                                               confirmOptOutScan: 72 * 60 * 60,
+                                                                               maintenanceScan: 240 * 60 * 60))
         let database = MockDataBase()
 
         let brokerProfileQueryData = brokerProfileQueryData(for: profileQuery,
@@ -99,7 +113,12 @@ final class OperationsTests: XCTestCase {
 
     func testCleanScanOperationWithError() async throws {
         let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
-        let dataBroker = DataBroker(name: "Test Broker", steps: [Step]())
+        let dataBroker = DataBroker(name: "Test Broker",
+                                    steps: [Step](),
+                                    schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+                                                                               retryError: 48 * 60 * 60,
+                                                                               confirmOptOutScan: 72 * 60 * 60,
+                                                                               maintenanceScan: 240 * 60 * 60))
         let database = MockDataBase()
 
         let brokerProfileQueryData = brokerProfileQueryData(for: profileQuery,
@@ -129,7 +148,12 @@ final class OperationsTests: XCTestCase {
 
     func testOptOutOperationWithSuccess() async throws {
         let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
-        let dataBroker = DataBroker(name: "Test Broker", steps: [Step]())
+        let dataBroker = DataBroker(name: "Test Broker",
+                                    steps: [Step](),
+                                    schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+                                                                               retryError: 48 * 60 * 60,
+                                                                               confirmOptOutScan: 72 * 60 * 60,
+                                                                               maintenanceScan: 240 * 60 * 60))
         let extractedProfile = ExtractedProfile(name: "John")
 
         let optOutOperationData = OptOutOperationData(brokerProfileQueryID: UUID(),
@@ -169,7 +193,12 @@ final class OperationsTests: XCTestCase {
 
     func testOptOutOperationWithRunnerError() async throws {
         let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
-        let dataBroker = DataBroker(name: "Test Broker", steps: [Step]())
+        let dataBroker = DataBroker(name: "Test Broker",
+                                    steps: [Step](),
+                                    schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+                                                                               retryError: 48 * 60 * 60,
+                                                                               confirmOptOutScan: 72 * 60 * 60,
+                                                                               maintenanceScan: 240 * 60 * 60))
         let extractedProfile = ExtractedProfile(name: "John")
 
         let optOutOperationData = OptOutOperationData(brokerProfileQueryID: UUID(),
@@ -211,7 +240,12 @@ final class OperationsTests: XCTestCase {
 
     func testOptOutOperationWithoutOptOutDataError() async throws {
         let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
-        let dataBroker = DataBroker(name: "Test Broker", steps: [Step]())
+        let dataBroker = DataBroker(name: "Test Broker",
+                                    steps: [Step](),
+                                    schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+                                                                               retryError: 48 * 60 * 60,
+                                                                               confirmOptOutScan: 72 * 60 * 60,
+                                                                               maintenanceScan: 240 * 60 * 60))
         let extractedProfile = ExtractedProfile(name: "John")
 
         let database = MockDataBase()
@@ -237,7 +271,12 @@ final class OperationsTests: XCTestCase {
 
     func testOptOutConfirmationSuccess() async throws {
         let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
-        let dataBroker = DataBroker(name: "Test Broker", steps: [Step]())
+        let dataBroker = DataBroker(name: "Test Broker",
+                                    steps: [Step](),
+                                    schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+                                                                               retryError: 48 * 60 * 60,
+                                                                               confirmOptOutScan: 72 * 60 * 60,
+                                                                               maintenanceScan: 240 * 60 * 60))
 
         let extractedProfile = ExtractedProfile(name: "John")
 
@@ -288,7 +327,12 @@ final class OperationsTests: XCTestCase {
 
     func testOptOutConfirmationNotRemoved() async throws {
         let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
-        let dataBroker = DataBroker(name: "Test Broker", steps: [Step]())
+        let dataBroker = DataBroker(name: "Test Broker",
+                                    steps: [Step](),
+                                    schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+                                                                               retryError: 48 * 60 * 60,
+                                                                               confirmOptOutScan: 72 * 60 * 60,
+                                                                               maintenanceScan: 240 * 60 * 60))
 
         let extractedProfile = ExtractedProfile(name: "John")
 
@@ -331,7 +375,12 @@ final class OperationsTests: XCTestCase {
 
     func testOptOutConfirmationRemovedOnSomeProfiles() async throws {
         let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
-        let dataBroker = DataBroker(name: "Test Broker", steps: [Step]())
+        let dataBroker = DataBroker(name: "Test Broker",
+                                    steps: [Step](),
+                                    schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+                                                                               retryError: 48 * 60 * 60,
+                                                                               confirmOptOutScan: 72 * 60 * 60,
+                                                                               maintenanceScan: 240 * 60 * 60))
 
         let extractedProfile1 = ExtractedProfile(name: "John")
 
@@ -418,7 +467,15 @@ struct MockDataBase: DataBase {
     }
 
     func brokerProfileQueryData(for id: UUID) -> BrokerProfileQueryData? {
-        BrokerProfileQueryData(id: UUID(), profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46), dataBroker: DataBroker(name: "batata", steps: [Step]()))
+        BrokerProfileQueryData(id: UUID(),
+                               profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46),
+                               dataBroker: DataBroker(name: "batata",
+                                                      steps: [Step](),
+                                                      schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+                                                                                                 retryError: 48 * 60 * 60,
+                                                                                                 confirmOptOutScan: 72 * 60 * 60,
+                                                                                                 maintenanceScan: 240 * 60 * 60)))
+
     }
 
     func saveOperationData(_ data: BrokerOperationData) {
@@ -442,8 +499,14 @@ struct MockDataBase: DataBase {
     }
 
     func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
-        let data = BrokerProfileQueryData(id: UUID(), profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46), dataBroker: DataBroker(name: "batata", steps: [Step]()))
-
+        let data = BrokerProfileQueryData(id: UUID(),
+                                                profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46),
+                                                dataBroker: DataBroker(name: "batata",
+                                                                       steps: [Step](),
+                                                                       schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+                                                                                                                  retryError: 48 * 60 * 60,
+                                                                                                                  confirmOptOutScan: 72 * 60 * 60,
+                                                                                                                  maintenanceScan: 240 * 60 * 60)))
         return [data]
     }
 

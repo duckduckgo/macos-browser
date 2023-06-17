@@ -48,7 +48,7 @@ final class BrokerProfileQueryOperationsManager: OperationsManager {
         self.database = database
     }
 
-    func updateOperationDataDates(_ operationData: BrokerOperationData) {
+    private func updateOperationDataDates(_ operationData: BrokerOperationData) {
         var data = operationData
         data.lastRunDate = Date()
 
@@ -61,10 +61,16 @@ final class BrokerProfileQueryOperationsManager: OperationsManager {
                 data.preferredRunDate = Date().addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.retryError)
             case .optOutRequested:
                 optOutData?.preferredRunDate = nil
-                let newDate = Date().addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.confirmScan)
+                let newDate = Date().addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.confirmOptOutScan)
                 if let scanDate = scanData?.preferredRunDate, scanDate > newDate {
                     scanData?.preferredRunDate = newDate
                 }
+            case .matchFound, .noMatchFound:
+                let newDate = Date().addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.maintenanceScan)
+                if scanData?.preferredRunDate == nil || scanData!.preferredRunDate! > newDate {
+                    scanData?.preferredRunDate = newDate
+                }
+
             default:
                 break
             }
@@ -90,6 +96,7 @@ final class BrokerProfileQueryOperationsManager: OperationsManager {
             } else {
                 let event = HistoryEvent(type: .noMatchFound)
                 brokerProfileQueryData.scanData.addHistoryEvent(event)
+
             }
             brokerProfileQueryData.updateExtractedProfiles(profiles)
 

@@ -45,7 +45,6 @@ public struct BrokerProfileQueryData: Sendable {
             self.scanData = scanData
         } else {
             self.scanData = ScanOperationData(brokerProfileQueryID: id,
-                                              preferredRunDate: Date(),
                                               historyEvents: [HistoryEvent]())
         }
     }
@@ -61,9 +60,10 @@ public struct BrokerProfileQueryData: Sendable {
 
             if !isExistingProfile {
                 let optOutOperationData = OptOutOperationData(brokerProfileQueryID: id,
-                                                              preferredRunDate: Date(),
                                                               historyEvents: [HistoryEvent](),
                                                               extractedProfile: extractedProfile)
+                // If it's a new found profile, we'd like to opt-out ASAP
+                optOutOperationData.preferredRunDate = Date()
                 optOutsData.append(optOutOperationData)
             }
         }

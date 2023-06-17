@@ -47,7 +47,7 @@ public final class ScanOperationData: BrokerOperationData {
 
     internal init(id: UUID = UUID(),
                   brokerProfileQueryID: UUID,
-                  preferredRunDate: Date?,
+                  preferredRunDate: Date? = nil,
                   historyEvents: [HistoryEvent],
                   lastRunDate: Date? = nil) {
 
@@ -65,13 +65,12 @@ public final class OptOutOperationData: BrokerOperationData {
     let brokerProfileQueryID: UUID
     var preferredRunDate: Date?
     var historyEvents: [HistoryEvent]
-    var lastRunDate: Date?
-
+    var lastRunDate: Date? 
     var extractedProfile: ExtractedProfile
 
     internal init(id: UUID = UUID(),
                   brokerProfileQueryID: UUID,
-                  preferredRunDate: Date?,
+                  preferredRunDate: Date? = nil,
                   historyEvents: [HistoryEvent],
                   lastRunDate: Date? = nil,
                   extractedProfile: ExtractedProfile) {
