@@ -122,8 +122,6 @@ public struct ExtractAction: Action {
     }
 }
 
-import Foundation
-
 public struct ExtractedProfile: Codable, Sendable {
     let id: UUID
     let name: String?

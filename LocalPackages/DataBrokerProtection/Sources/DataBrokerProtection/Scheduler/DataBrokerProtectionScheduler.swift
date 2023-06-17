@@ -19,7 +19,7 @@
 import Foundation
 
 protocol SchedulerConfig {
-   var runFrequency: TimeInterval { get }
+    var runFrequency: TimeInterval { get }
     var concurrentOperationsPerBroker: Int { get }
     var concurrentOperationsDifferentBrokers: Int { get }
     var intervalBetweenSameBrokerOperations: TimeInterval { get }
