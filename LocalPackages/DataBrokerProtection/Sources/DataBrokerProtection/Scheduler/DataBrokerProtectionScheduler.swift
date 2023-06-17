@@ -57,7 +57,6 @@ final class DataBrokerProtectionScheduler {
     }
 
     // MARK: - Public functions
-
     func runScanOnAllDataBrokers() async throws {
         for manager in operationManagers {
             let runner = self.operationRunnerProvider.getOperationRunner()
@@ -106,14 +105,6 @@ final class DataBrokerProtectionScheduler {
 
         return dataBrokerOperationManagerCollectionList
     }
-
-    // Get next operation
-    // Run Queue
-    // Download JSON data
-    // Handle errors?
-    // How many concurrent actions?
-    // Cadence on when to run the queue
-    // Take into consideration error by broker not by profileQuery
 }
 
 struct DataBrokerOperationManagerCollection {

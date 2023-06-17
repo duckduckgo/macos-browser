@@ -47,5 +47,4 @@ final class TestOperationRunner: OperationRunner {
     deinit {
         print("DEINIT")
     }
-
 }
