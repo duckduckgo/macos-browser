@@ -102,9 +102,17 @@ final class OperationsTests: XCTestCase {
                                 scanAction: nil,
                                 scanResults: expectedExtractedProfiles)
 
+        let expectedScanPreferredDate = Date().addingTimeInterval(dataBroker.schedulingConfig.maintenanceScan)
+        let expectedOptOutPreferredDate = Date()
+
         try await operationsManager.runScanOperation(on: runner)
         let data = operationsManager.brokerProfileQueryData
 
+        for optOutData in data.optOutsData {
+            XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: optOutData.preferredRunDate, date2: expectedOptOutPreferredDate))
+        }
+
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: data.scanData.preferredRunDate, date2: expectedScanPreferredDate))
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: data.scanData.lastRunDate, date2: Date()))
         XCTAssertEqual(expectedExtractedProfiles, data.extractedProfiles)
         XCTAssertEqual(data.scanData.historyEvents.count, expectedEvents.count)
@@ -130,6 +138,7 @@ final class OperationsTests: XCTestCase {
 
         let expectedExtractedProfiles = [ExtractedProfile]()
         let expectedHistoryTypes: [HistoryEvent.EventType] = [.scanStarted, .error]
+        let expectedScanPreferredDate = Date().addingTimeInterval(dataBroker.schedulingConfig.retryError)
 
         let runner = MockRunner(optOutAction: nil,
                                 scanAction: { throw NSError(domain: "test", code: 123) },
@@ -137,12 +146,15 @@ final class OperationsTests: XCTestCase {
 
         do {
             try await operationsManager.runScanOperation(on: runner)
+            XCTFail("Should not succeed")
         } catch {
             let data = operationsManager.brokerProfileQueryData
             XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: data.scanData.lastRunDate, date2: Date()))
             XCTAssertEqual(expectedExtractedProfiles, data.extractedProfiles)
             XCTAssertEqual(data.scanData.historyEvents.count, expectedHistoryTypes.count)
             XCTAssertEqual(data.scanData.historyEvents.map { $0.type }, expectedHistoryTypes)
+            XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: data.scanData.preferredRunDate, date2: expectedScanPreferredDate))
+
         }
     }
 
@@ -180,6 +192,7 @@ final class OperationsTests: XCTestCase {
                                 scanResults: [ExtractedProfile]())
 
         try await operationsManager.runOptOutOperation(for: extractedProfile, on: runner)
+        let expectedScanPreferredDate = Date().addingTimeInterval(dataBroker.schedulingConfig.confirmOptOutScan)
 
         let optOutDataOperationData = profileQueryData.optOutsData.filter({ $0.id == optOutOperationData.id }).first
 
@@ -189,6 +202,9 @@ final class OperationsTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: optOutDataOperationData!.lastRunDate, date2: Date()))
         XCTAssertEqual(optOutDataOperationData?.historyEvents.count, expectedHistoryTypes.count)
         XCTAssertEqual(optOutDataOperationData?.historyEvents.map { $0.type }, expectedHistoryTypes)
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: profileQueryData.scanData.preferredRunDate, date2: expectedScanPreferredDate))
+        XCTAssertNil(optOutOperationData.preferredRunDate)
+
     }
 
     func testOptOutOperationWithRunnerError() async throws {
@@ -232,10 +248,13 @@ final class OperationsTests: XCTestCase {
 
         let expectedHistoryTypes: [HistoryEvent.EventType] = [.optOutStarted(profileID: extractedProfile.id), .error]
 
+        let expectedOptOutPreferredDate = Date().addingTimeInterval(dataBroker.schedulingConfig.retryError)
+
         XCTAssertNotNil(optOutDataOperationData)
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: optOutDataOperationData!.lastRunDate, date2: Date()))
         XCTAssertEqual(optOutDataOperationData?.historyEvents.count, expectedHistoryTypes.count)
         XCTAssertEqual(optOutDataOperationData?.historyEvents.map { $0.type }, expectedHistoryTypes)
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: optOutDataOperationData?.preferredRunDate, date2: expectedOptOutPreferredDate))
     }
 
     func testOptOutOperationWithoutOptOutDataError() async throws {
@@ -311,9 +330,16 @@ final class OperationsTests: XCTestCase {
         let scanExpectedHistoryTypes: [HistoryEvent.EventType] = [.scanStarted, .noMatchFound]
         let optOutExpectedHistoryTypes: [HistoryEvent.EventType] = [.optOutConfirmed(profileID: extractedProfile.id)]
 
+        let expectedOptOutPreferredDate = Date()
+        let expectedScanPreferredDate = Date().addingTimeInterval(dataBroker.schedulingConfig.maintenanceScan)
+
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: optOutOperationData.preferredRunDate, date2: expectedOptOutPreferredDate))
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: data.scanData.preferredRunDate, date2: expectedScanPreferredDate))
+
         XCTAssertEqual(expectedExtractedProfiles, data.extractedProfiles)
         XCTAssertEqual(data.scanData.historyEvents.count, scanExpectedHistoryTypes.count)
         XCTAssertEqual(data.scanData.historyEvents.map { $0.type }, scanExpectedHistoryTypes)
+
 
         XCTAssertEqual(optOutOperationData.historyEvents.count, optOutExpectedHistoryTypes.count)
         XCTAssertEqual(optOutOperationData.historyEvents.map { $0.type }, optOutExpectedHistoryTypes)
@@ -365,6 +391,13 @@ final class OperationsTests: XCTestCase {
         let data = operationsManager.brokerProfileQueryData
 
         let scanExpectedHistoryTypes: [HistoryEvent.EventType] = [.scanStarted, .matchFound(profileID: extractedProfile.id)]
+
+        let expectedOptOutPreferredDate = Date()
+        let expectedScanPreferredDate = Date().addingTimeInterval(dataBroker.schedulingConfig.maintenanceScan)
+
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: optOutOperationData.preferredRunDate, date2: expectedOptOutPreferredDate))
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: data.scanData.preferredRunDate, date2: expectedScanPreferredDate))
+
 
         XCTAssertEqual(expectedExtractedProfiles, data.extractedProfiles)
         XCTAssertEqual(data.scanData.historyEvents.count, scanExpectedHistoryTypes.count)

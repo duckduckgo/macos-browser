@@ -53,28 +53,48 @@ final class BrokerProfileQueryOperationsManager: OperationsManager {
         data.lastRunDate = Date()
 
         let optOutData = operationData as? OptOutOperationData
-        let scanData = operationData as? ScanOperationData
+        var scanData = operationData as? ScanOperationData
+
+        // If we're setting an optOut date we might need to update the scan date as well
+        if scanData == nil {
+            scanData = brokerProfileQueryData.scanData
+        }
+
+        let maintenanceScanDate = Date().addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.maintenanceScan)
 
         if let lastHistoryEvent = data.historyEvents.last {
             switch lastHistoryEvent.type {
             case .error:
-                data.preferredRunDate = Date().addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.retryError)
+                let newDate = Date().addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.retryError)
+                data.updatePreferredRunDate(newDate)
+
             case .optOutRequested:
                 optOutData?.preferredRunDate = nil
                 let newDate = Date().addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.confirmOptOutScan)
-                if let scanDate = scanData?.preferredRunDate, scanDate > newDate {
-                    scanData?.preferredRunDate = newDate
+                scanData?.updatePreferredRunDate(newDate)
+            case .matchFound:
+                if var optOutData = optOutData, shouldScheduleNewOptOut(operationData: optOutData) {
+                    optOutData.updatePreferredRunDate(Date())
+                } else {
+                    scanData?.updatePreferredRunDate(maintenanceScanDate)
                 }
-            case .matchFound, .noMatchFound:
-                let newDate = Date().addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.maintenanceScan)
-                if scanData?.preferredRunDate == nil || scanData!.preferredRunDate! > newDate {
-                    scanData?.preferredRunDate = newDate
-                }
+
+            case .noMatchFound:
+                scanData?.updatePreferredRunDate(maintenanceScanDate)
+                optOutData?.preferredRunDate = nil
 
             default:
                 break
             }
         }
+    }
+
+    // If the last time we removed the profile has a bigger time difference than the current date + maintenance we should schedule for a new optout
+    private func shouldScheduleNewOptOut(operationData: OptOutOperationData) -> Bool {
+        guard let lastRemovalEvent = operationData.lastEventWithType(type: .optOutRequested(profileID: operationData.extractedProfile.id)) else {
+            return false
+        }
+        return lastRemovalEvent.date.addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.maintenanceScan) < Date()
     }
 
     func runScanOperation(on runner: OperationRunner) async throws {
@@ -85,6 +105,9 @@ final class BrokerProfileQueryOperationsManager: OperationsManager {
         }
         do {
             brokerProfileQueryData.scanData.addHistoryEvent(.init(type: .scanStarted))
+
+            // Clean preferredRunDate when the operation runs
+            brokerProfileQueryData.scanData.preferredRunDate = nil
 
             let profiles = try await runner.scan(brokerProfileQueryData)
 
@@ -127,12 +150,16 @@ final class BrokerProfileQueryOperationsManager: OperationsManager {
 
         defer {
             updateOperationDataDates(data)
+            updateOperationDataDates(brokerProfileQueryData.scanData)
             database.saveOperationData(data)
             notificationCenter.post(name: DataBrokerNotifications.didFinishOptOut, object: brokerProfileQueryData.dataBroker.name)
         }
 
         do {
             brokerProfileQueryData.addHistoryEvent(.init(type: .optOutStarted(profileID: extractedProfile.id)), for: data)
+
+            // Clean preferredRunDate when the operation runs
+            data.preferredRunDate = nil
 
             try await runner.optOut(extractedProfile)
 

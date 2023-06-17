@@ -39,3 +39,21 @@ struct HistoryEvent: Sendable {
         self.type = type
     }
 }
+
+extension HistoryEvent.EventType: Equatable {
+    static func ==(lhs: HistoryEvent.EventType, rhs: HistoryEvent.EventType) -> Bool {
+        switch (lhs, rhs) {
+        case (.noMatchFound, .noMatchFound),
+             (.error, .error),
+             (.scanStarted, .scanStarted):
+            return true
+        case let (.matchFound(profileID: lhsProfileID), .matchFound(profileID: rhsProfileID)),
+             let (.optOutStarted(profileID: lhsProfileID), .optOutStarted(profileID: rhsProfileID)),
+             let (.optOutRequested(profileID: lhsProfileID), .optOutRequested(profileID: rhsProfileID)),
+             let (.optOutConfirmed(profileID: lhsProfileID), .optOutConfirmed(profileID: rhsProfileID)):
+            return lhsProfileID == rhsProfileID
+        default:
+            return false
+        }
+    }
+}

@@ -25,6 +25,7 @@ protocol BrokerOperationData {
     var historyEvents: [HistoryEvent] { get set }
     var lastRunDate: Date? { get set }
 
+    func lastEventWithType(type: HistoryEvent.EventType) -> HistoryEvent?
     mutating func addHistoryEvent(_ historyEvent: HistoryEvent)
 }
 
@@ -35,6 +36,16 @@ extension BrokerOperationData {
 
     var lastRunDate: Date? {
         historyEvents.last?.date
+    }
+
+    mutating func updatePreferredRunDate(_ date: Date) {
+        if preferredRunDate == nil || preferredRunDate! > date {
+            preferredRunDate = date
+        }
+    }
+
+    func lastEventWithType(type: HistoryEvent.EventType) -> HistoryEvent? {
+        return historyEvents.last(where: { $0.type == type })
     }
 }
 
