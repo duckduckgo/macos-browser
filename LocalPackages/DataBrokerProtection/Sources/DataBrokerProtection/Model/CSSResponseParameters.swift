@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionResponseModels.swift
+//  CSSResponseParameters.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -48,8 +48,6 @@ struct CSSSuccessResponse: Decodable {
             self.response = .navigate(try container.decode(NavigateResponse.self, forKey: .response))
         case .extract:
             self.response = .extract(try container.decode([ExtractedProfile].self, forKey: .response))
-        default:
-            self.response = nil
         }
     }
 }
