@@ -18,7 +18,7 @@
 
 import Foundation
 
-struct HistoryEvent {
+struct HistoryEvent: Sendable {
     enum EventType {
         case noMatchFound
         case matchFound(profileID: UUID)
