@@ -1378,17 +1378,26 @@
                         "domains": [
                             "aarp.org",
                             "ally.com",
+                            "auspost.com.au",
                             "bjs.com",
                             "bose.com",
                             "bose.com.au",
                             "fedex.com",
+                            "fnbo.com",
                             "guitarcenter.com",
+                            "harley-davidson.com",
                             "hilton.com",
+                            "jcpenney.com",
                             "kohls.com",
+                            "lenovo.com",
                             "lowes.com",
                             "nvidia.com",
+                            "safeway.com",
                             "shutterfly.com",
-                            "verizon.com"
+                            "truist.com",
+                            "verizon.com",
+                            "vineyardvines.com",
+                            "xfinity.com"
                         ]
                     },
                     "options": {
@@ -27763,8 +27772,15 @@
                         "domains": [
                             "bankofamerica.com",
                             "bloomingdales.com",
+                            "caremark.com",
                             "chilis.com",
+                            "cox.com",
+                            "hsbc.co.uk",
+                            "hsbc.com",
                             "humana.com",
+                            "intuit.com",
+                            "ml.com",
+                            "mtb.com",
                             "pch.com",
                             "usbank.com"
                         ]
