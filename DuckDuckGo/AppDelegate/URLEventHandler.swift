@@ -117,7 +117,7 @@ final class URLEventHandler {
     ///
     private static func handleNetworkProtectionURL(_ url: URL) {
         switch url {
-        case AppLauncher.Command.showStatus.launchURL:
+        case AppLaunchCommand.showStatus.launchURL:
             Task {
                 await WindowControllersManager.shared.showNetworkProtectionStatus()
             }

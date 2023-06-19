@@ -19,58 +19,11 @@
 import AppKit
 import Foundation
 import Common
+import NetworkProtection
 
 /// Launches the main App
 ///
-public final class AppLauncher {
-    public enum Command: Codable {
-        case justOpen
-        case shareFeedback
-        case showStatus
-        case startVPN
-        case stopVPN
-
-        var commandURL: String? {
-            switch self {
-            case .justOpen:
-                return "networkprotection://just-open"
-            case .shareFeedback:
-                return "https://form.asana.com/?k=_wNLt6YcT5ILpQjDuW0Mxw&d=137249556945"
-            case .showStatus:
-                return "networkprotection://show-status"
-            default:
-                return nil
-            }
-        }
-
-        var helperAppPath: String? {
-            switch self {
-            case .startVPN:
-                return "./Contents/Resources/startVPN.app"
-            case .stopVPN:
-                return "./Contents/Resources/stopVPN.app"
-            default:
-                return nil
-            }
-        }
-
-        public var launchURL: URL? {
-            guard let commandURL else {
-                return nil
-            }
-
-            return URL(string: commandURL)!
-        }
-
-        var hideApp: Bool {
-            switch self {
-            case .startVPN, .stopVPN:
-                return true
-            default:
-                return false
-            }
-        }
-    }
+public final class AppLauncher: AppLaunching {
 
     private let mainBundleURL: URL
 
@@ -78,7 +31,7 @@ public final class AppLauncher {
         mainBundleURL = appBundleURL
     }
 
-    public func launchApp(withCommand command: Command) async {
+    public func launchApp(withCommand command: AppLaunchCommand) async {
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.allowsRunningApplicationSubstitution = false
 
@@ -103,6 +56,50 @@ public final class AppLauncher {
             }
         } catch {
             os_log("🔵 Open Application failed: %{public}@", type: .error, error.localizedDescription)
+        }
+    }
+
+}
+
+extension AppLaunchCommand {
+    var commandURL: String? {
+        switch self {
+        case .justOpen:
+            return "networkprotection://just-open"
+        case .shareFeedback:
+            return "https://form.asana.com/?k=_wNLt6YcT5ILpQjDuW0Mxw&d=137249556945"
+        case .showStatus:
+            return "networkprotection://show-status"
+        default:
+            return nil
+        }
+    }
+
+    var helperAppPath: String? {
+        switch self {
+        case .startVPN:
+            return "./Contents/Resources/startVPN.app"
+        case .stopVPN:
+            return "./Contents/Resources/stopVPN.app"
+        default:
+            return nil
+        }
+    }
+
+    public var launchURL: URL? {
+        guard let commandURL else {
+            return nil
+        }
+
+        return URL(string: commandURL)!
+    }
+
+    var hideApp: Bool {
+        switch self {
+        case .startVPN, .stopVPN:
+            return true
+        default:
+            return false
         }
     }
 }

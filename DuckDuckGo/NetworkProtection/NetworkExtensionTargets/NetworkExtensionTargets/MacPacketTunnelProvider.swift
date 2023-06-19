@@ -32,7 +32,8 @@ final class MacPacketTunnelProvider: NEPacketTunnelProvider {
                                                         useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
                                                         debugEvents: self.networkProtectionDebugEvents,
                                                         providerEvents: self.packetTunnelProviderEvents,
-                                                        notificationPoster: DistributedNotificationCenter.forType(.networkProtection))
+                                                        notificationPoster: DistributedNotificationCenter.forType(.networkProtection),
+                                                        appLauncher: AppLauncher(appBundleURL: .mainAppBundleURL))
         return packetTunnelProvider
     }()
 

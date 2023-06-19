@@ -344,13 +344,15 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
     private let debugEvents: EventMapping<NetworkProtectionError>?
     private let providerEvents: EventMapping<Event>
     private let notificationPoster: NetworkProtectionNotificationPosting
+    private let appLauncher: AppLaunching?
 
     public init(notificationCenter: NotificationCenter,
                 notificationsPresenter: NetworkProtectionNotificationsPresenter,
                 useSystemKeychain: Bool,
                 debugEvents: EventMapping<NetworkProtectionError>?,
                 providerEvents: EventMapping<Event>,
-                notificationPoster: NetworkProtectionNotificationPosting) {
+                notificationPoster: NetworkProtectionNotificationPosting,
+                appLauncher: AppLaunching? = nil) {
         os_log("[+] PacketTunnelProvider", log: .networkProtectionMemoryLog, type: .debug)
         self.notificationCenter = notificationCenter
         self.notificationsPresenter = notificationsPresenter
@@ -358,6 +360,7 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
         self.debugEvents = debugEvents
         self.providerEvents = providerEvents
         self.notificationPoster = notificationPoster
+        self.appLauncher = appLauncher
 
         super.init()
 
@@ -424,16 +427,16 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
         let isOnDemand = options?["is-on-demand"] as? Bool == true
         let isActivatedFromSystemSettings = options?["activationAttemptId"] == nil && !isOnDemand
 
-        let internalCompletionHandler = { (error: Error?) in
+        let internalCompletionHandler = { [weak self] (error: Error?) in
             if error != nil {
-                self.connectionStatus = .disconnected
+                self?.connectionStatus = .disconnected
 
                 // if connection is failing when activated by system on-demand
                 // ask the Main App to disable the on-demand rule to prevent activation loop
                 // To be reconsidered for the Kill Switch
                 if isOnDemand {
-                    Task {
-                        // await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN) TODO: Deal with this
+                    Task { [self] in
+                        await self?.appLauncher?.launchApp(withCommand: .stopVPN)
                         completionHandler(error)
                     }
                     return
@@ -446,7 +449,7 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
         if isActivatedFromSystemSettings {
             // ask the Main App to reconfigure & restart with on-demand rule “on” - when connection triggered from System Settings
             Task {
-                // await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .startVPN) TODO: Deal with this
+                await appLauncher?.launchApp(withCommand: .startVPN)
                 internalCompletionHandler(NEVPNError(.configurationStale))
             }
             return
@@ -536,7 +539,7 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
                     // we can‘t prevent a respawn with on-demand rule ON
                     // request the main app to reconfigure with on-demand OFF
 
-                    // await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN) TODO: Deal with this
+                    await self.appLauncher?.launchApp(withCommand: .stopVPN)
                     break
 
                 case .superceded:
