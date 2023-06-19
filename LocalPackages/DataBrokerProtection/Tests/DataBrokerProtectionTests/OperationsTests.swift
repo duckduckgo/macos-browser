@@ -231,7 +231,7 @@ final class OperationsTests: XCTestCase {
             try await operationsManager.runOptOutOperation(for: extractedProfile, on: runner)
             XCTFail("Operation should throw")
         } catch {
-            XCTAssertEqual(OperationsError.noOperationDataForExtractedProfile, error as! OperationsError)
+            XCTAssertEqual(OperationsError.noOperationDataForExtractedProfile, error as? OperationsError)
         }
     }
 

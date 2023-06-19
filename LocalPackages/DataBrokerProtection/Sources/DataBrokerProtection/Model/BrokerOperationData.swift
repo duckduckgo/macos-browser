@@ -19,7 +19,7 @@
 import Foundation
 
 protocol BrokerOperationData {
-    var id: UUID { get } 
+    var id: UUID { get }
     var brokerProfileQueryID: UUID { get }
     var preferredRunDate: Date? { get set }
     var historyEvents: [HistoryEvent] { get set }

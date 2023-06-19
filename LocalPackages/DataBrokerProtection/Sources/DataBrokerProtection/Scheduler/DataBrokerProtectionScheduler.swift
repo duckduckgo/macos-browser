@@ -36,7 +36,7 @@ protocol OperationRunnerProvider {
     func getOperationRunner() -> OperationRunner
 }
 
-class DataBrokerProtectionScheduler {
+final class DataBrokerProtectionScheduler {
     var operationManagers: [DataBrokerOperationManagerCollection]
     let database: DataBase
     let config: SchedulerConfig
@@ -56,7 +56,6 @@ class DataBrokerProtectionScheduler {
         setupManagers()
     }
 
-
     // MARK: - Public functions
 
     func runScanOnAllDataBrokers() async throws {
@@ -69,7 +68,6 @@ class DataBrokerProtectionScheduler {
     func start() {
 
     }
-
 
     // MARK: - Private functions
 
@@ -145,4 +143,3 @@ struct DataBrokerNotifications {
     public static let didFinishOptOut = NSNotification.Name(rawValue: "com.duckduckgo.dbp.didFinishOptOut")
 
 }
-
