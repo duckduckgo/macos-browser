@@ -18,7 +18,7 @@
 
 import Foundation
 
-class BrokerProfileQueryData {
+public struct BrokerProfileQueryData: Sendable {
     public let id: UUID
     public let profileQuery: ProfileQuery
     public let dataBroker: DataBroker
@@ -30,11 +30,11 @@ class BrokerProfileQueryData {
         optOutsData.map { $0.extractedProfile }
     }
 
-    internal init(id: UUID,
-                  profileQuery: ProfileQuery,
-                  dataBroker: DataBroker,
-                  scanOperationData: ScanOperationData? = nil,
-                  optOutOperationsData: [OptOutOperationData] = [OptOutOperationData]()) {
+    public init(id: UUID,
+                profileQuery: ProfileQuery,
+                dataBroker: DataBroker,
+                scanOperationData: ScanOperationData? = nil,
+                optOutOperationsData: [OptOutOperationData] = [OptOutOperationData]()) {
 
         self.id = id
         self.profileQuery = profileQuery
@@ -50,7 +50,7 @@ class BrokerProfileQueryData {
         }
     }
 
-    func updateExtractedProfiles(_ extractedProfiles: [ExtractedProfile]) {
+    mutating func updateExtractedProfiles(_ extractedProfiles: [ExtractedProfile]) {
 
         extractedProfiles.forEach { extractedProfile in
 
@@ -67,7 +67,6 @@ class BrokerProfileQueryData {
                 optOutsData.append(optOutOperationData)
             }
         }
-
 
         // Check for removed profiles
         let removedProfilesData = optOutsData.filter { !extractedProfiles.contains($0.extractedProfile) }
