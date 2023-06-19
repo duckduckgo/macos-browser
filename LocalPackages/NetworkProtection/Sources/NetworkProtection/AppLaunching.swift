@@ -29,7 +29,6 @@ public enum AppLaunchCommand: Codable {
     case stopVPN
 }
 
-
 public protocol AppLaunching {
     func launchApp(withCommand command: AppLaunchCommand) async
 }

@@ -539,7 +539,6 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
                     // request the main app to reconfigure with on-demand OFF
 
                     await self.appLauncher?.launchApp(withCommand: .stopVPN)
-                    break
 
                 case .superceded:
                     self.notificationsPresenter.showSupercededNotification()
