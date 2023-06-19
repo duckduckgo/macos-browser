@@ -11,7 +11,7 @@
 		<key>NEProviderClasses</key>
 		<dict>
 			<key>com.apple.networkextension.packet-tunnel</key>
-			<string>$(PRODUCT_MODULE_NAME).PacketTunnelProvider</string>
+			<string>$(PRODUCT_MODULE_NAME).MacPacketTunnelProvider</string>
 		</dict>
 		<key>MAIN_BUNDLE_IDENTIFIER</key>
 		<string>$(MAIN_BUNDLE_IDENTIFIER)</string>
