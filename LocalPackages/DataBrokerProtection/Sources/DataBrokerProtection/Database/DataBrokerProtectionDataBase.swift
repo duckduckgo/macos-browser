@@ -27,14 +27,14 @@ protocol DataBase {
     func brokerProfileQueryData(for id: UUID) -> BrokerProfileQueryData?
 }
 
-class DataBrokerProtectionDataBase: DataBase {
+final class DataBrokerProtectionDataBase: DataBase {
 
     func brokerProfileQueryData(for profileQuery: ProfileQuery, dataBroker: DataBroker) -> BrokerProfileQueryData? {
         return BrokerProfileQueryData(id: UUID(), profileQuery: profileQuery, dataBroker: dataBroker)
     }
 
     func brokerProfileQueryData(for id: UUID) -> BrokerProfileQueryData? {
-        BrokerProfileQueryData(id: UUID(), profileQuery: ProfileQuery(name: "potato"), dataBroker: DataBroker(name: "batata"))
+        BrokerProfileQueryData(id: UUID(), profileQuery: ProfileQuery(firstName: "John", lastName: "Deo", city: "Miami", state: "FL", age: 46), dataBroker: DataBroker(name: "batata", steps: [Step]()))
     }
 
     func saveOperationData(_ data: BrokerOperationData) {
@@ -58,7 +58,7 @@ class DataBrokerProtectionDataBase: DataBase {
     }
 
     func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
-        let data = BrokerProfileQueryData(id: UUID(), profileQuery: ProfileQuery(name: "potato"), dataBroker: DataBroker(name: "batata"))
+        let data = BrokerProfileQueryData(id: UUID(), profileQuery: ProfileQuery(firstName: "John", lastName: "Deo", city: "Miami", state: "FL", age: 46), dataBroker: DataBroker(name: "batata", steps: [Step]()))
 
         return [data]
     }
