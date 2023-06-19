@@ -217,7 +217,9 @@ extension HomePage.Models {
 
         // Helper Functions
         @objc private func newTabOpenNotification(_ notification: Notification) {
-            listOfFeatures = randomiseFeatures()
+            if !isFirstSession {
+                listOfFeatures = randomiseFeatures()
+            }
         }
 
         private func randomiseFeatures() -> [FeatureType] {
