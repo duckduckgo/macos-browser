@@ -468,7 +468,6 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
 
         do {
             try load(options: options)
-            // loadVendorOptions(from: tunnelProviderProtocol) TODO: Deal with this
         } catch {
             internalCompletionHandler(NEVPNError(.configurationInvalid))
             return
