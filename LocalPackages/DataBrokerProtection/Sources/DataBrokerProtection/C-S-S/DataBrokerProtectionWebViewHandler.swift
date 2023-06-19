@@ -66,7 +66,6 @@ internal class DataBrokerProtectionWebViewHandler: NSObject {
     func finish() {
         webView?.stopLoading()
         webView = nil
-        window?.close()
     }
 
     private func waitForWebViewLoad(timeoutInSeconds: Int = 0) async throws {
@@ -85,7 +84,7 @@ internal class DataBrokerProtectionWebViewHandler: NSObject {
         }
     }
 
-    func execute(action: Action, profileData: ProfileData) {
+    func execute(action: Action, profileData: ProfileQuery) {
         userContentController?.dataBrokerUserScripts.dataBrokerFeature.pushAction(
             method: .onActionReceived,
             webView: self.webView!,
