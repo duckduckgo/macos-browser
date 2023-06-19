@@ -24,26 +24,40 @@ struct DataBrokerScheduleConfig {
     let confirmScan: TimeInterval
 }
 
-struct DataBroker {
+public struct DataBroker: Encodable, Sendable {
     let name: String
-    let schedulingConfig: DataBrokerScheduleConfig
+    let steps: [Step]
+    let schedulingConfig: DataBrokerScheduleConfig = DataBrokerScheduleConfig(emailConfirmation: 10 * 60,
+                                                                              retryError: 48 * 60,
+                                                                              confirmScan: 72 * 60)
 
-    internal init(name: String) {
-        self.name = name
-        self.schedulingConfig = DataBrokerScheduleConfig(emailConfirmation: 10 * 60,
-                                                         retryError: 48 * 60,
-                                                         confirmScan: 72 * 60)
+    enum CodingKeys: CodingKey {
+        case name
+        case steps
     }
 
+    public init(name: String, steps: [Step]) {
+        self.name = name
+        self.steps = steps
+    }
+
+    func scanStep() throws -> Step {
+        guard let scanStep = steps.first(where: { $0.type == .scan }) else {
+            assertionFailure("Broker is missing the scan step.")
+            throw DataBrokerProtectionError.unrecoverableError
+        }
+
+        return scanStep
+    }
 }
 
 extension DataBroker: Hashable {
 
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(name)
     }
 
-    static func ==(lhs: DataBroker, rhs: DataBroker) -> Bool {
+    public static func == (lhs: DataBroker, rhs: DataBroker) -> Bool {
         return lhs.name == rhs.name
     }
 }

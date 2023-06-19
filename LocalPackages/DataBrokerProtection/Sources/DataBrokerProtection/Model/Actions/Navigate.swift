@@ -1,5 +1,5 @@
 //
-//  ProfileQuery.swift
+//  NavigateAction.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,20 +16,16 @@
 //  limitations under the License.
 //
 
-import Foundation
+public struct NavigateAction: Action {
+    public var id: String = "navigate"
+    public var actionType: ActionType = .navigate
+    let url: String
+    let ageRange: [String]
 
-public struct ProfileQuery: Encodable, Sendable {
-    let firstName: String
-    let lastName: String
-    let city: String
-    let state: String
-    let age: Int
-
-    public init(firstName: String, lastName: String, city: String, state: String, age: Int) {
-        self.firstName = firstName
-        self.lastName = lastName
-        self.city = city
-        self.state = state
-        self.age = age
+    public init(id: String, actionType: ActionType, url: String, ageRange: [String]) {
+        self.id = id
+        self.actionType = actionType
+        self.url = url
+        self.ageRange = ageRange
     }
 }

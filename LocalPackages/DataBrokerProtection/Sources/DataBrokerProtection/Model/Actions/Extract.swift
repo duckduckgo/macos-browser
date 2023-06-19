@@ -1,5 +1,5 @@
 //
-//  ProfileQuery.swift
+//  Extract.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,20 +16,16 @@
 //  limitations under the License.
 //
 
-import Foundation
+public struct ExtractAction: Action {
+    public var id: String = "extract"
+    public var actionType: ActionType = .extract
+    let selector: String
+    let profile: ExtractedProfile
 
-public struct ProfileQuery: Encodable, Sendable {
-    let firstName: String
-    let lastName: String
-    let city: String
-    let state: String
-    let age: Int
-
-    public init(firstName: String, lastName: String, city: String, state: String, age: Int) {
-        self.firstName = firstName
-        self.lastName = lastName
-        self.city = city
-        self.state = state
-        self.age = age
+    public init(id: String, actionType: ActionType, selector: String, profile: ExtractedProfile) {
+        self.id = id
+        self.actionType = actionType
+        self.selector = selector
+        self.profile = profile
     }
 }

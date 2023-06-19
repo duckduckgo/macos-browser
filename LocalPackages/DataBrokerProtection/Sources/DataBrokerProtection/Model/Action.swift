@@ -1,5 +1,5 @@
 //
-//  ProfileQuery.swift
+//  Action.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,18 +18,12 @@
 
 import Foundation
 
-public struct ProfileQuery: Encodable, Sendable {
-    let firstName: String
-    let lastName: String
-    let city: String
-    let state: String
-    let age: Int
+public enum ActionType: String, Codable, Sendable {
+    case extract
+    case navigate
+}
 
-    public init(firstName: String, lastName: String, city: String, state: String, age: Int) {
-        self.firstName = firstName
-        self.lastName = lastName
-        self.city = city
-        self.state = state
-        self.age = age
-    }
+public protocol Action: Encodable, Sendable {
+    var id: String { get }
+    var actionType: ActionType { get }
 }
