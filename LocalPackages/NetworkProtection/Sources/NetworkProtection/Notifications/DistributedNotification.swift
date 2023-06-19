@@ -26,9 +26,6 @@ extension DistributedNotificationCenter.CenterType {
 }
 
 extension DistributedNotificationCenter {
-
-    static let preferredStringEncoding = String.Encoding.utf8
-
     // MARK: - Logging
 
     private func logPost(_ networkProtectionNotification: DistributedNotificationName, object: String? = nil, log: OSLog = .networkProtectionDistributedNotificationsLog) {
@@ -63,6 +60,8 @@ extension NetworkProtectionNotificationPosting {
 }
 
 extension NotificationCenter {
+    static let preferredStringEncoding = String.Encoding.utf8
+
     public func addObserver(for networkProtectionNotification: DistributedNotificationName, object: Any?, queue: OperationQueue?, using block: @escaping @Sendable (Notification) -> Void) -> NSObjectProtocol {
 
         addObserver(forName: networkProtectionNotification.notificationName, object: object, queue: queue, using: block)
