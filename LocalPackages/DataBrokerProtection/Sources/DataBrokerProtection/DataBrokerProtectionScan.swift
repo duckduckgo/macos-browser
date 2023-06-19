@@ -22,7 +22,7 @@ import BrowserServicesKit
 import UserScript
 
 protocol DataBrokerProtectionScanOperation {
-    func scan(dataBrokerData: DataBrokerData, profileData: ProfileData) async throws -> [ExtractedProfile]
+    func scan(query: BrokerProfileQueryData) async throws -> [ExtractedProfile]
 }
 
 public class DataBrokerProtectionScan: DataBrokerProtectionScanOperation {
@@ -31,7 +31,7 @@ public class DataBrokerProtectionScan: DataBrokerProtectionScanOperation {
 
     private var scanActiveContinuation: CheckedContinuation<[ExtractedProfile], Error>?
     private var handler: DataBrokerProtectionWebViewHandler?
-    private var profileData: ProfileData?
+    private var profileData: ProfileQuery?
     private var actionsHandler: DataBrokerProtectionActionsHandler?
 
     public init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties) {
@@ -39,18 +39,18 @@ public class DataBrokerProtectionScan: DataBrokerProtectionScanOperation {
         self.prefs = prefs
     }
 
-    public func scan(dataBrokerData: DataBrokerData, profileData: ProfileData) async throws -> [ExtractedProfile] {
+    public func scan(query: BrokerProfileQueryData) async throws -> [ExtractedProfile] {
         try await withCheckedThrowingContinuation { continuation in
             self.scanActiveContinuation = continuation
-            self.profileData = profileData
+            self.profileData = query.profileQuery
 
             Task {
-                await self.initialize(dataBrokerData: dataBrokerData, profileData: profileData)
+                await self.initialize(dataBrokerData: query.dataBroker, profileData: query.profileQuery)
             }
         }
     }
 
-    private func initialize(dataBrokerData: DataBrokerData, profileData: ProfileData) async {
+    private func initialize(dataBrokerData: DataBroker, profileData: ProfileQuery) async {
         handler = await DataBrokerProtectionWebViewHandler(privacyConfig: privacyConfig, prefs: prefs, delegate: self)
         await handler?.initializeWebView()
 

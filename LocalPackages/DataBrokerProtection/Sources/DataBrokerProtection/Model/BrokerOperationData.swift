@@ -19,8 +19,8 @@
 import Foundation
 
 protocol BrokerOperationData {
-    var id: UUID { get set }
-    var brokerProfileQueryID: UUID { get set }
+    var id: UUID { get }
+    var brokerProfileQueryID: UUID { get }
     var preferredRunDate: Date? { get set }
     var historyEvents: [HistoryEvent] { get set }
     var lastRunDate: Date? { get set }
@@ -34,13 +34,13 @@ extension BrokerOperationData {
     }
 
     var lastRunDate: Date? {
-        return historyEvents.last?.date
+        historyEvents.last?.date
     }
 }
 
-class ScanOperationData: BrokerOperationData {
-    var id: UUID
-    var brokerProfileQueryID: UUID
+public final class ScanOperationData: BrokerOperationData {
+    let id: UUID
+    let brokerProfileQueryID: UUID
     var preferredRunDate: Date?
     var historyEvents: [HistoryEvent]
     var lastRunDate: Date?
@@ -60,9 +60,9 @@ class ScanOperationData: BrokerOperationData {
 
 }
 
-class OptOutOperationData: BrokerOperationData {
-    var id: UUID
-    var brokerProfileQueryID: UUID
+public final class OptOutOperationData: BrokerOperationData {
+    let id: UUID
+    let brokerProfileQueryID: UUID
     var preferredRunDate: Date?
     var historyEvents: [HistoryEvent]
     var lastRunDate: Date?
