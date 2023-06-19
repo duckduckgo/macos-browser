@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "daniel/keychain-fixes",
-        "revision" : "a0c140f18d7c43d7a8f688836ec34edcbcdd6275"
+        "revision" : "1786629a3f78c5126eb41de691bb7d5db147933d",
+        "version" : "60.0.1"
       }
     },
     {
