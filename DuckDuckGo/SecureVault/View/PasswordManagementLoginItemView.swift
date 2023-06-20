@@ -80,9 +80,6 @@ struct PasswordManagementLoginItemView: View {
                 let btnLabel = Text(model.toggleConfirmationAlert.button)
                 let btnAction = model.togglePrivateEmailStatus
                 var button = Alert.Button.default(btnLabel, action: btnAction)
-                if model.toggleConfirmationAlert.destructive == true {
-                    button = Alert.Button.destructive(btnLabel, action: btnAction)
-                }
                 return Alert(
                     title: Text(model.toggleConfirmationAlert.title),
                     message: Text(model.toggleConfirmationAlert.message),
@@ -199,7 +196,7 @@ private struct UsernameLabel: View {
     var body: some View {
         HStack(alignment: .center, spacing: 6) {
 
-            if model.usernameIsPrivateEmail {
+            if model.isSignedIn && model.usernameIsPrivateEmail && model.privateEmailStatus != .notFound {
                 PrivateEmailImage()
             }
 
@@ -238,7 +235,7 @@ private struct PrivateEmailActivationButton: View {
 
     var body: some View {
         let status = model.privateEmailStatus
-        if status == .active || status == .inactive {
+        if model.isSignedIn && (status == .active || status == .inactive) {
             VStack(alignment: .leading) {
                 Button(status == .active ? UserText.pmDeactivateAddress : UserText.pmActivateAddress ) {
                     model.isShowingAddressUpdateConfirmAlert = true
@@ -260,8 +257,6 @@ private struct PrivateEmailImage: View {
             return NSImage(imageLiteralResourceName: "Email-16")
         case .inactive:
             return NSImage(imageLiteralResourceName: "Email-Deactivate-16")
-        case .notFound:
-            return NSImage(imageLiteralResourceName: "Email-Warning-16")
         default:
             return NSImage(imageLiteralResourceName: "Alert-Color-16")
         }
