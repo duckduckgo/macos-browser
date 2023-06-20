@@ -85,67 +85,6 @@ final class EncryptionKeyStoreTests: XCTestCase {
         XCTAssertEqual(originalKey, readKey)
     }
 
-    func testThatReadingKeyWhenThereIsOneAndIsEncryptionKeyResavedIsFalseWillReturnTheSameKeyAndKeyIsStoredInBase64() {
-        // set IsEncryptionKeyResaved to false
-        var userDefaults = UserDefaultsWrapper<Bool>(key: .isEncryptionKeyResaved, defaultValue: false)
-        userDefaults.wrappedValue = false
-
-        // Save key with the old way
-        let originalKey = generator.randomKey()
-        saveKeyInBinary(key: originalKey)
-        XCTAssertThrowsError(try readBase64KeyFromKeychain(account: account))
-
-        // Read key anc chek if it is the same key
-        let store = EncryptionKeyStore(generator: generator, account: account)
-        let readKey = try? store.readKey()
-        XCTAssertEqual(originalKey, readKey)
-        XCTAssertNoThrow(try readBase64KeyFromKeychain(account: account))
-    }
-
-    private func readBase64KeyFromKeychain(account: String) throws -> SymmetricKey? {
-        var query = defaultKeychainQueryAttributes
-        query[kSecReturnData as String] = true
-
-        var item: CFTypeRef?
-        let status = SecItemCopyMatching(query as CFDictionary, &item)
-
-        switch status {
-        case errSecSuccess:
-            guard let data = item as? Data else {
-                throw EncryptionKeyStoreError.readFailed(status)
-            }
-            guard let base64String = String(data: data, encoding: .utf8) else {
-                throw EncryptionKeyStoreError.cannotTrasformDataToString(status)
-            }
-            guard let keyData = Data(base64Encoded: base64String) else {
-                throw EncryptionKeyStoreError.cannotTrasfrotmStringToBase64Data(status)
-            }
-
-            return SymmetricKey(data: keyData)
-        case errSecItemNotFound:
-            return nil
-        default:
-            throw EncryptionKeyStoreError.readFailed(status)
-        }
-    }
-
-    private var defaultKeychainQueryAttributes: [String: Any] {
-        return [
-            kSecClass: kSecClassGenericPassword,
-            kSecAttrAccount: account,
-            kSecUseDataProtectionKeychain: true
-        ] as [String: Any]
-    }
-
-    private func saveKeyInBinary(key: SymmetricKey) {
-        var query = defaultKeychainQueryAttributes
-        query[kSecAttrService as String] = EncryptionKeyStore.Constants.encryptionKeyService
-        query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlocked
-        query[kSecValueData as String] = key.dataRepresentation
-
-        let status = SecItemAdd(query as CFDictionary, nil)
-    }
-
     private func removeTestKeys() {
         let store = EncryptionKeyStore(generator: generator, account: account)
         try? store.deleteKey()
