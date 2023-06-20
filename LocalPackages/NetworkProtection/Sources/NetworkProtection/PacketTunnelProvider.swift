@@ -25,24 +25,6 @@ import Foundation
 import NetworkExtension
 import UserNotifications
 
-public protocol PacketTunnelProviderDelegate: AnyObject {
-    func connectionStatusDidChange(_ data: String?)
-    func lastSelectedServerInfoDidChange(_ payload: String?)
-    func userDidBecomeActive()
-    func didReportLatency(ms: Int, server: String, networkType: NetworkConnectionType)
-    func didCompleteRekey()
-    func tunnelDidError(_ errorMessage: String?)
-    func tunnelIsHavingIssue(_ isHavingIssue: Bool)
-    func connectionDidFailWhenOnActivationBySystemOnDemand(_ completion: () -> Void)
-    func didStartFromSystemSettings(_ completion: () -> Void)
-    func userTriggeredStopFromSystemSettings(_ completion: () -> Void)
-}
-
-public protocol PlatformNotificationDispatcher {
-    func connectionStatusDidChange(_ data: String?)
-    func lastSelectedServerInfoDidChange(_ payload: String?)
-}
-
 // swiftlint:disable:next type_body_length
 open class PacketTunnelProvider: NEPacketTunnelProvider {
 
@@ -73,8 +55,6 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
             }
         }
     }
-
-    public weak var delegate: PacketTunnelProviderDelegate?
 
     // MARK: - WireGuard
 
@@ -801,7 +781,6 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
         }
 
         os_log("🔵 Tunnel interface is %{public}@", log: .networkProtection, type: .info, adapter.interfaceName ?? "unknown")
-        delegate?.userDidBecomeActive()
 
         if let interfaceName = adapter.interfaceName {
             do {
