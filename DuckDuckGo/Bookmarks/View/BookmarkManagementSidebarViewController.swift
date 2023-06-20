@@ -115,6 +115,8 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         reloadData()
 
         tabSwitcherButton.select(tabType: .bookmarks)
+
+        LocalBookmarkManager.shared.requestSync()
     }
 
     func select(folder: BookmarkFolder) {

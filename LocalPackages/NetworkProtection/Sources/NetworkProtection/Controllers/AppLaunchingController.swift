@@ -29,7 +29,7 @@ public final class AppLaunchingController: TunnelController {
         await appLauncher.launchApp(withCommand: .startVPN)
     }
 
-    public func stop() async throws {
+    public func stop() async {
         await appLauncher.launchApp(withCommand: .stopVPN)
     }
 }

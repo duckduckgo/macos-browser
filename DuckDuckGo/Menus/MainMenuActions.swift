@@ -783,6 +783,22 @@ extension MainViewController {
         #endif
     }
 
+    @IBAction func showPopUpWindow(_ sender: Any?) {
+        let tabURL = Tab.TabContent.url(URL(string: "https://duckduckgo.com")!)
+        let tab = Tab(content: tabURL,
+                      webViewConfiguration: WKWebViewConfiguration(),
+                      parentTab: nil,
+                      isBurner: false,
+                      canBeClosedWithBack: false,
+                      webViewSize: .zero)
+
+        WindowsManager.openPopUpWindow(with: tab, isBurner: false, contentSize: nil)
+    }
+
+    @IBAction func resetEmailProtectionInContextPrompt(_ sender: Any?) {
+        EmailManager().resetEmailProtectionInContextPrompt()
+    }
+
     @IBAction func fetchConfigurationNow(_ sender: Any?) {
         ConfigurationManager.shared.forceRefresh()
     }

@@ -75,6 +75,9 @@ extension Tab: NavigationResponder {
             // browsing history
             .weak(nullable: self.history),
 
+            // Find In Page
+            .weak(nullable: self.findInPage),
+
             // should be the last, for Unit Tests navigation events tracking
             .struct(nullable: testsClosureNavigationResponder)
         )
