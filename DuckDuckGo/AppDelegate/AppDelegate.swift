@@ -78,9 +78,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     // swiftlint:disable:next function_body_length
     func applicationWillFinishLaunching(_ notification: Notification) {
 #if !APPSTORE && !DEBUG
-        isShowingMoveAppAlert = true
         PFMoveToApplicationsFolderIfNecessary()
-        isShowingMoveAppAlert = false
 #endif
 
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
