@@ -26,8 +26,8 @@
 // These are macros to be able to use custom i18n tools
 #define _I10NS(nsstr) NSLocalizedStringFromTableInBundle(nsstr, @"MoveApplication", [LetsMove bundle], nil)
 #define kStrMoveApplicationCouldNotMove _I10NS(@"Could not move to Applications folder")
-#define kStrMoveApplicationQuestionTitle  _I10NS(@"You're almost there")
-#define kStrMoveApplicationQuestionTitleHome _I10NS(@"You're almost there")
+#define kStrMoveApplicationQuestionTitle  _I10NS(@"Move to Applications folder?")
+#define kStrMoveApplicationQuestionTitleHome _I10NS(@"Move to Applications folder?")
 #define kStrMoveApplicationQuestionMessage _I10NS(@"The DuckDuckGo app needs to be in the Applications folder for some features to work properly.")
 #define kStrMoveApplicationButtonMove _I10NS(@"Move to Applications Folder")
 #define kStrMoveApplicationButtonDoNotMove _I10NS(@"Do Not Move")
