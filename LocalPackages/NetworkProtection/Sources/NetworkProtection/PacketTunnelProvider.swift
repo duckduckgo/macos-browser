@@ -44,7 +44,7 @@ public protocol PlatformNotificationDispatcher {
 }
 
 // swiftlint:disable:next type_body_length
-public final class PacketTunnelProvider: NEPacketTunnelProvider {
+open class PacketTunnelProvider: NEPacketTunnelProvider {
 
     public enum Event {
         case userBecameActive
@@ -411,7 +411,7 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
         try tokenStore.store(authToken)
     }
 
-    public override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
+    open override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         connectionStatus = .connecting
 
         // when activated by system "on-demand" the option is set
