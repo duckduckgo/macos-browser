@@ -190,9 +190,9 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         isNew = credentials?.account.id == nil
 
         // Determine Private Email Status when required
+        usernameIsPrivateEmail = emailManager.isPrivateEmail(email: username)
         if emailManager.isSignedIn {
             isSignedIn = true
-            usernameIsPrivateEmail = emailManager.isPrivateEmail(email: username)
             if usernameIsPrivateEmail {
                 Task { try? await getPrivateEmailStatus() }
             }
