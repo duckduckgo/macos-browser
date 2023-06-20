@@ -59,6 +59,8 @@ extension NetworkProtectionNotificationPosting {
     }
 }
 
+public typealias NetworkProtectionNotificationCenter = NotificationCenter & NetworkProtectionNotificationPosting
+
 extension NotificationCenter {
     static let preferredStringEncoding = String.Encoding.utf8
 

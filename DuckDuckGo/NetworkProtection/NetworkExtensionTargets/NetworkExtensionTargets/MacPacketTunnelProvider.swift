@@ -32,7 +32,6 @@ final class MacPacketTunnelProvider: NEPacketTunnelProvider {
                                                         useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
                                                         debugEvents: self.networkProtectionDebugEvents,
                                                         providerEvents: self.packetTunnelProviderEvents,
-                                                        notificationPoster: DistributedNotificationCenter.forType(.networkProtection),
                                                         appLauncher: AppLauncher(appBundleURL: .mainAppBundleURL))
         return packetTunnelProvider
     }()
@@ -107,14 +106,14 @@ final class MacPacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
-    static let controllerErrorStore = NetworkProtectionTunnelErrorStore()
+    private lazy var controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: DistributedNotificationCenter.forType(.networkProtection))
 
     // MARK: - Error Reporting
-    private lazy var networkProtectionDebugEvents: EventMapping<NetworkProtectionError>? = .init { event, _, _, _ in
+    private lazy var networkProtectionDebugEvents: EventMapping<NetworkProtectionError>? = .init { [weak self] event, _, _, _ in
         let domainEvent: NetworkProtectionPixelEvent
 #if DEBUG
         // Makes sure we see the assertion failure in the yellow NetP alert.
-        Self.controllerErrorStore.lastErrorMessage = "[Debug] Error event: \(event.localizedDescription)"
+        self?.controllerErrorStore.lastErrorMessage = "[Debug] Error event: \(event.localizedDescription)"
 #endif
         switch event {
         case .noServerRegistrationInfo:

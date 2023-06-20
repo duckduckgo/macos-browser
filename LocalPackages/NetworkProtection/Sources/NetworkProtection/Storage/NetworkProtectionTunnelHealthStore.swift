@@ -18,20 +18,18 @@
 
 import Foundation
 import Common
-import Combine
 
 /// Stores information about NetP's tunnel health
 ///
 final class NetworkProtectionTunnelHealthStore {
-    public let issuePublisher: AnyPublisher<Bool, Never>
-
-    private let issueSubject = PassthroughSubject<Bool, Never>()
     private static let isHavingConnectivityIssuesKey = "com.duckduckgo.isHavingConnectivityIssues"
     private let userDefaults: UserDefaults
+    private let notificationCenter: NetworkProtectionNotificationCenter
 
-    init(userDefaults: UserDefaults = .standard) {
+    init(userDefaults: UserDefaults = .standard,
+         notificationCenter: NetworkProtectionNotificationCenter) {
         self.userDefaults = userDefaults
-        self.issuePublisher = issueSubject.eraseToAnyPublisher()
+        self.notificationCenter = notificationCenter
     }
 
     var isHavingConnectivityIssues: Bool {
@@ -42,9 +40,16 @@ final class NetworkProtectionTunnelHealthStore {
             guard newValue != userDefaults.bool(forKey: Self.isHavingConnectivityIssuesKey) else {
                 return
             }
-
             userDefaults.set(newValue, forKey: Self.isHavingConnectivityIssuesKey)
-            issueSubject.send(newValue)
+            postIssueChangeNotification(newValue: newValue)
+        }
+    }
+    // MARK: - Posting Issue Notifications
+    private func postIssueChangeNotification(newValue: Bool) {
+        if newValue {
+            notificationCenter.post(.issuesStarted)
+        } else {
+            notificationCenter.post(.issuesResolved)
         }
     }
 }

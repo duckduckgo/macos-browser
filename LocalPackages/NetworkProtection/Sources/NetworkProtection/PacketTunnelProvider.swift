@@ -119,7 +119,7 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     private func broadcastConnectionStatus() {
         let data = ConnectionStatusEncoder().encode(connectionStatus)
-        notificationPoster.post(.statusDidChange, object: data)
+        notificationCenter.post(.statusDidChange, object: data)
     }
 
     // MARK: - Server Selection
@@ -158,7 +158,7 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
             payload = nil
         }
 
-        notificationPoster.post(.serverSelected, object: payload)
+        notificationCenter.post(.serverSelected, object: payload)
         // Update shared userdefaults
     }
 
@@ -325,8 +325,8 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     private var lastTestFailed = false
     private let bandwidthAnalyzer = NetworkProtectionConnectionBandwidthAnalyzer()
-    private let tunnelHealth = NetworkProtectionTunnelHealthStore()
-    private let controllerErrorStore = NetworkProtectionTunnelErrorStore()
+    private let tunnelHealth: NetworkProtectionTunnelHealthStore
+    private let controllerErrorStore: NetworkProtectionTunnelErrorStore
     private let latencyReporter = NetworkProtectionLatencyReporter(log: .networkProtection)
 
     // MARK: - Notifications: Observation Tokens
@@ -339,19 +339,17 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - Initializers
 
-    private let notificationCenter: NotificationCenter
+    private let notificationCenter: NetworkProtectionNotificationCenter
     private let useSystemKeychain: Bool
     private let debugEvents: EventMapping<NetworkProtectionError>?
     private let providerEvents: EventMapping<Event>
-    private let notificationPoster: NetworkProtectionNotificationPosting
     private let appLauncher: AppLaunching?
 
-    public init(notificationCenter: NotificationCenter,
+    public init(notificationCenter: NetworkProtectionNotificationCenter,
                 notificationsPresenter: NetworkProtectionNotificationsPresenter,
                 useSystemKeychain: Bool,
                 debugEvents: EventMapping<NetworkProtectionError>?,
                 providerEvents: EventMapping<Event>,
-                notificationPoster: NetworkProtectionNotificationPosting,
                 appLauncher: AppLaunching? = nil) {
         os_log("[+] PacketTunnelProvider", log: .networkProtectionMemoryLog, type: .debug)
         self.notificationCenter = notificationCenter
@@ -359,8 +357,9 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
         self.useSystemKeychain = useSystemKeychain
         self.debugEvents = debugEvents
         self.providerEvents = providerEvents
-        self.notificationPoster = notificationPoster
         self.appLauncher = appLauncher
+        self.tunnelHealth = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
+        self.controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
 
         super.init()
 
@@ -368,14 +367,6 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
             self?.broadcastConnectionStatus()
             self?.broadcastLastSelectedServerInfo()
         }
-
-        tunnelHealth.issuePublisher.sink { [weak self] isHavingIssue in
-            self?.tunnelIsHavingIssue(isHavingIssue)
-        }.store(in: &cancellables)
-
-        controllerErrorStore.errorPublisher.sink { [weak notificationPoster] errorMessage in
-            notificationPoster?.post(.tunnelErrorChanged, object: errorMessage)
-        }.store(in: &cancellables)
 
         connectionStatus = .disconnected
     }
@@ -841,16 +832,6 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
 
         Task {
             await handleAdapterStarted(resumed: true)
-        }
-    }
-
-    // MARK: - PacketTunnelProviderDelegate
-
-    func tunnelIsHavingIssue(_ isHavingIssue: Bool) {
-        if isHavingIssue {
-            notificationPoster.post(.issuesStarted)
-        } else {
-            notificationPoster.post(.issuesResolved)
         }
     }
 }
