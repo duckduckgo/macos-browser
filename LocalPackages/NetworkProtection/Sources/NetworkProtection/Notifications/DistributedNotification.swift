@@ -29,12 +29,6 @@ extension DistributedNotificationCenter {
 
     static let preferredStringEncoding = String.Encoding.utf8
 
-    public func post(_ networkProtectionNotification: DistributedNotificationName, object: String? = nil, log: OSLog = .networkProtectionDistributedNotificationsLog) {
-        logPost(networkProtectionNotification, object: object, log: log)
-
-        postNotificationName(networkProtectionNotification.notificationName, object: object, options: [.deliverImmediately, .postToAllSessions])
-    }
-
     // MARK: - Logging
 
     private func logPost(_ networkProtectionNotification: DistributedNotificationName, object: String? = nil, log: OSLog = .networkProtectionDistributedNotificationsLog) {
@@ -48,7 +42,25 @@ extension DistributedNotificationCenter {
 
 }
 
+extension DistributedNotificationCenter: NetworkProtectionNotificationPosting {
+    public func post(_ networkProtectionNotification: DistributedNotificationName, object: String? = nil, log: OSLog = .networkProtectionDistributedNotificationsLog) {
+        logPost(networkProtectionNotification, object: object, log: log)
+
+        postNotificationName(networkProtectionNotification.notificationName, object: object, options: [.deliverImmediately, .postToAllSessions])
+    }
+}
+
 #endif
+
+public protocol NetworkProtectionNotificationPosting: AnyObject {
+    func post(_ networkProtectionNotification: DistributedNotificationName, object: String?, log: OSLog)
+}
+
+extension NetworkProtectionNotificationPosting {
+    func post(_ networkProtectionNotification: DistributedNotificationName, object: String? = nil) {
+        post(networkProtectionNotification, object: object, log: .networkProtectionDistributedNotificationsLog)
+    }
+}
 
 extension NotificationCenter {
     public func addObserver(for networkProtectionNotification: DistributedNotificationName, object: Any?, queue: OperationQueue?, using block: @escaping @Sendable (Notification) -> Void) -> NSObjectProtocol {

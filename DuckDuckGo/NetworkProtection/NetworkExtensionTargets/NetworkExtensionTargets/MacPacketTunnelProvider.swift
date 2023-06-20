@@ -23,11 +23,31 @@ import Common
 import Networking
 import PixelKit
 
-final class MacPacketTunnelProvider: NEPacketTunnelProvider, PacketTunnelProviderDelegate {
+final class MacPacketTunnelProvider: NEPacketTunnelProvider {
 
-    private let controllerErrorStore = NetworkProtectionTunnelErrorStore()
-    private let distributedNotificationCenter = DistributedNotificationCenter.forType(.networkProtection)
-    private lazy var notificationsPresenter: NetworkProtectionNotificationsPresenter = {
+    private lazy var genericPacketTunnelProvider: PacketTunnelProvider = {
+        let distributedNotificationCenter = DistributedNotificationCenter.forType(.networkProtection)
+        let packetTunnelProvider = PacketTunnelProvider(notificationCenter: distributedNotificationCenter,
+                                                        notificationsPresenter: Self.makeNotificationsPresenter(),
+                                                        useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
+                                                        debugEvents: self.networkProtectionDebugEvents,
+                                                        providerEvents: self.packetTunnelProviderEvents,
+                                                        notificationPoster: DistributedNotificationCenter.forType(.networkProtection))
+        return packetTunnelProvider
+    }()
+
+    private lazy var packetTunnelProviderEvents: EventMapping<PacketTunnelProvider.Event> = .init { event, _, _, _ in
+        switch event {
+        case .userBecameActive:
+            Pixel.fire(.networkProtectionActiveUser, frequency: .dailyOnly, includeAppVersionParameter: true)
+        case .reportLatency(ms: let ms, server: let server, networkType: let networkType):
+            Pixel.fire(.networkProtectionLatency(ms: ms, server: server, networkType: networkType), frequency: .standard)
+        case .rekeyCompleted:
+            Pixel.fire(.networkProtectionRekeyCompleted, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
+        }
+    }
+
+    private static func makeNotificationsPresenter() -> NetworkProtectionNotificationsPresenter {
 #if NETP_SYSTEM_EXTENSION
         let ipcConnection = IPCConnection(log: .networkProtectionIPCLog, memoryManagementLog: .networkProtectionMemoryLog)
         ipcConnection.startListener()
@@ -42,15 +62,23 @@ final class MacPacketTunnelProvider: NEPacketTunnelProvider, PacketTunnelProvide
         }
         return NetworkProtectionUNNotificationsPresenter(mainAppURL: mainAppURL)
 #endif
-    }()
+    }
 
-    private lazy var genericPacketTunnelProvider: PacketTunnelProvider = {
-        let packetTunnelProvider = PacketTunnelProvider(notificationCenter: distributedNotificationCenter,
-                                                        createNotificationsPresenter: self.notificationsPresenter,
-                                                        useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
-                                                        debugEvents: networkProtectionDebugEvents)
-        packetTunnelProvider.delegate = self
-        return packetTunnelProvider
+    private static var notificationsPresenter: NetworkProtectionNotificationsPresenter = {
+#if NETP_SYSTEM_EXTENSION
+        let ipcConnection = IPCConnection(log: .networkProtectionIPCLog, memoryManagementLog: .networkProtectionMemoryLog)
+        ipcConnection.startListener()
+        return NetworkProtectionIPCNotificationsPresenter(ipcConnection: ipcConnection)
+#else
+        let parentBundlePath = "../../../"
+        let mainAppURL: URL
+        if #available(macOS 13, *) {
+            mainAppURL = URL(filePath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
+        } else {
+            mainAppURL = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
+        }
+        return NetworkProtectionUNNotificationsPresenter(mainAppURL: mainAppURL)
+#endif
     }()
 
     // MARK: - Pixels
@@ -78,15 +106,14 @@ final class MacPacketTunnelProvider: NEPacketTunnelProvider, PacketTunnelProvide
         }
     }
 
+    static let controllerErrorStore = NetworkProtectionTunnelErrorStore()
+
     // MARK: - Error Reporting
-    private lazy var networkProtectionDebugEvents: EventMapping<NetworkProtectionError>? = .init { [weak self] event, _, _, _ in
-        guard let self = self else {
-            return
-        }
+    private lazy var networkProtectionDebugEvents: EventMapping<NetworkProtectionError>? = .init { event, _, _, _ in
         let domainEvent: NetworkProtectionPixelEvent
 #if DEBUG
         // Makes sure we see the assertion failure in the yellow NetP alert.
-        self.controllerErrorStore.lastErrorMessage = "[Debug] Error event: \(event.localizedDescription)"
+        Self.controllerErrorStore.lastErrorMessage = "[Debug] Error event: \(event.localizedDescription)"
 #endif
         switch event {
         case .noServerRegistrationInfo:
@@ -209,39 +236,5 @@ final class MacPacketTunnelProvider: NEPacketTunnelProvider, PacketTunnelProvide
 
     override func wake() {
         genericPacketTunnelProvider.wake()
-    }
-
-    // MARK: - PacketTunnelProviderDelegate
-
-    func connectionStatusDidChange(_ data: String?) {
-        distributedNotificationCenter.post(.statusDidChange, object: data)
-    }
-
-    func lastSelectedServerInfoDidChange(_ payload: String?) {
-        distributedNotificationCenter.post(.serverSelected, object: payload)
-    }
-
-    func userDidBecomeActive() {
-        Pixel.fire(.networkProtectionActiveUser, frequency: .dailyOnly, includeAppVersionParameter: true)
-    }
-
-    func didReportLatency(ms: Int, server: String, networkType: NetworkConnectionType) {
-        Pixel.fire(.networkProtectionLatency(ms: ms, server: server, networkType: networkType), frequency: .standard)
-    }
-
-    func didCompleteRekey() {
-        Pixel.fire(.networkProtectionRekeyCompleted, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
-    }
-
-    func tunnelDidError(_ errorMessage: String?) {
-        distributedNotificationCenter.post(.tunnelErrorChanged, object: errorMessage)
-    }
-
-    func tunnelIsHavingIssue(_ isHavingIssue: Bool) {
-        if isHavingIssue {
-            distributedNotificationCenter.post(.issuesStarted)
-        } else {
-            distributedNotificationCenter.post(.issuesResolved)
-        }
     }
 }

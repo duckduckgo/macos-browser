@@ -46,7 +46,7 @@ public protocol PlatformNotificationDispatcher {
 // swiftlint:disable:next type_body_length
 public final class PacketTunnelProvider: NEPacketTunnelProvider {
 
-    enum Event {
+    public enum Event {
         case userBecameActive
         case reportLatency(ms: Int, server: String, networkType: NetworkConnectionType)
         case rekeyCompleted
@@ -119,7 +119,7 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     private func broadcastConnectionStatus() {
         let data = ConnectionStatusEncoder().encode(connectionStatus)
-        delegate?.connectionStatusDidChange(data)
+        notificationPoster.post(.statusDidChange, object: data)
     }
 
     // MARK: - Server Selection
@@ -158,13 +158,13 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
             payload = nil
         }
 
-        delegate?.lastSelectedServerInfoDidChange(payload)
+        notificationPoster.post(.serverSelected, object: payload)
         // Update shared userdefaults
     }
 
     // MARK: - User Notifications
 
-    private lazy var notificationsPresenter: NetworkProtectionNotificationsPresenter = createNotificationsPresenter()
+    private let notificationsPresenter: NetworkProtectionNotificationsPresenter
 
     // MARK: - Registration Key
 
@@ -213,8 +213,8 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
     private func rekey() async {
         os_log("Rekeying...", log: .networkProtectionKeyManagement, type: .info)
 
-        delegate?.userDidBecomeActive()
-        delegate?.didCompleteRekey()
+        providerEvents.fire(.userBecameActive)
+        providerEvents.fire(.rekeyCompleted)
 
         self.resetRegistrationKey()
 
@@ -318,8 +318,8 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
             self.latencyReporter.stop()
         }
 
-        self.latencyReporter.start(ip: ip) { [serverName=lastSelectedServerInfo.name, weak delegate] latency, networkType in
-            delegate?.didReportLatency(ms: Int(latency * 1000), server: serverName, networkType: networkType)
+        self.latencyReporter.start(ip: ip) { [serverName=lastSelectedServerInfo.name, providerEvents] latency, networkType in
+            providerEvents.fire(.reportLatency(ms: Int(latency * 1000), server: serverName, networkType: networkType))
         }
     }
 
@@ -340,19 +340,24 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
     // MARK: - Initializers
 
     private let notificationCenter: NotificationCenter
-    private let createNotificationsPresenter: () -> NetworkProtectionNotificationsPresenter
     private let useSystemKeychain: Bool
     private let debugEvents: EventMapping<NetworkProtectionError>?
+    private let providerEvents: EventMapping<Event>
+    private let notificationPoster: NetworkProtectionNotificationPosting
 
     public init(notificationCenter: NotificationCenter,
-                createNotificationsPresenter: @autoclosure @escaping () -> NetworkProtectionNotificationsPresenter,
+                notificationsPresenter: NetworkProtectionNotificationsPresenter,
                 useSystemKeychain: Bool,
-                debugEvents: EventMapping<NetworkProtectionError>?) {
+                debugEvents: EventMapping<NetworkProtectionError>?,
+                providerEvents: EventMapping<Event>,
+                notificationPoster: NetworkProtectionNotificationPosting) {
         os_log("[+] PacketTunnelProvider", log: .networkProtectionMemoryLog, type: .debug)
         self.notificationCenter = notificationCenter
-        self.createNotificationsPresenter = createNotificationsPresenter
+        self.notificationsPresenter = notificationsPresenter
         self.useSystemKeychain = useSystemKeychain
         self.debugEvents = debugEvents
+        self.providerEvents = providerEvents
+        self.notificationPoster = notificationPoster
 
         super.init()
 
@@ -361,12 +366,12 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
             self?.broadcastLastSelectedServerInfo()
         }
 
-        tunnelHealth.issuePublisher.sink { [weak delegate] isHavingIssue in
-            delegate?.tunnelIsHavingIssue(isHavingIssue)
+        tunnelHealth.issuePublisher.sink { [weak self] isHavingIssue in
+            self?.tunnelIsHavingIssue(isHavingIssue)
         }.store(in: &cancellables)
 
-        controllerErrorStore.errorPublisher.sink { [weak delegate] errorMessage in
-            delegate?.tunnelDidError(errorMessage)
+        controllerErrorStore.errorPublisher.sink { [weak notificationPoster] errorMessage in
+            notificationPoster?.post(.tunnelErrorChanged, object: errorMessage)
         }.store(in: &cancellables)
 
         connectionStatus = .disconnected
@@ -835,6 +840,16 @@ public final class PacketTunnelProvider: NEPacketTunnelProvider {
 
         Task {
             await handleAdapterStarted(resumed: true)
+        }
+    }
+
+    // MARK: - PacketTunnelProviderDelegate
+
+    func tunnelIsHavingIssue(_ isHavingIssue: Bool) {
+        if isHavingIssue {
+            notificationPoster.post(.issuesStarted)
+        } else {
+            notificationPoster.post(.issuesResolved)
         }
     }
 }
