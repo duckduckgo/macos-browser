@@ -66,6 +66,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     @Published var privateEmailStatus: EmailAliasStatus = .unknown
     @Published var isShowingAddressUpdateConfirmAlert: Bool = false
     @Published var isShowingDuckRemovalAlert: Bool = false
+    @Published var isSignedIn: Bool = false
 
     var userDuckAddress: String {
         return emailManager.userEmail ?? ""
@@ -73,30 +74,32 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     var privateEmailMessage: String {
         var message: String
-        switch privateEmailStatus {
-        case .inactive:
-        message = UserText.pmEmailMessageInactive
-        case .notFound:
-        message = UserText.pmEmailMessageNotAllowed
-        case .error:
-        message = UserText.pmEmailMessageError
-        default:
-        message = ""
+        if isSignedIn {
+            switch privateEmailStatus {
+            case .inactive:
+                message = UserText.pmEmailMessageInactive
+            case .notFound:
+                message = ""
+            case .error:
+                message = UserText.pmEmailMessageError
+            default:
+                message = ""
+            }
+        } else {
+            message = UserText.pmSignInToManageEmail
         }
         return message
     }
 
-    var toggleConfirmationAlert: (title: String, message: String, button: String, destructive: Bool) {
+    var toggleConfirmationAlert: (title: String, message: String, button: String) {
         if privateEmailStatus == .active {
             return (title: UserText.pmEmailDeactivateConfirmTitle,
                     message: UserText.pmEmailDeactivateConfirmContent,
-                    button: UserText.pmDeactivate,
-                    destructive: true)
+                    button: UserText.pmDeactivate)
         }
         return (title: UserText.pmEmailActivateConfirmTitle,
                 message: UserText.pmEmailActivateConfirmContent,
-                button: UserText.pmActivate,
-                destructive: false)
+                button: UserText.pmActivate)
     }
 
     private var previousUsername: String = ""
@@ -187,9 +190,12 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         isNew = credentials?.account.id == nil
 
         // Determine Private Email Status when required
-        usernameIsPrivateEmail = emailManager.isPrivateEmail(email: username)
-        if usernameIsPrivateEmail {
-            Task { try? await getPrivateEmailStatus() }
+        if emailManager.isSignedIn {
+            isSignedIn = true
+            usernameIsPrivateEmail = emailManager.isPrivateEmail(email: username)
+            if usernameIsPrivateEmail {
+                Task { try? await getPrivateEmailStatus() }
+            }
         }
 
         if let date = credentials?.account.created {
