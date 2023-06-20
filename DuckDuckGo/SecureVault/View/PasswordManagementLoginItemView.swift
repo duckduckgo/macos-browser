@@ -217,7 +217,7 @@ private struct UsernameLabel: View {
                     }
                 }
 
-                if model.hasValidPrivateEmail && model.privateEmailMessage != "" {
+                if model.usernameIsPrivateEmail && model.privateEmailMessage != "" {
                     Text(model.privateEmailMessage)
                         .font(.caption)
                         .lineLimit(nil)
