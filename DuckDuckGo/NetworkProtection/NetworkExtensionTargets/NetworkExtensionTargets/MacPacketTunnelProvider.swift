@@ -62,7 +62,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     private let controllerErrorStore: NetworkProtectionTunnelErrorStore
 
     // MARK: - Error Reporting
-
+    
+    // swiftlint:disable:next cyclomatic_complexity
+    // swiftlint:disable:next function_body_length
     private static func networkProtectionDebugEvents(controllerErrorStore: NetworkProtectionTunnelErrorStore) -> EventMapping<NetworkProtectionError>? {
         return EventMapping { event, _, _, _ in
             let domainEvent: NetworkProtectionPixelEvent
@@ -131,6 +133,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             Pixel.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
         }
     }
+    // swiftlint:enable cyclomatic_complexity
+    // swiftlint:enable function_body_length
 
     // MARK: - PacketTunnelProvider.Event reporting
 
