@@ -194,38 +194,36 @@ private struct UsernameLabel: View {
     @Binding var isHovering: Bool
 
     var body: some View {
-        HStack(alignment: .center, spacing: 6) {
 
-            if model.isSignedIn && model.usernameIsPrivateEmail && model.privateEmailStatus != .notFound {
-                PrivateEmailImage()
-            }
+        VStack(alignment: .leading, spacing: 7) {
 
-            VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 8) {
 
-                HStack(spacing: 5) {
+                if model.usernameIsPrivateEmail {
+                    PrivateEmailImage()
+                }
 
-                    Text(model.username)
+                Text(model.username)
 
-                    if isHovering {
-                        Button {
-                            model.copy(model.username)
-                        } label: {
-                            Image("Copy")
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .tooltip(UserText.copyUsernameTooltip)
+                if isHovering {
+                    Button {
+                        model.copy(model.username)
+                    } label: {
+                        Image("Copy")
                     }
-                }
-
-                if model.usernameIsPrivateEmail && model.privateEmailMessage != "" {
-                    Text(model.privateEmailMessage)
-                        .font(.caption)
-                        .lineLimit(nil)
-                        .multilineTextAlignment(.leading)
-                        .fixedSize(horizontal: false, vertical: true)
+                    .buttonStyle(PlainButtonStyle())
+                    .tooltip(UserText.copyUsernameTooltip)
                 }
             }
-        }.frame(minHeight: 30)
+
+            if model.usernameIsPrivateEmail && model.privateEmailMessage != "" {
+                Text(model.privateEmailMessage)
+                    .font(.footnote)
+                    .lineLimit(nil)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 }
 
@@ -252,14 +250,19 @@ private struct PrivateEmailImage: View {
     @EnvironmentObject var model: PasswordManagementLoginModel
 
     var image: NSImage {
-        switch model.privateEmailStatus {
-        case .active:
+        if !model.isSignedIn {
             return NSImage(imageLiteralResourceName: "Email-16")
-        case .inactive:
-            return NSImage(imageLiteralResourceName: "Email-Deactivate-16")
-        default:
-            return NSImage(imageLiteralResourceName: "Alert-Color-16")
+        } else {
+            switch model.privateEmailStatus {
+                case .active:
+                    return NSImage(imageLiteralResourceName: "Email-16")
+                case .inactive:
+                    return NSImage(imageLiteralResourceName: "Email-Deactivate-16")
+                default:
+                    return NSImage(imageLiteralResourceName: "Alert-Color-16")
+            }
         }
+
     }
 
     var body: some View {
