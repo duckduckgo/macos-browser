@@ -348,6 +348,12 @@ final class EmailOptionsButtonSubMenu: NSMenu {
                 .targetting(self)
                 .withImage(NSImage(named: "OptionsButtonMenuEmailGenerateAddress"))
 
+            addItem(withTitle: UserText.emailOptionsMenuManageAccountSubItem, action: #selector(manageAccountAction(_:)), keyEquivalent: "")
+                .targetting(self)
+                .withImage(NSImage(named: "Identity-16"))
+
+            addItem(.separator())
+
             addItem(withTitle: UserText.emailOptionsMenuTurnOffSubItem, action: #selector(turnOffEmailAction(_:)), keyEquivalent: "")
                 .targetting(self)
                 .withImage(NSImage(named: "OptionsButtonMenuEmailDisabled"))
@@ -358,6 +364,11 @@ final class EmailOptionsButtonSubMenu: NSMenu {
                 .withImage(NSImage(named: "OptionsButtonMenuEmail"))
 
         }
+    }
+
+    @objc func manageAccountAction(_ sender: NSMenuItem) {
+        let tab = Tab(content: .url(EmailUrls().emailProtectionAccountLink), shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
+        tabCollectionViewModel.append(tab: tab)
     }
 
     @objc func createAddressAction(_ sender: NSMenuItem) {
