@@ -167,6 +167,17 @@ extension NSAlert {
         return alert
     }
 
+    static func disableEmailProtection() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.disableEmailProtectionTitle
+        alert.informativeText = UserText.disableEmailProtectionMessage
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.disable)
+        alert.addButton(withTitle: UserText.cancel)
+        return alert
+    }
+
+
     @discardableResult
     func runModal() async -> NSApplication.ModalResponse {
         await withCheckedContinuation { continuation in

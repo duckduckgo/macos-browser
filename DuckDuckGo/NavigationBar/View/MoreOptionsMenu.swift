@@ -381,7 +381,11 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     @objc func turnOffEmailAction(_ sender: NSMenuItem) {
-        emailManager.signOut()
+        let alert = NSAlert.disableEmailProtection()
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn {
+            emailManager.signOut()
+        }
     }
 
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
