@@ -28,7 +28,7 @@ extension DistributedNotificationCenter.CenterType {
 extension DistributedNotificationCenter {
     // MARK: - Logging
 
-    private func logPost(_ networkProtectionNotification: DistributedNotificationName, object: String? = nil, log: OSLog = .networkProtectionDistributedNotificationsLog) {
+    private func logPost(_ networkProtectionNotification: NetworkProtectionNotificationName, object: String? = nil, log: OSLog = .networkProtectionDistributedNotificationsLog) {
 
         if let string = object {
             os_log("%{public}@: Distributed notification posted: %{public}@ (%{public}@)", log: log, type: .debug, String(describing: Thread.current), networkProtectionNotification.rawValue, string)
@@ -40,7 +40,7 @@ extension DistributedNotificationCenter {
 }
 
 extension DistributedNotificationCenter: NetworkProtectionNotificationPosting {
-    public func post(_ networkProtectionNotification: DistributedNotificationName, object: String? = nil, log: OSLog = .networkProtectionDistributedNotificationsLog) {
+    public func post(_ networkProtectionNotification: NetworkProtectionNotificationName, object: String? = nil, log: OSLog = .networkProtectionDistributedNotificationsLog) {
         logPost(networkProtectionNotification, object: object, log: log)
 
         postNotificationName(networkProtectionNotification.notificationName, object: object, options: [.deliverImmediately, .postToAllSessions])
@@ -50,11 +50,11 @@ extension DistributedNotificationCenter: NetworkProtectionNotificationPosting {
 #endif
 
 public protocol NetworkProtectionNotificationPosting: AnyObject {
-    func post(_ networkProtectionNotification: DistributedNotificationName, object: String?, log: OSLog)
+    func post(_ networkProtectionNotification: NetworkProtectionNotificationName, object: String?, log: OSLog)
 }
 
 extension NetworkProtectionNotificationPosting {
-    func post(_ networkProtectionNotification: DistributedNotificationName, object: String? = nil) {
+    func post(_ networkProtectionNotification: NetworkProtectionNotificationName, object: String? = nil) {
         post(networkProtectionNotification, object: object, log: .networkProtectionDistributedNotificationsLog)
     }
 }
@@ -62,17 +62,17 @@ extension NetworkProtectionNotificationPosting {
 extension NotificationCenter {
     static let preferredStringEncoding = String.Encoding.utf8
 
-    public func addObserver(for networkProtectionNotification: DistributedNotificationName, object: Any?, queue: OperationQueue?, using block: @escaping @Sendable (Notification) -> Void) -> NSObjectProtocol {
+    public func addObserver(for networkProtectionNotification: NetworkProtectionNotificationName, object: Any?, queue: OperationQueue?, using block: @escaping @Sendable (Notification) -> Void) -> NSObjectProtocol {
 
         addObserver(forName: networkProtectionNotification.notificationName, object: object, queue: queue, using: block)
     }
 
-    public func publisher(for networkProtectionNotification: DistributedNotificationName, object: AnyObject? = nil) -> NotificationCenter.Publisher {
+    public func publisher(for networkProtectionNotification: NetworkProtectionNotificationName, object: AnyObject? = nil) -> NotificationCenter.Publisher {
         self.publisher(for: networkProtectionNotification.notificationName)
     }
 }
 
-public enum DistributedNotificationName: String {
+public enum NetworkProtectionNotificationName: String {
     // Tunnel Status
     case statusDidChange = "com.duckduckgo.network-protection.NetworkProtectionNotification.statusDidChange"
 
