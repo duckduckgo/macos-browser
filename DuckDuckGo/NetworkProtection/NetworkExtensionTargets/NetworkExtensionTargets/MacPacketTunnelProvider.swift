@@ -38,26 +38,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         } else {
             mainAppURL = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
         }
-        return NetworkProtectionUNNotificationsPresenter(mainAppURL: mainAppURL)
+        return NetworkProtectionUNNotificationsPresenter(appLauncher: AppLauncher(appBundleURL: mainAppURL))
 #endif
     }
-
-    private static var notificationsPresenter: NetworkProtectionNotificationsPresenter = {
-#if NETP_SYSTEM_EXTENSION
-        let ipcConnection = IPCConnection(log: .networkProtectionIPCLog, memoryManagementLog: .networkProtectionMemoryLog)
-        ipcConnection.startListener()
-        return NetworkProtectionIPCNotificationsPresenter(ipcConnection: ipcConnection)
-#else
-        let parentBundlePath = "../../../"
-        let mainAppURL: URL
-        if #available(macOS 13, *) {
-            mainAppURL = URL(filePath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
-        } else {
-            mainAppURL = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
-        }
-        return NetworkProtectionUNNotificationsPresenter(mainAppURL: mainAppURL)
-#endif
-    }()
 
     private let controllerErrorStore: NetworkProtectionTunnelErrorStore
 
