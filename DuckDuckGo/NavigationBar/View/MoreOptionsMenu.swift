@@ -356,7 +356,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
 
             addItem(withTitle: UserText.emailOptionsMenuTurnOffSubItem, action: #selector(turnOffEmailAction(_:)), keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "OptionsButtonMenuEmailDisabled"))
+                .withImage(NSImage(named: "Email-Disabled-16"))
 
         } else {
             addItem(withTitle: UserText.emailOptionsMenuTurnOnSubItem, action: #selector(turnOnEmailAction(_:)), keyEquivalent: "")
