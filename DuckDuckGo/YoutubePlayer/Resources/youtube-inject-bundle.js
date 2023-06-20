@@ -633,15 +633,14 @@
     }
   };
   function captureGlobals() {
-    var _a, _b, _c, _d, _e, _f;
     return {
       window,
-      encrypt: (_a = window.crypto.subtle) == null ? void 0 : _a.encrypt.bind(window.crypto.subtle),
-      decrypt: (_b = window.crypto.subtle) == null ? void 0 : _b.decrypt.bind(window.crypto.subtle),
-      generateKey: (_c = window.crypto.subtle) == null ? void 0 : _c.generateKey.bind(window.crypto.subtle),
-      exportKey: (_d = window.crypto.subtle) == null ? void 0 : _d.exportKey.bind(window.crypto.subtle),
-      importKey: (_e = window.crypto.subtle) == null ? void 0 : _e.importKey.bind(window.crypto.subtle),
-      getRandomValues: (_f = window.crypto.getRandomValues) == null ? void 0 : _f.bind(window.crypto),
+      encrypt: window.crypto.subtle.encrypt.bind(window.crypto.subtle),
+      decrypt: window.crypto.subtle.decrypt.bind(window.crypto.subtle),
+      generateKey: window.crypto.subtle.generateKey.bind(window.crypto.subtle),
+      exportKey: window.crypto.subtle.exportKey.bind(window.crypto.subtle),
+      importKey: window.crypto.subtle.importKey.bind(window.crypto.subtle),
+      getRandomValues: window.crypto.getRandomValues.bind(window.crypto),
       TextEncoder,
       TextDecoder,
       Uint8Array,
@@ -849,13 +848,6 @@
         };
       });
     }
-    addLargeOverlay(userValues, params) {
-      let playerVideo = document.querySelector("#player video"), containerElement = document.querySelector("#player .html5-video-player");
-      if (playerVideo && containerElement) {
-        this.stopVideoFromPlaying(playerVideo);
-        this.appendOverlayToPage(containerElement, params);
-      }
-    }
     addSmallDaxOverlay(params) {
       let containerElement = document.querySelector("#player .html5-video-player");
       if (!containerElement) {
@@ -886,6 +878,11 @@
         if (!playerElement) {
           return null;
         }
+        const videoElement = playerElement.querySelector("video");
+        const playerContainer = playerElement.querySelector(".html5-video-player");
+        if (!videoElement || !playerContainer) {
+          return null;
+        }
         const userValues = this.userValues;
         this.lastVideoId = params.id;
         this.removeAllOverlays();
@@ -895,7 +892,8 @@
         if ("alwaysAsk" in userValues.privatePlayerMode) {
           if (!userValues.overlayInteracted) {
             if (!this.environment.hasOneTimeOverride()) {
-              this.addLargeOverlay(userValues, params);
+              this.stopVideoFromPlaying(videoElement);
+              this.appendOverlayToPage(playerContainer, params);
             }
           } else {
             this.addSmallDaxOverlay(params);
