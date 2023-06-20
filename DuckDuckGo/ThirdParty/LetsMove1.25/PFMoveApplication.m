@@ -31,8 +31,8 @@
 #define kStrMoveApplicationQuestionMessage _I10NS(@"The DuckDuckGo app needs to be in the Applications folder for some features to work properly.")
 #define kStrMoveApplicationButtonMove _I10NS(@"Move to Applications Folder")
 #define kStrMoveApplicationButtonDoNotMove _I10NS(@"Do Not Move")
-#define kStrMoveApplicationQuestionInfoWillRequirePasswd _I10NS(@"Note that this will require an administrator password.")
-#define kStrMoveApplicationQuestionInfoInDownloadsFolder _I10NS(@"This will keep your Downloads folder uncluttered.")
+#define kStrMoveApplicationQuestionInfoWillRequirePasswd _I10NS(@"")
+#define kStrMoveApplicationQuestionInfoInDownloadsFolder _I10NS(@"")
 
 // Needs to be defined for compiling under 10.5 SDK
 #ifndef NSAppKitVersionNumber10_5
