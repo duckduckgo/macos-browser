@@ -22,12 +22,9 @@ import BrowserServicesKit
 extension EmailUrls {
 
     private struct Url {
-        //static let emailProtectionLink = "https://duckduckgo.com/email"
-        //static let emailProtectionInContextSignupLink = "https://duckduckgo.com/email/start-incontext"
-        //static let emailProtectionAccountLink = "https://duckduckgo.com/email/settings/account"
-        static let emailProtectionLink = "https://quackdev.duckduckgo.com/email/"
-        static let emailProtectionInContextSignupLink = "https://quackdev.duckduckgo.com/email/start-incontext"
-        static let emailProtectionAccountLink = "https://quackdev.duckduckgo.com/email/settings/account"
+        static let emailProtectionLink = "https://duckduckgo.com/email"
+        static let emailProtectionInContextSignupLink = "https://duckduckgo.com/email/start-incontext"
+        static let emailProtectionAccountLink = "https://duckduckgo.com/email/settings/account"
     }
 
     var emailProtectionLink: URL {
