@@ -270,10 +270,6 @@ private struct PrivateEmailImage: View {
     var body: some View {
         ZStack {
 
-            RoundedRectangle(cornerRadius: 4)
-                .fill(Color("BlackWhite100").opacity(0.06))
-                .frame(width: 24, height: 24)
-
             if model.privateEmailRequestInProgress {
                 ActivityIndicator(isAnimating: $model.privateEmailRequestInProgress, style: .spinning)
             } else {
