@@ -1,5 +1,5 @@
 //
-//  NotificationCenter+NetworkProtection.swift
+//  SyncErrorHandler.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,12 +16,19 @@
 //  limitations under the License.
 //
 
+import Common
+import DDGSync
 import Foundation
 
-extension NotificationCenter {
-    public func addObserver(for notification: NetworkProtection.DistributedNotification, object obj: Any?, queue: OperationQueue?, using block: @escaping (Notification) -> Void) -> NotificationToken {
+public class SyncErrorHandler: EventMapping<SyncError> {
 
-        let token = addObserver(forName: notification.name, object: obj, queue: queue, using: block)
-        return NotificationToken(notificationCenter: self, token: token)
+    public init() {
+        super.init { event, _, _, _ in
+            Pixel.fire(.debug(event: .syncSentUnauthenticatedRequest, error: event))
+        }
+    }
+
+    override init(mapping: @escaping EventMapping<SyncError>.Mapping) {
+        fatalError("Use init()")
     }
 }

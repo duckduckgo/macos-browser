@@ -45,4 +45,9 @@ final class NetworkProtectionIPCNotificationsPresenter: NetworkProtectionNotific
     func showConnectionFailureNotification() {
         ipcConnection.connectionFailure()
     }
+
+    func showSupercededNotification() {
+        ipcConnection.superceded()
+    }
+
 }

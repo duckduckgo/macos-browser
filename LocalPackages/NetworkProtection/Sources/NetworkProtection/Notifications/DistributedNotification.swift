@@ -23,33 +23,35 @@ extension DistributedNotificationCenter.CenterType {
     public static let networkProtection = DistributedNotificationCenter.CenterType("com.duckduckgo.DistributedNotificationCenter.CenterType.networkProtection")
 }
 
-extension NotificationCenter {
-    public func addObserver(for networkProtectionNotification: DistributedNotification, object: Any?, queue: OperationQueue?, using block: @escaping @Sendable (Notification) -> Void) -> NSObjectProtocol {
-
-        addObserver(forName: networkProtectionNotification.name, object: object, queue: queue, using: block)
-    }
-}
-
 extension DistributedNotificationCenter {
-    public func post(_ networkProtectionNotification: DistributedNotification, object: String? = nil, log: OSLog = .networkProtectionDistributedNotificationsLog) {
 
+    static let preferredStringEncoding = String.Encoding.utf8
+
+    public func publisher(for networkProtectionNotification: DistributedNotificationName, object: AnyObject? = nil) -> NotificationCenter.Publisher {
+        self.publisher(for: networkProtectionNotification.notificationName)
+    }
+
+    public func post(_ networkProtectionNotification: DistributedNotificationName, object: String? = nil, log: OSLog = .networkProtectionDistributedNotificationsLog) {
         logPost(networkProtectionNotification, object: object, log: log)
-        postNotificationName(networkProtectionNotification.name, object: object, options: [.deliverImmediately, .postToAllSessions])
+
+        postNotificationName(networkProtectionNotification.notificationName, object: object, options: [.deliverImmediately, .postToAllSessions])
     }
 
     // MARK: - Logging
 
-    private func logPost(_ networkProtectionNotification: DistributedNotification, object: String? = nil, log: OSLog = .networkProtectionDistributedNotificationsLog) {
+    private func logPost(_ networkProtectionNotification: DistributedNotificationName, object: String? = nil, log: OSLog = .networkProtectionDistributedNotificationsLog) {
 
         if let string = object {
-            os_log("%{public}@: Distributed notification posted: %{public}@ (%{public}@)", log: log, type: .debug, String(describing: Thread.current), String(describing: networkProtectionNotification), string)
+            os_log("%{public}@: Distributed notification posted: %{public}@ (%{public}@)", log: log, type: .debug, String(describing: Thread.current), networkProtectionNotification.rawValue, string)
         } else {
-            os_log("Distributed notification posted: %{public}@", log: log, type: .debug, String(describing: networkProtectionNotification))
+            os_log("Distributed notification posted: %{public}@", log: log, type: .debug, networkProtectionNotification.rawValue)
         }
     }
+
 }
 
-public enum DistributedNotification: String {
+public enum DistributedNotificationName: String {
+
     // Tunnel Status
     case statusDidChange = "com.duckduckgo.network-protection.NetworkProtectionNotification.statusDidChange"
 
@@ -70,9 +72,8 @@ public enum DistributedNotification: String {
     // New Status Observer
     case requestStatusUpdate = "com.duckduckgo.network-protection.NetworkProtectionNotification.requestStatusUpdate"
 
-    static let preferredStringEncoding = String.Encoding.utf8
-
-    public var name: Foundation.Notification.Name {
+    fileprivate var notificationName: Foundation.Notification.Name {
         NSNotification.Name(rawValue: rawValue)
     }
+
 }

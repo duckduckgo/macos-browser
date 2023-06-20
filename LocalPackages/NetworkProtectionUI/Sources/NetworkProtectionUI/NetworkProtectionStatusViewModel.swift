@@ -466,12 +466,7 @@ extension NetworkProtectionStatusView {
         ///
         private func stopNetworkProtection() {
             Task { @MainActor in
-                do {
-                    try await tunnelController.stop()
-                } catch {
-                    logger.log(error)
-                    refreshInternalIsRunning()
-                }
+                await tunnelController.stop()
             }
         }
     }

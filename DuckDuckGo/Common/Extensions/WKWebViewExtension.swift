@@ -209,6 +209,19 @@ extension WKWebView {
         }
     }
 
+    @MainActor
+    func evaluateJavaScript<T>(_ script: String) async throws -> T? {
+        try await withUnsafeThrowingContinuation { c in
+            evaluateJavaScript(script) { result, error in
+                if let error {
+                    c.resume(with: .failure(error))
+                } else {
+                    c.resume(with: .success(result as? T))
+                }
+            }
+        }
+    }
+
     func close() {
         self.evaluateJavaScript("window.close()")
     }
@@ -218,9 +231,10 @@ extension WKWebView {
         self.evaluateJavaScript("window.open(\(urlEnc), '_blank', 'noopener, noreferrer')")
     }
 
-    func getMimeType(callback: @escaping (String?) -> Void) {
-        self.evaluateJavaScript("document.contentType") { (result, _) in
-            callback(result as? String)
+    @MainActor
+    var mimeType: String? {
+        get async {
+            try? await self.evaluateJavaScript("document.contentType")
         }
     }
 
@@ -274,9 +288,20 @@ extension WKWebView {
         self.superview?.makeMeFirstResponder()
     }
 
-    private enum Selector {
-        static let fullScreenPlaceholderView = "_fullScreenPlaceholderView"
-        static let printOperationWithPrintInfoForFrame = "_printOperationWithPrintInfo:forFrame:"
+    /// Collapses page text selection to the start of the first range in the selection.
+    @MainActor
+    func collapsSelectionToStart() async throws {
+        try await evaluateJavaScript("window.getSelection().collapseToStart()") as Void?
     }
 
+    @MainActor
+    func deselectAll() async throws {
+        try await evaluateJavaScript("window.getSelection().removeAllRanges()") as Void?
+    }
+
+}
+
+private enum Selector {
+    static let fullScreenPlaceholderView = "_fullScreenPlaceholderView"
+    static let printOperationWithPrintInfoForFrame = "_printOperationWithPrintInfo:forFrame:"
 }
