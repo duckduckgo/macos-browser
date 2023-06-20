@@ -218,7 +218,7 @@ private struct UsernameLabel: View {
 
             if model.usernameIsPrivateEmail && model.privateEmailMessage != "" {
                 Text(model.privateEmailMessage)
-                    .font(.footnote)
+                    .font(.subheadline)
                     .lineLimit(nil)
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
