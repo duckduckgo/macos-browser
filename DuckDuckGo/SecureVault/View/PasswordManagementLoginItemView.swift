@@ -305,7 +305,7 @@ private struct PrivateEmailMessage: View {
                             .lineLimit(nil)
                             .multilineTextAlignment(.leading)
                             .fixedSize(horizontal: false, vertical: true)
-                            .onTapGesture {                                
+                            .onTapGesture {
                                 model.enableEmailProtection()
                             }
                     }
