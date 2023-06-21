@@ -275,6 +275,8 @@ private struct PrivateEmailImage: View {
 private struct PrivateEmailMessage: View {
     @EnvironmentObject var model: PasswordManagementLoginModel
 
+    @State private var hover: Bool = false
+
     @available(macOS 12, *)
     var attributedString: AttributedString {
         let text = String(format: UserText.pmSignInToManageEmail, UserText.pmEnableEmailProtection)
@@ -305,6 +307,16 @@ private struct PrivateEmailMessage: View {
                         combinedText
                             .onTapGesture {
                                 model.enableEmailProtection()
+                            }
+                            .onHover { isHovered in
+                                hover = isHovered
+                                DispatchQueue.main.async {
+                                    if hover {
+                                        NSCursor.pointingHand.push()
+                                    } else {
+                                        NSCursor.pop()
+                                    }
+                                }
                             }
                     } else {
                         Text(String(format: UserText.pmSignInToManageEmail, UserText.pmEnableEmailProtection))
