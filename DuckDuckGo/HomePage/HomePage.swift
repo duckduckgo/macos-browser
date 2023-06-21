@@ -16,8 +16,7 @@
 //  limitations under the License.
 //
 
-import SwiftUI
-import SwiftUIExtensions
+import Foundation
 
 /// Namespace declaration
 struct HomePage {

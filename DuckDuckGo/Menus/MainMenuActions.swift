@@ -781,7 +781,6 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: "home.page.show.duck.player")
         UserDefaults.standard.set(true, forKey: "home.page.show.email.protection")
         UserDefaults.standard.set(true, forKey: "home.page.show.cookie")
-        UserDefaults.standard.set(true, forKey: "home.page.show.add.to.dock")
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {

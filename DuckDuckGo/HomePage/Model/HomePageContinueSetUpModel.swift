@@ -33,7 +33,6 @@ extension HomePage.Models {
         let itemsRowCountWhenCollapsed = HomePage.featureRowCountWhenCollapsed
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
-        let queue: DispatchQueue = DispatchQueue(label: "ContinueSetUp")
 
         let privacyConfig = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
         var duckPlayerURL: String {
@@ -84,8 +83,6 @@ extension HomePage.Models {
         var hasContent: Bool {
             return !featuresMatrix.isEmpty
         }
-
-        private var wasAddedToDockInThisSession = false
 
         lazy var listOfFeatures = isFirstSession ? FeatureType.allCases: randomiseFeatures()
 
