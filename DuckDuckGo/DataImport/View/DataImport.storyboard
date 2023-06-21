@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -507,13 +507,13 @@ Gw
             <objects>
                 <viewController storyboardIdentifier="FileImportViewController" id="Meg-M8-8oL" userLabel="File Import View Controller" customClass="FileImportViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" translatesAutoresizingMaskIntoConstraints="NO" id="n2z-bE-Ka8">
-                        <rect key="frame" x="0.0" y="0.0" width="512" height="1049"/>
+                        <rect key="frame" x="0.0" y="0.0" width="512" height="1161"/>
                         <subviews>
                             <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="249" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HLb-Dw-Y0O">
-                                <rect key="frame" x="20" y="3" width="472" height="1043"/>
+                                <rect key="frame" x="20" y="3" width="472" height="1155"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qiB-A6-LS4">
-                                        <rect key="frame" x="-2" y="1028" width="112" height="15"/>
+                                        <rect key="frame" x="-2" y="1140" width="112" height="15"/>
                                         <textFieldCell key="cell" alignment="left" title="Description Label" id="SpT-id-yTr">
                                             <font key="font" size="13" name="SFProText-Regular"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -521,7 +521,7 @@ Gw
                                         </textFieldCell>
                                     </textField>
                                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="16" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EN8-1q-QQA">
-                                        <rect key="frame" x="0.0" y="812" width="469" height="196"/>
+                                        <rect key="frame" x="0.0" y="924" width="469" height="196"/>
                                         <subviews>
                                             <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="6" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Kin-jC-41p">
                                                 <rect key="frame" x="0.0" y="159" width="469" height="37"/>
@@ -887,7 +887,7 @@ Gw
                                         </customSpacing>
                                     </stackView>
                                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="16" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BKA-tg-ogp" userLabel="LastPass Info View">
-                                        <rect key="frame" x="0.0" y="578" width="472" height="214"/>
+                                        <rect key="frame" x="0.0" y="690" width="472" height="214"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0eU-q7-pCD">
                                                 <rect key="frame" x="-2" y="199" width="292" height="15"/>
@@ -1202,11 +1202,40 @@ Gw
                                             <real value="3.4028234663852886e+38"/>
                                         </customSpacing>
                                     </stackView>
-                                    <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="16" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="p9R-Ta-H50" userLabel="1Password 7 Info View">
-                                        <rect key="frame" x="0.0" y="328" width="472" height="230"/>
+                                    <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="p9R-Ta-H50" userLabel="1Password 7 Info View">
+                                        <rect key="frame" x="0.0" y="384" width="472" height="286"/>
                                         <subviews>
+                                            <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JFc-G2-1jH" userLabel="Version Info Stack View">
+                                                <rect key="frame" x="0.0" y="254" width="472" height="32"/>
+                                                <subviews>
+                                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="hdF-rG-Mcm" userLabel="Password Export Info">
+                                                        <rect key="frame" x="0.0" y="8" width="16" height="16"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" constant="16" id="sm7-67-n9a"/>
+                                                            <constraint firstAttribute="height" constant="16" id="ygi-KE-btK"/>
+                                                        </constraints>
+                                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="PasswordExportInfo" id="eyU-ld-hdj"/>
+                                                    </imageView>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ucJ-dA-nkL">
+                                                        <rect key="frame" x="22" y="0.0" width="452" height="32"/>
+                                                        <textFieldCell key="cell" title="You can find your version by selecting 1Password 7 → About 1Password from the Menu Bar" id="yih-Qv-UIt">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                </subviews>
+                                                <visibilityPriorities>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                </visibilityPriorities>
+                                                <customSpacing>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                </customSpacing>
+                                            </stackView>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QIm-OA-zFu">
-                                                <rect key="frame" x="-2" y="215" width="314" height="15"/>
+                                                <rect key="frame" x="-2" y="219" width="314" height="15"/>
                                                 <textFieldCell key="cell" alignment="left" title="Step 1: Export your passwords from 1Password 7" id="X2C-Xb-JHU">
                                                     <font key="font" size="13" name="SFProText-Semibold"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1351,16 +1380,16 @@ Gw
                                                                         </textFieldCell>
                                                                     </textField>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LsE-Cz-hKr">
-                                                                        <rect key="frame" x="64" y="3" width="124" height="15"/>
-                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="File → Export → All" allowsEditingTextAttributes="YES" id="Oox-l5-5X3">
+                                                                        <rect key="frame" x="64" y="3" width="163" height="15"/>
+                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="File → Export → All Items" allowsEditingTextAttributes="YES" id="Oox-l5-5X3">
                                                                             <font key="font" size="13" name="SFProText-Semibold"/>
                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
                                                                     </textField>
                                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="82n-UF-vqX">
-                                                                        <rect key="frame" x="187" y="3" width="156" height="15"/>
-                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Items from the Menu Bar" allowsEditingTextAttributes="YES" id="fak-DP-rKk">
+                                                                        <rect key="frame" x="226" y="3" width="118" height="15"/>
+                                                                        <textFieldCell key="cell" lineBreakMode="clipping" title="from the Menu Bar" allowsEditingTextAttributes="YES" id="fak-DP-rKk">
                                                                             <font key="font" size="13" name="SFProText-Regular"/>
                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1561,17 +1590,48 @@ Gw
                                         <visibilityPriorities>
                                             <integer value="1000"/>
                                             <integer value="1000"/>
+                                            <integer value="1000"/>
                                         </visibilityPriorities>
                                         <customSpacing>
                                             <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
+                                            <real value="3.4028234663852886e+38"/>
                                         </customSpacing>
                                     </stackView>
-                                    <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="16" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="N72-5P-3dY" userLabel="1Password 8 Info View">
-                                        <rect key="frame" x="0.0" y="94" width="472" height="214"/>
+                                    <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="N72-5P-3dY" userLabel="1Password 8 Info View">
+                                        <rect key="frame" x="0.0" y="94" width="472" height="270"/>
                                         <subviews>
+                                            <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KGi-zW-0Ve" userLabel="Version Info Stack View">
+                                                <rect key="frame" x="0.0" y="238" width="472" height="32"/>
+                                                <subviews>
+                                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="rZa-Wh-cwe" userLabel="Password Export Info">
+                                                        <rect key="frame" x="0.0" y="8" width="16" height="16"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="1Ic-f9-GcJ"/>
+                                                            <constraint firstAttribute="width" constant="16" id="DQw-O5-Est"/>
+                                                        </constraints>
+                                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="PasswordExportInfo" id="g6U-1s-BXU"/>
+                                                    </imageView>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vgR-Qf-H6L">
+                                                        <rect key="frame" x="22" y="0.0" width="452" height="32"/>
+                                                        <textFieldCell key="cell" title="You can find your version by selecting 1Password → About 1Password from the Menu Bar" id="OrB-sI-2Ek">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                </subviews>
+                                                <visibilityPriorities>
+                                                    <integer value="1000"/>
+                                                    <integer value="1000"/>
+                                                </visibilityPriorities>
+                                                <customSpacing>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                    <real value="3.4028234663852886e+38"/>
+                                                </customSpacing>
+                                            </stackView>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="U2e-4E-Lf0">
-                                                <rect key="frame" x="-2" y="199" width="303" height="15"/>
+                                                <rect key="frame" x="-2" y="203" width="303" height="15"/>
                                                 <textFieldCell key="cell" alignment="left" title="Step 1: Export your passwords from 1Password" id="74V-e5-TOc">
                                                     <font key="font" size="13" name="SFProText-Semibold"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -1857,8 +1917,10 @@ Gw
                                         <visibilityPriorities>
                                             <integer value="1000"/>
                                             <integer value="1000"/>
+                                            <integer value="1000"/>
                                         </visibilityPriorities>
                                         <customSpacing>
+                                            <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
                                             <real value="3.4028234663852886e+38"/>
                                         </customSpacing>
@@ -2056,6 +2118,7 @@ Third line</string>
         <image name="File" width="16" height="16"/>
         <image name="Info" width="16" height="16"/>
         <image name="More" width="16" height="16"/>
+        <image name="PasswordExportInfo" width="16" height="16"/>
         <image name="SuccessCheckmark" width="16" height="16"/>
         <namedColor name="BlackWhite50">
             <color red="0.49803921568627452" green="0.49803921568627452" blue="0.49803921568627452" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
