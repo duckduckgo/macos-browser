@@ -57,11 +57,11 @@ final class NetworkProtectionInvitePresenter: NetworkProtectionInvitePresenting,
     }
 
     func didCompleteInviteFlow() {
-        Task {
-            await WindowControllersManager.shared.showNetworkProtectionStatus(retry: true)
-        }
         presentedViewController?.dismiss()
         presentedViewController = nil
+        Task {
+            await WindowControllersManager.shared.showNetworkProtectionStatus()
+        }
     }
 }
 
