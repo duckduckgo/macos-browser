@@ -49,8 +49,6 @@ final class OperationsTests: XCTestCase {
                                                             dataBroker: dataBroker,
                                                             database: database)
 
-        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
-                                                                    database: database)
 
         let expectedExtractedProfiles = [ExtractedProfile]()
 
@@ -58,8 +56,11 @@ final class OperationsTests: XCTestCase {
                                 scanAction: nil,
                                 scanResults: expectedExtractedProfiles)
 
-        try await operationsManager.runScanOperation(on: runner)
-        let data = operationsManager.brokerProfileQueryData
+       try await BrokerProfileQueryOperationsManager().runOperation(operationData: brokerProfileQueryData.scanData,
+                                                                     brokerProfileQueryData: brokerProfileQueryData,
+                                                                     database: database,
+                                                                     runner: runner)
+        let data = brokerProfileQueryData
 
 
         let expectedPreferredDate = Date().addingTimeInterval(dataBroker.schedulingConfig.maintenanceScan)
@@ -88,8 +89,7 @@ final class OperationsTests: XCTestCase {
                                                             dataBroker: dataBroker,
                                                             database: database)
 
-        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
-                                                                    database: database)
+
 
         let expectedExtractedProfiles = [ExtractedProfile(name: "Profile1"),
                                          ExtractedProfile(name: "Profile2")]
@@ -105,8 +105,12 @@ final class OperationsTests: XCTestCase {
         let expectedScanPreferredDate = Date().addingTimeInterval(dataBroker.schedulingConfig.maintenanceScan)
         let expectedOptOutPreferredDate = Date()
 
-        try await operationsManager.runScanOperation(on: runner)
-        let data = operationsManager.brokerProfileQueryData
+        try await BrokerProfileQueryOperationsManager().runOperation(operationData: brokerProfileQueryData.scanData,
+                                                                      brokerProfileQueryData: brokerProfileQueryData,
+                                                                      database: database,
+                                                                      runner: runner)
+
+        let data = brokerProfileQueryData
 
         for optOutData in data.optOutsData {
             XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: optOutData.preferredRunDate, date2: expectedOptOutPreferredDate))
@@ -133,8 +137,7 @@ final class OperationsTests: XCTestCase {
                                                             dataBroker: dataBroker,
                                                             database: database)
 
-        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
-                                                                    database: database)
+
 
         let expectedExtractedProfiles = [ExtractedProfile]()
         let expectedHistoryTypes: [HistoryEvent.EventType] = [.scanStarted, .error]
@@ -145,10 +148,13 @@ final class OperationsTests: XCTestCase {
                                 scanResults: expectedExtractedProfiles)
 
         do {
-            try await operationsManager.runScanOperation(on: runner)
+            try await BrokerProfileQueryOperationsManager().runOperation(operationData: brokerProfileQueryData.scanData,
+                                                                          brokerProfileQueryData: brokerProfileQueryData,
+                                                                          database: database,
+                                                                          runner: runner)
             XCTFail("Should not succeed")
         } catch {
-            let data = operationsManager.brokerProfileQueryData
+            let data = brokerProfileQueryData
             XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: data.scanData.lastRunDate, date2: Date()))
             XCTAssertEqual(expectedExtractedProfiles, data.extractedProfiles)
             XCTAssertEqual(data.scanData.historyEvents.count, expectedHistoryTypes.count)
@@ -184,14 +190,16 @@ final class OperationsTests: XCTestCase {
                                                             dataBroker: dataBroker,
                                                             database: database)
 
-        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
-                                                                    database: database)
 
         let runner = MockRunner(optOutAction: nil,
                                 scanAction: nil,
                                 scanResults: [ExtractedProfile]())
 
-        try await operationsManager.runOptOutOperation(for: extractedProfile, on: runner)
+        try await BrokerProfileQueryOperationsManager().runOperation(operationData: optOutOperationData,
+                                                                      brokerProfileQueryData: brokerProfileQueryData,
+                                                                      database: database,
+                                                                      runner: runner)
+
         let expectedScanPreferredDate = Date().addingTimeInterval(dataBroker.schedulingConfig.confirmOptOutScan)
 
         let optOutDataOperationData = profileQueryData.optOutsData.filter({ $0.id == optOutOperationData.id }).first
@@ -233,8 +241,6 @@ final class OperationsTests: XCTestCase {
                                                             dataBroker: dataBroker,
                                                             database: database)
 
-        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
-                                                                    database: database)
 
         let runner = MockRunner(optOutAction: {
             throw NSError(domain: "test", code: 123)
@@ -242,7 +248,11 @@ final class OperationsTests: XCTestCase {
                                 scanAction: nil,
                                 scanResults: [ExtractedProfile]())
 
-        try? await operationsManager.runOptOutOperation(for: extractedProfile, on: runner)
+
+        try? await BrokerProfileQueryOperationsManager().runOperation(operationData: optOutOperationData,
+                                                                      brokerProfileQueryData: brokerProfileQueryData,
+                                                                      database: database,
+                                                                      runner: runner)
 
         let optOutDataOperationData = profileQueryData.optOutsData.filter({ $0.id == optOutOperationData.id }).first
 
@@ -255,37 +265,6 @@ final class OperationsTests: XCTestCase {
         XCTAssertEqual(optOutDataOperationData?.historyEvents.count, expectedHistoryTypes.count)
         XCTAssertEqual(optOutDataOperationData?.historyEvents.map { $0.type }, expectedHistoryTypes)
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: optOutDataOperationData?.preferredRunDate, date2: expectedOptOutPreferredDate))
-    }
-
-    func testOptOutOperationWithoutOptOutDataError() async throws {
-        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
-        let dataBroker = DataBroker(name: "Test Broker",
-                                    steps: [Step](),
-                                    schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
-                                                                               retryError: 48 * 60 * 60,
-                                                                               confirmOptOutScan: 72 * 60 * 60,
-                                                                               maintenanceScan: 240 * 60 * 60))
-        let extractedProfile = ExtractedProfile(name: "John")
-
-        let database = MockDataBase()
-
-        let brokerProfileQueryData = brokerProfileQueryData(for: profileQuery,
-                                                            dataBroker: dataBroker,
-                                                            database: database)
-
-        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
-                                                                    database: database)
-
-        let runner = MockRunner(optOutAction: nil,
-                                scanAction: nil,
-                                scanResults: [ExtractedProfile]())
-
-        do {
-            try await operationsManager.runOptOutOperation(for: extractedProfile, on: runner)
-            XCTFail("Operation should throw")
-        } catch {
-            XCTAssertEqual(OperationsError.noOperationDataForExtractedProfile, error as? OperationsError)
-        }
     }
 
     func testOptOutConfirmationSuccess() async throws {
@@ -315,8 +294,7 @@ final class OperationsTests: XCTestCase {
                                                             dataBroker: dataBroker,
                                                             database: database)
 
-        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
-                                                                    database: database)
+
 
         let expectedExtractedProfiles = [extractedProfile]
 
@@ -324,8 +302,12 @@ final class OperationsTests: XCTestCase {
                                 scanAction: nil,
                                 scanResults: [ExtractedProfile]())
 
-        try await operationsManager.runScanOperation(on: runner)
-        let data = operationsManager.brokerProfileQueryData
+        try await BrokerProfileQueryOperationsManager().runOperation(operationData: brokerProfileQueryData.scanData,
+                                                                      brokerProfileQueryData: brokerProfileQueryData,
+                                                                      database: database,
+                                                                      runner: runner)
+
+        let data = brokerProfileQueryData
 
         let scanExpectedHistoryTypes: [HistoryEvent.EventType] = [.scanStarted, .noMatchFound]
         let optOutExpectedHistoryTypes: [HistoryEvent.EventType] = [.optOutConfirmed(profileID: extractedProfile.id)]
@@ -378,8 +360,6 @@ final class OperationsTests: XCTestCase {
                                                             dataBroker: dataBroker,
                                                             database: database)
 
-        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
-                                                                    database: database)
 
         let expectedExtractedProfiles = [extractedProfile]
 
@@ -387,8 +367,11 @@ final class OperationsTests: XCTestCase {
                                 scanAction: nil,
                                 scanResults: [extractedProfile])
 
-        try await operationsManager.runScanOperation(on: runner)
-        let data = operationsManager.brokerProfileQueryData
+        try await BrokerProfileQueryOperationsManager().runOperation(operationData: brokerProfileQueryData.scanData,
+                                                                      brokerProfileQueryData: brokerProfileQueryData,
+                                                                      database: database,
+                                                                      runner: runner)
+        let data = brokerProfileQueryData
 
         let scanExpectedHistoryTypes: [HistoryEvent.EventType] = [.scanStarted, .matchFound(profileID: extractedProfile.id)]
 
@@ -440,8 +423,6 @@ final class OperationsTests: XCTestCase {
                                                             dataBroker: dataBroker,
                                                             database: database)
 
-        let operationsManager = BrokerProfileQueryOperationsManager(brokerProfileQueryData: brokerProfileQueryData,
-                                                                    database: database)
 
         let expectedExtractedProfiles = [extractedProfile1]
 
@@ -449,8 +430,11 @@ final class OperationsTests: XCTestCase {
                                 scanAction: nil,
                                 scanResults: expectedExtractedProfiles)
 
-        try await operationsManager.runScanOperation(on: runner)
-        let data = operationsManager.brokerProfileQueryData
+        try await BrokerProfileQueryOperationsManager().runOperation(operationData: brokerProfileQueryData.scanData,
+                                                                      brokerProfileQueryData: brokerProfileQueryData,
+                                                                      database: database,
+                                                                      runner: runner)
+        let data = brokerProfileQueryData
 
         let scanExpectedHistoryTypes: [HistoryEvent.EventType] = [.scanStarted, .matchFound(profileID: extractedProfile1.id)]
         let optOut1ExpectedHistoryTypes: [HistoryEvent.EventType] = []
@@ -489,7 +473,7 @@ final class OperationsTests: XCTestCase {
     }
 }
 
-struct MockDataBase: DataBase {
+private struct MockDataBase: DataBase {
     var mockBrokerProfileQueryData: BrokerProfileQueryData?
 
     func brokerProfileQueryData(for profileQuery: ProfileQuery, dataBroker: DataBroker) -> BrokerProfileQueryData? {

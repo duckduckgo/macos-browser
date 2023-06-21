@@ -18,7 +18,7 @@
 
 import Foundation
 
-protocol BrokerOperationData {
+internal protocol BrokerOperationData {
     var id: UUID { get }
     var brokerProfileQueryID: UUID { get }
     var preferredRunDate: Date? { get set }

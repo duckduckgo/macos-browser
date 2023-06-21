@@ -27,6 +27,7 @@ protocol OperationRunner {
 // TODO: Remove this
 import WebKit
 
+@MainActor
 final class TestOperationRunner: OperationRunner {
 
     let webView: WKWebView

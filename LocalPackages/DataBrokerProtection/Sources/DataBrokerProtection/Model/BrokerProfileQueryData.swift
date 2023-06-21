@@ -18,13 +18,17 @@
 
 import Foundation
 
-public struct BrokerProfileQueryData: Sendable {
+final public class BrokerProfileQueryData: Sendable {
     public let id: UUID
     public let profileQuery: ProfileQuery
     public let dataBroker: DataBroker
 
     public var scanData: ScanOperationData
     public var optOutsData: [OptOutOperationData] = [OptOutOperationData]()
+
+    internal var operationsData: [BrokerOperationData] {
+        optOutsData + [scanData]
+    }
 
     var extractedProfiles: [ExtractedProfile] {
         optOutsData.map { $0.extractedProfile }
@@ -49,7 +53,7 @@ public struct BrokerProfileQueryData: Sendable {
         }
     }
 
-    mutating func updateExtractedProfiles(_ extractedProfiles: [ExtractedProfile]) {
+    func updateExtractedProfiles(_ extractedProfiles: [ExtractedProfile]) {
 
         extractedProfiles.forEach { extractedProfile in
 

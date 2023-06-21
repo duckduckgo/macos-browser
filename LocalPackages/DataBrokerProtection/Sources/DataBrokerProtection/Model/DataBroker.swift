@@ -26,6 +26,7 @@ public struct DataBrokerScheduleConfig {
 }
 
 public struct DataBroker: Encodable, Sendable {
+    let id = UUID()
     let name: String
     let steps: [Step]
     let schedulingConfig: DataBrokerScheduleConfig

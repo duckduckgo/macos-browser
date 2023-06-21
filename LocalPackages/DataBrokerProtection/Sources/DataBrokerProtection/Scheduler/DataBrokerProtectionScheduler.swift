@@ -37,7 +37,6 @@ protocol OperationRunnerProvider {
 }
 
 final class DataBrokerProtectionScheduler {
-    var operationManagers: [DataBrokerOperationManagerCollection]
     let database: DataBase
     let config: SchedulerConfig
     let operationRunnerProvider: OperationRunnerProvider
@@ -51,86 +50,90 @@ final class DataBrokerProtectionScheduler {
         self.database = database
         self.config = config
         self.operationRunnerProvider = operationRunnerProvider
-        self.operationManagers = [DataBrokerOperationManagerCollection]()
         self.notificationCenter = notificationCenter
-        setupManagers()
     }
 
     // MARK: - Public functions
     func runScanOnAllDataBrokers() async throws {
-        for manager in operationManagers {
-            let runner = self.operationRunnerProvider.getOperationRunner()
-            try await manager.runScan(on: runner)
-        }
+        // Run all data broker scans
     }
 
     func start() {
-
+        runOperations()
+        print("ENDED")
     }
 
     // MARK: - Private functions
 
-    private func setupManagers() {
+    private func runOperations() {
         let brokersProfileData = database.fetchAllBrokerProfileQueryData()
-        self.operationManagers = createDataBrokerOperationManagerCollection(from: brokersProfileData)
-    }
+        let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData)
 
-    private func runOptOutOperations() async throws {
-        for manager in operationManagers {
-            let runner = self.operationRunnerProvider.getOperationRunner()
-            try await manager.runOptOut(on: runner)
-        }
-    }
-
-    private func createDataBrokerOperationManagerCollection(from brokerProfileQueryDataList: [BrokerProfileQueryData]) -> [DataBrokerOperationManagerCollection] {
-        var dataBrokerOperationManagerCollectionList = [DataBrokerOperationManagerCollection]()
-
-        // Group the broker profile query data by data broker
-        let groupedData = Dictionary(grouping: brokerProfileQueryDataList, by: { $0.dataBroker })
-
-        // Create a DataBrokerOperationManagerCollection for each data broker
-        for (dataBroker, brokerProfileQueryDataList) in groupedData {
-            let operationManagers = brokerProfileQueryDataList.map {
-                BrokerProfileQueryOperationsManager(brokerProfileQueryData: $0,
-                                                    database: database,
-                                                    notificationCenter: notificationCenter)
-
+        for collection in dataBrokerOperationCollections {
+            Task {
+                try? await collection.runOperations()
             }
-            let dataBrokerOperationManagerCollection = DataBrokerOperationManagerCollection(dataBroker: dataBroker,
-                                                                                            operationManagers: operationManagers,
-                                                                                            config: config)
-
-            dataBrokerOperationManagerCollectionList.append(dataBrokerOperationManagerCollection)
         }
 
-        return dataBrokerOperationManagerCollectionList
+    }
+
+    func createDataBrokerOperationCollections(from brokerProfileQueriesData: [BrokerProfileQueryData]) -> [DataBrokerOperationCollection] {
+        var collections: [DataBrokerOperationCollection] = []
+        var visitedDataBrokerIDs: Set<UUID> = []
+
+        for queryData in brokerProfileQueriesData {
+            let dataBrokerID = queryData.dataBroker.id
+
+            if !visitedDataBrokerIDs.contains(dataBrokerID) {
+                let matchingQueriesData = brokerProfileQueriesData.filter { $0.dataBroker.id == dataBrokerID }
+                let collection = DataBrokerOperationCollection(brokerProfileQueriesData: matchingQueriesData,
+                                                               database: database)
+                collections.append(collection)
+
+                visitedDataBrokerIDs.insert(dataBrokerID)
+            }
+        }
+
+        return collections
     }
 }
 
-struct DataBrokerOperationManagerCollection {
-    let dataBroker: DataBroker
-    let operationManagers: [OperationsManager]
-    let config: SchedulerConfig
-
-    func runScan(on runner: OperationRunner) async throws {
-        for manager in operationManagers {
-            // check for preferredRunDate/ lastRanDate and intervalBetweenSameBrokerOperations
-            try await manager.runScanOperation(on: runner)
-            try await Task.sleep(nanoseconds: UInt64(config.intervalBetweenSameBrokerOperations) * 1_000_000_000)
-
-        }
-    }
-
-    func runOptOut(on runner: OperationRunner) async throws {
-        for manager in operationManagers {
-
-            try await manager.runOptOutOperations(on: runner)
-        }
-    }
-}
 
 struct DataBrokerNotifications {
     public static let didFinishScan = NSNotification.Name(rawValue: "com.duckduckgo.dbp.didFinishScan")
     public static let didFinishOptOut = NSNotification.Name(rawValue: "com.duckduckgo.dbp.didFinishOptOut")
 
+}
+
+struct DataBrokerOperationCollection {
+    let brokerProfileQueriesData: [BrokerProfileQueryData]
+    let database: DataBase
+    let id = UUID()
+
+    func runOperations() async throws {
+        let ids = brokerProfileQueriesData.map { $0.dataBroker.id }
+        print("Running operation \(id) ON \(ids)")
+        let currentDate = Date()
+
+        let sortedOperationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
+            .filter { $0.preferredRunDate != nil && $0.preferredRunDate! <= currentDate }
+            .sorted { $0.preferredRunDate! < $1.preferredRunDate!}
+
+        print("SORTED \(sortedOperationsData.count)")
+        
+        for operationData in sortedOperationsData {
+            let brokerProfileData = brokerProfileQueriesData.filter { $0.id == operationData.brokerProfileQueryID }.first
+
+            let testRunner = await TestOperationRunner()
+            if let brokerProfileData = brokerProfileData {
+                try await BrokerProfileQueryOperationsManager().runOperation(operationData: operationData,
+                                                                             brokerProfileQueryData: brokerProfileData,
+                                                                             database: database,
+                                                                             runner: testRunner)
+            } else {
+                print("NO")
+            }
+        }
+        print("Finished operation \(id)")
+    }
 }

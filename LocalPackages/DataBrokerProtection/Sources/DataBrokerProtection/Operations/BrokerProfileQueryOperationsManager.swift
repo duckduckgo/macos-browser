@@ -23,32 +23,41 @@ enum OperationsError: Error {
 }
 
 protocol OperationsManager {
-    var brokerProfileQueryData: BrokerProfileQueryData { get }
-
-    init(brokerProfileQueryData: BrokerProfileQueryData,
-         database: DataBase,
-         notificationCenter: NotificationCenter)
-
-    func runScanOperation(on runner: OperationRunner) async throws
-    func runOptOutOperation(for extractedProfile: ExtractedProfile, on runner: OperationRunner) async throws
-    func runOptOutOperations(on runner: OperationRunner) async throws
+    func runOperation(operationData: BrokerOperationData,
+                               brokerProfileQueryData: BrokerProfileQueryData,
+                               database: DataBase,
+                               notificationCenter: NotificationCenter,
+                               runner: OperationRunner) async throws
 }
 
-final class BrokerProfileQueryOperationsManager: OperationsManager {
-    var brokerProfileQueryData: BrokerProfileQueryData
-    let database: DataBase
-    let notificationCenter: NotificationCenter
+struct BrokerProfileQueryOperationsManager: OperationsManager {
 
-    required init(brokerProfileQueryData: BrokerProfileQueryData,
-                  database: DataBase,
-                  notificationCenter: NotificationCenter = NotificationCenter.default) {
+    internal func runOperation(operationData: BrokerOperationData,
+                               brokerProfileQueryData: BrokerProfileQueryData,
+                               database: DataBase,
+                               notificationCenter: NotificationCenter = NotificationCenter.default,
+                               runner: OperationRunner) async throws{
 
-        self.brokerProfileQueryData = brokerProfileQueryData
-        self.notificationCenter = notificationCenter
-        self.database = database
+        if let _ = operationData as? ScanOperationData {
+            try await runScanOperation(on: runner,
+                             brokerProfileQueryData: brokerProfileQueryData,
+                             database: database,
+                             notificationCenter: notificationCenter)
+
+        } else if let optOutOperationData = operationData as? OptOutOperationData {
+            try await runOptOutOperation(for: optOutOperationData.extractedProfile,
+                                         on: runner,
+                                         brokerProfileQueryData: brokerProfileQueryData,
+                                         database: database,
+                                         notificationCenter: notificationCenter)
+        } else {
+            print("No op")
+        }
     }
 
-    private func updateOperationDataDates(_ operationData: BrokerOperationData) {
+
+    private func updateOperationDataDates(_ operationData: BrokerOperationData,
+                                          brokerProfileQueryData: BrokerProfileQueryData ) {
         var data = operationData
         data.lastRunDate = Date()
 
@@ -73,7 +82,8 @@ final class BrokerProfileQueryOperationsManager: OperationsManager {
                 let newDate = Date().addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.confirmOptOutScan)
                 scanData?.updatePreferredRunDate(newDate)
             case .matchFound:
-                if var optOutData = optOutData, shouldScheduleNewOptOut(operationData: optOutData) {
+                if var optOutData = optOutData, shouldScheduleNewOptOut(operationData: optOutData,
+                                                                        brokerProfileQueryData: brokerProfileQueryData) {
                     optOutData.updatePreferredRunDate(Date())
                 } else {
                     scanData?.updatePreferredRunDate(maintenanceScanDate)
@@ -90,19 +100,27 @@ final class BrokerProfileQueryOperationsManager: OperationsManager {
     }
 
     // If the last time we removed the profile has a bigger time difference than the current date + maintenance we should schedule for a new optout
-    private func shouldScheduleNewOptOut(operationData: OptOutOperationData) -> Bool {
+    private func shouldScheduleNewOptOut(operationData: OptOutOperationData,
+                                         brokerProfileQueryData: BrokerProfileQueryData) -> Bool {
         guard let lastRemovalEvent = operationData.lastEventWithType(type: .optOutRequested(profileID: operationData.extractedProfile.id)) else {
             return false
         }
         return lastRemovalEvent.date.addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.maintenanceScan) < Date()
     }
 
-    func runScanOperation(on runner: OperationRunner) async throws {
+    private func runScanOperation(on runner: OperationRunner,
+                          brokerProfileQueryData: BrokerProfileQueryData,
+                          database: DataBase,
+                          notificationCenter: NotificationCenter) async throws {
         defer {
-            updateOperationDataDates(brokerProfileQueryData.scanData)
+            updateOperationDataDates(brokerProfileQueryData.scanData,
+                                     brokerProfileQueryData: brokerProfileQueryData)
             database.saveOperationData(brokerProfileQueryData.scanData)
+            print("Finished scan operation on \(brokerProfileQueryData.dataBroker.name)")
             notificationCenter.post(name: DataBrokerNotifications.didFinishScan, object: brokerProfileQueryData.dataBroker.name)
         }
+        print("Running scan operation on \(brokerProfileQueryData.dataBroker.name)")
+
         do {
             brokerProfileQueryData.scanData.addHistoryEvent(.init(type: .scanStarted))
 
@@ -131,13 +149,12 @@ final class BrokerProfileQueryOperationsManager: OperationsManager {
         }
     }
 
-    func runOptOutOperations(on runner: OperationRunner) async throws {
-        for extractedProfile in self.brokerProfileQueryData.extractedProfiles {
-            try await runOptOutOperation(for: extractedProfile, on: runner)
-        }
-    }
+    func runOptOutOperation(for extractedProfile: ExtractedProfile,
+                            on runner: OperationRunner,
+                            brokerProfileQueryData: BrokerProfileQueryData,
+                            database: DataBase,
+                            notificationCenter: NotificationCenter) async throws {
 
-    func runOptOutOperation(for extractedProfile: ExtractedProfile, on runner: OperationRunner) async throws {
         guard let data = brokerProfileQueryData.optOutsData.filter({ $0.extractedProfile.id == extractedProfile.id }).first else {
             // TODO: Fix error, send pixel
             throw OperationsError.noOperationDataForExtractedProfile
@@ -148,9 +165,13 @@ final class BrokerProfileQueryOperationsManager: OperationsManager {
             return
         }
 
+        print("Running opt operation on \(brokerProfileQueryData.dataBroker.name) \(String(describing: extractedProfile.name))")
+
         defer {
-            updateOperationDataDates(data)
-            updateOperationDataDates(brokerProfileQueryData.scanData)
+            print("Finished opt operation on \(brokerProfileQueryData.dataBroker.name) \(String(describing: extractedProfile.name))")
+
+            updateOperationDataDates(data, brokerProfileQueryData: brokerProfileQueryData)
+            updateOperationDataDates(brokerProfileQueryData.scanData, brokerProfileQueryData: brokerProfileQueryData)
             database.saveOperationData(data)
             notificationCenter.post(name: DataBrokerNotifications.didFinishOptOut, object: brokerProfileQueryData.dataBroker.name)
         }
