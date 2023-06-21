@@ -103,6 +103,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     }
 
     private var previousUsername: String = ""
+    private var loadTimer: Timer = Timer()
 
     init(onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
          onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
@@ -272,7 +273,17 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     @MainActor
     private func setLoadingStatus(_ status: Bool) {
-        privateEmailRequestInProgress = status
+        if status == true {
+            loadTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(showLoader), userInfo: nil, repeats: false)
+        } else {
+            loadTimer.invalidate()
+            privateEmailRequestInProgress = false
+        }
+
+    }
+
+    @objc func showLoader() {
+        privateEmailRequestInProgress = true
     }
 
 }
