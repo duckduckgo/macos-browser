@@ -92,7 +92,6 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"
         case homePageShowCookie = "home.page.show.cookie"
-        case homePageShowAddToDock = "home.page.show.add.to.dock"
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"
         case homePageContinueSetUpImport = "home.page.continue.set.up.import"

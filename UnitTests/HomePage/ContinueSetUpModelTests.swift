@@ -58,6 +58,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     func testModelReturnsCorrectStrings() {
+        XCTAssertEqual(vm.itemsPerRow, HomePage.featuresPerRow)
         XCTAssertEqual(vm.deleteActionTitle, UserText.newTabSetUpRemoveItemAction)
     }
 
@@ -300,8 +301,6 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     func testThtatWhenIfAllFeatureActiveThenVisibleMatrixIsEmpty() {
-        var homePageShowAddToDock = UserDefaultsWrapper<Bool>(key: .homePageShowAddToDock, defaultValue: true)
-        homePageShowAddToDock.wrappedValue = false
         capturingDefaultBrowserProvider.isDefault = true
         emailStorage.isEmailProtectionEnabled = true
         privacyPreferences.autoconsentEnabled = true
@@ -331,11 +330,6 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm.removeItem(for: .cookiePopUp)
         XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.cookiePopUp))
-
-//#if !APPSTORE
-//        vm.removeItem(for: .addToDock)
-//        XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.addToDock))
-//#endif
 
         let vm2 = HomePage.Models.ContinueSetUpModel.fixture()
         XCTAssertTrue(vm2.visibleFeaturesMatrix.flatMap { $0 }.isEmpty)

@@ -41,7 +41,6 @@ struct Favorites: View {
             .onHover { isHovering in
                 self.isHovering = isHovering
             }
-            .visibility(model.hasContent ? .visible : .gone)
         } else {
             VStack(spacing: 4) {
                 FavoritesGrid(isHovering: $isHovering)
@@ -50,7 +49,6 @@ struct Favorites: View {
             .onHover { isHovering in
                 self.isHovering = isHovering
             }
-            .visibility(model.hasContent ? .visible : .gone)
         }
     }
 

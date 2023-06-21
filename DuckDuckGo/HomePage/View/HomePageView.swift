@@ -80,12 +80,11 @@ extension HomePage.Views {
                 .frame(maxWidth: .infinity)
                 .background(backgroundColor)
                 .contextMenu(ContextMenu(menuItems: {
-                    Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavouriteVisible)
-                        .toggleStyle(.checkbox)
-                        .disabled(!favoritesModel.hasContent)
                     Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
                         .toggleStyle(.checkbox)
-                        .disabled(!continueSetUpModel.hasContent)
+                        .visibility(continueSetUpModel.hasContent ? .visible : .gone)
+                    Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavouriteVisible)
+                        .toggleStyle(.checkbox)
                     Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
                         .toggleStyle(.checkbox)
                 }))
@@ -114,11 +113,15 @@ extension HomePage.Views {
                 ZStack {
                     Rectangle()
                         .fill(buttonBackgroundColor)
-                        .frame(width: 28, height: 28, alignment: .bottomTrailing)
+                        .frame(width: 16.02, height: 16.02, alignment: .bottomTrailing)
                         .cornerRadius(3)
-                    IconButton(icon: NSImage(named: "OptionsMainView")!) {
-                        isHomeContentPopoverVisible.toggle()
-                    }
+                    Image("OptionsMainView")
+                        .resizable()
+                        .frame(width: 16.02, height: 16.02)
+                        .scaledToFit()
+                        .link(onHoverChanged: nil) {
+                            isHomeContentPopoverVisible.toggle()
+                        }
                     .onHover { isHovering in
                         self.isHovering = isHovering
                     }
@@ -138,17 +141,6 @@ extension HomePage.Views {
                 .font(.custom("SFProText-Regular", size: 13))
             Divider()
             HStack {
-                Toggle(isOn: $model.isFavouriteVisible, label: {
-                    HStack {
-                        Image("Favorite")
-                            .frame(width: 16.02, height: 16.02)
-                        Text(UserText.newTabFavoriteSectionTitle)
-                    }
-                })
-                .disabled(!favoritesModel.hasContent)
-                Spacer()
-            }
-            HStack {
                 Toggle(isOn: $model.isContinueSetUpVisible, label: {
                     HStack {
                         Image("RocketNoColor")
@@ -156,7 +148,17 @@ extension HomePage.Views {
                         Text(UserText.newTabMenuItemShowContinuteSetUp)
                     }
                 })
-                .disabled(!continueSetUpModel.hasContent)
+                .visibility(continueSetUpModel.hasContent ? .visible : .gone)
+                Spacer()
+            }
+            HStack {
+                Toggle(isOn: $model.isFavouriteVisible, label: {
+                    HStack {
+                        Image("Favorite")
+                            .frame(width: 16.02, height: 16.02)
+                        Text(UserText.newTabFavoriteSectionTitle)
+                    }
+                })
                 Spacer()
             }
             HStack {

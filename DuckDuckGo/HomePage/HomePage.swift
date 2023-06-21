@@ -32,9 +32,7 @@ struct HomePage {
 
     static let favoritesPerRow = 6
     static let favoritesRowCountWhenCollapsed = 1
-    static let featuresPerRow = 3
+    static let featuresPerRow = 2
     static let featureRowCountWhenCollapsed = 1
 
-    // MARK: Colors
-    static let homePageBlue = Color(red: 57/255, green: 105/255, blue: 239/255)
 }

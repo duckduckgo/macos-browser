@@ -53,9 +53,7 @@ extension HomePage.Views {
             .frame(height: 32)
             .font(.system(size: 11))
             .link {
-                withAnimation {
-                    isExpanded = !isExpanded
-                }
+                isExpanded = !isExpanded
             }
 
         }
