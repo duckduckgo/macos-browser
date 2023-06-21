@@ -237,6 +237,15 @@ extension AppDelegate {
         FireCoordinator.fireButtonAction()
     }
 
+    @IBAction func navigateToPrivateEmail(_ sender: Any?) {
+        guard let window = NSApplication.shared.keyWindow,
+              let windowController = window.windowController as? MainWindowController else {
+            assertionFailure("No reference to main window controller")
+            return
+        }
+        windowController.mainViewController.browserTabViewController.openNewTab(with: .url(URL.duckDuckGoEmail))
+    }
+
     // MARK: - Network Protection Debug
 
     @IBAction func resetNetworkProtectionState(_ sender: Any?) {

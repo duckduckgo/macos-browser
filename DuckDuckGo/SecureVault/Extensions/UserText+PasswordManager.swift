@@ -60,8 +60,8 @@ extension UserText {
     static let pmRemovedDuckAddressTitle = NSLocalizedString("pm.removed.duck.address.title", value: "Private Duck Address username was removed", comment: "Title for the alert dialog telling the user an updated username is no longer a private email address")
     static let pmRemovedDuckAddressContent = NSLocalizedString("pm.removed.duck.address.content", value: "You can still manage this Duck Address from emails received from it in your personal inbox.", comment: "Content for the alert dialog telling the user an updated username is no longer a private email address")
     static let pmRemovedDuckAddressButton = NSLocalizedString("pm.removed.duck.address.button", value: "Got it", comment: "Button text for the alert dialog telling the user an updated username is no longer a private email address")
-    static let pmSignInToManageEmail = NSLocalizedString("pm.signin.to.manage", value: "Enable Email Protection on this device to manage Duck Addresses", comment: "Message displayed below a private email address when the user is signed out of private protection")
-
+    static let pmSignInToManageEmail = NSLocalizedString("pm.signin.to.manage", value: "To manage your Duck Addresses on this device", comment: "Message displayed to the user when they are logged out of Email protection.")
+    static let pmEnableEmailProtection = NSLocalizedString("pm.enable.email.protection", value: "Enable Email Protection", comment: "Text link to email protection website")
     static let pmCardNumber = NSLocalizedString("pm.card.number", value: "Card Number", comment: "Label for card number title")
     static let pmCardholderName = NSLocalizedString("pm.card.cardholder-name", value: "Cardholder Name", comment: "Label for cardholder name title")
     static let pmCardVerificationValue = NSLocalizedString("pm.card.cvv", value: "CVV", comment: "Label for CVV title")

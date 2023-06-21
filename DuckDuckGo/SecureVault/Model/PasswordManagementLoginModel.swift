@@ -259,6 +259,11 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     }
 
+    func enableEmailProtection() {
+        NSApp.sendAction(#selector(NSPopover.performClose(_:)), to: nil, from: nil)
+        NSApp.sendAction(#selector(AppDelegate.navigateToPrivateEmail(_:)), to: nil, from: nil)
+    }
+
     @MainActor
     private func setPrivateEmailStatus(_ status: EmailAliasStatus) {
         hasValidPrivateEmail = true
