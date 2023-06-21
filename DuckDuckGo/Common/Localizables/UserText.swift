@@ -745,7 +745,7 @@ struct UserText {
     static let newTabSetUpEmailProtectionCardTitle = NSLocalizedString("newTab.setup.email.protection.title", value: "Protect Your Inbox", comment: "Title of the Email Protection card of the Set Up section in the home page")
     static let newTabSetUpCookieManagerCardTitle = NSLocalizedString("newTab.setup.cookie.manager.title", value: "Eliminate Cookie Pop-ups", comment: "Title of the Cookie Manager card of the Set Up section in the home page")
 
-    static let newTabSetUpDefaultBrowserAction = NSLocalizedString("newTab.setup.default.browser.action", value: "Make Default browser", comment: "Action title on the action menu of the Default Browser card")
+    static let newTabSetUpDefaultBrowserAction = NSLocalizedString("newTab.setup.default.browser.action", value: "Make Default Browser", comment: "Action title on the action menu of the Default Browser card")
     static let newTabSetUpImportAction = NSLocalizedString("newTab.setup.Import.action", value: "Import Now", comment: "Action title on the action menu of the Import card of the Set Up section in the home page")
     static let newTabSetUpDuckPlayerAction = NSLocalizedString("newTab.setup.duck.player.action", value: "Try Duck Player", comment: "Action title on the action menu of the Duck Player card of the Set Up section in the home page")
     static let newTabSetUpEmailProtectionAction = NSLocalizedString("newTab.setup.email.protection.action", value: "Get a Duck Address", comment: "Action title on the action menu of the Email Protection card of the Set Up section in the home page")
