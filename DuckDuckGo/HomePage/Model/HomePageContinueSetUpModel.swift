@@ -110,7 +110,6 @@ extension HomePage.Models {
             self.duckPlayerPreferences = duckPlayerPreferences
             refreshFeaturesMatrix()
             NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
-            isFirstSession = false
         }
 
         @MainActor func performAction(for featureType: FeatureType) {
@@ -198,6 +197,9 @@ extension HomePage.Models {
         @objc private func newTabOpenNotification(_ notification: Notification) {
             if !isFirstSession {
                 listOfFeatures = randomiseFeatures()
+            }
+            if OnboardingViewModel().onboardingFinished {
+                isFirstSession = false
             }
         }
 
