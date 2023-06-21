@@ -16,11 +16,12 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
 import CoreData
+import DDGSync
 import Bookmarks
 import Cocoa
-import os.log
 
 // swiftlint:disable:next type_body_length
 final class LocalBookmarkStore: BookmarkStore {
@@ -78,6 +79,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
         context.perform {
             do {
+                self.context.refreshAllObjects()
                 let results: [BookmarkEntity]
 
                 switch type {
@@ -89,9 +91,13 @@ final class LocalBookmarkStore: BookmarkStore {
                     // When fetching the top level entities, the root folder will be returned. To make things simpler for the caller, this function
                     // will return the children of the root folder, as the root folder is an implementation detail of the bookmarks store.
                     let rootFolder = BookmarkUtils.fetchRootFolder(self.context)
-                    results = rootFolder?.childrenArray ?? []
+                    let orphanedEntities = BookmarkUtils.fetchOrphanedEntities(self.context)
+                    if !orphanedEntities.isEmpty {
+                        self.reportOrphanedBookmarksIfNeeded()
+                    }
+                    results = (rootFolder?.childrenArray ?? []) + orphanedEntities
                 case .favorites:
-                    results = self.favoritesFolder?.favorites?.array as? [BookmarkEntity] ?? []
+                    results = self.favoritesFolder?.favoritesArray ?? []
                 }
 
                 let entities: [BaseBookmarkEntity] = results.compactMap { entity in
@@ -103,6 +109,15 @@ final class LocalBookmarkStore: BookmarkStore {
             } catch let error {
                 completion(nil, error)
             }
+        }
+    }
+
+    private func reportOrphanedBookmarksIfNeeded() {
+        Task { @MainActor in
+            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService, syncService.authState == .inactive else {
+                return
+            }
+            Pixel.fire(.debug(event: .orphanedBookmarksPresent))
         }
     }
 
@@ -172,7 +187,7 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             for object in fetchResults {
-                self.context.delete(object)
+                object.markPendingDeletion()
             }
 
             do {
@@ -353,7 +368,7 @@ final class LocalBookmarkStore: BookmarkStore {
             } catch {
                 self.context.rollback()
                 // Only throw this assertion when running in debug and when unit tests are not running.
-                if !AppDelegate.isRunningTests {
+                if !NSApp.isRunningUnitTests {
                     assertionFailure("LocalBookmarkStore: Saving of context failed")
                 }
 
@@ -592,7 +607,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 os_log("Failed to import bookmarks, with error: %s", log: .dataImportExport, type: .error, error.localizedDescription)
 
                 // Only throw this assertion when running in debug and when unit tests are not running.
-                if !AppDelegate.isRunningTests {
+                if !NSApp.isRunningUnitTests {
                     assertionFailure("LocalBookmarkStore: Saving of context failed, error: \(error.localizedDescription)")
                 }
             }
@@ -836,7 +851,7 @@ final class LocalBookmarkStore: BookmarkStore {
 fileprivate extension BookmarkEntity {
 
     var isInvalid: Bool {
-        if title == nil {
+        if title == nil && isPendingDeletion == false {
             return true
         }
 

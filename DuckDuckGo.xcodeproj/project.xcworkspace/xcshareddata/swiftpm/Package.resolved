@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "d2d7850a5a1402036650e5900635700574cc39d1",
-        "version" : "47.0.0"
+        "revision" : "68e3bd3951f08427d2f2198ab4d1f232c0160ed1",
+        "version" : "61.0.1"
       }
     },
     {
@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "ed10de3485f454ca59259266a0b3942bd21b43db",
-        "version" : "3.4.1"
+        "revision" : "801b7f23476f797c6eaa72b070e6c80abb82801a",
+        "version" : "4.4.4"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "9f0c2eab4223f1f28cced4eac73e4381a8daa35e",
-        "version" : "6.3.0"
+        "revision" : "44cd844b6bb5d8ccfefbd6e025817d800c26ad76",
+        "version" : "7.2.0"
       }
     },
     {
@@ -32,16 +32,16 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/GRDB.swift.git",
       "state" : {
-        "revision" : "8eac7de76dff73dc467d5c43f9beabc61a6d6e02",
-        "version" : "2.0.0"
+        "revision" : "4475888676cfe1aabb1a35f379cd079ea692da1e",
+        "version" : "2.1.1"
       }
     },
     {
       "identity" : "lottie-ios",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/airbnb/lottie-ios",
+      "location" : "https://github.com/duckduckgo/lottie-ios.git",
       "state" : {
-        "revision" : "4a6058cbbdfe4f74aeae92c8bd51ad3b0de2a1ee",
+        "revision" : "abf5510e261c85ffddd29de0bca9b72592ea2bdd",
         "version" : "3.3.0"
       }
     },
@@ -55,11 +55,11 @@
       }
     },
     {
-      "identity" : "openssl",
+      "identity" : "openssl-xcframework",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/krzyzanowskim/OpenSSL",
+      "location" : "https://github.com/duckduckgo/OpenSSL-XCFramework",
       "state" : {
-        "revision" : "52db2ab9de7f78d1dea0d728fddd47fb133e25b7",
+        "revision" : "238e8f700809ff0e1cad5f906cb4c3b0f77f44f9",
         "version" : "1.1.1900"
       }
     },
@@ -100,12 +100,39 @@
       }
     },
     {
+      "identity" : "swifter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/httpswift/swifter.git",
+      "state" : {
+        "revision" : "9483a5d459b45c3ffd059f7b55f9638e268632fd",
+        "version" : "1.5.0"
+      }
+    },
+    {
+      "identity" : "sync_crypto",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/sync_crypto",
+      "state" : {
+        "revision" : "2ab6ab6f0f96b259c14c2de3fc948935fc16ac78",
+        "version" : "0.2.0"
+      }
+    },
+    {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
       "state" : {
         "revision" : "4684440d03304e7638a2c8086895367e90987463",
         "version" : "1.2.1"
+      }
+    },
+    {
+      "identity" : "wireguard-apple",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/wireguard-apple",
+      "state" : {
+        "revision" : "156abe15063b35b633363ec33fc2c040f81f9326",
+        "version" : "1.0.0"
       }
     }
   ],

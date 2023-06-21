@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -78,6 +78,11 @@
                                                 <action selector="newWindow:" target="Ady-hI-5gd" id="nK2-0w-B4c"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="New Burner Window" keyEquivalent="N" id="fx4-EK-KRg">
+                                            <connections>
+                                                <action selector="newBurnerWindow:" target="Ady-hI-5gd" id="vLy-E3-sFd"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="New Tab" keyEquivalent="t" id="9qI-62-tsd" userLabel="New Tab">
                                             <connections>
                                                 <action selector="newTab:" target="Ady-hI-5gd" id="Gnb-ML-joG"/>
@@ -121,7 +126,7 @@
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Export" id="SGe-jt-1so">
                                                 <items>
-                                                    <menuItem title="Logins..." id="raM-fX-nRg">
+                                                    <menuItem title="Passwords..." id="raM-fX-nRg">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="openExportLogins:" target="Ady-hI-5gd" id="MLl-kw-Su4"/>
@@ -386,7 +391,7 @@
                                         <menuItem isSeparatorItem="YES" id="hB3-LF-h0Y"/>
                                         <menuItem title="Show Bookmarks Bar" keyEquivalent="B" id="z3f-ie-l71">
                                             <connections>
-                                                <action selector="toggleBookmarksBar:" target="Ady-hI-5gd" id="nVa-wD-QtY"/>
+                                                <action selector="toggleBookmarksBarFromMenu:" target="Ady-hI-5gd" id="dCK-ha-Oqf"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Show Downloads" keyEquivalent="j" id="qWL-J6-S8r">
@@ -408,6 +413,11 @@
                                         <menuItem title="Show Downloads Shortcut" keyEquivalent="J" id="3II-oR-MBb">
                                             <connections>
                                                 <action selector="toggleDownloadsShortcut:" target="Ady-hI-5gd" id="ReL-VD-CSo"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Show Network Protection" keyEquivalent="N" id="UYq-tJ-SrY" userLabel="Toggle Network Protection Menu Item">
+                                            <connections>
+                                                <action selector="toggleNetworkProtectionShortcut:" target="Ady-hI-5gd" id="bgl-XJ-Gcy"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="LIc-c6-SKt"/>
@@ -500,8 +510,18 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="eoz-XM-HpQ"/>
+                                        <menuItem title="Clear All History…" enabled="NO" id="n9a-Bc-r7Z">
+                                            <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                                            <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="clearAllHistory:" target="Ady-hI-5gd" id="5Q8-pp-l2m"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                     <connections>
+                                        <outlet property="clearAllHistoryMenuItem" destination="n9a-Bc-r7Z" id="L22-xU-BaT"/>
                                         <outlet property="recentlyClosedMenuItem" destination="pWT-lm-yTC" id="bhY-MN-oMZ"/>
                                         <outlet property="reopenAllWindowsFromLastSessionMenuItem" destination="C6V-uF-uX8" id="YoX-kD-0PA"/>
                                         <outlet property="reopenLastClosedMenuItem" destination="c3l-v1-kxk" id="1OS-ma-fzm"/>
@@ -525,14 +545,20 @@
                                         </menuItem>
                                         <menuItem title="Toggle Bookmarks Bar" keyEquivalent="B" id="SwH-Sh-zIJ">
                                             <connections>
-                                                <action selector="toggleBookmarksBar:" target="Ady-hI-5gd" id="EkG-vj-emY"/>
+                                                <action selector="toggleBookmarksBarFromMenu:" target="Ady-hI-5gd" id="K35-ch-3LK"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="aPG-H0-BrG"/>
-                                        <menuItem title="Import Bookmarks and Passwords..." id="tNX-Bv-yM3" userLabel="Import Bookmarks...">
+                                        <menuItem title="Import Bookmarks…" id="tNX-Bv-yM3" userLabel="Import Bookmarks...">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="openImportBrowserDataWindow:" target="Ady-hI-5gd" id="NdE-Lt-CL5"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Export Bookmarks…" enabled="NO" id="3K6-pB-Kea">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="openExportBookmarks:" target="Ady-hI-5gd" id="h3L-FO-yq9"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="xsn-Ak-LSd"/>
@@ -724,10 +750,16 @@ CQ
                                                             <action selector="resetPinnedTabs:" target="Ady-hI-5gd" id="4iv-wI-8wp"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="Reset Youtube Overlay Interactions" id="tTd-ZO-0Zx">
+                                                    <menuItem title="Reset YouTube Overlay Interactions" id="tTd-ZO-0Zx">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="resetPrivatePlayerOverlayInteractions:" target="Ady-hI-5gd" id="Tr1-yK-ayF"/>
+                                                            <action selector="resetDuckPlayerOverlayInteractions:" target="Ady-hI-5gd" id="Tr1-yK-ayF"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Reset Email Protection InContext Prompt" id="jSt-Yy-xOA">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetEmailProtectionInContextPrompt:" target="Ady-hI-5gd" id="aB4-ox-qKt"/>
                                                         </connections>
                                                     </menuItem>
                                                 </items>
@@ -749,18 +781,103 @@ CQ
                                                             <action selector="showCredentialsSavedPopover:" target="Ady-hI-5gd" id="f2c-5P-iB5"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Show Pop Up Window" id="jXc-4d-0P3">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="showPopUpWindow:" target="Ady-hI-5gd" id="gub-iq-D4g"/>
+                                                        </connections>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>
-                                        <menuItem title="Configuration" id="Vu8-iE-7RS">
+                                        <menuItem title="Remote Configuration" id="Vu8-iE-7RS">
                                             <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Configuration" id="z0p-D5-iYh">
+                                            <menu key="submenu" title="Remote Configuration" id="z0p-D5-iYh">
                                                 <items>
-                                                    <menuItem title="Fetch configuration now" id="ZB2-SK-OqK" userLabel="Fetch configuration now">
+                                                    <menuItem title="Fetch Configuration Now" id="ZB2-SK-OqK" userLabel="Fetch configuration now">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="fetchConfigurationNow:" target="Ady-hI-5gd" id="31i-Lv-4r5"/>
                                                         </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
+                                        </menuItem>
+                                        <menuItem title="Network Protection" id="Dt6-sj-4hn">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="Network Protection" id="Rah-lS-gno">
+                                                <items>
+                                                    <menuItem title="Reset Network Protection State" id="p4h-oC-tpw">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetNetworkProtectionState:" target="Ady-hI-5gd" id="mIO-RZ-oSp"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Remove System Extension and Login Items" id="bKT-dU-DaE" userLabel="Remove System Extension">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="removeNetworkProtectionSystemExtensionAndAgents:" target="Ady-hI-5gd" id="S7i-iV-WN0"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem isSeparatorItem="YES" id="FSc-gX-vGh"/>
+                                                    <menuItem title="Preferred Server Location" id="Zh6-DO-H1c">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Preferred Server Location" id="jbT-17-qgW">
+                                                            <items>
+                                                                <menuItem title="Automatic" id="0j8-SE-pRP">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="networkProtectionPreferredServerChanged:" target="Ady-hI-5gd" id="3eT-N4-yyJ"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                            </items>
+                                                        </menu>
+                                                    </menuItem>
+                                                    <menuItem title="Registration Key" id="ckA-tq-fXI">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Registration Key" id="ywX-2q-1Dq">
+                                                            <items>
+                                                                <menuItem title="Expire Now" id="104-Zf-0KB">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="networkProtectionExpireRegistrationKeyNow:" target="Ady-hI-5gd" id="PZ4-J7-0am"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem isSeparatorItem="YES" id="MEg-4g-gji"/>
+                                                                <menuItem title="Validity" id="iPz-EO-Nv6">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <menu key="submenu" id="HwX-wm-4zf">
+                                                                        <items>
+                                                                            <menuItem title="Automatic" id="Hsh-im-6Cc">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                                <connections>
+                                                                                    <action selector="networkProtectionSetRegistrationKeyValidity:" target="Ady-hI-5gd" id="oVF-DB-lPW"/>
+                                                                                </connections>
+                                                                            </menuItem>
+                                                                        </items>
+                                                                    </menu>
+                                                                </menuItem>
+                                                            </items>
+                                                        </menu>
+                                                    </menuItem>
+                                                    <menuItem title="Simulate Failure" id="K5h-D4-For">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Simulate Failure" id="iLs-sj-2Gd">
+                                                            <items>
+                                                                <menuItem title="Enable NetP &gt; Controller Failure" id="xyA-ob-gEy">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="networkProtectionSimulateControllerFailure:" target="Ady-hI-5gd" id="7Ez-Oa-zkP"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="Enable NetP &gt; Tunnel Failure" id="kVa-n8-UNx">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="networkProtectionSimulateTunnelFailure:" target="Ady-hI-5gd" id="4Pb-oF-nwr"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                            </items>
+                                                        </menu>
                                                     </menuItem>
                                                 </items>
                                             </menu>
@@ -808,6 +925,7 @@ CQ
                             <outlet property="closeTabMenuItem" destination="DVo-aG-piG" id="Hr0-hn-2p1"/>
                             <outlet property="closeWindowMenuItem" destination="CzI-4o-2re" id="32H-X4-8Ub"/>
                             <outlet property="debugMenuItem" destination="ilv-5f-YpZ" id="4F7-9b-Mve"/>
+                            <outlet property="exportBookmarksMenuItem" destination="3K6-pB-Kea" id="LbP-Ft-aAT"/>
                             <outlet property="favoriteThisPageMenuItem" destination="cHZ-Fb-aKU" id="uPM-LY-AmL"/>
                             <outlet property="favoritesMenuItem" destination="Y9I-ZC-gGg" id="zk1-XL-x3e"/>
                             <outlet property="forwardMenuItem" destination="Gbj-sV-aI3" id="54P-Ym-Ic2"/>
@@ -817,6 +935,11 @@ CQ
                             <outlet property="importBookmarksMenuItem" destination="tNX-Bv-yM3" id="NI1-on-lCU"/>
                             <outlet property="importBrowserDataMenuItem" destination="gTV-od-6G5" id="2R0-Pa-qG4"/>
                             <outlet property="manageBookmarksMenuItem" destination="BaO-sP-wbQ" id="rn7-HX-04s"/>
+                            <outlet property="networkProtectionMenuItem" destination="Dt6-sj-4hn" id="rwK-fl-TRh"/>
+                            <outlet property="networkProtectionPreferredServerLocationItem" destination="Zh6-DO-H1c" id="3wy-2a-ACt"/>
+                            <outlet property="networkProtectionRegistrationKeyValidityMenuItem" destination="iPz-EO-Nv6" id="Sw3-Bt-aZt"/>
+                            <outlet property="networkProtectionRegistrationKeyValidityMenuSeparatorItem" destination="MEg-4g-gji" id="yWq-Rz-B9B"/>
+                            <outlet property="newBurnerWindowMenuItem" destination="fx4-EK-KRg" id="52V-eM-hzi"/>
                             <outlet property="newTabMenuItem" destination="9qI-62-tsd" id="6SI-rG-P34"/>
                             <outlet property="newWindowMenuItem" destination="Was-JA-tGl" id="uyQ-qR-DFk"/>
                             <outlet property="openLocationMenuItem" destination="xnU-dQ-JR1" id="DYS-Dt-ydU"/>
@@ -832,6 +955,7 @@ CQ
                             <outlet property="toggleBookmarksShortcutMenuItem" destination="bXm-yY-7AL" id="KjP-Tc-Hwo"/>
                             <outlet property="toggleDownloadsShortcutMenuItem" destination="3II-oR-MBb" id="lBF-XY-b4Z"/>
                             <outlet property="toggleFullscreenMenuItem" destination="4J7-dP-txa" id="lyl-pp-TR0"/>
+                            <outlet property="toggleNetworkProtectionShortcutMenuItem" destination="UYq-tJ-SrY" id="9HV-Xs-n4f"/>
                             <outlet property="zoomInMenuItem" destination="lMK-tC-RJd" id="Ddo-RX-A6Z"/>
                             <outlet property="zoomOutMenuItem" destination="flw-Fc-cm6" id="1AB-0r-vvx"/>
                         </connections>

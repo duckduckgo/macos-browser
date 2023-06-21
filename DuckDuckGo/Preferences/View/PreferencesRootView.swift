@@ -17,10 +17,12 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
+import SyncUI
 
 fileprivate extension Preferences.Const {
     static let sidebarWidth: CGFloat = 256
-    static let paneContentWidth: CGFloat = 512
+    static let paneContentWidth: CGFloat = 524
     static let panePaddingHorizontal: CGFloat = 48
     static let panePaddingVertical: CGFloat = 40
 }
@@ -44,6 +46,8 @@ extension Preferences {
                             switch model.selectedPane {
                             case .general:
                                 GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences())
+                            case .sync:
+                                SyncView()
                             case .appearance:
                                 AppearanceView(model: .shared)
                             case .privacy:
@@ -52,10 +56,15 @@ extension Preferences {
                                 AutofillView(model: AutofillPreferencesModel())
                             case .downloads:
                                 DownloadsView(model: DownloadsPreferences())
-                            case .privatePlayer:
-                                PrivatePlayerView(model: .shared)
+                            case .duckPlayer:
+                                DuckPlayerView(model: .shared)
                             case .about:
-                                AboutView(model: .init())
+#if NETWORK_PROTECTION
+                                let netPInvitePresenter = NetworkProtectionInvitePresenter()
+                                AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter))
+#else
+                                AboutView(model: AboutModel())
+#endif
                             }
                         }
                         .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)
@@ -69,6 +78,18 @@ extension Preferences {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color("InterfaceBackgroundColor"))
+        }
+    }
+
+}
+
+struct SyncView: View {
+
+    var body: some View {
+        if let syncService = (NSApp.delegate as? AppDelegate)?.syncService {
+            SyncUI.ManagementView(model: SyncPreferences(syncService: syncService))
+        } else {
+            FailedAssertionView("Failed to initialize Sync Management View")
         }
     }
 

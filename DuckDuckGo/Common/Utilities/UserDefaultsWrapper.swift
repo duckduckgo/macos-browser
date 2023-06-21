@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 
 @propertyWrapper
@@ -47,7 +48,7 @@ public struct UserDefaultsWrapper<T> {
         case lastUsedCustomDownloadLocation = "preferences.custom-last-used-download-location"
         case alwaysRequestDownloadLocationKey = "preferences.download-location.always-request"
         case autoconsentEnabled = "preferences.autoconsent-enabled"
-        case privatePlayerMode = "preferences.duck-player"
+        case duckPlayerMode = "preferences.duck-player"
         case youtubeOverlayInteracted = "preferences.youtube-overlay-interacted"
 
         case selectedPasswordManager = "preferences.autofill.selected-password-manager"
@@ -66,6 +67,7 @@ public struct UserDefaultsWrapper<T> {
         case currentThemeName = "com.duckduckgo.macos.currentThemeNameKey"
         case showFullURL = "preferences.appearance.show-full-url"
         case showAutocompleteSuggestions = "preferences.appearance.show-autocomplete-suggestions"
+        case defaultPageZoom = "preferences.appearance.default-page-zoom"
 
         // ATB
         case installDate = "statistics.installdate.key"
@@ -90,10 +92,18 @@ public struct UserDefaultsWrapper<T> {
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"
 
         case showBookmarksBar = "bookmarks.bar.show"
+        case lastBookmarksBarUsagePixelSendDate = "bookmarks.bar.last-usage-pixel-send-date"
 
         case pinnedViews = "pinning.pinned-views"
+        case manuallyToggledPinnedViews = "pinning.manually-toggled-pinned-views"
 
         case lastDatabaseFactoryFailurePixelDate = "last.database.factory.failure.pixel.date"
+
+        case loggingEnabledDate = "logging.enabled.date"
+        case loggingCategories = "logging.categories"
+
+        // Temporary for activetion pixel
+        case firstLaunchDate = "first.app.launch.date"
     }
 
     enum RemovedKeys: String, CaseIterable {
@@ -112,12 +122,14 @@ public struct UserDefaultsWrapper<T> {
 
     static var sharedDefaults: UserDefaults {
 #if DEBUG
-        if AppDelegate.isRunningTests,
-           let defaults = UserDefaults(suiteName: Bundle.main.bundleIdentifier! + ".tests") {
-            return defaults
+        if case .normal = NSApp.runType {
+            return .standard
+        } else {
+            return UserDefaults(suiteName: Bundle.main.bundleIdentifier! + "." + NSApp.runType.description)!
         }
-#endif
+#else
         return .standard
+#endif
     }
 
     public init(key: Key, defaultValue: T, setIfEmpty: Bool = false, defaults: UserDefaults? = nil) {

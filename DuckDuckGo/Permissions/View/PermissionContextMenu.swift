@@ -376,7 +376,7 @@ private extension NSMenuItem {
                           permission: PermissionType,
                           target: PermissionContextMenu) -> NSMenuItem {
 
-        let title = String(format: UserText.permissionPopupOpenFormat, query.url?.absoluteString ?? "“”")
+        let title = String(format: UserText.permissionPopupOpenFormat, (query.url?.isEmpty ?? true) ? "“”" : query.url!.absoluteString)
         let item = NSMenuItem(title: title, action: #selector(PermissionContextMenu.allowPermissionQuery), keyEquivalent: "")
         item.representedObject = query
         item.target = target

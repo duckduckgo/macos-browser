@@ -17,8 +17,12 @@
 //
 
 import Cocoa
-import os.log
 import BrowserServicesKit
+import Common
+
+#if NETWORK_PROTECTION
+import NetworkProtection
+#endif
 
 // Actions are sent to objects of responder chain
 
@@ -37,15 +41,19 @@ extension AppDelegate {
     // MARK: - File
 
     @IBAction func newWindow(_ sender: Any?) {
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(isBurner: false)
+    }
+
+    @IBAction func newBurnerWindow(_ sender: Any?) {
+        WindowsManager.openNewWindow(isBurner: true)
     }
 
     @IBAction func newTab(_ sender: Any?) {
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(isBurner: false)
     }
 
     @IBAction func openLocation(_ sender: Any?) {
-        WindowsManager.openNewWindow()
+        WindowsManager.openNewWindow(isBurner: false)
     }
 
     @IBAction func closeAllWindows(_ sender: Any?) {
@@ -75,11 +83,11 @@ extension AppDelegate {
             return
         }
 
-        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url), shouldLoadInBackground: true))
+        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url), shouldLoadInBackground: true, isBurner: false), isBurner: false)
     }
 
-    @objc func clearAllHistory(_ sender: NSMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+    @IBAction func clearAllHistory(_ sender: NSMenuItem) {
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage, isBurner: false), isBurner: false),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -89,7 +97,7 @@ extension AppDelegate {
     }
 
     @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage, isBurner: false), isBurner: false),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -126,20 +134,21 @@ extension AppDelegate {
             return
         }
 
-        let tab = Tab(content: .url(url), shouldLoadInBackground: true)
-        WindowsManager.openNewWindow(with: tab)
+        let tab = Tab(content: .url(url), shouldLoadInBackground: true, isBurner: false)
+        WindowsManager.openNewWindow(with: tab, isBurner: false)
     }
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks)])
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
-        WindowsManager.openNewWindow(with: tabCollectionViewModel)
+        let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks, isBurner: false)])
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isBurner: false)
+
+        WindowsManager.openNewWindow(with: tabCollectionViewModel, isBurner: false)
     }
 
     @IBAction func openPreferences(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(content: .anyPreferencePane)])
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
-        WindowsManager.openNewWindow(with: tabCollectionViewModel)
+        let tabCollection = TabCollection(tabs: [Tab(content: .anyPreferencePane, isBurner: false)])
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, isBurner: false)
+        WindowsManager.openNewWindow(with: tabCollectionViewModel, isBurner: false)
     }
 
     @IBAction func openAbout(_ sender: Any?) {
@@ -228,6 +237,119 @@ extension AppDelegate {
         FireCoordinator.fireButtonAction()
     }
 
+    // MARK: - Network Protection Debug
+
+    @IBAction func resetNetworkProtectionState(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        Task { @MainActor in
+            guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
+
+            do {
+                try await NetworkProtectionTunnelController.resetAllState()
+            } catch {
+                await NSAlert(error: error).runModal()
+            }
+        }
+#endif
+    }
+
+    @IBAction func removeNetworkProtectionSystemExtensionAndAgents(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        Task { @MainActor in
+            guard case .alertFirstButtonReturn = await NSAlert.removeSystemExtensionAndAgentsAlert().runModal() else { return }
+
+            do {
+                try await NetworkProtectionTunnelController.removeSystemExtensionAndAgents()
+            } catch {
+                await NSAlert(error: error).runModal()
+            }
+        }
+#endif
+    }
+
+    @IBAction func networkProtectionPreferredServerChanged(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        guard let title = (sender as? NSMenuItem)?.title else {
+            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
+            return
+        }
+
+        let selectedServer: SelectedNetworkProtectionServer
+
+        if title == "Automatic" {
+            selectedServer = .automatic
+        } else {
+            let titleComponents = title.components(separatedBy: " ")
+            selectedServer = .endpoint(titleComponents.first!)
+        }
+
+        NetworkProtectionTunnelController.setSelectedServer(selectedServer: selectedServer)
+#endif
+    }
+
+    @IBAction func networkProtectionExpireRegistrationKeyNow(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        Task {
+            try? await NetworkProtectionTunnelController.expireRegistrationKeyNow()
+        }
+#endif
+    }
+
+    @IBAction func networkProtectionSetRegistrationKeyValidity(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        guard let menuItem = sender as? NSMenuItem else {
+            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
+            return
+        }
+
+        // nil means automatic
+        let validity = menuItem.representedObject as? TimeInterval
+
+        Task {
+            do {
+                try await NetworkProtectionTunnelController.setRegistrationKeyValidity(validity)
+            } catch {
+                assertionFailure("Could not override the key validity due to an error: \(error.localizedDescription)")
+                os_log("Could not override the key validity due to an error: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
+            }
+        }
+#endif
+    }
+
+    @IBAction func networkProtectionSimulateControllerFailure(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        guard let menuItem = sender as? NSMenuItem else {
+            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
+            return
+        }
+
+        if menuItem.state == .on {
+            menuItem.state = .off
+        } else {
+            menuItem.state = .on
+        }
+
+        NetworkProtectionTunnelController.simulationOptions.setEnabled(menuItem.state == .on, option: .controllerFailure)
+#endif
+    }
+
+    @IBAction func networkProtectionSimulateTunnelFailure(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        guard let menuItem = sender as? NSMenuItem else {
+            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
+            return
+        }
+
+        if menuItem.state == .on {
+            menuItem.state = .off
+        } else {
+            menuItem.state = .on
+        }
+
+        NetworkProtectionTunnelController.simulationOptions.setEnabled(menuItem.state == .on, option: .tunnelFailure)
+#endif
+    }
+
 }
 
 extension MainViewController {
@@ -235,13 +357,13 @@ extension MainViewController {
     // MARK: - Main Menu
 
     @IBAction func openPreferences(_ sender: Any?) {
-        browserTabViewController.openNewTab(with: .anyPreferencePane, selected: true)
+        browserTabViewController.openNewTab(with: .anyPreferencePane)
     }
 
     // MARK: - File
 
     @IBAction func newTab(_ sender: Any?) {
-        browserTabViewController.openNewTab(with: .homePage, selected: true)
+        browserTabViewController.openNewTab(with: .homePage)
     }
 
     @IBAction func openLocation(_ sender: Any?) {
@@ -258,7 +380,7 @@ extension MainViewController {
         // (this is in line with Safari behavior)
         if isHandlingKeyDownEvent, tabCollectionViewModel.selectionIndex?.isPinnedTab == true {
             if tabCollectionViewModel.tabCollection.tabs.isEmpty {
-                tabCollectionViewModel.append(tab: Tab(content: .homePage), selected: true)
+                tabCollectionViewModel.append(tab: Tab(content: .homePage, isBurner: false), selected: true)
             } else {
                 tabCollectionViewModel.select(at: .unpinned(0))
             }
@@ -320,7 +442,7 @@ extension MainViewController {
             if let vc = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.navigationBarViewController {
                 navigationBarViewController = vc
             } else {
-                WindowsManager.openNewWindow(with: Tab(content: .homePage))
+                WindowsManager.openNewWindow(with: Tab(content: .homePage, isBurner: false), isBurner: false)
                 guard let wc = WindowControllersManager.shared.mainWindowControllers.first(where: { $0.window?.isPopUpWindow == false }) else {
                     return
                 }
@@ -331,7 +453,7 @@ extension MainViewController {
         navigationBarViewController?.toggleDownloadsPopover(keepButtonVisible: false)
     }
 
-    @IBAction func toggleBookmarksBar(_ sender: Any) {
+    @IBAction func toggleBookmarksBarFromMenu(_ sender: Any) {
         PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
     }
 
@@ -345,6 +467,10 @@ extension MainViewController {
 
     @IBAction func toggleDownloadsShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .downloads)
+    }
+
+    @IBAction func toggleNetworkProtectionShortcut(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .networkProtection)
     }
 
     // MARK: - History
@@ -369,7 +495,7 @@ extension MainViewController {
 
     @IBAction func home(_ sender: Any?) {
         guard view.window?.isPopUpWindow == false else {
-            browserTabViewController.openNewTab(with: .homePage, selected: true)
+            browserTabViewController.openNewTab(with: .homePage)
             return
         }
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
@@ -396,7 +522,7 @@ extension MainViewController {
         adjustFirstResponder()
     }
 
-    @objc func clearAllHistory(_ sender: NSMenuItem) {
+    @IBAction func clearAllHistory(_ sender: NSMenuItem) {
         guard let window = view.window else {
             assertionFailure("No window")
             return
@@ -467,12 +593,16 @@ extension MainViewController {
             return
         }
 
-        let tabs = models.compactMap { ($0.entity as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true) }
+        let tabs = models.compactMap { ($0.entity as? Bookmark)?.urlObject }.map {
+            Tab(content: .url($0),
+                shouldLoadInBackground: true,
+                isBurner: tabCollectionViewModel.isBurner)
+        }
         tabCollectionViewModel.append(tabs: tabs)
     }
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
-        browserTabViewController.openNewTab(with: .bookmarks, selected: true)
+        browserTabViewController.openNewTab(with: .bookmarks)
     }
 
     // MARK: - Window
@@ -510,7 +640,7 @@ extension MainViewController {
 
         let tab = selectedTabViewModel.tab
         tabCollectionViewModel.removeSelected()
-        WindowsManager.openNewWindow(with: tab)
+        WindowsManager.openNewWindow(with: tab, isBurner: tabCollectionViewModel.isBurner)
     }
 
     @IBAction func pinOrUnpinTab(_ sender: Any?) {
@@ -637,8 +767,8 @@ extension MainViewController {
         tabCollectionViewModel.pinnedTabsManager?.tabCollection.removeAll()
     }
 
-    @IBAction func resetPrivatePlayerOverlayInteractions(_ sender: Any?) {
-        PrivatePlayerPreferences.shared.youtubeOverlayInteracted = false
+    @IBAction func resetDuckPlayerOverlayInteractions(_ sender: Any?) {
+        DuckPlayerPreferences.shared.youtubeOverlayInteracted = false
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
@@ -653,9 +783,24 @@ extension MainViewController {
         #endif
     }
 
+    @IBAction func showPopUpWindow(_ sender: Any?) {
+        let tabURL = Tab.TabContent.url(URL(string: "https://duckduckgo.com")!)
+        let tab = Tab(content: tabURL,
+                      webViewConfiguration: WKWebViewConfiguration(),
+                      parentTab: nil,
+                      isBurner: false,
+                      canBeClosedWithBack: false,
+                      webViewSize: .zero)
+
+        WindowsManager.openPopUpWindow(with: tab, isBurner: false, contentSize: nil)
+    }
+
+    @IBAction func resetEmailProtectionInContextPrompt(_ sender: Any?) {
+        EmailManager().resetEmailProtectionInContextPrompt()
+    }
+
     @IBAction func fetchConfigurationNow(_ sender: Any?) {
-        ConfigurationManager.shared.lastUpdateTime = .distantPast
-        ConfigurationManager.shared.refreshIfNeeded()
+        ConfigurationManager.shared.forceRefresh()
     }
 
     // MARK: - Developer Tools
@@ -679,7 +824,6 @@ extension MainViewController {
     @IBAction func showPageResources(_ sender: Any?) {
         tabCollectionViewModel.selectedTabViewModel?.tab.webView.showPageSource()
     }
-
 }
 
 extension MainViewController: NSMenuItemValidation {
@@ -777,11 +921,11 @@ extension MainViewController: NSMenuItemValidation {
     }
     // swiftlint:enable function_body_length
     // swiftlint:enable cyclomatic_complexity
-
 }
 
 extension AppDelegate: NSMenuItemValidation {
 
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         switch menuItem.action {
         case #selector(AppDelegate.closeAllWindows(_:)):
@@ -795,9 +939,105 @@ extension AppDelegate: NSMenuItemValidation {
         case #selector(AppDelegate.reopenAllWindowsFromLastSession(_:)):
             return stateRestorationManager.canRestoreLastSessionState
 
+        // Enables and disables export bookmarks itemz
+        case #selector(AppDelegate.openExportBookmarks(_:)):
+            return bookmarksManager.list?.totalBookmarks != 0
+
+        // Enables and disables export passwords items
+        case #selector(AppDelegate.openExportLogins(_:)):
+            return areTherePasswords
+
+        case #selector(AppDelegate.networkProtectionPreferredServerChanged(_:)):
+#if NETWORK_PROTECTION
+            let selectedServerName = NetworkProtectionTunnelController.selectedServerName()
+
+            switch menuItem.title {
+            case "Automatic":
+                menuItem.state = selectedServerName == nil ? .on : .off
+            default:
+                guard let selectedServerName = selectedServerName else {
+                    menuItem.state = .off
+                    break
+                }
+
+                menuItem.state = (menuItem.title.hasPrefix("\(selectedServerName) ")) ? .on : .off
+            }
+
+            return true
+#else
+            return false
+#endif
+
+        case #selector(AppDelegate.networkProtectionExpireRegistrationKeyNow(_:)):
+            return true
+
+        case #selector(AppDelegate.networkProtectionSetRegistrationKeyValidity(_:)):
+#if NETWORK_PROTECTION
+            let selectedValidity = NetworkProtectionTunnelController.registrationKeyValidity()
+
+            switch menuItem.title {
+            case "Automatic":
+                menuItem.state = selectedValidity == nil ? .on : .off
+            default:
+                guard let selectedValidity = selectedValidity,
+                      let menuItemValidity = menuItem.representedObject as? TimeInterval,
+                      selectedValidity == menuItemValidity else {
+
+                    menuItem.state = .off
+                    break
+                }
+
+                menuItem.state =  .on
+            }
+
+            return true
+#else
+            return false
+#endif
+
+        case #selector(AppDelegate.networkProtectionSimulateControllerFailure(_:)):
+#if NETWORK_PROTECTION
+            menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.controllerFailure) ? .on : .off
+            return true
+#else
+            return false
+#endif
+
+        case #selector(AppDelegate.networkProtectionSimulateTunnelFailure(_:)):
+#if NETWORK_PROTECTION
+            menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
+            return true
+#else
+            return false
+#endif
+
         default:
             return true
         }
+    }
+
+    private var areTherePasswords: Bool {
+        let vault = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        guard let vault else {
+            return false
+        }
+        let accounts = (try? vault.accounts()) ?? []
+        if !accounts.isEmpty {
+            return true
+        }
+        let cards = (try? vault.creditCards()) ?? []
+        if !cards.isEmpty {
+            return true
+        }
+        let notes = (try? vault.notes()) ?? []
+        if !notes.isEmpty {
+            return true
+        }
+        let identities = (try? vault.identities()) ?? []
+        if !identities.isEmpty {
+            return true
+        }
+        return false
     }
 
 }

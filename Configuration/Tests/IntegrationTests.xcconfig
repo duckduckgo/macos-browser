@@ -17,7 +17,9 @@
 
 MACOSX_DEPLOYMENT_TARGET = 11.1
 
-INFOPLIST_FILE = Integration Tests/Info.plist
+FEATURE_FLAGS = FEEDBACK NETWORK_PROTECTION
+
+INFOPLIST_FILE = IntegrationTests/Info.plist
 PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.Integration-Tests
 
 TEST_HOST=$(BUILT_PRODUCTS_DIR)/DuckDuckGo.app/Contents/MacOS/DuckDuckGo

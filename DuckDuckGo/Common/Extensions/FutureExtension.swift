@@ -57,14 +57,22 @@ extension Future where Failure == Never {
         return (future, { fulfill(.success($0)) })
     }
 
-    func get() async -> Output {
-        if #available(macOS 12.0, *) {
-            return await self.value
-        } else {
-            return await withCheckedContinuation { continuation in
-                self.receive { result in
-                    continuation.resume(with: result)
+}
+
+extension Publishers.First {
+
+    func promise() -> Future<Output, Failure> {
+        return Future { fulfill in
+            var cancellable: AnyCancellable?
+            cancellable = self.sink { completion in
+                withExtendedLifetime(cancellable) {
+                    if case .failure(let error) = completion {
+                        fulfill(.failure(error))
+                    }
+                    cancellable = nil
                 }
+            } receiveValue: { output in
+                fulfill(.success(output))
             }
         }
     }

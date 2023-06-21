@@ -17,18 +17,39 @@
 //
 
 import SwiftUI
+import Common
 
 final class AboutModel: ObservableObject {
     let appVersion = AppVersion()
 
+#if NETWORK_PROTECTION
+    private let netPInvitePresenter: NetworkProtectionInvitePresenting
+#endif
+
+#if NETWORK_PROTECTION
+    init(netPInvitePresenter: NetworkProtectionInvitePresenting) {
+        self.netPInvitePresenter = netPInvitePresenter
+    }
+#else
+    init() {}
+#endif
+
     let displayableAboutURL: String = URL.aboutDuckDuckGo
         .toString(decodePunycode: false, dropScheme: true, needsWWW: false, dropTrailingSlash: false)
 
+    @MainActor
     func openURL(_ url: URL) {
         WindowControllersManager.shared.show(url: url, newTab: true)
     }
 
+    @MainActor
     func openFeedbackForm() {
         FeedbackPresenter.presentFeedbackForm()
     }
+
+#if NETWORK_PROTECTION
+    func displayNetPInvite() {
+        netPInvitePresenter.present()
+    }
+#endif
 }

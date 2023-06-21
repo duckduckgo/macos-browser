@@ -115,6 +115,8 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         reloadData()
 
         tabSwitcherButton.select(tabType: .bookmarks)
+
+        LocalBookmarkManager.shared.requestSync()
     }
 
     func select(folder: BookmarkFolder) {
@@ -249,7 +251,7 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
             return
         }
 
-        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true) }
+        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, isBurner: tabCollection.isBurner) }
         tabCollection.append(tabs: tabs)
     }
 

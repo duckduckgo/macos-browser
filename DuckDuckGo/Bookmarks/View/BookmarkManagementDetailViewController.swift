@@ -18,7 +18,6 @@
 
 import AppKit
 import Combine
-import os
 
 protocol BookmarkManagementDetailViewControllerDelegate: AnyObject {
 
@@ -146,7 +145,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
         if let url = (entity as? Bookmark)?.urlObject {
             if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-                WindowsManager.openNewWindow(with: url)
+                WindowsManager.openNewWindow(with: url, isBurner: false)
             } else if NSApplication.shared.isCommandPressed {
                 WindowControllersManager.shared.show(url: url, newTab: true)
             } else {
@@ -484,7 +483,11 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
             return
         }
 
-        let tabs = bookmarks.compactMap { $0.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true) }
+        let tabs = bookmarks.compactMap { $0.urlObject }.map {
+            Tab(content: .url($0),
+                shouldLoadInBackground: true,
+                isBurner: tabCollection.isBurner)
+        }
         tabCollection.append(tabs: tabs)
     }
 
@@ -644,7 +647,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        WindowsManager.openNewWindow(with: url)
+        WindowsManager.openNewWindow(with: url, isBurner: false)
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
@@ -671,15 +674,12 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
     }
 
     func copyBookmark(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark, let bookmarkURL = bookmark.urlObject as NSURL? else {
+        guard let bookmark = sender.representedObject as? Bookmark else {
             assertionFailure("Failed to cast menu represented object to Bookmark")
             return
         }
 
-        let pasteboard = NSPasteboard.general
-        pasteboard.declareTypes([.URL], owner: nil)
-        bookmarkURL.write(to: pasteboard)
-        pasteboard.setString(bookmarkURL.absoluteString ?? "", forType: .string)
+        bookmark.copyUrlToPasteboard()
     }
 
     func deleteBookmark(_ sender: NSMenuItem) {

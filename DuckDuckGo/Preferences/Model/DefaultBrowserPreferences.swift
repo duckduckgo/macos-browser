@@ -19,6 +19,7 @@
 import Foundation
 import SwiftUI
 import Combine
+import Common
 
 protocol DefaultBrowserProvider {
     var bundleIdentifier: String { get }
@@ -70,7 +71,23 @@ struct SystemDefaultBrowserProvider: DefaultBrowserProvider {
 
 final class DefaultBrowserPreferences: ObservableObject {
 
-    @Published private(set) var isDefault: Bool = false
+    @Published private(set) var isDefault: Bool = false {
+        didSet {
+            // Temporary pixel for first time user import data
+#if DEBUG
+            if NSApp.isRunningUnitTests {
+                return
+            }
+#endif
+            if Pixel.isNewUser && isDefault {
+                let repetition = Pixel.Event.Repetition(key: Pixel.Event.setAsDefaultInitial.name)
+                if repetition == .initial {
+                    Pixel.fire(.setAsDefaultInitial)
+                }
+
+            }
+        }
+    }
     @Published private(set) var restorePreviousSession: Bool = false
 
     init(defaultBrowserProvider: DefaultBrowserProvider = SystemDefaultBrowserProvider()) {

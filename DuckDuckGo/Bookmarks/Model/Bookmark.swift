@@ -23,23 +23,24 @@ internal class BaseBookmarkEntity {
 
     static func singleEntity(with uuid: String) -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == %@", #keyPath(BookmarkEntity.uuid), uuid)
+        request.predicate = NSPredicate(format: "%K == %@ AND %K == NO", #keyPath(BookmarkEntity.uuid), uuid, #keyPath(BookmarkEntity.isPendingDeletion))
         return request
     }
 
     static func favorite(with uuid: String) -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == %@ AND %K != nil AND %K == NO",
+        request.predicate = NSPredicate(format: "%K == %@ AND %K != nil AND %K == NO AND %K == NO",
                                         #keyPath(BookmarkEntity.uuid),
                                         uuid as CVarArg,
                                         #keyPath(BookmarkEntity.favoriteFolder),
-                                        #keyPath(BookmarkEntity.isFolder))
+                                        #keyPath(BookmarkEntity.isFolder),
+                                        #keyPath(BookmarkEntity.isPendingDeletion))
         return request
     }
 
     static func entities(with identifiers: [String]) -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K IN %@", #keyPath(BookmarkEntity.uuid), identifiers)
+        request.predicate = NSPredicate(format: "%K IN %@ AND %K == NO", #keyPath(BookmarkEntity.uuid), identifiers, #keyPath(BookmarkEntity.isPendingDeletion))
         return request
     }
 
@@ -91,7 +92,7 @@ final class BookmarkFolder: BaseBookmarkEntity {
 
     static func bookmarkFoldersFetchRequest() -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == YES", #keyPath(BookmarkEntity.isFolder))
+        request.predicate = NSPredicate(format: "%K == YES AND %K == NO", #keyPath(BookmarkEntity.isFolder), #keyPath(BookmarkEntity.isPendingDeletion))
         return request
     }
 
@@ -128,7 +129,7 @@ final class Bookmark: BaseBookmarkEntity {
 
     static func bookmarksFetchRequest() -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == NO", #keyPath(BookmarkEntity.isFolder))
+        request.predicate = NSPredicate(format: "%K == NO AND %K == NO", #keyPath(BookmarkEntity.isFolder), #keyPath(BookmarkEntity.isPendingDeletion))
         return request
     }
 
@@ -142,10 +143,15 @@ final class Bookmark: BaseBookmarkEntity {
 
     let faviconManagement: FaviconManagement
     func favicon(_ sizeCategory: Favicon.SizeCategory) -> NSImage? {
-        if let privatePlayerFavicon = PrivatePlayer.shared.image(for: self) {
-            return privatePlayerFavicon
+        if let duckPlayerFavicon = DuckPlayer.shared.image(for: self) {
+            return duckPlayerFavicon
         }
-        return faviconManagement.getCachedFavicon(for: url, sizeCategory: sizeCategory)?.image
+
+        if let url = urlObject {
+            return faviconManagement.getCachedFavicon(for: url, sizeCategory: sizeCategory)?.image
+        } else {
+            return faviconManagement.getCachedFavicon(for: url, sizeCategory: sizeCategory)?.image
+        }
     }
 
     init(id: String,

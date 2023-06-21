@@ -6,11 +6,14 @@ import {Communications} from "./src/comms";
 
 /**
  * @typedef UserValues - A way to communicate some user state
- * @property {{enabled: {name: string}} | {alwaysAsk:{}} | {disabled:{}}} privatePlayerMode - one of 3 values: 'enabled:{}', 'alwaysAsk:{}', 'disabled:{}'
+ * @property {{enabled: {}} | {alwaysAsk:{}} | {disabled:{}}} privatePlayerMode - one of 3 values: 'enabled:{}', 'alwaysAsk:{}', 'disabled:{}'
  * @property {boolean} overlayInteracted - always a boolean
  */
+const userScriptConfig = $DDGYoutubeUserScriptConfig$;
 
-// const defaultEnvironment =  window.env || {
+/** @type {string[]} */
+const allowedProxyOrigins = userScriptConfig.allowedOrigins.filter(origin => !origin.endsWith('youtube.com'));
+
 const defaultEnvironment = {
     getHref() {
         return window.location.href
@@ -22,17 +25,69 @@ const defaultEnvironment = {
     setHref(href) {
         window.location.href = href;
     },
-    enabled() {
+    overlaysEnabled() {
+        if (userScriptConfig.testMode === "overlay-enabled") {
+            return true;
+        }
         return window.location.hostname === "www.youtube.com"
+    },
+    enabledProxy() {
+        return allowedProxyOrigins.includes(window.location.hostname)
+    },
+    isTestMode() {
+        return typeof userScriptConfig.testMode === "string"
+    },
+    /**
+     * @returns {boolean}
+     */
+    hasOneTimeOverride() {
+        try {
+            // #ddg-play is a hard requirement, regardless of referrer
+            if (window.location.hash !== "#ddg-play") return false
+
+            // double-check that we have something that might be a parseable URL
+            if (typeof document.referrer !== "string") return false
+            if (document.referrer.length === 0) return false; // can be empty!
+
+            const { hostname } = new URL(document.referrer);
+            const isAllowed = allowedProxyOrigins.includes(hostname)
+            return isAllowed;
+        } catch (e) {
+            if (userScriptConfig.testMode) {
+                console.log("could not evaluate hasOneTimeOverride")
+                console.error(e)
+            }
+        }
+        return false
     }
 }
 
-if (defaultEnvironment.enabled()) {
-    const macos = Communications.fromInjectedConfig(
-        // @ts-ignore
-        $WebkitMessagingConfig$
-    )
-    initWithEnvironment(defaultEnvironment, macos)
+if (defaultEnvironment.overlaysEnabled()) {
+    try {
+        const comms = Communications.fromInjectedConfig(
+            userScriptConfig.webkitMessagingConfig
+        )
+        initWithEnvironment(defaultEnvironment, comms)
+    } catch (e) {
+        if (userScriptConfig.testMode) {
+            console.log("failed to init overlays")
+            console.error(e);
+        }
+    }
+}
+
+if (defaultEnvironment.enabledProxy()) {
+    try {
+        const comms = Communications.fromInjectedConfig(
+            userScriptConfig.webkitMessagingConfig
+        )
+        comms.serpProxy();
+    } catch (e) {
+        if (userScriptConfig.testMode) {
+            console.log("failed to init proxy")
+            console.error(e);
+        }
+    }
 }
 
 /**
@@ -40,7 +95,6 @@ if (defaultEnvironment.enabled()) {
  * @param {Communications} comms - methods to communicate with a native backend
  */
 function initWithEnvironment(environment, comms) {
-
     /**
      * Entry point. Until this returns with initial user values, we cannot continue.
      */
@@ -52,7 +106,6 @@ function initWithEnvironment(environment, comms) {
      * @param {UserValues} userValues - user values are state-based things that can update
      */
     function enable(userValues) {
-
         const videoPlayerOverlay = new VideoOverlayManager(userValues, environment, comms);
         videoPlayerOverlay.handleFirstPageLoad();
 
@@ -280,50 +333,83 @@ function initWithEnvironment(environment, comms) {
         const OpenInDuckPlayer = {
             clickBoundElements: new Map(),
             enabled: false,
-
+            /** @type {string|null} */
+            lastMouseOver: null,
             bindEventsToAll: () => {
                 if (!OpenInDuckPlayer.enabled) {
-                    return;
+                    return
                 }
 
-                let videoLinksAndPreview = Array.from(document.querySelectorAll('a[href^="/watch?v="], #media-container-link')),
-                    isValidVideoLinkOrPreview = (element) => {
-                        return VideoThumbnail.isSingleVideoURL(element?.getAttribute('href')) ||
-                            element.getAttribute('id') === 'media-container-link';
-                    },
-                    excludeAlreadyBound = (element) => !OpenInDuckPlayer.clickBoundElements.has(element);
-
+                const videoLinksAndPreview = Array.from(document.querySelectorAll('a[href^="/watch?v="], #media-container-link'))
+                const isValidVideoLinkOrPreview = (element) => {
+                    return VideoThumbnail.isSingleVideoURL(element?.getAttribute('href')) ||
+                        element.getAttribute('id') === 'media-container-link'
+                }
                 videoLinksAndPreview
-                    .filter(excludeAlreadyBound)
-                    .forEach(element => {
-                        if (isValidVideoLinkOrPreview(element)) {
+                    .forEach((element) => {
+                        // bail when this element was already seen
+                        if (OpenInDuckPlayer.clickBoundElements.has(element)) return
 
-                            let onClickOpenDuckPlayer = (event) => {
-                                event.preventDefault();
-                                event.stopPropagation();
+                        // bail if it's not a valid element
+                        if (!isValidVideoLinkOrPreview(element)) return
 
-                                let link = event.target.closest('a');
+                        // handle mouseover + click events
+                        const handler = {
+                            handleEvent (event) {
+                                switch (event.type) {
+                                    case 'mouseover': {
+                                        /**
+                                         * Store the element's link value on hover - this occurs just in time
+                                         * before the youtube overlay take sover the event space
+                                         */
+                                        const href = element instanceof HTMLAnchorElement
+                                            ? VideoParams.fromHref(element.href)?.toPrivatePlayerUrl()
+                                            : null
+                                        if (href) {
+                                            OpenInDuckPlayer.lastMouseOver = href
+                                        }
+                                        break
+                                    }
+                                    case 'click': {
+                                        /**
+                                         * On click, the receiver might be the preview element - if
+                                         * it is, we want to use the last hovered `a` tag instead
+                                         */
+                                        event.preventDefault()
+                                        event.stopPropagation()
 
-                                if (link) {
-                                    const href = VideoParams.fromHref(link.href)?.toPrivatePlayerUrl();
-                                    comms.openInDuckPlayerViaMessage(href);
+                                        const link = event.target.closest('a')
+                                        const fromClosest = VideoParams.fromHref(link?.href)?.toPrivatePlayerUrl()
+
+                                        if (fromClosest) {
+                                            comms.openInDuckPlayerViaMessage(fromClosest)
+                                        } else if (OpenInDuckPlayer.lastMouseOver) {
+                                            comms.openInDuckPlayerViaMessage(OpenInDuckPlayer.lastMouseOver)
+                                        } else {
+                                            // could not navigate, doing nothing
+                                        }
+
+                                        break
+                                    }
                                 }
-
-                                return false;
-                            };
-
-                            element.addEventListener('click', onClickOpenDuckPlayer, true);
-
-                            OpenInDuckPlayer.clickBoundElements.set(element, onClickOpenDuckPlayer);
+                            }
                         }
-                    });
+
+                        // register both handlers
+                        element.addEventListener('mouseover', handler, true)
+                        element.addEventListener('click', handler, true)
+
+                        // store the handler for removal later (eg: if settings change)
+                        OpenInDuckPlayer.clickBoundElements.set(element, handler)
+                    })
             },
 
             disable: () => {
-                OpenInDuckPlayer.clickBoundElements.forEach((functionToRemove, element) => {
-                    element.removeEventListener('click', functionToRemove, true);
-                    OpenInDuckPlayer.clickBoundElements.delete(element);
-                });
+                OpenInDuckPlayer.clickBoundElements.forEach((handler, element) => {
+                    element.removeEventListener('mouseover', handler, true)
+                    element.removeEventListener('click', handler, true)
+                    OpenInDuckPlayer.clickBoundElements.delete(element)
+                })
 
                 OpenInDuckPlayer.enabled = false;
             },

@@ -16,133 +16,121 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
-import os
+import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
 extension OSLog {
 
-    static var config: OSLog {
-        Logging.configLoggingEnabled ? Logging.configLog : .disabled
+    enum AppCategories: String, CaseIterable {
+        case atb = "ATB"
+        case config = "Configuration Downloading"
+        case fire = "Fire"
+        case passwordManager = "Password Manager"
+        case history = "History"
+        case dataImportExport = "Data Import/Export"
+        case pixel = "Pixel"
+        case contentBlocking = "Content Blocking"
+        case httpsUpgrade = "HTTPS Upgrade"
+        case favicons = "Favicons"
+        case autoLock = "Auto-Lock"
+        case tabLazyLoading = "Lazy Loading"
+        case autoconsent = "Autoconsent"
+        case bookmarks = "Bookmarks"
+        case attribution = "Ad Attribution"
+        case bitwarden = "Bitwarden"
+        case navigation = "Navigation"
+        case duckPlayer = "Duck Player"
+        case sync = "Sync"
+    }
+    enum AllCategories {
+        static var allCases: [String] {
+            Categories.allCases.map(\.rawValue) + AppCategories.allCases.map(\.rawValue)
+        }
     }
 
-    static var fire: OSLog {
-        Logging.fireLoggingEnabled ? Logging.fireLog : .disabled
+    @OSLogWrapper(.atb) static var atb
+    @OSLogWrapper(.config) static var config
+    @OSLogWrapper(.fire) static var fire
+    @OSLogWrapper(.history) static var history
+    @OSLogWrapper(.dataImportExport) static var dataImportExport
+    @OSLogWrapper(.pixel) static var pixel
+    @OSLogWrapper(.contentBlocking) static var contentBlocking
+    @OSLogWrapper(.httpsUpgrade) static var httpsUpgrade
+    @OSLogWrapper(.favicons) static var favicons
+    @OSLogWrapper(.autoLock) static var autoLock
+    @OSLogWrapper(.tabLazyLoading) static var tabLazyLoading
+    @OSLogWrapper(.autoconsent) static var autoconsent
+    @OSLogWrapper(.bookmarks) static var bookmarks
+    @OSLogWrapper(.attribution) static var attribution
+    @OSLogWrapper(.bitwarden) static var bitwarden
+    @OSLogWrapper(.navigation) static var navigation
+    @OSLogWrapper(.duckPlayer) static var duckPlayer
+    @OSLogWrapper(.sync) static var sync
+
+    // Debug->Logging categories will only be enabled for one day
+    @UserDefaultsWrapper(key: .loggingEnabledDate, defaultValue: .distantPast)
+    private static var loggingEnabledDate: Date
+    private static var isLoggingEnabledToday: Bool {
+        NSCalendar.current.isDate(Date(), inSameDayAs: loggingEnabledDate)
     }
 
-    static var passwordManager: OSLog {
-        Logging.passwordManagerEnabled ? Logging.passwordManagerLog : .disabled
+    @UserDefaultsWrapper(key: .loggingCategories, defaultValue: [])
+    private static var loggingCategoriesSetting: [String] {
+        didSet {
+            loggingEnabledDate = Date()
+        }
+    }
+    static var loggingCategories: Set<String> {
+        get {
+            guard isLoggingEnabledToday else { return [] }
+            return Set(loggingCategoriesSetting)
+        }
+        set {
+            loggingCategoriesSetting = Array(newValue)
+            enabledLoggingCategories = loggingCategories
+        }
     }
 
-    static var history: OSLog {
-        Logging.historyLoggingEnabled ? Logging.historyLog : .disabled
-    }
+    static let isRunningInDebugEnvironment: Bool = {
+        ProcessInfo().environment[ProcessInfo.Constants.osActivityMode] == ProcessInfo.Constants.debug
+            || ProcessInfo().environment[ProcessInfo.Constants.osActivityDtMode] == ProcessInfo.Constants.yes
+    }()
 
-    static var dataImportExport: OSLog {
-        Logging.dataImportExportLoggingEnabled ? Logging.dataImportExportLog : .disabled
-    }
-
-    static var pixel: OSLog {
-        Logging.pixelLoggingEnabled ? Logging.pixelLog : .disabled
-    }
-
-    static var autoconsent: OSLog {
-        Logging.autoconsentLoggingEnabled ? Logging.autoconsentLog : .disabled
-    }
-
-    static var contentBlocking: OSLog {
-        Logging.contentBlockingLoggingEnabled ? Logging.contentBlockingLog : .disabled
-    }
-
-    static var favicons: OSLog {
-        Logging.faviconLoggingEnabled ? Logging.faviconLog : .disabled
-    }
-
-    static var autoLock: OSLog {
-        Logging.autoLockLoggingEnabled ? Logging.autoLockLog : .disabled
-    }
-
-    static var tabLazyLoading: OSLog {
-        Logging.tabLazyLoaderLoggingEnabled ? Logging.tabLazyLoaderLog : .disabled
-    }
-
-    static var bookmarks: OSLog {
-        Logging.bookmarksLoggingEnabled ? Logging.bookmarksLog : .disabled
-    }
-
-    static var bitwarden: OSLog {
-        Logging.bitwardenLoggingEnabled ? Logging.bitwardenLog : .disabled
-    }
-
-    static var attribution: OSLog {
-        Logging.attributionLoggingEnabled ? Logging.attributionLog : .disabled
-    }
-
-    static var atb: OSLog {
-        Logging.atbLoggingEnabled ? Logging.atbLog : .disabled
-    }
-
-    static var navigation: OSLog {
-        Logging.navigationLoggingEnabled ? Logging.navigationLog : .disabled
-    }
+    static let subsystem = Bundle.main.bundleIdentifier!
 
 }
 
-struct Logging {
-
-    fileprivate static let atbLoggingEnabled = false
-    fileprivate static let atbLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "ATB")
-
-    fileprivate static let configLoggingEnabled = false
-    fileprivate static let configLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Configuration Downloading")
-
-    fileprivate static let fireLoggingEnabled = false
-    fileprivate static let fireLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Fire")
-
-    fileprivate static let passwordManagerEnabled = false
-    fileprivate static let passwordManagerLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Password Manager")
-
-    fileprivate static let historyLoggingEnabled = false
-    fileprivate static let historyLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "History")
-
-    fileprivate static let dataImportExportLoggingEnabled = false
-    fileprivate static let dataImportExportLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Data Import/Export")
-
-    fileprivate static let pixelLoggingEnabled = false
-    fileprivate static let pixelLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Pixel")
-
-    fileprivate static let contentBlockingLoggingEnabled = false
-    fileprivate static let contentBlockingLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Content Blocking")
-
-    fileprivate static let faviconLoggingEnabled = false
-    fileprivate static let faviconLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Favicons")
-
-    fileprivate static let autoLockLoggingEnabled = false
-    fileprivate static let autoLockLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Auto-Lock")
-
-    fileprivate static let tabLazyLoaderLoggingEnabled = false
-    fileprivate static let tabLazyLoaderLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Lazy Loading")
-
-    fileprivate static let autoconsentLoggingEnabled = false
-    fileprivate static let autoconsentLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Autoconsent")
-
-    fileprivate static let bookmarksLoggingEnabled = false
-    fileprivate static let bookmarksLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bookmarks")
-
-    fileprivate static let attributionLoggingEnabled = false
-    fileprivate static let attributionLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Ad Attribution")
-
-    fileprivate static let bitwardenLoggingEnabled = false
-    fileprivate static let bitwardenLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Bitwarden")
-
-    fileprivate static let navigationLoggingEnabled = false
-    fileprivate static let navigationLog: OSLog = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "DuckDuckGo", category: "Navigation")
-
+extension ProcessInfo {
+    enum Constants {
+        static let osActivityMode = "OS_ACTIVITY_MODE"
+        static let osActivityDtMode = "OS_ACTIVITY_DT_MODE"
+        static let debug = "debug"
+        static let yes = "YES"
+    }
 }
 
-func logOrAssertionFailure(_ message: StaticString, args: CVarArg...) {
-#if DEBUG
-    assertionFailure("\(message)")
+extension OSLog.OSLogWrapper {
+
+    private static let enableLoggingCategoriesOnce: Void = {
+#if CI
+        OSLog.enabledLoggingCategories = Set(OSLog.AllCategories.allCases)
 #else
-    os_log("BWManager: Wrong handler", type: .error)
+        OSLog.enabledLoggingCategories = OSLog.loggingCategories
+#endif
+    }()
+
+    init(_ category: OSLog.AppCategories) {
+        _=Self.enableLoggingCategoriesOnce
+        self.init(rawValue: category.rawValue)
+    }
+
+}
+
+func logOrAssertionFailure(_ message: String) {
+#if DEBUG && !CI
+    assertionFailure(message)
+#else
+    os_log("%{public}s", type: .error, message)
 #endif
 }

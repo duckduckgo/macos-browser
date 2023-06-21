@@ -17,8 +17,8 @@
 //
 
 import WebKit
-import os
 import BrowserServicesKit
+import Common
 import UserScript
 import PrivacyDashboard
 
@@ -204,10 +204,7 @@ extension AutoconsentUserScript {
             return
         }
 
-        if !url.isHttp && !url.isHttps
-            // bundled test page is served from file://
-            && !(AppDelegate.isRunningTests && (url.path.hasSuffix("/autoconsent-test-page.html") || url.path.hasSuffix("/autoconsent-test-page-banner.html"))) {
-
+        guard [.http, .https].contains(url.navigationalScheme) else {
             // ignore special schemes
             os_log("Ignoring special URL scheme: %s", log: .autoconsent, type: .debug, messageData.url)
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
@@ -251,8 +248,8 @@ extension AutoconsentUserScript {
                 "enablePrehide": preferences.autoconsentEnabled ?? false,
                 "enableCosmeticRules": true,
                 "detectRetries": 20
-            ]
-        ], nil)
+            ] as [String: Any?]
+        ] as [String: Any?], nil)
     }
 
     @MainActor

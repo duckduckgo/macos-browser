@@ -15,7 +15,7 @@ print_usage_and_exit() {
 
 	cat <<- EOF
 	Usage:
-	  $ $(basename "$0") <review|release|review-appstore|release-appstore> [-a <asana_task_url>] [-d] [-s] [-v <version>]
+	  $ $(basename "$0") <review|release|review-sandbox|release-sandbox> [-a <asana_task_url>] [-d] [-s] [-v <version>]
 
 	Options:
 	 -a <asana_task_url>  Update Asana task after building the app (implies -d)
@@ -48,12 +48,12 @@ read_command_line_arguments() {
 			scheme="DuckDuckGo Privacy Browser"
 			configuration="Release"
 			;;
-		review-appstore)
+		review-sandbox)
 			app_name="DuckDuckGo App Store Review"
 			scheme="Product Review Release App Store"
 			configuration="Review"
 			;;
-		release-appstore)
+		release-sandbox)
 			app_name="DuckDuckGo"
 			scheme="DuckDuckGo Privacy Browser App Store"
 			configuration="Release"
@@ -297,7 +297,8 @@ create_dmg() {
 
 export_app_version_to_environment() {
 	if [[ -n "${GITHUB_ENV}" ]]; then
-		echo "app_version=${app_version}" >> "${GITHUB_ENV}"
+		echo "app-version=${app_version}" >> "${GITHUB_ENV}"
+		echo "app-name=${app_name}" >> "${GITHUB_ENV}"
 	fi
 }
 

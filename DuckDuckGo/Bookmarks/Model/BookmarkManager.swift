@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
+import Bookmarks
 import Cocoa
-import os.log
 import Combine
+import Common
 
 protocol BookmarkManager: AnyObject {
 
@@ -44,6 +45,9 @@ protocol BookmarkManager: AnyObject {
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
+    func cleanUpBookmarksDatabase()
+    func updateBookmarkDatabaseCleanupSchedule(shouldEnable: Bool)
+
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
     var list: BookmarkList? { get }
@@ -66,8 +70,26 @@ final class LocalBookmarkManager: BookmarkManager {
 
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared)
     private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
+    private lazy var bookmarkDatabaseCleaner = BookmarkDatabaseCleaner(
+        bookmarkDatabase: BookmarkDatabase.shared.db,
+        errorEvents: BookmarksCleanupErrorHandling(),
+        log: .bookmarks
+    )
 
     // MARK: - Bookmarks
+
+    func updateBookmarkDatabaseCleanupSchedule(shouldEnable: Bool) {
+        bookmarkDatabaseCleaner.cleanUpDatabaseNow()
+        if shouldEnable {
+            bookmarkDatabaseCleaner.scheduleRegularCleaning()
+        } else {
+            bookmarkDatabaseCleaner.cancelCleaningSchedule()
+        }
+    }
+
+    func cleanUpBookmarksDatabase() {
+        bookmarkDatabaseCleaner.cleanUpDatabaseNow()
+    }
 
     func loadBookmarks() {
         bookmarkStore.loadAll(type: .topLevelEntities) { [weak self] (topLevelEntities, error) in
@@ -142,6 +164,7 @@ final class LocalBookmarkManager: BookmarkManager {
             }
 
             self?.loadBookmarks()
+            self?.requestSync()
         }
 
         return bookmark
@@ -161,18 +184,21 @@ final class LocalBookmarkManager: BookmarkManager {
             }
 
             self?.loadBookmarks()
+            self?.requestSync()
         }
     }
 
     func remove(folder: BookmarkFolder) {
         bookmarkStore.remove(objectsWithUUIDs: [folder.id]) { [weak self] _, _ in
             self?.loadBookmarks()
+            self?.requestSync()
         }
     }
 
     func remove(objectsWithUUIDs uuids: [String]) {
         bookmarkStore.remove(objectsWithUUIDs: uuids) { [weak self] _, _ in
             self?.loadBookmarks()
+            self?.requestSync()
         }
     }
 
@@ -186,11 +212,13 @@ final class LocalBookmarkManager: BookmarkManager {
         list?.update(with: bookmark)
         bookmarkStore.update(bookmark: bookmark)
         loadBookmarks()
+        requestSync()
     }
 
     func update(folder: BookmarkFolder) {
         bookmarkStore.update(folder: folder)
         loadBookmarks()
+        requestSync()
     }
 
     func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark? {
@@ -207,6 +235,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
         bookmarkStore.update(bookmark: newBookmark)
         loadBookmarks()
+        requestSync()
 
         return newBookmark
     }
@@ -222,6 +251,7 @@ final class LocalBookmarkManager: BookmarkManager {
             }
 
             self?.loadBookmarks()
+            self?.requestSync()
         }
 
         return folder
@@ -234,6 +264,9 @@ final class LocalBookmarkManager: BookmarkManager {
     func add(objectsWithUUIDs uuids: [String], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
         bookmarkStore.add(objectsWithUUIDs: uuids, to: parent) { [weak self] error in
             self?.loadBookmarks()
+            if error == nil {
+                self?.requestSync()
+            }
             completion(error)
         }
     }
@@ -241,6 +274,9 @@ final class LocalBookmarkManager: BookmarkManager {
     func update(objectsWithUUIDs uuids: [String], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void) {
         bookmarkStore.update(objectsWithUUIDs: uuids, update: update) { [weak self] error in
             self?.loadBookmarks()
+            if error == nil {
+                self?.requestSync()
+            }
             completion(error)
         }
     }
@@ -252,6 +288,9 @@ final class LocalBookmarkManager: BookmarkManager {
     func move(objectUUIDs: [String], toIndex index: Int?, withinParentFolder parent: ParentFolderType, completion: @escaping (Error?) -> Void) {
         bookmarkStore.move(objectUUIDs: objectUUIDs, toIndex: index, withinParentFolder: parent) { [weak self] error in
             self?.loadBookmarks()
+            if error == nil {
+                self?.requestSync()
+            }
             completion(error)
         }
     }
@@ -259,6 +298,9 @@ final class LocalBookmarkManager: BookmarkManager {
     func moveFavorites(with objectUUIDs: [String], toIndex index: Int?, completion: @escaping (Error?) -> Void) {
         bookmarkStore.moveFavorites(with: objectUUIDs, toIndex: index) { [weak self] error in
             self?.loadBookmarks()
+            if error == nil {
+                self?.requestSync()
+            }
             completion(error)
         }
     }
@@ -277,7 +319,8 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult {
         let results = bookmarkStore.importBookmarks(bookmarks, source: source)
-        self.loadBookmarks()
+        loadBookmarks()
+        requestSync()
 
         return results
     }
@@ -291,6 +334,17 @@ final class LocalBookmarkManager: BookmarkManager {
 
         store.resetBookmarks()
         loadBookmarks()
+        requestSync()
     }
 
+    func requestSync() {
+        Task { @MainActor in
+            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService, syncService.authState == .active else {
+                os_log(.debug, log: OSLog.sync, "Sync disabled, not scheduling")
+                return
+            }
+            os_log(.debug, log: OSLog.sync, "Requesting sync")
+            syncService.scheduler.notifyDataChanged()
+        }
+    }
 }
