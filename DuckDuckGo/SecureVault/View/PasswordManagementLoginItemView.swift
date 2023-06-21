@@ -172,7 +172,13 @@ private struct UsernameView: View {
 
                 VStack(alignment: .leading) {
 
-                    UsernameLabel(isHovering: $isHovering)
+                    HStack {
+                        if model.privateEmailRequestInProgress {
+                            ActivityIndicator(isAnimating: $model.privateEmailRequestInProgress, style: .spinning).padding(.trailing, 6)
+                        }
+
+                        UsernameLabel(isHovering: $isHovering)
+                    }
 
                     if model.hasValidPrivateEmail && !model.privateEmailRequestInProgress {
                         PrivateEmailActivationButton()
@@ -243,7 +249,7 @@ private struct PrivateEmailImage: View {
 
     @EnvironmentObject var model: PasswordManagementLoginModel
 
-    var image: NSImage {
+    var image: NSImage? {
         if !model.isSignedIn {
             return NSImage(imageLiteralResourceName: "Email-16")
         } else {
@@ -252,22 +258,19 @@ private struct PrivateEmailImage: View {
                 return NSImage(imageLiteralResourceName: "Email-16")
             case .inactive:
                 return NSImage(imageLiteralResourceName: "Email-Deactivate-16")
-            default:
+            case .error:
                 return NSImage(imageLiteralResourceName: "Alert-Color-16")
+            default:
+                return nil
             }
-        }
 
+        }
     }
 
     var body: some View {
-        ZStack {
-
-            if model.privateEmailRequestInProgress {
-                ActivityIndicator(isAnimating: $model.privateEmailRequestInProgress, style: .spinning)
-            } else {
-                Image(nsImage: image)
-                    .aspectRatio(contentMode: .fit)
-            }
+        if let image {
+            Image(nsImage: image)
+                .aspectRatio(contentMode: .fit)
         }
     }
 }
@@ -309,7 +312,7 @@ private struct PrivateEmailMessage: View {
                                 model.enableEmailProtection()
                             }
                             .onHover { isHovered in
-                                hover = isHovered
+                                self.hover = isHovered
                                 DispatchQueue.main.async {
                                     if hover {
                                         NSCursor.pointingHand.push()
