@@ -275,6 +275,16 @@ private struct PrivateEmailImage: View {
 private struct PrivateEmailMessage: View {
     @EnvironmentObject var model: PasswordManagementLoginModel
 
+    @available(macOS 12, *)
+    var attributedString: AttributedString {
+        let text = String(format: UserText.pmSignInToManageEmail, UserText.pmEnableEmailProtection)
+        var attributedString = AttributedString(text)
+        if let range = attributedString.range(of: UserText.pmEnableEmailProtection) {
+            attributedString[range].foregroundColor = .blue
+        }
+        return attributedString
+    }
+
     var body: some View {
         VStack {
             if model.usernameIsPrivateEmail && model.privateEmailMessage != "" {
@@ -285,12 +295,9 @@ private struct PrivateEmailMessage: View {
                         .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: true)
                 } else {
-                    let signInText = Text(UserText.pmSignInToManageEmail)
-                    let enableEmailProtectionText = Text(UserText.pmEnableEmailProtection)
-                        .foregroundColor(.blue)
 
-                    if #available(macOS 11.0, *) {
-                        let combinedText = Text("\(signInText) \(enableEmailProtectionText)")
+                    if #available(macOS 12.0, *) {
+                        let combinedText = Text(attributedString)
                             .font(.subheadline)
                             .lineLimit(nil)
                             .multilineTextAlignment(.leading)
