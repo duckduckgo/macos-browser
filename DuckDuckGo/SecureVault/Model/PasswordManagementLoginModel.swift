@@ -274,7 +274,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     @MainActor
     private func setLoadingStatus(_ status: Bool) {
         if status == true {
-            loadTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(showLoader), userInfo: nil, repeats: false)
+            loadTimer = Timer.scheduledTimer(timeInterval: 0.3, target: self, selector: #selector(showLoader), userInfo: nil, repeats: false)
         } else {
             loadTimer.invalidate()
             privateEmailRequestInProgress = false
