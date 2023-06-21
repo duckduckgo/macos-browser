@@ -216,13 +216,7 @@ private struct UsernameLabel: View {
                 }
             }
 
-            if model.usernameIsPrivateEmail && model.privateEmailMessage != "" {
-                Text(model.privateEmailMessage)
-                    .font(.subheadline)
-                    .lineLimit(nil)
-                    .multilineTextAlignment(.leading)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            PrivateEmailMessage()
         }
     }
 }
@@ -254,12 +248,12 @@ private struct PrivateEmailImage: View {
             return NSImage(imageLiteralResourceName: "Email-16")
         } else {
             switch model.privateEmailStatus {
-                case .active:
-                    return NSImage(imageLiteralResourceName: "Email-16")
-                case .inactive:
-                    return NSImage(imageLiteralResourceName: "Email-Deactivate-16")
-                default:
-                    return NSImage(imageLiteralResourceName: "Alert-Color-16")
+            case .active:
+                return NSImage(imageLiteralResourceName: "Email-16")
+            case .inactive:
+                return NSImage(imageLiteralResourceName: "Email-Deactivate-16")
+            default:
+                return NSImage(imageLiteralResourceName: "Alert-Color-16")
             }
         }
 
@@ -273,6 +267,49 @@ private struct PrivateEmailImage: View {
             } else {
                 Image(nsImage: image)
                     .aspectRatio(contentMode: .fit)
+            }
+        }
+    }
+}
+
+private struct PrivateEmailMessage: View {
+    @EnvironmentObject var model: PasswordManagementLoginModel
+
+    var body: some View {
+        VStack {
+            if model.usernameIsPrivateEmail && model.privateEmailMessage != "" {
+                if model.isSignedIn {
+                    Text(model.privateEmailMessage)
+                        .font(.subheadline)
+                        .lineLimit(nil)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    let signInText = Text(UserText.pmSignInToManageEmail)
+                    let enableEmailProtectionText = Text(UserText.pmEnableEmailProtection)
+                        .foregroundColor(.blue)
+
+                    if #available(macOS 11.0, *) {
+                        let combinedText = Text("\(signInText) \(enableEmailProtectionText)")
+                            .font(.subheadline)
+                            .lineLimit(nil)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                        combinedText
+                            .onTapGesture {
+                                model.enableEmailProtection()
+                            }
+                    } else {
+                        Text(String(format: UserText.pmSignInToManageEmail, UserText.pmEnableEmailProtection))
+                            .font(.subheadline)
+                            .lineLimit(nil)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .onTapGesture {                                
+                                model.enableEmailProtection()
+                            }
+                    }
+                }
             }
         }
     }
