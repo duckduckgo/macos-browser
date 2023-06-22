@@ -39,7 +39,7 @@ struct SystemExtensionManager {
     }
 
     func activate(replace: Bool) -> AsyncThrowingStream<ActivationRequestEvent, Error> {
-        return SystemExtensionRequest.activationRequest(forExtensionWithIdentifier: bundleID, manager: manager, replace: replace).submit()
+        return SystemExtensionRequest.activationRequest(forExtensionWithIdentifier: bundleID, manager: manager).submit()
     }
 
     func deactivate() async throws {
