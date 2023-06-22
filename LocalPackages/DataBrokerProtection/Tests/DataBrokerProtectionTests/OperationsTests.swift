@@ -96,7 +96,7 @@ final class OperationsTests: XCTestCase {
         
         var expectedEvents: [HistoryEvent.EventType] = [.scanStarted]
         
-        expectedEvents.append(contentsOf: expectedExtractedProfiles.map { HistoryEvent(type: .matchFound(profileID: $0.id)).type })
+        expectedEvents.append(contentsOf: expectedExtractedProfiles.map { HistoryEvent(type: .matchFound(extractedProfileID: $0.id)).type })
         
         let runner = MockRunner(optOutAction: nil,
                                 scanAction: nil,
@@ -204,7 +204,7 @@ final class OperationsTests: XCTestCase {
         
         let optOutDataOperationData = profileQueryData.optOutsData.filter({ $0.id == optOutOperationData.id }).first
         
-        let expectedHistoryTypes: [HistoryEvent.EventType] = [.optOutStarted(profileID: extractedProfile.id), .optOutRequested(profileID: extractedProfile.id)]
+        let expectedHistoryTypes: [HistoryEvent.EventType] = [.optOutStarted(extractedProfileID: extractedProfile.id), .optOutRequested(extractedProfileID: extractedProfile.id)]
         
         XCTAssertNotNil(optOutDataOperationData)
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: optOutDataOperationData!.lastRunDate, date2: Date()))
@@ -256,7 +256,7 @@ final class OperationsTests: XCTestCase {
         
         let optOutDataOperationData = profileQueryData.optOutsData.filter({ $0.id == optOutOperationData.id }).first
         
-        let expectedHistoryTypes: [HistoryEvent.EventType] = [.optOutStarted(profileID: extractedProfile.id), .error]
+        let expectedHistoryTypes: [HistoryEvent.EventType] = [.optOutStarted(extractedProfileID: extractedProfile.id), .error]
         
         let expectedOptOutPreferredDate = Date().addingTimeInterval(dataBroker.schedulingConfig.retryError)
         
@@ -310,7 +310,7 @@ final class OperationsTests: XCTestCase {
         let data = brokerProfileQueryData
         
         let scanExpectedHistoryTypes: [HistoryEvent.EventType] = [.scanStarted, .noMatchFound]
-        let optOutExpectedHistoryTypes: [HistoryEvent.EventType] = [.optOutConfirmed(profileID: extractedProfile.id)]
+        let optOutExpectedHistoryTypes: [HistoryEvent.EventType] = [.optOutConfirmed(extractedProfileID: extractedProfile.id)]
         
         let expectedOptOutPreferredDate = Date()
         let expectedScanPreferredDate = Date().addingTimeInterval(dataBroker.schedulingConfig.maintenanceScan)
@@ -373,7 +373,7 @@ final class OperationsTests: XCTestCase {
                                                                         runner: runner)
         let data = brokerProfileQueryData
         
-        let scanExpectedHistoryTypes: [HistoryEvent.EventType] = [.scanStarted, .matchFound(profileID: extractedProfile.id)]
+        let scanExpectedHistoryTypes: [HistoryEvent.EventType] = [.scanStarted, .matchFound(extractedProfileID: extractedProfile.id)]
         
         let expectedOptOutPreferredDate = Date()
         let expectedScanPreferredDate = Date().addingTimeInterval(dataBroker.schedulingConfig.maintenanceScan)
@@ -436,9 +436,9 @@ final class OperationsTests: XCTestCase {
                                                                         runner: runner)
         let data = brokerProfileQueryData
         
-        let scanExpectedHistoryTypes: [HistoryEvent.EventType] = [.scanStarted, .matchFound(profileID: extractedProfile1.id)]
+        let scanExpectedHistoryTypes: [HistoryEvent.EventType] = [.scanStarted, .matchFound(extractedProfileID: extractedProfile1.id)]
         let optOut1ExpectedHistoryTypes: [HistoryEvent.EventType] = []
-        let optOut2ExpectedHistoryTypes: [HistoryEvent.EventType] = [.optOutConfirmed(profileID: extractedProfile2.id)]
+        let optOut2ExpectedHistoryTypes: [HistoryEvent.EventType] = [.optOutConfirmed(extractedProfileID: extractedProfile2.id)]
         
         XCTAssertEqual(data.scanData.historyEvents.count, scanExpectedHistoryTypes.count)
         XCTAssertEqual(data.scanData.historyEvents.map { $0.type }, scanExpectedHistoryTypes)
@@ -530,15 +530,15 @@ extension HistoryEvent.EventType {
         switch (lhs, rhs) {
         case (.noMatchFound, .noMatchFound):
             return true
-        case let (.matchFound(profileID: lhsProfileID), .matchFound(profileID: rhsProfileID)):
+        case let (.matchFound(extractedProfileID: lhsProfileID), .matchFound(extractedProfileID: rhsProfileID)):
             return lhsProfileID == rhsProfileID
         case (.error, .error):
             return true
-        case let (.optOutRequested(profileID: lhsProfileID), .optOutRequested(profileID: rhsProfileID)):
+        case let (.optOutRequested(extractedProfileID: lhsProfileID), .optOutRequested(extractedProfileID: rhsProfileID)):
             return lhsProfileID == rhsProfileID
-        case let (.optOutConfirmed(profileID: lhsProfileID), .optOutConfirmed(profileID: rhsProfileID)):
+        case let (.optOutConfirmed(extractedProfileID: lhsProfileID), .optOutConfirmed(extractedProfileID: rhsProfileID)):
             return lhsProfileID == rhsProfileID
-        case let (.optOutStarted(profileID: lhsProfileID), .optOutStarted(profileID: rhsProfileID)):
+        case let (.optOutStarted(extractedProfileID: lhsProfileID), .optOutStarted(extractedProfileID: rhsProfileID)):
             return lhsProfileID == rhsProfileID
         case (.scanStarted, .scanStarted):
             return true

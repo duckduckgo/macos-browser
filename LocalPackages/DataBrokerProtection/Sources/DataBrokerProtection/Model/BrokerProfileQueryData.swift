@@ -75,7 +75,7 @@ final public class BrokerProfileQueryData: Sendable {
         // Check for removed profiles
         let removedProfilesData = optOutsData.filter { !extractedProfiles.contains($0.extractedProfile) }
         for removedProfileData in removedProfilesData {
-            let event = HistoryEvent(type: .optOutConfirmed(profileID: removedProfileData.extractedProfile.id))
+            let event = HistoryEvent(type: .optOutConfirmed(extractedProfileID: removedProfileData.extractedProfile.id))
             addHistoryEvent(event, for: removedProfileData)
             removedProfileData.extractedProfile.removedDate = Date()
             print("Profile removed from optOutsData: \(removedProfileData.extractedProfile)")

@@ -102,7 +102,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
     // If the last time we removed the profile has a bigger time difference than the current date + maintenance we should schedule for a new optout
     private func shouldScheduleNewOptOut(operationData: OptOutOperationData,
                                          brokerProfileQueryData: BrokerProfileQueryData) -> Bool {
-        guard let lastRemovalEvent = operationData.lastEventWithType(type: .optOutRequested(profileID: operationData.extractedProfile.id)) else {
+        guard let lastRemovalEvent = operationData.lastEventWithType(type: .optOutRequested(extractedProfileID: operationData.extractedProfile.id)) else {
             return false
         }
         return lastRemovalEvent.date.addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.maintenanceScan) < Date()
@@ -131,7 +131,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
             if profiles.count > 0 {
                 profiles.forEach {
-                    let event = HistoryEvent(type: .matchFound(profileID: $0.id))
+                    let event = HistoryEvent(type: .matchFound(extractedProfileID: $0.id))
                     brokerProfileQueryData.scanData.addHistoryEvent(event)
                 }
             } else {
@@ -177,14 +177,14 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
         do {
-            brokerProfileQueryData.addHistoryEvent(.init(type: .optOutStarted(profileID: extractedProfile.id)), for: data)
+            brokerProfileQueryData.addHistoryEvent(.init(type: .optOutStarted(extractedProfileID: extractedProfile.id)), for: data)
 
             // Clean preferredRunDate when the operation runs
             data.preferredRunDate = nil
 
             try await runner.optOut(extractedProfile)
 
-            let event = HistoryEvent(type: .optOutRequested(profileID: extractedProfile.id))
+            let event = HistoryEvent(type: .optOutRequested(extractedProfileID: extractedProfile.id))
             brokerProfileQueryData.addHistoryEvent(event, for: data)
         } catch {
             let event = HistoryEvent(type: .error)

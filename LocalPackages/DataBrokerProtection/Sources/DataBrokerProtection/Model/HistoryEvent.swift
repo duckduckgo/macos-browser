@@ -21,11 +21,11 @@ import Foundation
 struct HistoryEvent: Sendable {
     enum EventType {
         case noMatchFound
-        case matchFound(profileID: UUID)
+        case matchFound(extractedProfileID: UUID)
         case error
-        case optOutStarted(profileID: UUID)
-        case optOutRequested(profileID: UUID)
-        case optOutConfirmed(profileID: UUID)
+        case optOutStarted(extractedProfileID: UUID)
+        case optOutRequested(extractedProfileID: UUID)
+        case optOutConfirmed(extractedProfileID: UUID)
         case scanStarted
     }
 
@@ -47,10 +47,10 @@ extension HistoryEvent.EventType: Equatable {
              (.error, .error),
              (.scanStarted, .scanStarted):
             return true
-        case let (.matchFound(profileID: lhsProfileID), .matchFound(profileID: rhsProfileID)),
-             let (.optOutStarted(profileID: lhsProfileID), .optOutStarted(profileID: rhsProfileID)),
-             let (.optOutRequested(profileID: lhsProfileID), .optOutRequested(profileID: rhsProfileID)),
-             let (.optOutConfirmed(profileID: lhsProfileID), .optOutConfirmed(profileID: rhsProfileID)):
+        case let (.matchFound(extractedProfileID: lhsProfileID), .matchFound(extractedProfileID: rhsProfileID)),
+             let (.optOutStarted(extractedProfileID: lhsProfileID), .optOutStarted(extractedProfileID: rhsProfileID)),
+             let (.optOutRequested(extractedProfileID: lhsProfileID), .optOutRequested(extractedProfileID: rhsProfileID)),
+             let (.optOutConfirmed(extractedProfileID: lhsProfileID), .optOutConfirmed(extractedProfileID: rhsProfileID)):
             return lhsProfileID == rhsProfileID
         default:
             return false
