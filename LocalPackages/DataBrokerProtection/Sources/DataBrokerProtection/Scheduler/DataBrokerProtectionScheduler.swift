@@ -18,20 +18,8 @@
 
 import Foundation
 
-protocol SchedulerConfig {
-    var runFrequency: TimeInterval { get }
-    var concurrentOperationsDifferentBrokers: Int { get }
-    var intervalBetweenSameBrokerOperations: TimeInterval { get }
-}
-
-struct DataBrokerProtectionSchedulerConfig: SchedulerConfig {
-    var runFrequency: TimeInterval = 4 * 60 * 60
-    var concurrentOperationsDifferentBrokers: Int = 1
-    var intervalBetweenSameBrokerOperations: TimeInterval = 1 * 60
-}
-
 protocol OperationRunnerProvider {
-    func getOperationRunner() -> OperationRunner
+    func getOperationRunner() -> WebOperationRunner
 }
 
 final class DataBrokerProtectionScheduler {
@@ -61,11 +49,9 @@ final class DataBrokerProtectionScheduler {
 
     func start() {
         runScheduledOperations()
-        print("ENDED")
     }
 
     // MARK: - Private functions
-
     private func runScheduledOperations() {
         let brokersProfileData = database.fetchAllBrokerProfileQueryData()
         let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData)
@@ -75,8 +61,8 @@ final class DataBrokerProtectionScheduler {
         }
     }
 
-    func createDataBrokerOperationCollections(from brokerProfileQueriesData: [BrokerProfileQueryData]) -> [DataBrokerCollectionOperation] {
-        var collections: [DataBrokerCollectionOperation] = []
+    private func createDataBrokerOperationCollections(from brokerProfileQueriesData: [BrokerProfileQueryData]) -> [DataBrokerOperationsCollection] {
+        var collections: [DataBrokerOperationsCollection] = []
         var visitedDataBrokerIDs: Set<UUID> = []
 
         for queryData in brokerProfileQueriesData {
@@ -84,7 +70,7 @@ final class DataBrokerProtectionScheduler {
 
             if !visitedDataBrokerIDs.contains(dataBrokerID) {
                 let matchingQueriesData = brokerProfileQueriesData.filter { $0.dataBroker.id == dataBrokerID }
-                let collection = DataBrokerCollectionOperation(brokerProfileQueriesData: matchingQueriesData,
+                let collection = DataBrokerOperationsCollection(brokerProfileQueriesData: matchingQueriesData,
                                                                database: database)
                 collections.append(collection)
 
@@ -93,112 +79,5 @@ final class DataBrokerProtectionScheduler {
         }
 
         return collections
-    }
-}
-
-
-struct DataBrokerNotifications {
-    public static let didFinishScan = NSNotification.Name(rawValue: "com.duckduckgo.dbp.didFinishScan")
-    public static let didFinishOptOut = NSNotification.Name(rawValue: "com.duckduckgo.dbp.didFinishOptOut")
-
-}
-
-class DataBrokerCollectionOperation: Operation {
-    private let brokerProfileQueriesData: [BrokerProfileQueryData]
-    private let database: DataBase
-    private let id = UUID()
-    private var _isExecuting = false
-    private var _isFinished = false
-
-    deinit {
-        print("Deinit Operation \(self.id)")
-    }
-
-    init(brokerProfileQueriesData: [BrokerProfileQueryData], database: DataBase) {
-        self.brokerProfileQueriesData = brokerProfileQueriesData
-        self.database = database
-        print("New op created \(id)")
-        super.init()
-    }
-
-    override func start() {
-        if isCancelled {
-            finish()
-            return
-        }
-
-        // Mark the operation as executing
-        willChangeValue(forKey: "isExecuting")
-        _isExecuting = true
-        didChangeValue(forKey: "isExecuting")
-
-        main()
-    }
-
-    override var isAsynchronous: Bool {
-        return true
-    }
-
-    override var isExecuting: Bool {
-        return _isExecuting
-    }
-
-    override var isFinished: Bool {
-        return _isFinished
-    }
-
-    override func main() {
-        Task {
-            await runOperation()
-            finish()
-        }
-
-    }
-
-    private func runOperation() async  {
-        let ids = brokerProfileQueriesData.map { $0.dataBroker.id }
-        print("Running operation \(id) ON \(ids)")
-        let currentDate = Date()
-
-        let sortedOperationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
-            .filter { $0.preferredRunDate != nil && $0.preferredRunDate! <= currentDate }
-            .sorted { $0.preferredRunDate! < $1.preferredRunDate! }
-
-        print("SORTED \(sortedOperationsData.count)")
-
-        for operationData in sortedOperationsData {
-            if isCancelled {
-                return
-            }
-
-            let brokerProfileData = brokerProfileQueriesData.filter { $0.id == operationData.brokerProfileQueryID }.first
-
-            let testRunner = await TestOperationRunner()
-            if let brokerProfileData = brokerProfileData {
-                do {
-                    try await BrokerProfileQueryOperationsManager().runOperation(operationData: operationData,
-                                                                            brokerProfileQueryData: brokerProfileData,
-                                                                            database: database,
-                                                                            runner: testRunner)
-                } catch {
-                    print("Error: \(error)")
-                }
-            } else {
-                print("NO")
-            }
-        }
-        print("Finished operation \(id)")
-    }
-
-    private func finish() {
-        willChangeValue(forKey: "isExecuting")
-        willChangeValue(forKey: "isFinished")
-
-        _isExecuting = false
-        _isFinished = true
-        print("Operation \(id): done")
-
-        didChangeValue(forKey: "isExecuting")
-        didChangeValue(forKey: "isFinished")
     }
 }

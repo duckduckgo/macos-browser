@@ -56,7 +56,7 @@ final class OperationsTests: XCTestCase {
                                 scanAction: nil,
                                 scanResults: expectedExtractedProfiles)
 
-       try await BrokerProfileQueryOperationsManager().runOperation(operationData: brokerProfileQueryData.scanData,
+       try await DataBrokerProfileQueryOperationManager().runOperation(operationData: brokerProfileQueryData.scanData,
                                                                      brokerProfileQueryData: brokerProfileQueryData,
                                                                      database: database,
                                                                      runner: runner)
@@ -105,7 +105,7 @@ final class OperationsTests: XCTestCase {
         let expectedScanPreferredDate = Date().addingTimeInterval(dataBroker.schedulingConfig.maintenanceScan)
         let expectedOptOutPreferredDate = Date()
 
-        try await BrokerProfileQueryOperationsManager().runOperation(operationData: brokerProfileQueryData.scanData,
+        try await DataBrokerProfileQueryOperationManager().runOperation(operationData: brokerProfileQueryData.scanData,
                                                                       brokerProfileQueryData: brokerProfileQueryData,
                                                                       database: database,
                                                                       runner: runner)
@@ -148,7 +148,7 @@ final class OperationsTests: XCTestCase {
                                 scanResults: expectedExtractedProfiles)
 
         do {
-            try await BrokerProfileQueryOperationsManager().runOperation(operationData: brokerProfileQueryData.scanData,
+            try await DataBrokerProfileQueryOperationManager().runOperation(operationData: brokerProfileQueryData.scanData,
                                                                           brokerProfileQueryData: brokerProfileQueryData,
                                                                           database: database,
                                                                           runner: runner)
@@ -195,7 +195,7 @@ final class OperationsTests: XCTestCase {
                                 scanAction: nil,
                                 scanResults: [ExtractedProfile]())
 
-        try await BrokerProfileQueryOperationsManager().runOperation(operationData: optOutOperationData,
+        try await DataBrokerProfileQueryOperationManager().runOperation(operationData: optOutOperationData,
                                                                       brokerProfileQueryData: brokerProfileQueryData,
                                                                       database: database,
                                                                       runner: runner)
@@ -249,7 +249,7 @@ final class OperationsTests: XCTestCase {
                                 scanResults: [ExtractedProfile]())
 
 
-        try? await BrokerProfileQueryOperationsManager().runOperation(operationData: optOutOperationData,
+        try? await DataBrokerProfileQueryOperationManager().runOperation(operationData: optOutOperationData,
                                                                       brokerProfileQueryData: brokerProfileQueryData,
                                                                       database: database,
                                                                       runner: runner)
@@ -302,7 +302,7 @@ final class OperationsTests: XCTestCase {
                                 scanAction: nil,
                                 scanResults: [ExtractedProfile]())
 
-        try await BrokerProfileQueryOperationsManager().runOperation(operationData: brokerProfileQueryData.scanData,
+        try await DataBrokerProfileQueryOperationManager().runOperation(operationData: brokerProfileQueryData.scanData,
                                                                       brokerProfileQueryData: brokerProfileQueryData,
                                                                       database: database,
                                                                       runner: runner)
@@ -367,7 +367,7 @@ final class OperationsTests: XCTestCase {
                                 scanAction: nil,
                                 scanResults: [extractedProfile])
 
-        try await BrokerProfileQueryOperationsManager().runOperation(operationData: brokerProfileQueryData.scanData,
+        try await DataBrokerProfileQueryOperationManager().runOperation(operationData: brokerProfileQueryData.scanData,
                                                                       brokerProfileQueryData: brokerProfileQueryData,
                                                                       database: database,
                                                                       runner: runner)
@@ -430,7 +430,7 @@ final class OperationsTests: XCTestCase {
                                 scanAction: nil,
                                 scanResults: expectedExtractedProfiles)
 
-        try await BrokerProfileQueryOperationsManager().runOperation(operationData: brokerProfileQueryData.scanData,
+        try await DataBrokerProfileQueryOperationManager().runOperation(operationData: brokerProfileQueryData.scanData,
                                                                       brokerProfileQueryData: brokerProfileQueryData,
                                                                       database: database,
                                                                       runner: runner)
@@ -529,7 +529,7 @@ private struct MockDataBase: DataBase {
 
 }
 
-struct MockRunner: OperationRunner {
+struct MockRunner: WebOperationRunner {
     let optOutAction: (() throws -> Void)?
     let scanAction: (() throws -> Void)?
     let scanResults: [ExtractedProfile]

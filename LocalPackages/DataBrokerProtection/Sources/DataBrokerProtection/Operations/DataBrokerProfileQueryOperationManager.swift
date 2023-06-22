@@ -1,5 +1,5 @@
 //
-//  BrokerProfileQueryOperationsManager.swift
+//  DataBrokerProfileQueryOperationManager.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -27,16 +27,16 @@ protocol OperationsManager {
                                brokerProfileQueryData: BrokerProfileQueryData,
                                database: DataBase,
                                notificationCenter: NotificationCenter,
-                               runner: OperationRunner) async throws
+                               runner: WebOperationRunner) async throws
 }
 
-struct BrokerProfileQueryOperationsManager: OperationsManager {
+struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
     internal func runOperation(operationData: BrokerOperationData,
                                brokerProfileQueryData: BrokerProfileQueryData,
                                database: DataBase,
                                notificationCenter: NotificationCenter = NotificationCenter.default,
-                               runner: OperationRunner) async throws{
+                               runner: WebOperationRunner) async throws{
 
         if let _ = operationData as? ScanOperationData {
             try await runScanOperation(on: runner,
@@ -108,7 +108,7 @@ struct BrokerProfileQueryOperationsManager: OperationsManager {
         return lastRemovalEvent.date.addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.maintenanceScan) < Date()
     }
 
-    private func runScanOperation(on runner: OperationRunner,
+    private func runScanOperation(on runner: WebOperationRunner,
                           brokerProfileQueryData: BrokerProfileQueryData,
                           database: DataBase,
                           notificationCenter: NotificationCenter) async throws {
@@ -149,8 +149,8 @@ struct BrokerProfileQueryOperationsManager: OperationsManager {
         }
     }
 
-    func runOptOutOperation(for extractedProfile: ExtractedProfile,
-                            on runner: OperationRunner,
+    internal func runOptOutOperation(for extractedProfile: ExtractedProfile,
+                            on runner: WebOperationRunner,
                             brokerProfileQueryData: BrokerProfileQueryData,
                             database: DataBase,
                             notificationCenter: NotificationCenter) async throws {
