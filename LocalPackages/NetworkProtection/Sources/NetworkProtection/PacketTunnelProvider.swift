@@ -238,7 +238,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
 
     /// Updates the bandwidth analyzer with the latest data from the WireGuard Adapter
     ///
-    private func updateBandwidthAnalyzer() async {
+    public func updateBandwidthAnalyzer() async {
         guard let (rx, tx) = try? await adapter.getBytesTransmitted() else {
             self.bandwidthAnalyzer.preventIdle()
             return
@@ -564,7 +564,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
-    private func updateTunnelConfiguration(selectedServer: SelectedNetworkProtectionServer, reassert: Bool = true) async throws {
+    public func updateTunnelConfiguration(selectedServer: SelectedNetworkProtectionServer, reassert: Bool = true) async throws {
         let serverSelectionMethod: NetworkProtectionServerSelectionMethod
 
         switch selectedServerStore.selectedServer {
@@ -577,7 +577,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
         try await updateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod, reassert: reassert)
     }
 
-    private func updateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod, reassert: Bool = true) async throws {
+    public func updateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod, reassert: Bool = true) async throws {
 
         let tunnelConfiguration = try await generateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod)
 
@@ -793,7 +793,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
-    private func handleAdapterStopped() async {
+    public func handleAdapterStopped() async {
         connectionStatus = .disconnected
         await self.connectionTester.stop()
     }
