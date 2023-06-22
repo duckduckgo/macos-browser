@@ -1,5 +1,5 @@
 //
-//  Action.swift
+//  FillForm.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,15 +18,27 @@
 
 import Foundation
 
-public enum ActionType: String, Codable, Sendable {
-    case extract
-    case navigate
-    case fillForm
-    case click
-    case expectation
+public struct PageElement: Codable, Sendable {
+    let type: String
+    let selector: String
+
+    public init(type: String, selector: String) {
+        self.type = type
+        self.selector = selector
+    }
 }
 
-public protocol Action: Encodable, Sendable {
-    var id: String { get }
-    var actionType: ActionType { get }
+public struct FillFormAction: Action {
+    public var id: String = "fillForm"
+    public var actionType: ActionType = .fillForm
+
+    let selector: String
+    let elements: [PageElement]
+
+    public init(id: String, actionType: ActionType, selector: String, elements: [PageElement]) {
+        self.id = id
+        self.actionType = actionType
+        self.selector = selector
+        self.elements = elements
+    }
 }

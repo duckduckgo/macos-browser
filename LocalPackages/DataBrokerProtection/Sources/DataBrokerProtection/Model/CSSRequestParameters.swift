@@ -39,6 +39,14 @@ public struct State: Encodable {
             try container.encode(navigateAction, forKey: .action)
         } else if let extractAction = action as? ExtractAction {
             try container.encode(extractAction, forKey: .action)
+        } else if let fillFormAction = action as? FillFormAction {
+            try container.encode(fillFormAction, forKey: .action)
+        } else if let clickAction = action as? ClickAction {
+            try container.encode(clickAction, forKey: .action)
+        } else if let expectationAction = action as? ExpectationAction {
+            try container.encode(expectationAction, forKey: .action)
+        } else {
+            assertionFailure("Action not found. Please add the missing action to the encoding list.")
         }
     }
 }

@@ -1,5 +1,5 @@
 //
-//  Action.swift
+//  Click.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,15 +18,15 @@
 
 import Foundation
 
-public enum ActionType: String, Codable, Sendable {
-    case extract
-    case navigate
-    case fillForm
-    case click
-    case expectation
-}
+public struct ClickAction: Action {
+    public var id: String = "click"
+    public var actionType: ActionType = .click
 
-public protocol Action: Encodable, Sendable {
-    var id: String { get }
-    var actionType: ActionType { get }
+    let elements: [PageElement]
+
+    public init(id: String, actionType: ActionType, elements: [PageElement]) {
+        self.id = id
+        self.actionType = actionType
+        self.elements = elements
+    }
 }

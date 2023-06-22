@@ -49,6 +49,14 @@ public struct DataBroker: Encodable, Sendable {
 
         return scanStep
     }
+
+    func optOutStep() throws -> Step? {
+        guard let optOutStep = steps.first(where: { $0.type == .optOut }) else {
+            return nil
+        }
+
+        return optOutStep
+    }
 }
 
 extension DataBroker: Hashable {
