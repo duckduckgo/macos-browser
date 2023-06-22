@@ -79,6 +79,9 @@ extension HomePage.Views {
                 }
                 .frame(maxWidth: .infinity)
                 .background(backgroundColor)
+                .onAppear {
+                    LocalBookmarkManager.shared.requestSync()
+                }
                 .contextMenu(ContextMenu(menuItems: {
                     Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
                         .toggleStyle(.checkbox)

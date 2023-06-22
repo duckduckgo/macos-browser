@@ -32,6 +32,7 @@ final class UserText {
     static let networkProtectionConnectionFailureNotificationSubtitle = NSLocalizedString("network.protection.failure.notification.subtitle", value: "Unable to connect at this time. Please try again later.", comment: "The subtitle of the notification shown when Network Protection fails to reconnect")
 
     static let networkProtectioSupercededNotificationTitle = NSLocalizedString("network.protection.superceded.notification.title", value: "Network Protection is disabled", comment: "The title of the notification shown when VPN connection is replaced by another app VPN connection taking over")
-    static let networkProtectionSupercededNotificationSubtitle = NSLocalizedString("network.protection.superceded.notification.subtitle", value: "A VPN app on your device may have disabled it. Use the toggle to re-enable.", comment: "The subtitle of the notification shown when VPN connection is replaced by another app VPN connection taking over")
+    static let networkProtectionSupercededNotificationSubtitle = NSLocalizedString("network.protection.superceded.notification.subtitle", value: "A VPN app on your device may have disabled it. Click to re-enable.", comment: "The subtitle of the notification shown when VPN connection is replaced by another app VPN connection taking over")
+    static let networkProtectionSupercededReconnectActionTitle = NSLocalizedString("network.protection.superceded.action.reconnect.title", value: "Re-enable", comment: "The title of the `Reconnect` notification action button shown when VPN connection is replaced by another app VPN connection taking over")
 
 }
