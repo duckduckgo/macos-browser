@@ -337,9 +337,7 @@ final class LocalBookmarkManager: BookmarkManager {
         requestSync()
     }
 
-    // MARK: - Private
-
-    private func requestSync() {
+    func requestSync() {
         Task { @MainActor in
             guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService, syncService.authState == .active else {
                 os_log(.debug, log: OSLog.sync, "Sync disabled, not scheduling")

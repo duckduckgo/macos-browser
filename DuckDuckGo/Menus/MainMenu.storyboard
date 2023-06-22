@@ -755,6 +755,12 @@ CQ
                                                             <action selector="resetDuckPlayerOverlayInteractions:" target="Ady-hI-5gd" id="Tr1-yK-ayF"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Reset Email Protection InContext Prompt" id="jSt-Yy-xOA">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetEmailProtectionInContextPrompt:" target="Ady-hI-5gd" id="aB4-ox-qKt"/>
+                                                        </connections>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>
@@ -772,6 +778,12 @@ CQ
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="showCredentialsSavedPopover:" target="Ady-hI-5gd" id="f2c-5P-iB5"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Show Pop Up Window" id="jXc-4d-0P3">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="showPopUpWindow:" target="Ady-hI-5gd" id="gub-iq-D4g"/>
                                                         </connections>
                                                     </menuItem>
                                                 </items>

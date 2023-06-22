@@ -40,6 +40,10 @@ final class Application: NSApplication {
     override init() {
         super.init()
 
+#if !APPSTORE && !DEBUG
+        PFMoveToApplicationsFolderIfNecessary()
+#endif
+
         if !isRunningUnitTests {
 #if DEBUG
             Pixel.setUp(dryRun: true)
@@ -239,6 +243,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
+        syncService.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
         syncService.scheduler.notifyAppLifecycleEvent()
     }
 
@@ -297,6 +302,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     // MARK: - Sync
 
     private func startupSync() {
+        syncService.initializeIfNeeded(isInternalUser: internalUserDecider.isInternalUser)
+
         syncStateCancellable = syncService.authStatePublisher
             .prepend(syncService.authState)
             .map { $0 == .inactive }

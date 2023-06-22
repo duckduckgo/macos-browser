@@ -184,6 +184,7 @@ final class NavigationBarPopovers: Injectable {
             popover.viewController.currentTabWebsite = .init(tab)
         }
 
+        LocalBookmarkManager.shared.requestSync()
         show(popover: popover, usingView: view)
     }
 

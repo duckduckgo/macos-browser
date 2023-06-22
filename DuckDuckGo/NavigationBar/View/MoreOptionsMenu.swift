@@ -509,7 +509,7 @@ final class BookmarksSubMenu: NSMenu {
         addItem(withTitle: UserText.importBookmarks, action: #selector(MoreOptionsMenu.openBookmarkImportInterface(_:)), keyEquivalent: "")
             .targetting(target)
 
-        let exportBookmarItem = NSMenuItem(title: UserText.exportBookmarks, action: #selector(MoreOptionsMenu.openBookmarkExportInterface(_:)), keyEquivalent: "")
+        let exportBookmarItem = NSMenuItem(title: UserText.exportBookmarks, action: #selector(MoreOptionsMenu.openBookmarkExportInterface(_:)), keyEquivalent: "").targetting(target)
         exportBookmarItem.isEnabled = bookmarkManager.list?.totalBookmarks != 0
         addItem(exportBookmarItem)
 
