@@ -100,7 +100,7 @@ struct FireCoordinatorDependencies: FireCoordinator.Dependencies {
 struct WindowManagerNestedDependencies: AbstractWindowManagerNestedDependencies.Dependencies {
 
     let emailManager = BrowserServicesKit.EmailManager()
-    let passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator()
+    let passwordManagerCoordinator: PasswordManagerCoordinating
     let urlMatcher: BrowserServicesKit.AutofillUrlMatcher = AutofillDomainNameUrlMatcher()
     let downloadListCoordinator: DownloadListCoordinator
 
@@ -122,6 +122,7 @@ struct WindowManagerNestedDependencies: AbstractWindowManagerNestedDependencies.
          fireViewModel: FireViewModel,
          fireCoordinator: FireCoordinator,
          pinnedTabsManager: PinnedTabsManager,
+         passwordManagerCoordinator: PasswordManagerCoordinating,
          windowManager: WindowManager) {
 
         self.internalUserDecider = internalUserDecider
@@ -132,6 +133,7 @@ struct WindowManagerNestedDependencies: AbstractWindowManagerNestedDependencies.
         self.fireCoordinator = fireCoordinator
 
         self.pinnedTabsManager = pinnedTabsManager
+        self.passwordManagerCoordinator = passwordManagerCoordinator
         self.windowManager = windowManager
     }
 
@@ -201,11 +203,13 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
         var recentlyClosedCoordinator: RecentlyClosedCoordinator!
         var fireCoordinator: FireCoordinator!
         var downloadListCoordinator: DownloadListCoordinator!
-        passwordManagerCoordinator = PasswordManagerCoordinator()
+        var passwordManagerCoordinator: PasswordManagerCoordinator!
 
-        let windowManager = WindowManager(dependencyProvider: windowManagerDependencies) { [internalUserDecider, syncService, passwordManagerCoordinator] windowManager in
+        let windowManager = WindowManager(dependencyProvider: windowManagerDependencies) { [internalUserDecider, syncService] windowManager in
 
             downloadListCoordinator = DownloadListCoordinator(windowManager: windowManager)
+            passwordManagerCoordinator = PasswordManagerCoordinator(bitwardenManagement: BWManager.shared, windowManager: windowManager)
+
             let recentlyClosedCoordinatorDependencies = RecentlyClosedCoordinatorDependencies(pinnedTabsManager: pinnedTabsManager, windowManager: windowManager, passwordManagerCoordinator: passwordManagerCoordinator)
             recentlyClosedCoordinator = RecentlyClosedCoordinator(dependencyProvider: recentlyClosedCoordinatorDependencies)
 
@@ -223,6 +227,7 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
                                                    fireViewModel: fireCoordinatorDependencies.fireViewModel,
                                                    fireCoordinator: fireCoordinator,
                                                    pinnedTabsManager: pinnedTabsManager,
+                                                   passwordManagerCoordinator: passwordManagerCoordinator,
                                                    windowManager: windowManager)
         }
         self.windowManager = windowManager
@@ -236,6 +241,7 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
         self.stateRestorationManager = AppStateRestorationManager(dependencyProvider: stateRestorationManagerDependencies,
                                                                   shouldRestorePreviousSession: StartupPreferences().restorePreviousSession)
 
+        self.passwordManagerCoordinator = passwordManagerCoordinator
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
         self.fireCoordinator = fireCoordinator
         self.downloadListCoordinator = downloadListCoordinator

@@ -31,10 +31,13 @@ final class HistoryMenu: NSMenu, Injectable {
 
     @Injected
     var recentlyClosedCoordinator: RecentlyClosedCoordinator
+    @Injected
+    var windowManager: WindowManagerProtocol
 
     required init(coder: NSCoder) {
         self.dependencies = .init(Self.dependencyProvider)
         Self.dependencyProvider = nil
+        self.reopenMenuItemKeyEquivalentManager = ReopenMenuItemKeyEquivalentManager(windowManager: dependencies.windowManager)
 
         super.init(coder: coder)
     }
@@ -55,7 +58,7 @@ final class HistoryMenu: NSMenu, Injectable {
 
     private let historyCoordinator: HistoryCoordinating = HistoryCoordinator.shared
     private var recentlyClosedMenu: RecentlyClosedMenu?
-    private let reopenMenuItemKeyEquivalentManager = ReopenMenuItemKeyEquivalentManager()
+    private let reopenMenuItemKeyEquivalentManager: ReopenMenuItemKeyEquivalentManager
 
     override func update() {
         super.update()
@@ -270,8 +273,8 @@ extension HistoryMenu {
         }
 
         @MainActor
-        convenience init() {
-            self.init(isInInitialStatePublisher: Just(false) /*WindowManager.shared.$isInInitialState*/, canRestoreLastSessionState: NSApp.canRestoreLastSessionState)
+        convenience init(windowManager: WindowManagerProtocol) {
+            self.init(isInInitialStatePublisher: windowManager.isInInitialStatePublisher, canRestoreLastSessionState: NSApp.canRestoreLastSessionState)
         }
 
         private weak var currentlyAssignedMenuItem: NSMenuItem?

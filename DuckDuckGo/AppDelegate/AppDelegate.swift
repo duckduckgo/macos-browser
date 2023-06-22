@@ -213,7 +213,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         if windowManager.windows.isEmpty,
            case .normal = NSApp.runType {
-            windowManager.openNewWindow(isBurner: true, lazyLoadTabs: true)
+            windowManager.openNewWindow(isBurner: false, lazyLoadTabs: true)
         }
 
         grammarFeaturesManager.manage()

@@ -68,6 +68,7 @@ protocol WindowManagerProtocol: AnyObject {
     func closeWindows(except window: NSWindow?)
 
     var isInInitialState: Bool { get }
+    var isInInitialStatePublisher: AnyPublisher<Bool, Never> { get }
     func updateIsInInitialState()
 
 #if NETWORK_PROTECTION
@@ -154,6 +155,10 @@ final class WindowManager: WindowManagerProtocol, Injectable {
      * _Initial_ meaning a single window with a single home page tab.
      */
     @Published private(set) var isInInitialState: Bool = true
+    var isInInitialStatePublisher: AnyPublisher<Bool, Never> {
+        $isInInitialState.eraseToAnyPublisher()
+    }
+
     @Published private(set) var mainWindowControllers = [MainWindowController]()
 
     var mainWindowControllersPublisher: AnyPublisher<[MainWindowController], Never> {

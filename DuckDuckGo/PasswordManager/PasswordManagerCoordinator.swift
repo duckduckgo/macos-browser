@@ -40,7 +40,13 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
         case makingOfUrlFailed
     }
 
-    let bitwardenManagement: BWManagement = BWManager.shared
+    let bitwardenManagement: BWManagement
+    let windowManager: WindowManagerProtocol
+
+    init(bitwardenManagement: BWManagement, windowManager: WindowManagerProtocol) {
+        self.bitwardenManagement = bitwardenManagement
+        self.windowManager = windowManager
+    }
 
     var isEnabled: Bool {
         return bitwardenManagement.status != .disabled
@@ -94,7 +100,7 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
         switch bitwardenManagement.status {
         case .disabled, .notInstalled, .oldVersion, .missingHandshake, .handshakeNotApproved, .error:
             Task {
-//                await WindowManager.shared.showPreferencesTab(withSelectedPane: .autofill)
+                await windowManager.showPreferencesTab(withSelectedPane: .autofill)
             }
             return
         default:

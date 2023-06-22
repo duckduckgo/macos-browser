@@ -67,7 +67,7 @@ extension Preferences {
 
         var body: some View {
             HStack(spacing: 0) {
-                Preferences.Sidebar().environmentObject(model).frame(width: Const.sidebarWidth)
+                Sidebar().environmentObject(model).frame(width: Const.sidebarWidth)
 
                 Color(NSColor.separatorColor).frame(width: 1)
 
@@ -77,24 +77,24 @@ extension Preferences {
 
                             switch model.selectedPane {
                             case .general:
-                                Preferences.GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences())
+                                GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences())
                             case .sync:
                                 SyncView(dependencyProvider: dependencies)
                             case .appearance:
-                                Preferences.AppearanceView(model: .shared)
+                                AppearanceView(model: .shared)
                             case .privacy:
-                                Preferences.PrivacyView(model: PrivacyPreferencesModel(dependencyProvider: dependencies))
+                                PrivacyView(model: PrivacyPreferencesModel(dependencyProvider: dependencies))
                             case .autofill:
-                                Preferences.AutofillView(model: AutofillPreferencesModel(dependencyProvider: dependencies))
+                                AutofillView(model: AutofillPreferencesModel(dependencyProvider: dependencies))
                             case .downloads:
-                                Preferences.DownloadsView(model: DownloadsPreferences())
+                                DownloadsView(model: DownloadsPreferences())
                             case .duckPlayer:
-                                Preferences.DuckPlayerView(model: .shared)
+                                DuckPlayerView(model: .shared)
                             case .about:
 #if NETWORK_PROTECTION
-                                Preferences.AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter, windowManager: dependencies.windowManager))
+                                AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter, windowManager: dependencies.windowManager))
 #else
-                                Preferences.AboutView(model: AboutModel(windowManager: dependencies.windowManager))
+                                AboutView(model: AboutModel(windowManager: dependencies.windowManager))
 #endif
                             }
                         }
