@@ -71,7 +71,8 @@ final class DataBrokerProtectionScheduler {
             if !visitedDataBrokerIDs.contains(dataBrokerID) {
                 let matchingQueriesData = brokerProfileQueriesData.filter { $0.dataBroker.id == dataBrokerID }
                 let collection = DataBrokerOperationsCollection(brokerProfileQueriesData: matchingQueriesData,
-                                                               database: database)
+                                                               database: database,
+                                                                intervalBetweenOperations: config.intervalBetweenSameBrokerOperations)
                 collections.append(collection)
 
                 visitedDataBrokerIDs.insert(dataBrokerID)

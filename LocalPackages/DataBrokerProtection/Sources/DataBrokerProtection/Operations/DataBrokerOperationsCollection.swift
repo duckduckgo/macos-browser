@@ -24,14 +24,19 @@ class DataBrokerOperationsCollection: Operation {
     private let id = UUID()
     private var _isExecuting = false
     private var _isFinished = false
+    private let intervalBetweenOperations: TimeInterval?
 
     deinit {
         print("Deinit Operation \(self.id)")
     }
 
-    init(brokerProfileQueriesData: [BrokerProfileQueryData], database: DataBase) {
+    init(brokerProfileQueriesData: [BrokerProfileQueryData],
+         database: DataBase,
+         intervalBetweenOperations: TimeInterval? = nil) {
+
         self.brokerProfileQueriesData = brokerProfileQueriesData
         self.database = database
+        self.intervalBetweenOperations = intervalBetweenOperations
         print("New op created \(id)")
         super.init()
     }
@@ -94,6 +99,10 @@ class DataBrokerOperationsCollection: Operation {
                                                                             brokerProfileQueryData: brokerProfileData,
                                                                             database: database,
                                                                             runner: testRunner)
+                    if let sleepInterval = intervalBetweenOperations {
+                        print("Waiting \(sleepInterval) seconds...")
+                        try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
+                    }
                 } catch {
                     print("Error: \(error)")
                 }

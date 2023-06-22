@@ -27,5 +27,5 @@ protocol SchedulerConfig {
 struct DataBrokerProtectionSchedulerConfig: SchedulerConfig {
     var runFrequency: TimeInterval = 4 * 60 * 60
     var concurrentOperationsDifferentBrokers: Int = 1
-    var intervalBetweenSameBrokerOperations: TimeInterval = 1 * 60
+    var intervalBetweenSameBrokerOperations: TimeInterval = 2
 }
