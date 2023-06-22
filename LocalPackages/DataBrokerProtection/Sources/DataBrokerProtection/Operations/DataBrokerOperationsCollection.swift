@@ -19,12 +19,21 @@
 import Foundation
 
 class DataBrokerOperationsCollection: Operation {
+
+    enum OperationType {
+        case scan
+        case optOut
+        case all
+    }
+
     private let brokerProfileQueriesData: [BrokerProfileQueryData]
     private let database: DataBase
     private let id = UUID()
     private var _isExecuting = false
     private var _isFinished = false
-    private let intervalBetweenOperations: TimeInterval?
+    private let intervalBetweenOperations: TimeInterval? // The time in seconds to wait in-between operations
+    private let priorityDate: Date? // The date to filter and sort operations priorities
+    private let operationType: OperationType
 
     deinit {
         print("Deinit Operation \(self.id)")
@@ -32,11 +41,15 @@ class DataBrokerOperationsCollection: Operation {
 
     init(brokerProfileQueriesData: [BrokerProfileQueryData],
          database: DataBase,
-         intervalBetweenOperations: TimeInterval? = nil) {
+         operationType: OperationType,
+         intervalBetweenOperations: TimeInterval? = nil,
+         priorityDate: Date? = nil) {
 
         self.brokerProfileQueriesData = brokerProfileQueriesData
         self.database = database
         self.intervalBetweenOperations = intervalBetweenOperations
+        self.priorityDate = priorityDate
+        self.operationType = operationType
         print("New op created \(id)")
         super.init()
     }
@@ -71,19 +84,33 @@ class DataBrokerOperationsCollection: Operation {
             await runOperation()
             finish()
         }
-
     }
 
     private func runOperation() async  {
         let ids = brokerProfileQueriesData.map { $0.dataBroker.id }
         print("Running operation \(id) ON \(ids)")
-        let currentDate = Date()
 
-        let sortedOperationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
-            .filter { $0.preferredRunDate != nil && $0.preferredRunDate! <= currentDate }
-            .sorted { $0.preferredRunDate! < $1.preferredRunDate! }
+        let sortedOperationsData: [BrokerOperationData]
+        let operationsData: [BrokerOperationData]
 
-        print("SORTED \(sortedOperationsData.count)")
+        switch operationType {
+        case .optOut:
+            operationsData = brokerProfileQueriesData.flatMap { $0.optOutsData }
+        case .scan:
+            operationsData = brokerProfileQueriesData.compactMap { $0.scanData }
+        case .all:
+            operationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
+        }
+
+
+        if let priorityDate = priorityDate {
+            sortedOperationsData = operationsData
+                .filter { $0.preferredRunDate != nil && $0.preferredRunDate! <= priorityDate }
+                .sorted { $0.preferredRunDate! < $1.preferredRunDate! }
+
+        } else {
+            sortedOperationsData = operationsData
+        }
 
         for operationData in sortedOperationsData {
             if isCancelled {

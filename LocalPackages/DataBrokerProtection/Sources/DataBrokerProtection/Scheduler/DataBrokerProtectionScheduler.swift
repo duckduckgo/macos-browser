@@ -43,25 +43,32 @@ final class DataBrokerProtectionScheduler {
     }
 
     // MARK: - Public functions
-    func runScanOnAllDataBrokers() async throws {
+    func runScanOnAllDataBrokers() {
         // Run all data broker scans
+        operationQueue.cancelAllOperations()
+        runOperations(operationType: .scan, priorityDate: nil)
     }
 
     func start() {
-        runScheduledOperations()
+        runOperations(operationType: .all, priorityDate: Date())
     }
 
     // MARK: - Private functions
-    private func runScheduledOperations() {
+    private func runOperations(operationType: DataBrokerOperationsCollection.OperationType, priorityDate: Date?) {
         let brokersProfileData = database.fetchAllBrokerProfileQueryData()
-        let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData)
+        let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
+                                                                                  operationType: operationType,
+                                                                                  priorityDate: priorityDate)
 
         for collection in dataBrokerOperationCollections {
             operationQueue.addOperation(collection)
         }
     }
 
-    private func createDataBrokerOperationCollections(from brokerProfileQueriesData: [BrokerProfileQueryData]) -> [DataBrokerOperationsCollection] {
+    private func createDataBrokerOperationCollections(from brokerProfileQueriesData: [BrokerProfileQueryData],
+                                                      operationType: DataBrokerOperationsCollection.OperationType,
+                                                      priorityDate: Date?) -> [DataBrokerOperationsCollection] {
+
         var collections: [DataBrokerOperationsCollection] = []
         var visitedDataBrokerIDs: Set<UUID> = []
 
@@ -71,8 +78,10 @@ final class DataBrokerProtectionScheduler {
             if !visitedDataBrokerIDs.contains(dataBrokerID) {
                 let matchingQueriesData = brokerProfileQueriesData.filter { $0.dataBroker.id == dataBrokerID }
                 let collection = DataBrokerOperationsCollection(brokerProfileQueriesData: matchingQueriesData,
-                                                               database: database,
-                                                                intervalBetweenOperations: config.intervalBetweenSameBrokerOperations)
+                                                                database: database,
+                                                                operationType: operationType,
+                                                                intervalBetweenOperations: config.intervalBetweenSameBrokerOperations,
+                                                                priorityDate: priorityDate)
                 collections.append(collection)
 
                 visitedDataBrokerIDs.insert(dataBrokerID)
