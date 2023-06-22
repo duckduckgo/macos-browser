@@ -754,12 +754,12 @@ extension MainViewController {
         for noteID in notes.compactMap(\.id) {
             try? vault?.deleteNoteFor(noteId: noteID)
         }
-        UserDefaults.standard.set(false, forKey: "home.page.continue.set.up.import")
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageContinueSetUpImport.rawValue)
     }
 
     @IBAction func resetBookmarks(_ sender: Any?) {
         LocalBookmarkManager.shared.resetBookmarks()
-        UserDefaults.standard.set(false, forKey: "home.page.continue.set.up.import")
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageContinueSetUpImport.rawValue)
     }
 
     @IBAction func resetPinnedTabs(_ sender: Any?) {
@@ -775,12 +775,12 @@ extension MainViewController {
     }
 
     @IBAction func resetMakeDuckDuckGoYoursUserSettings(_ sender: Any?) {
-        UserDefaults.standard.set(true, forKey: "home.page.show.all.features")
-        UserDefaults.standard.set(true, forKey: "home.page.show.make.default")
-        UserDefaults.standard.set(true, forKey: "home.page.show.import")
-        UserDefaults.standard.set(true, forKey: "home.page.show.duck.player")
-        UserDefaults.standard.set(true, forKey: "home.page.show.email.protection")
-        UserDefaults.standard.set(true, forKey: "home.page.show.cookie")
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowAllFeatures.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowMakeDefault.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowImport.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowDuckPlayer.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowCookie.rawValue)
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {

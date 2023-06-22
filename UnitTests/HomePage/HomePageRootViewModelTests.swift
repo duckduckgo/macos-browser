@@ -23,23 +23,23 @@ final class HomePageRootViewModelTests: XCTestCase {
 
     func testWhenInitializedThenItLoadsPersistedValues() throws {
         var persistor = HomePage.Models.HomePagePreferencesUserDefaultsPersistor()
-        persistor.isFavouriteVisible = true
+        persistor.isFavoriteVisible = true
         persistor.isContinueSetUpVisible = true
         persistor.isRecentActivityVisible = true
 
         var model = HomePage.Models.HomePageRootViewModel(homePagePreferencesPersistor: persistor)
 
-        XCTAssertTrue(model.isFavouriteVisible)
+        XCTAssertTrue(model.isFavoriteVisible)
         XCTAssertTrue(model.isContinueSetUpVisible)
         XCTAssertTrue(model.isRecentActivityVisible)
 
-        persistor.isFavouriteVisible = false
+        persistor.isFavoriteVisible = false
         persistor.isContinueSetUpVisible = false
         persistor.isRecentActivityVisible = false
 
         model = HomePage.Models.HomePageRootViewModel(homePagePreferencesPersistor: persistor)
 
-        XCTAssertFalse(model.isFavouriteVisible)
+        XCTAssertFalse(model.isFavoriteVisible)
         XCTAssertFalse(model.isContinueSetUpVisible)
         XCTAssertFalse(model.isRecentActivityVisible)
     }
@@ -50,15 +50,15 @@ final class HomePageRootViewModelTests: XCTestCase {
 
         model.isRecentActivityVisible = true
         XCTAssertEqual(persistor.isRecentActivityVisible, true)
-        model.isFavouriteVisible = true
-        XCTAssertEqual(persistor.isFavouriteVisible, true)
+        model.isFavoriteVisible = true
+        XCTAssertEqual(persistor.isFavoriteVisible, true)
         model.isContinueSetUpVisible = true
         XCTAssertEqual(persistor.isContinueSetUpVisible, true)
 
         model.isRecentActivityVisible = false
         XCTAssertEqual(persistor.isRecentActivityVisible, false)
-        model.isFavouriteVisible = false
-        XCTAssertEqual(persistor.isFavouriteVisible, false)
+        model.isFavoriteVisible = false
+        XCTAssertEqual(persistor.isFavoriteVisible, false)
         model.isContinueSetUpVisible = false
         XCTAssertEqual(persistor.isContinueSetUpVisible, false)
 
@@ -69,14 +69,14 @@ final class HomePageRootViewModelTests: XCTestCase {
         var persister1 = HomePage.Models.HomePagePreferencesUserDefaultsPersistor()
         var persister2 = HomePage.Models.HomePagePreferencesUserDefaultsPersistor()
 
-        persister2.isFavouriteVisible = false
-        persister1.isFavouriteVisible = true
+        persister2.isFavoriteVisible = false
+        persister1.isFavoriteVisible = true
         persister2.isRecentActivityVisible = false
         persister1.isRecentActivityVisible = true
         persister2.isContinueSetUpVisible = false
         persister1.isContinueSetUpVisible = true
 
-        XCTAssertTrue(persister2.isFavouriteVisible)
+        XCTAssertTrue(persister2.isFavoriteVisible)
         XCTAssertTrue(persister2.isRecentActivityVisible)
         XCTAssertTrue(persister2.isContinueSetUpVisible)
     }

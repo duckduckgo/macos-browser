@@ -26,16 +26,16 @@ extension HomePage.Models {
 
         init(homePagePreferencesPersistor: HomePagePreferencesUserDefaultsPersistor = HomePagePreferencesUserDefaultsPersistor()) {
             self.homePagePreferencesPersistor = homePagePreferencesPersistor
-            isFavouriteVisible = homePagePreferencesPersistor.isFavouriteVisible
+            isFavoriteVisible = homePagePreferencesPersistor.isFavoriteVisible
             isContinueSetUpVisible = homePagePreferencesPersistor.isContinueSetUpVisible
             isRecentActivityVisible = homePagePreferencesPersistor.isRecentActivityVisible
         }
 
-        @Published var isFavouriteVisible: Bool {
+        @Published var isFavoriteVisible: Bool {
             didSet {
-                homePagePreferencesPersistor.isFavouriteVisible = isFavouriteVisible
+                homePagePreferencesPersistor.isFavoriteVisible = isFavoriteVisible
                 // Temporary Pixel
-                if !isFavouriteVisible {
+                if !isFavoriteVisible {
                     Pixel.fire(.favoriteSectionHidden)
                 }
             }
@@ -66,7 +66,7 @@ extension HomePage.Models {
     struct HomePagePreferencesUserDefaultsPersistor {
 
         @UserDefaultsWrapper(key: .homePageIsFavoriteVisible, defaultValue: true)
-        var isFavouriteVisible: Bool
+        var isFavoriteVisible: Bool
 
         @UserDefaultsWrapper(key: .homePageIsContinueSetupVisible, defaultValue: true)
         var isContinueSetUpVisible: Bool

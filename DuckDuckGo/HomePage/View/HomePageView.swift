@@ -51,7 +51,7 @@ extension HomePage.Views {
 
                                 Favorites()
                                     .padding(.top, 72)
-                                    .visibility(model.isFavouriteVisible ? .visible : .gone)
+                                    .visibility(model.isFavoriteVisible ? .visible : .gone)
 
                                 RecentlyVisited()
                                     .padding(.top, 66)
@@ -83,7 +83,7 @@ extension HomePage.Views {
                     Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
                         .toggleStyle(.checkbox)
                         .visibility(continueSetUpModel.hasContent ? .visible : .gone)
-                    Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavouriteVisible)
+                    Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavoriteVisible)
                         .toggleStyle(.checkbox)
                     Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
                         .toggleStyle(.checkbox)
@@ -134,6 +134,7 @@ extension HomePage.Views {
         @EnvironmentObject var model: HomePage.Models.HomePageRootViewModel
         @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
         @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
+        let iconSize = 16.02
 
         var body: some View {
             Text(UserText.newTabBottomPopoverTitle)
@@ -144,7 +145,7 @@ extension HomePage.Views {
                 Toggle(isOn: $model.isContinueSetUpVisible, label: {
                     HStack {
                         Image("RocketNoColor")
-                            .frame(width: 16.02, height: 16.02)
+                            .frame(width: iconSize, height: iconSize)
                         Text(UserText.newTabMenuItemShowContinuteSetUp)
                     }
                 })
@@ -152,10 +153,10 @@ extension HomePage.Views {
                 Spacer()
             }
             HStack {
-                Toggle(isOn: $model.isFavouriteVisible, label: {
+                Toggle(isOn: $model.isFavoriteVisible, label: {
                     HStack {
                         Image("Favorite")
-                            .frame(width: 16.02, height: 16.02)
+                            .frame(width: iconSize, height: iconSize)
                         Text(UserText.newTabFavoriteSectionTitle)
                     }
                 })
@@ -165,7 +166,7 @@ extension HomePage.Views {
                 Toggle(isOn: $model.isRecentActivityVisible, label: {
                     HStack {
                         Image("Shield")
-                            .frame(width: 16.02, height: 16.02)
+                            .frame(width: iconSize, height: iconSize)
                         Text(UserText.newTabRecentActivitySectionTitle)
                     }
                 })

@@ -253,10 +253,9 @@ extension HomePage.Views {
         struct NextStepsView: View {
             let text = "Next Steps"
             let textWidth: CGFloat
-            let backgroundColor = Color(red: 57/255, green: 105/255, blue: 239/255)
 
             init() {
-                textWidth = (text as NSString).size(withAttributes: [.font: NSFont.systemFont(ofSize: 13) as Any]).width
+                textWidth = (text as NSString).size(withAttributes: [.font: NSFont.systemFont(ofSize: 14) as Any]).width
             }
 
             var body: some View {
@@ -266,7 +265,7 @@ extension HomePage.Views {
                         .padding(.top, 5)
                     ZStack {
                         Rectangle()
-                            .fill(backgroundColor)
+                            .fill(Color("HomePageNextStepsBlue"))
                             .frame(width: textWidth, height: 20)
                         Text(text)
                             .foregroundColor(.white)
