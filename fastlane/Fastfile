@@ -102,13 +102,14 @@ platform :mac do
   #
   # @option [String] version (default: nil) Marketing version string
   # @option [Boolean] skip_confirm (default: false) If true, avoids any interactive prompt
+  # @option [Boolean] resume (default: false) If true, the lane can run from a release/ branch and will run dedicated prechecks.
   #
   desc 'Executes the release preparation work in the repository'
   lane :code_freeze do |options|
-    macos_codefreeze_prechecks
+    options[:resume]? macos_codefreeze_resume_prechecks : macos_codefreeze_prechecks
     new_version = validate_new_version(options)
     app_store_build_number = increment_app_store_build_number(options)
-    macos_create_release_branch(version: new_version)
+    macos_create_release_branch(version: new_version) unless options[:resume]
     macos_update_embedded_files
     macos_update_version_and_build_number_config(
       version: new_version,
@@ -182,13 +183,36 @@ platform :mac do
   # - Ensures git status is clean
   #
   private_lane :macos_codefreeze_prechecks do
-    ensure_git_status_clean
+    ensure_git_status_clean 
 
     ensure_git_branch(branch: DEFAULT_BRANCH)
     git_pull
 
     git_submodule_update(recursive: true, init: true)
     ensure_git_status_clean
+  end
+
+  # Ensures that the local repository is in a resumable state:
+  #
+  # - Validates the current branch
+  # - Validates not committed changes 
+  #
+  private_lane :macos_codefreeze_resume_prechecks do
+    unless git_branch.start_with?(RELEASE_BRANCH) 
+      UI.abort_with_message!("Not in a resumable state: should be a #{RELEASE_BRANCH} branch")
+    end
+
+    git_status = sh("git", "status")
+    message = 'There are no changes in the current branch.'
+    unless git_status.include?('nothing to commit, working tree clean')
+      git_changes = git_status.split("\n").select { |line| line.include?('modified:')}.join("\n")
+      message = "Current branch contains these changes:\n #{git_changes}."
+    end
+    unless UI.confirm(
+      "#{message}\nDo you want to continue?"
+    )
+      UI.abort_with_message!('Aborted by user.')
+    end
   end
 
   # Calculates the new version or validate the provided one, if it exists
