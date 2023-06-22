@@ -17,12 +17,11 @@
 //
 
 import Foundation
-import SwiftCompilerPlugin
 import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
 
-struct InjectedMacro: AccessorMacro {
+public struct InjectedMacro: AccessorMacro {
 
     public static func expansion<
         Context: MacroExpansionContext,

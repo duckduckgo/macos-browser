@@ -32,7 +32,7 @@ public struct Injected<Value>: @unchecked Sendable {
     }
 
     public static subscript<Owner: Injectable & AnyObject>(_enclosingInstance owner: Owner,
-                                                           wrapped propertyKeyPath: KeyPath<Owner, Value>,
+                                                           wrapped keyPath: KeyPath<Owner, Value>,
                                                            storage selfKeyPath: KeyPath<Owner, Self>) -> Value {
         owner.dependencies._storage[keyPath] as! Value // swiftlint:disable:this force_cast
     }

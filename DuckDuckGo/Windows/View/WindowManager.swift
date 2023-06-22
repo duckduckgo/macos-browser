@@ -69,6 +69,10 @@ protocol WindowManagerProtocol: AnyObject {
 
     var isInInitialState: Bool { get }
     func updateIsInInitialState()
+
+#if NETWORK_PROTECTION
+    func showNetworkProtectionStatus(retry: Bool) async
+#endif
 }
 
 extension WindowManagerProtocol {
@@ -113,6 +117,11 @@ extension WindowManagerProtocol {
         closeWindows(except: nil)
     }
 
+#if NETWORK_PROTECTION
+    func showNetworkProtectionStatus() async {
+        await showNetworkProtectionStatus(retry: false)
+    }
+#endif
 }
 
 #if swift(>=5.9)
@@ -442,14 +451,13 @@ extension WindowManager {
     // MARK: - Network Protection
 
 #if NETWORK_PROTECTION
-    @MainActor
-    func showNetworkProtectionStatus(retry: Bool = false) async {
+    func showNetworkProtectionStatus(retry: Bool) async {
         guard let windowController = mainWindowControllers.first else {
             guard !retry else {
                 return
             }
 
-            WindowsManager.openNewWindow()
+            self.openNewWindow()
 
             // Not proud of this ugly hack... ideally openNewWindow() should let us know when the window is ready
             try? await Task.sleep(interval: 0.5)

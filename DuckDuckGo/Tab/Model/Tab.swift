@@ -185,6 +185,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
         var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
         let duckPlayer: DuckPlayer
         var downloadManager: FileDownloadManagerProtocol
+        var passwordManagerCoordinator: PasswordManagerCoordinating
     }
 
     // "protected" properties
@@ -200,6 +201,9 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
 
     @Injected
     var pinnedTabsManager: PinnedTabsManager?
+
+    @Injected
+    var passwordManagerCoordinator: PasswordManagerCoordinating
 
     private let webViewConfiguration: WKWebViewConfiguration
 
@@ -362,7 +366,8 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
                                                        workspace: workspace,
                                                        cbaTimeReporter: cbaTimeReporter,
                                                        duckPlayer: duckPlayer,
-                                                       downloadManager: downloadManager))
+                                                       downloadManager: downloadManager,
+                                                       passwordManagerCoordinator: dependencies.passwordManagerCoordinator))
 
         super.init()
         tabGetter = { [weak self] in self }

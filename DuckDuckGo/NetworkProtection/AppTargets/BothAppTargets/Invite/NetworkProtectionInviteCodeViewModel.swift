@@ -45,7 +45,7 @@ final class NetworkProtectionInviteViewModel: ObservableObject {
     private weak var delegate: NetworkProtectionInviteViewModelDelegate?
     private var textCancellable: AnyCancellable?
 
-    init(delegate: NetworkProtectionInviteViewModelDelegate, redemptionCoordinator: NetworkProtectionCodeRedeeming) {
+    init(delegate: NetworkProtectionInviteViewModelDelegate?, redemptionCoordinator: NetworkProtectionCodeRedeeming) {
         self.delegate = delegate
         self.redemptionCoordinator = redemptionCoordinator
         textCancellable = $text.sink { [weak self] _ in

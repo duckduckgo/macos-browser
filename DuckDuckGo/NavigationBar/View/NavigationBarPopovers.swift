@@ -33,7 +33,7 @@ import NetworkProtectionUI
 final class NavigationBarPopovers: Injectable {
     let dependencies: DependencyStorage
 
-    typealias InjectedDependencies = SaveIdentityPopover.Dependencies & SavePaymentMethodPopover.Dependencies & PasswordManagementPopover.Dependencies & DownloadsPopover.Dependencies & BookmarkListPopover.Dependencies
+    typealias InjectedDependencies = SaveIdentityPopover.Dependencies & SavePaymentMethodPopover.Dependencies & PasswordManagementPopover.Dependencies & DownloadsPopover.Dependencies & BookmarkListPopover.Dependencies & SaveCredentialsPopover.Dependencies
 
     enum Constants {
         static let downloadsPopoverAutoHidingInterval: TimeInterval = 10
@@ -244,7 +244,7 @@ final class NavigationBarPopovers: Injectable {
     }
 
     private func showSaveCredentialsPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        let popover = SaveCredentialsPopover()
+        let popover = SaveCredentialsPopover(dependencyProvider: dependencies)
         popover.delegate = delegate
         saveCredentialsPopover = popover
         show(popover: popover, usingView: view)

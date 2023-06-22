@@ -17,10 +17,32 @@
 //
 
 import Foundation
+
 import SwiftParser
 import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
+
+#if swift(>=5.9)
+
+// Xcode 15: uncomment this
+// import CompilerPluginSupport
+//
+// @main
+// struct DependencyInjectionPlugin: CompilerPlugin {
+//     let providingMacros: [Macro.Type] = [
+//         InjectableMacro.self,
+//         InjectedMacro.self
+//     ]
+// }
+
+@main
+struct DependencyInjectionPlugin {
+    static func main() {
+    }
+}
+
+#else
 
 final class InjectableVisitor: SyntaxVisitor {
 
@@ -163,8 +185,8 @@ struct DependencyInjectionPlugin {
 
                 let data = output.data(using: .utf8)!
                 if data.count == (try? fm.attributesOfItem(atPath: outputPath)[.size]) as? Int,
-                    let oldData = try? Data(contentsOf: URL(fileURLWithPath: outputPath)),
-                    oldData == data {
+                   let oldData = try? Data(contentsOf: URL(fileURLWithPath: outputPath)),
+                   oldData == data {
 
                     return
                 }
@@ -199,3 +221,5 @@ extension String {
     }
 
 }
+
+#endif

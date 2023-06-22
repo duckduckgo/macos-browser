@@ -20,6 +20,7 @@ import AppKit
 import BrowserServicesKit
 import Combine
 import Common
+import DependencyInjection
 
 protocol SaveCredentialsDelegate: AnyObject {
 
@@ -28,11 +29,19 @@ protocol SaveCredentialsDelegate: AnyObject {
 
 }
 
-final class SaveCredentialsViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class SaveCredentialsViewController: NSViewController, Injectable {
+    let dependencies: DependencyStorage
 
-    static func create() -> SaveCredentialsViewController {
-        let storyboard = NSStoryboard(name: "PasswordManager", bundle: nil)
-        let controller: SaveCredentialsViewController = storyboard.instantiateController(identifier: "SaveCredentials")
+    @Injected
+    var passwordManagerCoordinator: PasswordManagerCoordinating
+
+    static func create(dependencyProvider: DependencyProvider) -> SaveCredentialsViewController {
+        let controller = NSStoryboard(name: "PasswordManager", bundle: nil).instantiateController(identifier: "SaveCredentials") { coder in
+            SaveCredentialsViewController(coder: coder, dependencyProvider: dependencyProvider)
+        }
         controller.loadView()
 
         return controller
@@ -65,8 +74,6 @@ final class SaveCredentialsViewController: NSViewController {
 
     private var faviconManagement: FaviconManagement = FaviconManager.shared
 
-    private var passwordManagerCoordinator = PasswordManagerCoordinator.shared
-
     private var passwordManagerStateCancellable: AnyCancellable?
 
     private var saveButtonAction: (() -> Void)?
@@ -76,6 +83,15 @@ final class SaveCredentialsViewController: NSViewController {
     var passwordData: Data {
         let string = hiddenPasswordField.isHidden ? visiblePasswordField.stringValue : hiddenPasswordField.stringValue
         return string.data(using: .utf8)!
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
+
+    init?(coder: NSCoder, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+        super.init(coder: coder)
     }
 
     override func viewDidLoad() {

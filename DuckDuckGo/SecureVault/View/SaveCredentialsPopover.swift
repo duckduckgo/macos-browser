@@ -18,10 +18,18 @@
 
 import AppKit
 import BrowserServicesKit
+import DependencyInjection
 
-final class SaveCredentialsPopover: NSPopover {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class SaveCredentialsPopover: NSPopover, Injectable {
+    let dependencies: DependencyStorage
 
-    override init() {
+    typealias InjectedDependencies = SaveCredentialsViewController.Dependencies
+
+    init(dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
         super.init()
 
         self.animates = false
@@ -38,7 +46,7 @@ final class SaveCredentialsPopover: NSPopover {
     var viewController: SaveCredentialsViewController { contentViewController as! SaveCredentialsViewController }
 
     private func setupContentController() {
-        let controller = SaveCredentialsViewController.create()
+        let controller = SaveCredentialsViewController.create(dependencyProvider: dependencies)
         controller.delegate = self
         contentViewController = controller
     }

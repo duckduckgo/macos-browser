@@ -39,6 +39,8 @@ final class PasswordManagementViewController: NSViewController, Injectable {
 
     @Injected
     var windowManager: WindowManagerProtocol
+    @Injected
+    var passwordManagerCoordinator: PasswordManagerCoordinating
 
     typealias InjectedDependencies = PasswordManagementLoginModel.Dependencies
 
@@ -153,8 +155,6 @@ final class PasswordManagementViewController: NSViewController, Injectable {
     var secureVault: SecureVault? {
         try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
     }
-
-    private let passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
 
     init?(coder: NSCoder, dependencyProvider: DependencyProvider) {
         self.dependencies = .init(dependencyProvider)
@@ -714,7 +714,7 @@ final class PasswordManagementViewController: NSViewController, Injectable {
     }
 
     private func displayExternalPasswordManagerView() {
-        let passwordManagerView = PasswordManagementBitwardenItemView(manager: PasswordManagerCoordinator.shared, windowManager: windowManager) { [weak self] in
+        let passwordManagerView = PasswordManagementBitwardenItemView(manager: passwordManagerCoordinator, windowManager: windowManager) { [weak self] in
             self?.dismiss()
         }
 

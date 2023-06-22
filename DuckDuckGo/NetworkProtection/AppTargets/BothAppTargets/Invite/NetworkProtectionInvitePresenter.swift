@@ -19,14 +19,20 @@
 #if NETWORK_PROTECTION
 
 import Foundation
-import SwiftUI
 import NetworkProtection
+import SwiftUI
 
 protocol NetworkProtectionInvitePresenting {
     func present()
 }
 
 final class NetworkProtectionInvitePresenter: NetworkProtectionInvitePresenting, NetworkProtectionInviteViewModelDelegate {
+
+    var windowManager: WindowManagerProtocol
+
+    init(windowManager: WindowManagerProtocol) {
+        self.windowManager = windowManager
+    }
 
     private var presentedViewController: NSViewController?
 
@@ -41,7 +47,7 @@ final class NetworkProtectionInvitePresenter: NetworkProtectionInvitePresenting,
         let newWindowController = hostingVC.wrappedInWindowController()
 
         guard let newWindow = newWindowController.window,
-              let parentWindowController = WindowManager.shared.lastKeyMainWindowController
+              let parentWindowController = windowManager.lastKeyMainWindowController
         else {
             assertionFailure("Failed to present \(hostingVC)")
             return
@@ -58,7 +64,7 @@ final class NetworkProtectionInvitePresenter: NetworkProtectionInvitePresenting,
 
     func didCompleteInviteFlow() {
         Task {
-            await WindowManager.shared.showNetworkProtectionStatus()
+            await windowManager.showNetworkProtectionStatus()
         }
         presentedViewController?.dismiss()
         presentedViewController = nil

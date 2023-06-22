@@ -30,6 +30,9 @@ import WebKit
 final class ContentOverlayViewController: NSViewController, EmailManagerRequestDelegate, Injectable {
     let dependencies: DependencyStorage
 
+    @Injected
+    var passwordManagerCoordinator: PasswordManagerCoordinating
+
     typealias InjectedDependencies = AutofillPreferencesModel.Dependencies
 
     @IBOutlet var webView: WKWebView!
@@ -45,7 +48,7 @@ final class ContentOverlayViewController: NSViewController, EmailManagerRequestD
     }()
 
     lazy var vaultManager: SecureVaultManager = {
-        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared,
+        let manager = SecureVaultManager(passwordManager: passwordManagerCoordinator,
                                          includePartialAccountMatches: true,
                                          tld: ContentBlocking.shared.tld)
         manager.delegate = self
@@ -303,9 +306,8 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestPasswordManagerForDomain domain: String) {
-        let mngr = PasswordManagerCoordinator.shared
-        if mngr.isEnabled {
-            mngr.bitwardenManagement.openBitwarden()
+        if passwordManagerCoordinator.isEnabled {
+            passwordManagerCoordinator.bitwardenManagement.openBitwarden()
         } else {
             autofillPreferencesModel.showAutofillPopover(.logins)
         }

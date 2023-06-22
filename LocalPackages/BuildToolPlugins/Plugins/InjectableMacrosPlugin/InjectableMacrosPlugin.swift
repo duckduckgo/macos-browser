@@ -182,7 +182,7 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
             ]
         }
 
-        let packagePath = context.xcodeProject.directory.appending("LocalPackages", "DependencyInjection")
+        let packagePath = context.xcodeProject.directory.appending("LocalPackages", "DependencyInjectionMacroPlugin")
 #if arch(x86_64)
         let arch = "x86_64-apple-macosx"
 #elseif arch(arm64)

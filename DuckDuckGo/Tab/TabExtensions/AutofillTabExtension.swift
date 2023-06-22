@@ -28,8 +28,8 @@ final class AutofillTabExtension: TabExtension {
         return emailManager
     }
 
-    static var vaultManagerProvider: (SecureVaultManagerDelegate) -> AutofillSecureVaultDelegate = { delegate in
-        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared,
+    static var vaultManagerProvider: (SecureVaultManagerDelegate, PasswordManagerCoordinating) -> AutofillSecureVaultDelegate = { delegate, coordinator in
+        let manager = SecureVaultManager(passwordManager: coordinator,
                                          includePartialAccountMatches: true,
                                          tld: ContentBlocking.shared.tld)
         manager.delegate = delegate
@@ -55,14 +55,14 @@ final class AutofillTabExtension: TabExtension {
 
     @Published var autofillDataToSave: AutofillData?
 
-    init(autofillUserScriptPublisher: some Publisher<WebsiteAutofillUserScript?, Never>) {
+    init(autofillUserScriptPublisher: some Publisher<WebsiteAutofillUserScript?, Never>, passwordManagerCoordinator: PasswordManagerCoordinating) {
         autofillUserScriptCancellable = autofillUserScriptPublisher.sink { [weak self] autofillScript in
             guard let self, let autofillScript else { return }
 
             self.autofillScript = autofillScript
             self.emailManager = Self.emailManagerProvider(self)
             autofillScript.emailDelegate = self.emailManager
-            self.vaultManager = Self.vaultManagerProvider(self)
+            self.vaultManager = Self.vaultManagerProvider(self, passwordManagerCoordinator)
             autofillScript.vaultDelegate = self.vaultManager
         }
     }

@@ -16,10 +16,11 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import SwiftUI
 
 struct PasswordManagementBitwardenItemView: View {
-    var manager: PasswordManagerCoordinator
+    var manager: PasswordManagerCoordinating
     let windowManager: WindowManagerProtocol?
     let didFinish: () -> Void
 
@@ -56,7 +57,70 @@ struct PasswordManagementBitwardenItemView: View {
 }
 
 struct PasswordManagementBitwardenItemView_Previews: PreviewProvider {
+
+    final class PasswordManagerCoordinatorPreview: PasswordManagerCoordinating {
+        var displayName: String {
+            "Display Name"
+        }
+
+        var username: String? {
+            "example.username@duck.com"
+        }
+
+        func openPasswordManager() {
+        }
+
+        var isEnabled: Bool {
+            true
+        }
+
+        var name: String {
+            "Name"
+        }
+
+        var isLocked: Bool {
+            false
+        }
+
+        var activeVaultEmail: String? {
+            nil
+        }
+
+        var bitwardenManagement: BWManagement {
+            fatalError()
+        }
+
+        func accountsFor(domain: String, completion: @escaping ([SecureVaultModels.WebsiteAccount], Error?) -> Void) {
+            completion([], nil)
+        }
+
+        func cachedAccountsFor(domain: String) -> [SecureVaultModels.WebsiteAccount] {
+            []
+        }
+
+        func cachedWebsiteCredentialsFor(domain: String, username: String) -> SecureVaultModels.WebsiteCredentials? {
+            nil
+        }
+
+        func websiteCredentialsFor(accountId: String, completion: @escaping (SecureVaultModels.WebsiteCredentials?, Error?) -> Void) {
+            completion(nil, nil)
+        }
+
+        func websiteCredentialsFor(domain: String, completion: @escaping ([SecureVaultModels.WebsiteCredentials], Error?) -> Void) {
+            completion([], nil)
+        }
+
+        func askToUnlock(completionHandler: @escaping () -> Void) {
+            completionHandler()
+        }
+
+        func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, completion: @escaping (Error?) -> Void) {
+            completion(nil)
+        }
+
+    }
+
     static var previews: some View {
-        PasswordManagementBitwardenItemView(manager: PasswordManagerCoordinator.shared, windowManager: nil, didFinish: {})
+        PasswordManagementBitwardenItemView(manager: PasswordManagerCoordinatorPreview(), windowManager: nil, didFinish: {})
     }
 }

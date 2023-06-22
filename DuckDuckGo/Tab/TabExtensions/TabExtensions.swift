@@ -69,6 +69,7 @@ protocol TabExtensionDependencies {
     var downloadManager: FileDownloadManagerProtocol { get }
     var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? { get }
     var duckPlayer: DuckPlayer { get }
+    var passwordManagerCoordinator: PasswordManagerCoordinating { get }
 }
 
 // swiftlint:disable:next large_tuple
@@ -138,7 +139,7 @@ extension TabExtensionsBuilder {
         }
 
         add {
-            AutofillTabExtension(autofillUserScriptPublisher: userScripts.map(\.?.autofillScript))
+            AutofillTabExtension(autofillUserScriptPublisher: userScripts.map(\.?.autofillScript), passwordManagerCoordinator: dependencies.passwordManagerCoordinator)
         }
         add {
             ContextMenuManager(contextMenuScriptPublisher: userScripts.map(\.?.contextMenuScript))

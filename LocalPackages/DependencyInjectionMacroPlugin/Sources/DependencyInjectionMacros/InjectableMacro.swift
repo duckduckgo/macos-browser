@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import SwiftCompilerPlugin
 import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
@@ -344,11 +343,13 @@ extension InjectableMacro: PeerMacro {
                 AssociatedtypeDeclSyntax.init(identifier: " Owner = \(raw: identifier)")
             }.as(DeclSyntax.self)!,
 
-            FunctionDeclSyntax("func \(raw: identifier)_InjectedVars_allKeyPaths() -> Set<AnyKeyPath>") {"""
+            """
+            func \(raw: identifier)_InjectedVars_allKeyPaths() -> Set<AnyKeyPath> {
                 [
                     \(raw: keyPaths.joined(separator: ",\n"))
                 ]
-            """}.as(DeclSyntax.self)!,
+            }
+            """,
 
             ProtocolDeclSyntax(
                 "protocol \(raw: identifier)_DependencyProviderProtocol: DependencyStorageProtocol"

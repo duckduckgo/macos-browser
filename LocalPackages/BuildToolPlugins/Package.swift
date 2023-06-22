@@ -26,7 +26,7 @@ packageDependencies = []
 #else
 packageDependencies = [
     // pre Xcode 15 macros
-    .package(path: "../DependencyInjection")
+    .package(path: "../DependencyInjectionMacroPlugin")
 ]
 #endif
 
@@ -35,7 +35,7 @@ let dependencies: [PackageDescription.Target.Dependency]
 dependencies = []
 #else
 dependencies = [
-    .product(name: "DependencyInjectionMacros", package: "DependencyInjection")
+    .product(name: "DependencyInjectionMacros", package: "DependencyInjectionMacroPlugin")
 ]
 #endif
 

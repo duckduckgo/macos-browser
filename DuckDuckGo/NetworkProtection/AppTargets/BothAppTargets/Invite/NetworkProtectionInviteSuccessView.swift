@@ -46,8 +46,13 @@ struct NetworkProtectionInviteSuccessView: View {
 }
 
 struct NetworkProtectionSuccessView_Previews: PreviewProvider {
+    private final class NetworkProtectionInviteViewModelPreviewDelegate: NetworkProtectionInviteViewModelDelegate {
+        func didCancelInviteFlow() {}
+        func didCompleteInviteFlow() {}
+    }
+
     static var previews: some View {
-        NetworkProtectionInviteSuccessView(model: NetworkProtectionInviteViewModel(delegate: NetworkProtectionInvitePresenter(), redemptionCoordinator: NetworkProtectionCodeRedemptionCoordinator()))
+        NetworkProtectionInviteSuccessView(model: NetworkProtectionInviteViewModel(delegate: NetworkProtectionInviteViewModelPreviewDelegate(), redemptionCoordinator: NetworkProtectionCodeRedemptionCoordinator()))
     }
 }
 

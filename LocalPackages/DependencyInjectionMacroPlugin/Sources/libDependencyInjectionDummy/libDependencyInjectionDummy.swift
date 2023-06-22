@@ -1,5 +1,5 @@
 //
-//  DependencyInjectionPlugin.swift
+//  libDependencyInjectionDummy.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,15 +16,9 @@
 //  limitations under the License.
 //
 
-import SwiftCompilerPlugin
-import SwiftSyntaxMacros
+import Foundation
 
 @main
-struct DependencyInjectionPlugin: CompilerPlugin {
-
-    let providingMacros: [Macro.Type] = [
-        InjectableMacro.self,
-        InjectedMacro.self
-    ]
-
+public struct DummyStruct {
+    static func main() {}
 }

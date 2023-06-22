@@ -2861,6 +2861,7 @@
 		B610F2E327A8F37A00FCEBE9 /* CBRCompileTimeReporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBRCompileTimeReporterTests.swift; sourceTree = "<group>"; };
 		B610F2E527AA388100FCEBE9 /* ContentBlockingUpdatingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockingUpdatingTests.swift; sourceTree = "<group>"; };
 		B610F2E727AA397100FCEBE9 /* ContentBlockerRulesManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerRulesManagerMock.swift; sourceTree = "<group>"; };
+		B614C50F2A443F650063E9D8 /* DependencyInjectionMacroPlugin */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = DependencyInjectionMacroPlugin; sourceTree = "<group>"; };
 		B61E2CD4294346C000773D8A /* Tab+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tab+Navigation.swift"; sourceTree = "<group>"; };
 		B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKWebView+Download.swift"; sourceTree = "<group>"; };
 		B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKProcessPool+DownloadDelegate.swift"; sourceTree = "<group>"; };
@@ -3003,7 +3004,6 @@
 		B6A924D82664C72D001A28CA /* WebKitDownloadTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitDownloadTask.swift; sourceTree = "<group>"; };
 		B6A924DD2664CA08001A28CA /* LegacyWebKitDownloadDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyWebKitDownloadDelegate.swift; sourceTree = "<group>"; };
 		B6A9D9B42A3C1E9500215976 /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
-		B6A9D9B72A3C4F5B00215976 /* DependencyInjection_5.9 */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = DependencyInjection_5.9; sourceTree = "<group>"; };
 		B6A9E45226142B070067D1B9 /* Pixel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pixel.swift; sourceTree = "<group>"; };
 		B6A9E46A2614618A0067D1B9 /* OperatingSystemVersionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperatingSystemVersionExtension.swift; sourceTree = "<group>"; };
 		B6A9E46F26146A250067D1B9 /* DateExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtension.swift; sourceTree = "<group>"; };
@@ -3622,7 +3622,7 @@
 		378E279C2970217400FCADA2 /* LocalPackages */ = {
 			isa = PBXGroup;
 			children = (
-				B6A9D9B72A3C4F5B00215976 /* DependencyInjection_5.9 */,
+				B614C50F2A443F650063E9D8 /* DependencyInjectionMacroPlugin */,
 				B67A9BC22A303C58006B3711 /* DependencyInjection */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
 				4BE15DB22A0B0DD500898243 /* NetworkProtection */,
@@ -6440,6 +6440,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B6A594162A447A7500577FE7 /* PBXTargetDependency */,
 				B60F389B2A305F2E00C620B4 /* PBXTargetDependency */,
 				B60F38892A3050F300C620B4 /* PBXTargetDependency */,
 			);
@@ -6692,6 +6693,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA585DA4248FD31500E9A3E2 /* Build configuration list for PBXNativeTarget "DuckDuckGo Privacy Browser" */;
 			buildPhases = (
+				B6330A522A447F6000D9AA6D /* Make /Applications symlink, remove app on Clean build */,
 				CBCCF59E299667B700C02DFE /* Assert Xcode version */,
 				3705272528992C8A000C06A2 /* Check Embedded Config URLs */,
 				AA585D7A248FD31100E9A3E2 /* Sources */,
@@ -6707,6 +6709,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B6A5941B2A447BF000577FE7 /* PBXTargetDependency */,
 				B60F389F2A309FF500C620B4 /* PBXTargetDependency */,
 				4B5F14FC2A15291D0060320F /* PBXTargetDependency */,
 				4B2537642A11BE7600610219 /* PBXTargetDependency */,
@@ -7285,6 +7288,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
 			shellScript = "./lint.sh\n";
+		};
+		B6330A522A447F6000D9AA6D /* Make /Applications symlink, remove app on Clean build */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Make /Applications symlink, remove app on Clean build";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ ! -L ${BUILT_PRODUCTS_DIR}/Applications ]]; then\n    # rm ${BUILT_PRODUCTS_DIR}/Applications directory created by Xcode\n    echo \"removing ${BUILT_PRODUCTS_DIR}/Applications\" \n    rm -rf ${BUILT_PRODUCTS_DIR}/Applications\n    # create ${BUILT_PRODUCTS_DIR}/Applications symlink to /Applications\n    ln -s /Applications ${BUILT_PRODUCTS_DIR}/Applications\n    # create /Applications/DEBUG dir\n    echo \"making ${DSTROOT}/${INSTALL_PATH}\"\n    mkdir -p ${DSTROOT}/${INSTALL_PATH}\n    # we only get here on clean build, remove an existing app on clean build\n    echo \"removing ${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n    rm -rf ${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app\nfi\n    \n\n";
 		};
 		CBCCF59E299667B700C02DFE /* Assert Xcode version */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -9235,6 +9257,14 @@
 			isa = PBXTargetDependency;
 			productRef = B60F389E2A309FF500C620B4 /* InjectableMacrosPlugin */;
 		};
+		B6A594162A447A7500577FE7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B6A594152A447A7500577FE7 /* libDependencyInjectionMacros.dylib */;
+		};
+		B6A5941B2A447BF000577FE7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B6A5941A2A447BF000577FE7 /* libDependencyInjectionMacros.dylib */;
+		};
 		B6EC37F229B5DA8F001ACE79 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = B6EC37E729B5DA2A001ACE79 /* tests-server */;
@@ -10246,6 +10276,14 @@
 		B67A9BC52A303FD9006B3711 /* DependencyInjection */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DependencyInjection;
+		};
+		B6A594152A447A7500577FE7 /* libDependencyInjectionMacros.dylib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = libDependencyInjectionMacros.dylib;
+		};
+		B6A5941A2A447BF000577FE7 /* libDependencyInjectionMacros.dylib */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = libDependencyInjectionMacros.dylib;
 		};
 		B6AE39F229374AEC00C37AA4 /* OHHTTPStubs */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -31,7 +31,6 @@ fileprivate extension Preferences.Const {
 #if swift(>=5.9)
 @Injectable
 #endif
-
 final class AbstractRootViewDependencies: Injectable {
     let dependencies: DependencyStorage
 
@@ -53,9 +52,17 @@ extension Preferences {
 
         let dependencies: AbstractRootViewDependencies.DependencyStorage
 
+#if NETWORK_PROTECTION
+        let netPInvitePresenter: NetworkProtectionInvitePresenter
+#endif
+
         init(model: PreferencesSidebarModel, dependencyProvider: AbstractRootViewDependencies.DependencyProvider) {
             self.dependencies = .init(dependencyProvider)
             self.model = model
+
+#if NETWORK_PROTECTION
+            self.netPInvitePresenter = NetworkProtectionInvitePresenter(windowManager: dependencies.windowManager)
+#endif
         }
 
         var body: some View {
@@ -85,7 +92,6 @@ extension Preferences {
                                 Preferences.DuckPlayerView(model: .shared)
                             case .about:
 #if NETWORK_PROTECTION
-                                let netPInvitePresenter = NetworkProtectionInvitePresenter()
                                 Preferences.AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter, windowManager: dependencies.windowManager))
 #else
                                 Preferences.AboutView(model: AboutModel(windowManager: dependencies.windowManager))

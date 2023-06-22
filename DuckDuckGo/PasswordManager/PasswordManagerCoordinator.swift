@@ -23,14 +23,18 @@ import Common
 
 protocol PasswordManagerCoordinating: BrowserServicesKit.PasswordManager {
 
-    var displayName: String { get }
+    var bitwardenManagement: BWManagement { get }
 
+    var displayName: String { get }
+    var username: String? { get }
+    var activeVaultEmail: String? { get }
+
+    func openPasswordManager()
+    func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, completion: @escaping (Error?) -> Void)
 }
 
 // Encapsulation of third party password managers
 final class PasswordManagerCoordinator: PasswordManagerCoordinating {
-
-    static let shared = PasswordManagerCoordinator()
 
     enum PasswordManagerCoordinatorError: Error {
         case makingOfUrlFailed
@@ -90,7 +94,7 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
         switch bitwardenManagement.status {
         case .disabled, .notInstalled, .oldVersion, .missingHandshake, .handshakeNotApproved, .error:
             Task {
-                await WindowManager.shared.showPreferencesTab(withSelectedPane: .autofill)
+//                await WindowManager.shared.showPreferencesTab(withSelectedPane: .autofill)
             }
             return
         default:

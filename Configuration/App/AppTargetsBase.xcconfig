@@ -41,3 +41,4 @@ PRODUCT_NAME = $(PRODUCT_NAME_PREFIX)
 PRODUCT_NAME[config=Review][arch=*][sdk=*] = $(PRODUCT_NAME_PREFIX) Review
 
 SWIFT_OBJC_BRIDGING_HEADER = $(SRCROOT)/DuckDuckGo/Bridging.h
+OTHER_SWIFT_FLAGS = -Xfrontend -load-plugin-library -Xfrontend ${BUILD_DIR}/${CONFIGURATION}/PackageFrameworks/libDependencyInjectionMacros.dylib.framework/Versions/A/libDependencyInjectionMacros.dylib

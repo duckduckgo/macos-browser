@@ -77,7 +77,7 @@ final class MainViewController: NSViewController, Injectable {
     }
 
     required init?(coder: NSCoder) {
-        fatalError()
+        fatalError("\(Self.self): Bad initializer")
     }
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, dependencyProvider: DependencyProvider) {

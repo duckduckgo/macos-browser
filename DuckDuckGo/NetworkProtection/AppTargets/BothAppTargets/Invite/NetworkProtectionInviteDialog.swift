@@ -37,8 +37,13 @@ struct NetworkProtectionInviteDialog: View {
 }
 
 struct NetworkProtectionInviteDialog_Previews: PreviewProvider {
+    private final class NetworkProtectionInviteViewModelPreviewDelegate: NetworkProtectionInviteViewModelDelegate {
+        func didCancelInviteFlow() {}
+        func didCompleteInviteFlow() {}
+    }
+
     static var previews: some View {
-        NetworkProtectionInviteDialog(model: NetworkProtectionInviteViewModel(delegate: NetworkProtectionInvitePresenter(), redemptionCoordinator: NetworkProtectionCodeRedemptionCoordinator()))
+        NetworkProtectionInviteDialog(model: NetworkProtectionInviteViewModel(delegate: NetworkProtectionInviteViewModelPreviewDelegate(), redemptionCoordinator: NetworkProtectionCodeRedemptionCoordinator()))
     }
 }
 

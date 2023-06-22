@@ -106,7 +106,7 @@ final class URLEventHandler {
         { url in
 #if NETWORK_PROTECTION
             if url.scheme == "networkprotection" {
-                handleNetworkProtectionURL(url)
+                handleNetworkProtectionURL(url, using: windowManager)
             } else {
                 windowManager.show(url: url, newTab: true)
             }
@@ -120,11 +120,11 @@ final class URLEventHandler {
 
     /// Handles NetP URLs
     ///
-    private static func handleNetworkProtectionURL(_ url: URL) {
+    private static func handleNetworkProtectionURL(_ url: URL, using windowManager: WindowManagerProtocol) {
         switch url {
         case AppLauncher.Command.showStatus.launchURL:
-            Task { [windowManager] in
-                await windowManager.shared.showNetworkProtectionStatus()
+            Task {
+                await windowManager.showNetworkProtectionStatus()
             }
         default:
             return

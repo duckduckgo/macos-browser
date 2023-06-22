@@ -63,7 +63,7 @@ struct NetworkProtectionInviteCodeView: View {
 
 struct NetworkProtectionInviteCodeView_Previews: PreviewProvider {
     static var previews: some View {
-        NetworkProtectionInviteCodeView(model: NetworkProtectionInviteViewModel(delegate: NetworkProtectionInvitePresenter(), redemptionCoordinator: NetworkProtectionCodeRedemptionCoordinator()))
+        NetworkProtectionInviteCodeView(model: NetworkProtectionInviteViewModel(delegate: nil, redemptionCoordinator: NetworkProtectionCodeRedemptionCoordinator()))
     }
 }
 

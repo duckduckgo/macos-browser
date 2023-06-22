@@ -35,12 +35,14 @@ struct RecentlyClosedCoordinatorDependencies: RecentlyClosedCoordinator.Dependen
     @_implements(Tab_InjectedVars, pinnedTabsManager)
     var tabPinnedTabsManager: PinnedTabsManager? { pinnedTabsManagerValue }
     var pinnedTabsManager: PinnedTabsManager { pinnedTabsManagerValue }
+    let passwordManagerCoordinator: PasswordManagerCoordinating
 
     let windowManager: WindowManagerProtocol
 
-    init(pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager) {
+    init(pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager, passwordManagerCoordinator: PasswordManagerCoordinating) {
         self.pinnedTabsManagerValue = pinnedTabsManager
         self.windowManager = windowManager
+        self.passwordManagerCoordinator = passwordManagerCoordinator
     }
 
 }
@@ -54,15 +56,17 @@ struct FireDependencies: Fire.Dependencies {
     @_implements(Tab_InjectedVars, pinnedTabsManager)
     var tabPinnedTabsManager: PinnedTabsManager? { pinnedTabsManagerValue }
     var pinnedTabsManager: PinnedTabsManager { pinnedTabsManagerValue }
+    let passwordManagerCoordinator: PasswordManagerCoordinating
 
     let windowManager: WindowManagerProtocol
 
-    init(downloadListCoordinator: DownloadListCoordinator, recentlyClosedCoordinator: RecentlyClosedCoordinating, pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager) {
+    init(downloadListCoordinator: DownloadListCoordinator, recentlyClosedCoordinator: RecentlyClosedCoordinating, pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager, passwordManagerCoordinator: PasswordManagerCoordinating) {
         self.downloadListCoordinator = downloadListCoordinator
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
 
         self.pinnedTabsManagerValue = pinnedTabsManager
         self.windowManager = windowManager
+        self.passwordManagerCoordinator = passwordManagerCoordinator
     }
 
 }
@@ -78,11 +82,12 @@ struct FireCoordinatorDependencies: FireCoordinator.Dependencies {
     let fireViewModel: FireViewModel
 
     @MainActor
-    init(downloadListCoordinator: DownloadListCoordinator, recentlyClosedCoordinator: RecentlyClosedCoordinating, pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager) {
+    init(downloadListCoordinator: DownloadListCoordinator, recentlyClosedCoordinator: RecentlyClosedCoordinating, pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager, passwordManagerCoordinator: PasswordManagerCoordinating) {
         let fireDependencies = FireDependencies(downloadListCoordinator: downloadListCoordinator,
                                                 recentlyClosedCoordinator: recentlyClosedCoordinator,
                                                 pinnedTabsManager: pinnedTabsManager,
-                                                windowManager: windowManager)
+                                                windowManager: windowManager,
+                                                passwordManagerCoordinator: passwordManagerCoordinator)
         self.fireViewModel = FireViewModel(fire: Fire(dependencyProvider: fireDependencies))
 
         self.downloadListCoordinator = downloadListCoordinator
@@ -136,14 +141,16 @@ struct StateRestorationManagerDependencies: AppStateRestorationManager.Dependenc
     let statePersistenceService: StatePersistenceService
 
     let pinnedTabsManager: PinnedTabsManager?
+    let passwordManagerCoordinator: PasswordManagerCoordinating
 
     let windowManager: WindowManager
 
     @MainActor
-    init(statePersistenceService: StatePersistenceService, pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager) {
+    init(statePersistenceService: StatePersistenceService, pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager, passwordManagerCoordinator: PasswordManagerCoordinating) {
         self.statePersistenceService = statePersistenceService
         self.pinnedTabsManager = pinnedTabsManager
         self.windowManager = windowManager
+        self.passwordManagerCoordinator = passwordManagerCoordinator
     }
 
 }
@@ -165,6 +172,7 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
     @_implements(TabCollectionViewModel_InjectedVars, pinnedTabsManager)
     var tabcvmPinnedTabsManager: PinnedTabsManager? { pinnedTabsManagerValue }
     var pinnedTabsManager: PinnedTabsManager { pinnedTabsManagerValue }
+    let passwordManagerCoordinator: PasswordManagerCoordinating
 
     @MainActor
     init(isRunningUnitTests: Bool) { // swiftlint:disable:this function_body_length
@@ -193,17 +201,19 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
         var recentlyClosedCoordinator: RecentlyClosedCoordinator!
         var fireCoordinator: FireCoordinator!
         var downloadListCoordinator: DownloadListCoordinator!
+        passwordManagerCoordinator = PasswordManagerCoordinator()
 
-        let windowManager = WindowManager(dependencyProvider: windowManagerDependencies) { [internalUserDecider, syncService] windowManager in
+        let windowManager = WindowManager(dependencyProvider: windowManagerDependencies) { [internalUserDecider, syncService, passwordManagerCoordinator] windowManager in
 
             downloadListCoordinator = DownloadListCoordinator(windowManager: windowManager)
-            let recentlyClosedCoordinatorDependencies = RecentlyClosedCoordinatorDependencies(pinnedTabsManager: pinnedTabsManager, windowManager: windowManager)
+            let recentlyClosedCoordinatorDependencies = RecentlyClosedCoordinatorDependencies(pinnedTabsManager: pinnedTabsManager, windowManager: windowManager, passwordManagerCoordinator: passwordManagerCoordinator)
             recentlyClosedCoordinator = RecentlyClosedCoordinator(dependencyProvider: recentlyClosedCoordinatorDependencies)
 
             let fireCoordinatorDependencies = FireCoordinatorDependencies(downloadListCoordinator: downloadListCoordinator,
                                                                           recentlyClosedCoordinator: recentlyClosedCoordinator,
                                                                           pinnedTabsManager: pinnedTabsManager,
-                                                                          windowManager: windowManager)
+                                                                          windowManager: windowManager,
+                                                                          passwordManagerCoordinator: passwordManagerCoordinator)
             fireCoordinator = FireCoordinator(dependencyProvider: fireCoordinatorDependencies)
 
             return WindowManagerNestedDependencies(internalUserDecider: internalUserDecider,
@@ -221,7 +231,8 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
         let statePersistenceService = StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName)
         let stateRestorationManagerDependencies = StateRestorationManagerDependencies(statePersistenceService: statePersistenceService,
                                                                                       pinnedTabsManager: pinnedTabsManager,
-                                                                                      windowManager: windowManager)
+                                                                                      windowManager: windowManager,
+                                                                                      passwordManagerCoordinator: passwordManagerCoordinator)
         self.stateRestorationManager = AppStateRestorationManager(dependencyProvider: stateRestorationManagerDependencies,
                                                                   shouldRestorePreviousSession: StartupPreferences().restorePreviousSession)
 

@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 5.8
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,17 +6,6 @@ import PackageDescription
 let packageDependencies: [PackageDescription.Package.Dependency]
 let products: [PackageDescription.Product]
 let targets: [PackageDescription.Target]
-
-#if swift(>=5.9)
-
-let package = Package(
-    name: "DP_legacy",
-    products: [],
-    dependencies: [],
-    targets: []
-)
-
-#else
 
 let package = Package(
     name: "DependencyInjection",
@@ -26,31 +15,13 @@ let package = Package(
             name: "DependencyInjection",
             targets: ["DependencyInjection"]
         ),
-        .executable(
-            name: "DependencyInjectionMacros",
-            targets: ["DependencyInjectionMacros"]
-        ),
     ],
-    dependencies: [
-        // Depend on the latest Swift 5.9 prerelease of SwiftSyntax
-        .package(url: "https://github.com/apple/swift-syntax.git", branch: "main"),
-    ],
+    dependencies: [],
     targets: [
-        .executableTarget(
-            name: "DependencyInjectionMacros",
-            dependencies: [
-                .product(name: "SwiftParser", package: "swift-syntax"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
-                .product(name: "SwiftCompilerPlugin", package: "swift-syntax")
-            ]
-        ),
-
         // Library that exposes a macro as part of its API, which is used in client programs.
-        .target(name: "DependencyInjection", dependencies: ["DependencyInjectionMacros"]),
-
+        .target(
+            name: "DependencyInjection",
+            dependencies: []
+        ),
     ]
 )
-
-#endif
-
