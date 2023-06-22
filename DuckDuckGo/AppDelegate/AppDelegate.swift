@@ -243,7 +243,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
-        syncService.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
+        syncService.initializeIfNeeded(isInternalUser: internalUserDecider.isInternalUser)
         syncService.scheduler.notifyAppLifecycleEvent()
     }
 
