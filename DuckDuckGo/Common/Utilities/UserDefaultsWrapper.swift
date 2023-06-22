@@ -69,8 +69,6 @@ public struct UserDefaultsWrapper<T> {
         case showAutocompleteSuggestions = "preferences.appearance.show-autocomplete-suggestions"
         case defaultPageZoom = "preferences.appearance.default-page-zoom"
 
-        case isEncryptionKeyResaved = "encryption.key.store.is.encryption.key.resaved"
-
         // ATB
         case installDate = "statistics.installdate.key"
         case atb = "statistics.atb.key"

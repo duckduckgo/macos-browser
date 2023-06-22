@@ -27,13 +27,11 @@ final class EncryptionKeyStoreTests: XCTestCase {
     override func setUp() {
         super.setUp()
         removeTestKeys()
-        UserDefaultsWrapper<Any>.clearAll()
     }
 
     override func tearDown() {
         super.tearDown()
         removeTestKeys()
-        UserDefaultsWrapper<Any>.clearAll()
     }
 
     func testStoringKeys() {
@@ -68,21 +66,6 @@ final class EncryptionKeyStoreTests: XCTestCase {
         XCTAssertNotNil(secondReadKey)
         XCTAssertEqual(mockGenerator.numberOfKeysGenerated, 1)
         XCTAssertEqual(firstReadKey, secondReadKey)
-    }
-
-    func testThatReadingKeyWhenThereIsOneAndIsEncryptionKeyResavedIsTrueWillReturnTheSameKeyAndKey() {
-        // set IsEncryptionKeyResaved to true
-        var userDefaults = UserDefaultsWrapper<Bool>(key: .isEncryptionKeyResaved, defaultValue: false)
-        userDefaults.wrappedValue = true
-        // Save key in base 64
-        let originalKey = generator.randomKey()
-        let store = EncryptionKeyStore(generator: generator, account: account)
-        try? store.store(key: originalKey)
-        // Read key
-        let readKey = try? store.readKey()
-
-        // Check if it is the same key
-        XCTAssertEqual(originalKey, readKey)
     }
 
     private func removeTestKeys() {
