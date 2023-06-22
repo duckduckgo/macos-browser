@@ -34,6 +34,7 @@ class DataBrokerOperationsCollection: Operation {
     private let intervalBetweenOperations: TimeInterval? // The time in seconds to wait in-between operations
     private let priorityDate: Date? // The date to filter and sort operations priorities
     private let operationType: OperationType
+    private let notificationCenter: NotificationCenter
 
     deinit {
         print("Deinit Operation \(self.id)")
@@ -43,13 +44,15 @@ class DataBrokerOperationsCollection: Operation {
          database: DataBase,
          operationType: OperationType,
          intervalBetweenOperations: TimeInterval? = nil,
-         priorityDate: Date? = nil) {
+         priorityDate: Date? = nil,
+         notificationCenter: NotificationCenter = NotificationCenter.default) {
 
         self.brokerProfileQueriesData = brokerProfileQueriesData
         self.database = database
         self.intervalBetweenOperations = intervalBetweenOperations
         self.priorityDate = priorityDate
         self.operationType = operationType
+        self.notificationCenter = notificationCenter
         print("New op created \(id)")
         super.init()
     }
@@ -123,9 +126,10 @@ class DataBrokerOperationsCollection: Operation {
             if let brokerProfileData = brokerProfileData {
                 do {
                     try await DataBrokerProfileQueryOperationManager().runOperation(operationData: operationData,
-                                                                            brokerProfileQueryData: brokerProfileData,
-                                                                            database: database,
-                                                                            runner: testRunner)
+                                                                                    brokerProfileQueryData: brokerProfileData,
+                                                                                    database: database,
+                                                                                    notificationCenter: notificationCenter,
+                                                                                    runner: testRunner)
                     if let sleepInterval = intervalBetweenOperations {
                         print("Waiting \(sleepInterval) seconds...")
                         try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)

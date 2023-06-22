@@ -18,7 +18,7 @@
 
 import Foundation
 
-struct DataBrokerNotifications {
+internal struct DataBrokerNotifications {
     public static let didFinishScan = NSNotification.Name(rawValue: "com.duckduckgo.dbp.didFinishScan")
     public static let didFinishOptOut = NSNotification.Name(rawValue: "com.duckduckgo.dbp.didFinishOptOut")
 
