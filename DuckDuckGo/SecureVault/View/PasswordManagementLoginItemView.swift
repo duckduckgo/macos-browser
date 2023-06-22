@@ -211,7 +211,7 @@ private struct UsernameLabel: View {
 
                 Text(model.username)
 
-                if isHovering {
+                if isHovering && model.username != "" {
                     Button {
                         model.copy(model.username)
                     } label: {
@@ -389,7 +389,7 @@ private struct PasswordView: View {
                         Text(model.password.isEmpty ? "" : "••••••••••••")
                     }
 
-                    if isHovering || isPasswordVisible {
+                    if (isHovering || isPasswordVisible) && model.password != "" {
                         Button {
                             isPasswordVisible = !isPasswordVisible
                         } label: {
@@ -399,7 +399,7 @@ private struct PasswordView: View {
                         .tooltip(isPasswordVisible ? UserText.hidePasswordTooltip : UserText.showPasswordTooltip)
                     }
 
-                    if isHovering {
+                    if isHovering && model.password != "" {
                         Button {
                             model.copy(model.password)
                         } label: {
