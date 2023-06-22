@@ -350,12 +350,11 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             self?.broadcastConnectionStatus()
             self?.broadcastLastSelectedServerInfo()
         }
-
-        connectionStatus = .disconnected
     }
 
     deinit {
         os_log("[-] PacketTunnelProvider", log: .networkProtectionMemoryLog, type: .debug)
+        exit(0)
     }
 
     private func setupPixels(defaultHeaders: [String: String]) {

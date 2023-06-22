@@ -303,7 +303,7 @@ public struct NetworkProtectionStatusView: View {
     }
 
     private func featureToggleRow() -> some View {
-        Toggle(isOn: model.isRunning) {
+        Toggle(isOn: model.isToggleOn) {
             HStack {
                 Text(UserText.networkProtectionStatusViewConnLabel)
                     .applyLabelAttributes(colorScheme: colorScheme)
@@ -320,6 +320,7 @@ public struct NetworkProtectionStatusView: View {
                     .frame(width: 8)
             }
         }
+        .disabled(model.isToggleDisabled)
         .toggleStyle(.switch)
         .padding(EdgeInsets(top: 3, leading: 9, bottom: 3, trailing: 9))
     }

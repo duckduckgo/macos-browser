@@ -39,7 +39,7 @@ struct LoginItem {
     let agentBundleID: String
     let url: URL
 
-    var isRunning: Bool {
+    var isToggleOn: Bool {
         !runningApplications.isEmpty
     }
 
@@ -136,7 +136,7 @@ struct LoginItem {
 extension LoginItem: CustomDebugStringConvertible {
 
     var debugDescription: String {
-        "<LoginItem \(agentBundleID) isEnabled: \(status) isRunning: \(isRunning)>"
+        "<LoginItem \(agentBundleID) isEnabled: \(status) isRunning: \(isToggleOn)>"
     }
 
 }

@@ -38,24 +38,23 @@ struct SystemExtensionManager {
         self.manager = manager
     }
 
-    func activate() -> AsyncThrowingStream<ActivationRequestEvent, Error> {
-        return SystemExtensionRequest.activationRequest(forExtensionWithIdentifier: bundleID, manager: manager).submit()
+    func activate(replace: Bool) -> AsyncThrowingStream<ActivationRequestEvent, Error> {
+        return SystemExtensionRequest.activationRequest(forExtensionWithIdentifier: bundleID, manager: manager, replace: replace).submit()
     }
 
     func deactivate() async throws {
         for try await _ in SystemExtensionRequest.deactivationRequest(forExtensionWithIdentifier: bundleID, manager: manager).submit() {}
     }
-
 }
 
 final class SystemExtensionRequest: NSObject {
-
     typealias Event = SystemExtensionManager.ActivationRequestEvent
 
     private let activationRequest: OSSystemExtensionRequest
     private let manager: OSSystemExtensionManager
 
     private var continuation: AsyncThrowingStream<Event, Error>.Continuation?
+    private var extensionReplaced = false
 
     private init(activationRequest: OSSystemExtensionRequest, manager: OSSystemExtensionManager) {
         self.manager = manager
@@ -88,13 +87,13 @@ final class SystemExtensionRequest: NSObject {
             self.continuation = continuation
         }
     }
-
 }
 
 extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
 
     func request(_ request: OSSystemExtensionRequest, actionForReplacingExtension existing: OSSystemExtensionProperties, withExtension ext: OSSystemExtensionProperties) -> OSSystemExtensionRequest.ReplacementAction {
 
+        extensionReplaced = true
         return .replace
     }
 
@@ -112,6 +111,21 @@ extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
             // Not much we can do about this, so let's assume it's a good result and not show any errors
             continuation?.yield(.activated)
             Pixel.fire(.networkProtectionSystemExtensionUnknownActivationResult)
+        }
+
+        // When the system extension is replaced, macOS marks the activation request as .completed
+        // even before the previous sysex process is killed, which makes starting the VPN again fail
+        // immediately.
+        //
+        // To mitiage this problem when the sysex is replaced, I'm adding an intentional 1 second delay
+        // before signalling that this request finished.
+        guard !extensionReplaced else {
+            Task {
+                try await Task.sleep(nanoseconds: 1 * NSEC_PER_SEC)
+                continuation?.finish()
+            }
+
+            return
         }
 
         continuation?.finish()
