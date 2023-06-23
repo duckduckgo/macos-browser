@@ -32,6 +32,7 @@ class DataBrokerProtectionScheduler {
           activity = NSBackgroundActivityScheduler(identifier: identifier)
           activity.repeats = true
 
+          //TODO: Arbitrary numbers for now
           // Scheduling an activity to fire between 15 and 45 minutes from now
           activity.interval = 30 * 60
           activity.tolerance = 15 * 60
