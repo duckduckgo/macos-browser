@@ -343,22 +343,24 @@ final class TabCollectionViewModel: NSObject {
 
     // MARK: - Removal
 
-    func remove(at index: TabIndex, published: Bool = true) {
+    func remove(at index: TabIndex, published: Bool = true, forceChange: Bool = false) {
         switch index {
         case .unpinned(let i):
-            return removeUnpinnedTab(at: i, published: published)
+            return removeUnpinnedTab(at: i, published: published, forceChange: forceChange)
         case .pinned(let i):
             return removePinnedTab(at: i, published: published)
         }
     }
 
-    private func removeUnpinnedTab(at index: Int, published: Bool = true) {
-        guard changesEnabled else { return }
+    private func removeUnpinnedTab(at index: Int, published: Bool = true, forceChange: Bool = false) {
+        guard changesEnabled || forceChange else { return }
 
         let parentTab = tabCollection.tabs[safe: index]?.parentTab
         guard tabCollection.removeTab(at: index, published: published) else { return }
 
-        didRemoveTab(at: .unpinned(index), withParent: parentTab)
+        didRemoveTab(at: .unpinned(index),
+                     withParent: parentTab,
+                     forced: forceChange)
     }
 
     private func removePinnedTab(at index: Int, published: Bool = true) {
@@ -372,7 +374,7 @@ final class TabCollectionViewModel: NSObject {
         didRemoveTab(at: .pinned(index), withParent: nil)
     }
 
-    private func didRemoveTab(at index: TabIndex, withParent parentTab: Tab?) {
+    private func didRemoveTab(at index: TabIndex, withParent parentTab: Tab?, forced: Bool = false) {
 
         func notifyDelegate() {
             if index.isUnpinnedTab {
@@ -414,7 +416,7 @@ final class TabCollectionViewModel: NSObject {
         }
 
         notifyDelegate()
-        select(at: newSelectionIndex)
+        select(at: newSelectionIndex, forceChange: forced)
     }
 
     func moveTab(at fromIndex: Int, to otherViewModel: TabCollectionViewModel, at toIndex: Int) {
@@ -432,8 +434,8 @@ final class TabCollectionViewModel: NSObject {
         otherViewModel.selectParentOnRemoval = true
     }
 
-    func removeAllTabs(except exceptionIndex: Int? = nil) {
-        guard changesEnabled else { return }
+    func removeAllTabs(except exceptionIndex: Int? = nil, forceChange: Bool = false) {
+        guard changesEnabled || forceChange else { return }
 
         tabCollection.removeAll(andAppend: exceptionIndex.map { tabCollection.tabs[$0] })
 
@@ -491,15 +493,15 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
-    func removeSelected() {
-        guard changesEnabled else { return }
+    func removeSelected(forceChange: Bool = false) {
+        guard changesEnabled || forceChange else { return }
 
         guard let selectionIndex = selectionIndex else {
             os_log("TabCollectionViewModel: No tab selected", type: .error)
             return
         }
 
-        remove(at: selectionIndex)
+        remove(at: selectionIndex, forceChange: forceChange)
     }
 
     // MARK: - Others

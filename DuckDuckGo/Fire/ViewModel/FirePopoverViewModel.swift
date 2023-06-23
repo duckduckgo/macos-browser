@@ -63,7 +63,6 @@ final class FirePopoverViewModel {
         self.tld = tld
 
         updateAvailableClearingOptions()
-        updateItems(for: initialClearingOption)
     }
 
     var clearingOption = ClearingOption.allData {
@@ -138,7 +137,7 @@ final class FirePopoverViewModel {
 
                 return tabCollectionViewModel.localHistory
             case .allData:
-                return (historyCoordinating.history?.visitedDomains ?? Set<String>())
+                return (historyCoordinating.history?.visitedDomains(tld: tld) ?? Set<String>())
                     .union(tabCollectionViewModel?.localHistory ?? Set<String>())
             }
         }
@@ -205,6 +204,10 @@ final class FirePopoverViewModel {
         })
     }
 
+    func refreshItems() {
+        updateItems(for: clearingOption)
+    }
+
     // MARK: - Warning
 
     @Published private(set) var areOtherTabsInfluenced = false
@@ -236,15 +239,47 @@ final class FirePopoverViewModel {
     // MARK: - Burning
 
     func burn() {
-        if clearingOption == .allData && areAllSelected {
-            if let tabCollectionViewModel = tabCollectionViewModel {
-                // Burn everything
-                fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel, eraseFullHistory: false)
+        switch (clearingOption, areAllSelected) {
+        case (.currentSite, _), (.currentTab, _):
+            guard let tabCollectionViewModel = tabCollectionViewModel,
+                  let tabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+                assertionFailure("No tab selected")
+                return
             }
-        } else {
-            // Burn selected domains
-            fireViewModel.fire.burnDomains(selectedDomains)
+            let burningEntity = Fire.BurningEntity.tab(tabViewModel: tabViewModel,
+                                                       selectedDomains: selectedDomains,
+                                                       parentTabCollectionViewModel: tabCollectionViewModel)
+            fireViewModel.fire.burnEntity(entity: burningEntity)
+        case (.currentWindow, _):
+            guard let tabCollectionViewModel = tabCollectionViewModel else {
+                assertionFailure("FirePopoverViewModel: TabCollectionViewModel is not present")
+                return
+            }
+            let burningEntity = Fire.BurningEntity.window(tabCollectionViewModel: tabCollectionViewModel,
+                                                          selectedDomains: selectedDomains)
+            fireViewModel.fire.burnEntity(entity: burningEntity)
+
+        case (.allData, true):
+            fireViewModel.fire.burnAll(eraseFullHistory: false)
+
+        case (.allData, false):
+            fireViewModel.fire.burnEntity(entity: .allWindows(mainWindowControllers: WindowControllersManager.shared.mainWindowControllers,
+                                                              selectedDomains: selectedDomains))
         }
+    }
+
+}
+
+extension History {
+
+    func visitedDomains(tld: TLD) -> Set<String> {
+        return reduce(Set<String>(), { result, historyEntry in
+            if let host = historyEntry.url.host, let eTLDPlus1Domain = tld.eTLDplus1(host) {
+                return result.union([eTLDPlus1Domain])
+            } else {
+                return result
+            }
+        })
     }
 
 }

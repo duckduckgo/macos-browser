@@ -102,6 +102,12 @@ final class FirePopoverViewController: NSViewController {
         subscribeToAreOtherTabsInfluenced()
     }
 
+    override func viewWillAppear() {
+        super.viewWillAppear()
+
+        firePopoverViewModel.refreshItems()
+    }
+
     @IBAction func optionsButtonAction(_ sender: NSPopUpButton) {
         guard let tag = sender.selectedItem?.tag, let clearingOption = FirePopoverViewModel.ClearingOption(rawValue: tag) else {
             assertionFailure("Clearing option for not found for the selected menu item")

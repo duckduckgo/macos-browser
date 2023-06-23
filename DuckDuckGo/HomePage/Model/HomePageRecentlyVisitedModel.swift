@@ -98,7 +98,7 @@ final class RecentlyVisitedModel: ObservableObject {
 
     @MainActor
     func burn(_ site: RecentlyVisitedSiteModel) {
-        fire.burnDomains(Set<String>([site.domain]))
+        fire.burnEntity(entity: .none(selectedDomains: Set<String>([site.domain])))
         recentSites = recentSites.filter { $0.domain != site.domain }
         numberOfTrackersBlocked -= site.numberOfTrackersBlocked
     }

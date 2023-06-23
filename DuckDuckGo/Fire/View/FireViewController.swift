@@ -162,19 +162,10 @@ final class FireViewController: NSViewController {
         var playFireAnimation = true
 
         // Don't animate on other windows
+        //TODO! There is a change to do this more reliably
         let lastKeyWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         if view.window?.windowController !== lastKeyWindowController {
             playFireAnimation = false
-        }
-
-        switch burningData {
-        case .all: break
-        case .specificDomains(let burningDomains):
-            let localHistory = tabCollectionViewModel.selectedTab?.localHistory ?? Set()
-            if localHistory.isDisjoint(with: burningDomains) {
-                // Do not play if current tab isn't affected
-                playFireAnimation = false
-            }
         }
 
         if playFireAnimation {
@@ -183,13 +174,21 @@ final class FireViewController: NSViewController {
             progressIndicatorWrapper.isHidden = true
             fireViewModel.isAnimationPlaying = true
 
+            fireViewModel.fire.fireAnimationDidStart()
             fireAnimationView?.play { [weak self] _ in
                 guard let self = self else { return }
 
                 self.fireViewModel.isAnimationPlaying = false
+                fireViewModel.fire.fireAnimationDidFinish()
+
+                // If not finished yet, present the progress indicator
                 if self.fireViewModel.fire.burningData != nil {
-                    self.progressIndicatorWrapper.isHidden = false
-                    self.progressIndicatorWrapperBG.applyDropShadow()
+
+                    // Waits until windows are closed in Fire.swift
+                    DispatchQueue.main.async {
+                        self.progressIndicatorWrapper.isHidden = false
+                        self.progressIndicatorWrapperBG.applyDropShadow()
+                    }
                 }
             }
         }

@@ -1112,7 +1112,7 @@ extension Tab: NewWindowPolicyDecisionMaker {
 
 extension Tab: TabDataClearing {
     @MainActor
-    func prepareForDataClearing(caller: TabDataCleaner) {
+    func prepareForDataClearing(caller: TabCleanupPreparer) {
         webViewCancellables.removeAll()
 
         webView.stopLoading()
