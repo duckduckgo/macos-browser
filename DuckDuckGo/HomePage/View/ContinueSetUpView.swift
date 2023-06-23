@@ -265,7 +265,7 @@ extension HomePage.Views {
                         .padding(.top, 5)
                     ZStack {
                         Rectangle()
-                            .fill(Color("HomePageNextStepsBlue"))
+                            .fill(Color("LinkBlueColor"))
                             .frame(width: textWidth, height: 20)
                         Text(text)
                             .foregroundColor(.white)
