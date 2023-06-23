@@ -32,6 +32,7 @@ public class ConnectionStatusObserverThroughDistributedNotifications: Connection
     private static let monitorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtection.ConnectionStatusObserverThroughDistributedNotifications.monitorDispatchQueue", qos: .background)
     private let monitor = NWPathMonitor()
     private static let timeoutOnNetworkChanges: TimeInterval = .seconds(3)
+    private var lastStatusResponseTimestamp = Date()
     private var lastStatusChangeTimestamp: Date?
 
     // MARK: - Notifications
@@ -77,6 +78,7 @@ public class ConnectionStatusObserverThroughDistributedNotifications: Connection
     }
 
     private func handleDistributedStatusChangeNotification(_ notification: Notification) {
+        lastStatusResponseTimestamp = Date()
         let statusChange: ConnectionStatusChange
 
         do {
@@ -125,26 +127,16 @@ public class ConnectionStatusObserverThroughDistributedNotifications: Connection
     /// The timeout is currently set to 3 seconds.
     ///
     private func requestStatusUpdate() {
+        let requestDate = Date()
         distributedNotificationCenter.post(.requestStatusUpdate)
 
-        var cancellable: AnyCancellable!
+        Task {
+            try? await Task.sleep(interval: Self.timeoutOnNetworkChanges)
 
-        // This isn't used anywhere else so we can keep it here.
-        struct TimeoutError: Error {}
-
-        cancellable = publisher
-            .dropFirst()
-            .mapError { _ -> TimeoutError in }
-            .timeout(.seconds(Self.timeoutOnNetworkChanges), scheduler: DispatchQueue.main, customError: TimeoutError.init)
-            .sink(receiveCompletion: { [weak publisher] completion in
-                if case .failure = completion {
-                    publisher?.send(.disconnected)
-                }
-
-                cancellable.cancel()
-            }, receiveValue: { value in
-                cancellable.cancel()
-            })
+            if lastStatusResponseTimestamp < requestDate {
+                publisher.send(.disconnected)
+            }
+        }
     }
 
     // MARK: - Logging
