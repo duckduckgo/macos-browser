@@ -29,14 +29,17 @@ public final class ScanOperation: DataBrokerOperation {
     public var query: BrokerProfileQueryData
     public var webViewHandler: DataBrokerProtectionWebViewHandler?
     public var actionsHandler: DataBrokerProtectionActionsHandler?
+    public var emailService: DataBrokerProtectionEmailService
     public var continuation: CheckedContinuation<[ExtractedProfile], Error>?
 
     public init(privacyConfig: PrivacyConfigurationManaging,
                 prefs: ContentScopeProperties,
-                query: BrokerProfileQueryData) {
+                query: BrokerProfileQueryData,
+                emailService: DataBrokerProtectionEmailService = DataBrokerProtectionEmailService()) {
         self.privacyConfig = privacyConfig
         self.prefs = prefs
         self.query = query
+        self.emailService = emailService
     }
 
     public func run() async throws -> [ExtractedProfile] {
@@ -66,7 +69,7 @@ public final class ScanOperation: DataBrokerOperation {
 
     public func executeNextStep() async {
         if let action = actionsHandler?.nextAction() {
-            await webViewHandler?.execute(action: action, profileData: query.profileQuery)
+            await runNextAction(action)
         } else {
             await webViewHandler?.finish() // If we executed all steps we release the web view
         }

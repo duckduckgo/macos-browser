@@ -26,6 +26,7 @@ public protocol DataBrokerOperation: CSSCommunicationDelegate {
     var privacyConfig: PrivacyConfigurationManaging { get }
     var prefs: ContentScopeProperties { get }
     var query: BrokerProfileQueryData { get }
+    var emailService: DataBrokerProtectionEmailService { get }
 
     var webViewHandler: DataBrokerProtectionWebViewHandler? { get set }
     var actionsHandler: DataBrokerProtectionActionsHandler? { get }
@@ -70,5 +71,27 @@ public extension DataBrokerOperation {
         Task {
             await webViewHandler?.finish()
         }
+    }
+
+    func getProfileWithEmail() async throws -> ProfileQuery {
+        let email = try await emailService.getEmail()
+        return query.profileQuery.copy(email: email)
+    }
+
+    func runNextAction(_ action: Action) async {
+        var profile: ProfileQuery
+
+        if action.needsEmail {
+            do {
+                profile = try await getProfileWithEmail()
+            } catch {
+                onError(error: .emailError(error as? DataBrokerProtectionEmailService.EmailError))
+                return
+            }
+        } else {
+            profile = query.profileQuery
+        }
+
+        await webViewHandler?.execute(action: action, profileData: profile)
     }
 }
