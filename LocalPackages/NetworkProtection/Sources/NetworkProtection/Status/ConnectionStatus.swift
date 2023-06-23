@@ -27,3 +27,36 @@ public enum ConnectionStatus: Codable, Equatable {
     case reasserting
     case unknown
 }
+
+/// This struct represents a status change and holds the new status and a timestamp registering when
+/// the change happened.
+///
+/// This is useful to know whether we have processed or still need to process the status, in case the notification
+/// is sent out more than once.
+///
+public struct ConnectionStatusChange: Codable {
+    let status: ConnectionStatus
+    let timestamp: Date
+
+    public init(status: ConnectionStatus, on timestamp: Date) {
+        self.status = status
+        self.timestamp = timestamp
+    }
+
+    enum CodingKeys: CodingKey {
+        case status
+        case timestamp
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.status = try container.decode(ConnectionStatus.self, forKey: .status)
+        self.timestamp = try container.decode(Date.self, forKey: .timestamp)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.status, forKey: .status)
+        try container.encode(self.timestamp, forKey: .timestamp)
+    }
+}
