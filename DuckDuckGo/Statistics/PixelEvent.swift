@@ -237,6 +237,7 @@ extension Pixel {
             case bookmarksSaveFailed
             case bookmarksSaveFailedOnImport
             case bookmarksCleanupFailed
+            case orphanedBookmarksPresent
 
             case bookmarksCouldNotLoadDatabase
             case bookmarksCouldNotPrepareDatabase
@@ -246,7 +247,7 @@ extension Pixel {
             case bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration
             case bookmarksMigrationCouldNotRemoveOldStore
 
-            // Errors from Sync Metadata Module
+            case syncSentUnauthenticatedRequest
             case syncMetadataCouldNotLoadDatabase
             case syncBookmarksProviderInitializationFailed
             case syncBookmarksFailed
@@ -551,6 +552,7 @@ extension Pixel.Event.Debug {
         case .bookmarksSaveFailed: return "bookmarks_save_failed"
         case .bookmarksSaveFailedOnImport: return "bookmarks_save_failed_on_import"
         case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
+        case .orphanedBookmarksPresent: return "bookmarks_orphans_present"
 
         case .bookmarksCouldNotLoadDatabase: return "bookmarks_could_not_load_database"
         case .bookmarksCouldNotPrepareDatabase: return "bookmarks_could_not_prepare_database"
@@ -561,6 +563,7 @@ extension Pixel.Event.Debug {
             return "bookmarks_migration_could_not_prepare_database_on_failed_migration"
         case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
 
+        case .syncSentUnauthenticatedRequest: return "sync_sent_unauthenticated_request"
         case .syncMetadataCouldNotLoadDatabase: return "sync_metadata_could_not_load_database"
         case .syncBookmarksProviderInitializationFailed: return "sync_bookmarks_provider_initialization_failed"
         case .syncBookmarksFailed: return "sync_bookmarks_failed"

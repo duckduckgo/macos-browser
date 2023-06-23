@@ -333,50 +333,83 @@ function initWithEnvironment(environment, comms) {
         const OpenInDuckPlayer = {
             clickBoundElements: new Map(),
             enabled: false,
-
+            /** @type {string|null} */
+            lastMouseOver: null,
             bindEventsToAll: () => {
                 if (!OpenInDuckPlayer.enabled) {
-                    return;
+                    return
                 }
 
-                let videoLinksAndPreview = Array.from(document.querySelectorAll('a[href^="/watch?v="], #media-container-link')),
-                    isValidVideoLinkOrPreview = (element) => {
-                        return VideoThumbnail.isSingleVideoURL(element?.getAttribute('href')) ||
-                            element.getAttribute('id') === 'media-container-link';
-                    },
-                    excludeAlreadyBound = (element) => !OpenInDuckPlayer.clickBoundElements.has(element);
-
+                const videoLinksAndPreview = Array.from(document.querySelectorAll('a[href^="/watch?v="], #media-container-link'))
+                const isValidVideoLinkOrPreview = (element) => {
+                    return VideoThumbnail.isSingleVideoURL(element?.getAttribute('href')) ||
+                        element.getAttribute('id') === 'media-container-link'
+                }
                 videoLinksAndPreview
-                    .filter(excludeAlreadyBound)
-                    .forEach(element => {
-                        if (isValidVideoLinkOrPreview(element)) {
+                    .forEach((element) => {
+                        // bail when this element was already seen
+                        if (OpenInDuckPlayer.clickBoundElements.has(element)) return
 
-                            let onClickOpenDuckPlayer = (event) => {
-                                event.preventDefault();
-                                event.stopPropagation();
+                        // bail if it's not a valid element
+                        if (!isValidVideoLinkOrPreview(element)) return
 
-                                let link = event.target.closest('a');
+                        // handle mouseover + click events
+                        const handler = {
+                            handleEvent (event) {
+                                switch (event.type) {
+                                    case 'mouseover': {
+                                        /**
+                                         * Store the element's link value on hover - this occurs just in time
+                                         * before the youtube overlay take sover the event space
+                                         */
+                                        const href = element instanceof HTMLAnchorElement
+                                            ? VideoParams.fromHref(element.href)?.toPrivatePlayerUrl()
+                                            : null
+                                        if (href) {
+                                            OpenInDuckPlayer.lastMouseOver = href
+                                        }
+                                        break
+                                    }
+                                    case 'click': {
+                                        /**
+                                         * On click, the receiver might be the preview element - if
+                                         * it is, we want to use the last hovered `a` tag instead
+                                         */
+                                        event.preventDefault()
+                                        event.stopPropagation()
 
-                                if (link) {
-                                    const href = VideoParams.fromHref(link.href)?.toPrivatePlayerUrl();
-                                    comms.openInDuckPlayerViaMessage(href);
+                                        const link = event.target.closest('a')
+                                        const fromClosest = VideoParams.fromHref(link?.href)?.toPrivatePlayerUrl()
+
+                                        if (fromClosest) {
+                                            comms.openInDuckPlayerViaMessage(fromClosest)
+                                        } else if (OpenInDuckPlayer.lastMouseOver) {
+                                            comms.openInDuckPlayerViaMessage(OpenInDuckPlayer.lastMouseOver)
+                                        } else {
+                                            // could not navigate, doing nothing
+                                        }
+
+                                        break
+                                    }
                                 }
-
-                                return false;
-                            };
-
-                            element.addEventListener('click', onClickOpenDuckPlayer, true);
-
-                            OpenInDuckPlayer.clickBoundElements.set(element, onClickOpenDuckPlayer);
+                            }
                         }
-                    });
+
+                        // register both handlers
+                        element.addEventListener('mouseover', handler, true)
+                        element.addEventListener('click', handler, true)
+
+                        // store the handler for removal later (eg: if settings change)
+                        OpenInDuckPlayer.clickBoundElements.set(element, handler)
+                    })
             },
 
             disable: () => {
-                OpenInDuckPlayer.clickBoundElements.forEach((functionToRemove, element) => {
-                    element.removeEventListener('click', functionToRemove, true);
-                    OpenInDuckPlayer.clickBoundElements.delete(element);
-                });
+                OpenInDuckPlayer.clickBoundElements.forEach((handler, element) => {
+                    element.removeEventListener('mouseover', handler, true)
+                    element.removeEventListener('click', handler, true)
+                    OpenInDuckPlayer.clickBoundElements.delete(element)
+                })
 
                 OpenInDuckPlayer.enabled = false;
             },

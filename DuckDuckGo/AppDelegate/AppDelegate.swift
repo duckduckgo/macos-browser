@@ -64,7 +64,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var appIconChanger: AppIconChanger!
 
     private(set) var syncDataProviders: SyncDataProviders!
-    private(set) var syncService: DDGSyncing!
+    private(set) var syncService: DDGSyncing?
     private var syncStateCancellable: AnyCancellable?
     private var bookmarksSyncErrorCancellable: AnyCancellable?
     let bookmarksManager = LocalBookmarkManager.shared
@@ -77,6 +77,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     // swiftlint:disable:next function_body_length
     func applicationWillFinishLaunching(_ notification: Notification) {
+#if !APPSTORE && !DEBUG
+        PFMoveToApplicationsFolderIfNecessary()
+#endif
+
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
         Configuration.setURLProvider(AppConfigurationURLProvider())
 
@@ -157,9 +161,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
-
-        syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
-        syncService = DDGSync(dataProvidersSource: syncDataProviders, log: OSLog.sync)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -210,17 +211,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         startupNetworkProtection()
 #endif
 
-        syncStateCancellable = syncService.authStatePublisher
-            .prepend(syncService.authState)
-            .map { $0 == .inactive }
-            .removeDuplicates()
-            .sink { isSyncDisabled in
-                LocalBookmarkManager.shared.updateBookmarkDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
-            }
+        startupSync()
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
-        syncService.scheduler.notifyAppLifecycleEvent()
+        syncService?.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
+        syncService?.scheduler.notifyAppLifecycleEvent()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -277,6 +273,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private func applyPreferredTheme() {
         let appearancePreferences = AppearancePreferences()
         appearancePreferences.updateUserInterfaceStyle()
+    }
+
+    // MARK: - Sync
+
+    private func startupSync() {
+        let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
+        let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync)
+        syncService.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
+
+        syncStateCancellable = syncService.authStatePublisher
+            .prepend(syncService.authState)
+            .map { $0 == .inactive }
+            .removeDuplicates()
+            .sink { isSyncDisabled in
+                LocalBookmarkManager.shared.updateBookmarkDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
+            }
+
+        // This is also called in applicationDidBecomeActive, but we're also calling it here, since
+        // syncService can be nil when applicationDidBecomeActive is called during startup, if a modal
+        // alert is shown before it's instantiated.  In any case it should be safe to call this here,
+        // since the scheduler debounces calls to notifyAppLifecycleEvent().
+        //
+        syncService.scheduler.notifyAppLifecycleEvent()
+
+        self.syncDataProviders = syncDataProviders
+        self.syncService = syncService
     }
 
     // MARK: - Network Protection
