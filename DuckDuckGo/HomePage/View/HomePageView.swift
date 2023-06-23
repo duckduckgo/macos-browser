@@ -68,7 +68,8 @@ extension HomePage.Views {
                         HStack {
                             Spacer()
                             HomeContentButtonView(isHomeContentPopoverVisible: $isHomeContentPopoverVisible)
-                                .padding()
+                                .padding(.bottom, 14)
+                                .padding(.trailing, 14)
                                 .popover(isPresented: $isHomeContentPopoverVisible, content: {
                                     HomeContentPopoverView()
                                         .padding()
@@ -96,8 +97,10 @@ extension HomePage.Views {
 
         struct HomeContentButtonView: View {
             let defaultColor: Color = Color("NewTabPageBackgroundColor")
-            let onHoverColor: Color = Color("HomeFavoritesBackgroundColor")
-            let onSelectedColor: Color = Color("HomeFavoritesHoverColor")
+            let onHoverColor: Color = Color("ButtonMouseOverColor")
+            let onSelectedColor: Color = Color("ButtonMouseDownColor")
+            let iconSize = 16.02
+            let targetSize = 28.0
 
             @State var isHovering: Bool = false
             @Binding var isHomeContentPopoverVisible: Bool
@@ -116,11 +119,11 @@ extension HomePage.Views {
                 ZStack {
                     Rectangle()
                         .fill(buttonBackgroundColor)
-                        .frame(width: 16.02, height: 16.02, alignment: .bottomTrailing)
+                        .frame(width: targetSize, height: targetSize, alignment: .bottomTrailing)
                         .cornerRadius(3)
                     Image("OptionsMainView")
                         .resizable()
-                        .frame(width: 16.02, height: 16.02)
+                        .frame(width: iconSize, height: iconSize)
                         .scaledToFit()
                         .link(onHoverChanged: nil) {
                             isHomeContentPopoverVisible.toggle()
