@@ -517,7 +517,11 @@ protocol NewWindowPolicyDecisionMaker {
             }
             return newContent
         }()
-        guard newContent != self.content else { return nil }
+
+        // effectively says if userEntered is set then continue
+        if case .url(_, _, let userEntered) = newContent, userEntered == nil, newContent == self.content {
+            return nil
+        }
         self.content = newContent
 
         dismissPresentedAlert()
@@ -741,11 +745,17 @@ protocol NewWindowPolicyDecisionMaker {
     @MainActor
     @discardableResult
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async -> ExpectedNavigation? {
+
         let content = self.content
         guard let url = content.urlForWebView,
               url.scheme.map(URL.NavigationalScheme.init) != .about else { return nil }
 
-        if shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) {
+        var userForcedReload = false
+        if case .url(let url, _, let userEntered) = content, url.absoluteString == userEntered {
+            userForcedReload = shouldLoadInBackground // only force it if this is a foreground load
+        }
+
+        if userForcedReload || shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) {
             let didRestore = restoreInteractionStateDataIfNeeded()
 
             guard !didRestore else { return nil }

@@ -276,11 +276,7 @@ final class AddressBarTextField: NSTextField {
             }
         }
 
-        if selectedTabViewModel.tab.content == .url(url, userEntered: userEnteredValue) {
-            selectedTabViewModel.reload()
-        } else {
-            selectedTabViewModel.tab.setUrl(url, userEntered: userEnteredValue)
-        }
+        selectedTabViewModel.tab.setUrl(url, userEntered: userEnteredValue)
 
         self.window?.makeFirstResponder(nil)
     }
