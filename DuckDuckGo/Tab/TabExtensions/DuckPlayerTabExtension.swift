@@ -87,6 +87,7 @@ final class DuckPlayerTabExtension {
             if script.messageOriginPolicy.isAllowed(hostname) && canPushMessagesToJS {
                 duckPlayer.$mode
                         .dropFirst()
+                        .receive(on: DispatchQueue.main)
                         .sink { [weak self] playerMode in
                             guard let self = self else {
                                 return
@@ -107,6 +108,7 @@ final class DuckPlayerTabExtension {
             if canPushMessagesToJS {
                 duckPlayer.$mode
                     .dropFirst()
+                    .receive(on: DispatchQueue.main)
                     .sink { [weak self] playerMode in
                         guard let self = self else {
                             return
