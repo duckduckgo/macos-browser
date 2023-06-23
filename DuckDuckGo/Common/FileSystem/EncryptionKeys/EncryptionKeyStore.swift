@@ -58,10 +58,6 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
     private let generator: EncryptionKeyGenerating
     private let account: String
 
-    /// Needed to change how we save the key
-    @UserDefaultsWrapper(key: .isEncryptionKeyResaved, defaultValue: false)
-    private var isEncryptionKeyResaved: Bool
-
     private var defaultKeychainQueryAttributes: [String: Any] {
         return [
             kSecClass: kSecClassGenericPassword,
@@ -95,16 +91,24 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
          guard status == errSecSuccess else {
              throw EncryptionKeyStoreError.storageFailed(status)
          }
-        /// Needed to change how we save the key
-        isEncryptionKeyResaved = true
      }
 
     func readKey() throws -> SymmetricKey {
         /// Needed to change how we save the key
-        if !isEncryptionKeyResaved {
-            try resaveKey()
+        /// Checks if the base64 non iCloud key already exist
+        /// if so we return
+        if let key = try? readKeyFromKeychain(account: account, format: .base64) {
+            return key
+        }
+        /// If the base64 key does not exist we check if we have the legacy key
+        /// if so we store it as base64 local item key
+        if let key = try readKeyFromKeychain(account: account, format: .raw) {
+            try store(key: key)
         }
 
+        /// We try again to retrieve the base64 non iCloud key
+        /// if so we return the key
+        /// otherwise we generate a new one and store it
         if let key = try readKeyFromKeychain(account: account, format: .base64) {
             return key
         } else {
@@ -125,12 +129,6 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
     }
 
     // MARK: - Private
-
-    private func resaveKey() throws {
-        if let key = try readKeyFromKeychain(account: account, format: .raw) {
-            try store(key: key)
-        }
-    }
 
     private enum KeyFormat {
         case raw
