@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "shane/css-for-duckplayer",
-        "revision" : "f744c78481cd4ceaa2d9d475d213977a02190010"
+        "revision" : "ade328a6d938ece5f21843818e55688e63c6fbba",
+        "version" : "62.0.1"
       }
     },
     {
