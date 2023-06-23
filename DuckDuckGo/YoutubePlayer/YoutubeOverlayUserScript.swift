@@ -76,6 +76,7 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
 
     // MARK: - Private Methods
 
+    @MainActor
     private func handleOpenDuckPlayer(params: Any, message: UserScriptMessage) -> Encodable? {
         guard let dict = params as? [String: Any],
               let href = dict["href"] as? String,
@@ -85,9 +86,7 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
             assertionFailure("YoutubeOverlayUserScript: expected URL")
             return nil
         }
-        DispatchQueue.main.async { [weak self] in
-            self?.delegate?.youtubeOverlayUserScriptDidRequestDuckPlayer(with: url, in: webView)
-        }
+        self.delegate?.youtubeOverlayUserScriptDidRequestDuckPlayer(with: url, in: webView)
         return nil
     }
 
@@ -99,6 +98,7 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
 }
 
 extension YoutubeOverlayUserScript {
+    @MainActor
     func handleSendJSPixel(params: Any, message: UserScriptMessage) -> Encodable? {
         // Temporary pixel for first time user uses Duck Player
         if !Pixel.isNewUser {
