@@ -752,7 +752,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         var userForcedReload = false
         if case .url(let url, _, let userEntered) = content, url.absoluteString == userEntered {
-            userForcedReload = shouldLoadInBackground // only force it if this is a foreground load
+            userForcedReload = shouldLoadInBackground
         }
 
         if userForcedReload || shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) {
