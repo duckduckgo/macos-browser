@@ -129,16 +129,20 @@ public class ConnectionStatusObserverThroughDistributedNotifications: Connection
 
         var cancellable: AnyCancellable!
 
+        // This isn't used anywhere else so we can keep it here.
+        struct TimeoutError: Error {}
+
         cancellable = publisher
             .dropFirst()
-            .timeout(.seconds(Self.timeoutOnNetworkChanges), scheduler: DispatchQueue.main)
+            .mapError { _ -> TimeoutError in }
+            .timeout(.seconds(Self.timeoutOnNetworkChanges), scheduler: DispatchQueue.main, customError: TimeoutError.init)
             .sink(receiveCompletion: { [weak publisher] completion in
                 if case .failure = completion {
                     publisher?.send(.disconnected)
                 }
 
                 cancellable.cancel()
-            }, receiveValue: { _ in
+            }, receiveValue: { value in
                 cancellable.cancel()
             })
     }
