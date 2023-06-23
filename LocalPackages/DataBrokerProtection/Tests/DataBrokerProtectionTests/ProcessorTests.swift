@@ -26,7 +26,6 @@ final class ProcessorTests: XCTestCase {
 
         let config = MockSchedulerConfig()
 
-        let notificationCenter = NotificationCenter()
         let expectedExtractedProfiles = [ExtractedProfile]()
         let runner = MockRunner(optOutAction: nil,
                                 scanAction: nil,
@@ -35,35 +34,19 @@ final class ProcessorTests: XCTestCase {
         let runnerProvider = MockRunnerProvider(runner: runner)
         let scheduler = DataBrokerProtectionProcessor(database: database,
                                                       config: config,
-                                                      operationRunnerProvider: runnerProvider,
-                                                      notificationCenter: notificationCenter)
+                                                      operationRunnerProvider: runnerProvider)
 
         let expectation = XCTestExpectation(description: "All scans finished.")
 
-        scheduler.runScanOnAllDataBrokers()
-
-        var notificationCounter = 0
-        let numberOfExpectedScanOperations = 5
         let expectedScanDate = Date().addingTimeInterval(database.commonScheduleConfig.maintenanceScan)
 
-        let handler: (Notification) -> Bool = { notification in
-            notificationCounter += 1
-
-            if notificationCounter == numberOfExpectedScanOperations {
-                database.brokerProfileQueryDataList.forEach {
-                    XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: $0.scanData.preferredRunDate))
-                }
-                expectation.fulfill()
-
+        scheduler.runScanOnAllDataBrokers {
+            database.brokerProfileQueryDataList.forEach {
+                XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: $0.scanData.preferredRunDate))
             }
-            return true
+            expectation.fulfill()
         }
 
-        let notification = XCTNSNotificationExpectation(name: DataBrokerNotifications.didFinishScan,
-                                                        object: nil,
-                                                        notificationCenter: notificationCenter)
-
-        notification.handler = handler
         wait(for: [expectation], timeout: 15.0)
     }
 

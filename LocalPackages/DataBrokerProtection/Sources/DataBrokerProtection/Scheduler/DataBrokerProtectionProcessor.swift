@@ -43,18 +43,26 @@ final class DataBrokerProtectionProcessor {
     }
 
     // MARK: - Public functions
-    func runScanOnAllDataBrokers() {
-        // Run all data broker scans
+    func runScanOnAllDataBrokers(completion: (() -> Void)? = nil ) {
         operationQueue.cancelAllOperations()
-        runOperations(operationType: .scan, priorityDate: nil)
+        runOperations(operationType: .scan, priorityDate: nil) {
+            print("Done scans")
+            completion?()
+        }
     }
 
-    func runQueuedOperations() {
-        runOperations(operationType: .all, priorityDate: Date())
+    func runQueuedOperations(completion: (() -> Void)? = nil ) {
+        runOperations(operationType: .all, priorityDate: Date()) {
+            print("Done Queue operations")
+            completion?()
+        }
     }
 
     // MARK: - Private functions
-    private func runOperations(operationType: DataBrokerOperationsCollection.OperationType, priorityDate: Date?) {
+    private func runOperations(operationType: DataBrokerOperationsCollection.OperationType,
+                               priorityDate: Date?,
+                               completion: @escaping () -> Void) {
+
         let brokersProfileData = database.fetchAllBrokerProfileQueryData()
         let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
                                                                                   operationType: operationType,
@@ -62,6 +70,10 @@ final class DataBrokerProtectionProcessor {
 
         for collection in dataBrokerOperationCollections {
             operationQueue.addOperation(collection)
+        }
+
+        operationQueue.addBarrierBlock {
+            completion()
         }
     }
 

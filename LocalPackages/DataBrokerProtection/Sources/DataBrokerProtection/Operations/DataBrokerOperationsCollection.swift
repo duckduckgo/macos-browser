@@ -63,9 +63,9 @@ class DataBrokerOperationsCollection: Operation {
             return
         }
 
-        willChangeValue(forKey: "isExecuting")
+        willChangeValue(forKey: #keyPath(isExecuting))
         _isExecuting = true
-        didChangeValue(forKey: "isExecuting")
+        didChangeValue(forKey: #keyPath(isExecuting))
 
         main()
     }
@@ -145,14 +145,14 @@ class DataBrokerOperationsCollection: Operation {
     }
 
     private func finish() {
-        willChangeValue(forKey: "isExecuting")
-        willChangeValue(forKey: "isFinished")
+        willChangeValue(forKey: #keyPath(isExecuting))
+        willChangeValue(forKey: #keyPath(isFinished))
 
         _isExecuting = false
         _isFinished = true
         print("Operation \(id): done")
 
-        didChangeValue(forKey: "isExecuting")
-        didChangeValue(forKey: "isFinished")
+        didChangeValue(forKey: #keyPath(isExecuting))
+        didChangeValue(forKey: #keyPath(isFinished))
     }
 }

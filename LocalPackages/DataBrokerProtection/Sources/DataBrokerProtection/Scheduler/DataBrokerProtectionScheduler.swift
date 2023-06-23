@@ -19,5 +19,40 @@
 import Foundation
 
 class DataBrokerProtectionScheduler {
+    let activity: NSBackgroundActivityScheduler
+    lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
+        DataBrokerProtectionProcessor(database:DataBrokerProtectionDataBase() ,
+                                                      config: DataBrokerProtectionSchedulerConfig(),
+                                                      operationRunnerProvider: DataBrokerOperationRunnerProvider())
+    }()
+
+      init() {
+          let identifier = "com.dbp.duckduckgo"
+          activity = NSBackgroundActivityScheduler(identifier: identifier)
+          activity.repeats = true
+
+          // Scheduling an activity to fire between 15 and 45 minutes from now
+          activity.interval = 30 * 60
+          activity.tolerance = 15 * 60
+
+          activity.qualityOfService = QualityOfService.utility
+      }
+
+    public func start() {
+        activity.schedule { completion in
+            print("Running databroker processor...")
+            self.dataBrokerProcessor.runQueuedOperations {
+                completion(.finished)
+            }
+        }
+    }
+
+    public func stop() {
+        activity.invalidate()
+    }
+
+    public func scanAllBrokers() {
+        self.dataBrokerProcessor.runScanOnAllDataBrokers()
+    }
 }
