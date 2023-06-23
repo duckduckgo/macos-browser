@@ -70,24 +70,40 @@ final class EncryptionKeyStoreTests: XCTestCase {
         XCTAssertEqual(firstReadKey, secondReadKey)
     }
 
-    func testThatReadingKeyWhenThereIsOneAndIsEncryptionKeyResavedIsTrueWillReturnTheSameKeyAndKey() {
-        // set IsEncryptionKeyResaved to true
-        var userDefaults = UserDefaultsWrapper<Bool>(key: .isEncryptionKeyResaved, defaultValue: false)
-        userDefaults.wrappedValue = true
-        // Save key in base 64
+    func testThatIfWhenThereIsAKeySavedInRowFormatTheSameKeyIsReadInBase64() {
         let originalKey = generator.randomKey()
         let store = EncryptionKeyStore(generator: generator, account: account)
-        try? store.store(key: originalKey)
-        // Read key
+
+        try? storeWithOldMechanism(key: originalKey)
         let readKey = try? store.readKey()
 
-        // Check if it is the same key
         XCTAssertEqual(originalKey, readKey)
     }
 
     private func removeTestKeys() {
         let store = EncryptionKeyStore(generator: generator, account: account)
         try? store.deleteKey()
+    }
+
+    private func storeWithOldMechanism(key: SymmetricKey) throws {
+        var query = oldDefaultKeychainQueryAttributes
+        query[kSecAttrService as String] = EncryptionKeyStore.Constants.encryptionKeyService
+         query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlocked
+         query[kSecValueData as String] = key.dataRepresentation
+
+         let status = SecItemAdd(query as CFDictionary, nil)
+
+         guard status == errSecSuccess else {
+             throw EncryptionKeyStoreError.storageFailed(status)
+         }
+     }
+
+    private var oldDefaultKeychainQueryAttributes: [String: Any] {
+        return [
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrAccount: account,
+            kSecUseDataProtectionKeychain: true
+        ] as [String: Any]
     }
 
 }
