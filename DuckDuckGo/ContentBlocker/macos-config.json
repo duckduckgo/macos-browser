@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1687189415617,
+    "version": 1687434481633,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1089,6 +1089,10 @@
             "state": "enabled",
             "exceptions": [
                 {
+                    "domain": "foxnews.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
+                },
+                {
                     "domain": "strava.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/748"
                 },
@@ -1097,7 +1101,7 @@
                     "reason": "Video pauses at about 13-15 seconds in. Playing the video again results in a single frame rendering without progressing to the next frame."
                 }
             ],
-            "hash": "8d35648bb7862913ed30243074e6b6f1"
+            "hash": "7550837006dcfeed61c9dabcc0a0012c"
         },
         "cookie": {
             "settings": {
@@ -2845,12 +2849,28 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/988"
                 },
                 {
-                    "domain": "myaccount.google.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1023"
-                },
-                {
                     "domain": "natwest.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/851"
+                },
+                {
+                    "domain": "royalcaribbean.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1035"
+                },
+                {
+                    "domain": "concordgroupinsurance.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1035"
+                },
+                {
+                    "domain": "auto-owners.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1035"
+                },
+                {
+                    "domain": "aoins.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1035"
+                },
+                {
+                    "domain": "bell.ca",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1035"
                 },
                 {
                     "domain": "costco.com",
@@ -3419,7 +3439,7 @@
                     }
                 }
             },
-            "hash": "e1c85c0a311257d3142133b063a61cc6"
+            "hash": "435aa60f288c31636fa71f9714b42767"
         },
         "serviceworkerInitiatedRequests": {
             "exceptions": [],
@@ -3768,6 +3788,17 @@
                                     "aternos.org"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/328"
+                            }
+                        ]
+                    },
+                    "certona.net": {
+                        "rules": [
+                            {
+                                "rule": "edge1.certona.net/cd/dd7aa8af/www.asics.com/scripts/resonance.js",
+                                "domains": [
+                                    "asics.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1038"
                             }
                         ]
                     },
@@ -4477,12 +4508,13 @@
                                     "bbcgoodfood.com",
                                     "dailyherald.com",
                                     "emirates.com",
+                                    "garnethill.com",
                                     "iltalehti.fi",
                                     "kingarthurbaking.com",
                                     "pickfu.com",
                                     "rbcroyalbank.com"
                                 ],
-                                "reason": "ah.nl - 'Bonus offer' elements do not render and are not clickable.,aeromexico.com, al.com, bbcgoodfood.com - https://github.com/duckduckgo/privacy-configuration/issues/921,dailyherald.com - Article images render as grey boxes.,emirates.com - After filling out login details and clicking to proceed, a loading spinners shows on the proceed button and the login does not progress.,iltalehti.fi - Article video renders as a blank box.,kingarthurbaking.com - https://github.com/duckduckgo/privacy-configuration/issues/348,pickfu.com - https://github.com/duckduckgo/privacy-configuration/issues/346,rbcroyalbank.com - Investments page renders blank."
+                                "reason": "ah.nl - 'Bonus offer' elements do not render and are not clickable.,aeromexico.com, al.com, bbcgoodfood.com, garnethill.com - https://github.com/duckduckgo/privacy-configuration/issues/921,dailyherald.com - Article images render as grey boxes.,emirates.com - After filling out login details and clicking to proceed, a loading spinners shows on the proceed button and the login does not progress.,iltalehti.fi - Article video renders as a blank box.,kingarthurbaking.com - https://github.com/duckduckgo/privacy-configuration/issues/348,pickfu.com - https://github.com/duckduckgo/privacy-configuration/issues/346,rbcroyalbank.com - Investments page renders blank."
                             }
                         ]
                     },
@@ -4494,6 +4526,17 @@
                                     "wp.pl"
                                 ],
                                 "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                            }
+                        ]
+                    },
+                    "greylabeldelivery.com": {
+                        "rules": [
+                            {
+                                "rule": "tags.asics.com.greylabeldelivery.com",
+                                "domains": [
+                                    "asics.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/379"
                             }
                         ]
                     },
@@ -4731,6 +4774,17 @@
                                     "shein.com"
                                 ],
                                 "reason": "When attempting to create an account (after filling out registration form and clicking 'Register'), there is an 'access timed out' warning, and account creation does not proceed."
+                            }
+                        ]
+                    },
+                    "maxymiser.net": {
+                        "rules": [
+                            {
+                                "rule": "service.maxymiser.net",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1030"
                             }
                         ]
                     },
@@ -5281,6 +5335,17 @@
                             }
                         ]
                     },
+                    "tealiumiq.com": {
+                        "rules": [
+                            {
+                                "rule": "visitor-service-us-east-1.tealiumiq.com/asics/main/",
+                                "domains": [
+                                    "asics.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/379"
+                            }
+                        ]
+                    },
                     "theplatform.com": {
                         "rules": [
                             {
@@ -5651,6 +5716,17 @@
                                     "thetrainline.com"
                                 ],
                                 "reason": "CNAME ENTRY GENERATED FROM: datadome.co"
+                            }
+                        ]
+                    },
+                    "asics.com": {
+                        "rules": [
+                            {
+                                "rule": "tags.asics.com",
+                                "domains": [
+                                    "asics.com"
+                                ],
+                                "reason": "CNAME ENTRY GENERATED FROM: tags.asics.com.greylabeldelivery.com"
                             }
                         ]
                     },
@@ -13843,7 +13919,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "f352ada245966c90cdbe29e23a0d5a7d"
+            "hash": "35a22f069d974e69b9bdd7bf4e40a682"
         },
         "trackingCookies1p": {
             "settings": {
