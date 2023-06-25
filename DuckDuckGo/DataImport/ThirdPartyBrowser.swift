@@ -95,6 +95,7 @@ enum ThirdPartyBrowser: CaseIterable {
     var fallbackApplicationIcon: NSImage? {
         switch self {
         case .lastPass: return NSImage(named: "LastPassIcon")
+        case .onePassword8: return NSImage(named: "1PasswordIcon")
         case .onePassword7: return NSImage(named: "1PasswordIcon")
         default: return nil
         }

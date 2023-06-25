@@ -208,9 +208,9 @@ final class FileImportViewController: NSViewController {
                 switch importSource {
                 case .bookmarksHTML:
                     delegate?.fileImportViewController(self, didSelectBookmarksFileWithURL: selectedURL)
-                case .csv, .onePassword7, .lastPass, .safari:
+                case .csv, .onePassword8, .onePassword7, .lastPass, .safari:
                     delegate?.fileImportViewController(self, didSelectCSVFileWithURL: selectedURL)
-                default:
+                case .brave, .chrome, .edge, .firefox:
                     break
                 }
             } else {
