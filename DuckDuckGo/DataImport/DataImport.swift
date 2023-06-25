@@ -65,8 +65,14 @@ enum DataImport {
         }
 
         var canImportData: Bool {
-            let isInstalled = (ThirdPartyBrowser.browser(for: self)?.isInstalled ?? false)
-            return isInstalled || [.csv, .onePassword7, .lastPass, .bookmarksHTML].contains(self)
+            if ThirdPartyBrowser.browser(for: self)?.isInstalled ?? false {
+                return true
+            }
+
+            switch self {
+            case .csv, .onePassword8, .onePassword7, .lastPass, .bookmarksHTML: return true // Users can always import from exported files
+            case .brave, .chrome, .edge, .firefox, .safari: return false // Users can't import from browsers unless they're installed
+            }
         }
 
         var pixelEventSource: Pixel.Event.DataImportSource {
