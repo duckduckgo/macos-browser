@@ -24,12 +24,23 @@ public struct ProfileQuery: Encodable, Sendable {
     let city: String
     let state: String
     let age: Int
+    let fullName: String
+    let profileUrl: String?
+    let email: String?
 
-    public init(firstName: String, lastName: String, city: String, state: String, age: Int) {
+    public init(firstName: String,
+                lastName: String,
+                city: String,
+                state: String, age: Int,
+                profileUrl: String? = nil,
+                email: String? = nil) {
         self.firstName = firstName
         self.lastName = lastName
         self.city = city
         self.state = state
         self.age = age
+        self.fullName = "\(firstName) \(lastName)"
+        self.profileUrl = profileUrl
+        self.email = email
     }
 }

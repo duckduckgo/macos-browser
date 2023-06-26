@@ -1,5 +1,5 @@
 //
-//  NavigateAction.swift
+//  Click.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,14 +16,15 @@
 //  limitations under the License.
 //
 
-public struct NavigateAction: Action {
-    public let id: String = "navigate"
-    public let actionType: ActionType = .navigate
-    let url: String
-    let ageRange: [String]
+import Foundation
 
-    public init(url: String, ageRange: [String]) {
-        self.url = url
-        self.ageRange = ageRange
+public struct ClickAction: Action {
+    public let id: String = "click"
+    public let actionType: ActionType = .click
+
+    let elements: [PageElement]
+
+    public init(elements: [PageElement]) {
+        self.elements = elements
     }
 }

@@ -1,5 +1,5 @@
 //
-//  NavigateAction.swift
+//  FillForm.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,14 +16,27 @@
 //  limitations under the License.
 //
 
-public struct NavigateAction: Action {
-    public let id: String = "navigate"
-    public let actionType: ActionType = .navigate
-    let url: String
-    let ageRange: [String]
+import Foundation
 
-    public init(url: String, ageRange: [String]) {
-        self.url = url
-        self.ageRange = ageRange
+public struct PageElement: Codable, Sendable {
+    let type: String
+    let selector: String
+
+    public init(type: String, selector: String) {
+        self.type = type
+        self.selector = selector
+    }
+}
+
+public struct FillFormAction: Action {
+    public let id: String = "fillForm"
+    public let actionType: ActionType = .fillForm
+
+    let selector: String
+    let elements: [PageElement]
+
+    public init(selector: String, elements: [PageElement]) {
+        self.selector = selector
+        self.elements = elements
     }
 }
