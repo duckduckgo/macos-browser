@@ -129,7 +129,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
             let profiles = try await runner.scan(brokerProfileQueryData)
 
-            if profiles.count > 0 {
+            if !profiles.isEmpty {
                 profiles.forEach {
                     let event = HistoryEvent(type: .matchFound(extractedProfileID: $0.id))
                     brokerProfileQueryData.scanData.addHistoryEvent(event)
