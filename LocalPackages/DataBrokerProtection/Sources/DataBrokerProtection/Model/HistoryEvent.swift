@@ -21,11 +21,11 @@ import Foundation
 struct HistoryEvent: Sendable {
     enum EventType {
         case noMatchFound
-        case matchFound(profileID: UUID)
+        case matchFound(extractedProfileID: UUID)
         case error
-        case optOutStarted(profileID: UUID)
-        case optOutRequested(profileID: UUID)
-        case optOutConfirmed(profileID: UUID)
+        case optOutStarted(extractedProfileID: UUID)
+        case optOutRequested(extractedProfileID: UUID)
+        case optOutConfirmed(extractedProfileID: UUID)
         case scanStarted
     }
 
@@ -37,5 +37,23 @@ struct HistoryEvent: Sendable {
         self.id = UUID()
         self.date = Date()
         self.type = type
+    }
+}
+
+extension HistoryEvent.EventType: Equatable {
+    static func ==(lhs: HistoryEvent.EventType, rhs: HistoryEvent.EventType) -> Bool {
+        switch (lhs, rhs) {
+        case (.noMatchFound, .noMatchFound),
+             (.error, .error),
+             (.scanStarted, .scanStarted):
+            return true
+        case let (.matchFound(extractedProfileID: lhsProfileID), .matchFound(extractedProfileID: rhsProfileID)),
+             let (.optOutStarted(extractedProfileID: lhsProfileID), .optOutStarted(extractedProfileID: rhsProfileID)),
+             let (.optOutRequested(extractedProfileID: lhsProfileID), .optOutRequested(extractedProfileID: rhsProfileID)),
+             let (.optOutConfirmed(extractedProfileID: lhsProfileID), .optOutConfirmed(extractedProfileID: rhsProfileID)):
+            return lhsProfileID == rhsProfileID
+        default:
+            return false
+        }
     }
 }

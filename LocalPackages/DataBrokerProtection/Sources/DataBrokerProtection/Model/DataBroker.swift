@@ -18,27 +18,28 @@
 
 import Foundation
 
-struct DataBrokerScheduleConfig {
+public struct DataBrokerScheduleConfig {
     let emailConfirmation: TimeInterval
     let retryError: TimeInterval
-    let confirmScan: TimeInterval
+    let confirmOptOutScan: TimeInterval
+    let maintenanceScan: TimeInterval
 }
 
 public struct DataBroker: Encodable, Sendable {
+    let id = UUID()
     let name: String
     let steps: [Step]
-    let schedulingConfig: DataBrokerScheduleConfig = DataBrokerScheduleConfig(emailConfirmation: 10 * 60,
-                                                                              retryError: 48 * 60,
-                                                                              confirmScan: 72 * 60)
-
+    let schedulingConfig: DataBrokerScheduleConfig
+    
     enum CodingKeys: CodingKey {
         case name
         case steps
     }
 
-    public init(name: String, steps: [Step]) {
+    public init(name: String, steps: [Step], schedulingConfig: DataBrokerScheduleConfig) {
         self.name = name
         self.steps = steps
+        self.schedulingConfig = schedulingConfig
     }
 
     func scanStep() throws -> Step {
