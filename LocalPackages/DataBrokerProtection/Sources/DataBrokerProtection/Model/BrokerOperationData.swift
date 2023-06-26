@@ -18,13 +18,14 @@
 
 import Foundation
 
-protocol BrokerOperationData {
+internal protocol BrokerOperationData {
     var id: UUID { get }
     var brokerProfileQueryID: UUID { get }
     var preferredRunDate: Date? { get set }
     var historyEvents: [HistoryEvent] { get set }
     var lastRunDate: Date? { get set }
 
+    func lastEventWith(type: HistoryEvent.EventType) -> HistoryEvent?
     mutating func addHistoryEvent(_ historyEvent: HistoryEvent)
 }
 
@@ -35,6 +36,10 @@ extension BrokerOperationData {
 
     var lastRunDate: Date? {
         historyEvents.last?.date
+    }
+
+    func lastEventWith(type: HistoryEvent.EventType) -> HistoryEvent? {
+        return historyEvents.last(where: { $0.type == type })
     }
 }
 
@@ -47,7 +52,7 @@ public final class ScanOperationData: BrokerOperationData {
 
     internal init(id: UUID = UUID(),
                   brokerProfileQueryID: UUID,
-                  preferredRunDate: Date?,
+                  preferredRunDate: Date? = nil,
                   historyEvents: [HistoryEvent],
                   lastRunDate: Date? = nil) {
 
@@ -65,13 +70,12 @@ public final class OptOutOperationData: BrokerOperationData {
     let brokerProfileQueryID: UUID
     var preferredRunDate: Date?
     var historyEvents: [HistoryEvent]
-    var lastRunDate: Date?
-
+    var lastRunDate: Date? 
     var extractedProfile: ExtractedProfile
 
     internal init(id: UUID = UUID(),
                   brokerProfileQueryID: UUID,
-                  preferredRunDate: Date?,
+                  preferredRunDate: Date? = nil,
                   historyEvents: [HistoryEvent],
                   lastRunDate: Date? = nil,
                   extractedProfile: ExtractedProfile) {
