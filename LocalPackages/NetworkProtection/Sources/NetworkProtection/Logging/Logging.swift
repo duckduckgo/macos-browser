@@ -95,4 +95,5 @@ struct Logging {
 
     fileprivate static let networkProtectionSleepLoggingEnabled = true
     fileprivate static let networkProtectionSleepLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Sleep and Wake")
+
 }
