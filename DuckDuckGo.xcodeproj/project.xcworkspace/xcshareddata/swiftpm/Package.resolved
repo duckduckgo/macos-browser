@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "ade328a6d938ece5f21843818e55688e63c6fbba",
-        "version" : "62.0.1"
+        "branch" : "shane/ccf-duckplayer",
+        "revision" : "8cdfbb615d320e6e52ddae9409c103895b242552"
       }
     },
     {
@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "260329ad8021115235d64ddd76c24629f93a7212",
-        "version" : "4.21.1"
+        "revision" : "1b5548805ed1d5af4bb6432ea23890797540fbdd",
+        "version" : "4.22.1"
       }
     },
     {
