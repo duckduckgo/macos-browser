@@ -30,7 +30,7 @@ final class YoutubeOverlayUserScriptTests: XCTestCase {
     override func setUp() {
         persistor = DuckPlayerPreferencesPersistorMock()
         preferences = DuckPlayerPreferences(persistor: persistor)
-        youtubeOverlayUserScript = YoutubeOverlayUserScript(preferences: preferences)
+        youtubeOverlayUserScript = YoutubeOverlayUserScript(duckPlayerPreferences: preferences)
     }
 
     override func tearDown() {
@@ -39,23 +39,23 @@ final class YoutubeOverlayUserScriptTests: XCTestCase {
         youtubeOverlayUserScript = nil
     }
 
-    func testWhenHandleSendJSPixelWithForPlayUsePixelYoutubeOverlayUserPressedButtonsSetTrue() {
-        let message = MockMessage(messageBody: ["pixelName": "play.use"])
-        youtubeOverlayUserScript.handleSendJSPixel(message) { _ in }
+    @MainActor func testWhenHandleSendJSPixelWithForPlayUsePixelYoutubeOverlayUserPressedButtonsSetTrue() {
+        let message = MockMessage(messageBody: ["params": ["pixelName": "play.use"]])
+        _ = youtubeOverlayUserScript.handleSendJSPixel(params: ["something"], message: message)
 
         XCTAssertTrue(persistor.youtubeOverlayAnyButtonPressed)
     }
 
-    func testWhenHandleSendJSPixelWithForPlayDoNotUsePixelYoutubeOverlayUserPressedButtonsSetTrue() {
-        let message = MockMessage(messageBody: ["pixelName": "play.do_not_use"])
-        youtubeOverlayUserScript.handleSendJSPixel(message) { _ in }
+    @MainActor func testWhenHandleSendJSPixelWithForPlayDoNotUsePixelYoutubeOverlayUserPressedButtonsSetTrue() {
+        let message = MockMessage(messageBody: ["params": ["pixelName": "play.do_not_use"]])
+        _ = youtubeOverlayUserScript.handleSendJSPixel(params: ["something"], message: message)
 
         XCTAssertTrue(persistor.youtubeOverlayAnyButtonPressed)
     }
 
-    func testWhenHandleSendJSPixelWithForPlayOverlayPixelYoutubeOverlayUserPressedButtonsNotSet() {
-        let message = MockMessage(messageBody: ["pixelName": "overlay"])
-        youtubeOverlayUserScript.handleSendJSPixel(message) { _ in }
+    @MainActor func testWhenHandleSendJSPixelWithForPlayOverlayPixelYoutubeOverlayUserPressedButtonsNotSet() {
+        let message = MockMessage(messageBody: ["params": ["pixelName": "overlay"]])
+        _ = youtubeOverlayUserScript.handleSendJSPixel(params: ["something"], message: message)
 
         XCTAssertFalse(persistor.youtubeOverlayAnyButtonPressed)
     }

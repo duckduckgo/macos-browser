@@ -105,11 +105,11 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
 extension YoutubeOverlayUserScript {
     @MainActor
     func handleSendJSPixel(params: Any, message: UserScriptMessage) -> Encodable? {
-        guard let body = message.messageBody as? [String: Any], let params = body["params"] as? [String: Any] else {
+        guard let body = message.messageBody as? [String: Any], let parameters = body["params"] as? [String: Any] else {
             return nil
         }
-        let message = params["pixelName"] as? String
-        if message == "play.use" || message == "play.do_not_use" {
+        let pixelName = parameters["pixelName"] as? String
+        if pixelName == "play.use" || pixelName == "play.do_not_use" {
             duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
         }
 
@@ -117,7 +117,7 @@ extension YoutubeOverlayUserScript {
         if !Pixel.isNewUser {
             return nil
         }
-        if message == "play.use" {
+        if pixelName == "play.use" {
             let repetition = Pixel.Event.Repetition(key: Pixel.Event.watchInDuckPlayerInitial.name)
             if repetition == .initial {
                 Pixel.fire(.watchInDuckPlayerInitial)
