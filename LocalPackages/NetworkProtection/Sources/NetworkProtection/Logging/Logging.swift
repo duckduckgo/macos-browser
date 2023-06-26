@@ -84,15 +84,15 @@ struct Logging {
     fileprivate static let networkProtectionKeyManagementLoggingEnabled = false
     fileprivate static let networkProtectionKeyManagement: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Key Management")
 
-    fileprivate static let networkProtectionMemoryLoggingEnabled = true
+    fileprivate static let networkProtectionMemoryLoggingEnabled = false
     fileprivate static let networkProtectionMemoryLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Memory")
 
     fileprivate static let networkProtectionPixelLoggingEnabled = false
     fileprivate static let networkProtectionPixel: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Pixel")
 
-    fileprivate static let networkProtectionStatusReporterLoggingEnabled = true
+    fileprivate static let networkProtectionStatusReporterLoggingEnabled = false
     fileprivate static let networkProtectionStatusReporterLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Status Reporter")
 
-    fileprivate static let networkProtectionSleepLoggingEnabled = true
+    fileprivate static let networkProtectionSleepLoggingEnabled = false
     fileprivate static let networkProtectionSleepLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Sleep and Wake")
 }
