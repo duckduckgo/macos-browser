@@ -94,6 +94,14 @@ public final class ConnectionStatusTransitionAwaiter {
                 return
             }
 
+            // Even if we didn't reach the target status, the transition may be in a status
+            // that is acceptable (ie: the target status is "connected" and the current status
+            // is "connecting" is a good thing, same for "disconnected" and "disconnecting").
+            //
+            // When this is the case we'll extend the allowed waiting time, as we want to make
+            // sure the toggle stays locked until the OS updates to another state that lets the
+            // toggle be unlocked.
+            //
             if targetStatus.acceptsIntermediateStatus(currentStatus) {
                 // We have a valid intermediate status, let's wait more
                 continue
