@@ -129,16 +129,16 @@ final class FirePopoverViewModel {
                     return Set<String>()
                 }
 
-                return tab.localHistory
+                return tab.localHistoryDomains
             case .currentWindow:
                 guard let tabCollectionViewModel = tabCollectionViewModel else {
                     return []
                 }
 
-                return tabCollectionViewModel.localHistory
+                return tabCollectionViewModel.localHistoryDomains
             case .allData:
                 return (historyCoordinating.history?.visitedDomains(tld: tld) ?? Set<String>())
-                    .union(tabCollectionViewModel?.localHistory ?? Set<String>())
+                    .union(tabCollectionViewModel?.localHistoryDomains ?? Set<String>())
             }
         }
 
@@ -230,7 +230,7 @@ final class FirePopoverViewModel {
         let otherTabs = allTabs.filter({ $0 != selectedTab })
 
         let otherTabsLocalHistory = otherTabs.reduce(Set<String>()) { result, tab in
-            return result.union(tab.localHistory)
+            return result.union(tab.localHistoryDomains)
         }
 
         areOtherTabsInfluenced = !otherTabsLocalHistory.isDisjoint(with: selectedDomains)
@@ -260,7 +260,7 @@ final class FirePopoverViewModel {
             fireViewModel.fire.burnEntity(entity: burningEntity)
 
         case (.allData, true):
-            fireViewModel.fire.burnAll(eraseFullHistory: false)
+            fireViewModel.fire.burnAll()
 
         case (.allData, false):
             fireViewModel.fire.burnEntity(entity: .allWindows(mainWindowControllers: WindowControllersManager.shared.mainWindowControllers,

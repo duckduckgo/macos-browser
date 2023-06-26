@@ -691,11 +691,19 @@ extension TabCollectionViewModel {
 }
 
 extension TabCollectionViewModel {
-    var localHistory: Set<String> {
+    var localHistory: [Visit] {
         var history = tabCollection.localHistory
         if let pinnedTabsHistory = pinnedTabsCollection?.localHistory {
-            history.formUnion(pinnedTabsHistory)
+            history = history + pinnedTabsHistory
         }
         return history
+    }
+
+    var localHistoryDomains: Set<String> {
+        var historyDomains = tabCollection.localHistoryDomains
+        if let pinnedTabsHistoryDomains = pinnedTabsCollection?.localHistoryDomains {
+            historyDomains.formUnion(pinnedTabsHistoryDomains)
+        }
+        return historyDomains
     }
 }

@@ -140,11 +140,13 @@ final class TabCollection: NSObject {
 
     // MARK: - Fire button
 
-    // Visited domains of removed tabs used for fire button logic
-    var localHistoryOfRemovedTabs = Set<String>()
+    // Visits of removed tabs used for fire button logic
+    var localHistoryOfRemovedTabs = [Visit]()
 
     private func keepLocalHistory(of tab: Tab) {
-        localHistoryOfRemovedTabs.formUnion(tab.localHistory)
+        for visit in tab.localHistory where !localHistoryOfRemovedTabs.contains(visit) {
+            localHistoryOfRemovedTabs.append(visit)
+        }
     }
 
 }

@@ -28,7 +28,7 @@ protocol HistoryCoordinating: AnyObject {
     var history: History? { get }
     var historyDictionaryPublisher: Published<[URL: HistoryEntry]?>.Publisher { get }
 
-    func addVisit(of url: URL)
+    func addVisit(of url: URL) -> Visit?
     func addBlockedTracker(entityName: String, on url: URL)
     func trackerFound(on: URL)
     func updateTitleIfNeeded(title: String, url: URL)
@@ -38,7 +38,6 @@ protocol HistoryCoordinating: AnyObject {
     func title(for url: URL) -> String?
 
     func burnAll(completion: @escaping () -> Void)
-    func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void)
     func burnDomains(_ baseDomains: Set<String>, tld: TLD, completion: @escaping () -> Void)
     func burnVisits(_ visits: [Visit], completion: @escaping () -> Void)
 
@@ -80,17 +79,18 @@ final class HistoryCoordinator: HistoryCoordinating {
 
     private var cancellables = Set<AnyCancellable>()
 
-    func addVisit(of url: URL) {
+    func addVisit(of url: URL) -> Visit? {
         guard let historyDictionary = historyDictionary else {
             os_log("Visit of %s ignored", log: .history, url.absoluteString)
-            return
+            return nil
         }
 
         let entry = historyDictionary[url] ?? HistoryEntry(url: url)
-        entry.addVisit()
+        let visit = entry.addVisit()
         entry.failedToLoad = false
 
         self.historyDictionary?[url] = entry
+        return visit
     }
 
     func addBlockedTracker(entityName: String, on url: URL) {
@@ -157,18 +157,6 @@ final class HistoryCoordinator: HistoryCoordinating {
         guard let historyDictionary = historyDictionary else { return }
 
         let entries = Array(historyDictionary.values)
-
-        removeEntries(entries, completionHandler: { _ in
-            completion()
-        })
-    }
-
-    func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
-        guard let historyDictionary = historyDictionary else { return }
-
-        let entries: [HistoryEntry] = historyDictionary.values.filter { historyEntry in
-            return !fireproofDomains.isURLFireproof(url: historyEntry.url)
-        }
 
         removeEntries(entries, completionHandler: { _ in
             completion()

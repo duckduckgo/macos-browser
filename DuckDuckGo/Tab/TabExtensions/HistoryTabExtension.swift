@@ -27,7 +27,7 @@ final class HistoryTabExtension: NSObject {
     private let historyCoordinating: HistoryCoordinating
     private let isBurner: Bool
 
-    private(set) var localHistory = Set<String>()
+    private(set) var localHistory = [Visit]()
     private var cancellables = Set<AnyCancellable>()
 
     private var url: URL? {
@@ -97,11 +97,9 @@ final class HistoryTabExtension: NSObject {
         }
 
         // Add to global history
-        historyCoordinating.addVisit(of: url)
-
-        // Add to local history
-        if let host = url.host?.droppingWwwPrefix(), !host.isEmpty {
-            localHistory.insert(host)
+        if let visit = historyCoordinating.addVisit(of: url) {
+            // Add to local history
+            localHistory.append(visit)
         }
 
         self.visitState = .added
@@ -138,12 +136,29 @@ extension HistoryTabExtension: NSCodingExtension {
     }
 
     func awakeAfter(using decoder: NSCoder) {
-        let visitedDomains = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
-        self.localHistory = Set(visitedDomains)
+        let visitUUIDStrings = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
+        let visitUUIDs = visitUUIDStrings
+        //TODO! WHen history loads, append visits to localHistory
+//        assert(historyCoordinating.history != nil)
+//
+//
+//        let entries = historyCoordinating.history!
+//        let allVisits = entries.flatMap { entry in
+//            Array(entry.visits)
+//        }
+//
+//        let visits = visitUUIDs.compactMap { uuid in
+//            allVisits.first { visit in
+//                uuid == visit.identifier?.uuidString
+//            }
+//        }
+//
+//        self.localHistory = visits
     }
 
     func encode(using coder: NSCoder) {
-        coder.encode(Array(localHistory), forKey: NSSecureCodingKeys.visitedDomains)
+        let ids = localHistory.compactMap { $0.identifier?.uuidString }
+        coder.encode(ids, forKey: NSSecureCodingKeys.visitedDomains)
     }
 
 }
@@ -202,7 +217,7 @@ extension HistoryTabExtension: NavigationResponder {
 }
 
 protocol HistoryExtensionProtocol: AnyObject, NavigationResponder {
-    var localHistory: Set<String> { get }
+    var localHistory: [Visit] { get }
 }
 
 extension HistoryTabExtension: HistoryExtensionProtocol, TabExtension {
@@ -214,7 +229,19 @@ extension TabExtensions {
 }
 
 extension Tab {
-    var localHistory: Set<String> {
+
+    var localHistory: [Visit] {
         self.history?.localHistory ?? []
     }
+
+    var localHistoryDomains: Set<String> {
+        var localHistoryDomains = Set<String>()
+        for visit in localHistory {
+            if let host = visit.historyEntry?.url.host {
+                localHistoryDomains.insert(host)
+            }
+        }
+        return localHistoryDomains
+    }
+
 }

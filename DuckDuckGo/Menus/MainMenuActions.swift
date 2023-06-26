@@ -533,7 +533,7 @@ extension MainViewController {
             guard case .alertFirstButtonReturn = response, let self = self else {
                 return
             }
-            FireCoordinator.fireViewModel.fire.burnAll(eraseFullHistory: true)
+            FireCoordinator.fireViewModel.fire.burnAll()
         })
     }
 
@@ -668,7 +668,7 @@ extension MainViewController {
         WindowsManager.closeWindows(except: view.window)
 
         tabCollectionViewModel.append(tabs: otherTabs)
-        tabCollectionViewModel.tabCollection.localHistoryOfRemovedTabs.formUnion(otherLocalHistoryOfRemovedTabs)
+        tabCollectionViewModel.tabCollection.localHistoryOfRemovedTabs += otherLocalHistoryOfRemovedTabs
     }
 
     // MARK: - Edit
