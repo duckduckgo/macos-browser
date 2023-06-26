@@ -2278,7 +2278,7 @@
 		4B17E2D3287380390003BD39 /* PersistentAppInterfaceSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentAppInterfaceSettings.swift; sourceTree = "<group>"; };
 		4B18E3232A1D32B1005D0AAA /* NetworkProtectionStartVPN.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = NetworkProtectionStartVPN.xcconfig; path = Configuration/App/NetworkProtection/NetworkProtectionStartVPN.xcconfig; sourceTree = SOURCE_ROOT; };
 		4B18E3252A1D3581005D0AAA /* NetworkProtectionStopVPN.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = NetworkProtectionStopVPN.xcconfig; path = Configuration/App/NetworkProtection/NetworkProtectionStopVPN.xcconfig; sourceTree = SOURCE_ROOT; };
-		4B18E3272A1D3896005D0AAA /* NetworkProtectionStartStopVPNBase.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionStartStopVPNBase.xcconfig; sourceTree = "<group>"; };
+		4B18E3272A1D3896005D0AAA /* NetworkProtectionVPNHelpersBase.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionVPNHelpersBase.xcconfig; sourceTree = "<group>"; };
 		4B1AD89D25FC27E200261379 /* Integration Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Integration Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B1AD8A125FC27E200261379 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4B1AD91625FC46FB00261379 /* CoreDataEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEncryptionTests.swift; sourceTree = "<group>"; };
@@ -2543,6 +2543,8 @@
 		7B5291892A169BC90022E406 /* NetworkProtectionDeveloperID.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionDeveloperID.xcconfig; sourceTree = "<group>"; };
 		7B736E5F2A4A22B700F9922A /* enableOnDemand.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = enableOnDemand.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B736E692A4A22DD00F9922A /* disableOnDemand.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = disableOnDemand.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7B9459632A4A5BAF0012535A /* NetworkProtectionEnableOnDemand.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionEnableOnDemand.xcconfig; sourceTree = "<group>"; };
+		7B9459642A4A5BAF0012535A /* NetworkProtectionDisableOnDemand.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionDisableOnDemand.xcconfig; sourceTree = "<group>"; };
 		7BB108572A43375D000AB95F /* PFMoveApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFMoveApplication.h; sourceTree = "<group>"; };
 		7BB108582A43375D000AB95F /* PFMoveApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFMoveApplication.m; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
@@ -3781,7 +3783,9 @@
 				4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */,
 				4B2D064D2A11D04000DE1F49 /* DuckDuckGoAgentAppStore.xcconfig */,
 				4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */,
-				4B18E3272A1D3896005D0AAA /* NetworkProtectionStartStopVPNBase.xcconfig */,
+				7B9459642A4A5BAF0012535A /* NetworkProtectionDisableOnDemand.xcconfig */,
+				7B9459632A4A5BAF0012535A /* NetworkProtectionEnableOnDemand.xcconfig */,
+				4B18E3272A1D3896005D0AAA /* NetworkProtectionVPNHelpersBase.xcconfig */,
 				4B18E3232A1D32B1005D0AAA /* NetworkProtectionStartVPN.xcconfig */,
 				4B18E3252A1D3581005D0AAA /* NetworkProtectionStopVPN.xcconfig */,
 			);
@@ -9700,56 +9704,56 @@
 		};
 		7B736E5B2A4A22B700F9922A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B18E3252A1D3581005D0AAA /* NetworkProtectionStopVPN.xcconfig */;
+			baseConfigurationReference = 7B9459632A4A5BAF0012535A /* NetworkProtectionEnableOnDemand.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
 		};
 		7B736E5C2A4A22B700F9922A /* CI */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B18E3252A1D3581005D0AAA /* NetworkProtectionStopVPN.xcconfig */;
+			baseConfigurationReference = 7B9459632A4A5BAF0012535A /* NetworkProtectionEnableOnDemand.xcconfig */;
 			buildSettings = {
 			};
 			name = CI;
 		};
 		7B736E5D2A4A22B700F9922A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B18E3252A1D3581005D0AAA /* NetworkProtectionStopVPN.xcconfig */;
+			baseConfigurationReference = 7B9459632A4A5BAF0012535A /* NetworkProtectionEnableOnDemand.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
 		};
 		7B736E5E2A4A22B700F9922A /* Review */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B18E3252A1D3581005D0AAA /* NetworkProtectionStopVPN.xcconfig */;
+			baseConfigurationReference = 7B9459632A4A5BAF0012535A /* NetworkProtectionEnableOnDemand.xcconfig */;
 			buildSettings = {
 			};
 			name = Review;
 		};
 		7B736E652A4A22DD00F9922A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B18E3252A1D3581005D0AAA /* NetworkProtectionStopVPN.xcconfig */;
+			baseConfigurationReference = 7B9459642A4A5BAF0012535A /* NetworkProtectionDisableOnDemand.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
 		};
 		7B736E662A4A22DD00F9922A /* CI */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B18E3252A1D3581005D0AAA /* NetworkProtectionStopVPN.xcconfig */;
+			baseConfigurationReference = 7B9459642A4A5BAF0012535A /* NetworkProtectionDisableOnDemand.xcconfig */;
 			buildSettings = {
 			};
 			name = CI;
 		};
 		7B736E672A4A22DD00F9922A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B18E3252A1D3581005D0AAA /* NetworkProtectionStopVPN.xcconfig */;
+			baseConfigurationReference = 7B9459642A4A5BAF0012535A /* NetworkProtectionDisableOnDemand.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
 		};
 		7B736E682A4A22DD00F9922A /* Review */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B18E3252A1D3581005D0AAA /* NetworkProtectionStopVPN.xcconfig */;
+			baseConfigurationReference = 7B9459642A4A5BAF0012535A /* NetworkProtectionDisableOnDemand.xcconfig */;
 			buildSettings = {
 			};
 			name = Review;
