@@ -196,7 +196,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
 #if NETP_SYSTEM_EXTENSION
-
     /// - Returns: `true` if the system extension and the background agent were activated successfully
     ///
     private func ensureSystemExtensionIsActivated() async throws -> Bool {
