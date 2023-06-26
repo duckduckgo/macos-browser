@@ -37,14 +37,12 @@ public struct Item: Codable, Sendable {
 }
 
 public struct ExpectationAction: Action {
-    public var id: String = "expectaction"
-    public var actionType: ActionType = .expectation
+    public let id: String = "expectaction"
+    public let actionType: ActionType = .expectation
 
     let expectations: [Item]
 
-    public init(id: String, actionType: ActionType, expectations: [Item]) {
-        self.id = id
-        self.actionType = actionType
+    public init(expectations: [Item]) {
         self.expectations = expectations
     }
 }

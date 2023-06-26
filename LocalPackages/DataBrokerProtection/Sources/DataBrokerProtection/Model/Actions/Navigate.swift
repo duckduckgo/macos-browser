@@ -17,14 +17,12 @@
 //
 
 public struct NavigateAction: Action {
-    public var id: String = "navigate"
-    public var actionType: ActionType = .navigate
+    public let id: String = "navigate"
+    public let actionType: ActionType = .navigate
     let url: String
     let ageRange: [String]
 
-    public init(id: String, actionType: ActionType, url: String, ageRange: [String]) {
-        self.id = id
-        self.actionType = actionType
+    public init(url: String, ageRange: [String]) {
         self.url = url
         self.ageRange = ageRange
     }

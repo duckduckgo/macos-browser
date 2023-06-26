@@ -35,17 +35,19 @@ public struct State: Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(profileData, forKey: .profileData)
-        if let navigateAction = action as? NavigateAction {
+
+        switch action {
+        case let navigateAction as NavigateAction:
             try container.encode(navigateAction, forKey: .action)
-        } else if let extractAction = action as? ExtractAction {
+        case let extractAction as ExtractAction:
             try container.encode(extractAction, forKey: .action)
-        } else if let fillFormAction = action as? FillFormAction {
+        case let fillFormAction as FillFormAction:
             try container.encode(fillFormAction, forKey: .action)
-        } else if let clickAction = action as? ClickAction {
+        case let clickAction as ClickAction:
             try container.encode(clickAction, forKey: .action)
-        } else if let expectationAction = action as? ExpectationAction {
+        case let expectationAction as ExpectationAction:
             try container.encode(expectationAction, forKey: .action)
-        } else {
+        default:
             assertionFailure("Action not found. Please add the missing action to the encoding list.")
         }
     }

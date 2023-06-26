@@ -17,14 +17,12 @@
 //
 
 public struct ExtractAction: Action {
-    public var id: String = "extract"
-    public var actionType: ActionType = .extract
+    public let id: String = "extract"
+    public let actionType: ActionType = .extract
     let selector: String
     let profile: ExtractedProfile
 
-    public init(id: String, actionType: ActionType, selector: String, profile: ExtractedProfile) {
-        self.id = id
-        self.actionType = actionType
+    public init(selector: String, profile: ExtractedProfile) {
         self.selector = selector
         self.profile = profile
     }

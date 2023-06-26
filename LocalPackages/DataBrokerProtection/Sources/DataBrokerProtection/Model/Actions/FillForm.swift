@@ -29,15 +29,13 @@ public struct PageElement: Codable, Sendable {
 }
 
 public struct FillFormAction: Action {
-    public var id: String = "fillForm"
-    public var actionType: ActionType = .fillForm
+    public let id: String = "fillForm"
+    public let actionType: ActionType = .fillForm
 
     let selector: String
     let elements: [PageElement]
 
-    public init(id: String, actionType: ActionType, selector: String, elements: [PageElement]) {
-        self.id = id
-        self.actionType = actionType
+    public init(selector: String, elements: [PageElement]) {
         self.selector = selector
         self.elements = elements
     }
