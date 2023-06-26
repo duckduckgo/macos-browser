@@ -208,6 +208,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 return true
             case .willActivateAfterReboot:
                 controllerErrorStore.lastErrorMessage = "Please reboot to activate Network Protection"
+                return false
             }
         }
 
