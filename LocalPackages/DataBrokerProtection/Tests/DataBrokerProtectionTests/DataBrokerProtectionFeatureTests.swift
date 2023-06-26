@@ -62,10 +62,9 @@ final class DataBrokerProtectionFeatureTests: XCTestCase {
 
         sut.parseActionCompleted(params: params)
 
-        // TODO: Fix this
-//        XCTAssertNil(mockCSSDelegate.lastError)
-//        XCTAssertNotNil(mockCSSDelegate.profiles)
-//        XCTAssertEqual(mockCSSDelegate.profiles?.count, 2)
+        XCTAssertNil(mockCSSDelegate.lastError)
+        XCTAssertNotNil(mockCSSDelegate.profiles)
+        XCTAssertEqual(mockCSSDelegate.profiles?.count, 2)
     }
 
     func testWhenUnknownActionIsParsed_thenDelegateSendsParsingError() {
