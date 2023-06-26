@@ -196,22 +196,17 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
 #if NETP_SYSTEM_EXTENSION
-    /// Static var to request that the extension is replaced the first time we activate it.  Will only be unset when the extension is
-    /// successfully activated.
-    ///
-    private static var replaceExtension = true
 
     /// - Returns: `true` if the system extension and the background agent were activated successfully
     ///
     private func ensureSystemExtensionIsActivated() async throws -> Bool {
         var activated = false
 
-        for try await event in SystemExtensionManager().activate(replace: Self.replaceExtension) {
+        for try await event in SystemExtensionManager().activate() {
             switch event {
             case .waitingForUserApproval:
                 self.controllerErrorStore.lastErrorMessage = "Go to Security & Privacy in System Settings to allow Network Protection to activate"
             case .activated:
-                Self.replaceExtension = false
                 self.controllerErrorStore.lastErrorMessage = nil
                 activated = true
             case .willActivateAfterReboot:
@@ -263,7 +258,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
             os_log(.error, log: .networkProtection, "🟢 checking login agents")
             for item in Self.loginItems {
-                guard !item.isToggleOn && (condition.shouldIgnoreItemStatus || item.status.isEnabled) else {
+                guard !item.isRunning && (condition.shouldIgnoreItemStatus || item.status.isEnabled) else {
                     os_log(.error, log: .networkProtection, "🟢 %{public}s: ok", item.debugDescription)
                     continue
                 }
