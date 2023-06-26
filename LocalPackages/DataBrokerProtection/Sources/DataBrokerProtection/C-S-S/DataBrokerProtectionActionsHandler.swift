@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-internal class DataBrokerProtectionActionsHandler {
+public final class DataBrokerProtectionActionsHandler {
     private var lastExecutedActionIndex: Int?
 
     let step: Step

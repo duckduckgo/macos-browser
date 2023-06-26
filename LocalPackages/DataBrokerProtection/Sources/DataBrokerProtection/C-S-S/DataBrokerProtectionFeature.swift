@@ -21,9 +21,10 @@ import WebKit
 import BrowserServicesKit
 import UserScript
 
-protocol CSSCommunicationDelegate: AnyObject {
+public protocol CSSCommunicationDelegate: AnyObject {
     func loadURL(url: URL)
     func extractedProfiles(profiles: [ExtractedProfile])
+    func success(actionId: String)
     func onError(error: DataBrokerProtectionError)
 }
 
@@ -92,6 +93,8 @@ struct DataBrokerProtectionFeature: Subfeature {
             }
         case .extract(let profiles):
             delegate?.extractedProfiles(profiles: profiles)
+        case .fillForm, .click, .expectation:
+            delegate?.success(actionId: success.actionID)
         default: return
         }
     }
