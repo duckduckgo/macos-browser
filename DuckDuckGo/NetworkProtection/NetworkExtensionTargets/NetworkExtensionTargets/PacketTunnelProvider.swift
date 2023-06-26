@@ -437,7 +437,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         // when activated by system "on-demand" the option is set
         let isOnDemand = options?["is-on-demand"] as? Bool == true
         let isActivatedFromSystemSettings = options?["activationAttemptId"] == nil && !isOnDemand
-        let activatedFromApp = options?["activationAttemptId"] != nil
 
         let internalCompletionHandler = { (error: Error?) in
             if error != nil {
@@ -455,13 +454,12 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 }
             }
 
-            if activatedFromApp {
+            if !isOnDemand {
                 Task {
                     // This completion handler signals a coorect connection.  We want to signal this before turning
                     // on-demand ON so that it won't interfere with the current connection.
                     completionHandler(error)
 
-                    os_log("Enabling on demand", log: .networkProtection)
                     await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .enableOnDemand)
                     return
                 }
