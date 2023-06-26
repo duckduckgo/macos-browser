@@ -111,6 +111,14 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
            data.preferredRunDate = date
        }
    }
+
+    private func handleOperationError(brokerProfileQuery: BrokerProfileQueryData, operationData: BrokerOperationData, error: Error) {
+        let event = HistoryEvent(type: .error)
+        brokerProfileQuery.addHistoryEvent(event, for: operationData)
+        //TODO: Send error pixel
+        print("ERROR \(error)")
+    }
+
     // If the last time we removed the profile has a bigger time difference than the current date + maintenance we should schedule for a new optout
     private func shouldScheduleNewOptOut(operationData: OptOutOperationData,
                                          brokerProfileQueryData: BrokerProfileQueryData) -> Bool {
@@ -154,9 +162,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             brokerProfileQueryData.updateExtractedProfiles(profiles)
 
         } catch {
-            let event = HistoryEvent(type: .error)
-            brokerProfileQueryData.addHistoryEvent(event, for: brokerProfileQueryData.scanData)
-            print("ERROR \(error)")
+            handleOperationError(brokerProfileQuery: brokerProfileQueryData,
+                                 operationData: brokerProfileQueryData.scanData,
+                                 error: error)
             throw error
         }
     }
@@ -199,9 +207,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             let event = HistoryEvent(type: .optOutRequested(extractedProfileID: extractedProfile.id))
             brokerProfileQueryData.addHistoryEvent(event, for: data)
         } catch {
-            let event = HistoryEvent(type: .error)
-            brokerProfileQueryData.addHistoryEvent(event, for: data)
-            print("ERROR \(error)")
+            handleOperationError(brokerProfileQuery: brokerProfileQueryData,
+                                 operationData: data,
+                                 error: error)
             throw error
         }
 
