@@ -44,6 +44,8 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("DuckDuckGo Notifications.app", .unknown),
         .init("startVPN.app", .unknown),
         .init("stopVPN.app", .unknown),
+        .init("enableOnDemand.app", .unknown),
+        .init("disableOnDemand.app", .unknown),
         .init("PFMoveApplication.m", .source)
     ],
 

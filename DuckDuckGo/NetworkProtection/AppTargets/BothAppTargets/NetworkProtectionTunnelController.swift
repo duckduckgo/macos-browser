@@ -162,7 +162,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }()
 
         // reconnect on reboot
-        tunnelManager.isOnDemandEnabled = true
         tunnelManager.onDemandRules = [NEOnDemandRuleConnect(interfaceType: .any)]
     }
 
@@ -372,6 +371,22 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         default:
             break
         }
+    }
+
+    // MARK: - On Demand
+
+    func enableOnDemand() async throws {
+        let manager = try await loadOrMakeTunnelManager()
+
+        manager.isOnDemandEnabled = true
+        try await manager.saveToPreferences()
+    }
+
+    func disableOnDemand() async throws {
+        let manager = try await loadOrMakeTunnelManager()
+
+        manager.isOnDemandEnabled = false
+        try await manager.saveToPreferences()
     }
 
     // MARK: - Debug commands for the extension

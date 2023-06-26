@@ -62,6 +62,32 @@ final class AppMain {
             }
 
             dispatchMain()
+        case "enableOnDemand":
+            swizzleMainBundle()
+
+            Task {
+                do {
+                    try await NetworkProtectionTunnelController().enableOnDemand()
+                    exit(0)
+                } catch {
+                    fatalError("Could not enable on demand due to error: \(String(describing: error))")
+                }
+            }
+
+            dispatchMain()
+        case "disableOnDemand":
+            swizzleMainBundle()
+
+            Task {
+                do {
+                    try await NetworkProtectionTunnelController().disableOnDemand()
+                    exit(0)
+                } catch {
+                    fatalError("Could not disable on demand due to error: \(String(describing: error))")
+                }
+            }
+
+            dispatchMain()
         default:
             break
         }
