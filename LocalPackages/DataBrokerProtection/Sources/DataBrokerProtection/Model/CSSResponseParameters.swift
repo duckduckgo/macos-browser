@@ -25,6 +25,9 @@ struct NavigateResponse: Decodable {
 enum CSSSuccessData {
     case navigate(NavigateResponse)
     case extract([ExtractedProfile])
+    case fillForm
+    case click
+    case expectation
 }
 
 struct CSSSuccessResponse: Decodable {
@@ -48,6 +51,12 @@ struct CSSSuccessResponse: Decodable {
             self.response = .navigate(try container.decode(NavigateResponse.self, forKey: .response))
         case .extract:
             self.response = .extract(try container.decode([ExtractedProfile].self, forKey: .response))
+        case .fillForm:
+            self.response = .fillForm
+        case .click:
+            self.response = .click
+        case .expectation:
+            self.response = .expectation
         }
     }
 }
