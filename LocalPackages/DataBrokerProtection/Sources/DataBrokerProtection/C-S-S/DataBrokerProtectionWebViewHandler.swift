@@ -22,7 +22,7 @@ import BrowserServicesKit
 import UserScript
 
 @MainActor
-internal class DataBrokerProtectionWebViewHandler: NSObject {
+public final class DataBrokerProtectionWebViewHandler: NSObject {
     private var activeContinuation: CheckedContinuation<Void, Error>?
 
     let webViewConfiguration: WKWebViewConfiguration
@@ -95,15 +95,15 @@ internal class DataBrokerProtectionWebViewHandler: NSObject {
 
 extension DataBrokerProtectionWebViewHandler: WKNavigationDelegate {
 
-    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+    public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
     }
 
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.activeContinuation?.resume()
         self.activeContinuation = nil
     }
 
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         self.activeContinuation?.resume(throwing: error)
         self.activeContinuation = nil
     }
