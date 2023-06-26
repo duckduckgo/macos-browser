@@ -113,21 +113,6 @@ extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
             Pixel.fire(.networkProtectionSystemExtensionUnknownActivationResult)
         }
 
-        // When the system extension is replaced, macOS marks the activation request as .completed
-        // even before the previous sysex process is killed, which makes starting the VPN again fail
-        // immediately.
-        //
-        // To mitiage this problem when the sysex is replaced, I'm adding an intentional 1 second delay
-        // before signalling that this request finished.
-        guard !extensionReplaced else {
-            Task {
-                try await Task.sleep(nanoseconds: 1 * NSEC_PER_SEC)
-                continuation?.finish()
-            }
-
-            return
-        }
-
         continuation?.finish()
     }
 

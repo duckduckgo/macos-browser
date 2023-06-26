@@ -102,6 +102,7 @@ public class ConnectionStatusObserverThroughSession: ConnectionStatusObserver {
 
     private func handleStatusChange(in session: NETunnelProviderSession) {
         let status = self.connectionStatus(from: session)
+        logStatusChanged(status: status)
         publisher.send(status)
     }
 

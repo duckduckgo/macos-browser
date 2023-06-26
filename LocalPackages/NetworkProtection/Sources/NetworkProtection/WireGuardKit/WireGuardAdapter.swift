@@ -78,7 +78,7 @@ public class WireGuardAdapter {
                 _ = strcpy($0, "com.apple.net.utun_control")
             }
         }
-        for fd: Int32 in 0...1024 {
+        for fd: Int32 in stride(from: 1023, to: 0, by: -1) {
             var addr = sockaddr_ctl()
             var ret: Int32 = -1
             var len = socklen_t(MemoryLayout.size(ofValue: addr))

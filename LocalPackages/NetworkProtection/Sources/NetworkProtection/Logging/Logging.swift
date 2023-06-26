@@ -90,7 +90,7 @@ struct Logging {
     fileprivate static let networkProtectionPixelLoggingEnabled = false
     fileprivate static let networkProtectionPixel: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Pixel")
 
-    fileprivate static let networkProtectionStatusReporterLoggingEnabled = false
+    fileprivate static let networkProtectionStatusReporterLoggingEnabled = true
     fileprivate static let networkProtectionStatusReporterLog: OSLog = OSLog(subsystem: subsystem, category: "Network Protection: Status Reporter")
 
     fileprivate static let networkProtectionSleepLoggingEnabled = true

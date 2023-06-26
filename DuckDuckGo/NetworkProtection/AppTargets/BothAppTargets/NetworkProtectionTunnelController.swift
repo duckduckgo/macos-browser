@@ -337,11 +337,11 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             // Intentional no-op
             break
         default:
-            try start(tunnelManager)
+            try await start(tunnelManager)
         }
     }
 
-    private func start(_ tunnelManager: NETunnelProviderManager) throws {
+    private func start(_ tunnelManager: NETunnelProviderManager, attemptCount: Int = 0) async throws {
         var options = [String: NSObject]()
 
         options["activationAttemptId"] = UUID().uuidString as NSString
@@ -361,6 +361,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             }
 
             try tunnelManager.connection.startVPNTunnel(options: options)
+
+            let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusObserver: ConnectionStatusObserverThroughSession(), transitionTimeout: .seconds(1))
+            try await statusTransitionAwaiter.waitUntilConnectionStarted()
         } catch {
             controllerErrorStore.lastErrorMessage = error.localizedDescription
             throw error
@@ -383,6 +386,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         switch tunnelManager.connection.status {
         case .connected, .connecting, .reasserting:
             tunnelManager.connection.stopVPNTunnel()
+
+            let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusObserver: ConnectionStatusObserverThroughSession(), transitionTimeout: .seconds(1))
+            try? await statusTransitionAwaiter.waitUntilConnectionStarted()
         default:
             break
         }
