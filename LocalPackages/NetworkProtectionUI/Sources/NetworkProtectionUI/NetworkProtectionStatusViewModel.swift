@@ -28,6 +28,7 @@ extension NetworkProtectionStatusView {
 
     /// The view model definition for ``NetworkProtectionStatusView``
     ///
+    @MainActor
     public final class Model: ObservableObject {
 
         public struct MenuItem {
@@ -80,6 +81,7 @@ extension NetworkProtectionStatusView {
 
         // MARK: - Feature Image
 
+        @MainActor
         var mainImageAsset: NetworkProtectionAsset {
             switch connectionStatus {
             case .connected:
@@ -97,6 +99,7 @@ extension NetworkProtectionStatusView {
 
         // MARK: - Initialization & Deinitialization
 
+        @MainActor
         public init(controller: TunnelController,
                     statusReporter: NetworkProtectionStatusReporter,
                     menuItems: [MenuItem],
@@ -127,7 +130,8 @@ extension NetworkProtectionStatusView {
         }
 
         deinit {
-            stopTimer()
+            timer?.invalidate()
+            timer = nil
         }
 
         // MARK: - Subscriptions
@@ -246,6 +250,7 @@ extension NetworkProtectionStatusView {
             }
         }
 
+        @MainActor
         private func refreshInternalIsRunning() {
             switch connectionStatus {
             case .connected, .connecting, .reasserting:
@@ -301,12 +306,42 @@ extension NetworkProtectionStatusView {
 
         private var previousConnectionStatus: NetworkProtection.ConnectionStatus = .disconnected
 
+        @MainActor
         @Published
         private var connectionStatus: NetworkProtection.ConnectionStatus = .disconnected {
             didSet {
+                detectAndRefreshExternalToggleSwitching()
                 previousConnectionStatus = oldValue
                 refreshInternalIsRunning()
                 refreshTimeLapsed()
+            }
+        }
+
+        /// This method is a bit of a hack to detect when the toggle is controlled by the agent app, or by another external event causing the
+        /// tunnel to start or stop.
+        ///
+        /// In case we detect that the tunnel is being controlled externally, we disable the toggle while it's transitioning.
+        ///
+        private func detectAndRefreshExternalToggleSwitching() {
+            switch toggleTransition {
+            case .idle:
+                // When the toggle transition is idle, if the status changes to connecting or disconnecting
+                // it means the tunnel is being controlled from elsewhere.
+                if connectionStatus == .connecting {
+                    toggleTransition = .switchingOn(locallyInitiated: false)
+                } else if connectionStatus == .disconnecting {
+                    toggleTransition = .switchingOff(locallyInitiated: false)
+                }
+            case .switchingOn(let locallyInitiated), .switchingOff(let locallyInitiated):
+                guard !locallyInitiated else { break }
+
+                if connectionStatus == .connecting {
+                    toggleTransition = .switchingOn(locallyInitiated: false)
+                } else if connectionStatus == .disconnecting {
+                    toggleTransition = .switchingOff(locallyInitiated: false)
+                } else {
+                    toggleTransition = .idle
+                }
             }
         }
 
@@ -315,19 +350,25 @@ extension NetworkProtectionStatusView {
         @frozen
         enum ToggleTransition {
             case idle
-            case switchingOn
-            case switchingOff
+            case switchingOn(locallyInitiated: Bool)
+            case switchingOff(locallyInitiated: Bool)
         }
 
         /// Specifies a transition the toggle is undergoing, which will make sure the toggle stays in a position (either ON or OFF)
         /// and ignores intermediate status updates until the transition completes and this is set back to .idle.
+        @MainActor
         @Published
         private(set) var toggleTransition = ToggleTransition.idle
 
         /// The toggle is disabled while transitioning due to user interaction.
         ///
+        @MainActor
         var isToggleDisabled: Bool {
-            toggleTransition != .idle
+            if case .idle = toggleTransition {
+                return false
+            }
+
+            return true
         }
 
         // MARK: - Connection Status: Errors
@@ -362,6 +403,7 @@ extension NetworkProtectionStatusView {
         /// The description for the current connection status.
         /// When the status is `connected` this description will also show the time lapsed since connection.
         ///
+        @MainActor
         var connectionStatusDescription: String {
             // If the user is toggling NetP ON or OFF we'll respect the toggle state
             // until it's idle again
@@ -497,7 +539,7 @@ extension NetworkProtectionStatusView {
         ///
         private func startNetworkProtection() {
             Task { @MainActor in
-                toggleTransition = .switchingOn
+                toggleTransition = .switchingOn(locallyInitiated: true)
 
                 do {
                     try await tunnelController.start()
@@ -514,7 +556,7 @@ extension NetworkProtectionStatusView {
         ///
         private func stopNetworkProtection() {
             Task { @MainActor in
-                toggleTransition = .switchingOff
+                toggleTransition = .switchingOff(locallyInitiated: true)
                 await tunnelController.stop()
                 toggleTransition = .idle
             }
