@@ -23,6 +23,8 @@ enum EncryptionKeyStoreError: Error, ErrorWithParameters {
     case storageFailed(OSStatus)
     case readFailed(OSStatus)
     case deletionFailed(OSStatus)
+    case cannotTransformDataToString(OSStatus)
+    case cannotTransfrotmStringToBase64Data(OSStatus)
 
     var errorParameters: [String: String] {
         switch self {
@@ -31,6 +33,10 @@ enum EncryptionKeyStoreError: Error, ErrorWithParameters {
         case .readFailed(let status):
             return [Pixel.Parameters.keychainErrorCode: "\(status)"]
         case .deletionFailed(let status):
+            return [Pixel.Parameters.keychainErrorCode: "\(status)"]
+        case .cannotTransformDataToString(let status):
+            return [Pixel.Parameters.keychainErrorCode: "\(status)"]
+        case .cannotTransfrotmStringToBase64Data(let status):
             return [Pixel.Parameters.keychainErrorCode: "\(status)"]
         }
     }
@@ -45,6 +51,8 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
         static let encryptionKeyAccount = "com.duckduckgo.macos.browser"
 #endif
         static let encryptionKeyService = "DuckDuckGo Privacy Browser Data Encryption Key"
+
+        static let encryptionKeyServiceBase64 = "DuckDuckGo Privacy Browser Encryption Key v2"
     }
 
     private let generator: EncryptionKeyGenerating
@@ -53,8 +61,7 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
     private var defaultKeychainQueryAttributes: [String: Any] {
         return [
             kSecClass: kSecClassGenericPassword,
-            kSecAttrAccount: account,
-            kSecUseDataProtectionKeychain: true
+            kSecAttrAccount: account
         ] as [String: Any]
     }
 
@@ -70,25 +77,43 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
     // MARK: - Keychain
 
     func store(key: SymmetricKey) throws {
-        var query = defaultKeychainQueryAttributes
-        query[kSecAttrService as String] = Constants.encryptionKeyService
-        query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlocked
-        query[kSecValueData as String] = key.dataRepresentation
+         let attributes: [String: Any] = [
+             kSecClass as String: kSecClassGenericPassword,
+             kSecAttrAccount as String: account,
+             kSecValueData as String: key.dataRepresentation.base64EncodedString(),
+             kSecAttrService as String: Constants.encryptionKeyServiceBase64,
+             kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlocked
+         ]
 
-        let status = SecItemAdd(query as CFDictionary, nil)
+         // Add the login item to the keychain
+         let status = SecItemAdd(attributes as CFDictionary, nil)
 
-        guard status == errSecSuccess else {
-            throw EncryptionKeyStoreError.storageFailed(status)
-        }
-    }
+         guard status == errSecSuccess else {
+             throw EncryptionKeyStoreError.storageFailed(status)
+         }
+     }
 
     func readKey() throws -> SymmetricKey {
-        if let key = try readKeyFromKeychain(account: account) {
+        /// Needed to change how we save the key
+        /// Checks if the base64 non iCloud key already exist
+        /// if so we return
+        if let key = try? readKeyFromKeychain(account: account, format: .base64) {
+            return key
+        }
+        /// If the base64 key does not exist we check if we have the legacy key
+        /// if so we store it as base64 local item key
+        if let key = try readKeyFromKeychain(account: account, format: .raw) {
+            try store(key: key)
+        }
+
+        /// We try again to retrieve the base64 non iCloud key
+        /// if so we return the key
+        /// otherwise we generate a new one and store it
+        if let key = try readKeyFromKeychain(account: account, format: .base64) {
             return key
         } else {
             let generatedKey = generator.randomKey()
             try store(key: generatedKey)
-
             return generatedKey
         }
     }
@@ -105,11 +130,22 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
 
     // MARK: - Private
 
-    private func readKeyFromKeychain(account: String) throws -> SymmetricKey? {
+    private enum KeyFormat {
+        case raw
+        case base64
+    }
+
+    private func readKeyFromKeychain(account: String, format: KeyFormat) throws -> SymmetricKey? {
         var query = defaultKeychainQueryAttributes
         query[kSecReturnData as String] = true
 
         var item: CFTypeRef?
+        switch format {
+        case .raw:
+            query[kSecAttrService as String] = Constants.encryptionKeyService
+        case .base64:
+            query[kSecAttrService as String] = Constants.encryptionKeyServiceBase64
+        }
         let status = SecItemCopyMatching(query as CFDictionary, &item)
 
         switch status {
@@ -118,12 +154,24 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
                 throw EncryptionKeyStoreError.readFailed(status)
             }
 
-            return SymmetricKey(data: data)
+            let finalData: Data
+            switch format {
+            case .raw:
+                finalData = data
+            case .base64:
+                guard let base64String = String(data: data, encoding: .utf8) else {
+                    throw EncryptionKeyStoreError.cannotTransformDataToString(status)
+                }
+                guard let keyData = Data(base64Encoded: base64String) else {
+                    throw EncryptionKeyStoreError.cannotTransfrotmStringToBase64Data(status)
+                }
+                finalData = keyData
+            }
+            return SymmetricKey(data: finalData)
         case errSecItemNotFound:
             return nil
         default:
             throw EncryptionKeyStoreError.readFailed(status)
         }
     }
-
 }

@@ -25,8 +25,6 @@ extension DistributedNotificationCenter.CenterType {
 
 extension DistributedNotificationCenter {
 
-    static let preferredStringEncoding = String.Encoding.utf8
-
     public func publisher(for networkProtectionNotification: DistributedNotificationName, object: AnyObject? = nil) -> NotificationCenter.Publisher {
         self.publisher(for: networkProtectionNotification.notificationName)
     }

@@ -90,17 +90,25 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
+    /// Holds the date when the status was last changed so we can send it out as additional information
+    /// in our status-change notifications.
+    ///
+    private var lastStatusChangeDate = Date()
+
     private var connectionStatus: ConnectionStatus = .disconnected {
         didSet {
             if oldValue != connectionStatus {
+                lastStatusChangeDate = Date()
                 broadcastConnectionStatus()
             }
         }
     }
 
     private func broadcastConnectionStatus() {
-        let data = ConnectionStatusEncoder().encode(connectionStatus)
-        distributedNotificationCenter.post(.statusDidChange, object: data)
+        let lastStatusChange = ConnectionStatusChange(status: connectionStatus, on: lastStatusChangeDate)
+        let payload = ConnectionStatusChangeEncoder().encode(lastStatusChange)
+
+        distributedNotificationCenter.post(.statusDidChange, object: payload)
     }
 
     // MARK: - Server Selection
@@ -119,28 +127,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
 
         let serverStatusInfo = NetworkProtectionStatusServerInfo(serverLocation: serverInfo.serverLocation, serverAddress: serverInfo.endpoint?.description)
-        let payload: String?
-
-        do {
-            let encoder = JSONEncoder()
-            let jsonData = try encoder.encode(serverStatusInfo)
-
-            payload = String(data: jsonData, encoding: .utf8)
-
-            if payload == nil {
-                os_log("Error encoding serverInfo Data to String: %{public}@", log: .networkProtection, type: .error, String(describing: jsonData))
-                // Continue anyway, we'll just update the UI to show "Unknown" server info, which is better
-                // than showing the info from the previous server.
-            }
-        } catch {
-            os_log("Error encoding serverInfo to Data: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
-            // Continue anyway, we'll just update the UI to show "Unknown" server info, which is better
-            // than showing the info from the previous server.
-            payload = nil
-        }
+        let payload = ServerSelectedNotificationObjectEncoder().encode(serverStatusInfo)
 
         distributedNotificationCenter.post(.serverSelected, object: payload)
-        // Update shared userdefaults
     }
 
     // MARK: - User Notifications
