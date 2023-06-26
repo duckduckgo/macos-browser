@@ -319,6 +319,8 @@ extension NetworkProtectionStatusView {
             case switchingOff
         }
 
+        /// Specifies a transition the toggle is undergoing, which will make sure the toggle stays in a position (either ON or OFF)
+        /// and ignores intermediate status updates until the transition completes and this is set back to .idle.
         @Published
         private(set) var toggleTransition = ToggleTransition.idle
 
