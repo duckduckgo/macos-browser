@@ -102,7 +102,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
     // If the last time we removed the profile has a bigger time difference than the current date + maintenance we should schedule for a new optout
     private func shouldScheduleNewOptOut(operationData: OptOutOperationData,
                                          brokerProfileQueryData: BrokerProfileQueryData) -> Bool {
-        guard let lastRemovalEvent = operationData.lastEventWithType(type: .optOutRequested(extractedProfileID: operationData.extractedProfile.id)) else {
+        guard let lastRemovalEvent = operationData.lastEventWith(type: .optOutRequested(extractedProfileID: operationData.extractedProfile.id)) else {
             return false
         }
         return lastRemovalEvent.date.addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.maintenanceScan) < Date()
