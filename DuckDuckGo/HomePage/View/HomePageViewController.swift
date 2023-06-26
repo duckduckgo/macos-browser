@@ -34,7 +34,7 @@ final class HomePageViewController: NSViewController {
     var defaultBrowserModel: HomePage.Models.DefaultBrowserModel!
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
     var featuresModel: HomePage.Models.ContinueSetUpModel!
-    var homePageRootViewModel: HomePage.Models.HomePageRootViewModel!
+    var homePageRootViewModel: AppearancePreferences!
     var cancellables = Set<AnyCancellable>()
 
     @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
@@ -67,7 +67,7 @@ final class HomePageViewController: NSViewController {
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
         featuresModel = createFeatureModel()
-        homePageRootViewModel = HomePage.Models.HomePageRootViewModel()
+        homePageRootViewModel = AppearancePreferences.shared
 
         refreshModels()
 

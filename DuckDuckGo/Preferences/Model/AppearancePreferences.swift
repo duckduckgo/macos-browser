@@ -23,6 +23,9 @@ protocol AppearancePreferencesPersistor {
     var showAutocompleteSuggestions: Bool { get set }
     var currentThemeName: String { get set }
     var defaultPageZoom: CGFloat { get set }
+    var isFavoriteVisible: Bool { get set }
+    var isContinueSetUpVisible: Bool { get set }
+    var isRecentActivityVisible: Bool { get set }
 }
 
 struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
@@ -37,6 +40,15 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: DefaultZoomValue.percent100.rawValue)
     var defaultPageZoom: CGFloat
+
+    @UserDefaultsWrapper(key: .homePageIsFavoriteVisible, defaultValue: true)
+    var isFavoriteVisible: Bool
+
+    @UserDefaultsWrapper(key: .homePageIsContinueSetupVisible, defaultValue: true)
+    var isContinueSetUpVisible: Bool
+
+    @UserDefaultsWrapper(key: .homePageIsRecentActivityVisible, defaultValue: true)
+    var isRecentActivityVisible: Bool
 }
 
 enum DefaultZoomValue: CGFloat, CaseIterable {
@@ -128,6 +140,36 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    @Published var isFavoriteVisible: Bool {
+        didSet {
+            persistor.isFavoriteVisible = isFavoriteVisible
+            // Temporary Pixel
+            if !isFavoriteVisible {
+                Pixel.fire(.favoriteSectionHidden)
+            }
+        }
+    }
+
+    @Published var isContinueSetUpVisible: Bool {
+        didSet {
+            persistor.isContinueSetUpVisible = isContinueSetUpVisible
+            // Temporary Pixel
+            if !isContinueSetUpVisible {
+                Pixel.fire(.continueSetUpSectionHidden)
+            }
+        }
+    }
+
+    @Published var isRecentActivityVisible: Bool {
+        didSet {
+            persistor.isRecentActivityVisible = isRecentActivityVisible
+            // Temporary Pixel
+            if !isRecentActivityVisible {
+                Pixel.fire(.recentActivitySectionHidden)
+            }
+        }
+    }
+
     func updateUserInterfaceStyle() {
         NSApp.appearance = currentThemeName.appearance
     }
@@ -137,6 +179,9 @@ final class AppearancePreferences: ObservableObject {
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         showAutocompleteSuggestions = persistor.showAutocompleteSuggestions
+        isFavoriteVisible = persistor.isFavoriteVisible
+        isRecentActivityVisible = persistor.isRecentActivityVisible
+        isContinueSetUpVisible = persistor.isContinueSetUpVisible
         defaultPageZoom =  .init(rawValue: persistor.defaultPageZoom) ?? .percent100
     }
 
