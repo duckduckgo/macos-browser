@@ -78,7 +78,11 @@ public class WireGuardAdapter {
                 _ = strcpy($0, "com.apple.net.utun_control")
             }
         }
-        for fd: Int32 in 0...1024 {
+
+        // We stride backwards since sometimes the OS creates more than one fd and from
+        // our testing the highest fd is always the one that we should use.
+        // Ref: https://app.asana.com/0/1203137811378537/1204887455080246/f
+        for fd: Int32 in stride(from: 1023, through: 1, by: -1) {
             var addr = sockaddr_ctl()
             var ret: Int32 = -1
             var len = socklen_t(MemoryLayout.size(ofValue: addr))
