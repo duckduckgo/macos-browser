@@ -34,7 +34,15 @@ final class DataBrokerProtectionDataBase: DataBase {
     }
 
     func brokerProfileQueryData(for id: UUID) -> BrokerProfileQueryData? {
-        BrokerProfileQueryData(id: UUID(), profileQuery: ProfileQuery(firstName: "John", lastName: "Deo", city: "Miami", state: "FL", age: 46), dataBroker: DataBroker(name: "batata", steps: [Step]()))
+        let dataBroker = DataBroker(name: "Test Broker",
+                                    steps: [Step](),
+                                    schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+                                                                               retryError: 48 * 60 * 60,
+                                                                               confirmOptOutScan: 72 * 60 * 60,
+                                                                               maintenanceScan: 240 * 60 * 60))
+        return BrokerProfileQueryData(id: UUID(),
+                                      profileQuery: ProfileQuery(firstName: "John", lastName: "Deo", city: "Miami", state: "FL", age: 46),
+                                      dataBroker: dataBroker)
     }
 
     func saveOperationData(_ data: BrokerOperationData) {
@@ -58,7 +66,14 @@ final class DataBrokerProtectionDataBase: DataBase {
     }
 
     func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
-        let data = BrokerProfileQueryData(id: UUID(), profileQuery: ProfileQuery(firstName: "John", lastName: "Deo", city: "Miami", state: "FL", age: 46), dataBroker: DataBroker(name: "batata", steps: [Step]()))
+        let dataBroker = DataBroker(name: "Test Broker",
+                                    steps: [Step](),
+                                    schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+                                                                               retryError: 48 * 60 * 60,
+                                                                               confirmOptOutScan: 72 * 60 * 60,
+                                                                               maintenanceScan: 240 * 60 * 60))
+
+        let data = BrokerProfileQueryData(id: UUID(), profileQuery: ProfileQuery(firstName: "John", lastName: "Deo", city: "Miami", state: "FL", age: 46), dataBroker: dataBroker)
 
         return [data]
     }

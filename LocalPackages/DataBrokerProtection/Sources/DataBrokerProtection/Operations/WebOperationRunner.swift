@@ -1,5 +1,5 @@
 //
-//  OperationRunner.swift
+//  WebOperationRunner.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import Foundation
 
-protocol OperationRunner {
+protocol WebOperationRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData) async throws -> [ExtractedProfile]
     func optOut(_ extractedProfile: ExtractedProfile) async throws
@@ -27,7 +27,8 @@ protocol OperationRunner {
 // TODO: Remove this
 import WebKit
 
-final class TestOperationRunner: OperationRunner {
+@MainActor
+final class TestOperationRunner: WebOperationRunner {
 
     let webView: WKWebView
 
@@ -47,5 +48,4 @@ final class TestOperationRunner: OperationRunner {
     deinit {
         print("DEINIT")
     }
-
 }

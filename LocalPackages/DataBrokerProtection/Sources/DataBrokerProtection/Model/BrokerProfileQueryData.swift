@@ -18,13 +18,17 @@
 
 import Foundation
 
-public struct BrokerProfileQueryData: Sendable {
+final public class BrokerProfileQueryData: Sendable {
     public let id: UUID
     public let profileQuery: ProfileQuery
     public let dataBroker: DataBroker
 
     public var scanData: ScanOperationData
     public var optOutsData: [OptOutOperationData] = [OptOutOperationData]()
+
+    internal var operationsData: [BrokerOperationData] {
+        optOutsData + [scanData]
+    }
 
     var extractedProfiles: [ExtractedProfile] {
         optOutsData.map { $0.extractedProfile }
@@ -45,12 +49,11 @@ public struct BrokerProfileQueryData: Sendable {
             self.scanData = scanData
         } else {
             self.scanData = ScanOperationData(brokerProfileQueryID: id,
-                                              preferredRunDate: Date(),
                                               historyEvents: [HistoryEvent]())
         }
     }
 
-    mutating func updateExtractedProfiles(_ extractedProfiles: [ExtractedProfile]) {
+    func updateExtractedProfiles(_ extractedProfiles: [ExtractedProfile]) {
 
         extractedProfiles.forEach { extractedProfile in
 
@@ -61,9 +64,10 @@ public struct BrokerProfileQueryData: Sendable {
 
             if !isExistingProfile {
                 let optOutOperationData = OptOutOperationData(brokerProfileQueryID: id,
-                                                              preferredRunDate: Date(),
                                                               historyEvents: [HistoryEvent](),
                                                               extractedProfile: extractedProfile)
+                // If it's a new found profile, we'd like to opt-out ASAP
+                optOutOperationData.preferredRunDate = Date()
                 optOutsData.append(optOutOperationData)
             }
         }
@@ -71,7 +75,7 @@ public struct BrokerProfileQueryData: Sendable {
         // Check for removed profiles
         let removedProfilesData = optOutsData.filter { !extractedProfiles.contains($0.extractedProfile) }
         for removedProfileData in removedProfilesData {
-            let event = HistoryEvent(type: .optOutConfirmed(profileID: removedProfileData.extractedProfile.id))
+            let event = HistoryEvent(type: .optOutConfirmed(extractedProfileID: removedProfileData.extractedProfile.id))
             addHistoryEvent(event, for: removedProfileData)
             removedProfileData.extractedProfile.removedDate = Date()
             print("Profile removed from optOutsData: \(removedProfileData.extractedProfile)")
