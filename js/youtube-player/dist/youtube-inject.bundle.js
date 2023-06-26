@@ -983,6 +983,7 @@
   };
 
   // youtube-inject.js
+  alert("lol");
   var userScriptConfig = $DDGYoutubeUserScriptConfig$;
   var allowedProxyOrigins = userScriptConfig.allowedOrigins.filter((origin) => !origin.endsWith("youtube.com"));
   var defaultEnvironment = {
