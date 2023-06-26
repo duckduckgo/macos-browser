@@ -116,5 +116,7 @@
 	<string>$(AGENT_PRODUCT_NAME)</string>
 	<key>NETP_APP_GROUP</key>
 	<string>$(NETP_APP_GROUP)</string>
+	<key>NETP_BUNDLE_ID</key>
+	<string>$(NETP_BUNDLE_ID)</string>
 </dict>
 </plist>

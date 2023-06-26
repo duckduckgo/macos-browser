@@ -341,15 +341,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     private func updateNetworkProtectionTunnelAndMenu() {
+        NetworkProtectionTunnelController.resetLoginItems()
+
         Task {
             let provider = NetworkProtectionTunnelController()
 
+            // Restart NetP SysEx on app update
             if await provider.isConnected() {
                 await provider.stop()
+                try? await provider.start()
             }
         }
-
-        NetworkProtectionTunnelController.resetLoginItems()
     }
 
     /// Fetches a new list of Network Protection servers, and updates the existing set.

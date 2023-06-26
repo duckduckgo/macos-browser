@@ -3010,6 +3010,7 @@
 		B6B2400D28083B49001B8F3A /* WebViewContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewContainerView.swift; sourceTree = "<group>"; };
 		B6B3E0952654DACD0040E0A2 /* UTTypeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UTTypeTests.swift; sourceTree = "<group>"; };
 		B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSScreenExtension.swift; sourceTree = "<group>"; };
+		B6B84AB72A498C09006A133B /* NetworkProtectionAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionAppStore.xcconfig; sourceTree = "<group>"; };
 		B6BBF16F2744CDE1004F850E /* CoreDataStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStoreTests.swift; sourceTree = "<group>"; };
 		B6BBF1712744CE36004F850E /* FireproofDomainsStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofDomainsStoreMock.swift; sourceTree = "<group>"; };
 		B6BBF17327475B15004F850E /* PopupBlockedPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupBlockedPopover.swift; sourceTree = "<group>"; };
@@ -3550,6 +3551,7 @@
 				376CC8B4296EB630006B63A7 /* AppStore.xcconfig */,
 				376CC8B5296EBA8F006B63A7 /* AppStoreBuildNumber.xcconfig */,
 				7B5291892A169BC90022E406 /* NetworkProtectionDeveloperID.xcconfig */,
+				B6B84AB72A498C09006A133B /* NetworkProtectionAppStore.xcconfig */,
 				378C76D8296842FD0092E949 /* App */,
 				4B4D604E2A0B293C00BCD287 /* Extensions */,
 				378C76D92968433B0092E949 /* Tests */,
@@ -6521,7 +6523,7 @@
 			buildPhases = (
 				4B2537562A11BE7300610219 /* Sources */,
 				4B2537572A11BE7300610219 /* Frameworks */,
-				B6BD8F0A2A260E5900B6A41F /* ShellScript */,
+				B6BD8F0A2A260E5900B6A41F /* Embed libswift_Concurrency.dylib */,
 			);
 			buildRules = (
 			);
@@ -7243,7 +7245,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"ditto ${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_ID} $BUILT_PRODUCTS_DIR/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_BUNDLE_ID}\"\n\nditto \"${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_ID}\" \"$BUILT_PRODUCTS_DIR/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_BUNDLE_ID}\" || exit 1\n";
+			shellScript = "SYSEX_BUNDLE_NAME=\"${SYSEX_BUNDLE_ID_BASE}.systemextension\"\necho \"ditto ${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_NAME} $BUILT_PRODUCTS_DIR/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_BUNDLE_NAME}\"\n\nditto \"${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_NAME}\" \"$BUILT_PRODUCTS_DIR/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_BUNDLE_NAME}\" || exit 1\n";
 		};
 		AA8EDF2824925E940071C2E8 /* Swift Lint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -7264,7 +7266,7 @@
 			shellPath = /bin/zsh;
 			shellScript = "./lint.sh\n";
 		};
-		B6BD8F0A2A260E5900B6A41F /* ShellScript */ = {
+		B6BD8F0A2A260E5900B6A41F /* Embed libswift_Concurrency.dylib */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -7273,6 +7275,7 @@
 			);
 			inputPaths = (
 			);
+			name = "Embed libswift_Concurrency.dylib";
 			outputFileListPaths = (
 			);
 			outputPaths = (

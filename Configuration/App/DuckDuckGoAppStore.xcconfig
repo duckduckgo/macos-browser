@@ -16,6 +16,7 @@
 #include "AppTargetsBase.xcconfig"
 #include "../AppStore.xcconfig"
 #include "ManualAppStoreRelease.xcconfig"
+#include "../NetworkProtectionAppStore.xcconfig"
 
 AGENT_BUNDLE_ID[sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.agent
 AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.agent.debug
@@ -44,5 +45,11 @@ PROVISIONING_PROFILE_SPECIFIER[config=Debug][sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios macos
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = Sandbox MacOS Browser Product Review
+
+NETP_BUNDLE_ID[sdk=*] = $(APPEX_BUNDLE_ID_BASE)
+NETP_BUNDLE_ID[config=CI][sdk=*] = $(APPEX_BUNDLE_ID_BASE)
+NETP_BUNDLE_ID[config=Review][sdk=*] = $(APPEX_BUNDLE_ID_BASE)
+NETP_BUNDLE_ID[config=Debug][sdk=*] = $(APPEX_BUNDLE_ID_BASE)
+NETP_BUNDLE_ID[config=Release][sdk=*] = $(APPEX_BUNDLE_ID_BASE)
 
 #include? "../../LocalOverridesAppStore.xcconfig"

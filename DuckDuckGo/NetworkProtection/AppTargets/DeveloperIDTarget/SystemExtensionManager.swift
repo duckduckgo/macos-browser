@@ -23,7 +23,7 @@ import Combine
 
 struct SystemExtensionManager {
 
-    enum ActivationRequestEvent {
+    enum RequestEvent {
         case waitingForUserApproval
         case activated
         case willActivateAfterReboot
@@ -32,13 +32,13 @@ struct SystemExtensionManager {
     let bundleID: String
     let manager: OSSystemExtensionManager
 
-    init(bundleID: String = NetworkProtectionBundle.extensionBundle().bundleIdentifier!,
+    init(bundleID: String = Bundle.main.networkProtectionExtensionBundleId,
          manager: OSSystemExtensionManager = .shared) {
         self.bundleID = bundleID
         self.manager = manager
     }
 
-    func activate() -> AsyncThrowingStream<ActivationRequestEvent, Error> {
+    func activate() -> AsyncThrowingStream<RequestEvent, Error> {
         return SystemExtensionRequest.activationRequest(forExtensionWithIdentifier: bundleID, manager: manager).submit()
     }
 
@@ -50,36 +50,36 @@ struct SystemExtensionManager {
 
 final class SystemExtensionRequest: NSObject {
 
-    typealias Event = SystemExtensionManager.ActivationRequestEvent
+    typealias Event = SystemExtensionManager.RequestEvent
 
-    private let activationRequest: OSSystemExtensionRequest
+    private let request: OSSystemExtensionRequest
     private let manager: OSSystemExtensionManager
 
     private var continuation: AsyncThrowingStream<Event, Error>.Continuation?
 
-    private init(activationRequest: OSSystemExtensionRequest, manager: OSSystemExtensionManager) {
+    private init(request: OSSystemExtensionRequest, manager: OSSystemExtensionManager) {
         self.manager = manager
-        self.activationRequest = activationRequest
+        self.request = request
 
         super.init()
     }
 
     static func activationRequest(forExtensionWithIdentifier bundleId: String, manager: OSSystemExtensionManager) -> Self {
-        self.init(activationRequest: .activationRequest(forExtensionWithIdentifier: bundleId, queue: .global()), manager: manager)
+        self.init(request: .activationRequest(forExtensionWithIdentifier: bundleId, queue: .global()), manager: manager)
     }
 
     static func deactivationRequest(forExtensionWithIdentifier bundleId: String, manager: OSSystemExtensionManager) -> Self {
-        self.init(activationRequest: .deactivationRequest(forExtensionWithIdentifier: bundleId, queue: .global()), manager: manager)
+        self.init(request: .deactivationRequest(forExtensionWithIdentifier: bundleId, queue: .global()), manager: manager)
     }
 
     /// submitting the request returns an Async Iterator providing the OSSystemExtensionRequest state change events
-    /// until an `ActivationRequestEvent` event is received.
+    /// until an `RequestEvent` event is received.
     func submit() -> AsyncThrowingStream<Event, Error> {
         assert(continuation == nil, "Request can only be submitted once")
 
         defer {
-            activationRequest.delegate = self
-            manager.submitRequest(activationRequest)
+            request.delegate = self
+            manager.submitRequest(request)
         }
         return AsyncThrowingStream { [self /* keep the request delegate alive */] continuation in
             continuation.onTermination = { _ in

@@ -14,10 +14,7 @@
 //
 
 #include "../ExtensionBase.xcconfig"
-
-// Since we're using nonstandard bundle IDs we'll just define them here, but we should consider
-// standardizing the bundle IDs so we can just define BUNDLE_IDENTIFIER_PREFIX
-BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.mobile.ios
+#include "../../NetworkProtectionAppStore.xcconfig"
 
 CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
 CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = DuckDuckGo/NetworkProtectionAppExtension.entitlements
@@ -34,11 +31,11 @@ FEATURE_FLAGS[config=CI][arch=*][sdk=*] = NETWORK_EXTENSION NETWORK_PROTECTION
 FEATURE_FLAGS[config=Debug][arch=*][sdk=*] = NETWORK_EXTENSION NETWORK_PROTECTION
 FEATURE_FLAGS[config=Review][arch=*][sdk=*] = NETWORK_EXTENSION NETWORK_PROTECTION
 
-PRODUCT_BUNDLE_IDENTIFIER[sdk=*] =
-PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] =
-PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug.network-protection-extension
-PRODUCT_BUNDLE_IDENTIFIER[config=Release][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).network-protection-extension
-PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).review.network-protection-extension
+PRODUCT_BUNDLE_IDENTIFIER[sdk=*] = $(APPEX_BUNDLE_ID_BASE)
+PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(APPEX_BUNDLE_ID_BASE)
+PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(APPEX_BUNDLE_ID_BASE)
+PRODUCT_BUNDLE_IDENTIFIER[config=Release][sdk=*] = $(APPEX_BUNDLE_ID_BASE)
+PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(APPEX_BUNDLE_ID_BASE)
 
 SDKROOT = macosx
 SKIP_INSTALL = YES

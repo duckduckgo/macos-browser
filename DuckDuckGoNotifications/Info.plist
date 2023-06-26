@@ -10,5 +10,7 @@
 	<string>$(MAIN_BUNDLE_IDENTIFIER)</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
+	<key>NETP_BUNDLE_ID</key>
+	<string>$(NETP_BUNDLE_ID)</string>
 </dict>
 </plist>
