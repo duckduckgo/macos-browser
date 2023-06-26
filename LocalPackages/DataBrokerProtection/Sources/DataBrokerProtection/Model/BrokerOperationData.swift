@@ -38,12 +38,6 @@ extension BrokerOperationData {
         historyEvents.last?.date
     }
 
-    mutating func updatePreferredRunDate(_ date: Date) {
-        if preferredRunDate == nil || preferredRunDate! > date {
-            preferredRunDate = date
-        }
-    }
-
     func lastEventWith(type: HistoryEvent.EventType) -> HistoryEvent? {
         return historyEvents.last(where: { $0.type == type })
     }

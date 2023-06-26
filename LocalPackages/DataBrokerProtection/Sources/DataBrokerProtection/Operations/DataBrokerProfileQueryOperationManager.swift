@@ -75,22 +75,27 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             switch lastHistoryEvent.type {
             case .error:
                 let newDate = Date().addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.retryError)
-                data.updatePreferredRunDate(newDate)
-
+                updatePreferredRunDate(newDate, on: data)
             case .optOutRequested:
                 optOutData?.preferredRunDate = nil
                 let newDate = Date().addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.confirmOptOutScan)
-                scanData?.updatePreferredRunDate(newDate)
+                if let scanData = scanData {
+                    updatePreferredRunDate(newDate, on: scanData)
+                }
             case .matchFound:
-                if var optOutData = optOutData, shouldScheduleNewOptOut(operationData: optOutData,
+                if let optOutData = optOutData, shouldScheduleNewOptOut(operationData: optOutData,
                                                                         brokerProfileQueryData: brokerProfileQueryData) {
-                    optOutData.updatePreferredRunDate(Date())
+                    updatePreferredRunDate(Date(), on: optOutData)
                 } else {
-                    scanData?.updatePreferredRunDate(maintenanceScanDate)
+                    if let scanData = scanData {
+                        updatePreferredRunDate(maintenanceScanDate, on: scanData)
+                    }
                 }
 
             case .noMatchFound:
-                scanData?.updatePreferredRunDate(maintenanceScanDate)
+                if let scanData = scanData {
+                    updatePreferredRunDate(maintenanceScanDate, on: scanData)
+                }
                 optOutData?.preferredRunDate = nil
 
             default:
@@ -99,6 +104,13 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
     }
 
+    private func updatePreferredRunDate(_ date: Date, on data: BrokerOperationData) {
+        var data = data
+
+        if data.preferredRunDate == nil || data.preferredRunDate! > date {
+           data.preferredRunDate = date
+       }
+   }
     // If the last time we removed the profile has a bigger time difference than the current date + maintenance we should schedule for a new optout
     private func shouldScheduleNewOptOut(operationData: OptOutOperationData,
                                          brokerProfileQueryData: BrokerProfileQueryData) -> Bool {
