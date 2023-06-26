@@ -109,7 +109,18 @@ extension Pixel {
         case emailUserCreatedAlias
 
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
+
+        case networkProtectionSystemExtensionUnknownActivationResult
+
         case debug(event: Debug, error: Error? = nil)
+
+        // Activation Points
+        case newTabInitial
+        case emailEnabledInitial
+        case cookieManagementEnabledInitial
+        case watchInDuckPlayerInitial
+        case setAsDefaultInitial
+        case importDataInitial
 
         enum Debug {
 
@@ -183,6 +194,7 @@ extension Pixel {
 
             case bitwardenNotResponding
             case bitwardenRespondedCannotDecrypt
+            case bitwardenRespondedCannotDecryptUnique(repetition: Repetition = .init(key: "bitwardenRespondedCannotDecryptUnique"))
             case bitwardenHandshakeFailed
             case bitwardenDecryptionOfSharedKeyFailed
             case bitwardenStoringOfTheSharedKeyFailed
@@ -203,6 +215,18 @@ extension Pixel {
             case userSelectedToInstallUpdate
             case userSelectedToDismissUpdate
 
+            case networkProtectionClientFailedToEncodeRedeemRequest
+            case networkProtectionClientInvalidInviteCode
+            case networkProtectionClientFailedToRedeemInviteCode(error: Error?)
+            case networkProtectionClientFailedToParseRedeemResponse(error: Error)
+            case networkProtectionClientInvalidAuthToken
+            case networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: String)
+            case networkProtectionKeychainReadError(field: String, status: Int32)
+            case networkProtectionKeychainWriteError(field: String, status: Int32)
+            case networkProtectionKeychainDeleteError(status: Int32)
+            case networkProtectionNoAuthTokenFoundError
+            case networkProtectionUnhandledError(function: String, line: Int, error: Error)
+
             case faviconDecryptionFailed
             case downloadListItemDecryptionFailed
             case historyEntryDecryptionFailed
@@ -212,6 +236,8 @@ extension Pixel {
             case missingParent
             case bookmarksSaveFailed
             case bookmarksSaveFailedOnImport
+            case bookmarksCleanupFailed
+            case orphanedBookmarksPresent
 
             case bookmarksCouldNotLoadDatabase
             case bookmarksCouldNotPrepareDatabase
@@ -220,6 +246,11 @@ extension Pixel {
             case bookmarksMigrationCouldNotPrepareDatabase
             case bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration
             case bookmarksMigrationCouldNotRemoveOldStore
+
+            case syncSentUnauthenticatedRequest
+            case syncMetadataCouldNotLoadDatabase
+            case syncBookmarksProviderInitializationFailed
+            case syncBookmarksFailed
 
             case invalidPayload(Configuration)
 
@@ -290,6 +321,20 @@ extension Pixel.Event {
             } else {
                 return "m_mac_\(pixel.pixelName)"
             }
+        case .emailEnabledInitial:
+            return "m_mac.enable-email-protection.initial"
+        case .cookieManagementEnabledInitial:
+            return "m_mac.cookie-management-enabled.initial"
+        case .watchInDuckPlayerInitial:
+            return "m_mac.watch-in-duckplayer.initial"
+        case .setAsDefaultInitial:
+            return "m_mac.set-as-default.initial"
+        case .importDataInitial:
+            return "m_mac.import-data.initial"
+        case .newTabInitial:
+            return "m_mac.new-tab-opened.initial"
+        case .networkProtectionSystemExtensionUnknownActivationResult:
+            return "m_mac_netp_system_extension_unknown_activation_result"
         }
     }
 }
@@ -431,6 +476,8 @@ extension Pixel.Event.Debug {
             return "bitwarden_not_responding"
         case .bitwardenRespondedCannotDecrypt:
             return "bitwarden_responded_cannot_decrypt"
+        case .bitwardenRespondedCannotDecryptUnique:
+            return "bitwarden_responded_cannot_decrypt_unique"
         case .bitwardenHandshakeFailed:
             return "bitwarden_handshake_failed"
         case .bitwardenDecryptionOfSharedKeyFailed:
@@ -469,6 +516,29 @@ extension Pixel.Event.Debug {
         case .userSelectedToDismissUpdate:
             return "user_selected_to_dismiss_update"
 
+        case .networkProtectionClientFailedToEncodeRedeemRequest:
+            return "netp_backend_api_error_encoding_redeem_request_body_failed"
+        case .networkProtectionClientInvalidInviteCode:
+            return "netp_backend_api_error_invalid_invite_code"
+        case .networkProtectionClientFailedToRedeemInviteCode:
+            return "netp_backend_api_error_failed_to_redeem_invite_code"
+        case .networkProtectionClientFailedToParseRedeemResponse:
+            return "netp_backend_api_error_parsing_redeem_response_failed"
+        case .networkProtectionClientInvalidAuthToken:
+            return "netp_backend_api_error_invalid_auth_token"
+        case .networkProtectionKeychainErrorFailedToCastKeychainValueToData:
+            return "netp_keychain_error_failed_to_cast_keychain_value_to_data"
+        case .networkProtectionKeychainReadError:
+            return "netp_keychain_error_read_failed"
+        case .networkProtectionKeychainWriteError:
+            return "netp_keychain_error_write_failed"
+        case .networkProtectionKeychainDeleteError:
+            return "netp_keychain_error_delete_failed"
+        case .networkProtectionNoAuthTokenFoundError:
+            return "netp_no_auth_token_found_error"
+        case .networkProtectionUnhandledError:
+            return "netp_unhandled_error"
+
         case .faviconDecryptionFailed:
             return "favicon_decryption_failed"
         case .downloadListItemDecryptionFailed:
@@ -481,6 +551,8 @@ extension Pixel.Event.Debug {
         case .missingParent: return "bookmark_missing_parent"
         case .bookmarksSaveFailed: return "bookmarks_save_failed"
         case .bookmarksSaveFailedOnImport: return "bookmarks_save_failed_on_import"
+        case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
+        case .orphanedBookmarksPresent: return "bookmarks_orphans_present"
 
         case .bookmarksCouldNotLoadDatabase: return "bookmarks_could_not_load_database"
         case .bookmarksCouldNotPrepareDatabase: return "bookmarks_could_not_prepare_database"
@@ -490,6 +562,11 @@ extension Pixel.Event.Debug {
         case .bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration:
             return "bookmarks_migration_could_not_prepare_database_on_failed_migration"
         case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
+
+        case .syncSentUnauthenticatedRequest: return "sync_sent_unauthenticated_request"
+        case .syncMetadataCouldNotLoadDatabase: return "sync_metadata_could_not_load_database"
+        case .syncBookmarksProviderInitializationFailed: return "sync_bookmarks_provider_initialization_failed"
+        case .syncBookmarksFailed: return "sync_bookmarks_failed"
 
         case .invalidPayload(let configuration): return "m_d_\(configuration.rawValue)_invalid_payload".lowercased()
 
