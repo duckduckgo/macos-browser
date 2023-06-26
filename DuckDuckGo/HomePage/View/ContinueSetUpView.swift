@@ -268,7 +268,7 @@ extension HomePage.Views {
                             .fill(Color("LinkBlueColor"))
                             .frame(width: textWidth, height: 20)
                         Text(text)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color("HomeNextStepsTextColor"))
                     }
                     Image("NextStepsRight")
                         .frame(width: 10, height: 19)
