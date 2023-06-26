@@ -1,9 +1,8 @@
 {
   "images" : [
     {
-      "filename" : "Left.pdf",
-      "idiom" : "universal",
-      "scale" : "1x"
+      "filename" : "Left.svg",
+      "idiom" : "universal"
     },
     {
       "appearances" : [
@@ -12,37 +11,8 @@
           "value" : "dark"
         }
       ],
-      "filename" : "Left-Dark.pdf",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "idiom" : "universal",
-      "scale" : "3x"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "idiom" : "universal",
-      "scale" : "3x"
+      "filename" : "Left-Dark.svg",
+      "idiom" : "universal"
     }
   ],
   "info" : {
