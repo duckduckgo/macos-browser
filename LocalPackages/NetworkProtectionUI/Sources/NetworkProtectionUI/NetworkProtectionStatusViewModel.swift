@@ -220,9 +220,12 @@ extension NetworkProtectionStatusView {
             }
 
             refreshTimeLapsed()
+            let call = refreshTimeLapsed
 
-            let newTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-                self?.refreshTimeLapsed()
+            let newTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                Task { @MainActor in
+                    call()
+                }
             }
 
             timer = newTimer
@@ -317,10 +320,8 @@ extension NetworkProtectionStatusView {
             }
         }
 
-        /// This method is a bit of a hack to detect when the toggle is controlled by the agent app, or by another external event causing the
-        /// tunnel to start or stop.
-        ///
-        /// In case we detect that the tunnel is being controlled externally, we disable the toggle while it's transitioning.
+        /// This method serves as a simple mechanism to detect when the toggle is controlled by the agent app, or by another
+        /// external event causing the tunnel to start or stop, so we can disable the toggle as it's transitioning..
         ///
         private func detectAndRefreshExternalToggleSwitching() {
             switch toggleTransition {
@@ -356,13 +357,11 @@ extension NetworkProtectionStatusView {
 
         /// Specifies a transition the toggle is undergoing, which will make sure the toggle stays in a position (either ON or OFF)
         /// and ignores intermediate status updates until the transition completes and this is set back to .idle.
-        @MainActor
         @Published
         private(set) var toggleTransition = ToggleTransition.idle
 
         /// The toggle is disabled while transitioning due to user interaction.
         ///
-        @MainActor
         var isToggleDisabled: Bool {
             if case .idle = toggleTransition {
                 return false
@@ -403,7 +402,6 @@ extension NetworkProtectionStatusView {
         /// The description for the current connection status.
         /// When the status is `connected` this description will also show the time lapsed since connection.
         ///
-        @MainActor
         var connectionStatusDescription: String {
             // If the user is toggling NetP ON or OFF we'll respect the toggle state
             // until it's idle again
