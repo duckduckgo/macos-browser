@@ -75,12 +75,31 @@ final class DataBrokerProtectionFeatureTests: XCTestCase {
 
         XCTAssertEqual(mockCSSDelegate.lastError, .parsingErrorObjectFailed)
     }
+
+    func testWhenClickActionIsParsed_thenDelegateSendsSuccessWithCorrectActionId() {
+        let params = ["result": ["success": ["actionID": "click", "actionType": "click"] as [String: Any]]]
+        let sut = DataBrokerProtectionFeature(delegate: mockCSSDelegate)
+
+        sut.parseActionCompleted(params: params)
+
+        XCTAssertEqual(mockCSSDelegate.successActionId, "click")
+    }
+
+    func testWhenExpectationActionIsParsed_thenDelegateSendsSuccessWithCorrectActionId() {
+        let params = ["result": ["success": ["actionID": "expectation", "actionType": "expectation"] as [String: Any]]]
+        let sut = DataBrokerProtectionFeature(delegate: mockCSSDelegate)
+
+        sut.parseActionCompleted(params: params)
+
+        XCTAssertEqual(mockCSSDelegate.successActionId, "expectation")
+    }
 }
 
 final class MockCSSCommunicationDelegate: CSSCommunicationDelegate {
     var lastError: DataBrokerProtectionError?
     var profiles: [ExtractedProfile]?
     var url: URL?
+    var successActionId: String?
 
     func loadURL(url: URL) {
         self.url = url
@@ -88,6 +107,10 @@ final class MockCSSCommunicationDelegate: CSSCommunicationDelegate {
 
     func extractedProfiles(profiles: [ExtractedProfile]) {
         self.profiles = profiles
+    }
+
+    func success(actionId: String) {
+        self.successActionId = actionId
     }
 
     func onError(error: DataBrokerProtectionError) {
@@ -98,5 +121,6 @@ final class MockCSSCommunicationDelegate: CSSCommunicationDelegate {
         lastError = nil
         profiles = nil
         url = nil
+        successActionId = nil
     }
 }

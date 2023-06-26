@@ -21,6 +21,9 @@ import Foundation
 public enum ActionType: String, Codable, Sendable {
     case extract
     case navigate
+    case fillForm
+    case click
+    case expectation
 }
 
 public protocol Action: Encodable, Sendable {

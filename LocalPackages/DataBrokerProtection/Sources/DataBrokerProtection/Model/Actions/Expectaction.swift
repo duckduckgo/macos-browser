@@ -1,5 +1,5 @@
 //
-//  Extract.swift
+//  Expectaction.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,14 +16,33 @@
 //  limitations under the License.
 //
 
-public struct ExtractAction: Action {
-    public let id: String = "extract"
-    public let actionType: ActionType = .extract
-    let selector: String
-    let profile: ExtractedProfile
+import Foundation
 
-    public init(selector: String, profile: ExtractedProfile) {
+public enum ItemType: String, Codable, Sendable {
+    case text
+    case url
+    case element = "elementExpectation"
+}
+
+public struct Item: Codable, Sendable {
+    let type: ItemType
+    let expect: String?
+    let selector: String?
+
+    public init(type: ItemType, expect: String?, selector: String?) {
+        self.type = type
+        self.expect = expect
         self.selector = selector
-        self.profile = profile
+    }
+}
+
+public struct ExpectationAction: Action {
+    public let id: String = "expectaction"
+    public let actionType: ActionType = .expectation
+
+    let expectations: [Item]
+
+    public init(expectations: [Item]) {
+        self.expectations = expectations
     }
 }

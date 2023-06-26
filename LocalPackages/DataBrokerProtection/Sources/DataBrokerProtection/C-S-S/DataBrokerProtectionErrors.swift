@@ -22,7 +22,7 @@ struct CSSError: Decodable {
     let error: String
 }
 
-enum DataBrokerProtectionError: Error, Equatable {
+public enum DataBrokerProtectionError: Error, Equatable {
     case malformedURL
     case noActionFound
     case actionFailed(actionID: String, message: String)
