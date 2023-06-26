@@ -17,10 +17,12 @@
 //
 
 import BrowserServicesKit
+import Common
 import Combine
 import Foundation
 import Navigation
 import WebKit
+import UserScript
 
 extension NSImage {
     static let duckPlayer: NSImage = #imageLiteral(resourceName: "DuckPlayer")
@@ -51,6 +53,16 @@ enum DuckPlayerMode: Equatable, Codable {
         }
     }
 
+}
+
+/// Values that the Frontend can use to determine the current state.
+public struct UserValues: Codable {
+    enum CodingKeys: String, CodingKey {
+        case duckPlayerMode = "privatePlayerMode"
+        case overlayInteracted
+    }
+    let duckPlayerMode: DuckPlayerMode
+    let overlayInteracted: Bool
 }
 
 final class DuckPlayer {
@@ -99,6 +111,31 @@ final class DuckPlayer {
             }
             .receive(on: DispatchQueue.main)
             .assign(to: \.isFeatureEnabled, onWeaklyHeld: self)
+    }
+
+    // MARK: - Common Message Handlers
+
+    public func handleSetUserValues(params: Any, message: UserScriptMessage) -> Encodable? {
+        guard let userValues: UserValues = DecodableHelper.decode(from: params) else {
+            assertionFailure("YoutubeOverlayUserScript: expected JSON representation of UserValues")
+            return nil
+        }
+
+        self.preferences.youtubeOverlayInteracted = userValues.overlayInteracted
+        self.preferences.duckPlayerMode = userValues.duckPlayerMode
+
+        return encodeUserValues()
+    }
+
+    public func handleGetUserValues(params: Any, message: UserScriptMessage) -> Encodable? {
+        encodeUserValues()
+    }
+
+    private func encodeUserValues() -> UserValues {
+        UserValues(
+            duckPlayerMode: self.preferences.duckPlayerMode,
+            overlayInteracted: self.preferences.youtubeOverlayInteracted
+        )
     }
 
     // MARK: - Private
