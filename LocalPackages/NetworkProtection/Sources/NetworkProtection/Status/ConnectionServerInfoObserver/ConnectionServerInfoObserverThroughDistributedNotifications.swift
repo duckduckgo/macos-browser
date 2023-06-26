@@ -1,5 +1,5 @@
 //
-//  ConnectionServerInfoObserverThroughIPC.swift
+//  ConnectionServerInfoObserverThroughDistributedNotifications.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -26,12 +26,8 @@ import NotificationCenter
 
 /// Observes the server info through Distributed Notifications and an IPC connection.
 ///
-public class ConnectionServerInfoObserverThroughIPC: ConnectionServerInfoObserver {
+public class ConnectionServerInfoObserverThroughDistributedNotifications: ConnectionServerInfoObserver {
     public let publisher = CurrentValueSubject<NetworkProtectionStatusServerInfo, Never>(.unknown)
-
-    // MARK: - Notifications: Decoding
-
-    private let serverSelectedDecoder = ServerSelectedNotificationObjectDecoder()
 
     // MARK: - Notifications
 
@@ -60,7 +56,18 @@ public class ConnectionServerInfoObserverThroughIPC: ConnectionServerInfoObserve
     }
 
     private func handleServerSelected(_ notification: Notification) {
-        let serverInfo = serverSelectedDecoder.decode(notification.object)
+
+        let serverInfo: NetworkProtectionStatusServerInfo
+
+        do {
+            serverInfo = try ServerSelectedNotificationObjectDecoder().decodeObject(from: notification)
+        } catch {
+            let error = StaticString(stringLiteral: "Could not decode .serverSelected distributed notification object")
+            assertionFailure("\(error)")
+            os_log(error, log: log, type: .error)
+            return
+        }
+
         publisher.send(serverInfo)
     }
 }

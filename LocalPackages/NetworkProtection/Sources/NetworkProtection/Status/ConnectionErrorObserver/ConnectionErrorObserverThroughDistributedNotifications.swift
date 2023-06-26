@@ -1,5 +1,5 @@
 //
-//  ConnectionErrorObserverThroughIPC.swift
+//  ConnectionErrorObserverThroughDistributedNotifications.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -25,7 +25,7 @@ import Common
 
 /// Observes the server info through Distributed Notifications and an IPC connection.
 ///
-public class ConnectionErrorObserverThroughIPC: ConnectionErrorObserver {
+public class ConnectionErrorObserverThroughDistributedNotifications: ConnectionErrorObserver {
     public let publisher = CurrentValueSubject<String?, Never>(nil)
 
     // MARK: - Notifications

@@ -1,5 +1,5 @@
 //
-//  ConnectionStatusObserverThroughIPC.swift
+//  ConnectionStatusObserverThroughDistributedNotifications.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -24,21 +24,18 @@ import NetworkExtension
 import NotificationCenter
 import Common
 
-/// Observes the tunnel status through Distributed Notifications and an IPC connection.
+/// Observes the tunnel status through Distributed Notifications.
 ///
-public class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver {
+public class ConnectionStatusObserverThroughDistributedNotifications: ConnectionStatusObserver {
     public let publisher = CurrentValueSubject<ConnectionStatus, Never>(.unknown)
 
     // MARK: - Network Path Monitoring
 
-    private static let monitorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtection.ConnectionStatusObserverThroughIPC.monitorDispatchQueue", qos: .background)
+    private static let monitorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtection.ConnectionStatusObserverThroughDistributedNotifications.monitorDispatchQueue", qos: .background)
     private let monitor = NWPathMonitor()
     private static let timeoutOnNetworkChanges: TimeInterval = .seconds(3)
-    private var lastUpdate: Date = Date()
-
-    // MARK: - Notifications: Decoding
-
-    private let connectionStatusDecoder = ConnectionStatusDecoder()
+    private var lastStatusResponseTimestamp = Date()
+    private var lastStatusChangeTimestamp: Date?
 
     // MARK: - Notifications
 
@@ -64,11 +61,15 @@ public class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver {
     }
 
     func start() {
-        distributedNotificationCenter.publisher(for: .statusDidChange).sink { [weak self] notification in
+        distributedNotificationCenter.publisher(for: .statusDidChange)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
             self?.handleDistributedStatusChangeNotification(notification)
         }.store(in: &cancellables)
 
-        workspaceNotificationCenter.publisher(for: NSWorkspace.didWakeNotification).sink { [weak self] notification in
+        workspaceNotificationCenter.publisher(for: NSWorkspace.didWakeNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
             self?.handleDidWake(notification)
         }.store(in: &cancellables)
 
@@ -79,11 +80,25 @@ public class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver {
     }
 
     private func handleDistributedStatusChangeNotification(_ notification: Notification) {
-        let connectionStatus = connectionStatusDecoder.decode(notification.object)
-        logStatusChanged(status: connectionStatus)
-        lastUpdate = Date()
+        lastStatusResponseTimestamp = Date()
+        let statusChange: ConnectionStatusChange
 
-        publisher.send(connectionStatus)
+        do {
+            statusChange = try ConnectionStatusChangeDecoder().decodeObject(from: notification)
+        } catch {
+            os_log("Could not decode .statusDidChange distributed notification object: %{public}@", log: log, type: .error, String(describing: notification.object))
+            assertionFailure("Could not decode .statusDidChange distributed notification object: \(String(describing: notification.object))")
+            return
+        }
+
+        guard shouldProcessStatusChange(statusChange) else {
+            return
+        }
+
+        lastStatusChangeTimestamp = statusChange.timestamp
+        logStatusChanged(status: statusChange.status)
+
+        publisher.send(statusChange.status)
     }
 
     private func handleDidWake(_ notification: Notification) {
@@ -91,6 +106,24 @@ public class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver {
     }
 
     // MARK: - Requesting Status Updates
+
+    /// This method checks if we should process a status change notification, or if it has already been processed and there's
+    /// no need to do it again.
+    ///
+    /// We should process the received status change if any of the following conditions is true:
+    ///     - We have never processed a status change before; or
+    ///     - The last status change we recorded was prior to the newly received change.
+    ///
+    /// - Parameters:
+    ///     - change: a change that we want to know if we need to process or not.
+    ///
+    private func shouldProcessStatusChange(_ change: ConnectionStatusChange) -> Bool {
+        guard let lastStatusChangeTimestamp else {
+            return true
+        }
+
+        return lastStatusChangeTimestamp < change.timestamp
+    }
 
     /// Requests a status update and updates the status to disconnected if we don't hear back within a certain time.
     /// The timeout is currently set to 3 seconds.
@@ -102,7 +135,7 @@ public class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver {
         Task {
             try? await Task.sleep(interval: Self.timeoutOnNetworkChanges)
 
-            if lastUpdate < requestDate {
+            if lastStatusResponseTimestamp < requestDate {
                 publisher.send(.disconnected)
             }
         }

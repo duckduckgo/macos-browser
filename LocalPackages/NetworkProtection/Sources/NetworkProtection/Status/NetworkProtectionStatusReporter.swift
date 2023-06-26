@@ -112,6 +112,7 @@ public final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStat
             self?.handleControllerErrorStatusChanged(notification)
         }.store(in: &cancellables)
 
+        // swiftlint:disable:next unused_capture_list
         distributedNotificationCenter.publisher(for: .issuesStarted).sink { [weak self] _ in
             guard let self else { return }
 
@@ -119,6 +120,7 @@ public final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStat
             connectivityIssuesPublisher.send(true)
         }.store(in: &cancellables)
 
+        // swiftlint:disable:next unused_capture_list
         distributedNotificationCenter.publisher(for: .issuesResolved).sink { [weak self] _ in
             guard let self else { return }
 
