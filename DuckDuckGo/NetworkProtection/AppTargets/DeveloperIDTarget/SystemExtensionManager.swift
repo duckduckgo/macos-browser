@@ -23,7 +23,7 @@ import Combine
 
 struct SystemExtensionManager {
 
-    enum RequestEvent {
+    enum ActivationRequestEvent {
         case waitingForUserApproval
         case activated
         case willActivateAfterReboot
@@ -32,13 +32,13 @@ struct SystemExtensionManager {
     let bundleID: String
     let manager: OSSystemExtensionManager
 
-    init(bundleID: String = Bundle.main.networkProtectionExtensionBundleId,
+    init(bundleID: String = NetworkProtectionBundle.extensionBundle().bundleIdentifier!,
          manager: OSSystemExtensionManager = .shared) {
         self.bundleID = bundleID
         self.manager = manager
     }
 
-    func activate() -> AsyncThrowingStream<RequestEvent, Error> {
+    func activate() -> AsyncThrowingStream<ActivationRequestEvent, Error> {
         return SystemExtensionRequest.activationRequest(forExtensionWithIdentifier: bundleID, manager: manager).submit()
     }
 
@@ -50,7 +50,7 @@ struct SystemExtensionManager {
 
 final class SystemExtensionRequest: NSObject {
 
-    typealias Event = SystemExtensionManager.RequestEvent
+    typealias Event = SystemExtensionManager.ActivationRequestEvent
 
     private let request: OSSystemExtensionRequest
     private let manager: OSSystemExtensionManager
@@ -73,7 +73,7 @@ final class SystemExtensionRequest: NSObject {
     }
 
     /// submitting the request returns an Async Iterator providing the OSSystemExtensionRequest state change events
-    /// until an `RequestEvent` event is received.
+    /// until an Event is received.
     func submit() -> AsyncThrowingStream<Event, Error> {
         assert(continuation == nil, "Request can only be submitted once")
 
