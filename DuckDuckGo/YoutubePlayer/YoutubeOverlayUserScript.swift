@@ -108,7 +108,6 @@ extension YoutubeOverlayUserScript {
         guard let body = message.messageBody as? [String: Any], let params = body["params"] as? [String: Any] else {
             return nil
         }
-        print(body)
         let message = params["pixelName"] as? String
         if message == "play.use" || message == "play.do_not_use" {
             duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
