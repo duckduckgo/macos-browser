@@ -200,21 +200,20 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// - Returns: `true` if the system extension and the background agent were activated successfully
     ///
     private func ensureSystemExtensionIsActivated() async throws -> Bool {
-        var activated = false
-
         for try await event in SystemExtensionManager().activate() {
             switch event {
             case .waitingForUserApproval:
                 self.controllerErrorStore.lastErrorMessage = "Go to Security & Privacy in System Settings to allow Network Protection to activate"
             case .activated:
                 self.controllerErrorStore.lastErrorMessage = nil
-                activated = true
+                return true
             case .willActivateAfterReboot:
                 controllerErrorStore.lastErrorMessage = "Please reboot to activate Network Protection"
             }
         }
 
-        return activated
+        controllerErrorStore.lastErrorMessage = nil
+        return true
     }
 #endif
 
