@@ -60,7 +60,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             if logLevel == .error {
                 os_log("🔵 Received error from adapter: %{public}@", log: .networkProtection, type: .error, message)
             } else {
-                os_log("🔵 Received message from adapter: %{public}@", log: .networkProtection, type: .info, message)
+                os_log("🔵 Received message from adapter: %{public}@", log: .networkProtection, message)
             }
         }
     }()
@@ -179,7 +179,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     private func resetRegistrationKey() {
-        os_log("Resetting the current registration key", log: .networkProtectionKeyManagement, type: .info)
+        os_log("Resetting the current registration key", log: .networkProtectionKeyManagement)
         keyStore.resetCurrentKeyPair()
     }
 
@@ -196,7 +196,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     private func rekey() async {
-        os_log("Rekeying...", log: .networkProtectionKeyManagement, type: .info)
+        os_log("Rekeying...", log: .networkProtectionKeyManagement)
 
         Pixel.fire(.networkProtectionActiveUser, frequency: .dailyOnly, includeAppVersionParameter: true)
         Pixel.fire(.networkProtectionRekeyCompleted, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
@@ -471,7 +471,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         tunnelHealth.isHavingConnectivityIssues = false
         controllerErrorStore.lastErrorMessage = nil
 
-        os_log("🔵 Will load options\n%{public}@", log: .networkProtection, type: .info, String(describing: options))
+        os_log("🔵 Will load options\n%{public}@", log: .networkProtection, String(describing: options))
 
         if options?["tunnelFailureSimulation"] as? String == "true" {
             internalCompletionHandler(TunnelError.simulateTunnelFailureError)
