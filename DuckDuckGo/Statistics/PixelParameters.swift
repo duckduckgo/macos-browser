@@ -111,7 +111,10 @@ extension Pixel.Event {
              .setAsDefaultInitial,
              .importDataInitial,
              .newTabInitial,
-             .networkProtectionSystemExtensionUnknownActivationResult:
+             .networkProtectionSystemExtensionUnknownActivationResult,
+             .favoriteSectionHidden,
+             .recentActivitySectionHidden,
+             .continueSetUpSectionHidden:
 
             return nil
         }
