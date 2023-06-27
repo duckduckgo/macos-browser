@@ -45,7 +45,6 @@ enum NetworkProtectionBundle {
 #endif
     }
 
-#if !NETWORK_EXTENSION
     static func extensionBundle(at url: URL) -> Bundle {
         let extensionURLs: [URL]
         do {
@@ -56,15 +55,17 @@ enum NetworkProtectionBundle {
             fatalError("🔵 Failed to get the contents of \(url.absoluteString): \(error.localizedDescription)")
         }
 
-        for url in extensionURLs {
-            guard let bundle = Bundle(url: url),
-                  bundle.bundleIdentifier == Bundle.main.networkProtectionExtensionBundleId else { continue }
-
-            return bundle
+        // This should be updated to work well with other extensions
+        guard let extensionURL = extensionURLs.first else {
+            fatalError("🔵 Failed to find any system extensions")
         }
-        fatalError("🔵 Failed to find system extension")
+
+        guard let extensionBundle = Bundle(url: extensionURL) else {
+            fatalError("🔵 Failed to create a bundle with URL \(extensionURL.absoluteString)")
+        }
+
+        return extensionBundle
     }
-#endif
 
     static func usesSystemKeychain() -> Bool {
 #if NETP_SYSTEM_EXTENSION
@@ -73,16 +74,4 @@ enum NetworkProtectionBundle {
         false
 #endif
     }
-}
-
-extension Bundle {
-
-    var networkProtectionExtensionBundleId: String {
-        let key = "NETP_BUNDLE_ID"
-        guard let bundleID = object(forInfoDictionaryKey: key) as? String else {
-            fatalError("Info.plist is missing \(key)")
-        }
-        return bundleID
-    }
-
 }
