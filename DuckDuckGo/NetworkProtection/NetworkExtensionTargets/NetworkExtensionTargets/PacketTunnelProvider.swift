@@ -565,6 +565,15 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
+    override func cancelTunnelWithError(_ error: Error?) {
+        // ensure on-demand rule is taken down on connection retry failure
+        Task {
+            await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+
+            super.cancelTunnelWithError(error)
+        }
+    }
+
     /// Do not cancel, directly... call this method so that the adapter and tester are stopped too.
     private func stopTunnel(with stopError: Error) {
         connectionStatus = .disconnecting
