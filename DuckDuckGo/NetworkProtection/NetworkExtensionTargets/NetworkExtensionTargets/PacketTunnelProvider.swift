@@ -468,15 +468,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             completionHandler(error)
         }
 
-        if isActivatedFromSystemSettings {
-            // ask the Main App to reconfigure & restart with on-demand rule “on” - when connection triggered from System Settings
-            Task {
-                await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .startVPN)
-                internalCompletionHandler(NEVPNError(.configurationStale))
-            }
-            return
-        }
-
         tunnelHealth.isHavingConnectivityIssues = false
         controllerErrorStore.lastErrorMessage = nil
 
