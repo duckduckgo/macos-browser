@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "shane/ccf-duckplayer",
-        "revision" : "8cdfbb615d320e6e52ddae9409c103895b242552"
+        "revision" : "f3fffd9ab145fce92014294de92d3923e218d4fe",
+        "version" : "62.0.3"
       }
     },
     {
