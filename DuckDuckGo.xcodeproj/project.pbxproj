@@ -78,6 +78,7 @@
 		1E950E432912A10D0051A99B /* UserScript in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E422912A10D0051A99B /* UserScript */; };
 		1EB78A9A2A1B918F00274FCE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1EB78A992A1B90A000274FCE /* Images.xcassets */; };
 		1EB78A9B2A1B919000274FCE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1EB78A992A1B90A000274FCE /* Images.xcassets */; };
+		1EBCDCC22A4ADF17007D8001 /* AccountsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EBCDCC12A4ADF17007D8001 /* AccountsService.swift */; };
 		3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */; };
 		310E79BF294A19A8007C49E8 /* FireproofingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */; };
 		311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B262628E73E0A00FD181A /* TabShadowConfig.swift */; };
@@ -2135,6 +2136,7 @@
 		1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPermissionHandler.swift; sourceTree = "<group>"; };
 		1E9C15A02A45EE5E00D80BAC /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		1EB78A992A1B90A000274FCE /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		1EBCDCC12A4ADF17007D8001 /* AccountsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsService.swift; sourceTree = "<group>"; };
 		3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionViewController.swift; sourceTree = "<group>"; };
 		310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofingReferenceTests.swift; sourceTree = "<group>"; };
 		311B262628E73E0A00FD181A /* TabShadowConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowConfig.swift; sourceTree = "<group>"; };
@@ -3418,6 +3420,7 @@
 			children = (
 				1EB78A992A1B90A000274FCE /* Images.xcassets */,
 				1E73C7C62A163A8900B7BBA0 /* PurchaseManager.swift */,
+				1EBCDCC12A4ADF17007D8001 /* AccountsService.swift */,
 				1E53D72A2A0CD00700D977A4 /* PurchaseViewController.swift */,
 				1E73C7C32A138B6000B7BBA0 /* PurchaseModel.swift */,
 				1E53D7262A0CCFCD00D977A4 /* PurchaseView.swift */,
@@ -8901,6 +8904,7 @@
 				B65536A62685B82B00085A79 /* Permissions.swift in Sources */,
 				AAC82C60258B6CB5009B6B42 /* TabPreviewWindowController.swift in Sources */,
 				AAC5E4E425D6BA9C007F5990 /* NSSizeExtension.swift in Sources */,
+				1EBCDCC22A4ADF17007D8001 /* AccountsService.swift in Sources */,
 				AA6820EB25503D6A005ED0D5 /* Fire.swift in Sources */,
 				37445F9C2A1569F00029F789 /* SyncBookmarksAdapter.swift in Sources */,
 				B6AAAC3E26048F690029438D /* RandomAccessCollectionExtension.swift in Sources */,

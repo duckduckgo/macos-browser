@@ -92,8 +92,6 @@ final class PurchaseManager: ObservableObject {
     func sendPurchaseConfirmation(for transaction: Transaction) async {
         print(transaction)
 
-        let transactionString = transaction.debugDescription
-
         var request = URLRequest(url: URL(string: "https://use-subspoc1.eastus.cloudapp.azure.com/newAppleSubscription")!)
         request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
@@ -153,7 +151,6 @@ final class PurchaseManager: ObservableObject {
 
             let result = try await product.purchase(options: options)
 
-
             print(" -- [PurchaseManager] receiving await task result")
             purchaseQueue.removeAll()
 
@@ -179,14 +176,46 @@ final class PurchaseManager: ObservableObject {
         }
     }
 
+    private var accessToken: String = ""
+
+    @MainActor
+    func exchangeToken() {
+        Task {
+            do {
+                let response = try await AccountsService.getAccessToken()
+
+                DispatchQueue.main.async {
+                    self.accessToken = response?.accessToken ?? ""
+                }
+            } catch {
+                print("Error exchanging token: \(error)")
+            }
+        }
+    }
+
+    @MainActor
+    func fetchEntitlements() {
+        Task {
+            do {
+                let response = try await AccountsService.validateToken(accessToken: self.accessToken)
+
+                if let response = response {
+                    print("Current entitlements: \(response.account.entitlements.map { $0.product }.joined(separator: ",") )")
+                }
+            } catch {
+                print("Error fetching entitlements: \(error)")
+            }
+        }
+    }
+
     private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
-        //Check whether the JWS passes StoreKit verification.
+        // Check whether the JWS passes StoreKit verification.
         switch result {
         case .unverified:
-            //StoreKit parses the JWS, but it fails verification.
+            // StoreKit parses the JWS, but it fails verification.
             throw StoreError.failedVerification
         case .verified(let safe):
-            //The result is verified. Return the unwrapped value.
+            // The result is verified. Return the unwrapped value.
             return safe
         }
     }

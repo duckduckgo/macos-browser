@@ -48,7 +48,8 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("PurchaseManager.swift", .source),
         .init("PurchaseView.swift", .source),
         .init("PurchaseModel.swift", .source),
-        .init("PurchaseViewController.swift", .source)
+        .init("PurchaseViewController.swift", .source),
+        .init("AccountsService.swift", .source)
     ],
 
     "DuckDuckGo Privacy Browser App Store": [],

@@ -185,9 +185,14 @@ struct PurchaseView: View {
                     Button("UUID #2") { customUUID = "22222222-2222-2222-2222-222222222222" }
                     Button("Clear UUID") { customUUID = "" }
                 }
+
+                Group {
+                    Spacer()
+                    Button("Exchange token") { manager.exchangeToken() }
+                    Button("Fetch entitlements") { manager.fetchEntitlements() }
+                }
             }
 
-            Spacer()
             Group {
                 HStack {
                     Spacer()
