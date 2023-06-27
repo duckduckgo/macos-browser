@@ -105,11 +105,10 @@ extension Preferences {
 
                 // SECTION 3: New Tab Page
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.newTabBottomPopoverTitle)
-                    ToggleMenuItem(title: UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
-                    ToggleMenuItem(title: UserText.newTabMenuItemShowFavorite, isOn: $model.isFavoriteVisible)
-                    ToggleMenuItem(title: UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
-                    TextMenuItemCaption(text: "Choose what content you want shown")
+                    TextMenuItemHeader(text: UserText.newTabContentSettingTitle)
+                    ToggleMenuItem(title: UserText.showNextSteps, isOn: $model.isContinueSetUpVisible)
+                    ToggleMenuItem(title: UserText.showFavorites, isOn: $model.isFavoriteVisible)
+                    ToggleMenuItem(title: UserText.showRecentActivity, isOn: $model.isRecentActivityVisible)
                 }
 
                 // SECTION 4: Zoom Setting
