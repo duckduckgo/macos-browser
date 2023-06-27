@@ -734,7 +734,7 @@ struct UserText {
 
     // MARK: New Tab
     // Context Menu
-    static let newTabBottomPopoverTitle = NSLocalizedString("newTab.bottom.popover.title", value: "Home Content", comment: "Title of the popover that appears when pressing the bottom right button")
+    static let newTabBottomPopoverTitle = NSLocalizedString("newTab.bottom.popover.title", value: "New Tab Page", comment: "Title of the popover that appears when pressing the bottom right button")
     static let newTabMenuItemShowFavorite = NSLocalizedString("newTab.menu.item.show.favorite", value: "Show Favorites", comment: "Title of the menu item in the home page to show/hide favorite section")
     static let newTabMenuItemShowContinuteSetUp = NSLocalizedString("newTab.menu.item.show.continue.setup", value: "Next Steps", comment: "Title of the menu item in the home page to show/hide continue setup section")
     static let newTabMenuItemShowRecentActivity = NSLocalizedString("newTab.menu.item.show.recent.activity", value: "Show Recent Activity", comment: "Title of the menu item in the home page to show/hide recent activity section")

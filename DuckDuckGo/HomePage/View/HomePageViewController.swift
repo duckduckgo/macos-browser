@@ -34,7 +34,7 @@ final class HomePageViewController: NSViewController {
     var defaultBrowserModel: HomePage.Models.DefaultBrowserModel!
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
     var featuresModel: HomePage.Models.ContinueSetUpModel!
-    var homePageRootViewModel: AppearancePreferences!
+    var appearancePreferences: AppearancePreferences!
     var cancellables = Set<AnyCancellable>()
 
     @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
@@ -67,7 +67,7 @@ final class HomePageViewController: NSViewController {
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
         featuresModel = createFeatureModel()
-        homePageRootViewModel = AppearancePreferences.shared
+        appearancePreferences = AppearancePreferences.shared
 
         refreshModels()
 
@@ -76,7 +76,7 @@ final class HomePageViewController: NSViewController {
             .environmentObject(defaultBrowserModel)
             .environmentObject(recentlyVisitedModel)
             .environmentObject(featuresModel)
-            .environmentObject(homePageRootViewModel)
+            .environmentObject(appearancePreferences)
             .onTapGesture { [weak self] in
                 // Remove focus from the address bar if interacting with this view.
                 self?.view.makeMeFirstResponder()
