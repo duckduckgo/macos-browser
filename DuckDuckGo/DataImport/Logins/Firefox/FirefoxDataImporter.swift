@@ -40,7 +40,7 @@ final class FirefoxDataImporter: DataImporter {
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
                     completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
-        guard let firefoxProfileURL = profile?.profileURL ?? defaultFirefoxProfilePath() else {
+        guard let firefoxProfileURL = profile?.profileURL ?? Self.defaultFirefoxProfilePath() else {
             completion(.failure(.generic(.cannotReadFile)))
             return
         }
@@ -136,7 +136,21 @@ final class FirefoxDataImporter: DataImporter {
         }
     }
 
-    private func defaultFirefoxProfilePath() -> URL? {
+    static func loginDatabaseRequiresPrimaryPassword(profileURL: URL?) -> Bool {
+        guard let firefoxProfileURL = profileURL ?? defaultFirefoxProfilePath() else {
+            return false
+        }
+
+        let loginReader = FirefoxLoginReader(firefoxProfileURL: firefoxProfileURL, primaryPassword: nil)
+        let loginResult = loginReader.readLogins(dataFormat: nil)
+
+        switch loginResult {
+        case .success: return false
+        case .failure(let failure): return failure == .requiresPrimaryPassword
+        }
+    }
+
+    static func defaultFirefoxProfilePath() -> URL? {
         guard let potentialProfiles = try? FileManager.default.contentsOfDirectory(atPath: profilesDirectoryURL().path) else {
             return nil
         }
@@ -151,7 +165,7 @@ final class FirefoxDataImporter: DataImporter {
         return profilesDirectoryURL().appendingPathComponent(selectedProfile)
     }
 
-    private func profilesDirectoryURL() -> URL {
+    static func profilesDirectoryURL() -> URL {
         let applicationSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         return applicationSupportURL.appendingPathComponent("Firefox/Profiles")
     }

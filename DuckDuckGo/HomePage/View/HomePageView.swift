@@ -56,6 +56,9 @@ extension HomePage.Views {
                 }
                 .frame(maxWidth: .infinity)
                 .background(backgroundColor)
+                .onAppear {
+                    LocalBookmarkManager.shared.requestSync()
+                }
         }
     }
 }
