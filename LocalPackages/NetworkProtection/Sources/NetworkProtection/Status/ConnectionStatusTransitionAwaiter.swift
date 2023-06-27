@@ -31,7 +31,7 @@ import Foundation
 public final class ConnectionStatusTransitionAwaiter {
 
     public enum TransitionError: Error {
-        case transitionTimeout
+        case timeout
     }
 
     /// The target status for a supported transition
@@ -87,7 +87,7 @@ public final class ConnectionStatusTransitionAwaiter {
     }
 
     private func waitUntilTargetStatus(_ targetStatus: TargetStatus) async throws {
-        while await !expect(.connected, within: .seconds(1)) {
+        while await !expect(.connected, within: transitionTimeout) {
             let currentStatus = statusObserver.publisher.value
 
             if targetStatus.sameStatus(as: currentStatus) {
@@ -107,7 +107,7 @@ public final class ConnectionStatusTransitionAwaiter {
                 continue
             }
 
-            throw TransitionError.transitionTimeout
+            throw TransitionError.timeout
         }
     }
 
