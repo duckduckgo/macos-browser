@@ -177,8 +177,8 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
         try JSONEncoder().encode(cache).write(to: cacheURL)
 
         guard !filesToProcess.isEmpty else {
-            return [
-                .prebuildCommand(displayName: "DependencyInjectionMacros", executable: try context.tool(named: "echo").path, arguments: ["rebuild not needed"], outputFilesDirectory: workDir)
+            return try [
+                .prebuildCommand(displayName: "DependencyInjectionMacros", executable: context.tool(named: "echo").path, arguments: ["rebuild not needed"], outputFilesDirectory: workDir),
             ]
         }
 
@@ -190,11 +190,10 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
 #endif
         let macroToolPath = packagePath.appending(".build", arch, "*", "DependencyInjectionMacros")
             .string.replacingOccurrences(of: " ", with: "\\ ")
-        let home = ProcessInfo().environment["HOME"]!
 
-        return [
-            .prebuildCommand(displayName: "Build DependencyInjectionMacros", executable: try context.tool(named: "sh").path, arguments: ["-c", "export HOME=\(home) && source ~/.bashrc && swift build --package-path '\(packagePath)'"], outputFilesDirectory: emptyDir),
-            .prebuildCommand(displayName: "DependencyInjectionMacros", executable: try context.tool(named: "sh").path, arguments: ["-c", "cd \(workDir); \(macroToolPath) \(filesToProcess.joined(separator: " "))"], outputFilesDirectory: workDir)
+        return try [
+            .prebuildCommand(displayName: "Build DependencyInjectionMacros", executable: context.tool(named: "sh").path, arguments: ["-c", "export PATH=\"$PATH\" && swift build --package-path '\(packagePath)'"], outputFilesDirectory: emptyDir),
+            .prebuildCommand(displayName: "DependencyInjectionMacros", executable: context.tool(named: "sh").path, arguments: ["-c", "cd \(workDir); \(macroToolPath) \(filesToProcess.joined(separator: " "))"], outputFilesDirectory: workDir),
         ]
     }
     // swiftlint:enable cyclomatic_complexity
