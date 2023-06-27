@@ -51,7 +51,7 @@ public struct ProfileQuery: Encodable, Sendable {
                 state: String? = nil,
                 age: Int? = nil,
                 profileUrl: String? = nil,
-                email: String? = nil) -> ProfileQuery{
+                email: String? = nil) -> ProfileQuery {
         ProfileQuery(
             firstName: firstName ?? self.firstName,
             lastName: lastName ?? self.lastName,
