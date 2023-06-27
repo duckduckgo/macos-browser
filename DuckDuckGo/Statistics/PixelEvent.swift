@@ -256,6 +256,8 @@ extension Pixel {
             case syncMetadataCouldNotLoadDatabase
             case syncBookmarksProviderInitializationFailed
             case syncBookmarksFailed
+            case syncLoginsProviderInitializationFailed
+            case syncLoginsFailed
 
             case invalidPayload(Configuration)
 
@@ -578,6 +580,8 @@ extension Pixel.Event.Debug {
         case .syncMetadataCouldNotLoadDatabase: return "sync_metadata_could_not_load_database"
         case .syncBookmarksProviderInitializationFailed: return "sync_bookmarks_provider_initialization_failed"
         case .syncBookmarksFailed: return "sync_bookmarks_failed"
+        case .syncLoginsProviderInitializationFailed: return "sync_logins_provider_initialization_failed"
+        case .syncLoginsFailed: return "sync_logins_failed"
 
         case .invalidPayload(let configuration): return "m_d_\(configuration.rawValue)_invalid_payload".lowercased()
 
