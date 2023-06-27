@@ -54,7 +54,7 @@ SYSEX_BUNDLE_NAME = $(SYSEX_PRODUCT_NAME).systemextension
 
 // Install Developer ID build to /Applications/DEBUG/
 DEPLOYMENT_LOCATION[config=Debug] = YES;
-DSTROOT[config=Debug] = /;
-INSTALL_PATH[config=Debug] = Applications/DEBUG;
+DSTROOT[config=Debug] = ${BUILT_PRODUCTS_DIR}
+INSTALL_PATH[config=Debug] = Applications/DEBUG
 
 #include? "../../LocalOverrides.xcconfig"

@@ -18,9 +18,9 @@
 
 // swiftlint:disable identifier_name
 
+import Common
 import Darwin
 import Foundation
-import Common
 import Network
 import QuartzCore
 
@@ -90,7 +90,7 @@ public final class Pinger: @unchecked Sendable {
                 ttl: Int? = nil,
                 timeout: TimeInterval = Constants.defaultTimeout,
                 queue: DispatchQueue = DispatchQueue(label: "Pinger"),
-                log: @autoclosure @escaping (() -> OSLog) = .disabled) {
+                log: @autoclosure @escaping (() -> OSLog)) {
 
         self.ip = ip
         self.id = id

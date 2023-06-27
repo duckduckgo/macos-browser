@@ -1163,8 +1163,6 @@
 		4B5A4F4C27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A4F4B27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift */; };
 		4B5F14DC2A1470AA0060320F /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5F14C52A145D6A0060320F /* Main.swift */; };
 		4B5F14F22A1476EF0060320F /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5F14C52A145D6A0060320F /* Main.swift */; };
-		4B5F14F42A14824F0060320F /* startVPN.app in Embed NetP Controller Apps */ = {isa = PBXBuildFile; fileRef = 4B5F14CB2A14702C0060320F /* startVPN.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		4B5F14F52A1482530060320F /* stopVPN.app in Embed NetP Controller Apps */ = {isa = PBXBuildFile; fileRef = 4B5F14E12A1476BD0060320F /* stopVPN.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4B5FF67826B602B100D42879 /* FirefoxDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5FF67726B602B100D42879 /* FirefoxDataImporter.swift */; };
 		4B65143E263924B5005B46EB /* EmailUrlExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */; };
 		4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B677427255DBEB800025BD8 /* httpsMobileV2BloomSpec.json */; };
@@ -2019,6 +2017,20 @@
 			remoteGlobalIDString = AA585D7D248FD31100E9A3E2;
 			remoteInfo = DuckDuckGo;
 		};
+		B69D05F12A4AF18F0032D14D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B5F14CA2A14702C0060320F;
+			remoteInfo = startVPN;
+		};
+		B69D05F32A4AF1A30032D14D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B5F14E02A1476BC0060320F;
+			remoteInfo = stopVPN;
+		};
 		B6EC37F129B5DA8F001ACE79 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
@@ -2046,18 +2058,6 @@
 				4B2D065E2A11D2D700DE1F49 /* DuckDuckGo Notifications.app in Embed Login Items */,
 			);
 			name = "Embed Login Items";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4B5F14F32A14823D0060320F /* Embed NetP Controller Apps */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 7;
-			files = (
-				4B5F14F52A1482530060320F /* stopVPN.app in Embed NetP Controller Apps */,
-				4B5F14F42A14824F0060320F /* startVPN.app in Embed NetP Controller Apps */,
-			);
-			name = "Embed NetP Controller Apps";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		B6EC37E629B5DA2A001ACE79 /* CopyFiles */ = {
@@ -6568,7 +6568,7 @@
 				4B2D06652A13318400DE1F49 /* Sources */,
 				4B2D06662A13318400DE1F49 /* Frameworks */,
 				4B2D06672A13318400DE1F49 /* Resources */,
-				4B2D067D2A13341200DE1F49 /* ShellScript */,
+				4B2D067D2A13341200DE1F49 /* Copy Assets */,
 			);
 			buildRules = (
 			);
@@ -6680,6 +6680,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA585DA4248FD31500E9A3E2 /* Build configuration list for PBXNativeTarget "DuckDuckGo Privacy Browser" */;
 			buildPhases = (
+				B69D05F02A4AF1050032D14D /* Make /Applications symlink, remove app on Clean build */,
 				CBCCF59E299667B700C02DFE /* Assert Xcode version */,
 				3705272528992C8A000C06A2 /* Check Embedded Config URLs */,
 				AA585D7A248FD31100E9A3E2 /* Sources */,
@@ -6687,13 +6688,14 @@
 				AA585D7B248FD31100E9A3E2 /* Frameworks */,
 				AA585D7C248FD31100E9A3E2 /* Resources */,
 				4B2D065D2A11D2AE00DE1F49 /* Embed Login Items */,
-				4B5F14F32A14823D0060320F /* Embed NetP Controller Apps */,
-				4B5F14F62A14825A0060320F /* Replace VPN Controllers with Symlinks */,
+				4B5F14F62A14825A0060320F /* Embed startVPN.app & stopVPN.app */,
 				7B6469992A165AE00095095A /* Embed System Network Extension */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B69D05F42A4AF1A30032D14D /* PBXTargetDependency */,
+				B69D05F22A4AF18F0032D14D /* PBXTargetDependency */,
 				4B5F14FC2A15291D0060320F /* PBXTargetDependency */,
 				4B2537642A11BE7600610219 /* PBXTargetDependency */,
 			);
@@ -7190,9 +7192,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/NetworkProtectionUI_NetworkProtectionUI.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
+			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\nrsync -Lru \"${BUILT_PRODUCTS_DIR}/NetworkProtectionUI_NetworkProtectionUI.bundle/\" \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
 		};
-		4B2D067D2A13341200DE1F49 /* ShellScript */ = {
+		4B2D067D2A13341200DE1F49 /* Copy Assets */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -7201,15 +7203,16 @@
 			);
 			inputPaths = (
 			);
+			name = "Copy Assets";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/NetworkProtectionUI_NetworkProtectionUI.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
+			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\nrsync -Lru \"${BUILT_PRODUCTS_DIR}/NetworkProtectionUI_NetworkProtectionUI.bundle\" \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
 		};
-		4B5F14F62A14825A0060320F /* Replace VPN Controllers with Symlinks */ = {
+		4B5F14F62A14825A0060320F /* Embed startVPN.app & stopVPN.app */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -7219,33 +7222,34 @@
 			);
 			inputPaths = (
 			);
-			name = "Replace VPN Controllers with Symlinks";
+			name = "Embed startVPN.app & stopVPN.app";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"Replace and Sign\" # for easier build log search\n\n# startVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/startVPN.app/Contents/MacOS\"\nrm ./startVPN\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./startVPN\npopd\n\n# stopVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/stopVPN.app/Contents/MacOS\"\nrm ./stopVPN\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./stopVPN\ncd ../../.. \npopd\n";
+			shellScript = "startVPN_DEST=\"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/startVPN.app\"\nif [ ! -d \"${startVPN_DEST}\" ]; then\n  echo \"ditto ${BUILT_PRODUCTS_DIR}/startVPN.app ${startVPN_DEST}\"\n  ditto \"${BUILT_PRODUCTS_DIR}/startVPN.app\" \"${startVPN_DEST}\" || exit 1\n\n  echo \"replace startVPN.app binary with symlink\"\n  rm -rf \"${startVPN_DEST}/Contents/Frameworks\"\n  pushd \"${startVPN_DEST}/Contents/MacOS\"\n    rm ./startVPN\n    ln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./startVPN\n  popd\nelse\n  echo \"startVPN.app already in place\"\nfi\n\nstopVPN_DEST=\"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/stopVPN.app\"\nif [ ! -d \"${stopVPN_DEST}\" ]; then\n  echo \"ditto ${BUILT_PRODUCTS_DIR}/stopVPN.app ${stopVPN_DEST}\"\n  ditto \"${BUILT_PRODUCTS_DIR}/stopVPN.app\" \"${stopVPN_DEST}\" || exit 1\n\n  echo \"replace stopVPN.app binary with symlink\"\n  rm -rf \"${stopVPN_DEST}/Contents/Frameworks\"\n  pushd \"${stopVPN_DEST}/Contents/MacOS\"\n    rm ./stopVPN\n    ln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./stopVPN\n  popd\nelse\n  echo \"stopVPN.app already in place\"\nfi\n";
 		};
 		7B6469992A165AE00095095A /* Embed System Network Extension */ = {
 			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
 			);
 			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(SYSEX_BUNDLE_ID)",
 			);
 			name = "Embed System Network Extension";
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(CONTENTS_FOLDER_PATH)/Library/SystemExtensions/$(SYSEX_BUNDLE_ID)",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "SYSEX_TARGET_NAME=\"${SYSEX_BUNDLE_ID}.systemextension\"\necho \"ditto ${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_NAME} $BUILT_PRODUCTS_DIR/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_TARGET_NAME}\"\n\nditto \"${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_NAME}\" \"$BUILT_PRODUCTS_DIR/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_TARGET_NAME}\" || exit 1\n";
+			shellScript = "SYSEX_TARGET_NAME=\"${SYSEX_BUNDLE_ID}.systemextension\"\necho \"ditto ${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_NAME} ${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_TARGET_NAME}\"\n\nditto \"${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_NAME}\" \"${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_TARGET_NAME}\" || exit 1\n";
 		};
 		AA8EDF2824925E940071C2E8 /* Swift Lint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -7266,8 +7270,28 @@
 			shellPath = /bin/zsh;
 			shellScript = "./lint.sh\n";
 		};
+		B69D05F02A4AF1050032D14D /* Make /Applications symlink, remove app on Clean build */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Make /Applications symlink, remove app on Clean build";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ ! -L ${BUILT_PRODUCTS_DIR}/Applications ]]; then\n    # rm ${BUILT_PRODUCTS_DIR}/Applications directory created by Xcode\n    echo \"removing ${BUILT_PRODUCTS_DIR}/Applications\" \n    rm -rf ${BUILT_PRODUCTS_DIR}/Applications\n    # create ${BUILT_PRODUCTS_DIR}/Applications symlink to /Applications\n    ln -s /Applications ${BUILT_PRODUCTS_DIR}/Applications\n    # create /Applications/DEBUG dir\n    echo \"making ${DSTROOT}/${INSTALL_PATH}\"\n    mkdir -p ${DSTROOT}/${INSTALL_PATH}\n    # we only get here on clean build, remove an existing app on clean build\n    echo \"removing ${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n    rm -rf ${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app\nfi\n    \n\n";
+		};
 		B6BD8F0A2A260E5900B6A41F /* Embed libswift_Concurrency.dylib */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -9227,6 +9251,16 @@
 			isa = PBXTargetDependency;
 			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
 			targetProxy = AA585D91248FD31400E9A3E2 /* PBXContainerItemProxy */;
+		};
+		B69D05F22A4AF18F0032D14D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B5F14CA2A14702C0060320F /* startVPN */;
+			targetProxy = B69D05F12A4AF18F0032D14D /* PBXContainerItemProxy */;
+		};
+		B69D05F42A4AF1A30032D14D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B5F14E02A1476BC0060320F /* stopVPN */;
+			targetProxy = B69D05F32A4AF1A30032D14D /* PBXContainerItemProxy */;
 		};
 		B6EC37F229B5DA8F001ACE79 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
