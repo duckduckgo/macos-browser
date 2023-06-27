@@ -183,6 +183,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             // MARK: perform first time launch logic here
         }
 
+        startupSync()
+
         stateRestorationManager.applicationDidFinishLaunching()
 
         BWManager.shared.initCommunication()
@@ -210,8 +212,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #if NETWORK_PROTECTION
         startupNetworkProtection()
 #endif
-
-        startupSync()
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
