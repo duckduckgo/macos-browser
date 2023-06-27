@@ -382,13 +382,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         try await manager.saveToPreferences()
     }
 
-    func disableOnDemand() async throws {
-        let manager = try await loadOrMakeTunnelManager()
-
-        manager.isOnDemandEnabled = false
-        try await manager.saveToPreferences()
-    }
-
     // MARK: - Debug commands for the extension
 
     static func resetAllState() async throws {

@@ -31,7 +31,6 @@ public final class AppLauncher {
         case startVPN
         case stopVPN
         case enableOnDemand
-        case disableOnDemand
 
         var commandURL: String? {
             switch self {
@@ -54,8 +53,6 @@ public final class AppLauncher {
                 return "./Contents/Resources/stopVPN.app"
             case .enableOnDemand:
                 return "./Contents/Resources/enableOnDemand.app"
-            case .disableOnDemand:
-                return "./Contents/Resources/disableOnDemand.app"
             default:
                 return nil
             }

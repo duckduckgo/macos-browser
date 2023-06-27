@@ -1332,9 +1332,7 @@
 		7B1E81A027C8874900FF0E60 /* ContentOverlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */; };
 		7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4CE8E626F02134009134B1 /* TabBarTests.swift */; };
 		7B736E582A4A22B700F9922A /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5F14C52A145D6A0060320F /* Main.swift */; };
-		7B736E622A4A22DD00F9922A /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5F14C52A145D6A0060320F /* Main.swift */; };
 		7B736E6A2A4A22FC00F9922A /* enableOnDemand.app in Embed NetP Controller Apps */ = {isa = PBXBuildFile; fileRef = 7B736E5F2A4A22B700F9922A /* enableOnDemand.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		7B736E6B2A4A230100F9922A /* disableOnDemand.app in Embed NetP Controller Apps */ = {isa = PBXBuildFile; fileRef = 7B736E692A4A22DD00F9922A /* disableOnDemand.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7B838C382A1DD8DD00E05A13 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B2D06522A11D19B00DE1F49 /* Assets.xcassets */; };
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
 		7BB108592A43375D000AB95F /* PFMoveApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BB108582A43375D000AB95F /* PFMoveApplication.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -2058,7 +2056,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				7B736E6B2A4A230100F9922A /* disableOnDemand.app in Embed NetP Controller Apps */,
 				7B736E6A2A4A22FC00F9922A /* enableOnDemand.app in Embed NetP Controller Apps */,
 				4B5F14F52A1482530060320F /* stopVPN.app in Embed NetP Controller Apps */,
 				4B5F14F42A14824F0060320F /* startVPN.app in Embed NetP Controller Apps */,
@@ -2542,9 +2539,7 @@
 		7B5291882A1697680022E406 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B5291892A169BC90022E406 /* NetworkProtectionDeveloperID.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionDeveloperID.xcconfig; sourceTree = "<group>"; };
 		7B736E5F2A4A22B700F9922A /* enableOnDemand.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = enableOnDemand.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		7B736E692A4A22DD00F9922A /* disableOnDemand.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = disableOnDemand.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B9459632A4A5BAF0012535A /* NetworkProtectionEnableOnDemand.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionEnableOnDemand.xcconfig; sourceTree = "<group>"; };
-		7B9459642A4A5BAF0012535A /* NetworkProtectionDisableOnDemand.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionDisableOnDemand.xcconfig; sourceTree = "<group>"; };
 		7BB108572A43375D000AB95F /* PFMoveApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFMoveApplication.h; sourceTree = "<group>"; };
 		7BB108582A43375D000AB95F /* PFMoveApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFMoveApplication.m; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
@@ -3231,13 +3226,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7B736E632A4A22DD00F9922A /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		AA585D7B248FD31100E9A3E2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -3783,7 +3771,6 @@
 				4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */,
 				4B2D064D2A11D04000DE1F49 /* DuckDuckGoAgentAppStore.xcconfig */,
 				4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */,
-				7B9459642A4A5BAF0012535A /* NetworkProtectionDisableOnDemand.xcconfig */,
 				7B9459632A4A5BAF0012535A /* NetworkProtectionEnableOnDemand.xcconfig */,
 				4B18E3272A1D3896005D0AAA /* NetworkProtectionVPNHelpersBase.xcconfig */,
 				4B18E3232A1D32B1005D0AAA /* NetworkProtectionStartVPN.xcconfig */,
@@ -4955,7 +4942,6 @@
 				4B5F14CB2A14702C0060320F /* startVPN.app */,
 				4B5F14E12A1476BD0060320F /* stopVPN.app */,
 				7B736E5F2A4A22B700F9922A /* enableOnDemand.app */,
-				7B736E692A4A22DD00F9922A /* disableOnDemand.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -6718,22 +6704,6 @@
 			productReference = 7B736E5F2A4A22B700F9922A /* enableOnDemand.app */;
 			productType = "com.apple.product-type.application";
 		};
-		7B736E602A4A22DD00F9922A /* disableOnDemand */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 7B736E642A4A22DD00F9922A /* Build configuration list for PBXNativeTarget "disableOnDemand" */;
-			buildPhases = (
-				7B736E612A4A22DD00F9922A /* Sources */,
-				7B736E632A4A22DD00F9922A /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = disableOnDemand;
-			productName = stopVPN;
-			productReference = 7B736E692A4A22DD00F9922A /* disableOnDemand.app */;
-			productType = "com.apple.product-type.application";
-		};
 		AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA585DA4248FD31500E9A3E2 /* Build configuration list for PBXNativeTarget "DuckDuckGo Privacy Browser" */;
@@ -6919,7 +6889,6 @@
 				4B5F14CA2A14702C0060320F /* startVPN */,
 				4B5F14E02A1476BC0060320F /* stopVPN */,
 				7B736E562A4A22B700F9922A /* enableOnDemand */,
-				7B736E602A4A22DD00F9922A /* disableOnDemand */,
 			);
 		};
 /* End PBXProject section */
@@ -7286,7 +7255,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"Replace and Sign\" # for easier build log search\n\n# startVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/startVPN.app/Contents/MacOS\"\nrm ./startVPN\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./startVPN\npopd\n\n# stopVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/stopVPN.app/Contents/MacOS\"\nrm ./stopVPN\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./stopVPN\ncd ../../.. \npopd\n\n# enableOnDemand\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/enableOnDemand.app/Contents/MacOS\"\nrm ./enableOnDemand\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./enableOnDemand\ncd ../../.. \npopd\n\n# disableOnDemand\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/disableOnDemand.app/Contents/MacOS\"\nrm ./disableOnDemand\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./disableOnDemand\ncd ../../.. \npopd\n";
+			shellScript = "echo \"Replace and Sign\" # for easier build log search\n\n# startVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/startVPN.app/Contents/MacOS\"\nrm ./startVPN\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./startVPN\npopd\n\n# stopVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/stopVPN.app/Contents/MacOS\"\nrm ./stopVPN\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./stopVPN\ncd ../../.. \npopd\n\n# enableOnDemand\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/enableOnDemand.app/Contents/MacOS\"\nrm ./enableOnDemand\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./enableOnDemand\ncd ../../.. \npopd\n";
 		};
 		7B6469992A165AE00095095A /* Embed System Network Extension */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -8403,14 +8372,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B736E582A4A22B700F9922A /* Main.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		7B736E612A4A22DD00F9922A /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				7B736E622A4A22DD00F9922A /* Main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9730,34 +9691,6 @@
 			};
 			name = Review;
 		};
-		7B736E652A4A22DD00F9922A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7B9459642A4A5BAF0012535A /* NetworkProtectionDisableOnDemand.xcconfig */;
-			buildSettings = {
-			};
-			name = Debug;
-		};
-		7B736E662A4A22DD00F9922A /* CI */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7B9459642A4A5BAF0012535A /* NetworkProtectionDisableOnDemand.xcconfig */;
-			buildSettings = {
-			};
-			name = CI;
-		};
-		7B736E672A4A22DD00F9922A /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7B9459642A4A5BAF0012535A /* NetworkProtectionDisableOnDemand.xcconfig */;
-			buildSettings = {
-			};
-			name = Release;
-		};
-		7B736E682A4A22DD00F9922A /* Review */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7B9459642A4A5BAF0012535A /* NetworkProtectionDisableOnDemand.xcconfig */;
-			buildSettings = {
-			};
-			name = Review;
-		};
 		AA585DA2248FD31500E9A3E2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37717E66296B5A20002FAEDF /* Global.xcconfig */;
@@ -10005,17 +9938,6 @@
 				7B736E5C2A4A22B700F9922A /* CI */,
 				7B736E5D2A4A22B700F9922A /* Release */,
 				7B736E5E2A4A22B700F9922A /* Review */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		7B736E642A4A22DD00F9922A /* Build configuration list for PBXNativeTarget "disableOnDemand" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				7B736E652A4A22DD00F9922A /* Debug */,
-				7B736E662A4A22DD00F9922A /* CI */,
-				7B736E672A4A22DD00F9922A /* Release */,
-				7B736E682A4A22DD00F9922A /* Review */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

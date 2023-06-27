@@ -45,7 +45,6 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("startVPN.app", .unknown),
         .init("stopVPN.app", .unknown),
         .init("enableOnDemand.app", .unknown),
-        .init("disableOnDemand.app", .unknown),
         .init("PFMoveApplication.m", .source)
     ],
 
