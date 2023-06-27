@@ -134,7 +134,7 @@ public struct UserDefaultsWrapper<T> {
     }
 
     static var sharedDefaults: UserDefaults {
-#if DEBUG
+#if DEBUG && !NETP_SYSTEM_EXTENSION
         if case .normal = NSApp.runType {
             return .standard
         } else {
