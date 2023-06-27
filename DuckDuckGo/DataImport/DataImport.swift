@@ -27,7 +27,8 @@ enum DataImport {
         case edge
         case firefox
         case safari
-        case onePassword
+        case onePassword8
+        case onePassword7
         case lastPass
         case csv
         case bookmarksHTML
@@ -48,7 +49,9 @@ enum DataImport {
                 return "Safari"
             case .lastPass:
                 return "LastPass"
-            case .onePassword:
+            case .onePassword7:
+                return "1Password 7"
+            case .onePassword8:
                 return "1Password"
             case .csv:
                 return UserText.importLoginsCSV
@@ -62,7 +65,14 @@ enum DataImport {
         }
 
         var canImportData: Bool {
-            return (ThirdPartyBrowser.browser(for: self)?.isInstalled ?? false) || [.csv, .onePassword, .lastPass, .bookmarksHTML].contains(self)
+            if ThirdPartyBrowser.browser(for: self)?.isInstalled ?? false {
+                return true
+            }
+
+            switch self {
+            case .csv, .onePassword8, .onePassword7, .lastPass, .bookmarksHTML: return true // Users can always import from exported files
+            case .brave, .chrome, .edge, .firefox, .safari: return false // Users can't import from browsers unless they're installed
+            }
         }
 
         var pixelEventSource: Pixel.Event.DataImportSource {
@@ -72,7 +82,8 @@ enum DataImport {
             case .edge: return .edge
             case .firefox: return .firefox
             case .safari: return .safari
-            case .onePassword: return .onePassword
+            case .onePassword7: return .onePassword7
+            case .onePassword8: return .onePassword8
             case .lastPass: return .lastPass
             case .csv: return .csv
             case .bookmarksHTML: return .bookmarksHTML
@@ -140,7 +151,7 @@ enum DataImport {
                 self.profiles = profileURLs.map({
                     BrowserProfile.for(browser: .safari, profileURL: $0)
                 }).sorted()
-            case .lastPass, .onePassword:
+            case .lastPass, .onePassword7, .onePassword8:
                 self.profiles = []
             }
         }
@@ -155,7 +166,7 @@ enum DataImport {
                 return profiles.first { $0.profileName == "Default" } ?? profiles.first
             case .firefox:
                 return profiles.first { $0.profileName == "default-release" } ?? profiles.first
-            case .safari, .lastPass, .onePassword:
+            case .safari, .lastPass, .onePassword7, .onePassword8:
                 return nil
             }
         }
