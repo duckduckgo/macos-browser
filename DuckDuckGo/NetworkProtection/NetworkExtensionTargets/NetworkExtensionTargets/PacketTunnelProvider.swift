@@ -454,16 +454,18 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 }
             }
 
-            completionHandler(error)
-        }
+            if !isOnDemand {
+                Task {
+                    // This completion handler signals a coorect connection.  We want to signal this before turning
+                    // on-demand ON so that it won't interfere with the current connection.
+                    completionHandler(error)
 
-        if isActivatedFromSystemSettings {
-            // ask the Main App to reconfigure & restart with on-demand rule “on” - when connection triggered from System Settings
-            Task {
-                await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .startVPN)
-                internalCompletionHandler(NEVPNError(.configurationStale))
+                    await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .enableOnDemand)
+                    return
+                }
             }
-            return
+
+            completionHandler(error)
         }
 
         tunnelHealth.isHavingConnectivityIssues = false
