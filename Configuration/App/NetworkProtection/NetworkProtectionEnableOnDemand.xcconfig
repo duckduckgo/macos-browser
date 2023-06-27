@@ -15,9 +15,9 @@
 
 #include "NetworkProtectionVPNHelpersBase.xcconfig"
 
-PRODUCT_BUNDLE_IDENTIFIER=com.duckduckgo.macos.browser.network-protection.start-vpn
+PRODUCT_BUNDLE_IDENTIFIER=com.duckduckgo.macos.browser.network-protection.enable-on-demand
 
 PROVISIONING_PROFILE_SPECIFIER[config=Debug][sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
-PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = MacOS Browser NetP - Start VPN
-PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = MacOS Browser NetP - Start VPN
+PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = MacOS Browser NetP - Enable On-Demand
+PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = MacOS Browser NetP - Enable On-Demand

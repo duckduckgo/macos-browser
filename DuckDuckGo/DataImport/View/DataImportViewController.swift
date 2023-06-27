@@ -31,7 +31,7 @@ final class DataImportViewController: NSViewController {
         static let identifier = "DataImportViewController"
     }
 
-    enum InteractionState {
+    enum InteractionState: Equatable {
         case unableToImport
         case permissionsRequired([DataImport.DataType])
         case ableToImport
@@ -40,7 +40,7 @@ final class DataImportViewController: NSViewController {
         case completedImport(DataImport.Summary)
     }
 
-    private struct ViewState {
+    private struct ViewState: Equatable {
         var selectedImportSource: DataImport.Source
         var interactionState: InteractionState
 
@@ -78,7 +78,6 @@ final class DataImportViewController: NSViewController {
 
     private var viewState: ViewState = .defaultState() {
         didSet {
-
             renderCurrentViewState()
 
             let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
@@ -196,11 +195,21 @@ final class DataImportViewController: NSViewController {
             switch (source, loginsSelected) {
             case (.safari, _), (_, false):
                 interactionState = .ableToImport
+            case (.firefox, _):
+                if FirefoxDataImporter.loginDatabaseRequiresPrimaryPassword(profileURL: selectedProfile?.profileURL) {
+                    interactionState = .moreInfoAvailable
+                } else {
+                    interactionState = .ableToImport
+                }
             case (_, true):
                 interactionState = .moreInfoAvailable
             }
 
-            self.viewState = ViewState(selectedImportSource: source, interactionState: interactionState)
+            let newState = ViewState(selectedImportSource: source, interactionState: interactionState)
+
+            if newState != self.viewState {
+                self.viewState = newState
+            }
         }
 
     }
@@ -489,6 +498,10 @@ extension DataImportViewController: BrowserImportViewControllerDelegate {
         } else {
             refreshViewState()
         }
+    }
+
+    func browserImportViewControllerRequestedParentViewRefresh(_ viewController: BrowserImportViewController) {
+        refreshViewState()
     }
 
 }
