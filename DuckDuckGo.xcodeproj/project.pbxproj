@@ -2280,7 +2280,7 @@
 		4B1E6EEC27AB5E5100F51793 /* PasswordManagementListSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementListSection.swift; sourceTree = "<group>"; };
 		4B1E6EEF27AB5E5D00F51793 /* NSPopUpButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPopUpButtonView.swift; sourceTree = "<group>"; };
 		4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementItemList.swift; sourceTree = "<group>"; };
-		4B25375A2A11BE7300610219 /* com.duckduckgo.macos.browser.debug.network-protection-extension.systemextension */ = {isa = PBXFileReference; explicitFileType = "wrapper.system-extension"; includeInIndex = 0; path = "com.duckduckgo.macos.browser.debug.network-protection-extension.systemextension"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B25375A2A11BE7300610219 /* duckduckgo.netp.systemextension */ = {isa = PBXFileReference; explicitFileType = "wrapper.system-extension"; includeInIndex = 0; path = duckduckgo.netp.systemextension; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B25376C2A11BF6D00610219 /* NetworkProtectionSystemExtension_Release.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = NetworkProtectionSystemExtension_Release.entitlements; sourceTree = "<group>"; };
 		4B25376D2A11BF6D00610219 /* NetworkProtectionSystemExtension_Debug.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = NetworkProtectionSystemExtension_Debug.entitlements; sourceTree = "<group>"; };
 		4B25376E2A11BF8B00610219 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -4925,7 +4925,7 @@
 				B6EC37E829B5DA2A001ACE79 /* tests-server */,
 				4B4D603D2A0B290200BCD287 /* NetworkProtectionAppExtension.appex */,
 				4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */,
-				4B25375A2A11BE7300610219 /* com.duckduckgo.macos.browser.debug.network-protection-extension.systemextension */,
+				4B25375A2A11BE7300610219 /* duckduckgo.netp.systemextension */,
 				4B2D06392A11CFBB00DE1F49 /* DuckDuckGo Agent.app */,
 				4B2D06692A13318400DE1F49 /* DuckDuckGo Agent App Store.app */,
 				4B5F14CB2A14702C0060320F /* startVPN.app */,
@@ -6537,7 +6537,7 @@
 				4B2D062F2A11C15900DE1F49 /* Common */,
 			);
 			productName = NetworkProtectionSystemExtension;
-			productReference = 4B25375A2A11BE7300610219 /* com.duckduckgo.macos.browser.debug.network-protection-extension.systemextension */;
+			productReference = 4B25375A2A11BE7300610219 /* duckduckgo.netp.systemextension */;
 			productType = "com.apple.product-type.system-extension";
 		};
 		4B2D06382A11CFBA00DE1F49 /* DuckDuckGoAgent */ = {
@@ -7245,7 +7245,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "SYSEX_BUNDLE_NAME=\"${SYSEX_BUNDLE_ID_BASE}.systemextension\"\necho \"ditto ${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_NAME} $BUILT_PRODUCTS_DIR/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_BUNDLE_NAME}\"\n\nditto \"${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_NAME}\" \"$BUILT_PRODUCTS_DIR/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_BUNDLE_NAME}\" || exit 1\n";
+			shellScript = "SYSEX_TARGET_NAME=\"${SYSEX_BUNDLE_ID}.systemextension\"\necho \"ditto ${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_NAME} $BUILT_PRODUCTS_DIR/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_TARGET_NAME}\"\n\nditto \"${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_NAME}\" \"$BUILT_PRODUCTS_DIR/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_TARGET_NAME}\" || exit 1\n";
 		};
 		AA8EDF2824925E940071C2E8 /* Swift Lint */ = {
 			isa = PBXShellScriptBuildPhase;

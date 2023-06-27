@@ -17,8 +17,8 @@
 // standardizing the bundle IDs so we can just define BUNDLE_IDENTIFIER_PREFIX
 BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.mobile.ios
 
-APPEX_BUNDLE_ID_BASE[sdk=*] =
-APPEX_BUNDLE_ID_BASE[config=CI][sdk=*] =
-APPEX_BUNDLE_ID_BASE[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug.network-protection-extension
-APPEX_BUNDLE_ID_BASE[config=Release][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).network-protection-extension
-APPEX_BUNDLE_ID_BASE[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).review.network-protection-extension
+APPEX_BUNDLE_ID[sdk=*] =
+APPEX_BUNDLE_ID[config=CI][sdk=*] =
+APPEX_BUNDLE_ID[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug.network-protection-extension
+APPEX_BUNDLE_ID[config=Release][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).network-protection-extension
+APPEX_BUNDLE_ID[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).review.network-protection-extension

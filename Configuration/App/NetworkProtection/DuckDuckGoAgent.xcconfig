@@ -16,13 +16,8 @@
 #include "../AppTargetsBase.xcconfig"
 #include "../../NetworkProtectionDeveloperID.xcconfig"
 
-BUNDLE_IDENTIFIER_PREFIX = $(AGENT_BUNDLE_ID)
-
 // Override AppTargetsBase.xcconfig until we resolve bundle IDs.
-PRODUCT_BUNDLE_IDENTIFIER[sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
-PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
-PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
-PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
+PRODUCT_BUNDLE_IDENTIFIER[sdk=*] = $(AGENT_BUNDLE_ID)
 
 INFOPLIST_FILE = DuckDuckGoAgent/Info.plist
 GENERATE_INFOPLIST_FILE = YES
