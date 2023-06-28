@@ -32,6 +32,10 @@ public struct FillFormAction: Action {
     public let id: String = "fillForm"
     public let actionType: ActionType = .fillForm
 
+    public var needsEmail: Bool {
+        elements.contains { $0.type == "email" }
+    }
+
     let selector: String
     let elements: [PageElement]
 
