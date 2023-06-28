@@ -560,7 +560,6 @@ extension NetworkProtectionStatusView {
 
                 await tunnelController.stop()
                 try? await statusTransitionAwaiter.waitUntilConnectionStopped()
-                //try? await Task.sleep(nanoseconds:  2 * NSEC_PER_SEC)
 
                 toggleTransition = .idle
             }
