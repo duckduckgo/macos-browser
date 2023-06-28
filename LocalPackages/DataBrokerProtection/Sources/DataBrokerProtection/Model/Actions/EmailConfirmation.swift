@@ -1,5 +1,5 @@
 //
-//  Action.swift
+//  EmailConfirmation.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,23 +18,13 @@
 
 import Foundation
 
-public enum ActionType: String, Codable, Sendable {
-    case extract
-    case navigate
-    case fillForm
-    case click
-    case expectation
-    case emailConfirmation
-}
+public struct EmailConfirmationAction: Action {
+    public let id: String = "emailConfirmation"
+    public let actionType: ActionType = .emailConfirmation
 
-public protocol Action: Encodable, Sendable {
-    var id: String { get }
-    var actionType: ActionType { get }
-    var needsEmail: Bool { get }
-}
+    let pollingTime: Int
 
-public extension Action {
-    var needsEmail: Bool {
-        get { false }
+    public init(pollingTime: Int) {
+        self.pollingTime = pollingTime
     }
 }
