@@ -79,11 +79,7 @@ final class FirePopoverViewModel {
     private(set) var hasOnlySingleFireproofDomain: Bool = false
     @Published private(set) var selectable: [Item] = []
     @Published private(set) var fireproofed: [Item] = []
-    @Published private(set) var selected: Set<Int> = Set() {
-        didSet {
-            updateAreOtherTabsInfluenced()
-        }
-    }
+    @Published private(set) var selected: Set<Int> = Set()
 
     let selectableSectionIndex = 0
     let fireproofedSectionIndex = 1
@@ -181,30 +177,11 @@ final class FirePopoverViewModel {
 
     // MARK: - Warning
 
-    @Published private(set) var areOtherTabsInfluenced = false
-
     var hasPinnedTabs: Bool {
         guard let pinnedTabsManager = tabCollectionViewModel?.pinnedTabsManager else {
             return false
         }
         return pinnedTabsManager.tabCollection.tabs.isEmpty
-    }
-
-    private func updateAreOtherTabsInfluenced() {
-        let selectedTab = tabCollectionViewModel?.selectedTabViewModel?.tab
-        var allTabs = WindowControllersManager.shared.mainWindowControllers.flatMap {
-            $0.mainViewController.tabCollectionViewModel.tabCollection.tabs
-        }
-        if let pinnedTabs = tabCollectionViewModel?.pinnedTabsManager?.tabCollection.tabs {
-            allTabs.append(contentsOf: pinnedTabs)
-        }
-        let otherTabs = allTabs.filter({ $0 != selectedTab })
-
-        let otherTabsLocalHistory = otherTabs.reduce(Set<String>()) { result, tab in
-            return result.union(tab.localHistoryDomains)
-        }
-
-        areOtherTabsInfluenced = !otherTabsLocalHistory.isDisjoint(with: selectedDomains)
     }
 
     // MARK: - Burning

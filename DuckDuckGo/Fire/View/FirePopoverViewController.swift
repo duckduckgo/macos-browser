@@ -61,7 +61,6 @@ final class FirePopoverViewController: NSViewController {
     private var appearanceCancellable: AnyCancellable?
     private var viewModelCancellable: AnyCancellable?
     private var selectedCancellable: AnyCancellable?
-    private var areOtherTabsInfluencedCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("FirePopoverViewController: Bad initializer")
@@ -99,7 +98,6 @@ final class FirePopoverViewController: NSViewController {
         appearanceCancellable = view.subscribeForAppApperanceUpdates()
         subscribeToViewModel()
         subscribeToSelected()
-        subscribeToAreOtherTabsInfluenced()
     }
 
     override func viewWillAppear() {
@@ -136,15 +134,20 @@ final class FirePopoverViewController: NSViewController {
     }
 
     private func updateWarningWrapperView() {
-        warningWrapperView.isHidden = firePopoverViewModel.clearingOption == .allData ||
-        !firePopoverViewModel.areOtherTabsInfluenced || detailsWrapperView.isHidden
+        warningWrapperView.isHidden = detailsWrapperView.isHidden
 
         if !warningWrapperView.isHidden {
-            if firePopoverViewModel.hasPinnedTabs {
-                warningButton.title = "   \(UserText.fireDialogAllUnpinnedTabsWillClose)"
-            } else {
-                warningButton.title = "   \(UserText.fireDialogAllTabsWillClose)"
+            let title: String
+            switch firePopoverViewModel.clearingOption {
+            case .currentTab:
+                title = UserText.fireDialogTabWillClose
+            case .currentWindow:
+                title = UserText.fireDialogWindowWillClose
+            case .allData:
+                title = UserText.fireDialogAllWindowsWillClose
             }
+
+            warningButton.title = "   \(title)"
         }
 
         collectionViewBottomConstraint.constant = warningWrapperView.isHidden ? 0 : 32
@@ -185,15 +188,6 @@ final class FirePopoverViewController: NSViewController {
                 self.collectionView.selectionIndexPaths = selectionIndexPaths
                 self.updateCloseDetailsButton()
                 self.updateClearButton()
-            }
-    }
-
-    private func subscribeToAreOtherTabsInfluenced() {
-        areOtherTabsInfluencedCancellable = firePopoverViewModel.$areOtherTabsInfluenced
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                guard let self = self else { return }
-                self.updateWarningWrapperView()
             }
     }
 
