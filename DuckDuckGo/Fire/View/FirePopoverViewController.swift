@@ -243,20 +243,18 @@ final class FirePopoverViewController: NSViewController {
         var maxWidth: CGFloat = 0
 
         FirePopoverViewModel.ClearingOption.allCases.forEach { option in
-            if firePopoverViewModel.availableClearingOptions.contains(option) {
-                if option == .allData {
-                    menu.addItem(.separator())
-                }
-
-                let item = NSMenuItem(title: option.string)
-                item.tag = option.rawValue
-                menu.addItem(item)
-
-                let width = (option.string as NSString)
-                    .boundingRect(with: constraintSize, options: .usesDeviceMetrics, attributes: attributes, context: nil)
-                    .width
-                maxWidth = max(maxWidth, width)
+            if option == .allData {
+                menu.addItem(.separator())
             }
+
+            let item = NSMenuItem(title: option.string)
+            item.tag = option.rawValue
+            menu.addItem(item)
+
+            let width = (option.string as NSString)
+                .boundingRect(with: constraintSize, options: .usesDeviceMetrics, attributes: attributes, context: nil)
+                .width
+            maxWidth = max(maxWidth, width)
         }
 
         optionsButtonWidthConstraint.constant = maxWidth + 32
