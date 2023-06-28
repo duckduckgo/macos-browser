@@ -131,7 +131,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - Initialization
 
-    init() {
+    @objc public init() {
         let distributedNotificationCenter = DistributedNotificationCenter.forType(.networkProtection)
         controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: distributedNotificationCenter)
         super.init(notificationCenter: distributedNotificationCenter,
