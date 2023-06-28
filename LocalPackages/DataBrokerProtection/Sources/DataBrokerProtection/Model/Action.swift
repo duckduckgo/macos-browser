@@ -29,4 +29,11 @@ public enum ActionType: String, Codable, Sendable {
 public protocol Action: Encodable, Sendable {
     var id: String { get }
     var actionType: ActionType { get }
+    var needsEmail: Bool { get }
+}
+
+public extension Action {
+    var needsEmail: Bool {
+        get { false }
+    }
 }
