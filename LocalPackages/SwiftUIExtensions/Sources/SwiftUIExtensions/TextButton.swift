@@ -37,3 +37,21 @@ public struct TextButton: View {
         .cursor(.pointingHand)
     }
 }
+
+public struct IconButton: View {
+    public let action: () -> Void
+    public let icon: NSImage
+
+    public init(icon: NSImage, action: @escaping () -> Void) {
+        self.icon = icon
+        self.action = action
+    }
+
+    public var body: some View {
+        Button(action: action) {
+            Image(nsImage: icon)
+         }
+        .buttonStyle(.plain)
+        .cursor(.pointingHand)
+    }
+}
