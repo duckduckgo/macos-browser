@@ -23,6 +23,13 @@ public struct DataBrokerScheduleConfig {
     let retryError: TimeInterval
     let confirmOptOutScan: TimeInterval
     let maintenanceScan: TimeInterval
+
+    public init(emailConfirmation: TimeInterval, retryError: TimeInterval, confirmOptOutScan: TimeInterval, maintenanceScan: TimeInterval) {
+        self.emailConfirmation = emailConfirmation
+        self.retryError = retryError
+        self.confirmOptOutScan = confirmOptOutScan
+        self.maintenanceScan = maintenanceScan
+    }
 }
 
 public struct DataBroker: Encodable, Sendable {
