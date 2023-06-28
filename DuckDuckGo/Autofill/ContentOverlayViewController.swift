@@ -249,10 +249,6 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         return true
     }
 
-    public func secureVaultManagerShouldSilentlySaveGeneratedPassword(_: SecureVaultManager) -> Bool {
-        return false
-    }
-
     public func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
         DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { authenticationResult in
             handler(authenticationResult.authenticated)
