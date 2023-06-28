@@ -105,10 +105,10 @@ extension Preferences {
 
                 // SECTION 3: New Tab Page
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.newTabContentSettingTitle)
-                    ToggleMenuItem(title: UserText.showNextSteps, isOn: $model.isContinueSetUpVisible)
-                    ToggleMenuItem(title: UserText.showFavorites, isOn: $model.isFavoriteVisible)
-                    ToggleMenuItem(title: UserText.showRecentActivity, isOn: $model.isRecentActivityVisible)
+                    TextMenuItemHeader(text: UserText.newTabBottomPopoverTitle)
+                    ToggleMenuItem(title: UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
+                    ToggleMenuItem(title: UserText.newTabFavoriteSectionTitle, isOn: $model.isFavoriteVisible)
+                    ToggleMenuItem(title: UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
                 }
 
                 // SECTION 4: Zoom Setting

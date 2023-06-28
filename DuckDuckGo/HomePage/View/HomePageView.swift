@@ -152,7 +152,7 @@ extension HomePage.Views {
                     HStack {
                         Image("RocketNoColor")
                             .frame(width: iconSize, height: iconSize)
-                        Text(UserText.newTabMenuItemShowContinuteSetUp)
+                        Text(UserText.newTabSetUpSectionTitle)
                     }
                 })
                 .visibility(continueSetUpModel.hasContent ? .visible : .gone)
