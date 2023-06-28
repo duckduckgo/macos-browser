@@ -122,14 +122,15 @@ final class FaviconImageCache {
 
     func burnDomains(_ baseDomains: Set<String>,
                      exceptBookmarks bookmarkManager: BookmarkManager,
-                     exceptSavedLogins: Set<String>,
+                     exceptSavedLogins logins: Set<String>,
+                     exceptHistoryDomains history: Set<String>,
                      tld: TLD,
                      completion: @escaping () -> Void) {
         removeFavicons(filter: { favicon in
             guard let host = favicon.documentUrl.host, let baseDomain = tld.eTLDplus1(host) else {
                 return false
             }
-            return baseDomains.contains(baseDomain) && !bookmarkManager.isHostInBookmarks(host: host) && !exceptSavedLogins.contains(host)
+            return baseDomains.contains(baseDomain) && !bookmarkManager.isHostInBookmarks(host: host) && !logins.contains(host) && !history.contains(host)
         }, completionHandler: completion)
     }
 

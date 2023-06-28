@@ -39,7 +39,12 @@ protocol FaviconManagement: AnyObject {
 
     func burnExcept(fireproofDomains: FireproofDomains, bookmarkManager: BookmarkManager, savedLogins: Set<String>, completion: @escaping () -> Void)
 
-    func burnDomains(_ domains: Set<String>, exceptBookmarks bookmarkManager: BookmarkManager, exceptSavedLogins: Set<String>, tld: TLD, completion: @escaping () -> Void)
+    func burnDomains(_ domains: Set<String>,
+                     exceptBookmarks bookmarkManager: BookmarkManager,
+                     exceptSavedLogins: Set<String>,
+                     exceptExistingHistory history: History,
+                     tld: TLD,
+                     completion: @escaping () -> Void)
 
 }
 
@@ -240,10 +245,20 @@ final class FaviconManager: FaviconManagement {
     func burnDomains(_ baseDomains: Set<String>,
                      exceptBookmarks bookmarkManager: BookmarkManager,
                      exceptSavedLogins: Set<String> = [],
+                     exceptExistingHistory history: History,
                      tld: TLD,
                      completion: @escaping () -> Void) {
-        self.referenceCache.burnDomains(baseDomains, exceptBookmarks: bookmarkManager, exceptSavedLogins: exceptSavedLogins, tld: tld) {
-            self.imageCache.burnDomains(baseDomains, exceptBookmarks: bookmarkManager, exceptSavedLogins: exceptSavedLogins, tld: tld) {
+        let existingHistoryDomains = Set(history.compactMap { $0.url.host })
+
+        self.referenceCache.burnDomains(baseDomains, exceptBookmarks: bookmarkManager,
+                                        exceptSavedLogins: exceptSavedLogins,
+                                        exceptHistoryDomains: existingHistoryDomains,
+                                        tld: tld) {
+            self.imageCache.burnDomains(baseDomains,
+                                        exceptBookmarks: bookmarkManager,
+                                        exceptSavedLogins: exceptSavedLogins,
+                                        exceptHistoryDomains: existingHistoryDomains,
+                                        tld: tld) {
                 DispatchQueue.main.async {
                     completion()
                 }

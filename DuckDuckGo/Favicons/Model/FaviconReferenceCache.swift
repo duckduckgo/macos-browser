@@ -195,21 +195,22 @@ final class FaviconReferenceCache {
 
     func burnDomains(_ baseDomains: Set<String>,
                      exceptBookmarks bookmarkManager: BookmarkManager,
-                     exceptSavedLogins: Set<String>,
+                     exceptSavedLogins logins: Set<String>,
+                     exceptHistoryDomains history: Set<String>,
                      tld: TLD,
                      completion: @escaping () -> Void) {
         // Remove host references
         removeHostReferences(filter: { hostReference in
             let host = hostReference.host
             let baseDomain = tld.eTLDplus1(host) ?? ""
-            return baseDomains.contains(baseDomain) && !bookmarkManager.isHostInBookmarks(host: host) && !exceptSavedLogins.contains(host)
+            return baseDomains.contains(baseDomain) && !bookmarkManager.isHostInBookmarks(host: host) && !logins.contains(host) && !history.contains(host)
         }) {
             // Remove URL references
             self.removeUrlReferences(filter: { urlReference in
                 guard let host = urlReference.documentUrl.host else {
                     return false
                 }
-                return baseDomains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host) && !exceptSavedLogins.contains(host)
+                return baseDomains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host) && !logins.contains(host) && !history.contains(host)
             }, completionHandler: completion)
         }
     }
