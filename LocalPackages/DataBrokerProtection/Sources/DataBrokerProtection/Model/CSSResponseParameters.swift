@@ -57,6 +57,8 @@ struct CSSSuccessResponse: Decodable {
             self.response = .click
         case .expectation:
             self.response = .expectation
+        case .emailConfirmation:
+            self.response = nil // Email confirmation is done on the native side. We shouldn't have a response here
         }
     }
 }

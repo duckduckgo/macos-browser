@@ -23,6 +23,9 @@ public struct DataBrokerProtectionEmailService {
     public enum EmailError: Error, Equatable {
         case cantGenerateURL
         case cantFindEmail
+        case invalidEmailLink
+        case linkExtractionTimedOut
+        case cantDecodeEmailLink
     }
 
     // This authentication method will be replaced with https://app.asana.com/0/72649045549333/1203580969735029/f
@@ -57,9 +60,53 @@ public struct DataBrokerProtectionEmailService {
         }
     }
 
+    func getConfirmationLink(from email: String,
+                             numberOfRetries: Int = 100,
+                             pollingIntervalInSeconds: Int = 30) async throws -> URL {
+        let pollingTimeInNanoSecondsSeconds = UInt64(pollingIntervalInSeconds) * NSEC_PER_SEC
+
+        for _ in 1...numberOfRetries {
+            if let emailLink = try await extractEmailLink(email: email) {
+                if let url = URL(string: emailLink) {
+                    return url
+                } else {
+                    throw EmailError.invalidEmailLink
+                }
+            } else {
+                try await Task.sleep(nanoseconds: pollingTimeInNanoSecondsSeconds)
+            }
+        }
+
+        throw EmailError.linkExtractionTimedOut
+    }
+
+    private func extractEmailLink(email: String) async throws -> String? {
+        guard let url = URL(string: Constants.baseUrl + "/links?e=\(email)") else {
+            throw EmailError.cantGenerateURL
+        }
+
+        var request = URLRequest(url: url)
+        let base64Login = authAsBase64HeaderValue(user: Constants.authUser,
+                                                                   key: Constants.authPass)
+
+        request.setValue(base64Login, forHTTPHeaderField: "Authorization")
+        let (data, _) = try await urlSession.data(for: request)
+
+        do {
+            let result = try JSONDecoder().decode(EmailLink.self, from: data)
+            return result.link
+        } catch {
+            throw EmailError.cantDecodeEmailLink
+        }
+    }
+
     private func authAsBase64HeaderValue(user: String, key: String) -> String {
         let loginStr = String(format: "%@:%@", user, key)
         let loginData = loginStr.data(using: .utf8)!
         return "Basic \(loginData.base64EncodedString())"
     }
+}
+
+internal struct EmailLink: Codable {
+    let link: String?
 }
