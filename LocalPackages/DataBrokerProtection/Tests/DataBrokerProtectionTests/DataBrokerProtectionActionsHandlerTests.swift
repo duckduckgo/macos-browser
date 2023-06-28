@@ -29,8 +29,8 @@ final class DataBrokerProtectionActionsHandlerTests: XCTestCase {
     }
 
     func testWhenNextStepDoesNotFindAnyMoreActions_thenNilIsReturned() {
-        let firstAction = NavigateAction(id: "id", actionType: .navigate, url: "url", ageRange: [String]())
-        let secondAction = NavigateAction(id: "id2", actionType: .navigate, url: "url", ageRange: [String]())
+        let firstAction = NavigateAction(url: "url", ageRange: [String]())
+        let secondAction = NavigateAction(url: "url", ageRange: [String]())
         let step = Step(type: .scan, actions: [firstAction, secondAction])
         let sut = DataBrokerProtectionActionsHandler(step: step)
 
@@ -41,8 +41,8 @@ final class DataBrokerProtectionActionsHandlerTests: XCTestCase {
     }
 
     func testWhenNextStepFindsAnAction_thenThatNextActionIsReturned() {
-        let firstAction = NavigateAction(id: "id", actionType: .navigate, url: "url", ageRange: [String]())
-        let secondAction = NavigateAction(id: "id2", actionType: .navigate, url: "url", ageRange: [String]())
+        let firstAction = NavigateAction(url: "url", ageRange: [String]())
+        let secondAction = NavigateAction(url: "url", ageRange: [String]())
         let step = Step(type: .scan, actions: [firstAction, secondAction])
         let sut = DataBrokerProtectionActionsHandler(step: step)
 
