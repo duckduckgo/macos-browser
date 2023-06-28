@@ -144,16 +144,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - NEPacketTunnelProvider
 
-    override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
-        loadVendorOptions(from: tunnelProviderProtocol)
-        super.startTunnel(options: options, completionHandler: completionHandler)
-    }
-
-    private var tunnelProviderProtocol: NETunnelProviderProtocol? {
-        protocolConfiguration as? NETunnelProviderProtocol
-    }
-
-    private func loadVendorOptions(from provider: NETunnelProviderProtocol?) {
+    public override func loadVendorOptions(from provider: NETunnelProviderProtocol?) {
         guard let vendorOptions = provider?.providerConfiguration else {
             os_log("🔵 Provider is nil, or providerConfiguration is not set", log: .networkProtection)
             assertionFailure("Provider is nil, or providerConfiguration is not set")

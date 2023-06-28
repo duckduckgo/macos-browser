@@ -348,6 +348,10 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
         os_log("[-] PacketTunnelProvider", log: .networkProtectionMemoryLog, type: .debug)
     }
 
+    private var tunnelProviderProtocol: NETunnelProviderProtocol? {
+        protocolConfiguration as? NETunnelProviderProtocol
+    }
+
     private func load(options: [String: NSObject]?) throws {
         guard let options = options else {
             os_log("🔵 Tunnel options are not set", log: .networkProtection)
@@ -357,6 +361,10 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
         loadKeyValidity(from: options)
         loadSelectedServer(from: options)
         try loadAuthToken(from: options)
+    }
+
+    open func loadVendorOptions(from provider: NETunnelProviderProtocol?) {
+        /* Implement in subclass */
     }
 
     private func loadKeyValidity(from options: [String: AnyObject]) {
@@ -434,6 +442,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
 
         do {
             try load(options: options)
+            loadVendorOptions(from: tunnelProviderProtocol)
         } catch {
             internalCompletionHandler(NEVPNError(.configurationInvalid))
             return
