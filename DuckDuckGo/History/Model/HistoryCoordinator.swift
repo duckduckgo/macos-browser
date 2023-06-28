@@ -26,6 +26,7 @@ typealias History = [HistoryEntry]
 protocol HistoryCoordinating: AnyObject {
 
     var history: History? { get }
+    var allHistoryVisits: [Visit]? { get }
     var historyDictionaryPublisher: Published<[URL: HistoryEntry]?>.Publisher { get }
 
     func addVisit(of url: URL) -> Visit?
@@ -77,6 +78,10 @@ final class HistoryCoordinator: HistoryCoordinating {
         return makeHistory(from: historyDictionary)
     }
 
+    var allHistoryVisits: [Visit]? {
+        history?.flatMap { $0.visits }
+    }
+
     private var cancellables = Set<AnyCancellable>()
 
     func addVisit(of url: URL) -> Visit? {
@@ -90,6 +95,8 @@ final class HistoryCoordinator: HistoryCoordinating {
         entry.failedToLoad = false
 
         self.historyDictionary?[url] = entry
+
+        commitChanges(url: url)
         return visit
     }
 
@@ -324,7 +331,13 @@ final class HistoryCoordinator: HistoryCoordinating {
                 case .failure(let error):
                     os_log("Saving of history entry failed: %s", log: .history, type: .error, error.localizedDescription)
                 }
-            }, receiveValue: {})
+            }, receiveValue: { result in
+                for (id, date) in result {
+                    let visit = entry.visits.first { $0.date == date }
+                    assert(visit != nil)
+                    visit?.identifier = id
+                }
+            })
             .store(in: &cancellables)
     }
 

@@ -27,7 +27,20 @@ final class HistoryTabExtension: NSObject {
     private let historyCoordinating: HistoryCoordinating
     private let isBurner: Bool
 
-    private(set) var localHistory = [Visit]()
+    private(set) var localHistory: [Visit] {
+        get {
+            loadRestoredLocalHistoryIfNeeded()
+            return _localHistory
+        }
+        set {
+            _localHistory = newValue
+        }
+    }
+    private(set) var _localHistory = [Visit]()
+
+    // Used to identify visits of the tab from previous app sessions
+    private var localHistoryIDs = [Visit.ID]()
+
     private var cancellables = Set<AnyCancellable>()
 
     private var url: URL? {
@@ -119,6 +132,18 @@ final class HistoryTabExtension: NSObject {
         historyCoordinating.commitChanges(url: url)
     }
 
+    private func loadRestoredLocalHistoryIfNeeded() {
+        if !localHistoryIDs.isEmpty {
+            let storedLocalHistory = localHistoryIDs.compactMap { id in
+                historyCoordinating.allHistoryVisits?.first(where: { visit in
+                    visit.identifier == id
+                })
+            }
+            localHistoryIDs = []
+            _localHistory.append(contentsOf: storedLocalHistory)
+        }
+    }
+
     @objc private func applicationWillTerminate(_: Notification) {
         commitBeforeClosing()
     }
@@ -136,28 +161,11 @@ extension HistoryTabExtension: NSCodingExtension {
     }
 
     func awakeAfter(using decoder: NSCoder) {
-        let visitUUIDStrings = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
-        let visitUUIDs = visitUUIDStrings
-        //TODO! WHen history loads, append visits to localHistory
-//        assert(historyCoordinating.history != nil)
-//
-//
-//        let entries = historyCoordinating.history!
-//        let allVisits = entries.flatMap { entry in
-//            Array(entry.visits)
-//        }
-//
-//        let visits = visitUUIDs.compactMap { uuid in
-//            allVisits.first { visit in
-//                uuid == visit.identifier?.uuidString
-//            }
-//        }
-//
-//        self.localHistory = visits
+        localHistoryIDs = decoder.decodeObject(of: [NSArray.self, NSURL.self], forKey: NSSecureCodingKeys.visitedDomains) as? [URL] ?? []
     }
 
     func encode(using coder: NSCoder) {
-        let ids = localHistory.compactMap { $0.identifier?.uuidString }
+        let ids = localHistory.compactMap { $0.identifier }
         coder.encode(ids, forKey: NSSecureCodingKeys.visitedDomains)
     }
 

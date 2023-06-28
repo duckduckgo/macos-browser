@@ -24,7 +24,7 @@ import Combine
 protocol HistoryStoring {
 
     func cleanOld(until date: Date) -> Future<History, Error>
-    func save(entry: HistoryEntry) -> Future<Void, Error>
+    func save(entry: HistoryEntry) -> Future<[(id: Visit.ID, date: Date)], Error>
     func removeEntries(_ entries: [HistoryEntry]) -> Future<Void, Error>
     func removeVisits(_ visits: [Visit]) -> Future<Void, Error>
 
@@ -159,7 +159,7 @@ final class HistoryStore: HistoryStoring {
         }
     }
 
-    func save(entry: HistoryEntry) -> Future<Void, Error> {
+    func save(entry: HistoryEntry) -> Future<[(id: Visit.ID, date: Date)], Error> {
         return Future { [weak self] promise in
             self?.context.perform { [weak self] in
                 guard let self = self else {
@@ -198,51 +198,71 @@ final class HistoryStore: HistoryStoring {
                     historyEntryMO.update(with: entry, afterInsertion: true)
                     historyEntryManagedObject = historyEntryMO
                 }
-                let insertNewVisitsResult = self.insertNewVisits(of: entry,
-                                                                 into: historyEntryManagedObject,
-                                                                 context: self.context)
-                do {
-                    try self.context.save()
-                } catch {
-                    Pixel.fire(.debug(event: .historySaveFailed, error: error))
-                    promise(.failure(HistoryStoreError.savingFailed))
-                    return
-                }
 
-                promise(insertNewVisitsResult)
+                let insertionResult = self.insertNewVisits(of: entry,
+                                                           into: historyEntryManagedObject,
+                                                           context: self.context)
+                switch insertionResult {
+                case .failure(let error):
+                    Pixel.fire(.debug(event: .historySaveFailed, error: error))
+                    promise(.failure(error))
+                case .success(let visitMOs):
+                    do {
+                        try self.context.save()
+                    } catch {
+                        Pixel.fire(.debug(event: .historySaveFailed, error: error))
+                        promise(.failure(HistoryStoreError.savingFailed))
+                        return
+                    }
+
+                    let result = visitMOs.compactMap {
+                        if let date = $0.date {
+                            return (id: $0.objectID.uriRepresentation(), date: date)
+                        } else {
+                            return nil
+                        }
+                    }
+                    promise(.success(result))
+                }
             }
         }
     }
 
     private func insertNewVisits(of historyEntry: HistoryEntry,
                                  into historyEntryManagedObject: HistoryEntryManagedObject,
-                                 context: NSManagedObjectContext) -> Result<Void, Error> {
-        var success = true
+                                 context: NSManagedObjectContext) -> Result<[VisitManagedObject], Error> {
+        var result: [VisitManagedObject]? = Array()
         historyEntry.visits
             .filter {
                 $0.savingState == .initialized
             }
             .forEach {
                 $0.savingState = .saved
-                if case .failure = self.insert(visit: $0,
-                                               into: historyEntryManagedObject,
-                                               context: context) {
-                    success = false
+                let insertionResult = self.insert(visit: $0,
+                                                  into: historyEntryManagedObject,
+                                                  context: context)
+                switch insertionResult {
+                case .success(let visitMO): result?.append(visitMO)
+                case .failure: result = nil
                 }
             }
-        return success ? .success(()) : .failure(HistoryStoreError.savingFailed)
+        if let result {
+            return .success(result)
+        } else {
+            return .failure(HistoryStoreError.savingFailed)
+        }
     }
 
     private func insert(visit: Visit,
                         into historyEntryManagedObject: HistoryEntryManagedObject,
-                        context: NSManagedObjectContext) -> Result<Void, Error> {
+                        context: NSManagedObjectContext) -> Result<VisitManagedObject, Error> {
         let insertedObject = NSEntityDescription.insertNewObject(forEntityName: VisitManagedObject.className(), into: context)
         guard let visitMO = insertedObject as? VisitManagedObject else {
             Pixel.fire(.debug(event: .historyInsertVisitFailed))
             return .failure(HistoryStoreError.savingFailed)
         }
         visitMO.update(with: visit, historyEntryManagedObject: historyEntryManagedObject)
-        return .success(())
+        return .success(visitMO)
     }
 
     func removeVisits(_ visits: [Visit]) -> Future<Void, Error> {
@@ -389,12 +409,14 @@ private extension VisitManagedObject {
 private extension Visit {
 
     convenience init?(visitMO: VisitManagedObject?) {
-        guard let visitMO = visitMO, let date = visitMO.date else {
+        guard let visitMO = visitMO,
+                let date = visitMO.date else {
             assertionFailure("Bad type or date is nil")
             return nil
         }
 
-        self.init(date: date)
+        let id = visitMO.objectID.uriRepresentation()
+        self.init(date: date, identifier: id)
         savingState = .saved
     }
 

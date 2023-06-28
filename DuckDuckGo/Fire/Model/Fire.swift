@@ -49,8 +49,8 @@ final class Fire {
     }
 
     enum BurningEntity {
-        //TODO case visits
-        //TODO rewrite case domains
+        //TODO! case visits
+        //TODO! rewrite case domains
         case none(selectedDomains: Set<String>)
         case tab(tabViewModel: TabViewModel,
                  selectedDomains: Set<String>,
@@ -193,7 +193,7 @@ final class Fire {
 //        let pinnedTabsViewModels = pinnedTabViewModels()
         let windowControllers = windowControllerManager.mainWindowControllers
 
-        tabCleanupPreparer.prepareTabsForCleanup(allTabViewModels()) {
+        tabCleanupPreparer.prepareTabsForCleanup(windowControllerManager.allTabViewModels) {
 
             group.enter()
             self.burnTabs(burningEntity: .allWindows(mainWindowControllers: windowControllers, selectedDomains: Set())) {
@@ -298,19 +298,6 @@ final class Fire {
                 $0.close()
             }
         }
-    }
-
-    // MARK: - Tabs
-
-    @MainActor
-    private func allTabViewModels() -> [TabViewModel] {
-        var allTabViewModels = [TabViewModel] ()
-        for window in windowControllerManager.mainWindowControllers {
-            let tabCollectionViewModel = window.mainViewController.tabCollectionViewModel
-
-            allTabViewModels.append(contentsOf: tabCollectionViewModel.tabViewModels.values)
-        }
-        return allTabViewModels
     }
 
     // MARK: - Web cache
@@ -418,6 +405,7 @@ final class Fire {
         self.faviconManagement.burnDomains(baseDomains,
                                            exceptBookmarks: LocalBookmarkManager.shared,
                                            exceptSavedLogins: autofillDomains,
+                                           exceptExistingHistory: historyCoordinating.history ?? [],
                                            tld: tld,
                                            completion: completion)
     }
@@ -580,7 +568,7 @@ fileprivate extension TabCollectionViewModel {
 //        }
 
 
-    //TODO
+    //TODO!
 //        // Clean local history of pinned tabs
 //        if let domains = domains {
 //            pinnedTabsManager.tabCollection.localHistoryOfRemovedTabs.subtract(domains)

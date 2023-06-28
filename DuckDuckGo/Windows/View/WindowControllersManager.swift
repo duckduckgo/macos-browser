@@ -215,3 +215,20 @@ extension Tab {
         return self.pinnedTabsManager.isTabPinned(self)
     }
 }
+
+// MARK: - Accessing all TabCollectionViewModels
+extension WindowControllersManager {
+
+    var allTabCollectionViewModels: [TabCollectionViewModel] {
+        return mainWindowControllers.map {
+            $0.mainViewController.tabCollectionViewModel
+        }
+    }
+
+    var allTabViewModels: [TabViewModel] {
+        return allTabCollectionViewModels.flatMap {
+            Array($0.tabViewModels.values)
+        }
+    }
+
+}
