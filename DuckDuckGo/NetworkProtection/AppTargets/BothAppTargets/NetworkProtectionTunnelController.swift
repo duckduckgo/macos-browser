@@ -48,10 +48,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     private let controllerErrorStore = NetworkProtectionControllerErrorStore()
 
-    // MARK: - Status transitions
-
-    let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusObserver: ConnectionStatusObserverThroughSession(), transitionTimeout: .seconds(1))
-
     // MARK: - VPN Tunnel & Configuration
 
     /// Auth token store
@@ -359,7 +355,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             }
 
             try tunnelManager.connection.startVPNTunnel(options: options)
-            try await statusTransitionAwaiter.waitUntilConnectionStarted()
         } catch {
             controllerErrorStore.lastErrorMessage = error.localizedDescription
             throw error
@@ -382,7 +377,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         switch tunnelManager.connection.status {
         case .connected, .connecting, .reasserting:
             tunnelManager.connection.stopVPNTunnel()
-            try? await statusTransitionAwaiter.waitUntilConnectionStarted()
         default:
             break
         }

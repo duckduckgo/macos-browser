@@ -81,7 +81,6 @@ extension NetworkProtectionStatusView {
 
         // MARK: - Feature Image
 
-        @MainActor
         var mainImageAsset: NetworkProtectionAsset {
             switch connectionStatus {
             case .connected:
@@ -99,7 +98,6 @@ extension NetworkProtectionStatusView {
 
         // MARK: - Initialization & Deinitialization
 
-        @MainActor
         public init(controller: TunnelController,
                     statusReporter: NetworkProtectionStatusReporter,
                     menuItems: [MenuItem],
@@ -118,6 +116,7 @@ extension NetworkProtectionStatusView {
             internalServerLocation = statusReporter.serverInfoPublisher.value.serverLocation
             lastTunnelErrorMessage = statusReporter.connectionErrorPublisher.value
             lastControllerErrorMessage = statusReporter.controllerErrorMessagePublisher.value
+            statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusSubject: statusReporter.statusPublisher, transitionTimeout: .seconds(1))
 
             // Particularly useful when unit testing with an initial status of our choosing.
             refreshInternalIsRunning()
@@ -360,6 +359,8 @@ extension NetworkProtectionStatusView {
         @Published
         private(set) var toggleTransition = ToggleTransition.idle
 
+        private let statusTransitionAwaiter: ConnectionStatusTransitionAwaiter
+
         /// The toggle is disabled while transitioning due to user interaction.
         ///
         var isToggleDisabled: Bool {
@@ -541,6 +542,7 @@ extension NetworkProtectionStatusView {
 
                 do {
                     try await tunnelController.start()
+                    try await statusTransitionAwaiter.waitUntilConnectionStarted()
                 } catch {
                     logger.log(error)
                     refreshInternalIsRunning()
@@ -555,7 +557,11 @@ extension NetworkProtectionStatusView {
         private func stopNetworkProtection() {
             Task { @MainActor in
                 toggleTransition = .switchingOff(locallyInitiated: true)
+
                 await tunnelController.stop()
+                try? await statusTransitionAwaiter.waitUntilConnectionStopped()
+                //try? await Task.sleep(nanoseconds:  2 * NSEC_PER_SEC)
+
                 toggleTransition = .idle
             }
         }

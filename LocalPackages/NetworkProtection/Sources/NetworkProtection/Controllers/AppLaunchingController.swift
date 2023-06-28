@@ -20,7 +20,6 @@ import Foundation
 
 public final class AppLaunchingController: TunnelController {
     private let appLauncher: AppLauncher
-    private let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusObserver: ConnectionStatusObserverThroughSession(), transitionTimeout: .seconds(1))
 
     public init(appLauncher: AppLauncher) {
         self.appLauncher = appLauncher
@@ -28,11 +27,9 @@ public final class AppLaunchingController: TunnelController {
 
     public func start() async throws {
         await appLauncher.launchApp(withCommand: .startVPN)
-        try await statusTransitionAwaiter.waitUntilConnectionStarted()
     }
 
     public func stop() async {
         await appLauncher.launchApp(withCommand: .stopVPN)
-        try? await statusTransitionAwaiter.waitUntilConnectionStopped()
     }
 }

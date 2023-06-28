@@ -68,11 +68,12 @@ public final class ConnectionStatusTransitionAwaiter {
         }
     }
 
-    private let statusObserver: ConnectionStatusObserver
+    private let statusSubject: CurrentValueSubject<ConnectionStatus, Never>
     private let transitionTimeout: DispatchQueue.SchedulerTimeType.Stride
 
-    public init(statusObserver: ConnectionStatusObserver, transitionTimeout: DispatchQueue.SchedulerTimeType.Stride) {
-        self.statusObserver = statusObserver
+    public init(statusSubject: CurrentValueSubject<ConnectionStatus, Never>, transitionTimeout: DispatchQueue.SchedulerTimeType.Stride) {
+
+        self.statusSubject = statusSubject
         self.transitionTimeout = transitionTimeout
     }
 
@@ -87,8 +88,8 @@ public final class ConnectionStatusTransitionAwaiter {
     }
 
     private func waitUntilTargetStatus(_ targetStatus: TargetStatus) async throws {
-        while await !expect(.connected, within: transitionTimeout) {
-            let currentStatus = statusObserver.publisher.value
+        while await !expect(targetStatus, within: transitionTimeout) {
+            let currentStatus = statusSubject.value
 
             if targetStatus.sameStatus(as: currentStatus) {
                 return
@@ -127,7 +128,7 @@ public final class ConnectionStatusTransitionAwaiter {
         await withCheckedContinuation { continuation in
             var cancellable: AnyCancellable?
 
-            cancellable = statusObserver.publisher
+            cancellable = statusSubject
                 .receive(on: DispatchQueue.main)
                 .timeout(timeout, scheduler: DispatchQueue.main)
                 .sink(receiveCompletion: { _ in
