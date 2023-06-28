@@ -87,6 +87,91 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
             XCTFail("Unexpected. It should not throw")
         }
     }
+
+    func testWhenEmailExtractingExceedesRetries_thenTimeOutErrorIsThrown() async {
+        let responseDictionary = ["response": "Not ready"]
+        let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
+        MockURLProtocol.requestHandler = { _ in (HTTPURLResponse.ok, responseData) }
+
+        let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
+
+        do {
+            _ = try await sut.getConfirmationLink(
+                from: "some@email.com",
+                numberOfRetries: 2,
+                pollingIntervalInSeconds: 2
+            )
+        } catch {
+            if let error = error as? DataBrokerProtectionEmailService.EmailError, case .linkExtractionTimedOut = error {
+                return
+            }
+
+            XCTFail("Unexpected error thrown: \(error).")
+        }
+    }
+
+    func testWhenEmailCannotBeDecoded_thenCannotBeDecodedErrorIsThrown() async {
+        let responseDictionary = ["link": ["test": "test"]]
+        let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
+        MockURLProtocol.requestHandler = { _ in (HTTPURLResponse.ok, responseData) }
+
+        let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
+
+        do {
+            _ = try await sut.getConfirmationLink(
+                from: "some@email.com",
+                numberOfRetries: 2,
+                pollingIntervalInSeconds: 2
+            )
+        } catch {
+            if let error = error as? DataBrokerProtectionEmailService.EmailError, case .cantDecodeEmailLink = error {
+                return
+            }
+
+            XCTFail("Unexpected error thrown: \(error).")
+        }
+    }
+
+    func testWhenEmailLinkIsInvalid_thenInvalidEmailLinkErrorIsThrown() async {
+        let invalidLink = EmailLink(link: "invalidURL")
+        let responseData = try? JSONEncoder().encode(invalidLink)
+        MockURLProtocol.requestHandler = { _ in (HTTPURLResponse.ok, responseData) }
+
+        let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
+
+        do {
+            _ = try await sut.getConfirmationLink(
+                from: "some@email.com",
+                numberOfRetries: 1,
+                pollingIntervalInSeconds: 1
+            )
+        } catch {
+            if let error = error as? DataBrokerProtectionEmailService.EmailError, case .invalidEmailLink = error {
+                return
+            }
+
+            XCTFail("Unexpected error thrown: \(error).")
+        }
+    }
+
+    func testWhenEmailLinkIsValid_thenTheURLIsReturned() async {
+        let validURL = EmailLink(link: "www.duckduckgo.com")
+        let responseData = try? JSONEncoder().encode(validURL)
+        MockURLProtocol.requestHandler = { _ in (HTTPURLResponse.ok, responseData) }
+
+        let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
+
+        do {
+            let url = try await sut.getConfirmationLink(
+                from: "some@email.com",
+                numberOfRetries: 1,
+                pollingIntervalInSeconds: 1
+            )
+            XCTAssertEqual(url.absoluteString, "www.duckduckgo.com")
+        } catch {
+            XCTFail("Unexpected. It should not throw")
+        }
+    }
 }
 
 final class MockURLProtocol: URLProtocol {
