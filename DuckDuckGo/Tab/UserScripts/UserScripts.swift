@@ -34,7 +34,9 @@ final class UserScripts: UserScriptsProvider {
     let contentBlockerRulesScript: ContentBlockerRulesUserScript
     let surrogatesScript: SurrogatesUserScript
     let contentScopeUserScript: ContentScopeUserScript
+    let contentScopeUserScriptIsolated: ContentScopeUserScript
     let autofillScript: WebsiteAutofillUserScript
+    let specialPages: SpecialPagesUserScript?
     let autoconsentUserScript: UserScriptWithAutoconsent?
     let youtubeOverlayScript: YoutubeOverlayUserScript?
     let youtubePlayerUserScript: YoutubePlayerUserScript?
@@ -50,7 +52,10 @@ final class UserScripts: UserScriptsProvider {
                                                 sessionKey: sessionKey,
                                                 featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfig))
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)
+        contentScopeUserScriptIsolated = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs, isIsolated: true)
+
         autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
+
         if #available(macOS 11, *) {
             autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider,
                                                           config: sourceProvider.privacyConfigurationManager.privacyConfig)
@@ -61,19 +66,25 @@ final class UserScripts: UserScriptsProvider {
         if DuckPlayer.shared.isAvailable {
             youtubeOverlayScript = YoutubeOverlayUserScript()
             youtubePlayerUserScript = YoutubePlayerUserScript()
+            specialPages = SpecialPagesUserScript()
         } else {
             youtubeOverlayScript = nil
             youtubePlayerUserScript = nil
+            specialPages = nil
         }
 
         if let autoconsentUserScript = autoconsentUserScript {
             userScripts.append(autoconsentUserScript)
         }
         if let youtubeOverlayScript = youtubeOverlayScript {
-            userScripts.append(youtubeOverlayScript)
+            contentScopeUserScriptIsolated.registerSubfeature(delegate: youtubeOverlayScript)
         }
+
         if let youtubePlayerUserScript = youtubePlayerUserScript {
-            userScripts.append(youtubePlayerUserScript)
+            if let specialPages = specialPages {
+                specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
+                userScripts.append(specialPages)
+            }
         }
     }
 
@@ -88,6 +99,7 @@ final class UserScripts: UserScriptsProvider {
         hoverUserScript,
         clickToLoadScript,
         contentScopeUserScript,
+        contentScopeUserScriptIsolated,
         autofillScript
     ]
 
