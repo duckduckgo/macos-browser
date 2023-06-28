@@ -31,6 +31,8 @@ public enum DataBrokerProtectionError: Error, Equatable {
     case userScriptMessageBrokerNotSet
     case unknown(String)
     case unrecoverableError
+    case noOptOutStep
+    case emailError(DataBrokerProtectionEmailService.EmailError?)
 
     static func parse(params: Any) -> DataBrokerProtectionError {
         let errorDataResult = try? JSONSerialization.data(withJSONObject: params)
