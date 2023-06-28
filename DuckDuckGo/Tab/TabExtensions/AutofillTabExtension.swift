@@ -117,10 +117,6 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         return true
     }
 
-    func secureVaultManagerShouldSilentlySaveGeneratedPassword(_: SecureVaultManager) -> Bool {
-        return false
-    }
-
     func secureVaultManager(_: SecureVaultManager, promptUserToUseGeneratedPasswordForDomain: String, withGeneratedPassword generatedPassword: String, completionHandler: @escaping (Bool) -> Void) {
         // no-op on macOS
     }

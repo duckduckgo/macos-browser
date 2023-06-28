@@ -1,30 +1,12 @@
 {
   "pins" : [
     {
-      "identity" : "browserserviceskit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/BrowserServicesKit",
-      "state" : {
-        "branch" : "daniel/manage-private-duck-address",
-        "revision" : "e1ebf2c1d7eed12c58e20fc0d9884aa5625db267"
-      }
-    },
-    {
       "identity" : "content-scope-scripts",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "801b7f23476f797c6eaa72b070e6c80abb82801a",
-        "version" : "4.4.4"
-      }
-    },
-    {
-      "identity" : "duckduckgo-autofill",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
-      "state" : {
-        "revision" : "44cd844b6bb5d8ccfefbd6e025817d800c26ad76",
-        "version" : "7.2.0"
+        "revision" : "260329ad8021115235d64ddd76c24629f93a7212",
+        "version" : "4.21.1"
       }
     },
     {
