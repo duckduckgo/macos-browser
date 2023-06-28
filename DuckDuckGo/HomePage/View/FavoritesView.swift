@@ -50,7 +50,6 @@ struct Favorites: View {
                 self.isHovering = isHovering
             }
         }
-
     }
 
 }

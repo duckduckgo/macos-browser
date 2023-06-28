@@ -230,10 +230,8 @@ final class BookmarkListViewController: NSViewController {
         // Set up constraints
         let titleWidth = (manageBookmarksButton.title as NSString).size(withAttributes: [.font: manageBookmarksButton.font as Any]).width
         let buttonWidth = imageSize.width + titleWidth + padding * 3
-        print(buttonWidth)
         manageBookmarksButton.translatesAutoresizingMaskIntoConstraints = false
         let widthConstraint = NSLayoutConstraint(item: manageBookmarksButton!, attribute: NSLayoutConstraint.Attribute.width, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: buttonWidth)
-//        let heightConstraint = NSLayoutConstraint(item: manageBookmarksButton!, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 28)
         NSLayoutConstraint.activate([widthConstraint])
     }
 }

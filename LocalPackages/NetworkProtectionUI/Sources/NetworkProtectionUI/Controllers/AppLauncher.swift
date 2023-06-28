@@ -55,7 +55,7 @@ public final class AppLauncher: AppLaunching {
                 try await NSWorkspace.shared.openApplication(at: launchURL, configuration: configuration)
             }
         } catch {
-            os_log("🔵 Open Application failed: %{public}@", type: .error, error.localizedDescription)
+            os_log("🔵 Open Application failed: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
         }
     }
 

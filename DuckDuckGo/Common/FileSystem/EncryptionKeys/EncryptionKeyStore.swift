@@ -167,7 +167,6 @@ final class EncryptionKeyStore: EncryptionKeyStoring {
                 }
                 finalData = keyData
             }
-            print(finalData.base64EncodedString())
             return SymmetricKey(data: finalData)
         case errSecItemNotFound:
             return nil

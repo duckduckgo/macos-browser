@@ -65,6 +65,8 @@ on:
         required: true
       NETP_STOP_VPN_PROVISION_PROFILE_BASE64:
         required: true
+      NETP_ENABLE_ON_DEMAND_PROVISION_PROFILE_BASE64:
+        required: true
       SSH_PRIVATE_KEY_FIND_IN_PAGE:
         required: true
       APPLE_API_KEY_BASE64:
@@ -112,6 +114,7 @@ jobs:
         NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64 }}
         NETP_START_VPN_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_START_VPN_PROVISION_PROFILE_BASE64 }}
         NETP_STOP_VPN_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_STOP_VPN_PROVISION_PROFILE_BASE64 }}
+        NETP_ENABLE_ON_DEMAND_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_ENABLE_ON_DEMAND_PROVISION_PROFILE_BASE64 }}
       run: |
         # create variables
         CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
@@ -126,6 +129,7 @@ jobs:
         NETP_NOTIFICATIONS_REVIEW_PP_PATH=$RUNNER_TEMP/netp_notifications_review_pp.provisionprofile
         NETP_START_VPN_PP_PATH=$RUNNER_TEMP/netp_start_vpn_pp.provisionprofile
         NETP_STOP_VPN_PP_PATH=$RUNNER_TEMP/netp_stop_vpn_pp.provisionprofile
+        NETP_ENABLE_ON_DEMAND_PP_PATH=$RUNNER_TEMP/netp_enable_on_demand_pp.provisionprofile
 
         # import certificate from secrets
         echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
@@ -139,6 +143,7 @@ jobs:
         echo -n "$NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64" | base64 --decode -o $NETP_NOTIFICATIONS_REVIEW_PP_PATH
         echo -n "$NETP_START_VPN_PROVISION_PROFILE_BASE64" | base64 --decode -o $NETP_START_VPN_PP_PATH
         echo -n "$NETP_STOP_VPN_PROVISION_PROFILE_BASE64" | base64 --decode -o $NETP_STOP_VPN_PP_PATH
+        echo -n "$NETP_ENABLE_ON_DEMAND_PROVISION_PROFILE_BASE64" | base64 --decode -o $NETP_ENABLE_ON_DEMAND_PP_PATH
 
         # create temporary keychain
         security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
@@ -161,6 +166,7 @@ jobs:
             $NETP_NOTIFICATIONS_REVIEW_PP_PATH \
             $NETP_START_VPN_PP_PATH \
             $NETP_STOP_VPN_PP_PATH \
+            $NETP_ENABLE_ON_DEMAND_PP_PATH \
             ~/Library/MobileDevice/Provisioning\ Profiles
 
     - name: Register SSH keys for submodules access
