@@ -81,6 +81,8 @@ extension AppLaunchCommand {
             return "./Contents/Resources/startVPN.app"
         case .stopVPN:
             return "./Contents/Resources/stopVPN.app"
+        case .enableOnDemand:
+            return "./Contents/Resources/enableOnDemand.app"
         default:
             return nil
         }

@@ -404,12 +404,12 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
             }
 
             if !isOnDemand {
-                Task {
+                Task { [self] in
                     // This completion handler signals a coorect connection.  We want to signal this before turning
                     // on-demand ON so that it won't interfere with the current connection.
                     completionHandler(error)
 
-                    await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .enableOnDemand)
+                    await self?.appLauncher?.launchApp(withCommand: .enableOnDemand)
                     return
                 }
             }
@@ -514,10 +514,10 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
-    override func cancelTunnelWithError(_ error: Error?) {
+    public override func cancelTunnelWithError(_ error: Error?) {
         // ensure on-demand rule is taken down on connection retry failure
         Task {
-            await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+            await self.appLauncher?.launchApp(withCommand: .stopVPN)
 
             super.cancelTunnelWithError(error)
         }
