@@ -238,6 +238,11 @@ public struct InjectableMacro: MemberMacro {
             storageInitLiteral = "nestedProvider._storage.merging(\(storageInitLiteral)) { $1 }"
         }
 
+        // map Owner.dependencyName keyPath to Owner_InjectedVars.dependencyName keyPath
+        let keyPathMappings = vars.map {
+            "case \\\(identifier).\($0.name): return \\\(identifier)_InjectedVars.\($0.name)"
+        }.joined(separator: "\n")
+
         var result: [DeclSyntax] = [
             "typealias Dependencies = \(raw: identifier)_OwnedInjectedVars & \(raw: identifier)_DependencyProviderProtocol \(raw: compositions)",
             "typealias DependencyProvider = \(raw: identifier)_DependencyProviderProtocol \(raw: dynamicCompositions)"
@@ -252,6 +257,14 @@ public struct InjectableMacro: MemberMacro {
               result.formUnion(\(raw: identifier)_InjectedVars_allKeyPaths())
               \(raw: keyPathsGetters)
               return result
+            }
+            """,
+            """
+            func dependencyKeyPath(forInjectedKeyPath keyPath: AnyKeyPath) -> AnyKeyPath {
+              switch keyPath {
+              \(raw: keyPathMappings)
+              default: return keyPath
+              }
             }
             """,
             """

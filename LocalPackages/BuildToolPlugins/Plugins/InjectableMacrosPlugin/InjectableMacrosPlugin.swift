@@ -193,7 +193,7 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
 
         return try [
             .prebuildCommand(displayName: "Build DependencyInjectionMacros", executable: context.tool(named: "sh").path, arguments: ["-c", "export PATH=\"$PATH\" && swift build --package-path '\(packagePath)'"], outputFilesDirectory: emptyDir),
-            .prebuildCommand(displayName: "DependencyInjectionMacros", executable: context.tool(named: "sh").path, arguments: ["-c", "cd \(workDir); \(macroToolPath) \(filesToProcess.joined(separator: " "))"], outputFilesDirectory: workDir),
+            .prebuildCommand(displayName: "DependencyInjectionMacros", executable: context.tool(named: "sh").path, arguments: ["-c", "cd \(workDir); \(macroToolPath) \(filesToProcess.joined(separator: " "))"], outputFilesDirectory: workDir)
         ]
     }
     // swiftlint:enable cyclomatic_complexity

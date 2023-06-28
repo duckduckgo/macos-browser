@@ -7324,6 +7324,7 @@
 			inputPaths = (
 			);
 			name = "Make /Applications symlink, remove app on Clean build";
+			runOnlyForDeploymentPostprocessing = 0;
 			shellScript = "if [[ ! -L ${BUILT_PRODUCTS_DIR}/Applications ]]; then\n    # rm ${BUILT_PRODUCTS_DIR}/Applications directory created by Xcode\n    echo \"removing ${BUILT_PRODUCTS_DIR}/Applications\" \n    rm -rf ${BUILT_PRODUCTS_DIR}/Applications\n    # create ${BUILT_PRODUCTS_DIR}/Applications symlink to /Applications\n    ln -s /Applications ${BUILT_PRODUCTS_DIR}/Applications\n    # create /Applications/DEBUG dir\n    echo \"making ${DSTROOT}/${INSTALL_PATH}\"\n    mkdir -p ${DSTROOT}/${INSTALL_PATH}\n    # we only get here on clean build, remove an existing app on clean build\n    echo \"removing ${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n    rm -rf ${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app\nfi\n    \n\n";
 		};
 		B6BD8F0A2A260E5900B6A41F /* ShellScript */ = {
@@ -7360,7 +7361,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#\"${SRCROOT}/scripts/assert_xcode_version.sh\"\n";
+			shellScript = "\"${SRCROOT}/scripts/assert_xcode_version.sh\"\n";
 		};
 		CBCCF59F2996681700C02DFE /* Assert Xcode version */ = {
 			isa = PBXShellScriptBuildPhase;

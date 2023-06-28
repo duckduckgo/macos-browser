@@ -28,6 +28,7 @@ public protocol Injectable {
     associatedtype DependencyStorage: DependencyStorageProtocol
 
     static func getAllDependencyProviderKeyPaths() -> Set<AnyKeyPath>
+    func dependencyKeyPath(forInjectedKeyPath keyPath: AnyKeyPath) -> AnyKeyPath
 
     var dependencies: DependencyStorage { get }
 }
