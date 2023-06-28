@@ -27,6 +27,7 @@ public protocol DataBrokerOperation: CSSCommunicationDelegate {
     var prefs: ContentScopeProperties { get }
     var query: BrokerProfileQueryData { get }
     var emailService: DataBrokerProtectionEmailService { get }
+    var captchaService: DataBrokerProtectionCaptchaService { get } 
 
     var webViewHandler: DataBrokerProtectionWebViewHandler? { get set }
     var actionsHandler: DataBrokerProtectionActionsHandler? { get }
@@ -37,41 +38,8 @@ public protocol DataBrokerOperation: CSSCommunicationDelegate {
 }
 
 public extension DataBrokerOperation {
-    func complete(_ value: ReturnValue) {
-        self.continuation?.resume(returning: value)
-        self.continuation = nil
-    }
 
-    func failed(with error: DataBrokerProtectionError) {
-        self.continuation?.resume(throwing: error)
-        self.continuation = nil
-    }
-
-    func initialize() async {
-        webViewHandler = await DataBrokerProtectionWebViewHandler(privacyConfig: privacyConfig, prefs: prefs, delegate: self)
-        await webViewHandler?.initializeWebView()
-    }
-
-    func loadURL(url: URL) {
-        Task {
-            try? await webViewHandler?.load(url: url)
-            await executeNextStep()
-        }
-    }
-
-    func success(actionId: String) {
-        Task {
-            await executeNextStep()
-        }
-    }
-
-    func onError(error: DataBrokerProtectionError) {
-        failed(with: error)
-
-        Task {
-            await webViewHandler?.finish()
-        }
-    }
+    // MARK: - Shared functions
 
     func getProfileWithEmail() async throws -> ProfileQuery {
         let email = try await emailService.getEmail()
@@ -109,6 +77,59 @@ public extension DataBrokerOperation {
             }
         } catch {
             onError(error: .emailError(error as? DataBrokerProtectionEmailService.EmailError))
+        }
+    }
+
+    // MARK: - CSSCommunicationDelegate
+
+    func complete(_ value: ReturnValue) {
+        self.continuation?.resume(returning: value)
+        self.continuation = nil
+    }
+
+    func failed(with error: DataBrokerProtectionError) {
+        self.continuation?.resume(throwing: error)
+        self.continuation = nil
+    }
+
+    func initialize() async {
+        webViewHandler = await DataBrokerProtectionWebViewHandler(privacyConfig: privacyConfig, prefs: prefs, delegate: self)
+        await webViewHandler?.initializeWebView()
+    }
+
+    func loadURL(url: URL) {
+        Task {
+            try? await webViewHandler?.load(url: url)
+            await executeNextStep()
+        }
+    }
+
+    func success(actionId: String) {
+        Task {
+            await executeNextStep()
+        }
+    }
+
+    func captchaInformation(captchaInfo: GetCaptchaInfoResponse) {
+        Task {
+            do {
+                let captchaTransactonId = try await captchaService.submitCaptchaInformation(captchaInfo)
+                print(captchaTransactonId)
+            } catch {
+                if let captchaError = error as? CaptchaServiceError {
+                    onError(error: DataBrokerProtectionError.captchaServiceError(captchaError))
+                } else {
+                    onError(error: DataBrokerProtectionError.captchaServiceError(.errorWhenSubmittingCaptcha))
+                }
+            }
+        }
+    }
+
+    func onError(error: DataBrokerProtectionError) {
+        failed(with: error)
+
+        Task {
+            await webViewHandler?.finish()
         }
     }
 }

@@ -36,3 +36,41 @@ func areDatesEqualIgnoringSeconds(date1: Date?, date2: Date?) -> Bool {
 
     return normalizedDate1 == normalizedDate2
 }
+
+extension HTTPURLResponse {
+    static let ok = HTTPURLResponse(url: URL(string: "www.example.com")!, statusCode: 200, httpVersion: nil, headerFields: [String : String]())!
+}
+
+typealias RequestHandler = ((URLRequest) throws -> (HTTPURLResponse, Data?))
+final class MockURLProtocol: URLProtocol {
+
+    static var lastRequest: URLRequest?
+    static var requestHandlerQueue = [RequestHandler]()
+
+    override class func canInit(with request: URLRequest) -> Bool { true }
+
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        if MockURLProtocol.requestHandlerQueue.isEmpty {
+            fatalError("Handler is unavailable.")
+        }
+
+        let handler = MockURLProtocol.requestHandlerQueue.removeFirst()
+        MockURLProtocol.lastRequest = request
+
+        do {
+            let (response, data) = try handler(request)
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            if let data = data {
+                client?.urlProtocol(self, didLoad: data)
+            }
+            client?.urlProtocolDidFinishLoading(self)
+        } catch {
+            client?.urlProtocol(self, didFailWithError: error)
+        }
+    }
+
+    override func stopLoading() { }
+
+}

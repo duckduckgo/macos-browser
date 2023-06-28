@@ -1,5 +1,5 @@
 //
-//  Action.swift
+//  GetCaptchaInfo.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,24 +18,13 @@
 
 import Foundation
 
-public enum ActionType: String, Codable, Sendable {
-    case extract
-    case navigate
-    case fillForm
-    case click
-    case expectation
-    case emailConfirmation
-    case getCaptchaInfo
-}
+public struct GetCaptchaInfoAction: Action {
+    public var id: String = "getCaptchaInfo"
+    public var actionType: ActionType = .getCaptchaInfo
 
-public protocol Action: Encodable, Sendable {
-    var id: String { get }
-    var actionType: ActionType { get }
-    var needsEmail: Bool { get }
-}
+    let selector: String
 
-public extension Action {
-    var needsEmail: Bool {
-        get { false }
+    public init(selector: String) {
+        self.selector = selector
     }
 }

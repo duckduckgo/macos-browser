@@ -1,5 +1,5 @@
 //
-//  Action.swift
+//  HTTPUtils.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,24 +18,7 @@
 
 import Foundation
 
-public enum ActionType: String, Codable, Sendable {
-    case extract
-    case navigate
-    case fillForm
-    case click
-    case expectation
-    case emailConfirmation
-    case getCaptchaInfo
-}
-
-public protocol Action: Encodable, Sendable {
-    var id: String { get }
-    var actionType: ActionType { get }
-    var needsEmail: Bool { get }
-}
-
-public extension Action {
-    var needsEmail: Bool {
-        get { false }
-    }
+struct Headers {
+    private static let authToken = "" // Use DBP API Dev Access Token on Bitwarden
+    static let authorizationHeader = "bearer \(authToken)"
 }
