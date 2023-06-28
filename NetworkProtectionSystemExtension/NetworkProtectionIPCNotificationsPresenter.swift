@@ -50,4 +50,7 @@ final class NetworkProtectionIPCNotificationsPresenter: NetworkProtectionNotific
         ipcConnection.superceded()
     }
 
+    func showTestNotification() {
+        ipcConnection.testNotification()
+    }
 }

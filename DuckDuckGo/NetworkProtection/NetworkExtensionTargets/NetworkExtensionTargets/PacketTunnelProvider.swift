@@ -707,6 +707,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             handleSetKeyValidity(messageData, completionHandler: completionHandler)
         case .resetAllState:
             handleResetAllState(messageData, completionHandler: completionHandler)
+        case .triggerTestNotification:
+            handleTriggerTestNotification(messageData, completionHandler: completionHandler)
         }
     }
 
@@ -815,6 +817,10 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             setKeyValidity(keyValidity)
             completionHandler?(nil)
         }
+    }
+
+    private func handleTriggerTestNotification(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
+        notificationsPresenter.showTestNotification()
     }
 
     // MARK: - Adapter start completion handling

@@ -127,6 +127,13 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
         showNotification(content)
     }
 
+    func showTestNotification() {
+        // These strings are deliberately hardcoded as we don't want them localized, they're only for debugging:
+        let content = notificationContent(title: "Test notification",
+                                          subtitle: "Test notification")
+        showNotification(content)
+    }
+
     private func showNotification(_ content: UNNotificationContent) {
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: .none)
 
