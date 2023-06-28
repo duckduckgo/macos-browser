@@ -79,19 +79,36 @@ public extension DataBrokerOperation {
     }
 
     func runNextAction(_ action: Action) async {
-        var profile: ProfileQuery
+        if let emailConfirmationAction = action as? EmailConfirmationAction {
+            try? await runEmailConfirmationAction(action: emailConfirmationAction)
+            return
+        }
 
         if action.needsEmail {
             do {
-                profile = try await getProfileWithEmail()
+                query.profileQuery = try await getProfileWithEmail()
             } catch {
                 onError(error: .emailError(error as? DataBrokerProtectionEmailService.EmailError))
                 return
             }
-        } else {
-            profile = query.profileQuery
         }
 
-        await webViewHandler?.execute(action: action, profileData: profile)
+        await webViewHandler?.execute(action: action, profileData: query.profileQuery)
+    }
+
+    private func runEmailConfirmationAction(action: EmailConfirmationAction) async throws {
+        do {
+            if let email = query.profileQuery.email {
+                let url =  try await emailService.getConfirmationLink(
+                    from: email,
+                    pollingIntervalInSeconds: action.pollingTime)
+                try? await webViewHandler?.load(url: url)
+            } else {
+                assertionFailure("Trying to run email confirmation without an email.")
+                throw DataBrokerProtectionEmailService.EmailError.cantFindEmail
+            }
+        } catch {
+            onError(error: .emailError(error as? DataBrokerProtectionEmailService.EmailError))
+        }
     }
 }
