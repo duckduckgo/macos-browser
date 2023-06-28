@@ -20,7 +20,7 @@ import Foundation
 
 final public class BrokerProfileQueryData: Sendable {
     public let id: UUID
-    public let profileQuery: ProfileQuery
+    public var profileQuery: ProfileQuery
     public let dataBroker: DataBroker
 
     public var scanData: ScanOperationData
