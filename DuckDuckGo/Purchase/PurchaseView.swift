@@ -84,7 +84,7 @@ struct PurchaseView: View {
                         SubscriptionRow(product: rowModel.product,
                                         isPurchased: rowModel.isPurchased,
                                         isBeingPurchased: rowModel.isBeingPurchased,
-                                        buyButtonAction: { manager.buy(rowModel.product, customUUID: customUUID) })
+                                        buyButtonAction: { manager.buy(rowModel.product, customUUID: model.externalID ?? "") })
                     }
                 }
             }

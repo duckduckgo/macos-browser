@@ -33,6 +33,8 @@ public final class PurchaseModel: ObservableObject {
     @Published var subscriptions: [SubscriptionRowModel]
     @Published var storefrontCountry: String = ""
 
+    var externalID: String?
+
     init(subscriptions: [SubscriptionRowModel] = []) {
         print(" -- PurchaseModel init --")
         self.subscriptions = subscriptions

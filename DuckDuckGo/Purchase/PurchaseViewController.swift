@@ -47,16 +47,7 @@ final class PurchaseViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-//        Task {
-//            await manager.updatePurchasedProducts()
-//            await manager.updateAvailableProducts()
-//        }
-
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { self.model.state = .authenticating }
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 4) { self.model.state = .loadingProducts }
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 6) { self.model.state = .readyToPurchase }
-
-        checkAndUpdateViewModelState()
+        update(for: initialState)
 
         manager.$availableProducts.combineLatest(manager.$purchasedProductIDs, manager.$purchaseQueue).receive(on: RunLoop.main).sink { [weak self] availableProducts, purchasedProductIDs, purchaseQueue in
             print(" -- got combineLatest -")
@@ -70,7 +61,53 @@ final class PurchaseViewController: NSViewController {
                                                                                   isPurchased: purchasedProductIDs.contains($0.id),
                                                                                   isBeingPurchased: purchaseQueue.contains($0.id)) }
         }.store(in: &cancellables)
+    }
 
+    private var initialState: PurchaseModel.State {
+        if hasAuthServiceToken {
+            // ok
+            return .loadingProducts
+        } else if hasEmailProtection {
+            // exchange token
+            return .authenticating
+        } else {
+            // nothing
+            return .noEmailProtection
+        }
+    }
+
+    private func update(for state: PurchaseModel.State) {
+        print(" [[ New state -> \(state) ]]")
+        model.state = state
+
+        switch state {
+        case .noEmailProtection:
+            return
+        case .authenticating:
+            Task {
+                switch await AccountsService.getAccessToken() {
+                case .success(let response):
+                    self.authServiceToken = response.accessToken
+                    self.update(for: .loadingProducts)
+                case .failure(let error):
+                    print("Error: \(error)")
+                }
+            }
+        case .loadingProducts:
+            Task {
+                switch await AccountsService.validateToken(accessToken: self.authServiceToken ?? "") {
+                case .success(let response):
+                    self.model.externalID = response.account.externalID
+                    await manager.updatePurchasedProducts()
+                    await manager.updateAvailableProducts()
+                    self.update(for: .readyToPurchase)
+                case .failure(let error):
+                    print("Error: \(error)")
+                }
+            }
+        default:
+            return
+        }
     }
 
     private func checkAndUpdateViewModelState(thisIsRetry: Bool = false) {

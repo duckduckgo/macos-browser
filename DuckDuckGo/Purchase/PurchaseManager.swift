@@ -79,8 +79,13 @@ final class PurchaseManager: ObservableObject {
         print(" -- [PurchaseManager] updateAvailableProducts()")
 
         do {
-            availableProducts = try await Product.products(for: Self.productIdentifiers)
+            let availableProducts = try await Product.products(for: Self.productIdentifiers)
             print(" -- [PurchaseManager] updateAvailableProducts(): fetched \(availableProducts.count) products")
+
+            if self.availableProducts != availableProducts {
+                print("availableProducts changed!")
+                self.availableProducts = availableProducts
+            }
         } catch {
             print("Error updating available products: \(error)")
         }
@@ -130,7 +135,12 @@ final class PurchaseManager: ObservableObject {
         }
 
         print(" -- [PurchaseManager] updatePurchasedProducts(): have \(purchasedSubscriptions.count) active subscriptions")
-        self.purchasedProductIDs = purchasedSubscriptions
+
+        if self.purchasedProductIDs != purchasedSubscriptions {
+            print("purchasedSubscriptions changed!")
+            self.purchasedProductIDs = purchasedSubscriptions
+        }
+
         subscriptionGroupStatus = try? await availableProducts.first?.subscription?.status.first?.state
     }
 
@@ -138,6 +148,7 @@ final class PurchaseManager: ObservableObject {
     func buy(_ product: Product, customUUID: String) {
         print(" -- [PurchaseManager] buy: \(product.displayName) (customUUID: \(customUUID))")
 
+        print("purchaseQueue append!")
         purchaseQueue.append(product.id)
 
         Task {
@@ -153,6 +164,7 @@ final class PurchaseManager: ObservableObject {
 
             print(" -- [PurchaseManager] receiving await task result")
             purchaseQueue.removeAll()
+            print("purchaseQueue removeAll!")
 
             switch result {
             case let .success(.verified(transaction)):
