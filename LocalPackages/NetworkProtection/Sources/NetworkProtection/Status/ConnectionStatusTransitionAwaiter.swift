@@ -19,6 +19,17 @@
 import Combine
 import Foundation
 
+extension Publisher {
+    /// Stops the publisher after a certain time has passed.
+    ///
+    /// The difference with `timeout(_:tolerance:scheduler:)` is that receiving new values does not reset the timeout.
+    ///
+    func stopAfter<S>(_ interval: S.SchedulerTimeType.Stride, tolerance: S.SchedulerTimeType.Stride? = nil, scheduler: S, options: S.SchedulerOptions? = nil) -> AnyPublisher<Output, Failure> where S: Scheduler {
+        prefix(untilOutputFrom: Just(()).delay(for: interval, tolerance: tolerance, scheduler: scheduler, options: nil))
+            .eraseToAnyPublisher()
+    }
+}
+
 /// This class provides a mechanism to asynchronously await for a certain connection transition
 /// to be fulfilled, while also specifying a timeout for the expectation.
 ///
@@ -135,11 +146,10 @@ public final class ConnectionStatusTransitionAwaiter {
 
         await withCheckedContinuation { continuation in
             var cancellable: AnyCancellable?
-            var result = false
 
             cancellable = statusObserver.publisher
                 .receive(on: DispatchQueue.main)
-                .timeout(timeout, scheduler: DispatchQueue.main)
+                .stopAfter(timeout, scheduler: DispatchQueue.main)
                 .sink(receiveCompletion: { _ in
                     continuation.resume(returning: false)
                     cancellable?.cancel()

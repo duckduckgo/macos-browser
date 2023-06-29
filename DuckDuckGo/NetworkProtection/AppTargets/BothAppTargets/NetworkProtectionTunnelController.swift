@@ -272,36 +272,37 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// Starts the VPN connection used for Network Protection
     ///
     func start() async {
-        do {
-            try await start(enableLoginItems: true)
-        } catch {
-            controllerErrorStore.lastErrorMessage = error.localizedDescription
-        }
+        await start(enableLoginItems: true)
     }
 
-    func start(enableLoginItems: Bool) async throws {
+    func start(enableLoginItems: Bool) async {
         controllerErrorStore.lastErrorMessage = nil
 
         if enableLoginItems {
             Self.enableLoginItems()
         }
 
+        do {
 #if NETP_SYSTEM_EXTENSION
-        guard try await ensureSystemExtensionIsActivated() else {
-            return
-        }
+            guard try await ensureSystemExtensionIsActivated() else {
+                return
+            }
 #endif
 
-        let tunnelManager = try await loadOrMakeTunnelManager()
+            let tunnelManager = try await loadOrMakeTunnelManager()
 
-        switch tunnelManager.connection.status {
-        case .invalid:
-            throw StartError.connectionStatusInvalid
-        case .connected:
-            // Intentional no-op
-            break
-        default:
-            try await start(tunnelManager)
+            switch tunnelManager.connection.status {
+            case .invalid:
+                throw StartError.connectionStatusInvalid
+            case .connected:
+                // Intentional no-op
+                break
+            default:
+                try await start(tunnelManager)
+            }
+        } catch {
+            await stop()
+            controllerErrorStore.lastErrorMessage = error.localizedDescription
         }
     }
 
@@ -318,18 +319,13 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             options["tunnelFailureSimulation"] = "true" as NSString
         }
 
-        do {
-            if Self.simulationOptions.isEnabled(.controllerFailure) {
-                Self.simulationOptions.setEnabled(false, option: .controllerFailure)
-                throw StartError.simulateControllerFailureError
-            }
-
-            try tunnelManager.connection.startVPNTunnel(options: options)
-            try await statusTransitionAwaiter.waitUntilConnectionStarted()
-        } catch {
-            controllerErrorStore.lastErrorMessage = error.localizedDescription
-            throw error
+        if Self.simulationOptions.isEnabled(.controllerFailure) {
+            Self.simulationOptions.setEnabled(false, option: .controllerFailure)
+            throw StartError.simulateControllerFailureError
         }
+
+        try tunnelManager.connection.startVPNTunnel(options: options)
+        try await statusTransitionAwaiter.waitUntilConnectionStarted()
     }
 
     /// Stops the VPN connection used for Network Protection
