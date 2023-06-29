@@ -115,7 +115,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
     private func handleOperationError(brokerProfileQuery: BrokerProfileQueryData, operationData: BrokerOperationData, error: Error) {
         let event = HistoryEvent(type: .error)
         brokerProfileQuery.addHistoryEvent(event, for: operationData)
-        //TODO: Send error pixel
+        // TODO: Send error pixel
         print("ERROR \(error)")
     }
 
