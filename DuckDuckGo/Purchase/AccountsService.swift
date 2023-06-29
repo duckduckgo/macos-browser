@@ -67,8 +67,9 @@ struct AccountsService {
             let product: String
         }
     }
+    // swiftlint:enable nesting
 
-    // MARK: - Private
+    // MARK: - Private API
 
     private static func executeAPICall<T>(method: String, endpoint: String, headers: [String: String]) async -> Result<T, AccountsService.Error> where T: Decodable {
         let request = makeAPIRequest(method: method, endpoint: endpoint, headers: headers)
