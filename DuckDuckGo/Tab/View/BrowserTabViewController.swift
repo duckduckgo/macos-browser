@@ -401,6 +401,9 @@ final class BrowserTabViewController: NSViewController {
         transientTabContentViewController?.removeCompletely()
         preferencesViewController?.removeCompletely()
         bookmarksViewController?.removeCompletely()
+#if DBP
+        dataBrokerProtectionHomeViewController?.removeCompletely()
+#endif
         if includingWebView {
             self.removeWebViewFromHierarchy()
         }
@@ -453,6 +456,12 @@ final class BrowserTabViewController: NSViewController {
             removeAllTabContent()
             view.addAndLayout(homePageView)
 
+#if DBP
+        case .dataBrokerProtection:
+            removeAllTabContent()
+            let dataBrokerProtectionViewController = dataBrokerProtectionHomeViewControllerCreatingIfNeeded()
+            addAndLayoutChild(dataBrokerProtectionViewController)
+#endif
         default:
             removeAllTabContent()
         }
@@ -471,6 +480,19 @@ final class BrowserTabViewController: NSViewController {
 
         return isDifferentTabDisplayed || tabIsNotOnScreen || (isPinnedTab && isKeyWindow)
     }
+
+#if DBP
+    // MARK: - DataBrokerProtection
+    
+    var dataBrokerProtectionHomeViewController: DBPHomeViewController?
+    private func dataBrokerProtectionHomeViewControllerCreatingIfNeeded() -> DBPHomeViewController {
+        return dataBrokerProtectionHomeViewController ?? {
+            let dataBrokerProtectionHomeViewController = DBPHomeViewController()
+            self.dataBrokerProtectionHomeViewController = dataBrokerProtectionHomeViewController
+            return dataBrokerProtectionHomeViewController
+        }()
+    }
+#endif
 
     // MARK: - Preferences
 

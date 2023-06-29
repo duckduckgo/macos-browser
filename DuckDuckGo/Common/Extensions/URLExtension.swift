@@ -120,6 +120,12 @@ extension URL {
         return URL(string: "about:preferences")!
     }
 
+#if DBP
+    static var dataBrokerProtection: URL {
+        return URL(string: "about:dbp")!
+    }
+#endif
+    
     static func preferencePane(_ pane: PreferencePaneIdentifier) -> URL {
         return Self.preferences.appendingPathComponent(pane.rawValue)
     }
