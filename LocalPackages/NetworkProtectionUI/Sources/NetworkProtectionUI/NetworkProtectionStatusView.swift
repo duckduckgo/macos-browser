@@ -238,7 +238,7 @@ public struct NetworkProtectionStatusView: View {
                 }
             }
             .padding(16)
-            .background(RoundedRectangle(cornerRadius: 8).fill(Color("AlertBubbleBackground")))
+            .background(RoundedRectangle(cornerRadius: 8).fill(Color("AlertBubbleBackground", bundle: Bundle.module)))
         }
         .padding(EdgeInsets(top: 8, leading: 8, bottom: 4, trailing: 8))
     }
