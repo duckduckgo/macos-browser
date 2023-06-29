@@ -26,7 +26,6 @@ struct PurchaseView: View {
     @ObservedObject var model: PurchaseModel
 
     @State private var showingAlert = false
-    @State private var customUUID = ""
 
     public let dismissAction: () -> Void
 
@@ -192,22 +191,9 @@ struct PurchaseView: View {
             Divider()
 
             Group {
-                HStack {
-                    Text("UUID:")
-                    TextField("00000000-0000-0000-0000-000000000000", text: $customUUID)
-                }
-                HStack {
-                    Spacer()
-                    Button("UUID #1") { customUUID = "11111111-1111-1111-1111-111111111111" }
-                    Button("UUID #2") { customUUID = "22222222-2222-2222-2222-222222222222" }
-                    Button("Clear UUID") { customUUID = "" }
-                }
-
-                Group {
-                    Spacer()
-                    Button("Exchange token") { manager.exchangeToken() }
-                    Button("Fetch entitlements") { manager.fetchEntitlements() }
-                }
+                Spacer()
+                Button("Exchange token") { manager.exchangeToken() }
+                Button("Fetch entitlements") { manager.fetchEntitlements() }
             }
 
             Group {
