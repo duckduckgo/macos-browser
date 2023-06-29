@@ -20,6 +20,7 @@ import AppKit
 import SwiftUI
 
 protocol CookieConsentUserPermissionViewControllerDelegate: AnyObject {
+    var type: CookieConsentPopoverType { get }
     func cookieConsentUserPermissionViewController(_ controller: CookieConsentUserPermissionViewController, didFinishWithResult result: Bool)
 }
 
@@ -30,7 +31,7 @@ public final class CookieConsentUserPermissionViewController: NSViewController {
     private let viewSize = CGSize(width: 550, height: 300)
 
     private lazy var consentView: NSHostingView<PermissionView> = {
-        let permissionView = CookieConsentUserPermissionView(sketchAnimationModel: sketchAnimationModel) { result in
+        let permissionView = CookieConsentUserPermissionView(sketchAnimationModel: sketchAnimationModel, type: delegate?.type ?? .site) { result in
             self.delegate?.cookieConsentUserPermissionViewController(self, didFinishWithResult: result)
         }
         return NSHostingView(rootView: permissionView)
@@ -42,7 +43,6 @@ public final class CookieConsentUserPermissionViewController: NSViewController {
 
     public override func viewDidLoad() {
         super.viewDidLoad()
-
         view.addSubview(consentView)
         setupConstraints()
         view.applyDropShadow()
