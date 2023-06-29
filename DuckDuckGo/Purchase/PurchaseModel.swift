@@ -22,6 +22,14 @@ import StoreKit
 @available(macOS 12.0, *)
 public final class PurchaseModel: ObservableObject {
 
+    enum State {
+        case noEmailProtection
+        case authenticating
+        case loadingProducts
+        case readyToPurchase
+    }
+
+    @Published var state: State = .noEmailProtection
     @Published var subscriptions: [SubscriptionRowModel]
     @Published var storefrontCountry: String = ""
 

@@ -34,24 +34,41 @@ struct PurchaseView: View {
         ZStack {
             closeButtonOverlay
             Spacer()
-            if model.subscriptions.isEmpty {
-                SpinnerView()
-            } else {
-                subscriptionsList
+            switch model.state {
+            case .noEmailProtection: unauthenticatedView
+            case .authenticating: authenticatingView
+            case .loadingProducts: loadingProductsView
+            case .readyToPurchase: subscriptionsList
             }
         }
         .padding(.all, 16)
     }
 
-    struct SpinnerView: View {
-        var body: some View {
-            VStack {
-                Text("Fetching subscriptions...")
-                    .font(.largeTitle)
-                ActivityIndicator(isAnimating: .constant(true), style: .spinning)
-            }
-            .padding(.all, 32)
+    private var unauthenticatedView: some View {
+        VStack {
+            Text("No Email Protection")
+                .font(.largeTitle)
+            Text("Before purchasing a subscription please first sign in to email protection.")
         }
+        .padding(.all, 32)
+    }
+
+    private var authenticatingView: some View {
+        VStack {
+            Text("Authenticating...")
+                .font(.largeTitle)
+            ActivityIndicator(isAnimating: .constant(true), style: .spinning)
+        }
+        .padding(.all, 32)
+    }
+
+    private var loadingProductsView: some View {
+        VStack {
+            Text("Loading subscriptions...")
+                .font(.largeTitle)
+            ActivityIndicator(isAnimating: .constant(true), style: .spinning)
+        }
+        .padding(.all, 32)
     }
 
     private var subscriptionsList: some View {

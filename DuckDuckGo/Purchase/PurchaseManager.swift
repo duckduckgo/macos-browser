@@ -181,14 +181,11 @@ final class PurchaseManager: ObservableObject {
     @MainActor
     func exchangeToken() {
         Task {
-            do {
-                let response = try await AccountsService.getAccessToken()
-
-                DispatchQueue.main.async {
-                    self.accessToken = response?.accessToken ?? ""
-                }
-            } catch {
-                print("Error exchanging token: \(error)")
+            switch await AccountsService.getAccessToken() {
+            case .success(let response):
+                self.accessToken = response.accessToken
+            case .failure(let error):
+                print("Error: \(error)")
             }
         }
     }
@@ -196,14 +193,12 @@ final class PurchaseManager: ObservableObject {
     @MainActor
     func fetchEntitlements() {
         Task {
-            do {
-                let response = try await AccountsService.validateToken(accessToken: self.accessToken)
-
-                if let response = response {
-                    print("Current entitlements: \(response.account.entitlements.map { $0.product }.joined(separator: ",") )")
-                }
-            } catch {
-                print("Error fetching entitlements: \(error)")
+            switch await AccountsService.validateToken(accessToken: self.accessToken) {
+            case .success(let response):
+                print("Current entitlements: \(response.account.entitlements.map { $0.product }.joined(separator: ",") )")
+                print("ExternalID: \(response.account.externalID)")
+            case .failure(let error):
+                print("Error: \(error)")
             }
         }
     }

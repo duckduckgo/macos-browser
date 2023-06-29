@@ -20,12 +20,15 @@ import AppKit
 import SwiftUI
 import StoreKit
 import Combine
+import BrowserServicesKit
 
 @available(macOS 12.0, *)
 final class PurchaseViewController: NSViewController {
 
     private let manager = PurchaseManager.shared
     private let model = PurchaseModel()
+
+    private var authServiceToken: String?
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -44,10 +47,16 @@ final class PurchaseViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        Task {
-            await manager.updatePurchasedProducts()
-            await manager.updateAvailableProducts()
-        }
+//        Task {
+//            await manager.updatePurchasedProducts()
+//            await manager.updateAvailableProducts()
+//        }
+
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { self.model.state = .authenticating }
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 4) { self.model.state = .loadingProducts }
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 6) { self.model.state = .readyToPurchase }
+
+        checkAndUpdateViewModelState()
 
         manager.$availableProducts.combineLatest(manager.$purchasedProductIDs, manager.$purchaseQueue).receive(on: RunLoop.main).sink { [weak self] availableProducts, purchasedProductIDs, purchaseQueue in
             print(" -- got combineLatest -")
@@ -60,16 +69,52 @@ final class PurchaseViewController: NSViewController {
             self?.model.subscriptions = sortedProducts.map { SubscriptionRowModel(product: $0,
                                                                                   isPurchased: purchasedProductIDs.contains($0.id),
                                                                                   isBeingPurchased: purchaseQueue.contains($0.id)) }
-
         }.store(in: &cancellables)
 
     }
 
-    override func viewDidAppear() {
-        super.viewDidAppear()
-//        Task {
-//            let storefront = await Storefront.current
-//            print(storefront ?? "")
-//        }
+    private func checkAndUpdateViewModelState(thisIsRetry: Bool = false) {
+        guard hasAuthServiceToken else {
+            if !thisIsRetry {
+                checkEmailProtectionAndExchangeToken()
+            }
+            return
+        }
+
+        // fetch entitlements
+        model.state = .loadingProducts
+        // get external_id
+
+        // fetch products
     }
+
+    private var hasAuthServiceToken: Bool {
+        guard let token = authServiceToken else { return false }
+        return !token.isEmpty
+    }
+
+    private func checkEmailProtectionAndExchangeToken() {
+        guard hasEmailProtection else {
+            model.state = .noEmailProtection
+            return
+        }
+
+        model.state = .authenticating
+
+        // exchange token
+        Task {
+            switch await AccountsService.getAccessToken() {
+            case .success(let response):
+                self.authServiceToken = response.accessToken
+                self.checkAndUpdateViewModelState(thisIsRetry: true)
+            case .failure(let error):
+                print("Error: \(error)")
+            }
+        }
+    }
+
+    private var hasEmailProtection: Bool {
+        EmailManager().isSignedIn
+    }
+
 }
