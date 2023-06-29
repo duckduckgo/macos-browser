@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "browserserviceskit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/BrowserServicesKit",
+      "state" : {
+        "branch" : "michal/email-headers",
+        "revision" : "e5334b0b9f8054f596d26027b9b458ae6ff7752c"
+      }
+    },
+    {
       "identity" : "content-scope-scripts",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
