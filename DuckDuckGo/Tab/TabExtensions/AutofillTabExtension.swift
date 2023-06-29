@@ -79,7 +79,7 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         return true
     }
 
-    func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData, hasGeneratedPassword generatedPassword: Bool, withTrigger trigger: AutofillUserScript.GetTriggerType?) {
+    func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData, withTrigger trigger: AutofillUserScript.GetTriggerType?) {
         self.autofillDataToSave = data
     }
 
