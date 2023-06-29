@@ -128,20 +128,21 @@ public final class ConnectionStatusTransitionAwaiter {
 
         await withCheckedContinuation { continuation in
             var cancellable: AnyCancellable?
+            var result = false
 
             cancellable = statusSubject
                 .receive(on: DispatchQueue.main)
                 .timeout(timeout, scheduler: DispatchQueue.main)
                 .sink(receiveCompletion: { _ in
-                    cancellable?.cancel()
                     continuation.resume(returning: false)
+                    cancellable?.cancel()
                 }, receiveValue: { newStatus in
                     guard status.sameStatus(as: newStatus) else {
                         return
                     }
 
-                    cancellable?.cancel()
                     continuation.resume(returning: true)
+                    cancellable?.cancel()
                 })
         }
     }

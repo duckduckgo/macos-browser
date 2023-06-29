@@ -53,35 +53,19 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// Auth token store
     private let tokenStore: NetworkProtectionTokenStore
 
-    /// The actual storage for our tunnel manager.
-    ///
-    private var internalTunnelManager: NETunnelProviderManager?
-
     /// The tunnel manager: will try to load if it its not loaded yet, but if one can't be loaded from preferences,
-    /// a new one will not be created.  This is useful for querying the connection state and information without triggering
+    /// a new one will NOT be created.  This is useful for querying the connection state and information without triggering
     /// a VPN-access popup to the user.
     ///
-    private var tunnelManager: NETunnelProviderManager? {
-        get async {
-            guard let tunnelManager = internalTunnelManager else {
-                let tunnelManager = await loadTunnelManager()
-                internalTunnelManager = tunnelManager
-                return tunnelManager
-            }
-
-            return tunnelManager
-        }
-    }
-
     private func loadTunnelManager() async -> NETunnelProviderManager? {
         try? await NETunnelProviderManager.loadAllFromPreferences().first
     }
 
+
     private func loadOrMakeTunnelManager() async throws -> NETunnelProviderManager {
-        guard let tunnelManager = await tunnelManager else {
+        guard let tunnelManager = await loadTunnelManager() else {
             let tunnelManager = NETunnelProviderManager()
             try await setupAndSave(tunnelManager)
-            internalTunnelManager = tunnelManager
             return tunnelManager
         }
 
@@ -110,11 +94,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         self.logger = logger
         self.tokenStore = tokenStore
 
-        startObservingVPNConfigChanges(notificationCenter: notificationCenter)
-
         Task {
             // Make sure the tunnel is loaded
-            _ = await tunnelManager
+            _ = await loadTunnelManager()
         }
     }
 
@@ -122,19 +104,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     private var configChangeCancellable: AnyCancellable?
 
-    private func startObservingVPNConfigChanges(notificationCenter: NotificationCenter) {
-        configChangeCancellable = notificationCenter.publisher(for: .NEVPNConfigurationChange)
-            .compactMap { $0.object as? NETunnelProviderManager }
-            .assign(to: \.internalTunnelManager, onWeaklyHeld: self)
-    }
-
     // MARK: - Tunnel Configuration
-
-    /// Reloads the tunnel manager from preferences.
-    ///
-    private func reloadTunnelManager() {
-        internalTunnelManager = nil
-    }
 
     /// Setups the tunnel manager if it's not set up already.
     ///
@@ -172,7 +142,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// - Returns: `true` if the VPN is connected, connecting or reasserting, and `false` otherwise.
     ///
     func isConnected() async -> Bool {
-        guard let tunnelManager = await tunnelManager else {
+        guard let tunnelManager = await loadTunnelManager() else {
             return false
         }
 
@@ -317,7 +287,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
         switch tunnelManager.connection.status {
         case .invalid:
-            reloadTunnelManager()
             try await start()
         case .connected:
             // Intentional no-op
@@ -356,7 +325,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// Stops the VPN connection used for Network Protection
     ///
     func stop() async {
-        guard let tunnelManager = await tunnelManager else {
+        guard let tunnelManager = await loadTunnelManager() else {
             return
         }
 
