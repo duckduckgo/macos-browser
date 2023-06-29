@@ -356,7 +356,7 @@ final class TabCollectionViewModel: NSObject {
         guard changesEnabled || forceChange else { return }
 
         let parentTab = tabCollection.tabs[safe: index]?.parentTab
-        guard tabCollection.removeTab(at: index, published: published) else { return }
+        guard tabCollection.removeTab(at: index, published: published, forced: forceChange) else { return }
 
         didRemoveTab(at: .unpinned(index),
                      withParent: parentTab,
