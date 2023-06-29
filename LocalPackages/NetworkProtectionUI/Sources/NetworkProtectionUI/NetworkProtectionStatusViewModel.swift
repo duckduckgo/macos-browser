@@ -116,7 +116,7 @@ extension NetworkProtectionStatusView {
             internalServerLocation = statusReporter.serverInfoPublisher.value.serverLocation
             lastTunnelErrorMessage = statusReporter.connectionErrorPublisher.value
             lastControllerErrorMessage = statusReporter.controllerErrorMessagePublisher.value
-            statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusSubject: statusReporter.statusPublisher, transitionTimeout: .seconds(1))
+            statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusSubject: statusReporter.statusPublisher, transitionTimeout: .seconds(10))
 
             // Particularly useful when unit testing with an initial status of our choosing.
             refreshInternalIsRunning()
@@ -544,6 +544,13 @@ extension NetworkProtectionStatusView {
                     try await tunnelController.start()
                     try await statusTransitionAwaiter.waitUntilConnectionStarted()
                 } catch {
+                    // If it's taking too long to connect, stop trying so that the user is not stuck
+                    // in the transition
+                    if case ConnectionStatusTransitionAwaiter.TransitionError.timeout = error {
+                        await tunnelController.stop()
+                        try? await statusTransitionAwaiter.waitUntilConnectionStopped()
+                    }
+
                     logger.log(error)
                     refreshInternalIsRunning()
                 }

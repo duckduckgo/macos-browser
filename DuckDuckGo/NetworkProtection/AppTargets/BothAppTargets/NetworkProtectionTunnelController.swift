@@ -300,17 +300,8 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }
 
 #if NETP_SYSTEM_EXTENSION
-        do {
-            guard try await ensureSystemExtensionIsActivated() else {
-                return
-            }
-        } catch OSSystemExtensionError.requestCanceled {
-            // Since cancelling the system extension activation request is an explicit decision by
-            // our logic that means the previously-working extension will be kept, we most definitely
-            // don't want it to prevent the VPN from trying to start up.
-            // This is intentionally a no-op
-        } catch {
-           throw error
+        guard try await ensureSystemExtensionIsActivated() else {
+            return
         }
 #endif
 

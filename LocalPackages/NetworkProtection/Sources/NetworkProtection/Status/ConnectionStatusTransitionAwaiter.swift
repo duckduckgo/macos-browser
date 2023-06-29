@@ -103,10 +103,11 @@ public final class ConnectionStatusTransitionAwaiter {
             // sure the toggle stays locked until the OS updates to another state that lets the
             // toggle be unlocked.
             //
+            /*
             if targetStatus.acceptsIntermediateStatus(currentStatus) {
                 // We have a valid intermediate status, let's wait more
                 continue
-            }
+            }*/
 
             throw TransitionError.timeout
         }
