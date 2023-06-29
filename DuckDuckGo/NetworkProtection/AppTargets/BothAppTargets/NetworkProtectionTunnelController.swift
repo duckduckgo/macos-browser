@@ -304,13 +304,13 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             guard try await ensureSystemExtensionIsActivated() else {
                 return
             }
-        } catch let error as OSSystemExtensionError {
+        } catch OSSystemExtensionError.requestCanceled {
             // Since cancelling the system extension activation request is an explicit decision by
-            // our logic, we most definitely won't want it to prevent the VPN from trying to start up
-            // if there's an active extension that works.
-            guard error.code == .requestCanceled else {
-                throw error
-            }
+            // our logic that means the previously-working extension will be kept, we most definitely
+            // don't want it to prevent the VPN from trying to start up.
+            // This is intentionally a no-op
+        } catch {
+           throw error
         }
 #endif
 
