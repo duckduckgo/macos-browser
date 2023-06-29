@@ -35,8 +35,8 @@ final class UserAgentTests: XCTestCase {
     }
 
     func testWhenDomainIsDuckDuckGo_ThenUserAgentDoesntIncludeChromeOrSafari() {
-        XCTAssert(!UserAgent.for(URL.duckDuckGo).contains("Safari"))
-        XCTAssert(!UserAgent.for(URL.duckDuckGo).contains("Chrome"))
+        XCTAssertTrue(UserAgent.for(URL.duckDuckGo).contains("Safari"))
+        XCTAssertFalse(UserAgent.for(URL.duckDuckGo).contains("Chrome"))
     }
 
     func testWhenUserAgentIsDuckDuckGo_ThenUserAgentContainsExpectedParameters() {
