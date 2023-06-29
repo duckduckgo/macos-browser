@@ -22,8 +22,8 @@ import SwiftUI
 import BrowserServicesKit
 import SwiftUIExtensions
 
-private let interItemSpacing: CGFloat = 23
-private let itemSpacing: CGFloat = 13
+private let interItemSpacing: CGFloat = 20
+private let itemSpacing: CGFloat = 6
 
 struct PasswordManagementLoginItemView: View {
 
