@@ -136,7 +136,6 @@ final class MoreOptionsMenu: NSMenu {
 #endif // NETWORK_PROTECTION
 
 #if DBP
-
         let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
                                                   action: #selector(openDataBrokerProtection),
                                                   keyEquivalent: "")

@@ -483,7 +483,7 @@ final class BrowserTabViewController: NSViewController {
 
 #if DBP
     // MARK: - DataBrokerProtection
-    
+
     var dataBrokerProtectionHomeViewController: DBPHomeViewController?
     private func dataBrokerProtectionHomeViewControllerCreatingIfNeeded() -> DBPHomeViewController {
         return dataBrokerProtectionHomeViewController ?? {
