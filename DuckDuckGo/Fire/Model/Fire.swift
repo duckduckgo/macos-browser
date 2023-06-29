@@ -329,8 +329,6 @@ final class Fire {
             var result = [Visit]()
             let existingTabsVisits = filterVisits(visits: tabCollectionViewModel.localHistory, domains: domains)
             result.append(contentsOf: existingTabsVisits)
-            let removedTabsVisits = filterVisits(visits: tabCollectionViewModel.tabCollection.localHistoryOfRemovedTabs, domains: domains)
-            result.append(contentsOf: removedTabsVisits)
             visits = result
         case .allWindows(mainWindowControllers: _, selectedDomains: let domains):
             burnHistory(of: domains, completion: completion)
@@ -521,6 +519,16 @@ extension TabCollection {
 
         for tab in tabs {
             domains = domains.union(tab.localHistoryDomains)
+        }
+        return domains
+    }
+
+    var localHistoryDomainsOfRemovedTabs: Set<String> {
+        var domains = Set<String>()
+        for visit in localHistoryOfRemovedTabs {
+            if let host = visit.historyEntry?.url.host {
+                domains.insert(host)
+            }
         }
         return domains
     }
