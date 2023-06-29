@@ -251,7 +251,7 @@ extension HomePage.Views {
         }
 
         struct NextStepsView: View {
-            let text = "Next Steps"
+            let text = UserText.newTabSetUpSectionTitle
             let textWidth: CGFloat
 
             init() {
