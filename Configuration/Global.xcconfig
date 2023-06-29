@@ -96,6 +96,8 @@ SWIFT_COMPILATION_MODE[config=Debug][arch=*][sdk=*] =
 // prioritized.
 SWIFT_STRICT_CONCURRENCY = minimal;
 
-DDG_SLOW_COMPILE_CHECK = -Xfrontend -warn-long-expression-type-checking=100 -Xfrontend -warn-long-function-bodies=100
+DDG_SLOW_COMPILE_CHECK_THRESHOLD = 100
+DDG_SLOW_COMPILE_CHECK_THRESHOLD[config=CI] = 250
+DDG_SLOW_COMPILE_CHECK = -Xfrontend -warn-long-expression-type-checking=$(DDG_SLOW_COMPILE_CHECK_THRESHOLD) -Xfrontend -warn-long-function-bodies=$(DDG_SLOW_COMPILE_CHECK_THRESHOLD)
 OTHER_SWIFT_FLAGS[config=Debug][arch=*][sdk=*] = $(inherited) $(DDG_SLOW_COMPILE_CHECK)
 OTHER_SWIFT_FLAGS[config=CI][arch=*][sdk=*] = $(inherited) $(DDG_SLOW_COMPILE_CHECK)
