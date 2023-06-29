@@ -26,6 +26,8 @@ struct AccountsService {
         case serverError(description: String)
         case unknownServerError
         case connectionError
+
+        var description: String { return String(reflecting: self) }
     }
 
     private static let baseURL = URL(string: "https://quackdev.duckduckgo.com/api/auth")!
@@ -87,7 +89,8 @@ struct AccountsService {
                 }
             } else {
                 if let decodedResponse = decode(ErrorResponse.self, from: data) {
-                    return .failure(.serverError(description: decodedResponse.error))
+                    let errorDescription = [method, endpoint, urlResponse.httpStatusCodeAsString ?? "", decodedResponse.error].joined(separator: " ")
+                    return .failure(.serverError(description: errorDescription))
                 } else {
                     return .failure(.unknownServerError)
                 }
@@ -120,5 +123,13 @@ struct AccountsService {
 
     private static func printDebugInfo(method: String, endpoint: String, data: Data, response: URLResponse) {
         print("[\((response as? HTTPURLResponse)!.statusCode)] \(method) /\(endpoint) :: \(String(data: data, encoding: .utf8) ?? "")" )
+    }
+}
+
+extension URLResponse {
+
+    var httpStatusCodeAsString : String? {
+        guard let httpStatusCode = (self as? HTTPURLResponse)?.statusCode else { return nil }
+        return String(httpStatusCode)
     }
 }

@@ -27,6 +27,7 @@ public final class PurchaseModel: ObservableObject {
         case authenticating
         case loadingProducts
         case readyToPurchase
+        case errorOccurred(error: AccountsService.Error)
     }
 
     @Published var state: State = .noEmailProtection
@@ -42,10 +43,20 @@ public final class PurchaseModel: ObservableObject {
 
     var hasOngoingPurchase: Bool { subscriptions.reduce(false) { $0 || $1.isBeingPurchased } }
 
+    var errorReason: String {
+        guard case .errorOccurred(let error) = state else { return "Unknown reason" }
+        return error.localizedDescription
+    }
+
+    var errorDescription: String {
+        guard case .errorOccurred(let error) = state else { return "Unknown error" }
+        return error.description
+    }
+
     func buy(_ product: Product) {
         print("Buying \(product.displayName)")
     }
-    
+
     @MainActor
     func loadStorefrontCountry() async {
         storefrontCountry = "Loading..."

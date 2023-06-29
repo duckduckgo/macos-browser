@@ -65,15 +65,21 @@ final class PurchaseViewController: NSViewController {
 
     private var initialState: PurchaseModel.State {
         if hasAuthServiceToken {
-            // ok
             return .loadingProducts
         } else if hasEmailProtection {
-            // exchange token
             return .authenticating
         } else {
-            // nothing
             return .noEmailProtection
         }
+    }
+
+    private var hasAuthServiceToken: Bool {
+        guard let token = authServiceToken else { return false }
+        return !token.isEmpty
+    }
+
+    private var hasEmailProtection: Bool {
+        EmailManager().isSignedIn
     }
 
     private func update(for state: PurchaseModel.State) {
@@ -83,6 +89,8 @@ final class PurchaseViewController: NSViewController {
         switch state {
         case .noEmailProtection:
             return
+        case .errorOccurred(let error):
+            print("Error: \(error)")
         case .authenticating:
             Task {
                 switch await AccountsService.getAccessToken() {
@@ -90,7 +98,7 @@ final class PurchaseViewController: NSViewController {
                     self.authServiceToken = response.accessToken
                     self.update(for: .loadingProducts)
                 case .failure(let error):
-                    print("Error: \(error)")
+                    self.update(for: .errorOccurred(error: error))
                 }
             }
         case .loadingProducts:
@@ -102,56 +110,11 @@ final class PurchaseViewController: NSViewController {
                     await manager.updateAvailableProducts()
                     self.update(for: .readyToPurchase)
                 case .failure(let error):
-                    print("Error: \(error)")
+                    self.update(for: .errorOccurred(error: error))
                 }
             }
         default:
             return
         }
     }
-
-    private func checkAndUpdateViewModelState(thisIsRetry: Bool = false) {
-        guard hasAuthServiceToken else {
-            if !thisIsRetry {
-                checkEmailProtectionAndExchangeToken()
-            }
-            return
-        }
-
-        // fetch entitlements
-        model.state = .loadingProducts
-        // get external_id
-
-        // fetch products
-    }
-
-    private var hasAuthServiceToken: Bool {
-        guard let token = authServiceToken else { return false }
-        return !token.isEmpty
-    }
-
-    private func checkEmailProtectionAndExchangeToken() {
-        guard hasEmailProtection else {
-            model.state = .noEmailProtection
-            return
-        }
-
-        model.state = .authenticating
-
-        // exchange token
-        Task {
-            switch await AccountsService.getAccessToken() {
-            case .success(let response):
-                self.authServiceToken = response.accessToken
-                self.checkAndUpdateViewModelState(thisIsRetry: true)
-            case .failure(let error):
-                print("Error: \(error)")
-            }
-        }
-    }
-
-    private var hasEmailProtection: Bool {
-        EmailManager().isSignedIn
-    }
-
 }

@@ -38,6 +38,7 @@ struct PurchaseView: View {
             case .authenticating: authenticatingView
             case .loadingProducts: loadingProductsView
             case .readyToPurchase: subscriptionsList
+            case .errorOccurred: errorView
             }
         }
         .padding(.all, 16)
@@ -66,6 +67,18 @@ struct PurchaseView: View {
             Text("Loading subscriptions...")
                 .font(.largeTitle)
             ActivityIndicator(isAnimating: .constant(true), style: .spinning)
+        }
+        .padding(.all, 32)
+    }
+
+    private var errorView: some View {
+        VStack {
+            Text("An error has occurred")
+                .font(.largeTitle)
+            Text(model.errorReason)
+                .font(.headline)
+            Text(model.errorDescription)
+                .font(.caption)
         }
         .padding(.all, 32)
     }
