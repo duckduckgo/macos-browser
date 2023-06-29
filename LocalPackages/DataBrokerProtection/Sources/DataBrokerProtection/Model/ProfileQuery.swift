@@ -46,12 +46,12 @@ public struct ProfileQuery: Encodable, Sendable {
     }
 
     public func copy(firstName: String? = nil,
-                lastName: String? = nil,
-                city: String? = nil,
-                state: String? = nil,
-                age: Int? = nil,
-                profileUrl: String? = nil,
-                email: String? = nil) -> ProfileQuery {
+                     lastName: String? = nil,
+                     city: String? = nil,
+                     state: String? = nil,
+                     age: Int? = nil,
+                     profileUrl: String? = nil,
+                     email: String? = nil) -> ProfileQuery {
         ProfileQuery(
             firstName: firstName ?? self.firstName,
             lastName: lastName ?? self.lastName,

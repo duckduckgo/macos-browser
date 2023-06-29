@@ -24,10 +24,10 @@ enum OperationsError: Error {
 
 protocol OperationsManager {
     func runOperation(operationData: BrokerOperationData,
-                               brokerProfileQueryData: BrokerProfileQueryData,
-                               database: DataBase,
-                               notificationCenter: NotificationCenter,
-                               runner: WebOperationRunner) async throws
+                      brokerProfileQueryData: BrokerProfileQueryData,
+                      database: DataBase,
+                      notificationCenter: NotificationCenter,
+                      runner: WebOperationRunner) async throws
 }
 
 struct DataBrokerProfileQueryOperationManager: OperationsManager {
@@ -36,13 +36,13 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                brokerProfileQueryData: BrokerProfileQueryData,
                                database: DataBase,
                                notificationCenter: NotificationCenter = NotificationCenter.default,
-                               runner: WebOperationRunner) async throws{
+                               runner: WebOperationRunner) async throws {
 
-        if let _ = operationData as? ScanOperationData {
+        if operationData as? ScanOperationData != nil {
             try await runScanOperation(on: runner,
-                             brokerProfileQueryData: brokerProfileQueryData,
-                             database: database,
-                             notificationCenter: notificationCenter)
+                                       brokerProfileQueryData: brokerProfileQueryData,
+                                       database: database,
+                                       notificationCenter: notificationCenter)
 
         } else if let optOutOperationData = operationData as? OptOutOperationData {
             try await runOptOutOperation(for: optOutOperationData.extractedProfile,
@@ -55,9 +55,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
     }
 
-
+    // swiftlint:disable:next cyclomatic_complexity
     private func updateOperationDataDates(_ operationData: BrokerOperationData,
-                                          brokerProfileQueryData: BrokerProfileQueryData ) {
+                                          brokerProfileQueryData: BrokerProfileQueryData) {
         var data = operationData
         data.lastRunDate = Date()
 
@@ -108,9 +108,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         var data = data
 
         if data.preferredRunDate == nil || data.preferredRunDate! > date {
-           data.preferredRunDate = date
-       }
-   }
+            data.preferredRunDate = date
+        }
+    }
 
     private func handleOperationError(brokerProfileQuery: BrokerProfileQueryData, operationData: BrokerOperationData, error: Error) {
         let event = HistoryEvent(type: .error)
@@ -129,9 +129,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
     }
 
     private func runScanOperation(on runner: WebOperationRunner,
-                          brokerProfileQueryData: BrokerProfileQueryData,
-                          database: DataBase,
-                          notificationCenter: NotificationCenter) async throws {
+                                  brokerProfileQueryData: BrokerProfileQueryData,
+                                  database: DataBase,
+                                  notificationCenter: NotificationCenter) async throws {
         defer {
             updateOperationDataDates(brokerProfileQueryData.scanData,
                                      brokerProfileQueryData: brokerProfileQueryData)
@@ -170,10 +170,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
     }
 
     internal func runOptOutOperation(for extractedProfile: ExtractedProfile,
-                            on runner: WebOperationRunner,
-                            brokerProfileQueryData: BrokerProfileQueryData,
-                            database: DataBase,
-                            notificationCenter: NotificationCenter) async throws {
+                                     on runner: WebOperationRunner,
+                                     brokerProfileQueryData: BrokerProfileQueryData,
+                                     database: DataBase,
+                                     notificationCenter: NotificationCenter) async throws {
 
         guard let data = brokerProfileQueryData.optOutsData.filter({ $0.extractedProfile.id == extractedProfile.id }).first else {
             // TODO: Fix error, send pixel
@@ -198,7 +198,6 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
         do {
             brokerProfileQueryData.addHistoryEvent(.init(type: .optOutStarted(extractedProfileID: extractedProfile.id)), for: data)
-
             // Clean preferredRunDate when the operation runs
             data.preferredRunDate = nil
 

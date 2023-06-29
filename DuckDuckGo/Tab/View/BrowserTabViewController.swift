@@ -419,6 +419,7 @@ final class BrowserTabViewController: NSViewController {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: true)
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private func showTabContent(of tabViewModel: TabViewModel?) {
         guard tabCollectionViewModel.allTabsCount > 0 else {
             view.window?.performClose(self)

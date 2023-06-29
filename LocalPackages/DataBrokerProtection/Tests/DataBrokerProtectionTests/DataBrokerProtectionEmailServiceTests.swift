@@ -21,7 +21,7 @@ import Foundation
 @testable import DataBrokerProtection
 
 extension HTTPURLResponse {
-    static let ok = HTTPURLResponse(url: URL(string: "www.example.com")!, statusCode: 200, httpVersion: nil, headerFields: [String : String]())!
+    static let ok = HTTPURLResponse(url: URL(string: "www.example.com")!, statusCode: 200, httpVersion: nil, headerFields: [String: String]())!
 }
 
 final class DataBrokerProtectionEmailServiceTests: XCTestCase {

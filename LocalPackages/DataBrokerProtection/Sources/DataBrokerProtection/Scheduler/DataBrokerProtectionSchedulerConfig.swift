@@ -25,7 +25,7 @@ protocol SchedulerConfig {
 }
 
 struct DataBrokerProtectionSchedulerConfig: SchedulerConfig {
-    //TODO: Arbitrary numbers for now
+    // TODO: Arbitrary numbers for now
     var runFrequency: TimeInterval = 4 * 60 * 60
     var concurrentOperationsDifferentBrokers: Int = 1
     var intervalBetweenSameBrokerOperations: TimeInterval = 2
