@@ -335,7 +335,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }
     }
 
-    private func start(_ tunnelManager: NETunnelProviderManager, attemptCount: Int = 0) async throws {
+    private func start(_ tunnelManager: NETunnelProviderManager) async throws {
         var options = [String: NSObject]()
 
         options["activationAttemptId"] = UUID().uuidString as NSString
