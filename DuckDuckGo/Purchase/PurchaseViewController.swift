@@ -32,13 +32,18 @@ final class PurchaseViewController: NSViewController {
 
     private var cancellables = Set<AnyCancellable>()
 
+    deinit {
+        print(" -- PurchaseViewController deinit --")
+    }
+
     override func loadView() {
         view = NSView(frame: NSRect(x: 0, y: 0, width: 600, height: 600))
 
         let purchaseView = PurchaseView(manager: PurchaseManager.shared,
                                         model: self.model,
                                         dismissAction: { [weak self] in
-            self?.dismiss()
+            guard let self = self else { return }
+            self.presentingViewController?.dismiss(self)
         })
 
         view.addAndLayout(NSHostingView(rootView: purchaseView))
@@ -46,6 +51,7 @@ final class PurchaseViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        print(" -- PurchaseViewController viewDidLoad() --")
 
         update(for: initialState)
 
@@ -61,6 +67,11 @@ final class PurchaseViewController: NSViewController {
                                                                                   isPurchased: purchasedProductIDs.contains($0.id),
                                                                                   isBeingPurchased: purchaseQueue.contains($0.id)) }
         }.store(in: &cancellables)
+    }
+
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        print(" -- PurchaseViewController viewDidDisappear() --")
     }
 
     private var initialState: PurchaseModel.State {

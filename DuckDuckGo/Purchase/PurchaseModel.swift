@@ -41,6 +41,10 @@ public final class PurchaseModel: ObservableObject {
         self.subscriptions = subscriptions
     }
 
+    deinit {
+        print(" -- PurchaseModel deinit --")
+    }
+
     var hasOngoingPurchase: Bool { subscriptions.map { $0.isBeingPurchased }.contains(true) }
 
     var errorReason: String {
