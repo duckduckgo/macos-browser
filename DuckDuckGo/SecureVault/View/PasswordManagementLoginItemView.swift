@@ -172,13 +172,7 @@ private struct UsernameView: View {
 
                 VStack(alignment: .leading) {
 
-                    HStack {
-                        if model.privateEmailRequestInProgress {
-                            ActivityIndicator(isAnimating: $model.privateEmailRequestInProgress, style: .spinning).padding(.trailing, 6)
-                        }
-
-                        UsernameLabel(isHovering: $isHovering)
-                    }
+                    UsernameLabel(isHovering: $isHovering)
 
                     if model.hasValidPrivateEmail && !model.privateEmailRequestInProgress {
                         PrivateEmailActivationButton()
