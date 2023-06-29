@@ -67,10 +67,10 @@ public final class StatusBarMenu {
 
         let menuItems = [
             MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: {
-                await appLauncher.launchApp(withCommand: .shareFeedback)
+                try? await appLauncher.launchApp(withCommand: .shareFeedback)
             }),
             MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: {
-                await appLauncher.launchApp(withCommand: .justOpen)
+                try? await appLauncher.launchApp(withCommand: .justOpen)
             })
         ]
 

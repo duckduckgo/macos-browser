@@ -70,6 +70,10 @@ public enum DistributedNotificationName: String {
     // New Status Observer
     case requestStatusUpdate = "com.duckduckgo.network-protection.NetworkProtectionNotification.requestStatusUpdate"
 
+    case stopVPN = "com.duckduckgo.network-protection.NetworkProtectionNotification.stopVPN"
+    case startVPN = "com.duckduckgo.network-protection.NetworkProtectionNotification.startVPN"
+    case enableOnDemand = "com.duckduckgo.network-protection.NetworkProtectionNotification.enableOnDemand"
+
     fileprivate var notificationName: Foundation.Notification.Name {
         NSNotification.Name(rawValue: rawValue)
     }

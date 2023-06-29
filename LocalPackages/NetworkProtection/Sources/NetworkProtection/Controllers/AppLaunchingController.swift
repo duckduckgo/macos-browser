@@ -26,10 +26,10 @@ public final class AppLaunchingController: TunnelController {
     }
 
     public func start() async throws {
-        await appLauncher.launchApp(withCommand: .startVPN)
+        try await appLauncher.launchApp(withCommand: .startVPN)
     }
 
-    public func stop() async {
-        await appLauncher.launchApp(withCommand: .stopVPN)
+    public func stop() async throws {
+        try await appLauncher.launchApp(withCommand: .stopVPN)
     }
 }

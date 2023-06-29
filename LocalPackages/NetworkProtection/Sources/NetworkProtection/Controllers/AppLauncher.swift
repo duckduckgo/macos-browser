@@ -82,7 +82,7 @@ public final class AppLauncher {
         mainBundleURL = appBundleURL
     }
 
-    public func launchApp(withCommand command: Command) async {
+    public func launchApp(withCommand command: Command) async throws {
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.allowsRunningApplicationSubstitution = false
 
@@ -107,6 +107,7 @@ public final class AppLauncher {
             }
         } catch {
             os_log("🔵 Open Application failed: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
+            throw error
         }
     }
 

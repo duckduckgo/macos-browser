@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import Combine
 import Common
 import NetworkExtension
 import NetworkProtection
@@ -52,9 +53,35 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
     /// For some reason the App will crash if this is initialized right away, which is why it was changed to be lazy.
     ///
     private lazy var networkProtectionMenu = NetworkProtectionUI.StatusBarMenu()
+    private var cancellables = Set<AnyCancellable>()
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         os_log("DuckDuckGoAgent started", log: .networkProtectionLoginItemLog, type: .info)
         networkProtectionMenu.show()
+
+        let mainAppURL: URL
+        let parentBundlePath = "../../../../"
+        if #available(macOS 13, *) {
+            mainAppURL = URL(filePath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
+        } else {
+            mainAppURL = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
+        }
+
+        // fallback for system extension failing to launch helper tools directly
+        DistributedNotificationCenter.default().publisher(for: .stopVPN).sink { _ in
+            Task {
+                try await AppLauncher(appBundleURL: mainAppURL).launchApp(withCommand: .stopVPN)
+            }
+        }.store(in: &cancellables)
+        DistributedNotificationCenter.default().publisher(for: .startVPN).sink { _ in
+            Task {
+                try await AppLauncher(appBundleURL: mainAppURL).launchApp(withCommand: .startVPN)
+            }
+        }.store(in: &cancellables)
+        DistributedNotificationCenter.default().publisher(for: .enableOnDemand).sink { _ in
+            Task {
+                try await AppLauncher(appBundleURL: mainAppURL).launchApp(withCommand: .enableOnDemand)
+            }
+        }.store(in: &cancellables)
     }
 }

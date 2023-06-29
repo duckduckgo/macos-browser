@@ -275,7 +275,7 @@ final class NavigationBarPopovers {
                 name: UserText.networkProtectionNavBarStatusViewShareFeedback,
                 action: {
                     let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
-                    await appLauncher.launchApp(withCommand: .shareFeedback)
+                    try? await appLauncher.launchApp(withCommand: .shareFeedback)
             })
         ]
 

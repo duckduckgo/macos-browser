@@ -447,7 +447,11 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 // To be reconsidered for the Kill Switch
                 if isOnDemand {
                     Task {
-                        await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+                        do {
+                            try await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+                        } catch {
+                            self.distributedNotificationCenter.post(.stopVPN)
+                        }
                         completionHandler(error)
                     }
                     return
@@ -460,7 +464,11 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                     // on-demand ON so that it won't interfere with the current connection.
                     completionHandler(error)
 
-                    await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .enableOnDemand)
+                    do {
+                        try await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .enableOnDemand)
+                    } catch {
+                        self.distributedNotificationCenter.post(.enableOnDemand)
+                    }
                     return
                 }
             }
@@ -551,7 +559,11 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                     // stop requested by user from System Settings
                     // we can‘t prevent a respawn with on-demand rule ON
                     // request the main app to reconfigure with on-demand OFF
-                    await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+                    do {
+                        try await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+                    } catch {
+                        self.distributedNotificationCenter.post(.stopVPN)
+                    }
 
                 case .superceded:
                     self.notificationsPresenter.showSupercededNotification()
@@ -568,7 +580,11 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     override func cancelTunnelWithError(_ error: Error?) {
         // ensure on-demand rule is taken down on connection retry failure
         Task {
-            await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+            do {
+                try await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+            } catch {
+                distributedNotificationCenter.post(.stopVPN)
+            }
 
             super.cancelTunnelWithError(error)
         }
