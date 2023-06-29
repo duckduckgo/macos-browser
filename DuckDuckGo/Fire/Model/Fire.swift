@@ -335,7 +335,6 @@ final class Fire {
             return
         }
 
-        //TODO! clear local history?
         historyCoordinating.burnVisits(visits, completion: completion)
     }
 
@@ -426,6 +425,7 @@ final class Fire {
                     tabCollectionViewModel.replaceTab(at: index, with: tab, forceChange: true)
                 }
             } else {
+                //TODO! Avoid storing to localHistoryOfRemovedTabs
                 tabCollectionViewModel.removeSelected(forceChange: true)
             }
         case .window(tabCollectionViewModel: let tabCollectionViewModel,
