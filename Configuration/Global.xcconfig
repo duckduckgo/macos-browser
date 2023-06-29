@@ -95,3 +95,7 @@ SWIFT_COMPILATION_MODE[config=Debug][arch=*][sdk=*] =
 // that feature, and more time is needed to address them. To avoid bothering other developers, this is being disabled and a task to fix it will be
 // prioritized.
 SWIFT_STRICT_CONCURRENCY = minimal;
+
+DDG_SLOW_COMPILE_CHECK = -Xfrontend -warn-long-expression-type-checking=100 -Xfrontend -warn-long-function-bodies=100
+OTHER_SWIFT_FLAGS[config=Debug][arch=*][sdk=*] = $(inherited) $(DDG_SLOW_COMPILE_CHECK)
+OTHER_SWIFT_FLAGS[config=CI][arch=*][sdk=*] = $(inherited) $(DDG_SLOW_COMPILE_CHECK)
