@@ -41,7 +41,7 @@ public final class PurchaseModel: ObservableObject {
         self.subscriptions = subscriptions
     }
 
-    var hasOngoingPurchase: Bool { subscriptions.reduce(false) { $0 || $1.isBeingPurchased } }
+    var hasOngoingPurchase: Bool { subscriptions.map { $0.isBeingPurchased }.contains(true) }
 
     var errorReason: String {
         guard case .errorOccurred(let error) = state else { return "Unknown reason" }
