@@ -53,12 +53,6 @@ extension NetworkProtectionStatusView {
 
         public let menuItems: [MenuItem]
 
-        // MARK: - Logging
-
-        /// The object that's in charge of logging errors and other information.
-        ///
-        private let logger: NetworkProtectionLogger
-
         // MARK: - Misc
 
         /// The `RunLoop` for the timer.
@@ -101,13 +95,11 @@ extension NetworkProtectionStatusView {
         public init(controller: TunnelController,
                     statusReporter: NetworkProtectionStatusReporter,
                     menuItems: [MenuItem],
-                    logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger(),
                     runLoopMode: RunLoop.Mode? = nil) {
 
             self.tunnelController = controller
             self.statusReporter = statusReporter
             self.menuItems = menuItems
-            self.logger = logger
             self.runLoopMode = runLoopMode
 
             connectionStatus = statusReporter.statusPublisher.value
@@ -116,7 +108,6 @@ extension NetworkProtectionStatusView {
             internalServerLocation = statusReporter.serverInfoPublisher.value.serverLocation
             lastTunnelErrorMessage = statusReporter.connectionErrorPublisher.value
             lastControllerErrorMessage = statusReporter.controllerErrorMessagePublisher.value
-            statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusSubject: statusReporter.statusPublisher, transitionTimeout: .seconds(10))
 
             // Particularly useful when unit testing with an initial status of our choosing.
             refreshInternalIsRunning()
@@ -359,8 +350,6 @@ extension NetworkProtectionStatusView {
         @Published
         private(set) var toggleTransition = ToggleTransition.idle
 
-        private let statusTransitionAwaiter: ConnectionStatusTransitionAwaiter
-
         /// The toggle is disabled while transitioning due to user interaction.
         ///
         var isToggleDisabled: Bool {
@@ -539,22 +528,7 @@ extension NetworkProtectionStatusView {
         private func startNetworkProtection() {
             Task { @MainActor in
                 toggleTransition = .switchingOn(locallyInitiated: true)
-
-                do {
-                    try await tunnelController.start()
-                    try await statusTransitionAwaiter.waitUntilConnectionStarted()
-                } catch {
-                    // If it's taking too long to connect, stop trying so that the user is not stuck
-                    // in the transition
-                    if case ConnectionStatusTransitionAwaiter.TransitionError.timeout = error {
-                        await tunnelController.stop()
-                        try? await statusTransitionAwaiter.waitUntilConnectionStopped()
-                    }
-
-                    logger.log(error)
-                    refreshInternalIsRunning()
-                }
-
+                await tunnelController.start()
                 toggleTransition = .idle
             }
         }
@@ -564,10 +538,7 @@ extension NetworkProtectionStatusView {
         private func stopNetworkProtection() {
             Task { @MainActor in
                 toggleTransition = .switchingOff(locallyInitiated: true)
-
                 await tunnelController.stop()
-                try? await statusTransitionAwaiter.waitUntilConnectionStopped()
-
                 toggleTransition = .idle
             }
         }

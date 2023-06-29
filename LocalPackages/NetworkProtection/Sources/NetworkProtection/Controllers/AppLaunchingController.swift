@@ -25,7 +25,7 @@ public final class AppLaunchingController: TunnelController {
         self.appLauncher = appLauncher
     }
 
-    public func start() async throws {
+    public func start() async {
         await appLauncher.launchApp(withCommand: .startVPN)
     }
 

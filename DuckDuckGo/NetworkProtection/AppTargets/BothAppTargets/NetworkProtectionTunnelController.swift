@@ -53,6 +53,12 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// Auth token store
     private let tokenStore: NetworkProtectionTokenStore
 
+    // MARK: - Connection Status
+
+    private let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusObserver: ConnectionStatusObserverThroughSession(), transitionTimeout: .seconds(4))
+
+    // MARK: - Tunnel Manager
+
     /// The tunnel manager: will try to load if it its not loaded yet, but if one can't be loaded from preferences,
     /// a new one will NOT be created.  This is useful for querying the connection state and information without triggering
     /// a VPN-access popup to the user.
@@ -60,7 +66,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     private func loadTunnelManager() async -> NETunnelProviderManager? {
         try? await NETunnelProviderManager.loadAllFromPreferences().first
     }
-
 
     private func loadOrMakeTunnelManager() async throws -> NETunnelProviderManager {
         guard let tunnelManager = await loadTunnelManager() else {
@@ -247,10 +252,17 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     // MARK: - Starting & Stopping the VPN
 
     enum StartError: LocalizedError {
+        case connectionStatusInvalid
         case simulateControllerFailureError
 
         var errorDescription: String? {
             switch self {
+            case .connectionStatusInvalid:
+                #if DEBUG
+                return "[DEBUG] Connection status invalid"
+                #else
+                return "An unexpected error occurred, please try again"
+                #endif
             case .simulateControllerFailureError:
                 return "Simulated a controller error as requested"
             }
@@ -259,8 +271,12 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     /// Starts the VPN connection used for Network Protection
     ///
-    func start() async throws {
-        try await start(enableLoginItems: true)
+    func start() async {
+        do {
+            try await start(enableLoginItems: true)
+        } catch {
+            controllerErrorStore.lastErrorMessage = error.localizedDescription
+        }
     }
 
     func start(enableLoginItems: Bool) async throws {
@@ -276,18 +292,11 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }
 #endif
 
-        let tunnelManager: NETunnelProviderManager
-
-        do {
-            tunnelManager = try await loadOrMakeTunnelManager()
-        } catch {
-            controllerErrorStore.lastErrorMessage = error.localizedDescription
-            throw error
-        }
+        let tunnelManager = try await loadOrMakeTunnelManager()
 
         switch tunnelManager.connection.status {
         case .invalid:
-            try await start()
+            throw StartError.connectionStatusInvalid
         case .connected:
             // Intentional no-op
             break
@@ -316,6 +325,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             }
 
             try tunnelManager.connection.startVPNTunnel(options: options)
+            try await statusTransitionAwaiter.waitUntilConnectionStarted()
         } catch {
             controllerErrorStore.lastErrorMessage = error.localizedDescription
             throw error
@@ -329,6 +339,14 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             return
         }
 
+        do {
+            try await stop(tunnelManager: tunnelManager)
+        } catch {
+            controllerErrorStore.lastErrorMessage = error.localizedDescription
+        }
+    }
+
+    func stop(tunnelManager: NEVPNManager) async throws {
         // disable reconnect on demand if requested to stop
         if tunnelManager.isOnDemandEnabled {
             tunnelManager.isOnDemandEnabled = false
@@ -338,6 +356,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         switch tunnelManager.connection.status {
         case .connected, .connecting, .reasserting:
             tunnelManager.connection.stopVPNTunnel()
+            try await statusTransitionAwaiter.waitUntilConnectionStopped()
         default:
             break
         }

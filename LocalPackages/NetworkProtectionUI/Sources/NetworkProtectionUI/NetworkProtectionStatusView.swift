@@ -351,7 +351,7 @@ struct NetworkProtectionStatusView_Previews: PreviewProvider {
             false
         }
 
-        func start() async throws {
+        func start() async {
             print("Preview controller started")
         }
 

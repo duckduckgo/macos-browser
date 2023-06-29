@@ -30,8 +30,15 @@ import Foundation
 ///
 public final class ConnectionStatusTransitionAwaiter {
 
-    public enum TransitionError: Error {
+    public enum TransitionError: LocalizedError {
         case timeout
+
+        public var errorDescription: String? {
+            switch self {
+            case .timeout:
+                return "The connection attempt timed out, please try again"
+            }
+        }
     }
 
     /// The target status for a supported transition
@@ -68,12 +75,12 @@ public final class ConnectionStatusTransitionAwaiter {
         }
     }
 
-    private let statusSubject: CurrentValueSubject<ConnectionStatus, Never>
+    private let statusObserver: ConnectionStatusObserver
     private let transitionTimeout: DispatchQueue.SchedulerTimeType.Stride
 
-    public init(statusSubject: CurrentValueSubject<ConnectionStatus, Never>, transitionTimeout: DispatchQueue.SchedulerTimeType.Stride) {
+    public init(statusObserver: ConnectionStatusObserver, transitionTimeout: DispatchQueue.SchedulerTimeType.Stride) {
 
-        self.statusSubject = statusSubject
+        self.statusObserver = statusObserver
         self.transitionTimeout = transitionTimeout
     }
 
@@ -89,7 +96,7 @@ public final class ConnectionStatusTransitionAwaiter {
 
     private func waitUntilTargetStatus(_ targetStatus: TargetStatus) async throws {
         while await !expect(targetStatus, within: transitionTimeout) {
-            let currentStatus = statusSubject.value
+            let currentStatus = statusObserver.publisher.value
 
             if targetStatus.sameStatus(as: currentStatus) {
                 return
@@ -130,7 +137,7 @@ public final class ConnectionStatusTransitionAwaiter {
             var cancellable: AnyCancellable?
             var result = false
 
-            cancellable = statusSubject
+            cancellable = statusObserver.publisher
                 .receive(on: DispatchQueue.main)
                 .timeout(timeout, scheduler: DispatchQueue.main)
                 .sink(receiveCompletion: { _ in
