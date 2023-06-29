@@ -54,7 +54,6 @@ final class SystemExtensionRequest: NSObject {
     private let manager: OSSystemExtensionManager
 
     private var continuation: AsyncThrowingStream<Event, Error>.Continuation?
-    private var extensionReplaced = false
 
     private init(activationRequest: OSSystemExtensionRequest, manager: OSSystemExtensionManager) {
         self.manager = manager
@@ -93,7 +92,6 @@ extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
 
     func request(_ request: OSSystemExtensionRequest, actionForReplacingExtension existing: OSSystemExtensionProperties, withExtension ext: OSSystemExtensionProperties) -> OSSystemExtensionRequest.ReplacementAction {
 
-        extensionReplaced = true
         return .replace
     }
 
