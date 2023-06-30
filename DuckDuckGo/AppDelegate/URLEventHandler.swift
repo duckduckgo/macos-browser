@@ -21,7 +21,6 @@ import Foundation
 
 #if NETWORK_PROTECTION
 import NetworkProtection
-import NetworkProtectionUI
 #endif
 
 @MainActor
