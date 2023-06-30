@@ -78,7 +78,6 @@ public final class NetworkProtectionKeychainKeyStore: NetworkProtectionKeyStore 
     public func currentKeyPair() -> KeyPair {
         os_log("Querying the current key pair (publicKey: %{public}@, expirationDate: %{public}@)",
                log: .networkProtectionKeyManagement,
-               type: .info,
                String(describing: currentPublicKey),
                String(describing: currentExpirationDate))
 
@@ -86,7 +85,6 @@ public final class NetworkProtectionKeychainKeyStore: NetworkProtectionKeyStore 
             let keyPair = newCurrentKeyPair()
             os_log("Returning a new key pair as there's no current private key (newPublicKey: %{public}@)",
                    log: .networkProtectionKeyManagement,
-                   type: .info,
                    String(describing: keyPair.publicKey.base64Key))
             return keyPair
         }
@@ -97,15 +95,11 @@ public final class NetworkProtectionKeychainKeyStore: NetworkProtectionKeyStore 
             let keyPair = newCurrentKeyPair()
             os_log("Returning a new key pair as the expirationDate date is missing, or we're past it (now: %{public}@, expirationDate: %{public}@)",
                    log: .networkProtectionKeyManagement,
-                   type: .info,
                    String(describing: Date()),
                    String(describing: currentExpirationDate))
             return keyPair
         }
 
-        os_log("Returning an existing key pair.",
-               log: .networkProtectionKeyManagement,
-               type: .info)
         return KeyPair(privateKey: currentPrivateKey, expirationDate: currentExpirationDate)
     }
 

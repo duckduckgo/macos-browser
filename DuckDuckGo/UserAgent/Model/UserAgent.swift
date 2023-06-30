@@ -61,11 +61,8 @@ enum UserAgent {
     static let webViewDefault = ""
 
     static let localUserAgentConfiguration: KeyValuePairs<RegEx, String> = [
-        // use safari when serving up PDFs from duckduckgo directly
-        regex("https://duckduckgo\\.com/[^?]*\\.pdf"): UserAgent.safari,
-
-        // use default WKWebView user agent for duckduckgo domain to remove CTA
-        regex("https://duckduckgo\\.com/.*"): UserAgent.webViewDefault
+        // Use safari agent or else nginx gets a truncated user agent and ends it ends up blank
+        regex("https://duckduckgo\\.com/.*"): UserAgent.safari
     ]
 
     static func duckDuckGoUserAgent(appVersion: String = AppVersion.shared.versionNumber,

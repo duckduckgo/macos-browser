@@ -23,12 +23,14 @@ import Common
 /// Launches the main App
 ///
 public final class AppLauncher {
+
     public enum Command: Codable {
         case justOpen
         case shareFeedback
         case showStatus
         case startVPN
         case stopVPN
+        case enableOnDemand
 
         var commandURL: String? {
             switch self {
@@ -49,6 +51,8 @@ public final class AppLauncher {
                 return "./Contents/Resources/startVPN.app"
             case .stopVPN:
                 return "./Contents/Resources/stopVPN.app"
+            case .enableOnDemand:
+                return "./Contents/Resources/enableOnDemand.app"
             default:
                 return nil
             }
@@ -102,7 +106,8 @@ public final class AppLauncher {
                 try await NSWorkspace.shared.openApplication(at: launchURL, configuration: configuration)
             }
         } catch {
-            os_log("🔵 Open Application failed: %{public}@", type: .error, error.localizedDescription)
+            os_log("🔵 Open Application failed: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
         }
     }
+
 }

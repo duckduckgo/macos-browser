@@ -19,6 +19,7 @@
 import Common
 import Foundation
 import CoreData
+import DDGSync
 import Bookmarks
 import Cocoa
 
@@ -91,6 +92,9 @@ final class LocalBookmarkStore: BookmarkStore {
                     // will return the children of the root folder, as the root folder is an implementation detail of the bookmarks store.
                     let rootFolder = BookmarkUtils.fetchRootFolder(self.context)
                     let orphanedEntities = BookmarkUtils.fetchOrphanedEntities(self.context)
+                    if !orphanedEntities.isEmpty {
+                        self.reportOrphanedBookmarksIfNeeded()
+                    }
                     results = (rootFolder?.childrenArray ?? []) + orphanedEntities
                 case .favorites:
                     results = self.favoritesFolder?.favoritesArray ?? []
@@ -105,6 +109,15 @@ final class LocalBookmarkStore: BookmarkStore {
             } catch let error {
                 completion(nil, error)
             }
+        }
+    }
+
+    private func reportOrphanedBookmarksIfNeeded() {
+        Task { @MainActor in
+            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService, syncService.authState == .inactive else {
+                return
+            }
+            Pixel.fire(.debug(event: .orphanedBookmarksPresent))
         }
     }
 
@@ -636,7 +649,7 @@ final class LocalBookmarkStore: BookmarkStore {
         var makeFavorties = true
         if root.children?.count != 0 {
             makeFavorties = false
-            parent = BookmarkEntity.makeFolder(title: "Imported from \(importSourceName)",
+            parent = BookmarkEntity.makeFolder(title: "\(UserText.bookmarkImportedFromFolder) \(importSourceName)",
                                                parent: root,
                                                context: context)
         }

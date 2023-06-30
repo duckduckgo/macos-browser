@@ -754,10 +754,12 @@ extension MainViewController {
         for noteID in notes.compactMap(\.id) {
             try? vault?.deleteNoteFor(noteId: noteID)
         }
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageContinueSetUpImport.rawValue)
     }
 
     @IBAction func resetBookmarks(_ sender: Any?) {
         LocalBookmarkManager.shared.resetBookmarks()
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageContinueSetUpImport.rawValue)
     }
 
     @IBAction func resetPinnedTabs(_ sender: Any?) {
@@ -768,7 +770,17 @@ extension MainViewController {
     }
 
     @IBAction func resetDuckPlayerOverlayInteractions(_ sender: Any?) {
+        DuckPlayerPreferences.shared.youtubeOverlayAnyButtonPressed = false
         DuckPlayerPreferences.shared.youtubeOverlayInteracted = false
+    }
+
+    @IBAction func resetMakeDuckDuckGoYoursUserSettings(_ sender: Any?) {
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowAllFeatures.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowMakeDefault.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowImport.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowDuckPlayer.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowCookie.rawValue)
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {

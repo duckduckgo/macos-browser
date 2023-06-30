@@ -33,6 +33,8 @@ final class HomePageViewController: NSViewController {
     var favoritesModel: HomePage.Models.FavoritesModel!
     var defaultBrowserModel: HomePage.Models.DefaultBrowserModel!
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
+    var featuresModel: HomePage.Models.ContinueSetUpModel!
+    var appearancePreferences: AppearancePreferences!
     var cancellables = Set<AnyCancellable>()
 
     @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
@@ -64,6 +66,8 @@ final class HomePageViewController: NSViewController {
         favoritesModel = createFavoritesModel()
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
+        featuresModel = createFeatureModel()
+        appearancePreferences = AppearancePreferences.shared
 
         refreshModels()
 
@@ -71,6 +75,8 @@ final class HomePageViewController: NSViewController {
             .environmentObject(favoritesModel)
             .environmentObject(defaultBrowserModel)
             .environmentObject(recentlyVisitedModel)
+            .environmentObject(featuresModel)
+            .environmentObject(appearancePreferences)
             .onTapGesture { [weak self] in
                 // Remove focus from the address bar if interacting with this view.
                 self?.view.makeMeFirstResponder()
@@ -129,12 +135,19 @@ final class HomePageViewController: NSViewController {
         refreshFavoritesModel()
         refreshRecentlyVisitedModel()
         refreshDefaultBrowserModel()
+        refreshContinueSetUpModel()
     }
 
     func createRecentlyVisitedModel() -> HomePage.Models.RecentlyVisitedModel {
         return .init { [weak self] url in
             self?.openUrl(url)
         }
+    }
+
+    func createFeatureModel() -> HomePage.Models.ContinueSetUpModel {
+        let vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: SystemDefaultBrowserProvider(), dataImportProvider: BookmarksAndPasswordsImportStatusProvider(), tabCollectionViewModel: tabCollectionViewModel, duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor())
+        vm.delegate = self
+        return vm
     }
 
     func createDefaultBrowserModel() -> HomePage.Models.DefaultBrowserModel {
@@ -170,6 +183,10 @@ final class HomePageViewController: NSViewController {
 
     func refreshFavoritesModel() {
         favoritesModel.favorites = bookmarkManager.list?.favoriteBookmarks ?? []
+    }
+
+    func refreshContinueSetUpModel() {
+        featuresModel.refreshFeaturesMatrix()
     }
 
     func refreshRecentlyVisitedModel() {

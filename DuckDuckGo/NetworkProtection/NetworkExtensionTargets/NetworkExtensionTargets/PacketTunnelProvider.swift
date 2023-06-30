@@ -60,7 +60,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             if logLevel == .error {
                 os_log("🔵 Received error from adapter: %{public}@", log: .networkProtection, type: .error, message)
             } else {
-                os_log("🔵 Received message from adapter: %{public}@", log: .networkProtection, type: .info, message)
+                os_log("🔵 Received message from adapter: %{public}@", log: .networkProtection, message)
             }
         }
     }()
@@ -90,17 +90,25 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
+    /// Holds the date when the status was last changed so we can send it out as additional information
+    /// in our status-change notifications.
+    ///
+    private var lastStatusChangeDate = Date()
+
     private var connectionStatus: ConnectionStatus = .disconnected {
         didSet {
             if oldValue != connectionStatus {
+                lastStatusChangeDate = Date()
                 broadcastConnectionStatus()
             }
         }
     }
 
     private func broadcastConnectionStatus() {
-        let data = ConnectionStatusEncoder().encode(connectionStatus)
-        distributedNotificationCenter.post(.statusDidChange, object: data)
+        let lastStatusChange = ConnectionStatusChange(status: connectionStatus, on: lastStatusChangeDate)
+        let payload = ConnectionStatusChangeEncoder().encode(lastStatusChange)
+
+        distributedNotificationCenter.post(.statusDidChange, object: payload)
     }
 
     // MARK: - Server Selection
@@ -119,28 +127,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
 
         let serverStatusInfo = NetworkProtectionStatusServerInfo(serverLocation: serverInfo.serverLocation, serverAddress: serverInfo.endpoint?.description)
-        let payload: String?
-
-        do {
-            let encoder = JSONEncoder()
-            let jsonData = try encoder.encode(serverStatusInfo)
-
-            payload = String(data: jsonData, encoding: .utf8)
-
-            if payload == nil {
-                os_log("Error encoding serverInfo Data to String: %{public}@", log: .networkProtection, type: .error, String(describing: jsonData))
-                // Continue anyway, we'll just update the UI to show "Unknown" server info, which is better
-                // than showing the info from the previous server.
-            }
-        } catch {
-            os_log("Error encoding serverInfo to Data: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
-            // Continue anyway, we'll just update the UI to show "Unknown" server info, which is better
-            // than showing the info from the previous server.
-            payload = nil
-        }
+        let payload = ServerSelectedNotificationObjectEncoder().encode(serverStatusInfo)
 
         distributedNotificationCenter.post(.serverSelected, object: payload)
-        // Update shared userdefaults
     }
 
     // MARK: - User Notifications
@@ -190,7 +179,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     private func resetRegistrationKey() {
-        os_log("Resetting the current registration key", log: .networkProtectionKeyManagement, type: .info)
+        os_log("Resetting the current registration key", log: .networkProtectionKeyManagement)
         keyStore.resetCurrentKeyPair()
     }
 
@@ -207,7 +196,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     private func rekey() async {
-        os_log("Rekeying...", log: .networkProtectionKeyManagement, type: .info)
+        os_log("Rekeying...", log: .networkProtectionKeyManagement)
 
         Pixel.fire(.networkProtectionActiveUser, frequency: .dailyOnly, includeAppVersionParameter: true)
         Pixel.fire(.networkProtectionRekeyCompleted, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
@@ -465,22 +454,24 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 }
             }
 
-            completionHandler(error)
-        }
+            if !isOnDemand {
+                Task {
+                    // This completion handler signals a coorect connection.  We want to signal this before turning
+                    // on-demand ON so that it won't interfere with the current connection.
+                    completionHandler(error)
 
-        if isActivatedFromSystemSettings {
-            // ask the Main App to reconfigure & restart with on-demand rule “on” - when connection triggered from System Settings
-            Task {
-                await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .startVPN)
-                internalCompletionHandler(NEVPNError(.configurationStale))
+                    await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .enableOnDemand)
+                    return
+                }
             }
-            return
+
+            completionHandler(error)
         }
 
         tunnelHealth.isHavingConnectivityIssues = false
         controllerErrorStore.lastErrorMessage = nil
 
-        os_log("🔵 Will load options\n%{public}@", log: .networkProtection, type: .info, String(describing: options))
+        os_log("🔵 Will load options\n%{public}@", log: .networkProtection, String(describing: options))
 
         if options?["tunnelFailureSimulation"] as? String == "true" {
             internalCompletionHandler(TunnelError.simulateTunnelFailureError)
@@ -571,6 +562,15 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
                 completionHandler()
             }
+        }
+    }
+
+    override func cancelTunnelWithError(_ error: Error?) {
+        // ensure on-demand rule is taken down on connection retry failure
+        Task {
+            await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+
+            super.cancelTunnelWithError(error)
         }
     }
 

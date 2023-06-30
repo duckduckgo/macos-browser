@@ -51,6 +51,7 @@ public struct UserDefaultsWrapper<T> {
         case autoconsentEnabled = "preferences.autoconsent-enabled"
         case duckPlayerMode = "preferences.duck-player"
         case youtubeOverlayInteracted = "preferences.youtube-overlay-interacted"
+        case youtubeOverlayButtonsUsed = "preferences.youtube-overlay-user-used-buttons"
 
         case selectedPasswordManager = "preferences.autofill.selected-password-manager"
 
@@ -83,10 +84,22 @@ public struct UserDefaultsWrapper<T> {
 
         case onboardingFinished = "onboarding.finished"
 
+        // Home Page
         case homePageShowPagesOnHover = "home.page.show.pages.on.hover"
         case homePageShowAllFavorites = "home.page.show.all.favorites"
+        case homePageShowAllFeatures = "home.page.show.all.features"
+        case homePageShowMakeDefault = "home.page.show.make.default"
+        case homePageShowImport = "home.page.show.import"
+        case homePageShowDuckPlayer = "home.page.show.duck.player"
+        case homePageShowEmailProtection = "home.page.show.email.protection"
+        case homePageShowCookie = "home.page.show.cookie"
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"
+        case homePageContinueSetUpImport = "home.page.continue.set.up.import"
+        case homePageIsFavoriteVisible = "home.page.is.favorite.visible"
+        case homePageIsContinueSetupVisible = "home.page.is.continue.setup.visible"
+        case homePageIsRecentActivityVisible = "home.page.is.recent.activity.visible"
+        case homePageIsFirstSession = "home.page.is.first.session"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 
@@ -122,7 +135,7 @@ public struct UserDefaultsWrapper<T> {
     }
 
     static var sharedDefaults: UserDefaults {
-#if DEBUG
+#if DEBUG && !NETP_SYSTEM_EXTENSION
         if case .normal = NSApp.runType {
             return .standard
         } else {

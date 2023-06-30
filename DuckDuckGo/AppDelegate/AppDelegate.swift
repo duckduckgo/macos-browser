@@ -77,6 +77,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     // swiftlint:disable:next function_body_length
     func applicationWillFinishLaunching(_ notification: Notification) {
+#if !APPSTORE && !DEBUG
+        PFMoveToApplicationsFolderIfNecessary()
+#endif
+
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
         Configuration.setURLProvider(AppConfigurationURLProvider())
 
@@ -179,6 +183,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             // MARK: perform first time launch logic here
         }
 
+        startupSync()
+
         stateRestorationManager.applicationDidFinishLaunching()
 
         BWManager.shared.initCommunication()
@@ -206,11 +212,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #if NETWORK_PROTECTION
         startupNetworkProtection()
 #endif
-
-        startupSync()
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
+        syncService?.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
         syncService?.scheduler.notifyAppLifecycleEvent()
     }
 
@@ -275,6 +280,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private func startupSync() {
         let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
         let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync)
+        syncService.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
 
         syncStateCancellable = syncService.authStatePublisher
             .prepend(syncService.authState)
@@ -321,12 +327,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         // should‘ve been run at least once with NetP enabled
         guard let lastVersionRun = versionStore.lastVersionRun else {
-            os_log(.error, log: .networkProtection, "🔴 running netp for the first time: update not needed")
+            os_log(.info, log: .networkProtection, "No last version found for the NetP login items, skipping update")
             return
         }
 
         if lastVersionRun != currentVersion {
-            os_log(.error, log: .networkProtection, "🟡 App updated from %{public}s to %{public}s: updating", lastVersionRun, currentVersion)
+            os_log(.info, log: .networkProtection, "App updated from %{public}s to %{public}s: updating login items", lastVersionRun, currentVersion)
             updateNetworkProtectionTunnelAndMenu()
         } else {
             // If login items failed to launch (e.g. because of the App bundle rename), launch using NSWorkspace
@@ -335,15 +341,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     private func updateNetworkProtectionTunnelAndMenu() {
+        NetworkProtectionTunnelController.resetLoginItems()
+
         Task {
             let provider = NetworkProtectionTunnelController()
 
+            // Restart NetP SysEx on app update
             if await provider.isConnected() {
                 await provider.stop()
+                try? await provider.start()
             }
         }
-
-        NetworkProtectionTunnelController.resetLoginItems()
     }
 
     /// Fetches a new list of Network Protection servers, and updates the existing set.
