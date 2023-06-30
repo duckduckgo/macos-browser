@@ -23,6 +23,7 @@ import Common
 /// Launches the main App
 ///
 public final class AppLauncher {
+
     public enum Command: Codable {
         case justOpen
         case shareFeedback
@@ -105,4 +106,5 @@ public final class AppLauncher {
             os_log("🔵 Open Application failed: %{public}@", type: .error, error.localizedDescription)
         }
     }
+
 }

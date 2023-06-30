@@ -1,5 +1,5 @@
 //
-//  ConnectionServerInfoObserverThroughIPC.swift
+//  ConnectionErrorObserverThroughDistributedNotifications.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,25 +16,21 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Combine
 import Foundation
-import Common
 import NetworkExtension
-import NotificationCenter
+import Common
 
 /// Observes the server info through Distributed Notifications and an IPC connection.
 ///
-public class ConnectionServerInfoObserverThroughIPC: ConnectionServerInfoObserver {
-    public let publisher = CurrentValueSubject<NetworkProtectionStatusServerInfo, Never>(.unknown)
-
-    // MARK: - Notifications: Decoding
-
-    private let serverSelectedDecoder = ServerSelectedNotificationObjectDecoder()
+public class ConnectionErrorObserverThroughDistributedNotifications: ConnectionErrorObserver {
+    public let publisher = CurrentValueSubject<String?, Never>(nil)
 
     // MARK: - Notifications
 
     private let distributedNotificationCenter: DistributedNotificationCenter
-    private var serverSelectedCancellable: AnyCancellable!
+    private var tunnelErrorChangedCancellable: AnyCancellable!
 
     // MARK: - Logging
 
@@ -52,13 +48,18 @@ public class ConnectionServerInfoObserverThroughIPC: ConnectionServerInfoObserve
     }
 
     func start() {
-        serverSelectedCancellable = distributedNotificationCenter.publisher(for: .serverSelected).sink { [weak self] notification in
-            self?.handleServerSelected(notification)
+        tunnelErrorChangedCancellable = distributedNotificationCenter.publisher(for: .tunnelErrorChanged).sink { [weak self] notification in
+            self?.handleTunnelErrorStatusChanged(notification)
         }
     }
 
-    private func handleServerSelected(_ notification: Notification) {
-        let serverInfo = serverSelectedDecoder.decode(notification.object)
-        publisher.send(serverInfo)
+    // MARK: - Handling Notifications
+
+    private func handleTunnelErrorStatusChanged(_ notification: Notification) {
+        let errorMessage = notification.object as? String
+
+        if errorMessage != publisher.value {
+            publisher.send(errorMessage)
+        }
     }
 }

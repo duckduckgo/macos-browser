@@ -17,54 +17,51 @@
 //
 
 import WebKit
+import Common
 import UserScript
 
-final class YoutubePlayerUserScript: NSObject, StaticUserScript {
+final class YoutubePlayerUserScript: NSObject, Subfeature {
 
-    enum MessageNames: String, CaseIterable {
-        case setAlwaysOpenSettingTo
-    }
-
-    public var requiresRunInPageContentWorld: Bool {
-        return true
-    }
-
-    static var injectionTime: WKUserScriptInjectionTime { .atDocumentStart}
-    static var forMainFrameOnly: Bool { true }
-    static var source: String = ""
-    static var script: WKUserScript = YoutubePlayerUserScript.makeWKUserScript()
-    var messageNames: [String] { MessageNames.allCases.map(\.rawValue) }
+    weak var broker: UserScriptMessageBroker?
+    weak var webView: WKWebView?
 
     var isEnabled: Bool = false
 
-    init(preferences: DuckPlayerPreferences = .shared) {
-        duckPlayerPreferences = preferences
+    // this isn't an issue to be set to 'all' because the page
+    public let messageOriginPolicy: MessageOriginPolicy = .all
+    public let featureName: String = "duckPlayerPage"
+
+    // MARK: - Subfeature
+
+    public func with(broker: UserScriptMessageBroker) {
+        self.broker = broker
     }
 
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    // MARK: - MessageNames
+
+    enum MessageNames: String, CaseIterable {
+        case setUserValues
+        case getUserValues
+    }
+
+    func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
         guard isEnabled else {
-            return
+            return nil
         }
-
-        guard let messageType = MessageNames(rawValue: message.name) else {
-            assertionFailure("YoutubePlayerUserScript: unexpected message name \(message.name)")
-            return
-        }
-
-        switch messageType {
-        case .setAlwaysOpenSettingTo:
-            handleAlwaysOpenSettings(message: message)
+        switch MessageNames(rawValue: methodName) {
+        case .getUserValues:
+            return DuckPlayer.shared.handleGetUserValues
+        case .setUserValues:
+            return DuckPlayer.shared.handleSetUserValues
+        default:
+            assertionFailure("YoutubePlayerUserScript: Failed to parse User Script message: \(methodName)")
+            return nil
         }
     }
 
-    private func handleAlwaysOpenSettings(message: WKScriptMessage) {
-        guard let alwaysOpenOnDuckPlayer = message.body as? Bool else {
-            assertionFailure("YoutubePlayerUserScript: expected Bool")
-            return
+    func userValuesUpdated(userValues: UserValues) {
+        if let webView = webView {
+            broker?.push(method: "onUserValuesChanged", params: userValues, for: self, into: webView)
         }
-
-        duckPlayerPreferences.duckPlayerMode = .init(alwaysOpenOnDuckPlayer)
     }
-
-    private let duckPlayerPreferences: DuckPlayerPreferences
 }

@@ -1,5 +1,5 @@
 //
-//  ConnectionErrorObserverThroughIPC.swift
+//  ConnectionServerInfoObserverThroughDistributedNotifications.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,21 +16,21 @@
 //  limitations under the License.
 //
 
-import AppKit
 import Combine
 import Foundation
-import NetworkExtension
 import Common
+import NetworkExtension
+import NotificationCenter
 
 /// Observes the server info through Distributed Notifications and an IPC connection.
 ///
-public class ConnectionErrorObserverThroughIPC: ConnectionErrorObserver {
-    public let publisher = CurrentValueSubject<String?, Never>(nil)
+public class ConnectionServerInfoObserverThroughDistributedNotifications: ConnectionServerInfoObserver {
+    public let publisher = CurrentValueSubject<NetworkProtectionStatusServerInfo, Never>(.unknown)
 
     // MARK: - Notifications
 
     private let distributedNotificationCenter: DistributedNotificationCenter
-    private var tunnelErrorChangedCancellable: AnyCancellable!
+    private var serverSelectedCancellable: AnyCancellable!
 
     // MARK: - Logging
 
@@ -48,18 +48,24 @@ public class ConnectionErrorObserverThroughIPC: ConnectionErrorObserver {
     }
 
     func start() {
-        tunnelErrorChangedCancellable = distributedNotificationCenter.publisher(for: .tunnelErrorChanged).sink { [weak self] notification in
-            self?.handleTunnelErrorStatusChanged(notification)
+        serverSelectedCancellable = distributedNotificationCenter.publisher(for: .serverSelected).sink { [weak self] notification in
+            self?.handleServerSelected(notification)
         }
     }
 
-    // MARK: - Handling Notifications
+    private func handleServerSelected(_ notification: Notification) {
 
-    private func handleTunnelErrorStatusChanged(_ notification: Notification) {
-        let errorMessage = notification.object as? String
+        let serverInfo: NetworkProtectionStatusServerInfo
 
-        if errorMessage != publisher.value {
-            publisher.send(errorMessage)
+        do {
+            serverInfo = try ServerSelectedNotificationObjectDecoder().decodeObject(from: notification)
+        } catch {
+            let error = StaticString(stringLiteral: "Could not decode .serverSelected distributed notification object")
+            assertionFailure("\(error)")
+            os_log(error, log: log, type: .error)
+            return
         }
+
+        publisher.send(serverInfo)
     }
 }

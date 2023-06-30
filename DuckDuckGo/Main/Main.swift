@@ -37,23 +37,31 @@ final class AppMain {
         case startVPNFailed(_ error: Error)
     }
 
-    static func main() async throws {
+    static func main() {
 #if NETWORK_PROTECTION
         switch (CommandLine.arguments.first! as NSString).lastPathComponent {
         case "startVPN":
             swizzleMainBundle()
 
-            do {
-                try await NetworkProtectionTunnelController().start(enableLoginItems: false)
-                exit(0)
-            } catch {
-                throw LaunchError.startVPNFailed(error)
+            Task {
+                do {
+                    try await NetworkProtectionTunnelController().start(enableLoginItems: false)
+                    exit(0)
+                } catch {
+                    fatalError("Could not start the tunnel due to error: \(String(describing: error))")
+                }
             }
+
+            dispatchMain()
         case "stopVPN":
             swizzleMainBundle()
 
-            await NetworkProtectionTunnelController().stop()
-            exit(0)
+            Task {
+                await NetworkProtectionTunnelController().stop()
+                exit(0)
+            }
+
+            dispatchMain()
         default:
             break
         }

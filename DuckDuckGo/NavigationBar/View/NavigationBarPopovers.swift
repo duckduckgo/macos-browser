@@ -173,6 +173,7 @@ final class NavigationBarPopovers {
             popover.viewController.currentTabWebsite = .init(tab)
         }
 
+        LocalBookmarkManager.shared.requestSync()
         show(popover: popover, usingView: view)
     }
 
