@@ -201,12 +201,12 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         for try await event in SystemExtensionManager().activate() {
             switch event {
             case .waitingForUserApproval:
-                self.controllerErrorStore.lastErrorMessage = "Go to Security & Privacy in System Settings to allow Network Protection to activate"
+                self.controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseAllowSystemExtension
             case .activated:
                 self.controllerErrorStore.lastErrorMessage = nil
                 return true
             case .willActivateAfterReboot:
-                controllerErrorStore.lastErrorMessage = "Please reboot to activate Network Protection"
+                controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseReboot
                 return false
             }
         }
@@ -325,6 +325,11 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             default:
                 try await start(tunnelManager)
             }
+        } catch OSSystemExtensionError.requestSuperseded {
+            await stop()
+            // Even if the installation request is superseeded we want to show the message that tells the user
+            // to go to System Settings to allow the extension
+            controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseAllowSystemExtension
         } catch {
             await stop()
             controllerErrorStore.lastErrorMessage = error.localizedDescription
