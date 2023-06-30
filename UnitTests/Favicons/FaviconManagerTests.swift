@@ -26,5 +26,5 @@ class FaviconManagerTests: XCTestCase {
         let faviconManager = FaviconManager(cacheType: .inMemory)
         XCTAssertNotNil(faviconManager.store as? FaviconNullStore)
     }
-    
+
 }

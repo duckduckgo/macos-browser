@@ -28,6 +28,7 @@ final class UserContentUpdating {
     struct NewContent: UserContentControllerNewContent {
         let rulesUpdate: ContentBlockerRulesManager.UpdateEvent
         let sourceProvider: ScriptSourceProviding
+        @MainActor
         var makeUserScripts: @MainActor (ScriptSourceProviding) -> UserScripts { return UserScripts.init(with:) }
     }
 
