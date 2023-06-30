@@ -7192,7 +7192,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\nrsync -Lru \"${BUILT_PRODUCTS_DIR}/NetworkProtectionUI_NetworkProtectionUI.bundle/\" \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
+			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\n#\n# -L - transform symlink into referent file/dir\n# -r - recursive\n# -u - skip non-updated files\nrsync -Lru \"${BUILT_PRODUCTS_DIR}/NetworkProtectionUI_NetworkProtectionUI.bundle/\" \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
 		};
 		4B2D067D2A13341200DE1F49 /* Copy Assets */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -7210,7 +7210,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\nrsync -Lru \"${BUILT_PRODUCTS_DIR}/NetworkProtectionUI_NetworkProtectionUI.bundle\" \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
+			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\n#\n# -L - transform symlink into referent file/dir\n# -r - recursive\n# -u - skip non-updated files\nrsync -Lru \"${BUILT_PRODUCTS_DIR}/NetworkProtectionUI_NetworkProtectionUI.bundle\" \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
 		};
 		4B5F14F62A14825A0060320F /* Embed startVPN.app & stopVPN.app */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -7233,19 +7233,18 @@
 		};
 		7B6469992A165AE00095095A /* Embed System Network Extension */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(SYSEX_BUNDLE_ID)",
 			);
 			name = "Embed System Network Extension";
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(CONTENTS_FOLDER_PATH)/Library/SystemExtensions/$(SYSEX_BUNDLE_ID)",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

@@ -42,8 +42,6 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("SystemExtensionManager.swift", .source),
         .init("DuckDuckGo Agent.app", .unknown),
         .init("DuckDuckGo Notifications.app", .unknown),
-        .init("startVPN.app", .unknown),
-        .init("stopVPN.app", .unknown),
         .init("PFMoveApplication.m", .source)
     ],
 
