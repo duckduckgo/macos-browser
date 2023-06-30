@@ -20,9 +20,9 @@ import Foundation
 import NetworkProtection
 
 public final class AppLaunchingController: TunnelController {
-    private let appLauncher: AppLauncher
+    private let appLauncher: AppLaunching
 
-    public init(appLauncher: AppLauncher) {
+    public init(appLauncher: AppLaunching) {
         self.appLauncher = appLauncher
     }
 

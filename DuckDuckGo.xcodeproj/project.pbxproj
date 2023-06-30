@@ -1971,11 +1971,12 @@
 		EEAD7A7A2A1D3E20002A24E7 /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
 		EEAD7A7B2A1D3E20002A24E7 /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
 		EEAD7A7C2A1D3E20002A24E7 /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
-		EEAD7A842A1D3E20002A24E7 /* AppLaunchingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A702A1D3E1F002A24E7 /* AppLaunchingController.swift */; };
-		EEAD7A852A1D3E20002A24E7 /* AppLaunchingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A702A1D3E1F002A24E7 /* AppLaunchingController.swift */; };
-		EEAD7A862A1D3E20002A24E7 /* AppLaunchingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A702A1D3E1F002A24E7 /* AppLaunchingController.swift */; };
 		EEC111E4294D06020086524F /* JSAlert.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EEC111E3294D06020086524F /* JSAlert.storyboard */; };
 		EEC111E6294D06290086524F /* JSAlertViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC111E5294D06290086524F /* JSAlertViewModel.swift */; };
+		EEC589D92A4F1CE300BCD60C /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
+		EEC589DA2A4F1CE400BCD60C /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
+		EEC589DB2A4F1CE700BCD60C /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
+		EEC589DC2A4F1CE800BCD60C /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
 		EEC8EB3E2982CA3B0065AA39 /* JSAlertViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC111E5294D06290086524F /* JSAlertViewModel.swift */; };
 		EEC8EB3F2982CA440065AA39 /* JSAlert.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EEC111E3294D06020086524F /* JSAlert.storyboard */; };
 		EEC8EB402982CD550065AA39 /* JSAlertViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */; };
@@ -3108,7 +3109,6 @@
 		EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = clickToLoad.js; sourceTree = "<group>"; };
 		EE339227291BDEFD009F62C1 /* JSAlertController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSAlertController.swift; sourceTree = "<group>"; };
 		EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppLauncher.swift; sourceTree = "<group>"; };
-		EEAD7A702A1D3E1F002A24E7 /* AppLaunchingController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppLaunchingController.swift; sourceTree = "<group>"; };
 		EEC111E3294D06020086524F /* JSAlert.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = JSAlert.storyboard; sourceTree = "<group>"; };
 		EEC111E5294D06290086524F /* JSAlertViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAlertViewModel.swift; sourceTree = "<group>"; };
 		EECE10E429DD77E60044D027 /* FeatureFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlag.swift; sourceTree = "<group>"; };
@@ -3904,6 +3904,7 @@
 		4B4D60542A0B29FA00BCD287 /* NetworkProtection */ = {
 			isa = PBXGroup;
 			children = (
+				EEC589D62A4F1B1F00BCD60C /* AppAndExtensionAndAgentTargets */,
 				4B4D60572A0B29FA00BCD287 /* AppAndExtensionTargets */,
 				4B4D60602A0B29FA00BCD287 /* AppTargets */,
 				4B4D60742A0B29FA00BCD287 /* NetworkExtensionTargets */,
@@ -4015,7 +4016,6 @@
 		4B4D607A2A0B29FA00BCD287 /* NetworkExtensionAndNotificationTargets */ = {
 			isa = PBXGroup;
 			children = (
-				EEAD7A6D2A1D3E1F002A24E7 /* Controllers */,
 				4B4D607C2A0B29FA00BCD287 /* UserText+NetworkProtectionExtensions.swift */,
 			);
 			path = NetworkExtensionAndNotificationTargets;
@@ -6439,16 +6439,6 @@
 			path = fonts;
 			sourceTree = "<group>";
 		};
-		EEAD7A6D2A1D3E1F002A24E7 /* Controllers */ = {
-			isa = PBXGroup;
-			children = (
-				EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */,
-				EEAD7A702A1D3E1F002A24E7 /* AppLaunchingController.swift */,
-			);
-			name = Controllers;
-			path = DuckDuckGo/NetworkProtection/NetworkExtensionTargets/NetworkExtensionAndNotificationTargets/Controllers;
-			sourceTree = SOURCE_ROOT;
-		};
 		EEAEA3F4294D05CF00D04DF3 /* JSAlert */ = {
 			isa = PBXGroup;
 			children = (
@@ -6457,6 +6447,14 @@
 				EEC111E5294D06290086524F /* JSAlertViewModel.swift */,
 			);
 			path = JSAlert;
+			sourceTree = "<group>";
+		};
+		EEC589D62A4F1B1F00BCD60C /* AppAndExtensionAndAgentTargets */ = {
+			isa = PBXGroup;
+			children = (
+				EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */,
+			);
+			path = AppAndExtensionAndAgentTargets;
 			sourceTree = "<group>";
 		};
 		EEF53E162950CEB6002D78F4 /* JSAlert */ = {
@@ -7474,6 +7472,7 @@
 				4B4D60B42A0C847900BCD287 /* LoginItem.swift in Sources */,
 				3706FEBF293F6EFF00E42796 /* BWError.swift in Sources */,
 				3706FAC6293F65D500E42796 /* ConnectBitwardenViewController.swift in Sources */,
+				EEC589DA2A4F1CE400BCD60C /* AppLauncher.swift in Sources */,
 				3706FAC8293F65D500E42796 /* AppTrackerDataSetProvider.swift in Sources */,
 				3706FAC9293F65D500E42796 /* EncryptionKeyGeneration.swift in Sources */,
 				3706FACA293F65D500E42796 /* TabLazyLoader.swift in Sources */,
@@ -8319,7 +8318,6 @@
 				4B2537782A11C00F00610219 /* NetworkProtectionExtensionMachService.swift in Sources */,
 				4B2537792A11C00F00610219 /* IPCConnection.swift in Sources */,
 				4B2537722A11BF8B00610219 /* main.swift in Sources */,
-				EEAD7A852A1D3E20002A24E7 /* AppLaunchingController.swift in Sources */,
 				4B2D06312A11C18C00DE1F49 /* UserDefaultsWrapper.swift in Sources */,
 				EEF12E6F2A2111880023E6BF /* MacPacketTunnelProvider.swift in Sources */,
 				4B2D06292A11C0C900DE1F49 /* NetworkProtectionBundle.swift in Sources */,
@@ -8332,6 +8330,7 @@
 			files = (
 				4B2D065B2A11D1FF00DE1F49 /* Logging.swift in Sources */,
 				4B2D06572A11D19B00DE1F49 /* DuckDuckGoAgentAppDelegate.swift in Sources */,
+				EEC589DB2A4F1CE700BCD60C /* AppLauncher.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8341,6 +8340,7 @@
 			files = (
 				4B2D067C2A13340900DE1F49 /* Logging.swift in Sources */,
 				4B2D067A2A1333EF00DE1F49 /* DuckDuckGoAgentAppDelegate.swift in Sources */,
+				EEC589DC2A4F1CE800BCD60C /* AppLauncher.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8354,7 +8354,6 @@
 				4B4BEC432A11B5C7001D9AC5 /* NetworkProtectionBundle.swift in Sources */,
 				4B4BEC452A11B5EE001D9AC5 /* UserText+NetworkProtectionExtensions.swift in Sources */,
 				4B4BEC3F2A11B5AE001D9AC5 /* IPCConnection.swift in Sources */,
-				EEAD7A862A1D3E20002A24E7 /* AppLaunchingController.swift in Sources */,
 				4B4BEC422A11B5C7001D9AC5 /* NetworkProtectionSharedState.swift in Sources */,
 				B602E8222A1E2603006D261F /* Bundle+NetworkProtectionExtensions.swift in Sources */,
 				B602E81A2A1E2570006D261F /* URL+NetworkProtection.swift in Sources */,
@@ -8380,7 +8379,6 @@
 				4B4D60A52A0B2EC000BCD287 /* UserText+NetworkProtectionExtensions.swift in Sources */,
 				EEF12E6E2A2111880023E6BF /* MacPacketTunnelProvider.swift in Sources */,
 				4B4D60AC2A0C804B00BCD287 /* OptionalExtension.swift in Sources */,
-				EEAD7A842A1D3E20002A24E7 /* AppLaunchingController.swift in Sources */,
 				EEAD7A7A2A1D3E20002A24E7 /* AppLauncher.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8927,6 +8925,7 @@
 				B69B503D2726A12500758A2B /* VariantManager.swift in Sources */,
 				AA97BF4625135DD30014931A /* ApplicationDockMenu.swift in Sources */,
 				4B8A4DFF27C83B29005F40E8 /* SaveIdentityViewController.swift in Sources */,
+				EEC589D92A4F1CE300BCD60C /* AppLauncher.swift in Sources */,
 				4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */,
 				B6A9E47F26146A800067D1B9 /* PixelArguments.swift in Sources */,
 				37BF3F21286F0A7A00BD9014 /* PinnedTabsViewModel.swift in Sources */,
