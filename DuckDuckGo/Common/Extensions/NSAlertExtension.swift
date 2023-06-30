@@ -177,7 +177,6 @@ extension NSAlert {
         return alert
     }
 
-
     @discardableResult
     func runModal() async -> NSApplication.ModalResponse {
         await withCheckedContinuation { continuation in
