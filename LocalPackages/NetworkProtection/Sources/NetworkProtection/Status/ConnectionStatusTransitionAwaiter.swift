@@ -147,18 +147,26 @@ public final class ConnectionStatusTransitionAwaiter {
         await withCheckedContinuation { continuation in
             var cancellable: AnyCancellable?
 
+            // Apparently cancelling the subscription is not instantaneous, as I've
+            // seen Xcode complain about the continuation being called more than once.
+            // Because of this, I'm taking an approach where I can nil out the
+            // continuation whenever it's called.
+            var internalContinuation = Optional(continuation)
+
             cancellable = statusObserver.publisher
                 .receive(on: DispatchQueue.main)
                 .stopAfter(timeout, scheduler: DispatchQueue.main)
                 .sink(receiveCompletion: { _ in
-                    continuation.resume(returning: false)
+                    internalContinuation?.resume(returning: false)
+                    internalContinuation = nil
                     cancellable?.cancel()
                 }, receiveValue: { newStatus in
                     guard status.sameStatus(as: newStatus) else {
                         return
                     }
 
-                    continuation.resume(returning: true)
+                    internalContinuation?.resume(returning: true)
+                    internalContinuation = nil
                     cancellable?.cancel()
                 })
         }
