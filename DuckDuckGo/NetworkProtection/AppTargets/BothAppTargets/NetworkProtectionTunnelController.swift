@@ -109,6 +109,31 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     private var configChangeCancellable: AnyCancellable?
 
+    private func startObservingVPNConfigChanges(notificationCenter: NotificationCenter) {
+        configChangeCancellable = notificationCenter.publisher(for: .NEVPNConfigurationChange)
+            .sink(receiveValue: { _ in
+                Task {
+                    // As crazy as it seems, this calls fixes an issue with the main app
+                    // no longer receiveing status updates.
+                    //
+                    // You can use these steps to repro the original issue and see if this can be
+                    // removed or replaced:
+                    //
+                    //  1. Reset NetP so that the VPN config is removed and the sysex
+                    //      (haven't tested appex) are uninstalled.
+                    //  2. Start NetP from the main app, the system dialog will tell you
+                    //      to go to System Settings to enable the extension, tap
+                    //      "Go to system settings" but don't allow yet.
+                    //  3. Tap on the status menu app, and start NetP, you should see the alert again
+                    //  4. This time allow the system extension.
+                    //  5. Without this line, you'll see NetP connect and the main app not report
+                    //      any status updates.
+                    //
+                    try? await NETunnelProviderManager.loadAllFromPreferences()
+                }
+            })
+    }
+
     // MARK: - Tunnel Configuration
 
     /// Setups the tunnel manager if it's not set up already.
