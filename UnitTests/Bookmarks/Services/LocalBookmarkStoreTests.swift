@@ -321,7 +321,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
             return
         }
 
-        XCTAssertEqual(initialParentFolder.children.count, 3)
+        XCTAssertEqual(initialParentFolder.children.count, 30)
 
         // Verify initial order of saved bookmarks:
 

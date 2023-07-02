@@ -5,8 +5,8 @@ UI.abort_with_message!('Please run fastlane via `bundle exec`') unless FastlaneC
 ########################################################################
 # Environment Variables
 ########################################################################
-DEFAULT_BRANCH = 'develop'
-RELEASE_BRANCH = 'release'
+DEFAULT_BRANCH = 'dominik/develop-test'
+RELEASE_BRANCH = 'dominik/release-test'
 PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
 VERSION_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/Version.xcconfig')
 APP_STORE_BUILD_NUMBER_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/AppStoreBuildNumber.xcconfig')
