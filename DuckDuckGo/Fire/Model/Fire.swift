@@ -461,12 +461,12 @@ final class Fire {
         case .tab(tabViewModel: let tabViewModel, selectedDomains: _, parentTabCollectionViewModel: _):
             return [tabViewModel]
         case .window(tabCollectionViewModel: let tabCollectionViewModel, selectedDomains: _):
-            var pinnedTabViewModels = Array(pinnedTabsManager.tabViewModels.values)
+            let pinnedTabViewModels = Array(pinnedTabsManager.tabViewModels.values)
             let tabViewModels = Array(tabCollectionViewModel.tabViewModels.values)
             return pinnedTabViewModels + tabViewModels
         case .allWindows:
-            var pinnedTabViewModels = Array(pinnedTabsManager.tabViewModels.values)
-            var tabViewModels = windowControllerManager.allTabViewModels
+            let pinnedTabViewModels = Array(pinnedTabsManager.tabViewModels.values)
+            let tabViewModels = windowControllerManager.allTabViewModels
             return pinnedTabViewModels + tabViewModels
         }
     }

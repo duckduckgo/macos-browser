@@ -103,8 +103,6 @@ final class TabCollectionTests: XCTestCase {
     }
 
     func testWhenTabIsRemoved_ThenItsLocalHistoryIsKeptInTabCollection() {
-        let url = URL.duckDuckGo
-
         let tabCollection = TabCollection()
         let historyExtensionMock = HistoryTabExtensionMock()
         let extensionBuilder = TestTabExtensionsBuilder(load: [HistoryTabExtensionMock.self]) { builder in { _, _ in
