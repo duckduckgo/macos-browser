@@ -43,7 +43,7 @@ final class Pixel {
     }
 
     private static let moreInfoHeader: HTTPHeaders = [APIRequest.HTTPHeaderField.moreInfo: "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString]
-    
+
     // Temporary for activation pixels
     static private var aMonthAgo = Calendar.current.date(byAdding: .month, value: -1, to: Date())!
     @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: aMonthAgo)
