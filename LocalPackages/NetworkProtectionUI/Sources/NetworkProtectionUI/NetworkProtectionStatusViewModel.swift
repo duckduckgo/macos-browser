@@ -530,8 +530,8 @@ extension NetworkProtectionStatusView {
 
             Task { @MainActor in
                 await tunnelController.start()
-                refreshInternalIsRunning()
                 toggleTransition = .idle
+                refreshInternalIsRunning()
             }
         }
 
@@ -542,8 +542,8 @@ extension NetworkProtectionStatusView {
 
             Task { @MainActor in
                 await tunnelController.stop()
-                refreshInternalIsRunning()
                 toggleTransition = .idle
+                refreshInternalIsRunning()
             }
         }
     }

@@ -68,7 +68,7 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
             connected
         }
 
-        func start() async throws {
+        func start() async {
             startCallback?()
         }
 
