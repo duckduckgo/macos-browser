@@ -95,7 +95,7 @@ final class DataBrokerProtectionFeatureTests: XCTestCase {
     }
 
     func testWhenGetCaptchaInfoIsParsed_thenTheCorrectCaptchaInfoIsParsed() {
-        let params = ["result": ["success": ["actionID": "getCaptchaInfo", "actionType": "getCaptchaInfo", "response" : ["siteKey": "1234", "url": "www.test.com", "type": "g-captcha"]] as [String: Any]]]
+        let params = ["result": ["success": ["actionID": "getCaptchaInfo", "actionType": "getCaptchaInfo", "response": ["siteKey": "1234", "url": "www.test.com", "type": "g-captcha"]] as [String: Any]]]
         let sut = DataBrokerProtectionFeature(delegate: mockCSSDelegate)
 
         sut.parseActionCompleted(params: params)

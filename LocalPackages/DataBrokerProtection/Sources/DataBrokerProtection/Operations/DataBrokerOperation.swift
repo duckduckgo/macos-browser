@@ -27,7 +27,7 @@ public protocol DataBrokerOperation: CSSCommunicationDelegate {
     var prefs: ContentScopeProperties { get }
     var query: BrokerProfileQueryData { get }
     var emailService: DataBrokerProtectionEmailService { get }
-    var captchaService: DataBrokerProtectionCaptchaService { get } 
+    var captchaService: DataBrokerProtectionCaptchaService { get }
 
     var webViewHandler: DataBrokerProtectionWebViewHandler? { get set }
     var actionsHandler: DataBrokerProtectionActionsHandler? { get }
