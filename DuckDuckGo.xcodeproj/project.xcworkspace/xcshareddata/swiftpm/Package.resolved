@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "8794f9b1c0ff58fb8cc25ad6661bc62ae51924b8",
-        "version" : "62.0.7"
+        "branch" : "dominik/sync-improve-crypter-performance",
+        "revision" : "bf8139e94bb652a75142b339d9e83f89238bfb1f"
       }
     },
     {
