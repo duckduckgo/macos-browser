@@ -74,7 +74,7 @@ final class ProcessorTests: XCTestCase {
         var notificationCounter = 0
         let expectedScanDate = Date().addingTimeInterval(database.commonScheduleConfig.confirmOptOutScan)
 
-        let handler: (Notification) -> Bool = { notification in
+        let handler: (Notification) -> Bool = { _ in
             notificationCounter += 1
 
             let optOutDataRemovedFirst = database.brokerProfileQueryDataList.flatMap { $0.optOutsData }.filter { $0.extractedProfile.name == "ProfileToRemoveFirst"}.first!
@@ -83,8 +83,7 @@ final class ProcessorTests: XCTestCase {
             let scanDataRemovedFirst = database.brokerProfileQueryDataList.compactMap { $0.scanData }.filter { $0.brokerProfileQueryID == optOutDataRemovedFirst.brokerProfileQueryID }.first!
             let scanDataRemovedSecond = database.brokerProfileQueryDataList.compactMap { $0.scanData }.filter { $0.brokerProfileQueryID == optOutDataRemovedSecond.brokerProfileQueryID }.first!
 
-
-            if notificationCounter == 1  {
+            if notificationCounter == 1 {
                 XCTAssertTrue(optOutDataRemovedFirst.historyEvents.last?.type == .optOutRequested(extractedProfileID: optOutDataRemovedFirst.extractedProfile.id))
 
                 XCTAssertNil(optOutDataRemovedSecond.historyEvents.last)
@@ -138,6 +137,7 @@ private struct MockDataBase: DataBase {
         maintenanceScan: 240 * 60 * 60
     )
 
+    // swiftlint:disable:next function_body_length
     internal init(mockBrokerProfileQueryData: BrokerProfileQueryData? = nil) {
         self.mockBrokerProfileQueryData = mockBrokerProfileQueryData
 
@@ -169,7 +169,6 @@ private struct MockDataBase: DataBase {
                                                       historyEvents: historyEvents,
                                                       extractedProfile: extractedProfile)
 
-
         let optOutToRemoveFirst = OptOutOperationData(brokerProfileQueryID: brokerProfileQueryID2,
                                                       preferredRunDate: Date().addingTimeInterval(-1000),
                                                       historyEvents: [HistoryEvent](),
@@ -183,7 +182,7 @@ private struct MockDataBase: DataBase {
         )
 
         let data2 = BrokerProfileQueryData(
-            id:brokerProfileQueryID2,
+            id: brokerProfileQueryID2,
             profileQuery: ProfileQuery(firstName: "Jane", lastName: "Smith", city: "New York", state: "NY", age: 32),
             dataBroker: databroker1,
             optOutOperationsData: [removedOptOutOperationData, optOutToRemoveFirst]
@@ -214,7 +213,6 @@ private struct MockDataBase: DataBase {
         brokerProfileQueryDataList = [data1, data2, data3, data4, data5]
     }
 
-
     func brokerProfileQueryData(for profileQuery: ProfileQuery, dataBroker: DataBroker) -> BrokerProfileQueryData? {
         if let data = mockBrokerProfileQueryData {
             return data
@@ -225,7 +223,6 @@ private struct MockDataBase: DataBase {
     func brokerProfileQueryData(for id: UUID) -> BrokerProfileQueryData? {
         brokerProfileQueryDataList.filter { $0.id == id }.first
     }
-
 
     func saveOperationData(_ data: BrokerOperationData) {
 
