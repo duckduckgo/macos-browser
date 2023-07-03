@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionSchedulerConfig.swift
+//  DBPHomeViewController.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,15 +18,13 @@
 
 import Foundation
 
-protocol SchedulerConfig {
-    var runFrequency: TimeInterval { get }
-    var concurrentOperationsDifferentBrokers: Int { get }
-    var intervalBetweenSameBrokerOperations: TimeInterval { get }
-}
+final class DBPHomeViewController: NSViewController {
 
-struct DataBrokerProtectionSchedulerConfig: SchedulerConfig {
-    // TODO: Arbitrary numbers for now
-    var runFrequency: TimeInterval = 4 * 60 * 60
-    var concurrentOperationsDifferentBrokers: Int = 1
-    var intervalBetweenSameBrokerOperations: TimeInterval = 2
+    override func loadView() {
+        view = NSView()
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
 }
