@@ -6,7 +6,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "shane/webcompat",
-        "revision" : "442e2ef38637f9e0213b1b80f874565878e6b327"
+        "revision" : "d3b055755ba0f460930b0e4c8435cd693c82a7df"
       }
     },
     {
@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "branch" : "07-03-fix_web-compat_run_web-compat_first_in_webkit_environments",
-        "revision" : "c8ef17ca3f228cebb14127268d5a893963a82d97"
+        "revision" : "630eb2c4cf94055e630fd5b7daae71bed893ad0a",
+        "version" : "4.22.4"
       }
     },
     {
