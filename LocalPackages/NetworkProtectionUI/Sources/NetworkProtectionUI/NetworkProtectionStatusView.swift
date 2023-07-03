@@ -228,7 +228,7 @@ public struct NetworkProtectionStatusView: View {
     private func connectionHealthWarningView(message: String) -> some View {
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: 12) {
-                Image("WarningColored")
+                Image("WarningColored", bundle: Bundle.module)
 
                 /// Text elements in SwiftUI don't expand horizontally more than needed, so we're adding an "optional" spacer at the end so that
                 /// the alert bubble won't shrink if there's not enough text.
@@ -238,7 +238,7 @@ public struct NetworkProtectionStatusView: View {
                 }
             }
             .padding(16)
-            .background(RoundedRectangle(cornerRadius: 8).fill(Color("AlertBubbleBackground")))
+            .background(RoundedRectangle(cornerRadius: 8).fill(Color("AlertBubbleBackground", bundle: Bundle.module)))
         }
         .padding(EdgeInsets(top: 8, leading: 8, bottom: 4, trailing: 8))
     }
@@ -303,7 +303,7 @@ public struct NetworkProtectionStatusView: View {
     }
 
     private func featureToggleRow() -> some View {
-        Toggle(isOn: model.isRunning) {
+        Toggle(isOn: model.isToggleOn) {
             HStack {
                 Text(UserText.networkProtectionStatusViewConnLabel)
                     .applyLabelAttributes(colorScheme: colorScheme)
@@ -320,6 +320,7 @@ public struct NetworkProtectionStatusView: View {
                     .frame(width: 8)
             }
         }
+        .disabled(model.isToggleDisabled)
         .toggleStyle(.switch)
         .padding(EdgeInsets(top: 3, leading: 9, bottom: 3, trailing: 9))
     }
@@ -350,7 +351,7 @@ struct NetworkProtectionStatusView_Previews: PreviewProvider {
             false
         }
 
-        func start() async throws {
+        func start() async {
             print("Preview controller started")
         }
 

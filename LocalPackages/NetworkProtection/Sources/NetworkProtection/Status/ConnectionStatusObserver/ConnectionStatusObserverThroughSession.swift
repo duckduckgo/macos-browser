@@ -59,6 +59,28 @@ public class ConnectionStatusObserverThroughSession: ConnectionStatusObserver {
     }
 
     private func startObservers() {
+        notificationCenter.publisher(for: .NEVPNConfigurationChange).sink { _ in
+            Task {
+                // As crazy as it seems, this calls fixes an issue with the main app
+                // no longer receiveing status updates.
+                //
+                // You can use these steps to repro the original issue and see if this can be
+                // removed or replaced:
+                //
+                //  1. Reset NetP so that the VPN config is removed and the sysex
+                //      (haven't tested appex) are uninstalled.
+                //  2. Start NetP from the main app, the system dialog will tell you
+                //      to go to System Settings to enable the extension, tap
+                //      "Go to system settings" but don't allow yet.
+                //  3. Tap on the status menu app, and start NetP, you should see the alert again
+                //  4. This time allow the system extension.
+                //  5. Without this line, you'll see NetP connect and the main app not report
+                //      any status updates.
+                //
+                try? await NETunnelProviderManager.loadAllFromPreferences()
+            }
+        }.store(in: &cancellables)
+
         notificationCenter.publisher(for: .NEVPNStatusDidChange).sink { [weak self] notification in
             self?.handleStatusChangeNotification(notification)
         }.store(in: &cancellables)
@@ -102,6 +124,7 @@ public class ConnectionStatusObserverThroughSession: ConnectionStatusObserver {
 
     private func handleStatusChange(in session: NETunnelProviderSession) {
         let status = self.connectionStatus(from: session)
+        logStatusChanged(status: status)
         publisher.send(status)
     }
 

@@ -101,9 +101,13 @@ final class NetworkProtectionConnectionTester {
         self.timerQueue = timerQueue
         self.log = log
         self.resultHandler = resultHandler
+
+        os_log("[+] %{public}@", log: .networkProtectionMemoryLog, type: .debug, String(describing: self))
     }
 
     deinit {
+        os_log("[-] %{public}@", log: .networkProtectionMemoryLog, type: .debug, String(describing: self))
+
         cancelTimerImmediately()
     }
 

@@ -339,8 +339,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             self?.broadcastConnectionStatus()
             self?.broadcastLastSelectedServerInfo()
         }
-
-        connectionStatus = .disconnected
     }
 
     deinit {
@@ -561,6 +559,15 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 }
 
                 completionHandler()
+
+                #if os(macOS)
+                // From what I'm seeing in my tests the next call to start the tunnel is MUCH
+                // less likely to fail if we force this extension to exit when the tunnel is killed.
+                //
+                // Ref: https://app.asana.com/0/72649045549333/1204668639086684/f
+                //
+                exit(0)
+                #endif
             }
         }
     }
