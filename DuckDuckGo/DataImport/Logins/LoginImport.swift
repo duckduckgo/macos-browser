@@ -38,8 +38,39 @@ struct ImportedLoginCredential: Equatable {
     let username: String
     let password: String
 
+    private enum CommonTitlePatterns: String, CaseIterable {
+        /* Matches the following title patterns
+         duck.com
+         duck.com (test@duck.com)
+         signin.duck.com
+         signin.duck.com (test@duck.com.co)
+         https://signin.duck.com
+         https://signin.duck.com (test@duck.com.co)
+         https://signin.duck.com?page.php?test=variable1&b=variable2
+         https://signin.duck.com/section/page.php?test=variable1&b=variable2 */
+        case urlUsername = #"^(?:https?:\/\/)?(?:[\w-]+\.)*([\w-]+\.[a-z]+)(?:[\/?#][^\s()]*)?(?: \([^)]+\))?$"#
+    }
+
+    // Extracts a hostname from the provided title string, via pattern matching
+    private static func extractHostName(fromTitle title: String?) -> String? {
+        guard let title,
+              title != "" else {
+            return nil
+        }
+        for pattern in CommonTitlePatterns.allCases {
+            guard let range = title.range(of: pattern.rawValue, options: .regularExpression),
+                  range.lowerBound != range.upperBound
+            else { continue }
+            let host = String(title[range])
+            return host.isEmpty ? nil : host
+        }
+        return nil
+    }
+
     init(title: String? = nil, url: String, username: String, password: String) {
-        self.title = title
+        // If the title is "equal" to the hostname, drop it
+        let hostNameFromTitle = ImportedLoginCredential.extractHostName(fromTitle: title)
+        self.title = title == hostNameFromTitle || title == "" ? nil : title
         self.url = URL(string: url)?.host ?? url // Try to use the host if possible, as the Secure Vault saves credentials using the host.
         self.username = username
         self.password = password

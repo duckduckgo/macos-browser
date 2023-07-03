@@ -29,7 +29,9 @@ final class AutofillTabExtension: TabExtension {
     }
 
     static var vaultManagerProvider: (SecureVaultManagerDelegate) -> AutofillSecureVaultDelegate = { delegate in
-        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared)
+        let manager = SecureVaultManager(passwordManager: PasswordManagerCoordinator.shared,
+                                         includePartialAccountMatches: true,
+                                         tld: ContentBlocking.shared.tld)
         manager.delegate = delegate
         return manager
     }
@@ -77,7 +79,7 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         return true
     }
 
-    func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData) {
+    func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData, hasGeneratedPassword generatedPassword: Bool, withTrigger trigger: AutofillUserScript.GetTriggerType?) {
         self.autofillDataToSave = data
     }
 
@@ -86,6 +88,10 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
                             withAccounts accounts: [SecureVaultModels.WebsiteAccount],
                             withTrigger trigger: AutofillUserScript.GetTriggerType,
                             completionHandler: @escaping (SecureVaultModels.WebsiteAccount?) -> Void) {
+        // no-op on macOS
+    }
+
+    func secureVaultManager(_: SecureVaultManager, promptUserWithGeneratedPassword password: String, completionHandler: @escaping (Bool) -> Void) {
         // no-op on macOS
     }
 
@@ -107,10 +113,29 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         Pixel.fire(.jsPixel(pixel))
     }
 
-    func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager) -> Bool {
+    func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager, shouldSilentlySave: Bool) -> Bool {
         return true
     }
 
+    func secureVaultManagerShouldSilentlySaveGeneratedPassword(_: SecureVaultManager) -> Bool {
+        return false
+    }
+
+    func secureVaultManager(_: SecureVaultManager, promptUserToUseGeneratedPasswordForDomain: String, withGeneratedPassword generatedPassword: String, completionHandler: @escaping (Bool) -> Void) {
+        // no-op on macOS
+    }
+
+    public func secureVaultManager(_: SecureVaultManager, didRequestCreditCardsManagerForDomain domain: String) {
+        // no-op
+    }
+
+    public func secureVaultManager(_: SecureVaultManager, didRequestIdentitiesManagerForDomain domain: String) {
+        // no-op
+    }
+
+    func secureVaultManager(_: SecureVaultManager, didRequestPasswordManagerForDomain domain: String) {
+        // no-op
+    }
 }
 
 extension AutofillType {

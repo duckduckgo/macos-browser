@@ -1,0 +1,57 @@
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+#include "../ExtensionBase.xcconfig"
+#include "../../NetworkProtectionDeveloperID.xcconfig"
+
+CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
+CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Debug.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Release.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Release.entitlements
+CODE_SIGN_STYLE[config=Debug][sdk=*] = Automatic
+
+CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
+CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
+CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
+
+GENERATE_INFOPLIST_FILE = YES
+INFOPLIST_FILE = NetworkProtectionSystemExtension/Info.plist
+INFOPLIST_KEY_NSHumanReadableCopyright = Copyright © 2023 DuckDuckGo. All rights reserved.
+INFOPLIST_KEY_NSSystemExtensionUsageDescription = Network Protection
+
+FEATURE_FLAGS[arch=*][sdk=*] = NETP_SYSTEM_EXTENSION NETWORK_EXTENSION NETWORK_PROTECTION
+FEATURE_FLAGS[config=CI][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION NETWORK_EXTENSION NETWORK_PROTECTION
+FEATURE_FLAGS[config=Debug][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION NETWORK_EXTENSION NETWORK_PROTECTION
+FEATURE_FLAGS[config=Review][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION NETWORK_EXTENSION NETWORK_PROTECTION
+
+PRODUCT_BUNDLE_IDENTIFIER[sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+PRODUCT_BUNDLE_IDENTIFIER[config=Release][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+
+PRODUCT_NAME[sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+PRODUCT_NAME[config=CI][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+PRODUCT_NAME[config=Debug][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+PRODUCT_NAME[config=Release][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+PRODUCT_NAME[config=Review][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
+
+PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
+PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS NetP System Extension - Release
+PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS NetP System Extension - Review
+
+SDKROOT = macosx
+SKIP_INSTALL = YES
+SWIFT_EMIT_LOC_STRINGS = YES

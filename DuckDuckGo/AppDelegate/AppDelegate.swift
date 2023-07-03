@@ -25,8 +25,13 @@ import Configuration
 import Networking
 import Bookmarks
 import DDGSync
+import ServiceManagement
+import SyncDataProviders
 
-@NSApplicationMain
+#if NETWORK_PROTECTION
+import NetworkProtection
+#endif
+
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
 
@@ -54,11 +59,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
-    private(set) var internalUserDecider: InternalUserDecider!
+    private(set) var internalUserDecider: InternalUserDecider?
     private(set) var featureFlagger: FeatureFlagger!
     private var appIconChanger: AppIconChanger!
-    private(set) var syncService: DDGSyncing!
-    private(set) var syncPersistence: SyncDataPersistor!
+
+    private(set) var syncDataProviders: SyncDataProviders!
+    private(set) var syncService: DDGSyncing?
+    private var syncStateCancellable: AnyCancellable?
+    private var bookmarksSyncErrorCancellable: AnyCancellable?
+    let bookmarksManager = LocalBookmarkManager.shared
 
 #if !APPSTORE
     var updateController: UpdateController!
@@ -68,6 +77,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     // swiftlint:disable:next function_body_length
     func applicationWillFinishLaunching(_ notification: Notification) {
+#if !APPSTORE && !DEBUG
+        PFMoveToApplicationsFolderIfNecessary()
+#endif
+
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
         Configuration.setURLProvider(AppConfigurationURLProvider())
 
@@ -123,7 +136,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
 
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
-        internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
+        let internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
+        self.internalUserDecider = internalUserDecider
 
 #if DEBUG
         func mock<T>(_ className: String) -> T {
@@ -147,8 +161,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
-        syncPersistence = SyncDataPersistor()
-        syncService = DDGSync(persistence: syncPersistence)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -156,17 +168,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         HistoryCoordinator.shared.loadHistory()
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
-        LocalBookmarkManager.shared.loadBookmarks()
+        bookmarksManager.loadBookmarks()
         FaviconManager.shared.loadFavicons()
         ConfigurationManager.shared.start()
         FileDownloadManager.shared.delegate = self
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 
+        if LocalStatisticsStore().atb == nil {
+            Pixel.firstLaunchDate = Date()
+        }
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
             // MARK: perform first time launch logic here
         }
+
+        startupSync()
 
         stateRestorationManager.applicationDidFinishLaunching()
 
@@ -188,8 +205,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         urlEventHandler.applicationDidFinishLaunching()
 
         subscribeToEmailProtectionStatusNotifications()
+        subscribeToDataImportCompleteNotification()
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
+
+#if NETWORK_PROTECTION
+        startupNetworkProtection()
+#endif
+    }
+
+    func applicationDidBecomeActive(_ notification: Notification) {
+        syncService?.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
+        syncService?.scheduler.notifyAppLifecycleEvent()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -232,6 +259,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
+        guard let internalUserDecider else {
+            return nil
+        }
+
         return ApplicationDockMenu(internalUserDecider: internalUserDecider)
     }
 
@@ -244,6 +275,102 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         appearancePreferences.updateUserInterfaceStyle()
     }
 
+    // MARK: - Sync
+
+    private func startupSync() {
+        let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
+        let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync)
+        syncService.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
+
+        syncStateCancellable = syncService.authStatePublisher
+            .prepend(syncService.authState)
+            .map { $0 == .inactive }
+            .removeDuplicates()
+            .sink { isSyncDisabled in
+                LocalBookmarkManager.shared.updateBookmarkDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
+            }
+
+        // This is also called in applicationDidBecomeActive, but we're also calling it here, since
+        // syncService can be nil when applicationDidBecomeActive is called during startup, if a modal
+        // alert is shown before it's instantiated.  In any case it should be safe to call this here,
+        // since the scheduler debounces calls to notifyAppLifecycleEvent().
+        //
+        syncService.scheduler.notifyAppLifecycleEvent()
+
+        self.syncDataProviders = syncDataProviders
+        self.syncService = syncService
+    }
+
+    // MARK: - Network Protection
+
+#if NETWORK_PROTECTION
+
+    private func startupNetworkProtection() {
+        let networkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
+
+        guard networkProtectionFeatureVisibility.isFeatureActivated else {
+            NetworkProtectionTunnelController.disableLoginItems()
+            LocalPinningManager.shared.unpin(.networkProtection)
+            return
+        }
+
+        updateNetworkProtectionIfVersionChanged()
+        refreshNetworkProtectionServers()
+    }
+
+    private func updateNetworkProtectionIfVersionChanged() {
+        let currentVersion = AppVersion.shared.versionNumber
+        let versionStore = NetworkProtectionLastVersionRunStore()
+        defer {
+            versionStore.lastVersionRun = currentVersion
+        }
+
+        // should‘ve been run at least once with NetP enabled
+        guard let lastVersionRun = versionStore.lastVersionRun else {
+            os_log(.info, log: .networkProtection, "No last version found for the NetP login items, skipping update")
+            return
+        }
+
+        if lastVersionRun != currentVersion {
+            os_log(.info, log: .networkProtection, "App updated from %{public}s to %{public}s: updating login items", lastVersionRun, currentVersion)
+            updateNetworkProtectionTunnelAndMenu()
+        } else {
+            // If login items failed to launch (e.g. because of the App bundle rename), launch using NSWorkspace
+            NetworkProtectionTunnelController.ensureLoginItemsAreRunning(.ifLoginItemsAreEnabled, after: 1)
+        }
+    }
+
+    private func updateNetworkProtectionTunnelAndMenu() {
+        NetworkProtectionTunnelController.resetLoginItems()
+
+        Task {
+            let provider = NetworkProtectionTunnelController()
+
+            // Restart NetP SysEx on app update
+            if await provider.isConnected() {
+                await provider.stop()
+                try? await provider.start()
+            }
+        }
+    }
+
+    /// Fetches a new list of Network Protection servers, and updates the existing set.
+    private func refreshNetworkProtectionServers() {
+        Task {
+            let serverCount: Int
+            do {
+                serverCount = try await NetworkProtectionDeviceManager.create().refreshServerList().count
+            } catch {
+                os_log("Failed to update Network Protection servers", log: .networkProtection, type: .error)
+                return
+            }
+
+            os_log("Successfully updated Network Protection servers; total server count = %{public}d", log: .networkProtection, serverCount)
+        }
+    }
+
+#endif
+
     private func subscribeToEmailProtectionStatusNotifications() {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(emailDidSignInNotification(_:)),
@@ -255,12 +382,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                                                object: nil)
     }
 
+    private func subscribeToDataImportCompleteNotification() {
+        NotificationCenter.default.addObserver(self, selector: #selector(dataImportCompleteNotification(_:)), name: .dataImportComplete, object: nil)
+    }
+
     @objc private func emailDidSignInNotification(_ notification: Notification) {
         Pixel.fire(.emailEnabled)
+        let repetition = Pixel.Event.Repetition(key: Pixel.Event.emailEnabledInitial.name)
+        // Temporary pixel for first time user enables email protection
+        if Pixel.isNewUser && repetition == .initial {
+            Pixel.fire(.emailEnabledInitial)
+        }
     }
 
     @objc private func emailDidSignOutNotification(_ notification: Notification) {
         Pixel.fire(.emailDisabled)
+    }
+
+    @objc private func dataImportCompleteNotification(_ notification: Notification) {
+        // Temporary pixel for first time user import data
+        let repetition = Pixel.Event.Repetition(key: Pixel.Event.importDataInitial.name)
+        if Pixel.isNewUser && repetition == .initial {
+            Pixel.fire(.importDataInitial)
+        }
     }
 
 }

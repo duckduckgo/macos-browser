@@ -38,8 +38,17 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("UpdateController.swift", .source),
         .init("LegacyWebKitDownloadDelegate.swift", .source),
         .init("WKProcessPool+DownloadDelegate.swift", .source),
-        .init("_WKDownload+WebKitDownload.swift", .source)
+        .init("_WKDownload+WebKitDownload.swift", .source),
+        .init("SystemExtensionManager.swift", .source),
+        .init("DuckDuckGo Agent.app", .unknown),
+        .init("DuckDuckGo Notifications.app", .unknown),
+        .init("startVPN.app", .unknown),
+        .init("stopVPN.app", .unknown),
+        .init("enableOnDemand.app", .unknown),
+        .init("PFMoveApplication.m", .source)
     ],
+
+    "DuckDuckGo Privacy Browser App Store": [],
 
     "Unit Tests": [
         .init("BWEncryptionTests.swift", .source),
@@ -125,7 +134,7 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
 
         var errors = [Error]()
 
-        let filesWithSpaceInPath = targets[0].inputFiles.filter { $0.path.string.firstIndex(of: " ") != nil }
+        let filesWithSpaceInPath = targets[0].inputFiles.filter { $0.type != .unknown && $0.path.string.firstIndex(of: " ") != nil }
         if !filesWithSpaceInPath.isEmpty {
             errors.append(contentsOf: filesWithSpaceInPath.map(\.path.string).sorted().map(FileWithSpaceInPathError.init))
         }

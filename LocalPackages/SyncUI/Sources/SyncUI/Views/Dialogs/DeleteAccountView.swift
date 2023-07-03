@@ -52,7 +52,7 @@ struct DeleteAccountView: View {
         }
         .frame(width: 360,
                // Grow with the number of devices, up to a point
-               height: min(410, 280 + (CGFloat(devices.count) * 40)))
+               height: min(410, 272 + (CGFloat(devices.count) * 44)))
     }
 
 }

@@ -36,6 +36,7 @@ struct PasswordManagementItemListView: View {
     }
 
     @EnvironmentObject var model: PasswordManagementItemListModel
+    @State var autoSelected = false
 
     var body: some View {
 
@@ -53,11 +54,16 @@ struct PasswordManagementItemListView: View {
                 ScrollView {
                     ScrollViewReader { proxy in
                         PasswordManagementItemListStackView()
-                            .onAppear {
-                                // Scrolling to the selected item doesn't work consistently without a very slight delay.
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    if let selectionID = model.selected?.id {
-                                        proxy.scrollTo(selectionID, anchor: .center)
+                            // Selection/scroll wont work until list is fully rendered
+                            // so give it a few milis based on element count before auto-selecting
+                            .onChange(of: model.selected?.id) { itemId in
+                                if !autoSelected {
+                                    let delay = TimeInterval(model.itemCount) * 0.0001
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                                        if let selectionID = itemId {
+                                            proxy.scrollTo(selectionID, anchor: .center)
+                                            autoSelected = true
+                                        }
                                     }
                                 }
                             }

@@ -19,46 +19,45 @@
 import SwiftUI
 extension HomePage.Views {
 
-struct MoreOrLess: View {
+    struct MoreOrLess: View {
 
-    @Binding var isExpanded: Bool
+        @Binding var isExpanded: Bool
 
-    var body: some View {
+        var body: some View {
 
-        HStack(spacing: 20) {
+            HStack(spacing: 20) {
 
-            VStack {
-                Divider()
-                    .foregroundColor(Color("HomePageMoreOrLessTextColor"))
-            }.frame(maxWidth: .infinity)
+                VStack {
+                    Divider()
+                        .foregroundColor(Color("HomePageMoreOrLessTextColor"))
+                }.frame(maxWidth: .infinity)
 
-            HStack {
-                Text(isExpanded ? UserText.moreOrLessCollapse : UserText.moreOrLessExpand)
-                Group {
-                    if #available(macOS 11.0, *) {
-                        Image("HomeArrowUp")
-                    } else {
-                        Text("^")
+                HStack {
+                    Text(isExpanded ? UserText.moreOrLessCollapse : UserText.moreOrLessExpand)
+                    Group {
+                        if #available(macOS 11.0, *) {
+                            Image("HomeArrowUp")
+                        } else {
+                            Text("^")
+                        }
                     }
+                    .rotationEffect(.degrees(isExpanded ? 0 : 180))
                 }
-                .rotationEffect(.degrees(isExpanded ? 0 : 180))
-            }
-            .foregroundColor(Color("HomePageMoreOrLessTextColor"))
+                .foregroundColor(Color("HomePageMoreOrLessTextColor"))
 
-            VStack {
-                Divider()
-                    .foregroundColor(Color("HomePageMoreOrLessTextColor"))
-            }.frame(maxWidth: .infinity)
-        }
-        .font(.system(size: 11))
-        .link {
-            withAnimation {
+                VStack {
+                    Divider()
+                        .foregroundColor(Color("HomePageMoreOrLessTextColor"))
+                }.frame(maxWidth: .infinity)
+            }
+            .frame(height: 32)
+            .font(.system(size: 11))
+            .link {
                 isExpanded = !isExpanded
             }
+
         }
 
     }
-
-}
 
 }

@@ -53,7 +53,7 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet var emptyStateTitle: NSTextField!
     @IBOutlet var emptyStateMessage: NSTextField!
     @IBOutlet var emptyStateButton: NSButton!
-
+    @IBOutlet weak var exportLoginItem: NSMenuItem!
     @IBOutlet var lockScreen: NSView!
     @IBOutlet var lockScreenIconImageView: NSImageView! {
         didSet {
@@ -161,6 +161,8 @@ final class PasswordManagementViewController: NSViewController {
         addVaultItemButton.sendAction(on: .leftMouseDown)
         moreButton.sendAction(on: .leftMouseDown)
 
+        exportLoginItem.title = UserText.exportLogins
+
         NotificationCenter.default.addObserver(forName: .deviceBecameLocked, object: nil, queue: .main) { [weak self] _ in
             self?.displayLockScreen()
         }
@@ -256,6 +258,11 @@ final class PasswordManagementViewController: NSViewController {
     @IBAction func openImportBrowserDataWindow(_ sender: Any?) {
         self.dismiss()
         NSApp.sendAction(#selector(openImportBrowserDataWindow(_:)), to: nil, from: sender)
+    }
+
+    @IBAction func openExportLogins(_ sender: Any) {
+        self.dismiss()
+        NSApp.sendAction(#selector(AppDelegate.openExportLogins(_:)), to: nil, from: sender)
     }
 
     @IBAction func onImportClicked(_ sender: NSButton) {
@@ -358,10 +365,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func createLoginItemView() {
-        let itemModel = PasswordManagementLoginModel(onDirtyChanged: { [weak self] isDirty in
-            self?.isDirty = isDirty
-            self?.postChange()
-        }, onSaveRequested: { [weak self] credentials in
+        let itemModel = PasswordManagementLoginModel(onSaveRequested: { [weak self] credentials in
             self?.doSaveCredentials(credentials)
         }, onDeleteRequested: { [weak self] credentials in
             self?.promptToDelete(credentials: credentials)

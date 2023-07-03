@@ -20,6 +20,7 @@ import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 class CapturingOptionsButtonMenuDelegate: OptionsButtonMenuDelegate {
+
     var optionsButtonMenuRequestedPreferencesCalled = false
     var optionsButtonMenuRequestedAppearancePreferencesCalled = false
 
@@ -65,6 +66,14 @@ class CapturingOptionsButtonMenuDelegate: OptionsButtonMenuDelegate {
 
     func optionsButtonMenuRequestedAppearancePreferences(_ menu: NSMenu) {
         optionsButtonMenuRequestedAppearancePreferencesCalled = true
+    }
+
+    func optionsButtonMenuRequestedBookmarkExportInterface(_ menu: NSMenu) {
+
+    }
+
+    func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {
+
     }
 
 }

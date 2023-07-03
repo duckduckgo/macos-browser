@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "jacek/fix-httpheaders",
-        "revision" : "92b2eccbc668a700cc077d5ef206d11c70488b2e"
+        "revision" : "e81a77fd52b86ba4626e7864572bde62c71c96ba",
+        "version" : "63.0.0"
       }
     },
     {
@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "801b7f23476f797c6eaa72b070e6c80abb82801a",
-        "version" : "4.4.4"
+        "revision" : "63f77323f119ac61fdb483f9c25f02d5d09f49ba",
+        "version" : "4.22.3"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "8f403fad4f6ccf18a3900fc560f43067a527ac9f",
-        "version" : "6.5.1"
+        "revision" : "44cd844b6bb5d8ccfefbd6e025817d800c26ad76",
+        "version" : "7.2.0"
       }
     },
     {
@@ -120,10 +120,19 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
       "state" : {
         "revision" : "4684440d03304e7638a2c8086895367e90987463",
         "version" : "1.2.1"
+      }
+    },
+    {
+      "identity" : "wireguard-apple",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/wireguard-apple",
+      "state" : {
+        "revision" : "156abe15063b35b633363ec33fc2c040f81f9326",
+        "version" : "1.0.0"
       }
     }
   ],

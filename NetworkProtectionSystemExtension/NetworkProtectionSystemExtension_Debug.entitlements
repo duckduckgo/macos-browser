@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>com.apple.developer.networking.networkextension</key>
+	<array>
+		<string>packet-tunnel-provider</string>
+	</array>
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>$(TeamIdentifierPrefix)com.duckduckgo.macos.browser.network-protection.system-extension</string>
+		<string>$(TeamIdentifierPrefix)com.duckduckgo.macos.browser.network-protection</string>
+		<string>$(NETP_APP_GROUP)</string>
+	</array>
+	<key>com.apple.security.network.client</key>
+	<true/>
+	<key>com.apple.security.network.server</key>
+	<true/>
+	<key>com.apple.security.temporary-exception.files.absolute-path.read-write</key>
+	<array>
+		<string>/Library/Keychains/System.keychain</string>
+		<string>/private/var/db/mds/system/mds.lock</string>
+		<string>/Library/Keychains/</string>
+		<string>/Library/Application Support/</string>
+	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.duckduckgo.network-protection</string>
+	</array>
+</dict>
+</plist>

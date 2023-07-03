@@ -26,7 +26,6 @@ extension OSLog {
         case atb = "ATB"
         case config = "Configuration Downloading"
         case fire = "Fire"
-        case passwordManager = "Password Manager"
         case history = "History"
         case dataImportExport = "Data Import/Export"
         case pixel = "Pixel"
@@ -41,7 +40,10 @@ extension OSLog {
         case bitwarden = "Bitwarden"
         case navigation = "Navigation"
         case duckPlayer = "Duck Player"
+        case sync = "Sync"
+        case networkProtection = "Network Protection"
     }
+
     enum AllCategories {
         static var allCases: [String] {
             Categories.allCases.map(\.rawValue) + AppCategories.allCases.map(\.rawValue)
@@ -65,6 +67,8 @@ extension OSLog {
     @OSLogWrapper(.bitwarden) static var bitwarden
     @OSLogWrapper(.navigation) static var navigation
     @OSLogWrapper(.duckPlayer) static var duckPlayer
+    @OSLogWrapper(.sync) static var sync
+    @OSLogWrapper(.networkProtection) static var networkProtection
 
     // Debug->Logging categories will only be enabled for one day
     @UserDefaultsWrapper(key: .loggingEnabledDate, defaultValue: .distantPast)
@@ -125,10 +129,10 @@ extension OSLog.OSLogWrapper {
 
 }
 
-func logOrAssertionFailure(_ message: StaticString, args: CVarArg...) {
-#if DEBUG
-    assertionFailure("\(message)")
+func logOrAssertionFailure(_ message: String) {
+#if DEBUG && !CI
+    assertionFailure(message)
 #else
-    os_log("BWManager: Wrong handler", type: .error)
+    os_log("%{public}s", type: .error, message)
 #endif
 }

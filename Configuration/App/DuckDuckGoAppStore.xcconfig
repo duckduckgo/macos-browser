@@ -17,7 +17,12 @@
 #include "../AppStore.xcconfig"
 #include "ManualAppStoreRelease.xcconfig"
 
-BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.mobile.ios
+AGENT_BUNDLE_ID[sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.agent
+AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.agent.debug
+AGENT_BUNDLE_ID[config=CI][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.agent.debug
+AGENT_BUNDLE_ID[config=Review][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.agent.review
+
+PRODUCT_BUNDLE_IDENTIFIER = $(MAIN_BUNDLE_IDENTIFIER)
 
 CODE_SIGN_ENTITLEMENTS = DuckDuckGo/DuckDuckGoAppStore.entitlements
 CODE_SIGN_ENTITLEMENTS[config=CI][arch=*][sdk=*] = DuckDuckGo/DuckDuckGoAppStoreCI.entitlements

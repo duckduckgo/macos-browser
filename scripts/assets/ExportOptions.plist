@@ -16,6 +16,18 @@
 		<string>Sandbox MacOS Browser Release</string>
 		<key>com.duckduckgo.mobile.ios.review</key>
 		<string>Sandbox MacOS Browser Product Review</string>
+		<key>com.duckduckgo.macos.browser.network-protection-extension</key>
+		<string>macOS NetP System Extension - Release</string>
+		<key>com.duckduckgo.macos.browser.review.network-protection-extension</key>
+		<string>macOS NetP System Extension - Review</string>
+		<key>HKE973VLUW.com.duckduckgo.macos.browser.network-protection.system-extension.agent</key>
+		<string>macOS Network Protection Agent App (Distribution)</string>
+		<key>HKE973VLUW.com.duckduckgo.macos.browser.network-protection.system-extension.agent.review</key>
+		<string>macOS Network Protection Agent App Product Review</string>
+		<key>HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications</key>
+		<string>Mac Browser NetP Developer ID Not. (Distribution)</string>
+		<key>HKE973VLUW.com.duckduckgo.macos.browser.network-protection.notifications.review</key>
+		<string>MacOS Browser NetP Notifications Product Review</string>
 	</dict>
 	<key>signingCertificate</key>
 	<string></string>

@@ -168,4 +168,12 @@ extension NSColor {
 
     static let buttonColor: NSColor = NSColor(named: "ButtonColor")!
 
+    static var logoBackgroundColor: NSColor {
+        NSColor(named: "LogoBackgroundColor")!
+    }
+
+    var ciColor: CIColor {
+        CIColor(color: self)!
+    }
+
 }

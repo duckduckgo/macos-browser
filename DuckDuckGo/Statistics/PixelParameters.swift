@@ -104,7 +104,17 @@ extension Pixel.Event {
              .emailUserCreatedAlias,
              .emailUserPressedUseAlias,
              .emailUserPressedUseAddress,
-             .jsPixel:
+             .jsPixel,
+             .emailEnabledInitial,
+             .cookieManagementEnabledInitial,
+             .watchInDuckPlayerInitial,
+             .setAsDefaultInitial,
+             .importDataInitial,
+             .newTabInitial,
+             .networkProtectionSystemExtensionUnknownActivationResult,
+             .favoriteSectionHidden,
+             .recentActivitySectionHidden,
+             .continueSetUpSectionHidden:
 
             return nil
         }

@@ -337,6 +337,15 @@ final class TabTests: XCTestCase {
         withExtendedLifetime((c1, c2)) {}
     }
 
+    @MainActor
+    func testIfTabIsBurner_ThenFaviconManagerIsInMemory() throws {
+        let tab = Tab(content: .homePage, isBurner: false)
+        XCTAssertTrue(tab.faviconManagement === FaviconManager.shared)
+
+        let burnerTab = Tab(content: .homePage, isBurner: true)
+        XCTAssertTrue(burnerTab.faviconManagement !== FaviconManager.shared)
+    }
+
 }
 
 extension Tab {

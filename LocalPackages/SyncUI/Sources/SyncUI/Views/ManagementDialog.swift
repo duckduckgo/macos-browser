@@ -24,7 +24,7 @@ public enum ManagementDialogKind: Equatable {
     case deleteAccount(_ devices: [SyncDevice])
     case askToSyncAnotherDevice
     case syncAnotherDevice
-    case deviceSynced
+    case deviceSynced(_ devices: [SyncDevice])
     case saveRecoveryPDF
     case turnOffSync
     case deviceDetails(_ device: SyncDevice)
@@ -62,8 +62,8 @@ public struct ManagementDialog: View {
                 RecoverAccountView()
             case .syncAnotherDevice:
                 SyncAnotherDeviceView()
-            case .deviceSynced:
-                SyncSetupCompleteView()
+            case .deviceSynced(let devices):
+                SyncSetupCompleteView(devices: devices)
             case .saveRecoveryPDF:
                 SaveRecoveryPDFView()
             case .turnOffSync:

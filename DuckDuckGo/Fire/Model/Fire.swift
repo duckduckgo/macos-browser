@@ -19,6 +19,7 @@
 import Common
 import Foundation
 import BrowserServicesKit
+import DDGSync
 import PrivacyDashboard
 import WebKit
 
@@ -95,13 +96,16 @@ final class Fire {
     let stateRestorationManager: AppStateRestorationManager?
     let recentlyClosedCoordinator: RecentlyClosedCoordinating?
     let pinnedTabsManager: PinnedTabsManager
-
+    let bookmarkManager: BookmarkManager
+    let syncService: DDGSyncing?
     let tabsCleaner = TabDataCleaner()
+    let secureVaultFactory: SecureVaultFactory
 
     enum BurningData: Equatable {
         case specificDomains(_ domains: Set<String>)
         case all
     }
+
     @Published private(set) var burningData: BurningData?
 
     @MainActor
@@ -114,7 +118,10 @@ final class Fire {
          autoconsentManagement: AutoconsentManagement? = nil,
          stateRestorationManager: AppStateRestorationManager? = nil,
          recentlyClosedCoordinator: RecentlyClosedCoordinating? = RecentlyClosedCoordinator.shared,
-         pinnedTabsManager: PinnedTabsManager? = nil
+         pinnedTabsManager: PinnedTabsManager? = nil,
+         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+         syncService: DDGSyncing? = nil,
+         secureVaultFactory: SecureVaultFactory = SecureVaultFactory.default
     ) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating
@@ -124,6 +131,9 @@ final class Fire {
         self.faviconManagement = faviconManagement
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
         self.pinnedTabsManager = pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager
+        self.bookmarkManager = bookmarkManager
+        self.syncService = syncService ?? (NSApp.delegate as? AppDelegate)?.syncService
+        self.secureVaultFactory = secureVaultFactory
 
         if #available(macOS 11, *), autoconsentManagement == nil {
             self.autoconsentManagement = AutoconsentManagement.shared
@@ -148,6 +158,7 @@ final class Fire {
         os_log("Fire started", log: .fire)
 
         burnLastSessionState()
+        burnDeletedBookmarks()
 
         burningData = .specificDomains(domains)
 
@@ -222,12 +233,14 @@ final class Fire {
         burningData = .all
 
         burnLastSessionState()
+        burnDeletedBookmarks()
 
         let pinnedTabsViewModels = pinnedTabViewModels()
 
         tabsCleaner.prepareTabsForCleanup(allTabViewModels()) {
             let group = DispatchGroup()
             group.enter()
+
             Task {
                 await self.burnWebCache()
                 group.leave()
@@ -351,15 +364,27 @@ final class Fire {
 
     // MARK: - Favicons
 
+    private func autofillDomains() -> Set<String> {
+        guard let vault = try? secureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared),
+              let accounts = try? vault.accounts() else {
+            return []
+        }
+        return Set(accounts.map { $0.domain })
+    }
+
     private func burnFavicons(completion: @escaping () -> Void) {
+        let autofillDomains = autofillDomains()
         self.faviconManagement.burnExcept(fireproofDomains: FireproofDomains.shared,
                                           bookmarkManager: LocalBookmarkManager.shared,
+                                          savedLogins: autofillDomains,
                                           completion: completion)
     }
 
     private func burnFavicons(for domains: Set<String>, completion: @escaping () -> Void) {
+        let autofillDomains = autofillDomains()
         self.faviconManagement.burnDomains(domains,
-                                           except: LocalBookmarkManager.shared,
+                                           exceptBookmarks: LocalBookmarkManager.shared,
+                                           exceptSavedLogins: autofillDomains,
                                            completion: completion)
     }
 
@@ -434,6 +459,14 @@ final class Fire {
     @MainActor
     private func burnRecentlyClosed(domains: Set<String>? = nil) {
         recentlyClosedCoordinator?.burnCache(domains: domains)
+    }
+
+    // MARK: - Bookmarks cleanup
+
+    private func burnDeletedBookmarks() {
+        if syncService?.authState == .inactive {
+            LocalBookmarkManager.shared.cleanUpBookmarksDatabase()
+        }
     }
 }
 

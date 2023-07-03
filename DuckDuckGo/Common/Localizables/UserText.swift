@@ -41,6 +41,7 @@ struct UserText {
     static let pasteAndGo = NSLocalizedString("paste.and.go", value: "Paste & Go", comment: "Paste & Go button")
     static let pasteAndSearch = NSLocalizedString("paste.and.search", value: "Paste & Search", comment: "Paste & Search button")
     static let clear = NSLocalizedString("clear", value: "Clear", comment: "Clear button")
+    static let `continue` = NSLocalizedString("`continue`", value: "Continue", comment: "Continue button")
     static func openIn(value: String) -> String {
         let localized = NSLocalizedString("open.in",
                                           value: "Open in %@",
@@ -65,6 +66,7 @@ struct UserText {
     static let openSystemPreferences = NSLocalizedString("open.preferences", value: "Open System Preferences", comment: "Open System Preferences (to re-enable permission for the App) (up to and including macOS 12")
 
     static let unknownErrorMessage = NSLocalizedString("error.unknown", value: "An unknown error has occurred", comment: "Error page subtitle")
+    static let unknownErrorTryAgainMessage = NSLocalizedString("error.unknown.try.again", value: "An unknown error has occurred", comment: "Generic error message on a dialog for when the cause is not known.")
 
     static let moveTabToNewWindow = NSLocalizedString("options.menu.move.tab.to.new.window",
                                                       value: "Move Tab to New Window",
@@ -112,6 +114,7 @@ struct UserText {
     static let moreMenuItem = NSLocalizedString("sharing.more", value: "More…", comment: "Sharing Menu -> More…")
     static let findInPageMenuItem = NSLocalizedString("find.in.page.menu.item", value: "Find in Page…", comment: "Menu item title")
     static let shareMenuItem = NSLocalizedString("share.menu.item", value: "Share", comment: "Menu item title")
+    static let shareViaQRCodeMenuItem = NSLocalizedString("share.menu.item.qr.code", value: "Create QR Code", comment: "Menu item title")
     static let printMenuItem = NSLocalizedString("print.menu.item", value: "Print…", comment: "Menu item title")
     static let newWindowMenuItem = NSLocalizedString("new.window.menu.item", value: "New Window", comment: "Menu item title")
     static let newBurnerWindowMenuItem = NSLocalizedString("new.burner.window.menu.item", value: "New Burner Window", comment: "Menu item title")
@@ -202,8 +205,11 @@ struct UserText {
     static let passwordManagementLock = NSLocalizedString("passsword.management.lock", value: "Lock", comment: "Lock Logins Vault menu")
     static let passwordManagementUnlock = NSLocalizedString("passsword.management.unlock", value: "Unlock", comment: "Unlock Logins Vault menu")
 
-    static let importBrowserData = NSLocalizedString("import.browser.data", value: "Import Bookmarks and Passwords…", comment: "Opens Import Browser Data dialog")
-
+//    static let importBrowserData = NSLocalizedString("import.browser.data", value: "Import Bookmarks and Passwords…", comment: "Opens Import Browser Data dialog")
+    static let importBookmarks = NSLocalizedString("import.browser.data", value: "Import Bookmarks…", comment: "Opens Import Browser Data dialog")
+    static let importPasswords = NSLocalizedString("import.browser.data", value: "Import Passwords…", comment: "Opens Import Browser Data dialog")
+    static let exportLogins = NSLocalizedString("export.logins.data", value: "Export Passwords…", comment: "Opens Export Logins Data dialog")
+    static let exportBookmarks = NSLocalizedString("export.bookmarks.menu.item", value: "Export Bookmarks…", comment: "Export bookmarks menu item")
     static let bookmarks = NSLocalizedString("bookmarks", value: "Bookmarks", comment: "Button for bookmarks")
     static let favorites = NSLocalizedString("favorites", value: "Favorites", comment: "Title text for the Favorites menu item")
     static let bookmarksOpenInNewTabs = NSLocalizedString("bookmarks.open.in.new.tabs", value: "Open in New Tabs", comment: "Open all bookmarks in folder in new tabs")
@@ -215,6 +221,7 @@ struct UserText {
     static let bookmarkThisPage = NSLocalizedString("bookmark.this.page", value: "Bookmark This Page", comment: "Menu item for bookmarking current page")
     static let bookmarksShowToolbarPanel = NSLocalizedString("bookmarks.show-toolbar-panel", value: "Open Bookmarks Panel", comment: "Menu item for opening the bookmarks panel")
     static let bookmarksManageBookmarks = NSLocalizedString("bookmarks.manage-bookmarks", value: "Manage Bookmarks", comment: "Menu item for opening the bookmarks management interface")
+    static let bookmarkImportedFromFolder = NSLocalizedString("bookmarks.imported.from.folder", value: "Imported from", comment: "Name of the folder the imported bookmarks are saved into")
 
     static let zoom = NSLocalizedString("zoom", value: "Zoom", comment: "Menu with Zooming commands")
 
@@ -296,8 +303,8 @@ struct UserText {
     static let reopenAllWindowsFromLastSession = NSLocalizedString("preferences.reopen-windows", value: "Reopen all windows from last session", comment: "Option to control session restoration")
     static let theme = NSLocalizedString("preferences.appearance.theme", value: "Theme", comment: "Theme preferences")
     static let addressBar = NSLocalizedString("preferences.appearance.address-bar", value: "Address Bar", comment: "Theme preferences")
-    static let showFullWebsiteAddress = NSLocalizedString("preferences.appearance.show-full-url", value: "Show full website address", comment: "Option to show full URL in the address bar")
-    static let showAutocompleteSuggestions = NSLocalizedString("preferences.appearance.show-autocomplete-suggestions", value: "Show autocomplete suggestions", comment: "Option to show autocomplete suggestions in the address bar")
+    static let showFullWebsiteAddress = NSLocalizedString("preferences.appearance.show-full-url", value: "Full website address", comment: "Option to show full URL in the address bar")
+    static let showAutocompleteSuggestions = NSLocalizedString("preferences.appearance.show-autocomplete-suggestions", value: "Autocomplete suggestions", comment: "Option to show autocomplete suggestions in the address bar")
     static let zoomSettingTitle = NSLocalizedString("preferences.appearance.zoom", value: "Zoom", comment: "Zoom settings section title")
     static let zoomPickerTitle = NSLocalizedString("preferences.appearance.zoom-picker", value: "Default page zoom", comment: "Default page zoom picker title")
     static let defaultZoomPageMoreOptionsItem = NSLocalizedString("more-options.zoom.default-zoom-page", value: "Change Default Page Zoom…", comment: "Default page zoom picker title")
@@ -492,12 +499,12 @@ struct UserText {
     static let downloadsActiveAlertMessageFormat = NSLocalizedString("downloads.active.alert.message.format", value: "Are you sure you want to quit? DuckDuckGo Privacy Browser is currently downloading “%@”%@. If you quit now DuckDuckGo Privacy Browser won’t finish downloading this file.", comment: "Alert text format when trying to quit application while file “filename”[, and others] are being downloaded")
     static let downloadsActiveAlertMessageAndOthers = NSLocalizedString("downloads.active.alert.message.and.others", value: ", and other files", comment: "Alert text format element for “, and other files”")
 
-    static let exportLoginsFailedMessage = NSLocalizedString("export.logins.failed.message", value: "Failed to Export Logins", comment: "Alert title when exporting login data fails")
+    static let exportLoginsFailedMessage = NSLocalizedString("export.logins.failed.message", value: "Failed to Export Passwords", comment: "Alert title when exporting login data fails")
     static let exportLoginsFailedInformative = NSLocalizedString("export.logins.failed.informative", value: "Please check that no file exists at the location you selected.", comment: "Alert message when exporting login data fails")
-    static let exportBookmarksFailedMessage = NSLocalizedString("export.bookmarks.failed.message", value: "Failed to Export Bookmarks", comment: "Alert title when exporting login data fails")
+    static let exportBookmarksFailedMessage = NSLocalizedString("export.bookmarks.failed.message", value: "Failed to Export Bookmarks…", comment: "Alert title when exporting login data fails")
     static let exportBookmarksFailedInformative = NSLocalizedString("export.bookmarks.failed.informative", value: "Please check that no file exists at the location you selected.", comment: "Alert message when exporting bookmarks fails")
 
-    static let exportLoginsFileNameSuffix = NSLocalizedString("export.logins.file.name.suffix", value: "Logins", comment: "The last part of the suggested file name for exporting logins")
+    static let exportLoginsFileNameSuffix = NSLocalizedString("export.logins.file.name.suffix", value: "Passwords", comment: "The last part of the suggested file name for exporting logins")
     static let exportBookmarksFileNameSuffix = NSLocalizedString("export.bookmarks.file.name.suffix", value: "Bookmarks", comment: "The last part of the suggested file for exporting bookmarks")
     static let exportLoginsWarning = NSLocalizedString("export.logins.warning", value: "This file contains your passwords in plain text and should be saved in a secure location and deleted when you are done.\nAnyone with access to this file will be able to read your passwords.", comment: "Warning text presented when exporting logins.")
 
@@ -562,10 +569,13 @@ struct UserText {
     static let cookiePopupHiddenNotification = NSLocalizedString("notification.badge.popuphidden", value: "Pop-up Hidden", comment: "Notification that appears when browser cosmetically hides a cookie popup")
 
     static let autoconsentModalTitle = NSLocalizedString("autoconsent.modal.title", value: "Looks like this site has a cookie pop-up 👇", comment: "Title for modal asking the user to auto manage cookies")
+    static let autoconsentFromSetUpModalTitle = NSLocalizedString("autoconsent.from.setup.modal.title", value: "Want DuckDuckGo to handle cookie pop-ups?", comment: "Title for modal asking the user to auto manage cookies")
 
     static let autoconsentModalBody = NSLocalizedString("autoconsent.modal.body", value: "Want me to handle these for you? I can try to minimize cookies, maximize privacy, and hide pop-ups like these.", comment: "Body for modal asking the user to auto manage cookies")
+    static let autoconsentFromSetUpModalBody = NSLocalizedString("autoconsent.from.setup.modal.body", value: "When we detect cookie pop-ups on sites you visit, we can try to select the most private settings available and hide pop-ups like this.", comment: "Body for modal asking the user to auto manage cookies")
 
     static let autoconsentModalConfirmButton = NSLocalizedString("autoconsent.modal.cta.confirm", value: "Manage Cookie Pop-ups", comment: "Confirm button for modal asking the user to auto manage cookies")
+    static let autoconsentFromSetUpModalConfirmButton = NSLocalizedString("autoconsent.from.setup.modal.cta.confirm", value: "Handle Pop-ups For Me", comment: "Confirm button for modal asking the user to auto manage cookies")
     static let autoconsentModalDenyButton = NSLocalizedString("autoconsent.modal.cta.deny", value: "No Thanks", comment: "Deny button for modal asking the user to auto manage cookies")
 
     static let clearThisHistoryMenuItem = NSLocalizedString("history.menu.clear.this.history", value: "Clear This History…", comment: "Menu item to clear parts of history and data")
@@ -586,6 +596,9 @@ struct UserText {
     static let bookmarksBarContextMenuCopy = NSLocalizedString("bookmarks.bar.context-menu.copy", value: "Copy", comment: "Copy menu item for the bookmarks bar context menu")
     static let bookmarksBarContextMenuDelete = NSLocalizedString("bookmarks.bar.context-menu.delete", value: "Delete", comment: "Delete menu item for the bookmarks bar context menu")
     static let bookmarksBarContextMenuMoveToEnd = NSLocalizedString("bookmarks.bar.context-menu.move-to-end", value: "Move to End", comment: "Move to End menu item for the bookmarks bar context menu")
+
+    static let inviteDialogGetStartedButton = NSLocalizedString("invite.dialog.get.started.button", value: "Get Started", comment: "Get Started button on an invite dialog")
+    static let inviteDialogUnrecognizedCodeMessage = NSLocalizedString("invite.dialog.unrecognized.code.message", value: "We didn’t recognize this Invite Code.", comment: "Message to show after user enters an unrecognized invite code")
 
     // MARK: - Bitwarden
 
@@ -639,6 +652,9 @@ struct UserText {
     static let showDownloadsShortcut = NSLocalizedString("pinning.show-downloads-shortcut", value: "Show Downloads Shortcut", comment: "Menu item for showing the downloads shortcut")
     static let hideDownloadsShortcut = NSLocalizedString("pinning.hide-downloads-shortcut", value: "Hide Downloads Shortcut", comment: "Menu item for hiding the downloads shortcut")
 
+    static let showNetworkProtectionShortcut = NSLocalizedString("pinning.show-netp-shortcut", value: "Show Network Protection", comment: "Menu item for showing the NetP shortcut")
+    static let hideNetworkProtectionShortcut = NSLocalizedString("pinning.hide-netp-shortcut", value: "Hide Network Protection", comment: "Menu item for hiding the NetP shortcut")
+
     // MARK: - Tooltips
 
     static let autofillShortcutTooltip = NSLocalizedString("tooltip.autofill.shortcut", value: "Autofill", comment: "Tooltip for the autofill shortcut")
@@ -651,6 +667,7 @@ struct UserText {
     static let newBookmarkTooltip = NSLocalizedString("tooltip.bookmarks.new-bookmark", value: "New bookmark", comment: "Tooltip for the New Bookmark button")
     static let newFolderTooltip = NSLocalizedString("tooltip.bookmarks.new-folder", value: "New folder", comment: "Tooltip for the New Folder button")
     static let manageBookmarksTooltip = NSLocalizedString("tooltip.bookmarks.manage-bookmarks", value: "Manage bookmarks", comment: "Tooltip for the Manage Bookmarks button")
+    static let bookmarksManage = NSLocalizedString("bookmarks.manage", value: "Manage", comment: "Button for opening the bookmarks management interface")
 
     static let openDownloadsFolderTooltip = NSLocalizedString("tooltip.downloads.open-downloads-folder", value: "Open downloads folder", comment: "Tooltip for the Open Downloads Folder button")
     static let clearDownloadHistoryTooltip = NSLocalizedString("tooltip.downloads.clear-download-history", value: "Clear download history", comment: "Tooltip for the Clear Downloads button")
@@ -711,6 +728,39 @@ struct UserText {
     static let noAccessToSelectedFolderHeader = NSLocalizedString("no.access.to.selected.folder.header", value: "DuckDuckGo needs permission to access selected folder", comment: "Header of the alert dialog informing user about failed download")
     static let noAccessToSelectedFolder = NSLocalizedString("no.access.to.selected.folder", value: "Grant access to the location of download.", comment: "Alert presented to user if the app doesn't have rights to access selected folder")
 
+    // MARK: New Tab
+    // Context Menu
+    static let newTabBottomPopoverTitle = NSLocalizedString("newTab.bottom.popover.title", value: "New Tab Page", comment: "Title of the popover that appears when pressing the bottom right button")
+    static let newTabMenuItemShowFavorite = NSLocalizedString("newTab.menu.item.show.favorite", value: "Show Favorites", comment: "Title of the menu item in the home page to show/hide favorite section")
+    static let newTabMenuItemShowContinuteSetUp = NSLocalizedString("newTab.menu.item.show.continue.setup", value: "Show Next Steps", comment: "Title of the menu item in the home page to show/hide continue setup section")
+    static let newTabMenuItemShowRecentActivity = NSLocalizedString("newTab.menu.item.show.recent.activity", value: "Show Recent Activity", comment: "Title of the menu item in the home page to show/hide recent activity section")
+
+    // Favorites
+    static let newTabFavoriteSectionTitle = NSLocalizedString("newTab.favorites.section.title", value: "Favorites", comment: "Title of the Favorites section in the home page")
+
+    // Set Up
+    static let newTabSetUpSectionTitle = NSLocalizedString("newTab.setup.section.title", value: "Next Steps", comment: "Title of the setup section in the home page")
+    static let newTabSetUpDefaultBrowserCardTitle = NSLocalizedString("newTab.setup.default.browser.title", value: "Default to Privacy", comment: "Title of the Default Browser card of the Set Up section in the home page")
+    static let newTabSetUpImportCardTitle = NSLocalizedString("newTab.setup.import.title", value: "Bring Your Stuff", comment: "Title of the Import card of the Set Up section in the home page")
+    static let newTabSetUpDuckPlayerCardTitle = NSLocalizedString("newTab.setup.duck.player.title", value: "Clean Up YouTube", comment: "Title of the Duck Player card of the Set Up section in the home page")
+    static let newTabSetUpEmailProtectionCardTitle = NSLocalizedString("newTab.setup.email.protection.title", value: "Protect Your Inbox", comment: "Title of the Email Protection card of the Set Up section in the home page")
+    static let newTabSetUpCookieManagerCardTitle = NSLocalizedString("newTab.setup.cookie.manager.title", value: "Let Us Handle Cookie Pop-ups", comment: "Title of the Cookie Manager card of the Set Up section in the home page")
+
+    static let newTabSetUpDefaultBrowserAction = NSLocalizedString("newTab.setup.default.browser.action", value: "Make Default Browser", comment: "Action title on the action menu of the Default Browser card")
+    static let newTabSetUpImportAction = NSLocalizedString("newTab.setup.Import.action", value: "Import Now", comment: "Action title on the action menu of the Import card of the Set Up section in the home page")
+    static let newTabSetUpDuckPlayerAction = NSLocalizedString("newTab.setup.duck.player.action", value: "Try Duck Player", comment: "Action title on the action menu of the Duck Player card of the Set Up section in the home page")
+    static let newTabSetUpEmailProtectionAction = NSLocalizedString("newTab.setup.email.protection.action", value: "Get a Duck Address", comment: "Action title on the action menu of the Email Protection card of the Set Up section in the home page")
+    static let newTabSetUpCookieManagerAction = NSLocalizedString("newTab.setup.cookie.manager.action", value: "Handle Pop-ups For Me", comment: "Action title on the action menu of the Cookie Manager card of the Set Up section in the home page")
+    static let newTabSetUpRemoveItemAction = NSLocalizedString("newTab.setup.remove.item", value: "Dismiss", comment: "Action title on the action menu of the set up cards card of the SetUp section in the home page to remove the item")
+
+    static let newTabSetUpDefaultBrowserSummary = NSLocalizedString("newTab.setup.default.browser.summary", value: "We automatically block trackers as you browse. It's privacy, simplified.", comment: "Summary of the Default Browser card")
+    static let newTabSetUpImportSummary = NSLocalizedString("newTab.setup.import.summary", value: "Import bookmarks, favorites, and passwords from your old browser.", comment: "Summary of the Import card of the Set Up section in the home page")
+    static let newTabSetUpDuckPlayerSummary = NSLocalizedString("newTab.setup.duck.player.summary", value: "Enjoy a clean viewing experience without personalized ads.", comment: "Summary of the Duck Player card of the Set Up section in the home page")
+    static let newTabSetUpEmailProtectionSummary = NSLocalizedString("newTab.setup.email.protection.summary", value: "Generate custom @duck.com addresses that clean trackers from incoming email.", comment: "Summary of the Email Protection card of the Set Up section in the home page")
+    static let newTabSetUpCookieManagerSummary = NSLocalizedString("newTab.setup.cookie.manager.summary", value: "We need your permission to say no to cookies on your behalf. Easy choice.", comment: "Summary of the Cookie Manager card of the Set Up section in the home page")
+
+    // Recent Activity
+    static let newTabRecentActivitySectionTitle = NSLocalizedString("newTab.recent.activity.section.title", value: "Recent Activity", comment: "Title of the RecentActivity section in the home page")
     static let burnerWindowHeader = NSLocalizedString("burner.window.header", value: "Burner Window", comment: "Header shown on the hompage of the burner window")
     static let burnerTabHomeTitle = NSLocalizedString("burner.tab.home.title", value: "New Burner Tab", comment: "Tab title for burner tab")
     static let burnerHomepageDescription1 = NSLocalizedString("burner.homepage.description.1", value: "All DuckDuckGo windows block most hidden trackers so websites can't spy on you.", comment: "")
@@ -718,10 +768,5 @@ struct UserText {
     static let burnerHomepageDescription3 = NSLocalizedString("burner.homepage.description.3", value: "Burner Windows make it easier to:", comment: "")
     static let burnerHomepageDescription4 = NSLocalizedString("burner.homepage.description.4", value: "Sign into a site with a different account", comment: "")
     static let burnerHomepageDescription5 = NSLocalizedString("burner.homepage.description.5", value: "View websites without signing in", comment: "")
-
-
-
-
-
 }
 

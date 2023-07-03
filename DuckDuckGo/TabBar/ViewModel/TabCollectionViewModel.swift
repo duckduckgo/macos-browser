@@ -174,6 +174,14 @@ final class TabCollectionViewModel: NSObject {
         }
     }
 
+    @discardableResult func select(tab: Tab, forceChange: Bool = false) -> Bool {
+        guard let index = tabCollection.tabs.firstIndex(where: { $0 == tab }) else {
+            return false
+        }
+
+        return selectUnpinnedTab(at: index, forceChange: forceChange)
+    }
+
     @discardableResult func selectDisplayableTabIfPresent(_ content: Tab.TabContent) -> Bool {
         guard changesEnabled else { return false }
         guard content.isDisplayable else { return false }
@@ -266,6 +274,9 @@ final class TabCollectionViewModel: NSObject {
         guard changesEnabled || forceChange else { return }
 
         tabCollection.append(tab: tab)
+        if tab.content == .homePage {
+            NotificationCenter.default.post(name: HomePage.Models.newHomePageTabOpen, object: nil)
+        }
 
         if selected {
             selectUnpinnedTab(at: tabCollection.tabs.count - 1, forceChange: forceChange)

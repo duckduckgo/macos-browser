@@ -147,7 +147,7 @@ extension TabExtensionsBuilder {
             HoveredLinkTabExtension(hoverUserScriptPublisher: userScripts.map(\.?.hoverUserScript))
         }
         add {
-            FindInPageTabExtension(findInPageScriptPublisher: userScripts.map(\.?.findInPageScript))
+            FindInPageTabExtension()
         }
         add {
             DownloadsTabExtension(downloadManager:

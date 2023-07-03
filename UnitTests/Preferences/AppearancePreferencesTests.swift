@@ -20,6 +20,9 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
+    var isFavoriteVisible: Bool
+    var isContinueSetUpVisible: Bool
+    var isRecentActivityVisible: Bool
     var showFullURL: Bool
     var showAutocompleteSuggestions: Bool
     var currentThemeName: String
@@ -29,12 +32,18 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         showFullURL: Bool = false,
         showAutocompleteSuggestions: Bool = true,
         currentThemeName: String = ThemeName.systemDefault.rawValue,
-        defaultPageZoom: CGFloat = DefaultZoomValue.percent100.rawValue
+        defaultPageZoom: CGFloat = DefaultZoomValue.percent100.rawValue,
+        isContinueSetUpVisible: Bool = true,
+        isFavoriteVisible: Bool = true,
+        isRecentActivityVisible: Bool = true
     ) {
         self.showFullURL = showFullURL
         self.showAutocompleteSuggestions = showAutocompleteSuggestions
         self.currentThemeName = currentThemeName
         self.defaultPageZoom = defaultPageZoom
+        self.isContinueSetUpVisible = isContinueSetUpVisible
+        self.isFavoriteVisible = isFavoriteVisible
+        self.isRecentActivityVisible = isRecentActivityVisible
     }
 }
 
@@ -46,7 +55,10 @@ final class AppearancePreferencesTests: XCTestCase {
                 showFullURL: false,
                 showAutocompleteSuggestions: true,
                 currentThemeName: ThemeName.systemDefault.rawValue,
-                defaultPageZoom: DefaultZoomValue.percent100.rawValue
+                defaultPageZoom: DefaultZoomValue.percent100.rawValue,
+                isContinueSetUpVisible: true,
+                isFavoriteVisible: true,
+                isRecentActivityVisible: true
             )
         )
 
@@ -54,19 +66,28 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.showAutocompleteSuggestions, true)
         XCTAssertEqual(model.currentThemeName, ThemeName.systemDefault)
         XCTAssertEqual(model.defaultPageZoom, DefaultZoomValue.percent100)
+        XCTAssertEqual(model.isFavoriteVisible, true)
+        XCTAssertEqual(model.isContinueSetUpVisible, true)
+        XCTAssertEqual(model.isRecentActivityVisible, true)
 
         model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
                 showFullURL: true,
                 showAutocompleteSuggestions: false,
                 currentThemeName: ThemeName.light.rawValue,
-                defaultPageZoom: DefaultZoomValue.percent50.rawValue
+                defaultPageZoom: DefaultZoomValue.percent50.rawValue,
+                isContinueSetUpVisible: false,
+                isFavoriteVisible: false,
+                isRecentActivityVisible: false
             )
         )
         XCTAssertEqual(model.showFullURL, true)
         XCTAssertEqual(model.showAutocompleteSuggestions, false)
         XCTAssertEqual(model.currentThemeName, ThemeName.light)
         XCTAssertEqual(model.defaultPageZoom, DefaultZoomValue.percent50)
+        XCTAssertEqual(model.isFavoriteVisible, false)
+        XCTAssertEqual(model.isContinueSetUpVisible, false)
+        XCTAssertEqual(model.isRecentActivityVisible, false)
     }
 
     func testWhenInitializedWithGarbageThenThemeIsSetToSystemDefault() throws {
@@ -111,5 +132,40 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(persister.defaultPageZoom, randomZoomLevel.rawValue)
         let savedZoomValue = UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: DefaultZoomValue.percent100.rawValue).wrappedValue
         XCTAssertEqual(savedZoomValue, randomZoomLevel.rawValue)
+    }
+
+    func testWhenNewTabPreferencesAreUpdatedThenPersistedValuesAreUpdated() throws {
+        let model = AppearancePreferences(persistor: AppearancePreferencesPersistorMock())
+
+        model.isRecentActivityVisible = true
+        XCTAssertEqual(model.isRecentActivityVisible, true)
+        model.isFavoriteVisible = true
+        XCTAssertEqual(model.isFavoriteVisible, true)
+        model.isContinueSetUpVisible = true
+        XCTAssertEqual(model.isContinueSetUpVisible, true)
+
+        model.isRecentActivityVisible = false
+        XCTAssertEqual(model.isRecentActivityVisible, false)
+        model.isFavoriteVisible = false
+        XCTAssertEqual(model.isFavoriteVisible, false)
+        model.isContinueSetUpVisible = false
+        XCTAssertEqual(model.isContinueSetUpVisible, false)
+    }
+
+    func testPersisterReturnsValuesFromDisk() {
+        UserDefaultsWrapper<Any>.clearAll()
+        var persister1 = AppearancePreferencesUserDefaultsPersistor()
+        var persister2 = AppearancePreferencesUserDefaultsPersistor()
+
+        persister2.isFavoriteVisible = false
+        persister1.isFavoriteVisible = true
+        persister2.isRecentActivityVisible = false
+        persister1.isRecentActivityVisible = true
+        persister2.isContinueSetUpVisible = false
+        persister1.isContinueSetUpVisible = true
+
+        XCTAssertTrue(persister2.isFavoriteVisible)
+        XCTAssertTrue(persister2.isRecentActivityVisible)
+        XCTAssertTrue(persister2.isContinueSetUpVisible)
     }
 }

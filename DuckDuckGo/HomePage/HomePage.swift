@@ -31,5 +31,7 @@ struct HomePage {
 
     static let favoritesPerRow = 6
     static let favoritesRowCountWhenCollapsed = 1
+    static let featuresPerRow = 2
+    static let featureRowCountWhenCollapsed = 1
 
 }

@@ -27,4 +27,8 @@ extension NSSize {
         width < size.width && height < size.height
     }
 
+    func scaled(by scaleFactor: CGFloat) -> NSSize {
+        NSSize(width: width * scaleFactor, height: height * scaleFactor)
+    }
+
 }

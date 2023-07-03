@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import Common
 
 enum SecureVaultItem: Equatable, Identifiable, Comparable {
 
@@ -115,7 +116,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
     var displayTitle: String {
         switch self {
         case .account(let account):
-            return ((account.title ?? "").isEmpty == true ? account.domain.droppingWwwPrefix() : account.title) ?? ""
+            return ((account.title ?? "").isEmpty == true ? account.domain : account.title) ?? ""
         case .card(let card):
             return card.title
         case .identity(let identity):
@@ -152,11 +153,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
             return defaultFirstCharacter
         }
 
-        if character.isLetter {
-            return character.uppercased()
-        } else {
-            return defaultFirstCharacter
-        }
+        return character.isLetter ? character.uppercased() : defaultFirstCharacter
     }
 
     var category: SecureVaultSorting.Category {
@@ -241,8 +238,11 @@ final class PasswordManagementItemListModel: ObservableObject {
         didSet {
             updateFilteredData()
             calculateEmptyState()
+            itemCount = items.count
         }
     }
+
+    @Published private(set) var itemCount: Int = 0
 
     @Published var sortDescriptor = SecureVaultSorting.default {
         didSet {
@@ -311,8 +311,15 @@ final class PasswordManagementItemListModel: ObservableObject {
     }
 
     func selectLoginWithDomainOrFirst(domain: String, notify: Bool = true) {
+        let websiteAccounts = items
+            .compactMap { $0.websiteAccount }
+        let bestMatch = websiteAccounts.sortedForDomain(domain, tld: ContentBlocking.shared.tld, removeDuplicates: true)
         for section in displayedItems {
-            if let account = section.items.first(where: { $0.websiteAccount?.domain.droppingWwwPrefix() == domain.droppingWwwPrefix() }) {
+            if let account = section.items.first(where: {
+                $0.websiteAccount?.username == bestMatch.first?.username &&
+                $0.websiteAccount?.domain == bestMatch.first?.domain &&
+                $0.websiteAccount?.signature == bestMatch.first?.signature
+            }) {
                 selected(item: account, notify: notify)
                 return
             }
@@ -359,7 +366,7 @@ final class PasswordManagementItemListModel: ObservableObject {
 
         switch sortDescriptor.parameter {
         case .title:
-            displayedItems = PasswordManagementListSection.sections(with: itemsByCategory, by: \.firstCharacter, order: sortDescriptor.order)
+            displayedItems = PasswordManagementListSection.sectionsByTLD(with: itemsByCategory, order: sortDescriptor.order)
         case .dateCreated:
             displayedItems = PasswordManagementListSection.sections(with: itemsByCategory, by: \.created, order: sortDescriptor.order)
         case .dateModified:

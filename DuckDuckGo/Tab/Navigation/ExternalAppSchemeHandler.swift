@@ -79,6 +79,11 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         navigationAction.targetFrame?.webView?.makeMeFirstResponder()
         navigationAction.targetFrame?.webView?.removeFocusFromWebView()
 
+        if let targetSecurityOrigin = navigationAction.targetFrame?.securityOrigin,
+           navigationAction.sourceFrame.securityOrigin != targetSecurityOrigin {
+            return .cancel
+        }
+
         let permissionType = PermissionType.externalScheme(scheme: scheme)
         // use domain from the url for user-entered app schemes, otherwise use current website domain
         let domain = navigationAction.isUserEnteredUrl ? navigationAction.url.host ?? "" : navigationAction.sourceFrame.securityOrigin.host

@@ -156,14 +156,16 @@ extension WindowControllersManager {
             }
         }
 
+        let nonPopupMainWindowControllers = mainWindowControllers.filter { $0.window?.isPopUpWindow == false }
+
         // If there is a main window, open the URL in it
-        if let windowController = mainWindowControllers.first(where: { $0.window?.isMainWindow == true && $0.window?.isPopUpWindow == false })
+        if let windowController = nonPopupMainWindowControllers.first(where: { $0.window?.isMainWindow == true })
             // If a last key window is available, open the URL in it
             ?? lastKeyMainWindowController
             // If there is any open window on the current screen, open the URL in it
-            ?? mainWindowControllers.first(where: { $0.window?.screen == NSScreen.main && $0.window?.isPopUpWindow == false })
-            // If there is any window available, open the URL in it
-            ?? { mainWindowControllers.first?.window?.isPopUpWindow == false ? mainWindowControllers.first : nil }() {
+            ?? nonPopupMainWindowControllers.first(where: { $0.window?.screen == NSScreen.main })
+            // If there is any non-popup window available, open the URL in it
+            ?? nonPopupMainWindowControllers.first {
 
             show(url: url, in: windowController)
             return
@@ -185,6 +187,28 @@ extension WindowControllersManager {
         tabCollectionViewModel.appendNewTab(with: content)
         windowController.window?.orderFront(nil)
     }
+
+    // MARK: - Network Protection
+
+#if NETWORK_PROTECTION
+    @MainActor
+    func showNetworkProtectionStatus(retry: Bool = false) async {
+        guard let windowController = mainWindowControllers.first else {
+            guard !retry else {
+                return
+            }
+
+            WindowsManager.openNewWindow()
+
+            // Not proud of this ugly hack... ideally openNewWindow() should let us know when the window is ready
+            try? await Task.sleep(interval: 0.5)
+            await showNetworkProtectionStatus(retry: true)
+            return
+        }
+
+        windowController.mainViewController.navigationBarViewController.showNetworkProtectionStatus()
+    }
+#endif
 
 }
 

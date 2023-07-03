@@ -108,11 +108,15 @@ final class HistoryTabExtension: NSObject {
     }
 
     private func updateVisitTitle(_ title: String) {
+        guard !isBurner else { return }
+
         guard let url else { return }
         historyCoordinating.updateTitleIfNeeded(title: title, url: url)
     }
 
     private func commitBeforeClosing() {
+        guard !isBurner else { return }
+
         guard let url else { return }
         historyCoordinating.commitChanges(url: url)
     }

@@ -61,10 +61,10 @@ final class DownloadListCoordinatorTests: XCTestCase {
         }
     }
 
-    func setUpCoordinatorAndAddDownload() -> (WKDownloadMock, WebKitDownloadTask, UUID) {
+    func setUpCoordinatorAndAddDownload(isBurner: Bool = false) -> (WKDownloadMock, WebKitDownloadTask, UUID) {
         setUpCoordinator()
         let download = WKDownloadMock()
-        let task = WebKitDownloadTask(download: download, promptForLocation: false, destinationURL: destURL, tempURL: tempURL, isBurner: false)
+        let task = WebKitDownloadTask(download: download, promptForLocation: false, destinationURL: destURL, tempURL: tempURL, isBurner: isBurner)
 
         let e = expectation(description: "download added")
         var id: UUID!
@@ -179,6 +179,26 @@ final class DownloadListCoordinatorTests: XCTestCase {
                 XCTAssertEqual(item.destinationURL, self.destURL)
                 XCTAssertNil(item.tempURL)
                 XCTAssertNil(item.progress)
+            }
+        }
+
+        task.downloadDidFinish(download.asWKDownload())
+
+        withExtendedLifetime(c) {
+            waitForExpectations(timeout: 1)
+        }
+        XCTAssertFalse(coordinator.hasActiveDownloads)
+    }
+
+    func testWhenDownloadFromBurnerWindowFinishesThenDownloadItemRemoved() {
+        let (download, task, _) = setUpCoordinatorAndAddDownload(isBurner: true)
+
+        let taskRemoved = expectation(description: "Task removed")
+        let c = coordinator.updates.sink { (kind, item) in
+            XCTAssertTrue(item.isBurner)
+
+            if case .removed = kind {
+                taskRemoved.fulfill()
             }
         }
 

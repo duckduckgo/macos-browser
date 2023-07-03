@@ -349,7 +349,7 @@ final class FutureExtensionTests: XCTestCase {
         let future = subj.first().promise()
         subj.send(1)
 
-        let result = await future.get()
+        let result = try await future.get()
         XCTAssertEqual(result, 1)
     }
 
