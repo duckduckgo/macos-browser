@@ -526,8 +526,9 @@ extension NetworkProtectionStatusView {
         /// Start network protection.
         ///
         private func startNetworkProtection() {
+            toggleTransition = .switchingOn(locallyInitiated: true)
+
             Task { @MainActor in
-                toggleTransition = .switchingOn(locallyInitiated: true)
                 await tunnelController.start()
                 refreshInternalIsRunning()
                 toggleTransition = .idle
@@ -537,8 +538,9 @@ extension NetworkProtectionStatusView {
         /// Stop network protection.
         ///
         private func stopNetworkProtection() {
+            toggleTransition = .switchingOff(locallyInitiated: true)
+
             Task { @MainActor in
-                toggleTransition = .switchingOff(locallyInitiated: true)
                 await tunnelController.stop()
                 refreshInternalIsRunning()
                 toggleTransition = .idle
