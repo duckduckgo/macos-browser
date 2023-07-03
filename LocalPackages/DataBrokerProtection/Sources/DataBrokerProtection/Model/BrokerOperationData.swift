@@ -70,7 +70,7 @@ public final class OptOutOperationData: BrokerOperationData {
     let brokerProfileQueryID: UUID
     var preferredRunDate: Date?
     var historyEvents: [HistoryEvent]
-    var lastRunDate: Date? 
+    var lastRunDate: Date?
     var extractedProfile: ExtractedProfile
 
     internal init(id: UUID = UUID(),
