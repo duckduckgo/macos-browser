@@ -49,8 +49,6 @@ final class Fire {
     }
 
     enum BurningEntity {
-        //TODO! case visits
-        //TODO! rewrite case domains
         case none(selectedDomains: Set<String>)
         case tab(tabViewModel: TabViewModel,
                  selectedDomains: Set<String>,
@@ -59,7 +57,6 @@ final class Fire {
                     selectedDomains: Set<String>)
         case allWindows(mainWindowControllers: [MainWindowController],
                         selectedDomains: Set<String>)
-        //TODO! allWindows
     }
 
     @Published private(set) var burningData: BurningData?
@@ -174,7 +171,6 @@ final class Fire {
 
         burningData = .all
 
-        //TODO! special entity
         let entity = BurningEntity.allWindows(mainWindowControllers: windowControllerManager.mainWindowControllers, selectedDomains: Set())
 
         burnLastSessionState()
@@ -468,7 +464,7 @@ final class Fire {
             var pinnedTabViewModels = Array(pinnedTabsManager.tabViewModels.values)
             let tabViewModels = Array(tabCollectionViewModel.tabViewModels.values)
             return pinnedTabViewModels + tabViewModels
-        case .allWindows(mainWindowControllers: _, selectedDomains: _):
+        case .allWindows:
             var pinnedTabViewModels = Array(pinnedTabsManager.tabViewModels.values)
             var tabViewModels = windowControllerManager.allTabViewModels
             return pinnedTabViewModels + tabViewModels

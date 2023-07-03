@@ -36,6 +36,8 @@ final class HistoryTabExtension: NSObject {
             _localHistory = newValue
         }
     }
+
+    // swiftlint:disable:next identifier_name
     private(set) var _localHistory = [Visit]()
 
     // Used to identify visits of the tab from previous app sessions
