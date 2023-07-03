@@ -27,6 +27,9 @@ final class TabViewModel {
         static let burnerHome = NSImage(named: "BurnerTabFavicon")!
         static let preferences = NSImage(named: "Preferences")!
         static let bookmarks = NSImage(named: "Bookmarks")!
+#if DBP
+        static let dataBrokerProtection = NSImage(named: "BurnerWindowPopoverIcon1")! // PLACEHOLDER: Change it once we have the final icon
+#endif
     }
 
     private(set) var tab: Tab
@@ -248,6 +251,10 @@ final class TabViewModel {
         }
 
         switch tab.content {
+#if DBP
+        case .dataBrokerProtection:
+            title = UserText.tabDataBrokerProtectionTitle
+#endif
         case .preferences:
             title = UserText.tabPreferencesTitle
         case .bookmarks:
@@ -279,6 +286,11 @@ final class TabViewModel {
         }
 
         switch tab.content {
+#if DBP
+        case .dataBrokerProtection:
+            favicon = Favicon.dataBrokerProtection
+            return
+#endif
         case .homePage:
             if tab.burnerMode.isBurner {
                 favicon = Favicon.burnerHome
