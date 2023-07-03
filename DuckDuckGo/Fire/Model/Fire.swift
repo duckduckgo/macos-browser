@@ -190,7 +190,7 @@ final class Fire {
             self.burnTabs(burningEntity: .allWindows(mainWindowControllers: windowControllers, selectedDomains: Set())) {
                 Task {
                     await self.burnWebCache()
-                    self.burnHistory(ofEntity: entity) {
+                    self.burnHistory {
                         self.burnPermissions {
                             self.burnFavicons {
                                 self.burnDownloads()
@@ -425,7 +425,6 @@ final class Fire {
                     tabCollectionViewModel.replaceTab(at: index, with: tab, forceChange: true)
                 }
             } else {
-                //TODO! Avoid storing to localHistoryOfRemovedTabs
                 tabCollectionViewModel.removeSelected(forceChange: true)
             }
         case .window(tabCollectionViewModel: let tabCollectionViewModel,

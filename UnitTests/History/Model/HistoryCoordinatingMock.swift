@@ -24,12 +24,15 @@ import Common
 final class HistoryCoordinatingMock: HistoryCoordinating {
 
     var history: History?
+    var allHistoryVisits: [DuckDuckGo_Privacy_Browser.Visit]?
     @Published private(set) var historyDictionary: [URL: DuckDuckGo_Privacy_Browser.HistoryEntry]?
     var historyDictionaryPublisher: Published<[URL: DuckDuckGo_Privacy_Browser.HistoryEntry]?>.Publisher { $historyDictionary }
 
     var addVisitCalled = false
-    func addVisit(of url: URL) {
+    var visit: Visit?
+    func addVisit(of url: URL) -> DuckDuckGo_Privacy_Browser.Visit? {
         addVisitCalled = true
+        return visit
     }
 
     var updateTitleIfNeededCalled = false
@@ -50,6 +53,12 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
     var burnCalled = false
     func burn(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void) {
         burnCalled = true
+        completion()
+    }
+
+    var burnAllCalled = false
+    func burnAll(completion: @escaping () -> Void) {
+        burnAllCalled = true
         completion()
     }
 

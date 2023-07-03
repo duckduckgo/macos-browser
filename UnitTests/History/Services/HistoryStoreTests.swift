@@ -364,7 +364,7 @@ final class HistoryStoreTests: XCTestCase {
                 case .failure(let error):
                     XCTFail("Saving of history entry failed - \(error.localizedDescription)", file: file, line: line)
                 }
-            } receiveValue: {}
+            } receiveValue: { _ in }
             .store(in: &cancellables)
     }
 }

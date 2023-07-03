@@ -106,10 +106,10 @@ final class TabCollectionTests: XCTestCase {
         let url = URL.duckDuckGo
 
         let tabCollection = TabCollection()
-
+        let historyExtensionMock = HistoryTabExtensionMock()
         let extensionBuilder = TestTabExtensionsBuilder(load: [HistoryTabExtensionMock.self]) { builder in { _, _ in
             builder.override {
-                HistoryTabExtensionMock()
+                historyExtensionMock
             }
         }}
 
@@ -117,10 +117,12 @@ final class TabCollectionTests: XCTestCase {
         tabCollection.append(tab: tab1)
         let tab2 = Tab(content: .homePage, extensionsBuilder: extensionBuilder)
         tabCollection.append(tab: tab2)
-        (tab2.history as! HistoryTabExtensionMock).localHistory.insert(url.host!)
+
+        let visit = Visit(date: Date())
+        historyExtensionMock.localHistory.append(visit)
 
         tabCollection.removeAll()
-        XCTAssert(tabCollection.localHistoryOfRemovedTabs.contains(url.host!))
+        XCTAssert(tabCollection.localHistoryOfRemovedTabs.contains(visit))
     }
 
     // MARK: - Move
@@ -186,6 +188,8 @@ extension Tab {
 }
 
 class HistoryTabExtensionMock: TabExtension, HistoryExtensionProtocol {
-    var localHistory: Set<String> = []
+
+    var localHistory: [DuckDuckGo_Privacy_Browser.Visit] = []
     func getPublicProtocol() -> HistoryExtensionProtocol { self }
+
 }

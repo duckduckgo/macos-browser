@@ -31,7 +31,7 @@ class HistoryCoordinatorTests: XCTestCase {
     func testWhenAddVisitIsCalledBeforeHistoryIsLoadedFromStorage_ThenVisitIsIgnored() {
         let historyStoringMock = HistoryStoringMock()
         historyStoringMock.cleanOldResult = nil
-        let historyCoordinator = HistoryCoordinator(historyStoring: historyStoringMock)
+        let historyCoordinator = HistoryCoordinator()
 
         let url = URL.duckDuckGo
         historyCoordinator.addVisit(of: url)
@@ -108,7 +108,7 @@ class HistoryCoordinatorTests: XCTestCase {
         XCTAssert(historyCoordinatorMock.commitChangesCalled)
     }
 
-    func testWhenHistoryIsBurning_ThenHistoryIsCleanedExceptFireproofDomains() {
+    func testWhenHistoryIsBurning_ThenHistoryIsCleanedIncludingFireproofDomains() {
         let (historyStoringMock, historyCoordinator) = HistoryCoordinator.aHistoryCoordinator
 
         let url1 = URL(string: "https://duckduckgo.com")!
@@ -128,8 +128,8 @@ class HistoryCoordinatorTests: XCTestCase {
 
         let fireproofDomains = FireproofDomains(store: FireproofDomainsStoreMock())
         fireproofDomains.add(domain: fireproofDomain)
-        historyCoordinator.burn(except: fireproofDomains) {
-            XCTAssert(historyStoringMock.removeEntriesArray.count == 2)
+        historyCoordinator.burnAll {
+            XCTAssert(historyStoringMock.removeEntriesArray.count == 4)
         }
     }
 

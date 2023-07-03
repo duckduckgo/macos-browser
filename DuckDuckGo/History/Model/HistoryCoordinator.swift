@@ -48,7 +48,7 @@ protocol HistoryCoordinating: AnyObject {
 final class HistoryCoordinator: HistoryCoordinating {
     static let shared = HistoryCoordinator()
 
-    private init() {}
+    init() {}
 
     init(historyStoring: HistoryStoring) {
         self.historyStoring = historyStoring
@@ -84,7 +84,7 @@ final class HistoryCoordinator: HistoryCoordinating {
 
     private var cancellables = Set<AnyCancellable>()
 
-    func addVisit(of url: URL) -> Visit? {
+    @discardableResult func addVisit(of url: URL) -> Visit? {
         guard let historyDictionary = historyDictionary else {
             os_log("Visit of %s ignored", log: .history, url.absoluteString)
             return nil
@@ -333,9 +333,9 @@ final class HistoryCoordinator: HistoryCoordinating {
                 }
             }, receiveValue: { result in
                 for (id, date) in result {
-                    let visit = entry.visits.first { $0.date == date }
-                    assert(visit != nil)
-                    visit?.identifier = id
+                    if let visit = entry.visits.first(where: { $0.date == date }) {
+                        visit.identifier = id
+                    }
                 }
             })
             .store(in: &cancellables)

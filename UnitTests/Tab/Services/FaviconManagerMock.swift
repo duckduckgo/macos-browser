@@ -51,7 +51,7 @@ final class FaviconManagerMock: FaviconManagement {
         completion()
     }
 
-    func burnDomains(_ domains: Set<String>, exceptBookmarks bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, exceptSavedLogins: Set<String>, tld: Common.TLD, completion: @escaping () -> Void) {
+    func burnDomains(_ domains: Set<String>, exceptBookmarks bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, exceptSavedLogins: Set<String>, exceptExistingHistory history: DuckDuckGo_Privacy_Browser.History, tld: Common.TLD, completion: @escaping () -> Void) {
         completion()
     }
 }

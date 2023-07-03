@@ -27,7 +27,7 @@ final class FireTests: XCTestCase {
 
     var cancellables = Set<AnyCancellable>()
 
-    func testWhenBurnAllThenTabsAreClosedAndNewEmptyTabIsOpen() {
+    func testWhenBurnAll_ThenAllWindowsAreClosed() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
         let permissionManager = PermissionManagerMock()
@@ -36,51 +36,57 @@ final class FireTests: XCTestCase {
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
                         permissionManager: permissionManager,
+                        windowControllerManager: WindowControllersManager.shared,
                         faviconManagement: faviconManager,
                         tld: ContentBlocking.shared.tld)
+
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
+        let window = WindowsManager.openNewWindow(with: tabCollectionViewModel, isBurner: false, lazyLoadTabs: true)
+
+        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 3)
+        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.first?.content, .homePage)
 
         let burningExpectation = expectation(description: "Burning")
-        fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) {
+
+        fire.burnAll {
+            XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 0)
             burningExpectation.fulfill()
         }
 
         waitForExpectations(timeout: 5, handler: nil)
-
-        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 1)
-        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.first?.content, .homePage)
     }
 
-    func testWhenBurnAllThenPinnedTabsArePersisted() {
+    func testWhenBurnAll_ThenPinnedTabsArePersisted() {
         let manager = WebCacheManagerMock()
         let historyCoordinator = HistoryCoordinatingMock()
         let permissionManager = PermissionManagerMock()
         let faviconManager = FaviconManagerMock()
 
         let pinnedTabs: [Tab] = [
-            .init(content: .url("https://duck.com".url!)),
-            .init(content: .url("https://spreadprivacy.com".url!)),
-            .init(content: .url("https://wikipedia.org".url!))
+            .init(content: .url("https://duck.com/".url!)),
+            .init(content: .url("https://spreadprivacy.com/".url!)),
+            .init(content: .url("https://wikipedia.org/".url!))
         ]
         let pinnedTabsManager = PinnedTabsManager(tabCollection: .init(tabs: pinnedTabs))
 
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
                         permissionManager: permissionManager,
+                        windowControllerManager: WindowControllersManager.shared,
                         faviconManagement: faviconManager,
                         pinnedTabsManager: pinnedTabsManager,
                         tld: ContentBlocking.shared.tld)
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel(with: pinnedTabsManager)
+        let window = WindowsManager.openNewWindow(with: tabCollectionViewModel, isBurner: false, lazyLoadTabs: true)
 
         let burningExpectation = expectation(description: "Burning")
-        fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) {
+        fire.burnAll {
             burningExpectation.fulfill()
         }
 
         waitForExpectations(timeout: 5, handler: nil)
 
-        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 1)
-        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.first?.content, .homePage)
+        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 0)
         XCTAssertEqual(pinnedTabsManager.tabCollection.tabs.map(\.content.url), pinnedTabs.map(\.content.url))
     }
 
@@ -94,19 +100,21 @@ final class FireTests: XCTestCase {
         let fire = Fire(cacheManager: manager,
                         historyCoordinating: historyCoordinator,
                         permissionManager: permissionManager,
+                        windowControllerManager: WindowControllersManager.shared,
                         faviconManagement: faviconManager,
                         recentlyClosedCoordinator: recentlyClosedCoordinator,
                         tld: ContentBlocking.shared.tld)
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
+        let window = WindowsManager.openNewWindow(with: tabCollectionViewModel, isBurner: false, lazyLoadTabs: true)
 
         let finishedBurningExpectation = expectation(description: "Finished burning")
-        fire.burnAll(tabCollectionViewModel: tabCollectionViewModel) {
+        fire.burnAll {
             finishedBurningExpectation.fulfill()
         }
 
         waitForExpectations(timeout: 5)
         XCTAssert(manager.clearCalled)
-        XCTAssert(historyCoordinator.burnCalled)
+        XCTAssert(historyCoordinator.burnAllCalled)
         XCTAssert(permissionManager.burnPermissionsCalled)
         XCTAssert(recentlyClosedCoordinator.burnCacheCalled)
     }
@@ -136,7 +144,7 @@ final class FireTests: XCTestCase {
             }
         } .store(in: &cancellables)
 
-        fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
+        fire.burnAll()
 
         waitForExpectations(timeout: 5, handler: nil)
     }
@@ -152,7 +160,7 @@ final class FireTests: XCTestCase {
                         tld: ContentBlocking.shared.tld)
 
         XCTAssertTrue(appStateRestorationManager.canRestoreLastSessionState)
-        fire.burnAll(tabCollectionViewModel: .makeTabCollectionViewModel())
+        fire.burnAll()
         XCTAssertFalse(appStateRestorationManager.canRestoreLastSessionState)
     }
 
@@ -167,7 +175,7 @@ final class FireTests: XCTestCase {
                         tld: ContentBlocking.shared.tld)
 
         XCTAssertTrue(appStateRestorationManager.canRestoreLastSessionState)
-        fire.burnDomains(["https://example.com"])
+        fire.burnEntity(entity: .none(selectedDomains: Set()))
         XCTAssertFalse(appStateRestorationManager.canRestoreLastSessionState)
     }
 
