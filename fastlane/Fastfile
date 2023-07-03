@@ -106,15 +106,29 @@ platform :mac do
   #
   desc 'Executes the release preparation work in the repository'
   lane :code_freeze do |options|
-    options[:resume]? macos_codefreeze_resume_prechecks : macos_codefreeze_prechecks
-    new_version = validate_new_version(options)
-    app_store_build_number = increment_app_store_build_number(options)
-    macos_create_release_branch(version: new_version) unless options[:resume]
-    macos_update_embedded_files
-    macos_update_version_and_build_number_config(
-      version: new_version,
-      build_number: app_store_build_number
-    )
+    begin
+      options[:resume]? macos_codefreeze_resume_prechecks : macos_codefreeze_prechecks
+      new_version = validate_new_version(options)
+      app_store_build_number = increment_app_store_build_number(options)
+      macos_create_release_branch(version: new_version) unless options[:resume]
+      macos_update_embedded_files
+      macos_update_version_and_build_number_config(
+        version: new_version,
+        build_number: app_store_build_number
+      )
+    rescue => exception
+      if exception.message == "Tests have failed"
+        UI.user_error! %{Tests have failed.
+* If you believe the failing test is flaky, please retry the same fastlane command,
+  appending `resume:true`.
+* If the failure looks legitimate, try to fix it, commit the fix (be sure to only
+  include the files you've changed while making a fix and leave other changed files
+  unmodified), and run the command again appending `resume:true`.
+        }
+      else
+        raise exception
+      end
+    end
   end
 
   #################################################
