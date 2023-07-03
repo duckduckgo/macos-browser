@@ -41,7 +41,7 @@ struct HistoryEvent: Sendable {
 }
 
 extension HistoryEvent.EventType: Equatable {
-    static func ==(lhs: HistoryEvent.EventType, rhs: HistoryEvent.EventType) -> Bool {
+    static func == (lhs: HistoryEvent.EventType, rhs: HistoryEvent.EventType) -> Bool {
         switch (lhs, rhs) {
         case (.noMatchFound, .noMatchFound),
              (.error, .error),
