@@ -18,7 +18,7 @@
 
 import Foundation
 
-class DataBrokerOperationsCollection: Operation {
+final class DataBrokerOperationsCollection: Operation {
 
     enum OperationType {
         case scan
@@ -89,7 +89,7 @@ class DataBrokerOperationsCollection: Operation {
         }
     }
 
-    private func runOperation() async  {
+    private func runOperation() async {
         let ids = brokerProfileQueriesData.map { $0.dataBroker.id }
         print("Running operation \(id) ON \(ids)")
 
@@ -104,7 +104,6 @@ class DataBrokerOperationsCollection: Operation {
         case .all:
             operationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
         }
-
 
         if let priorityDate = priorityDate {
             sortedOperationsData = operationsData

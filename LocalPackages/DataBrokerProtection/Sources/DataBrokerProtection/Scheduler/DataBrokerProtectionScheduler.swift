@@ -18,21 +18,21 @@
 
 import Foundation
 
-class DataBrokerProtectionScheduler {
+final class DataBrokerProtectionScheduler {
     let activity: NSBackgroundActivityScheduler
     lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
-        DataBrokerProtectionProcessor(database:DataBrokerProtectionDataBase() ,
-                                                      config: DataBrokerProtectionSchedulerConfig(),
-                                                      operationRunnerProvider: DataBrokerOperationRunnerProvider())
+        DataBrokerProtectionProcessor(database: DataBrokerProtectionDataBase(),
+                                      config: DataBrokerProtectionSchedulerConfig(),
+                                      operationRunnerProvider: DataBrokerOperationRunnerProvider())
     }()
 
-      init() {
+    init() {
           let identifier = "com.dbp.duckduckgo"
           activity = NSBackgroundActivityScheduler(identifier: identifier)
           activity.repeats = true
 
-          //TODO: Arbitrary numbers for now
+          // TODO: Arbitrary numbers for now
           // Scheduling an activity to fire between 15 and 45 minutes from now
           activity.interval = 30 * 60
           activity.tolerance = 15 * 60
