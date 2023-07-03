@@ -264,25 +264,29 @@ final class NavigationBarPopovers {
 
 #if NETWORK_PROTECTION
     func showNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        let controller = NetworkProtectionTunnelController()
-        let statusReporter = DefaultNetworkProtectionStatusReporter(
-            statusObserver: ConnectionStatusObserverThroughSession(),
-            serverInfoObserver: ConnectionServerInfoObserverThroughSession(),
-            connectionErrorObserver: ConnectionErrorObserverThroughSession())
+        let popover = networkProtectionPopover ?? {
+            let controller = NetworkProtectionTunnelController()
+            let statusReporter = DefaultNetworkProtectionStatusReporter(
+                statusObserver: ConnectionStatusObserverThroughSession(),
+                serverInfoObserver: ConnectionServerInfoObserverThroughSession(),
+                connectionErrorObserver: ConnectionErrorObserverThroughSession())
 
-        let menuItems = [
-            NetworkProtectionStatusView.Model.MenuItem(
-                name: UserText.networkProtectionNavBarStatusViewShareFeedback,
-                action: {
-                    let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
-                    await appLauncher.launchApp(withCommand: .shareFeedback)
-            })
-        ]
+            let menuItems = [
+                NetworkProtectionStatusView.Model.MenuItem(
+                    name: UserText.networkProtectionNavBarStatusViewShareFeedback,
+                    action: {
+                        let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
+                        await appLauncher.launchApp(withCommand: .shareFeedback)
+                })
+            ]
 
-        let popover = NetworkProtectionPopover(controller: controller, statusReporter: statusReporter, menuItems: menuItems)
-        popover.delegate = delegate
+            let popover = NetworkProtectionPopover(controller: controller, statusReporter: statusReporter, menuItems: menuItems)
+            popover.delegate = delegate
+            networkProtectionPopover = popover
 
-        networkProtectionPopover = popover
+            return popover
+        }()
+
         show(popover: popover, usingView: view, preferredEdge: .maxY)
     }
 #endif

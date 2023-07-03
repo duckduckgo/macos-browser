@@ -26,7 +26,7 @@ public protocol TunnelController {
 
     /// Starts the VPN connection used for Network Protection
     ///
-    func start() async throws
+    func start() async
 
     /// Stops the VPN connection used for Network Protection
     ///
