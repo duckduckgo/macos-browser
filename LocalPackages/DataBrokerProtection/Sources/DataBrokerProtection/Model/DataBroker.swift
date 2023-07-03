@@ -37,7 +37,7 @@ public struct DataBroker: Encodable, Sendable {
     let name: String
     let steps: [Step]
     let schedulingConfig: DataBrokerScheduleConfig
-    
+
     enum CodingKeys: CodingKey {
         case name
         case steps
