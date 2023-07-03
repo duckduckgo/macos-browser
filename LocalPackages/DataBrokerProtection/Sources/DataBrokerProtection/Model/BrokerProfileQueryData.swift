@@ -78,6 +78,7 @@ final public class BrokerProfileQueryData: Sendable {
             let event = HistoryEvent(type: .optOutConfirmed(extractedProfileID: removedProfileData.extractedProfile.id))
             addHistoryEvent(event, for: removedProfileData)
             removedProfileData.extractedProfile.removedDate = Date()
+            removedProfileData.preferredRunDate = nil
             print("Profile removed from optOutsData: \(removedProfileData.extractedProfile)")
 
         }
