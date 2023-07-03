@@ -55,7 +55,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     // MARK: - Connection Status
 
-    private let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusObserver: ConnectionStatusObserverThroughSession(), transitionTimeout: .seconds(4))
+    private let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusObserver: ConnectionStatusObserverThroughSession(), transitionTimeout: .seconds(15))
 
     // MARK: - Tunnel Manager
 
