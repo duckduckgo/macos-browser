@@ -20,10 +20,6 @@ import XCTest
 import Foundation
 @testable import DataBrokerProtection
 
-extension HTTPURLResponse {
-    static let ok = HTTPURLResponse(url: URL(string: "www.example.com")!, statusCode: 200, httpVersion: nil, headerFields: [String: String]())!
-}
-
 final class DataBrokerProtectionEmailServiceTests: XCTestCase {
 
     enum MockError: Error {
@@ -36,8 +32,12 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
         return URLSession(configuration: testConfiguration)
     }
 
+    override func tearDown() async throws {
+        MockURLProtocol.requestHandlerQueue.removeAll()
+    }
+
     func testWhenSessionThrows_thenTheCorrectErrorIsThrown() async {
-        MockURLProtocol.requestHandler = { _ in throw MockError.someError }
+        MockURLProtocol.requestHandlerQueue.append({ _ in throw MockError.someError })
         let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
 
         do {
@@ -57,7 +57,7 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
     func testWhenResponseIsIncorrect_thenTheCantFindEmailExceptionIsThrown() async {
         let responseDictionary = [String: AnyObject]()
         let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
-        MockURLProtocol.requestHandler = { _ in (HTTPURLResponse.ok, responseData) }
+        MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
         let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
 
@@ -76,7 +76,7 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
     func testWhenResponseIsCorrect_thenTheEmailIsReturned() async {
         let responseDictionary = ["emailAddress": "test@ddg.com"]
         let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
-        MockURLProtocol.requestHandler = { _ in (HTTPURLResponse.ok, responseData) }
+        MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
         let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
 
@@ -91,7 +91,9 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
     func testWhenEmailExtractingExceedesRetries_thenTimeOutErrorIsThrown() async {
         let responseDictionary = ["response": "Not ready"]
         let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
-        MockURLProtocol.requestHandler = { _ in (HTTPURLResponse.ok, responseData) }
+        let notReadyResponse: RequestHandler = { _ in (HTTPURLResponse.ok, responseData) }
+        MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
+        MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
 
         let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
 
@@ -110,10 +112,34 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
         }
     }
 
+    func testWhenEmailSuccedesInLastRetry_thenSuccessIsReturned() async {
+        let validURL = EmailLink(link: "www.duckduckgo.com")
+        let successResponseData = try? JSONEncoder().encode(validURL)
+        let responseDictionary = ["response": "Not ready"]
+        let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
+        let notReadyResponse: RequestHandler = { _ in (HTTPURLResponse.ok, responseData) }
+        let successResponse: RequestHandler = { _ in (HTTPURLResponse.ok, successResponseData) }
+        MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
+        MockURLProtocol.requestHandlerQueue.append(successResponse)
+
+        let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
+
+        do {
+            let url = try await sut.getConfirmationLink(
+                from: "some@email.com",
+                numberOfRetries: 2,
+                pollingIntervalInSeconds: 2
+            )
+            XCTAssertEqual(url.absoluteString, "www.duckduckgo.com")
+        } catch {
+            XCTFail("Unexpected. It should not throw")
+        }
+    }
+
     func testWhenEmailCannotBeDecoded_thenCannotBeDecodedErrorIsThrown() async {
         let responseDictionary = ["link": ["test": "test"]]
         let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
-        MockURLProtocol.requestHandler = { _ in (HTTPURLResponse.ok, responseData) }
+        MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
         let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
 
@@ -135,7 +161,7 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
     func testWhenEmailLinkIsInvalid_thenInvalidEmailLinkErrorIsThrown() async {
         let invalidLink = EmailLink(link: "invalidURL")
         let responseData = try? JSONEncoder().encode(invalidLink)
-        MockURLProtocol.requestHandler = { _ in (HTTPURLResponse.ok, responseData) }
+        MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
         let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
 
@@ -157,7 +183,7 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
     func testWhenEmailLinkIsValid_thenTheURLIsReturned() async {
         let validURL = EmailLink(link: "www.duckduckgo.com")
         let responseData = try? JSONEncoder().encode(validURL)
-        MockURLProtocol.requestHandler = { _ in (HTTPURLResponse.ok, responseData) }
+        MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
         let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
 
@@ -172,35 +198,4 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
             XCTFail("Unexpected. It should not throw")
         }
     }
-}
-
-final class MockURLProtocol: URLProtocol {
-
-    static var lastRequest: URLRequest?
-    static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data?))?
-
-    override class func canInit(with request: URLRequest) -> Bool { true }
-
-    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
-
-    override func startLoading() {
-        guard let handler = MockURLProtocol.requestHandler else {
-            fatalError("Handler is unavailable.")
-        }
-        MockURLProtocol.lastRequest = request
-
-        do {
-            let (response, data) = try handler(request)
-            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-            if let data = data {
-                client?.urlProtocol(self, didLoad: data)
-            }
-            client?.urlProtocolDidFinishLoading(self)
-        } catch {
-            client?.urlProtocol(self, didFailWithError: error)
-        }
-    }
-
-    override func stopLoading() { }
-
 }
