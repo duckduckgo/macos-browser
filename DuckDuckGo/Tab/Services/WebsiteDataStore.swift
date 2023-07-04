@@ -146,7 +146,7 @@ internal class WebCacheManager {
             // If domains are specified, clear just their cookies
             cookies = cookies.filter { cookie in
                 baseDomains.contains {
-                    cookie.belongs(toETLDPlus1Domain: $0)
+                    cookie.belongsTo($0)
                 }
             }
         }

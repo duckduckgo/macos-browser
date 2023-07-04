@@ -20,7 +20,7 @@ import Foundation
 
 extension HTTPCookie {
 
-    func belongs(toETLDPlus1Domain eTLDPlus1Domain: String) -> Bool {
+    func belongsTo(_ eTLDPlus1Domain: String) -> Bool {
         let cookieDomain = self.domain
 
         // Check if the cookie's domain is the same as the given eTLD+1 domain

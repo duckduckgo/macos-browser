@@ -30,37 +30,37 @@ class HTTPCookieTests: XCTestCase {
             .value: "TestValue"
         ]
         var cookie = HTTPCookie(properties: cookieProperties)!
-        XCTAssertTrue(cookie.belongs(toETLDPlus1Domain: "example.com"))
+        XCTAssertTrue(cookie.belongsTo("example.com"))
 
         // Case 2: Cookie domain is a subdomain of the eTLD+1 domain
         cookieProperties[.domain] = "sub.example.com"
         cookie = HTTPCookie(properties: cookieProperties)!
-        XCTAssertTrue(cookie.belongs(toETLDPlus1Domain: "example.com"))
+        XCTAssertTrue(cookie.belongsTo("example.com"))
 
         // Case 3: Cookie domain is not a subdomain of the eTLD+1 domain
         cookieProperties[.domain] = "sub.other.com"
         cookie = HTTPCookie(properties: cookieProperties)!
-        XCTAssertFalse(cookie.belongs(toETLDPlus1Domain: "example.com"))
+        XCTAssertFalse(cookie.belongsTo("example.com"))
 
         // Edge Case 1: eTLD+1 domain is a substring of the cookie domain, but the cookie domain is not a subdomain
         cookieProperties[.domain] = "example.com.fake.com"
         cookie = HTTPCookie(properties: cookieProperties)!
-        XCTAssertFalse(cookie.belongs(toETLDPlus1Domain: "example.com"))
+        XCTAssertFalse(cookie.belongsTo("example.com"))
 
         // Edge Case 2: eTLD+1 domain and cookie domain are in different case
         cookieProperties[.domain] = "EXAMPLE.COM"
         cookie = HTTPCookie(properties: cookieProperties)!
-        XCTAssertTrue(cookie.belongs(toETLDPlus1Domain: "example.com"))
+        XCTAssertTrue(cookie.belongsTo("example.com"))
 
         // Edge Case 3: Empty domain
         cookieProperties[.domain] = ""
         cookie = HTTPCookie(properties: cookieProperties)!
-        XCTAssertFalse(cookie.belongs(toETLDPlus1Domain: "example.com"))
+        XCTAssertFalse(cookie.belongsTo("example.com"))
 
         // Edge Case 4: Numeric domains
         cookieProperties[.domain] = "123.456"
         cookie = HTTPCookie(properties: cookieProperties)!
-        XCTAssertTrue(cookie.belongs(toETLDPlus1Domain: "123.456"))
+        XCTAssertTrue(cookie.belongsTo("123.456"))
     }
 
 }
