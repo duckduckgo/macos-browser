@@ -117,6 +117,7 @@ final class PurchaseViewController: NSViewController {
                 switch await AccountsService.validateToken(accessToken: self.authServiceToken ?? "") {
                 case .success(let response):
                     self.model.externalID = response.account.externalID
+                    self.model.currentEntitlements = response.account.entitlements
                     await manager.updatePurchasedProducts()
                     await manager.updateAvailableProducts()
                     self.update(for: .readyToPurchase)

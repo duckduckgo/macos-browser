@@ -152,30 +152,31 @@ struct PurchaseView: View {
 
     private var debugView: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Spacer()
-                Text("Magic Menu")
-                    .font(.largeTitle)
-                Text("(∩｀-´)⊃━☆ﾟ.*･｡ﾟ")
-                    .font(.title)
-                Spacer()
+            Group {
+                HStack {
+                    Spacer()
+                    Text("Magic Menu")
+                        .font(.largeTitle)
+                    Text("(∩｀-´)⊃━☆ﾟ.*･｡ﾟ")
+                        .font(.title)
+                    Spacer()
+                }
+                HStack {
+                    Text("Current App Store Country:")
+                    Text(model.storefrontCountry)
+                        .task {
+                            await model.loadStorefrontCountry()
+                        }
+                }
+
+                Divider()
+
+                HStack {
+                    Text("Purchased items: \(manager.purchasedProductIDs.joined(separator: ","))")
+                }
+
+                Divider()
             }
-            HStack {
-                Text("Current App Store Country:")
-                Text(model.storefrontCountry)
-                    .task {
-                        await model.loadStorefrontCountry()
-                    }
-            }
-
-            Divider()
-
-            HStack {
-                Text("Purchased items: \(manager.purchasedProductIDs.joined(separator: ","))")
-            }
-
-            Divider()
-
             HStack {
                 Group {
                     Text("Subscription state:")
@@ -201,15 +202,22 @@ struct PurchaseView: View {
                 }
             }
 
-            Divider()
-
             Group {
-                Spacer()
-                Button("Exchange token") { manager.exchangeToken() }
-                Button("Fetch entitlements") { manager.fetchEntitlements() }
+                Divider()
+                VStack(alignment: .leading) {
+                    Text("Entitlements:")
+                        .font(.title2)
+                    ForEach(model.currentEntitlements, id: \.self.id) { entitlement in
+                        Text("id:\(entitlement.id) name:\(entitlement.name) product:\(entitlement.product)")
+                    }
+                }
             }
 
             Group {
+                Divider()
+                Spacer()
+                Button("Exchange token") { manager.exchangeToken() }
+                Button("Fetch entitlements") { manager.fetchEntitlements() }
                 HStack {
                     Spacer()
                     Button("OK") { showingAlert = false }

@@ -34,6 +34,8 @@ public final class PurchaseModel: ObservableObject {
     @Published var subscriptions: [SubscriptionRowModel]
     @Published var storefrontCountry: String = ""
 
+    @Published var currentEntitlements: [AccountsService.ValidateTokenResponse.Entitlement] = []
+
     var externalID: String?
 
     init(subscriptions: [SubscriptionRowModel] = []) {
