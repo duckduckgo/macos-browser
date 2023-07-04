@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1687789841911,
+    "version": 1688408440977,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1093,10 +1093,6 @@
             "state": "enabled",
             "exceptions": [
                 {
-                    "domain": "foxnews.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
-                },
-                {
                     "domain": "strava.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/748"
                 },
@@ -1105,7 +1101,7 @@
                     "reason": "Video pauses at about 13-15 seconds in. Playing the video again results in a single frame rendering without progressing to the next frame."
                 }
             ],
-            "hash": "7550837006dcfeed61c9dabcc0a0012c"
+            "hash": "8d35648bb7862913ed30243074e6b6f1"
         },
         "cookie": {
             "settings": {
@@ -1204,6 +1200,10 @@
                     "reason": "Adblocker wall"
                 },
                 {
+                    "domain": "google.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+                },
+                {
                     "domain": "wiwo.de",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
                 },
@@ -1229,7 +1229,7 @@
                 }
             ],
             "settings": {
-                "useStrictHideStyleTag": false,
+                "useStrictHideStyleTag": true,
                 "rules": [
                     {
                         "selector": "[id*='gpt-']",
@@ -1528,7 +1528,16 @@
                         "type": "hide-empty"
                     }
                 ],
-                "styleTagExceptions": [],
+                "styleTagExceptions": [
+                    {
+                        "domain": "github.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1058"
+                    },
+                    {
+                        "domain": "duckduckgo.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1058"
+                    }
+                ],
                 "mediaAndFormSelectors": "video,canvas,embed,object,audio,map,form,input,textarea,select,option",
                 "adLabelStrings": [
                     "ad",
@@ -2368,7 +2377,7 @@
                                 "type": "hide"
                             },
                             {
-                                "selector": ".mxEhR",
+                                "selector": ".ZkqhQ",
                                 "type": "hide"
                             }
                         ]
@@ -2381,7 +2390,7 @@
                                 "type": "hide"
                             },
                             {
-                                "selector": ".mxEhR",
+                                "selector": ".ZkqhQ",
                                 "type": "hide"
                             }
                         ]
@@ -2570,7 +2579,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "1f903524775596b863a5b4c1f2e0e3eb"
+            "hash": "1ccdd6d65eae016eba128cdac7253174"
         },
         "exceptionHandler": {
             "exceptions": [],
@@ -2701,8 +2710,8 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/499"
                 }
             ],
-            "state": "enabled",
-            "hash": "2f880f7ca6db5218c28eb6c421bfa6cb"
+            "state": "disabled",
+            "hash": "4cbf5510157399d16404475be76e5980"
         },
         "fingerprintingHardware": {
             "settings": {
@@ -2800,8 +2809,8 @@
                     "reason": "After entering login details and clicking to log in, the site shows an adwall and prevents login."
                 }
             ],
-            "state": "enabled",
-            "hash": "e1ffe29047b2f96b52fd59399b7f034b"
+            "state": "disabled",
+            "hash": "6542908e0907b22d495b68c0bd351e65"
         },
         "fingerprintingTemporaryStorage": {
             "exceptions": [
@@ -2848,6 +2857,109 @@
                 ]
             },
             "hash": "470c77b05c99b8f0986cc40422a59c91"
+        },
+        "harmfulApis": {
+            "settings": {
+                "deviceOrientation": {
+                    "state": "enabled",
+                    "filterEvents": [
+                        "deviceorientation",
+                        "devicemotion"
+                    ]
+                },
+                "GenericSensor": {
+                    "state": "enabled",
+                    "filterPermissions": [
+                        "accelerometer",
+                        "ambient-light-sensor",
+                        "gyroscope",
+                        "magnetometer"
+                    ],
+                    "blockSensorStart": true
+                },
+                "UaClientHints": {
+                    "state": "enabled",
+                    "highEntropyValues": {
+                        "trimBrands": true,
+                        "model": "",
+                        "trimPlatformVersion": 2,
+                        "trimUaFullVersion": 1,
+                        "trimFullVersionList": 1
+                    }
+                },
+                "NetworkInformation": {
+                    "state": "enabled"
+                },
+                "getInstalledRelatedApps": {
+                    "state": "enabled",
+                    "returnValue": []
+                },
+                "FileSystemAccess": {
+                    "state": "enabled",
+                    "disableOpenFilePicker": true,
+                    "disableSaveFilePicker": true,
+                    "disableDirectoryPicker": true,
+                    "disableGetAsFileSystemHandle": true
+                },
+                "WindowPlacement": {
+                    "state": "enabled",
+                    "filterPermissions": [
+                        "window-placement",
+                        "window-management"
+                    ],
+                    "screenIsExtended": false
+                },
+                "WebBluetooth": {
+                    "state": "enabled",
+                    "filterPermissions": [
+                        "bluetooth"
+                    ],
+                    "filterEvents": [
+                        "availabilitychanged"
+                    ],
+                    "blockGetAvailability": true,
+                    "blockRequestDevice": true
+                },
+                "WebUsb": {
+                    "state": "enabled"
+                },
+                "WebSerial": {
+                    "state": "enabled"
+                },
+                "WebHid": {
+                    "state": "enabled"
+                },
+                "WebMidi": {
+                    "state": "enabled",
+                    "filterPermissions": [
+                        "midi"
+                    ]
+                },
+                "IdleDetection": {
+                    "state": "enabled",
+                    "filterPermissions": [
+                        "idle-detection"
+                    ]
+                },
+                "WebNfc": {
+                    "state": "enabled",
+                    "disableNdefReader": true,
+                    "disableNdefMessage": true,
+                    "disableNdefRecord": true
+                },
+                "StorageManager": {
+                    "state": "enabled",
+                    "allowedQuotaValues": [
+                        1073741824,
+                        4294967296,
+                        9999999999
+                    ]
+                },
+                "domains": []
+            },
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "40ccb9ae93e37d9c2c991a5fadabded7"
         },
         "https": {
             "state": "enabled",
@@ -3637,6 +3749,17 @@
                                     "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
+                            }
+                        ]
+                    },
+                    "ezodn.com": {
+                        "rules": [
+                            {
+                                "rule": "ezodn.com/cmp",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/468"
                             }
                         ]
                     },
@@ -4621,6 +4744,17 @@
                                     "aternos.org"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/328"
+                            }
+                        ]
+                    },
+                    "quantcast.com": {
+                        "rules": [
+                            {
+                                "rule": "cmp.quantcast.com",
+                                "domains": [
+                                    "express.co.uk"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1068"
                             }
                         ]
                     },
@@ -13412,7 +13546,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "b560b07a337eb315764a8a7e36c48916"
+            "hash": "752de074680af7cbe994a47713f769c6"
         },
         "trackingCookies1p": {
             "settings": {
@@ -13806,6 +13940,18 @@
         },
         {
             "domain": "ticketmaster.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
+        },
+        {
+            "domain": "livenation.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1053"
+        },
+        {
+            "domain": "bank.marksandspencer.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
+        },
+        {
+            "domain": "www7.marksandspencer.com",
             "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
         }
     ]

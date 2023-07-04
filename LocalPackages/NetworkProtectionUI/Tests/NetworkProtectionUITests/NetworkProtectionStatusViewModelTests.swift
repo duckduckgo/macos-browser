@@ -72,7 +72,7 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
             startCallback?()
         }
 
-        func stop() async throws {
+        func stop() async {
             stopCallback?()
         }
     }
@@ -89,8 +89,8 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
             statusReporter: statusReporter,
             menuItems: [])
 
-        let isRunning = await model.isRunning.wrappedValue
-        XCTAssertFalse(isRunning)
+        let isToggleOn = await model.isToggleOn.wrappedValue
+        XCTAssertFalse(isToggleOn)
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusDisconnected)
         XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
         XCTAssertEqual(model.featureStatusDescription, UserText.networkProtectionStatusViewFeatureOff)
@@ -107,8 +107,8 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
             statusReporter: statusReporter,
             menuItems: [])
 
-        let isRunning = await model.isRunning.wrappedValue
-        XCTAssertFalse(isRunning)
+        let isToggleOn = await model.isToggleOn.wrappedValue
+        XCTAssertFalse(isToggleOn)
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusDisconnected)
         XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
         XCTAssertEqual(model.featureStatusDescription, UserText.networkProtectionStatusViewFeatureOff)
@@ -151,8 +151,8 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
             statusReporter: statusReporter,
             menuItems: [])
 
-        let isRunning = await model.isRunning.wrappedValue
-        XCTAssertTrue(isRunning)
+        let isToggleOn = await model.isToggleOn.wrappedValue
+        XCTAssertTrue(isToggleOn)
         XCTAssertTrue(model.connectionStatusDescription.hasPrefix(UserText.networkProtectionStatusConnected))
         XCTAssertEqual(model.timeLapsed, mockDateString)
         XCTAssertEqual(model.featureStatusDescription, UserText.networkProtectionStatusViewFeatureOn)
@@ -189,7 +189,7 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
         }
 
         Task { @MainActor in
-            model.isRunning.wrappedValue = true
+            model.isToggleOn.wrappedValue = true
         }
 
         await fulfillment(of: [networkProtectionWasStarted], timeout: 0.1)
@@ -216,7 +216,7 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
         }
 
         Task { @MainActor in
-            model.isRunning.wrappedValue = false
+            model.isToggleOn.wrappedValue = false
         }
 
         await fulfillment(of: [networkProtectionWasStopped], timeout: 0.1)

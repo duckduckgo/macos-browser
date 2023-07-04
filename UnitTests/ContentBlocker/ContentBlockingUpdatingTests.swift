@@ -165,8 +165,8 @@ final class ContentBlockingUpdatingTests: XCTestCase {
                etag: "asd",
                identifier: ContentBlockerRulesIdentifier(name: "test",
                                                          tdsEtag: "asd",
-                                                         tempListEtag: nil,
-                                                         allowListEtag: nil,
+                                                         tempListId: nil,
+                                                         allowListId: nil,
                                                          unprotectedSitesHash: nil))]
     }
 

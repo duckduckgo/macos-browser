@@ -264,32 +264,35 @@ final class NavigationBarPopovers {
 
 #if NETWORK_PROTECTION
     func showNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        let controller = NetworkProtectionTunnelController()
-        let statusObserver = ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                    platformDidWakeNotification: NSWorkspace.didWakeNotification)
-        let statusInfoObserver = ConnectionServerInfoObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                            platformDidWakeNotification: NSWorkspace.didWakeNotification)
-        let connectionErrorObserver = ConnectionErrorObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                            platformDidWakeNotification: NSWorkspace.didWakeNotification)
-        let statusReporter = DefaultNetworkProtectionStatusReporter(
-            statusObserver: statusObserver,
-            serverInfoObserver: statusInfoObserver,
-            connectionErrorObserver: connectionErrorObserver
-        )
+        let popover = networkProtectionPopover ?? {
+            let controller = NetworkProtectionTunnelController()
+            let statusObserver = ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
+                                                                        platformDidWakeNotification: NSWorkspace.didWakeNotification)
+            let statusInfoObserver = ConnectionServerInfoObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
+                                                                                platformDidWakeNotification: NSWorkspace.didWakeNotification)
+            let connectionErrorObserver = ConnectionErrorObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
+                                                                                platformDidWakeNotification: NSWorkspace.didWakeNotification)
+            let statusReporter = DefaultNetworkProtectionStatusReporter(
+                statusObserver: statusObserver,
+                serverInfoObserver: statusInfoObserver,
+                connectionErrorObserver: connectionErrorObserver
+            )
 
-        let menuItems = [
-            NetworkProtectionStatusView.Model.MenuItem(
-                name: UserText.networkProtectionNavBarStatusViewShareFeedback,
-                action: {
-                    let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
-                    await appLauncher.launchApp(withCommand: .shareFeedback)
-            })
-        ]
+            let menuItems = [
+                NetworkProtectionStatusView.Model.MenuItem(
+                    name: UserText.networkProtectionNavBarStatusViewShareFeedback,
+                    action: {
+                        let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
+                        await appLauncher.launchApp(withCommand: .shareFeedback)
+                })
+            ]
 
-        let popover = NetworkProtectionPopover(controller: controller, statusReporter: statusReporter, menuItems: menuItems)
-        popover.delegate = delegate
+            let popover = NetworkProtectionPopover(controller: controller, statusReporter: statusReporter, menuItems: menuItems)
+            popover.delegate = delegate
 
-        networkProtectionPopover = popover
+            networkProtectionPopover = popover
+            return popover
+        }()
         show(popover: popover, usingView: view, preferredEdge: .maxY)
     }
 #endif
