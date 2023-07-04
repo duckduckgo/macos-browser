@@ -266,10 +266,17 @@ final class NavigationBarPopovers {
     func showNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         let popover = networkProtectionPopover ?? {
             let controller = NetworkProtectionTunnelController()
+            let statusObserver = ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
+                                                                        platformDidWakeNotification: NSWorkspace.didWakeNotification)
+            let statusInfoObserver = ConnectionServerInfoObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
+                                                                                platformDidWakeNotification: NSWorkspace.didWakeNotification)
+            let connectionErrorObserver = ConnectionErrorObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
+                                                                                platformDidWakeNotification: NSWorkspace.didWakeNotification)
             let statusReporter = DefaultNetworkProtectionStatusReporter(
-                statusObserver: ConnectionStatusObserverThroughSession(),
-                serverInfoObserver: ConnectionServerInfoObserverThroughSession(),
-                connectionErrorObserver: ConnectionErrorObserverThroughSession())
+                statusObserver: statusObserver,
+                serverInfoObserver: statusInfoObserver,
+                connectionErrorObserver: connectionErrorObserver
+            )
 
             let menuItems = [
                 NetworkProtectionStatusView.Model.MenuItem(
@@ -282,11 +289,10 @@ final class NavigationBarPopovers {
 
             let popover = NetworkProtectionPopover(controller: controller, statusReporter: statusReporter, menuItems: menuItems)
             popover.delegate = delegate
-            networkProtectionPopover = popover
 
+            networkProtectionPopover = popover
             return popover
         }()
-
         show(popover: popover, usingView: view, preferredEdge: .maxY)
     }
 #endif

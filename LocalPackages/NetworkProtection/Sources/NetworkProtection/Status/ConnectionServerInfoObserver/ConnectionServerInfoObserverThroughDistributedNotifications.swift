@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if os(macOS)
+
 import Combine
 import Foundation
 import Common
@@ -69,3 +71,5 @@ public class ConnectionServerInfoObserverThroughDistributedNotifications: Connec
         publisher.send(serverInfo)
     }
 }
+
+#endif
