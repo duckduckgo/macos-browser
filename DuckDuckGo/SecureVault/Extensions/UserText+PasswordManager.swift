@@ -51,7 +51,6 @@ extension UserText {
     static let pmActivateAddress = NSLocalizedString("pm.activate.private.email", value: "Reactivate Duck Address", comment: "Activate private email address button")
     static let pmDeactivate = NSLocalizedString("pm.deactivate", value: "Deactivate", comment: "Deactivate button")
     static let pmActivate = NSLocalizedString("pm.activate", value: "Reactivate", comment: "Activate button")
-    static let pmEmailMessageInactive = NSLocalizedString("pm.private.email.mesage.inactive", value: "Deactivated and not receiving emails.", comment: "Mesasage displayed when a private email address is deactivated")
     static let pmEmailMessageError = NSLocalizedString("pm.private.email.mesage.error", value: "Management of this address is temporarily unavailable.", comment: "Mesasage displayed when a user tries to manage a private email address but the service is not available, returns an error or network is down")
     static let pmEmailActivateConfirmTitle = NSLocalizedString("pm.private.email.mesage.activate.confirm.title", value: "Reactivate Private Duck Address?", comment: "Title for the confirmation message  displayed when a user tries activate a Private Email Address")
     static let pmEmailActivateConfirmContent = NSLocalizedString("pm.private.email.mesage.activate.confirm.content", value: "Emails sent to %@ will be forwarded to your inbox.", comment: "Text for the confirmation message displayed when a user tries activate a Private Email Address")

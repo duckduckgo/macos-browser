@@ -79,7 +79,7 @@ struct PasswordManagementLoginItemView: View {
             .background(EmptyView().alert(isPresented: $model.isShowingAddressUpdateConfirmAlert) {
                 let btnLabel = Text(model.toggleConfirmationAlert.button)
                 let btnAction = model.togglePrivateEmailStatus
-                var button = Alert.Button.default(btnLabel, action: btnAction)
+                let button = Alert.Button.default(btnLabel, action: btnAction)
                 return Alert(
                     title: Text(model.toggleConfirmationAlert.title),
                     message: Text(model.toggleConfirmationAlert.message),
