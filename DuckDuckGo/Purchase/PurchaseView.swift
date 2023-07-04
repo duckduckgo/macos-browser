@@ -85,6 +85,10 @@ struct PurchaseView: View {
 
     private var subscriptionsList: some View {
         VStack {
+            if !model.currentEntitlements.isEmpty {
+                entitlementsList
+            }
+
             Text("Subscriptions")
                 .font(.largeTitle)
 
@@ -114,6 +118,32 @@ struct PurchaseView: View {
             Spacer()
         }
         .padding(.all, 48)
+    }
+
+    var columns: [GridItem] = [GridItem(), GridItem(.flexible()), GridItem()]
+
+    private var entitlementsList: some View {
+        VStack {
+            Text("Entitlements")
+                .font(.largeTitle)
+            ScrollView(.horizontal) {
+                HStack {
+                    ForEach(model.currentEntitlements, id: \.self.id) { entitlement in
+                        VStack(alignment: .leading) {
+                            Text("id: \(entitlement.id)")
+                            Text("name: \(entitlement.name)")
+                            Text("product: \(entitlement.product)")
+                        }
+                        .padding()
+                        .frame(height: 60)
+                        .background(Color(white: 0.9))
+                        .cornerRadius(15)
+                    }
+                    .padding()
+                }
+            }
+        }
+        .padding()
     }
 
     private var closeButtonOverlay: some View {

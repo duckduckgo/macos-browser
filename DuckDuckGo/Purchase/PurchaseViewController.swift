@@ -37,7 +37,7 @@ final class PurchaseViewController: NSViewController {
     }
 
     override func loadView() {
-        view = NSView(frame: NSRect(x: 0, y: 0, width: 600, height: 600))
+        view = NSView(frame: NSRect(x: 0, y: 0, width: 650, height: 700))
 
         let purchaseView = PurchaseView(manager: PurchaseManager.shared,
                                         model: self.model,
