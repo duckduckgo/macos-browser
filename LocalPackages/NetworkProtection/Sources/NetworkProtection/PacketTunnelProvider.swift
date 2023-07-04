@@ -25,10 +25,11 @@ import Foundation
 import NetworkExtension
 import UserNotifications
 
+// swiftlint:disable:next type_body_length
+
 /// Abstract class implementing the DuckDuckGo PacketTunnelProvider specifics and entry point into
 /// The NetP extensions. Must be overriden by each platform to inject the hooks provided by the init
 ///
-// swiftlint:disable:next type_body_length
 open class PacketTunnelProvider: NEPacketTunnelProvider {
 
     public enum Event {
