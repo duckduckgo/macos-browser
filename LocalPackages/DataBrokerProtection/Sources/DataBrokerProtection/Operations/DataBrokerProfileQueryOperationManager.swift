@@ -55,6 +55,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
     }
 
+    // https://app.asana.com/0/0/1204834439855281/f
     // swiftlint:disable:next cyclomatic_complexity
     private func updateOperationDataDates(_ operationData: BrokerOperationData,
                                           brokerProfileQueryData: BrokerProfileQueryData) {
@@ -76,12 +77,14 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             case .error:
                 let newDate = Date().addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.retryError)
                 updatePreferredRunDate(newDate, on: data)
+
             case .optOutRequested:
                 optOutData?.preferredRunDate = nil
                 let newDate = Date().addingTimeInterval(brokerProfileQueryData.dataBroker.schedulingConfig.confirmOptOutScan)
                 if let scanData = scanData {
                     updatePreferredRunDate(newDate, on: scanData)
                 }
+
             case .matchFound:
                 if let optOutData = optOutData, shouldScheduleNewOptOut(operationData: optOutData,
                                                                         brokerProfileQueryData: brokerProfileQueryData) {
@@ -92,13 +95,15 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                     }
                 }
 
-            case .noMatchFound:
+            case .noMatchFound, .optOutConfirmed:
                 if let scanData = scanData {
                     updatePreferredRunDate(maintenanceScanDate, on: scanData)
                 }
                 optOutData?.preferredRunDate = nil
 
-            default:
+            case .optOutStarted, .scanStarted:
+                // We don't need to update the dates when we have these statuses
+                // This is added to ensure that the compiler can detect any new enums added in the future
                 break
             }
         }
