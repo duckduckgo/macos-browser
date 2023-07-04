@@ -21,6 +21,7 @@ import Foundation
 import SwiftUI
 import BrowserServicesKit
 import SwiftUIExtensions
+import Combine
 
 private let interItemSpacing: CGFloat = 20
 private let itemSpacing: CGFloat = 6
@@ -313,6 +314,7 @@ private struct NotesView: View {
     @EnvironmentObject var model: PasswordManagementLoginModel
     let cornerRadius: CGFloat = 8.0
     let borderWidth: CGFloat = 0.4
+    let characterLimit: Int = 10000
 
     var body: some View {
 
@@ -328,6 +330,9 @@ private struct NotesView: View {
                     .frame(height: 197.0)
                     .font(.body)
                     .foregroundColor(.primary)
+                    .onChange(of: model.notes) {
+                        model.notes = String($0.prefix(characterLimit))
+                    }
                     .padding(EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 0.0))
                     .clipShape(RoundedRectangle(cornerRadius: cornerRadius,
                                                 style: .continuous))
@@ -342,6 +347,9 @@ private struct NotesView: View {
             } else {
                 EditableTextView(text: $model.notes)
                     .frame(height: 197.0)
+                    .onReceive(Just(model.notes)) {
+                        model.notes = String($0.prefix(characterLimit))
+                    }
                     .clipShape(RoundedRectangle(cornerRadius: cornerRadius,
                                                 style: .continuous))
                     .overlay(
@@ -377,6 +385,7 @@ struct FocusableTextEditor: View {
 
     let cornerRadius: CGFloat = 8.0
     let borderWidth: CGFloat = 0.4
+    let characterLimit: Int = 10000
 
     var body: some View {
         TextEditor(text: $model.notes)
@@ -387,6 +396,9 @@ struct FocusableTextEditor: View {
             .padding(EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 0.0))
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius,
                                         style: .continuous))
+            .onChange(of: model.notes) {
+                model.notes = String($0.prefix(characterLimit))
+            }
             .background(
                 ZStack {
                     RoundedRectangle(cornerRadius: cornerRadius).stroke(Color.accentColor.opacity(0.5), lineWidth: 4).opacity(isFocused ? 1 : 0).scaleEffect(isFocused ? 1 : 1.04)
