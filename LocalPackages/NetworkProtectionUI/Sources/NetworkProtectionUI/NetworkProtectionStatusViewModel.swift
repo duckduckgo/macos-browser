@@ -28,6 +28,7 @@ extension NetworkProtectionStatusView {
 
     /// The view model definition for ``NetworkProtectionStatusView``
     ///
+    @MainActor
     public final class Model: ObservableObject {
 
         public struct MenuItem {
@@ -51,12 +52,6 @@ extension NetworkProtectionStatusView {
         // MARK: - Extra Menu Items
 
         public let menuItems: [MenuItem]
-
-        // MARK: - Logging
-
-        /// The object that's in charge of logging errors and other information.
-        ///
-        private let logger: NetworkProtectionLogger
 
         // MARK: - Misc
 
@@ -100,13 +95,11 @@ extension NetworkProtectionStatusView {
         public init(controller: TunnelController,
                     statusReporter: NetworkProtectionStatusReporter,
                     menuItems: [MenuItem],
-                    logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger(),
                     runLoopMode: RunLoop.Mode? = nil) {
 
             self.tunnelController = controller
             self.statusReporter = statusReporter
             self.menuItems = menuItems
-            self.logger = logger
             self.runLoopMode = runLoopMode
 
             connectionStatus = statusReporter.statusPublisher.value
@@ -127,7 +120,8 @@ extension NetworkProtectionStatusView {
         }
 
         deinit {
-            stopTimer()
+            timer?.invalidate()
+            timer = nil
         }
 
         // MARK: - Subscriptions
@@ -216,9 +210,12 @@ extension NetworkProtectionStatusView {
             }
 
             refreshTimeLapsed()
+            let call = refreshTimeLapsed
 
-            let newTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-                self?.refreshTimeLapsed()
+            let newTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                Task { @MainActor in
+                    call()
+                }
             }
 
             timer = newTimer
@@ -246,6 +243,7 @@ extension NetworkProtectionStatusView {
             }
         }
 
+        @MainActor
         private func refreshInternalIsRunning() {
             switch connectionStatus {
             case .connected, .connecting, .reasserting:
@@ -268,9 +266,18 @@ extension NetworkProtectionStatusView {
         /// Convenience binding to be able to both query and toggle NetP.
         ///
         @MainActor
-        var isRunning: Binding<Bool> {
+        var isToggleOn: Binding<Bool> {
             .init {
-                self.internalIsRunning
+                switch self.toggleTransition {
+                case .idle:
+                    break
+                case .switchingOn:
+                    return true
+                case .switchingOff:
+                    return false
+                }
+
+                return self.internalIsRunning
             } set: { newValue in
                 guard newValue != self.internalIsRunning else {
                     return
@@ -292,14 +299,68 @@ extension NetworkProtectionStatusView {
 
         private var previousConnectionStatus: NetworkProtection.ConnectionStatus = .disconnected
 
+        @MainActor
         @Published
         private var connectionStatus: NetworkProtection.ConnectionStatus = .disconnected {
             didSet {
+                detectAndRefreshExternalToggleSwitching()
                 previousConnectionStatus = oldValue
                 refreshInternalIsRunning()
                 refreshTimeLapsed()
             }
         }
+
+        /// This method serves as a simple mechanism to detect when the toggle is controlled by the agent app, or by another
+        /// external event causing the tunnel to start or stop, so we can disable the toggle as it's transitioning..
+        ///
+        private func detectAndRefreshExternalToggleSwitching() {
+            switch toggleTransition {
+            case .idle:
+                // When the toggle transition is idle, if the status changes to connecting or disconnecting
+                // it means the tunnel is being controlled from elsewhere.
+                if connectionStatus == .connecting {
+                    toggleTransition = .switchingOn(locallyInitiated: false)
+                } else if connectionStatus == .disconnecting {
+                    toggleTransition = .switchingOff(locallyInitiated: false)
+                }
+            case .switchingOn(let locallyInitiated), .switchingOff(let locallyInitiated):
+                guard !locallyInitiated else { break }
+
+                if connectionStatus == .connecting {
+                    toggleTransition = .switchingOn(locallyInitiated: false)
+                } else if connectionStatus == .disconnecting {
+                    toggleTransition = .switchingOff(locallyInitiated: false)
+                } else {
+                    toggleTransition = .idle
+                }
+            }
+        }
+
+        // MARK: - Connection Status: Toggle State
+
+        @frozen
+        enum ToggleTransition {
+            case idle
+            case switchingOn(locallyInitiated: Bool)
+            case switchingOff(locallyInitiated: Bool)
+        }
+
+        /// Specifies a transition the toggle is undergoing, which will make sure the toggle stays in a position (either ON or OFF)
+        /// and ignores intermediate status updates until the transition completes and this is set back to .idle.
+        @Published
+        private(set) var toggleTransition = ToggleTransition.idle
+
+        /// The toggle is disabled while transitioning due to user interaction.
+        ///
+        var isToggleDisabled: Bool {
+            if case .idle = toggleTransition {
+                return false
+            }
+
+            return true
+        }
+
+        // MARK: - Connection Status: Errors
 
         @Published
         private var isHavingConnectivityIssues: Bool = false
@@ -309,6 +370,8 @@ extension NetworkProtectionStatusView {
 
         @Published
         private var lastTunnelErrorMessage: String?
+
+        // MARK: - Connection Status: Timer
 
         /// The description for the current connection status.
         /// When the status is `connected` this description will also show the time lapsed since connection.
@@ -330,6 +393,17 @@ extension NetworkProtectionStatusView {
         /// When the status is `connected` this description will also show the time lapsed since connection.
         ///
         var connectionStatusDescription: String {
+            // If the user is toggling NetP ON or OFF we'll respect the toggle state
+            // until it's idle again
+            switch toggleTransition {
+            case .idle:
+                break
+            case .switchingOn:
+                return UserText.networkProtectionStatusConnecting
+            case .switchingOff:
+                return UserText.networkProtectionStatusDisconnecting
+            }
+
             switch connectionStatus {
             case .connected:
                 return "\(UserText.networkProtectionStatusConnected) · \(timeLapsed)"
@@ -452,21 +526,24 @@ extension NetworkProtectionStatusView {
         /// Start network protection.
         ///
         private func startNetworkProtection() {
+            toggleTransition = .switchingOn(locallyInitiated: true)
+
             Task { @MainActor in
-                do {
-                    try await tunnelController.start()
-                } catch {
-                    logger.log(error)
-                    refreshInternalIsRunning()
-                }
+                await tunnelController.start()
+                toggleTransition = .idle
+                refreshInternalIsRunning()
             }
         }
 
         /// Stop network protection.
         ///
         private func stopNetworkProtection() {
+            toggleTransition = .switchingOff(locallyInitiated: true)
+
             Task { @MainActor in
                 await tunnelController.stop()
+                toggleTransition = .idle
+                refreshInternalIsRunning()
             }
         }
     }

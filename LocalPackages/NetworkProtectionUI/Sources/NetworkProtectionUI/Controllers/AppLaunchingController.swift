@@ -1,5 +1,5 @@
 //
-//  Controller.swift
+//  AppLaunchingController.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -17,18 +17,20 @@
 //
 
 import Foundation
+import NetworkProtection
 
-/// This protocol offers an interface to control the tunnel.
-/// 
-public protocol TunnelController {
+public final class AppLaunchingController: TunnelController {
+    private let appLauncher: AppLaunching
 
-    // MARK: - Starting & Stopping the VPN
+    public init(appLauncher: AppLaunching) {
+        self.appLauncher = appLauncher
+    }
 
-    /// Starts the VPN connection used for Network Protection
-    ///
-    func start() async
+    public func start() async {
+        await appLauncher.launchApp(withCommand: .startVPN)
+    }
 
-    /// Stops the VPN connection used for Network Protection
-    ///
-    func stop() async
+    public func stop() async {
+        await appLauncher.launchApp(withCommand: .stopVPN)
+    }
 }

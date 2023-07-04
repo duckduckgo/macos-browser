@@ -20,7 +20,7 @@ import Foundation
 
 /// Abstracts the notification presentation.  This was mainly designed for appex vs sysex usage.
 ///
-protocol NetworkProtectionNotificationsPresenter {
+public protocol NetworkProtectionNotificationsPresenter {
 
     /// Present a "reconnected" notification to the user.
     func showReconnectedNotification()

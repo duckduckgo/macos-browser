@@ -21,15 +21,18 @@
 
 import Combine
 import Common
-import Networking
 import Foundation
 import NetworkExtension
-import NetworkProtection
-import PixelKit
 import UserNotifications
 
 // swiftlint:disable:next type_body_length
-final class PacketTunnelProvider: NEPacketTunnelProvider {
+open class PacketTunnelProvider: NEPacketTunnelProvider {
+
+    public enum Event {
+        case userBecameActive
+        case reportLatency(ms: Int, server: String, networkType: NetworkConnectionType)
+        case rekeyCompleted
+    }
 
     // MARK: - Error Handling
 
@@ -69,13 +72,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     private let timerQueue = DispatchQueue(label: "com.duckduckgo.network-protection.PacketTunnelProvider.timerQueue")
 
-    // MARK: - Distributed Notifications
-
-    private var distributedNotificationCenter = DistributedNotificationCenter.forType(.networkProtection)
-
     // MARK: - Status
 
-    override var reasserting: Bool {
+    public override var reasserting: Bool {
         get {
             super.reasserting
         }
@@ -108,7 +107,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         let lastStatusChange = ConnectionStatusChange(status: connectionStatus, on: lastStatusChangeDate)
         let payload = ConnectionStatusChangeEncoder().encode(lastStatusChange)
 
-        distributedNotificationCenter.post(.statusDidChange, object: payload)
+        notificationCenter.post(.statusDidChange, object: payload)
     }
 
     // MARK: - Server Selection
@@ -129,35 +128,20 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         let serverStatusInfo = NetworkProtectionStatusServerInfo(serverLocation: serverInfo.serverLocation, serverAddress: serverInfo.endpoint?.description)
         let payload = ServerSelectedNotificationObjectEncoder().encode(serverStatusInfo)
 
-        distributedNotificationCenter.post(.serverSelected, object: payload)
+        notificationCenter.post(.serverSelected, object: payload)
     }
 
     // MARK: - User Notifications
 
-    private let notificationsPresenter: NetworkProtectionNotificationsPresenter = {
-#if NETP_SYSTEM_EXTENSION
-        NetworkProtectionIPCNotificationsPresenter(ipcConnection: PacketTunnelProvider.ipcConnection)
-#else
-        let parentBundlePath = "../../../"
-        let mainAppURL: URL
-
-        if #available(macOS 13, *) {
-            mainAppURL = URL(filePath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
-        } else {
-            mainAppURL = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
-        }
-
-        return NetworkProtectionUNNotificationsPresenter(mainAppURL: mainAppURL)
-#endif
-    }()
+    private let notificationsPresenter: NetworkProtectionNotificationsPresenter
 
     // MARK: - Registration Key
 
-    private lazy var keyStore = NetworkProtectionKeychainKeyStore(useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
-                                                                  errorEvents: networkProtectionDebugEvents)
+    private lazy var keyStore = NetworkProtectionKeychainKeyStore(useSystemKeychain: useSystemKeychain,
+                                                                  errorEvents: debugEvents)
 
-    private lazy var tokenStore = NetworkProtectionKeychainTokenStore(useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
-                                                                      errorEvents: networkProtectionDebugEvents)
+    private lazy var tokenStore = NetworkProtectionKeychainTokenStore(useSystemKeychain: useSystemKeychain,
+                                                                      errorEvents: debugEvents)
 
     /// This is for overriding the defaults.  A `nil` value means NetP will just use the defaults.
     ///
@@ -198,8 +182,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     private func rekey() async {
         os_log("Rekeying...", log: .networkProtectionKeyManagement)
 
-        Pixel.fire(.networkProtectionActiveUser, frequency: .dailyOnly, includeAppVersionParameter: true)
-        Pixel.fire(.networkProtectionRekeyCompleted, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
+        providerEvents.fire(.userBecameActive)
+        providerEvents.fire(.rekeyCompleted)
 
         self.resetRegistrationKey()
 
@@ -243,7 +227,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     /// Updates the bandwidth analyzer with the latest data from the WireGuard Adapter
     ///
-    private func updateBandwidthAnalyzer() async {
+    public func updateBandwidthAnalyzer() async {
         guard let (rx, tx) = try? await adapter.getBytesTransmitted() else {
             self.bandwidthAnalyzer.preventIdle()
             return
@@ -251,16 +235,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
         bandwidthAnalyzer.record(rxBytes: rx, txBytes: tx)
     }
-
-    // MARK: - IPC
-
-#if NETP_SYSTEM_EXTENSION
-    static let ipcConnection = {
-        let connection = IPCConnection(log: .networkProtectionIPCLog, memoryManagementLog: .networkProtectionMemoryLog)
-        connection.startListener()
-        return connection
-    }()
-#endif
 
     // MARK: - Connection tester
 
@@ -313,61 +287,59 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             self.latencyReporter.stop()
         }
 
-        self.latencyReporter.start(ip: ip) { [serverName=lastSelectedServerInfo.name] latency, networkType in
-            Pixel.fire(.networkProtectionLatency(ms: Int(latency * 1000), server: serverName, networkType: networkType), frequency: .standard)
+        self.latencyReporter.start(ip: ip) { [serverName=lastSelectedServerInfo.name, providerEvents] latency, networkType in
+            providerEvents.fire(.reportLatency(ms: Int(latency * 1000), server: serverName, networkType: networkType))
         }
     }
 
     private var lastTestFailed = false
     private let bandwidthAnalyzer = NetworkProtectionConnectionBandwidthAnalyzer()
-    private let tunnelHealth = NetworkProtectionTunnelHealthStore()
-    private let controllerErrorStore = NetworkProtectionTunnelErrorStore()
+    private let tunnelHealth: NetworkProtectionTunnelHealthStore
+    private let controllerErrorStore: NetworkProtectionTunnelErrorStore
     private let latencyReporter = NetworkProtectionLatencyReporter(log: .networkProtection)
 
     // MARK: - Notifications: Observation Tokens
 
     private var requestStatusUpdateCancellable: AnyCancellable!
 
+    // MARK: - Cancellables
+
+    private var cancellables = Set<AnyCancellable>()
+
     // MARK: - Initializers
 
-    override init() {
+    private let notificationCenter: NetworkProtectionNotificationCenter
+    private let useSystemKeychain: Bool
+    private let debugEvents: EventMapping<NetworkProtectionError>?
+    private let providerEvents: EventMapping<Event>
+    private let appLauncher: AppLaunching?
+
+    public init(notificationCenter: NetworkProtectionNotificationCenter,
+                notificationsPresenter: NetworkProtectionNotificationsPresenter,
+                useSystemKeychain: Bool,
+                debugEvents: EventMapping<NetworkProtectionError>?,
+                providerEvents: EventMapping<Event>,
+                appLauncher: AppLaunching? = nil) {
         os_log("[+] PacketTunnelProvider", log: .networkProtectionMemoryLog, type: .debug)
+        self.notificationCenter = notificationCenter
+        self.notificationsPresenter = notificationsPresenter
+        self.useSystemKeychain = useSystemKeychain
+        self.debugEvents = debugEvents
+        self.providerEvents = providerEvents
+        self.appLauncher = appLauncher
+        self.tunnelHealth = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
+        self.controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
 
         super.init()
 
-        requestStatusUpdateCancellable = distributedNotificationCenter.publisher(for: .requestStatusUpdate).sink { [weak self] _ in
+        requestStatusUpdateCancellable = notificationCenter.publisher(for: .requestStatusUpdate).sink { [weak self] _ in
             self?.broadcastConnectionStatus()
             self?.broadcastLastSelectedServerInfo()
         }
-
-        connectionStatus = .disconnected
     }
 
     deinit {
         os_log("[-] PacketTunnelProvider", log: .networkProtectionMemoryLog, type: .debug)
-    }
-
-    private func setupPixels(defaultHeaders: [String: String]) {
-        let dryRun: Bool
-#if DEBUG
-        dryRun = true
-#else
-        dryRun = false
-#endif
-
-        Pixel.setUp(dryRun: dryRun,
-                    appVersion: AppVersion.shared.versionNumber,
-                    defaultHeaders: defaultHeaders,
-                    log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
-
-            let url = URL.pixelUrl(forPixelNamed: pixelName)
-            let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: headers)
-            let request = APIRequest(configuration: configuration)
-
-            request.fetch { _, error in
-                onComplete(error)
-            }
-        }
     }
 
     private var tunnelProviderProtocol: NETunnelProviderProtocol? {
@@ -385,25 +357,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         try loadAuthToken(from: options)
     }
 
-    private func loadVendorOptions(from provider: NETunnelProviderProtocol?) {
-        guard let vendorOptions = provider?.providerConfiguration else {
-            os_log("🔵 Provider is nil, or providerConfiguration is not set", log: .networkProtection)
-            assertionFailure("Provider is nil, or providerConfiguration is not set")
-            return
-        }
-
-        loadDefaultPixelHeaders(from: vendorOptions)
-    }
-
-    private func loadDefaultPixelHeaders(from options: [String: Any]) {
-        guard let defaultPixelHeaders = options[NetworkProtectionOptionKey.defaultPixelHeaders.rawValue] as? [String: String] else {
-
-            os_log("🔵 Pixel options are not set", log: .networkProtection)
-            assertionFailure("Default pixel headers are not set")
-            return
-        }
-
-        setupPixels(defaultHeaders: defaultPixelHeaders)
+    open func loadVendorOptions(from provider: NETunnelProviderProtocol?) {
+        /* Implement in subclass */
     }
 
     private func loadKeyValidity(from options: [String: AnyObject]) {
@@ -431,23 +386,23 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         try tokenStore.store(authToken)
     }
 
-    override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
+    open override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         connectionStatus = .connecting
 
         // when activated by system "on-demand" the option is set
         let isOnDemand = options?["is-on-demand"] as? Bool == true
         let isActivatedFromSystemSettings = options?["activationAttemptId"] == nil && !isOnDemand
 
-        let internalCompletionHandler = { (error: Error?) in
+        let internalCompletionHandler = { [weak self] (error: Error?) in
             if error != nil {
-                self.connectionStatus = .disconnected
+                self?.connectionStatus = .disconnected
 
                 // if connection is failing when activated by system on-demand
                 // ask the Main App to disable the on-demand rule to prevent activation loop
                 // To be reconsidered for the Kill Switch
                 if isOnDemand {
-                    Task {
-                        await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+                    Task { [self] in
+                        await self?.appLauncher?.launchApp(withCommand: .stopVPN)
                         completionHandler(error)
                     }
                     return
@@ -455,12 +410,12 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             }
 
             if !isOnDemand {
-                Task {
+                Task { [self] in
                     // This completion handler signals a coorect connection.  We want to signal this before turning
                     // on-demand ON so that it won't interfere with the current connection.
                     completionHandler(error)
 
-                    await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .enableOnDemand)
+                    await self?.appLauncher?.launchApp(withCommand: .enableOnDemand)
                     return
                 }
             }
@@ -534,7 +489,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
-    override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
+    public override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
         connectionStatus = .disconnecting
         os_log("Stopping tunnel with reason %{public}@", log: .networkProtection, type: .info, String(describing: reason))
 
@@ -551,7 +506,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                     // stop requested by user from System Settings
                     // we can‘t prevent a respawn with on-demand rule ON
                     // request the main app to reconfigure with on-demand OFF
-                    await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+
+                    await self.appLauncher?.launchApp(withCommand: .stopVPN)
 
                 case .superceded:
                     self.notificationsPresenter.showSupercededNotification()
@@ -561,14 +517,23 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 }
 
                 completionHandler()
+
+                #if os(macOS)
+                // From what I'm seeing in my tests the next call to start the tunnel is MUCH
+                // less likely to fail if we force this extension to exit when the tunnel is killed.
+                //
+                // Ref: https://app.asana.com/0/72649045549333/1204668639086684/f
+                //
+                exit(0)
+                #endif
             }
         }
     }
 
-    override func cancelTunnelWithError(_ error: Error?) {
+    public override func cancelTunnelWithError(_ error: Error?) {
         // ensure on-demand rule is taken down on connection retry failure
         Task {
-            await AppLauncher(appBundleURL: .mainAppBundleURL).launchApp(withCommand: .stopVPN)
+            await self.appLauncher?.launchApp(withCommand: .stopVPN)
 
             super.cancelTunnelWithError(error)
         }
@@ -615,7 +580,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
-    private func updateTunnelConfiguration(selectedServer: SelectedNetworkProtectionServer, reassert: Bool = true) async throws {
+    public func updateTunnelConfiguration(selectedServer: SelectedNetworkProtectionServer, reassert: Bool = true) async throws {
         let serverSelectionMethod: NetworkProtectionServerSelectionMethod
 
         switch selectedServerStore.selectedServer {
@@ -628,7 +593,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         try await updateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod, reassert: reassert)
     }
 
-    private func updateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod, reassert: Bool = true) async throws {
+    public func updateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod, reassert: Bool = true) async throws {
 
         let tunnelConfiguration = try await generateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod)
 
@@ -660,7 +625,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         do {
             let deviceManager = NetworkProtectionDeviceManager(tokenStore: tokenStore,
                                                                keyStore: keyStore,
-                                                               errorEvents: networkProtectionDebugEvents)
+                                                               errorEvents: debugEvents)
 
             configurationResult = try await deviceManager.generateTunnelConfiguration(selectionMethod: serverSelectionMethod)
         } catch {
@@ -682,7 +647,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - App Messages
 
-    override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
+    public override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
         guard let message = ExtensionMessage(rawValue: messageData[0]) else {
             completionHandler?(nil)
             return
@@ -832,7 +797,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
 
         os_log("🔵 Tunnel interface is %{public}@", log: .networkProtection, type: .info, adapter.interfaceName ?? "unknown")
-        Pixel.fire(.networkProtectionActiveUser, frequency: .dailyOnly, includeAppVersionParameter: true)
 
         if let interfaceName = adapter.interfaceName {
             do {
@@ -845,109 +809,25 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
-    private func handleAdapterStopped() async {
+    public func handleAdapterStopped() async {
         connectionStatus = .disconnected
         await self.connectionTester.stop()
     }
 
     // MARK: - Computer sleeping
 
-    override func sleep() async {
+    public override func sleep() async {
         os_log("Sleep", log: .networkProtectionSleepLog, type: .info)
 
         await connectionTester.stop()
     }
 
-    override func wake() {
+    public override func wake() {
         os_log("Wake up", log: .networkProtectionSleepLog, type: .info)
 
         Task {
             await handleAdapterStarted(resumed: true)
         }
-    }
-
-    // MARK: - Error Reporting
-
-    private lazy var networkProtectionDebugEvents: EventMapping<NetworkProtectionError>? = .init { [weak self] event, _, _, _ in
-
-        guard let self = self else {
-            return
-        }
-
-        let domainEvent: NetworkProtectionPixelEvent
-
-#if DEBUG
-        // Makes sure we see the assertion failure in the yellow NetP alert.
-        self.controllerErrorStore.lastErrorMessage = "[Debug] Error event: \(event.localizedDescription)"
-#endif
-
-        switch event {
-        case .noServerRegistrationInfo:
-            domainEvent = .networkProtectionTunnelConfigurationNoServerRegistrationInfo
-        case .couldNotSelectClosestServer:
-            domainEvent = .networkProtectionTunnelConfigurationCouldNotSelectClosestServer
-        case .couldNotGetPeerPublicKey:
-            domainEvent = .networkProtectionTunnelConfigurationCouldNotGetPeerPublicKey
-        case .couldNotGetPeerHostName:
-            domainEvent = .networkProtectionTunnelConfigurationCouldNotGetPeerHostName
-        case .couldNotGetInterfaceAddressRange:
-            domainEvent = .networkProtectionTunnelConfigurationCouldNotGetInterfaceAddressRange
-
-        case .failedToFetchServerList(let eventError):
-            domainEvent = .networkProtectionClientFailedToFetchServerList(error: eventError)
-        case .failedToParseServerListResponse:
-            domainEvent = .networkProtectionClientFailedToParseServerListResponse
-        case .failedToEncodeRegisterKeyRequest:
-            domainEvent = .networkProtectionClientFailedToEncodeRegisterKeyRequest
-        case .failedToFetchRegisteredServers(let eventError):
-            domainEvent = .networkProtectionClientFailedToFetchRegisteredServers(error: eventError)
-        case .failedToParseRegisteredServersResponse:
-            domainEvent = .networkProtectionClientFailedToParseRegisteredServersResponse
-        case .failedToEncodeRedeemRequest:
-            domainEvent = .networkProtectionClientFailedToEncodeRedeemRequest
-        case .invalidInviteCode:
-            domainEvent = .networkProtectionClientInvalidInviteCode
-        case .failedToRedeemInviteCode(let error):
-            domainEvent = .networkProtectionClientFailedToRedeemInviteCode(error: error)
-        case .failedToParseRedeemResponse(let error):
-            domainEvent = .networkProtectionClientFailedToParseRedeemResponse(error: error)
-        case .invalidAuthToken:
-            domainEvent = .networkProtectionClientInvalidAuthToken
-        case .serverListInconsistency:
-            return
-
-        case .failedToEncodeServerList:
-            domainEvent = .networkProtectionServerListStoreFailedToEncodeServerList
-        case .failedToDecodeServerList:
-            domainEvent = .networkProtectionServerListStoreFailedToDecodeServerList
-        case .failedToWriteServerList(let eventError):
-            domainEvent = .networkProtectionServerListStoreFailedToWriteServerList(error: eventError)
-        case .noServerListFound:
-            return
-        case .couldNotCreateServerListDirectory:
-            return
-
-        case .failedToReadServerList(let eventError):
-            domainEvent = .networkProtectionServerListStoreFailedToReadServerList(error: eventError)
-
-        case .failedToCastKeychainValueToData(let field):
-            domainEvent = .networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: field)
-        case .keychainReadError(let field, let status):
-            domainEvent = .networkProtectionKeychainReadError(field: field, status: status)
-        case .keychainWriteError(let field, let status):
-            domainEvent = .networkProtectionKeychainWriteError(field: field, status: status)
-        case .keychainDeleteError(let status):
-            domainEvent = .networkProtectionKeychainDeleteError(status: status)
-
-        case .noAuthTokenFound:
-            domainEvent = .networkProtectionNoAuthTokenFoundError
-
-        case .unhandledError(function: let function, line: let line, error: let error):
-            domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
-        }
-
-        Pixel.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
-
     }
 }
 

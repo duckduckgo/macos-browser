@@ -42,6 +42,8 @@ final class Pixel {
         self.dryRun = dryRun
     }
 
+    private static let moreInfoHeader: HTTPHeaders = [APIRequest.HTTPHeaderField.moreInfo: "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString]
+
     // Temporary for activation pixels
     static private var aMonthAgo = Calendar.current.date(byAdding: .month, value: -1, to: Date())!
     @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: aMonthAgo)
@@ -51,7 +53,7 @@ final class Pixel {
               withAdditionalParameters params: [String: String]? = nil,
               allowedQueryReservedCharacters: CharacterSet? = nil,
               includeAppVersionParameter: Bool = true,
-              withHeaders headers: HTTPHeaders = APIRequest.Headers().default,
+              withHeaders headers: APIRequest.Headers = APIRequest.Headers(additionalHeaders: moreInfoHeader),
               onComplete: @escaping (Error?) -> Void = {_ in }) {
 
         var newParams = params ?? [:]
@@ -61,9 +63,6 @@ final class Pixel {
         #if DEBUG
             newParams[Parameters.test] = Values.test
         #endif
-
-        var headers = headers
-        headers[APIRequest.HTTPHeaderField.moreInfo] = "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString
 
         guard !dryRun else {
             let params = params?.filter { key, _ in !["appVersion", "test"].contains(key) } ?? [:]
