@@ -47,9 +47,8 @@ public struct DataBrokerProtectionEmailService {
         }
 
         var request = URLRequest(url: url)
-        let base64Login = authAsBase64HeaderValue(user: Constants.authUser, key: Constants.authPass)
+        request.setValue(Headers.authorizationHeader, forHTTPHeaderField: "Authorization")
 
-        request.setValue(base64Login, forHTTPHeaderField: "Authorization")
         let (data, _) = try await urlSession.data(for: request)
 
         if let resJson = try? JSONSerialization.jsonObject(with: data) as? [String: AnyObject],
@@ -86,10 +85,8 @@ public struct DataBrokerProtectionEmailService {
         }
 
         var request = URLRequest(url: url)
-        let base64Login = authAsBase64HeaderValue(user: Constants.authUser,
-                                                                   key: Constants.authPass)
+        request.setValue(Headers.authorizationHeader, forHTTPHeaderField: "Authorization")
 
-        request.setValue(base64Login, forHTTPHeaderField: "Authorization")
         let (data, _) = try await urlSession.data(for: request)
 
         do {
@@ -98,12 +95,6 @@ public struct DataBrokerProtectionEmailService {
         } catch {
             throw EmailError.cantDecodeEmailLink
         }
-    }
-
-    private func authAsBase64HeaderValue(user: String, key: String) -> String {
-        let loginStr = String(format: "%@:%@", user, key)
-        let loginData = loginStr.data(using: .utf8)!
-        return "Basic \(loginData.base64EncodedString())"
     }
 }
 
