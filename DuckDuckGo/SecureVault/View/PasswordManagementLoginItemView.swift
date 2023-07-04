@@ -215,6 +215,8 @@ private struct UsernameLabel: View {
                     .tooltip(UserText.copyUsernameTooltip)
                 }
             }
+
+            PrivateEmailMessage()
         }
     }
 }
@@ -263,6 +265,68 @@ private struct PrivateEmailImage: View {
         if let image {
             Image(nsImage: image)
                 .aspectRatio(contentMode: .fit)
+        }
+    }
+}
+
+private struct PrivateEmailMessage: View {
+    @EnvironmentObject var model: PasswordManagementLoginModel
+
+    @State private var hover: Bool = false
+
+    @available(macOS 12, *)
+    var attributedString: AttributedString {
+        let text = String(format: UserText.pmSignInToManageEmail, UserText.pmEnableEmailProtection)
+        var attributedString = AttributedString(text)
+        if let range = attributedString.range(of: UserText.pmEnableEmailProtection) {
+            attributedString[range].foregroundColor = .blue
+        }
+        return attributedString
+    }
+
+    var body: some View {
+        VStack {
+            if model.usernameIsPrivateEmail && model.privateEmailMessage != "" {
+                if model.isSignedIn {
+                    Text(model.privateEmailMessage)
+                        .font(.subheadline)
+                        .lineLimit(nil)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+
+                    if #available(macOS 12.0, *) {
+                        let combinedText = Text(attributedString)
+                            .font(.subheadline)
+                            .lineLimit(nil)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                        combinedText
+                            .onTapGesture {
+                                model.enableEmailProtection()
+                            }
+                            .onHover { isHovered in
+                                self.hover = isHovered
+                                DispatchQueue.main.async {
+                                    if hover {
+                                        NSCursor.pointingHand.push()
+                                    } else {
+                                        NSCursor.pop()
+                                    }
+                                }
+                            }
+                    } else {
+                        Text(String(format: UserText.pmSignInToManageEmail, UserText.pmEnableEmailProtection))
+                            .font(.subheadline)
+                            .lineLimit(nil)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .onTapGesture {
+                                model.enableEmailProtection()
+                            }
+                    }
+                }
+            }
         }
     }
 }
