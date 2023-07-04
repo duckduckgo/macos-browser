@@ -130,7 +130,10 @@ final class FaviconImageCache {
             guard let host = favicon.documentUrl.host, let baseDomain = tld.eTLDplus1(host) else {
                 return false
             }
-            return baseDomains.contains(baseDomain) && !bookmarkManager.isHostInBookmarks(host: host) && !logins.contains(host) && !history.contains(host)
+            return baseDomains.contains(baseDomain) &&
+            !bookmarkManager.isHostInBookmarks(host: host) &&
+            !logins.contains(host) &&
+            !history.contains(host)
         }, completionHandler: completion)
     }
 
