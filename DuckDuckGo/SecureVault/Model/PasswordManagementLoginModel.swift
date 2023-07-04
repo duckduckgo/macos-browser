@@ -94,11 +94,11 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var toggleConfirmationAlert: (title: String, message: String, button: String) {
         if privateEmailStatus == .active {
             return (title: UserText.pmEmailDeactivateConfirmTitle,
-                    message: UserText.pmEmailDeactivateConfirmContent,
+                    message: String(format: UserText.pmEmailDeactivateConfirmContent, username),
                     button: UserText.pmDeactivate)
         }
         return (title: UserText.pmEmailActivateConfirmTitle,
-                message: UserText.pmEmailActivateConfirmContent,
+                message: String(format: UserText.pmEmailActivateConfirmContent, username),
                 button: UserText.pmActivate)
     }
 
