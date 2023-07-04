@@ -93,12 +93,24 @@ final class DataBrokerProtectionFeatureTests: XCTestCase {
 
         XCTAssertEqual(mockCSSDelegate.successActionId, "expectation")
     }
+
+    func testWhenGetCaptchaInfoIsParsed_thenTheCorrectCaptchaInfoIsParsed() {
+        let params = ["result": ["success": ["actionID": "getCaptchaInfo", "actionType": "getCaptchaInfo", "response": ["siteKey": "1234", "url": "www.test.com", "type": "g-captcha"]] as [String: Any]]]
+        let sut = DataBrokerProtectionFeature(delegate: mockCSSDelegate)
+
+        sut.parseActionCompleted(params: params)
+
+        XCTAssertEqual(mockCSSDelegate.captchaInfo?.siteKey, "1234")
+        XCTAssertEqual(mockCSSDelegate.captchaInfo?.url, "www.test.com")
+        XCTAssertEqual(mockCSSDelegate.captchaInfo?.type, "g-captcha")
+    }
 }
 
 final class MockCSSCommunicationDelegate: CSSCommunicationDelegate {
     var lastError: DataBrokerProtectionError?
     var profiles: [ExtractedProfile]?
     var url: URL?
+    var captchaInfo: GetCaptchaInfoResponse?
     var successActionId: String?
 
     func loadURL(url: URL) {
@@ -113,6 +125,10 @@ final class MockCSSCommunicationDelegate: CSSCommunicationDelegate {
         self.successActionId = actionId
     }
 
+    func captchaInformation(captchaInfo: GetCaptchaInfoResponse) {
+        self.captchaInfo = captchaInfo
+    }
+
     func onError(error: DataBrokerProtectionError) {
         self.lastError = error
     }
@@ -122,5 +138,6 @@ final class MockCSSCommunicationDelegate: CSSCommunicationDelegate {
         profiles = nil
         url = nil
         successActionId = nil
+        captchaInfo = nil
     }
 }

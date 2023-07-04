@@ -22,12 +22,38 @@ struct NavigateResponse: Decodable {
     let url: String
 }
 
+public struct GetCaptchaInfoResponse: Decodable {
+    let siteKey: String
+    let url: String
+    let type: String
+
+    enum CodingKeys: CodingKey {
+        case siteKey
+        case url
+        case type
+    }
+
+    init(siteKey: String, url: String, type: String) {
+        self.siteKey = siteKey
+        self.url = url
+        self.type = type
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.siteKey = try container.decode(String.self, forKey: .siteKey)
+        self.url = try container.decode(String.self, forKey: .url)
+        self.type = try container.decode(String.self, forKey: .type)
+    }
+}
+
 enum CSSSuccessData {
     case navigate(NavigateResponse)
     case extract([ExtractedProfile])
     case fillForm
     case click
     case expectation
+    case getCaptchaInfo(GetCaptchaInfoResponse)
 }
 
 struct CSSSuccessResponse: Decodable {
@@ -59,6 +85,8 @@ struct CSSSuccessResponse: Decodable {
             self.response = .expectation
         case .emailConfirmation:
             self.response = nil // Email confirmation is done on the native side. We shouldn't have a response here
+        case .getCaptchaInfo:
+            self.response = .getCaptchaInfo(try container.decode(GetCaptchaInfoResponse.self, forKey: .response))
         }
     }
 }
