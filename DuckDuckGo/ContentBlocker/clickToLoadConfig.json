@@ -9,8 +9,8 @@
         ],
         "excludedDomains": [
             {
-                "domain": "",
-                "reason": ""
+                "domain": "www.figma.com",
+                "reason": "breakage due to file browser fb-page element"
             }
         ],
         "surrogates": [

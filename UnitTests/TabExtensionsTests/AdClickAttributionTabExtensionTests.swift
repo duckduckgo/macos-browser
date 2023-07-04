@@ -638,7 +638,7 @@ extension TrackerData {
 
 }
 extension ContentBlockerRulesIdentifier {
-    static let mock = ContentBlockerRulesIdentifier(name: "name", tdsEtag: "tdsEtag", tempListEtag: nil, allowListEtag: nil, unprotectedSitesHash: nil)
+    static let mock = ContentBlockerRulesIdentifier(name: "name", tdsEtag: "tdsEtag", tempListId: nil, allowListId: nil, unprotectedSitesHash: nil)
 }
 
 class UserContentControllerMock: UserContentControllerProtocol {

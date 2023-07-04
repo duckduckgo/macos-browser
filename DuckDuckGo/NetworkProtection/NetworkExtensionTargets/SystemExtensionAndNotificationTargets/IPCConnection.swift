@@ -98,12 +98,12 @@ final class IPCConnection: NSObject {
         // The remote object is the provider's IPCConnection instance.
         newConnection.remoteObjectInterface = NSXPCInterface(with: ProviderCommunication.self)
 
-        newConnection.invalidationHandler = {
-            self.currentConnection = nil
+        newConnection.invalidationHandler = { [weak self] in
+            self?.currentConnection = nil
         }
 
-        newConnection.interruptionHandler = {
-            self.currentConnection = nil
+        newConnection.interruptionHandler = { [weak self] in
+            self?.currentConnection = nil
         }
 
         currentConnection = newConnection

@@ -21,6 +21,7 @@ import AppKit
 protocol BrowserImportViewControllerDelegate: AnyObject {
 
     func browserImportViewController(_ viewController: BrowserImportViewController, didChangeSelectedImportOptions options: [DataImport.DataType])
+    func browserImportViewControllerRequestedParentViewRefresh(_ viewController: BrowserImportViewController)
 
 }
 
@@ -118,6 +119,11 @@ final class BrowserImportViewController: NSViewController {
             bookmarksCheckbox.title = UserText.bookmarkImportBookmarks
             passwordsWarningLabel.isHidden = true
         }
+    }
+
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        delegate?.browserImportViewControllerRequestedParentViewRefresh(self)
     }
 
     @IBAction func selectedImportOptionsChanged(_ sender: NSButton) {

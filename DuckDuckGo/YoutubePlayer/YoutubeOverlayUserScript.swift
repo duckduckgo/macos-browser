@@ -27,6 +27,7 @@ protocol YoutubeOverlayUserScriptDelegate: AnyObject {
 
 final class YoutubeOverlayUserScript: NSObject, Subfeature {
 
+    let duckPlayerPreferences: DuckPlayerPreferences
     weak var broker: UserScriptMessageBroker?
     weak var delegate: YoutubeOverlayUserScriptDelegate?
     weak var webView: WKWebView?
@@ -35,6 +36,10 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
         .exact(hostname: "duckduckgo.com")
     ])
     public var featureName: String = "duckPlayer"
+
+    init(duckPlayerPreferences: DuckPlayerPreferences = DuckPlayerPreferences.shared) {
+        self.duckPlayerPreferences = duckPlayerPreferences
+    }
 
     // MARK: - Subfeature
 
@@ -100,14 +105,18 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
 extension YoutubeOverlayUserScript {
     @MainActor
     func handleSendJSPixel(params: Any, message: UserScriptMessage) -> Encodable? {
+        guard let body = message.messageBody as? [String: Any], let parameters = body["params"] as? [String: Any] else {
+            return nil
+        }
+        let pixelName = parameters["pixelName"] as? String
+        if pixelName == "play.use" || pixelName == "play.do_not_use" {
+            duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
+        }
+
         // Temporary pixel for first time user uses Duck Player
         if !Pixel.isNewUser {
             return nil
         }
-        guard let body = message.messageBody as? [String: Any] else {
-            return nil
-        }
-        let pixelName = body["pixelName"] as? String
         if pixelName == "play.use" {
             let repetition = Pixel.Event.Repetition(key: Pixel.Event.watchInDuckPlayerInitial.name)
             if repetition == .initial {

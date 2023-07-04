@@ -183,6 +183,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             // MARK: perform first time launch logic here
         }
 
+        startupSync()
+
         stateRestorationManager.applicationDidFinishLaunching()
 
         BWManager.shared.initCommunication()
@@ -210,8 +212,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #if NETWORK_PROTECTION
         startupNetworkProtection()
 #endif
-
-        startupSync()
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
@@ -349,7 +349,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             // Restart NetP SysEx on app update
             if await provider.isConnected() {
                 await provider.stop()
-                try? await provider.start()
+                await provider.start()
             }
         }
     }

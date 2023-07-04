@@ -339,8 +339,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             self?.broadcastConnectionStatus()
             self?.broadcastLastSelectedServerInfo()
         }
-
-        connectionStatus = .disconnected
     }
 
     deinit {
@@ -361,7 +359,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                     log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
-            let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: headers)
+            let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
+            let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
             let request = APIRequest(configuration: configuration)
 
             request.fetch { _, error in
@@ -561,6 +560,15 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
                 }
 
                 completionHandler()
+
+                #if os(macOS)
+                // From what I'm seeing in my tests the next call to start the tunnel is MUCH
+                // less likely to fail if we force this extension to exit when the tunnel is killed.
+                //
+                // Ref: https://app.asana.com/0/72649045549333/1204668639086684/f
+                //
+                exit(0)
+                #endif
             }
         }
     }
