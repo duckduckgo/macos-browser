@@ -246,13 +246,33 @@ struct PurchaseView: View {
             Group {
                 Divider()
                 Spacer()
-                Button("Exchange token") { manager.exchangeToken() }
-                Button("Fetch entitlements") { manager.fetchEntitlements() }
-                HStack {
-                    Spacer()
-                    Button("OK") { showingAlert = false }
-                    Spacer()
+                Button("Refresh access token") {
+                    Task {
+                        switch await AccountsService.getAccessToken() {
+                        case .success(let response):
+                            self.model.authServiceToken = response.accessToken
+                        case .failure(let error):
+                            print(error)
+                        }
+                    }
                 }
+
+                Button("Refresh entitlements") {
+                    Task {
+                        switch await AccountsService.validateToken(accessToken: self.model.authServiceToken ?? "") {
+                        case .success(let response):
+                            self.model.externalID = response.account.externalID
+                            self.model.currentEntitlements = response.account.entitlements
+                        case .failure(let error):
+                            print(error)
+                        }
+                    }
+                }
+            }
+            HStack {
+                Spacer()
+                Button("OK") { showingAlert = false }
+                Spacer()
             }
         }.padding(16)
     }

@@ -36,6 +36,8 @@ public final class PurchaseModel: ObservableObject {
 
     @Published var currentEntitlements: [AccountsService.ValidateTokenResponse.Entitlement] = []
 
+
+    var authServiceToken: String?
     var externalID: String?
 
     init(subscriptions: [SubscriptionRowModel] = []) {
@@ -68,6 +70,8 @@ public final class PurchaseModel: ObservableObject {
         storefrontCountry = "Loading..."
         storefrontCountry = await Storefront.current?.countryCode ?? "<unknown>"
     }
+
+    
 }
 
 @available(macOS 12.0, *)

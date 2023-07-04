@@ -28,8 +28,6 @@ final class PurchaseViewController: NSViewController {
     private let manager = PurchaseManager.shared
     private let model = PurchaseModel()
 
-    private var authServiceToken: String?
-
     private var cancellables = Set<AnyCancellable>()
 
     deinit {
@@ -85,7 +83,7 @@ final class PurchaseViewController: NSViewController {
     }
 
     private var hasAuthServiceToken: Bool {
-        guard let token = authServiceToken else { return false }
+        guard let token = model.authServiceToken else { return false }
         return !token.isEmpty
     }
 
@@ -106,7 +104,7 @@ final class PurchaseViewController: NSViewController {
             Task {
                 switch await AccountsService.getAccessToken() {
                 case .success(let response):
-                    self.authServiceToken = response.accessToken
+                    self.model.authServiceToken = response.accessToken
                     self.update(for: .loadingProducts)
                 case .failure(let error):
                     self.update(for: .errorOccurred(error: error))
@@ -114,7 +112,7 @@ final class PurchaseViewController: NSViewController {
             }
         case .loadingProducts:
             Task {
-                switch await AccountsService.validateToken(accessToken: self.authServiceToken ?? "") {
+                switch await AccountsService.validateToken(accessToken: self.model.authServiceToken ?? "") {
                 case .success(let response):
                     self.model.externalID = response.account.externalID
                     self.model.currentEntitlements = response.account.entitlements
