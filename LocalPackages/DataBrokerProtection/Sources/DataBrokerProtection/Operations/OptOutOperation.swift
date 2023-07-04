@@ -24,22 +24,26 @@ import UserScript
 public final class OptOutOperation: DataBrokerOperation {
     public typealias ReturnValue = Void
 
-    public var privacyConfig: PrivacyConfigurationManaging
-    public var prefs: ContentScopeProperties
-    public var query: BrokerProfileQueryData
+    public let privacyConfig: PrivacyConfigurationManaging
+    public let prefs: ContentScopeProperties
+    public let query: BrokerProfileQueryData
+    public let emailService: DataBrokerProtectionEmailService
+    public let captchaService: DataBrokerProtectionCaptchaService
     public var webViewHandler: DataBrokerProtectionWebViewHandler?
     public var actionsHandler: DataBrokerProtectionActionsHandler?
-    public var emailService: DataBrokerProtectionEmailService
     public var continuation: CheckedContinuation<Void, Error>?
 
     public init(privacyConfig: PrivacyConfigurationManaging,
                 prefs: ContentScopeProperties,
                 query: BrokerProfileQueryData,
-                emailService: DataBrokerProtectionEmailService = DataBrokerProtectionEmailService()) {
+                emailService: DataBrokerProtectionEmailService = DataBrokerProtectionEmailService(),
+                captchaService: DataBrokerProtectionCaptchaService = DataBrokerProtectionCaptchaService()
+    ) {
         self.privacyConfig = privacyConfig
         self.prefs = prefs
         self.query = query
         self.emailService = emailService
+        self.captchaService = captchaService
     }
 
     public func run() async throws {
