@@ -32,6 +32,7 @@ public enum DataBrokerProtectionError: Error, Equatable {
     case unknown(String)
     case unrecoverableError
     case noOptOutStep
+    case captchaServiceError(CaptchaServiceError)
     case emailError(DataBrokerProtectionEmailService.EmailError?)
 
     static func parse(params: Any) -> DataBrokerProtectionError {

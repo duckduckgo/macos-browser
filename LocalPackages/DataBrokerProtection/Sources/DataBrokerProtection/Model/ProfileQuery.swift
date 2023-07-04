@@ -18,11 +18,17 @@
 
 import Foundation
 
+public struct Address: Encodable, Sendable {
+    let city: String
+    let state: String
+}
+
 public struct ProfileQuery: Encodable, Sendable {
     let firstName: String
     let lastName: String
     let city: String
     let state: String
+    let addresses: [Address]
     let age: Int
     let fullName: String
     let profileUrl: String?
@@ -39,6 +45,7 @@ public struct ProfileQuery: Encodable, Sendable {
         self.lastName = lastName
         self.city = city
         self.state = state
+        self.addresses = [Address(city: city, state: state)]
         self.age = age
         self.fullName = "\(firstName) \(lastName)"
         self.profileUrl = profileUrl
