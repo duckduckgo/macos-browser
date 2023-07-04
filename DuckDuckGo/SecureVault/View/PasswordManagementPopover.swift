@@ -75,7 +75,7 @@ extension PasswordManagementPopover: NSPopoverDelegate {
     func popoverDidClose(_ notification: Notification) {
         if let window = viewController.view.window {
             for sheet in window.sheets {
-                window.endSheet(sheet, returnCode: .cancel)
+                sheet.endSheet(window)
             }
         }
         viewController.postChange()
