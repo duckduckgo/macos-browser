@@ -24,6 +24,7 @@ import UserScript
 public protocol CSSCommunicationDelegate: AnyObject {
     func loadURL(url: URL)
     func extractedProfiles(profiles: [ExtractedProfile])
+    func captchaInformation(captchaInfo: GetCaptchaInfoResponse)
     func success(actionId: String)
     func onError(error: DataBrokerProtectionError)
 }
@@ -93,6 +94,8 @@ struct DataBrokerProtectionFeature: Subfeature {
             }
         case .extract(let profiles):
             delegate?.extractedProfiles(profiles: profiles)
+        case .getCaptchaInfo(let captchaInfo):
+            delegate?.captchaInformation(captchaInfo: captchaInfo)
         case .fillForm, .click, .expectation:
             delegate?.success(actionId: success.actionID)
         default: return
