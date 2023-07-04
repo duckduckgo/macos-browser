@@ -55,7 +55,7 @@ public final class DataBrokerProtectionWebViewHandler: NSObject {
             window?.makeKeyAndOrderFront(nil)
         }
 
-        try? await self.load(url: URL(string: "https://www.duckduckgo.com")!)
+        try? await self.load(url: URL(string: "https://dataveria.com/ng/control/privacy")!)
     }
 
     func load(url: URL) async throws {
