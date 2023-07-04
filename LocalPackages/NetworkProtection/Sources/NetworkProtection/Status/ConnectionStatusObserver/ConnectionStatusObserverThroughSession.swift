@@ -61,21 +61,13 @@ public class ConnectionStatusObserverThroughSession: ConnectionStatusObserver {
     private func startObservers() {
         notificationCenter.publisher(for: .NEVPNConfigurationChange).sink { _ in
             Task {
-                // As crazy as it seems, this calls fixes an issue with the main app
-                // no longer receiveing status updates.
+                // As crazy as it seems, this calls fixes an issue with tunnel session
+                // having a nil manager, when in theory it should never be `nil`.  I don't know
+                // why this happens, but I believe it may be because we run multiple instances
+                // of our App controlling the session, and if any modification is made to the
+                // session, other instances should reload it from preferences.
                 //
-                // You can use these steps to repro the original issue and see if this can be
-                // removed or replaced:
-                //
-                //  1. Reset NetP so that the VPN config is removed and the sysex
-                //      (haven't tested appex) are uninstalled.
-                //  2. Start NetP from the main app, the system dialog will tell you
-                //      to go to System Settings to enable the extension, tap
-                //      "Go to system settings" but don't allow yet.
-                //  3. Tap on the status menu app, and start NetP, you should see the alert again
-                //  4. This time allow the system extension.
-                //  5. Without this line, you'll see NetP connect and the main app not report
-                //      any status updates.
+                // For better or worse, this line ensures the session's manager is not nil.
                 //
                 try? await NETunnelProviderManager.loadAllFromPreferences()
             }
