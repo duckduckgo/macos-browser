@@ -369,7 +369,7 @@ final class Fire {
               let accounts = try? vault.accounts() else {
             return []
         }
-        return Set(accounts.map { $0.domain })
+        return Set(accounts.compactMap { $0.domain })
     }
 
     private func burnFavicons(completion: @escaping () -> Void) {

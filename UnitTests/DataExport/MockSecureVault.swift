@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import GRDB
 
 final class MockSecureVault: SecureVault {
 
@@ -41,8 +42,8 @@ final class MockSecureVault: SecureVault {
         return storedAccounts.filter { $0.domain == domain }
     }
 
-    func accountsWithPartialMatchesFor(eTLDplus1: String) throws -> [BrowserServicesKit.SecureVaultModels.WebsiteAccount] {
-        return storedAccounts.filter { $0.domain.contains(eTLDplus1) }
+    func accountsWithPartialMatchesFor(eTLDplus1: String) throws -> [SecureVaultModels.WebsiteAccount] {
+        return storedAccounts.filter { $0.domain?.contains(eTLDplus1) ?? false }
     }
 
     func websiteCredentialsFor(accountId: Int64) throws -> SecureVaultModels.WebsiteCredentials? {
@@ -117,6 +118,40 @@ final class MockSecureVault: SecureVault {
 
     func existingCardForAutofill(matching proposedCard: SecureVaultModels.CreditCard) throws -> SecureVaultModels.CreditCard? {
         return nil
+    }
+
+    func inDatabaseTransaction(_ block: @escaping (Database) throws -> Void) throws {}
+
+    func modifiedWebsiteCredentials() throws -> [SecureVaultModels.WebsiteAccountSyncMetadata] {
+        []
+    }
+
+    func deleteWebsiteCredentialsFor(accountId: Int64, in database: Database) throws {
+        try deleteWebsiteCredentialsFor(accountId: accountId)
+    }
+
+    func deleteWebsiteCredentialsMetadata(_ metadata: SecureVaultModels.WebsiteAccountSyncMetadata, in database: Database) throws {
+        if let accountId = metadata.objectId {
+            try deleteWebsiteCredentialsFor(accountId: accountId)
+        }
+    }
+
+    func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, clearModifiedAt: Bool) throws -> Int64 {
+        try storeWebsiteCredentials(credentials)
+    }
+
+    func storeWebsiteCredentialsMetadata(_ metadata: SecureVaultModels.WebsiteAccountSyncMetadata, clearModifiedAt: Bool, in database: Database) throws {}
+
+    func websiteCredentialsForSyncIds(_ syncIds: any Sequence<String>, in database: Database) throws -> [SecureVaultModels.WebsiteAccountSyncMetadata] {
+        []
+    }
+
+    func websiteCredentialsMetadataForAccountId(_ accountId: Int64, in database: Database) throws -> SecureVaultModels.WebsiteAccountSyncMetadata? {
+        nil
+    }
+
+    func accountsForDomain(_ domain: String, in database: Database) throws -> [SecureVaultModels.WebsiteAccount] {
+        try accountsFor(domain: domain)
     }
 
 }
