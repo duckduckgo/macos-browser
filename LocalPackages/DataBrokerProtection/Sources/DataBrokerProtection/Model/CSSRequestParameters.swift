@@ -47,6 +47,8 @@ public struct State: Encodable {
             try container.encode(clickAction, forKey: .action)
         case let expectationAction as ExpectationAction:
             try container.encode(expectationAction, forKey: .action)
+        case let getCaptchaInfo as GetCaptchaInfoAction:
+            try container.encode(getCaptchaInfo, forKey: .action)
         default:
             assertionFailure("Action not found. Please add the missing action to the encoding list.")
         }
