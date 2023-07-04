@@ -114,7 +114,7 @@ final class Fire {
         let group = DispatchGroup()
         dispatchGroup = group
 
-        let domains = burningDomains(from: entity)
+        let domains = domainsToBurn(from: entity)
         burningData = .specificDomains(domains)
 
         burnLastSessionState()
@@ -439,7 +439,7 @@ final class Fire {
         completion()
     }
 
-    private func burningDomains(from entity: BurningEntity) -> Set<String> {
+    private func domainsToBurn(from entity: BurningEntity) -> Set<String> {
         switch entity {
         case .none(let domains):
             return domains
