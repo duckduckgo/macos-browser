@@ -44,12 +44,8 @@ final class AppMain {
             swizzleMainBundle()
 
             Task {
-                do {
-                    try await NetworkProtectionTunnelController().start(enableLoginItems: false)
-                    exit(0)
-                } catch {
-                    fatalError("Could not start the tunnel due to error: \(String(describing: error))")
-                }
+                await NetworkProtectionTunnelController().start(enableLoginItems: false)
+                exit(0)
             }
 
             dispatchMain()

@@ -1,7 +1,7 @@
 //
-//  AppLaunchingController.swift
+//  AppLaunching.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,20 +16,20 @@
 //  limitations under the License.
 //
 
+// SPDX-License-Identifier: MIT
+// Copyright © 2018-2021 WireGuard LLC. All Rights Reserved.
+
 import Foundation
 
-public final class AppLaunchingController: TunnelController {
-    private let appLauncher: AppLauncher
+public enum AppLaunchCommand: Codable {
+    case justOpen
+    case shareFeedback
+    case showStatus
+    case startVPN
+    case stopVPN
+    case enableOnDemand
+}
 
-    public init(appLauncher: AppLauncher) {
-        self.appLauncher = appLauncher
-    }
-
-    public func start() async throws {
-        await appLauncher.launchApp(withCommand: .startVPN)
-    }
-
-    public func stop() async {
-        await appLauncher.launchApp(withCommand: .stopVPN)
-    }
+public protocol AppLaunching {
+    func launchApp(withCommand command: AppLaunchCommand) async
 }

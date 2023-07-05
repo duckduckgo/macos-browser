@@ -45,11 +45,9 @@ struct SystemExtensionManager {
     func deactivate() async throws {
         for try await _ in SystemExtensionRequest.deactivationRequest(forExtensionWithIdentifier: bundleID, manager: manager).submit() {}
     }
-
 }
 
 final class SystemExtensionRequest: NSObject {
-
     typealias Event = SystemExtensionManager.ActivationRequestEvent
 
     private let request: OSSystemExtensionRequest
@@ -88,7 +86,6 @@ final class SystemExtensionRequest: NSObject {
             self.continuation = continuation
         }
     }
-
 }
 
 extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
