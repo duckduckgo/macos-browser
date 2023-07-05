@@ -825,10 +825,16 @@ CQ
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Remote Configuration" id="z0p-D5-iYh">
                                                 <items>
-                                                    <menuItem title="Fetch Configuration Now" id="ZB2-SK-OqK" userLabel="Fetch configuration now">
+                                                    <menuItem title="Edit..." id="ZB2-SK-OqK" userLabel="Edit...">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="fetchConfigurationNow:" target="Ady-hI-5gd" id="31i-Lv-4r5"/>
+                                                            <action selector="editRemoteConfiguration:" target="Ady-hI-5gd" id="b0W-8i-5Fe"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Fetch Configuration Now" id="Hbz-AQ-GcK" userLabel="Fetch configuration now">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="fetchConfigurationNow:" target="Ady-hI-5gd" id="0v7-bu-3Jt"/>
                                                         </connections>
                                                     </menuItem>
                                                 </items>

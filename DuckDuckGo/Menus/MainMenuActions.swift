@@ -735,6 +735,10 @@ extension MainViewController {
         ConfigurationManager.shared.forceRefresh()
     }
 
+    @IBAction func editRemoteConfiguration(_ sender: Any?) {
+        browserTabViewController.openNewTab(with: .url("ddg-debug://remote-config".url!))
+    }
+
     // MARK: - Developer Tools
 
     @IBAction func toggleDeveloperTools(_ sender: Any?) {
