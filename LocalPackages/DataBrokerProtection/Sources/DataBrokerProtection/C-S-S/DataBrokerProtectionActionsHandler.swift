@@ -19,6 +19,8 @@
 public final class DataBrokerProtectionActionsHandler {
     private var lastExecutedActionIndex: Int?
 
+    var captchaTransactionId: CaptchaTransactionId?
+
     let step: Step
 
     init(step: Step) {

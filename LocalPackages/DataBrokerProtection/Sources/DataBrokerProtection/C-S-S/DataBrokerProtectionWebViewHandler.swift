@@ -84,7 +84,7 @@ public final class DataBrokerProtectionWebViewHandler: NSObject {
         }
     }
 
-    func execute(action: Action, profileData: ProfileQuery) {
+    func execute(action: Action, profileData: CCFRequestData) {
         userContentController?.dataBrokerUserScripts.dataBrokerFeature.pushAction(
             method: .onActionReceived,
             webView: self.webView!,

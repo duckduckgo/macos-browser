@@ -19,6 +19,7 @@
 import Foundation
 
 typealias CaptchaTransactionId = String
+typealias CaptchaResolveData = String
 
 public enum CaptchaServiceError: Error {
     case cantGenerateCaptchaServiceURL
@@ -27,6 +28,11 @@ public enum CaptchaServiceError: Error {
     case invalidRequestWhenSubmittingCaptcha
     case timedOutWhenSubmittingCaptcha
     case errorWhenSubmittingCaptcha
+    case errorWhenFetchingCaptchaResult
+    case nilDataWhenFetchigCaptchaResult
+    case timedOutWhenFetchingCaptchaResult
+    case failureWhenFetchingCaptchaResult
+    case invalidRequestWhenFetchingCaptchaResult
 }
 
 struct CaptchaTransaction: Codable {
@@ -41,12 +47,44 @@ struct CaptchaTransaction: Codable {
     let transactionId: String?
 }
 
+struct Backend: Codable {
+    let pollAttempts, solveAttempts: Int
+}
+
+struct Meta: Codable {
+    let lastBackend: String
+    let backends: [String: Backend]
+    let timeToSolution: Double
+    let type: String
+    let lastUpdated: Double
+}
+
+struct CaptchaResult: Codable {
+
+    enum Message: String, Codable {
+        case ready = "SOLUTION_READY"
+        case notReady = "SOLUTION_NOT_READY"
+        case failure = "FAILURE"
+        case invalidRequest = "INVALID_REQUEST"
+    }
+
+    let data: String?
+    let message: Message
+    let meta: Meta
+}
+
 public struct DataBrokerProtectionCaptchaService {
 
     private struct Constants {
         struct URL {
-            static let submit = "submit"
-            static let baseURL = "https://dbp.duckduckgo.com/dbp/captcha/v0/"
+            private static let baseURL = "https://dbp.duckduckgo.com/dbp/captcha/v0/"
+            private static let result = "result"
+
+            static let submit = Constants.URL.baseURL + "submit"
+
+            static func result(for transactionID: CaptchaTransactionId) -> String {
+                "\(Constants.URL.baseURL)\(Constants.URL.result)?transactionId=\(transactionID)"
+            }
         }
     }
 
@@ -56,9 +94,14 @@ public struct DataBrokerProtectionCaptchaService {
         self.urlSession = urlSession
     }
 
+    /// Submits captcha information to the backend to start solving it,
+    ///
+    /// - Parameters:
+    ///   - captchaInfo: A struct that containes a `siteKey`, `url` and `type`
+    /// - Returns: `CaptchaTransactionId` an identifier so we can later use to fetch the resolved captcha information
     func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse,
                                   retries: Int = 5) async throws -> CaptchaTransactionId {
-        guard let captchaSubmitResult = try? await submitCaptchaRequest(captchaInfo) else {
+        guard let captchaSubmitResult = try? await submitCaptchaInformationRequest(captchaInfo) else {
             throw CaptchaServiceError.errorWhenSubmittingCaptcha
         }
 
@@ -82,8 +125,8 @@ public struct DataBrokerProtectionCaptchaService {
         }
     }
 
-    private func submitCaptchaRequest(_ captchaInfo: GetCaptchaInfoResponse) async throws -> CaptchaTransaction {
-        guard let url = URL(string: Constants.URL.baseURL + Constants.URL.submit) else {
+    private func submitCaptchaInformationRequest(_ captchaInfo: GetCaptchaInfoResponse) async throws -> CaptchaTransaction {
+        guard let url = URL(string: Constants.URL.submit) else {
             throw CaptchaServiceError.cantGenerateCaptchaServiceURL
         }
 
@@ -101,8 +144,57 @@ public struct DataBrokerProtectionCaptchaService {
         request.httpBody = try JSONSerialization.data(withJSONObject: bodyObject, options: [])
 
         let (data, _) = try await urlSession.data(for: request)
-
         let result = try JSONDecoder().decode(CaptchaTransaction.self, from: data)
+
+        return result
+    }
+
+    /// Fetches the resolved captcha information with the passed transaction ID.
+    ///
+    /// - Parameters:
+    ///   - transactionID: The transaction ID of the previous submitted captcha information
+    ///   - retries: The number of retries until we timed out. Defaults to 100
+    ///   - pollingInterval: The time between each poll in seconds. Defaults to 40 seconds
+    /// - Returns: `CaptchaResolveData` a string containing the data to resolve the captcha
+    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId,
+                                   retries: Int = 100,
+                                   pollingInterval: Int = 40) async throws -> CaptchaResolveData {
+        guard let captchaResolveResult = try? await submitCaptchaToBeResolvedRequest(transactionID) else {
+            throw CaptchaServiceError.errorWhenFetchingCaptchaResult
+        }
+
+        switch captchaResolveResult.message {
+        case .ready:
+            if let data = captchaResolveResult.data {
+                return data
+            } else {
+                throw CaptchaServiceError.nilDataWhenFetchigCaptchaResult
+            }
+        case .notReady:
+            if retries == 0 {
+                throw CaptchaServiceError.timedOutWhenFetchingCaptchaResult
+            }
+            try await Task.sleep(nanoseconds: UInt64(pollingInterval) * NSEC_PER_SEC)
+            return try await submitCaptchaToBeResolved(for: transactionID, retries: retries - 1, pollingInterval: pollingInterval)
+        case .failure:
+            throw CaptchaServiceError.failureWhenFetchingCaptchaResult
+        case .invalidRequest:
+            throw CaptchaServiceError.invalidRequestWhenFetchingCaptchaResult
+        }
+    }
+
+    private func submitCaptchaToBeResolvedRequest(_ transactionID: CaptchaTransactionId) async throws -> CaptchaResult {
+        guard let url = URL(string: Constants.URL.result(for: transactionID)) else {
+            throw CaptchaServiceError.cantGenerateCaptchaServiceURL
+        }
+
+        var request = URLRequest(url: url)
+        request.setValue(Headers.authorizationHeader, forHTTPHeaderField: "Authorization")
+        request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "GET"
+
+        let (data, _) = try await urlSession.data(for: request)
+        let result = try JSONDecoder().decode(CaptchaResult.self, from: data)
 
         return result
     }
