@@ -21,12 +21,31 @@ import Common
 import Foundation
 import Navigation
 
+protocol PrivacyDebugToolsScriptsProvider {
+    var privacyConfigurationEditUserScript: PrivacyConfigurationEditUserScript? { get }
+}
+extension UserScripts: PrivacyDebugToolsScriptsProvider {}
+
 final class PrivacyDebugToolsTabExtension {
 
     let privacyDebugTools: PrivacyDebugTools
+    private var cancellables = Set<AnyCancellable>()
+    private var youtubePlayerCancellables = Set<AnyCancellable>()
+    private weak var privacyConfigurationEditUserScript: PrivacyConfigurationEditUserScript?
 
-    init(privacyDebugTools: PrivacyDebugTools) {
+    init(
+        privacyDebugTools: PrivacyDebugTools,
+        scriptsPublisher: some Publisher<some PrivacyDebugToolsScriptsProvider, Never>
+    ) {
         self.privacyDebugTools = privacyDebugTools
+
+        scriptsPublisher.sink { [weak self] scripts in
+            self?.privacyConfigurationEditUserScript = scripts.privacyConfigurationEditUserScript
+
+//            DispatchQueue.main.async { [weak self] in
+//                self?.setUpYoutubeScriptsIfNeeded(for: self?.webView?.url)
+//            }
+        }.store(in: &cancellables)
     }
 }
 

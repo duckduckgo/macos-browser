@@ -41,6 +41,8 @@ final class UserScripts: UserScriptsProvider {
     let youtubeOverlayScript: YoutubeOverlayUserScript?
     let youtubePlayerUserScript: YoutubePlayerUserScript?
 
+    let privacyConfigurationEditUserScript: PrivacyConfigurationEditUserScript?
+
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
@@ -73,11 +75,23 @@ final class UserScripts: UserScriptsProvider {
             specialPages = nil
         }
 
+        if (NSApp.delegate as? AppDelegate)?.internalUserDecider?.isInternalUser == true {
+            privacyConfigurationEditUserScript = PrivacyConfigurationEditUserScript()
+        } else {
+            privacyConfigurationEditUserScript = nil
+        }
+
         if let autoconsentUserScript = autoconsentUserScript {
             userScripts.append(autoconsentUserScript)
         }
         if let youtubeOverlayScript = youtubeOverlayScript {
             contentScopeUserScriptIsolated.registerSubfeature(delegate: youtubeOverlayScript)
+        }
+
+        if let privacyConfigurationEditUserScript {
+            if let specialPages {
+                specialPages.registerSubfeature(delegate: privacyConfigurationEditUserScript)
+            }
         }
 
         if let youtubePlayerUserScript = youtubePlayerUserScript {

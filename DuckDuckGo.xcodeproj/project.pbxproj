@@ -907,6 +907,8 @@
 		37158E3E2A556EF900874A9E /* PrivacyDebugTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37158E3C2A556EF900874A9E /* PrivacyDebugTools.swift */; };
 		37158E402A55712500874A9E /* PrivacyDebugToolsSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37158E3F2A55712500874A9E /* PrivacyDebugToolsSchemeHandler.swift */; };
 		37158E412A55712500874A9E /* PrivacyDebugToolsSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37158E3F2A55712500874A9E /* PrivacyDebugToolsSchemeHandler.swift */; };
+		37158E442A55B5E200874A9E /* PrivacyConfigurationEditUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37158E432A55B5E200874A9E /* PrivacyConfigurationEditUserScript.swift */; };
+		37158E452A55B5E200874A9E /* PrivacyConfigurationEditUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37158E432A55B5E200874A9E /* PrivacyConfigurationEditUserScript.swift */; };
 		37197EA12942441700394917 /* Tab+UIDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBDE293C8F7F00C3C99E /* Tab+UIDelegate.swift */; };
 		37197EA22942441900394917 /* Tab+Dialogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBE0293C8FD500C3C99E /* Tab+Dialogs.swift */; };
 		37197EA32942441D00394917 /* UserDialogRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBE2293C8FFF00C3C99E /* UserDialogRequest.swift */; };
@@ -2223,6 +2225,7 @@
 		37158E3C2A556EF900874A9E /* PrivacyDebugTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDebugTools.swift; sourceTree = "<group>"; };
 		37158E3F2A55712500874A9E /* PrivacyDebugToolsSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDebugToolsSchemeHandler.swift; sourceTree = "<group>"; };
 		37158E422A55755300874A9E /* content-scope-scripts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "content-scope-scripts"; path = "../content-scope-scripts"; sourceTree = "<group>"; };
+		37158E432A55B5E200874A9E /* PrivacyConfigurationEditUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyConfigurationEditUserScript.swift; sourceTree = "<group>"; };
 		371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackPresenter.swift; sourceTree = "<group>"; };
 		372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCredentialsAdapter.swift; sourceTree = "<group>"; };
 		373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLReader.swift; sourceTree = "<group>"; };
@@ -3565,6 +3568,7 @@
 			children = (
 				37158E3C2A556EF900874A9E /* PrivacyDebugTools.swift */,
 				37158E3F2A55712500874A9E /* PrivacyDebugToolsSchemeHandler.swift */,
+				37158E432A55B5E200874A9E /* PrivacyConfigurationEditUserScript.swift */,
 			);
 			path = PrivacyDebugTools;
 			sourceTree = "<group>";
@@ -7784,6 +7788,7 @@
 				3706FB7C293F65D500E42796 /* KeySetDictionary.swift in Sources */,
 				B6F7127F29F6779000594A45 /* QRSharingService.swift in Sources */,
 				3706FB7E293F65D500E42796 /* FireCoordinator.swift in Sources */,
+				37158E452A55B5E200874A9E /* PrivacyConfigurationEditUserScript.swift in Sources */,
 				3706FB7F293F65D500E42796 /* GeolocationProvider.swift in Sources */,
 				B603FD9F2A02712E00F3FCA9 /* CIImageExtension.swift in Sources */,
 				7BBD45B52A691C3A00C83CA9 /* NetworkProtectionLoginItemsManager.swift in Sources */,
@@ -8846,6 +8851,7 @@
 				4BB99CFF26FE191E001E4761 /* BookmarkImport.swift in Sources */,
 				B68503A7279141CD00893A05 /* KeySetDictionary.swift in Sources */,
 				B66260E029AC6EBD00E9E3EE /* HistoryTabExtension.swift in Sources */,
+				37158E442A55B5E200874A9E /* PrivacyConfigurationEditUserScript.swift in Sources */,
 				AAEEC6A927088ADB008445F7 /* FireCoordinator.swift in Sources */,
 				B655369B268442EE00085A79 /* GeolocationProvider.swift in Sources */,
 				B6C0B23C26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift in Sources */,
