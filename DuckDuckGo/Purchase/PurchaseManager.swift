@@ -145,7 +145,7 @@ final class PurchaseManager: ObservableObject {
     }
 
     @MainActor
-    func buy(_ product: Product, customUUID: String) {
+    func purchase(_ product: Product, customUUID: String) {
         print(" -- [PurchaseManager] buy: \(product.displayName) (customUUID: \(customUUID))")
 
         print("purchaseQueue append!")

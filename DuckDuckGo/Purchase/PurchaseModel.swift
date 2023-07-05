@@ -71,9 +71,10 @@ public final class PurchaseModel: ObservableObject {
     @MainActor
     func purchase(_ product: Product) {
         print("Purchasing \(product.displayName)")
-        manager.buy(product, customUUID: externalID ?? "")
+        manager.purchase(product, customUUID: externalID ?? "")
     }
 
+    @MainActor
     func restorePurchases() {
 
     }
