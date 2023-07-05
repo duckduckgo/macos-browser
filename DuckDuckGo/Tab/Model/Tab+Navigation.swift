@@ -40,6 +40,8 @@ extension Tab: NavigationResponder {
 
     func setupNavigationDelegate() {
         navigationDelegate.setResponders(
+            .weak(nullable: self.privacyDebugTools),
+
             .weak(nullable: self.navigationHotkeyHandler),
 
             .weak(self),

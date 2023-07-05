@@ -61,6 +61,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private let crashReporter = CrashReporter()
     private(set) var internalUserDecider: InternalUserDecider?
     private(set) var featureFlagger: FeatureFlagger!
+    private(set) var privacyDebugTools: PrivacyDebugTools!
     private var appIconChanger: AppIconChanger!
 
     private(set) var syncDataProviders: SyncDataProviders!
@@ -161,6 +162,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
+        privacyDebugTools = PrivacyDebugTools(internalUserDecider: internalUserDecider)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
