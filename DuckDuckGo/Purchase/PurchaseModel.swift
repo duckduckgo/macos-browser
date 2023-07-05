@@ -1,5 +1,5 @@
 //
-//  PurchaseModel.swift
+//  PurchaseViewModel.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,7 @@ import Combine
 import StoreKit
 
 @available(macOS 12.0, *)
-public final class PurchaseModel: ObservableObject {
+public final class PurchaseViewModel: ObservableObject {
 
     enum State {
         case noEmailProtection
@@ -42,12 +42,12 @@ public final class PurchaseModel: ObservableObject {
     var externalID: String?
 
     init(manager: PurchaseManager) {
-        print(" -- PurchaseModel init --")
+        print(" -- PurchaseViewModel init --")
         self.manager = manager
     }
 
     deinit {
-        print(" -- PurchaseModel deinit --")
+        print(" -- PurchaseViewModel deinit --")
     }
 
     var hasOngoingPurchase: Bool { subscriptions.map { $0.isBeingPurchased }.contains(true) }

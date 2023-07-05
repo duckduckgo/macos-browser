@@ -26,7 +26,7 @@ import BrowserServicesKit
 final class PurchaseViewController: NSViewController {
 
     private let manager = PurchaseManager.shared
-    private let model = PurchaseModel(manager: PurchaseManager.shared)
+    private let model = PurchaseViewModel(manager: PurchaseManager.shared)
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -72,7 +72,7 @@ final class PurchaseViewController: NSViewController {
         print(" -- PurchaseViewController viewDidDisappear() --")
     }
 
-    private var initialState: PurchaseModel.State {
+    private var initialState: PurchaseViewModel.State {
         if hasAuthServiceToken {
             return .loadingProducts
         } else if hasEmailProtection {
@@ -91,7 +91,7 @@ final class PurchaseViewController: NSViewController {
         EmailManager().isSignedIn
     }
 
-    private func update(for state: PurchaseModel.State) {
+    private func update(for state: PurchaseViewModel.State) {
         print(" [[ New state -> \(state) ]]")
         model.state = state
 

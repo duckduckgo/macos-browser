@@ -23,7 +23,7 @@ import StoreKit
 struct PurchaseView: View {
 
     @ObservedObject var manager: PurchaseManager
-    @ObservedObject var model: PurchaseModel
+    @ObservedObject var model: PurchaseViewModel
 
     @State private var showingAlert = false
 
