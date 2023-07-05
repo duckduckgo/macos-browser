@@ -30,19 +30,20 @@ public final class PurchaseModel: ObservableObject {
         case errorOccurred(error: AccountsService.Error)
     }
 
+    private var manager: PurchaseManager
+
     @Published var state: State = .noEmailProtection
-    @Published var subscriptions: [SubscriptionRowModel]
+    @Published var subscriptions: [SubscriptionRowModel] = []
     @Published var storefrontCountry: String = ""
 
     @Published var currentEntitlements: [AccountsService.ValidateTokenResponse.Entitlement] = []
 
-
     var authServiceToken: String?
     var externalID: String?
 
-    init(subscriptions: [SubscriptionRowModel] = []) {
+    init(manager: PurchaseManager) {
         print(" -- PurchaseModel init --")
-        self.subscriptions = subscriptions
+        self.manager = manager
     }
 
     deinit {
@@ -61,17 +62,21 @@ public final class PurchaseModel: ObservableObject {
         return error.description
     }
 
-    func buy(_ product: Product) {
-        print("Buying \(product.displayName)")
-    }
-
     @MainActor
     func loadStorefrontCountry() async {
         storefrontCountry = "Loading..."
         storefrontCountry = await Storefront.current?.countryCode ?? "<unknown>"
     }
 
-    
+    @MainActor
+    func purchase(_ product: Product) {
+        print("Purchasing \(product.displayName)")
+        manager.buy(product, customUUID: externalID ?? "")
+    }
+
+    func restorePurchases() {
+
+    }
 }
 
 @available(macOS 12.0, *)

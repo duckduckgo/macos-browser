@@ -26,7 +26,7 @@ import BrowserServicesKit
 final class PurchaseViewController: NSViewController {
 
     private let manager = PurchaseManager.shared
-    private let model = PurchaseModel()
+    private let model = PurchaseModel(manager: PurchaseManager.shared)
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -37,7 +37,7 @@ final class PurchaseViewController: NSViewController {
     override func loadView() {
         view = NSView(frame: NSRect(x: 0, y: 0, width: 650, height: 700))
 
-        let purchaseView = PurchaseView(manager: PurchaseManager.shared,
+        let purchaseView = PurchaseView(manager: manager,
                                         model: self.model,
                                         dismissAction: { [weak self] in
             guard let self = self else { return }
