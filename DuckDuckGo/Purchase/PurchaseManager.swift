@@ -190,31 +190,6 @@ final class PurchaseManager: ObservableObject {
 
     private var accessToken: String = ""
 
-    @MainActor
-    func exchangeToken() {
-        Task {
-            switch await AccountsService.getAccessToken() {
-            case .success(let response):
-                self.accessToken = response.accessToken
-            case .failure(let error):
-                print("Error: \(error)")
-            }
-        }
-    }
-
-    @MainActor
-    func fetchEntitlements() {
-        Task {
-            switch await AccountsService.validateToken(accessToken: self.accessToken) {
-            case .success(let response):
-                print("Current entitlements: \(response.account.entitlements.map { $0.product }.joined(separator: ",") )")
-                print("ExternalID: \(response.account.externalID)")
-            case .failure(let error):
-                print("Error: \(error)")
-            }
-        }
-    }
-
     private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
         // Check whether the JWS passes StoreKit verification.
         switch result {

@@ -25,10 +25,23 @@ import BrowserServicesKit
 @available(macOS 12.0, *)
 final class PurchaseViewController: NSViewController {
 
-    private let manager = PurchaseManager.shared
-    private let model = PurchaseViewModel(manager: PurchaseManager.shared)
+    private let manager: PurchaseManager
+    private let model: PurchaseViewModel
+    private let actions: PurchaseViewActions
 
     private var cancellables = Set<AnyCancellable>()
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    init() {
+        manager = PurchaseManager.shared
+        model = PurchaseViewModel()
+        actions = PurchaseViewActions(manager: manager, model: model)
+
+        super.init(nibName: nil, bundle: nil)
+    }
 
     deinit {
         print(" -- PurchaseViewController deinit --")
@@ -39,6 +52,7 @@ final class PurchaseViewController: NSViewController {
 
         let purchaseView = PurchaseView(manager: manager,
                                         model: self.model,
+                                        actions: self.actions,
                                         dismissAction: { [weak self] in
             guard let self = self else { return }
             self.presentingViewController?.dismiss(self)
@@ -64,6 +78,13 @@ final class PurchaseViewController: NSViewController {
             self?.model.subscriptions = sortedProducts.map { SubscriptionRowModel(product: $0,
                                                                                   isPurchased: purchasedProductIDs.contains($0.id),
                                                                                   isBeingPurchased: purchaseQueue.contains($0.id)) }
+        }.store(in: &cancellables)
+
+        manager.$purchasedProductIDs.receive(on: RunLoop.main).sink { [weak self] _ in
+
+            print(" -- refreshing entitlements -")
+            self?.actions.refreshEntitlements()
+
         }.store(in: &cancellables)
     }
 
