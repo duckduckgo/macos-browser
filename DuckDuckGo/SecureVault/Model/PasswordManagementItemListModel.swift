@@ -101,7 +101,8 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
         case .account(let account):
             return account.domain.lowercased().contains(filter) ||
                 account.username.lowercased().contains(filter) ||
-                account.title?.lowercased().contains(filter) ?? false
+                account.title?.lowercased().contains(filter) ?? false ||
+                account.notes?.lowercased().contains(filter) ?? false
         case .card(let card):
             return card.title.localizedCaseInsensitiveContains(filter)
         case .identity(let identity):
