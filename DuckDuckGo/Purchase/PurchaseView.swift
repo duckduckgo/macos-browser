@@ -110,7 +110,7 @@ struct PurchaseView: View {
             Spacer()
 
             Button {
-                manager.restorePurchases()
+                model.restorePurchases()
             } label: {
                 Text("Restore Purchases")
             }

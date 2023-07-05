@@ -76,7 +76,7 @@ public final class PurchaseModel: ObservableObject {
 
     @MainActor
     func restorePurchases() {
-
+        manager.restorePurchases()
     }
 }
 
