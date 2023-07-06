@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Common
 
 typealias CaptchaTransactionId = String
 typealias CaptchaResolveData = String
@@ -129,7 +130,7 @@ public struct DataBrokerProtectionCaptchaService {
         guard let url = URL(string: Constants.URL.submit) else {
             throw CaptchaServiceError.cantGenerateCaptchaServiceURL
         }
-
+        os_log("Submitting captcha request ...", log: .service)
         var request = URLRequest(url: url)
         request.setValue(Headers.authorizationHeader, forHTTPHeaderField: "Authorization")
         request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
@@ -166,19 +167,23 @@ public struct DataBrokerProtectionCaptchaService {
         switch captchaResolveResult.message {
         case .ready:
             if let data = captchaResolveResult.data {
+                os_log("Captcha ready ...", log: .service)
                 return data
             } else {
                 throw CaptchaServiceError.nilDataWhenFetchingCaptchaResult
             }
         case .notReady:
+            os_log("Captcha not ready ...", log: .service)
             if retries == 0 {
                 throw CaptchaServiceError.timedOutWhenFetchingCaptchaResult
             }
             try await Task.sleep(nanoseconds: UInt64(pollingInterval) * NSEC_PER_SEC)
             return try await submitCaptchaToBeResolved(for: transactionID, retries: retries - 1, pollingInterval: pollingInterval)
         case .failure:
+            os_log("Captcha failure ...", log: .service)
             throw CaptchaServiceError.failureWhenFetchingCaptchaResult
         case .invalidRequest:
+            os_log("Captcha invalid request ...", log: .service)
             throw CaptchaServiceError.invalidRequestWhenFetchingCaptchaResult
         }
     }

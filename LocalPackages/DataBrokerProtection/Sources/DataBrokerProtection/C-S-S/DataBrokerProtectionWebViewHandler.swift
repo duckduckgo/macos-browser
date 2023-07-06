@@ -20,6 +20,7 @@ import Foundation
 import WebKit
 import BrowserServicesKit
 import UserScript
+import Common
 
 @MainActor
 public final class DataBrokerProtectionWebViewHandler: NSObject {
@@ -85,6 +86,8 @@ public final class DataBrokerProtectionWebViewHandler: NSObject {
     }
 
     func execute(action: Action, profileData: CCFRequestData) {
+        os_log("Executing action: %{public}@", log: .action, String(describing: action.actionType.rawValue))
+
         userContentController?.dataBrokerUserScripts.dataBrokerFeature.pushAction(
             method: .onActionReceived,
             webView: self.webView!,
