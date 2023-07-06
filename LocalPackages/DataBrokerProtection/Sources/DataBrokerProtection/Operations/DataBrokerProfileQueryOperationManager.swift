@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Common
 
 enum OperationsError: Error {
     case noOperationDataForExtractedProfile
@@ -50,8 +51,6 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                          brokerProfileQueryData: brokerProfileQueryData,
                                          database: database,
                                          notificationCenter: notificationCenter)
-        } else {
-            print("No op")
         }
     }
 
@@ -121,7 +120,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         let event = HistoryEvent(type: .error)
         brokerProfileQuery.addHistoryEvent(event, for: operationData)
         // TODO: Send error pixel
-        print("ERROR \(error)")
+        os_log("Error : %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+
     }
 
     // If the last time we removed the profile has a bigger time difference than the current date + maintenance we should schedule for a new optout
@@ -141,10 +141,11 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             updateOperationDataDates(brokerProfileQueryData.scanData,
                                      brokerProfileQueryData: brokerProfileQueryData)
             database.saveOperationData(brokerProfileQueryData.scanData)
-            print("Finished scan operation on \(brokerProfileQueryData.dataBroker.name)")
+
+            os_log("Finished scan operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
             notificationCenter.post(name: DataBrokerNotifications.didFinishScan, object: brokerProfileQueryData.dataBroker.name)
         }
-        print("Running scan operation on \(brokerProfileQueryData.dataBroker.name)")
+        os_log("Running scan operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 
         do {
             brokerProfileQueryData.scanData.addHistoryEvent(.init(type: .scanStarted))
@@ -186,14 +187,14 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
         guard extractedProfile.removedDate == nil else {
-            print("Profile already extracted")
+            os_log("Profile already extracted, skipping...", log: .dataBrokerProtection)
             return
         }
 
-        print("Running opt operation on \(brokerProfileQueryData.dataBroker.name) \(String(describing: extractedProfile.name))")
+        os_log("Running opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 
         defer {
-            print("Finished opt operation on \(brokerProfileQueryData.dataBroker.name) \(String(describing: extractedProfile.name))")
+            os_log("Finished opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 
             updateOperationDataDates(data, brokerProfileQueryData: brokerProfileQueryData)
             updateOperationDataDates(brokerProfileQueryData.scanData, brokerProfileQueryData: brokerProfileQueryData)
