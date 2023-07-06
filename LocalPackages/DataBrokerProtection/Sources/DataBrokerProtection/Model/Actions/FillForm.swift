@@ -24,17 +24,12 @@ struct PageElement: Codable, Sendable {
 }
 
 struct FillFormAction: Action {
-    let id: String = "fillForm"
-    let actionType: ActionType = .fillForm
+    let id: String
+    let actionType: ActionType
     let selector: String
     let elements: [PageElement]
 
-    public var needsEmail: Bool {
+    var needsEmail: Bool {
         elements.contains { $0.type == "email" }
-    }
-
-    init(selector: String, elements: [PageElement]) {
-        self.selector = selector
-        self.elements = elements
     }
 }
