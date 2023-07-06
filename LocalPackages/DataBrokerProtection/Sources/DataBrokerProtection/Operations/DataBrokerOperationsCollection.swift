@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Common
 
 final class DataBrokerOperationsCollection: Operation {
 
@@ -37,7 +38,7 @@ final class DataBrokerOperationsCollection: Operation {
     private let notificationCenter: NotificationCenter
 
     deinit {
-        print("Deinit Operation \(self.id)")
+        os_log("Deinit operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
     }
 
     init(brokerProfileQueriesData: [BrokerProfileQueryData],
@@ -91,7 +92,8 @@ final class DataBrokerOperationsCollection: Operation {
 
     private func runOperation() async {
         let ids = brokerProfileQueriesData.map { $0.dataBroker.id }
-        print("Running operation \(id) ON \(ids)")
+
+        os_log("Running operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
 
         let sortedOperationsData: [BrokerOperationData]
         let operationsData: [BrokerOperationData]
@@ -122,25 +124,25 @@ final class DataBrokerOperationsCollection: Operation {
             let brokerProfileData = brokerProfileQueriesData.filter { $0.id == operationData.brokerProfileQueryID }.first
 
             let testRunner = await TestOperationRunner()
-            if let brokerProfileData = brokerProfileData {
-                do {
-                    try await DataBrokerProfileQueryOperationManager().runOperation(operationData: operationData,
-                                                                                    brokerProfileQueryData: brokerProfileData,
-                                                                                    database: database,
-                                                                                    notificationCenter: notificationCenter,
-                                                                                    runner: testRunner)
-                    if let sleepInterval = intervalBetweenOperations {
-                        print("Waiting \(sleepInterval) seconds...")
-                        try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
-                    }
-                } catch {
-                    print("Error: \(error)")
+
+            guard let brokerProfileData = brokerProfileData else {
+                continue
+            }
+            do {
+                try await DataBrokerProfileQueryOperationManager().runOperation(operationData: operationData,
+                                                                                brokerProfileQueryData: brokerProfileData,
+                                                                                database: database,
+                                                                                notificationCenter: notificationCenter,
+                                                                                runner: testRunner)
+                if let sleepInterval = intervalBetweenOperations {
+                    os_log("Waiting...: %{public}d", log: .dataBrokerProtection, sleepInterval)
+                    try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
                 }
-            } else {
-                print("No brokerProfileData")
+            } catch {
+                os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
             }
         }
-        print("Finished operation \(id)")
+        os_log("Finished operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
     }
 
     private func finish() {
@@ -149,7 +151,6 @@ final class DataBrokerOperationsCollection: Operation {
 
         _isExecuting = false
         _isFinished = true
-        print("Operation \(id): done")
 
         didChangeValue(forKey: #keyPath(isExecuting))
         didChangeValue(forKey: #keyPath(isFinished))
