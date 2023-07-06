@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionWebViewHandler.swift
+//  WebViewHandler.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -23,7 +23,7 @@ import UserScript
 import Common
 
 @MainActor
-public final class DataBrokerProtectionWebViewHandler: NSObject {
+final class WebViewHandler: NSObject {
     private var activeContinuation: CheckedContinuation<Void, Error>?
 
     let webViewConfiguration: WKWebViewConfiguration
@@ -32,7 +32,7 @@ public final class DataBrokerProtectionWebViewHandler: NSObject {
     var webView: WKWebView?
     var window: NSWindow?
 
-    init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CSSCommunicationDelegate) {
+    init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate) {
         let configuration = WKWebViewConfiguration()
         configuration.applyDataBrokerConfiguration(privacyConfig: privacyConfig, prefs: prefs, delegate: delegate)
         self.webViewConfiguration = configuration
@@ -96,17 +96,17 @@ public final class DataBrokerProtectionWebViewHandler: NSObject {
     }
 }
 
-extension DataBrokerProtectionWebViewHandler: WKNavigationDelegate {
+extension WebViewHandler: WKNavigationDelegate {
 
-    public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
     }
 
-    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.activeContinuation?.resume()
         self.activeContinuation = nil
     }
 
-    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         self.activeContinuation?.resume(throwing: error)
         self.activeContinuation = nil
     }

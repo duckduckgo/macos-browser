@@ -18,31 +18,25 @@
 
 import Foundation
 
-public enum ItemType: String, Codable, Sendable {
+enum ItemType: String, Codable, Sendable {
     case text
     case url
     case element = "elementExpectation"
 }
 
-public struct Item: Codable, Sendable {
+struct Item: Codable, Sendable {
     let type: ItemType
     let expect: String?
     let selector: String?
-
-    public init(type: ItemType, expect: String?, selector: String?) {
-        self.type = type
-        self.expect = expect
-        self.selector = selector
-    }
 }
 
-public struct ExpectationAction: Action {
-    public let id: String = "expectaction"
-    public let actionType: ActionType = .expectation
+internal struct ExpectationAction: Action {
+    let id: String = "expectaction"
+    let actionType: ActionType = .expectation
 
     let expectations: [Item]
 
-    public init(expectations: [Item]) {
+    init(expectations: [Item]) {
         self.expectations = expectations
     }
 }

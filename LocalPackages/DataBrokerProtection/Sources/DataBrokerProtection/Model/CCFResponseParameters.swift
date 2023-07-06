@@ -1,5 +1,5 @@
 //
-//  CSSResponseParameters.swift
+//  CCFResponseParameters.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,7 @@ struct NavigateResponse: Decodable {
     let url: String
 }
 
-public struct GetCaptchaInfoResponse: Decodable {
+struct GetCaptchaInfoResponse: Decodable {
     let siteKey: String
     let url: String
     let type: String
@@ -39,7 +39,7 @@ public struct GetCaptchaInfoResponse: Decodable {
         self.type = type
     }
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.siteKey = try container.decode(String.self, forKey: .siteKey)
         self.url = try container.decode(String.self, forKey: .url)
@@ -47,7 +47,7 @@ public struct GetCaptchaInfoResponse: Decodable {
     }
 }
 
-enum CSSSuccessData {
+enum CCFSuccessData {
     case navigate(NavigateResponse)
     case extract([ExtractedProfile])
     case fillForm
@@ -57,10 +57,10 @@ enum CSSSuccessData {
     case solveCaptcha
 }
 
-struct CSSSuccessResponse: Decodable {
+struct CCFSuccessResponse: Decodable {
     let actionID: String
     let actionType: ActionType
-    let response: CSSSuccessData?
+    let response: CCFSuccessData?
 
     enum CodingKeys: CodingKey {
         case actionID
@@ -94,26 +94,26 @@ struct CSSSuccessResponse: Decodable {
     }
 }
 
-struct CSSErrorResponse: Decodable {
+struct CCFErrorResponse: Decodable {
     let actionID: String
     let message: String
 }
 
-struct CSSSuccess: Decodable {
-    let success: CSSSuccessResponse
+struct CCFSuccess: Decodable {
+    let success: CCFSuccessResponse
 }
 
-struct CSSErrorWrapper: Decodable {
-    let error: CSSErrorResponse
+struct CCFErrorWrapper: Decodable {
+    let error: CCFErrorResponse
 }
 
-enum CSSResultResponse {
-    case success(CSSSuccessResponse)
-    case error(CSSErrorResponse)
+enum CCFResultResponse {
+    case success(CCFSuccessResponse)
+    case error(CCFErrorResponse)
 }
 
-struct CSSResult: Decodable {
-    let result: CSSResultResponse
+struct CCFResult: Decodable {
+    let result: CCFResultResponse
 
     enum CodingKeys: CodingKey {
         case result
@@ -124,9 +124,9 @@ struct CSSResult: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        if let success = try? container.decode(CSSSuccess.self, forKey: .result) {
+        if let success = try? container.decode(CCFSuccess.self, forKey: .result) {
             result = .success(success.success)
-        } else if let error = try? container.decode(CSSErrorWrapper.self, forKey: .result) {
+        } else if let error = try? container.decode(CCFErrorWrapper.self, forKey: .result) {
             result = .error(error.error)
         } else {
             throw DataBrokerProtectionError.parsingErrorObjectFailed
