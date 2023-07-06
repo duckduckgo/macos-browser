@@ -17,13 +17,8 @@
 //
 
 struct ExtractAction: Action {
-    let id: String = "extract"
-    let actionType: ActionType = .extract
+    let id: String
+    let actionType: ActionType
     let selector: String
     let profile: ExtractedProfile
-
-    init(selector: String, profile: ExtractedProfile) {
-        self.selector = selector
-        self.profile = profile
-    }
 }

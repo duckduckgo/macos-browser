@@ -18,17 +18,30 @@
 
 import Foundation
 
-enum StepType: Sendable {
+enum StepType: String, Codable, Sendable {
     case scan
     case optOut
 }
 
-struct Step: Encodable, Sendable {
+struct Step: Codable, Sendable {
     let type: StepType
     let actions: [Action]
 
     enum CodingKeys: String, CodingKey {
-        case actions
+        case actions, stepType
+    }
+
+    init(type: StepType, actions: [Action]) {
+        self.type = type
+        self.actions = actions
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        type = try container.decode(StepType.self, forKey: .stepType)
+
+        let actionsList = try container.decode([[String: Any]].self, forKey: .actions)
+        actions = try Step.parse(actionsList)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -41,5 +54,46 @@ struct Step: Encodable, Sendable {
                 try actionsContainer.encode(extractAction)
             }
         }
+    }
+
+    static func parse(_ actions: [[String: Any]]) throws -> [Action] {
+        var actionList = [Action]()
+
+        for list in actions {
+            guard let typeValue = list["actionType"] as? String,
+                  let actionType = ActionType(rawValue: typeValue) else {
+                continue
+            }
+             let jsonData = try JSONSerialization.data(withJSONObject: list, options: .prettyPrinted)
+
+            switch actionType {
+            case .click:
+                let action = try JSONDecoder().decode(ClickAction.self, from: jsonData)
+                actionList.append(action)
+            case .extract:
+                let action = try JSONDecoder().decode(ExtractAction.self, from: jsonData)
+                actionList.append(action)
+            case .fillForm:
+                let action = try JSONDecoder().decode(FillFormAction.self, from: jsonData)
+                actionList.append(action)
+            case .navigate:
+                let action = try JSONDecoder().decode(NavigateAction.self, from: jsonData)
+                actionList.append(action)
+            case .expectation:
+                let action = try JSONDecoder().decode(ExpectationAction.self, from: jsonData)
+                actionList.append(action)
+            case .getCaptchaInfo:
+                let action = try JSONDecoder().decode(GetCaptchaInfoAction.self, from: jsonData)
+                actionList.append(action)
+            case .solveCaptcha:
+                let action = try JSONDecoder().decode(SolveCaptchaAction.self, from: jsonData)
+                actionList.append(action)
+            case .emailConfirmation:
+                let action = try JSONDecoder().decode(EmailConfirmationAction.self, from: jsonData)
+                actionList.append(action)
+            }
+        }
+
+        return actionList
     }
 }

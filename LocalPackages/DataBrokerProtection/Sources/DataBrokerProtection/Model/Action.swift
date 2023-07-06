@@ -29,7 +29,7 @@ enum ActionType: String, Codable, Sendable {
     case solveCaptcha
 }
 
-protocol Action: Encodable, Sendable {
+protocol Action: Codable, Sendable {
     var id: String { get }
     var actionType: ActionType { get }
     var needsEmail: Bool { get }

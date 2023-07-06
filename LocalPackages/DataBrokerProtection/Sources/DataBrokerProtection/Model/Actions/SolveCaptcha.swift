@@ -19,11 +19,7 @@
 import Foundation
 
 struct SolveCaptchaAction: Action {
-    let id: String = "solveCaptcha"
-    let actionType: ActionType = .solveCaptcha
+    let id: String
+    let actionType: ActionType
     let selector: String
-
-    public init(selector: String) {
-        self.selector = selector
-    }
 }
