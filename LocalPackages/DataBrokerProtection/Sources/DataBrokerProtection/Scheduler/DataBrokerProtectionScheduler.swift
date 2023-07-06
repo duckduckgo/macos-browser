@@ -17,9 +17,12 @@
 //
 
 import Foundation
+import Common
 
-final class DataBrokerProtectionScheduler {
-    let activity: NSBackgroundActivityScheduler
+public final class DataBrokerProtectionScheduler {
+    private let activity: NSBackgroundActivityScheduler
+    private let schedulerIdentifier = "com.duckduckgo.macos.browser.databroker-protection-scheduler"
+
     lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
         DataBrokerProtectionProcessor(database: DataBrokerProtectionDataBase(),
@@ -27,9 +30,8 @@ final class DataBrokerProtectionScheduler {
                                       operationRunnerProvider: DataBrokerOperationRunnerProvider())
     }()
 
-    init() {
-          let identifier = "com.dbp.duckduckgo"
-          activity = NSBackgroundActivityScheduler(identifier: identifier)
+    public init() {
+          activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
           activity.repeats = true
 
           // TODO: Arbitrary numbers for now
@@ -41,8 +43,8 @@ final class DataBrokerProtectionScheduler {
       }
 
     public func start() {
+        os_log("Starting scheduler...", log: .dataBrokerProtection)
         activity.schedule { completion in
-            print("Running databroker processor...")
             self.dataBrokerProcessor.runQueuedOperations {
                 completion(.finished)
             }
@@ -50,10 +52,12 @@ final class DataBrokerProtectionScheduler {
     }
 
     public func stop() {
+        os_log("Stopping scheduler...", log: .dataBrokerProtection)
         activity.invalidate()
     }
 
     public func scanAllBrokers() {
+        os_log("Scanning all brokers...", log: .dataBrokerProtection)
         self.dataBrokerProcessor.runScanOnAllDataBrokers()
     }
 }
