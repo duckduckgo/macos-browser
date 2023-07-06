@@ -65,16 +65,6 @@ final class UserScripts: UserScriptsProvider {
             autoconsentUserScript = nil
         }
 
-        if DuckPlayer.shared.isAvailable {
-            youtubeOverlayScript = YoutubeOverlayUserScript()
-            youtubePlayerUserScript = YoutubePlayerUserScript()
-            specialPages = SpecialPagesUserScript()
-        } else {
-            youtubeOverlayScript = nil
-            youtubePlayerUserScript = nil
-            specialPages = nil
-        }
-
         let shouldLoadPrivacyDebugTools: Bool = {
 #if DEBUG
             true
@@ -82,6 +72,22 @@ final class UserScripts: UserScriptsProvider {
             (NSApp.delegate as? AppDelegate)?.internalUserDecider?.isInternalUser == true
 #endif
         }()
+
+        let shouldLoadSpecialPages = DuckPlayer.shared.isAvailable || shouldLoadPrivacyDebugTools
+
+        if DuckPlayer.shared.isAvailable {
+            youtubeOverlayScript = YoutubeOverlayUserScript()
+            youtubePlayerUserScript = YoutubePlayerUserScript()
+        } else {
+            youtubeOverlayScript = nil
+            youtubePlayerUserScript = nil
+        }
+
+        if shouldLoadSpecialPages {
+            specialPages = SpecialPagesUserScript()
+        } else {
+            specialPages = nil
+        }
 
         if shouldLoadPrivacyDebugTools {
             privacyConfigurationEditUserScript = PrivacyConfigurationEditUserScript(
@@ -99,17 +105,17 @@ final class UserScripts: UserScriptsProvider {
             contentScopeUserScriptIsolated.registerSubfeature(delegate: youtubeOverlayScript)
         }
 
-        if let privacyConfigurationEditUserScript {
-            if let specialPages {
+        if let specialPages {
+            if let privacyConfigurationEditUserScript {
                 specialPages.registerSubfeature(delegate: privacyConfigurationEditUserScript)
+            }
+            if let youtubePlayerUserScript {
+                specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
             }
         }
 
-        if let youtubePlayerUserScript = youtubePlayerUserScript {
-            if let specialPages = specialPages {
-                specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
-                userScripts.append(specialPages)
-            }
+        if let specialPages {
+            userScripts.append(specialPages)
         }
     }
 
