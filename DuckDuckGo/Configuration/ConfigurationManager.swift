@@ -34,7 +34,7 @@ final class ConfigurationManager {
         case bloomFilterPersistenceFailed
         case bloomFilterExclusionsNotFound
         case bloomFilterExclusionsPersistenceFailed
-
+        case configurationNotSupportedForOnDemandRefreshing
     }
 
     enum Constants {
@@ -185,8 +185,12 @@ final class ConfigurationManager {
         }
     }
 
-    public func forceRefresh() async {
-        await refreshNow()
+    public func forceRefresh(_ configuration: Configuration) async throws {
+        guard [Configuration.privacyConfiguration, .trackerDataSet].contains(configuration) else {
+            throw Error.configurationNotSupportedForOnDemandRefreshing
+        }
+        try await fetcher.fetch(configuration)
+        updateTrackerBlockingDependencies()
     }
 
     private func tryAgainLater() {

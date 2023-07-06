@@ -64,7 +64,7 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
     }
 
     @MainActor
-    func handleUpdateResource(params: Any, message: UserScriptMessage) async -> Encodable? {
+    func handleUpdateResource(params: Any, message: UserScriptMessage) async throws -> Encodable? {
         guard let request: UpdateResourceRequest = DecodableHelper.decode(from: params) else {
             assertionFailure("PrivacyConfigurationEditUserScript: expected JSON representation of UpdateResourceRequest")
             return nil
@@ -73,15 +73,15 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
         switch request.source {
         case let .remote(url):
             configurationURLProvider.setURL(url.url, for: .privacyConfiguration)
-            await ConfigurationManager.shared.forceRefresh()
+            try await ConfigurationManager.shared.forceRefresh(.privacyConfiguration)
             return generateFeaturesResponse()
         case let .debugTools(content):
             let result = ContentBlocking.shared.privacyConfigurationManager.override(with: content.utf8data)
-            if result == .downloaded {
-                return generateFeaturesResponse()
+            if result != .downloaded {
+                throw UpdateResourceError(message: "Failed to parse custom Privacy Config")
             }
+            return generateFeaturesResponse()
         }
-        return nil
     }
 
     private let dateFormatter = ISO8601DateFormatter()
@@ -115,6 +115,10 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
 
         return FeaturesResponse(features: .init(remoteResources: .init(resources: [resource])))
     }
+}
+
+struct UpdateResourceError: Error {
+    let message: String
 }
 
 // MARK: - UpdateResource
