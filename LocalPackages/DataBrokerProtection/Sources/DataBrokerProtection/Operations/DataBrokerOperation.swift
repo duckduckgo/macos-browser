@@ -52,6 +52,17 @@ public extension DataBrokerOperation {
             return
         }
 
+        if action as? SolveCaptchaAction != nil, let captchaTransactionId = actionsHandler?.captchaTransactionId {
+            actionsHandler?.captchaTransactionId = nil
+            if let captchaData = try? await captchaService.submitCaptchaToBeResolved(for: captchaTransactionId) {
+                await webViewHandler?.execute(action: action, profileData: .solveCaptcha(CaptchaToken(token: captchaData)))
+            } else {
+                onError(error: .captchaServiceError(CaptchaServiceError.nilDataWhenFetchingCaptchaResult))
+            }
+
+            return
+        }
+
         if action.needsEmail {
             do {
                 query.profileQuery = try await getProfileWithEmail()
@@ -61,7 +72,7 @@ public extension DataBrokerOperation {
             }
         }
 
-        await webViewHandler?.execute(action: action, profileData: query.profileQuery)
+        await webViewHandler?.execute(action: action, profileData: .profile(query.profileQuery))
     }
 
     private func runEmailConfirmationAction(action: EmailConfirmationAction) async throws {
@@ -113,8 +124,8 @@ public extension DataBrokerOperation {
     func captchaInformation(captchaInfo: GetCaptchaInfoResponse) {
         Task {
             do {
-                let captchaTransactonId = try await captchaService.submitCaptchaInformation(captchaInfo)
-                print(captchaTransactonId)
+                actionsHandler?.captchaTransactionId = try await captchaService.submitCaptchaInformation(captchaInfo)
+                await executeNextStep()
             } catch {
                 if let captchaError = error as? CaptchaServiceError {
                     onError(error: DataBrokerProtectionError.captchaServiceError(captchaError))

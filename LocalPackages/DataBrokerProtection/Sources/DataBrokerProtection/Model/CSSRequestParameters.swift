@@ -18,6 +18,15 @@
 
 import Foundation
 
+public enum CCFRequestData: Encodable {
+    case profile(ProfileQuery)
+    case solveCaptcha(CaptchaToken)
+}
+
+public struct CaptchaToken: Encodable, Sendable {
+    let token: String
+}
+
 public struct InitParams: Encodable {
     let profileData: ProfileQuery
     let dataBrokerData: DataBroker
@@ -25,16 +34,25 @@ public struct InitParams: Encodable {
 
 public struct State: Encodable {
     let action: Action
-    let profileData: ProfileQuery?
+    let profileData: CCFRequestData?
 
     enum CodingKeys: String, CodingKey {
         case action
         case profileData
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(profileData, forKey: .profileData)
+
+        switch profileData {
+        case .profile(let profileQuery):
+            try container.encode(profileQuery, forKey: .profileData)
+        case .solveCaptcha(let captchaToken):
+            try container.encode(captchaToken, forKey: .profileData)
+        default:
+            try container.encodeNil(forKey: .profileData)
+        }
 
         switch action {
         case let navigateAction as NavigateAction:
@@ -49,6 +67,8 @@ public struct State: Encodable {
             try container.encode(expectationAction, forKey: .action)
         case let getCaptchaInfo as GetCaptchaInfoAction:
             try container.encode(getCaptchaInfo, forKey: .action)
+        case let solveCaptcha as SolveCaptchaAction:
+            try container.encode(solveCaptcha, forKey: .action)
         default:
             assertionFailure("Action not found. Please add the missing action to the encoding list.")
         }
