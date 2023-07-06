@@ -30,7 +30,6 @@ final class PrivacyDebugToolsTabExtension {
 
     let privacyDebugTools: PrivacyDebugTools
     private var cancellables = Set<AnyCancellable>()
-    private var youtubePlayerCancellables = Set<AnyCancellable>()
     private weak var privacyConfigurationEditUserScript: PrivacyConfigurationEditUserScript?
 
     init(
@@ -41,10 +40,6 @@ final class PrivacyDebugToolsTabExtension {
 
         scriptsPublisher.sink { [weak self] scripts in
             self?.privacyConfigurationEditUserScript = scripts.privacyConfigurationEditUserScript
-
-//            DispatchQueue.main.async { [weak self] in
-//                self?.setUpYoutubeScriptsIfNeeded(for: self?.webView?.url)
-//            }
         }.store(in: &cancellables)
     }
 }
@@ -62,12 +57,6 @@ extension PrivacyDebugToolsTabExtension: NavigationResponder {
         }
         return .next
     }
-
-    @MainActor
-    func navigationDidFinish(_ navigation: Navigation) {
-//        setUpYoutubeScriptsIfNeeded(for: navigation.url)
-    }
-
 }
 
 protocol PrivacyDebugToolsTabExtensionProtocol: AnyObject, NavigationResponder {

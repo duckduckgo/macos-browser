@@ -124,24 +124,6 @@ struct UpdateResourceRequest: Decodable {
         case remote(url: String)
         case debugTools(content: String)
     }
-
-    var url: URL? {
-        switch source {
-        case let .remote(url):
-            return url.url
-        default:
-            return nil
-        }
-    }
-
-    var content: String? {
-        switch source {
-        case let .debugTools(content):
-            return content
-        default:
-            return nil
-        }
-    }
 }
 
 // MARK: - Features Response
