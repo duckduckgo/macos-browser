@@ -52,12 +52,12 @@ public extension DataBrokerOperation {
             return
         }
 
-        if let _ = action as? SolveCaptchaAction, let captchaTransactionId = actionsHandler?.captchaTransactionId {
+        if action as? SolveCaptchaAction != nil, let captchaTransactionId = actionsHandler?.captchaTransactionId {
             actionsHandler?.captchaTransactionId = nil
             if let captchaData = try? await captchaService.submitCaptchaToBeResolved(for: captchaTransactionId) {
                 await webViewHandler?.execute(action: action, profileData: .solveCaptcha(CaptchaToken(token: captchaData)))
             } else {
-                onError(error: .captchaServiceError(CaptchaServiceError.nilDataWhenFetchigCaptchaResult))
+                onError(error: .captchaServiceError(CaptchaServiceError.nilDataWhenFetchingCaptchaResult))
             }
 
             return

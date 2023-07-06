@@ -29,7 +29,7 @@ public enum CaptchaServiceError: Error {
     case timedOutWhenSubmittingCaptcha
     case errorWhenSubmittingCaptcha
     case errorWhenFetchingCaptchaResult
-    case nilDataWhenFetchigCaptchaResult
+    case nilDataWhenFetchingCaptchaResult
     case timedOutWhenFetchingCaptchaResult
     case failureWhenFetchingCaptchaResult
     case invalidRequestWhenFetchingCaptchaResult
@@ -97,7 +97,7 @@ public struct DataBrokerProtectionCaptchaService {
     /// Submits captcha information to the backend to start solving it,
     ///
     /// - Parameters:
-    ///   - captchaInfo: A struct that containes a `siteKey`, `url` and `type`
+    ///   - captchaInfo: A struct that containers a `siteKey`, `url` and `type`
     /// - Returns: `CaptchaTransactionId` an identifier so we can later use to fetch the resolved captcha information
     func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse,
                                   retries: Int = 5) async throws -> CaptchaTransactionId {
@@ -168,7 +168,7 @@ public struct DataBrokerProtectionCaptchaService {
             if let data = captchaResolveResult.data {
                 return data
             } else {
-                throw CaptchaServiceError.nilDataWhenFetchigCaptchaResult
+                throw CaptchaServiceError.nilDataWhenFetchingCaptchaResult
             }
         case .notReady:
             if retries == 0 {

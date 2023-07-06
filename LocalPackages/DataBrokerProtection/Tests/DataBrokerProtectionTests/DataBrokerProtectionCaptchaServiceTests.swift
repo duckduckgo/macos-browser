@@ -214,6 +214,6 @@ extension GetCaptchaInfoResponse {
 
 extension Meta {
     static var mock: Meta {
-        Meta(lastBackend: "", backends: [String : Backend](), timeToSolution: 2.0, type: "type", lastUpdated: 1.0)
+        Meta(lastBackend: "", backends: [String: Backend](), timeToSolution: 2.0, type: "type", lastUpdated: 1.0)
     }
 }
