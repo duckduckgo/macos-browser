@@ -54,6 +54,7 @@ enum CSSSuccessData {
     case click
     case expectation
     case getCaptchaInfo(GetCaptchaInfoResponse)
+    case solveCaptcha
 }
 
 struct CSSSuccessResponse: Decodable {
@@ -87,6 +88,8 @@ struct CSSSuccessResponse: Decodable {
             self.response = nil // Email confirmation is done on the native side. We shouldn't have a response here
         case .getCaptchaInfo:
             self.response = .getCaptchaInfo(try container.decode(GetCaptchaInfoResponse.self, forKey: .response))
+        case .solveCaptcha:
+            self.response = .solveCaptcha
         }
     }
 }
