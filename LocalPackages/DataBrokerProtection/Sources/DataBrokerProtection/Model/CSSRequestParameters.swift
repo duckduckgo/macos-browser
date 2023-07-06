@@ -41,6 +41,7 @@ public struct State: Encodable {
         case profileData
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
