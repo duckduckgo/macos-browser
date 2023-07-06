@@ -142,7 +142,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                      brokerProfileQueryData: brokerProfileQueryData)
             database.saveOperationData(brokerProfileQueryData.scanData)
             os_log("Finished scan operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
-            notificationCenter.post(name: DataBrokerNotifications.didFinishScan, object: brokerProfileQueryData.dataBroker.name)
+            notificationCenter.post(name: DataBrokerProtectionNotifications.didFinishScan, object: brokerProfileQueryData.dataBroker.name)
         }
         os_log("Running scan operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 
