@@ -10,7 +10,7 @@
         <scene sceneID="lhD-K8-q8j">
             <objects>
                 <viewController id="NgM-AV-NvE" customClass="HomePageViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" autoresizesSubviews="NO" id="Veh-DK-43v">
+                    <view key="view" autoresizesSubviews="NO" id="Veh-DK-43v" customClass="BlurringView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="628" height="381"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <userDefinedRuntimeAttributes>
@@ -88,7 +88,7 @@
                                     </gridCell>
                                     <gridCell row="1G0-DG-YgP" column="jEV-wa-iSE" id="UYO-eE-UtK">
                                         <textField key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bLd-Hj-ttQ">
-                                            <rect key="frame" x="60" y="27" width="100" height="21"/>
+                                            <rect key="frame" x="310" y="27" width="100" height="21"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="W3q-og-79e">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -108,7 +108,7 @@
                                     </gridCell>
                                     <gridCell row="d3W-kk-2Ht" column="jEV-wa-iSE" id="efH-IF-rgE">
                                         <textField key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bB4-9W-QHG">
-                                            <rect key="frame" x="60" y="0.0" width="100" height="21"/>
+                                            <rect key="frame" x="310" y="0.0" width="100" height="21"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="vPZ-Ig-irl">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>

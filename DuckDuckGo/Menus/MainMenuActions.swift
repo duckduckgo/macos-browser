@@ -112,6 +112,10 @@ extension AppDelegate {
         stateRestorationManager.restoreLastSessionState(interactive: true)
     }
 
+    @IBAction func switchScreenSharingMode(_ sender: Any?) {
+        screenSharingModeCoordinator.switchMode()
+    }
+
     // MARK: - Help
 
     #if FEEDBACK

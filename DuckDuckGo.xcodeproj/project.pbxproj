@@ -62,6 +62,10 @@
 		1DB9618329F67F6200CF5568 /* FaviconNullStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB9617F29F67F3E00CF5568 /* FaviconNullStore.swift */; };
 		1DCFBC8A29ADF32B00313531 /* BurnerHomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */; };
 		1DCFBC8B29ADF32B00313531 /* BurnerHomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */; };
+		1DDEE1F42A569B520082F72A /* BlurringView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDEE1F32A569B520082F72A /* BlurringView.swift */; };
+		1DDEE1F62A56A1360082F72A /* ScreenSharingModeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDEE1F52A56A1360082F72A /* ScreenSharingModeCoordinator.swift */; };
+		1DDEE1F72A56A33B0082F72A /* ScreenSharingModeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDEE1F52A56A1360082F72A /* ScreenSharingModeCoordinator.swift */; };
+		1DDEE1F82A56AA9C0082F72A /* BlurringView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDEE1F32A569B520082F72A /* BlurringView.swift */; };
 		1DDF076328F815AD00EDFBE3 /* BWCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */; };
 		1DDF076428F815AD00EDFBE3 /* BWManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075E28F815AD00EDFBE3 /* BWManager.swift */; };
 		1DE03425298BC7F000CAB3D7 /* InternalUserDeciderStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D12F2E1298BC660009A65FD /* InternalUserDeciderStoreMock.swift */; };
@@ -2124,6 +2128,8 @@
 		1DB9617929F1D06D00CF5568 /* InternalUserDeciderMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalUserDeciderMock.swift; sourceTree = "<group>"; };
 		1DB9617F29F67F3E00CF5568 /* FaviconNullStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconNullStore.swift; sourceTree = "<group>"; };
 		1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BurnerHomePageView.swift; sourceTree = "<group>"; };
+		1DDEE1F32A569B520082F72A /* BlurringView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurringView.swift; sourceTree = "<group>"; };
+		1DDEE1F52A56A1360082F72A /* ScreenSharingModeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenSharingModeCoordinator.swift; sourceTree = "<group>"; };
 		1DDF075C28F815AD00EDFBE3 /* BWCredential.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWCredential.swift; sourceTree = "<group>"; };
 		1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWCommunicator.swift; sourceTree = "<group>"; };
 		1DDF075E28F815AD00EDFBE3 /* BWManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWManager.swift; sourceTree = "<group>"; };
@@ -3421,6 +3427,23 @@
 				1D6A491929CF75290011DF74 /* BurnerWindowPopover.storyboard */,
 			);
 			path = BurnerWindow;
+			sourceTree = "<group>";
+		};
+		1DDEE1F12A5693C20082F72A /* ScreenSharingMode */ = {
+			isa = PBXGroup;
+			children = (
+				1DDEE1F52A56A1360082F72A /* ScreenSharingModeCoordinator.swift */,
+				1DDEE1F22A569B3E0082F72A /* View */,
+			);
+			path = ScreenSharingMode;
+			sourceTree = "<group>";
+		};
+		1DDEE1F22A569B3E0082F72A /* View */ = {
+			isa = PBXGroup;
+			children = (
+				1DDEE1F32A569B520082F72A /* BlurringView.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		313AED9F287CAC5A00E1E8F4 /* UI */ = {
@@ -4972,6 +4995,7 @@
 		AA585D80248FD31100E9A3E2 /* DuckDuckGo */ = {
 			isa = PBXGroup;
 			children = (
+				1DDEE1F12A5693C20082F72A /* ScreenSharingMode */,
 				EEAEA3F4294D05CF00D04DF3 /* JSAlert */,
 				B31055BB27A1BA0E001AC618 /* Autoconsent */,
 				7B1E819A27C8874900FF0E60 /* Autofill */,
@@ -6462,7 +6486,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3706FCFA293F65D500E42796 /* Build configuration list for PBXNativeTarget "DuckDuckGo Privacy Browser App Store" */;
 			buildPhases = (
-				CBCCF59F2996681700C02DFE /* Assert Xcode version */,
 				378E2798296F6D1D00FCADA2 /* Validate PRODUCT_NAME */,
 				3706FA79293F65D500E42796 /* Check Embedded Config URLs */,
 				3706FA7A293F65D500E42796 /* Sources */,
@@ -6740,7 +6763,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA585DA4248FD31500E9A3E2 /* Build configuration list for PBXNativeTarget "DuckDuckGo Privacy Browser" */;
 			buildPhases = (
-				CBCCF59E299667B700C02DFE /* Assert Xcode version */,
 				3705272528992C8A000C06A2 /* Check Embedded Config URLs */,
 				AA585D7A248FD31100E9A3E2 /* Sources */,
 				AA8EDF2824925E940071C2E8 /* Swift Lint */,
@@ -7342,44 +7364,6 @@
 			shellPath = /bin/sh;
 			shellScript = "FRAMEWORKS_DIR=\"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\nDYLIB_TARGET_PATH=\"${FRAMEWORKS_DIR}/libswift_Concurrency.dylib\"\n\nif [ ! -e \"${DYLIB_TARGET_PATH}\" ]; then\n\n    DYLIB_PATH=$(find \"${TOOLCHAIN_DIR}/usr/lib\" -path \"*/${HOST_PLATFORM}/libswift_Concurrency.dylib\")\n    echo \"copy ${DYLIB_PATH} to ${DYLIB_TARGET_PATH}\"\n\n    mkdir -p \"${FRAMEWORKS_DIR}\"\n    cp \"${DYLIB_PATH}\" \"${DYLIB_TARGET_PATH}\" || exit 1\n\nelse\n    echo \"${DYLIB_TARGET_PATH} exists\"\nfi\n";
 		};
-		CBCCF59E299667B700C02DFE /* Assert Xcode version */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Assert Xcode version";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/scripts/assert_xcode_version.sh\"\n";
-		};
-		CBCCF59F2996681700C02DFE /* Assert Xcode version */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Assert Xcode version";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/scripts/assert_xcode_version.sh\"\n";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -7499,6 +7483,7 @@
 				3706FAEA293F65D500E42796 /* DataImportViewController.swift in Sources */,
 				3706FAEB293F65D500E42796 /* HistoryMenu.swift in Sources */,
 				3706FAEC293F65D500E42796 /* ContentScopeFeatureFlagging.swift in Sources */,
+				1DDEE1F72A56A33B0082F72A /* ScreenSharingModeCoordinator.swift in Sources */,
 				3706FAED293F65D500E42796 /* OnboardingButtonStyles.swift in Sources */,
 				3706FAEE293F65D500E42796 /* SaveIdentityPopover.swift in Sources */,
 				3706FAF0293F65D500E42796 /* YoutubePlayerNavigationHandler.swift in Sources */,
@@ -7867,6 +7852,7 @@
 				3706FC2B293F65D500E42796 /* DownloadViewModel.swift in Sources */,
 				987799F22999993C005D8EB6 /* LegacyBookmarkStore.swift in Sources */,
 				3706FC2C293F65D500E42796 /* BookmarkHTMLReader.swift in Sources */,
+				1DDEE1F82A56AA9C0082F72A /* BlurringView.swift in Sources */,
 				3706FC2D293F65D500E42796 /* Tab+NSSecureCoding.swift in Sources */,
 				3706FC2E293F65D500E42796 /* NSNotificationName+EmailManager.swift in Sources */,
 				37445F9D2A1569F00029F789 /* SyncBookmarksAdapter.swift in Sources */,
@@ -8658,6 +8644,7 @@
 				9826B0A22747DFEB0092F683 /* AppPrivacyConfigurationDataProvider.swift in Sources */,
 				B6B1E88B26D774090062C350 /* LinkButton.swift in Sources */,
 				4BBF0915282DD40100EE1418 /* TemporaryFileHandler.swift in Sources */,
+				1DDEE1F42A569B520082F72A /* BlurringView.swift in Sources */,
 				B602E8162A1E2570006D261F /* URL+NetworkProtection.swift in Sources */,
 				CB6BCDF927C6BEFF00CC76DC /* PrivacyFeatures.swift in Sources */,
 				B693954D26F04BEB0015B914 /* MouseClickView.swift in Sources */,
@@ -8929,6 +8916,7 @@
 				AA3D531527A1ED9300074EC1 /* FeedbackWindow.swift in Sources */,
 				B6685E3F29A606190043D2EE /* WorkspaceProtocol.swift in Sources */,
 				85F0FF1327CFAB04001C7C6E /* RecentlyVisitedView.swift in Sources */,
+				1DDEE1F62A56A1360082F72A /* ScreenSharingModeCoordinator.swift in Sources */,
 				AA7EB6DF27E7C57D00036718 /* MouseOverAnimationButton.swift in Sources */,
 				AA7412B724D1687000D22FE0 /* TabBarScrollView.swift in Sources */,
 				4B9292D92667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift in Sources */,

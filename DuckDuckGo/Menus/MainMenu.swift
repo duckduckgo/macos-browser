@@ -81,6 +81,9 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var toggleDownloadsShortcutMenuItem: NSMenuItem?
     @IBOutlet weak var toggleNetworkProtectionShortcutMenuItem: NSMenuItem?
 
+    // MARK: - Window
+    @IBOutlet weak var screenSharingModeMenuItem: NSMenuItem!
+
     // MARK: - Debug
 
     @IBOutlet weak var debugMenuItem: NSMenuItem?

@@ -62,6 +62,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var internalUserDecider: InternalUserDecider?
     private(set) var featureFlagger: FeatureFlagger!
     private var appIconChanger: AppIconChanger!
+    private(set) var screenSharingModeCoordinator: ScreenSharingModeCoordinator!
 
     private(set) var syncDataProviders: SyncDataProviders!
     private(set) var syncService: DDGSyncing?
@@ -161,6 +162,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
+        screenSharingModeCoordinator = ScreenSharingModeCoordinator(windowControllerManager: WindowControllersManager.shared,
+                                                                    mainMenu: NSApp.mainMenuTyped)
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {

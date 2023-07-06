@@ -709,6 +709,13 @@ CQ
                                                 <action selector="arrangeInFront:" target="Ady-hI-5gd" id="DRN-fu-gQh"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="ACL-Za-bZc"/>
+                                        <menuItem title="Screen Sharing Mode" id="9XM-9T-TtV">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="switchScreenSharingMode:" target="Ady-hI-5gd" id="BkY-fW-X8i"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
@@ -947,6 +954,7 @@ CQ
                             <outlet property="printMenuItem" destination="uFk-FD-FTB" id="mOP-Xp-myS"/>
                             <outlet property="printSeparatorItem" destination="anH-0y-7dE" id="E6b-rl-clQ"/>
                             <outlet property="reloadMenuItem" destination="aKZ-VG-MOp" id="J3D-X3-Xg3"/>
+                            <outlet property="screenSharingModeMenuItem" destination="9XM-9T-TtV" id="ZMO-03-a7L"/>
                             <outlet property="sendFeedbackMenuItem" destination="V8t-Ts-q0L" id="qwz-Oh-HGm"/>
                             <outlet property="shareMenuItem" destination="kUE-Qf-cwa" id="kEZ-Kc-Wf4"/>
                             <outlet property="stopMenuItem" destination="FyY-q1-f0k" id="BFN-Kd-aAb"/>
