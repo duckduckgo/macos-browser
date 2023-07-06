@@ -1,5 +1,5 @@
 //
-//  Action.swift
+//  SolveCaptcha.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,25 +18,13 @@
 
 import Foundation
 
-public enum ActionType: String, Codable, Sendable {
-    case extract
-    case navigate
-    case fillForm
-    case click
-    case expectation
-    case emailConfirmation
-    case getCaptchaInfo
-    case solveCaptcha
-}
+public struct SolveCaptchaAction: Action {
+    public var id: String = "solveCaptcha"
+    public var actionType: ActionType = .solveCaptcha
 
-public protocol Action: Encodable, Sendable {
-    var id: String { get }
-    var actionType: ActionType { get }
-    var needsEmail: Bool { get }
-}
+    let selector: String
 
-public extension Action {
-    var needsEmail: Bool {
-        get { false }
+    public init(selector: String) {
+        self.selector = selector
     }
 }
