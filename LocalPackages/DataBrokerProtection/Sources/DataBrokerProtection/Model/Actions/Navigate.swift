@@ -16,13 +16,13 @@
 //  limitations under the License.
 //
 
-public struct NavigateAction: Action {
-    public let id: String = "navigate"
-    public let actionType: ActionType = .navigate
+struct NavigateAction: Action {
+    let id: String = "navigate"
+    let actionType: ActionType = .navigate
     let url: String
     let ageRange: [String]
 
-    public init(url: String, ageRange: [String]) {
+    init(url: String, ageRange: [String]) {
         self.url = url
         self.ageRange = ageRange
     }

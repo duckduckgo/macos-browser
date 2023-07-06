@@ -302,7 +302,6 @@ final class OperationsTests: XCTestCase {
 
         let expectedScanPreferredDate = Date().addingTimeInterval(dataBroker.schedulingConfig.maintenanceScan)
 
-
         XCTAssertNil(optOutOperationData.preferredRunDate)
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: data.scanData.preferredRunDate, date2: expectedScanPreferredDate))
 
