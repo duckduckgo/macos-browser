@@ -79,7 +79,7 @@ struct Step: Codable, Sendable {
             case .navigate:
                 let action = try JSONDecoder().decode(NavigateAction.self, from: jsonData)
                 actionList.append(action)
-            case .expectation :
+            case .expectation:
                 let action = try JSONDecoder().decode(ExpectationAction.self, from: jsonData)
                 actionList.append(action)
             case .getCaptchaInfo:

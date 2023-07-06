@@ -20,127 +20,124 @@ import XCTest
 @testable import DataBrokerProtection
 
 final class BrokerJSONCodableTests: XCTestCase {
-
-    func testVerecorJSON_isCorrectlyParsed() {
-        let jsonString = """
+    let verecorJSONString = """
+               {
+                 "name": "verecor",
+                 "steps": [
                    {
-                     "name": "verecor",
-                     "steps": [
+                     "stepType": "scan",
+                     "actions": [
                        {
-                         "stepType": "scan",
-                         "actions": [
+                         "id": "fe235f94-1c33-11ee-be56-0242ac120002",
+                         "actionType": "navigate",
+                         "url": "https://verecor.com/profile/search?fname=${firstName}&lname=${lastName}&state=${stateUpcase}&city=${cityCapitalize}&fage=${ageRange}",
+                         "ageRange": [
+                           "18-30",
+                           "31-40",
+                           "41-50",
+                           "51-60",
+                           "61-70",
+                           "71-80",
+                           "81+"
+                         ]
+                       },
+                       {
+                         "id": "fe236548-1c33-11ee-be56-0242ac120002",
+                         "actionType": "extract",
+                         "selector": ".search-item",
+                         "profile": {
+                           "name": "//div[@class='col-sm-24 col-md-19 col-text']",
+                           "alternativeNamesList": ".name",
+                           "age": ".age",
+                           "addressCityStateList": ".location",
+                           "profileUrl": "a"
+                         }
+                       }
+                     ]
+                   },
+                   {
+                     "stepType": "optOut",
+                     "actions": [
+                       {
+                         "id": "fe23669c-1c33-11ee-be56-0242ac120002",
+                         "actionType": "navigate",
+                         "url": "https://verecor.com/ng/control/privacy"
+                       },
+                       {
+                         "id": "fe2367be-1c33-11ee-be56-0242ac120002",
+                         "actionType": "fillForm",
+                         "selector": ".ahm",
+                         "elements": [
                            {
-                             "id": "fe235f94-1c33-11ee-be56-0242ac120002",
-                             "actionType": "navigate",
-                             "url": "https://verecor.com/profile/search?fname=${firstName}&lname=${lastName}&state=${stateUpcase}&city=${cityCapitalize}&fage=${ageRange}",
-                             "ageRange": [
-                               "18-30",
-                               "31-40",
-                               "41-50",
-                               "51-60",
-                               "61-70",
-                               "71-80",
-                               "81+"
-                             ]
+                             "type": "fullName",
+                             "selector": "#user_name"
                            },
                            {
-                             "id": "fe236548-1c33-11ee-be56-0242ac120002",
-                             "actionType": "extract",
-                             "selector": ".search-item",
-                             "profile": {
-                               "name": "//div[@class='col-sm-24 col-md-19 col-text']",
-                               "alternativeNamesList": ".name",
-                               "age": ".age",
-                               "addressCityStateList": ".location",
-                               "profileUrl": "a"
-                             }
+                             "type": "email",
+                             "selector": "#user_email"
+                           },
+                           {
+                             "type": "profileUrl",
+                             "selector": "#url"
                            }
                          ]
                        },
                        {
-                         "stepType": "optOut",
-                         "actions": [
+                         "id": "fe2369f8-1c33-11ee-be56-0242ac120002",
+                         "actionType": "getCaptchaInfo",
+                         "selector": ".g-recaptcha"
+                       },
+                       {
+                         "id": "fe2368e0-1c33-11ee-be56-0242ac120002",
+                         "actionType": "solveCaptcha",
+                         "selector": ".g-recaptcha"
+                       },
+                       {
+                         "id": "fe236b10-1c33-11ee-be56-0242ac120002",
+                         "actionType": "click",
+                         "elements": [
                            {
-                             "id": "fe23669c-1c33-11ee-be56-0242ac120002",
-                             "actionType": "navigate",
-                             "url": "https://verecor.com/ng/control/privacy"
-                           },
+                             "type": "button",
+                             "selector": ".btn-sbmt"
+                           }
+                         ]
+                       },
+                       {
+                         "id": "fe236c32-1c33-11ee-be56-0242ac120002",
+                         "actionType": "expectation",
+                         "expectations": [
                            {
-                             "id": "fe2367be-1c33-11ee-be56-0242ac120002",
-                             "actionType": "fillForm",
-                             "selector": ".ahm",
-                             "elements": [
-                               {
-                                 "type": "fullName",
-                                 "selector": "#user_name"
-                               },
-                               {
-                                 "type": "email",
-                                 "selector": "#user_email"
-                               },
-                               {
-                                 "type": "profileUrl",
-                                 "selector": "#url"
-                               }
-                             ]
-                           },
+                             "type": "text",
+                             "selector": "body",
+                             "expect": "Your removal request has been received"
+                           }
+                         ]
+                       },
+                       {
+                         "id": "fe236d4a-1c33-11ee-be56-0242ac120002",
+                         "actionType": "emailConfirmation",
+                         "pollingTime": 30
+                       },
+                       {
+                         "id": "fe2371be-1c33-11ee-be56-0242ac120002",
+                         "actionType": "expectation",
+                         "expectations": [
                            {
-                             "id": "fe2369f8-1c33-11ee-be56-0242ac120002",
-                             "actionType": "getCaptchaInfo",
-                             "selector": ".g-recaptcha"
-                           },
-                           {
-                             "id": "fe2368e0-1c33-11ee-be56-0242ac120002",
-                             "actionType": "solveCaptcha",
-                             "selector": ".g-recaptcha"
-                           },
-                           {
-                             "id": "fe236b10-1c33-11ee-be56-0242ac120002",
-                             "actionType": "click",
-                             "elements": [
-                               {
-                                 "type": "button",
-                                 "selector": ".btn-sbmt"
-                               }
-                             ]
-                           },
-                           {
-                             "id": "fe236c32-1c33-11ee-be56-0242ac120002",
-                             "actionType": "expectation",
-                             "expectations": [
-                               {
-                                 "type": "text",
-                                 "selector": "body",
-                                 "expect": "Your removal request has been received"
-                               }
-                             ]
-                           },
-                           {
-                             "id": "fe236d4a-1c33-11ee-be56-0242ac120002",
-                             "actionType": "emailConfirmation",
-                             "pollingTime": 30
-                           },
-                           {
-                             "id": "fe2371be-1c33-11ee-be56-0242ac120002",
-                             "actionType": "expectation",
-                             "expectations": [
-                               {
-                                 "type": "text",
-                                 "selector": "body",
-                                 "expect": "Your information control request has been confirmed."
-                               }
-                             ]
+                             "type": "text",
+                             "selector": "body",
+                             "expect": "Your information control request has been confirmed."
                            }
                          ]
                        }
                      ]
                    }
+                 ]
+               }
+               """
 
-                   """
-
-
+    func testVerecorJSON_isCorrectlyParsed() {
         do {
-            _ = try JSONDecoder().decode(DataBroker.self, from: jsonString.data(using: .utf8)!)
+            _ = try JSONDecoder().decode(DataBroker.self, from: verecorJSONString.data(using: .utf8)!)
         } catch {
             XCTFail("JSON string should be parsed correctly.")
         }
