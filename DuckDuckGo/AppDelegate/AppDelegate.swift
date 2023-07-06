@@ -62,6 +62,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var internalUserDecider: InternalUserDecider?
     private(set) var featureFlagger: FeatureFlagger!
     private(set) var privacyDebugTools: PrivacyDebugTools!
+    private(set) var configurationURLProvider = AppConfigurationURLProvider()
     private var appIconChanger: AppIconChanger!
 
     private(set) var syncDataProviders: SyncDataProviders!
@@ -83,7 +84,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
-        Configuration.setURLProvider(AppConfigurationURLProvider())
+        Configuration.setURLProvider(configurationURLProvider)
 
         if !NSApp.isRunningUnitTests {
 #if DEBUG

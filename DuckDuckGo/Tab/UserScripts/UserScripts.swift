@@ -76,7 +76,10 @@ final class UserScripts: UserScriptsProvider {
         }
 
         if (NSApp.delegate as? AppDelegate)?.internalUserDecider?.isInternalUser == true {
-            privacyConfigurationEditUserScript = PrivacyConfigurationEditUserScript()
+            privacyConfigurationEditUserScript = PrivacyConfigurationEditUserScript(
+                // swiftlint:disable:next force_cast
+                configurationURLProvider: (NSApp.delegate as! AppDelegate).configurationURLProvider
+            )
         } else {
             privacyConfigurationEditUserScript = nil
         }

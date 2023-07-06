@@ -27,6 +27,11 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
     let messageOriginPolicy: MessageOriginPolicy = .all
     let featureName: String = "debugToolsPage"
     var broker: UserScriptMessageBroker?
+    let configurationURLProvider: ConfigurationURLProviding
+
+    init(configurationURLProvider: ConfigurationURLProviding) {
+        self.configurationURLProvider = configurationURLProvider
+    }
 
     // MARK: - Subfeature
 
@@ -38,12 +43,15 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
 
     enum MessageNames: String, CaseIterable {
         case getFeatures
+        case updateResource
     }
 
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
         switch MessageNames(rawValue: methodName) {
         case .getFeatures:
             return handleGetFeatures
+        case .updateResource:
+            return handleUpdateResource
         default:
             assertionFailure("PrivacyConfigurationEditUserScript: Failed to parse User Script message: \(methodName)")
             return nil
@@ -52,20 +60,51 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
 
     @MainActor
     func handleGetFeatures(params: Any, message: UserScriptMessage) -> Encodable? {
-        print(message.messageName)
+        generateFeaturesResponse()
+    }
+
+    @MainActor
+    func handleUpdateResource(params: Any, message: UserScriptMessage) -> Encodable? {
+        guard let request: UpdateResourceRequest = DecodableHelper.decode(from: params) else {
+            assertionFailure("PrivacyConfigurationEditUserScript: expected JSON representation of UpdateResourceRequest")
+            return nil
+        }
+
+        switch request.source {
+        case let .remote(url):
+            configurationURLProvider.setURL(url.url, for: .privacyConfiguration)
+            ConfigurationManager.shared.forceRefresh()
+            return generateFeaturesResponse()
+        case let .debugTools(content):
+            let result = ContentBlocking.shared.privacyConfigurationManager.override(with: content.utf8data)
+            if result == .downloaded {
+                return generateFeaturesResponse()
+            }
+        }
+        return nil
+    }
+
+    private let dateFormatter = ISO8601DateFormatter()
+
+    func generateFeaturesResponse() -> FeaturesResponse {
         let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
 
-        let dateFormatter = ISO8601DateFormatter()
+        let source: RemoteResource.Source = {
+            if let date = privacyConfigurationManager.overriddenAt {
+                return .debugTools(modifiedAt: dateFormatter.string(from: date))
+            }
+            return .remote(
+                url: AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString,
+                fetchedAt: dateFormatter.string(from: Date())
+            )
+        }()
 
         let resource = RemoteResource(
             id: "privacy-configuration",
             url: AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString,
             name: "Privacy Config",
             current: .init(
-                source: .remote(
-                    url: AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString,
-                    fetchedAt: dateFormatter.string(from: Date())
-                ),
+                source: source,
                 contents: privacyConfigurationManager.currentConfig.utf8String() ?? "",
                 contentType: "application/json"
             )
@@ -74,6 +113,38 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
         return FeaturesResponse(features: .init(remoteResources: .init(resources: [resource])))
     }
 }
+
+// MARK: - UpdateResource
+
+struct UpdateResourceRequest: Decodable {
+    let id: String
+    let source: Source
+
+    enum Source: Decodable {
+        case remote(url: String)
+        case debugTools(content: String)
+    }
+
+    var url: URL? {
+        switch source {
+        case let .remote(url):
+            return url.url
+        default:
+            return nil
+        }
+    }
+
+    var content: String? {
+        switch source {
+        case let .debugTools(content):
+            return content
+        default:
+            return nil
+        }
+    }
+}
+
+// MARK: - Features Response
 
 struct FeaturesResponse: Codable {
     let features: Features

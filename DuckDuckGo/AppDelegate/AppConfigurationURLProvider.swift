@@ -19,19 +19,33 @@
 import Foundation
 import Configuration
 
-struct AppConfigurationURLProvider: ConfigurationURLProviding {
+final class AppConfigurationURLProvider: ConfigurationURLProviding {
 
     func url(for configuration: Configuration) -> URL {
-        switch configuration {
-        case .bloomFilterBinary: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin")!
-        case .bloomFilterSpec: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom-spec.json")!
-        case .bloomFilterExcludedDomains: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json")!
-        case .privacyConfiguration: return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v3/macos-config.json")!
-        case .surrogates: return URL(string: "https://duckduckgo.com/contentblocking.js?l=surrogates")!
-        case .trackerDataSet: return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v5/current/macos-tds.json")!
-        // In archived repo, to be refactored shortly (https://staticcdn.duckduckgo.com/useragents/social_ctp_configuration.json)
-        case .FBConfig: return URL(string: "https://staticcdn.duckduckgo.com/useragents/")!
+        if let overriddenURL = overrides[configuration] {
+            return overriddenURL
+        }
+        return urls[configuration]!
+    }
+
+    func setURL(_ url: URL?, for configuration: Configuration) {
+        if let url {
+            overrides[configuration] = url
+        } else {
+            overrides.removeValue(forKey: configuration)
         }
     }
 
+    private var overrides: [Configuration: URL] = [:]
+
+    private let urls: [Configuration: URL] = [
+        .bloomFilterBinary: URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin")!,
+        .bloomFilterSpec: URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom-spec.json")!,
+        .bloomFilterExcludedDomains: URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json")!,
+        .privacyConfiguration: URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v3/macos-config.json")!,
+        .surrogates: URL(string: "https://duckduckgo.com/contentblocking.js?l=surrogates")!,
+        .trackerDataSet: URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v5/current/macos-tds.json")!,
+        // In archived repo, to be refactored shortly (https://staticcdn.duckduckgo.com/useragents/social_ctp_configuration.json)
+        .FBConfig: return URL(string: "https://staticcdn.duckduckgo.com/useragents/")!
+    ]
 }
