@@ -29,8 +29,8 @@ final class ActionsHandlerTests: XCTestCase {
     }
 
     func testWhenNextStepDoesNotFindAnyMoreActions_thenNilIsReturned() {
-        let firstAction = NavigateAction(url: "url", ageRange: [String]())
-        let secondAction = NavigateAction(url: "url", ageRange: [String]())
+        let firstAction = NavigateAction(id: "navigate1", actionType: .navigate, url: "url", ageRange: [String]())
+        let secondAction = NavigateAction(id: "navigate2", actionType: .navigate, url: "url", ageRange: [String]())
         let step = Step(type: .scan, actions: [firstAction, secondAction])
         let sut = ActionsHandler(step: step)
 
@@ -41,8 +41,8 @@ final class ActionsHandlerTests: XCTestCase {
     }
 
     func testWhenNextStepFindsAnAction_thenThatNextActionIsReturned() {
-        let firstAction = NavigateAction(url: "url", ageRange: [String]())
-        let secondAction = NavigateAction(url: "url", ageRange: [String]())
+        let firstAction = NavigateAction(id: "navigate1", actionType: .navigate, url: "url", ageRange: [String]())
+        let secondAction = NavigateAction(id: "navigate2", actionType: .navigate, url: "url", ageRange: [String]())
         let step = Step(type: .scan, actions: [firstAction, secondAction])
         let sut = ActionsHandler(step: step)
 
