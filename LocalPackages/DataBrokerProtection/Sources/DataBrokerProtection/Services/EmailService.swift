@@ -19,9 +19,9 @@
 import Foundation
 import Common
 
-public struct DataBrokerProtectionEmailService {
+struct EmailService {
 
-    public enum EmailError: Error, Equatable {
+    enum EmailError: Error, Equatable {
         case cantGenerateURL
         case cantFindEmail
         case invalidEmailLink
@@ -29,16 +29,13 @@ public struct DataBrokerProtectionEmailService {
         case cantDecodeEmailLink
     }
 
-    // This authentication method will be replaced with https://app.asana.com/0/72649045549333/1203580969735029/f
     private struct Constants {
         static let baseUrl = "https://dbp.duckduckgo.com/dbp/em/v0"
-        static let authUser = ""
-        static let authPass = ""
     }
 
     public let urlSession: URLSession
 
-    public init(urlSession: URLSession = URLSession.shared) {
+    init(urlSession: URLSession = URLSession.shared) {
         self.urlSession = urlSession
     }
 
