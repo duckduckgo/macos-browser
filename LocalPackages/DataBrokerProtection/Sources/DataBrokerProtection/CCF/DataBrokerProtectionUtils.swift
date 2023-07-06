@@ -21,11 +21,11 @@ import BrowserServicesKit
 import UserScript
 
 @MainActor
-final public class DataBrokerUserContentController: WKUserContentController {
+final class DataBrokerUserContentController: WKUserContentController {
 
     let dataBrokerUserScripts: DataBrokerUserScript
 
-    init(with privacyConfigurationManager: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CSSCommunicationDelegate) {
+    init(with privacyConfigurationManager: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate) {
         dataBrokerUserScripts = DataBrokerUserScript(privacyConfig: privacyConfigurationManager, prefs: prefs, delegate: delegate)
 
         super.init()
@@ -53,7 +53,7 @@ final class DataBrokerUserScript: UserScriptsProvider {
     let contentScopeUserScriptIsolated: ContentScopeUserScript
     var dataBrokerFeature: DataBrokerProtectionFeature
 
-    init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CSSCommunicationDelegate) {
+    init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate) {
         contentScopeUserScriptIsolated = ContentScopeUserScript(privacyConfig, properties: prefs, isIsolated: true)
         dataBrokerFeature = DataBrokerProtectionFeature(delegate: delegate)
         dataBrokerFeature.broker = contentScopeUserScriptIsolated.broker
@@ -100,7 +100,7 @@ extension WKUserContentController {
 extension WKWebViewConfiguration {
 
     @MainActor
-    func applyDataBrokerConfiguration(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CSSCommunicationDelegate) {
+    func applyDataBrokerConfiguration(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate) {
         preferences.isFraudulentWebsiteWarningEnabled = false
         let userContentController = DataBrokerUserContentController(with: privacyConfig, prefs: prefs, delegate: delegate)
         self.userContentController = userContentController

@@ -18,7 +18,7 @@
 
 import Foundation
 
-public enum ActionType: String, Codable, Sendable {
+enum ActionType: String, Codable, Sendable {
     case extract
     case navigate
     case fillForm
@@ -29,13 +29,13 @@ public enum ActionType: String, Codable, Sendable {
     case solveCaptcha
 }
 
-public protocol Action: Encodable, Sendable {
+protocol Action: Encodable, Sendable {
     var id: String { get }
     var actionType: ActionType { get }
     var needsEmail: Bool { get }
 }
 
-public extension Action {
+extension Action {
     var needsEmail: Bool {
         get { false }
     }
