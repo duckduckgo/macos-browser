@@ -18,7 +18,7 @@
 
 import Foundation
 
-struct CSSError: Decodable {
+struct CCFError: Decodable {
     let error: String
 }
 
@@ -33,13 +33,13 @@ public enum DataBrokerProtectionError: Error, Equatable {
     case unrecoverableError
     case noOptOutStep
     case captchaServiceError(CaptchaServiceError)
-    case emailError(DataBrokerProtectionEmailService.EmailError?)
+    case emailError(EmailService.EmailError?)
 
     static func parse(params: Any) -> DataBrokerProtectionError {
         let errorDataResult = try? JSONSerialization.data(withJSONObject: params)
 
         if let data = errorDataResult {
-            if let result = try? JSONDecoder().decode(CSSError.self, from: data) {
+            if let result = try? JSONDecoder().decode(CCFError.self, from: data) {
                 switch result.error {
                 case "No action found.": return .noActionFound
                 default: return .unknown(result.error)

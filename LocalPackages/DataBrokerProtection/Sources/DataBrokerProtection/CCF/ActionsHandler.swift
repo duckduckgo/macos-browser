@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionActionsHandler.swift
+//  ActionsHandler.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-public final class DataBrokerProtectionActionsHandler {
+public final class ActionsHandler {
     private var lastExecutedActionIndex: Int?
 
     var captchaTransactionId: CaptchaTransactionId?

@@ -21,16 +21,16 @@ import WebKit
 import BrowserServicesKit
 import UserScript
 
-public protocol DataBrokerOperation: CSSCommunicationDelegate {
+public protocol DataBrokerOperation: CCFCommunicationDelegate {
     associatedtype ReturnValue
     var privacyConfig: PrivacyConfigurationManaging { get }
     var prefs: ContentScopeProperties { get }
     var query: BrokerProfileQueryData { get }
-    var emailService: DataBrokerProtectionEmailService { get }
-    var captchaService: DataBrokerProtectionCaptchaService { get }
+    var emailService: EmailService { get }
+    var captchaService: CaptchaService { get }
 
-    var webViewHandler: DataBrokerProtectionWebViewHandler? { get set }
-    var actionsHandler: DataBrokerProtectionActionsHandler? { get }
+    var webViewHandler: WebViewHandler? { get set }
+    var actionsHandler: ActionsHandler? { get }
     var continuation: CheckedContinuation<ReturnValue, Error>? { get set }
 
     func run() async throws -> ReturnValue
@@ -67,7 +67,7 @@ public extension DataBrokerOperation {
             do {
                 query.profileQuery = try await getProfileWithEmail()
             } catch {
-                onError(error: .emailError(error as? DataBrokerProtectionEmailService.EmailError))
+                onError(error: .emailError(error as? EmailService.EmailError))
                 return
             }
         }
@@ -84,10 +84,10 @@ public extension DataBrokerOperation {
                 try? await webViewHandler?.load(url: url)
             } else {
                 assertionFailure("Trying to run email confirmation without an email.")
-                throw DataBrokerProtectionEmailService.EmailError.cantFindEmail
+                throw EmailService.EmailError.cantFindEmail
             }
         } catch {
-            onError(error: .emailError(error as? DataBrokerProtectionEmailService.EmailError))
+            onError(error: .emailError(error as? EmailService.EmailError))
         }
     }
 
@@ -104,7 +104,7 @@ public extension DataBrokerOperation {
     }
 
     func initialize() async {
-        webViewHandler = await DataBrokerProtectionWebViewHandler(privacyConfig: privacyConfig, prefs: prefs, delegate: self)
+        webViewHandler = await WebViewHandler(privacyConfig: privacyConfig, prefs: prefs, delegate: self)
         await webViewHandler?.initializeWebView()
     }
 

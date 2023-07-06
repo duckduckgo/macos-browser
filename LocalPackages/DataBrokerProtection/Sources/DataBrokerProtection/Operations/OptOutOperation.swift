@@ -27,17 +27,17 @@ public final class OptOutOperation: DataBrokerOperation {
     public let privacyConfig: PrivacyConfigurationManaging
     public let prefs: ContentScopeProperties
     public let query: BrokerProfileQueryData
-    public let emailService: DataBrokerProtectionEmailService
-    public let captchaService: DataBrokerProtectionCaptchaService
-    public var webViewHandler: DataBrokerProtectionWebViewHandler?
-    public var actionsHandler: DataBrokerProtectionActionsHandler?
+    public let emailService: EmailService
+    public let captchaService: CaptchaService
+    public var webViewHandler: WebViewHandler?
+    public var actionsHandler: ActionsHandler?
     public var continuation: CheckedContinuation<Void, Error>?
 
     public init(privacyConfig: PrivacyConfigurationManaging,
                 prefs: ContentScopeProperties,
                 query: BrokerProfileQueryData,
-                emailService: DataBrokerProtectionEmailService = DataBrokerProtectionEmailService(),
-                captchaService: DataBrokerProtectionCaptchaService = DataBrokerProtectionCaptchaService()
+                emailService: EmailService = EmailService(),
+                captchaService: CaptchaService = CaptchaService()
     ) {
         self.privacyConfig = privacyConfig
         self.prefs = prefs
@@ -55,7 +55,7 @@ public final class OptOutOperation: DataBrokerOperation {
 
                 do {
                     if let optOutStep = try query.dataBroker.optOutStep() {
-                        actionsHandler = DataBrokerProtectionActionsHandler(step: optOutStep)
+                        actionsHandler = ActionsHandler(step: optOutStep)
                         await executeNextStep()
                     } else {
                         // If we try to run an optout on a broker without an optout step, we throw.

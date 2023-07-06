@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionCaptchaService.swift
+//  CaptchaService.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -74,7 +74,7 @@ struct CaptchaResult: Codable {
     let meta: Meta
 }
 
-public struct DataBrokerProtectionCaptchaService {
+public struct CaptchaService {
 
     private struct Constants {
         struct URL {

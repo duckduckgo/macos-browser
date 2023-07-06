@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionWebViewHandler.swift
+//  WebViewHandler.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -23,7 +23,7 @@ import UserScript
 import Common
 
 @MainActor
-public final class DataBrokerProtectionWebViewHandler: NSObject {
+public final class WebViewHandler: NSObject {
     private var activeContinuation: CheckedContinuation<Void, Error>?
 
     let webViewConfiguration: WKWebViewConfiguration
@@ -32,7 +32,7 @@ public final class DataBrokerProtectionWebViewHandler: NSObject {
     var webView: WKWebView?
     var window: NSWindow?
 
-    init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CSSCommunicationDelegate) {
+    init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate) {
         let configuration = WKWebViewConfiguration()
         configuration.applyDataBrokerConfiguration(privacyConfig: privacyConfig, prefs: prefs, delegate: delegate)
         self.webViewConfiguration = configuration
@@ -96,7 +96,7 @@ public final class DataBrokerProtectionWebViewHandler: NSObject {
     }
 }
 
-extension DataBrokerProtectionWebViewHandler: WKNavigationDelegate {
+extension WebViewHandler: WKNavigationDelegate {
 
     public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
     }

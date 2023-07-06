@@ -21,7 +21,7 @@ import WebKit
 import BrowserServicesKit
 import UserScript
 
-public protocol CSSCommunicationDelegate: AnyObject {
+public protocol CCFCommunicationDelegate: AnyObject {
     func loadURL(url: URL)
     func extractedProfiles(profiles: [ExtractedProfile])
     func captchaInformation(captchaInfo: GetCaptchaInfoResponse)
@@ -29,11 +29,11 @@ public protocol CSSCommunicationDelegate: AnyObject {
     func onError(error: DataBrokerProtectionError)
 }
 
-enum CSSSubscribeActionName: String {
+enum CCFSubscribeActionName: String {
     case onActionReceived
 }
 
-enum CSSReceivedMethodName: String {
+enum CCFReceivedMethodName: String {
     case actionCompleted
     case actionError
 }
@@ -43,14 +43,14 @@ struct DataBrokerProtectionFeature: Subfeature {
     var featureName: String = "brokerProtection"
     var broker: UserScriptMessageBroker?
 
-    weak var delegate: CSSCommunicationDelegate?
+    weak var delegate: CCFCommunicationDelegate?
 
-    init(delegate: CSSCommunicationDelegate) {
+    init(delegate: CCFCommunicationDelegate) {
         self.delegate = delegate
     }
 
     func handler(forMethodNamed methodName: String) -> Handler? {
-        let actionResult = CSSReceivedMethodName(rawValue: methodName)
+        let actionResult = CCFReceivedMethodName(rawValue: methodName)
 
         if let actionResult = actionResult {
             switch actionResult {
@@ -70,7 +70,7 @@ struct DataBrokerProtectionFeature: Subfeature {
 
     func parseActionCompleted(params: Any) {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
-                let result = try? JSONDecoder().decode(CSSResult.self, from: data) else {
+                let result = try? JSONDecoder().decode(CCFResult.self, from: data) else {
             delegate?.onError(error: .parsingErrorObjectFailed)
             return
         }
@@ -84,7 +84,7 @@ struct DataBrokerProtectionFeature: Subfeature {
         }
     }
 
-    func parseSuccess(success: CSSSuccessResponse) {
+    func parseSuccess(success: CCFSuccessResponse) {
         switch success.response {
         case .navigate(let navigate):
             if let url = URL(string: navigate.url) {
@@ -112,7 +112,7 @@ struct DataBrokerProtectionFeature: Subfeature {
         self.broker = broker
     }
 
-    func pushAction(method: CSSSubscribeActionName, webView: WKWebView, params: Encodable) {
+    func pushAction(method: CCFSubscribeActionName, webView: WKWebView, params: Encodable) {
         guard let broker = broker else {
             delegate?.onError(error: .userScriptMessageBrokerNotSet)
             assertionFailure("Cannot continue without broker instance")
