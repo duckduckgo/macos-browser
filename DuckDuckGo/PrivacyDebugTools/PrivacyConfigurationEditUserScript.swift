@@ -64,7 +64,7 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
     }
 
     @MainActor
-    func handleUpdateResource(params: Any, message: UserScriptMessage) -> Encodable? {
+    func handleUpdateResource(params: Any, message: UserScriptMessage) async -> Encodable? {
         guard let request: UpdateResourceRequest = DecodableHelper.decode(from: params) else {
             assertionFailure("PrivacyConfigurationEditUserScript: expected JSON representation of UpdateResourceRequest")
             return nil
@@ -73,7 +73,7 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
         switch request.source {
         case let .remote(url):
             configurationURLProvider.setURL(url.url, for: .privacyConfiguration)
-            ConfigurationManager.shared.forceRefresh()
+            await ConfigurationManager.shared.forceRefresh()
             return generateFeaturesResponse()
         case let .debugTools(content):
             let result = ContentBlocking.shared.privacyConfigurationManager.override(with: content.utf8data)
@@ -89,6 +89,7 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
     @MainActor
     func generateFeaturesResponse() -> FeaturesResponse {
         let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
+        // swiftlint:disable:next force_cast
         let urlProvider = (NSApp.delegate as! AppDelegate).configurationURLProvider
 
         let source: RemoteResource.Source = {

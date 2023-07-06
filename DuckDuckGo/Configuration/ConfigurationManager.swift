@@ -185,6 +185,10 @@ final class ConfigurationManager {
         }
     }
 
+    public func forceRefresh() async {
+        await refreshNow()
+    }
+
     private func tryAgainLater() {
         lastUpdateTime = Date()
     }
