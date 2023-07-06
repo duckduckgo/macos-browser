@@ -2224,9 +2224,7 @@
 		37158E382A5569CA00874A9E /* PrivacyDebugToolsTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDebugToolsTabExtension.swift; sourceTree = "<group>"; };
 		37158E3C2A556EF900874A9E /* PrivacyDebugTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDebugTools.swift; sourceTree = "<group>"; };
 		37158E3F2A55712500874A9E /* PrivacyDebugToolsSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDebugToolsSchemeHandler.swift; sourceTree = "<group>"; };
-		37158E422A55755300874A9E /* content-scope-scripts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "content-scope-scripts"; path = "../content-scope-scripts"; sourceTree = "<group>"; };
 		37158E432A55B5E200874A9E /* PrivacyConfigurationEditUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyConfigurationEditUserScript.swift; sourceTree = "<group>"; };
-		37158E462A56A03800874A9E /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackPresenter.swift; sourceTree = "<group>"; };
 		372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCredentialsAdapter.swift; sourceTree = "<group>"; };
 		373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLReader.swift; sourceTree = "<group>"; };
@@ -5014,8 +5012,6 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
-				37158E422A55755300874A9E /* content-scope-scripts */,
-				37158E462A56A03800874A9E /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -10250,8 +10246,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 74.0.1;
+				branch = "dominik/privacy-debug-tools";
+				kind = branch;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {

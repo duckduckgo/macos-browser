@@ -23,7 +23,11 @@ final class PrivacyDebugTools {
     static let urlScheme = "ddg-debug"
 
     var isEnabled: Bool {
+#if DEBUG
+        true
+#else
         internalUserDecider.isInternalUser
+#endif
     }
 
     private let internalUserDecider: InternalUserDecider

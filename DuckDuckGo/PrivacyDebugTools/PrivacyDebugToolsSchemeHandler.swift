@@ -50,7 +50,7 @@ final class PrivacyDebugToolsSchemeHandler: NSObject, WKURLSchemeHandler {
             directoryURL.deleteLastPathComponent()
         }
 
-        print(directoryURL.path, fileName, fileExtension)
+        print("\(directoryURL.path)/\(fileName).\(fileExtension)")
 
         guard let file = ContentScopeScripts.Bundle.path(forResource: fileName, ofType: fileExtension, inDirectory: directoryURL.path) else {
             assertionFailure("HTML template not found")

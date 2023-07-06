@@ -75,7 +75,15 @@ final class UserScripts: UserScriptsProvider {
             specialPages = nil
         }
 
-        if (NSApp.delegate as? AppDelegate)?.internalUserDecider?.isInternalUser == true {
+        let shouldLoadPrivacyDebugTools: Bool = {
+#if DEBUG
+            true
+#else
+            (NSApp.delegate as? AppDelegate)?.internalUserDecider?.isInternalUser == true
+#endif
+        }()
+
+        if shouldLoadPrivacyDebugTools {
             privacyConfigurationEditUserScript = PrivacyConfigurationEditUserScript(
                 // swiftlint:disable:next force_cast
                 configurationURLProvider: (NSApp.delegate as! AppDelegate).configurationURLProvider
