@@ -18,12 +18,12 @@
 
 import Foundation
 
-public struct Address: Encodable, Sendable {
+struct Address: Encodable, Sendable {
     let city: String
     let state: String
 }
 
-public struct ProfileQuery: Encodable, Sendable {
+struct ProfileQuery: Encodable, Sendable {
     let firstName: String
     let lastName: String
     let city: String
@@ -52,13 +52,13 @@ public struct ProfileQuery: Encodable, Sendable {
         self.email = email
     }
 
-    public func copy(firstName: String? = nil,
-                     lastName: String? = nil,
-                     city: String? = nil,
-                     state: String? = nil,
-                     age: Int? = nil,
-                     profileUrl: String? = nil,
-                     email: String? = nil) -> ProfileQuery {
+    func copy(firstName: String? = nil,
+              lastName: String? = nil,
+              city: String? = nil,
+              state: String? = nil,
+              age: Int? = nil,
+              profileUrl: String? = nil,
+              email: String? = nil) -> ProfileQuery {
         ProfileQuery(
             firstName: firstName ?? self.firstName,
             lastName: lastName ?? self.lastName,

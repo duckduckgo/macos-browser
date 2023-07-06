@@ -106,7 +106,7 @@ final class DataBrokerProtectionFeatureTests: XCTestCase {
     }
 }
 
-final class MockCSSCommunicationDelegate: CSSCommunicationDelegate {
+final class MockCSSCommunicationDelegate: CCFCommunicationDelegate {
     var lastError: DataBrokerProtectionError?
     var profiles: [ExtractedProfile]?
     var url: URL?
