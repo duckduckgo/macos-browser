@@ -22,7 +22,7 @@ struct NavigateResponse: Decodable {
     let url: String
 }
 
-public struct GetCaptchaInfoResponse: Decodable {
+struct GetCaptchaInfoResponse: Decodable {
     let siteKey: String
     let url: String
     let type: String
@@ -39,7 +39,7 @@ public struct GetCaptchaInfoResponse: Decodable {
         self.type = type
     }
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.siteKey = try container.decode(String.self, forKey: .siteKey)
         self.url = try container.decode(String.self, forKey: .url)

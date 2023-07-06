@@ -21,7 +21,7 @@ import WebKit
 import BrowserServicesKit
 import UserScript
 
-public protocol CCFCommunicationDelegate: AnyObject {
+protocol CCFCommunicationDelegate: AnyObject {
     func loadURL(url: URL)
     func extractedProfiles(profiles: [ExtractedProfile])
     func captchaInformation(captchaInfo: GetCaptchaInfoResponse)

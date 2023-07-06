@@ -21,7 +21,7 @@ import BrowserServicesKit
 import UserScript
 
 @MainActor
-final public class DataBrokerUserContentController: WKUserContentController {
+final class DataBrokerUserContentController: WKUserContentController {
 
     let dataBrokerUserScripts: DataBrokerUserScript
 

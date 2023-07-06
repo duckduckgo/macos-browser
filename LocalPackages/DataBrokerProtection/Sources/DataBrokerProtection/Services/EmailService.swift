@@ -19,9 +19,9 @@
 import Foundation
 import Common
 
-public struct EmailService {
+struct EmailService {
 
-    public enum EmailError: Error, Equatable {
+    enum EmailError: Error, Equatable {
         case cantGenerateURL
         case cantFindEmail
         case invalidEmailLink
@@ -35,7 +35,7 @@ public struct EmailService {
 
     public let urlSession: URLSession
 
-    public init(urlSession: URLSession = URLSession.shared) {
+    init(urlSession: URLSession = URLSession.shared) {
         self.urlSession = urlSession
     }
 

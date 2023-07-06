@@ -21,23 +21,23 @@ import WebKit
 import BrowserServicesKit
 import UserScript
 
-public final class ScanOperation: DataBrokerOperation {
-    public typealias ReturnValue = [ExtractedProfile]
+final class ScanOperation: DataBrokerOperation {
+    typealias ReturnValue = [ExtractedProfile]
 
-    public let privacyConfig: PrivacyConfigurationManaging
-    public let prefs: ContentScopeProperties
-    public let query: BrokerProfileQueryData
-    public let emailService: EmailService
-    public let captchaService: CaptchaService
-    public var webViewHandler: WebViewHandler?
-    public var actionsHandler: ActionsHandler?
-    public var continuation: CheckedContinuation<[ExtractedProfile], Error>?
+    let privacyConfig: PrivacyConfigurationManaging
+    let prefs: ContentScopeProperties
+    let query: BrokerProfileQueryData
+    let emailService: EmailService
+    let captchaService: CaptchaService
+    var webViewHandler: WebViewHandler?
+    var actionsHandler: ActionsHandler?
+    var continuation: CheckedContinuation<[ExtractedProfile], Error>?
 
-    public init(privacyConfig: PrivacyConfigurationManaging,
-                prefs: ContentScopeProperties,
-                query: BrokerProfileQueryData,
-                emailService: EmailService = EmailService(),
-                captchaService: CaptchaService = CaptchaService()
+    init(privacyConfig: PrivacyConfigurationManaging,
+         prefs: ContentScopeProperties,
+         query: BrokerProfileQueryData,
+         emailService: EmailService = EmailService(),
+         captchaService: CaptchaService = CaptchaService()
     ) {
         self.privacyConfig = privacyConfig
         self.prefs = prefs
@@ -46,7 +46,7 @@ public final class ScanOperation: DataBrokerOperation {
         self.captchaService = captchaService
     }
 
-    public func run() async throws -> [ExtractedProfile] {
+    func run() async throws -> [ExtractedProfile] {
         try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
             Task {
@@ -63,7 +63,7 @@ public final class ScanOperation: DataBrokerOperation {
         }
     }
 
-    public func extractedProfiles(profiles: [ExtractedProfile]) {
+    func extractedProfiles(profiles: [ExtractedProfile]) {
         complete(profiles)
 
         Task {
@@ -71,7 +71,7 @@ public final class ScanOperation: DataBrokerOperation {
         }
     }
 
-    public func executeNextStep() async {
+    func executeNextStep() async {
         if let action = actionsHandler?.nextAction() {
             await runNextAction(action)
         } else {

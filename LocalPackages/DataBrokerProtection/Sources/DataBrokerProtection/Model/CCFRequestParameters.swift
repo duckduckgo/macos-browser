@@ -18,21 +18,21 @@
 
 import Foundation
 
-public enum CCFRequestData: Encodable {
+enum CCFRequestData: Encodable {
     case profile(ProfileQuery)
     case solveCaptcha(CaptchaToken)
 }
 
-public struct CaptchaToken: Encodable, Sendable {
+struct CaptchaToken: Encodable, Sendable {
     let token: String
 }
 
-public struct InitParams: Encodable {
+struct InitParams: Encodable {
     let profileData: ProfileQuery
     let dataBrokerData: DataBroker
 }
 
-public struct State: Encodable {
+struct State: Encodable {
     let action: Action
     let profileData: CCFRequestData?
 
@@ -42,7 +42,7 @@ public struct State: Encodable {
     }
 
     // swiftlint:disable:next cyclomatic_complexity
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         switch profileData {
@@ -75,6 +75,6 @@ public struct State: Encodable {
     }
 }
 
-public struct Params: Encodable {
+struct Params: Encodable {
     let state: State
 }

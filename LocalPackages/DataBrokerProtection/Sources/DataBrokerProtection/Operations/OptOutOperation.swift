@@ -21,23 +21,23 @@ import WebKit
 import BrowserServicesKit
 import UserScript
 
-public final class OptOutOperation: DataBrokerOperation {
-    public typealias ReturnValue = Void
+final class OptOutOperation: DataBrokerOperation {
+    typealias ReturnValue = Void
 
-    public let privacyConfig: PrivacyConfigurationManaging
-    public let prefs: ContentScopeProperties
-    public let query: BrokerProfileQueryData
-    public let emailService: EmailService
-    public let captchaService: CaptchaService
-    public var webViewHandler: WebViewHandler?
-    public var actionsHandler: ActionsHandler?
-    public var continuation: CheckedContinuation<Void, Error>?
+    let privacyConfig: PrivacyConfigurationManaging
+    let prefs: ContentScopeProperties
+    let query: BrokerProfileQueryData
+    let emailService: EmailService
+    let captchaService: CaptchaService
+    var webViewHandler: WebViewHandler?
+    var actionsHandler: ActionsHandler?
+    var continuation: CheckedContinuation<Void, Error>?
 
-    public init(privacyConfig: PrivacyConfigurationManaging,
-                prefs: ContentScopeProperties,
-                query: BrokerProfileQueryData,
-                emailService: EmailService = EmailService(),
-                captchaService: CaptchaService = CaptchaService()
+    init(privacyConfig: PrivacyConfigurationManaging,
+         prefs: ContentScopeProperties,
+         query: BrokerProfileQueryData,
+         emailService: EmailService = EmailService(),
+         captchaService: CaptchaService = CaptchaService()
     ) {
         self.privacyConfig = privacyConfig
         self.prefs = prefs
@@ -46,7 +46,7 @@ public final class OptOutOperation: DataBrokerOperation {
         self.captchaService = captchaService
     }
 
-    public func run() async throws {
+    func run() async throws {
         try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
 
@@ -68,11 +68,11 @@ public final class OptOutOperation: DataBrokerOperation {
         }
     }
 
-    public func extractedProfiles(profiles: [ExtractedProfile]) {
+    func extractedProfiles(profiles: [ExtractedProfile]) {
         // No - op
     }
 
-    public func executeNextStep() async {
+    func executeNextStep() async {
         if let action = actionsHandler?.nextAction() {
             await runNextAction(action)
         } else {

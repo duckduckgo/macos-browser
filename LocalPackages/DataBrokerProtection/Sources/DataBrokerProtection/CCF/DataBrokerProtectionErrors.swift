@@ -22,7 +22,7 @@ struct CCFError: Decodable {
     let error: String
 }
 
-public enum DataBrokerProtectionError: Error, Equatable {
+enum DataBrokerProtectionError: Error, Equatable {
     case malformedURL
     case noActionFound
     case actionFailed(actionID: String, message: String)

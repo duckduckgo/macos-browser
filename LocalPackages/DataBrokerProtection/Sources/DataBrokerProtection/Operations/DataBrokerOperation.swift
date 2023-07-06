@@ -21,7 +21,7 @@ import WebKit
 import BrowserServicesKit
 import UserScript
 
-public protocol DataBrokerOperation: CCFCommunicationDelegate {
+protocol DataBrokerOperation: CCFCommunicationDelegate {
     associatedtype ReturnValue
     var privacyConfig: PrivacyConfigurationManaging { get }
     var prefs: ContentScopeProperties { get }
@@ -37,7 +37,7 @@ public protocol DataBrokerOperation: CCFCommunicationDelegate {
     func executeNextStep() async
 }
 
-public extension DataBrokerOperation {
+extension DataBrokerOperation {
 
     // MARK: - Shared functions
 

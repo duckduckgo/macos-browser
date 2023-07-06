@@ -23,7 +23,7 @@ import UserScript
 import Common
 
 @MainActor
-public final class WebViewHandler: NSObject {
+final class WebViewHandler: NSObject {
     private var activeContinuation: CheckedContinuation<Void, Error>?
 
     let webViewConfiguration: WKWebViewConfiguration
@@ -98,15 +98,15 @@ public final class WebViewHandler: NSObject {
 
 extension WebViewHandler: WKNavigationDelegate {
 
-    public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
     }
 
-    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.activeContinuation?.resume()
         self.activeContinuation = nil
     }
 
-    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         self.activeContinuation?.resume(throwing: error)
         self.activeContinuation = nil
     }
