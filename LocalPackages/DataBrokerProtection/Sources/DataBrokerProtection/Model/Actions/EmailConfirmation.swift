@@ -19,11 +19,7 @@
 import Foundation
 
 struct EmailConfirmationAction: Action {
-    let id: String = "emailConfirmation"
-    let actionType: ActionType = .emailConfirmation
+    let id: String
+    let actionType: ActionType
     let pollingTime: Int
-
-    public init(pollingTime: Int) {
-        self.pollingTime = pollingTime
-    }
 }
