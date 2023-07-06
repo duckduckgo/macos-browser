@@ -74,20 +74,20 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
         case let .remote(url):
             configurationURLProvider.setURL(url.url, for: .privacyConfiguration)
             try await ConfigurationManager.shared.forceRefresh(.privacyConfiguration)
-            return generateFeaturesResponse()
+            return generateResourceResponse()
         case let .debugTools(content):
             let result = ContentBlocking.shared.privacyConfigurationManager.override(with: content.utf8data)
             if result != .downloaded {
                 throw UpdateResourceError(message: "Failed to parse custom Privacy Config")
             }
-            return generateFeaturesResponse()
+            return generateResourceResponse()
         }
     }
 
     private let dateFormatter = ISO8601DateFormatter()
 
     @MainActor
-    func generateFeaturesResponse() -> FeaturesResponse {
+    func generateResourceResponse() -> RemoteResource {
         let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
         // swiftlint:disable:next force_cast
         let urlProvider = (NSApp.delegate as! AppDelegate).configurationURLProvider
@@ -102,7 +102,7 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
             )
         }()
 
-        let resource = RemoteResource(
+        return RemoteResource(
             id: "privacy-configuration",
             url: urlProvider.url(for: .privacyConfiguration).absoluteString,
             name: "Privacy Config",
@@ -112,8 +112,11 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
                 contentType: "application/json"
             )
         )
+    }
 
-        return FeaturesResponse(features: .init(remoteResources: .init(resources: [resource])))
+    @MainActor
+    func generateFeaturesResponse() -> FeaturesResponse {
+        return FeaturesResponse(features: .init(remoteResources: .init(resources: [generateResourceResponse()])))
     }
 }
 
