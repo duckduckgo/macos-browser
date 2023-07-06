@@ -86,22 +86,24 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
 
     private let dateFormatter = ISO8601DateFormatter()
 
+    @MainActor
     func generateFeaturesResponse() -> FeaturesResponse {
         let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
+        let urlProvider = (NSApp.delegate as! AppDelegate).configurationURLProvider
 
         let source: RemoteResource.Source = {
             if let date = privacyConfigurationManager.overriddenAt {
                 return .debugTools(modifiedAt: dateFormatter.string(from: date))
             }
             return .remote(
-                url: AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString,
+                url: urlProvider.url(for: .privacyConfiguration).absoluteString,
                 fetchedAt: dateFormatter.string(from: Date())
             )
         }()
 
         let resource = RemoteResource(
             id: "privacy-configuration",
-            url: AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString,
+            url: urlProvider.url(for: .privacyConfiguration).absoluteString,
             name: "Privacy Config",
             current: .init(
                 source: source,
