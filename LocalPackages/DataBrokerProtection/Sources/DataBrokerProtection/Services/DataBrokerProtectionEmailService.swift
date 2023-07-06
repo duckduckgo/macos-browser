@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Common
 
 public struct DataBrokerProtectionEmailService {
 
@@ -65,13 +66,17 @@ public struct DataBrokerProtectionEmailService {
         let pollingTimeInNanoSecondsSeconds = UInt64(pollingIntervalInSeconds) * NSEC_PER_SEC
 
         for _ in 1...numberOfRetries {
+            os_log("Getting email confirmation link ...", log: .service)
             if let emailLink = try await extractEmailLink(email: email) {
                 if let url = URL(string: emailLink) {
+                    os_log("Email received", log: .service)
                     return url
                 } else {
+                    os_log("Invalid email link", log: .service)
                     throw EmailError.invalidEmailLink
                 }
             } else {
+                os_log("No email, waiting for a new request ...", log: .service)
                 try await Task.sleep(nanoseconds: pollingTimeInNanoSecondsSeconds)
             }
         }
