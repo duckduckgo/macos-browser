@@ -18,7 +18,7 @@
 
 import Foundation
 
-public struct ExtractedProfile: Codable, Sendable {
+struct ExtractedProfile: Codable, Sendable {
     let id: UUID = UUID()
     let name: String?
     let alternativeNamesList: String?
@@ -48,18 +48,18 @@ public struct ExtractedProfile: Codable, Sendable {
         case removedDate
     }
 
-    public init(name: String? = nil,
-                alternativeNamesList: String? = nil,
-                addressFull: String? = nil,
-                addressCityState: String? = nil,
-                addressCityStateList: String? = nil,
-                phone: String? = nil,
-                phoneList: String? = nil,
-                relativesList: String? = nil,
-                profileUrl: String? = nil,
-                reportId: String? = nil,
-                age: String? = nil,
-                removedDate: Date? = nil) {
+    init(name: String? = nil,
+         alternativeNamesList: String? = nil,
+         addressFull: String? = nil,
+         addressCityState: String? = nil,
+         addressCityStateList: String? = nil,
+         phone: String? = nil,
+         phoneList: String? = nil,
+         relativesList: String? = nil,
+         profileUrl: String? = nil,
+         reportId: String? = nil,
+         age: String? = nil,
+         removedDate: Date? = nil) {
         self.name = name
         self.alternativeNamesList = alternativeNamesList
         self.addressFull = addressFull
@@ -76,7 +76,7 @@ public struct ExtractedProfile: Codable, Sendable {
 }
 
 extension ExtractedProfile: Equatable {
-    public static func == (lhs: ExtractedProfile, rhs: ExtractedProfile) -> Bool {
+    static func == (lhs: ExtractedProfile, rhs: ExtractedProfile) -> Bool {
         lhs.name == rhs.name
     }
 }

@@ -18,21 +18,14 @@
 
 import Foundation
 
-public struct DataBrokerScheduleConfig {
+struct DataBrokerScheduleConfig {
     let emailConfirmation: TimeInterval
     let retryError: TimeInterval
     let confirmOptOutScan: TimeInterval
     let maintenanceScan: TimeInterval
-
-    public init(emailConfirmation: TimeInterval, retryError: TimeInterval, confirmOptOutScan: TimeInterval, maintenanceScan: TimeInterval) {
-        self.emailConfirmation = emailConfirmation
-        self.retryError = retryError
-        self.confirmOptOutScan = confirmOptOutScan
-        self.maintenanceScan = maintenanceScan
-    }
 }
 
-public struct DataBroker: Encodable, Sendable {
+struct DataBroker: Encodable, Sendable {
     let id = UUID()
     let name: String
     let steps: [Step]
@@ -43,7 +36,7 @@ public struct DataBroker: Encodable, Sendable {
         case steps
     }
 
-    public init(name: String, steps: [Step], schedulingConfig: DataBrokerScheduleConfig) {
+    init(name: String, steps: [Step], schedulingConfig: DataBrokerScheduleConfig) {
         self.name = name
         self.steps = steps
         self.schedulingConfig = schedulingConfig
@@ -69,11 +62,11 @@ public struct DataBroker: Encodable, Sendable {
 
 extension DataBroker: Hashable {
 
-    public func hash(into hasher: inout Hasher) {
+    func hash(into hasher: inout Hasher) {
         hasher.combine(name)
     }
 
-    public static func == (lhs: DataBroker, rhs: DataBroker) -> Bool {
+    static func == (lhs: DataBroker, rhs: DataBroker) -> Bool {
         return lhs.name == rhs.name
     }
 }
