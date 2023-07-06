@@ -139,7 +139,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         hasValidPrivateEmail = emailManager.isPrivateEmail(email: username)
         onSaveRequested(credentials)
         if emailManager.isPrivateEmail(email: previousUsername) &&
-            !hasValidPrivateEmail &&
+            hasValidPrivateEmail &&
             (privateEmailStatus == .active || privateEmailStatus == .inactive) {
             isShowingDuckRemovalAlert = true
         }
