@@ -17,6 +17,8 @@
 //
 
 import Foundation
+import DataBrokerProtection
+import AppKit
 
 final class DBPHomeViewController: NSViewController {
 
