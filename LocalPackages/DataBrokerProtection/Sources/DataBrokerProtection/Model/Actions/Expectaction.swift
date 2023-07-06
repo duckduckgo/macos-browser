@@ -31,12 +31,7 @@ struct Item: Codable, Sendable {
 }
 
 internal struct ExpectationAction: Action {
-    let id: String = "expectaction"
-    let actionType: ActionType = .expectation
-
+    let id: String
+    let actionType: ActionType
     let expectations: [Item]
-
-    init(expectations: [Item]) {
-        self.expectations = expectations
-    }
 }
