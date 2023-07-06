@@ -18,28 +18,22 @@
 
 import Foundation
 
-public struct PageElement: Codable, Sendable {
+struct PageElement: Codable, Sendable {
     let type: String
     let selector: String
-
-    public init(type: String, selector: String) {
-        self.type = type
-        self.selector = selector
-    }
 }
 
-public struct FillFormAction: Action {
-    public let id: String = "fillForm"
-    public let actionType: ActionType = .fillForm
+struct FillFormAction: Action {
+    let id: String = "fillForm"
+    let actionType: ActionType = .fillForm
+    let selector: String
+    let elements: [PageElement]
 
     public var needsEmail: Bool {
         elements.contains { $0.type == "email" }
     }
 
-    let selector: String
-    let elements: [PageElement]
-
-    public init(selector: String, elements: [PageElement]) {
+    init(selector: String, elements: [PageElement]) {
         self.selector = selector
         self.elements = elements
     }

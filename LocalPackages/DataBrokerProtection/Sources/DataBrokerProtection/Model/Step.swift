@@ -18,12 +18,12 @@
 
 import Foundation
 
-public enum StepType: Sendable {
+enum StepType: Sendable {
     case scan
     case optOut
 }
 
-public struct Step: Encodable, Sendable {
+struct Step: Encodable, Sendable {
     let type: StepType
     let actions: [Action]
 
@@ -31,12 +31,7 @@ public struct Step: Encodable, Sendable {
         case actions
     }
 
-    public init(type: StepType, actions: [Action]) {
-        self.type = type
-        self.actions = actions
-    }
-
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         var actionsContainer = container.nestedUnkeyedContainer(forKey: .actions)
         for action in actions {

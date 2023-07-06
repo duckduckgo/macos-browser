@@ -104,7 +104,7 @@ final class ProcessorTests: XCTestCase {
             return true
         }
 
-        let notification = XCTNSNotificationExpectation(name: DataBrokerNotifications.didFinishOptOut,
+        let notification = XCTNSNotificationExpectation(name: DataBrokerProtectionNotifications.didFinishOptOut,
                                                         object: nil,
                                                         notificationCenter: notificationCenter)
 
