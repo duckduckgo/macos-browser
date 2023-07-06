@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionEmailServiceTests.swift
+//  CaptchaServiceTests.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,7 @@ import XCTest
 import Foundation
 @testable import DataBrokerProtection
 
-final class DataBrokerProtectionCaptchaServiceTests: XCTestCase {
+final class CaptchaServiceTests: XCTestCase {
     let jsonEncoder = JSONEncoder()
 
     enum MockError: Error {
@@ -39,7 +39,7 @@ final class DataBrokerProtectionCaptchaServiceTests: XCTestCase {
 
     func testWhenSessionThrowsOnSubmittingCaptchaInfo_thenTheCorrectErrorIsThrown() async {
         MockURLProtocol.requestHandlerQueue.append({ _ in throw MockError.someError })
-        let sut = DataBrokerProtectionCaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession)
 
         do {
             _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock)
@@ -56,7 +56,7 @@ final class DataBrokerProtectionCaptchaServiceTests: XCTestCase {
     func testWhenFailureCriticalIsReturnedOnSubmittingCaptchaInfo_thenCriticalErrorWhenSubmittingCaptchaIsThrown() async {
         let response = CaptchaTransaction(message: .failureCritical, transactionId: nil)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(response)) })
-        let sut = DataBrokerProtectionCaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession)
 
         do {
             _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock)
@@ -73,7 +73,7 @@ final class DataBrokerProtectionCaptchaServiceTests: XCTestCase {
     func testWhenInvalidRequestIsReturnedOnSubmittingCaptchaInfo_thenInvalidRequestWhenSubmittingCaptchaIsThrown() async {
         let response = CaptchaTransaction(message: .invalidRequest, transactionId: nil)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(response)) })
-        let sut = DataBrokerProtectionCaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession)
 
         do {
             _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock)
@@ -94,7 +94,7 @@ final class DataBrokerProtectionCaptchaServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = DataBrokerProtectionCaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession)
 
         do {
             _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock, retries: 2)
@@ -113,7 +113,7 @@ final class DataBrokerProtectionCaptchaServiceTests: XCTestCase {
         let requestHandler: RequestHandler = { _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(captchaResult)) }
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = DataBrokerProtectionCaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession)
 
         do {
             _ = try await sut.submitCaptchaToBeResolved(for: "123456")
@@ -132,7 +132,7 @@ final class DataBrokerProtectionCaptchaServiceTests: XCTestCase {
         let requestHandler: RequestHandler = { _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(captchaResult)) }
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = DataBrokerProtectionCaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession)
 
         do {
             _ = try await sut.submitCaptchaToBeResolved(for: "123456")
@@ -151,13 +151,13 @@ final class DataBrokerProtectionCaptchaServiceTests: XCTestCase {
         let requestHandler: RequestHandler = { _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(captchaResult)) }
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = DataBrokerProtectionCaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession)
 
         do {
             _ = try await sut.submitCaptchaToBeResolved(for: "123456")
             XCTFail("Expected an error to be thrown")
         } catch {
-            if let error = error as? CaptchaServiceError, case .nilDataWhenFetchigCaptchaResult = error {
+            if let error = error as? CaptchaServiceError, case .nilDataWhenFetchingCaptchaResult = error {
                 return
             }
 
@@ -172,7 +172,7 @@ final class DataBrokerProtectionCaptchaServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = DataBrokerProtectionCaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession)
 
         do {
             _ = try await sut.submitCaptchaToBeResolved(for: "123456", retries: 2, pollingInterval: 1)
@@ -191,7 +191,7 @@ final class DataBrokerProtectionCaptchaServiceTests: XCTestCase {
         let requestHandler: RequestHandler = { _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(captchaResult)) }
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = DataBrokerProtectionCaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession)
 
         do {
             let data = try await sut.submitCaptchaToBeResolved(for: "123456", retries: 2, pollingInterval: 1)
