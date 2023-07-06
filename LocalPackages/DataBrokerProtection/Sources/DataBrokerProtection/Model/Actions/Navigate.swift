@@ -17,13 +17,8 @@
 //
 
 struct NavigateAction: Action {
-    let id: String = "navigate"
-    let actionType: ActionType = .navigate
+    let id: String
+    let actionType: ActionType
     let url: String
-    let ageRange: [String]
-
-    init(url: String, ageRange: [String]) {
-        self.url = url
-        self.ageRange = ageRange
-    }
+    let ageRange: [String]?
 }

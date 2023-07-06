@@ -19,11 +19,7 @@
 import Foundation
 
 struct ClickAction: Action {
-    let id: String = "click"
-    let actionType: ActionType = .click
+    let id: String
+    let actionType: ActionType
     let elements: [PageElement]
-
-    public init(elements: [PageElement]) {
-        self.elements = elements
-    }
 }
