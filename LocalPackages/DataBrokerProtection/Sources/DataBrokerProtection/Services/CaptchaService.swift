@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionCaptchaService.swift
+//  CaptchaService.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,7 @@ import Common
 typealias CaptchaTransactionId = String
 typealias CaptchaResolveData = String
 
-public enum CaptchaServiceError: Error {
+enum CaptchaServiceError: Error {
     case cantGenerateCaptchaServiceURL
     case nilTransactionIdWhenSubmittingCaptcha
     case criticalFailureWhenSubmittingCaptcha
@@ -74,7 +74,7 @@ struct CaptchaResult: Codable {
     let meta: Meta
 }
 
-public struct DataBrokerProtectionCaptchaService {
+struct CaptchaService {
 
     private struct Constants {
         struct URL {
@@ -91,7 +91,7 @@ public struct DataBrokerProtectionCaptchaService {
 
     private let urlSession: URLSession
 
-    public init(urlSession: URLSession = URLSession.shared) {
+    init(urlSession: URLSession = URLSession.shared) {
         self.urlSession = urlSession
     }
 

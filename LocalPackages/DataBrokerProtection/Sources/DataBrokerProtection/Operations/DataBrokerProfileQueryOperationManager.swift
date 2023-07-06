@@ -141,7 +141,6 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             updateOperationDataDates(brokerProfileQueryData.scanData,
                                      brokerProfileQueryData: brokerProfileQueryData)
             database.saveOperationData(brokerProfileQueryData.scanData)
-
             os_log("Finished scan operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
             notificationCenter.post(name: DataBrokerNotifications.didFinishScan, object: brokerProfileQueryData.dataBroker.name)
         }
@@ -199,7 +198,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             updateOperationDataDates(data, brokerProfileQueryData: brokerProfileQueryData)
             updateOperationDataDates(brokerProfileQueryData.scanData, brokerProfileQueryData: brokerProfileQueryData)
             database.saveOperationData(data)
-            notificationCenter.post(name: DataBrokerNotifications.didFinishOptOut, object: brokerProfileQueryData.dataBroker.name)
+            notificationCenter.post(name: DataBrokerProtectionNotifications.didFinishOptOut, object: brokerProfileQueryData.dataBroker.name)
         }
 
         do {

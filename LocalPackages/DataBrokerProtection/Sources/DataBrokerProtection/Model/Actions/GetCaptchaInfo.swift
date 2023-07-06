@@ -18,10 +18,9 @@
 
 import Foundation
 
-public struct GetCaptchaInfoAction: Action {
-    public var id: String = "getCaptchaInfo"
-    public var actionType: ActionType = .getCaptchaInfo
-
+struct GetCaptchaInfoAction: Action {
+    let id: String = "getCaptchaInfo"
+    let actionType: ActionType = .getCaptchaInfo
     let selector: String
 
     public init(selector: String) {

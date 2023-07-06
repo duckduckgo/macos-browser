@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionActionsHandlerTests.swift
+//  ActionsHandlerTests.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,11 +19,11 @@
 import XCTest
 @testable import DataBrokerProtection
 
-final class DataBrokerProtectionActionsHandlerTests: XCTestCase {
+final class ActionsHandlerTests: XCTestCase {
 
     func testWhenStepHasNoActions_thenNilIsReturned() {
         let step = Step(type: .scan, actions: [Action]())
-        let sut = DataBrokerProtectionActionsHandler(step: step)
+        let sut = ActionsHandler(step: step)
 
         XCTAssertNil(sut.nextAction())
     }
@@ -32,7 +32,7 @@ final class DataBrokerProtectionActionsHandlerTests: XCTestCase {
         let firstAction = NavigateAction(url: "url", ageRange: [String]())
         let secondAction = NavigateAction(url: "url", ageRange: [String]())
         let step = Step(type: .scan, actions: [firstAction, secondAction])
-        let sut = DataBrokerProtectionActionsHandler(step: step)
+        let sut = ActionsHandler(step: step)
 
         _ = sut.nextAction() // Returns the first action
         _ = sut.nextAction() // Returns the second action
@@ -44,7 +44,7 @@ final class DataBrokerProtectionActionsHandlerTests: XCTestCase {
         let firstAction = NavigateAction(url: "url", ageRange: [String]())
         let secondAction = NavigateAction(url: "url", ageRange: [String]())
         let step = Step(type: .scan, actions: [firstAction, secondAction])
-        let sut = DataBrokerProtectionActionsHandler(step: step)
+        let sut = ActionsHandler(step: step)
 
         _ = sut.nextAction() // Returns the first action
         let action = sut.nextAction() // Returns the second and last action
