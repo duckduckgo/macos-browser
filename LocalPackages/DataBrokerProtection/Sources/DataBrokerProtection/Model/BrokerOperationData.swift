@@ -18,7 +18,7 @@
 
 import Foundation
 
-internal protocol BrokerOperationData {
+protocol BrokerOperationData {
     var id: UUID { get }
     var brokerProfileQueryID: UUID { get }
     var preferredRunDate: Date? { get set }
@@ -43,18 +43,18 @@ extension BrokerOperationData {
     }
 }
 
-public final class ScanOperationData: BrokerOperationData {
+final class ScanOperationData: BrokerOperationData {
     let id: UUID
     let brokerProfileQueryID: UUID
     var preferredRunDate: Date?
     var historyEvents: [HistoryEvent]
     var lastRunDate: Date?
 
-    internal init(id: UUID = UUID(),
-                  brokerProfileQueryID: UUID,
-                  preferredRunDate: Date? = nil,
-                  historyEvents: [HistoryEvent],
-                  lastRunDate: Date? = nil) {
+    init(id: UUID = UUID(),
+         brokerProfileQueryID: UUID,
+         preferredRunDate: Date? = nil,
+         historyEvents: [HistoryEvent],
+         lastRunDate: Date? = nil) {
 
         self.id = id
         self.brokerProfileQueryID = brokerProfileQueryID
@@ -65,7 +65,7 @@ public final class ScanOperationData: BrokerOperationData {
 
 }
 
-public final class OptOutOperationData: BrokerOperationData {
+final class OptOutOperationData: BrokerOperationData {
     let id: UUID
     let brokerProfileQueryID: UUID
     var preferredRunDate: Date?
@@ -73,12 +73,12 @@ public final class OptOutOperationData: BrokerOperationData {
     var lastRunDate: Date?
     var extractedProfile: ExtractedProfile
 
-    internal init(id: UUID = UUID(),
-                  brokerProfileQueryID: UUID,
-                  preferredRunDate: Date? = nil,
-                  historyEvents: [HistoryEvent],
-                  lastRunDate: Date? = nil,
-                  extractedProfile: ExtractedProfile) {
+    init(id: UUID = UUID(),
+         brokerProfileQueryID: UUID,
+         preferredRunDate: Date? = nil,
+         historyEvents: [HistoryEvent],
+         lastRunDate: Date? = nil,
+         extractedProfile: ExtractedProfile) {
 
         self.id = id
         self.brokerProfileQueryID = brokerProfileQueryID

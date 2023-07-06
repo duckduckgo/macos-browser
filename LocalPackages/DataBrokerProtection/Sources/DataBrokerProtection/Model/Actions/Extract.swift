@@ -16,13 +16,13 @@
 //  limitations under the License.
 //
 
-public struct ExtractAction: Action {
-    public let id: String = "extract"
-    public let actionType: ActionType = .extract
+struct ExtractAction: Action {
+    let id: String = "extract"
+    let actionType: ActionType = .extract
     let selector: String
     let profile: ExtractedProfile
 
-    public init(selector: String, profile: ExtractedProfile) {
+    init(selector: String, profile: ExtractedProfile) {
         self.selector = selector
         self.profile = profile
     }

@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionEmailServiceTests.swift
+//  EmailServiceTests.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -20,7 +20,7 @@ import XCTest
 import Foundation
 @testable import DataBrokerProtection
 
-final class DataBrokerProtectionEmailServiceTests: XCTestCase {
+final class EmailServiceTests: XCTestCase {
 
     enum MockError: Error {
         case someError
@@ -38,13 +38,13 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
 
     func testWhenSessionThrows_thenTheCorrectErrorIsThrown() async {
         MockURLProtocol.requestHandlerQueue.append({ _ in throw MockError.someError })
-        let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
+        let sut = EmailService(urlSession: mockURLSession)
 
         do {
             _ = try await sut.getEmail()
             XCTFail("Expected an error to be thrown")
         } catch {
-            if let error = error as? DataBrokerProtectionEmailService.EmailError,
+            if let error = error as? EmailService.EmailError,
                     case .cantFindEmail = error,
                     case .cantGenerateURL = error {
                 XCTFail("Unexpected error thrown: \(error).")
@@ -59,13 +59,13 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
         let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
-        let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
+        let sut = EmailService(urlSession: mockURLSession)
 
         do {
             _ = try await sut.getEmail()
             XCTFail("Expected an error to be thrown")
         } catch {
-            if let error = error as? DataBrokerProtectionEmailService.EmailError, case .cantFindEmail = error {
+            if let error = error as? EmailService.EmailError, case .cantFindEmail = error {
                 return
             }
 
@@ -78,7 +78,7 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
         let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
-        let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
+        let sut = EmailService(urlSession: mockURLSession)
 
         do {
             let email = try await sut.getEmail()
@@ -95,7 +95,7 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
         MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
 
-        let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
+        let sut = EmailService(urlSession: mockURLSession)
 
         do {
             _ = try await sut.getConfirmationLink(
@@ -104,7 +104,7 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
                 pollingIntervalInSeconds: 2
             )
         } catch {
-            if let error = error as? DataBrokerProtectionEmailService.EmailError, case .linkExtractionTimedOut = error {
+            if let error = error as? EmailService.EmailError, case .linkExtractionTimedOut = error {
                 return
             }
 
@@ -122,7 +122,7 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
         MockURLProtocol.requestHandlerQueue.append(successResponse)
 
-        let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
+        let sut = EmailService(urlSession: mockURLSession)
 
         do {
             let url = try await sut.getConfirmationLink(
@@ -141,7 +141,7 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
         let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
-        let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
+        let sut = EmailService(urlSession: mockURLSession)
 
         do {
             _ = try await sut.getConfirmationLink(
@@ -150,7 +150,7 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
                 pollingIntervalInSeconds: 2
             )
         } catch {
-            if let error = error as? DataBrokerProtectionEmailService.EmailError, case .cantDecodeEmailLink = error {
+            if let error = error as? EmailService.EmailError, case .cantDecodeEmailLink = error {
                 return
             }
 
@@ -163,7 +163,7 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
         let responseData = try? JSONEncoder().encode(invalidLink)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
-        let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
+        let sut = EmailService(urlSession: mockURLSession)
 
         do {
             _ = try await sut.getConfirmationLink(
@@ -172,7 +172,7 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
                 pollingIntervalInSeconds: 1
             )
         } catch {
-            if let error = error as? DataBrokerProtectionEmailService.EmailError, case .invalidEmailLink = error {
+            if let error = error as? EmailService.EmailError, case .invalidEmailLink = error {
                 return
             }
 
@@ -185,7 +185,7 @@ final class DataBrokerProtectionEmailServiceTests: XCTestCase {
         let responseData = try? JSONEncoder().encode(validURL)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
-        let sut = DataBrokerProtectionEmailService(urlSession: mockURLSession)
+        let sut = EmailService(urlSession: mockURLSession)
 
         do {
             let url = try await sut.getConfirmationLink(

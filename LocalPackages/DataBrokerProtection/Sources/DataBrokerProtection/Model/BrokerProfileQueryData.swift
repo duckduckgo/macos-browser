@@ -18,15 +18,14 @@
 
 import Foundation
 
-final public class BrokerProfileQueryData: Sendable {
-    public let id: UUID
-    public var profileQuery: ProfileQuery
-    public let dataBroker: DataBroker
+final class BrokerProfileQueryData: Sendable {
+    let id: UUID
+    let dataBroker: DataBroker
 
-    public var scanData: ScanOperationData
-    public var optOutsData: [OptOutOperationData] = [OptOutOperationData]()
-
-    internal var operationsData: [BrokerOperationData] {
+    var profileQuery: ProfileQuery
+    var scanData: ScanOperationData
+    var optOutsData: [OptOutOperationData] = [OptOutOperationData]()
+    var operationsData: [BrokerOperationData] {
         optOutsData + [scanData]
     }
 
@@ -34,12 +33,11 @@ final public class BrokerProfileQueryData: Sendable {
         optOutsData.map { $0.extractedProfile }
     }
 
-    public init(id: UUID,
-                profileQuery: ProfileQuery,
-                dataBroker: DataBroker,
-                scanOperationData: ScanOperationData? = nil,
-                optOutOperationsData: [OptOutOperationData] = [OptOutOperationData]()) {
-
+    init(id: UUID,
+         profileQuery: ProfileQuery,
+         dataBroker: DataBroker,
+         scanOperationData: ScanOperationData? = nil,
+         optOutOperationsData: [OptOutOperationData] = [OptOutOperationData]()) {
         self.id = id
         self.profileQuery = profileQuery
         self.dataBroker = dataBroker
@@ -54,9 +52,7 @@ final public class BrokerProfileQueryData: Sendable {
     }
 
     func updateExtractedProfiles(_ extractedProfiles: [ExtractedProfile]) {
-
         extractedProfiles.forEach { extractedProfile in
-
             // If the profile was already removed, we create a new one even if we find it again
             let isExistingProfile = optOutsData.contains {
                 $0.extractedProfile == extractedProfile && $0.extractedProfile.removedDate == nil
@@ -80,7 +76,6 @@ final public class BrokerProfileQueryData: Sendable {
             removedProfileData.extractedProfile.removedDate = Date()
             removedProfileData.preferredRunDate = nil
             print("Profile removed from optOutsData: \(removedProfileData.extractedProfile)")
-
         }
     }
 
