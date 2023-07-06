@@ -96,7 +96,7 @@ struct DataBrokerProtectionFeature: Subfeature {
             delegate?.extractedProfiles(profiles: profiles)
         case .getCaptchaInfo(let captchaInfo):
             delegate?.captchaInformation(captchaInfo: captchaInfo)
-        case .fillForm, .click, .expectation:
+        case .fillForm, .click, .expectation, .solveCaptcha:
             delegate?.success(actionId: success.actionID)
         default: return
         }
