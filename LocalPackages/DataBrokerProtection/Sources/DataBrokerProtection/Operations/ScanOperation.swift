@@ -20,6 +20,7 @@ import Foundation
 import WebKit
 import BrowserServicesKit
 import UserScript
+import Common
 
 final class ScanOperation: DataBrokerOperation {
     typealias ReturnValue = [ExtractedProfile]
@@ -73,8 +74,10 @@ final class ScanOperation: DataBrokerOperation {
 
     func executeNextStep() async {
         if let action = actionsHandler?.nextAction() {
+            os_log("Next action: %{public}@", log: .action, String(describing: action.actionType.rawValue))
             await runNextAction(action)
         } else {
+            os_log("Releasing the web view", log: .action)
             await webViewHandler?.finish() // If we executed all steps we release the web view
         }
     }

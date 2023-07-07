@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import BrowserServicesKit
 
 protocol WebOperationRunner {
 
@@ -24,21 +25,21 @@ protocol WebOperationRunner {
     func optOut(_ extractedProfile: ExtractedProfile) async throws
 }
 
-// TODO: Remove this
-import WebKit
-
 @MainActor
 final class TestOperationRunner: WebOperationRunner {
+    var privacyConfigManager: PrivacyConfigurationManaging
+    var contentScopeProperties: ContentScopeProperties
 
-    let webView: WKWebView
-
-    internal init() {
-        self.webView = WKWebView(frame: .init(x: 0, y: 0, width: 100, height: 100))
+    internal init(privacyConfigManager: PrivacyConfigurationManaging,
+                  contentScopeProperties: ContentScopeProperties) {
+        self.privacyConfigManager = privacyConfigManager
+        self.contentScopeProperties = contentScopeProperties
     }
 
     func scan(_ profileQuery: BrokerProfileQueryData) async throws -> [ExtractedProfile] {
-        let extractedProfile = ExtractedProfile(name: "John")
-        return [extractedProfile]
+        let scan = ScanOperation(privacyConfig: privacyConfigManager, prefs: contentScopeProperties, query: profileQuery)
+        return try await scan.run()
+
     }
 
     func optOut(_ extractedProfile: ExtractedProfile) async throws {

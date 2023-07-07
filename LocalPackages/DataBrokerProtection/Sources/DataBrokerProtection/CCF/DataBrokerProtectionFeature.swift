@@ -20,6 +20,7 @@ import Foundation
 import WebKit
 import BrowserServicesKit
 import UserScript
+import Common
 
 protocol CCFCommunicationDelegate: AnyObject {
     func loadURL(url: URL)
@@ -58,17 +59,21 @@ struct DataBrokerProtectionFeature: Subfeature {
             case .actionError: return onActionError
             }
         } else {
-            // Send Pixel to check the method that was not parsed correctly.
+            os_log("Cant parse method: %{public}@", log: .action, methodName)
             return nil
         }
     }
 
     func onActionCompleted(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        os_log("Action completed", log: .action)
+
         parseActionCompleted(params: params)
         return nil
     }
 
     func parseActionCompleted(params: Any) {
+        os_log("Parse action completed", log: .action)
+
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(CCFResult.self, from: data) else {
             delegate?.onError(error: .parsingErrorObjectFailed)
@@ -85,6 +90,8 @@ struct DataBrokerProtectionFeature: Subfeature {
     }
 
     func parseSuccess(success: CCFSuccessResponse) {
+        os_log("Parse success: %{public}@", log: .action, String(describing: success.actionType.rawValue))
+
         switch success.response {
         case .navigate(let navigate):
             if let url = URL(string: navigate.url) {
@@ -104,6 +111,8 @@ struct DataBrokerProtectionFeature: Subfeature {
 
     func onActionError(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let error = DataBrokerProtectionError.parse(params: params)
+        os_log("Action Error: %{public}@", log: .action, String(describing: error.localizedDescription))
+
         delegate?.onError(error: error)
         return nil
     }
@@ -118,6 +127,7 @@ struct DataBrokerProtectionFeature: Subfeature {
             assertionFailure("Cannot continue without broker instance")
             return
         }
+        os_log("Pushing into WebView: %@ params %@", log: .action, method.rawValue, String(describing: params))
 
         broker.push(method: method.rawValue, params: params, for: self, into: webView)
     }

@@ -18,6 +18,7 @@
 
 import Foundation
 import DataBrokerProtection
+import BrowserServicesKit
 import AppKit
 
 final class DBPHomeViewController: NSViewController {
@@ -28,5 +29,30 @@ final class DBPHomeViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        test()
+
+    }
+
+    private func test() {
+        let privacyConfigurationManager = PrivacyFeatures.contentBlocking.privacyConfigurationManager
+        let features = ContentScopeFeatureToggles(emailProtection: false,
+                                                  emailProtectionIncontextSignup: false,
+                                                  credentialsAutofill: false,
+                                                  identitiesAutofill: false,
+                                                  creditCardsAutofill: false,
+                                                  credentialsSaving: false,
+                                                  passwordGeneration: false,
+                                                  inlineIconCredentials: false,
+                                                  thirdPartyCredentialsProvider: false)
+
+        let privacySettings = PrivacySecurityPreferences.shared
+        let sessionKey = UUID().uuidString
+        let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled,
+                                                sessionKey: sessionKey,
+                                                featureToggles: features)
+
+        let scheduler = DataBrokerProtectionScheduler(privacyConfigManager: privacyConfigurationManager,
+                                                      contentScopeProperties: prefs)
+        scheduler.scanAllBrokers()
     }
 }

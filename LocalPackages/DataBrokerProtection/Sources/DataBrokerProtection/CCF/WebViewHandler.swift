@@ -55,16 +55,16 @@ final class WebViewHandler: NSObject {
             window?.contentView = self.webView
             window?.makeKeyAndOrderFront(nil)
         }
-
-        try? await self.load(url: URL(string: "https://dataveria.com/ng/control/privacy")!)
     }
 
     func load(url: URL) async throws {
         webView?.load(url)
+        os_log("Loading URL: %@", log: .action, String(describing: url.absoluteString))
         try await waitForWebViewLoad(timeoutInSeconds: 60)
     }
 
     func finish() {
+        os_log("WebViewHandler finished", log: .action)
         webView?.stopLoading()
         webView = nil
     }
@@ -102,11 +102,14 @@ extension WebViewHandler: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        os_log("WebViewHandler didFinish", log: .action)
+
         self.activeContinuation?.resume()
         self.activeContinuation = nil
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        os_log("WebViewHandler didFail: %{public}@", log: .action, String(describing: error.localizedDescription))
         self.activeContinuation?.resume(throwing: error)
         self.activeContinuation = nil
     }

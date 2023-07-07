@@ -94,7 +94,8 @@ final class DataBrokerProtectionProcessor {
                                                                 operationType: operationType,
                                                                 intervalBetweenOperations: config.intervalBetweenSameBrokerOperations,
                                                                 priorityDate: priorityDate,
-                                                                notificationCenter: notificationCenter)
+                                                                notificationCenter: notificationCenter,
+                                                                runner: operationRunnerProvider.getOperationRunner())
                 collections.append(collection)
 
                 visitedDataBrokerIDs.insert(dataBrokerID)

@@ -28,21 +28,22 @@ protocol DataBase {
 }
 
 final class DataBrokerProtectionDataBase: DataBase {
+    private var dataBrokers = [DataBroker]()
+    private var brokerProfileQueriesData = [BrokerProfileQueryData]()
+
+    init() {
+        setupFakeData()
+    }
 
     func brokerProfileQueryData(for profileQuery: ProfileQuery, dataBroker: DataBroker) -> BrokerProfileQueryData? {
-        return BrokerProfileQueryData(id: UUID(), profileQuery: profileQuery, dataBroker: dataBroker)
+        brokerProfileQueriesData.filter {
+            $0.profileQuery.fullName == profileQuery.fullName
+            && dataBroker.id == $0.dataBroker.id
+        }.first
     }
 
     func brokerProfileQueryData(for id: UUID) -> BrokerProfileQueryData? {
-        let dataBroker = DataBroker(name: "Test Broker",
-                                    steps: [Step](),
-                                    schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
-                                                                               retryError: 48 * 60 * 60,
-                                                                               confirmOptOutScan: 72 * 60 * 60,
-                                                                               maintenanceScan: 240 * 60 * 60))
-        return BrokerProfileQueryData(id: UUID(),
-                                      profileQuery: ProfileQuery(firstName: "John", lastName: "Deo", city: "Miami", state: "FL", age: 46),
-                                      dataBroker: dataBroker)
+        brokerProfileQueriesData.filter { $0.id == id }.first
     }
 
     func saveOperationData(_ data: BrokerOperationData) {
@@ -66,16 +67,142 @@ final class DataBrokerProtectionDataBase: DataBase {
     }
 
     func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
-        let dataBroker = DataBroker(name: "Test Broker",
-                                    steps: [Step](),
-                                    schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
-                                                                               retryError: 48 * 60 * 60,
-                                                                               confirmOptOutScan: 72 * 60 * 60,
-                                                                               maintenanceScan: 240 * 60 * 60))
-
-        let data = BrokerProfileQueryData(id: UUID(), profileQuery: ProfileQuery(firstName: "John", lastName: "Deo", city: "Miami", state: "FL", age: 46), dataBroker: dataBroker)
-
-        return [data]
+        return brokerProfileQueriesData
     }
 
+    private func setupFakeData() {
+        let dataBroker = TestData().dataBroker
+        let profileQuery = TestData().profileQuery
+        let queryData = BrokerProfileQueryData(id: UUID(), profileQuery: profileQuery, dataBroker: dataBroker)
+
+        self.dataBrokers.append(dataBroker)
+        self.brokerProfileQueriesData.append(queryData)
+    }
+}
+
+private struct TestData {
+
+    var profileQuery: ProfileQuery {
+        ProfileQuery(firstName: "John", lastName: "Smith", city: "New York", state: "NY", age: 65)
+    }
+
+    let verecorJSONString = """
+               {
+                 "name": "verecor",
+                 "steps": [
+                   {
+                     "stepType": "scan",
+                     "actions": [
+                       {
+                         "id": "fe235f94-1c33-11ee-be56-0242ac120002",
+                         "actionType": "navigate",
+                         "url": "https://verecor.com/profile/search?fname=${firstName}&lname=${lastName}&state=${stateUpcase}&city=${cityCapitalize}&fage=${ageRange}",
+                         "ageRange": [
+                           "18-30",
+                           "31-40",
+                           "41-50",
+                           "51-60",
+                           "61-70",
+                           "71-80",
+                           "81+"
+                         ]
+                       },
+                       {
+                         "id": "fe236548-1c33-11ee-be56-0242ac120002",
+                         "actionType": "extract",
+                         "selector": ".search-item",
+                         "profile": {
+                           "name": "//div[@class='col-sm-24 col-md-19 col-text']",
+                           "alternativeNamesList": ".name",
+                           "age": ".age",
+                           "addressCityStateList": ".location",
+                           "profileUrl": "a"
+                         }
+                       }
+                     ]
+                   },
+                   {
+                     "stepType": "optOut",
+                     "actions": [
+                       {
+                         "id": "fe23669c-1c33-11ee-be56-0242ac120002",
+                         "actionType": "navigate",
+                         "url": "https://verecor.com/ng/control/privacy"
+                       },
+                       {
+                         "id": "fe2367be-1c33-11ee-be56-0242ac120002",
+                         "actionType": "fillForm",
+                         "selector": ".ahm",
+                         "elements": [
+                           {
+                             "type": "fullName",
+                             "selector": "#user_name"
+                           },
+                           {
+                             "type": "email",
+                             "selector": "#user_email"
+                           },
+                           {
+                             "type": "profileUrl",
+                             "selector": "#url"
+                           }
+                         ]
+                       },
+                       {
+                         "id": "fe2369f8-1c33-11ee-be56-0242ac120002",
+                         "actionType": "getCaptchaInfo",
+                         "selector": ".g-recaptcha"
+                       },
+                       {
+                         "id": "fe2368e0-1c33-11ee-be56-0242ac120002",
+                         "actionType": "solveCaptcha",
+                         "selector": ".g-recaptcha"
+                       },
+                       {
+                         "id": "fe236b10-1c33-11ee-be56-0242ac120002",
+                         "actionType": "click",
+                         "elements": [
+                           {
+                             "type": "button",
+                             "selector": ".btn-sbmt"
+                           }
+                         ]
+                       },
+                       {
+                         "id": "fe236c32-1c33-11ee-be56-0242ac120002",
+                         "actionType": "expectation",
+                         "expectations": [
+                           {
+                             "type": "text",
+                             "selector": "body",
+                             "expect": "Your removal request has been received"
+                           }
+                         ]
+                       },
+                       {
+                         "id": "fe236d4a-1c33-11ee-be56-0242ac120002",
+                         "actionType": "emailConfirmation",
+                         "pollingTime": 30
+                       },
+                       {
+                         "id": "fe2371be-1c33-11ee-be56-0242ac120002",
+                         "actionType": "expectation",
+                         "expectations": [
+                           {
+                             "type": "text",
+                             "selector": "body",
+                             "expect": "Your information control request has been confirmed."
+                           }
+                         ]
+                       }
+                     ]
+                   }
+                 ]
+               }
+               """
+
+    var dataBroker: DataBroker {
+        // swiftlint:disable:next force_try
+        try! JSONDecoder().decode(DataBroker.self, from: verecorJSONString.data(using: .utf8)!)
+    }
 }

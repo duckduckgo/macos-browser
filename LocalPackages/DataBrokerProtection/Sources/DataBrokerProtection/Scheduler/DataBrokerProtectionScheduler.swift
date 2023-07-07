@@ -18,29 +18,38 @@
 
 import Foundation
 import Common
+import BrowserServicesKit
 
 public final class DataBrokerProtectionScheduler {
+    private let privacyConfigManager: PrivacyConfigurationManaging
+    private let contentScopeProperties: ContentScopeProperties
+
     private let activity: NSBackgroundActivityScheduler
     private let schedulerIdentifier = "com.duckduckgo.macos.browser.databroker-protection-scheduler"
 
     lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
-        DataBrokerProtectionProcessor(database: DataBrokerProtectionDataBase(),
+        let runnerProvider = DataBrokerOperationRunnerProvider(privacyConfigManager: privacyConfigManager,
+                                                               contentScopeProperties: contentScopeProperties)
+
+        return DataBrokerProtectionProcessor(database: DataBrokerProtectionDataBase(),
                                       config: DataBrokerProtectionSchedulerConfig(),
-                                      operationRunnerProvider: DataBrokerOperationRunnerProvider())
+                                      operationRunnerProvider: runnerProvider)
     }()
 
-    public init() {
-          activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
-          activity.repeats = true
+    public init(privacyConfigManager: PrivacyConfigurationManaging, contentScopeProperties: ContentScopeProperties) {
+        activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
+        activity.repeats = true
 
-          // TODO: Arbitrary numbers for now
-          // Scheduling an activity to fire between 15 and 45 minutes from now
-          activity.interval = 30 * 60
-          activity.tolerance = 15 * 60
+        // TODO: Arbitrary numbers for now
+        // Scheduling an activity to fire between 15 and 45 minutes from now
+        activity.interval = 30 * 60
+        activity.tolerance = 15 * 60
 
-          activity.qualityOfService = QualityOfService.utility
-      }
+        activity.qualityOfService = QualityOfService.utility
+        self.privacyConfigManager = privacyConfigManager
+        self.contentScopeProperties = contentScopeProperties
+    }
 
     public func start() {
         os_log("Starting scheduler...", log: .dataBrokerProtection)

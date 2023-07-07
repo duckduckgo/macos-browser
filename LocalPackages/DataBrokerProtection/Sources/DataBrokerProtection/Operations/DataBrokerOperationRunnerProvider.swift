@@ -17,10 +17,15 @@
 //
 
 import Foundation
+import BrowserServicesKit
 
 struct DataBrokerOperationRunnerProvider: OperationRunnerProvider {
+    var privacyConfigManager: PrivacyConfigurationManaging
+    var contentScopeProperties: ContentScopeProperties
+
     @MainActor
     func getOperationRunner() -> WebOperationRunner {
-        TestOperationRunner()
+        TestOperationRunner(privacyConfigManager: privacyConfigManager,
+                            contentScopeProperties: contentScopeProperties)
     }
 }
