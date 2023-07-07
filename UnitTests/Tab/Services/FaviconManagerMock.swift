@@ -23,6 +23,15 @@ import BrowserServicesKit
 
 final class FaviconManagerMock: FaviconManagement {
 
+    var faviconsLoadedPublisher: AnyPublisher<Bool, Never> {
+        PassthroughSubject().eraseToAnyPublisher()
+    }
+
+    func loadFavicons(bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager) {
+        fatalError()
+    }
+
+
     func loadFavicons() {}
     var areFaviconsLoaded: Bool { return true }
 

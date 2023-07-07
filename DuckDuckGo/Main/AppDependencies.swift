@@ -54,7 +54,11 @@ struct FireDependencies: Fire.Dependencies & AutoTabDependencies {
     let pinnedTabsManager: PinnedTabsManager
     let windowManager: WindowManagerProtocol
 
-    init(tabDependencies: TabDependencies, downloadListCoordinator: DownloadListCoordinator, recentlyClosedCoordinator: RecentlyClosedCoordinating, pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager) {
+    let syncService: DDGSyncing?
+
+    var stateRestorationManager: AppStateRestorationManager?
+
+    init(tabDependencies: TabDependencies, downloadListCoordinator: DownloadListCoordinator, recentlyClosedCoordinator: RecentlyClosedCoordinating, pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager, syncService: DDGSyncing?, stateRestorationManager: AppStateRestorationManager?) {
         self.tabDependencies = tabDependencies
 
         self.downloadListCoordinator = downloadListCoordinator
@@ -62,6 +66,8 @@ struct FireDependencies: Fire.Dependencies & AutoTabDependencies {
 
         self.pinnedTabsManager = pinnedTabsManager
         self.windowManager = windowManager
+        self.syncService = syncService
+        self.stateRestorationManager = stateRestorationManager
     }
 
 }
@@ -76,12 +82,14 @@ struct FireCoordinatorDependencies: FireCoordinator.Dependencies {
     let historyCoordinating: HistoryCoordinating
 
     @MainActor
-    init(tabDependencies: TabDependencies, downloadListCoordinator: DownloadListCoordinator, recentlyClosedCoordinator: RecentlyClosedCoordinating, pinnedTabsManager: PinnedTabsManager, faviconManagement: FaviconManagement, bookmarkManager: BookmarkManager, windowManager: WindowManager) {
+    init(tabDependencies: TabDependencies, downloadListCoordinator: DownloadListCoordinator, recentlyClosedCoordinator: RecentlyClosedCoordinating, pinnedTabsManager: PinnedTabsManager, faviconManagement: FaviconManagement, bookmarkManager: BookmarkManager, windowManager: WindowManager, syncService: DDGSyncing?, stateRestorationManager: AppStateRestorationManager?) {
         let fireDependencies = FireDependencies(tabDependencies: tabDependencies,
                                                 downloadListCoordinator: downloadListCoordinator,
                                                 recentlyClosedCoordinator: recentlyClosedCoordinator,
                                                 pinnedTabsManager: pinnedTabsManager,
-                                                windowManager: windowManager)
+                                                windowManager: windowManager,
+                                                syncService: syncService,
+                                                stateRestorationManager: stateRestorationManager)
         self.fireViewModel = FireViewModel(fire: Fire(dependencyProvider: fireDependencies))
         self.faviconManagement = faviconManagement
         self.historyCoordinating = tabDependencies.historyCoordinating
@@ -303,6 +311,8 @@ struct LocalBookmarkManagerDependencies: LocalBookmarkManager.Dependencies {
     let faviconManagement: FaviconManagement
 
     let duckPlayer: DuckPlayer
+
+    let syncService: () -> DDGSyncing?
 }
 
 struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & HistoryMenu.Dependencies & AutoTabDependencies {
@@ -315,7 +325,7 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
     let urlEventHandler: URLEventHandler
     let internalUserDecider: InternalUserDecider
     let downloadListCoordinator: DownloadListCoordinator
-    let stateRestorationManager: AppStateRestorationManager
+    let stateRestorationManager: AppStateRestorationManager?
     let recentlyClosedCoordinator: RecentlyClosedCoordinator
     let fireCoordinator: FireCoordinator
 
@@ -360,6 +370,7 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
         var downloadListCoordinator: DownloadListCoordinator!
         var passwordManagerCoordinator: PasswordManagerCoordinator!
         var tabDependencies: TabDependencies!
+        var stateRestorationManager: AppStateRestorationManager!
 
         var duckPlayer: DuckPlayer!
         let contentBlocking = AppContentBlocking(internalUserDecider: internalUserDecider, duckPlayer: { duckPlayer! })
@@ -384,13 +395,16 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
         let localBookmarkStoreDependencies = LocalBookmarkStoreDependencies(duckPlayer: duckPlayer, faviconManagement: faviconManagement)
         let bookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared, dependencyProvider: localBookmarkStoreDependencies)
 
+        var syncService: DDGSync!
         let localBookmarkManagerDependencies = LocalBookmarkManagerDependencies(bookmarkStore: bookmarkStore,
                                                                                 faviconManagement: faviconManagement,
-                                                                                duckPlayer: duckPlayer)
+                                                                                duckPlayer: duckPlayer,
+                                                                                syncService: { syncService })
         let bookmarkManager = LocalBookmarkManager(dependencyProvider: localBookmarkManagerDependencies)
 
         let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db, bookmarkManager: bookmarkManager)
-        self.syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync)
+        syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync)
+        self.syncService = syncService
 
         let historyStore = HistoryStore()
         historyCoordinator = HistoryCoordinator(historyStoring: historyStore)
@@ -399,7 +413,7 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
 
         let windowManager = WindowManager(
             dependencyProvider: windowManagerDependencies
-        ) { [internalUserDecider, syncService, configurationManager, downloadManager, historyCoordinator] windowManager in
+        ) { [internalUserDecider, configurationManager, downloadManager, historyCoordinator] windowManager in
 
             let downloadListCoordinatorDependencies = DownloadListCoordinatorDependencies(windowManager: windowManager,
                                                                                           downloadManager: downloadManager)
@@ -427,13 +441,24 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
                                                                                               windowManager: windowManager)
             recentlyClosedCoordinator = RecentlyClosedCoordinator(dependencyProvider: recentlyClosedCoordinatorDependencies)
 
+            let statePersistenceService = StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName)
+            let stateRestorationManagerDependencies = StateRestorationManagerDependencies(tabDependencies: tabDependencies,
+                                                                                          statePersistenceService: statePersistenceService,
+                                                                                          pinnedTabsManager: pinnedTabsManager,
+                                                                                          windowManager: windowManager,
+                                                                                          passwordManagerCoordinator: passwordManagerCoordinator)
+            stateRestorationManager = AppStateRestorationManager(dependencyProvider: stateRestorationManagerDependencies,
+                                                                 shouldRestorePreviousSession: StartupPreferences().restorePreviousSession)
+
             let fireCoordinatorDependencies = FireCoordinatorDependencies(tabDependencies: tabDependencies,
                                                                           downloadListCoordinator: downloadListCoordinator,
                                                                           recentlyClosedCoordinator: recentlyClosedCoordinator,
                                                                           pinnedTabsManager: pinnedTabsManager,
                                                                           faviconManagement: faviconManagement,
                                                                           bookmarkManager: bookmarkManager,
-                                                                          windowManager: windowManager)
+                                                                          windowManager: windowManager,
+                                                                          syncService: syncService,
+                                                                          stateRestorationManager: stateRestorationManager)
             fireCoordinator = FireCoordinator(dependencyProvider: fireCoordinatorDependencies)
 
             return WindowManagerNestedDependencies(tabDependencies: tabDependencies,
@@ -455,15 +480,7 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
         self.tabDependencies = tabDependencies
         self.urlEventHandler = URLEventHandler(windowManager: windowManager)
 
-        let statePersistenceService = StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName)
-        let stateRestorationManagerDependencies = StateRestorationManagerDependencies(tabDependencies: tabDependencies,
-                                                                                      statePersistenceService: statePersistenceService,
-                                                                                      pinnedTabsManager: pinnedTabsManager,
-                                                                                      windowManager: windowManager,
-                                                                                      passwordManagerCoordinator: passwordManagerCoordinator)
-        self.stateRestorationManager = AppStateRestorationManager(dependencyProvider: stateRestorationManagerDependencies,
-                                                                  shouldRestorePreviousSession: StartupPreferences().restorePreviousSession)
-
+        self.stateRestorationManager = stateRestorationManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
         self.fireCoordinator = fireCoordinator

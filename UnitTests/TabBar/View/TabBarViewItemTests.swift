@@ -119,10 +119,30 @@ final class TabBarViewItemTests: XCTestCase {
         let tab = Tab()
         tab.url = URL(string: "https://www.apple.com")
         let vm = TabViewModel(tab: tab)
-        tabBarViewItem.subscribe(to: vm, tabCollectionViewModel: TabCollectionViewModel())
+        tabBarViewItem.subscribe(to: vm, tabCollectionViewModel: TabCollectionViewModel(dependencyProvider: dependencies(for: TabCollectionViewModel.self)))
         // update menu
         tabBarViewItem.menuNeedsUpdate(menu)
         let item = menu.items .first { $0.title == UserText.fireproofSite }
         XCTAssertTrue(item?.isEnabled ?? false)
     }
+
+}
+
+private extension Tab {
+    
+    @MainActor
+    @nonobjc
+    convenience init(content: Tab.TabContent = .homePage) {
+        self.init(dependencyProvider: TestDependencyProvider.for(Tab.self), content: content)
+    }
+
+    var url: URL? {
+        get {
+            content.url
+        }
+        set {
+            setContent(newValue.map { TabContent.url($0) } ?? .homePage)
+        }
+    }
+
 }

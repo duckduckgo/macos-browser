@@ -225,11 +225,21 @@ final class TabIndexTests: XCTestCase {
     // MARK: -
 
     private func tabCollection(tabsCount: Int) -> TabCollection {
-        let tab = Tab(content: .url("https://duck.com".url!))
+        let tab = Tab(dependencyProvider: dependencies(for: Tab.self), content: .url("https://duck.com".url!))
         return TabCollection(tabs: .init(repeating: tab, count: tabsCount))
     }
 
     private func pinnedTabsManager(tabsCount: Int) -> PinnedTabsManager {
         PinnedTabsManager(tabCollection: tabCollection(tabsCount: tabsCount))
     }
+}
+
+
+private extension TabCollectionViewModel {
+
+    convenience init(tabCollection: TabCollection = TabCollection(), pinnedTabsManager: PinnedTabsManager) {
+        // TODO: PinnedTabsManager
+        self.init(tabCollection: tabCollection, dependencyProvider: TestDependencyProvider.for(TabCollectionViewModel.self))
+    }
+
 }

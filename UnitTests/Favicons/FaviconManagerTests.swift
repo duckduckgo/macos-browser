@@ -23,8 +23,12 @@ import Combine
 class FaviconManagerTests: XCTestCase {
 
     func testWhenFaviconManagerIsInMemory_ThenItMustInitNullStore() {
-        let faviconManager = FaviconManager(cacheType: .inMemory)
+        let faviconManager = FaviconManager(cacheType: .inMemory(bookmarkManager: createMockBookmarksManager()))
         XCTAssertNotNil(faviconManager.store as? FaviconNullStore)
+    }
+
+    private func createMockBookmarksManager() -> BookmarkManager {
+        LocalBookmarkManager(dependencyProvider: dependencies(for: LocalBookmarkManager.self))
     }
     
 }

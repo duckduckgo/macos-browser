@@ -52,7 +52,7 @@ final class PDFSearchTextMenuItemHandler: NSObject {
               let url = URL.makeURL(from: selectedText)
         else { return }
 
-        (NSApp.delegate as? AppDelegate)!.windowManager.show(url: url, newTab: true)
+        NSApp.delegateTyped.windowManager.show(url: url, newTab: true)
     }
 
 }

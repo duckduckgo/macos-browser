@@ -24,7 +24,7 @@ final class FirePopoverViewModelTests: XCTestCase {
 
     func testWhenThereIsOneTabWithNoHistoryThenClearingOptionsContainsCurrentTab() {
         let tab = Tab(content: .url("https://duck.com".url!))
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: .init(tabs: [tab]), isBurner: false)
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: .init(tabs: [tab]))
 
         let viewModel = makeViewModel(with: tabCollectionViewModel)
 
@@ -78,11 +78,26 @@ final class FirePopoverViewModelTests: XCTestCase {
 
     private func makeViewModel(with tabCollectionViewModel: TabCollectionViewModel) -> FirePopoverViewModel {
         FirePopoverViewModel(
-            fireViewModel: .init(),
             tabCollectionViewModel: tabCollectionViewModel,
-            historyCoordinating: HistoryCoordinatingMock(),
             fireproofDomains: FireproofDomains(store: FireproofDomainsStoreMock()),
-            faviconManagement: FaviconManagerMock()
+            dependencyProvider: dependencies(for: FirePopoverViewModel.self)
         )
     }
+}
+
+private extension Tab {
+
+    @MainActor
+    convenience init(content: Tab.TabContent = .homePage, extensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default) {
+        self.init(dependencyProvider: TestDependencyProvider.for(Tab.self), content: content)
+    }
+
+}
+
+private extension TabCollectionViewModel {
+
+    convenience init(tabCollection: TabCollection = TabCollection()) {
+        self.init(tabCollection: tabCollection, dependencyProvider: TestDependencyProvider.for(TabCollectionViewModel.self))
+    }
+
 }

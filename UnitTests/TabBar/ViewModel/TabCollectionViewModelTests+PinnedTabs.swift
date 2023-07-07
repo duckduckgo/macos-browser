@@ -277,17 +277,35 @@ extension TabCollectionViewModelTests {
     }
 }
 
-fileprivate extension TabCollectionViewModel {
+private extension Tab {
+
+    @MainActor
+    convenience init(parentTab: Tab) {
+        self.init(dependencyProvider: TestDependencyProvider.for(Tab.self), content: .url(.blankPage), parentTab: parentTab)
+    }
+
+    var url: URL? {
+        get {
+            content.url
+        }
+        set {
+            setContent(newValue.map { TabContent.url($0) } ?? .homePage)
+        }
+    }
+
+}
+
+private extension TabCollectionViewModel {
 
     static func aTabCollectionViewModelWithPinnedTab() -> TabCollectionViewModel {
         let tabCollection = TabCollection()
-        let pinnedTabsManager = PinnedTabsManager()
-        let vm = TabCollectionViewModel(tabCollection: tabCollection, pinnedTabsManager: pinnedTabsManager)
+        let vm = TabCollectionViewModel(tabCollection: tabCollection, dependencyProvider: TestDependencyProvider.for(TabCollectionViewModel.self))
         vm.appendPinnedTab()
         return vm
     }
 
     func appendPinnedTab() {
-        pinnedTabsManager?.tabCollection.append(tab: .init(content: .url("https://duck.com".url!), shouldLoadInBackground: false))
+        pinnedTabsManager!.tabCollection.append(tab: Tab(dependencyProvider: TestDependencyProvider.for(Tab.self), content: .url("https://duck.com".url!), shouldLoadInBackground: false))
     }
+
 }

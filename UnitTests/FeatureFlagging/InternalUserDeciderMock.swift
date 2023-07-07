@@ -21,7 +21,8 @@ import Combine
 @testable import DuckDuckGo_Privacy_Browser
 import BrowserServicesKit
 
-class InternalUserDeciderMock: InternalUserDecider {
+@objc(InternalUserDeciderMock)
+class InternalUserDeciderMock: NSObject, InternalUserDecider {
 
     var isInternalUser: Bool {
         false

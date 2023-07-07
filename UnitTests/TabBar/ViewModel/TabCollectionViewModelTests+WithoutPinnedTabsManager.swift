@@ -58,7 +58,7 @@ extension TabCollectionViewModelTests {
         let tabCollection = TabCollection()
         XCTAssertTrue(tabCollection.tabs.isEmpty)
 
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: TabCollection())
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: TabCollection(), dependencyProvider: dependencies(for: TabCollectionViewModel.self))
 
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 1)
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs[0].content, .homePage)
@@ -436,10 +436,30 @@ extension TabCollectionViewModelTests {
     }
 }
 
-fileprivate extension TabCollectionViewModel {
+private extension Tab {
+
+    @MainActor
+    @nonobjc
+    convenience init(content: Tab.TabContent = .homePage, parentTab: Tab? = nil) {
+        self.init(dependencyProvider: TestDependencyProvider.for(Tab.self), content: content, parentTab: parentTab)
+    }
+
+    var url: URL? {
+        get {
+            content.url
+        }
+        set {
+            setContent(newValue.map { TabContent.url($0) } ?? .homePage)
+        }
+    }
+
+}
+
+private extension TabCollectionViewModel {
 
     static func aTabCollectionViewModel() -> TabCollectionViewModel {
         let tabCollection = TabCollection()
-        return TabCollectionViewModel(tabCollection: tabCollection, pinnedTabsManager: nil)
+        return TabCollectionViewModel(tabCollection: tabCollection, dependencyProvider: TestDependencyProvider.for(TabCollectionViewModel.self))
     }
+    
 }

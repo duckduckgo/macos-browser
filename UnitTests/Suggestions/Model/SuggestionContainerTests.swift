@@ -27,7 +27,7 @@ final class SuggestionContainerTests: XCTestCase {
         let historyCoordinatingMock = HistoryCoordinatingMock()
         let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
                                                       historyCoordinating: historyCoordinatingMock,
-                                                      bookmarkManager: LocalBookmarkManager.shared)
+                                                      bookmarkManager: LocalBookmarkManager(dependencyProvider: dependencies(for: LocalBookmarkManager.self)))
 
         let e = expectation(description: "Suggestions updated")
         let cancellable = suggestionContainer.$result.sink {
@@ -52,7 +52,7 @@ final class SuggestionContainerTests: XCTestCase {
         let historyCoordinatingMock = HistoryCoordinatingMock()
         let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
                                                       historyCoordinating: historyCoordinatingMock,
-                                              bookmarkManager: LocalBookmarkManager.shared)
+                                                      bookmarkManager: LocalBookmarkManager(dependencyProvider: dependencies(for: LocalBookmarkManager.self)))
 
         suggestionContainer.getSuggestions(for: "test")
         suggestionContainer.stopGettingSuggestions()

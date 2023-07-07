@@ -22,22 +22,27 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 12.0, *)
+@MainActor
 class PrivacyDashboardIntegrationTests: XCTestCase {
 
-    static var window: NSWindow!
+    var window: NSWindow!
     var tabViewModel: TabViewModel {
-        (Self.window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
+        (self.window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
+    }
+
+    var windowManager: WindowManagerProtocol {
+        NSApp.delegateTyped.windowManager
     }
 
     @MainActor
-    override class func setUp() {
+    override func setUp() {
         // disable GPC redirects
         PrivacySecurityPreferences.shared.gpcEnabled = false
 
-        window = WindowsManager.openNewWindow(with: .none)!
+        window = windowManager.openNewWindow(with: .none)!
     }
 
-    override class func tearDown() {
+    override func tearDown() {
         window.close()
         window = nil
 

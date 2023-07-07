@@ -77,18 +77,23 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         contentBlockingMock = ContentBlockingMock()
         privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
 
+        TestDependencyProvider.set(MockAttributing(), for: \AbstractAdClickAttributionLogicDependencies.attributionFeatureConfig)
+        TestDependencyProvider.set({ [now] in now }, for: \AdClickAttributionTabExtension.now)
+        TestDependencyProvider.set(contentBlockingMock.privacyConfigurationManager, for: \AdClickAttributionTabExtension.privacyConfigurationManager)
+        TestDependencyProvider.set(ContentBlockerRulesManagerMock(), for: \AdClickAttributionTabExtension.contentBlockingManager)
+
         extensionsBuilder = TestTabExtensionsBuilder(load: [AdClickAttributionTabExtension.self]) { [unowned self] builder in { args, dependencies in
             builder.override {
                 AdClickAttributionTabExtension(inheritedAttribution: args.inheritedAttribution,
                                                userContentControllerFuture: Future { fulfill in DispatchQueue.main.async { fulfill(.success(self.userContentController)) } },
                                                contentBlockerRulesScriptPublisher: self.contentBlockerRulesScriptSubj,
                                                trackerInfoPublisher: self.trackerInfoPublisher,
-                                               dependencies: dependencies.privacyFeatures.contentBlocking,
-                                               dateTimeProvider: { self.now }) { _ in
+                                               dependencyProvider: self.dependencies(for: AdClickAttributionTabExtension.self)) { _ in
                     (logic: self.logic, detection: self.detection)
                 }
             }
         }}
+        TestDependencyProvider.set(extensionsBuilder, for: \Tab.tabExtensionsBuilder)
 
         schemeHandler = TestSchemeHandler()
         schemeHandler.middleware = [{ [data] _ in
@@ -147,7 +152,9 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             }
         }}
 
-        let parentTab = Tab(content: .none, extensionsBuilder: mockBuilder, shouldLoadInBackground: true)
+        let parentTab = Tab(dependencyProvider: dependencies(for: Tab.self).mutating {
+            $0.tabExtensionsBuilder = mockBuilder
+        }, content: .none, shouldLoadInBackground: true)
 
         let onApplyInheritedAttribution = expectation(description: "onApplyInheritedAttribution")
         /*childTab*/logic.onApplyInheritedAttribution = { [unowned logic] in
@@ -164,7 +171,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         }
         logic.onRulesChanged = { _ in }
 
-        let childTab = Tab(content: .none, extensionsBuilder: extensionsBuilder, parentTab: parentTab)
+        let childTab = Tab(dependencyProvider: dependencies(for: Tab.self), content: .none, parentTab: parentTab)
         DispatchQueue.main.async {
             self.makeContentBlockerRulesUserScript()
         }
@@ -200,7 +207,9 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             }
         }}
 
-        let parentTab = Tab(content: .none, extensionsBuilder: mockBuilder, shouldLoadInBackground: true)
+        let parentTab = Tab(dependencyProvider: dependencies(for: Tab.self).mutating {
+            $0.tabExtensionsBuilder = mockBuilder
+        }, content: .none, shouldLoadInBackground: true)
 
         let onApplyInheritedAttribution = expectation(description: "onApplyInheritedAttribution")
         /*childTab*/logic.onApplyInheritedAttribution = { [unowned logic] in
@@ -218,7 +227,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         logic.onRulesChanged = { _ in }
 
         makeContentBlockerRulesUserScript()
-        let childTab = Tab(content: .none, extensionsBuilder: extensionsBuilder, parentTab: parentTab)
+        let childTab = Tab(dependencyProvider: dependencies(for: Tab.self), content: .none, parentTab: parentTab)
 
         waitForExpectations(timeout: 1)
         XCTAssertEqual(childTab.adClickAttribution?.currentAttributionState, mockAttribution.currentAttributionState)
@@ -230,7 +239,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             return false
         }
 
-        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        let tab = Tab(dependencyProvider: dependencies(for: Tab.self), content: .none, webViewConfiguration: webViewConfiguration, shouldLoadInBackground: true)
         DispatchQueue.main.async {
             self.makeContentBlockerRulesUserScript()
         }
@@ -270,7 +279,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         privacyConfiguration.isFeatureKeyEnabled = { _, _ in
             return false
         }
-        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        let tab = Tab(dependencyProvider: dependencies(for: Tab.self), content: .none, webViewConfiguration: webViewConfiguration, shouldLoadInBackground: true)
         DispatchQueue.main.async {
             self.makeContentBlockerRulesUserScript()
         }
@@ -324,7 +333,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         schemeHandler.middleware = [{ _ in
             return .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
         }]
-        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        let tab = Tab(dependencyProvider: dependencies(for: Tab.self), content: .none, webViewConfiguration: webViewConfiguration, shouldLoadInBackground: true)
         DispatchQueue.main.async {
             self.makeContentBlockerRulesUserScript()
         }
@@ -351,7 +360,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         privacyConfiguration.isFeatureKeyEnabled = { _, _ in
             return false
         }
-        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        let tab = Tab(dependencyProvider: dependencies(for: Tab.self), content: .none, webViewConfiguration: webViewConfiguration, shouldLoadInBackground: true)
         DispatchQueue.main.async {
             self.makeContentBlockerRulesUserScript()
         }
@@ -407,7 +416,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             userScriptInstalled.fulfill()
         }
 
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        let tab = Tab(dependencyProvider: dependencies(for: Tab.self), content: .none, shouldLoadInBackground: true)
         DispatchQueue.main.async {
             self.makeContentBlockerRulesUserScript()
         }
@@ -449,7 +458,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         logic.onRulesChanged = { _ in
             userScriptInstalled.fulfill()
         }
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        let tab = Tab(dependencyProvider: dependencies(for: Tab.self), content: .none, shouldLoadInBackground: true)
         DispatchQueue.main.async {
             self.makeContentBlockerRulesUserScript()
         }
@@ -473,7 +482,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         logic.onRulesChanged = { _ in
             userScriptInstalled.fulfill()
         }
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        let tab = Tab(dependencyProvider: dependencies(for: Tab.self), content: .none, shouldLoadInBackground: true)
         DispatchQueue.main.async {
             self.makeContentBlockerRulesUserScript()
         }
@@ -504,7 +513,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         logic.onRulesChanged = { _ in
             userScriptInstalled.fulfill()
         }
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        let tab = Tab(dependencyProvider: dependencies(for: Tab.self), content: .none, shouldLoadInBackground: true)
         DispatchQueue.main.async {
             self.makeContentBlockerRulesUserScript()
         }
@@ -538,7 +547,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     }
 
     func testOnTrackerDataupdated_onRequestDetectedIsCalled() {
-        let tab = Tab(content: .none, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        let tab = Tab(dependencyProvider: dependencies(for: Tab.self), content: .none, shouldLoadInBackground: true)
         DispatchQueue.main.async {
             self.makeContentBlockerRulesUserScript()
         }

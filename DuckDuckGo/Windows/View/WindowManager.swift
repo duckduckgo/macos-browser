@@ -150,7 +150,7 @@ final class WindowManager: WindowManagerProtocol, Injectable {
     @Injected
     var pinnedTabsManager: PinnedTabsManager
 
-    private var nestedDependencies: AbstractWindowManagerNestedDependencies.DependencyStorage!
+    private(set) var nestedDependencies: AbstractWindowManagerNestedDependencies.DependencyStorage!
 
     /**
      * _Initial_ meaning a single window with a single home page tab.

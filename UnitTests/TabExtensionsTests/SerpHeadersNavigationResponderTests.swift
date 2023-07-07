@@ -75,7 +75,8 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
                 })
             }
         }}
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        // TODO: extbuild
+        let tab = Tab(dependencyProvider: dependencies(for: Tab.self), content: .none, shouldLoadInBackground: true)
 
         for url in ddgUrls {
             let eNavAction = expectation(description: "onNavAction for \(url.absoluteString)")
@@ -108,7 +109,8 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
             }
         }}
 
-        let tab = Tab(content: .none, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        // TODO: extbuild
+        let tab = Tab(dependencyProvider: dependencies(for: Tab.self), content: .none, shouldLoadInBackground: true)
 
         for url in nonDdgUrls {
             let eNavAction = expectation(description: "onNavAction for \(url.absoluteString)")

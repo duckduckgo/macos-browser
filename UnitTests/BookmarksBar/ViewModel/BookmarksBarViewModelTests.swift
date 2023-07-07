@@ -93,17 +93,17 @@ class BookmarksBarViewModelTests: XCTestCase {
 
     private func createMockBookmarksManager(mockBookmarkStore: BookmarkStoreMock = BookmarkStoreMock()) -> BookmarkManager {
         let mockFaviconManager = FaviconManagerMock()
-        return LocalBookmarkManager(bookmarkStore: mockBookmarkStore, faviconManagement: mockFaviconManager)
+        return LocalBookmarkManager(dependencyProvider: dependencies(for: LocalBookmarkManager.self))
     }
 
 }
 
-fileprivate extension TabCollectionViewModel {
+private extension TabCollectionViewModel {
 
     static func mock() -> TabCollectionViewModel {
         let tabCollection = TabCollection()
         let pinnedTabsManager = PinnedTabsManager()
-        return TabCollectionViewModel(tabCollection: tabCollection, pinnedTabsManager: pinnedTabsManager)
+        return TabCollectionViewModel(tabCollection: tabCollection, dependencyProvider: TestDependencyProvider.for(TabCollectionViewModel.self))
     }
 
 }

@@ -34,9 +34,8 @@ final class FireTests: XCTestCase {
         let faviconManager = FaviconManagerMock()
 
         let fire = Fire(cacheManager: manager,
-                        historyCoordinating: historyCoordinator,
                         permissionManager: permissionManager,
-                        faviconManagement: faviconManager)
+                        dependencyProvider: dependencies(for: Fire.self))
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
 
         let burningExpectation = expectation(description: "Burning")
@@ -64,10 +63,8 @@ final class FireTests: XCTestCase {
         let pinnedTabsManager = PinnedTabsManager(tabCollection: .init(tabs: pinnedTabs))
 
         let fire = Fire(cacheManager: manager,
-                        historyCoordinating: historyCoordinator,
                         permissionManager: permissionManager,
-                        faviconManagement: faviconManager,
-                        pinnedTabsManager: pinnedTabsManager)
+                        dependencyProvider: dependencies(for: Fire.self))
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel(with: pinnedTabsManager)
 
         let burningExpectation = expectation(description: "Burning")
@@ -90,10 +87,8 @@ final class FireTests: XCTestCase {
         let recentlyClosedCoordinator = RecentlyClosedCoordinatorMock()
 
         let fire = Fire(cacheManager: manager,
-                        historyCoordinating: historyCoordinator,
                         permissionManager: permissionManager,
-                        faviconManagement: faviconManager,
-                        recentlyClosedCoordinator: recentlyClosedCoordinator)
+                        dependencyProvider: dependencies(for: Fire.self))
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
 
         let finishedBurningExpectation = expectation(description: "Finished burning")
@@ -115,9 +110,8 @@ final class FireTests: XCTestCase {
         let faviconManager = FaviconManagerMock()
 
         let fire = Fire(cacheManager: manager,
-                        historyCoordinating: historyCoordinator,
                         permissionManager: permissionManager,
-                        faviconManagement: faviconManager)
+                        dependencyProvider: dependencies(for: Fire.self))
 
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
 
@@ -141,10 +135,12 @@ final class FireTests: XCTestCase {
         let fileName = "testStateFileForBurningAllData"
         let fileStore = preparePersistedState(withFileName: fileName)
         let service = StatePersistenceService(fileStore: fileStore, fileName: fileName)
-        let appStateRestorationManager = AppStateRestorationManager(service: service, shouldRestorePreviousSession: false)
+        let appStateRestorationManager = AppStateRestorationManager(dependencyProvider: dependencies(for: AppStateRestorationManager.self),
+                                                                    shouldRestorePreviousSession: false)
+        TestDependencyProvider.set(appStateRestorationManager, for: \Fire.stateRestorationManager)
         appStateRestorationManager.applicationDidFinishLaunching()
 
-        let fire = Fire(stateRestorationManager: appStateRestorationManager)
+        let fire = Fire(dependencyProvider: dependencies(for: Fire.self))
 
         XCTAssertTrue(appStateRestorationManager.canRestoreLastSessionState)
         fire.burnAll(tabCollectionViewModel: .makeTabCollectionViewModel())
@@ -155,10 +151,12 @@ final class FireTests: XCTestCase {
         let fileName = "testStateFileForBurningAllData"
         let fileStore = preparePersistedState(withFileName: fileName)
         let service = StatePersistenceService(fileStore: fileStore, fileName: fileName)
-        let appStateRestorationManager = AppStateRestorationManager(service: service, shouldRestorePreviousSession: false)
+        let appStateRestorationManager = AppStateRestorationManager(dependencyProvider: dependencies(for: AppStateRestorationManager.self),
+                                                                    shouldRestorePreviousSession: false)
+        TestDependencyProvider.set(appStateRestorationManager, for: \Fire.stateRestorationManager)
         appStateRestorationManager.applicationDidFinishLaunching()
 
-        let fire = Fire(stateRestorationManager: appStateRestorationManager)
+        let fire = Fire(dependencyProvider: dependencies(for: Fire.self))
 
         XCTAssertTrue(appStateRestorationManager.canRestoreLastSessionState)
         fire.burnDomains(["https://example.com"])
@@ -179,12 +177,20 @@ final class FireTests: XCTestCase {
 
 }
 
-fileprivate extension TabCollectionViewModel {
+private extension Tab {
+    @MainActor
+    @nonobjc
+    convenience init(content: Tab.TabContent = .homePage) {
+        self.init(dependencyProvider: TestDependencyProvider.for(Tab.self), content: content)
+    }
+}
+
+private extension TabCollectionViewModel {
 
     @MainActor
     static func makeTabCollectionViewModel(with pinnedTabsManager: PinnedTabsManager? = nil) -> TabCollectionViewModel {
-
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: .init(), pinnedTabsManager: pinnedTabsManager ?? WindowManager.shared.pinnedTabsManager)
+// TODO: WithDependencies
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: .init(), dependencyProvider: TestDependencyProvider.for(TabCollectionViewModel.self))
         tabCollectionViewModel.appendNewTab()
         tabCollectionViewModel.appendNewTab()
         return tabCollectionViewModel

@@ -126,7 +126,8 @@ final class LocalBookmarkStore: BookmarkStore, Injectable {
 
     private func reportOrphanedBookmarksIfNeeded() {
         Task { @MainActor in
-            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService, syncService.authState == .inactive else {
+            let syncService = NSApp.delegateTyped.syncService
+            guard syncService.authState == .inactive else {
                 return
             }
             Pixel.fire(.debug(event: .orphanedBookmarksPresent))

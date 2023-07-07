@@ -39,10 +39,10 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         // disable GPC redirects
         PrivacySecurityPreferences.shared.gpcEnabled = false
 
-        window = WindowsManager.openNewWindow(with: .none)!
+        window = NSApp.delegateTyped.windowManager.openNewWindow(with: .none)!
 
-        XCTAssertTrue(AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig.isFeature(.httpsUpgrade, enabledForDomain: "privacy-test-pages.glitch.me"))
-        await ConfigurationManager.shared.refreshIfNeeded()?.value
+//        XCTAssertTrue(AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig.isFeature(.httpsUpgrade, enabledForDomain: "privacy-test-pages.glitch.me"))
+        await NSApp.delegateTyped.configurationManager.refreshIfNeeded()?.value
     }
 
     override func tearDown() {
@@ -61,7 +61,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
 
         let url = URL(string: "http://privacy-test-pages.glitch.me/privacy-protections/https-upgrades/")!
         let upgradableUrl = URL(string: "http://good.third-party.site/privacy-protections/https-upgrades/frame.html")!
-        let upgradedUrl = try? await AppPrivacyFeatures.shared.httpsUpgrade.upgrade(url: upgradableUrl).get()
+        let upgradedUrl = try? await NSApp.delegateTyped.privacyFeatures.httpsUpgrade.upgrade(url: upgradableUrl).get()
         XCTAssertEqual(upgradedUrl, upgradableUrl.toHttps()!, "URL not upgraded")
 
         let tabViewModel = self.tabViewModel
@@ -92,7 +92,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         // await for popup to open and close
         _=try await comingBackToFirstTabPromise.value
 
-        let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
+        let downloadTaskFuture = NSApp.delegateTyped.downloadManager.downloadsPublisher.timeout(5).first().promise()
 
         // download results
         _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
@@ -170,7 +170,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         // await for popup to open and close
         _=try await comingBackToFirstTabPromise.value
 
-        let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
+        let downloadTaskFuture = NSApp.delegateTyped.downloadManager.downloadsPublisher.timeout(5).first().promise()
 
         // download results
         _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")

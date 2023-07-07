@@ -26,7 +26,7 @@ final class SuggestionContainerViewModelTests: XCTestCase {
     var cancellables = Set<AnyCancellable>()
 
     func testWhenSelectionIndexIsNilThenSelectedSuggestionViewModelIsNil() {
-        let suggestionContainer = SuggestionContainer()
+        let suggestionContainer = SuggestionContainer(bookmarkManager: LocalBookmarkManager(dependencyProvider: dependencies(for: LocalBookmarkManager.self)), historyCoordinating: HistoryCoordinatingMock())
         let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
 
         XCTAssertNil(suggestionContainerViewModel.selectionIndex)
@@ -51,7 +51,7 @@ final class SuggestionContainerViewModelTests: XCTestCase {
     }
 
     func testWhenSelectCalledWithIndexOutOfBoundsThenSelectedSuggestionViewModelIsNil() {
-        let suggestionContainer = SuggestionContainer()
+        let suggestionContainer = SuggestionContainer(bookmarkManager: LocalBookmarkManager(dependencyProvider: dependencies(for: LocalBookmarkManager.self)), historyCoordinating: HistoryCoordinatingMock())
         let suggestionListViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
 
         suggestionListViewModel.select(at: 0)
@@ -126,7 +126,7 @@ extension SuggestionContainerViewModel {
         let historyCoordinatingMock = HistoryCoordinatingMock()
         let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock,
                                                       historyCoordinating: historyCoordinatingMock,
-                                                      bookmarkManager: LocalBookmarkManager.shared)
+                                                      bookmarkManager: LocalBookmarkManager(dependencyProvider: TestDependencyProvider.for(LocalBookmarkManager.self)))
         let suggestionContainerViewModel = SuggestionContainerViewModel(suggestionContainer: suggestionContainer)
 
         suggestionContainer.getSuggestions(for: "Test")

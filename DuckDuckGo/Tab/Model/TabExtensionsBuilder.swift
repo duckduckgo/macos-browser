@@ -34,11 +34,7 @@ protocol TabExtensionsBuilderProtocol {
 struct TabExtensionsBuilder: TabExtensionsBuilderProtocol {
 
     static var `default`: TabExtensionsBuilderProtocol {
-#if DEBUG
-        return NSApp.isRunningUnitTests ? TestTabExtensionsBuilder.shared : TabExtensionsBuilder()
-#else
         return TabExtensionsBuilder()
-#endif
     }
 
     var components = [(protocolType: Any.Type, buildingBlock: any TabExtensionBuildingBlockProtocol)]()

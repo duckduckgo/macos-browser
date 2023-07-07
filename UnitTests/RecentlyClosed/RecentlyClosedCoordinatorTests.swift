@@ -87,7 +87,8 @@ private extension RecentlyClosedWindow {
     }
 }
 
-private final class WindowManagerMock: WindowManagerProtocol {
+@objc(WindowManagerMock)
+private final class WindowManagerMock: NSObject, WindowManagerProtocol {
 
     var pinnedTabsManager = PinnedTabsManager(tabCollection: .init())
 
@@ -96,4 +97,85 @@ private final class WindowManagerMock: WindowManagerProtocol {
 
     func register(_ windowController: MainWindowController) {}
     func unregister(_ windowController: MainWindowController) {}
+
+    var windows: [NSWindow] = []
+
+    var lastKeyMainWindowController: DuckDuckGo_Privacy_Browser.MainWindowController?
+
+    var mainWindowControllers: [DuckDuckGo_Privacy_Browser.MainWindowController] = []
+
+    var mainWindowControllersPublisher: AnyPublisher<[DuckDuckGo_Privacy_Browser.MainWindowController], Never> {
+        fatalError()
+    }
+
+    var didChangeKeyWindowController: AnyPublisher<Void, Never> {
+        fatalError()
+    }
+
+    func openPopUpWindow(with tab: DuckDuckGo_Privacy_Browser.Tab, isBurner: Bool, contentSize: NSSize?) {
+        fatalError()
+    }
+
+    func beginSheetFromMainWindow(_ viewController: NSViewController) {
+        fatalError()
+    }
+
+    func showTab(with content: DuckDuckGo_Privacy_Browser.Tab.TabContent) {
+        fatalError()
+    }
+
+    func showBookmarksTab() {
+        fatalError()
+    }
+
+    func open(bookmark: DuckDuckGo_Privacy_Browser.Bookmark) {
+        fatalError()
+    }
+
+    var isInInitialState: Bool = false
+
+    var isInInitialStatePublisher: AnyPublisher<Bool, Never> {
+        Just(false).eraseToAnyPublisher()
+    }
+
+    func updateIsInInitialState() {
+        fatalError()
+    }
+
+    func openNewWindow(isBurner: Bool, lazyLoadTabs: Bool) -> DuckDuckGo_Privacy_Browser.MainWindow? {
+        fatalError()
+    }
+
+    func openNewWindow(with initialUrl: URL, isBurner: Bool, parentTab: DuckDuckGo_Privacy_Browser.Tab?) {
+        fatalError()
+    }
+
+    func openNewWindow(with tab: DuckDuckGo_Privacy_Browser.Tab, isBurner: Bool, droppingPoint: NSPoint?, contentSize: NSSize?, showWindow: Bool, popUp: Bool) -> DuckDuckGo_Privacy_Browser.MainWindow? {
+        fatalError()
+    }
+
+    func openNewWindow(with tabCollectionViewModel: DuckDuckGo_Privacy_Browser.TabCollectionViewModel?, isBurner: Bool, droppingPoint: NSPoint?, contentSize: NSSize?, showWindow: Bool, popUp: Bool, lazyLoadTabs: Bool) -> DuckDuckGo_Privacy_Browser.MainWindow? {
+        fatalError()
+    }
+
+    func openNewWindow(with tabCollection: DuckDuckGo_Privacy_Browser.TabCollection, isBurner: Bool, droppingPoint: NSPoint?, contentSize: NSSize?, popUp: Bool) {
+        fatalError()
+    }
+
+    func showPreferencesTab(withSelectedPane pane: DuckDuckGo_Privacy_Browser.PreferencePaneIdentifier?) {
+        fatalError()
+    }
+
+    func show(url: URL?, newTab: Bool) {
+        fatalError()
+    }
+
+    func closeWindows(except window: NSWindow?) {
+        fatalError()
+    }
+
+    func showNetworkProtectionStatus(retry: Bool) async {
+        fatalError()
+    }
+
 }

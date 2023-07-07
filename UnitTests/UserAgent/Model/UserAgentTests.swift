@@ -89,3 +89,11 @@ final class UserAgentTests: XCTestCase {
     }
 
 }
+
+extension UserAgent {
+
+    static func `for`(_ url: URL?) -> String {
+        self.for(url, privacyConfig: MockPrivacyConfiguration())
+    }
+
+}

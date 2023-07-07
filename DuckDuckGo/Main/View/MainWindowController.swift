@@ -274,8 +274,8 @@ extension MainWindowController: NSWindowDelegate {
 
         // Unregistering triggers deinitialization of this object.
         // Because it's also the delegate, deinit within this method caused crash
-        DispatchQueue.main.async {
-            self.windowManager.unregister(self)
+        DispatchQueue.main.async { [weak windowManager] in
+            windowManager?.unregister(self)
         }
     }
 

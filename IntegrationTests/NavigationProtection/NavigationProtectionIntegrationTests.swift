@@ -37,6 +37,11 @@ class NavigationProtectionIntegrationTests: XCTestCase {
     }
 
     @MainActor
+    var windowManager: WindowManager {
+        NSApp.delegateTyped.windowManager as! WindowManager
+    }
+
+    @MainActor
     override func setUp() async throws {
 
     }
@@ -62,8 +67,11 @@ class NavigationProtectionIntegrationTests: XCTestCase {
                 TestsClosureNavigationResponderTabExtension(.init(didCancel: { onDidCancel?($0, $1) }, willStart: { onWillStart?($0) }))
             }
         }}
-        let tab = Tab(content: .none, extensionsBuilder: extensionsBuilder)
-        window = WindowsManager.openNewWindow(with: tab)!
+
+        let tab = Tab(dependencyProvider: Tab.DependencyStorage(windowManager.nestedDependencies).mutating {
+            $0.tabExtensionsBuilder = extensionsBuilder
+        }, content: .none)
+        window = windowManager.openNewWindow(with: tab)!
 
         let url = URL(string: "https://privacy-test-pages.glitch.me/privacy-protections/amp/")!
         _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
@@ -145,8 +153,10 @@ class NavigationProtectionIntegrationTests: XCTestCase {
                 }))
             }
         }}
-        let tab = Tab(content: .none, extensionsBuilder: extensionsBuilder)
-        window = WindowsManager.openNewWindow(with: tab)!
+        let tab = Tab(dependencyProvider: Tab.DependencyStorage(windowManager.nestedDependencies).mutating {
+            $0.tabExtensionsBuilder = extensionsBuilder
+        }, content: .none)
+        window = windowManager.openNewWindow(with: tab)!
 
         let url = URL(string: "https://privacy-test-pages.glitch.me/privacy-protections/referrer-trimming/")!
         _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
@@ -166,7 +176,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         var persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
         // download task promise
-        let downloadTaskPromise = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
+        let downloadTaskPromise = NSApp.delegateTyped.downloadManager.downloadsPublisher.timeout(5).first().promise()
         for i in 0...4 {
             do {
                 _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
@@ -197,8 +207,8 @@ class NavigationProtectionIntegrationTests: XCTestCase {
 
     @MainActor
     func testGPC() async throws {
-        let tab = Tab(content: .none)
-        window = WindowsManager.openNewWindow(with: tab)!
+        let tab = Tab(dependencyProvider: windowManager.nestedDependencies, content: .none)
+        window = windowManager.openNewWindow(with: tab)!
         let tabViewModel = (window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
 
         let url = URL(string: "https://privacy-test-pages.glitch.me/privacy-protections/gpc/")!
@@ -253,7 +263,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         for _ in 0..<5 {
             var persistor = DownloadsPreferencesUserDefaultsPersistor()
             persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
-            let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
+            let downloadTaskFuture = NSApp.delegateTyped.downloadManager.downloadsPublisher.timeout(5).first().promise()
             _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")
 
             let fileUrl = try await downloadTaskFuture.value.output

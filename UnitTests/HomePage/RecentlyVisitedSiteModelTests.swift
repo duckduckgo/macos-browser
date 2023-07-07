@@ -22,7 +22,7 @@ import XCTest
 class RecentlyVisitedSiteModelTests: XCTestCase {
 
     private func RecentlyVisitedSiteModel(originalURL: URL, duckPlayer: DuckPlayerMode = .disabled) -> HomePage.Models.RecentlyVisitedSiteModel? {
-        HomePage.Models.RecentlyVisitedSiteModel(originalURL: originalURL, bookmarkManager: LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(), faviconManagement: FaviconManagerMock()), fireproofDomains: FireproofDomains(store: FireproofDomainsStoreMock()), duckPlayer: .mock(withMode: duckPlayer))
+        HomePage.Models.RecentlyVisitedSiteModel(originalURL: originalURL, fireproofDomains: FireproofDomains(store: FireproofDomainsStoreMock()), dependencyProvider: dependencies(for: HomePage.Models.RecentlyVisitedSiteModel.self))
     }
 
     func testWhenOriginalURLIsHTTPS_ThenModelURLIsHTTPS() {

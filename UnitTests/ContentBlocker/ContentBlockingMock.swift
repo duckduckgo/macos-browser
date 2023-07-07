@@ -23,7 +23,10 @@ import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 @objc(ContentBlockingMock)
-final class ContentBlockingMock: NSObject, ContentBlockingProtocol, AdClickAttributionDependencies {
+final class ContentBlockingMock: NSObject, ContentBlockingProtocol {
+    var userContentUpdating: DuckDuckGo_Privacy_Browser.UserContentUpdating {
+        fatalError()
+    }
 
     struct EDP: EmbeddedDataProvider {
         var embeddedDataEtag: String = ""

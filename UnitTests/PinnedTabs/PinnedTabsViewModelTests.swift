@@ -19,10 +19,10 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-extension Tab {
+private extension Tab {
     @MainActor
     convenience init(content: TabContent, parentTab: Tab? = nil) {
-        self.init(content: content, parentTab: parentTab, shouldLoadInBackground: false)
+        self.init(dependencyProvider: TestDependencyProvider.for(Tab.self), content: content, parentTab: parentTab, shouldLoadInBackground: false)
     }
 }
 

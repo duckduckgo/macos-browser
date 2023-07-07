@@ -23,6 +23,22 @@ import BrowserServicesKit
 
 final class PasswordManagerCoordinatingMock: PasswordManagerCoordinating {
 
+    var bitwardenManagement: DuckDuckGo_Privacy_Browser.BWManagement {
+        fatalError()
+    }
+
+    var username: String?
+
+    var activeVaultEmail: String?
+
+    func openPasswordManager() {
+        fatalError()
+    }
+
+    func storeWebsiteCredentials(_ credentials: BrowserServicesKit.SecureVaultModels.WebsiteCredentials, completion: @escaping (Error?) -> Void) {
+        fatalError()
+    }
+
     var isEnabled: Bool = false
     var isLocked: Bool = false
 

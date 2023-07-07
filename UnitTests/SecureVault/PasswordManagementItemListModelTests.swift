@@ -152,8 +152,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
 extension PasswordManagementItemListModel {
 
     convenience init(onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void) {
-        self.init(passwordManagerCoordinator: PasswordManagerCoordinatingMock(),
-                  onItemSelected: onItemSelected)
+        self.init(dependencyProvider: TestDependencyProvider.for(PasswordManagementItemListModel.self), onItemSelected: onItemSelected)
     }
 
 }

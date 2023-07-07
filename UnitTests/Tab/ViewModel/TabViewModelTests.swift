@@ -184,7 +184,15 @@ final class TabViewModelTests: XCTestCase {
 
 }
 
-extension TabViewModel {
+private extension Tab {
+    @MainActor
+    @nonobjc
+    convenience init(content: Tab.TabContent = .homePage) {
+        self.init(dependencyProvider: TestDependencyProvider.for(Tab.self), content: content)
+    }
+}
+
+private extension TabViewModel {
 
     @MainActor
     static var aTabViewModel: TabViewModel {
@@ -194,7 +202,7 @@ extension TabViewModel {
 
     @MainActor
     static func forTabWithURL(_ url: URL) -> TabViewModel {
-        let tab = Tab(content: .url(url))
+        let tab = Tab(dependencyProvider: TestDependencyProvider.for(Tab.self), content: .url(url))
         return TabViewModel(tab: tab)
     }
 

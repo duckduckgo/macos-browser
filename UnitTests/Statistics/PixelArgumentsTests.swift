@@ -30,7 +30,7 @@ class PixelArgumentsTests: XCTestCase {
     override func setUp() {
         bookmarkStore = BookmarkStoreMock()
         bookmarkStore.bookmarks = []
-        bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
+        bookmarkManager = LocalBookmarkManager(dependencyProvider: dependencies(for: LocalBookmarkManager.self))
         bookmarkManager.loadBookmarks()
         UserDefaultsWrapper<Any>.clearAll()
         fireproofDomains = FireproofDomains(store: FireproofDomainsStoreMock())

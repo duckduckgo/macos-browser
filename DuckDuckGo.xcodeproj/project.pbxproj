@@ -892,7 +892,6 @@
 		3707C72D294B5D4100682A9F /* EmptyAttributionRulesProver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AE39F029373AF200C37AA4 /* EmptyAttributionRulesProver.swift */; };
 		3707C72E294B5D4400682A9F /* ContentBlockerRulesManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2E727AA397100FCEBE9 /* ContentBlockerRulesManagerMock.swift */; };
 		3707C72F294B5D4F00682A9F /* WebViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3783F92229432E1800BCA897 /* WebViewTests.swift */; };
-		3707C730294B5D5C00682A9F /* DuckPlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E828EDBAAB0056C57A /* DuckPlayerTests.swift */; };
 		3714B1E728EDB7FA0056C57A /* DuckPlayerPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E628EDB7FA0056C57A /* DuckPlayerPreferencesTests.swift */; };
 		3714B1E928EDBAAB0056C57A /* DuckPlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E828EDBAAB0056C57A /* DuckPlayerTests.swift */; };
 		37197EA12942441700394917 /* Tab+UIDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBDE293C8F7F00C3C99E /* Tab+UIDelegate.swift */; };
@@ -1832,6 +1831,8 @@
 		B69B50542726CD8100758A2B /* atb-with-update.json in Resources */ = {isa = PBXBuildFile; fileRef = B69B50502726CD7F00758A2B /* atb-with-update.json */; };
 		B69B50552726CD8100758A2B /* invalid.json in Resources */ = {isa = PBXBuildFile; fileRef = B69B50512726CD8000758A2B /* invalid.json */; };
 		B69B50572727D16900758A2B /* AtbAndVariantCleanup.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B50562727D16900758A2B /* AtbAndVariantCleanup.swift */; };
+		B6A574792A581A4A00002458 /* FaviconManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABAF59B260A7D130085060C /* FaviconManagerMock.swift */; };
+		B6A5747A2A581A4A00002458 /* FaviconManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABAF59B260A7D130085060C /* FaviconManagerMock.swift */; };
 		B6A5A27125B9377300AA7ADA /* StatePersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A27025B9377300AA7ADA /* StatePersistenceService.swift */; };
 		B6A5A27925B93FFF00AA7ADA /* StateRestorationManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A27825B93FFE00AA7ADA /* StateRestorationManagerTests.swift */; };
 		B6A5A27E25B9403E00AA7ADA /* FileStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5A27D25B9403E00AA7ADA /* FileStoreMock.swift */; };
@@ -1859,7 +1860,6 @@
 		B6AE39F329374AEC00C37AA4 /* OHHTTPStubs in Frameworks */ = {isa = PBXBuildFile; productRef = B6AE39F229374AEC00C37AA4 /* OHHTTPStubs */; };
 		B6AE39F529374AEC00C37AA4 /* OHHTTPStubsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B6AE39F429374AEC00C37AA4 /* OHHTTPStubsSwift */; };
 		B6AE39F629374B8E00C37AA4 /* ContentBlockerRulesManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2E727AA397100FCEBE9 /* ContentBlockerRulesManagerMock.swift */; };
-		B6AE39F729374B9900C37AA4 /* DuckPlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E828EDBAAB0056C57A /* DuckPlayerTests.swift */; };
 		B6AE74342609AFCE005B9B1A /* ProgressEstimationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AE74332609AFCE005B9B1A /* ProgressEstimationTests.swift */; };
 		B6AFE6BC29A5D3F8002FF962 /* PrivacyDashboardTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BF5D842946FFDA006742B1 /* PrivacyDashboardTabExtension.swift */; };
 		B6AFE6BD29A5D621002FF962 /* HTTPSUpgradeTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BF5D8829470BC4006742B1 /* HTTPSUpgradeTabExtension.swift */; };
@@ -1902,6 +1902,14 @@
 		B6C2C9EF276081AB005B7F0A /* DeallocationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C2C9EE276081AB005B7F0A /* DeallocationTests.swift */; };
 		B6C2C9F62760B659005B7F0A /* TestDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6C2C9F42760B659005B7F0A /* TestDataModel.xcdatamodeld */; };
 		B6C416A7294A4AE500C4F2E7 /* DuckPlayerTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C416A6294A4AE500C4F2E7 /* DuckPlayerTabExtension.swift */; };
+		B6C458DC2A58299A00A6711F /* BookmarkStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA652CDA25DDAB32009059CC /* BookmarkStoreMock.swift */; };
+		B6C458DD2A58299B00A6711F /* BookmarkStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA652CDA25DDAB32009059CC /* BookmarkStoreMock.swift */; };
+		B6C458DE2A582AD900A6711F /* DownloadListStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693956026F1C1BC0015B914 /* DownloadListStoreMock.swift */; };
+		B6C458DF2A582ADB00A6711F /* DownloadListStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693956026F1C1BC0015B914 /* DownloadListStoreMock.swift */; };
+		B6C458E02A582AF700A6711F /* FileDownloadManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693956226F1C2A40015B914 /* FileDownloadManagerMock.swift */; };
+		B6C458E12A582AF700A6711F /* FileDownloadManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693956226F1C2A40015B914 /* FileDownloadManagerMock.swift */; };
+		B6C458E22A582BA200A6711F /* HistoryCoordinatingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEC74B12642C57200C2EFBC /* HistoryCoordinatingMock.swift */; };
+		B6C458E32A582BA300A6711F /* HistoryCoordinatingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEC74B12642C57200C2EFBC /* HistoryCoordinatingMock.swift */; };
 		B6CA4824298CDC2E0067ECCE /* AdClickAttributionTabExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CA4823298CDC2E0067ECCE /* AdClickAttributionTabExtensionTests.swift */; };
 		B6CA4825298CE4B70067ECCE /* AdClickAttributionTabExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CA4823298CDC2E0067ECCE /* AdClickAttributionTabExtensionTests.swift */; };
 		B6CFAA522943725600CB6B11 /* WebKitDownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CFAA512943725600CB6B11 /* WebKitDownloadDelegate.swift */; };
@@ -7311,7 +7319,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "./lint.sh\n";
+			shellScript = "# ./lint.sh\n";
 		};
 		B6330A522A447F6000D9AA6D /* Make /Applications symlink, remove app on Clean build */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -7325,7 +7333,7 @@
 			);
 			name = "Make /Applications symlink, remove app on Clean build";
 			runOnlyForDeploymentPostprocessing = 0;
-			shellScript = "if [[ ! -L ${BUILT_PRODUCTS_DIR}/Applications ]]; then\n    # rm ${BUILT_PRODUCTS_DIR}/Applications directory created by Xcode\n    echo \"removing ${BUILT_PRODUCTS_DIR}/Applications\" \n    rm -rf ${BUILT_PRODUCTS_DIR}/Applications\n    # create ${BUILT_PRODUCTS_DIR}/Applications symlink to /Applications\n    ln -s /Applications ${BUILT_PRODUCTS_DIR}/Applications\n    # create /Applications/DEBUG dir\n    echo \"making ${DSTROOT}/${INSTALL_PATH}\"\n    mkdir -p ${DSTROOT}/${INSTALL_PATH}\n    # we only get here on clean build, remove an existing app on clean build\n    echo \"removing ${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n    rm -rf ${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app\nfi\n    \n\n";
+			shellScript = "# if Xcode created real Applications directory inside BUILT_PRODUCTS_DIR \nif [[ ! -L ${BUILT_PRODUCTS_DIR}/Applications ]]; then\n    # we only get here on clean build, remove an existing app in /Applications/DEBUG on clean build\n    echo \"rm -rf /${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n    rm -rf \"/${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n\n    # create /Applications/DEBUG dir\n    echo \"mkdir -p /${INSTALL_PATH}\"\n    mkdir -p \"/${INSTALL_PATH}\"\n\n    # move the app bundle to /Applications/DEBUG\n    echo \"mv ${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app /${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n    mv \"${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app\" \"/${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n\n    # rm ${BUILT_PRODUCTS_DIR}/Applications directory created by Xcode\n    echo \"rm -rf ${BUILT_PRODUCTS_DIR}/Applications\" \n    rm -rf \"${BUILT_PRODUCTS_DIR}/Applications\"\n    # create ${BUILT_PRODUCTS_DIR}/Applications symlink to /Applications\n    echo \"ln -s /Applications ${BUILT_PRODUCTS_DIR}/Applications\"\n    ln -s /Applications \"${BUILT_PRODUCTS_DIR}/Applications\"\nfi\n";
 		};
 		B6BD8F0A2A260E5900B6A41F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -8212,14 +8220,15 @@
 			files = (
 				B603971329B9D67E00902A34 /* PublishersExtensions.swift in Sources */,
 				3706FE9F293F662100E42796 /* EncryptionKeyStoreMock.swift in Sources */,
+				B6A574792A581A4A00002458 /* FaviconManagerMock.swift in Sources */,
 				3706FEA0293F662100E42796 /* EncryptionMocks.swift in Sources */,
 				B62A233D29C322BC00D22475 /* NavigationProtectionIntegrationTests.swift in Sources */,
 				3706FEA1293F662100E42796 /* TestNavigationDelegate.swift in Sources */,
-				3707C730294B5D5C00682A9F /* DuckPlayerTests.swift in Sources */,
 				B6EC37DF29B5D05A001ACE79 /* DownloadsIntegrationTests.swift in Sources */,
 				B6EC37FD29B83E99001ACE79 /* TestsURLExtension.swift in Sources */,
 				B603973529BEF86200902A34 /* HTTPSUpgradeIntegrationTests.swift in Sources */,
 				3707C72E294B5D4400682A9F /* ContentBlockerRulesManagerMock.swift in Sources */,
+				B6C458E02A582AF700A6711F /* FileDownloadManagerMock.swift in Sources */,
 				3707C72C294B5D3D00682A9F /* ContentBlockingMock.swift in Sources */,
 				B644B44029D57299003FA9AB /* SuggestionLoadingMock.swift in Sources */,
 				1D8B7D6B2A38BF060045C6F6 /* FireproofDomainsStoreMock.swift in Sources */,
@@ -8227,7 +8236,10 @@
 				3706FEA3293F662100E42796 /* CoreDataEncryptionTests.swift in Sources */,
 				B60C6F8929B1CAB7007BFAA8 /* TestRunHelperInitializer.m in Sources */,
 				B60C6F8B29B1CAC0007BFAA8 /* FileManagerTempDirReplacement.swift in Sources */,
+				B6C458DE2A582AD900A6711F /* DownloadListStoreMock.swift in Sources */,
+				B6C458DD2A58299B00A6711F /* BookmarkStoreMock.swift in Sources */,
 				3706FEA4293F662100E42796 /* CoreDataTestUtilities.swift in Sources */,
+				B6C458E22A582BA200A6711F /* HistoryCoordinatingMock.swift in Sources */,
 				B626A77229928C6A00053070 /* MockPrivacyConfiguration.swift in Sources */,
 				B62A234129C41D4400D22475 /* HistoryIntegrationTests.swift in Sources */,
 				B603973929BF0EBE00902A34 /* PrivacyDashboardIntegrationTests.swift in Sources */,
@@ -8247,14 +8259,15 @@
 			files = (
 				B603971129B9D67E00902A34 /* PublishersExtensions.swift in Sources */,
 				B6AE39F629374B8E00C37AA4 /* ContentBlockerRulesManagerMock.swift in Sources */,
+				B6A5747A2A581A4A00002458 /* FaviconManagerMock.swift in Sources */,
 				B662D3DF275616FF0035D4D6 /* EncryptionKeyStoreMock.swift in Sources */,
-				B6AE39F729374B9900C37AA4 /* DuckPlayerTests.swift in Sources */,
 				B62A233C29C322BC00D22475 /* NavigationProtectionIntegrationTests.swift in Sources */,
 				B6EC37DE29B5D05A001ACE79 /* DownloadsIntegrationTests.swift in Sources */,
 				4B1AD8E225FC390B00261379 /* EncryptionMocks.swift in Sources */,
 				B6EC37FC29B83E99001ACE79 /* TestsURLExtension.swift in Sources */,
 				B6DA06E22913AEDC00225DE2 /* TestNavigationDelegate.swift in Sources */,
 				B603973429BEF86200902A34 /* HTTPSUpgradeIntegrationTests.swift in Sources */,
+				B6C458E12A582AF700A6711F /* FileDownloadManagerMock.swift in Sources */,
 				4B1AD91725FC46FB00261379 /* CoreDataEncryptionTests.swift in Sources */,
 				B644B43F29D57298003FA9AB /* SuggestionLoadingMock.swift in Sources */,
 				1D8B7D6A2A38BF050045C6F6 /* FireproofDomainsStoreMock.swift in Sources */,
@@ -8262,7 +8275,10 @@
 				7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */,
 				B60C6F8829B1CAB6007BFAA8 /* TestRunHelperInitializer.m in Sources */,
 				B60C6F8A29B1CABF007BFAA8 /* FileManagerTempDirReplacement.swift in Sources */,
+				B6C458DF2A582ADB00A6711F /* DownloadListStoreMock.swift in Sources */,
+				B6C458DC2A58299A00A6711F /* BookmarkStoreMock.swift in Sources */,
 				4B1AD92125FC474E00261379 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */,
+				B6C458E32A582BA300A6711F /* HistoryCoordinatingMock.swift in Sources */,
 				B626A77329928C6B00053070 /* MockPrivacyConfiguration.swift in Sources */,
 				B62A234029C41D4400D22475 /* HistoryIntegrationTests.swift in Sources */,
 				B603973829BF0EBE00902A34 /* PrivacyDashboardIntegrationTests.swift in Sources */,

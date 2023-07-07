@@ -25,16 +25,17 @@ import Configuration
 
 final class UserContentUpdating {
 
+    private struct UserScriptsDependencies: UserScripts.Dependencies {
+        let sourceProvider: ScriptSourceProviding
+        let duckPlayer: DuckPlayer
+    }
+
     struct NewContent: UserContentControllerNewContent {
         let duckPlayer: () -> DuckPlayer
 
         let rulesUpdate: ContentBlockerRulesManager.UpdateEvent
         let sourceProvider: ScriptSourceProviding
 
-        struct UserScriptsDependencies: UserScripts.Dependencies {
-            let sourceProvider: ScriptSourceProviding
-            let duckPlayer: DuckPlayer
-        }
 
         var makeUserScripts: @MainActor (ScriptSourceProviding) -> UserScripts {
             { sourceProvider in

@@ -33,7 +33,7 @@ class HistoryTabExtensionTests: XCTestCase {
         let trackersPublisher: AnyPublisher<DetectedTracker, Never> = Empty().eraseToAnyPublisher()
         let urlPublisher: AnyPublisher<URL?, Never> = Empty().eraseToAnyPublisher()
         let titlePublisher: AnyPublisher<String?, Never> = Empty().eraseToAnyPublisher()
-        let historyTabExtension = HistoryTabExtension(isBurner: true, historyCoordinating: historyCoordinatingMock, trackersPublisher: trackersPublisher, urlPublisher: urlPublisher, titlePublisher: titlePublisher)
+        let historyTabExtension = HistoryTabExtension(isBurner: true, trackersPublisher: trackersPublisher, urlPublisher: urlPublisher, titlePublisher: titlePublisher, dependencyProvider: dependencies(for: HistoryTabExtension.self))
 
         let navigationIdentity = NavigationIdentity(nil)
         let responderChain = ResponderChain(responderRefs: [])

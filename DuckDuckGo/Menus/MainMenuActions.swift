@@ -109,7 +109,7 @@ extension AppDelegate {
     // MARK: - Window
 
     @IBAction func reopenAllWindowsFromLastSession(_ sender: Any?) {
-        stateRestorationManager.restoreLastSessionState(interactive: true)
+        stateRestorationManager?.restoreLastSessionState(interactive: true)
     }
 
     // MARK: - Help
@@ -937,7 +937,7 @@ extension AppDelegate: NSMenuItemValidation {
 
         // Reopen All Windows from Last Session
         case #selector(AppDelegate.reopenAllWindowsFromLastSession(_:)):
-            return stateRestorationManager.canRestoreLastSessionState
+            return stateRestorationManager?.canRestoreLastSessionState ?? false
 
         // Enables and disables export bookmarks itemz
         case #selector(AppDelegate.openExportBookmarks(_:)):

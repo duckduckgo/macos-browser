@@ -21,6 +21,7 @@ import Cocoa
 import Combine
 import Common
 import DependencyInjection
+import DDGSync
 
 protocol BookmarkManager: AnyObject {
 
@@ -71,6 +72,8 @@ final class LocalBookmarkManager: BookmarkManager, Injectable {
     var bookmarkStore: BookmarkStore
     @Injected
     var faviconManagement: FaviconManagement
+    @Injected
+    var syncService: () -> DDGSyncing?
 
     typealias InjectedDependencies = Bookmark.Dependencies
 
@@ -349,8 +352,9 @@ final class LocalBookmarkManager: BookmarkManager, Injectable {
     }
 
     func requestSync() {
-        Task { @MainActor in
-            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService, syncService.authState == .active else {
+        Task { @MainActor [syncService] in
+            guard let syncService = syncService(),
+                  syncService.authState == .active else {
                 os_log(.debug, log: OSLog.sync, "Sync disabled, not scheduling")
                 return
             }

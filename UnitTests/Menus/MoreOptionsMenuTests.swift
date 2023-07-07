@@ -28,7 +28,6 @@ import NetworkProtection
 final class MoreOptionsMenuTests: XCTestCase {
 
     var tabCollectionViewModel: TabCollectionViewModel!
-    var passwordManagerCoordinator: PasswordManagerCoordinator!
     var capturingActionDelegate: CapturingOptionsButtonMenuDelegate!
     var moreOptionMenu: MoreOptionsMenu!
     var internalUserDecider: InternalUserDeciderMock!
@@ -39,8 +38,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        tabCollectionViewModel = TabCollectionViewModel()
-        passwordManagerCoordinator = PasswordManagerCoordinator()
+        tabCollectionViewModel = TabCollectionViewModel(dependencyProvider: dependencies(for: TabCollectionViewModel.self))
         capturingActionDelegate = CapturingOptionsButtonMenuDelegate()
         internalUserDecider = InternalUserDeciderMock()
 
@@ -48,13 +46,11 @@ final class MoreOptionsMenuTests: XCTestCase {
         networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(activated: false)
 
         moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
-                                         passwordManagerCoordinator: passwordManagerCoordinator,
                                          networkProtectionFeatureVisibility: networkProtectionVisibilityMock,
-                                         internalUserDecider: internalUserDecider)
+                                         dependencyProvider: dependencies(for: MoreOptionsMenu.self))
 #else
         moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
-                                         passwordManagerCoordinator: passwordManagerCoordinator,
-                                         internalUserDecider: internalUserDecider)
+                                         dependencyProvider: dependencies(for: MoreOptionsMenu.self))
 #endif
 
         moreOptionMenu.actionDelegate = capturingActionDelegate
@@ -62,7 +58,6 @@ final class MoreOptionsMenuTests: XCTestCase {
 
     override func tearDown() {
         tabCollectionViewModel = nil
-        passwordManagerCoordinator = nil
         capturingActionDelegate = nil
         moreOptionMenu = nil
         super.tearDown()
@@ -71,13 +66,11 @@ final class MoreOptionsMenuTests: XCTestCase {
     func testThatMoreOptionMenuHasTheExpectedItems_WhenNetworkProtectionIsEnabled() {
 #if NETWORK_PROTECTION
         let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
-                                             passwordManagerCoordinator: passwordManagerCoordinator,
                                              networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(activated: true),
-                                             internalUserDecider: internalUserDecider)
+                                             dependencyProvider: dependencies(for: MoreOptionsMenu.self))
 #else
         let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
-                                             passwordManagerCoordinator: passwordManagerCoordinator,
-                                             internalUserDecider: internalUserDecider)
+                                             dependencyProvider: dependencies(for: MoreOptionsMenu.self))
 #endif
 
         XCTAssertEqual(moreOptionMenu.items[0].title, "Send Feedback")
@@ -106,13 +99,11 @@ final class MoreOptionsMenuTests: XCTestCase {
     func testThatMoreOptionMenuHasTheExpectedItems_WhenNetworkProtectionIsDisabled() {
 #if NETWORK_PROTECTION
         let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
-                                             passwordManagerCoordinator: passwordManagerCoordinator,
                                              networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(activated: false),
-                                             internalUserDecider: internalUserDecider)
+                                             dependencyProvider: dependencies(for: MoreOptionsMenu.self))
 #else
         let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
-                                             passwordManagerCoordinator: passwordManagerCoordinator,
-                                             internalUserDecider: internalUserDecider)
+                                             dependencyProvider: dependencies(for: MoreOptionsMenu.self))
 #endif
 
         XCTAssertEqual(moreOptionMenu.items[0].title, "Send Feedback")

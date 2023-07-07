@@ -30,7 +30,7 @@ struct PreferencesSection: Hashable, Identifiable {
             if includingDuckPlayer {
                 panes.append(.duckPlayer)
             }
-            if (NSApp.delegate as? AppDelegate)!.internalUserDecider.isInternalUser {
+            if NSApp.delegateTyped.internalUserDecider.isInternalUser {
                 panes.insert(.sync, at: 1)
             }
             return panes

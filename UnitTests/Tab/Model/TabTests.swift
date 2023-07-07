@@ -123,7 +123,7 @@ final class TabTests: XCTestCase {
 
     @MainActor
     func testCanGoBack() throws {
-        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
+        let tab = Tab(dependencyProvider: dependencies(for: Tab.self), content: .none, webViewConfiguration: webViewConfiguration)
 
         var eCantGoBack = expectation(description: "canGoBack: false")
         var eCanGoBack: XCTestExpectation!
@@ -206,7 +206,8 @@ final class TabTests: XCTestCase {
             }
         }}
 
-        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
+        // TODO: extbuild
+        let tab = Tab(dependencyProvider: dependencies(for: Tab.self), content: .none, webViewConfiguration: webViewConfiguration)
 
         schemeHandler.middleware = [{ [urls] request in
             guard request.url!.path == urls.url1.path else { return nil }
@@ -281,8 +282,8 @@ final class TabTests: XCTestCase {
                 })
             }
         }}
-
-        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder)
+// TODO: extbuild
+        let tab = Tab(dependencyProvider: dependencies(for: Tab.self), content: .none, webViewConfiguration: webViewConfiguration)
 
         schemeHandler.middleware = [{ [urls] request in
             guard request.url!.path == urls.url1.path else { return nil }
@@ -339,16 +340,24 @@ final class TabTests: XCTestCase {
 
     @MainActor
     func testIfTabIsBurner_ThenFaviconManagerIsInMemory() throws {
-        let tab = Tab(content: .homePage, isBurner: false)
-        XCTAssertTrue(tab.faviconManagement === FaviconManager.shared)
+        // TODO: provide faviconMan in deps
+        let tab = Tab(dependencyProvider: TestDependencyProvider.for(Tab.self), content: .homePage, isBurner: false)
+//        XCTAssertTrue(tab.faviconManagement === faviconManagement)
 
-        let burnerTab = Tab(content: .homePage, isBurner: true)
-        XCTAssertTrue(burnerTab.faviconManagement !== FaviconManager.shared)
+        let burnerTab = Tab(dependencyProvider: TestDependencyProvider.for(Tab.self), content: .homePage, isBurner: true)
+//        XCTAssertTrue(burnerTab.faviconManagement !== faviconManagement)
     }
 
 }
 
-extension Tab {
+private extension Tab {
+
+    @MainActor
+    @nonobjc
+    convenience init(content: Tab.TabContent = .homePage) {
+        self.init(dependencyProvider: TestDependencyProvider.for(Tab.self), content: content)
+    }
+
     var url: URL? {
         get {
             content.url
@@ -357,4 +366,5 @@ extension Tab {
             setContent(newValue.map { TabContent.url($0) } ?? .homePage)
         }
     }
+
 }

@@ -99,6 +99,10 @@ final class Fire: Injectable {
     var faviconManagement: FaviconManagement
     @Injected
     var historyCoordinating: HistoryCoordinating
+    @Injected
+    var syncService: DDGSyncing?
+    @Injected
+    var stateRestorationManager: AppStateRestorationManager?
 
     typealias InjectedDependencies = Tab.Dependencies
 
@@ -112,8 +116,6 @@ final class Fire: Injectable {
     let webCacheManager: WebCacheManager
     let permissionManager: PermissionManagerProtocol
     let autoconsentManagement: AutoconsentManagement?
-    let stateRestorationManager: AppStateRestorationManager?
-    let syncService: DDGSyncing?
     let tabsCleaner = TabDataCleaner()
     let secureVaultFactory: SecureVaultFactory
 
@@ -128,8 +130,6 @@ final class Fire: Injectable {
     init(cacheManager: WebCacheManager = WebCacheManager.shared,
          permissionManager: PermissionManagerProtocol = PermissionManager.shared,
          autoconsentManagement: AutoconsentManagement? = nil,
-         stateRestorationManager: AppStateRestorationManager? = nil,
-         syncService: DDGSyncing? = nil,
          secureVaultFactory: SecureVaultFactory = SecureVaultFactory.default,
          dependencyProvider: DependencyProvider
     ) {
@@ -137,21 +137,12 @@ final class Fire: Injectable {
 
         self.webCacheManager = cacheManager
         self.permissionManager = permissionManager
-        self.syncService = syncService ?? (NSApp.delegate as? AppDelegate)?.syncService
         self.secureVaultFactory = secureVaultFactory
 
         if #available(macOS 11, *), autoconsentManagement == nil {
             self.autoconsentManagement = AutoconsentManagement.shared
         } else {
             self.autoconsentManagement = autoconsentManagement
-        }
-
-        if let stateRestorationManager = stateRestorationManager {
-            self.stateRestorationManager = stateRestorationManager
-        } else if let appDelegate = NSApp.delegate as? AppDelegate {
-            self.stateRestorationManager = appDelegate.stateRestorationManager
-        } else {
-            self.stateRestorationManager = nil
         }
     }
 

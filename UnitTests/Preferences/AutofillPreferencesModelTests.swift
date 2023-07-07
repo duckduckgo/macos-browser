@@ -18,6 +18,7 @@
 
 import XCTest
 import Combine
+import DependencyInjection
 @testable import DuckDuckGo_Privacy_Browser
 
 final class AutofillPreferencesPersistorMock: AutofillPreferencesPersistor {
@@ -38,13 +39,21 @@ final class UserAuthenticatorMock: UserAuthenticating {
     }
 }
 
+extension XCTestCase {
+
+    func dependencies<Owner: Injectable>(for ownerType: Owner.Type) -> Owner.DependencyStorage {
+        TestDependencyProvider.for(ownerType)
+    }
+
+}
+
 @MainActor
 final class AutofillPreferencesModelTests: XCTestCase {
 
     func testThatPreferencesArePersisted() throws {
         let persistor = AutofillPreferencesPersistorMock()
         let userAuthenticator = UserAuthenticatorMock()
-        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
+        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator, dependencyProvider: dependencies(for: AutofillPreferencesModel.self))
 
         model.askToSaveUsernamesAndPasswords.toggle()
         XCTAssertEqual(persistor.askToSaveUsernamesAndPasswords, model.askToSaveUsernamesAndPasswords)
@@ -59,7 +68,7 @@ final class AutofillPreferencesModelTests: XCTestCase {
     func testWhenUserIsAuthenticatedThenAutoLockCanBeDisabled() throws {
         let persistor = AutofillPreferencesPersistorMock()
         let userAuthenticator = UserAuthenticatorMock()
-        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
+        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator, dependencyProvider: dependencies(for: AutofillPreferencesModel.self))
 
         userAuthenticator._authenticateUser = { _ in return .success}
 
@@ -71,7 +80,7 @@ final class AutofillPreferencesModelTests: XCTestCase {
     func testWhenUserIsNotAuthenticatedThenAutoLockCannotBeDisabled() throws {
         let persistor = AutofillPreferencesPersistorMock()
         let userAuthenticator = UserAuthenticatorMock()
-        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
+        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator, dependencyProvider: dependencies(for: AutofillPreferencesModel.self))
 
         userAuthenticator._authenticateUser = { _ in return .failure}
 
@@ -83,7 +92,7 @@ final class AutofillPreferencesModelTests: XCTestCase {
     func testWhenUserIsAuthenticatedThenAutoLockThresholdCanBeChanged() throws {
         let persistor = AutofillPreferencesPersistorMock()
         let userAuthenticator = UserAuthenticatorMock()
-        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
+        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator, dependencyProvider: dependencies(for: AutofillPreferencesModel.self))
 
         userAuthenticator._authenticateUser = { _ in return .success}
 
@@ -96,7 +105,7 @@ final class AutofillPreferencesModelTests: XCTestCase {
     func testWhenUserIsNotAuthenticatedThenAutoLockThresholdCannotBeChanged() throws {
         let persistor = AutofillPreferencesPersistorMock()
         let userAuthenticator = UserAuthenticatorMock()
-        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator)
+        let model = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator, dependencyProvider: dependencies(for: AutofillPreferencesModel.self))
 
         userAuthenticator._authenticateUser = { _ in return .failure}
 

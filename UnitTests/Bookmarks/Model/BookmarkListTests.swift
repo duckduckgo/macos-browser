@@ -24,7 +24,7 @@ import XCTest
 final class BookmarkListTests: XCTestCase {
 
     func testWhenBookmarkIsInserted_ThenItIsPartOfTheList() {
-        var bookmarkList = BookmarkList()
+        var bookmarkList = BookmarkList(dependencyProvider: dependencies(for: Bookmark.self))
 
         let bookmark = Bookmark.aBookmark
         bookmarkList.insert(bookmark)
@@ -35,7 +35,7 @@ final class BookmarkListTests: XCTestCase {
     }
 
     func testWhenBookmarkIsAlreadyPartOfTheListInserted_ThenItCantBeInserted() {
-        var bookmarkList = BookmarkList()
+        var bookmarkList = BookmarkList(dependencyProvider: dependencies(for: Bookmark.self))
 
         let bookmark = Bookmark.aBookmark
         bookmarkList.insert(bookmark)
@@ -46,7 +46,7 @@ final class BookmarkListTests: XCTestCase {
     }
 
     func testWhenBookmarkIsRemoved_ThenItIsNoLongerInList() {
-        var bookmarkList = BookmarkList()
+        var bookmarkList = BookmarkList(dependencyProvider: dependencies(for: Bookmark.self))
 
         let bookmark = Bookmark.aBookmark
         bookmarkList.insert(bookmark)
@@ -58,7 +58,7 @@ final class BookmarkListTests: XCTestCase {
     }
 
     func testWhenBookmarkIsUpdatedInTheList_ThenListContainsChangedVersion() {
-        var bookmarkList = BookmarkList()
+        var bookmarkList = BookmarkList(dependencyProvider: dependencies(for: Bookmark.self))
 
         let bookmark = Bookmark.aBookmark
         bookmarkList.insert(bookmark)
@@ -71,7 +71,7 @@ final class BookmarkListTests: XCTestCase {
     }
 
     func testWhenUpdateIsCalledWithUnknownBookmark_ThenTheListRemainsUnchanged() {
-        var bookmarkList = BookmarkList()
+        var bookmarkList = BookmarkList(dependencyProvider: dependencies(for: Bookmark.self))
 
         let bookmark = Bookmark.aBookmark
         bookmarkList.insert(bookmark)
@@ -79,7 +79,7 @@ final class BookmarkListTests: XCTestCase {
         let unknownBookmark = Bookmark(id: UUID().uuidString,
                                        url: URL.duckDuckGoAutocomplete.absoluteString,
                                        title: "Unknown title",
-                                       isFavorite: true)
+                                       isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
 
         bookmarkList.update(with: unknownBookmark)
         let updateUrlResult = bookmarkList.updateUrl(of: unknownBookmark, to: URL.duckDuckGo.absoluteString)
@@ -94,12 +94,12 @@ final class BookmarkListTests: XCTestCase {
     }
 
     func testWhenBookmarkUrlIsUpdated_ThenJustTheBookmarkUrlIsUpdated() {
-        var bookmarkList = BookmarkList()
+        var bookmarkList = BookmarkList(dependencyProvider: dependencies(for: Bookmark.self))
 
         let bookmarks = [
-            Bookmark(id: UUID().uuidString, url: "wikipedia.org", title: "Title", isFavorite: true),
-            Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "Title", isFavorite: true),
-            Bookmark(id: UUID().uuidString, url: "apple.com", title: "Title", isFavorite: true)
+            Bookmark(id: UUID().uuidString, url: "wikipedia.org", title: "Title", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self)),
+            Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "Title", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self)),
+            Bookmark(id: UUID().uuidString, url: "apple.com", title: "Title", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
         ]
         bookmarks.forEach { bookmarkList.insert($0) }
         let bookmarkToReplace = bookmarks[2]
@@ -112,12 +112,12 @@ final class BookmarkListTests: XCTestCase {
     }
 
     func testWhenBookmarkUrlIsUpdatedToAlreadyBookmarkedUrl_ThenUpdatingMustFail() {
-        var bookmarkList = BookmarkList()
+        var bookmarkList = BookmarkList(dependencyProvider: dependencies(for: Bookmark.self))
 
         let firstUrl = URL(string: "wikipedia.org")!
         let bookmarks = [
-            Bookmark(id: UUID().uuidString, url: firstUrl.absoluteString, title: "Title", isFavorite: true),
-            Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "Title", isFavorite: true)
+            Bookmark(id: UUID().uuidString, url: firstUrl.absoluteString, title: "Title", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self)),
+            Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "Title", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
         ]
 
         bookmarks.forEach { bookmarkList.insert($0) }
@@ -139,7 +139,7 @@ fileprivate extension Bookmark {
                                               url: URL.duckDuckGo.absoluteString,
                                               title: "Title",
                                               isFavorite: false,
-                                              faviconManagement: FaviconManagerMock())
+                                              dependencyProvider: TestDependencyProvider.for(Bookmark.self))
 
     var identifiableBookmark: BookmarkList.IdentifiableBookmark {
         return BookmarkList.IdentifiableBookmark(from: self)

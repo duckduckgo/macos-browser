@@ -33,7 +33,11 @@ public struct MutableDependencyStorage<Owner: Injectable, Root> {
         nonmutating set {
             // update all the values with matching KeyPath name and type down the tree
             self.storagePtr.pointee[keyPath] = newValue
-            let nestedKeyPaths = Owner.collectKeyPaths(matchingDescription: Owner.description(forInjectedKeyPath: keyPath))
+            guard let keyPathDescription = Owner.description(forInjectedKeyPath: keyPath) else {
+                assertionFailure("\(keyPath) is not known to \(Owner.self)")
+                return
+            }
+            let nestedKeyPaths = Owner.collectKeyPaths(matchingDescription: keyPathDescription)
             for keyPath in nestedKeyPaths {
                 self.storagePtr.pointee[keyPath] = newValue
             }

@@ -30,7 +30,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
     func testWhenBookmarksAreNotLoadedYet_ThenManagerIgnoresBookmarkingRequests() {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
+        let bookmarkManager = LocalBookmarkManager(dependencyProvider: dependencies(for: LocalBookmarkManager.self))
 
         XCTAssertNil(bookmarkManager.makeBookmark(for: URL.duckDuckGo, title: "Test", isFavorite: false))
         XCTAssertNil(bookmarkManager.updateUrl(of: Bookmark.aBookmark, to: URL.duckDuckGoAutocomplete))
@@ -39,7 +39,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
     func testWhenBookmarksAreLoaded_ThenTheManagerHoldsAllLoadedBookmarks() {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
+        let bookmarkManager = LocalBookmarkManager(dependencyProvider: dependencies(for: LocalBookmarkManager.self))
 
         bookmarkStoreMock.bookmarks = [Bookmark.aBookmark]
         bookmarkManager.loadBookmarks()
@@ -53,7 +53,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
     func testWhenLoadFails_ThenTheManagerHoldsBookmarksAreNil() {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
+        let bookmarkManager = LocalBookmarkManager(dependencyProvider: dependencies(for: LocalBookmarkManager.self))
 
         bookmarkStoreMock.bookmarks = nil
         bookmarkStoreMock.loadError = BookmarkManagerError.somethingReallyBad
@@ -163,7 +163,7 @@ fileprivate extension LocalBookmarkManager {
     static var aManager: (LocalBookmarkManager, BookmarkStoreMock) {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()
-        let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
+        let bookmarkManager = LocalBookmarkManager(dependencyProvider: TestDependencyProvider.for(LocalBookmarkManager.self))
 
         bookmarkStoreMock.bookmarks = []
         bookmarkManager.loadBookmarks()
@@ -178,6 +178,7 @@ fileprivate extension Bookmark {
     static var aBookmark: Bookmark = Bookmark(id: UUID().uuidString,
                                               url: URL.duckDuckGo.absoluteString,
                                               title: "Title",
-                                              isFavorite: false)
+                                              isFavorite: false,
+                                              dependencyProvider: TestDependencyProvider.for(Bookmark.self))
 
 }

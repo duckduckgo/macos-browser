@@ -38,7 +38,8 @@ final class ContentBlockingUpdatingTests: XCTestCase {
                                                                                                                                               errorReporting: nil),
                                        configStorage: MockConfigurationStore(),
                                        privacySecurityPreferences: preferences,
-                                       tld: TLD())
+                                       tld: TLD(),
+                                       duckPlayer: { fatalError() })
     }
 
     override static func setUp() {

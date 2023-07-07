@@ -41,7 +41,7 @@ class BookmarkTests: XCTestCase {
                                                                 url: "https://example.com/",
                                                                 parent: rootFolder,
                                                                 context: context)
-        guard let bookmark = BaseBookmarkEntity.from(managedObject: bookmarkManagedObject) as? Bookmark else {
+        guard let bookmark = BaseBookmarkEntity.from(managedObject: bookmarkManagedObject, dependencyProvider: dependencies(for: Bookmark.self)) as? Bookmark else {
             XCTFail("Failed to create Bookmark from managed object")
             return
         }
@@ -53,7 +53,7 @@ class BookmarkTests: XCTestCase {
     func testWhenInitializingBaseBookmarkEntityFromBookmarkManagedObject_AndBookmarkIsFolder_ThenFolderIsCreated() {
         let folderManagedObject = BookmarkEntity.makeFolder(title: "Folder", parent: rootFolder, context: context)
 
-        guard let folder = BaseBookmarkEntity.from(managedObject: folderManagedObject) as? BookmarkFolder else {
+        guard let folder = BaseBookmarkEntity.from(managedObject: folderManagedObject, dependencyProvider: dependencies(for: Bookmark.self)) as? BookmarkFolder else {
             XCTFail("Failed to create Folder from managed object")
             return
         }
@@ -72,7 +72,7 @@ class BookmarkTests: XCTestCase {
                                                                 parent: folderManagedObject,
                                                                 context: context)
 
-        guard let folder = BaseBookmarkEntity.from(managedObject: folderManagedObject) as? BookmarkFolder else {
+        guard let folder = BaseBookmarkEntity.from(managedObject: folderManagedObject, dependencyProvider: dependencies(for: Bookmark.self)) as? BookmarkFolder else {
             XCTFail("Failed to create Folder from managed object")
             return
         }
@@ -80,7 +80,7 @@ class BookmarkTests: XCTestCase {
         XCTAssertEqual(folder.children.count, 1)
         XCTAssertEqual(folder.childFolders.count, 0)
         XCTAssertEqual(folder.childBookmarks.count, 1)
-        XCTAssertEqual(folder.children, [BaseBookmarkEntity.from(managedObject: bookmarkManagedObject)])
+        XCTAssertEqual(folder.children, [BaseBookmarkEntity.from(managedObject: bookmarkManagedObject, dependencyProvider: dependencies(for: Bookmark.self))])
         XCTAssertNil(folder.parentFolderUUID)
 
         let childBookmark = folder.children.first as? Bookmark

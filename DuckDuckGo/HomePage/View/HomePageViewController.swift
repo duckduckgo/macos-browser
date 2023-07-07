@@ -123,6 +123,8 @@ final class HomePageViewController: NSViewController, Injectable {
         super.viewWillDisappear()
 
         historyCancellable = nil
+        cancellables.removeAll()
+        burningDataCancellable = nil
     }
 
     func refreshModelsOnAppBecomingActive() {

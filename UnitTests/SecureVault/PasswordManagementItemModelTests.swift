@@ -28,7 +28,8 @@ final class PasswordManagementItemModelTests: XCTestCase {
 
     func testWhenCredentialsAreSavedThenSaveIsRequested() {
         let model = PasswordManagementLoginModel(onSaveRequested: onSaveRequested,
-                                                onDeleteRequested: onDeleteRequested)
+                                                 onDeleteRequested: onDeleteRequested,
+                                                 dependencyProvider: dependencies(for: PasswordManagementLoginModel.self))
 
         model.credentials = makeCredentials(id: "1")
         model.save()
@@ -39,7 +40,8 @@ final class PasswordManagementItemModelTests: XCTestCase {
 
     func testWhenCredentialsAreDeletedThenDeleteIsRequested() {
         let model = PasswordManagementLoginModel(onSaveRequested: onSaveRequested,
-                                                onDeleteRequested: onDeleteRequested)
+                                                 onDeleteRequested: onDeleteRequested,
+                                                 dependencyProvider: dependencies(for: PasswordManagementLoginModel.self))
 
         model.credentials = makeCredentials(id: "1")
         model.requestDelete()
@@ -50,7 +52,8 @@ final class PasswordManagementItemModelTests: XCTestCase {
 
     func testWhenCredentialsHasNoIdThenModelStateIsNew() {
         let model = PasswordManagementLoginModel(onSaveRequested: onSaveRequested,
-                                                onDeleteRequested: onDeleteRequested)
+                                                 onDeleteRequested: onDeleteRequested,
+                                                 dependencyProvider: dependencies(for: PasswordManagementLoginModel.self))
 
         model.createNew()
 
@@ -62,7 +65,8 @@ final class PasswordManagementItemModelTests: XCTestCase {
 
     func testWhenModelIsEditedThenStateIsUpdated() {
         let model = PasswordManagementLoginModel(onSaveRequested: onSaveRequested,
-                                                onDeleteRequested: onDeleteRequested)
+                                                 onDeleteRequested: onDeleteRequested,
+                                                 dependencyProvider: dependencies(for: PasswordManagementLoginModel.self))
 
         model.credentials = makeCredentials(id: "1")
         XCTAssertEqual(model.domain, "domain")

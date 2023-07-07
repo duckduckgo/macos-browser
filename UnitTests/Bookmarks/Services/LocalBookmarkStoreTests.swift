@@ -37,12 +37,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
         let context = container.viewContext
 
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
 
         let savingExpectation = self.expectation(description: "Saving")
         let loadingExpectation = self.expectation(description: "Loading")
 
-        let bookmark = Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true)
+        let bookmark = Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
 
         bookmarkStore.save(bookmark: bookmark, parent: nil, index: nil) { (success, error) in
             XCTAssert(success)
@@ -66,13 +66,13 @@ final class LocalBookmarkStoreTests: XCTestCase {
     func testWhenBookmarkIsRemoved_ThenItShouldntBeLoadedFromStore() {
         let context = container.viewContext
 
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
 
         let savingExpectation = self.expectation(description: "Saving")
         let removingExpectation = self.expectation(description: "Removing")
         let loadingExpectation = self.expectation(description: "Loading")
 
-        let bookmark = Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true)
+        let bookmark = Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
         bookmarkStore.save(bookmark: bookmark, parent: nil, index: nil) { (success, error) in
             XCTAssert(success)
             XCTAssertNil(error)
@@ -101,12 +101,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
     func testWhenBookmarkIsUpdated_ThenTheUpdatedVersionIsLoadedFromTheStore() {
         let context = container.viewContext
 
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
 
         let savingExpectation = self.expectation(description: "Saving")
         let loadingExpectation = self.expectation(description: "Loading")
 
-        let bookmark = Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true)
+        let bookmark = Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
 
         bookmarkStore.save(bookmark: bookmark, parent: nil, index: nil) { (success, error) in
             XCTAssert(success)
@@ -114,7 +114,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
             savingExpectation.fulfill()
 
-            let modifiedBookmark = Bookmark(id: bookmark.id, url: URL.duckDuckGo.absoluteString, title: "New Title", isFavorite: false)
+            let modifiedBookmark = Bookmark(id: bookmark.id, url: URL.duckDuckGo.absoluteString, title: "New Title", isFavorite: false, dependencyProvider: self.dependencies(for: Bookmark.self))
             bookmarkStore.update(bookmark: modifiedBookmark)
 
             bookmarkStore.loadAll(type: .bookmarks) { bookmarks, error in
@@ -133,7 +133,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
     func testWhenFolderIsAdded_AndItHasNoParentFolder_ThenItMustBeLoadedFromTheStore() {
         let context = container.viewContext
 
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
 
         let savingExpectation = self.expectation(description: "Saving")
         let loadingExpectation = self.expectation(description: "Loading")
@@ -161,7 +161,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     func testWhenFolderIsAdded_AndItHasParentFolder_ThenItMustBeLoadedFromTheStore() {
         let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
 
         let saveParentExpectation = self.expectation(description: "Save Parent Folder")
         let saveChildExpectation = self.expectation(description: "Save Child Folder")
@@ -204,14 +204,14 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     func testWhenBookmarkIsAdded_AndFolderHasBeenProvided_ThenBookmarkIsSavedToParentFolder() {
         let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
 
         let saveFolderExpectation = self.expectation(description: "Save Parent Folder")
         let saveBookmarkExpectation = self.expectation(description: "Save Bookmark")
         let loadingExpectation = self.expectation(description: "Loading")
 
         let folder = BookmarkFolder(id: UUID().uuidString, title: "Parent")
-        let bookmark = Bookmark(id: UUID().uuidString, url: "https://example.com", title: "Example", isFavorite: false)
+        let bookmark = Bookmark(id: UUID().uuidString, url: "https://example.com", title: "Example", isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
 
         bookmarkStore.save(folder: folder, parent: nil) { (success, error) in
             XCTAssert(success)
@@ -249,12 +249,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     func testWhenMovingBookmarkWithinParentCollection_AndIndexIsValid_ThenBookmarkIsMoved() async {
         let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
 
         let folder = BookmarkFolder(id: UUID().uuidString, title: "Parent")
-        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: false)
-        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: false)
-        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: false)
+        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
+        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
+        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
 
         // Save the initial bookmarks state:
 
@@ -299,12 +299,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     func testWhenMovingBookmarkWithinParentCollection_AndIndexIsOutOfBounds_ThenBookmarkIsAppended() async {
         let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
 
         let initialParentFolder = BookmarkFolder(id: UUID().uuidString, title: "Parent")
-        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: false)
-        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: false)
-        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: false)
+        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
+        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
+        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
 
         // Save the initial bookmarks state:
 
@@ -349,12 +349,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     func testWhenMovingMultipleBookmarksWithinParentCollection_AndIndexIsValid_ThenBookmarksAreMoved() async {
         let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
 
         let folder = BookmarkFolder(id: UUID().uuidString, title: "Parent")
-        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: false)
-        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: false)
-        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: false)
+        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
+        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
+        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
 
         // Save the initial bookmarks state:
 
@@ -458,12 +458,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     func testThatTopLevelEntitiesDoNotContainFavoritesFolder() async {
         let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
 
         // Create and save favorites:
 
-        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: true)
-        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: true)
+        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
+        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
 
         _ = await bookmarkStore.save(bookmark: bookmark1, parent: nil, index: nil)
         _ = await bookmarkStore.save(bookmark: bookmark2, parent: nil, index: nil)
@@ -481,11 +481,11 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     func testWhenBookmarkIsMarkedAsFavorite_ThenItDoesNotChangeParentFolder() async {
         let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
 
         let folder1 = BookmarkFolder(id: UUID().uuidString, title: "Folder 1")
         let folder2 = BookmarkFolder(id: UUID().uuidString, title: "Folder 2")
-        let bookmark = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example", isFavorite: false)
+        let bookmark = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example", isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
 
         // Save the initial bookmarks state:
 
@@ -539,12 +539,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     func testWhenMovingFavorite_AndIndexIsValid_ThenFavoriteIsMoved() async {
         let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
 
         let folder = BookmarkFolder(id: UUID().uuidString, title: "Parent")
-        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: true)
-        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: true)
-        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: true)
+        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
+        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
+        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
 
         // Save the initial bookmarks state:
 
@@ -587,12 +587,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     func testWhenMovingFavorite_AndIndexIsOutOfBounds_ThenFavoriteIsAppended() async {
         let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
 
         let initialParentFolder = BookmarkFolder(id: UUID().uuidString, title: "Parent")
-        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: true)
-        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: true)
-        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: true)
+        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
+        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
+        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
 
         // Save the initial bookmarks state:
 
@@ -635,12 +635,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     func testWhenMovingMultipleFavorites_AndIndexIsValid_ThenFavoritesAreMoved() async {
         let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
 
         let folder = BookmarkFolder(id: UUID().uuidString, title: "Parent")
-        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: true)
-        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: true)
-        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: true)
+        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
+        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
+        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
 
         // Save the initial bookmarks state:
 
@@ -691,12 +691,12 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     private func createInitialEntityMovementTestState() async -> EntityMovementTestState? {
         let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
 
         let initialParentFolder = BookmarkFolder(id: UUID().uuidString, title: "Parent")
-        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: false)
-        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: false)
-        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: false)
+        let bookmark1 = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example 1", isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
+        let bookmark2 = Bookmark(id: UUID().uuidString, url: "https://example2.com", title: "Example 2", isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
+        let bookmark3 = Bookmark(id: UUID().uuidString, url: "https://example3.com", title: "Example 3", isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
 
         // Save the initial bookmarks state:
 
@@ -732,7 +732,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     func testWhenBookmarksAreImported_AndNoDuplicatesExist_ThenBookmarksAreImported() {
         let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
 
         let bookmark = ImportedBookmarks.BookmarkOrFolder(name: "DuckDuckGo", type: "bookmark", urlString: "https://duckduckgo.com", children: nil)
         let bookmarkBar = ImportedBookmarks.BookmarkOrFolder(name: "Bookmark Bar", type: "folder", urlString: nil, children: [bookmark])
@@ -762,7 +762,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     func testWhenBookmarksAreImported_AndDuplicatesExist_ThenBookmarksAreStillImported() async {
         let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
         let importedBookmarks = createMockImportedBookmarks()
 
         // Import bookmarks once, and then again to test duplicates
@@ -817,7 +817,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     private func validateInitialImport(for source: BookmarkImportSource) async {
         let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
         let importedBookmarks = createMockImportedBookmarks()
 
         let result = bookmarkStore.importBookmarks(importedBookmarks, source: source)
@@ -855,7 +855,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
 
     private func validateSubsequentImport(for source: BookmarkImportSource) async {
         let context = container.viewContext
-        let bookmarkStore = LocalBookmarkStore(context: context)
+        let bookmarkStore = LocalBookmarkStore(context: context, dependencyProvider: dependencies(for: LocalBookmarkStore.self))
         let importedBookmarks = createMockImportedBookmarks()
 
         // Import bookmarks twice, one to initially populate the store and again to create the "Imported from [Browser]" folder.

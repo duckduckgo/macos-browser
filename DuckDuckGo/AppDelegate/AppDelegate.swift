@@ -139,7 +139,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     var downloadListCoordinator: DownloadListCoordinator
 
     @Injected
-    var stateRestorationManager: AppStateRestorationManager
+    var stateRestorationManager: AppStateRestorationManager?
 
     @Injected
     var recentlyClosedCoordinator: RecentlyClosedCoordinator
@@ -211,7 +211,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 #if !APPSTORE
         updateController = UpdateController(internalUserDecider: internalUserDecider)
-        stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
+        stateRestorationManager?.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
 #endif
 
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
@@ -235,7 +235,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             // MARK: perform first time launch logic here
         }
 
-        stateRestorationManager.applicationDidFinishLaunching()
+        stateRestorationManager?.applicationDidFinishLaunching()
 
         BWManager.shared.initCommunication()
 
@@ -267,6 +267,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
+#if DEBUG
+        guard !NSApp.isRunningUnitTests else { return }
+#endif
+
         syncService.initializeIfNeeded(isInternalUser: internalUserDecider.isInternalUser)
         syncService.scheduler.notifyAppLifecycleEvent()
     }
@@ -280,7 +284,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             downloadManager.cancelAll(waitUntilDone: true)
             downloadListCoordinator.sync()
         }
-        stateRestorationManager.applicationWillTerminate()
+        stateRestorationManager?.applicationWillTerminate()
 
         return .terminateNow
     }

@@ -46,12 +46,12 @@ class BookmarksExporterTests: XCTestCase {
                 BookmarkFolder(id: UUID().uuidString, title: TestData.folderName2, children: [
                     BookmarkFolder(id: UUID().uuidString, title: TestData.folderName3, children: [
                         BookmarkFolder(id: UUID().uuidString, title: TestData.folderName4, children: [
-                            Bookmark(id: UUID().uuidString, url: TestData.exampleUrl.absoluteString, title: TestData.exampleTitle, isFavorite: false)
+                            Bookmark(id: UUID().uuidString, url: TestData.exampleUrl.absoluteString, title: TestData.exampleTitle, isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
                         ])
                     ])
                 ])
             ])
-        ]))
+        ], dependencyProvider: dependencies(for: Bookmark.self)))
 
         try exporter.exportBookmarksTo(url: tmpFile)
         assertExportedFileEquals([
@@ -72,13 +72,13 @@ class BookmarksExporterTests: XCTestCase {
 
     func test_WhenFolderContainsAFolder_TheFileContainsTheNestedFolder() throws {
         let folder = BookmarkFolder(id: UUID().uuidString, title: TestData.folderName1, children: [
-            Bookmark(id: UUID().uuidString, url: TestData.exampleUrl.absoluteString, title: TestData.exampleTitle, isFavorite: false),
+            Bookmark(id: UUID().uuidString, url: TestData.exampleUrl.absoluteString, title: TestData.exampleTitle, isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self)),
             BookmarkFolder(id: UUID().uuidString, title: TestData.folderName2)
         ])
 
         let exporter = BookmarksExporter(list: BookmarkList(entities: [], topLevelEntities: [
             folder
-        ]))
+        ], dependencyProvider: dependencies(for: Bookmark.self)))
 
         try exporter.exportBookmarksTo(url: tmpFile)
         assertExportedFileEquals([
@@ -95,13 +95,13 @@ class BookmarksExporterTests: XCTestCase {
 
     func test_WhenFolderContainsMultipleBookmarks_TheFileContainsThatFolderWithTheBookmarks() throws {
         let folder = BookmarkFolder(id: UUID().uuidString, title: TestData.folderName1, children: [
-            Bookmark(id: UUID().uuidString, url: TestData.exampleUrl.absoluteString, title: TestData.exampleTitle, isFavorite: false),
-            Bookmark(id: UUID().uuidString, url: TestData.otherUrl.absoluteString, title: TestData.otherTitle, isFavorite: true)
+            Bookmark(id: UUID().uuidString, url: TestData.exampleUrl.absoluteString, title: TestData.exampleTitle, isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self)),
+            Bookmark(id: UUID().uuidString, url: TestData.otherUrl.absoluteString, title: TestData.otherTitle, isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
         ])
 
         let exporter = BookmarksExporter(list: BookmarkList(entities: [], topLevelEntities: [
             folder
-        ]))
+        ], dependencyProvider: dependencies(for: Bookmark.self)))
 
         try exporter.exportBookmarksTo(url: tmpFile)
         assertExportedFileEquals([
@@ -117,12 +117,12 @@ class BookmarksExporterTests: XCTestCase {
 
     func test_WhenFolderContainsABookmark_TheFileContainsThatFolderWithTheBookmark() throws {
         let folder = BookmarkFolder(id: UUID().uuidString, title: TestData.folderName1, children: [
-            Bookmark(id: UUID().uuidString, url: TestData.exampleUrl.absoluteString, title: TestData.exampleTitle, isFavorite: false)
+            Bookmark(id: UUID().uuidString, url: TestData.exampleUrl.absoluteString, title: TestData.exampleTitle, isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
         ])
 
         let exporter = BookmarksExporter(list: BookmarkList(entities: [], topLevelEntities: [
             folder
-        ]))
+        ], dependencyProvider: dependencies(for: Bookmark.self)))
 
         try exporter.exportBookmarksTo(url: tmpFile)
         assertExportedFileEquals([
@@ -139,7 +139,7 @@ class BookmarksExporterTests: XCTestCase {
         let exporter = BookmarksExporter(list: BookmarkList(entities: [], topLevelEntities: [
             BookmarkFolder(id: UUID().uuidString, title: TestData.folderName1),
             BookmarkFolder(id: UUID().uuidString, title: TestData.folderName2)
-        ]))
+        ], dependencyProvider: dependencies(for: Bookmark.self)))
 
         try exporter.exportBookmarksTo(url: tmpFile)
         assertExportedFileEquals([
@@ -155,7 +155,7 @@ class BookmarksExporterTests: XCTestCase {
     func test_WhenFolderAtTopLevel_ThenFileContainsFolder() throws {
         let exporter = BookmarksExporter(list: BookmarkList(entities: [], topLevelEntities: [
             BookmarkFolder(id: UUID().uuidString, title: TestData.folderName1)
-        ]))
+        ], dependencyProvider: dependencies(for: Bookmark.self)))
 
         try exporter.exportBookmarksTo(url: tmpFile)
         assertExportedFileEquals([
@@ -168,8 +168,8 @@ class BookmarksExporterTests: XCTestCase {
 
     func test_WhenBookmarkAtTopLevelIsFavorite_ThenFileContainsBookmarkAtTopLevelWithFavoriteAttribute() throws {
         let exporter = BookmarksExporter(list: BookmarkList(entities: [], topLevelEntities: [
-            Bookmark(id: UUID().uuidString, url: TestData.exampleUrl.absoluteString, title: TestData.exampleTitle, isFavorite: true)
-        ]))
+            Bookmark(id: UUID().uuidString, url: TestData.exampleUrl.absoluteString, title: TestData.exampleTitle, isFavorite: true, dependencyProvider: dependencies(for: Bookmark.self))
+        ], dependencyProvider: dependencies(for: Bookmark.self)))
 
         try exporter.exportBookmarksTo(url: tmpFile)
         assertExportedFileEquals([
@@ -186,9 +186,9 @@ class BookmarksExporterTests: XCTestCase {
 
     func test_WhenMultipleBookmarksAtTopLevel_ThenFileContainsAllBookmarksAtTopLevel() throws {
         let exporter = BookmarksExporter(list: BookmarkList(entities: [], topLevelEntities: [
-            Bookmark(id: UUID().uuidString, url: TestData.exampleUrl.absoluteString, title: TestData.exampleTitle, isFavorite: false),
-            Bookmark(id: UUID().uuidString, url: TestData.otherUrl.absoluteString, title: TestData.otherTitle, isFavorite: false)
-        ]))
+            Bookmark(id: UUID().uuidString, url: TestData.exampleUrl.absoluteString, title: TestData.exampleTitle, isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self)),
+            Bookmark(id: UUID().uuidString, url: TestData.otherUrl.absoluteString, title: TestData.otherTitle, isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
+        ], dependencyProvider: dependencies(for: Bookmark.self)))
 
         try exporter.exportBookmarksTo(url: tmpFile)
         assertExportedFileEquals([
@@ -201,8 +201,8 @@ class BookmarksExporterTests: XCTestCase {
 
     func test_WhenBookmarkTitleHasHTMLEntities_ThenTheExportedTitleIsEscaped() throws {
         let exporter = BookmarksExporter(list: BookmarkList(entities: [], topLevelEntities: [
-            Bookmark(id: UUID().uuidString, url: TestData.exampleUrl.absoluteString, title: TestData.titleWithUnescapedHTMLEntities, isFavorite: false)
-        ]))
+            Bookmark(id: UUID().uuidString, url: TestData.exampleUrl.absoluteString, title: TestData.titleWithUnescapedHTMLEntities, isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
+        ], dependencyProvider: dependencies(for: Bookmark.self)))
 
         try exporter.exportBookmarksTo(url: tmpFile)
         assertExportedFileEquals([
@@ -214,8 +214,8 @@ class BookmarksExporterTests: XCTestCase {
 
     func test_WhenBookmarkAtTopLevel_ThenFileContainsBookmarkAtTopLevel() throws {
         let exporter = BookmarksExporter(list: BookmarkList(entities: [], topLevelEntities: [
-            Bookmark(id: UUID().uuidString, url: TestData.exampleUrl.absoluteString, title: TestData.exampleTitle, isFavorite: false)
-        ]))
+            Bookmark(id: UUID().uuidString, url: TestData.exampleUrl.absoluteString, title: TestData.exampleTitle, isFavorite: false, dependencyProvider: dependencies(for: Bookmark.self))
+        ], dependencyProvider: dependencies(for: Bookmark.self)))
 
         try exporter.exportBookmarksTo(url: tmpFile)
         assertExportedFileEquals([
@@ -226,7 +226,7 @@ class BookmarksExporterTests: XCTestCase {
     }
 
     func test_WhenNoBookmarks_ThenFileContainsOnlyHeaderAndFooter() throws {
-        let exporter = BookmarksExporter(list: BookmarkList(entities: [], topLevelEntities: []))
+        let exporter = BookmarksExporter(list: BookmarkList(entities: [], topLevelEntities: [], dependencyProvider: dependencies(for: Bookmark.self)))
         try exporter.exportBookmarksTo(url: tmpFile)
         assertExportedFileEquals([
             BookmarksExporter.Template.header,

@@ -76,6 +76,10 @@ typealias TabExtensionsBuilderArguments = (
     webViewFuture: Future<WKWebView, Never>
 )
 
+#if swift(>=5.9)
+@Injectable
+#endif
+
 final class AbstractTabExtensionsDependencies: Injectable {
     let dependencies: DependencyStorage
 

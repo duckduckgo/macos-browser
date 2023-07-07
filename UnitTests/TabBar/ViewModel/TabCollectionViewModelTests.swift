@@ -49,7 +49,7 @@ final class TabCollectionViewModelTests: XCTestCase {
         let tabCollection = TabCollection()
         XCTAssertTrue(tabCollection.tabs.isEmpty)
 
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: TabCollection())
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: TabCollection(), dependencyProvider: dependencies(for: TabCollectionViewModel.self))
 
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 1)
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs[0].content, .homePage)
@@ -427,18 +427,27 @@ final class TabCollectionViewModelTests: XCTestCase {
     }
 }
 
-fileprivate extension TabCollectionViewModel {
-
+private extension TabCollectionViewModel {
     static func aTabCollectionViewModel() -> TabCollectionViewModel {
         let tabCollection = TabCollection()
-        let pinnedTabsManager = PinnedTabsManager()
-        return TabCollectionViewModel(tabCollection: tabCollection, pinnedTabsManager: pinnedTabsManager)
+        return TabCollectionViewModel(tabCollection: tabCollection, dependencyProvider: TestDependencyProvider.for(TabCollectionViewModel.self))
     }
 }
 
-extension Tab {
+private extension Tab {
+
     @MainActor
-    convenience init(parentTab: Tab) {
-        self.init(content: .url(.blankPage), parentTab: parentTab)
+    convenience init(content: Tab.TabContent = .url(.blankPage), parentTab: Tab? = nil) {
+        self.init(dependencyProvider: TestDependencyProvider.for(Tab.self), content: content, parentTab: parentTab)
     }
+
+    var url: URL? {
+        get {
+            content.url
+        }
+        set {
+            setContent(newValue.map { TabContent.url($0) } ?? .homePage)
+        }
+    }
+
 }

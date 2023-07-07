@@ -22,11 +22,20 @@ import XCTest
 @MainActor
 final class WindowManagerStateRestorationTests: XCTestCase {
 
+    var pinnedTabsManager: PinnedTabsManager!
+    var windowManager: WindowManager!
+
     override func setUp() {
+        pinnedTabsManager = PinnedTabsManager()
+        // TODO: pinnedTabsManager
+        windowManager = WindowManager(dependencyProvider: dependencies(for: WindowManager.self)) { _ in
+            dependencies(for: AbstractWindowManagerNestedDependencies.self)
+        }
+        assert(windowManager.mainWindowControllers.isEmpty)
     }
 
     override func tearDown() {
-        WindowsManager.closeWindows()
+        windowManager.closeWindows()
     }
 
     func isTab(_ a: Tab, equalTo b: Tab) -> Bool {
@@ -76,22 +85,20 @@ final class WindowManagerStateRestorationTests: XCTestCase {
                 shouldLoadInBackground: false)
         ]
 
-        WindowManager.shared.pinnedTabsManager.setUp(with: .init(tabs: pinnedTabs))
-        let model1 = TabCollectionViewModel(tabCollection: TabCollection(tabs: tabs1), selectionIndex: 0)
-        let model2 = TabCollectionViewModel(tabCollection: TabCollection(tabs: tabs2), selectionIndex: 2)
-        WindowsManager.openNewWindow(with: model1)
-        WindowsManager.openNewWindow(with: model2)
-        WindowManager.shared.lastKeyMainWindowController = WindowManager.shared.mainWindowControllers[1]
+        pinnedTabsManager.setUp(with: .init(tabs: pinnedTabs))
+        let model1 = TabCollectionViewModel(tabCollection: TabCollection(tabs: tabs1), selectionIndex: 0, dependencyProvider: dependencies(for: TabCollectionViewModel.self))
+        let model2 = TabCollectionViewModel(tabCollection: TabCollection(tabs: tabs2), selectionIndex: 2, dependencyProvider: dependencies(for: TabCollectionViewModel.self))
+        windowManager.openNewWindow(with: model1)
+        windowManager.openNewWindow(with: model2)
+        windowManager.lastKeyMainWindowController = windowManager.mainWindowControllers[1]
 
-        let state = WindowManagerStateRestoration(WindowManager: WindowManager.shared)
+        let state = WindowManagerStateRestoration(windowManager: windowManager)
         let archiver = NSKeyedArchiver(requiringSecureCoding: true)
         state.encode(with: archiver)
         let data = archiver.encodedData
 
         let unarchiver = try NSKeyedUnarchiver(forReadingFrom: data)
-        guard let restored = WindowManagerStateRestoration(coder: unarchiver) else {
-            return XCTFail("Could not unarchive WindowManagerStateRestoration")
-        }
+        let restored = try WindowManagerStateRestoration(dependencyProvider: dependencies(for: TabCollectionViewModel.self), coder: unarchiver)
 
         XCTAssertTrue(areTabsEqual(restored.pinnedTabs!.tabs, pinnedTabs))
         XCTAssertEqual(restored.windows.count, 2)
@@ -102,6 +109,16 @@ final class WindowManagerStateRestorationTests: XCTestCase {
             XCTAssertEqual(window.frame, state.windows[idx].frame)
             XCTAssertEqual(window.model.pinnedTabs, pinnedTabs)
         }
+    }
+
+}
+
+private extension Tab {
+
+    @MainActor
+    @nonobjc
+    convenience init(content: Tab.TabContent = .homePage, title: String? = nil, interactionStateData: Data? = nil, shouldLoadInBackground: Bool = false) {
+        self.init(dependencyProvider: TestDependencyProvider.for(Tab.self), content: content, title: title, interactionStateData: interactionStateData, shouldLoadInBackground: shouldLoadInBackground)
     }
 
 }

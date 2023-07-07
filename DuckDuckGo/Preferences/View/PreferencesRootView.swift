@@ -123,7 +123,7 @@ struct SyncView: View {
     }
 
     var body: some View {
-        if (NSApp.delegate as? AppDelegate)?.syncService != nil {
+        if NSApp.delegateTyped.syncService != nil {
             SyncUI.ManagementView(model: SyncPreferences(dependencyProvider: dependencies))
         } else {
             FailedAssertionView("Failed to initialize Sync Management View")

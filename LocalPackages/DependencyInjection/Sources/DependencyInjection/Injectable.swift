@@ -29,7 +29,7 @@ public protocol Injectable {
 
     static func getAllDependencyProviderKeyPaths() -> Set<AnyKeyPath>
     static func dependencyKeyPath(forInjectedKeyPath keyPath: AnyKeyPath) -> AnyKeyPath
-    static func description(forInjectedKeyPath keyPath: AnyKeyPath) -> String
+    static func description(forInjectedKeyPath keyPath: AnyKeyPath) -> String?
     static func collectKeyPaths(matchingDescription description: String) -> Set<AnyKeyPath>
 
     var dependencies: DependencyStorage { get }

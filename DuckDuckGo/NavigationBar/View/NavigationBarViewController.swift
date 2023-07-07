@@ -198,6 +198,12 @@ final class NavigationBarViewController: NSViewController, Injectable {
         }
     }
 
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        downloadsCancellables.removeAll()
+        navigationButtonsCancellables.removeAll()
+    }
+
     @IBSegueAction func createAddressBarViewController(_ coder: NSCoder) -> AddressBarViewController? {
         guard let addressBarViewController = AddressBarViewController(coder: coder,
                                                                       tabCollectionViewModel: tabCollectionViewModel,

@@ -26,6 +26,7 @@ import XCTest
 
 // swiftlint:disable opening_brace
 @available(macOS 12.0, *)
+@MainActor
 final class SearchNonexistentDomainTests: XCTestCase {
 
     struct URLs {
@@ -57,6 +58,10 @@ final class SearchNonexistentDomainTests: XCTestCase {
         mainViewController.navigationBarViewController.addressBarViewController?.addressBarTextField
     }
 
+    var windowManager: WindowManagerProtocol {
+        NSApp.delegateTyped.windowManager
+    }
+
     override func setUp() {
         contentBlockingMock = ContentBlockingMock()
         privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
@@ -86,10 +91,9 @@ final class SearchNonexistentDomainTests: XCTestCase {
 
     // MARK: - Tests
 
-    @MainActor
     func testWhenNonexistentDomainRequested_redirectedToSERP() async throws {
-        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
-        window = WindowsManager.openNewWindow(with: tab)!
+        let tab = Tab(dependencyProvider: NSApp.delegateTyped.dependencies.mutating { $0.privacyFeatures = privacyFeaturesMock }, content: .none, webViewConfiguration: webViewConfiguration)
+        window = windowManager.openNewWindow(with: tab)!
 
         let eRedirected = Future<URL, Never> { promise in
             self.schemeHandler.middleware = [{ request in
@@ -115,10 +119,9 @@ final class SearchNonexistentDomainTests: XCTestCase {
         XCTAssertEqual(redirectUrl, URL.makeSearchUrl(from: enteredString))
     }
 
-    @MainActor
     func testWhenNonexistentDomainRequestedWithValidTLD_notRedirectedToSERP() async throws {
-        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
-        window = WindowsManager.openNewWindow(with: tab)!
+        let tab = Tab(dependencyProvider: NSApp.delegateTyped.dependencies.mutating { $0.privacyFeatures = privacyFeaturesMock }, content: .none, webViewConfiguration: webViewConfiguration)
+        window = windowManager.openNewWindow(with: tab)!
 
         self.schemeHandler.middleware = [{ _ in
             .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
@@ -142,10 +145,9 @@ final class SearchNonexistentDomainTests: XCTestCase {
         XCTAssertEqual(error.errorCode, NSURLErrorCannotFindHost)
     }
 
-    @MainActor
     func testWhenNonexistentDomainRequestedWithScheme_notRedirectedToSERP() async throws {
-        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
-        window = WindowsManager.openNewWindow(with: tab)!
+        let tab = Tab(dependencyProvider: NSApp.delegateTyped.dependencies.mutating { $0.privacyFeatures = privacyFeaturesMock }, content: .none, webViewConfiguration: webViewConfiguration)
+        window = windowManager.openNewWindow(with: tab)!
 
         self.schemeHandler.middleware = [{ _ in
                 .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
@@ -169,10 +171,9 @@ final class SearchNonexistentDomainTests: XCTestCase {
         XCTAssertEqual(error.errorCode, NSURLErrorCannotFindHost)
     }
 
-    @MainActor
     func testWhenNonexistentDomainNotEnteredByUser_notRedirectedToSERP() async throws {
-        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
-        window = WindowsManager.openNewWindow(with: tab)!
+        let tab = Tab(dependencyProvider: NSApp.delegateTyped.dependencies.mutating { $0.privacyFeatures = privacyFeaturesMock }, content: .none, webViewConfiguration: webViewConfiguration)
+        window = windowManager.openNewWindow(with: tab)!
 
         self.schemeHandler.middleware = [{ _ in
             .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
@@ -191,10 +192,9 @@ final class SearchNonexistentDomainTests: XCTestCase {
         XCTAssertEqual(error.errorCode, NSURLErrorCannotFindHost)
     }
 
-    @MainActor
     func testWhenNonexistentDomainSuggestionChosen_redirectedToSERP() async throws {
-        let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
-        window = WindowsManager.openNewWindow(with: tab)!
+        let tab = Tab(dependencyProvider: NSApp.delegateTyped.dependencies.mutating { $0.privacyFeatures = privacyFeaturesMock }, content: .none, webViewConfiguration: webViewConfiguration)
+        window = windowManager.openNewWindow(with: tab)!
 
         let eRedirected = Future<URL, Never> { promise in
             self.schemeHandler.middleware = [{ request in
@@ -214,7 +214,7 @@ final class SearchNonexistentDomainTests: XCTestCase {
         addressBar.stringValue = enteredString
 
         let suggestionLoadingMock = SuggestionLoadingMock()
-        let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock, historyCoordinating: HistoryCoordinator.shared, bookmarkManager: LocalBookmarkManager.shared)
+        let suggestionContainer = SuggestionContainer(suggestionLoading: suggestionLoadingMock, historyCoordinating: NSApp.delegateTyped.historyCoordinator, bookmarkManager: NSApp.delegateTyped.bookmarkManager)
         addressBar.suggestionContainerViewModel = SuggestionContainerViewModel(isHomePage: true, isBurner: false, suggestionContainer: suggestionContainer)
 
         suggestionContainer.getSuggestions(for: enteredString)

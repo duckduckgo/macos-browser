@@ -56,6 +56,10 @@ extension NSApplication {
     var mainMenuTyped: MainMenu {
         return mainMenu as! MainMenu // swiftlint:disable:this force_cast
     }
+
+    var delegateTyped: AppDelegate {
+        return delegate as! AppDelegate // swiftlint:disable:this force_cast
+    }
 #endif
 
     var isCommandPressed: Bool {

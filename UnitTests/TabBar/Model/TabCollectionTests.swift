@@ -115,7 +115,8 @@ final class TabCollectionTests: XCTestCase {
 
         let tab1 = Tab()
         tabCollection.append(tab: tab1)
-        let tab2 = Tab(content: .homePage, extensionsBuilder: extensionBuilder)
+        // TODO: extensionBuilder
+        let tab2 = Tab(dependencyProvider: dependencies(for: Tab.self), content: .homePage)
         tabCollection.append(tab: tab2)
         (tab2.history as! HistoryTabExtensionMock).localHistory.insert(url.host!)
 
@@ -178,10 +179,11 @@ final class TabCollectionTests: XCTestCase {
 
 }
 
-extension Tab {
+private extension Tab {
     @MainActor
-    convenience override init() {
-        self.init(content: .homePage)
+    @nonobjc
+    convenience init(content: Tab.TabContent = .homePage) {
+        self.init(dependencyProvider: TestDependencyProvider.for(Tab.self), content: content)
     }
 }
 

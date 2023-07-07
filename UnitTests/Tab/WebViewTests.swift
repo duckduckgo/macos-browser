@@ -142,3 +142,12 @@ final class WebViewTests: XCTestCase {
         XCTAssertEqual(tabVM.tab.webView.zoomLevel, .percent75)
     }
 }
+
+private extension Tab {
+
+    @MainActor
+    convenience init(content: Tab.TabContent = .homePage) {
+        self.init(dependencyProvider: TestDependencyProvider.for(Tab.self), content: content)
+    }
+
+}

@@ -232,6 +232,9 @@ public struct InjectableMacro: MemberMacro {
             "case \\\(identifier)_InjectedVars.\($0.name): return \"\($0.name): \($0.type)\"\n      " +
             "case \\\(identifier).\($0.name): return \"\($0.name): \($0.type)\""
         }.joined(separator: "\n      ")
+        let nestedKeyPathDescriptionGetters = injectedDependenciesInjectables.map {
+            "\($0).description(forInjectedKeyPath: keyPath)"
+        }.joined(separator: "\n        ?? ")
 
         // map keyPath descriptions to nested KeyPaths
         let stringToKeyPathMappings = vars.map {
@@ -266,11 +269,12 @@ public struct InjectableMacro: MemberMacro {
             }
         """,
         """
-            nonisolated static func description(forInjectedKeyPath keyPath: AnyKeyPath) -> String {
+            nonisolated static func description(forInjectedKeyPath keyPath: AnyKeyPath) -> String? {
               switch keyPath {
               \(raw: keyPathStringMappings)
-              default: return "\\(keyPath)"
+              default: break
               }
+              return \(raw: nestedKeyPathDescriptionGetters.isEmpty ? "nil" : nestedKeyPathDescriptionGetters)
             }
         """,
         """

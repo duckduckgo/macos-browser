@@ -37,7 +37,7 @@ class DownloadsIntegrationTests: XCTestCase {
 
     @MainActor
     override class func setUp() {
-        window = WindowsManager.openNewWindow(with: .none)!
+        window = NSApp.delegateTyped.windowManager.openNewWindow(with: .none)!
     }
 
     override class func tearDown() {
@@ -53,7 +53,7 @@ class DownloadsIntegrationTests: XCTestCase {
         var persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
-        let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
+        let downloadTaskFuture = NSApp.delegateTyped.downloadManager.downloadsPublisher.timeout(5).first().promise()
 
         let url = URL.testsServer
             .appendingPathComponent("fname.dat")
@@ -80,7 +80,7 @@ class DownloadsIntegrationTests: XCTestCase {
         let pageUrl = URL.testsServer.appendingTestParameters(data: data.html)
         _=await tab.setUrl(pageUrl, userEntered: nil)?.value?.result
 
-        let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
+        let downloadTaskFuture = NSApp.delegateTyped.downloadManager.downloadsPublisher.timeout(5).first().promise()
 
         let js = """
         (function() {
@@ -112,7 +112,7 @@ class DownloadsIntegrationTests: XCTestCase {
         let pageUrl = URL.testsServer.appendingTestParameters(data: data.html)
         _=await tab.setUrl(pageUrl, userEntered: nil)?.value?.result
 
-        let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
+        let downloadTaskFuture = NSApp.delegateTyped.downloadManager.downloadsPublisher.timeout(5).first().promise()
 
         let js = """
         (function() {

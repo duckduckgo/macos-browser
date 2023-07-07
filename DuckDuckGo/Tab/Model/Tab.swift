@@ -241,7 +241,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
 
         let statisticsLoader = statisticsLoader
             ?? (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)
-        let internalUserDecider = (NSApp.delegate as? AppDelegate)?.internalUserDecider
+        let internalUserDecider = NSApp.delegateTyped.internalUserDecider
 
         let dependencies = DependencyStorage(dependencyProvider).mutating {
             if isBurner {
