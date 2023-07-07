@@ -131,6 +131,9 @@ extension WindowManagerProtocol {
 final class AbstractWindowManagerNestedDependencies: Injectable {
     let dependencies: DependencyStorage
 
+    @Injected
+    var pinnedTabsManager: PinnedTabsManager?
+
     typealias InjectedDependencies = Tab.Dependencies & TabCollectionViewModel.Dependencies & MainWindowController.Dependencies & MainViewController.Dependencies
 
     private init() { fatalError("\(Self.self) should not be instantiated") }
@@ -284,11 +287,13 @@ final class WindowManager: WindowManagerProtocol, Injectable {
         let tabCollection = TabCollection()
         tabCollection.append(tab: tab)
 
-        let tabCollectionViewModel: TabCollectionViewModel = popUp
-            ? TabCollectionViewModel(tabCollection: tabCollection, isBurner: isBurner, dependencyProvider: nestedDependencies)
-            : TabCollectionViewModel(tabCollection: tabCollection,
+        let tabCollectionViewModel = popUp
+            ? TabCollectionViewModel(tabCollection: tabCollection,
                                      isBurner: isBurner,
-                                     dependencyProvider: TabCollectionViewModel.makeDependencies(pinnedTabsManager: nil, nested: nestedDependencies))
+                                     dependencyProvider: nestedDependencies.mutating {
+                $0.pinnedTabsManager = nil
+            })
+            : TabCollectionViewModel(tabCollection: tabCollection, isBurner: isBurner, dependencyProvider: nestedDependencies)
 
         return openNewWindow(with: tabCollectionViewModel,
                              isBurner: isBurner,

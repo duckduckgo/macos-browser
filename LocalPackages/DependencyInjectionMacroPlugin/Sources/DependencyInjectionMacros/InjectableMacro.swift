@@ -222,30 +222,32 @@ public struct InjectableMacro: MemberMacro {
             throw CustomError.noInjectedMembers(location: context.location(of: declaration, at: .afterLeadingTrivia, filePathMode: .filePath))
         }
 
-        let dependencyInitArguments = vars.map {
-            "\($0.name): @escaping @autoclosure () -> (\($0.type))"
-        }.joined(separator: ", ")
-        let dynamicDependencyProviderInitArguments = dependencyInitArguments
-        + (dynamicCompositions.isEmpty ? "" : "\(dependencyInitArguments.isEmpty ? "" : ",") nested nestedProvider: any ") + dynamicCompositions.dropping(prefix: "& ")
-        var storageInitLiteral = vars.isEmpty ? "[:]" : ("[\n" + vars.map {
-            "\\\(identifier).\($0.name): \($0.name)"
-        }.joined(separator: ",\n") + "\n]")
-        if !dynamicCompositions.isEmpty {
-            storageInitLiteral = "nestedProvider._storage.merging(\(storageInitLiteral)) { $1 }"
-        }
-
         // map Owner.dependencyName keyPath to Owner_InjectedVars.dependencyName keyPath
         let keyPathMappings = vars.map {
             "case \\\(identifier).\($0.name): return \\\(identifier)_InjectedVars.\($0.name)"
-        }.joined(separator: "\n")
+        }.joined(separator: "\n      ")
+
+        // map Owner.dependencyName keyPath to the keyPath description (name and type string)
+        let keyPathStringMappings = vars.map {
+            "case \\\(identifier)_InjectedVars.\($0.name): return \"\($0.name): \($0.type)\"\n      " +
+            "case \\\(identifier).\($0.name): return \"\($0.name): \($0.type)\""
+        }.joined(separator: "\n      ")
+
+        // map keyPath descriptions to nested KeyPaths
+        let stringToKeyPathMappings = vars.map {
+            "case \"\($0.name): \($0.type)\": result.insert(\\\(identifier)_InjectedVars.\($0.name))"
+        }.joined(separator: "\n      ")
+        let keyPathByDescriptionCollectors = injectedDependenciesInjectables.map {
+            "result.formUnion(\($0).collectKeyPaths(matchingDescription: description))"
+        }.joined(separator: "\n      ")
 
         var result: [DeclSyntax] = [
             "typealias Dependencies = \(raw: identifier)_OwnedInjectedVars & \(raw: identifier)_DependencyProviderProtocol \(raw: compositions)",
-            "typealias DependencyProvider = \(raw: identifier)_DependencyProviderProtocol \(raw: dynamicCompositions)"
+        "    typealias DependencyProvider = \(raw: identifier)_DependencyProviderProtocol \(raw: dynamicCompositions)\n"
         ]
 
         result.append(contentsOf: [
-            """
+        """
 
             @Sendable
             nonisolated static func getAllDependencyProviderKeyPaths() -> Set<AnyKeyPath> {
@@ -254,18 +256,36 @@ public struct InjectableMacro: MemberMacro {
               \(raw: keyPathsGetters)
               return result
             }
-            """,
-            """
-            nonisolated func dependencyKeyPath(forInjectedKeyPath keyPath: AnyKeyPath) -> AnyKeyPath {
+        """,
+        """
+            nonisolated static func dependencyKeyPath(forInjectedKeyPath keyPath: AnyKeyPath) -> AnyKeyPath {
               switch keyPath {
               \(raw: keyPathMappings)
               default: return keyPath
               }
             }
-            """,
-            """
+        """,
+        """
+            nonisolated static func description(forInjectedKeyPath keyPath: AnyKeyPath) -> String {
+              switch keyPath {
+              \(raw: keyPathStringMappings)
+              default: return "\\(keyPath)"
+              }
+            }
+        """,
+        """
+            nonisolated static func collectKeyPaths(matchingDescription description: String) -> Set<AnyKeyPath> {
+              var result = Set<AnyKeyPath>()
+              switch description {
+              \(raw: stringToKeyPathMappings)
+              default: break
+              }
+              \(raw: keyPathByDescriptionCollectors)
+              return result
+            }
+        """,
+        """
 
-            // typealias DependencyStorage = DependencyStorageStruct<\(raw: identifier)>
             @dynamicMemberLookup
             struct DependencyStorage: DependencyProvider, DependencyStorageProtocol {
               typealias Owner = \(raw: identifier)
@@ -280,17 +300,11 @@ public struct InjectableMacro: MemberMacro {
                 self._storage = storage
               }
 
-              init(_ dependencyProvider: any Dependencies) {
-                self._storage = \(raw: identifier).getAllDependencyProviderKeyPaths().reduce(into: [:]) {
-                  $0[$1] = dependencyProvider[keyPath: $1]
-                }
-              }
-
               init(_ dependencyProvider: any DependencyProvider) {
                 // the dependencyProvider may be either dictionary-backed storage or a conforming struct
                 // if it is a struct, collect all the needed values for all dependency keyPaths providing the keyPaths through the Task Local Storage
                 self._storage = DependencyInjectionHelper.$collectKeyPaths.withValue(Owner.getAllDependencyProviderKeyPaths) {
-                    dependencyProvider._storage
+                  dependencyProvider._storage
                 }
               }
 
@@ -298,23 +312,16 @@ public struct InjectableMacro: MemberMacro {
                 value(for: keyPath)
               }
 
-              func mutating(_ transform: (MutableDependencyStorage<\(raw: identifier)_InjectedVars>) throws -> Void) rethrows -> Self {
-                  var storage = _storage
-                  try withUnsafeMutablePointer(to: &storage) { ptr in
-                    let mutableDependencies = MutableDependencyStorage<\(raw: identifier)_InjectedVars>(ptr)
-                    try transform(mutableDependencies)
-                  }
-                  return Self(storage)
+              func mutating(_ transform: (MutableDependencyStorage<\(raw: identifier), \(raw: identifier)_InjectedVars>) throws -> Void) rethrows -> Self {
+                var storage = _storage
+                try withUnsafeMutablePointer(to: &storage) { ptr in
+                  let mutableDependencies = MutableDependencyStorage<\(raw: identifier), \(raw: identifier)_InjectedVars>(ptr)
+                  try transform(mutableDependencies)
+                }
+                return Self(storage)
               }
             }
-            """,
-            """
-
-            nonisolated static func makeDependencies(\(raw: dynamicDependencyProviderInitArguments)) -> DependencyStorage {
-                DependencyStorage(\(raw: storageInitLiteral))
-            }
-
-            """
+        """
         ])
 
         return result
@@ -348,26 +355,34 @@ extension InjectableMacro: PeerMacro {
                 for vardecl in vars {
                     vardecl.with(\.trailingTrivia, " { get }\n")
                 }
-            }.as(DeclSyntax.self)!,
+            }
+                .with(\.trailingTrivia, "\n")
+                .as(DeclSyntax.self)!,
 
             ProtocolDeclSyntax(
                 "protocol \(raw: identifier)_OwnedInjectedVars: \(raw: identifier)_InjectedVars, DependenciesProtocol"
             ) {
                 AssociatedtypeDeclSyntax.init(identifier: " Owner = \(raw: identifier)")
-            }.as(DeclSyntax.self)!,
+                    .with(\.leadingTrivia, "\n    ")
+                    .with(\.trailingTrivia, "\n")
+            }
+                .with(\.trailingTrivia, "\n")
+                .as(DeclSyntax.self)!,
 
             """
             func \(raw: identifier)_InjectedVars_allKeyPaths() -> Set<AnyKeyPath> {
-                [
-                    \(raw: keyPaths.joined(separator: ",\n"))
-                ]
+              [
+                \(raw: keyPaths.joined(separator: ",\n    "))
+              ]
             }
             """,
 
             ProtocolDeclSyntax(
                 "protocol \(raw: identifier)_DependencyProviderProtocol: DependencyStorageProtocol"
             ) {
-            }.as(DeclSyntax.self)!
+            }
+                .with(\.leadingTrivia, "\n")
+                .as(DeclSyntax.self)!
         ])
 
         return result

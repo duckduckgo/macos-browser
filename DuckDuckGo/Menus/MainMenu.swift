@@ -43,6 +43,9 @@ final class MainMenu: NSMenu, Injectable {
     @Injected
     var bookmarkManager: BookmarkManager
 
+    @Injected
+    var internalUserDecider: InternalUserDecider
+
     typealias InjectedDependencies = SharingMenu.Dependencies
 
     required init(coder: NSCoder) {
@@ -407,7 +410,7 @@ final class MainMenu: NSMenu, Injectable {
 
     @MainActor
     private func updateBurnerWindowMenuItem() {
-        if !(NSApp.delegate as? AppDelegate)!.internalUserDecider.isInternalUser {
+        if !internalUserDecider.isInternalUser {
             newBurnerWindowMenuItem.isHidden = true
         }
     }

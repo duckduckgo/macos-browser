@@ -28,7 +28,9 @@ public protocol Injectable {
     associatedtype DependencyStorage: DependencyStorageProtocol
 
     static func getAllDependencyProviderKeyPaths() -> Set<AnyKeyPath>
-    func dependencyKeyPath(forInjectedKeyPath keyPath: AnyKeyPath) -> AnyKeyPath
+    static func dependencyKeyPath(forInjectedKeyPath keyPath: AnyKeyPath) -> AnyKeyPath
+    static func description(forInjectedKeyPath keyPath: AnyKeyPath) -> String
+    static func collectKeyPaths(matchingDescription description: String) -> Set<AnyKeyPath>
 
     var dependencies: DependencyStorage { get }
 }
@@ -40,6 +42,8 @@ public protocol DependencyStorageProtocol {
 
 public struct DependencyInjectionHelper {
     @TaskLocal public static var collectKeyPaths: (@Sendable () -> Set<AnyKeyPath>)!
+    /// use lazy storage value getter closures when running Unit Tests
+    public static var lazyAssignments = false
 }
 
 public protocol DependenciesProtocol {
@@ -48,8 +52,8 @@ public protocol DependenciesProtocol {
 
 public extension DependenciesProtocol {
     var _storage: [AnyKeyPath: Any] { // swiftlint:disable:this identifier_name
-        DependencyInjectionHelper.collectKeyPaths().reduce(into: [:]) {
-            $0[$1] = self[keyPath: $1]
+        DependencyInjectionHelper.collectKeyPaths().reduce(into: [:]) { result, keyPath in
+            result[keyPath] = DependencyInjectionHelper.lazyAssignments ? { self[keyPath: keyPath] } : self[keyPath: keyPath]
         }
     }
     func value<T>(for keyPath: AnyKeyPath) -> T {

@@ -18,7 +18,7 @@
 
 /// helper struct used for resolving the dependencies
 @dynamicMemberLookup
-public struct MutableDependencyStorage<Root> {
+public struct MutableDependencyStorage<Owner: Injectable, Root> {
 
     private var storagePtr: UnsafeMutablePointer<[AnyKeyPath: Any]>
 
@@ -28,10 +28,15 @@ public struct MutableDependencyStorage<Root> {
 
     public subscript<T>(dynamicMember keyPath: KeyPath<Root, T>) -> T {
         get {
-            self.storagePtr.pointee[keyPath] as! T // swiftlint:disable:this force_cast
+            self.storagePtr.pointee[keyPath] as? T ?? (self.storagePtr.pointee[keyPath] as? (() -> T))!()
         }
         nonmutating set {
+            // update all the values with matching KeyPath name and type down the tree
             self.storagePtr.pointee[keyPath] = newValue
+            let nestedKeyPaths = Owner.collectKeyPaths(matchingDescription: Owner.description(forInjectedKeyPath: keyPath))
+            for keyPath in nestedKeyPaths {
+                self.storagePtr.pointee[keyPath] = newValue
+            }
         }
     }
 

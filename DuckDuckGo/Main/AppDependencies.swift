@@ -343,7 +343,14 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
             fileStore = EncryptedFileStore()
         }
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
-        self.internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
+        self.internalUserDecider = {
+            let internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
+#if DEBUG
+            let url = URL(string: "https://use-login.duckduckgo.com")!
+            internalUserDecider.markUserAsInternalIfNeeded(forUrl: url, response: HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil))
+#endif
+            return internalUserDecider
+        }()
 
         let pinnedTabsManager = PinnedTabsManager()
         let windowManagerDependencies = WindowManagerDependencies(pinnedTabsManager: pinnedTabsManager)

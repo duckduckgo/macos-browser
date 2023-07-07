@@ -94,6 +94,7 @@ final class Application: NSApplication {
             }
 
             if isRunningUnitTests {
+                DependencyInjectionHelper.lazyAssignments = true
                 return DependencyStorageMock(_storage: [
                     \HistoryMenu_InjectedVars.windowManager: (NSClassFromString("WindowManagerMock")!.alloc() as? WindowManagerProtocol)!,
                     \AppDelegate_InjectedVars.internalUserDecider: (NSClassFromString("InternalUserDeciderMock")?.alloc() as? InternalUserDecider)!
