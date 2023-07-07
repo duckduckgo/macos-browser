@@ -7,11 +7,13 @@ public final class TunnelConfiguration {
     public var name: String?
     public var interface: InterfaceConfiguration
     public let peers: [PeerConfiguration]
+    public let tunnelThroughTCP: Bool
 
-    public init(name: String?, interface: InterfaceConfiguration, peers: [PeerConfiguration]) {
+    public init(name: String?, interface: InterfaceConfiguration, tunnelThroughTCP: Bool, peers: [PeerConfiguration]) {
         self.interface = interface
         self.peers = peers
         self.name = name
+        self.tunnelThroughTCP = tunnelThroughTCP
 
         let peerPublicKeysArray = peers.map { $0.publicKey }
         let peerPublicKeysSet = Set<PublicKey>(peerPublicKeysArray)
@@ -25,6 +27,7 @@ extension TunnelConfiguration: Equatable {
     public static func == (lhs: TunnelConfiguration, rhs: TunnelConfiguration) -> Bool {
         return lhs.name == rhs.name &&
             lhs.interface == rhs.interface &&
-            Set(lhs.peers) == Set(rhs.peers)
+            Set(lhs.peers) == Set(rhs.peers) &&
+            lhs.tunnelThroughTCP == rhs.tunnelThroughTCP
     }
 }

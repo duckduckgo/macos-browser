@@ -27,7 +27,7 @@ public enum NetworkProtectionServerSelectionMethod {
 
 public protocol NetworkProtectionDeviceManagement {
 
-    func generateTunnelConfiguration(selectionMethod: NetworkProtectionServerSelectionMethod) async throws -> (TunnelConfiguration, NetworkProtectionServerInfo)
+    func generateTunnelConfiguration(selectionMethod: NetworkProtectionServerSelectionMethod, tunnelThroughTCP: Bool) async throws -> (TunnelConfiguration, NetworkProtectionServerInfo)
 
 }
 
@@ -107,11 +107,12 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
     /// Requests a new server list from the backend and updates it locally.
     /// This method will return the remote server list if available, or the local server list if there was a problem with the service call.
     ///
-    public func refreshServerList() async throws -> [NetworkProtectionServer] {
+    public func refreshServerList(debugHeaderKey: String?) async throws -> [NetworkProtectionServer] {
         guard let token = try? tokenStore.fetchToken() else {
             throw NetworkProtectionError.noAuthTokenFound
         }
-        let servers = await networkClient.getServers(authToken: token)
+
+        let servers = await networkClient.getServers(authToken: token, debugHeaderKey: debugHeaderKey)
         let completeServerList: [NetworkProtectionServer]
 
         switch servers {
@@ -144,12 +145,12 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
     /// 2. If the key is new, register it with all backend servers and return a tunnel configuration + its server info
     /// 3. If the key already existed, look up the stored set of backend servers and check if the preferred server is registered. If not, register it, and return the tunnel configuration + server info.
     ///
-    public func generateTunnelConfiguration(selectionMethod: NetworkProtectionServerSelectionMethod) async throws -> (TunnelConfiguration, NetworkProtectionServerInfo) {
+    public func generateTunnelConfiguration(selectionMethod: NetworkProtectionServerSelectionMethod, tunnelThroughTCP: Bool) async throws -> (TunnelConfiguration, NetworkProtectionServerInfo) {
 
         let (selectedServer, keyPair) = try await register(selectionMethod: selectionMethod)
 
         do {
-            let configuration = try tunnelConfiguration(interfacePrivateKey: keyPair.privateKey, server: selectedServer)
+            let configuration = try tunnelConfiguration(interfacePrivateKey: keyPair.privateKey, tunnelThroughTCP: tunnelThroughTCP, server: selectedServer)
             return (configuration, selectedServer.serverInfo)
         } catch let error as NetworkProtectionError {
             errorEvents?.fire(error)
@@ -189,7 +190,8 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
         }
 
         var keyPair = keyStore.currentKeyPair()
-        let registeredServersResult = await networkClient.register(authToken: token, publicKey: keyPair.publicKey, withServerNamed: selectedServerName)
+        let debugHeaderKey = DefaultHeaderKeyUserDefaultsStore().debugHeaderKey
+        let registeredServersResult = await networkClient.register(authToken: token, publicKey: keyPair.publicKey, debugHeaderKey: debugHeaderKey, withServerNamed: selectedServerName)
         let selectedServer: NetworkProtectionServer
 
         switch registeredServersResult {
@@ -267,6 +269,7 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
     }
 
     func tunnelConfiguration(interfacePrivateKey: PrivateKey,
+                             tunnelThroughTCP: Bool,
                              server: NetworkProtectionServer) throws -> TunnelConfiguration {
 
         guard let allowedIPs = server.allowedIPs else {
@@ -289,7 +292,7 @@ public actor NetworkProtectionDeviceManager: NetworkProtectionDeviceManagement {
 
         let interface = interfaceConfiguration(privateKey: interfacePrivateKey, addressRange: interfaceAddressRange)
 
-        return TunnelConfiguration(name: "Network Protection", interface: interface, peers: [peerConfiguration])
+        return TunnelConfiguration(name: "Network Protection", interface: interface, tunnelThroughTCP: tunnelThroughTCP, peers: [peerConfiguration])
     }
 
     func peerConfiguration(serverPublicKey: PublicKey, serverEndpoint: Endpoint) -> PeerConfiguration {

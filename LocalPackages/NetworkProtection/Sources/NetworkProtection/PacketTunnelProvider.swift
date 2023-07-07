@@ -444,10 +444,10 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
 
         os_log("🔵 Done! Starting tunnel from the %{public}@", log: .networkProtection, type: .info, (isActivatedFromSystemSettings ? "settings" : (isOnDemand ? "on-demand" : "app")))
 
-        startTunnel(selectedServer: selectedServerStore.selectedServer, completionHandler: internalCompletionHandler)
+        startTunnel(selectedServer: selectedServerStore.selectedServer, tunnelThroughTCP: true, completionHandler: internalCompletionHandler)
     }
 
-    private func startTunnel(selectedServer: SelectedNetworkProtectionServer, completionHandler: @escaping (Error?) -> Void) {
+    private func startTunnel(selectedServer: SelectedNetworkProtectionServer, tunnelThroughTCP: Bool, completionHandler: @escaping (Error?) -> Void) {
 
         Task {
             let serverSelectionMethod: NetworkProtectionServerSelectionMethod
@@ -461,7 +461,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
 
             do {
                 os_log("🔵 Generating tunnel config", log: .networkProtection, type: .info)
-                let tunnelConfiguration = try await generateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod)
+                let tunnelConfiguration = try await generateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod, tunnelThroughTCP: tunnelThroughTCP)
                 startTunnel(with: tunnelConfiguration, completionHandler: completionHandler)
                 os_log("🔵 Done generating tunnel config", log: .networkProtection, type: .info)
             } catch {
@@ -474,7 +474,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
-    private func startTunnel(with tunnelConfiguration: TunnelConfiguration, completionHandler: @escaping (Error?) -> Void) {
+    open func startTunnel(with tunnelConfiguration: TunnelConfiguration, completionHandler: @escaping (Error?) -> Void) {
         adapter.start(tunnelConfiguration: tunnelConfiguration) { error in
             if let error {
                 os_log("🔵 Starting tunnel failed with %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
@@ -595,7 +595,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
 
     public func updateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod, reassert: Bool = true) async throws {
 
-        let tunnelConfiguration = try await generateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod)
+        let tunnelConfiguration = try await generateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod, tunnelThroughTCP: false)
 
         try await withCheckedThrowingContinuation { [weak self] (continuation: CheckedContinuation<Void, Error>) in
             guard let self = self else {
@@ -618,7 +618,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
-    private func generateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod) async throws -> TunnelConfiguration {
+    private func generateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod, tunnelThroughTCP: Bool) async throws -> TunnelConfiguration {
 
         let configurationResult: (TunnelConfiguration, NetworkProtectionServerInfo)
 
@@ -627,7 +627,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
                                                                keyStore: keyStore,
                                                                errorEvents: debugEvents)
 
-            configurationResult = try await deviceManager.generateTunnelConfiguration(selectionMethod: serverSelectionMethod)
+            configurationResult = try await deviceManager.generateTunnelConfiguration(selectionMethod: serverSelectionMethod, tunnelThroughTCP: tunnelThroughTCP)
         } catch {
             throw TunnelError.couldNotGenerateTunnelConfiguration(internalError: error)
         }
@@ -672,6 +672,10 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
             handleSetKeyValidity(messageData, completionHandler: completionHandler)
         case .resetAllState:
             handleResetAllState(messageData, completionHandler: completionHandler)
+        case .setDebugHeaderKey:
+            handleSetDebugHeaderKey(messageData, completionHandler: completionHandler)
+        case .clearDebugHeaderKey:
+            handleClearDebugHeaderKey(completionHandler: completionHandler)
         }
     }
 
@@ -780,6 +784,20 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
             setKeyValidity(keyValidity)
             completionHandler?(nil)
         }
+    }
+
+    private func handleSetDebugHeaderKey(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
+
+        let remainingData = messageData.suffix(messageData.count - 1)
+
+        DefaultHeaderKeyUserDefaultsStore().debugHeaderKey = String(data: remainingData, encoding: ExtensionMessage.preferredStringEncoding)
+
+        completionHandler?(nil)
+    }
+
+    private func handleClearDebugHeaderKey(completionHandler: ((Data?) -> Void)? = nil) {
+        DefaultHeaderKeyUserDefaultsStore().reset()
+        completionHandler?(nil)
     }
 
     // MARK: - Adapter start completion handling

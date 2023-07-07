@@ -139,7 +139,7 @@ extension TunnelConfiguration {
         }
 
         if let interfaceConfiguration = interfaceConfiguration {
-            self.init(name: name, interface: interfaceConfiguration, peers: peerConfigurations)
+            self.init(name: name, interface: interfaceConfiguration, tunnelThroughTCP: false, peers: peerConfigurations)
         } else {
             throw ParseError.noInterface
         }

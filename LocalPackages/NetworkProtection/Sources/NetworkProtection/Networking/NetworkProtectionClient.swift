@@ -17,12 +17,15 @@
 //
 
 import Foundation
+import Common
 
 public protocol NetworkProtectionClient {
     func redeem(inviteCode: String) async -> Result<String, NetworkProtectionClientError>
-    func getServers(authToken: String) async -> Result<[NetworkProtectionServer], NetworkProtectionClientError>
+    func getServers(authToken: String,
+                    debugHeaderKey: String?) async -> Result<[NetworkProtectionServer], NetworkProtectionClientError>
     func register(authToken: String,
                   publicKey: PublicKey,
+                  debugHeaderKey: String?,
                   withServerNamed serverName: String?) async -> Result<[NetworkProtectionServer], NetworkProtectionClientError>
 }
 
@@ -73,7 +76,6 @@ struct RedeemResponse: Decodable {
 }
 
 public final class NetworkProtectionBackendClient: NetworkProtectionClient {
-
     enum Constants {
         static let developmentEndpoint = URL(string: "https://staging.netp.duckduckgo.com")!
     }
@@ -115,9 +117,12 @@ public final class NetworkProtectionBackendClient: NetworkProtectionClient {
 
     public init() {}
 
-    public func getServers(authToken: String) async -> Result<[NetworkProtectionServer], NetworkProtectionClientError> {
+    public func getServers(authToken: String,
+                           debugHeaderKey: String?) async -> Result<[NetworkProtectionServer], NetworkProtectionClientError> {
         var request = URLRequest(url: serversURL)
         request.setValue("bearer \(authToken)", forHTTPHeaderField: "Authorization")
+        request.setValue(debugHeaderKey, forHTTPHeaderField: "NetP-Debug-Code")
+
         let downloadedData: Data
 
         do {
@@ -144,6 +149,7 @@ public final class NetworkProtectionBackendClient: NetworkProtectionClient {
 
     public func register(authToken: String,
                          publicKey: PublicKey,
+                         debugHeaderKey: String?,
                          withServerNamed serverName: String? = nil) async -> Result<[NetworkProtectionServer], NetworkProtectionClientError> {
         let requestBody = RegisterKeyRequestBody(publicKey: publicKey, server: serverName)
         let requestBodyData: Data
@@ -157,6 +163,8 @@ public final class NetworkProtectionBackendClient: NetworkProtectionClient {
         var request = URLRequest(url: registerKeyURL)
         request.setValue("bearer \(authToken)", forHTTPHeaderField: "Authorization")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(debugHeaderKey, forHTTPHeaderField: "NetP-Debug-Code")
+
         request.httpMethod = "POST"
         request.httpBody = requestBodyData
 
@@ -175,6 +183,8 @@ public final class NetworkProtectionBackendClient: NetworkProtectionClient {
         } catch {
             return .failure(NetworkProtectionClientError.failedToFetchRegisteredServers(error))
         }
+
+        os_log("Registration ok", String(describing: request))
 
         do {
             let decodedServers = try decoder.decode([NetworkProtectionServer].self, from: responseData)

@@ -28,6 +28,8 @@ public enum ExtensionMessage: UInt8 {
     case getServerAddress
     case expireRegistrationKey
     case setKeyValidity
+    case setDebugHeaderKey
+    case clearDebugHeaderKey
 
     public static let preferredStringEncoding = String.Encoding.utf16
 }

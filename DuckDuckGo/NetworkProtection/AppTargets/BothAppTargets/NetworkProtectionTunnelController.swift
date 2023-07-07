@@ -497,6 +497,28 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         try activeSession.sendProviderMessage(request)
     }
 
+    /// Sets the registration key validity time interval.
+    ///
+    /// - Parameters:
+    ///     - validity: the default registration key validity time interval.  A `nil` value means it will be automatically
+    ///         defined by NetP using its standard configuration.
+    ///
+    static func setDebugHeaderKey(_ debugHeaderKey: String?) async throws {
+        guard let activeSession = try await ConnectionSessionUtilities.activeSession() else {
+            return
+        }
+
+        var request: Data
+
+        if let debugHeaderKey {
+            request = Data([ExtensionMessage.setDebugHeaderKey.rawValue] + debugHeaderKey.data(using: ExtensionMessage.preferredStringEncoding)!)
+        } else {
+            request = Data([ExtensionMessage.clearDebugHeaderKey.rawValue])
+        }
+
+        try activeSession.sendProviderMessage(request)
+    }
+
     static func selectedServerName() -> String? {
         NetworkProtectionSelectedServerUserDefaultsStore().selectedServer.stringValue
     }

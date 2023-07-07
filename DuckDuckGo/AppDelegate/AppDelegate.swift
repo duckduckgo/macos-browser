@@ -357,9 +357,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     /// Fetches a new list of Network Protection servers, and updates the existing set.
     private func refreshNetworkProtectionServers() {
         Task {
+            let debugCode = ProcessInfo.processInfo.environment["NETP_DEBUG_CODE"]
+
+            if let debugCode {
+                try? await NetworkProtectionTunnelController.setDebugHeaderKey(debugCode)
+            }
+
             let serverCount: Int
             do {
-                serverCount = try await NetworkProtectionDeviceManager.create().refreshServerList().count
+                serverCount = try await NetworkProtectionDeviceManager.create().refreshServerList(debugHeaderKey: debugCode).count
             } catch {
                 os_log("Failed to update Network Protection servers", log: .networkProtection, type: .error)
                 return

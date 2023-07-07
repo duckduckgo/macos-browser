@@ -4,6 +4,7 @@
 import Foundation
 import Network
 import NetworkExtension
+import Common
 
 #if SWIFT_PACKAGE
 import WireGuard
@@ -57,12 +58,16 @@ final class PacketTunnelSettingsGenerator {
                 wgSettings.append("preshared_key=\(preSharedKey)\n")
             }
 
-            let result = resolvedEndpoint.map(Self.reresolveEndpoint)
-            if case .success((_, let resolvedEndpoint)) = result {
-                if case .name = resolvedEndpoint.host { assert(false, "Endpoint is not resolved") }
-                wgSettings.append("endpoint=\(resolvedEndpoint)\n")
+            if tunnelConfiguration.tunnelThroughTCP {
+                wgSettings.append("endpoint=127.0.0.1:8888\n")
+            } else {
+                let result = resolvedEndpoint.map(Self.reresolveEndpoint)
+                if case .success((_, let resolvedEndpoint)) = result {
+                    if case .name = resolvedEndpoint.host { assert(false, "Endpoint is not resolved") }
+                    wgSettings.append("endpoint=\(resolvedEndpoint)\n")
+                }
+                resolutionResults.append(result)
             }
-            resolutionResults.append(result)
 
             let persistentKeepAlive = peer.persistentKeepAlive ?? 0
             wgSettings.append("persistent_keepalive_interval=\(persistentKeepAlive)\n")
@@ -118,7 +123,24 @@ final class PacketTunnelSettingsGenerator {
 
         let ipv4Settings = NEIPv4Settings(addresses: ipv4Addresses.map { $0.destinationAddress }, subnetMasks: ipv4Addresses.map { $0.destinationSubnetMask })
         ipv4Settings.includedRoutes = ipv4IncludedRoutes
-        ipv4Settings.excludedRoutes = Self.ipv4ExcludedRoutes
+        ipv4Settings.excludedRoutes = Self.ipv4ExcludedRoutes + {
+            guard let endpointOptional = resolvedEndpoints.first,
+                  let endpoint = endpointOptional,
+                  case .success((_, let resolvedEndpoint)) = Self.reresolveEndpoint(endpoint: endpoint) else {
+                return []
+            }
+
+            switch resolvedEndpoint.host {
+            case .ipv4(let address):
+                os_log("🟣 IP is: %{public}@", "\(address)")
+                return [NEIPv4Route(destinationAddress: "\(address)", subnetMask: "255.255.255.255")]
+            case .name, .ipv6:
+                // no ipv6 support yet
+                return []
+            @unknown default:
+                return []
+            }
+        }()
         networkSettings.ipv4Settings = ipv4Settings
 
         let ipv6Settings = NEIPv6Settings(addresses: ipv6Addresses.map { $0.destinationAddress }, networkPrefixLengths: ipv6Addresses.map { $0.destinationNetworkPrefixLength })

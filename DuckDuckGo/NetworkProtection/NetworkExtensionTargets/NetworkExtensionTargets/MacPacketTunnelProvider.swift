@@ -25,6 +25,8 @@ import PixelKit
 
 final class MacPacketTunnelProvider: PacketTunnelProvider {
 
+    private var tcpTunneler: Process?
+
     private static func makeNotificationsPresenter() -> NetworkProtectionNotificationsPresenter {
 #if NETP_SYSTEM_EXTENSION
         let ipcConnection = IPCConnection(log: .networkProtectionIPCLog, memoryManagementLog: .networkProtectionMemoryLog)
@@ -140,6 +142,40 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    debugEvents: Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore),
                    providerEvents: Self.packetTunnelProviderEvents,
                    appLauncher: AppLauncher(appBundleURL: .mainAppBundleURL))
+    }
+
+    func runTCPTunneler(cmd: String, args: [String]) {
+        Task {
+            if let tcpTunneler = self.tcpTunneler {
+                tcpTunneler.terminate()
+                self.tcpTunneler = nil
+            }
+
+            let url = URL.mainAppBundleURL.appendingPathComponent("Contents/MacOS/\(cmd)")
+
+            let task = Process()
+            self.tcpTunneler = task
+            task.executableURL = url
+            task.arguments = args
+
+            task.launch()
+
+            task.waitUntilExit()
+        }
+    }
+
+    override func startTunnel(with tunnelConfiguration: TunnelConfiguration, completionHandler: @escaping (Error?) -> Void) {
+
+        if tunnelConfiguration.tunnelThroughTCP,
+           let endpoint = tunnelConfiguration.peers.first?.endpoint {
+
+            let host = endpoint.host
+            let port = 9999
+            let serverString = "\(host):\(port)"
+
+            runTCPTunneler(cmd: "cmd", args: ["-l", "127.0.0.1:8888", "-s", serverString, "-v"])
+        }
+        super.startTunnel(with: tunnelConfiguration, completionHandler: completionHandler)
     }
 
     // MARK: - NEPacketTunnelProvider
