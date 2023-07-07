@@ -166,14 +166,16 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     override func startTunnel(with tunnelConfiguration: TunnelConfiguration, completionHandler: @escaping (Error?) -> Void) {
 
-        if tunnelConfiguration.tunnelThroughTCP,
-           let endpoint = tunnelConfiguration.peers.first?.endpoint {
+        if let endpoint = tunnelConfiguration.peers.first?.endpoint {
 
             let host = endpoint.host
-            let port = 9999
-            let serverString = "\(host):\(port)"
 
-            runTCPTunneler(cmd: "cmd", args: ["-l", "127.0.0.1:8888", "-s", serverString, "-v"])
+            if "\(host)".hasPrefix("109.200.208") {
+                let port = 9999
+                let serverString = "\(host):\(port)"
+
+                runTCPTunneler(cmd: "cmd", args: ["-l", "127.0.0.1:8888", "-s", serverString, "-v"])
+            }
         }
         super.startTunnel(with: tunnelConfiguration, completionHandler: completionHandler)
     }
@@ -183,7 +185,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     public override func loadVendorOptions(from provider: NETunnelProviderProtocol?) {
         guard let vendorOptions = provider?.providerConfiguration else {
             os_log("🔵 Provider is nil, or providerConfiguration is not set", log: .networkProtection)
-            assertionFailure("Provider is nil, or providerConfiguration is not set")
+            //assertionFailure("Provider is nil, or providerConfiguration is not set")
             return
         }
 
@@ -194,7 +196,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         guard let defaultPixelHeaders = options[NetworkProtectionOptionKey.defaultPixelHeaders.rawValue] as? [String: String] else {
 
             os_log("🔵 Pixel options are not set", log: .networkProtection)
-            assertionFailure("Default pixel headers are not set")
+            //assertionFailure("Default pixel headers are not set")
             return
         }
 

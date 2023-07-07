@@ -58,16 +58,18 @@ final class PacketTunnelSettingsGenerator {
                 wgSettings.append("preshared_key=\(preSharedKey)\n")
             }
 
-            if tunnelConfiguration.tunnelThroughTCP {
-                wgSettings.append("endpoint=127.0.0.1:8888\n")
-            } else {
-                let result = resolvedEndpoint.map(Self.reresolveEndpoint)
-                if case .success((_, let resolvedEndpoint)) = result {
-                    if case .name = resolvedEndpoint.host { assert(false, "Endpoint is not resolved") }
+            let result = resolvedEndpoint.map(Self.reresolveEndpoint)
+            if case .success((_, let resolvedEndpoint)) = result {
+                if case .name = resolvedEndpoint.host { assert(false, "Endpoint is not resolved") }
+
+                if "\(resolvedEndpoint)".hasPrefix("109.200.208") {
+                    os_log("🟣 Endpoint set to 127.0.0.1:8888")
+                    wgSettings.append("endpoint=127.0.0.1:8888\n")
+                } else {
                     wgSettings.append("endpoint=\(resolvedEndpoint)\n")
                 }
-                resolutionResults.append(result)
             }
+            resolutionResults.append(result)
 
             let persistentKeepAlive = peer.persistentKeepAlive ?? 0
             wgSettings.append("persistent_keepalive_interval=\(persistentKeepAlive)\n")

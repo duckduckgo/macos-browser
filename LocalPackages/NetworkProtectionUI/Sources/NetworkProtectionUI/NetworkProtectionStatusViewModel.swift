@@ -487,9 +487,17 @@ extension NetworkProtectionStatusView {
 
             switch connectionStatus {
             case .connected:
+                if internalServerAddress.hasPrefix("109.200.208") {
+                    return internalServerAddress + "(TCP)"
+                }
+
                 return internalServerAddress
             case .disconnecting:
                 if case .connected = previousConnectionStatus {
+                    if internalServerAddress.hasPrefix("109.200.208") {
+                        return internalServerAddress + "(TCP)"
+                    }
+
                     return internalServerAddress
                 } else {
                     return UserText.networkProtectionServerAddressUnknown

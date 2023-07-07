@@ -444,10 +444,10 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
 
         os_log("🔵 Done! Starting tunnel from the %{public}@", log: .networkProtection, type: .info, (isActivatedFromSystemSettings ? "settings" : (isOnDemand ? "on-demand" : "app")))
 
-        startTunnel(selectedServer: selectedServerStore.selectedServer, tunnelThroughTCP: true, completionHandler: internalCompletionHandler)
+        startTunnel(selectedServer: selectedServerStore.selectedServer, completionHandler: internalCompletionHandler)
     }
 
-    private func startTunnel(selectedServer: SelectedNetworkProtectionServer, tunnelThroughTCP: Bool, completionHandler: @escaping (Error?) -> Void) {
+    private func startTunnel(selectedServer: SelectedNetworkProtectionServer, completionHandler: @escaping (Error?) -> Void) {
 
         Task {
             let serverSelectionMethod: NetworkProtectionServerSelectionMethod
@@ -461,7 +461,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
 
             do {
                 os_log("🔵 Generating tunnel config", log: .networkProtection, type: .info)
-                let tunnelConfiguration = try await generateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod, tunnelThroughTCP: tunnelThroughTCP)
+                let tunnelConfiguration = try await generateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod)
                 startTunnel(with: tunnelConfiguration, completionHandler: completionHandler)
                 os_log("🔵 Done generating tunnel config", log: .networkProtection, type: .info)
             } catch {
@@ -595,7 +595,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
 
     public func updateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod, reassert: Bool = true) async throws {
 
-        let tunnelConfiguration = try await generateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod, tunnelThroughTCP: false)
+        let tunnelConfiguration = try await generateTunnelConfiguration(serverSelectionMethod: serverSelectionMethod)
 
         try await withCheckedThrowingContinuation { [weak self] (continuation: CheckedContinuation<Void, Error>) in
             guard let self = self else {
@@ -618,7 +618,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }
 
-    private func generateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod, tunnelThroughTCP: Bool) async throws -> TunnelConfiguration {
+    private func generateTunnelConfiguration(serverSelectionMethod: NetworkProtectionServerSelectionMethod) async throws -> TunnelConfiguration {
 
         let configurationResult: (TunnelConfiguration, NetworkProtectionServerInfo)
 
@@ -627,7 +627,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
                                                                keyStore: keyStore,
                                                                errorEvents: debugEvents)
 
-            configurationResult = try await deviceManager.generateTunnelConfiguration(selectionMethod: serverSelectionMethod, tunnelThroughTCP: tunnelThroughTCP)
+            configurationResult = try await deviceManager.generateTunnelConfiguration(selectionMethod: serverSelectionMethod)
         } catch {
             throw TunnelError.couldNotGenerateTunnelConfiguration(internalError: error)
         }
