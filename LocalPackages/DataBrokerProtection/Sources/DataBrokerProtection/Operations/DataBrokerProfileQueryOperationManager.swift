@@ -113,6 +113,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
         if data.preferredRunDate == nil || data.preferredRunDate! > date {
             data.preferredRunDate = date
+            os_log("Updating preferredRunDate on %@", log: .dataBrokerProtection, data.id.uuidString)
+
         }
     }
 

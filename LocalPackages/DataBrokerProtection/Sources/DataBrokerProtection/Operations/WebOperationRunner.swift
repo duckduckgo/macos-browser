@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import Common
 
 protocol WebOperationRunner {
 
@@ -47,6 +48,6 @@ final class TestOperationRunner: WebOperationRunner {
     }
 
     deinit {
-        print("DEINIT")
+        os_log("WebOperationRunner Deinit", log: .dataBrokerProtection)
     }
 }
