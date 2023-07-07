@@ -35,6 +35,8 @@ final class WebViewHandler: NSObject {
     init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate) {
         let configuration = WKWebViewConfiguration()
         configuration.applyDataBrokerConfiguration(privacyConfig: privacyConfig, prefs: prefs, delegate: delegate)
+        configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
+
         self.webViewConfiguration = configuration
 
         let userContentController = configuration.userContentController as? DataBrokerUserContentController
@@ -55,6 +57,8 @@ final class WebViewHandler: NSObject {
             window?.contentView = self.webView
             window?.makeKeyAndOrderFront(nil)
         }
+
+        try? await load(url: URL(string: "https://www.example.com/")!)
     }
 
     func load(url: URL) async throws {

@@ -83,7 +83,7 @@ final class DataBrokerProtectionDataBase: DataBase {
 private struct TestData {
 
     var profileQuery: ProfileQuery {
-        ProfileQuery(firstName: "John", lastName: "Smith", city: "New York", state: "NY", age: 65)
+        ProfileQuery(firstName: "John", lastName: "Smith", city: "Miami", state: "FL", age: 65)
     }
 
     let verecorJSONString = """
@@ -96,7 +96,7 @@ private struct TestData {
                        {
                          "id": "fe235f94-1c33-11ee-be56-0242ac120002",
                          "actionType": "navigate",
-                         "url": "https://verecor.com/profile/search?fname=${firstName}&lname=${lastName}&state=${stateUpcase}&city=${cityCapitalize}&fage=${ageRange}",
+                         "url": "https://verecor.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${ageRange}",
                          "ageRange": [
                            "18-30",
                            "31-40",
