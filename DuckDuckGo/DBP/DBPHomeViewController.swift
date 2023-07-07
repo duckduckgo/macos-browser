@@ -22,6 +22,8 @@ import BrowserServicesKit
 import AppKit
 
 final class DBPHomeViewController: NSViewController {
+    private var scheduler: DataBrokerProtectionScheduler?
+
 
     override func loadView() {
         view = NSView()
@@ -29,11 +31,27 @@ final class DBPHomeViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        test()
 
+        let button1 = NSButton(title: "Start Scan", target: self, action: #selector(scanButtonClicked(_:)))
+        button1.frame = NSRect(x: 50, y: 50, width: 200, height: 30)
+        view.addSubview(button1)
+
+        let button2 = NSButton(title: "Start Scheduler", target: self, action: #selector(schedulerButtonClicked(_:)))
+        button2.frame = NSRect(x: 50, y: 100, width: 200, height: 30)
+        view.addSubview(button2)
+
+        setupScheduler()
     }
 
-    private func test() {
+    @objc func scanButtonClicked(_ sender: NSButton) {
+        scheduler?.scanAllBrokers()
+    }
+
+    @objc func schedulerButtonClicked(_ sender: NSButton) {
+        scheduler?.start()
+    }
+
+    private func setupScheduler() {
         let privacyConfigurationManager = PrivacyFeatures.contentBlocking.privacyConfigurationManager
         let features = ContentScopeFeatureToggles(emailProtection: false,
                                                   emailProtectionIncontextSignup: false,
@@ -51,8 +69,7 @@ final class DBPHomeViewController: NSViewController {
                                                 sessionKey: sessionKey,
                                                 featureToggles: features)
 
-        let scheduler = DataBrokerProtectionScheduler(privacyConfigManager: privacyConfigurationManager,
+        scheduler = DataBrokerProtectionScheduler(privacyConfigManager: privacyConfigurationManager,
                                                       contentScopeProperties: prefs)
-        scheduler.scanAllBrokers()
     }
 }

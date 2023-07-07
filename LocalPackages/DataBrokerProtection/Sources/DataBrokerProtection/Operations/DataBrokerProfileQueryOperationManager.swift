@@ -153,6 +153,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             brokerProfileQueryData.scanData.preferredRunDate = nil
 
             let profiles = try await runner.scan(brokerProfileQueryData)
+            os_log("Extracted profiles: %@", log: .dataBrokerProtection, profiles)
 
             if !profiles.isEmpty {
                 profiles.forEach {

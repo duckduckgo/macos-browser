@@ -53,11 +53,12 @@ public final class DataBrokerProtectionScheduler {
 
     public func start() {
         os_log("Starting scheduler...", log: .dataBrokerProtection)
-        activity.schedule { completion in
+      //  activity.schedule { completion in
+            os_log("Scheduler runnning...", log: .dataBrokerProtection)
             self.dataBrokerProcessor.runQueuedOperations {
-                completion(.finished)
+             //   completion(.finished)
             }
-        }
+      //  }
     }
 
     public func stop() {
