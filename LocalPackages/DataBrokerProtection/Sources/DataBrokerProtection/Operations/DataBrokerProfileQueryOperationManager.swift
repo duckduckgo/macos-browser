@@ -206,7 +206,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             // Clean preferredRunDate when the operation runs
             data.preferredRunDate = nil
 
-            try await runner.optOut(extractedProfile)
+            try await runner.optOut(profileQuery: brokerProfileQueryData, extractedProfile: extractedProfile)
 
             let event = HistoryEvent(type: .optOutRequested(extractedProfileID: extractedProfile.id))
             brokerProfileQueryData.addHistoryEvent(event, for: data)

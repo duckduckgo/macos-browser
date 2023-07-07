@@ -20,6 +20,7 @@ import Foundation
 
 enum CCFRequestData: Encodable {
     case profile(ProfileQuery)
+    case extractedProfile(ExtractedProfile)
     case solveCaptcha(CaptchaToken)
 }
 

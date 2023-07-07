@@ -22,7 +22,7 @@ import BrowserServicesKit
 protocol WebOperationRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData) async throws -> [ExtractedProfile]
-    func optOut(_ extractedProfile: ExtractedProfile) async throws
+    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile) async throws
 }
 
 @MainActor
@@ -38,12 +38,12 @@ final class TestOperationRunner: WebOperationRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData) async throws -> [ExtractedProfile] {
         let scan = ScanOperation(privacyConfig: privacyConfigManager, prefs: contentScopeProperties, query: profileQuery)
-        return try await scan.run()
-
+        return try await scan.run(inputValue: ())
     }
 
-    func optOut(_ extractedProfile: ExtractedProfile) async throws {
-        print("Fake opt out")
+    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile) async throws {
+        let optOut = OptOutOperation(privacyConfig: privacyConfigManager, prefs: contentScopeProperties, query: profileQuery)
+        try await optOut.run(inputValue: extractedProfile)
     }
 
     deinit {

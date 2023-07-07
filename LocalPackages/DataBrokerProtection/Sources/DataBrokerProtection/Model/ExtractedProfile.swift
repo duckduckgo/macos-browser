@@ -83,6 +83,7 @@ struct ExtractedProfile: Codable, Sendable {
     let profileUrl: String?
     let reportId: String?
     let age: String?
+    var email: String?
     var removedDate: Date?
 
     enum CodingKeys: CodingKey {
@@ -111,6 +112,7 @@ struct ExtractedProfile: Codable, Sendable {
          profileUrl: String? = nil,
          reportId: String? = nil,
          age: String? = nil,
+         email: String? = nil,
          removedDate: Date? = nil) {
         self.name = name
         self.alternativeNamesList = alternativeNamesList
@@ -123,6 +125,7 @@ struct ExtractedProfile: Codable, Sendable {
         self.profileUrl = profileUrl
         self.reportId = reportId
         self.age = age
+        self.email = email
         self.removedDate = removedDate
     }
 }

@@ -24,6 +24,7 @@ import Common
 
 final class ScanOperation: DataBrokerOperation {
     typealias ReturnValue = [ExtractedProfile]
+    typealias InputValue = Void
 
     let privacyConfig: PrivacyConfigurationManaging
     let prefs: ContentScopeProperties
@@ -33,6 +34,7 @@ final class ScanOperation: DataBrokerOperation {
     var webViewHandler: WebViewHandler?
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<[ExtractedProfile], Error>?
+    var extractedProfile: ExtractedProfile?
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
@@ -47,7 +49,7 @@ final class ScanOperation: DataBrokerOperation {
         self.captchaService = captchaService
     }
 
-    func run() async throws -> [ExtractedProfile] {
+    func run(inputValue: Void) async throws -> [ExtractedProfile] {
         try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
             Task {

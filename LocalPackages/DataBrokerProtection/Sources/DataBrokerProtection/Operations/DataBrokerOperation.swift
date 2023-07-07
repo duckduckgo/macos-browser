@@ -23,6 +23,8 @@ import UserScript
 
 protocol DataBrokerOperation: CCFCommunicationDelegate {
     associatedtype ReturnValue
+    associatedtype InputValue
+
     var privacyConfig: PrivacyConfigurationManaging { get }
     var prefs: ContentScopeProperties { get }
     var query: BrokerProfileQueryData { get }
@@ -32,8 +34,9 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     var webViewHandler: WebViewHandler? { get set }
     var actionsHandler: ActionsHandler? { get }
     var continuation: CheckedContinuation<ReturnValue, Error>? { get set }
+    var extractedProfile: ExtractedProfile? { get set }
 
-    func run() async throws -> ReturnValue
+    func run(inputValue: InputValue) async throws -> ReturnValue
     func executeNextStep() async
 }
 
@@ -41,9 +44,8 @@ extension DataBrokerOperation {
 
     // MARK: - Shared functions
 
-    func getProfileWithEmail() async throws -> ProfileQuery {
-        let email = try await emailService.getEmail()
-        return query.profileQuery.copy(email: email)
+    func getProfileWithEmail() async throws {
+
     }
 
     func runNextAction(_ action: Action) async {
@@ -65,19 +67,23 @@ extension DataBrokerOperation {
 
         if action.needsEmail {
             do {
-                query.profileQuery = try await getProfileWithEmail()
+                extractedProfile?.email = try await emailService.getEmail()
             } catch {
                 onError(error: .emailError(error as? EmailService.EmailError))
                 return
             }
         }
 
-        await webViewHandler?.execute(action: action, profileData: .profile(query.profileQuery))
+        if let extractedProfile = self.extractedProfile {
+            await webViewHandler?.execute(action: action, profileData: .extractedProfile(extractedProfile))
+        } else {
+            await webViewHandler?.execute(action: action, profileData: .profile(query.profileQuery))
+        }
     }
 
     private func runEmailConfirmationAction(action: EmailConfirmationAction) async throws {
         do {
-            if let email = query.profileQuery.email {
+            if let email = extractedProfile?.email {
                 let url =  try await emailService.getConfirmationLink(
                     from: email,
                     pollingIntervalInSeconds: action.pollingTime)
