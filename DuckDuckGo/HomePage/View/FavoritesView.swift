@@ -16,8 +16,42 @@
 //  limitations under the License.
 //
 
+import DependencyInjection
 import SwiftUI
 import SwiftUIExtensions
+
+#if swift(>=5.9)
+@Injectable
+#endif
+class AbstractFavoriteDependencies: Injectable {
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = AbstractFavoriteTemplateDependencies.Dependencies
+
+    private init() { fatalError("\(Self.self) should not be instantiated") }
+}
+
+#if swift(>=5.9)
+@Injectable
+#endif
+class AbstractFavoriteTemplateDependencies: Injectable {
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = AbstractFaviconViewDependencies.Dependencies
+
+    private init() { fatalError("\(Self.self) should not be instantiated") }
+}
+
+#if swift(>=5.9)
+@Injectable
+#endif
+class AbstractFavoritesGridAddButtonDependencies: Injectable {
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = AbstractFavoriteTemplateDependencies.Dependencies
+
+    private init() { fatalError("\(Self.self) should not be instantiated") }
+}
 
 extension HomePage.Views {
 
@@ -211,12 +245,13 @@ struct FavoritesGrid: View {
 
 fileprivate struct FavoritesGridAddButton: View {
 
+    let dependencies: AbstractFavoritesGridAddButtonDependencies.DependencyStorage
     @EnvironmentObject var model: HomePage.Models.FavoritesModel
 
     var body: some View {
 
         ZStack(alignment: .top) {
-            FavoriteTemplate(title: UserText.addFavorite, domain: nil)
+            FavoriteTemplate(dependencies: .init(dependencies), title: UserText.addFavorite, domain: nil)
             ZStack {
                 Image("Add")
                     .resizable()
@@ -249,6 +284,8 @@ fileprivate struct FavoritesGridGhostButton: View {
 
 struct FavoriteTemplate: View {
 
+    let dependencies: AbstractFavoriteTemplateDependencies.DependencyStorage
+
     let title: String
     let domain: String?
 
@@ -263,7 +300,7 @@ struct FavoriteTemplate: View {
                     .foregroundColor(isHovering ? Color("HomeFavoritesHoverColor") : Color("HomeFavoritesBackgroundColor"))
 
                 if let domain = domain {
-                    FaviconView(domain: domain)
+                    FaviconView(domain: domain, dependencyProvider: dependencies)
                         .frame(width: 32, height: 32)
                         .padding(9)
                 }
@@ -296,6 +333,8 @@ struct FavoriteTemplate: View {
 
 struct Favorite: View {
 
+    let dependencies: AbstractFavoriteDependencies.DependencyStorage
+
     @EnvironmentObject var model: HomePage.Models.FavoritesModel
 
     let bookmark: Bookmark
@@ -304,8 +343,9 @@ struct Favorite: View {
     private let bookmarkTitle: String
     private let bookmarkURL: URL
 
-    init?(bookmark: Bookmark) {
+    init?(bookmark: Bookmark, dependencyProvider: AbstractFavoriteDependencies.DependencyProvider) {
         guard let urlObject = bookmark.urlObject else { return nil }
+        self.dependencies = .init(dependencyProvider)
         self.bookmark = bookmark
         self.bookmarkTitle = bookmark.title
         self.bookmarkURL = urlObject
@@ -313,7 +353,7 @@ struct Favorite: View {
 
     var body: some View {
 
-        FavoriteTemplate(title: bookmarkTitle, domain: bookmarkURL.host)
+        FavoriteTemplate(dependencies: .init(dependencies), title: bookmarkTitle, domain: bookmarkURL.host)
             .link {
                 model.open(bookmark)
             }.contextMenu(ContextMenu(menuItems: {
@@ -337,10 +377,10 @@ extension HomePage.Models.FavoriteModel {
     var favoriteView: some View {
         switch favoriteType {
         case .bookmark(let bookmark):
-            HomePage.Views.Favorite(bookmark: bookmark)
+            HomePage.Views.Favorite(bookmark: bookmark, dependencyProvider: dependencies)
 
         case .addButton:
-            HomePage.Views.FavoritesGridAddButton()
+            HomePage.Views.FavoritesGridAddButton(dependencies: .init(dependencies))
 
         case .ghostButton:
             HomePage.Views.FavoritesGridGhostButton()

@@ -18,18 +18,39 @@
 
 import Cocoa
 import Combine
+import DependencyInjection
 
-final class AddEditFavoriteViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class AddEditFavoriteViewController: NSViewController, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var bookmarkManager: BookmarkManager
 
     @IBOutlet weak var headerTextField: NSTextField!
     @IBOutlet weak var titleInputTextField: NSTextField!
     @IBOutlet weak var urlInputTextField: NSTextField!
     @IBOutlet weak var confirmButton: NSButton!
 
-    private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     private var originalBookmark: Bookmark?
 
     private var cancellables = Set<AnyCancellable>()
+
+    init?(coder: NSCoder, dependencyProvider: DependencyProvider, bookmark: Bookmark? = nil) {
+        self.dependencies = .init(dependencyProvider)
+
+        super.init(coder: coder)
+
+        if let bookmark {
+            self.edit(bookmark: bookmark)
+        }
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()

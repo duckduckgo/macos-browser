@@ -17,10 +17,18 @@
 //
 
 import Cocoa
+import DependencyInjection
 
-final class BookmarkPopover: NSPopover {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class BookmarkPopover: NSPopover, Injectable {
+    let dependencies: DependencyStorage
 
-    override init() {
+    typealias InjectedDependencies = BookmarkPopoverViewController.Dependencies
+
+    init(dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
         super.init()
 
         behavior = .transient
@@ -37,8 +45,8 @@ final class BookmarkPopover: NSPopover {
 
     private func setupContentController() {
         let storyboard = NSStoryboard(name: "Bookmarks", bundle: nil)
-        let controller = storyboard.instantiateController(identifier: "BookmarkPopoverViewController") { coder in
-            BookmarkPopoverViewController(coder: coder)
+        let controller = storyboard.instantiateController(identifier: "BookmarkPopoverViewController") { [dependencies] coder in
+            BookmarkPopoverViewController(coder: coder, dependencyProvider: dependencies)
         }
         controller.delegate = self
         contentViewController = controller

@@ -32,6 +32,11 @@ final class PrivacyDashboardViewController: NSViewController, Injectable {
     @Injected
     var windowManager: WindowManagerProtocol
 
+    @Injected
+    var contentBlocking: AnyContentBlocking
+
+    typealias InjectedDependencies = ContentBlockingRulesUpdateObserver.Dependencies & WebsiteBreakageReporter.Dependencies
+
     struct Constants {
         static let initialContentHeight: CGFloat = 499
     }
@@ -40,8 +45,8 @@ final class PrivacyDashboardViewController: NSViewController, Injectable {
     private var contentHeightConstraint: NSLayoutConstraint!
 
     private let privacyDashboardController =  PrivacyDashboardController(privacyInfo: nil)
-    public let rulesUpdateObserver = ContentBlockingRulesUpdateObserver()
-    private let websiteBreakageReporter = WebsiteBreakageReporter()
+    public let rulesUpdateObserver: ContentBlockingRulesUpdateObserver
+    private let websiteBreakageReporter: WebsiteBreakageReporter
     private let permissionHandler = PrivacyDashboardPermissionHandler()
 
     /// Running the resize animation block during the popover animation causes frame hitching.
@@ -76,6 +81,8 @@ final class PrivacyDashboardViewController: NSViewController, Injectable {
 
     init?(coder: NSCoder, dependencyProvider: DependencyProvider) {
         self.dependencies = .init(dependencyProvider)
+        self.rulesUpdateObserver = ContentBlockingRulesUpdateObserver(dependencyProvider: dependencies)
+        self.websiteBreakageReporter = WebsiteBreakageReporter(dependencyProvider: dependencies)
 
         super.init(coder: coder)
     }
@@ -194,14 +201,14 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
             return
         }
 
-        let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+        let configuration = contentBlocking.privacyConfigurationManager.privacyConfig
         if isEnabled && configuration.isUserUnprotected(domain: domain) {
             configuration.userEnabledProtection(forDomain: domain)
         } else {
             configuration.userDisabledProtection(forDomain: domain)
         }
 
-        let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
+        let completionToken = contentBlocking.contentBlockingManager.scheduleCompilation()
         rulesUpdateObserver.didStartCompilation(for: domain, token: completionToken)
     }
 

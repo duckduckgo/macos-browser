@@ -42,7 +42,7 @@ final class PasswordManagementViewController: NSViewController, Injectable {
     @Injected
     var passwordManagerCoordinator: PasswordManagerCoordinating
 
-    typealias InjectedDependencies = PasswordManagementLoginModel.Dependencies
+    typealias InjectedDependencies = PasswordManagementLoginModel.Dependencies & DataImportViewController.Dependencies & PasswordManagementItemListModel.Dependencies
 
     static func create(dependencyProvider: DependencyProvider) -> PasswordManagementViewController {
         let storyboard = NSStoryboard(name: "PasswordManager", bundle: nil)
@@ -288,7 +288,7 @@ final class PasswordManagementViewController: NSViewController, Injectable {
 
     @IBAction func onImportClicked(_ sender: NSButton) {
         self.dismiss()
-        DataImportViewController.show(using: windowManager)
+        DataImportViewController.show(with: dependencies)
     }
 
     @IBAction func deviceAuthenticationRequested(_ sender: NSButton) {
@@ -644,7 +644,7 @@ final class PasswordManagementViewController: NSViewController, Injectable {
 
     // swiftlint:disable function_body_length
     private func createListView() {
-        let listModel = PasswordManagementItemListModel(passwordManagerCoordinator: self.passwordManagerCoordinator) { [weak self] previousValue, newValue in
+        let listModel = PasswordManagementItemListModel(dependencyProvider: dependencies) { [weak self] previousValue, newValue in
             guard let newValue = newValue,
                   let id = newValue.secureVaultID,
                   let window = self?.view.window else {

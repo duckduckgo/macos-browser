@@ -93,6 +93,12 @@ final class Fire: Injectable {
     var downloadListCoordinator: DownloadListCoordinator
     @Injected
     var recentlyClosedCoordinator: RecentlyClosedCoordinating
+    @Injected
+    var bookmarkManager: BookmarkManager
+    @Injected
+    var faviconManagement: FaviconManagement
+    @Injected
+    var historyCoordinating: HistoryCoordinating
 
     typealias InjectedDependencies = Tab.Dependencies
 
@@ -104,12 +110,9 @@ final class Fire: Injectable {
     private typealias TabCollectionsCleanupInfo = [TabCollectionViewModel: [TabCollectionViewModel.TabCleanupInfo]]
 
     let webCacheManager: WebCacheManager
-    let historyCoordinating: HistoryCoordinating
     let permissionManager: PermissionManagerProtocol
-    let faviconManagement: FaviconManagement
     let autoconsentManagement: AutoconsentManagement?
     let stateRestorationManager: AppStateRestorationManager?
-    let bookmarkManager: BookmarkManager
     let syncService: DDGSyncing?
     let tabsCleaner = TabDataCleaner()
     let secureVaultFactory: SecureVaultFactory
@@ -123,12 +126,9 @@ final class Fire: Injectable {
 
     @MainActor
     init(cacheManager: WebCacheManager = WebCacheManager.shared,
-         historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
          permissionManager: PermissionManagerProtocol = PermissionManager.shared,
-         faviconManagement: FaviconManagement = FaviconManager.shared,
          autoconsentManagement: AutoconsentManagement? = nil,
          stateRestorationManager: AppStateRestorationManager? = nil,
-         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
          syncService: DDGSyncing? = nil,
          secureVaultFactory: SecureVaultFactory = SecureVaultFactory.default,
          dependencyProvider: DependencyProvider
@@ -136,10 +136,7 @@ final class Fire: Injectable {
         self.dependencies = .init(dependencyProvider)
 
         self.webCacheManager = cacheManager
-        self.historyCoordinating = historyCoordinating
         self.permissionManager = permissionManager
-        self.faviconManagement = faviconManagement
-        self.bookmarkManager = bookmarkManager
         self.syncService = syncService ?? (NSApp.delegate as? AppDelegate)?.syncService
         self.secureVaultFactory = secureVaultFactory
 
@@ -383,7 +380,7 @@ final class Fire: Injectable {
     private func burnFavicons(completion: @escaping () -> Void) {
         let autofillDomains = autofillDomains()
         self.faviconManagement.burnExcept(fireproofDomains: FireproofDomains.shared,
-                                          bookmarkManager: LocalBookmarkManager.shared,
+                                          bookmarkManager: bookmarkManager,
                                           savedLogins: autofillDomains,
                                           completion: completion)
     }
@@ -391,7 +388,7 @@ final class Fire: Injectable {
     private func burnFavicons(for domains: Set<String>, completion: @escaping () -> Void) {
         let autofillDomains = autofillDomains()
         self.faviconManagement.burnDomains(domains,
-                                           exceptBookmarks: LocalBookmarkManager.shared,
+                                           exceptBookmarks: bookmarkManager,
                                            exceptSavedLogins: autofillDomains,
                                            completion: completion)
     }
@@ -473,7 +470,7 @@ final class Fire: Injectable {
 
     private func burnDeletedBookmarks() {
         if syncService?.authState == .inactive {
-            LocalBookmarkManager.shared.cleanUpBookmarksDatabase()
+            bookmarkManager.cleanUpBookmarksDatabase()
         }
     }
 }

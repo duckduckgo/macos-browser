@@ -50,7 +50,6 @@ protocol FileDownloadManagerDelegate: AnyObject {
 
 final class FileDownloadManager: FileDownloadManagerProtocol {
 
-    static let shared = FileDownloadManager()
     private let preferences: DownloadsPreferences
 
     weak var delegate: FileDownloadManagerDelegate?

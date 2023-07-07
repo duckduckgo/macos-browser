@@ -17,8 +17,13 @@
 //
 
 import AppKit
+import DependencyInjection
 
-final class FireproofDomainsViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class FireproofDomainsViewController: NSViewController, Injectable {
+    let dependencies: DependencyStorage
 
     enum Constants {
         static let storyboardName = "FireproofDomains"
@@ -26,21 +31,34 @@ final class FireproofDomainsViewController: NSViewController {
         static let cellIdentifier = NSUserInterfaceItemIdentifier(rawValue: "FireproofDomainCell")
     }
 
-    static func create() -> FireproofDomainsViewController {
+    static func create(dependencyProvider: DependencyProvider) -> FireproofDomainsViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
-        return storyboard.instantiateController(identifier: Constants.identifier)
+        return storyboard.instantiateController(identifier: Constants.identifier) { coder in
+            FireproofDomainsViewController(coder: coder, dependencyProvider: dependencyProvider)
+        }
     }
 
     @IBOutlet var tableView: NSTableView!
     @IBOutlet var removeDomainButton: NSButton!
 
-    private let faviconManagement: FaviconManagement = FaviconManager.shared
+    @Injected
+    var faviconManagement: FaviconManagement
 
     private var allFireproofDomains = [String]()
     private var filteredFireproofDomains: [String]?
 
     private var fireproofDomains: [String] {
         return filteredFireproofDomains ?? allFireproofDomains
+    }
+
+    private init(coder: NSCoder, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
+        super.init(coder: coder)!
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
     }
 
     override func viewDidLoad() {

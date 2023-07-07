@@ -16,11 +16,12 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Combine
 import Common
-import Lottie
 import DependencyInjection
+import Lottie
 
 protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 
@@ -36,7 +37,12 @@ protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 final class AddressBarButtonsViewController: NSViewController, Injectable {
     let dependencies: DependencyStorage
 
-    typealias InjectedDependencies = PrivacyDashboardPopover.Dependencies
+    @Injected
+    var privacyConfigurationManager: PrivacyConfigurationManaging
+    @Injected
+    var bookmarkManager: BookmarkManager
+
+    typealias InjectedDependencies = PrivacyDashboardPopover.Dependencies & BookmarkPopover.Dependencies
 
     static let homeFaviconImage = NSImage(named: "Search")
     static let searchImage = NSImage(named: "Search")
@@ -51,7 +57,7 @@ final class AddressBarButtonsViewController: NSViewController, Injectable {
     private var bookmarkPopover: BookmarkPopover?
     private func bookmarkPopoverCreatingIfNeeded() -> BookmarkPopover {
         return bookmarkPopover ?? {
-            let popover = BookmarkPopover()
+            let popover = BookmarkPopover(dependencyProvider: dependencies)
             popover.delegate = self
             self.bookmarkPopover = popover
             return popover
@@ -145,7 +151,6 @@ final class AddressBarButtonsViewController: NSViewController, Injectable {
 
     private var tabCollectionViewModel: TabCollectionViewModel
 
-    private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     var controllerMode: AddressBarViewController.Mode? {
         didSet {
             updateButtons()
@@ -782,9 +787,7 @@ final class AddressBarButtonsViewController: NSViewController, Injectable {
 
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
 
-            let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
-            let isUnprotected = configuration.isUserUnprotected(domain: host)
-
+            let isUnprotected = privacyConfigurationManager.privacyConfig.isUserUnprotected(domain: host)
             let isShieldDotVisible = isNotSecure || isUnprotected
 
             privacyEntryPointButton.image = isShieldDotVisible ? Self.shieldDotImage : Self.shieldImage

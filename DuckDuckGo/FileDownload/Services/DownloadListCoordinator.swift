@@ -18,16 +18,24 @@
 
 import Combine
 import Common
+import DependencyInjection
 import Foundation
 import Navigation
 import WebKit
 
-final class DownloadListCoordinator {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class DownloadListCoordinator: Injectable {
 
-    let windowManager: WindowManagerProtocol
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+    @Injected
+    var downloadManager: FileDownloadManagerProtocol
 
     private let store: DownloadListStoring
-    private let downloadManager: FileDownloadManagerProtocol
     private let webViewProvider: (() -> WKWebView?)?
 
     private var items = [UUID: DownloadListItem]()
@@ -46,15 +54,13 @@ final class DownloadListCoordinator {
 
     let progress = Progress()
 
-    init(windowManager: WindowManagerProtocol,
+    init(dependencyProvider: DependencyProvider,
          store: DownloadListStoring = DownloadListStore(),
-         downloadManager: FileDownloadManagerProtocol = FileDownloadManager.shared,
          clearItemsOlderThan clearDate: Date = .daysAgo(2),
          webViewProvider: (() -> WKWebView?)? = nil) {
 
-        self.windowManager = windowManager
+        self.dependencies = .init(dependencyProvider)
         self.store = store
-        self.downloadManager = downloadManager
         self.webViewProvider = webViewProvider
 
         load(clearingItemsOlderThan: clearDate)

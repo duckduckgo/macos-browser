@@ -41,14 +41,14 @@ final class SuggestionContainer {
         self.loading.dataSource = self
     }
 
-    convenience init () {
+    convenience init (bookmarkManager: BookmarkManager, historyCoordinating: HistoryCoordinating) {
         let urlFactory = { urlString in
             return URL.makeURL(fromSuggestionPhrase: urlString)
         }
 
         self.init(suggestionLoading: SuggestionLoader(urlFactory: urlFactory),
-                  historyCoordinating: HistoryCoordinator.shared,
-                  bookmarkManager: LocalBookmarkManager.shared)
+                  historyCoordinating: historyCoordinating,
+                  bookmarkManager: bookmarkManager)
     }
 
     func getSuggestions(for query: String) {

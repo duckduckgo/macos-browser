@@ -117,7 +117,7 @@ extension AppDelegate {
     #if FEEDBACK
 
     @IBAction func openFeedback(_ sender: Any?) {
-        FeedbackPresenter.presentFeedbackForm(using: windowManager)
+        FeedbackPresenter.presentFeedbackForm(with: dependencies)
     }
 
     #endif
@@ -161,7 +161,7 @@ extension AppDelegate {
     }
 
     @IBAction func openImportBrowserDataWindow(_ sender: Any?) {
-        DataImportViewController.show(using: windowManager)
+        DataImportViewController.show(with: dependencies)
     }
 
     @IBAction func openExportLogins(_ sender: Any?) {
@@ -209,7 +209,7 @@ extension AppDelegate {
     @IBAction func openExportBookmarks(_ sender: Any?) {
         guard let windowController = windowManager.lastKeyMainWindowController,
               let window = windowController.window,
-              let list = LocalBookmarkManager.shared.list else { return }
+              let list = bookmarkManager.list else { return }
 
         let savePanel = NSSavePanel()
         savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportBookmarksFileNameSuffix)"
@@ -756,7 +756,7 @@ extension MainViewController {
     }
 
     @IBAction func resetBookmarks(_ sender: Any?) {
-        LocalBookmarkManager.shared.resetBookmarks()
+        bookmarkManager.resetBookmarks()
     }
 
     @IBAction func resetPinnedTabs(_ sender: Any?) {
@@ -767,7 +767,7 @@ extension MainViewController {
     }
 
     @IBAction func resetDuckPlayerOverlayInteractions(_ sender: Any?) {
-        DuckPlayerPreferences.shared.youtubeOverlayInteracted = false
+        duckPlayerPreferences.youtubeOverlayInteracted = false
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
@@ -800,7 +800,7 @@ extension MainViewController {
     }
 
     @IBAction func fetchConfigurationNow(_ sender: Any?) {
-        ConfigurationManager.shared.forceRefresh()
+        configurationManager.forceRefresh()
     }
 
     // MARK: - Developer Tools
@@ -941,7 +941,7 @@ extension AppDelegate: NSMenuItemValidation {
 
         // Enables and disables export bookmarks itemz
         case #selector(AppDelegate.openExportBookmarks(_:)):
-            return bookmarksManager.list?.totalBookmarks != 0
+            return bookmarkManager.list?.totalBookmarks != 0
 
         // Enables and disables export passwords items
         case #selector(AppDelegate.openExportLogins(_:)):

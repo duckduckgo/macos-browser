@@ -84,12 +84,12 @@ extension WindowManagerProtocol {
     }
 
     @discardableResult
-    func openNewWindow(with tab: Tab, isBurner: Bool, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, showWindow: Bool = true) -> MainWindow? {
+    func openNewWindow(with tab: Tab, isBurner: Bool = false, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, showWindow: Bool = true) -> MainWindow? {
         self.openNewWindow(with: tab, isBurner: isBurner, droppingPoint: nil, contentSize: contentSize, showWindow: showWindow, popUp: false)
     }
 
     @discardableResult
-    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel?,
+    func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
                        isBurner: Bool = false,
                        droppingPoint: NSPoint? = nil,
                        contentSize: NSSize? = nil,
@@ -133,9 +133,7 @@ final class AbstractWindowManagerNestedDependencies: Injectable {
 
     typealias InjectedDependencies = Tab.Dependencies & TabCollectionViewModel.Dependencies & MainWindowController.Dependencies & MainViewController.Dependencies
 
-    init() {
-        fatalError("\(Self.self) should not be instantiated")
-    }
+    private init() { fatalError("\(Self.self) should not be instantiated") }
 }
 
 #if swift(>=5.9)
@@ -340,9 +338,9 @@ final class WindowManager: WindowManagerProtocol, Injectable {
             }
         } catch {
 #if DEBUG
-            fatalError("WindowsManager.makeNewWindow: \(error)")
+            fatalError("WindowManager.makeNewWindow: \(error)")
 #else
-            fatalError("WindowsManager.makeNewWindow: the App Bundle seems to be removed")
+            fatalError("WindowManager.makeNewWindow: the App Bundle seems to be removed")
 #endif
         }
 

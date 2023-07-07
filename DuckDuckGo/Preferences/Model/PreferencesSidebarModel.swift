@@ -16,11 +16,19 @@
 //  limitations under the License.
 //
 
-import SwiftUI
 import BrowserServicesKit
 import Combine
+import DependencyInjection
+import SwiftUI
 
-final class PreferencesSidebarModel: ObservableObject {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class PreferencesSidebarModel: ObservableObject, Injectable {
+
+    let dependencies: DependencyStorage
+
+    @Injected var privacyConfigurationManager: PrivacyConfigurationManaging
 
     let tabSwitcherTabs: [Tab.TabContent]
 
@@ -31,16 +39,17 @@ final class PreferencesSidebarModel: ObservableObject {
     init(
         loadSections: @escaping () -> [PreferencesSection],
         tabSwitcherTabs: [Tab.TabContent],
-        privacyConfigurationManager: PrivacyConfigurationManaging
+        dependencyProvider: DependencyProvider
     ) {
+        self.dependencies = .init(dependencyProvider)
         self.loadSections = loadSections
         self.tabSwitcherTabs = tabSwitcherTabs
         resetTabSelectionIfNeeded()
         refreshSections()
 
         privacyConfigCancellable = privacyConfigurationManager.updatesPublisher
-            .map { [weak privacyConfigurationManager] in
-                privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .duckPlayer) == true
+            .map { [dependencies] in
+                dependencies.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer) == true
             }
             .removeDuplicates()
             .asVoid()
@@ -53,12 +62,12 @@ final class PreferencesSidebarModel: ObservableObject {
     @MainActor
     convenience init(
         tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
-        privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
-        includeDuckPlayer: Bool
+        includeDuckPlayer: Bool,
+        dependencyProvider: DependencyProvider
     ) {
         self.init(loadSections: { PreferencesSection.defaultSections(includingDuckPlayer: includeDuckPlayer) },
                   tabSwitcherTabs: tabSwitcherTabs,
-                  privacyConfigurationManager: privacyConfigurationManager)
+                  dependencyProvider: dependencyProvider)
     }
 
     func refreshSections() {

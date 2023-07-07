@@ -26,7 +26,7 @@ final class SyncBookmarksAdapter {
 
     private(set) var provider: BookmarksProvider?
 
-    func setUpProviderIfNeeded(database: CoreDataDatabase, metadataStore: SyncMetadataStore) {
+    func setUpProviderIfNeeded(database: CoreDataDatabase, metadataStore: SyncMetadataStore, bookmarkManager: BookmarkManager) {
         guard provider == nil else {
             return
         }
@@ -35,7 +35,7 @@ final class SyncBookmarksAdapter {
             let provider = try BookmarksProvider(
                 database: database,
                 metadataStore: metadataStore,
-                reloadBookmarksAfterSync: LocalBookmarkManager.shared.loadBookmarks
+                reloadBookmarksAfterSync: bookmarkManager.loadBookmarks
             )
 
             syncErrorCancellable = provider.syncErrorPublisher

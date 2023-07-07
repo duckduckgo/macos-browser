@@ -29,78 +29,74 @@ struct WindowManagerDependencies: WindowManager.Dependencies {
 
 }
 
-struct RecentlyClosedCoordinatorDependencies: RecentlyClosedCoordinator.Dependencies {
+struct RecentlyClosedCoordinatorDependencies: RecentlyClosedCoordinator.Dependencies & AutoTabDependencies {
 
-    let pinnedTabsManagerValue: PinnedTabsManager
-    @_implements(Tab_InjectedVars, pinnedTabsManager)
-    var tabPinnedTabsManager: PinnedTabsManager? { pinnedTabsManagerValue }
-    var pinnedTabsManager: PinnedTabsManager { pinnedTabsManagerValue }
-    let passwordManagerCoordinator: PasswordManagerCoordinating
+    let tabDependencies: TabDependencies
 
+    let pinnedTabsManager: PinnedTabsManager
     let windowManager: WindowManagerProtocol
 
-    init(pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager, passwordManagerCoordinator: PasswordManagerCoordinating) {
-        self.pinnedTabsManagerValue = pinnedTabsManager
+    init(tabDependencies: TabDependencies, pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager) {
+        self.tabDependencies = tabDependencies
+        self.pinnedTabsManager = pinnedTabsManager
         self.windowManager = windowManager
-        self.passwordManagerCoordinator = passwordManagerCoordinator
     }
 
 }
 
-struct FireDependencies: Fire.Dependencies {
+struct FireDependencies: Fire.Dependencies & AutoTabDependencies {
+
+    let tabDependencies: TabDependencies
 
     let downloadListCoordinator: DownloadListCoordinator
     let recentlyClosedCoordinator: RecentlyClosedCoordinating
 
-    let pinnedTabsManagerValue: PinnedTabsManager
-    @_implements(Tab_InjectedVars, pinnedTabsManager)
-    var tabPinnedTabsManager: PinnedTabsManager? { pinnedTabsManagerValue }
-    var pinnedTabsManager: PinnedTabsManager { pinnedTabsManagerValue }
-    let passwordManagerCoordinator: PasswordManagerCoordinating
-
+    let pinnedTabsManager: PinnedTabsManager
     let windowManager: WindowManagerProtocol
 
-    init(downloadListCoordinator: DownloadListCoordinator, recentlyClosedCoordinator: RecentlyClosedCoordinating, pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager, passwordManagerCoordinator: PasswordManagerCoordinating) {
+    init(tabDependencies: TabDependencies, downloadListCoordinator: DownloadListCoordinator, recentlyClosedCoordinator: RecentlyClosedCoordinating, pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager) {
+        self.tabDependencies = tabDependencies
+
         self.downloadListCoordinator = downloadListCoordinator
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
 
-        self.pinnedTabsManagerValue = pinnedTabsManager
+        self.pinnedTabsManager = pinnedTabsManager
         self.windowManager = windowManager
-        self.passwordManagerCoordinator = passwordManagerCoordinator
     }
 
 }
 
 struct FireCoordinatorDependencies: FireCoordinator.Dependencies {
-    let pinnedTabsManagerValue: PinnedTabsManager
-    let downloadListCoordinator: DownloadListCoordinator
-
-    var pinnedTabsManager: PinnedTabsManager? { pinnedTabsManagerValue }
+    let faviconManagement: FaviconManagement
 
     let windowManager: WindowManagerProtocol
 
     let fireViewModel: FireViewModel
 
+    let historyCoordinating: HistoryCoordinating
+
     @MainActor
-    init(downloadListCoordinator: DownloadListCoordinator, recentlyClosedCoordinator: RecentlyClosedCoordinating, pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager, passwordManagerCoordinator: PasswordManagerCoordinating) {
-        let fireDependencies = FireDependencies(downloadListCoordinator: downloadListCoordinator,
+    init(tabDependencies: TabDependencies, downloadListCoordinator: DownloadListCoordinator, recentlyClosedCoordinator: RecentlyClosedCoordinating, pinnedTabsManager: PinnedTabsManager, faviconManagement: FaviconManagement, bookmarkManager: BookmarkManager, windowManager: WindowManager) {
+        let fireDependencies = FireDependencies(tabDependencies: tabDependencies,
+                                                downloadListCoordinator: downloadListCoordinator,
                                                 recentlyClosedCoordinator: recentlyClosedCoordinator,
                                                 pinnedTabsManager: pinnedTabsManager,
-                                                windowManager: windowManager,
-                                                passwordManagerCoordinator: passwordManagerCoordinator)
+                                                windowManager: windowManager)
         self.fireViewModel = FireViewModel(fire: Fire(dependencyProvider: fireDependencies))
-
-        self.downloadListCoordinator = downloadListCoordinator
-        self.pinnedTabsManagerValue = pinnedTabsManager
+        self.faviconManagement = faviconManagement
+        self.historyCoordinating = tabDependencies.historyCoordinating
         self.windowManager = windowManager
     }
 
 }
 
-struct WindowManagerNestedDependencies: AbstractWindowManagerNestedDependencies.Dependencies {
+struct WindowManagerNestedDependencies: AbstractWindowManagerNestedDependencies.Dependencies & AutoTabDependencies {
+
+    let tabDependencies: TabDependencies
+    let configurationManager: ConfigurationManager
+    let faviconManagement: FaviconManagement
 
     let emailManager = BrowserServicesKit.EmailManager()
-    let passwordManagerCoordinator: PasswordManagerCoordinating
     let urlMatcher: BrowserServicesKit.AutofillUrlMatcher = AutofillDomainNameUrlMatcher()
     let downloadListCoordinator: DownloadListCoordinator
 
@@ -108,22 +104,36 @@ struct WindowManagerNestedDependencies: AbstractWindowManagerNestedDependencies.
     let syncService: DDGSyncing
 
     let fireViewModel: FireViewModel
+    var fire: Fire { fireViewModel.fire }
+
     let fireCoordinator: FireCoordinator
 
     let pinnedTabsManager: PinnedTabsManager?
 
     let windowManager: WindowManagerProtocol
 
+    var duckPlayerPreferences: DuckPlayerPreferences
+
+    var scriptSourceProvider: ScriptSourceProviding
+
     @MainActor
-    init(internalUserDecider: BrowserServicesKit.InternalUserDecider,
+    init(tabDependencies: TabDependencies,
+         configurationManager: ConfigurationManager,
+         faviconManagement: FaviconManagement,
+         internalUserDecider: BrowserServicesKit.InternalUserDecider,
          syncService: DDGSyncing,
          recentlyClosedCoordinator: RecentlyClosedCoordinating,
          downloadListCoordinator: DownloadListCoordinator,
          fireViewModel: FireViewModel,
          fireCoordinator: FireCoordinator,
          pinnedTabsManager: PinnedTabsManager,
-         passwordManagerCoordinator: PasswordManagerCoordinating,
-         windowManager: WindowManager) {
+         windowManager: WindowManager,
+         duckPlayerPreferences: DuckPlayerPreferences,
+         scriptSourceProvider: ScriptSourceProviding) {
+
+        self.tabDependencies = tabDependencies
+        self.configurationManager = configurationManager
+        self.faviconManagement = faviconManagement
 
         self.internalUserDecider = internalUserDecider
         self.downloadListCoordinator = downloadListCoordinator
@@ -133,13 +143,19 @@ struct WindowManagerNestedDependencies: AbstractWindowManagerNestedDependencies.
         self.fireCoordinator = fireCoordinator
 
         self.pinnedTabsManager = pinnedTabsManager
-        self.passwordManagerCoordinator = passwordManagerCoordinator
+
         self.windowManager = windowManager
+
+        self.duckPlayerPreferences = duckPlayerPreferences
+        self.scriptSourceProvider = scriptSourceProvider
     }
 
 }
 
-struct StateRestorationManagerDependencies: AppStateRestorationManager.Dependencies {
+struct StateRestorationManagerDependencies: AppStateRestorationManager.Dependencies & AutoTabDependencies {
+
+    let tabDependencies: TabDependencies
+
     let statePersistenceService: StatePersistenceService
 
     let pinnedTabsManager: PinnedTabsManager?
@@ -148,7 +164,8 @@ struct StateRestorationManagerDependencies: AppStateRestorationManager.Dependenc
     let windowManager: WindowManager
 
     @MainActor
-    init(statePersistenceService: StatePersistenceService, pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager, passwordManagerCoordinator: PasswordManagerCoordinating) {
+    init(tabDependencies: TabDependencies, statePersistenceService: StatePersistenceService, pinnedTabsManager: PinnedTabsManager, windowManager: WindowManager, passwordManagerCoordinator: PasswordManagerCoordinating) {
+        self.tabDependencies = tabDependencies
         self.statePersistenceService = statePersistenceService
         self.pinnedTabsManager = pinnedTabsManager
         self.windowManager = windowManager
@@ -157,7 +174,141 @@ struct StateRestorationManagerDependencies: AppStateRestorationManager.Dependenc
 
 }
 
-struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & HistoryMenu.Dependencies & Tab.DependencyProvider {
+struct PasswordManagerCoordinatorDependencies: PasswordManagerCoordinator.Dependencies {
+    var bitwardenManagement: BWManagement
+    var windowManager: WindowManagerProtocol
+}
+
+struct DownloadListCoordinatorDependencies: DownloadListCoordinator.Dependencies {
+    var windowManager: WindowManagerProtocol
+    var downloadManager: FileDownloadManagerProtocol
+}
+
+struct TabDependencies: Tab.Dependencies {
+    var bookmarkManager: BookmarkManager
+
+    var faviconManagement: FaviconManagement
+
+    var pinnedTabsManager: PinnedTabsManager?
+
+    var passwordManagerCoordinator: PasswordManagerCoordinating
+
+    var privacyFeatures: PrivacyFeaturesProtocol
+
+    var contentBlocking: AnyContentBlocking { privacyFeatures.contentBlocking }
+
+    var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
+
+    var privacyConfigurationManager: BrowserServicesKit.PrivacyConfigurationManaging {
+        contentBlocking.privacyConfigurationManager
+    }
+
+    var contentBlockingManager: ContentBlockerRulesManagerProtocol {
+        contentBlocking.contentBlockingManager
+    }
+
+    var now: () -> Date
+
+    var attributionFeatureConfig: BrowserServicesKit.AdClickAttributing {
+        contentBlocking.adClickAttribution
+    }
+
+    var attributionRulesProvider: BrowserServicesKit.AdClickAttributionRulesProviding {
+        contentBlocking.adClickAttributionRulesProvider
+    }
+
+    var tld: Common.TLD {
+        contentBlocking.tld
+    }
+
+    let attributionEvents: Common.EventMapping<BrowserServicesKit.AdClickAttributionEvents>?
+
+    let attributionDebugEvents: Common.EventMapping<BrowserServicesKit.AdClickAttributionDebugEvents>?
+
+    let tabExtensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default
+
+    let attributionLog: () -> Common.OSLog
+
+    let duckPlayer: DuckPlayer
+
+    let historyCoordinating: HistoryCoordinating
+
+    let workspace: Workspace = NSWorkspace.shared
+
+    let downloadManager: FileDownloadManagerProtocol
+}
+
+protocol AutoTabDependencies: Tab.Dependencies {
+    var tabDependencies: TabDependencies { get }
+}
+extension AutoTabDependencies {
+
+    var bookmarkManager: BookmarkManager { tabDependencies.bookmarkManager }
+
+    var faviconManagement: FaviconManagement { tabDependencies.faviconManagement }
+
+    var pinnedTabsManager: PinnedTabsManager? { tabDependencies.pinnedTabsManager }
+
+    var passwordManagerCoordinator: PasswordManagerCoordinating { tabDependencies.passwordManagerCoordinator }
+
+    var privacyFeatures: PrivacyFeaturesProtocol { tabDependencies.privacyFeatures }
+
+    var contentBlocking: AnyContentBlocking { tabDependencies.contentBlocking }
+
+    var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? { tabDependencies.cbaTimeReporter }
+
+    var privacyConfigurationManager: BrowserServicesKit.PrivacyConfigurationManaging { tabDependencies.privacyConfigurationManager }
+
+    var contentBlockingManager: ContentBlockerRulesManagerProtocol { tabDependencies.contentBlockingManager }
+
+    var now: () -> Date { tabDependencies.now }
+
+    var attributionFeatureConfig: BrowserServicesKit.AdClickAttributing { tabDependencies.attributionFeatureConfig }
+
+    var attributionRulesProvider: BrowserServicesKit.AdClickAttributionRulesProviding { tabDependencies.attributionRulesProvider }
+
+    var tld: Common.TLD { tabDependencies.tld }
+
+    var attributionEvents: Common.EventMapping<BrowserServicesKit.AdClickAttributionEvents>? { tabDependencies.attributionEvents }
+
+    var attributionDebugEvents: Common.EventMapping<BrowserServicesKit.AdClickAttributionDebugEvents>? { tabDependencies.attributionDebugEvents }
+
+    var tabExtensionsBuilder: TabExtensionsBuilderProtocol { tabDependencies.tabExtensionsBuilder }
+
+    var attributionLog: () -> Common.OSLog { tabDependencies.attributionLog }
+
+    var duckPlayer: DuckPlayer { tabDependencies.duckPlayer }
+
+    var historyCoordinating: HistoryCoordinating { tabDependencies.historyCoordinating }
+
+    var workspace: Workspace { tabDependencies.workspace }
+
+    var downloadManager: FileDownloadManagerProtocol { tabDependencies.downloadManager }
+
+}
+
+struct ConfigurationManagerDependencies: ConfigurationManager.Dependencies {
+    let privacyFeatures: PrivacyFeaturesProtocol
+    var contentBlocking: AnyContentBlocking { privacyFeatures.contentBlocking }
+}
+
+struct LocalBookmarkStoreDependencies: LocalBookmarkStore.Dependencies {
+    let duckPlayer: DuckPlayer
+
+    let faviconManagement: FaviconManagement
+}
+struct LocalBookmarkManagerDependencies: LocalBookmarkManager.Dependencies {
+    let bookmarkStore: BookmarkStore
+
+    let faviconManagement: FaviconManagement
+
+    let duckPlayer: DuckPlayer
+}
+
+struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & HistoryMenu.Dependencies & AutoTabDependencies {
+
+    let privacyFeatures: PrivacyFeaturesProtocol
+    let tabDependencies: TabDependencies
 
     let windowManager: WindowManagerProtocol
     let syncService: DDGSyncing
@@ -168,16 +319,16 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
     let recentlyClosedCoordinator: RecentlyClosedCoordinator
     let fireCoordinator: FireCoordinator
 
-    let pinnedTabsManagerValue: PinnedTabsManager
-    @_implements(Tab_InjectedVars, pinnedTabsManager)
-    var tabPinnedTabsManager: PinnedTabsManager? { pinnedTabsManagerValue }
-    @_implements(TabCollectionViewModel_InjectedVars, pinnedTabsManager)
-    var tabcvmPinnedTabsManager: PinnedTabsManager? { pinnedTabsManagerValue }
-    var pinnedTabsManager: PinnedTabsManager { pinnedTabsManagerValue }
+    let pinnedTabsManager: PinnedTabsManager
     let passwordManagerCoordinator: PasswordManagerCoordinating
 
+    let configurationManager: ConfigurationManager
+
+    let historyCoordinator: HistoryCoordinator
+    let downloadManager: FileDownloadManager
+
     @MainActor
-    init(isRunningUnitTests: Bool) { // swiftlint:disable:this function_body_length
+    init() { // swiftlint:disable:this function_body_length
 #if CI
         let keyStore = (NSClassFromString("MockEncryptionKeyStore") as? EncryptionKeyStoring.Type)!.init()
 #else
@@ -185,7 +336,7 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
 #endif
         let fileStore: FileStore
         do {
-            let encryptionKey = isRunningUnitTests ? nil : try keyStore.readKey()
+            let encryptionKey = try keyStore.readKey()
             fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
         } catch {
             os_log("App Encryption Key could not be read: %s", "\(error)")
@@ -194,9 +345,6 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         self.internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
 
-        let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
-        self.syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync)
-
         let pinnedTabsManager = PinnedTabsManager()
         let windowManagerDependencies = WindowManagerDependencies(pinnedTabsManager: pinnedTabsManager)
 
@@ -204,37 +352,105 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
         var fireCoordinator: FireCoordinator!
         var downloadListCoordinator: DownloadListCoordinator!
         var passwordManagerCoordinator: PasswordManagerCoordinator!
+        var tabDependencies: TabDependencies!
 
-        let windowManager = WindowManager(dependencyProvider: windowManagerDependencies) { [internalUserDecider, syncService] windowManager in
+        var duckPlayer: DuckPlayer!
+        let contentBlocking = AppContentBlocking(internalUserDecider: internalUserDecider, duckPlayer: { duckPlayer! })
+        let privacyFeatures = AppPrivacyFeatures(contentBlocking: contentBlocking, database: Database.shared)
+        self.privacyFeatures = privacyFeatures
 
-            downloadListCoordinator = DownloadListCoordinator(windowManager: windowManager)
-            passwordManagerCoordinator = PasswordManagerCoordinator(bitwardenManagement: BWManager.shared, windowManager: windowManager)
+        let duckPlayerPreferences = DuckPlayerPreferences()
+        duckPlayer = DuckPlayer(preferences: duckPlayerPreferences, privacyConfigurationManager: contentBlocking.privacyConfigurationManager)
 
-            let recentlyClosedCoordinatorDependencies = RecentlyClosedCoordinatorDependencies(pinnedTabsManager: pinnedTabsManager, windowManager: windowManager, passwordManagerCoordinator: passwordManagerCoordinator)
+        let configurationManagerDependencies = ConfigurationManagerDependencies(privacyFeatures: privacyFeatures)
+        configurationManager = ConfigurationManager(dependencyProvider: configurationManagerDependencies)
+
+        let scriptSourceProvider = ScriptSourceProvider(configStorage: ConfigurationStore.shared,
+                                                        privacyConfigurationManager: contentBlocking.privacyConfigurationManager,
+                                                        privacySettings: PrivacySecurityPreferences.shared,
+                                                        contentBlockingManager: contentBlocking.contentBlockingManager,
+                                                        trackerDataManager: contentBlocking.trackerDataManager,
+                                                        tld: contentBlocking.tld)
+
+        let faviconManagement = FaviconManager(cacheType: .standard)
+
+        let localBookmarkStoreDependencies = LocalBookmarkStoreDependencies(duckPlayer: duckPlayer, faviconManagement: faviconManagement)
+        let bookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared, dependencyProvider: localBookmarkStoreDependencies)
+
+        let localBookmarkManagerDependencies = LocalBookmarkManagerDependencies(bookmarkStore: bookmarkStore,
+                                                                                faviconManagement: faviconManagement,
+                                                                                duckPlayer: duckPlayer)
+        let bookmarkManager = LocalBookmarkManager(dependencyProvider: localBookmarkManagerDependencies)
+
+        let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db, bookmarkManager: bookmarkManager)
+        self.syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync)
+
+        let historyStore = HistoryStore()
+        historyCoordinator = HistoryCoordinator(historyStoring: historyStore)
+
+        downloadManager = FileDownloadManager()
+
+        let windowManager = WindowManager(
+            dependencyProvider: windowManagerDependencies
+        ) { [internalUserDecider, syncService, configurationManager, downloadManager, historyCoordinator] windowManager in
+
+            let downloadListCoordinatorDependencies = DownloadListCoordinatorDependencies(windowManager: windowManager,
+                                                                                          downloadManager: downloadManager)
+            downloadListCoordinator = DownloadListCoordinator(dependencyProvider: downloadListCoordinatorDependencies)
+
+            let passwordManagerCoordinatorDependencies = PasswordManagerCoordinatorDependencies(bitwardenManagement: BWManager.shared,
+                                                                                                windowManager: windowManager)
+            passwordManagerCoordinator = PasswordManagerCoordinator(dependencyProvider: passwordManagerCoordinatorDependencies)
+
+            tabDependencies = TabDependencies(bookmarkManager: bookmarkManager,
+                                              faviconManagement: faviconManagement,
+                                              passwordManagerCoordinator: passwordManagerCoordinator,
+                                              privacyFeatures: privacyFeatures,
+                                              cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter.shared,
+                                              now: Date.init,
+                                              attributionEvents: contentBlocking.attributionEvents,
+                                              attributionDebugEvents: contentBlocking.attributionDebugEvents,
+                                              attributionLog: { OSLog.attribution },
+                                              duckPlayer: duckPlayer,
+                                              historyCoordinating: historyCoordinator,
+                                              downloadManager: downloadManager)
+
+            let recentlyClosedCoordinatorDependencies = RecentlyClosedCoordinatorDependencies(tabDependencies: tabDependencies,
+                                                                                              pinnedTabsManager: pinnedTabsManager,
+                                                                                              windowManager: windowManager)
             recentlyClosedCoordinator = RecentlyClosedCoordinator(dependencyProvider: recentlyClosedCoordinatorDependencies)
 
-            let fireCoordinatorDependencies = FireCoordinatorDependencies(downloadListCoordinator: downloadListCoordinator,
+            let fireCoordinatorDependencies = FireCoordinatorDependencies(tabDependencies: tabDependencies,
+                                                                          downloadListCoordinator: downloadListCoordinator,
                                                                           recentlyClosedCoordinator: recentlyClosedCoordinator,
                                                                           pinnedTabsManager: pinnedTabsManager,
-                                                                          windowManager: windowManager,
-                                                                          passwordManagerCoordinator: passwordManagerCoordinator)
+                                                                          faviconManagement: faviconManagement,
+                                                                          bookmarkManager: bookmarkManager,
+                                                                          windowManager: windowManager)
             fireCoordinator = FireCoordinator(dependencyProvider: fireCoordinatorDependencies)
 
-            return WindowManagerNestedDependencies(internalUserDecider: internalUserDecider,
+            return WindowManagerNestedDependencies(tabDependencies: tabDependencies,
+                                                   configurationManager: configurationManager,
+                                                   faviconManagement: faviconManagement,
+                                                   internalUserDecider: internalUserDecider,
                                                    syncService: syncService,
                                                    recentlyClosedCoordinator: recentlyClosedCoordinator,
                                                    downloadListCoordinator: downloadListCoordinator,
                                                    fireViewModel: fireCoordinatorDependencies.fireViewModel,
                                                    fireCoordinator: fireCoordinator,
                                                    pinnedTabsManager: pinnedTabsManager,
-                                                   passwordManagerCoordinator: passwordManagerCoordinator,
-                                                   windowManager: windowManager)
+                                                   windowManager: windowManager,
+                                                   duckPlayerPreferences: duckPlayerPreferences,
+                                                   scriptSourceProvider: scriptSourceProvider)
         }
+        self.pinnedTabsManager = pinnedTabsManager
         self.windowManager = windowManager
+        self.tabDependencies = tabDependencies
         self.urlEventHandler = URLEventHandler(windowManager: windowManager)
 
         let statePersistenceService = StatePersistenceService(fileStore: fileStore, fileName: AppStateRestorationManager.fileName)
-        let stateRestorationManagerDependencies = StateRestorationManagerDependencies(statePersistenceService: statePersistenceService,
+        let stateRestorationManagerDependencies = StateRestorationManagerDependencies(tabDependencies: tabDependencies,
+                                                                                      statePersistenceService: statePersistenceService,
                                                                                       pinnedTabsManager: pinnedTabsManager,
                                                                                       windowManager: windowManager,
                                                                                       passwordManagerCoordinator: passwordManagerCoordinator)
@@ -245,7 +461,6 @@ struct AppDependencies: AppDelegate.Dependencies & MainMenu.Dependencies & Histo
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
         self.fireCoordinator = fireCoordinator
         self.downloadListCoordinator = downloadListCoordinator
-        self.pinnedTabsManagerValue = pinnedTabsManager
     }
 
 }

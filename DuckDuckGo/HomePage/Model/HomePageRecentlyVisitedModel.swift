@@ -16,20 +16,57 @@
 //  limitations under the License.
 //
 
+import DependencyInjection
 import Foundation
 import SwiftUI
 
 extension HomePage.Models {
 
-final class RecentlyVisitedModel: ObservableObject {
+    typealias RecentlyVisitedModel = RecentlyVisitedModelImp
+
+    final class RecentlyVisitedPageModel: ObservableObject {
+
+        let actualTitle: String?
+        let url: URL
+        let visited: Date
+
+        @Published var displayTitle: String
+
+        init(actualTitle: String?, url: URL, visited: Date) {
+            self.actualTitle = actualTitle
+            self.url = url
+            self.visited = visited
+
+            // This gets fixed in the parent model, when iterating over history items
+            self.displayTitle = actualTitle ?? ""
+        }
+
+    }
+
+    typealias RecentlyVisitedSiteModel = RecentlyVisitedSiteModelImp
+
+}
+
+#if swift(>=5.9)
+@Injectable
+#endif
+final class RecentlyVisitedModelImp: ObservableObject, Injectable {
+
+    let dependencies: DependencyStorage
+
+    @Injected
+    var bookmarkManager: BookmarkManager
+
+    @Injected
+    var fire: Fire
+
+    typealias InjectedDependencies = HomePage.Models.RecentlyVisitedSiteModel.Dependencies
 
     private static let relativeDateFormatter: RelativeDateTimeFormatter = {
         let f = RelativeDateTimeFormatter()
         f.unitsStyle = .abbreviated
         return f
     } ()
-
-    private let fire: Fire
 
     @UserDefaultsWrapper(key: .homePageShowPagesOnHover, defaultValue: false)
     private static var showPagesOnHoverSetting: Bool
@@ -38,7 +75,7 @@ final class RecentlyVisitedModel: ObservableObject {
     private static var showRecentlyVisitedSetting: Bool
 
     @Published var numberOfTrackersBlocked = 0
-    @Published var recentSites = [RecentlyVisitedSiteModel]()
+    @Published var recentSites = [HomePage.Models.RecentlyVisitedSiteModel]()
     @Published var showPagesOnHover: Bool {
         didSet {
             Self.showPagesOnHoverSetting = showPagesOnHover
@@ -54,9 +91,10 @@ final class RecentlyVisitedModel: ObservableObject {
     let open: (URL) -> Void
 
     @MainActor
-    init(fire: Fire, open: @escaping (URL) -> Void) {
+    init(dependencyProvider: DependencyProvider, open: @escaping (URL) -> Void) {
+        self.dependencies = .init(dependencyProvider)
         self.open = open
-        self.fire = fire
+
         showPagesOnHover = Self.showPagesOnHoverSetting
         showRecentlyVisited = Self.showRecentlyVisitedSetting
     }
@@ -64,8 +102,8 @@ final class RecentlyVisitedModel: ObservableObject {
     func refreshWithHistory(_ history: [HistoryEntry]) {
         var numberOfTrackersBlocked = 0
 
-        var recentSites = [RecentlyVisitedSiteModel]()
-        var sitesByDomain = [String: RecentlyVisitedSiteModel]()
+        var recentSites = [HomePage.Models.RecentlyVisitedSiteModel]()
+        var sitesByDomain = [String: HomePage.Models.RecentlyVisitedSiteModel]()
 
         let aWeekAgo = Date.weekAgo
 
@@ -73,19 +111,19 @@ final class RecentlyVisitedModel: ObservableObject {
             .sorted(by: { $0.lastVisit > $1.lastVisit })
             .forEach {
 
-            numberOfTrackersBlocked += $0.numberOfTrackersBlocked
-            guard let host = $0.url.host?.droppingWwwPrefix() else { return }
+                numberOfTrackersBlocked += $0.numberOfTrackersBlocked
+                guard let host = $0.url.host?.droppingWwwPrefix() else { return }
 
-            var site = sitesByDomain[host]
-            if site == nil, let newSite = RecentlyVisitedSiteModel(originalURL: $0.url) {
-                sitesByDomain[host] = newSite
-                recentSites.append(newSite)
-                site = newSite
+                var site = sitesByDomain[host]
+                if site == nil, let newSite = HomePage.Models.RecentlyVisitedSiteModel(originalURL: $0.url, dependencyProvider: dependencies) {
+                    sitesByDomain[host] = newSite
+                    recentSites.append(newSite)
+                    site = newSite
+                }
+
+                site?.addBlockedEntities($0.blockedTrackingEntities)
+                site?.addPage(fromHistory: $0)
             }
-
-            site?.addBlockedEntities($0.blockedTrackingEntities)
-            site?.addPage(fromHistory: $0)
-        }
 
         recentSites.forEach {
             $0.fixDisplayTitles()
@@ -97,13 +135,13 @@ final class RecentlyVisitedModel: ObservableObject {
     }
 
     @MainActor
-    func burn(_ site: RecentlyVisitedSiteModel) {
+    func burn(_ site: HomePage.Models.RecentlyVisitedSiteModel) {
         fire.burnDomains(Set<String>([site.domain]))
         recentSites = recentSites.filter { $0.domain != site.domain }
         numberOfTrackersBlocked -= site.numberOfTrackersBlocked
     }
 
-    func toggleFavoriteSite(_ site: RecentlyVisitedSiteModel, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+    func toggleFavoriteSite(_ site: HomePage.Models.RecentlyVisitedSiteModel, bookmarkManager: BookmarkManager) {
         guard let url = site.domain.url else { return }
         if let bookmark = bookmarkManager.getBookmark(forUrl: url.absoluteString) {
             bookmark.isFavorite.toggle()
@@ -115,7 +153,7 @@ final class RecentlyVisitedModel: ObservableObject {
         }
     }
 
-    func open(_ site: RecentlyVisitedSiteModel) {
+    func open(_ site: HomePage.Models.RecentlyVisitedSiteModel) {
         guard site.isRealDomain, let url = site.url else { return }
         self.open(url)
     }
@@ -130,26 +168,21 @@ final class RecentlyVisitedModel: ObservableObject {
 
 }
 
-final class RecentlyVisitedPageModel: ObservableObject {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class RecentlyVisitedSiteModelImp: ObservableObject, Injectable {
 
-    let actualTitle: String?
-    let url: URL
-    let visited: Date
+    let dependencies: DependencyStorage
 
-    @Published var displayTitle: String
+    @Injected
+    var duckPlayer: DuckPlayer
 
-    init(actualTitle: String?, url: URL, visited: Date) {
-        self.actualTitle = actualTitle
-        self.url = url
-        self.visited = visited
+    @Injected
+    var contentBlocking: AnyContentBlocking
 
-        // This gets fixed in the parent model, when iterating over history items
-        self.displayTitle = actualTitle ?? ""
-    }
-
-}
-
-final class RecentlyVisitedSiteModel: ObservableObject {
+    @Injected
+    var bookmarkManager: BookmarkManager
 
     @UserDefaultsWrapper(key: .homePageShowPageTitles, defaultValue: false)
     private var showTitlesForPagesSetting: Bool
@@ -172,12 +205,11 @@ final class RecentlyVisitedSiteModel: ObservableObject {
 
     private let baseURL: URL?
     private let domainPlaceholder: String?
-    private let duckPlayer: DuckPlayer
 
     @Published var isFavorite: Bool
     @Published var isFireproof: Bool
     @Published var blockedEntities = [String]()
-    @Published var pages = [RecentlyVisitedPageModel]()
+    @Published var pages = [HomePage.Models.RecentlyVisitedPageModel]()
     @Published var numberOfTrackersBlocked = 0
     @Published var trackersFound = false
 
@@ -186,17 +218,16 @@ final class RecentlyVisitedSiteModel: ObservableObject {
     @Published var isHidden = false
 
     init?(originalURL: URL,
-          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
           fireproofDomains: FireproofDomains = FireproofDomains.shared,
-          duckPlayer: DuckPlayer = DuckPlayer.shared) {
+          dependencyProvider: DependencyProvider) {
         guard let domain = originalURL.host?.droppingWwwPrefix() else {
             return nil
         }
 
-        self.duckPlayer = duckPlayer
+        self.dependencies = .init(dependencyProvider)
 
         self.domain = domain
-        self.domainPlaceholder = duckPlayer.domainForRecentlyVisitedSite(with: originalURL)
+        self.domainPlaceholder = dependencies.duckPlayer.domainForRecentlyVisitedSite(with: originalURL)
 
         var components = URLComponents()
         components.scheme = originalURL.scheme
@@ -204,7 +235,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
         self.baseURL = components.url
 
         if let url = domain.url {
-            isFavorite = bookmarkManager.isUrlFavorited(url: url)
+            isFavorite = dependencies.bookmarkManager.isUrlFavorited(url: url)
         } else {
             isFavorite = false
         }
@@ -216,7 +247,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
         blockedEntities = [String](Set<String>(blockedEntities).union(entities))
     }
 
-    func addPage(fromHistory entry: HistoryEntry, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+    func addPage(fromHistory entry: HistoryEntry) {
         numberOfTrackersBlocked += entry.numberOfTrackersBlocked
 
         if entry.trackersFound {
@@ -229,7 +260,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
         // Max pages that should be shown is 10
         guard pages.count < maxPageListSize else { return }
 
-        pages.append(RecentlyVisitedPageModel(actualTitle: entry.title, url: entry.url, visited: entry.lastVisit))
+        pages.append(.init(actualTitle: entry.title, url: entry.url, visited: entry.lastVisit))
     }
 
     func fixDisplayTitles() {
@@ -271,7 +302,7 @@ final class RecentlyVisitedSiteModel: ObservableObject {
         pages = pages.filter { !urlsToRemove.contains($0.url) }
     }
 
-    func fixEntities(_ contentBlocking: AnyContentBlocking = ContentBlocking.shared) {
+    func fixEntities() {
         blockedEntities = blockedEntities.filter { !$0.isEmpty }.sorted(by: { l, r in
             contentBlocking.prevalenceForEntity(named: l) > contentBlocking.prevalenceForEntity(named: r)
         })
@@ -281,11 +312,9 @@ final class RecentlyVisitedSiteModel: ObservableObject {
         return entityDisplayName(entityName).slugfiscated()
     }
 
-    func entityDisplayName(_ entityName: String, _ contentBlocking: AnyContentBlocking = ContentBlocking.shared) -> String {
+    func entityDisplayName(_ entityName: String) -> String {
         return contentBlocking.displayNameForEntity(named: entityName)
     }
-
-}
 
 }
 

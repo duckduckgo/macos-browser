@@ -25,9 +25,8 @@ import Cocoa
 
 final class FeedbackWindow: NSWindow {
 
-    enum Size {
-        static let width: CGFloat = 360
-        static let height: CGFloat = 320
+    private static var contentRect: NSRect {
+        NSRect(x: 216, y: 264, width: 360, height: 320)
     }
 
     override var canBecomeMain: Bool { false }
@@ -36,4 +35,19 @@ final class FeedbackWindow: NSWindow {
         // swiftlint:disable:next force_cast
         contentViewController as! FeedbackViewController
     }
+
+    init(dependencyProvider: FeedbackViewController.DependencyProvider, currentTab: Tab?) {
+        super.init(contentRect: Self.contentRect,
+                   styleMask: [.titled, .closable, .fullSizeContentView],
+                   backing: .buffered,
+                   defer: true)
+        self.allowsToolTipsWhenApplicationIsInactive = false
+        self.autorecalculatesKeyViewLoop = false
+        self.isReleasedWhenClosed = false
+        self.titlebarAppearsTransparent = true
+        self.titleVisibility = .hidden
+
+        self.contentViewController = FeedbackViewController.instantiate(with: dependencyProvider, currentTab: currentTab)
+    }
+
 }

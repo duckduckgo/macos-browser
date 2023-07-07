@@ -23,6 +23,7 @@ import SyncDataProviders
 
 final class SyncDataProviders: DataProvidersSource {
     public let bookmarksAdapter: SyncBookmarksAdapter
+    private let bookmarkManager: BookmarkManager
 
     func makeDataProviders() -> [DataProviding] {
         initializeMetadataDatabaseIfNeeded()
@@ -31,12 +32,13 @@ final class SyncDataProviders: DataProvidersSource {
             return []
         }
 
-        bookmarksAdapter.setUpProviderIfNeeded(database: bookmarksDatabase, metadataStore: syncMetadata)
+        bookmarksAdapter.setUpProviderIfNeeded(database: bookmarksDatabase, metadataStore: syncMetadata, bookmarkManager: bookmarkManager)
         return [bookmarksAdapter.provider].compactMap { $0 }
     }
 
-    init(bookmarksDatabase: CoreDataDatabase) {
+    init(bookmarksDatabase: CoreDataDatabase, bookmarkManager: BookmarkManager) {
         self.bookmarksDatabase = bookmarksDatabase
+        self.bookmarkManager = bookmarkManager
         bookmarksAdapter = SyncBookmarksAdapter()
     }
 

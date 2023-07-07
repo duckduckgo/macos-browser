@@ -23,12 +23,14 @@ import BrowserServicesKit
 
 protocol AddressBarTextFieldDelegate: AnyObject {
 
-    func adressBarTextField(_ addressBarTextField: AddressBarTextField, didChangeValue value: AddressBarTextField.Value)
-    func adressBarTextField(_ addressBarTextField: AddressBarTextField, didRequestNewTabWith content: Tab.TabContent, selected: Bool)
+    func addressBarTextField(_: AddressBarTextField, didRequestHttpsUpgradeOf url: URL) async -> Result<URL, Error>
+    func addressBarTextField(_: AddressBarTextField, didChangeValue value: AddressBarTextField.Value)
+    func addressBarTextField(_: AddressBarTextField, didRequestNewTabWith content: Tab.TabContent, selected: Bool)
 
 }
 
 // swiftlint:disable:next type_body_length
+@MainActor
 final class AddressBarTextField: NSTextField {
 
     weak var addressBarTextFieldDelegate: AddressBarTextFieldDelegate?
@@ -308,7 +310,7 @@ final class AddressBarTextField: NSTextField {
             os_log("%s: Making url from address bar string failed", type: .error, className)
             return
         }
-        addressBarTextFieldDelegate?.adressBarTextField(self, didRequestNewTabWith: .url(url, userEntered: userEnteredValue), selected: selected)
+        addressBarTextFieldDelegate?.addressBarTextField(self, didRequestNewTabWith: .url(url, userEntered: userEnteredValue), selected: selected)
     }
 
     private func openNewTab(selected: Bool, suggestion: Suggestion?) {
@@ -347,12 +349,12 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func upgradeToHttps(url: URL, userEnteredValue: String, completion: @escaping (URL?, String, Bool) -> Void) {
-        Task {
-            let result = await PrivacyFeatures.httpsUpgrade.upgrade(url: url)
+        Task { [self] in
+            let result = await self.addressBarTextFieldDelegate?.addressBarTextField(self, didRequestHttpsUpgradeOf: url)
             switch result {
             case let .success(upgradedUrl):
                 completion(upgradedUrl, userEnteredValue, true)
-            case .failure:
+            case .none, .failure:
                 completion(url, userEnteredValue, false)
             }
         }
@@ -430,7 +432,7 @@ final class AddressBarTextField: NSTextField {
                 self.stringValue = value.string
             }
 
-            addressBarTextFieldDelegate?.adressBarTextField(self, didChangeValue: value)
+            addressBarTextFieldDelegate?.addressBarTextField(self, didChangeValue: value)
         }
     }
 

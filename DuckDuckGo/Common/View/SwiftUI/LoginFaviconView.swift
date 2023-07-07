@@ -22,7 +22,7 @@ struct LoginFaviconView: View {
 
     let domain: String
 
-    let faviconManagement: FaviconManagement = FaviconManager.shared
+    let faviconManagement: FaviconManagement
 
     var body: some View {
 

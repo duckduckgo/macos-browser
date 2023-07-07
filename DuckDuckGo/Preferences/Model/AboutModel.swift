@@ -17,11 +17,20 @@
 //
 
 import Common
+import DependencyInjection
 import SwiftUI
 
-final class AboutModel: ObservableObject {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class AboutModel: ObservableObject, Injectable {
 
-    let windowManager: WindowManagerProtocol
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+
+    typealias InjectedDependencies = FeedbackPresenter.Dependencies
 
     let appVersion = AppVersion()
 
@@ -30,14 +39,14 @@ final class AboutModel: ObservableObject {
 #endif
 
 #if NETWORK_PROTECTION
-    init(netPInvitePresenter: NetworkProtectionInvitePresenting, windowManager: WindowManagerProtocol) {
-        self.windowManager = windowManager
+    init(netPInvitePresenter: NetworkProtectionInvitePresenting, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
 
         self.netPInvitePresenter = netPInvitePresenter
     }
 #else
-    init(windowManager: WindowManagerProtocol) {
-        self.windowManager = windowManager
+    init(dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
     }
 #endif
 
@@ -51,7 +60,7 @@ final class AboutModel: ObservableObject {
 
     @MainActor
     func openFeedbackForm() {
-        FeedbackPresenter.presentFeedbackForm(using: windowManager)
+        FeedbackPresenter.presentFeedbackForm(with: dependencies)
     }
 
 #if NETWORK_PROTECTION

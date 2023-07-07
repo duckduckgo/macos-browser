@@ -33,6 +33,10 @@ final class HistoryMenu: NSMenu, Injectable {
     var recentlyClosedCoordinator: RecentlyClosedCoordinator
     @Injected
     var windowManager: WindowManagerProtocol
+    @Injected
+    var faviconManagement: FaviconManagement
+    @Injected
+    var historyCoordinator: HistoryCoordinator
 
     required init(coder: NSCoder) {
         self.dependencies = .init(Self.dependencyProvider)
@@ -56,7 +60,6 @@ final class HistoryMenu: NSMenu, Injectable {
     @IBOutlet weak var clearAllHistoryMenuItem: NSMenuItem?
     private let clearAllHistorySeparator = NSMenuItem.separator()
 
-    private let historyCoordinator: HistoryCoordinating = HistoryCoordinator.shared
     private var recentlyClosedMenu: RecentlyClosedMenu?
     private let reopenMenuItemKeyEquivalentManager: ReopenMenuItemKeyEquivalentManager
 
@@ -111,7 +114,7 @@ final class HistoryMenu: NSMenu, Injectable {
         recentlyVisitedMenuItems = [recentlyVisitedHeaderMenuItem]
         recentlyVisitedMenuItems.append(contentsOf: historyCoordinator.getRecentVisits(maxCount: 14)
             .map {
-                VisitMenuItem(visitViewModel: VisitViewModel(visit: $0))
+                VisitMenuItem(visitViewModel: VisitViewModel(visit: $0, faviconManager: faviconManagement))
             }
         )
         recentlyVisitedMenuItems.forEach {
@@ -186,7 +189,7 @@ final class HistoryMenu: NSMenu, Injectable {
 
     private func makeMenuItems(from grouping: HistoryGrouping) -> [NSMenuItem] {
         return grouping.visits.map { visit in
-            VisitMenuItem(visitViewModel: VisitViewModel(visit: visit))
+            VisitMenuItem(visitViewModel: VisitViewModel(visit: visit, faviconManager: faviconManagement))
         }
     }
 

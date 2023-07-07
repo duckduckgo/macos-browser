@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
 import Common
+import DependencyInjection
+import Foundation
 
 enum SecureVaultItem: Equatable, Identifiable, Comparable {
 
@@ -201,8 +202,22 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
 //// Using generic "item list" term as eventually this will be more than just accounts.
 ///
 /// Could maybe even abstract a bunch of this code to be more generic re-usable styled list for use elsewhere.
-final class PasswordManagementItemListModel: ObservableObject {
-    let passwordManagerCoordinator: PasswordManagerCoordinating
+
+#if swift(>=5.9)
+@Injectable
+#endif
+final class PasswordManagementItemListModel: ObservableObject, Injectable {
+
+    let dependencies: DependencyStorage
+
+    @Injected
+    var tld: TLD
+
+    @Injected
+    var passwordManagerCoordinator: PasswordManagerCoordinating
+
+    @Injected
+    var faviconManagement: FaviconManagement
 
     enum EmptyState {
         /// Displays nothing for the empty state. Used when data is still loading, or when filtering the All Items list.
@@ -274,10 +289,10 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void
 
-    init(passwordManagerCoordinator: PasswordManagerCoordinating,
+    init(dependencyProvider: DependencyProvider,
          onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void) {
+        self.dependencies = .init(dependencyProvider)
         self.onItemSelected = onItemSelected
-        self.passwordManagerCoordinator = passwordManagerCoordinator
     }
 
     func update(items: [SecureVaultItem]) {
@@ -313,7 +328,7 @@ final class PasswordManagementItemListModel: ObservableObject {
     func selectLoginWithDomainOrFirst(domain: String, notify: Bool = true) {
         let websiteAccounts = items
             .compactMap { $0.websiteAccount }
-        let bestMatch = websiteAccounts.sortedForDomain(domain, tld: ContentBlocking.shared.tld, removeDuplicates: true)
+        let bestMatch = websiteAccounts.sortedForDomain(domain, tld: tld, removeDuplicates: true)
         for section in displayedItems {
             if let account = section.items.first(where: {
                 $0.websiteAccount?.username == bestMatch.first?.username &&
@@ -366,7 +381,7 @@ final class PasswordManagementItemListModel: ObservableObject {
 
         switch sortDescriptor.parameter {
         case .title:
-            displayedItems = PasswordManagementListSection.sectionsByTLD(with: itemsByCategory, order: sortDescriptor.order)
+            displayedItems = PasswordManagementListSection.sectionsByTLD(with: itemsByCategory, order: sortDescriptor.order, tld: tld)
         case .dateCreated:
             displayedItems = PasswordManagementListSection.sections(with: itemsByCategory, by: \.created, order: sortDescriptor.order)
         case .dateModified:

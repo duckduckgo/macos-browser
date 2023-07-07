@@ -16,22 +16,33 @@
 //  limitations under the License.
 //
 
-import Common
-import Foundation
-import CoreData
-import DDGSync
 import Bookmarks
 import Cocoa
+import Common
+import CoreData
+import DDGSync
+import DependencyInjection
+import Foundation
 
+#if swift(>=5.9)
+@Injectable
+#endif
 // swiftlint:disable:next type_body_length
-final class LocalBookmarkStore: BookmarkStore {
+final class LocalBookmarkStore: BookmarkStore, Injectable {
+    let dependencies: DependencyStorage
 
-    init(bookmarkDatabase: BookmarkDatabase) {
+    typealias InjectedDependencies = Bookmark.Dependencies
+
+    init(bookmarkDatabase: BookmarkDatabase, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         self.context = bookmarkDatabase.db.makeContext(concurrencyType: .privateQueueConcurrencyType)
         sharedInitialization()
     }
 
-    init(context: NSManagedObjectContext) {
+    init(context: NSManagedObjectContext, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+        
         self.context = context
         sharedInitialization()
     }
@@ -102,7 +113,8 @@ final class LocalBookmarkStore: BookmarkStore {
 
                 let entities: [BaseBookmarkEntity] = results.compactMap { entity in
                     BaseBookmarkEntity.from(managedObject: entity,
-                                            parentFolderUUID: entity.parent?.uuid)
+                                            parentFolderUUID: entity.parent?.uuid,
+                                            dependencyProvider: self.dependencies)
                 }
 
                 mainQueueCompletion(bookmarks: entities, error: nil)
@@ -317,7 +329,7 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             bookmarkManagedObjects.forEach { managedObject in
-                if let entity = BaseBookmarkEntity.from(managedObject: managedObject, parentFolderUUID: nil) {
+                if let entity = BaseBookmarkEntity.from(managedObject: managedObject, parentFolderUUID: nil, dependencyProvider: self.dependencies) {
                     update(entity)
                     managedObject.update(with: entity, favoritesFolder: self.favoritesFolder)
                 }

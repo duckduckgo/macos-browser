@@ -38,7 +38,10 @@ final class BookmarkManagementSidebarViewController: NSViewController, Injectabl
     @Injected
     var windowManager: WindowManagerProtocol
 
-    typealias InjectedDependencies = Tab.Dependencies
+    @Injected
+    var bookmarkManager: BookmarkManager
+
+    typealias InjectedDependencies = Tab.Dependencies & BookmarkSidebarTreeController.Dependencies & BookmarkOutlineViewDataSource.Dependencies
 
     enum SelectionState: Equatable {
         case empty
@@ -59,14 +62,14 @@ final class BookmarkManagementSidebarViewController: NSViewController, Injectabl
 
     weak var delegate: BookmarkManagementSidebarViewControllerDelegate?
 
-    private let treeControllerDataSource = BookmarkSidebarTreeController()
+    private let treeControllerDataSource: BookmarkSidebarTreeController
 
     private lazy var treeController: BookmarkTreeController = {
         return BookmarkTreeController(dataSource: treeControllerDataSource)
     }()
 
     private lazy var dataSource: BookmarkOutlineViewDataSource = {
-        BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
+        BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController, dependencyProvider: dependencies)
     }()
 
     private var cancellables = Set<AnyCancellable>()
@@ -89,6 +92,7 @@ final class BookmarkManagementSidebarViewController: NSViewController, Injectabl
 
     init(coder: NSCoder, dependencyProvider: DependencyProvider) {
         self.dependencies = .init(dependencyProvider)
+        self.treeControllerDataSource = BookmarkSidebarTreeController(dependencyProvider: dependencies)
 
         super.init(coder: coder)!
     }
@@ -127,7 +131,7 @@ final class BookmarkManagementSidebarViewController: NSViewController, Injectabl
             }
         }.store(in: &cancellables)
 
-        LocalBookmarkManager.shared.listPublisher.receive(on: RunLoop.main).sink { [weak self] _ in
+        bookmarkManager.listPublisher.receive(on: RunLoop.main).sink { [weak self] _ in
             self?.reloadData()
         }.store(in: &cancellables)
     }
@@ -138,7 +142,7 @@ final class BookmarkManagementSidebarViewController: NSViewController, Injectabl
 
         tabSwitcherButton.select(tabType: .bookmarks)
 
-        LocalBookmarkManager.shared.requestSync()
+        bookmarkManager.requestSync()
     }
 
     func select(folder: BookmarkFolder) {
@@ -263,7 +267,7 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
             return
         }
 
-        LocalBookmarkManager.shared.remove(folder: folder)
+        bookmarkManager.remove(folder: folder)
     }
 
     func openInNewTabs(_ sender: NSMenuItem) {
@@ -284,11 +288,11 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
 extension BookmarkManagementSidebarViewController: AddFolderModalViewControllerDelegate {
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
-        LocalBookmarkManager.shared.makeFolder(for: name, parent: nil)
+        bookmarkManager.makeFolder(for: name, parent: nil)
     }
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {
-        LocalBookmarkManager.shared.update(folder: folder)
+        bookmarkManager.update(folder: folder)
     }
 
 }

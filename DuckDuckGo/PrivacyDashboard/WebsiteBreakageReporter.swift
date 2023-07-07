@@ -16,11 +16,24 @@
 //  limitations under the License.
 //
 
+import DependencyInjection
 import Foundation
 
-final class WebsiteBreakageReporter {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class WebsiteBreakageReporter: Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var contentBlocking: AnyContentBlocking
 
     private weak var tabViewModel: TabViewModel?
+
+    init(dependencyProvider: DependencyProvider, tabViewModel: TabViewModel? = nil) {
+        self.dependencies = .init(dependencyProvider)
+        self.tabViewModel = tabViewModel
+    }
 
     public func updateTabViewModel(_ tabViewModel: TabViewModel) {
         self.tabViewModel = tabViewModel
@@ -46,7 +59,7 @@ final class WebsiteBreakageReporter {
                                               siteUrlString: currentURL,
                                               osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
                                               upgradedHttps: currentTab?.privacyInfo?.connectionUpgradedTo != nil,
-                                              tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
+                                              tdsETag: contentBlocking.contentBlockingManager.currentRules.first?.etag,
                                               blockedTrackerDomains: blockedTrackerDomains,
                                               installedSurrogates: installedSurrogates,
                                               isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,

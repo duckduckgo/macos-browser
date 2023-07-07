@@ -136,10 +136,6 @@ extension SyntaxProtocol {
 
 public struct InjectableMacro: MemberMacro {
 
-    static func deprecatedAttribute(for identifier: String) -> AttributeSyntax {
-        "@available(*, deprecated, message: \"use \(raw: identifier).make\")"
-    }
-
     static func injectedVars(of declaration: InjectableDeclSyntax) -> [VariableDeclSyntax] {
         declaration.memberBlock.members.compactMap {
             guard let decl = $0.decl.as(VariableDeclSyntax.self),
@@ -227,7 +223,7 @@ public struct InjectableMacro: MemberMacro {
         }
 
         let dependencyInitArguments = vars.map {
-            "\($0.name): \($0.type)"
+            "\($0.name): @escaping @autoclosure () -> (\($0.type))"
         }.joined(separator: ", ")
         let dynamicDependencyProviderInitArguments = dependencyInitArguments
         + (dynamicCompositions.isEmpty ? "" : "\(dependencyInitArguments.isEmpty ? "" : ",") nested nestedProvider: any ") + dynamicCompositions.dropping(prefix: "& ")
@@ -260,7 +256,7 @@ public struct InjectableMacro: MemberMacro {
             }
             """,
             """
-            func dependencyKeyPath(forInjectedKeyPath keyPath: AnyKeyPath) -> AnyKeyPath {
+            nonisolated func dependencyKeyPath(forInjectedKeyPath keyPath: AnyKeyPath) -> AnyKeyPath {
               switch keyPath {
               \(raw: keyPathMappings)
               default: return keyPath
@@ -275,6 +271,10 @@ public struct InjectableMacro: MemberMacro {
               typealias Owner = \(raw: identifier)
 
               var _storage: [AnyKeyPath: Any] // swiftlint:disable:this identifier_name
+
+              func value<T>(for keyPath: AnyKeyPath) -> T {
+                _storage[keyPath] as? T ?? (self._storage[keyPath] as? (() -> T))!()
+              }
 
               init(_ storage: [AnyKeyPath: Any]) {
                 self._storage = storage
@@ -295,7 +295,7 @@ public struct InjectableMacro: MemberMacro {
               }
 
               subscript<T>(dynamicMember keyPath: KeyPath<\(raw: identifier)_InjectedVars, T>) -> T {
-                self._storage[keyPath] as! T // swiftlint:disable:this force_cast
+                value(for: keyPath)
               }
 
               func mutating(_ transform: (MutableDependencyStorage<\(raw: identifier)_InjectedVars>) throws -> Void) rethrows -> Self {

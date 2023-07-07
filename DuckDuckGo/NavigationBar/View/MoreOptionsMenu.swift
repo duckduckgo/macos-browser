@@ -63,7 +63,7 @@ final class MoreOptionsMenu: NSMenu, Injectable {
     @Injected
     var internalUserDecider: InternalUserDecider
 
-    typealias InjectedDependencies = EmailOptionsButtonSubMenu.Dependencies & SharingMenu.Dependencies
+    typealias InjectedDependencies = EmailOptionsButtonSubMenu.Dependencies & SharingMenu.Dependencies & BookmarksSubMenu.Dependencies
 
     weak var actionDelegate: OptionsButtonMenuDelegate?
 
@@ -267,7 +267,7 @@ final class MoreOptionsMenu: NSMenu, Injectable {
     }
 
     private func addUtilityItems() {
-        let bookmarksSubMenu = BookmarksSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
+        let bookmarksSubMenu = BookmarksSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel, dependencyProvider: dependencies)
 
         addItem(withTitle: UserText.bookmarks, action: #selector(openBookmarks), keyEquivalent: "")
             .targetting(self)
@@ -455,10 +455,20 @@ final class ZoomSubMenu: NSMenu {
 }
 
 @MainActor
-final class BookmarksSubMenu: NSMenu {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class BookmarksSubMenu: NSMenu, Injectable {
 
-    init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var bookmarkManager: BookmarkManager
+
+    init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
         super.init(title: UserText.passwordManagement)
+
         self.autoenablesItems = false
         updateMenuItems(with: tabCollectionViewModel, target: target)
     }
@@ -481,7 +491,7 @@ final class BookmarksSubMenu: NSMenu {
 
         addItem(NSMenuItem.separator())
 
-        if let favorites = LocalBookmarkManager.shared.list?.favoriteBookmarks {
+        if let favorites = bookmarkManager.list?.favoriteBookmarks {
             let favoriteViewModels = favorites.compactMap(BookmarkViewModel.init(entity:))
             let potentialItems = bookmarkMenuItems(from: favoriteViewModels)
 
@@ -494,7 +504,6 @@ final class BookmarksSubMenu: NSMenu {
             addItem(NSMenuItem.separator())
         }
 
-        let bookmarkManager = LocalBookmarkManager.shared
         guard let entities = bookmarkManager.list?.topLevelEntities else {
             return
         }

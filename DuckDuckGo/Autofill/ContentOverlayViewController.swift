@@ -32,6 +32,10 @@ final class ContentOverlayViewController: NSViewController, EmailManagerRequestD
 
     @Injected
     var passwordManagerCoordinator: PasswordManagerCoordinating
+    @Injected
+    var contentBlocking: AnyContentBlocking
+    @Injected
+    var scriptSourceProvider: ScriptSourceProviding
 
     typealias InjectedDependencies = AutofillPreferencesModel.Dependencies
 
@@ -50,7 +54,7 @@ final class ContentOverlayViewController: NSViewController, EmailManagerRequestD
     lazy var vaultManager: SecureVaultManager = {
         let manager = SecureVaultManager(passwordManager: passwordManagerCoordinator,
                                          includePartialAccountMatches: true,
-                                         tld: ContentBlocking.shared.tld)
+                                         tld: contentBlocking.tld)
         manager.delegate = self
         return manager
     }()
@@ -137,8 +141,7 @@ final class ContentOverlayViewController: NSViewController, EmailManagerRequestD
     }
 
     public func buildAutofillSource() -> AutofillUserScriptSourceProvider {
-        let scriptSourceProviding = DefaultScriptSourceProvider()
-        return scriptSourceProviding.buildAutofillSource()
+        scriptSourceProvider.buildAutofillSource()
     }
 
     private func initWebView() {

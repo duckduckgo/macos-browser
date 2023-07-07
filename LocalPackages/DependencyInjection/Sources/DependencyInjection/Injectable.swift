@@ -35,6 +35,7 @@ public protocol Injectable {
 
 public protocol DependencyStorageProtocol {
     var _storage: [AnyKeyPath: Any] { get } // swiftlint:disable:this identifier_name
+    func value<T>(for keyPath: AnyKeyPath) -> T
 }
 
 public struct DependencyInjectionHelper {
@@ -50,5 +51,8 @@ public extension DependenciesProtocol {
         DependencyInjectionHelper.collectKeyPaths().reduce(into: [:]) {
             $0[$1] = self[keyPath: $1]
         }
+    }
+    func value<T>(for keyPath: AnyKeyPath) -> T {
+        fatalError()
     }
 }

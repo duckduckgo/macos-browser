@@ -28,6 +28,8 @@ final class PrivacyPreferencesModel: ObservableObject, Injectable {
     @Injected
     var windowManager: WindowManagerProtocol
 
+    typealias InjectedDependencies = FireproofDomainsViewController.Dependencies
+
     @Published
     var isLoginDetectionEnabled: Bool {
         didSet {
@@ -50,7 +52,7 @@ final class PrivacyPreferencesModel: ObservableObject, Injectable {
 
     @MainActor
     func presentManageFireproofSitesDialog() {
-        let fireproofDomainsWindowController = FireproofDomainsViewController.create().wrappedInWindowController()
+        let fireproofDomainsWindowController = FireproofDomainsViewController.create(dependencyProvider: dependencies).wrappedInWindowController()
 
         guard let fireproofDomainsWindow = fireproofDomainsWindowController.window,
               let parentWindowController = windowManager.lastKeyMainWindowController

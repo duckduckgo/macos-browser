@@ -34,6 +34,7 @@ final class DownloadsViewController: NSViewController, Injectable {
 
     @Injected
     var windowManager: WindowManagerProtocol
+
     @Injected
     var downloadListCoordinator: DownloadListCoordinator
 

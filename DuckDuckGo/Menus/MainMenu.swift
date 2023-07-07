@@ -37,6 +37,12 @@ final class MainMenu: NSMenu, Injectable {
     static var dependencyProvider: DependencyProvider!
     let dependencies: DependencyStorage
 
+    @Injected
+    var faviconManagement: FaviconManagement
+
+    @Injected
+    var bookmarkManager: BookmarkManager
+
     typealias InjectedDependencies = SharingMenu.Dependencies
 
     required init(coder: NSCoder) {
@@ -202,7 +208,7 @@ final class MainMenu: NSMenu, Injectable {
 
     var faviconsCancellable: AnyCancellable?
     private func subscribeToFavicons() {
-        faviconsCancellable = FaviconManager.shared.$faviconsLoaded
+        faviconsCancellable = faviconManagement.faviconsLoadedPublisher
             .receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] loaded in
                 if loaded {
                     self?.updateFavicons(self?.bookmarksMenuItem)
@@ -222,7 +228,7 @@ final class MainMenu: NSMenu, Injectable {
 
     var bookmarkListCancellable: AnyCancellable?
     private func subscribeToBookmarkList() {
-        bookmarkListCancellable = LocalBookmarkManager.shared.$list
+        bookmarkListCancellable = bookmarkManager.listPublisher
             .compactMap({
                 let favorites = $0?.favoriteBookmarks.compactMap(BookmarkViewModel.init(entity:)) ?? []
                 let topLevelEntities = $0?.topLevelEntities.compactMap(BookmarkViewModel.init(entity:)) ?? []

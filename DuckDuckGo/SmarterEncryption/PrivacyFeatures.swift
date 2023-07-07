@@ -28,15 +28,7 @@ protocol PrivacyFeaturesProtocol {
 }
 typealias AnyPrivacyFeatures = any PrivacyFeaturesProtocol
 
-// refactor: var PrivacyFeatures to be removed, PrivacyFeaturesProtocol to be renamed to PrivacyFeatures
-// PrivacyFeatures to be passed to init methods as `some PrivacyFeatures`
-// swiftlint:disable:next identifier_name
-var PrivacyFeatures: AnyPrivacyFeatures {
-    AppPrivacyFeatures.shared
-}
-
 final class AppPrivacyFeatures: PrivacyFeaturesProtocol {
-    static var shared: AnyPrivacyFeatures!
 
     let contentBlocking: AnyContentBlocking
     let httpsUpgrade: HTTPSUpgrade

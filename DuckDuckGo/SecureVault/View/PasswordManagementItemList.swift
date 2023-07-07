@@ -190,7 +190,7 @@ private struct PasswordManagementItemStackContentsView: View {
             Section(header: Text(section.title).padding(.leading, 18).padding(.top, index == 0 ? 0 : 10)) {
 
                 ForEach(section.items, id: \.id) { item in
-                    ItemView(item: item) {
+                    ItemView(item: item, faviconManagement: model.faviconManagement) {
                         model.selected(item: item)
                     }
                     .padding(.horizontal, 10)
@@ -261,6 +261,7 @@ private struct ItemView: View {
     @EnvironmentObject var model: PasswordManagementItemListModel
 
     let item: SecureVaultItem
+    let faviconManagement: FaviconManagement
     let action: () -> Void
 
     var body: some View {
@@ -274,7 +275,7 @@ private struct ItemView: View {
 
                 switch item {
                 case .account(let account):
-                    LoginFaviconView(domain: account.domain)
+                    LoginFaviconView(domain: account.domain, faviconManagement: faviconManagement)
                         .padding(.leading, 6)
                 case .card:
                     Image("Card")

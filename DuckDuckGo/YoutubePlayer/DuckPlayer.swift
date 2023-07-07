@@ -71,8 +71,6 @@ final class DuckPlayer {
     static let duckPlayerScheme = "duck"
     static let commonName = UserText.duckPlayer
 
-    static let shared = DuckPlayer()
-
     var isAvailable: Bool {
         isFeatureEnabled
     }
@@ -83,10 +81,7 @@ final class DuckPlayer {
         preferences.youtubeOverlayInteracted
     }
 
-    init(
-        preferences: DuckPlayerPreferences = .shared,
-        privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager
-    ) {
+    init(preferences: DuckPlayerPreferences, privacyConfigurationManager: PrivacyConfigurationManaging) {
         self.preferences = preferences
         isFeatureEnabled = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .duckPlayer)
         mode = preferences.duckPlayerMode
@@ -103,7 +98,7 @@ final class DuckPlayer {
     // MARK: - Private
 
     private static let websiteTitlePrefix = "\(commonName) - "
-    private let preferences: DuckPlayerPreferences
+    let preferences: DuckPlayerPreferences
 
     private var isFeatureEnabled: Bool = false {
         didSet {

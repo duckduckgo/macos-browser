@@ -24,7 +24,7 @@ import DependencyInjection
 
 protocol TabExtensionsBuilderProtocol {
     @MainActor
-    func build(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) -> TabExtensions
+    func build(with args: TabExtensionsBuilderArguments, dependencyProvider: AbstractTabExtensionsDependencies.DependencyProvider) -> TabExtensions
 }
 
 // !! Register Tab Extensions in TabExtensions.swift
@@ -54,9 +54,9 @@ struct TabExtensionsBuilder: TabExtensionsBuilderProtocol {
 
     /// build TabExtensions struct from blocks collected above
     @MainActor
-    func build(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) -> TabExtensions {
+    func build(with args: TabExtensionsBuilderArguments, dependencyProvider: AbstractTabExtensionsDependencies.DependencyProvider) -> TabExtensions {
         var builder = self
-        builder.registerExtensions(with: args, dependencies: dependencies)
+        builder.registerExtensions(with: args, dependencyProvider: dependencyProvider)
         return TabExtensions(components: builder.components.map { $0.buildingBlock.make() })
     }
 
@@ -72,34 +72,34 @@ final class TestTabExtensionsBuilder: TabExtensionsBuilderProtocol {
     private var components = [(protocolType: Any.Type, buildingBlock: (any TabExtensionBuildingBlockProtocol))]()
 
     var extensionsToLoad: [any TabExtension.Type]?
-    private let overrideExtensionsFunc: (TestTabExtensionsBuilder) -> (TabExtensionsBuilderArguments, TabExtensionDependencies) -> Void
+    private let overrideExtensionsFunc: (TestTabExtensionsBuilder) -> (TabExtensionsBuilderArguments, AbstractTabExtensionsDependencies.DependencyProvider) -> Void
 
     init(load extensionsToLoad: [any TabExtension.Type]? = nil,
-         overrideExtensions: @escaping (TestTabExtensionsBuilder) -> (TabExtensionsBuilderArguments, TabExtensionDependencies) -> Void = TestTabExtensionsBuilder.overrideExtensions) {
+         overrideExtensions: @escaping (TestTabExtensionsBuilder) -> (TabExtensionsBuilderArguments, AbstractTabExtensionsDependencies.DependencyProvider) -> Void = TestTabExtensionsBuilder.overrideExtensions) {
         self.extensionsToLoad = extensionsToLoad
         self.overrideExtensionsFunc = overrideExtensions
     }
 
-    convenience init(overrideExtensions: @escaping (TestTabExtensionsBuilder) -> (TabExtensionsBuilderArguments, TabExtensionDependencies) -> Void,
+    convenience init(overrideExtensions: @escaping (TestTabExtensionsBuilder) -> (TabExtensionsBuilderArguments, AbstractTabExtensionsDependencies.DependencyProvider) -> Void,
                      _ extensionsToLoad: [any TabExtension.Type]) {
         self.init(load: extensionsToLoad, overrideExtensions: overrideExtensions)
     }
 
     convenience init(load extensionToLoad: any TabExtension.Type,
-                     overrideExtensions: @escaping (TestTabExtensionsBuilder) -> (TabExtensionsBuilderArguments, TabExtensionDependencies) -> Void = TestTabExtensionsBuilder.overrideExtensions) {
+                     overrideExtensions: @escaping (TestTabExtensionsBuilder) -> (TabExtensionsBuilderArguments, AbstractTabExtensionsDependencies.DependencyProvider) -> Void = TestTabExtensionsBuilder.overrideExtensions) {
         self.init(load: [extensionToLoad], overrideExtensions: overrideExtensions)
     }
 
-    func build(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) -> TabExtensions {
+    func build(with args: TabExtensionsBuilderArguments, dependencyProvider: AbstractTabExtensionsDependencies.DependencyProvider) -> TabExtensions {
         var builder = TabExtensionsBuilder()
-        builder.registerExtensions(with: args, dependencies: dependencies)
+        builder.registerExtensions(with: args, dependencyProvider: dependencyProvider)
 
         self.components = builder.components.filter { component in
             extensionsToLoad?.contains(where: {
                 $0.publicProtocolType == component.protocolType
             }) ?? true
         }
-        self.overrideExtensionsFunc(self)(args, dependencies)
+        self.overrideExtensionsFunc(self)(args, dependencyProvider)
 
         return TabExtensions(components: components.map { $0.buildingBlock.make() })
     }

@@ -18,6 +18,7 @@
 
 import Cocoa
 import Combine
+import DependencyInjection
 
 protocol BookmarkPopoverViewControllerDelegate: AnyObject {
 
@@ -25,7 +26,14 @@ protocol BookmarkPopoverViewControllerDelegate: AnyObject {
 
 }
 
-final class BookmarkPopoverViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class BookmarkPopoverViewController: NSViewController, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var bookmarkManager: BookmarkManager
 
     static let favoriteImage = NSImage(named: "Favorite")
     static let favoriteFilledImage = NSImage(named: "FavoriteFilled")
@@ -38,7 +46,6 @@ final class BookmarkPopoverViewController: NSViewController {
 
     private var folderPickerSelectionCancellable: AnyCancellable?
 
-    let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     var bookmark: Bookmark? {
         didSet {
             if isViewLoaded {
@@ -48,6 +55,16 @@ final class BookmarkPopoverViewController: NSViewController {
     }
 
     private var appearanceCancellable: AnyCancellable?
+
+    init?(coder: NSCoder, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
+        super.init(coder: coder)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()

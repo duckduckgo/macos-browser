@@ -20,17 +20,29 @@ import Cocoa
 
 final class AddEditFavoriteWindow: NSWindow {
 
-    enum Size {
-        static let width: CGFloat = 450
-        static let height: CGFloat = 175
+    static var contentRect: NSRect {
+        let width: CGFloat = 450
+        let height: CGFloat = 175
+        let screenFrame = NSScreen.main?.frame ?? .init(x: 0, y: 0, width: 1280, height: 960)
+        return NSRect(x: screenFrame.origin.x + screenFrame.size.width / 2.0 - width / 2.0,
+                      y: screenFrame.origin.y + screenFrame.size.height / 2.0 - height / 2.0,
+                      width: width,
+                      height: height)
     }
 
     override var canBecomeMain: Bool { false }
 
-    // swiftlint:disable force_cast
     var addEditFavoriteViewController: AddEditFavoriteViewController {
-        contentViewController as! AddEditFavoriteViewController
+        contentViewController as! AddEditFavoriteViewController // swiftlint:disable:this force_cast
     }
-    // swiftlint:enable force_cast
+
+    init(dependencyProvider: AddEditFavoriteViewController.DependencyProvider, bookmark: Bookmark? = nil) {
+        super.init(contentRect: Self.contentRect, styleMask: [.titled, .fullSizeContentView], backing: .buffered, defer: true)
+
+        self.contentViewController = NSStoryboard(name: "HomePage", bundle: .main)
+            .instantiateController(identifier: AddEditFavoriteViewController.className()) { coder in
+                AddEditFavoriteViewController(coder: coder, dependencyProvider: dependencyProvider, bookmark: bookmark)
+            }
+    }
 
 }

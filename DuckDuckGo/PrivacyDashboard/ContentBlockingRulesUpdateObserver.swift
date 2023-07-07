@@ -16,17 +16,29 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
 import BrowserServicesKit
+import Combine
+import DependencyInjection
+import Foundation
 
-final class ContentBlockingRulesUpdateObserver {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class ContentBlockingRulesUpdateObserver: Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var contentBlocking: AnyContentBlocking
 
     @Published public private(set) var pendingUpdates = [String: String]()
 
     public private(set) weak var tabViewModel: TabViewModel?
     private var onPendingUpdates: (() -> Void)?
     private var rulesRecompilationCancellable: AnyCancellable?
+
+    init(dependencyProvider: DependencyProvider) {
+        dependencies = .init(dependencyProvider)
+    }
 
     public func updateTabViewModel(_ tabViewModel: TabViewModel, onPendingUpdates: @escaping () -> Void) {
         rulesRecompilationCancellable?.cancel()
@@ -35,7 +47,7 @@ final class ContentBlockingRulesUpdateObserver {
         self.tabViewModel = tabViewModel
         self.onPendingUpdates = onPendingUpdates
 
-        bindContentBlockingRulesRecompilation(publisher: (ContentBlocking.shared as? AppContentBlocking)!.userContentUpdating.userContentBlockingAssets)
+        bindContentBlockingRulesRecompilation(publisher: contentBlocking.userContentUpdating.userContentBlockingAssets)
     }
 
     public func didStartCompilation(for domain: String, token: ContentBlockerRulesManager.CompletionToken ) {
@@ -68,6 +80,7 @@ final class ContentBlockingRulesUpdateObserver {
                 }
             }
     }
+
 }
 
 private extension UserContentUpdating.NewContent {

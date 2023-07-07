@@ -30,10 +30,14 @@ final class BookmarksBarViewController: NSViewController, Injectable {
     @Injected
     var windowManager: WindowManagerProtocol
 
+    @Injected
+    var bookmarkManager: BookmarkManager
+
+    typealias InjectedDependencies = AddBookmarkModalViewController.Dependencies
+
     @IBOutlet private var bookmarksBarCollectionView: NSCollectionView!
     @IBOutlet private var clippedItemsIndicator: NSButton!
 
-    private let bookmarkManager = LocalBookmarkManager.shared
     private let viewModel: BookmarksBarViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
 
@@ -48,7 +52,7 @@ final class BookmarksBarViewController: NSViewController, Injectable {
         self.dependencies = .init(dependencyProvider)
 
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.viewModel = BookmarksBarViewModel(bookmarkManager: LocalBookmarkManager.shared, tabCollectionViewModel: tabCollectionViewModel)
+        self.viewModel = BookmarksBarViewModel(bookmarkManager: dependencies.bookmarkManager, tabCollectionViewModel: tabCollectionViewModel)
 
         super.init(coder: coder)
     }
@@ -223,7 +227,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             bookmark.isFavorite = true
             bookmarkManager.update(bookmark: bookmark)
         case .edit:
-            let addBookmarkViewController = AddBookmarkModalViewController.create()
+            let addBookmarkViewController = AddBookmarkModalViewController.create(dependencyProvider: dependencies)
             addBookmarkViewController.delegate = self
             addBookmarkViewController.edit(bookmark: bookmark)
             beginSheet(addBookmarkViewController)

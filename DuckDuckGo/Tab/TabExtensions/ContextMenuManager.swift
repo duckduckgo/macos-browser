@@ -18,6 +18,7 @@
 
 import AppKit
 import Combine
+import DependencyInjection
 import Foundation
 import WebKit
 
@@ -27,7 +28,15 @@ enum NavigationDecision {
 }
 
 @MainActor
-final class ContextMenuManager: NSObject {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class ContextMenuManager: NSObject, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var bookmarkManager: BookmarkManager
+
     private var userScriptCancellable: AnyCancellable?
 
     private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
@@ -36,7 +45,8 @@ final class ContextMenuManager: NSObject {
     fileprivate weak var webView: WKWebView?
 
     @MainActor
-    init(contextMenuScriptPublisher: some Publisher<ContextMenuUserScript?, Never>) {
+    init(contextMenuScriptPublisher: some Publisher<ContextMenuUserScript?, Never>, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
         super.init()
 
         userScriptCancellable = contextMenuScriptPublisher.sink { [weak self] contextMenuScript in
@@ -388,11 +398,11 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { [selectedText] navigationAction in
+        onNewWindow = { [selectedText, bookmarkManager] navigationAction in
             guard let url = navigationAction?.request.url else { return .cancel }
 
             let title = selectedText ?? url.absoluteString
-            LocalBookmarkManager.shared.makeBookmark(for: url, title: title, isFavorite: false)
+            bookmarkManager.makeBookmark(for: url, title: title, isFavorite: false)
 
             return .cancel
         }

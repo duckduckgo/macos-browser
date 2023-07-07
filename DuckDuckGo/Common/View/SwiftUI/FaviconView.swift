@@ -16,12 +16,26 @@
 //  limitations under the License.
 //
 
+import DependencyInjection
 import SwiftUI
 import SwiftUIExtensions
 
-struct FaviconView: View {
+#if swift(>=5.9)
+@Injectable
+#endif
+class AbstractFaviconViewDependencies: Injectable {
+    let dependencies: DependencyStorage
 
-    let faviconManagement: FaviconManagement = FaviconManager.shared
+    @Injected
+    var duckPlayer: DuckPlayer
+    @Injected
+    var faviconManagement: FaviconManagement
+
+    private init() { fatalError("\(Self.self) should not be instantiated") }
+}
+
+struct FaviconView: View {
+    let dependencies: AbstractFaviconViewDependencies.DependencyStorage
 
     let domain: String
     let size: CGFloat
@@ -29,18 +43,19 @@ struct FaviconView: View {
     @State var image: NSImage?
     @State private var timer = Timer.publish(every: 0.1, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
 
-    init(domain: String, size: CGFloat = 32) {
+    init(domain: String, size: CGFloat = 32, dependencyProvider: AbstractFaviconViewDependencies.DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
         self.domain = domain
         self.size = size
     }
 
     func refreshImage() {
-        if let duckPlayerImage = DuckPlayer.shared.image(for: self) {
+        if let duckPlayerImage = dependencies.duckPlayer.image(for: self) {
             image = duckPlayerImage
             return
         }
 
-        let image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .medium)?.image
+        let image = dependencies.faviconManagement.getCachedFavicon(for: domain, sizeCategory: .medium)?.image
         if image?.size.isSmaller(than: CGSize(width: 16, height: 16)) == false {
             self.image = image
         }
@@ -75,7 +90,7 @@ struct FaviconView: View {
         }.onAppear {
             refreshImage()
         }.onReceive(timer) { _ in
-            guard faviconManagement.areFaviconsLoaded else { return }
+            guard dependencies.faviconManagement.areFaviconsLoaded else { return }
             timer.upstream.connect().cancel()
             refreshImage()
         }

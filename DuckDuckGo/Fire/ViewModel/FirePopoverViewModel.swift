@@ -30,8 +30,15 @@ final class FirePopoverViewModel: Injectable {
 
     @Injected
     var windowManager: WindowManagerProtocol
+
     @Injected
     var fireViewModel: FireViewModel
+
+    @Injected
+    var faviconManagement: FaviconManagement
+
+    @Injected
+    var historyCoordinating: HistoryCoordinating
 
     enum ClearingOption: Int, CaseIterable {
 
@@ -57,17 +64,13 @@ final class FirePopoverViewModel: Injectable {
     }
 
     init(tabCollectionViewModel: TabCollectionViewModel,
-         historyCoordinating: HistoryCoordinating,
          fireproofDomains: FireproofDomains,
-         faviconManagement: FaviconManagement,
          initialClearingOption: ClearingOption = .allData,
          dependencyProvider: DependencyProvider) {
         self.dependencies = .init(dependencyProvider)
 
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.historyCoordinating = historyCoordinating
         self.fireproofDomains = fireproofDomains
-        self.faviconManagement = faviconManagement
         self.clearingOption = initialClearingOption
 
         updateAvailableClearingOptions()
@@ -83,9 +86,7 @@ final class FirePopoverViewModel: Injectable {
     private(set) var shouldShowPinnedTabsInfo: Bool = false
 
     private weak var tabCollectionViewModel: TabCollectionViewModel?
-    private let historyCoordinating: HistoryCoordinating
     private let fireproofDomains: FireproofDomains
-    private let faviconManagement: FaviconManagement
 
     private(set) var availableClearingOptions = ClearingOption.allCases
     private(set) var hasOnlySingleFireproofDomain: Bool = false

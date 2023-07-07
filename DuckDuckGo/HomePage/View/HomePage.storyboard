@@ -24,35 +24,10 @@
             </objects>
             <point key="canvasLocation" x="-225" y="134.5"/>
         </scene>
-        <!--Window Controller-->
-        <scene sceneID="lTv-jV-yck">
-            <objects>
-                <customObject id="R0E-d0-9Ie" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <windowController storyboardIdentifier="AddEditFavoriteWindowController" id="K6L-bh-4We" sceneMemberID="viewController">
-                    <window key="window" allowsToolTipsWhenApplicationIsInactive="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="hhh-j7-rhE" customClass="AddEditFavoriteWindow" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <windowStyleMask key="styleMask" titled="YES" fullSizeContentView="YES"/>
-                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-                        <rect key="contentRect" x="216" y="264" width="450" height="175"/>
-                        <rect key="screenRect" x="0.0" y="0.0" width="1536" height="935"/>
-                        <view key="contentView" id="RbR-ht-OOI">
-                            <rect key="frame" x="0.0" y="0.0" width="450" height="175"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                        </view>
-                        <connections>
-                            <outlet property="delegate" destination="K6L-bh-4We" id="f1V-ER-5fQ"/>
-                        </connections>
-                    </window>
-                    <connections>
-                        <segue destination="Ckn-Av-e7Q" kind="relationship" relationship="window.shadowedContentViewController" id="6hF-Gg-Jzz"/>
-                    </connections>
-                </windowController>
-            </objects>
-            <point key="canvasLocation" x="-299" y="620"/>
-        </scene>
         <!--Add Edit Favorite View Controller-->
         <scene sceneID="Hna-Mq-EbE">
             <objects>
-                <viewController id="Ckn-Av-e7Q" customClass="AddEditFavoriteViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AddEditFavoriteViewController" id="Ckn-Av-e7Q" customClass="AddEditFavoriteViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="wnn-dI-Can">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="175"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -119,7 +94,7 @@
                                 </gridCells>
                             </gridView>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pot-HE-SGY">
-                                <rect key="frame" x="378" y="13" width="59" height="32"/>
+                                <rect key="frame" x="377" y="13" width="60" height="32"/>
                                 <buttonCell key="cell" type="push" title="Add" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="A8N-QU-TZk">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -132,7 +107,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Jmd-dj-8KN">
-                                <rect key="frame" x="304" y="13" width="76" height="32"/>
+                                <rect key="frame" x="303" y="13" width="76" height="32"/>
                                 <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="viu-3X-dwN">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>

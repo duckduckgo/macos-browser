@@ -28,14 +28,14 @@ final class BraveDataImporter: ChromiumDataImporter {
         return .brave
     }
 
-    init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
+    init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, faviconManagement: FaviconManagement) {
         let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         let defaultDataURL = applicationSupport.appendingPathComponent("BraveSoftware/Brave-Browser/Default/")
 
         super.init(applicationDataDirectoryURL: defaultDataURL,
                    loginImporter: loginImporter,
                    bookmarkImporter: bookmarkImporter,
-                   faviconManager: FaviconManager.shared)
+                   faviconManager: faviconManagement)
     }
 
 }

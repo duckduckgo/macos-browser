@@ -18,9 +18,17 @@
 
 import AppKit
 import Common
+import DependencyInjection
 import Foundation
 
-final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NSOutlineViewDelegate {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NSOutlineViewDelegate, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var bookmarkManager: BookmarkManager
 
     enum ContentMode {
         case bookmarksAndFolders
@@ -33,14 +41,14 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     var expandedNodesIDs = Set<String>()
 
     private let contentMode: ContentMode
-    private let bookmarkManager: BookmarkManager
 
     private var favoritesPseudoFolder = PseudoFolder.favorites
     private var bookmarksPseudoFolder = PseudoFolder.bookmarks
 
-    init(contentMode: ContentMode, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, treeController: BookmarkTreeController) {
+    init(contentMode: ContentMode, treeController: BookmarkTreeController, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         self.contentMode = contentMode
-        self.bookmarkManager = bookmarkManager
         self.treeController = treeController
 
         super.init()

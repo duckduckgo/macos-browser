@@ -86,7 +86,23 @@ final class Application: NSApplication {
             }
         }
 
-        let appDependencies = AppDependencies(isRunningUnitTests: isRunningUnitTests)
+        let appDependencies: AppDelegate.DependencyProvider & HistoryMenu.DependencyProvider & MainMenu.DependencyProvider = {
+#if DEBUG
+            struct DependencyStorageMock: AppDelegate.DependencyProvider & HistoryMenu.DependencyProvider & MainMenu.DependencyProvider {
+                var _storage: [AnyKeyPath: Any] // swiftlint:disable:this identifier_name
+                func value<T>(for keyPath: AnyKeyPath) -> T { fatalError("Invalid flow") }
+            }
+
+            if isRunningUnitTests {
+                return DependencyStorageMock(_storage: [
+                    \HistoryMenu_InjectedVars.windowManager: (NSClassFromString("WindowManagerMock")!.alloc() as? WindowManagerProtocol)!,
+                    \AppDelegate_InjectedVars.internalUserDecider: (NSClassFromString("InternalUserDeciderMock")?.alloc() as? InternalUserDecider)!
+                ])
+            }
+#endif
+            return AppDependencies()
+        }()
+
         _delegate = AppDelegate(dependencyProvider: appDependencies)
         self.delegate = _delegate
 
@@ -130,7 +146,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     @Injected
     var fireCoordinator: FireCoordinator
 
-    typealias InjectedDependencies = TabCollectionViewModel.Dependencies
+    @Injected
+    var privacyFeatures: PrivacyFeaturesProtocol
+
+    @Injected
+    var configurationManager: ConfigurationManager
+
+    @Injected
+    var bookmarkManager: BookmarkManager
+
+    @Injected
+    var faviconManagement: FaviconManagement
+
+    @Injected
+    var historyCoordinator: HistoryCoordinator
+
+    @Injected
+    var downloadManager: FileDownloadManager
+
+    typealias InjectedDependencies = TabCollectionViewModel.Dependencies & FeedbackPresenter.Dependencies & DataImportViewController.Dependencies
 
 #if DEBUG
     let disableCVDisplayLinkLogs: Void = {
@@ -151,7 +185,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     private var syncStateCancellable: AnyCancellable?
     private var bookmarksSyncErrorCancellable: AnyCancellable?
-    let bookmarksManager = LocalBookmarkManager.shared
 
     init(dependencyProvider: DependencyProvider) {
         dependencies = .init(dependencyProvider)
@@ -166,23 +199,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     var appUsageActivityMonitor: AppUsageActivityMonitor?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
+        guard !NSApp.isRunningUnitTests else { return }
+
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
         Configuration.setURLProvider(AppConfigurationURLProvider())
 
-#if DEBUG
-        func mock<T>(_ className: String) -> T {
-            ((NSClassFromString(className) as? NSObject.Type)!.init() as? T)!
-        }
-        AppPrivacyFeatures.shared = NSApp.isRunningUnitTests
-            // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
-            ? AppPrivacyFeatures(contentBlocking: mock("ContentBlockingMock"), httpsUpgradeStore: mock("HTTPSUpgradeStoreMock"))
-            : AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
-#else
-        AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
-#endif
-
         featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
-                                               privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
+                                               privacyConfig: privacyFeatures.contentBlocking.privacyConfigurationManager.privacyConfig)
         NSApp.mainMenuTyped.setup(with: featureFlagger)
 
 #if !APPSTORE
@@ -196,12 +219,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !NSApp.isRunningUnitTests else { return }
 
-        HistoryCoordinator.shared.loadHistory()
-        PrivacyFeatures.httpsUpgrade.loadDataAsync()
-        bookmarksManager.loadBookmarks()
-        FaviconManager.shared.loadFavicons()
-        ConfigurationManager.shared.start()
-        FileDownloadManager.shared.delegate = self
+        historyCoordinator.loadHistory()
+        privacyFeatures.httpsUpgrade.loadDataAsync()
+        bookmarkManager.loadBookmarks()
+        faviconManagement.loadFavicons(bookmarkManager: bookmarkManager)
+        configurationManager.start()
+        downloadManager.delegate = self
 
         if LocalStatisticsStore().atb == nil {
             Pixel.firstLaunchDate = Date()
@@ -248,12 +271,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        if !FileDownloadManager.shared.downloads.isEmpty {
-            let alert = NSAlert.activeDownloadsTerminationAlert(for: FileDownloadManager.shared.downloads)
+        if !downloadManager.downloads.isEmpty {
+            let alert = NSAlert.activeDownloadsTerminationAlert(for: downloadManager.downloads)
             if alert.runModal() == .cancel {
                 return .terminateCancel
             }
-            FileDownloadManager.shared.cancelAll(waitUntilDone: true)
+            downloadManager.cancelAll(waitUntilDone: true)
             downloadListCoordinator.sync()
         }
         stateRestorationManager.applicationWillTerminate()
@@ -308,8 +331,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             .prepend(syncService.authState)
             .map { $0 == .inactive }
             .removeDuplicates()
-            .sink { isSyncDisabled in
-                LocalBookmarkManager.shared.updateBookmarkDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
+            .sink { [bookmarkManager] isSyncDisabled in
+                bookmarkManager.updateBookmarkDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
             }
 
         // This is also called in applicationDidBecomeActive, but we're also calling it here, since

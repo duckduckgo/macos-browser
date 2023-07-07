@@ -37,7 +37,7 @@ final class YoutubePlayerUserScript: NSObject, StaticUserScript {
 
     var isEnabled: Bool = false
 
-    init(preferences: DuckPlayerPreferences = .shared) {
+    init(preferences: DuckPlayerPreferences) {
         duckPlayerPreferences = preferences
     }
 

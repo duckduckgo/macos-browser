@@ -43,7 +43,6 @@ struct PasswordManagementListSection {
     let title: String
     let items: [SecureVaultItem]
 
-    static let tld: TLD = ContentBlocking.shared.tld
     static let autofillUrlSort: AutofillUrlSort = AutofillDomainNameUrlSort()
     static let autofillDefaultKey = "#"
 
@@ -69,7 +68,8 @@ struct PasswordManagementListSection {
     }
 
     static func sectionsByTLD(with items: [SecureVaultItem],
-                              order: SecureVaultSorting.SortOrder) -> [PasswordManagementListSection] {
+                              order: SecureVaultSorting.SortOrder,
+                              tld: TLD) -> [PasswordManagementListSection] {
 
         let itemsByFirstCharacter: [String: [SecureVaultItem]] = items.reduce(into: [String: [SecureVaultItem]]()) { result, vaultItem in
             var key: String = autofillDefaultKey
@@ -91,7 +91,7 @@ struct PasswordManagementListSection {
         return sortedKeys.map { key in
             var itemsInSection = itemsByFirstCharacter[key] ?? []
             itemsInSection.sort { lhs, rhs in
-                return titleAndTLDCompare(lhs, rhs, order)
+                return titleAndTLDCompare(lhs, rhs, order, tld: tld)
             }
             return PasswordManagementListSection(title: key, items: itemsInSection)
         }
@@ -139,7 +139,7 @@ struct PasswordManagementListSection {
         }
     }
 
-    private static func titleAndTLDCompare(_ lhs: SecureVaultItem, _ rhs: SecureVaultItem, _ order: SecureVaultSorting.SortOrder) -> Bool {
+    private static func titleAndTLDCompare(_ lhs: SecureVaultItem, _ rhs: SecureVaultItem, _ order: SecureVaultSorting.SortOrder, tld: TLD) -> Bool {
         guard let lhsAccount = lhs.websiteAccount, let rhsAccount = rhs.websiteAccount else {
             return false
         }

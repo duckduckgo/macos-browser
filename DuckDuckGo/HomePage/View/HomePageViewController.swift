@@ -33,10 +33,14 @@ final class HomePageViewController: NSViewController, Injectable {
     var windowManager: WindowManagerProtocol
     @Injected
     var fireViewModel: FireViewModel
+    @Injected
+    var bookmarkManager: BookmarkManager
+    @Injected
+    var historyCoordinating: HistoryCoordinating
+
+    typealias InjectedDependencies = HomePage.Models.RecentlyVisitedModel.Dependencies & AbstractHomePageRootViewDependencies.Dependencies & HomePage.Models.FavoritesModel.Dependencies & AddEditFavoriteViewController.Dependencies
 
     private let tabCollectionViewModel: TabCollectionViewModel
-    private var bookmarkManager: BookmarkManager
-    private let historyCoordinating: HistoryCoordinating
 
     private weak var host: NSView?
 
@@ -54,14 +58,10 @@ final class HomePageViewController: NSViewController, Injectable {
 
     init?(coder: NSCoder,
           tabCollectionViewModel: TabCollectionViewModel,
-          bookmarkManager: BookmarkManager,
-          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
           dependencyProvider: DependencyProvider) {
         self.dependencies = .init(dependencyProvider)
 
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.bookmarkManager = bookmarkManager
-        self.historyCoordinating = historyCoordinating
 
         super.init(coder: coder)
     }
@@ -77,7 +77,7 @@ final class HomePageViewController: NSViewController, Injectable {
 
         refreshModels()
 
-        let rootView = HomePage.Views.RootView(isBurner: tabCollectionViewModel.isBurner)
+        let rootView = HomePage.Views.RootView(dependencies: .init(dependencies), isBurner: tabCollectionViewModel.isBurner)
             .environmentObject(favoritesModel)
             .environmentObject(defaultBrowserModel)
             .environmentObject(recentlyVisitedModel)
@@ -142,7 +142,7 @@ final class HomePageViewController: NSViewController, Injectable {
     }
 
     func createRecentlyVisitedModel() -> HomePage.Models.RecentlyVisitedModel {
-        return .init(fire: fireViewModel.fire) { [weak self] url in
+        return .init(dependencyProvider: dependencies) { [weak self] url in
             self?.openUrl(url)
         }
     }
@@ -163,7 +163,7 @@ final class HomePageViewController: NSViewController, Injectable {
     }
 
     func createFavoritesModel() -> HomePage.Models.FavoritesModel {
-        return .init(open: { [weak self] bookmark, target in
+        return .init(dependencyProvider: dependencies, open: { [weak self] bookmark, target in
             guard let urlObject = bookmark.urlObject else { return }
             self?.openUrl(urlObject, target: target)
         }, removeFavorite: { [weak self] bookmark in
@@ -224,31 +224,9 @@ final class HomePageViewController: NSViewController, Injectable {
     }
 
     private func showAddEditController(for bookmark: Bookmark? = nil) {
-        // swiftlint:disable force_cast
-        let windowController = NSStoryboard(name: "HomePage", bundle: .main).instantiateController(withIdentifier: "AddEditFavoriteWindowController") as! NSWindowController
-        // swiftlint:enable force_cast
-
-        guard let window = windowController.window as? AddEditFavoriteWindow else {
-            assertionFailure("HomePageViewController: Failed to present AddEditFavoriteWindowController")
-            return
-        }
-
-        guard let screen = window.screen else {
-            assertionFailure("HomePageViewController: No screen")
-            return
-        }
-
-        if let bookmark = bookmark {
-            window.addEditFavoriteViewController.edit(bookmark: bookmark)
-        }
-
-        let windowFrame = NSRect(x: screen.frame.origin.x + screen.frame.size.width / 2.0 - AddEditFavoriteWindow.Size.width / 2.0,
-                                 y: screen.frame.origin.y + screen.frame.size.height / 2.0 - AddEditFavoriteWindow.Size.height / 2.0,
-                                 width: AddEditFavoriteWindow.Size.width,
-                                 height: AddEditFavoriteWindow.Size.height)
+        let window = AddEditFavoriteWindow(dependencyProvider: dependencies, bookmark: bookmark)
 
         view.window?.addChildWindow(window, ordered: .above)
-        window.setFrame(windowFrame, display: true)
         window.makeKey()
     }
 

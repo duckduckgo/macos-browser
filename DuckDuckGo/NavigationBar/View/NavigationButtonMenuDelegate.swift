@@ -18,10 +18,20 @@
 
 import Cocoa
 import Common
+import DependencyInjection
 import WebKit
 
 @MainActor
-final class NavigationButtonMenuDelegate: NSObject {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class NavigationButtonMenuDelegate: NSObject, Injectable {
+    let dependencies: DependencyStorage
+    
+    @Injected
+    var faviconManagement: FaviconManagement
+    @Injected
+    var historyCoordinating: HistoryCoordinating
 
     enum ButtonType: Equatable {
         case back
@@ -31,7 +41,9 @@ final class NavigationButtonMenuDelegate: NSObject {
     private let buttonType: ButtonType
     private let tabCollectionViewModel: TabCollectionViewModel
 
-    init(buttonType: ButtonType, tabCollectionViewModel: TabCollectionViewModel) {
+    init(buttonType: ButtonType, tabCollectionViewModel: TabCollectionViewModel, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         self.buttonType = buttonType
         self.tabCollectionViewModel = tabCollectionViewModel
     }
@@ -57,8 +69,8 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
         }
 
         let listItemViewModel = WKBackForwardListItemViewModel(backForwardListItem: listItem,
-                                                               faviconManagement: FaviconManager.shared,
-                                                               historyCoordinating: HistoryCoordinator.shared,
+                                                               faviconManagement: faviconManagement,
+                                                               historyCoordinating: historyCoordinating,
                                                                isCurrentItem: index == currentIndex)
 
         item.title = listItemViewModel.title

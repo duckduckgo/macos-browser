@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Combine
 import ContentBlocking
+import DependencyInjection
 import Foundation
 import PrivacyDashboard
 
@@ -61,17 +62,6 @@ protocol NSCodingExtension: TabExtension {
     func awakeAfter(using decoder: NSCoder)
 }
 
-// Define dependencies used to instantiate TabExtensions here:
-protocol TabExtensionDependencies {
-    var privacyFeatures: PrivacyFeaturesProtocol { get }
-    var workspace: Workspace { get }
-    var historyCoordinating: HistoryCoordinating { get }
-    var downloadManager: FileDownloadManagerProtocol { get }
-    var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? { get }
-    var duckPlayer: DuckPlayer { get }
-    var passwordManagerCoordinator: PasswordManagerCoordinating { get }
-}
-
 // swiftlint:disable:next large_tuple
 typealias TabExtensionsBuilderArguments = (
     tabIdentifier: UInt64,
@@ -86,6 +76,18 @@ typealias TabExtensionsBuilderArguments = (
     webViewFuture: Future<WKWebView, Never>
 )
 
+final class AbstractTabExtensionsDependencies: Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected var privacyFeatures: PrivacyFeaturesProtocol
+    @Injected var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
+
+    typealias InjectedDependencies = AdClickAttributionTabExtension.Dependencies & AutofillTabExtension.Dependencies & ContextMenuManager.Dependencies & DownloadsTabExtension.Dependencies & HistoryTabExtension.Dependencies & ExternalAppSchemeHandler.Dependencies & DuckPlayerTabExtension.Dependencies
+
+    private init() { fatalError("\(Self.self) should not be instantiated") }
+
+}
+
 // swiftlint:disable function_body_length
 extension TabExtensionsBuilder {
 
@@ -97,8 +99,9 @@ extension TabExtensionsBuilder {
     /// ` add { MyOtherExtension(with: myExtension.resultPublisher) }
     /// Note: Extensions with state restoration support should conform to `NSCodingExtension`
     @MainActor
-    mutating func registerExtensions(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) {
+    mutating func registerExtensions(with args: TabExtensionsBuilderArguments, dependencyProvider: AbstractTabExtensionsDependencies.DependencyProvider) {
         let userScripts = args.userScriptsPublisher
+        let dependencies = AbstractTabExtensionsDependencies.DependencyStorage(dependencyProvider)
 
         let httpsUpgrade = add {
             HTTPSUpgradeTabExtension(httpsUpgrade: dependencies.privacyFeatures.httpsUpgrade)
@@ -129,9 +132,9 @@ extension TabExtensionsBuilder {
         add {
             AdClickAttributionTabExtension(inheritedAttribution: args.inheritedAttribution,
                                            userContentControllerFuture: args.userContentControllerFuture,
-                                           contentBlockerRulesScriptPublisher: userScripts.map { $0?.contentBlockerRulesScript },
+                                           contentBlockerRulesScriptPublisher:  userScripts.map { $0?.contentBlockerRulesScript },
                                            trackerInfoPublisher: contentBlocking.trackersPublisher.map { $0.request },
-                                           dependencies: dependencies.privacyFeatures.contentBlocking)
+                                           dependencyProvider: dependencies)
         }
 
         add {
@@ -139,10 +142,10 @@ extension TabExtensionsBuilder {
         }
 
         add {
-            AutofillTabExtension(autofillUserScriptPublisher: userScripts.map(\.?.autofillScript), passwordManagerCoordinator: dependencies.passwordManagerCoordinator)
+            AutofillTabExtension(autofillUserScriptPublisher: userScripts.map(\.?.autofillScript), dependencyProvider: dependencies)
         }
         add {
-            ContextMenuManager(contextMenuScriptPublisher: userScripts.map(\.?.contextMenuScript))
+            ContextMenuManager(contextMenuScriptPublisher: userScripts.map(\.?.contextMenuScript), dependencyProvider: dependencies)
         }
         add {
             HoveredLinkTabExtension(hoverUserScriptPublisher: userScripts.map(\.?.hoverUserScript))
@@ -151,32 +154,30 @@ extension TabExtensionsBuilder {
             FindInPageTabExtension()
         }
         add {
-            DownloadsTabExtension(downloadManager:
-                                    dependencies.downloadManager,
-                                  isBurner: args.isTabBurner)
+            DownloadsTabExtension(isBurner: args.isTabBurner, dependencyProvider: dependencies)
         }
         add {
             SearchNonexistentDomainNavigationResponder(tld: dependencies.privacyFeatures.contentBlocking.tld, contentPublisher: args.contentPublisher)
         }
         add {
             HistoryTabExtension(isBurner: args.isTabBurner,
-                                historyCoordinating: dependencies.historyCoordinating,
                                 trackersPublisher: contentBlocking.trackersPublisher,
                                 urlPublisher: args.contentPublisher.map { content in content.isUrl ? content.url : nil },
-                                titlePublisher: args.titlePublisher)
+                                titlePublisher: args.titlePublisher,
+                                dependencyProvider: dependencies)
         }
         add {
-            ExternalAppSchemeHandler(workspace: dependencies.workspace, permissionModel: args.permissionModel, contentPublisher: args.contentPublisher)
+            ExternalAppSchemeHandler(permissionModel: args.permissionModel, contentPublisher: args.contentPublisher, dependencyProvider: dependencies)
         }
         add {
             NavigationHotkeyHandler(isTabPinned: args.isTabPinned, isBurner: args.isTabBurner)
         }
 
         add {
-            DuckPlayerTabExtension(duckPlayer: dependencies.duckPlayer,
-                                   isBurner: args.isTabBurner,
+            DuckPlayerTabExtension(isBurner: args.isTabBurner,
                                    scriptsPublisher: userScripts.compactMap { $0 },
-                                   webViewPublisher: args.webViewFuture)
+                                   webViewPublisher: args.webViewFuture,
+                                   dependencyProvider: dependencies)
         }
     }
 
@@ -194,7 +195,7 @@ extension TestTabExtensionsBuilder {
     ])
 
     // override Tab Extensions initialisation registered in TabExtensionsBuilder.registerExtensions for Unit Tests
-    func overrideExtensions(with args: TabExtensionsBuilderArguments, dependencies: TabExtensionDependencies) {
+    func overrideExtensions(with args: TabExtensionsBuilderArguments, dependencyProvider: AbstractTabExtensionsDependencies.DependencyProvider) {
         /** ```
          let fbProtection = get(FBProtectionTabExtension.self)
 

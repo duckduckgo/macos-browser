@@ -28,11 +28,14 @@ final class PreferencesViewController: NSViewController, Injectable {
 
     let dependencies: DependencyStorage
 
-    typealias InjectedDependencies = AutofillPreferencesModel.Dependencies & AbstractRootViewDependencies.Dependencies
+    @Injected
+    var duckPlayer: DuckPlayer
+
+    typealias InjectedDependencies = AutofillPreferencesModel.Dependencies & AbstractPreferencesRootViewDependencies.Dependencies & PreferencesSidebarModel.Dependencies
 
     weak var delegate: BrowserTabSelectionDelegate?
 
-    let model = PreferencesSidebarModel(includeDuckPlayer: DuckPlayer.shared.isAvailable)
+    let model: PreferencesSidebarModel
     private var selectedTabIndexCancellable: AnyCancellable?
     private var selectedPreferencePaneCancellable: AnyCancellable?
 
@@ -40,7 +43,7 @@ final class PreferencesViewController: NSViewController, Injectable {
 
     init(dependencyProvider: DependencyProvider) {
         self.dependencies = .init(dependencyProvider)
-
+        self.model = PreferencesSidebarModel(includeDuckPlayer: dependencies.duckPlayer.isAvailable, dependencyProvider: dependencies)
         super.init(nibName: nil, bundle: nil)
     }
 

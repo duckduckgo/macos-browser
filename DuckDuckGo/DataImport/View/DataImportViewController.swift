@@ -20,8 +20,24 @@ import AppKit
 import BrowserServicesKit
 import Combine
 import Common
+import DependencyInjection
 
-final class DataImportViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class DataImportViewController: NSViewController, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+
+    @Injected
+    var bookmarkManager: BookmarkManager
+
+    @Injected
+    var faviconManagement: FaviconManagement
+
+    typealias InjectedDependencies = FeedbackPresenter.Dependencies
 
     enum Constants {
         static let storyboardName = "DataImport"
@@ -51,28 +67,27 @@ final class DataImportViewController: NSViewController {
         }
     }
 
-    let windowManager: WindowManagerProtocol
-
-    static func show(using windowManager: WindowManagerProtocol, completion: (() -> Void)? = nil) {
-        guard let windowController = windowManager.lastKeyMainWindowController,
+    static func show(with dependencyProvider: DependencyProvider, completion: (() -> Void)? = nil) {
+        let dependencies = DependencyStorage(dependencyProvider)
+        guard let windowController = dependencies.windowManager.lastKeyMainWindowController,
               windowController.window?.isKeyWindow == true else {
             return
         }
 
-        let viewController = DataImportViewController.create(windowManager: windowManager)
+        let viewController = DataImportViewController.create(with: dependencies)
         windowController.mainViewController.beginSheet(viewController) { _ in
             completion?()
         }
     }
 
-    static func create(windowManager: WindowManagerProtocol) -> DataImportViewController {
-        return NSStoryboard(name: Constants.storyboardName, bundle: nil).instantiateController(identifier: Constants.identifier) { coder in
-            Self.init(coder: coder, windowManager: windowManager)
+    private static func create(with dependencies: DependencyStorage) -> DataImportViewController {
+        NSStoryboard(name: Constants.storyboardName, bundle: nil).instantiateController(identifier: Constants.identifier) { coder in
+            Self.init(coder: coder, dependencies: dependencies)
         }
     }
 
-    init?(coder: NSCoder, windowManager: WindowManagerProtocol) {
-        self.windowManager = windowManager
+    private init?(coder: NSCoder, dependencies: DependencyStorage) {
+        self.dependencies = dependencies
 
         super.init(coder: coder)
     }
@@ -91,22 +106,22 @@ final class DataImportViewController: NSViewController {
 
             renderCurrentViewState()
 
-            let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
+            let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: bookmarkManager)
 
             do {
                 switch viewState.selectedImportSource {
                 case .brave:
-                    self.dataImporter = try BraveDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+                    self.dataImporter = try BraveDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter, faviconManagement: faviconManagement)
                 case .chrome:
-                    self.dataImporter = try ChromeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+                    self.dataImporter = try ChromeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter, faviconManagement: faviconManagement)
                 case .edge:
-                    self.dataImporter = try EdgeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+                    self.dataImporter = try EdgeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter, faviconManagement: faviconManagement)
                 case .firefox:
                     self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(),
                                                                 bookmarkImporter: bookmarkImporter,
-                                                                faviconManager: FaviconManager.shared)
+                                                                faviconManager: faviconManagement)
                 case .safari where !(currentChildViewController is FileImportViewController):
-                    self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter, faviconManager: FaviconManager.shared)
+                    self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter, faviconManager: faviconManagement)
                 case .bookmarksHTML:
                     if !(self.dataImporter is BookmarkHTMLImporter) {
                         self.dataImporter = nil
@@ -447,7 +462,7 @@ extension DataImportViewController: FileImportViewControllerDelegate {
             return
         }
 
-        let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
+        let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: bookmarkManager)
 
         self.dataImporter = BookmarkHTMLImporter(fileURL: url, bookmarkImporter: bookmarkImporter)
         self.viewState.interactionState = .ableToImport
@@ -483,7 +498,7 @@ extension DataImportViewController: FileImportViewControllerDelegate {
     func totalValidBookmarks(in fileURL: URL) -> Int? {
         let importer = BookmarkHTMLImporter(
             fileURL: fileURL,
-            bookmarkImporter: CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
+            bookmarkImporter: CoreDataBookmarkImporter(bookmarkManager: bookmarkManager)
         )
         return importer.totalBookmarks
     }
@@ -527,7 +542,7 @@ extension DataImportViewController: NSTextViewDelegate {
         view.window?.endSheet(sheet)
         dismiss()
 
-        FeedbackPresenter.presentFeedbackForm(using: windowManager)
+        FeedbackPresenter.presentFeedbackForm(with: dependencies)
 
         return true
     }

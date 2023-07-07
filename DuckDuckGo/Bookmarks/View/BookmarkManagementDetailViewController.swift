@@ -39,8 +39,10 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
     @Injected
     var windowManager: WindowManagerProtocol
+    @Injected
+    var bookmarkManager: BookmarkManager
 
-    typealias InjectedDependencies = Tab.Dependencies
+    typealias InjectedDependencies = Tab.Dependencies & DataImportViewController.Dependencies & AddBookmarkModalViewController.Dependencies
 
     fileprivate enum Constants {
         static let bookmarkCellIdentifier = NSUserInterfaceItemIdentifier(rawValue: "BookmarksCellIdentifier")
@@ -56,7 +58,6 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
     weak var delegate: BookmarkManagementDetailViewControllerDelegate?
 
-    private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     private var selectionState: BookmarkManagementSidebarViewController.SelectionState = .empty {
         didSet {
             editingBookmarkIndex = nil
@@ -144,7 +145,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     @IBAction func onImportClicked(_ sender: NSButton) {
-        DataImportViewController.show(using: windowManager)
+        DataImportViewController.show(with: dependencies)
     }
 
     @IBAction func handleDoubleClick(_ sender: NSTableView) {
@@ -185,7 +186,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     @IBAction func presentAddBookmarkModal(_ sender: Any) {
-        let addBookmarkViewController = AddBookmarkModalViewController.create()
+        let addBookmarkViewController = AddBookmarkModalViewController.create(dependencyProvider: dependencies)
         addBookmarkViewController.delegate = self
         beginSheet(addBookmarkViewController)
     }
@@ -258,11 +259,11 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     private func totalRows() -> Int {
         switch selectionState {
         case .empty:
-            return LocalBookmarkManager.shared.list?.topLevelEntities.count ?? 0
+            return bookmarkManager.list?.topLevelEntities.count ?? 0
         case .folder(let folder):
             return folder.children.count
         case .favorites:
-            return LocalBookmarkManager.shared.list?.favoriteBookmarks.count ?? 0
+            return bookmarkManager.list?.favoriteBookmarks.count ?? 0
         }
     }
 
@@ -421,18 +422,18 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         }
 
         if let parent = fetchEntity(at: row) as? BookmarkFolder, dropOperation == .on {
-            LocalBookmarkManager.shared.add(objectsWithUUIDs: draggedItemIdentifiers, to: parent) { _ in }
+            bookmarkManager.add(objectsWithUUIDs: draggedItemIdentifiers, to: parent) { _ in }
             return true
         } else if let currentFolderUUID = selectionState.selectedFolderUUID {
-            LocalBookmarkManager.shared.move(objectUUIDs: draggedItemIdentifiers,
+            bookmarkManager.move(objectUUIDs: draggedItemIdentifiers,
                                              toIndex: row,
                                              withinParentFolder: .parent(uuid: currentFolderUUID)) { _ in }
             return true
         } else {
             if selectionState == .favorites {
-                LocalBookmarkManager.shared.moveFavorites(with: draggedItemIdentifiers, toIndex: row) { _ in }
+                bookmarkManager.moveFavorites(with: draggedItemIdentifiers, toIndex: row) { _ in }
             } else {
-                LocalBookmarkManager.shared.move(objectUUIDs: draggedItemIdentifiers,
+                bookmarkManager.move(objectUUIDs: draggedItemIdentifiers,
                                                  toIndex: row,
                                                  withinParentFolder: .root) { _ in }
             }
@@ -443,22 +444,22 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     private func fetchEntity(at row: Int) -> BaseBookmarkEntity? {
         switch selectionState {
         case .empty:
-            return LocalBookmarkManager.shared.list?.topLevelEntities[safe: row]
+            return bookmarkManager.list?.topLevelEntities[safe: row]
         case .folder(let folder):
             return folder.children[safe: row]
         case .favorites:
-            return LocalBookmarkManager.shared.list?.favoriteBookmarks[safe: row]
+            return bookmarkManager.list?.favoriteBookmarks[safe: row]
         }
     }
 
     private func index(for entity: Bookmark) -> Int? {
         switch selectionState {
         case .empty:
-            return LocalBookmarkManager.shared.list?.topLevelEntities.firstIndex(of: entity)
+            return bookmarkManager.list?.topLevelEntities.firstIndex(of: entity)
         case .folder(let folder):
             return folder.children.firstIndex(of: entity)
         case .favorites:
-            return LocalBookmarkManager.shared.list?.favoriteBookmarks.firstIndex(of: entity)
+            return bookmarkManager.list?.favoriteBookmarks.firstIndex(of: entity)
         }
     }
 
@@ -546,7 +547,7 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
         }
 
         bookmark.isFavorite.toggle()
-        LocalBookmarkManager.shared.update(bookmark: bookmark)
+        bookmarkManager.update(bookmark: bookmark)
     }
 
     func bookmarkTableCellView(_ cell: BookmarkTableCellView, updatedBookmarkWithUUID uuid: String, newTitle: String, newUrl: String) {
@@ -632,7 +633,7 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
             return
         }
 
-        LocalBookmarkManager.shared.remove(folder: folder)
+        bookmarkManager.remove(folder: folder)
     }
 
     func openInNewTabs(_ sender: NSMenuItem) {
@@ -673,7 +674,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
         if let bookmark = sender.representedObject as? Bookmark {
             bookmark.isFavorite.toggle()
-            LocalBookmarkManager.shared.update(bookmark: bookmark)
+            bookmarkManager.update(bookmark: bookmark)
         } else if let bookmarks = sender.representedObject as? [Bookmark] {
             let bookmarkIdentifiers = bookmarks.map(\.id)
             bookmarkManager.update(objectsWithUUIDs: bookmarkIdentifiers, update: { entity in
@@ -708,7 +709,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        LocalBookmarkManager.shared.remove(bookmark: bookmark)
+        bookmarkManager.remove(bookmark: bookmark)
     }
 
     func deleteEntities(_ sender: NSMenuItem) {
@@ -723,7 +724,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        LocalBookmarkManager.shared.remove(objectsWithUUIDs: uuids)
+        bookmarkManager.remove(objectsWithUUIDs: uuids)
     }
 
 }

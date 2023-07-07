@@ -20,24 +20,42 @@ import BrowserServicesKit
 import Combine
 import Common
 import ContentBlocking
+import DependencyInjection
 import Foundation
 import Navigation
 import PrivacyDashboard
 import TrackerRadarKit
 import WebKit
 
-protocol AdClickAttributionDependencies {
+#if swift(>=5.9)
+@Injectable
+#endif
+class AbstractAdClickAttributionDetectionDependencies: Injectable {
+    let dependencies: DependencyStorage
 
-    var privacyConfigurationManager: PrivacyConfigurationManaging { get }
-    var contentBlockingManager: ContentBlockerRulesManagerProtocol { get }
-    var tld: TLD { get }
+    @Injected var attributionFeatureConfig: AdClickAttributing
+    @Injected var tld: TLD
+    @Injected var attributionEvents: EventMapping<AdClickAttributionEvents>?
+    @Injected var attributionDebugEvents: EventMapping<AdClickAttributionDebugEvents>?
+    @Injected var attributionLog: () -> OSLog
 
-    var adClickAttribution: AdClickAttributing { get }
-    var adClickAttributionRulesProvider: AdClickAttributionRulesProviding { get }
+    private init() { fatalError("\(Self.self) should not be instantiated") }
+}
 
-    var attributionEvents: EventMapping<AdClickAttributionEvents>? { get }
-    var attributionDebugEvents: EventMapping<AdClickAttributionDebugEvents>? { get }
+#if swift(>=5.9)
+@Injectable
+#endif
+class AbstractAdClickAttributionLogicDependencies: Injectable {
+    let dependencies: DependencyStorage
 
+    @Injected var attributionFeatureConfig: AdClickAttributing
+    @Injected var attributionRulesProvider: AdClickAttributionRulesProviding
+    @Injected var tld: TLD
+    @Injected var attributionEvents: EventMapping<AdClickAttributionEvents>?
+    @Injected var attributionDebugEvents: EventMapping<AdClickAttributionDebugEvents>?
+    @Injected var attributionLog: () -> OSLog
+
+    private init() { fatalError("\(Self.self) should not be instantiated") }
 }
 
 protocol UserContentControllerProtocol: AnyObject {
@@ -77,39 +95,54 @@ protocol ContentBlockerScriptProtocol: AnyObject {
 }
 extension ContentBlockerRulesUserScript: ContentBlockerScriptProtocol {}
 
-final class AdClickAttributionTabExtension: TabExtension {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class AdClickAttributionTabExtension: TabExtension, Injectable {
 
-    private static func makeAdClickAttributionDetection(with dependencies: any AdClickAttributionDependencies, delegate: AdClickAttributionLogic) -> AdClickAttributionDetection {
-        let detection = AdClickAttributionDetection(feature: dependencies.adClickAttribution,
+    let dependencies: DependencyStorage
+
+    @Injected
+    var privacyConfigurationManager: PrivacyConfigurationManaging
+
+    @Injected
+    var contentBlockingManager: ContentBlockerRulesManagerProtocol
+
+    @Injected
+    var now: () -> Date
+
+    typealias InjectedDependencies = AbstractAdClickAttributionLogicDependencies.Dependencies & AbstractAdClickAttributionDetectionDependencies.Dependencies
+
+    private static func makeAdClickAttributionDetection(with dependencyProvider: AbstractAdClickAttributionDetectionDependencies.DependencyProvider, delegate: AdClickAttributionLogic) -> AdClickAttributionDetection {
+        let dependencies = AbstractAdClickAttributionDetectionDependencies.DependencyStorage(dependencyProvider)
+        let detection = AdClickAttributionDetection(feature: dependencies.attributionFeatureConfig,
                                                     tld: dependencies.tld,
                                                     eventReporting: dependencies.attributionEvents,
                                                     errorReporting: dependencies.attributionDebugEvents,
-                                                    log: OSLog.attribution)
+                                                    log: dependencies.attributionLog())
         detection.delegate = delegate
         return detection
 
     }
 
-    private static func makeAdClickAttributionLogic(with dependencies: any AdClickAttributionDependencies) -> AdClickAttributionLogic {
-        return AdClickAttributionLogic(featureConfig: dependencies.adClickAttribution,
-                                       rulesProvider: dependencies.adClickAttributionRulesProvider,
+    private static func makeAdClickAttributionLogic(with dependencyProvider: AbstractAdClickAttributionLogicDependencies.DependencyProvider) -> AdClickAttributionLogic {
+        let dependencies = AbstractAdClickAttributionLogicDependencies.DependencyStorage(dependencyProvider)
+        return AdClickAttributionLogic(featureConfig: dependencies.attributionFeatureConfig,
+                                       rulesProvider: dependencies.attributionRulesProvider,
                                        tld: dependencies.tld,
                                        eventReporting: dependencies.attributionEvents,
                                        errorReporting: dependencies.attributionDebugEvents,
-                                       log: OSLog.attribution)
+                                       log: dependencies.attributionLog())
     }
 
-    private static func makeAdClickAttribution(with dependencies: any AdClickAttributionDependencies) -> (AdClickLogicProtocol, AdClickAttributionDetecting) {
-        let logic = makeAdClickAttributionLogic(with: dependencies)
-        let detection = makeAdClickAttributionDetection(with: dependencies, delegate: logic)
+    private static func makeAdClickAttribution(with dependencyProvider: AbstractAdClickAttributionDetectionDependencies.DependencyProvider & AbstractAdClickAttributionLogicDependencies.DependencyProvider) -> (AdClickLogicProtocol, AdClickAttributionDetecting) {
+        let logic = makeAdClickAttributionLogic(with: dependencyProvider)
+        let detection = makeAdClickAttributionDetection(with: dependencyProvider, delegate: logic)
         return (logic, detection)
     }
 
-    private let dependencies: any AdClickAttributionDependencies
-
     private weak var userContentController: UserContentControllerProtocol?
     private weak var contentBlockerRulesScript: ContentBlockerScriptProtocol?
-    private let dateTimeProvider: () -> Date
 
     private let detection: AdClickAttributionDetecting
     private let logic: AdClickLogicProtocol
@@ -124,12 +157,10 @@ final class AdClickAttributionTabExtension: TabExtension {
          userContentControllerFuture: some Publisher<some UserContentControllerProtocol, Never>,
          contentBlockerRulesScriptPublisher: some Publisher<(any ContentBlockerScriptProtocol)?, Never>,
          trackerInfoPublisher: some Publisher<DetectedRequest, Never>,
-         dependencies: some AdClickAttributionDependencies,
-         dateTimeProvider: @escaping () -> Date = Date.init,
-         logicsProvider: (AdClickAttributionDependencies) -> (AdClickLogicProtocol, AdClickAttributionDetecting) = AdClickAttributionTabExtension.makeAdClickAttribution) {
+         dependencyProvider: DependencyProvider,
+         logicsProvider: (AbstractAdClickAttributionDetectionDependencies.DependencyProvider & AbstractAdClickAttributionLogicDependencies.DependencyProvider) -> (AdClickLogicProtocol, AdClickAttributionDetecting) = AdClickAttributionTabExtension.makeAdClickAttribution) {
 
-        self.dependencies = dependencies
-        self.dateTimeProvider = dateTimeProvider
+        self.dependencies = .init(dependencyProvider)
 
         (self.logic, self.detection) = logicsProvider(dependencies)
         self.logic.delegate = self
@@ -158,7 +189,7 @@ final class AdClickAttributionTabExtension: TabExtension {
                 guard let self else { return }
 
                 self.contentBlockerRulesScript = contentBlockerRulesScript
-                self.logic.onRulesChanged(latestRules: self.dependencies.contentBlockingManager.currentRules)
+                self.logic.onRulesChanged(latestRules: self.contentBlockingManager.currentRules)
             }
             .store(in: &cancellables)
 
@@ -241,7 +272,7 @@ extension AdClickAttributionTabExtension: NavigationResponder {
     func navigationDidFinish(_ navigation: Navigation) {
         guard navigation.isCurrent else { return }
         detection.onDidFinishNavigation(url: navigation.url)
-        logic.onDidFinishNavigation(host: navigation.url.host, currentTime: dateTimeProvider())
+        logic.onDidFinishNavigation(host: navigation.url.host, currentTime: now())
     }
 
     func navigation(_ navigation: Navigation, didFailWith error: WKError) {
@@ -250,8 +281,6 @@ extension AdClickAttributionTabExtension: NavigationResponder {
     }
 
 }
-
-extension AppContentBlocking: AdClickAttributionDependencies {}
 
 protocol AdClickAttributionProtocol: AnyObject, NavigationResponder {
     var currentAttributionState: AdClickAttributionLogic.State { get }

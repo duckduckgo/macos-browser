@@ -18,10 +18,22 @@
 
 import Foundation
 import BrowserServicesKit
+import DependencyInjection
 import UserScript
 
+#if swift(>=5.9)
+@Injectable
+#endif
 @MainActor
-final class UserScripts: UserScriptsProvider {
+final class UserScripts: UserScriptsProvider, Injectable {
+
+    let dependencies: DependencyStorage
+
+    @Injected
+    var duckPlayer: DuckPlayer
+
+    @Injected
+    var sourceProvider: ScriptSourceProviding
 
     let pageObserverScript = PageObserverUserScript()
     let faviconScript = FaviconUserScript()
@@ -39,7 +51,10 @@ final class UserScripts: UserScriptsProvider {
     let youtubeOverlayScript: YoutubeOverlayUserScript?
     let youtubePlayerUserScript: YoutubePlayerUserScript?
 
-    init(with sourceProvider: ScriptSourceProviding) {
+    init(dependencyProvider: DependencyProvider) {
+        dependencies = .init(dependencyProvider)
+        let sourceProvider = dependencies.sourceProvider
+
         clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
@@ -58,9 +73,9 @@ final class UserScripts: UserScriptsProvider {
             autoconsentUserScript = nil
         }
 
-        if DuckPlayer.shared.isAvailable {
-            youtubeOverlayScript = YoutubeOverlayUserScript()
-            youtubePlayerUserScript = YoutubePlayerUserScript()
+        if dependencies.duckPlayer.isAvailable {
+            youtubeOverlayScript = YoutubeOverlayUserScript(preferences: dependencies.duckPlayer.preferences)
+            youtubePlayerUserScript = YoutubePlayerUserScript(preferences: dependencies.duckPlayer.preferences)
         } else {
             youtubeOverlayScript = nil
             youtubePlayerUserScript = nil

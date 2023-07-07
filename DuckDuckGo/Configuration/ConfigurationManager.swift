@@ -16,15 +16,27 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
 import BrowserServicesKit
+import Combine
 import Configuration
 import Common
+import DependencyInjection
+import Foundation
 import Networking
 
 @MainActor
-final class ConfigurationManager {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class ConfigurationManager: Injectable {
+
+    let dependencies: DependencyStorage
+
+    @Injected
+    var contentBlocking: AnyContentBlocking
+
+    @Injected
+    var privacyFeatures: PrivacyFeaturesProtocol
 
     enum Error: Swift.Error {
 
@@ -50,7 +62,6 @@ final class ConfigurationManager {
 
     }
 
-    static let shared = ConfigurationManager()
     static let queue: DispatchQueue = DispatchQueue(label: "Configuration Manager")
 
     @UserDefaultsWrapper(key: .configLastUpdated, defaultValue: .distantPast)
@@ -62,6 +73,10 @@ final class ConfigurationManager {
     private lazy var fetcher = ConfigurationFetcher(store: ConfigurationStore.shared,
                                                     log: .config,
                                                     eventMapping: Self.configurationDebugEvents)
+
+    init(dependencyProvider: DependencyProvider) {
+        dependencies = .init(dependencyProvider)
+    }
 
     private static let configurationDebugEvents = EventMapping<ConfigurationDebugEvents> { event, error, _, _ in
         let domainEvent: Pixel.Event.Debug
@@ -195,11 +210,11 @@ final class ConfigurationManager {
     }
 
     private func updateTrackerBlockingDependencies() {
-        ContentBlocking.shared.trackerDataManager.reload(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
-                                                         data: ConfigurationStore.shared.loadData(for: .trackerDataSet))
-        ContentBlocking.shared.privacyConfigurationManager.reload(etag: ConfigurationStore.shared.loadEtag(for: .privacyConfiguration),
-                                                                  data: ConfigurationStore.shared.loadData(for: .privacyConfiguration))
-        ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
+        contentBlocking.trackerDataManager.reload(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
+                                                  data: ConfigurationStore.shared.loadData(for: .trackerDataSet))
+        contentBlocking.privacyConfigurationManager.reload(etag: ConfigurationStore.shared.loadEtag(for: .privacyConfiguration),
+                                                           data: ConfigurationStore.shared.loadData(for: .privacyConfiguration))
+        contentBlocking.contentBlockingManager.scheduleCompilation()
     }
 
     private func updateBloomFilter() async throws {
@@ -209,15 +224,15 @@ final class ConfigurationManager {
         guard let bloomFilterData = ConfigurationStore.shared.loadData(for: .bloomFilterBinary) else {
             throw Error.bloomFilterBinaryNotFound
         }
-        try await Task.detached {
+        try await Task.detached { [privacyFeatures] in
             let spec = try JSONDecoder().decode(HTTPSBloomFilterSpecification.self, from: specData)
             do {
-                try await PrivacyFeatures.httpsUpgrade.persistBloomFilter(specification: spec, data: bloomFilterData)
+                try await privacyFeatures.httpsUpgrade.persistBloomFilter(specification: spec, data: bloomFilterData)
             } catch {
                 assertionFailure("persistBloomFilter failed: \(error)")
                 throw Error.bloomFilterPersistenceFailed
             }
-            await PrivacyFeatures.httpsUpgrade.loadData()
+            await privacyFeatures.httpsUpgrade.loadData()
         }.value
     }
 
@@ -225,14 +240,14 @@ final class ConfigurationManager {
         guard let bloomFilterExclusions = ConfigurationStore.shared.loadData(for: .bloomFilterExcludedDomains) else {
             throw Error.bloomFilterExclusionsNotFound
         }
-        try await Task.detached {
+        try await Task.detached { [privacyFeatures] in
             let excludedDomains = try JSONDecoder().decode(HTTPSExcludedDomains.self, from: bloomFilterExclusions).data
             do {
-                try await PrivacyFeatures.httpsUpgrade.persistExcludedDomains(excludedDomains)
+                try await privacyFeatures.httpsUpgrade.persistExcludedDomains(excludedDomains)
             } catch {
                 throw Error.bloomFilterExclusionsPersistenceFailed
             }
-            await PrivacyFeatures.httpsUpgrade.loadData()
+            await privacyFeatures.httpsUpgrade.loadData()
         }.value
     }
 

@@ -33,7 +33,7 @@ final class BrowserTabViewController: NSViewController, Injectable {
     @Injected
     var windowManager: WindowManagerProtocol
 
-    typealias InjectedDependencies = Tab.Dependencies & PreferencesViewController.Dependencies & HomePageViewController.Dependencies & ContentOverlayPopover.Dependencies & BookmarkManagementSplitViewController.Dependencies
+    typealias InjectedDependencies = Tab.Dependencies & PreferencesViewController.Dependencies & HomePageViewController.Dependencies & ContentOverlayPopover.Dependencies & BookmarkManagementSplitViewController.Dependencies & DataImportViewController.Dependencies
 
     @IBOutlet weak var errorView: NSView!
     @IBOutlet weak var homePageView: NSView!
@@ -81,7 +81,6 @@ final class BrowserTabViewController: NSViewController, Injectable {
     @IBSegueAction func createHomePageViewController(_ coder: NSCoder) -> NSViewController? {
         guard let controller = HomePageViewController(coder: coder,
                                                       tabCollectionViewModel: tabCollectionViewModel,
-                                                      bookmarkManager: LocalBookmarkManager.shared,
                                                       dependencyProvider: dependencies) else {
             fatalError("BrowserTabViewController: Failed to init HomePageViewController")
         }
@@ -872,7 +871,7 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
 extension BrowserTabViewController: OnboardingDelegate {
 
     func onboardingDidRequestImportData(completion: @escaping () -> Void) {
-        DataImportViewController.show(using: windowManager, completion: completion)
+        DataImportViewController.show(with: dependencies, completion: completion)
     }
 
     func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {

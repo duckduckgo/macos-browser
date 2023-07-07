@@ -114,7 +114,7 @@ final class YoutubeOverlayUserScript: NSObject, UserScript, UserScriptMessageEnc
     let generatedSecret: String = UUID().uuidString
 
     init(
-        preferences: DuckPlayerPreferences = .shared,
+        preferences: DuckPlayerPreferences,
         encrypter: UserScriptEncrypter = AESGCMUserScriptEncrypter(),
         hostProvider: UserScriptHostProvider = SecurityOriginHostProvider()
     ) {

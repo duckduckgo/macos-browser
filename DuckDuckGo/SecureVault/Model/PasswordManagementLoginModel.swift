@@ -29,6 +29,8 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     @Injected
     var windowManager: WindowManagerProtocol
     @Injected
+    var faviconManagement: FaviconManagement
+    @Injected
     var urlMatcher: AutofillUrlMatcher
 
     typealias Model = SecureVaultModels.WebsiteCredentials

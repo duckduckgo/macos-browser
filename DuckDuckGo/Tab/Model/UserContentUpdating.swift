@@ -26,9 +26,21 @@ import Configuration
 final class UserContentUpdating {
 
     struct NewContent: UserContentControllerNewContent {
+        let duckPlayer: () -> DuckPlayer
+
         let rulesUpdate: ContentBlockerRulesManager.UpdateEvent
         let sourceProvider: ScriptSourceProviding
-        var makeUserScripts: @MainActor (ScriptSourceProviding) -> UserScripts { return UserScripts.init(with:) }
+
+        struct UserScriptsDependencies: UserScripts.Dependencies {
+            let sourceProvider: ScriptSourceProviding
+            let duckPlayer: DuckPlayer
+        }
+
+        var makeUserScripts: @MainActor (ScriptSourceProviding) -> UserScripts {
+            { sourceProvider in
+                UserScripts(dependencyProvider: UserScriptsDependencies(sourceProvider: sourceProvider, duckPlayer: duckPlayer()))
+            }
+        }
     }
 
     @Published private var bufferedValue: NewContent?
@@ -41,7 +53,8 @@ final class UserContentUpdating {
          trackerDataManager: TrackerDataManager,
          configStorage: ConfigurationStoring,
          privacySecurityPreferences: PrivacySecurityPreferences,
-         tld: TLD) {
+         tld: TLD,
+         duckPlayer: @escaping () -> DuckPlayer) {
 
         let makeValue: (ContentBlockerRulesManager.UpdateEvent) -> NewContent = { rulesUpdate in
             let sourceProvider = ScriptSourceProvider(configStorage: configStorage,
@@ -50,7 +63,7 @@ final class UserContentUpdating {
                                                       contentBlockingManager: contentBlockerRulesManager,
                                                       trackerDataManager: trackerDataManager,
                                                       tld: tld)
-            return NewContent(rulesUpdate: rulesUpdate, sourceProvider: sourceProvider)
+            return NewContent(duckPlayer: duckPlayer, rulesUpdate: rulesUpdate, sourceProvider: sourceProvider)
         }
 
         // 1. Collect updates from ContentBlockerRulesManager and generate UserScripts based on its output

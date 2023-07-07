@@ -18,6 +18,7 @@
 
 import Combine
 import Common
+import DependencyInjection
 import Foundation
 import Navigation
 import WebKit
@@ -26,9 +27,15 @@ protocol TabDownloadsDelegate: AnyObject {
     func fileIconFlyAnimationOriginalRect(for downloadTask: WebKitDownloadTask) -> NSRect?
 }
 
-final class DownloadsTabExtension: NSObject {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class DownloadsTabExtension: NSObject, Injectable {
+    let dependencies: DependencyStorage
 
-    private let downloadManager: FileDownloadManagerProtocol
+    @Injected
+    var downloadManager: FileDownloadManagerProtocol
+
     private let isBurner: Bool
 
     @Published
@@ -47,8 +54,8 @@ final class DownloadsTabExtension: NSObject {
 
     weak var delegate: TabDownloadsDelegate?
 
-    init(downloadManager: FileDownloadManagerProtocol, isBurner: Bool) {
-        self.downloadManager = downloadManager
+    init(isBurner: Bool, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
         self.isBurner = isBurner
         super.init()
     }

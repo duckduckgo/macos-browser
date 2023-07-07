@@ -46,8 +46,6 @@ protocol HistoryCoordinating: AnyObject {
 /// Coordinates access to History. Uses its own queue with high qos for all operations.
 final class HistoryCoordinator: HistoryCoordinating {
 
-    static let shared = HistoryCoordinator()
-
     private init() {}
 
     init(historyStoring: HistoryStoring) {

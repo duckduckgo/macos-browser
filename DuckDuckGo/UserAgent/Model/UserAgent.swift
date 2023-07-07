@@ -74,8 +74,7 @@ enum UserAgent {
         return "ddg_mac/\(appVersion) (\(appID); macOS \(systemVersion))"
     }
 
-    static func `for`(_ url: URL?,
-                      privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> String {
+    static func `for`(_ url: URL?, privacyConfig: PrivacyConfiguration) -> String {
         guard let absoluteString = url?.absoluteString else {
             return Self.default
         }
@@ -99,8 +98,7 @@ enum UserAgent {
     static let webviewDefaultKey = "webViewDefault"
     static let domainKey = "domain"
 
-    static func isURLPartOfWebviewDefaultList(url: URL?,
-                                              privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> Bool {
+    static func isURLPartOfWebviewDefaultList(url: URL?, privacyConfig: PrivacyConfiguration) -> Bool {
         let settings = privacyConfig.settings(for: .customUserAgent)
         let webViewDefaultList = settings[webviewDefaultKey] as? [[String: String]] ?? []
         let domains = webViewDefaultList.map { $0[domainKey] ?? "" }

@@ -36,7 +36,10 @@ final class BookmarkListViewController: NSViewController, Injectable {
     @Injected
     var windowManager: WindowManagerProtocol
 
-    typealias InjectedDependencies = Tab.Dependencies
+    @Injected
+    var bookmarkManager: BookmarkManager
+
+    typealias InjectedDependencies = Tab.Dependencies & DataImportViewController.Dependencies & AddBookmarkModalViewController.Dependencies & BookmarkOutlineViewDataSource.Dependencies & BookmarkListTreeControllerDataSource.Dependencies
 
     private enum Constants {
         static let storyboardName = "Bookmarks"
@@ -64,8 +67,7 @@ final class BookmarkListViewController: NSViewController, Injectable {
     @IBOutlet var manageBookmarksButton: NSButton!
 
     private var cancellables = Set<AnyCancellable>()
-    private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
-    private let treeControllerDataSource = BookmarkListTreeControllerDataSource()
+    private let treeControllerDataSource: BookmarkListTreeControllerDataSource
 
     private var mouseUpEventsMonitor: Any?
     private var mouseDownEventsMonitor: Any?
@@ -76,7 +78,7 @@ final class BookmarkListViewController: NSViewController, Injectable {
     }()
 
     private lazy var dataSource: BookmarkOutlineViewDataSource = {
-        BookmarkOutlineViewDataSource(contentMode: .bookmarksAndFolders, treeController: treeController)
+        BookmarkOutlineViewDataSource(contentMode: .bookmarksAndFolders, treeController: treeController, dependencyProvider: dependencies)
     }()
 
     private var selectedNodes: [BookmarkNode] {
@@ -88,6 +90,7 @@ final class BookmarkListViewController: NSViewController, Injectable {
 
     init(coder: NSCoder, dependencyProvider: DependencyProvider) {
         self.dependencies = .init(dependencyProvider)
+        self.treeControllerDataSource = BookmarkListTreeControllerDataSource(dependencyProvider: dependencyProvider)
         super.init(coder: coder)!
     }
 
@@ -108,7 +111,7 @@ final class BookmarkListViewController: NSViewController, Injectable {
         outlineView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
                                              FolderPasteboardWriter.folderUTIInternalType])
 
-        LocalBookmarkManager.shared.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] list in
+        bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] list in
             self?.reloadData()
             let isEmpty = list?.topLevelEntities.isEmpty ?? true
             self?.emptyState.isHidden = !isEmpty
@@ -139,7 +142,7 @@ final class BookmarkListViewController: NSViewController, Injectable {
     }
 
     @IBAction func newBookmarkButtonClicked(_ sender: AnyObject) {
-        let newBookmarkViewController = AddBookmarkModalViewController.create()
+        let newBookmarkViewController = AddBookmarkModalViewController.create(dependencyProvider: dependencies)
         newBookmarkViewController.currentTabWebsite = currentTabWebsite
         newBookmarkViewController.delegate = self
 
@@ -178,7 +181,7 @@ final class BookmarkListViewController: NSViewController, Injectable {
     }
 
     @IBAction func onImportClicked(_ sender: NSButton) {
-        DataImportViewController.show(using: windowManager)
+        DataImportViewController.show(with: dependencies)
     }
 
     // MARK: NSOutlineView Configuration
@@ -357,7 +360,7 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
         }
 
         bookmark.isFavorite.toggle()
-        LocalBookmarkManager.shared.update(bookmark: bookmark)
+        bookmarkManager.update(bookmark: bookmark)
     }
 
     func editBookmark(_ sender: NSMenuItem) {
@@ -378,7 +381,7 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        LocalBookmarkManager.shared.remove(bookmark: bookmark)
+        bookmarkManager.remove(bookmark: bookmark)
     }
 
     func deleteEntities(_ sender: NSMenuItem) {
@@ -387,7 +390,7 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        LocalBookmarkManager.shared.remove(objectsWithUUIDs: uuids)
+        bookmarkManager.remove(objectsWithUUIDs: uuids)
     }
 
 }
@@ -418,7 +421,7 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
             return
         }
 
-        LocalBookmarkManager.shared.remove(folder: folder)
+        bookmarkManager.remove(folder: folder)
     }
 
     func openInNewTabs(_ sender: NSMenuItem) {

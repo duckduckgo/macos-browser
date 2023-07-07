@@ -129,7 +129,7 @@ extension Pixel.Event {
         case website
         case pwm
 
-        init(url: URL?, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+        init(url: URL?, bookmarkManager: BookmarkManager) {
             guard let url = url,
                   let bookmark = bookmarkManager.getBookmark(forUrl: url.absoluteString) else {
                 self = .website

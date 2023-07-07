@@ -463,6 +463,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///     - validity: the default registration key validity time interval.  A `nil` value means it will be automatically
     ///         defined by NetP using its standard configuration.
     ///
+    @MainActor
     static func setRegistrationKeyValidity(_ validity: TimeInterval?, defaults: UserDefaults = .standard) async throws {
         guard let activeSession = try await ConnectionSessionUtilities.activeSession() else {
             return

@@ -39,7 +39,7 @@ final class NavigationBarViewController: NSViewController, Injectable {
     @Injected
     var downloadListCoordinator: DownloadListCoordinator
 
-    typealias InjectedDependencies = Tab.Dependencies & MoreOptionsMenu.Dependencies & NavigationBarPopovers.Dependencies & AddressBarViewController.Dependencies
+    typealias InjectedDependencies = Tab.Dependencies & MoreOptionsMenu.Dependencies & NavigationBarPopovers.Dependencies & AddressBarViewController.Dependencies & DataImportViewController.Dependencies & NavigationButtonMenuDelegate.Dependencies
 
     enum Constants {
         static let downloadsButtonAutoHidingInterval: TimeInterval = 5 * 60
@@ -121,8 +121,8 @@ final class NavigationBarViewController: NSViewController, Injectable {
         self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popovers: popovers)
         self.isBurner = isBurner
         self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility
-        goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
-        goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
+        goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel, dependencyProvider: dependencies)
+        goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel, dependencyProvider: dependencies)
         super.init(coder: coder)
     }
 #else
@@ -797,7 +797,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedBookmarkImportInterface(_ menu: NSMenu) {
-        DataImportViewController.show(using: windowManager)
+        DataImportViewController.show(with: dependencies)
     }
 
     func optionsButtonMenuRequestedBookmarkExportInterface(_ menu: NSMenu) {

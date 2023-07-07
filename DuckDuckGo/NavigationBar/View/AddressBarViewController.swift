@@ -28,6 +28,13 @@ import Lottie
 final class AddressBarViewController: NSViewController, Injectable {
     let dependencies: DependencyStorage
 
+    @Injected
+    var privacyFeatures: PrivacyFeaturesProtocol
+    @Injected
+    var bookmarkManager: BookmarkManager
+    @Injected
+    var historyCoordinating: HistoryCoordinating
+    
     typealias InjectedDependencies = Tab.Dependencies & AddressBarButtonsViewController.Dependencies
 
     @IBOutlet weak var addressBarTextField: AddressBarTextField!
@@ -97,7 +104,7 @@ final class AddressBarViewController: NSViewController, Injectable {
         self.suggestionContainerViewModel = SuggestionContainerViewModel(
             isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage,
             isBurner: isBurner,
-            suggestionContainer: SuggestionContainer())
+            suggestionContainer: SuggestionContainer(bookmarkManager: dependencies.bookmarkManager, historyCoordinating: dependencies.historyCoordinating))
         self.isBurner = isBurner
 
         super.init(coder: coder)
@@ -508,15 +515,19 @@ extension AddressBarViewController: AddressBarButtonsViewControllerDelegate {
 
 extension AddressBarViewController: AddressBarTextFieldDelegate {
 
-    func adressBarTextField(_ addressBarTextField: AddressBarTextField, didChangeValue value: AddressBarTextField.Value) {
+    func addressBarTextField(_: AddressBarTextField, didChangeValue value: AddressBarTextField.Value) {
         updateMode(value: value)
         addressBarButtonsViewController?.textFieldValue = value
         updateView()
     }
 
-    func adressBarTextField(_ addressBarTextField: AddressBarTextField, didRequestNewTabWith content: Tab.TabContent, selected: Bool) {
+    func addressBarTextField(_: AddressBarTextField, didRequestNewTabWith content: Tab.TabContent, selected: Bool) {
         let tab = Tab(dependencyProvider: dependencies, content: content, shouldLoadInBackground: true, isBurner: isBurner)
         tabCollectionViewModel.append(tab: tab, selected: selected)
+    }
+
+    func addressBarTextField(_: AddressBarTextField, didRequestHttpsUpgradeOf url: URL) async -> Result<URL, Error> {
+        await privacyFeatures.httpsUpgrade.upgrade(url: url).mapError { $0 }
     }
 
 }

@@ -17,6 +17,7 @@
 //
 
 import Combine
+import DependencyInjection
 import Foundation
 import Navigation
 
@@ -25,9 +26,15 @@ protocol PermissionModelProtocol {
 }
 extension PermissionModel: PermissionModelProtocol {}
 
-final class ExternalAppSchemeHandler {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class ExternalAppSchemeHandler: Injectable {
+    let dependencies: DependencyStorage
 
-    private let workspace: Workspace
+    @Injected
+    var workspace: Workspace
+
     private let permissionModel: PermissionModelProtocol
 
     private var externalSchemeOpenedPerPageLoad = false
@@ -35,8 +42,8 @@ final class ExternalAppSchemeHandler {
     private var lastUserEnteredValue: String?
     private var cancellable: AnyCancellable?
 
-    init(workspace: Workspace, permissionModel: PermissionModelProtocol, contentPublisher: some Publisher<Tab.TabContent, Never>) {
-        self.workspace = workspace
+    init(permissionModel: PermissionModelProtocol, contentPublisher: some Publisher<Tab.TabContent, Never>, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
         self.permissionModel = permissionModel
 
         cancellable = contentPublisher.sink { [weak self] tabContent in

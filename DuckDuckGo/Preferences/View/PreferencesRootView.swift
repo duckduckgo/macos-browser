@@ -31,17 +31,18 @@ fileprivate extension Preferences.Const {
 #if swift(>=5.9)
 @Injectable
 #endif
-final class AbstractRootViewDependencies: Injectable {
+final class AbstractPreferencesRootViewDependencies: Injectable {
     let dependencies: DependencyStorage
 
     @Injected
     var windowManager: WindowManagerProtocol
 
-    typealias InjectedDependencies = AutofillPreferencesModel.Dependencies & PrivacyPreferencesModel.Dependencies & SyncPreferences.Dependencies
+    @Injected
+    var duckPlayerPreferences: DuckPlayerPreferences
 
-    init() {
-        fatalError("\(Self.self) should not be instantiated")
-    }
+    typealias InjectedDependencies = AutofillPreferencesModel.Dependencies & PrivacyPreferencesModel.Dependencies & SyncPreferences.Dependencies & AboutModel.Dependencies
+
+    private init() { fatalError("\(Self.self) should not be instantiated") }
 }
 
 extension Preferences {
@@ -50,13 +51,13 @@ extension Preferences {
 
         @ObservedObject var model: PreferencesSidebarModel
 
-        let dependencies: AbstractRootViewDependencies.DependencyStorage
+        let dependencies: AbstractPreferencesRootViewDependencies.DependencyStorage
 
 #if NETWORK_PROTECTION
         let netPInvitePresenter: NetworkProtectionInvitePresenter
 #endif
 
-        init(model: PreferencesSidebarModel, dependencyProvider: AbstractRootViewDependencies.DependencyProvider) {
+        init(model: PreferencesSidebarModel, dependencyProvider: AbstractPreferencesRootViewDependencies.DependencyProvider) {
             self.dependencies = .init(dependencyProvider)
             self.model = model
 
@@ -89,12 +90,12 @@ extension Preferences {
                             case .downloads:
                                 DownloadsView(model: DownloadsPreferences())
                             case .duckPlayer:
-                                DuckPlayerView(model: .shared)
+                                DuckPlayerView(model: dependencies.duckPlayerPreferences)
                             case .about:
 #if NETWORK_PROTECTION
-                                AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter, windowManager: dependencies.windowManager))
+                                AboutView(model: AboutModel(netPInvitePresenter: netPInvitePresenter, dependencyProvider: dependencies))
 #else
-                                AboutView(model: AboutModel(windowManager: dependencies.windowManager))
+                                AboutView(model: AboutModel(dependencyProvider: dependencies))
 #endif
                             }
                         }

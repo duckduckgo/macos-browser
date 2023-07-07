@@ -35,6 +35,9 @@ final class TabBarViewController: NSViewController, Injectable {
     @Injected
     var windowManager: WindowManagerProtocol
 
+    @Injected
+    var bookmarkManager: BookmarkManager
+
     typealias InjectedDependencies = Tab.Dependencies
 
     enum HorizontalSpace: CGFloat {
@@ -61,7 +64,6 @@ final class TabBarViewController: NSViewController, Injectable {
     @IBOutlet weak var addTabButton: MouseOverButton!
     let tabCollectionViewModel: TabCollectionViewModel
 
-    private let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
     private let pinnedTabsViewModel: PinnedTabsViewModel?
     private let pinnedTabsView: PinnedTabsView?
     private let pinnedTabsHostingView: PinnedTabsHostingView?

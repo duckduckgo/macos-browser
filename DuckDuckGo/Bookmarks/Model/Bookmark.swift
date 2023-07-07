@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
-import Cocoa
 import Bookmarks
+import Cocoa
+import DependencyInjection
 
 internal class BaseBookmarkEntity {
 
@@ -57,7 +58,7 @@ internal class BaseBookmarkEntity {
         self.isFolder = isFolder
     }
 
-    static func from(managedObject: BookmarkEntity, parentFolderUUID: String? = nil) -> BaseBookmarkEntity? {
+    static func from(managedObject: BookmarkEntity, parentFolderUUID: String? = nil, dependencyProvider: Bookmark.DependencyProvider) -> BaseBookmarkEntity? {
         guard let id = managedObject.uuid,
               let title = managedObject.title else {
             assertionFailure("\(#file): Failed to create BaseBookmarkEntity from BookmarkManagedObject")
@@ -66,7 +67,7 @@ internal class BaseBookmarkEntity {
 
         if managedObject.isFolder {
             let children: [BaseBookmarkEntity] = managedObject.childrenArray.compactMap {
-                return BaseBookmarkEntity.from(managedObject: $0, parentFolderUUID: id)
+                return BaseBookmarkEntity.from(managedObject: $0, parentFolderUUID: id, dependencyProvider: dependencyProvider)
             }
 
             let folder = BookmarkFolder(id: id, title: title, parentFolderUUID: parentFolderUUID, children: children)
@@ -82,7 +83,8 @@ internal class BaseBookmarkEntity {
                             url: url,
                             title: title,
                             isFavorite: managedObject.isFavorite,
-                            parentFolderUUID: parentFolderUUID)
+                            parentFolderUUID: parentFolderUUID,
+                            dependencyProvider: dependencyProvider)
         }
     }
 
@@ -125,7 +127,18 @@ final class BookmarkFolder: BaseBookmarkEntity {
     }
 }
 
-final class Bookmark: BaseBookmarkEntity {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class Bookmark: BaseBookmarkEntity, Injectable {
+
+    let dependencies: DependencyStorage
+
+    @Injected
+    var duckPlayer: DuckPlayer
+
+    @Injected
+    var faviconManagement: FaviconManagement
 
     static func bookmarksFetchRequest() -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
@@ -141,9 +154,8 @@ final class Bookmark: BaseBookmarkEntity {
         return url.isBookmarklet() ? url.toEncodedBookmarklet() : URL(string: url)
     }
 
-    let faviconManagement: FaviconManagement
     func favicon(_ sizeCategory: Favicon.SizeCategory) -> NSImage? {
-        if let duckPlayerFavicon = DuckPlayer.shared.image(for: self) {
+        if let duckPlayerFavicon = duckPlayer.image(for: self) {
             return duckPlayerFavicon
         }
 
@@ -159,21 +171,22 @@ final class Bookmark: BaseBookmarkEntity {
          title: String,
          isFavorite: Bool,
          parentFolderUUID: String? = nil,
-         faviconManagement: FaviconManagement = FaviconManager.shared) {
+         dependencyProvider: DependencyProvider) {
         self.url = url
         self.isFavorite = isFavorite
         self.parentFolderUUID = parentFolderUUID
-        self.faviconManagement = faviconManagement
+        self.dependencies = .init(dependencyProvider)
 
         super.init(id: id, title: title, isFolder: false)
     }
 
-    convenience init(from bookmark: Bookmark, with newUrl: String) {
+    convenience init(from bookmark: Bookmark, with newUrl: String, dependencyProvider: DependencyProvider) {
         self.init(id: bookmark.id,
                   url: newUrl,
                   title: bookmark.title,
                   isFavorite: bookmark.isFavorite,
-                  parentFolderUUID: bookmark.parentFolderUUID)
+                  parentFolderUUID: bookmark.parentFolderUUID,
+                  dependencyProvider: dependencyProvider)
     }
 
 }

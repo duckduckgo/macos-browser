@@ -16,7 +16,19 @@
 //  limitations under the License.
 //
 
+import DependencyInjection
 import Foundation
+
+#if swift(>=5.9)
+@Injectable
+#endif
+class AbstractFavoriteModelDependencies: Injectable {
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = AbstractFavoritesGridAddButtonDependencies.Dependencies & AbstractFavoriteDependencies.Dependencies
+
+    private init() { fatalError("\(Self.self) should not be instantiated") }
+}
 
 extension HomePage.Models {
 
@@ -29,104 +41,120 @@ extension HomePage.Models {
     }
 
     struct FavoriteModel: Identifiable, Equatable {
+        let dependencies: AbstractFavoriteModelDependencies.DependencyStorage
 
         let id: String
         let favoriteType: FavoriteType
 
-    }
-
-    final class FavoritesModel: ObservableObject {
-
-        enum OpenTarget {
-
-            case current, newTab, newWindow
-
-        }
-
-        @UserDefaultsWrapper(key: .homePageShowAllFavorites, defaultValue: true)
-        private static var showAllFavoritesSetting: Bool
-
-        @Published var showAllFavorites: Bool {
-            didSet {
-                Self.showAllFavoritesSetting = showAllFavorites
-                updateVisibleModels()
-            }
-        }
-
-        @Published var favorites: [Bookmark] = [] {
-            didSet {
-                var favorites = self.favorites.map { FavoriteModel(id: $0.id, favoriteType: .bookmark($0)) }
-                favorites.append(.init(id: UUID().uuidString, favoriteType: .addButton))
-
-                let lastRowCount = favorites.count % HomePage.favoritesPerRow
-                let missing = lastRowCount > 0 ? HomePage.favoritesPerRow - lastRowCount : 0
-
-                (0 ..< missing).forEach { _ in
-                    favorites.append(FavoriteModel(id: UUID().uuidString, favoriteType: .ghostButton))
-                }
-
-                models = favorites
-            }
-        }
-
-        @Published var models: [FavoriteModel] = [] {
-            didSet {
-                updateVisibleModels()
-            }
-        }
-
-        @Published private(set) var visibleModels: [FavoriteModel] = []
-
-        @Published private(set) var rows: [[FavoriteModel]] = []
-
-        let open: (Bookmark, OpenTarget) -> Void
-        let removeFavorite: (Bookmark) -> Void
-        let deleteBookmark: (Bookmark) -> Void
-        let addEdit: (Bookmark?) -> Void
-        let moveFavorite: (Bookmark, Int) -> Void
-
-        init(open: @escaping (Bookmark, OpenTarget) -> Void,
-             removeFavorite: @escaping (Bookmark) -> Void,
-             deleteBookmark: @escaping (Bookmark) -> Void,
-             addEdit: @escaping (Bookmark?) -> Void,
-             moveFavorite: @escaping (Bookmark, Int) -> Void
-        ) {
-
-            self.showAllFavorites = Self.showAllFavoritesSetting
-            self.open = open
-            self.removeFavorite = removeFavorite
-            self.deleteBookmark = deleteBookmark
-            self.addEdit = addEdit
-            self.moveFavorite = moveFavorite
-        }
-
-        func openInNewTab(_ bookmark: Bookmark) {
-            open(bookmark, .newTab)
-        }
-
-        func openInNewWindow(_ bookmark: Bookmark) {
-            open(bookmark, .newWindow)
-        }
-
-        func open(_ bookmark: Bookmark) {
-            open(bookmark, .current)
-        }
-
-        func edit(_ bookmark: Bookmark) {
-            addEdit(bookmark)
-        }
-
-        func addNew() {
-            addEdit(nil)
-        }
-
-        private func updateVisibleModels() {
-            if #available(macOS 12.0, *) {
-                visibleModels = showAllFavorites ? models : Array(models.prefix(HomePage.favoritesRowCountWhenCollapsed * HomePage.favoritesPerRow))
-            } else {
-                rows = models.chunked(into: HomePage.favoritesPerRow)
-            }
+        static func == (lhs: HomePage.Models.FavoriteModel, rhs: HomePage.Models.FavoriteModel) -> Bool {
+            lhs.id == rhs.id && lhs.favoriteType == rhs.favoriteType
         }
     }
 
+    typealias FavoritesModel = HomePageFavoritesModel
 }
+
+#if swift(>=5.9)
+@Injectable
+#endif
+final class HomePageFavoritesModel: ObservableObject, Injectable {
+    typealias FavoriteModel = HomePage.Models.FavoriteModel
+
+    enum OpenTarget {
+
+        case current, newTab, newWindow
+
+    }
+
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = AbstractFavoriteModelDependencies.Dependencies
+
+    @UserDefaultsWrapper(key: .homePageShowAllFavorites, defaultValue: true)
+    private static var showAllFavoritesSetting: Bool
+
+    @Published var showAllFavorites: Bool {
+        didSet {
+            Self.showAllFavoritesSetting = showAllFavorites
+            updateVisibleModels()
+        }
+    }
+
+    @Published var favorites: [Bookmark] = [] {
+        didSet {
+            var favorites = self.favorites.map { FavoriteModel(dependencies: .init(dependencies), id: $0.id, favoriteType: .bookmark($0)) }
+            favorites.append(FavoriteModel(dependencies: .init(dependencies), id: UUID().uuidString, favoriteType: .addButton))
+
+            let lastRowCount = favorites.count % HomePage.favoritesPerRow
+            let missing = lastRowCount > 0 ? HomePage.favoritesPerRow - lastRowCount : 0
+
+            (0 ..< missing).forEach { _ in
+                favorites.append(FavoriteModel(dependencies: .init(dependencies), id: UUID().uuidString, favoriteType: .ghostButton))
+            }
+
+            models = favorites
+        }
+    }
+
+    @Published var models: [FavoriteModel] = [] {
+        didSet {
+            updateVisibleModels()
+        }
+    }
+
+    @Published private(set) var visibleModels: [FavoriteModel] = []
+
+    @Published private(set) var rows: [[FavoriteModel]] = []
+
+    let open: (Bookmark, OpenTarget) -> Void
+    let removeFavorite: (Bookmark) -> Void
+    let deleteBookmark: (Bookmark) -> Void
+    let addEdit: (Bookmark?) -> Void
+    let moveFavorite: (Bookmark, Int) -> Void
+
+    init(dependencyProvider: DependencyProvider,
+         open: @escaping (Bookmark, OpenTarget) -> Void,
+         removeFavorite: @escaping (Bookmark) -> Void,
+         deleteBookmark: @escaping (Bookmark) -> Void,
+         addEdit: @escaping (Bookmark?) -> Void,
+         moveFavorite: @escaping (Bookmark, Int) -> Void
+    ) {
+        self.dependencies = .init(dependencyProvider)
+
+        self.showAllFavorites = Self.showAllFavoritesSetting
+        self.open = open
+        self.removeFavorite = removeFavorite
+        self.deleteBookmark = deleteBookmark
+        self.addEdit = addEdit
+        self.moveFavorite = moveFavorite
+    }
+
+    func openInNewTab(_ bookmark: Bookmark) {
+        open(bookmark, .newTab)
+    }
+
+    func openInNewWindow(_ bookmark: Bookmark) {
+        open(bookmark, .newWindow)
+    }
+
+    func open(_ bookmark: Bookmark) {
+        open(bookmark, .current)
+    }
+
+    func edit(_ bookmark: Bookmark) {
+        addEdit(bookmark)
+    }
+
+    func addNew() {
+        addEdit(nil)
+    }
+
+    private func updateVisibleModels() {
+        if #available(macOS 12.0, *) {
+            visibleModels = showAllFavorites ? models : Array(models.prefix(HomePage.favoritesRowCountWhenCollapsed * HomePage.favoritesPerRow))
+        } else {
+            rows = models.chunked(into: HomePage.favoritesPerRow)
+        }
+    }
+}
+

@@ -20,6 +20,7 @@ import Bookmarks
 import Cocoa
 import Combine
 import Common
+import DependencyInjection
 
 protocol BookmarkManager: AnyObject {
 
@@ -52,24 +53,34 @@ protocol BookmarkManager: AnyObject {
     var listPublisher: Published<BookmarkList?>.Publisher { get }
     var list: BookmarkList? { get }
 
+    func loadBookmarks()
+    func resetBookmarks()
+
+    func requestSync()
+
 }
 
-final class LocalBookmarkManager: BookmarkManager {
 
-    static let shared = LocalBookmarkManager()
+#if swift(>=5.9)
+@Injectable
+#endif
+final class LocalBookmarkManager: BookmarkManager, Injectable {
+    let dependencies: DependencyStorage
 
-    private init() {}
+    @Injected
+    var bookmarkStore: BookmarkStore
+    @Injected
+    var faviconManagement: FaviconManagement
 
-    init(bookmarkStore: BookmarkStore, faviconManagement: FaviconManagement) {
-        self.bookmarkStore = bookmarkStore
-        self.faviconManagement = faviconManagement
+    typealias InjectedDependencies = Bookmark.Dependencies
+
+    init(dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
     }
 
     @Published private(set) var list: BookmarkList?
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
 
-    private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared)
-    private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
     private lazy var bookmarkDatabaseCleaner = BookmarkDatabaseCleaner(
         bookmarkDatabase: BookmarkDatabase.shared.db,
         errorEvents: BookmarksCleanupErrorHandling(),
@@ -99,18 +110,18 @@ final class LocalBookmarkManager: BookmarkManager {
             }
 
             self?.bookmarkStore.loadAll(type: .bookmarks) { [weak self] (bookmarks, error) in
-                guard error == nil, let bookmarks = bookmarks else {
+                guard error == nil, let self, let bookmarks else {
                     os_log("LocalBookmarkManager: Failed to fetch bookmarks.", type: .error)
                     return
                 }
 
-                self?.bookmarkStore.loadAll(type: .favorites) { [weak self] (favorites, error) in
-                    guard error == nil, let favorites = favorites else {
+                self.bookmarkStore.loadAll(type: .favorites) { [weak self] (favorites, error) in
+                    guard error == nil, let self, let favorites else {
                         os_log("LocalBookmarkManager: Failed to fetch favorites.", type: .error)
                         return
                     }
 
-                    self?.list = BookmarkList(entities: bookmarks, topLevelEntities: topLevelEntities, favorites: favorites)
+                    self.list = BookmarkList(entities: bookmarks, topLevelEntities: topLevelEntities, favorites: favorites, dependencyProvider: self.dependencies)
                 }
             }
         }
@@ -154,7 +165,7 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         let id = UUID().uuidString
-        let bookmark = Bookmark(id: id, url: url.absoluteString, title: title, isFavorite: isFavorite, parentFolderUUID: parent?.id)
+        let bookmark = Bookmark(id: id, url: url.absoluteString, title: title, isFavorite: isFavorite, parentFolderUUID: parent?.id, dependencyProvider: dependencies)
 
         list?.insert(bookmark)
         bookmarkStore.save(bookmark: bookmark, parent: parent, index: index) { [weak self] success, _  in

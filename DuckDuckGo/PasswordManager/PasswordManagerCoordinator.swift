@@ -20,6 +20,7 @@ import Foundation
 import BrowserServicesKit
 import Combine
 import Common
+import DependencyInjection
 
 protocol PasswordManagerCoordinating: BrowserServicesKit.PasswordManager {
 
@@ -34,18 +35,24 @@ protocol PasswordManagerCoordinating: BrowserServicesKit.PasswordManager {
 }
 
 // Encapsulation of third party password managers
-final class PasswordManagerCoordinator: PasswordManagerCoordinating {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class PasswordManagerCoordinator: PasswordManagerCoordinating, Injectable {
 
     enum PasswordManagerCoordinatorError: Error {
         case makingOfUrlFailed
     }
 
-    let bitwardenManagement: BWManagement
-    let windowManager: WindowManagerProtocol
+    let dependencies: DependencyStorage
 
-    init(bitwardenManagement: BWManagement, windowManager: WindowManagerProtocol) {
-        self.bitwardenManagement = bitwardenManagement
-        self.windowManager = windowManager
+    @Injected
+    var bitwardenManagement: BWManagement
+    @Injected
+    var windowManager: WindowManagerProtocol
+
+    init(dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
     }
 
     var isEnabled: Bool {

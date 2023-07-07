@@ -33,6 +33,9 @@ import NetworkProtectionUI
 final class NavigationBarPopovers: Injectable {
     let dependencies: DependencyStorage
 
+    @Injected
+    var bookmarkManager: BookmarkManager
+
     typealias InjectedDependencies = SaveIdentityPopover.Dependencies & SavePaymentMethodPopover.Dependencies & PasswordManagementPopover.Dependencies & DownloadsPopover.Dependencies & BookmarkListPopover.Dependencies & SaveCredentialsPopover.Dependencies
 
     enum Constants {
@@ -184,7 +187,7 @@ final class NavigationBarPopovers: Injectable {
             popover.viewController.currentTabWebsite = .init(tab)
         }
 
-        LocalBookmarkManager.shared.requestSync()
+        bookmarkManager.requestSync()
         show(popover: popover, usingView: view)
     }
 

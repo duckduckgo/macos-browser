@@ -17,23 +17,33 @@
 //
 
 import Cocoa
+import DependencyInjection
 
-enum FeedbackPresenter {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class FeedbackPresenter: Injectable {
+
+    let dependencies: DependencyStorage
+
+    @Injected
+    var windowManager: WindowManagerProtocol
+
+    typealias InjectedDependencies = FeedbackViewController.Dependencies
+
+    private init() { fatalError("\(Self.self) should not be instantiated") }
 
     @MainActor
-    static func presentFeedbackForm(using windowManager: WindowManagerProtocol) {
-        // swiftlint:disable:next force_cast
-        let windowController = NSStoryboard(name: "Feedback", bundle: .main).instantiateController(withIdentifier: "FeedbackWindowController") as! NSWindowController
-
-        guard let feedbackWindow = windowController.window as? FeedbackWindow,
-              let parentWindowController = windowManager.lastKeyMainWindowController else {
+    static func presentFeedbackForm(with dependencyProvider: DependencyProvider) {
+        let dependencies = DependencyStorage(dependencyProvider)
+        guard let parentWindowController = dependencies.windowManager.lastKeyMainWindowController else {
             assertionFailure("FeedbackPresenter: Failed to present FeedbackWindow")
             return
         }
 
-        feedbackWindow.feedbackViewController.currentTab =
-            parentWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab
-        parentWindowController.window?.beginSheet(feedbackWindow) { _ in }
+        let feedbackWindow = FeedbackWindow(dependencyProvider: dependencyProvider,
+                                            currentTab: parentWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab)
+        parentWindowController.window?.beginSheet(feedbackWindow)
     }
 
 }

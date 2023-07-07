@@ -18,9 +18,29 @@
 
 import BrowserServicesKit
 import Combine
+import Common
+import DependencyInjection
 import Foundation
 
-final class AutofillTabExtension: TabExtension {
+#if swift(>=5.9)
+@Injectable
+#endif
+class AbstractSecureVaultManagerDependencies: Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected var tld: TLD
+    @Injected var passwordManagerCoordinator: PasswordManagerCoordinating
+
+    private init() { fatalError("\(Self.self) should not be instantiated") }
+}
+
+#if swift(>=5.9)
+@Injectable
+#endif
+final class AutofillTabExtension: TabExtension, Injectable {
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = AbstractSecureVaultManagerDependencies.Dependencies
 
     static var emailManagerProvider: (EmailManagerRequestDelegate) -> AutofillEmailDelegate = { delegate in
         let emailManager = EmailManager()
@@ -28,10 +48,11 @@ final class AutofillTabExtension: TabExtension {
         return emailManager
     }
 
-    static var vaultManagerProvider: (SecureVaultManagerDelegate, PasswordManagerCoordinating) -> AutofillSecureVaultDelegate = { delegate, coordinator in
-        let manager = SecureVaultManager(passwordManager: coordinator,
+    static var vaultManagerProvider: (SecureVaultManagerDelegate, AbstractSecureVaultManagerDependencies.DependencyProvider) -> AutofillSecureVaultDelegate = { delegate, dependencyProvider in
+        let dependencies = AbstractSecureVaultManagerDependencies.DependencyStorage(dependencyProvider)
+        let manager = SecureVaultManager(passwordManager: dependencies.passwordManagerCoordinator,
                                          includePartialAccountMatches: true,
-                                         tld: ContentBlocking.shared.tld)
+                                         tld: dependencies.tld)
         manager.delegate = delegate
         return manager
     }
@@ -55,14 +76,16 @@ final class AutofillTabExtension: TabExtension {
 
     @Published var autofillDataToSave: AutofillData?
 
-    init(autofillUserScriptPublisher: some Publisher<WebsiteAutofillUserScript?, Never>, passwordManagerCoordinator: PasswordManagerCoordinating) {
+    init(autofillUserScriptPublisher: some Publisher<WebsiteAutofillUserScript?, Never>, dependencyProvider: DependencyProvider) {
+        dependencies = .init(dependencyProvider)
+
         autofillUserScriptCancellable = autofillUserScriptPublisher.sink { [weak self] autofillScript in
             guard let self, let autofillScript else { return }
 
             self.autofillScript = autofillScript
             self.emailManager = Self.emailManagerProvider(self)
             autofillScript.emailDelegate = self.emailManager
-            self.vaultManager = Self.vaultManagerProvider(self, passwordManagerCoordinator)
+            self.vaultManager = Self.vaultManagerProvider(self, dependencyProvider)
             autofillScript.vaultDelegate = self.vaultManager
         }
     }

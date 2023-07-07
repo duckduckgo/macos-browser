@@ -17,17 +17,23 @@
 //
 
 import Foundation
+import DependencyInjection
 
-final class BookmarkSidebarTreeController: BookmarkTreeControllerDataSource {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class BookmarkSidebarTreeController: BookmarkTreeControllerDataSource, Injectable {
+    let dependencies: DependencyStorage
 
     func treeController(treeController: BookmarkTreeController, childNodesFor node: BookmarkNode) -> [BookmarkNode] {
         return node.isRoot ? childNodesForRootNode(node) : childNodes(for: node)
     }
 
-    private let bookmarkManager: BookmarkManager
+    @Injected
+    var bookmarkManager: BookmarkManager
 
-    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
-        self.bookmarkManager = bookmarkManager
+    init(dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
     }
 
     // MARK: - Private

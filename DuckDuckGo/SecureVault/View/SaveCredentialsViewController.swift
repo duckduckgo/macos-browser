@@ -38,6 +38,9 @@ final class SaveCredentialsViewController: NSViewController, Injectable {
     @Injected
     var passwordManagerCoordinator: PasswordManagerCoordinating
 
+    @Injected
+    var faviconManagement: FaviconManagement
+    
     static func create(dependencyProvider: DependencyProvider) -> SaveCredentialsViewController {
         let controller = NSStoryboard(name: "PasswordManager", bundle: nil).instantiateController(identifier: "SaveCredentials") { coder in
             SaveCredentialsViewController(coder: coder, dependencyProvider: dependencyProvider)
@@ -71,8 +74,6 @@ final class SaveCredentialsViewController: NSViewController, Injectable {
     weak var delegate: SaveCredentialsDelegate?
 
     private var credentials: SecureVaultModels.WebsiteCredentials?
-
-    private var faviconManagement: FaviconManagement = FaviconManager.shared
 
     private var passwordManagerStateCancellable: AnyCancellable?
 

@@ -19,13 +19,19 @@
 import Combine
 import Common
 import ContentBlocking
+import DependencyInjection
 import Foundation
 import Navigation
 import WebKit
 
-final class HistoryTabExtension: NSObject {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class HistoryTabExtension: NSObject, Injectable {
+    let dependencies: DependencyStorage
 
-    private let historyCoordinating: HistoryCoordinating
+    @Injected
+    var historyCoordinating: HistoryCoordinating
     private let isBurner: Bool
 
     private(set) var localHistory = Set<String>()
@@ -48,12 +54,12 @@ final class HistoryTabExtension: NSObject {
     private var visitState: VisitState = .expected
 
     init(isBurner: Bool,
-         historyCoordinating: HistoryCoordinating,
          trackersPublisher: some Publisher<DetectedTracker, Never>,
          urlPublisher: some Publisher<URL?, Never>,
-         titlePublisher: some Publisher<String?, Never>) {
+         titlePublisher: some Publisher<String?, Never>,
+         dependencyProvider: DependencyProvider) {
 
-        self.historyCoordinating = historyCoordinating
+        self.dependencies = .init(dependencyProvider)
         self.isBurner = isBurner
         super.init()
 

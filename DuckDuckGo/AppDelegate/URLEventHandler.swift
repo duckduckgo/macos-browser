@@ -27,23 +27,23 @@ import NetworkProtection
 @MainActor
 final class URLEventHandler {
 
-    let windowManager: WindowManagerProtocol
-
     private let handler: @MainActor (URL) -> Void
 
     private var didFinishLaunching = false
     private var urlsToOpen = [URL]()
 
-    init(windowManager: WindowManagerProtocol, handler: ((URL) -> Void)? = nil) {
-        self.windowManager = windowManager
-        self.handler = handler ?? Self.openURL(using: windowManager)
-
+    init(handler: @escaping (URL) -> Void) {
+        self.handler = handler
         NSAppleEventManager.shared().setEventHandler(
             self,
             andSelector: #selector(handleUrlEvent(event:reply:)),
             forEventClass: AEEventClass(kInternetEventClass),
             andEventID: AEEventID(kAEGetURL)
         )
+    }
+
+    convenience init(windowManager: WindowManagerProtocol) {
+        self.init(handler: Self.openURL(using: windowManager))
     }
 
     func applicationDidFinishLaunching() {

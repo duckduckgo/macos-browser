@@ -33,6 +33,12 @@ final class MainViewController: NSViewController, Injectable {
     var windowManager: WindowManagerProtocol
     @Injected
     var fireCoordinator: FireCoordinator
+    @Injected
+    var duckPlayerPreferences: DuckPlayerPreferences
+    @Injected
+    var configurationManager: ConfigurationManager
+    @Injected
+    var bookmarkManager: BookmarkManager
 
     typealias InjectedDependencies = TabCollectionViewModel.Dependencies & NavigationBarViewController.Dependencies & TabBarViewController.Dependencies
         & BrowserTabViewController.Dependencies & BookmarksBarViewController.Dependencies & FireViewController.Dependencies

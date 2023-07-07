@@ -16,12 +16,29 @@
 //  limitations under the License.
 //
 
-import SwiftUI
 import BrowserServicesKit
+import DependencyInjection
+import SwiftUI
+
+#if swift(>=5.9)
+@Injectable
+#endif
+class AbstractHomePageRootViewDependencies: Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var bookmarkManager: BookmarkManager
+
+    typealias InjectedDependencies = AbstractRecentlyVisitedDependencies.Dependencies
+
+    private init() { fatalError("\(Self.self) should not be instantiated") }
+
+}
 
 extension HomePage.Views {
 
     struct RootView: View {
+        let dependencies: AbstractHomePageRootViewDependencies.DependencyStorage
 
         let backgroundColor = Color("NewTabPageBackgroundColor")
         let targetWidth: CGFloat = 482
@@ -43,7 +60,7 @@ extension HomePage.Views {
                                 Favorites()
                                     .padding(.top, 72)
 
-                                RecentlyVisited()
+                                RecentlyVisited(dependencies: .init(dependencies))
                                     .padding(.top, 66)
                                     .padding(.bottom, 16)
 
@@ -57,7 +74,7 @@ extension HomePage.Views {
                 .frame(maxWidth: .infinity)
                 .background(backgroundColor)
                 .onAppear {
-                    LocalBookmarkManager.shared.requestSync()
+                    dependencies.bookmarkManager.requestSync()
                 }
         }
     }

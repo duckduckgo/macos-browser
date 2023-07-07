@@ -38,8 +38,6 @@ struct DuckPlayerPreferencesUserDefaultsPersistor: DuckPlayerPreferencesPersisto
 
 final class DuckPlayerPreferences: ObservableObject {
 
-    static let shared = DuckPlayerPreferences()
-
     @Published
     var duckPlayerMode: DuckPlayerMode {
         didSet {

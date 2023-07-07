@@ -16,12 +16,51 @@
 //  limitations under the License.
 //
 
+import DependencyInjection
 import SwiftUI
 import SwiftUIExtensions
+
+#if swift(>=5.9)
+@Injectable
+#endif
+class AbstractRecentlyVisitedDependencies: Injectable {
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = AbstractRecentlyVisitedSiteDependencies.Dependencies
+
+    private init() { fatalError("\(Self.self) should not be instantiated") }
+}
+
+#if swift(>=5.9)
+@Injectable
+#endif
+class AbstractRecentlyVisitedSiteDependencies: Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var bookmarkManager: BookmarkManager
+
+    typealias InjectedDependencies = AbstractSiteIconAndConnectorDependencies.Dependencies
+
+    private init() { fatalError("\(Self.self) should not be instantiated") }
+}
+
+#if swift(>=5.9)
+@Injectable
+#endif
+class AbstractSiteIconAndConnectorDependencies: Injectable {
+    let dependencies: DependencyStorage
+
+    typealias InjectedDependencies = AbstractFaviconViewDependencies.Dependencies
+
+    private init() { fatalError("\(Self.self) should not be instantiated") }
+}
 
 extension HomePage.Views {
 
 struct RecentlyVisited: View {
+
+    let dependencies: AbstractRecentlyVisitedDependencies.DependencyStorage
 
     @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
 
@@ -35,13 +74,13 @@ struct RecentlyVisited: View {
                 if #available(macOS 12, *) {
                     LazyVStack(spacing: 0) {
                         ForEach(model.recentSites, id: \.domain) {
-                            RecentlyVisitedSite(site: $0)
+                            RecentlyVisitedSite(dependencies: .init(dependencies), site: $0)
                         }
                     }
                 } else {
                     VStack(spacing: 0) {
                         ForEach(model.recentSites, id: \.domain) {
-                            RecentlyVisitedSite(site: $0)
+                            RecentlyVisitedSite(dependencies: .init(dependencies), site: $0)
                         }
                     }
                 }
@@ -99,6 +138,8 @@ struct RecentlyVisitedSiteEmptyState: View {
 
 struct RecentlyVisitedSite: View {
 
+    let dependencies: AbstractRecentlyVisitedSiteDependencies.DependencyStorage
+
     @EnvironmentObject var model: HomePage.Models.RecentlyVisitedModel
     @ObservedObject var site: HomePage.Models.RecentlyVisitedSiteModel
 
@@ -116,7 +157,7 @@ struct RecentlyVisitedSite: View {
 
             HStack(alignment: .top, spacing: 12) {
 
-                SiteIconAndConnector(site: site)
+                SiteIconAndConnector(dependencies: .init(dependencies), site: site)
 
                 VStack(alignment: .leading, spacing: 6) {
 
@@ -152,7 +193,7 @@ struct RecentlyVisitedSite: View {
                 Spacer()
 
                 HoverButton(size: 24, imageName: site.isFavorite ? "FavoriteFilled" : "Favorite", imageSize: 16, cornerRadius: 4) {
-                    model.toggleFavoriteSite(site)
+                    model.toggleFavoriteSite(site, bookmarkManager: dependencies.bookmarkManager)
                 }
                 .foregroundColor(Color("HomeFeedItemButtonTintColor"))
                 .tooltip(UserText.tooltipAddToFavorites)
@@ -353,6 +394,8 @@ struct RecentlyVisitedTitle: View {
 
 struct SiteIconAndConnector: View {
 
+    let dependencies: AbstractSiteIconAndConnectorDependencies.DependencyStorage
+
     let backgroundColor = Color("HomeFavoritesBackgroundColor")
     let mouseOverColor: Color = Color("HomeFavoritesHoverColor")
 
@@ -382,7 +425,7 @@ struct SiteIconAndConnector: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(isHovering ? mouseOverColor : backgroundColor)
 
-            FaviconView(domain: site.domainToDisplay, size: 22)
+            FaviconView(domain: site.domainToDisplay, size: 22, dependencyProvider: dependencies)
         }
         .link {
             self.isHovering = $0
@@ -404,7 +447,7 @@ struct SiteIconAndConnector: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(backgroundColor)
 
-            FaviconView(domain: site.domainToDisplay, size: 22)
+            FaviconView(domain: site.domainToDisplay, size: 22, dependencyProvider: dependencies)
         }
         .frame(width: 32, height: 32)
     }

@@ -23,8 +23,7 @@ final class VisitViewModel {
     let visit: Visit
     let faviconManager: FaviconManagement
 
-    init(visit: Visit,
-         faviconManager: FaviconManagement = FaviconManager.shared) {
+    init(visit: Visit, faviconManager: FaviconManagement) {
         self.visit = visit
         self.faviconManager = faviconManager
     }

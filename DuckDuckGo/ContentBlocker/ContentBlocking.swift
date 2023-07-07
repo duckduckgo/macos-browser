@@ -28,19 +28,18 @@ protocol ContentBlockingProtocol {
     var contentBlockingManager: ContentBlockerRulesManagerProtocol { get }
     var trackerDataManager: TrackerDataManager { get }
     var tld: TLD { get }
+    var userContentUpdating: UserContentUpdating { get }
 
     var contentBlockingAssetsPublisher: AnyPublisher<UserContentUpdating.NewContent, Never> { get }
 
+    var adClickAttribution: AdClickAttributing { get }
+    var adClickAttributionRulesProvider: AdClickAttributionRulesProviding { get }
+    var attributionEvents: EventMapping<AdClickAttributionEvents>? { get }
+    var attributionDebugEvents: EventMapping<AdClickAttributionDebugEvents>? { get }
+
 }
 
-typealias AnyContentBlocking = any ContentBlockingProtocol & AdClickAttributionDependencies
-
-// refactor: ContentBlocking.shared to be removed, ContentBlockingProtocol to be renamed to ContentBlocking
-// ContentBlocking to be passed to init methods as `some ContentBlocking`
-typealias ContentBlocking = AppContentBlocking
-extension ContentBlocking {
-    static var shared: AnyContentBlocking { PrivacyFeatures.contentBlocking }
-}
+typealias AnyContentBlocking = any ContentBlockingProtocol
 
 final class AppContentBlocking {
     let privacyConfigurationManager: PrivacyConfigurationManaging
@@ -57,7 +56,7 @@ final class AppContentBlocking {
     private let exceptionsSource: DefaultContentBlockerRulesExceptionsSource
 
     // keeping whole ContentBlocking state initialization in one place to avoid races between updates publishing and rules storing
-    init(internalUserDecider: InternalUserDecider) {
+    init(internalUserDecider: InternalUserDecider, duckPlayer: @escaping () -> DuckPlayer) {
         let configStorage = ConfigurationStore.shared
         privacyConfigurationManager = PrivacyConfigurationManager(fetchedETag: configStorage.loadEtag(for: .privacyConfiguration),
                                                                   fetchedData: configStorage.loadData(for: .privacyConfiguration),
@@ -86,7 +85,8 @@ final class AppContentBlocking {
                                                   trackerDataManager: trackerDataManager,
                                                   configStorage: configStorage,
                                                   privacySecurityPreferences: PrivacySecurityPreferences.shared,
-                                                  tld: tld)
+                                                  tld: tld,
+                                                  duckPlayer: duckPlayer)
 
         adClickAttributionRulesProvider = AdClickAttributionRulesProvider(config: adClickAttribution,
                                                                           compiledRulesSource: contentBlockingManager,

@@ -23,8 +23,9 @@ import BrowserServicesKit
 protocol FaviconManagement: AnyObject {
 
     var areFaviconsLoaded: Bool { get }
+    var faviconsLoadedPublisher: AnyPublisher<Bool, Never> { get }
 
-    func loadFavicons()
+    func loadFavicons(bookmarkManager: BookmarkManager)
 
     func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL, completion: @escaping (Favicon?) -> Void)
 
@@ -42,11 +43,9 @@ protocol FaviconManagement: AnyObject {
 
 final class FaviconManager: FaviconManagement {
 
-    static let shared = FaviconManager(cacheType: .standard)
-
     enum CacheType {
         case standard
-        case inMemory
+        case inMemory(bookmarkManager: BookmarkManager)
     }
 
     init(cacheType: CacheType) {
@@ -59,8 +58,8 @@ final class FaviconManager: FaviconManagement {
         imageCache = FaviconImageCache(faviconStoring: store)
         referenceCache = FaviconReferenceCache(faviconStoring: store)
 
-        if case .inMemory = cacheType {
-            loadFavicons()
+        if case .inMemory(bookmarkManager: let bookmarkManager) = cacheType {
+            loadFavicons(bookmarkManager: bookmarkManager)
         }
     }
 
@@ -69,14 +68,17 @@ final class FaviconManager: FaviconManagement {
     private let faviconURLSession = URLSession(configuration: .ephemeral)
 
     @Published var faviconsLoaded = false
+    var faviconsLoadedPublisher: AnyPublisher<Bool, Never> {
+        $faviconsLoaded.eraseToAnyPublisher()
+    }
 
-    func loadFavicons() {
-        imageCache.loadFavicons { _ in
+    func loadFavicons(bookmarkManager: BookmarkManager) {
+        imageCache.loadFavicons { [bookmarkManager] _ in
             self.imageCache.cleanOldExcept(fireproofDomains: FireproofDomains.shared,
-                                           bookmarkManager: LocalBookmarkManager.shared) {
+                                           bookmarkManager: bookmarkManager) {
                 self.referenceCache.loadReferences { _ in
                     self.referenceCache.cleanOldExcept(fireproofDomains: FireproofDomains.shared,
-                                                       bookmarkManager: LocalBookmarkManager.shared)
+                                                       bookmarkManager: bookmarkManager)
                     self.faviconsLoaded = true
                 }
             }

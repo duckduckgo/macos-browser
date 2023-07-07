@@ -178,15 +178,6 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
         }
 
     }
-    private struct ExtensionDependencies: TabExtensionDependencies {
-        let privacyFeatures: PrivacyFeaturesProtocol
-        let historyCoordinating: HistoryCoordinating
-        var workspace: Workspace
-        var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
-        let duckPlayer: DuckPlayer
-        var downloadManager: FileDownloadManagerProtocol
-        var passwordManagerCoordinator: PasswordManagerCoordinating
-    }
 
     // "protected" properties
     fileprivate weak var delegate: TabDelegate?
@@ -203,7 +194,18 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
     var pinnedTabsManager: PinnedTabsManager?
 
     @Injected
-    var passwordManagerCoordinator: PasswordManagerCoordinating
+    var tabExtensionsBuilder: TabExtensionsBuilderProtocol
+
+    @Injected
+    var contentBlocking: AnyContentBlocking
+
+    @Injected
+    var faviconManagement: FaviconManagement
+
+    @Injected
+    var bookmarkManager: BookmarkManager
+
+    typealias InjectedDependencies = AbstractTabExtensionsDependencies.Dependencies
 
     private let webViewConfiguration: WKWebViewConfiguration
 
@@ -220,19 +222,11 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
     @MainActor
     convenience init(dependencyProvider: DependencyProvider,
                      content: TabContent,
-                     faviconManagement: FaviconManagement = FaviconManager.shared,
                      webCacheManager: WebCacheManager = WebCacheManager.shared,
                      webViewConfiguration: WKWebViewConfiguration? = nil,
-                     historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-                     workspace: Workspace = NSWorkspace.shared,
-                     privacyFeatures: AnyPrivacyFeatures? = nil,
-                     duckPlayer: DuckPlayer? = nil,
-                     downloadManager: FileDownloadManagerProtocol = FileDownloadManager.shared,
                      permissionManager: PermissionManagerProtocol = PermissionManager.shared,
                      geolocationService: GeolocationServiceProtocol = GeolocationService.shared,
-                     cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
                      statisticsLoader: StatisticsLoader? = nil,
-                     extensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default,
                      title: String? = nil,
                      favicon: NSImage? = nil,
                      interactionStateData: Data? = nil,
@@ -245,31 +239,22 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
                      webViewSize: CGSize = CGSize(width: 1024, height: 768)
     ) {
 
-        let duckPlayer = duckPlayer
-            ?? (NSApp.isRunningUnitTests ? DuckPlayer.mock(withMode: .enabled) : DuckPlayer.shared)
         let statisticsLoader = statisticsLoader
             ?? (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)
-        let privacyFeatures = privacyFeatures ?? PrivacyFeatures
         let internalUserDecider = (NSApp.delegate as? AppDelegate)?.internalUserDecider
-        var faviconManager = faviconManagement
-        if isBurner {
-            faviconManager = FaviconManager(cacheType: .inMemory)
+
+        let dependencies = DependencyStorage(dependencyProvider).mutating {
+            if isBurner {
+                $0.faviconManagement = FaviconManager(cacheType: .inMemory(bookmarkManager: $0.bookmarkManager))
+            }
         }
 
-        self.init(dependencyProvider: dependencyProvider,
+        self.init(dependencyProvider: dependencies,
                   content: content,
-                  faviconManagement: faviconManager,
                   webCacheManager: webCacheManager,
                   webViewConfiguration: webViewConfiguration,
-                  historyCoordinating: historyCoordinating,
-                  workspace: workspace,
-                  privacyFeatures: privacyFeatures,
-                  duckPlayer: duckPlayer,
-                  downloadManager: downloadManager,
                   permissionManager: permissionManager,
                   geolocationService: geolocationService,
-                  extensionsBuilder: extensionsBuilder,
-                  cbaTimeReporter: cbaTimeReporter,
                   statisticsLoader: statisticsLoader,
                   internalUserDecider: internalUserDecider,
                   title: title,
@@ -288,18 +273,10 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
     // swiftlint:disable:next function_body_length
     init(dependencyProvider: DependencyProvider,
          content: TabContent,
-         faviconManagement: FaviconManagement,
          webCacheManager: WebCacheManager,
          webViewConfiguration: WKWebViewConfiguration?,
-         historyCoordinating: HistoryCoordinating,
-         workspace: Workspace,
-         privacyFeatures: AnyPrivacyFeatures,
-         duckPlayer: DuckPlayer,
-         downloadManager: FileDownloadManagerProtocol,
          permissionManager: PermissionManagerProtocol,
          geolocationService: GeolocationServiceProtocol,
-         extensionsBuilder: TabExtensionsBuilderProtocol,
-         cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
          statisticsLoader: StatisticsLoader?,
          internalUserDecider: InternalUserDecider?,
          title: String?,
@@ -316,7 +293,6 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
 
         self.dependencies = .init(dependencyProvider)
         self.content = content
-        self.faviconManagement = faviconManagement
         self.statisticsLoader = statisticsLoader
         self.internalUserDecider = internalUserDecider
         self.title = title
@@ -328,8 +304,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
         self.lastSelectedAt = lastSelectedAt
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
-        configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
-                                                 isBurner: isBurner)
+        configuration.applyStandardConfiguration(contentBlocking: dependencies.contentBlocking, isBurner: isBurner)
         self.webViewConfiguration = configuration
         let userContentController = configuration.userContentController as? UserContentController
         assert(userContentController != nil)
@@ -349,7 +324,8 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
 
         let webViewPromise = Future<WKWebView, Never>.promise()
         var tabGetter: () -> Tab? = { nil }
-        self.extensions = extensionsBuilder
+
+        self.extensions = dependencies.tabExtensionsBuilder
             .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
                           isTabPinned: { [dependencies] in tabGetter().map { tab in dependencies.pinnedTabsManager?.isTabPinned(tab) == true } ?? false },
                           isTabBurner: isBurner,
@@ -360,14 +336,7 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
                           userContentControllerFuture: userContentControllerPromise.future,
                           permissionModel: permissions,
                           webViewFuture: webViewPromise.future
-                         ),
-                   dependencies: ExtensionDependencies(privacyFeatures: privacyFeatures,
-                                                       historyCoordinating: historyCoordinating,
-                                                       workspace: workspace,
-                                                       cbaTimeReporter: cbaTimeReporter,
-                                                       duckPlayer: duckPlayer,
-                                                       downloadManager: downloadManager,
-                                                       passwordManagerCoordinator: dependencies.passwordManagerCoordinator))
+                         ), dependencyProvider: dependencies)
 
         super.init()
         tabGetter = { [weak self] in self }
@@ -938,7 +907,6 @@ final class Tab: NSObject, Identifiable, ObservableObject, Injectable {
     // MARK: - Favicon
 
     @Published var favicon: NSImage?
-    let faviconManagement: FaviconManagement
 
     private func handleFavicon() {
         guard content.isUrl, let url = content.urlForWebView else {
@@ -1061,7 +1029,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         }
 
         if navigationAction.isForMainFrame {
-            preferences.userAgent = UserAgent.for(navigationAction.url)
+            preferences.userAgent = UserAgent.for(navigationAction.url, privacyConfig: contentBlocking.privacyConfigurationManager.privacyConfig)
         }
         guard navigationAction.url.scheme != nil else { return .allow }
 

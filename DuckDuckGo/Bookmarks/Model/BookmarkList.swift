@@ -60,7 +60,11 @@ struct BookmarkList {
         return bookmarks
     }
 
-    init(entities: [BaseBookmarkEntity] = [], topLevelEntities: [BaseBookmarkEntity] = [], favorites: [BaseBookmarkEntity] = []) {
+    let dependencies: Bookmark.DependencyStorage
+
+    init(entities: [BaseBookmarkEntity] = [], topLevelEntities: [BaseBookmarkEntity] = [], favorites: [BaseBookmarkEntity] = [], dependencyProvider: Bookmark.DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
         let bookmarks = entities.compactMap { $0 as? Bookmark }
         let keysOrdered = bookmarks.compactMap { IdentifiableBookmark(from: $0) }
 
@@ -136,7 +140,7 @@ struct BookmarkList {
             return nil
         }
 
-        let newBookmark = Bookmark(from: bookmark, with: newURL)
+        let newBookmark = Bookmark(from: bookmark, with: newURL, dependencyProvider: dependencies)
         let newIdentifiableBookmark = IdentifiableBookmark(from: newBookmark)
 
         allBookmarkURLsOrdered.remove(at: index)

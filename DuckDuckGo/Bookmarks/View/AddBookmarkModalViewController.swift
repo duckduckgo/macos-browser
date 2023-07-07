@@ -18,6 +18,7 @@
 
 import AppKit
 import Combine
+import DependencyInjection
 
 protocol AddBookmarkModalViewControllerDelegate: AnyObject {
 
@@ -31,7 +32,14 @@ extension AddBookmarkModalViewControllerDelegate {
     func addBookmarkViewControllerWillClose() {}
 }
 
-final class AddBookmarkModalViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class AddBookmarkModalViewController: NSViewController, Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var bookmarkManager: BookmarkManager
 
     struct WebsiteInfo {
         let url: URL
@@ -51,9 +59,11 @@ final class AddBookmarkModalViewController: NSViewController {
         static let identifier = "AddBookmarkModalViewController"
     }
 
-    static func create() -> AddBookmarkModalViewController {
+    static func create(dependencyProvider: DependencyProvider) -> AddBookmarkModalViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
-        return storyboard.instantiateController(identifier: Constants.identifier)
+        return storyboard.instantiateController(identifier: Constants.identifier) { coder in
+            AddBookmarkModalViewController(coder: coder, dependencyProvider: dependencyProvider)
+        }
     }
 
     var currentTabWebsite: WebsiteInfo? {
@@ -79,6 +89,16 @@ final class AddBookmarkModalViewController: NSViewController {
 
             return isInputValid
         }
+    }
+
+    private init(coder: NSCoder, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+
+        super.init(coder: coder)!
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
     }
 
     weak var delegate: AddBookmarkModalViewControllerDelegate?
@@ -127,7 +147,7 @@ final class AddBookmarkModalViewController: NSViewController {
     }
 
     private func updateWithCurrentTabWebsite() {
-        if let website = currentTabWebsite, !LocalBookmarkManager.shared.isUrlBookmarked(url: website.url) {
+        if let website = currentTabWebsite, !bookmarkManager.isUrlBookmarked(url: website.url) {
             bookmarkTitleTextField.stringValue = website.title ?? ""
             urlTextField.stringValue = website.url.absoluteString
         }

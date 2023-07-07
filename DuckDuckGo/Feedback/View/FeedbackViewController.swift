@@ -19,8 +19,17 @@
 import Cocoa
 import Combine
 import Common
+import DependencyInjection
 
-final class FeedbackViewController: NSViewController {
+#if swift(>=5.9)
+@Injectable
+#endif
+final class FeedbackViewController: NSViewController, Injectable {
+
+    let dependencies: DependencyStorage
+
+    @Injected
+    var contentBlockingManager: ContentBlockerRulesManagerProtocol
 
     enum Constants {
         static let defaultContentHeight: CGFloat = 160
@@ -69,7 +78,7 @@ final class FeedbackViewController: NSViewController {
     private var browserFeedbackConstraint: NSLayoutConstraint?
     private var browserFeedbackBreakageConstraint: NSLayoutConstraint?
 
-    var currentTab: Tab?
+    let currentTab: Tab?
     var currentTabUrl: URL? {
         guard let url = currentTab?.content.url else {
             return nil
@@ -81,6 +90,23 @@ final class FeedbackViewController: NSViewController {
 
     private let feedbackSender = FeedbackSender()
     private let websiteBreakageSender = WebsiteBreakageSender()
+
+    static func instantiate(with dependencyProvider: DependencyProvider, currentTab: Tab?) -> Self {
+        NSStoryboard(name: "Feedback", bundle: .main).instantiateInitialController { coder in
+            self.init(coder: coder, currentTab: currentTab, dependencyProvider: dependencyProvider)
+        }!
+    }
+
+    private init?(coder: NSCoder, currentTab: Tab?, dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
+        self.currentTab = currentTab
+
+        super.init(coder: coder)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(Self.self): Bad initializer")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -309,7 +335,7 @@ final class FeedbackViewController: NSViewController {
                                                   siteUrlString: urlTextField.stringValue,
                                                   osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
                                                   upgradedHttps: currentTab?.privacyInfo?.connectionUpgradedTo != nil,
-                                                  tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
+                                                  tdsETag: contentBlockingManager.currentRules.first?.etag,
                                                   blockedTrackerDomains: blockedTrackerDomains,
                                                   installedSurrogates: installedSurrogates,
                                                   isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,

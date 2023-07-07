@@ -47,7 +47,6 @@ final class FirePopoverViewController: NSViewController, Injectable {
     weak var delegate: FirePopoverViewControllerDelegate?
 
     private var firePopoverViewModel: FirePopoverViewModel
-    private let historyCoordinating: HistoryCoordinating
 
     @IBOutlet weak var optionsButton: NSPopUpButton!
     @IBOutlet weak var optionsButtonWidthConstraint: NSLayoutConstraint!
@@ -76,17 +75,12 @@ final class FirePopoverViewController: NSViewController, Injectable {
 
     init?(coder: NSCoder,
           tabCollectionViewModel: TabCollectionViewModel,
-          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
           fireproofDomains: FireproofDomains = FireproofDomains.shared,
-          faviconManagement: FaviconManagement = FaviconManager.shared,
           dependencyProvider: DependencyProvider) {
         self.dependencies = .init(dependencyProvider)
 
-        self.historyCoordinating = historyCoordinating
         self.firePopoverViewModel = FirePopoverViewModel(tabCollectionViewModel: tabCollectionViewModel,
-                                                         historyCoordinating: historyCoordinating,
                                                          fireproofDomains: fireproofDomains,
-                                                         faviconManagement: faviconManagement,
                                                          dependencyProvider: dependencies)
 
         super.init(coder: coder)

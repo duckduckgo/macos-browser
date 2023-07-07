@@ -19,6 +19,7 @@
 import Combine
 import Common
 import ContentBlocking
+import DependencyInjection
 import Foundation
 import Navigation
 
@@ -28,8 +29,15 @@ protocol YoutubeScriptsProvider {
 }
 extension UserScripts: YoutubeScriptsProvider {}
 
-final class DuckPlayerTabExtension {
-    private let duckPlayer: DuckPlayer
+#if swift(>=5.9)
+@Injectable
+#endif
+final class DuckPlayerTabExtension: Injectable {
+    let dependencies: DependencyStorage
+
+    @Injected
+    var duckPlayer: DuckPlayer
+
     private let isBurner: Bool
     private var cancellables = Set<AnyCancellable>()
     private var youtubePlayerCancellables = Set<AnyCancellable>()
@@ -44,11 +52,11 @@ final class DuckPlayerTabExtension {
 
     private var shouldSelectNextNewTab: Bool?
 
-    init(duckPlayer: DuckPlayer,
-         isBurner: Bool,
+    init(isBurner: Bool,
          scriptsPublisher: some Publisher<some YoutubeScriptsProvider, Never>,
-         webViewPublisher: some Publisher<WKWebView, Never>) {
-        self.duckPlayer = duckPlayer
+         webViewPublisher: some Publisher<WKWebView, Never>,
+         dependencyProvider: DependencyProvider) {
+        self.dependencies = .init(dependencyProvider)
         self.isBurner = isBurner
 
         webViewPublisher.sink { [weak self] webView in
