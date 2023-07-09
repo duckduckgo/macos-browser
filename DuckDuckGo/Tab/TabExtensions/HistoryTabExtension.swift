@@ -194,9 +194,7 @@ extension HistoryTabExtension: NavigationResponder {
               navigation.url.isHypertextURL,
               case .expected = visitState else { return }
 
-        guard !navigation.navigationAction.navigationType.isBackForward,
-              !navigation.navigationAction.navigationType.isSessionRestoration,
-              navigation.navigationAction.navigationType != .reload else {
+        guard !navigation.navigationAction.navigationType.isBackForward else {
             // mark navigation visit as already added to ignore possible next same-document navigations
             self.visitState = .added
             return
