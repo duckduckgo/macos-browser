@@ -279,6 +279,14 @@ final class Fire {
                 $0.close()
             }
         }
+
+        // Open a new window in case there is none
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            if self.windowControllerManager.mainWindowControllers.count == 0 {
+                (NSApp.delegate as? AppDelegate)?.newWindow(self)
+            }
+        }
     }
 
     // MARK: - Web cache
