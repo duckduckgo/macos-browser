@@ -140,7 +140,11 @@ final class FirePopoverViewController: NSViewController {
             let title: String
             switch firePopoverViewModel.clearingOption {
             case .currentTab:
-                title = UserText.fireDialogTabWillClose
+                if firePopoverViewModel.tabCollectionViewModel?.selectedTab?.isPinned ?? false {
+                    title = UserText.fireDialogPinnedTabWillReload
+                } else {
+                    title = UserText.fireDialogTabWillClose
+                }
             case .currentWindow:
                 title = UserText.fireDialogWindowWillClose
             case .allData:

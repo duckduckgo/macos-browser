@@ -70,7 +70,7 @@ final class FirePopoverViewModel {
     private(set) var shouldShowPinnedTabsInfo: Bool = false
 
     private let fireViewModel: FireViewModel
-    private weak var tabCollectionViewModel: TabCollectionViewModel?
+    private(set) weak var tabCollectionViewModel: TabCollectionViewModel?
     private let historyCoordinating: HistoryCoordinating
     private let fireproofDomains: FireproofDomains
     private let faviconManagement: FaviconManagement
