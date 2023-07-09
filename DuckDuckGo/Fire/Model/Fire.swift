@@ -44,8 +44,18 @@ final class Fire {
     private var dispatchGroup: DispatchGroup?
 
     enum BurningData: Equatable {
-        case specificDomains(_ domains: Set<String>)
+        case specificDomains(_ domains: Set<String>, shouldPlayFireAnimation: Bool)
         case all
+
+        var shouldPlayFireAnimation: Bool {
+            switch self {
+            case .all, .specificDomains(_, shouldPlayFireAnimation: true):
+                return true
+            // We don't present the fire animation if user burns from the privacy feed
+            case .specificDomains(_, shouldPlayFireAnimation: false):
+                return false
+            }
+        }
     }
 
     enum BurningEntity {
@@ -57,6 +67,16 @@ final class Fire {
                     selectedDomains: Set<String>)
         case allWindows(mainWindowControllers: [MainWindowController],
                         selectedDomains: Set<String>)
+
+        var shouldPlayFireAnimation: Bool {
+            switch self {
+            // We don't present the fire animation if user burns from the privacy feed
+            case .none:
+                return false
+            case .tab, .window, .allWindows:
+                return true
+            }
+        }
     }
 
     @Published private(set) var burningData: BurningData?
@@ -117,7 +137,7 @@ final class Fire {
         let domains = domainsToBurn(from: entity)
         assert(domains.areAllETLDPlus1(tld: tld))
 
-        burningData = .specificDomains(domains)
+        burningData = .specificDomains(domains, shouldPlayFireAnimation: entity.shouldPlayFireAnimation)
 
         burnLastSessionState()
         burnDeletedBookmarks()

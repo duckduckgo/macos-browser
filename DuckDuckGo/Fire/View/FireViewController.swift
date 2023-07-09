@@ -77,7 +77,7 @@ final class FireViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
 
-        self.view.superview?.isHidden = true
+//        self.view.superview?.isHidden = true
         subscribeToFireAnimationEvents()
         progressIndicator.startAnimation(self)
     }
@@ -128,8 +128,13 @@ final class FireViewController: NSViewController {
                         return
                     }
 
-                Task {
-                    await self.animateFire(burningData: burningData)
+                switch burningData {
+                case .all, .specificDomains(_, shouldPlayFireAnimation: true):
+                    Task {
+                        await self.animateFire(burningData: burningData)
+                    }
+                case .specificDomains(_, shouldPlayFireAnimation: false):
+                    break
                 }
             })
             .store(in: &cancellables)
