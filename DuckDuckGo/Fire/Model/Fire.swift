@@ -115,6 +115,8 @@ final class Fire {
         dispatchGroup = group
 
         let domains = domainsToBurn(from: entity)
+        assert(domains.areAllETLDPlus1(tld: tld))
+
         burningData = .specificDomains(domains)
 
         burnLastSessionState()
@@ -534,6 +536,36 @@ extension TabCollection {
             }
         }
         return domains
+    }
+
+}
+
+extension Set where Element == String {
+
+    func transformedToETLDPlus1(tld: TLD) -> Set<String> {
+        var transformedSet = Set<String>()
+        for domain in self {
+            if let eTLDPlus1Domain = tld.eTLDplus1(domain) {
+                transformedSet.insert(eTLDPlus1Domain)
+            }
+        }
+        return transformedSet
+    }
+
+}
+
+extension Set where Element == String {
+
+    func areAllETLDPlus1(tld: TLD) -> Bool {
+        for domain in self {
+            guard let eTLDPlus1Host = tld.eTLDplus1(domain) else {
+                return false
+            }
+            if domain != eTLDPlus1Host {
+                return false
+            }
+        }
+        return true
     }
 
 }
