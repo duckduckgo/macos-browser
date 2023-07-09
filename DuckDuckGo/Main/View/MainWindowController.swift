@@ -128,6 +128,7 @@ final class MainWindowController: NSWindowController {
             .sink(receiveValue: { [weak self] burningData in
                 guard let self else { return }
                 self.userInteraction(prevented: burningData != nil)
+                self.moveTabBarView(toTitlebarView: burningData == nil)
             })
     }
 
