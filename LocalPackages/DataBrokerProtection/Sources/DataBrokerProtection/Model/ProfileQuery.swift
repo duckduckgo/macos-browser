@@ -31,16 +31,12 @@ struct ProfileQuery: Encodable, Sendable {
     let addresses: [Address]
     let age: Int
     let fullName: String
-    let profileUrl: String?
-    let email: String?
 
     public init(firstName: String,
                 lastName: String,
                 city: String,
                 state: String,
-                age: Int,
-                profileUrl: String? = nil,
-                email: String? = nil) {
+                age: Int) {
         self.firstName = firstName
         self.lastName = lastName
         self.city = city
@@ -48,25 +44,5 @@ struct ProfileQuery: Encodable, Sendable {
         self.addresses = [Address(city: city, state: state)]
         self.age = age
         self.fullName = "\(firstName) \(lastName)"
-        self.profileUrl = profileUrl
-        self.email = email
-    }
-
-    func copy(firstName: String? = nil,
-              lastName: String? = nil,
-              city: String? = nil,
-              state: String? = nil,
-              age: Int? = nil,
-              profileUrl: String? = nil,
-              email: String? = nil) -> ProfileQuery {
-        ProfileQuery(
-            firstName: firstName ?? self.firstName,
-            lastName: lastName ?? self.lastName,
-            city: city ?? self.city,
-            state: state ?? self.state,
-            age: age ?? self.age,
-            profileUrl: profileUrl,
-            email: email
-        )
     }
 }
