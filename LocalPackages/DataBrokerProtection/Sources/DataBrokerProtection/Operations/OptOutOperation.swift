@@ -20,9 +20,11 @@ import Foundation
 import WebKit
 import BrowserServicesKit
 import UserScript
+import Common
 
 final class OptOutOperation: DataBrokerOperation {
     typealias ReturnValue = Void
+    typealias InputValue = ExtractedProfile
 
     let privacyConfig: PrivacyConfigurationManaging
     let prefs: ContentScopeProperties
@@ -32,6 +34,7 @@ final class OptOutOperation: DataBrokerOperation {
     var webViewHandler: WebViewHandler?
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<Void, Error>?
+    var extractedProfile: ExtractedProfile?
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
@@ -46,11 +49,13 @@ final class OptOutOperation: DataBrokerOperation {
         self.captchaService = captchaService
     }
 
-    func run() async throws {
+    func run(inputValue: ExtractedProfile) async throws {
         try await withCheckedThrowingContinuation { continuation in
+            self.extractedProfile = inputValue
             self.continuation = continuation
 
             Task {
+
                 await initialize()
 
                 do {
@@ -73,6 +78,9 @@ final class OptOutOperation: DataBrokerOperation {
     }
 
     func executeNextStep() async {
+        os_log("OPTOUT Waiting %{public}f seconds...", log: .action, actionAwaitTime)
+        try? await Task.sleep(nanoseconds: UInt64(actionAwaitTime) * 1_000_000_000)
+
         if let action = actionsHandler?.nextAction() {
             await runNextAction(action)
         } else {
