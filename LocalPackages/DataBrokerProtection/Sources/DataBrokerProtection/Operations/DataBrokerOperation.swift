@@ -55,6 +55,7 @@ extension DataBrokerOperation {
     func runNextAction(_ action: Action) async {
         if let emailConfirmationAction = action as? EmailConfirmationAction {
             try? await runEmailConfirmationAction(action: emailConfirmationAction)
+            await executeNextStep()
             return
         }
 
