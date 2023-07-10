@@ -20,9 +20,11 @@ import Foundation
 import WebKit
 import BrowserServicesKit
 import UserScript
+import Common
 
 protocol DataBrokerOperation: CCFCommunicationDelegate {
     associatedtype ReturnValue
+
     var privacyConfig: PrivacyConfigurationManaging { get }
     var prefs: ContentScopeProperties { get }
     var query: BrokerProfileQueryData { get }
@@ -67,7 +69,7 @@ extension DataBrokerOperation {
             do {
                 query.profileQuery = try await getProfileWithEmail()
             } catch {
-                onError(error: .emailError(error as? EmailService.EmailError))
+                onError(error: .emailError(error as? EmailError))
                 return
             }
         }
@@ -84,10 +86,10 @@ extension DataBrokerOperation {
                 try? await webViewHandler?.load(url: url)
             } else {
                 assertionFailure("Trying to run email confirmation without an email.")
-                throw EmailService.EmailError.cantFindEmail
+                throw EmailError.cantFindEmail
             }
         } catch {
-            onError(error: .emailError(error as? EmailService.EmailError))
+            onError(error: .emailError(error as? EmailError))
         }
     }
 
