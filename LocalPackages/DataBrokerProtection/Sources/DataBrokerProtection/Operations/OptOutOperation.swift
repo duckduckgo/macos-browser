@@ -20,6 +20,7 @@ import Foundation
 import WebKit
 import BrowserServicesKit
 import UserScript
+import Common
 
 final class OptOutOperation: DataBrokerOperation {
     typealias ReturnValue = Void
@@ -77,6 +78,9 @@ final class OptOutOperation: DataBrokerOperation {
     }
 
     func executeNextStep() async {
+        os_log("OPTOUT Waiting %{public}f seconds...", log: .action, actionAwaitTime)
+        try? await Task.sleep(nanoseconds: UInt64(actionAwaitTime) * 1_000_000_000)
+
         if let action = actionsHandler?.nextAction() {
             await runNextAction(action)
         } else {

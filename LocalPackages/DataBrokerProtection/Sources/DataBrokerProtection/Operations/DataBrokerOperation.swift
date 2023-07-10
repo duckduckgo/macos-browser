@@ -45,6 +45,9 @@ extension DataBrokerOperation {
 
     // MARK: - Shared functions
 
+    var actionAwaitTime: TimeInterval {
+        return 1.0
+    }
     func getProfileWithEmail() async throws {
 
     }

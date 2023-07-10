@@ -137,7 +137,7 @@ final class DataBrokerOperationsCollection: Operation {
                                                                                 notificationCenter: notificationCenter,
                                                                                 runner: runner)
                 if let sleepInterval = intervalBetweenOperations {
-                    os_log("Waiting...: %{public}d", log: .dataBrokerProtection, sleepInterval)
+                    os_log("Waiting...: %{public}f", log: .dataBrokerProtection, sleepInterval)
                     try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
                 }
             } catch {

@@ -75,6 +75,10 @@ final class ScanOperation: DataBrokerOperation {
     }
 
     func executeNextStep() async {
+        os_log("SCAN Waiting %{public}f seconds...", log: .action, actionAwaitTime)
+
+        try? await Task.sleep(nanoseconds: UInt64(actionAwaitTime) * 1_000_000_000)
+
         if let action = actionsHandler?.nextAction() {
             os_log("Next action: %{public}@", log: .action, String(describing: action.actionType.rawValue))
             await runNextAction(action)
