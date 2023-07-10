@@ -252,10 +252,10 @@ private struct PrivateEmailImage: View {
             return NSImage(imageLiteralResourceName: "Email-16")
         } else {
             switch model.privateEmailStatus {
-                case .error:
-                    return NSImage(imageLiteralResourceName: "Alert-Color-16")
-                default:
-                    return nil
+            case .error:
+                return NSImage(imageLiteralResourceName: "Alert-Color-16")
+            default:
+                return nil
             }
 
         }
