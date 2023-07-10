@@ -36,6 +36,7 @@ final class DataBrokerOperationsCollection: Operation {
     private let priorityDate: Date? // The date to filter and sort operations priorities
     private let operationType: OperationType
     private let notificationCenter: NotificationCenter
+    private let runner: WebOperationRunner
     private let errorHandler: EventMapping<DataBrokerProtectionOperationError>?
 
     deinit {
@@ -48,6 +49,7 @@ final class DataBrokerOperationsCollection: Operation {
          intervalBetweenOperations: TimeInterval? = nil,
          priorityDate: Date? = nil,
          notificationCenter: NotificationCenter = NotificationCenter.default,
+         runner: WebOperationRunner,
          errorHandler: EventMapping<DataBrokerProtectionOperationError>? = nil) {
 
         self.brokerProfileQueriesData = brokerProfileQueriesData
@@ -56,6 +58,7 @@ final class DataBrokerOperationsCollection: Operation {
         self.priorityDate = priorityDate
         self.operationType = operationType
         self.notificationCenter = notificationCenter
+        self.runner = runner
         self.errorHandler = errorHandler
 
         super.init()
@@ -124,8 +127,6 @@ final class DataBrokerOperationsCollection: Operation {
 
             let brokerProfileData = brokerProfileQueriesData.filter { $0.id == operationData.brokerProfileQueryID }.first
 
-            let testRunner = await TestOperationRunner()
-
             guard let brokerProfileData = brokerProfileData else {
                 continue
             }
@@ -134,9 +135,9 @@ final class DataBrokerOperationsCollection: Operation {
                                                                                 brokerProfileQueryData: brokerProfileData,
                                                                                 database: database,
                                                                                 notificationCenter: notificationCenter,
-                                                                                runner: testRunner)
+                                                                                runner: runner)
                 if let sleepInterval = intervalBetweenOperations {
-                    os_log("Waiting...: %{public}d", log: .dataBrokerProtection, sleepInterval)
+                    os_log("Waiting...: %{public}f", log: .dataBrokerProtection, sleepInterval)
                     try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
                 }
             } catch {

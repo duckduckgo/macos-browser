@@ -21,20 +21,25 @@ import Common
 import BrowserServicesKit
 
 public final class DataBrokerProtectionScheduler {
+    private let privacyConfigManager: PrivacyConfigurationManaging
+    private let contentScopeProperties: ContentScopeProperties
+
     private let activity: NSBackgroundActivityScheduler
     private let errorHandler: EventMapping<DataBrokerProtectionOperationError>
     private let schedulerIdentifier = "com.duckduckgo.macos.browser.databroker-protection-scheduler"
 
     lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
-        DataBrokerProtectionProcessor(database: DataBrokerProtectionDataBase(),
-                                      config: DataBrokerProtectionSchedulerConfig(),
-                                      operationRunnerProvider: DataBrokerOperationRunnerProvider(),
-                                      errorHandler: errorHandler)
+        let runnerProvider = DataBrokerOperationRunnerProvider(privacyConfigManager: privacyConfigManager,
+                                                               contentScopeProperties: contentScopeProperties)
+
+        return DataBrokerProtectionProcessor(database: DataBrokerProtectionDataBase(),
+                                             config: DataBrokerProtectionSchedulerConfig(),
+                                             operationRunnerProvider: runnerProvider,
+                                             errorHandler: errorHandler)
     }()
 
-    public init(errorHandler: EventMapping<DataBrokerProtectionOperationError>) {
-        self.errorHandler = errorHandler
+    public init(privacyConfigManager: PrivacyConfigurationManaging, contentScopeProperties: ContentScopeProperties, errorHandler: EventMapping<DataBrokerProtectionOperationError>) {
 
         activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
         activity.repeats = true
@@ -44,15 +49,19 @@ public final class DataBrokerProtectionScheduler {
         activity.tolerance = 15 * 60
 
         activity.qualityOfService = QualityOfService.utility
+        self.privacyConfigManager = privacyConfigManager
+        self.contentScopeProperties = contentScopeProperties
+        self.errorHandler = errorHandler
     }
 
     public func start() {
         os_log("Starting scheduler...", log: .dataBrokerProtection)
-        activity.schedule { completion in
+      //  activity.schedule { completion in
+            os_log("Scheduler runnning...", log: .dataBrokerProtection)
             self.dataBrokerProcessor.runQueuedOperations {
-                completion(.finished)
+             //   completion(.finished)
             }
-        }
+      //  }
     }
 
     public func stop() {
