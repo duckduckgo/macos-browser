@@ -19,16 +19,15 @@
 import Foundation
 import Common
 
+public enum EmailError: Error, Equatable {
+    case cantGenerateURL
+    case cantFindEmail
+    case invalidEmailLink
+    case linkExtractionTimedOut
+    case cantDecodeEmailLink
+}
+
 struct EmailService {
-
-    enum EmailError: Error, Equatable {
-        case cantGenerateURL
-        case cantFindEmail
-        case invalidEmailLink
-        case linkExtractionTimedOut
-        case cantDecodeEmailLink
-    }
-
     private struct Constants {
         static let baseUrl = "https://dbp.duckduckgo.com/dbp/em/v0"
     }

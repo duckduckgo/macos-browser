@@ -18,29 +18,33 @@
 
 import Foundation
 import Common
+import BrowserServicesKit
 
 public final class DataBrokerProtectionScheduler {
     private let activity: NSBackgroundActivityScheduler
+    private let errorHandler: EventMapping<DataBrokerProtectionOperationError>
     private let schedulerIdentifier = "com.duckduckgo.macos.browser.databroker-protection-scheduler"
 
     lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
         DataBrokerProtectionProcessor(database: DataBrokerProtectionDataBase(),
                                       config: DataBrokerProtectionSchedulerConfig(),
-                                      operationRunnerProvider: DataBrokerOperationRunnerProvider())
+                                      operationRunnerProvider: DataBrokerOperationRunnerProvider(),
+                                      errorHandler: errorHandler)
     }()
 
-    public init() {
-          activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
-          activity.repeats = true
+    public init(errorHandler: EventMapping<DataBrokerProtectionOperationError>) {
+        self.errorHandler = errorHandler
 
-          // TODO: Arbitrary numbers for now
-          // Scheduling an activity to fire between 15 and 45 minutes from now
-          activity.interval = 30 * 60
-          activity.tolerance = 15 * 60
+        activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
+        activity.repeats = true
+        // TODO: Arbitrary numbers for now
+        // Scheduling an activity to fire between 15 and 45 minutes from now
+        activity.interval = 30 * 60
+        activity.tolerance = 15 * 60
 
-          activity.qualityOfService = QualityOfService.utility
-      }
+        activity.qualityOfService = QualityOfService.utility
+    }
 
     public func start() {
         os_log("Starting scheduler...", log: .dataBrokerProtection)
@@ -60,4 +64,5 @@ public final class DataBrokerProtectionScheduler {
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
         self.dataBrokerProcessor.runScanOnAllDataBrokers()
     }
+
 }

@@ -22,7 +22,7 @@ struct CCFError: Decodable {
     let error: String
 }
 
-enum DataBrokerProtectionError: Error, Equatable {
+public enum DataBrokerProtectionError: Error, Equatable {
     case malformedURL
     case noActionFound
     case actionFailed(actionID: String, message: String)
@@ -33,7 +33,7 @@ enum DataBrokerProtectionError: Error, Equatable {
     case unrecoverableError
     case noOptOutStep
     case captchaServiceError(CaptchaServiceError)
-    case emailError(EmailService.EmailError?)
+    case emailError(EmailError?)
 
     static func parse(params: Any) -> DataBrokerProtectionError {
         let errorDataResult = try? JSONSerialization.data(withJSONObject: params)
@@ -48,5 +48,34 @@ enum DataBrokerProtectionError: Error, Equatable {
         }
 
         return .parsingErrorObjectFailed
+    }
+}
+
+extension DataBrokerProtectionError {
+    var name: String {
+        switch self {
+        case .malformedURL:
+            return "malformedURL"
+        case .noActionFound:
+            return "noActionFound"
+        case .actionFailed:
+            return "actionFailed"
+        case .parsingErrorObjectFailed:
+            return "parsingErrorObjectFailed"
+        case .unknownMethodName:
+            return "unknownMethodName"
+        case .userScriptMessageBrokerNotSet:
+            return "userScriptMessageBrokerNotSet"
+        case .unknown(let name):
+            return name
+        case .unrecoverableError:
+            return "unrecoverableError"
+        case .noOptOutStep:
+            return "noOptOutStep"
+        case .captchaServiceError:
+            return "captchaServiceError"
+        case .emailError:
+            return "emailError"
+        }
     }
 }
