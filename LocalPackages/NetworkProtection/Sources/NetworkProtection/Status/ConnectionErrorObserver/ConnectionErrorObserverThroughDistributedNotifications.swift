@@ -16,7 +16,8 @@
 //  limitations under the License.
 //
 
-import AppKit
+#if os(macOS)
+
 import Combine
 import Foundation
 import NetworkExtension
@@ -63,3 +64,5 @@ public class ConnectionErrorObserverThroughDistributedNotifications: ConnectionE
         }
     }
 }
+
+#endif

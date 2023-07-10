@@ -18,6 +18,7 @@
 
 import Foundation
 import PixelKit
+import NetworkProtection
 
 extension Pixel {
 

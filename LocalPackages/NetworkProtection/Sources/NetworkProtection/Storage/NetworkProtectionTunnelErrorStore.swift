@@ -24,18 +24,18 @@ import Common
 /// we may need to show these errors in the status menu (which will eventually be run in its own agent), and in the status view within
 /// the app.
 ///
-final class NetworkProtectionTunnelErrorStore {
+public final class NetworkProtectionTunnelErrorStore {
     private static let lastErrorMessageKey = "com.duckduckgo.NetworkProtectionTunnelErrorStore.lastErrorMessage"
     private let userDefaults: UserDefaults
-    private let distributedNotificationCenter: DistributedNotificationCenter
+    private let notificationCenter: NetworkProtectionNotificationCenter
 
-    init(userDefaults: UserDefaults = .standard,
-         distributedNotificationCenter: DistributedNotificationCenter = .forType(.networkProtection)) {
+    public init(userDefaults: UserDefaults = .standard,
+                notificationCenter: NetworkProtectionNotificationCenter) {
         self.userDefaults = userDefaults
-        self.distributedNotificationCenter = distributedNotificationCenter
+        self.notificationCenter = notificationCenter
     }
 
-    var lastErrorMessage: String? {
+    public var lastErrorMessage: String? {
         get {
             userDefaults.string(forKey: Self.lastErrorMessageKey)
         }
@@ -45,10 +45,8 @@ final class NetworkProtectionTunnelErrorStore {
             postLastErrorMessageChangedNotification(newValue)
         }
     }
-
     // MARK: - Posting Notifications
-
     private func postLastErrorMessageChangedNotification(_ errorMessage: String?) {
-        distributedNotificationCenter.post(.tunnelErrorChanged, object: errorMessage)
+        notificationCenter.post(.tunnelErrorChanged, object: errorMessage)
     }
 }
