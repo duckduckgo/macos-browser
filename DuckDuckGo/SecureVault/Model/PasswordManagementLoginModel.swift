@@ -67,6 +67,14 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     @Published var isShowingAddressUpdateConfirmAlert: Bool = false
     @Published var isShowingDuckRemovalAlert: Bool = false
     @Published var isSignedIn: Bool = false
+    @Published var privateEmailStatusBool: Bool = false {
+        didSet {
+            let status = privateEmailStatus == .active ? true : false
+            if status != privateEmailStatusBool {
+                isShowingAddressUpdateConfirmAlert = true
+            }
+        }
+    }
 
     var userDuckAddress: String {
         return emailManager.userEmail ?? ""
@@ -75,13 +83,18 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var privateEmailMessage: String {
         var message: String
         if isSignedIn {
+
             switch privateEmailStatus {
-            case .error:
-                message = UserText.pmEmailMessageError
-            case .inactive, .notFound:
-                message = ""
-            default:
-                message = ""
+                case .error:
+                    message = UserText.pmEmailMessageError
+                case .active:
+                    message = UserText.pmEmailMessageActive
+                case .inactive:
+                    message = UserText.pmEmailMessageInactive
+                case .notFound:
+                    message = ""
+                default:
+                    message = UserText.pmEmailMessageInactive
             }
         } else {
             message = UserText.pmSignInToManageEmail
@@ -266,6 +279,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     private func setPrivateEmailStatus(_ status: EmailAliasStatus) {
         hasValidPrivateEmail = true
         privateEmailStatus = status
+        privateEmailStatusBool = status == .active ? true : false
     }
 
     @MainActor
@@ -276,6 +290,10 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
             privateEmailRequestInProgress = false
         }
 
+    }
+
+    func refreshprivateEmailStatusBool() {
+        privateEmailStatusBool = privateEmailStatus == .active ? true : false
     }
 
     @objc func showLoader() {

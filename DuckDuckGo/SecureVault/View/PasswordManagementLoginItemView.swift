@@ -21,6 +21,7 @@ import Foundation
 import SwiftUI
 import BrowserServicesKit
 import SwiftUIExtensions
+import Combine
 
 private let interItemSpacing: CGFloat = 18
 private let itemSpacing: CGFloat = 10
@@ -80,11 +81,14 @@ struct PasswordManagementLoginItemView: View {
                 let btnLabel = Text(model.toggleConfirmationAlert.button)
                 let btnAction = model.togglePrivateEmailStatus
                 let button = Alert.Button.default(btnLabel, action: btnAction)
+                let cancelBtnLabel = Text(UserText.cancel)
+                let cancelBtnAction = { model.refreshprivateEmailStatusBool() }
+                let cancelButton = Alert.Button.cancel(cancelBtnLabel, action: cancelBtnAction)
                 return Alert(
                     title: Text(model.toggleConfirmationAlert.title),
                     message: Text(model.toggleConfirmationAlert.message),
                     primaryButton: button,
-                    secondaryButton: .cancel(Text(UserText.cancel))
+                    secondaryButton: cancelButton
                 )
             })
             .background(EmptyView().alert(isPresented: $model.isShowingDuckRemovalAlert) {
@@ -153,7 +157,7 @@ private struct UsernameView: View {
     @EnvironmentObject var model: PasswordManagementLoginModel
 
     @State private var isHovering = false
-    @State private var isShowingPrivateEmailToggleConfirmDialog = false
+    @State private var isPrivateEmailEnabled: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -170,18 +174,18 @@ private struct UsernameView: View {
 
             } else {
 
-                VStack(alignment: .leading) {
-
+                HStack(alignment: .top) {
                     UsernameLabel(isHovering: $isHovering)
-
+                    Spacer()
                     if model.hasValidPrivateEmail && !model.privateEmailRequestInProgress {
-                        PrivateEmailActivationButton()
+                        Toggle("", isOn: $model.privateEmailStatusBool)
+                            .frame(width: 40)
+                            .toggleStyle(.switch)
                     }
-
                 }
-                .padding(.bottom, interItemSpacing)
             }
         }
+        .padding(.bottom, interItemSpacing)
         .onHover { hovering in
             isHovering = hovering
         }
@@ -248,14 +252,10 @@ private struct PrivateEmailImage: View {
             return NSImage(imageLiteralResourceName: "Email-16")
         } else {
             switch model.privateEmailStatus {
-            case .active:
-                return NSImage(imageLiteralResourceName: "Email-16")
-            case .inactive:
-                return NSImage(imageLiteralResourceName: "Email-Deactivate-16")
-            case .error:
-                return NSImage(imageLiteralResourceName: "Alert-Color-16")
-            default:
-                return nil
+                case .error:
+                    return NSImage(imageLiteralResourceName: "Alert-Color-16")
+                default:
+                    return nil
             }
 
         }
@@ -279,7 +279,7 @@ private struct PrivateEmailMessage: View {
         let text = String(format: UserText.pmSignInToManageEmail, UserText.pmEnableEmailProtection)
         var attributedString = AttributedString(text)
         if let range = attributedString.range(of: UserText.pmEnableEmailProtection) {
-            attributedString[range].foregroundColor = .blue
+            attributedString[range].foregroundColor = Color("LinkBlueColor")
         }
         return attributedString
     }
