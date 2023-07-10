@@ -25,6 +25,7 @@ public final class DataBrokerProtectionScheduler {
     private let contentScopeProperties: ContentScopeProperties
 
     private let activity: NSBackgroundActivityScheduler
+    private let errorHandler: EventMapping<DataBrokerProtectionOperationError>
     private let schedulerIdentifier = "com.duckduckgo.macos.browser.databroker-protection-scheduler"
 
     lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
@@ -33,14 +34,15 @@ public final class DataBrokerProtectionScheduler {
                                                                contentScopeProperties: contentScopeProperties)
 
         return DataBrokerProtectionProcessor(database: DataBrokerProtectionDataBase(),
-                                      config: DataBrokerProtectionSchedulerConfig(),
-                                      operationRunnerProvider: runnerProvider)
+                                             config: DataBrokerProtectionSchedulerConfig(),
+                                             operationRunnerProvider: runnerProvider,
+                                             errorHandler: errorHandler)
     }()
 
-    public init(privacyConfigManager: PrivacyConfigurationManaging, contentScopeProperties: ContentScopeProperties) {
+    public init(privacyConfigManager: PrivacyConfigurationManaging, contentScopeProperties: ContentScopeProperties, errorHandler: EventMapping<DataBrokerProtectionOperationError>) {
+
         activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
         activity.repeats = true
-
         // TODO: Arbitrary numbers for now
         // Scheduling an activity to fire between 15 and 45 minutes from now
         activity.interval = 30 * 60
@@ -49,6 +51,7 @@ public final class DataBrokerProtectionScheduler {
         activity.qualityOfService = QualityOfService.utility
         self.privacyConfigManager = privacyConfigManager
         self.contentScopeProperties = contentScopeProperties
+        self.errorHandler = errorHandler
     }
 
     public func start() {
@@ -70,4 +73,5 @@ public final class DataBrokerProtectionScheduler {
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
         self.dataBrokerProcessor.runScanOnAllDataBrokers()
     }
+
 }

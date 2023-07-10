@@ -20,11 +20,10 @@ import Foundation
 import DataBrokerProtection
 import BrowserServicesKit
 import AppKit
+import Common
 
 final class DBPHomeViewController: NSViewController {
     private var scheduler: DataBrokerProtectionScheduler?
-
-
     override func loadView() {
         view = NSView()
     }
@@ -70,6 +69,20 @@ final class DBPHomeViewController: NSViewController {
                                                 featureToggles: features)
 
         scheduler = DataBrokerProtectionScheduler(privacyConfigManager: privacyConfigurationManager,
-                                                      contentScopeProperties: prefs)
+                                                  contentScopeProperties: prefs,
+                                                  errorHandler: DataBrokerProtectionErrorHandling())
+    }
+}
+
+public class DataBrokerProtectionErrorHandling: EventMapping<DataBrokerProtectionOperationError> {
+
+    public init() {
+        super.init { event, _, _, _ in
+            Pixel.fire(.debug(event: .dataBrokerProtectionError, error: event.error), withAdditionalParameters: event.params)
+        }
+    }
+
+    override init(mapping: @escaping EventMapping<DataBrokerProtectionOperationError>.Mapping) {
+        fatalError("Use init()")
     }
 }

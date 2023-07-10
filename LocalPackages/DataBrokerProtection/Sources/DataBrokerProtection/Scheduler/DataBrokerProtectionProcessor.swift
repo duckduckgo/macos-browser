@@ -18,6 +18,9 @@
 
 import Foundation
 import Common
+import BrowserServicesKit
+import Common
+
 protocol OperationRunnerProvider {
     func getOperationRunner() -> WebOperationRunner
 }
@@ -28,17 +31,20 @@ final class DataBrokerProtectionProcessor {
     private let operationRunnerProvider: OperationRunnerProvider
     private let notificationCenter: NotificationCenter
     private let operationQueue: OperationQueue
+    private var errorHandler: EventMapping<DataBrokerProtectionOperationError>?
 
     init(database: DataBase,
          config: SchedulerConfig,
          operationRunnerProvider: OperationRunnerProvider,
-         notificationCenter: NotificationCenter = NotificationCenter.default) {
+         notificationCenter: NotificationCenter = NotificationCenter.default,
+         errorHandler: EventMapping<DataBrokerProtectionOperationError>? = nil) {
 
         self.database = database
         self.config = config
         self.operationRunnerProvider = operationRunnerProvider
         self.notificationCenter = notificationCenter
         self.operationQueue = OperationQueue()
+        self.errorHandler = errorHandler
         self.operationQueue.maxConcurrentOperationCount = config.concurrentOperationsDifferentBrokers
     }
 
@@ -95,7 +101,8 @@ final class DataBrokerProtectionProcessor {
                                                                 intervalBetweenOperations: config.intervalBetweenSameBrokerOperations,
                                                                 priorityDate: priorityDate,
                                                                 notificationCenter: notificationCenter,
-                                                                runner: operationRunnerProvider.getOperationRunner())
+                                                                runner: operationRunnerProvider.getOperationRunner(),
+                                                                errorHandler: errorHandler)
                 collections.append(collection)
 
                 visitedDataBrokerIDs.insert(dataBrokerID)

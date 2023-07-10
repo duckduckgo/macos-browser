@@ -37,6 +37,7 @@ final class DataBrokerOperationsCollection: Operation {
     private let operationType: OperationType
     private let notificationCenter: NotificationCenter
     private let runner: WebOperationRunner
+    private let errorHandler: EventMapping<DataBrokerProtectionOperationError>?
 
     deinit {
         os_log("Deinit operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
@@ -48,7 +49,8 @@ final class DataBrokerOperationsCollection: Operation {
          intervalBetweenOperations: TimeInterval? = nil,
          priorityDate: Date? = nil,
          notificationCenter: NotificationCenter = NotificationCenter.default,
-         runner: WebOperationRunner) {
+         runner: WebOperationRunner,
+         errorHandler: EventMapping<DataBrokerProtectionOperationError>? = nil) {
 
         self.brokerProfileQueriesData = brokerProfileQueriesData
         self.database = database
@@ -57,6 +59,8 @@ final class DataBrokerOperationsCollection: Operation {
         self.operationType = operationType
         self.notificationCenter = notificationCenter
         self.runner = runner
+        self.errorHandler = errorHandler
+
         super.init()
     }
 
@@ -93,8 +97,6 @@ final class DataBrokerOperationsCollection: Operation {
     }
 
     private func runOperation() async {
-        let ids = brokerProfileQueriesData.map { $0.dataBroker.id }
-
         os_log("Running operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
 
         let sortedOperationsData: [BrokerOperationData]
@@ -140,6 +142,12 @@ final class DataBrokerOperationsCollection: Operation {
                 }
             } catch {
                 os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+                if let error = error as? DataBrokerProtectionError,
+                   let dataBrokerName = brokerProfileQueriesData.first?.dataBroker.name {
+                    errorHandler?.fire(.init(error: error, dataBrokerName: dataBrokerName))
+                } else {
+                    os_log("Cant handle error", log: .dataBrokerProtection)
+                }
             }
         }
         os_log("Finished operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
