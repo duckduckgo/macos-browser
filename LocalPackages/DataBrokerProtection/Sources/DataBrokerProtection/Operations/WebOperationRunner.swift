@@ -17,35 +17,37 @@
 //
 
 import Foundation
+import BrowserServicesKit
+import Common
 
 protocol WebOperationRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData) async throws -> [ExtractedProfile]
-    func optOut(_ extractedProfile: ExtractedProfile) async throws
+    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile) async throws
 }
-
-// TODO: Remove this
-import WebKit
 
 @MainActor
 final class TestOperationRunner: WebOperationRunner {
+    var privacyConfigManager: PrivacyConfigurationManaging
+    var contentScopeProperties: ContentScopeProperties
 
-    let webView: WKWebView
-
-    internal init() {
-        self.webView = WKWebView(frame: .init(x: 0, y: 0, width: 100, height: 100))
+    internal init(privacyConfigManager: PrivacyConfigurationManaging,
+                  contentScopeProperties: ContentScopeProperties) {
+        self.privacyConfigManager = privacyConfigManager
+        self.contentScopeProperties = contentScopeProperties
     }
 
     func scan(_ profileQuery: BrokerProfileQueryData) async throws -> [ExtractedProfile] {
-        let extractedProfile = ExtractedProfile(name: "John")
-        return [extractedProfile]
+        let scan = ScanOperation(privacyConfig: privacyConfigManager, prefs: contentScopeProperties, query: profileQuery)
+        return try await scan.run(inputValue: ())
     }
 
-    func optOut(_ extractedProfile: ExtractedProfile) async throws {
-        print("Fake opt out")
+    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile) async throws {
+        let optOut = OptOutOperation(privacyConfig: privacyConfigManager, prefs: contentScopeProperties, query: profileQuery)
+        try await optOut.run(inputValue: extractedProfile)
     }
 
     deinit {
-        print("DEINIT")
+        os_log("WebOperationRunner Deinit", log: .dataBrokerProtection)
     }
 }
