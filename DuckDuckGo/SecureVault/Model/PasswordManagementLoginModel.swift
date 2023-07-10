@@ -83,7 +83,6 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var privateEmailMessage: String {
         var message: String
         if isSignedIn {
-
             switch privateEmailStatus {
             case .error:
                 message = UserText.pmEmailMessageError
