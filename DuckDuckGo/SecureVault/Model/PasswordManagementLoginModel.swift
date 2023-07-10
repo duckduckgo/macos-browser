@@ -85,16 +85,16 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         if isSignedIn {
 
             switch privateEmailStatus {
-                case .error:
-                    message = UserText.pmEmailMessageError
-                case .active:
-                    message = UserText.pmEmailMessageActive
-                case .inactive:
-                    message = UserText.pmEmailMessageInactive
-                case .notFound:
-                    message = ""
-                default:
-                    message = UserText.pmEmailMessageInactive
+            case .error:
+                message = UserText.pmEmailMessageError
+            case .active:
+                message = UserText.pmEmailMessageActive
+            case .inactive:
+                message = UserText.pmEmailMessageInactive
+            case .notFound:
+                message = ""
+            default:
+                message = UserText.pmEmailMessageInactive
             }
         } else {
             message = UserText.pmSignInToManageEmail
