@@ -20,5 +20,5 @@ struct ExtractAction: Action {
     let id: String
     let actionType: ActionType
     let selector: String
-    let profile: ExtractedProfile
+    let profile: ExtractProfileSelectors
 }
