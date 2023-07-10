@@ -51,8 +51,10 @@ struct State: Encodable {
             try container.encode(profileQuery, forKey: .profileData)
         case .solveCaptcha(let captchaToken):
             try container.encode(captchaToken, forKey: .profileData)
+        case .extractedProfile(let extractedProfile):
+            try container.encode(extractedProfile, forKey: .profileData)
         default:
-            try container.encodeNil(forKey: .profileData)
+            assertionFailure("We sure have a profile data. Soon to be renamed just to data")
         }
 
         switch action {

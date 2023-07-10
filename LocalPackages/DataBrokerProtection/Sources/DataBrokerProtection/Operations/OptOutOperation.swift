@@ -50,9 +50,11 @@ final class OptOutOperation: DataBrokerOperation {
 
     func run(inputValue: ExtractedProfile) async throws {
         try await withCheckedThrowingContinuation { continuation in
+            self.extractedProfile = inputValue
             self.continuation = continuation
 
             Task {
+
                 await initialize()
 
                 do {

@@ -135,7 +135,7 @@ private struct TestData {
                          "selector": ".ahm",
                          "elements": [
                            {
-                             "type": "fullName",
+                             "type": "name",
                              "selector": "#user_name"
                            },
                            {

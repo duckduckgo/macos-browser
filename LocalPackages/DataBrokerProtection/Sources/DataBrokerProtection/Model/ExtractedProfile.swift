@@ -98,6 +98,7 @@ struct ExtractedProfile: Codable, Sendable {
         case profileUrl
         case reportId
         case age
+        case email
         case removedDate
     }
 
