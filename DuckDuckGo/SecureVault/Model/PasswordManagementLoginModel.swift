@@ -59,7 +59,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var lastUpdatedDate: String = ""
     var createdDate: String = ""
 
-    // MARK: Private Emaill Address Variables
+    // MARK: Private Email Management
     @Published var privateEmailRequestInProgress: Bool = false
     @Published var usernameIsPrivateEmail: Bool = false
     @Published var hasValidPrivateEmail: Bool = false
@@ -94,7 +94,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
             case .notFound:
                 message = ""
             default:
-                message = UserText.pmEmailMessageInactive
+                message = ""
             }
         } else {
             message = UserText.pmSignInToManageEmail
@@ -114,6 +114,14 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     }
 
     private var previousUsername: String = ""
+
+    var shouldShowPrivateEmailToggle: Bool {
+        hasValidPrivateEmail && (privateEmailStatus == .active || privateEmailStatus == .inactive)
+    }
+
+    var shouldShowPrivateEmailSignedOutMesage: Bool {
+        usernameIsPrivateEmail && privateEmailMessage != ""
+    }
 
     init(onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
          onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,

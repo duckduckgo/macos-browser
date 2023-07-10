@@ -177,7 +177,7 @@ private struct UsernameView: View {
                 HStack(alignment: .top) {
                     UsernameLabel(isHovering: $isHovering)
                     Spacer()
-                    if model.hasValidPrivateEmail && !model.privateEmailRequestInProgress {
+                    if model.shouldShowPrivateEmailToggle {
                         Toggle("", isOn: $model.privateEmailStatusBool)
                             .frame(width: 40)
                             .toggleStyle(.switch)
@@ -286,7 +286,7 @@ private struct PrivateEmailMessage: View {
 
     var body: some View {
         VStack {
-            if model.usernameIsPrivateEmail && model.privateEmailMessage != "" {
+            if model.shouldShowPrivateEmailSignedOutMesage {
                 if model.isSignedIn {
                     Text(model.privateEmailMessage)
                         .font(.subheadline)
