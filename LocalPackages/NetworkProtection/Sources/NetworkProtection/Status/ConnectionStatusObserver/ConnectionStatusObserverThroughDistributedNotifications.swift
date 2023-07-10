@@ -27,7 +27,7 @@ import Common
 /// Observes the tunnel status through Distributed Notifications.
 ///
 public class ConnectionStatusObserverThroughDistributedNotifications: ConnectionStatusObserver {
-    public let publisher = CurrentValueSubject<ConnectionStatus, Never>(.unknown)
+    public let publisher = CurrentValueSubject<ConnectionStatus, Never>(.disconnected)
 
     // MARK: - Network Path Monitoring
 

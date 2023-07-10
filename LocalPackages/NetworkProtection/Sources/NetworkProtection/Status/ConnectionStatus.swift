@@ -25,7 +25,6 @@ public enum ConnectionStatus: Codable, Equatable {
     case connected(connectedDate: Date)
     case connecting
     case reasserting
-    case unknown
 }
 
 /// This struct represents a status change and holds the new status and a timestamp registering when

@@ -113,6 +113,10 @@ public final class ConnectionStatusTransitionAwaiter {
                 return
             }
 
+            if targetStatus.acceptsIntermediateStatus(currentStatus) {
+                continue
+            }
+
             throw TransitionError.timeout
         }
     }

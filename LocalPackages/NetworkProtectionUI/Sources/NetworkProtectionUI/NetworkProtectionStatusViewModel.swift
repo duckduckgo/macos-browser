@@ -339,7 +339,7 @@ extension NetworkProtectionStatusView {
         // MARK: - Connection Status: Toggle State
 
         @frozen
-        enum ToggleTransition {
+        enum ToggleTransition: Equatable {
             case idle
             case switchingOn(locallyInitiated: Bool)
             case switchingOff(locallyInitiated: Bool)
@@ -409,7 +409,7 @@ extension NetworkProtectionStatusView {
                 return "\(UserText.networkProtectionStatusConnected) · \(timeLapsed)"
             case .connecting, .reasserting:
                 return UserText.networkProtectionStatusConnecting
-            case .disconnected, .notConfigured, .unknown:
+            case .disconnected, .notConfigured:
                 return UserText.networkProtectionStatusDisconnected
             case .disconnecting:
                 return UserText.networkProtectionStatusDisconnecting
@@ -528,6 +528,16 @@ extension NetworkProtectionStatusView {
         private func startNetworkProtection() {
             toggleTransition = .switchingOn(locallyInitiated: true)
 
+            Task {
+                try? await Task.sleep(nanoseconds: 4 * NSEC_PER_SEC)
+
+                Task { @MainActor in
+                    if toggleTransition != .idle {
+                        toggleTransition = .idle
+                    }
+                }
+            }
+
             Task { @MainActor in
                 await tunnelController.start()
                 toggleTransition = .idle
@@ -539,6 +549,16 @@ extension NetworkProtectionStatusView {
         ///
         private func stopNetworkProtection() {
             toggleTransition = .switchingOff(locallyInitiated: true)
+
+            Task {
+                try? await Task.sleep(nanoseconds: 4 * NSEC_PER_SEC)
+
+                Task { @MainActor in
+                    if toggleTransition != .idle {
+                        toggleTransition = .idle
+                    }
+                }
+            }
 
             Task { @MainActor in
                 await tunnelController.stop()
