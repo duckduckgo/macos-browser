@@ -19,6 +19,8 @@
 import Foundation
 import DataBrokerProtection
 import AppKit
+import BrowserServicesKit
+import Common
 
 final class DBPHomeViewController: NSViewController {
 
@@ -28,5 +30,19 @@ final class DBPHomeViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+    }
+
+}
+
+public class DataBrokerProtectionErrorHandling: EventMapping<DataBrokerProtectionOperationError> {
+
+    public init() {
+        super.init { event, _, _, _ in
+            Pixel.fire(.debug(event: .dataBrokerProtectionError, error: event.error), withAdditionalParameters: event.params)
+        }
+    }
+
+    override init(mapping: @escaping EventMapping<DataBrokerProtectionOperationError>.Mapping) {
+        fatalError("Use init()")
     }
 }
