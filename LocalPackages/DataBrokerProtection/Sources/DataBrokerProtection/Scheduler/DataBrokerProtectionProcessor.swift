@@ -17,6 +17,8 @@
 //
 
 import Foundation
+import BrowserServicesKit
+import Common
 
 protocol OperationRunnerProvider {
     func getOperationRunner() -> WebOperationRunner
@@ -28,17 +30,20 @@ final class DataBrokerProtectionProcessor {
     private let operationRunnerProvider: OperationRunnerProvider
     private let notificationCenter: NotificationCenter
     private let operationQueue: OperationQueue
+    private var errorHandler: EventMapping<DataBrokerProtectionOperationError>?
 
     init(database: DataBase,
          config: SchedulerConfig,
          operationRunnerProvider: OperationRunnerProvider,
-         notificationCenter: NotificationCenter = NotificationCenter.default) {
+         notificationCenter: NotificationCenter = NotificationCenter.default,
+         errorHandler: EventMapping<DataBrokerProtectionOperationError>? = nil) {
 
         self.database = database
         self.config = config
         self.operationRunnerProvider = operationRunnerProvider
         self.notificationCenter = notificationCenter
         self.operationQueue = OperationQueue()
+        self.errorHandler = errorHandler
         self.operationQueue.maxConcurrentOperationCount = config.concurrentOperationsDifferentBrokers
     }
 
@@ -46,14 +51,12 @@ final class DataBrokerProtectionProcessor {
     func runScanOnAllDataBrokers(completion: (() -> Void)? = nil ) {
         operationQueue.cancelAllOperations()
         runOperations(operationType: .scan, priorityDate: nil) {
-            print("Done scans")
             completion?()
         }
     }
 
     func runQueuedOperations(completion: (() -> Void)? = nil ) {
         runOperations(operationType: .all, priorityDate: Date()) {
-            print("Done Queue operations")
             completion?()
         }
     }
@@ -94,7 +97,8 @@ final class DataBrokerProtectionProcessor {
                                                                 operationType: operationType,
                                                                 intervalBetweenOperations: config.intervalBetweenSameBrokerOperations,
                                                                 priorityDate: priorityDate,
-                                                                notificationCenter: notificationCenter)
+                                                                notificationCenter: notificationCenter,
+                                                                errorHandler: errorHandler)
                 collections.append(collection)
 
                 visitedDataBrokerIDs.insert(dataBrokerID)

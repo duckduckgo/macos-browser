@@ -267,7 +267,9 @@ extension Pixel {
             case invalidPayload(Configuration)
 
             case burnerTabMisplaced
-
+#if DBP
+            case dataBrokerProtectionError
+#endif
         }
 
     }
@@ -603,6 +605,9 @@ extension Pixel.Event.Debug {
 
         case .burnerTabMisplaced: return "burner_tab_misplaced"
 
+#if DBP
+        case .dataBrokerProtectionError: return "data_broker_error"
+#endif
         }
     }
 }
