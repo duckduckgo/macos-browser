@@ -35,6 +35,8 @@ final class WebViewHandler: NSObject {
     init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate) {
         let configuration = WKWebViewConfiguration()
         configuration.applyDataBrokerConfiguration(privacyConfig: privacyConfig, prefs: prefs, delegate: delegate)
+        configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
+
         self.webViewConfiguration = configuration
 
         let userContentController = configuration.userContentController as? DataBrokerUserContentController
@@ -56,20 +58,22 @@ final class WebViewHandler: NSObject {
             window?.makeKeyAndOrderFront(nil)
         }
 
-        try? await self.load(url: URL(string: "https://dataveria.com/ng/control/privacy")!)
+        try? await load(url: URL(string: "https://www.example.com/")!)
     }
 
     func load(url: URL) async throws {
         webView?.load(url)
+        os_log("Loading URL: %@", log: .action, String(describing: url.absoluteString))
         try await waitForWebViewLoad(timeoutInSeconds: 60)
     }
 
     func finish() {
+        os_log("WebViewHandler finished", log: .action)
         webView?.stopLoading()
         webView = nil
     }
 
-    private func waitForWebViewLoad(timeoutInSeconds: Int = 0) async throws {
+    func waitForWebViewLoad(timeoutInSeconds: Int = 0) async throws {
         try await withCheckedThrowingContinuation { continuation in
             self.activeContinuation = continuation
 
@@ -102,11 +106,14 @@ extension WebViewHandler: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        os_log("WebViewHandler didFinish", log: .action)
+
         self.activeContinuation?.resume()
         self.activeContinuation = nil
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        os_log("WebViewHandler didFail: %{public}@", log: .action, String(describing: error.localizedDescription))
         self.activeContinuation?.resume(throwing: error)
         self.activeContinuation = nil
     }

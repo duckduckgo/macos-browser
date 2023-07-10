@@ -24,6 +24,7 @@ import Common
 
 protocol DataBrokerOperation: CCFCommunicationDelegate {
     associatedtype ReturnValue
+    associatedtype InputValue
 
     var privacyConfig: PrivacyConfigurationManaging { get }
     var prefs: ContentScopeProperties { get }
@@ -34,8 +35,9 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     var webViewHandler: WebViewHandler? { get set }
     var actionsHandler: ActionsHandler? { get }
     var continuation: CheckedContinuation<ReturnValue, Error>? { get set }
+    var extractedProfile: ExtractedProfile? { get set }
 
-    func run() async throws -> ReturnValue
+    func run(inputValue: InputValue) async throws -> ReturnValue
     func executeNextStep() async
 }
 
@@ -43,14 +45,17 @@ extension DataBrokerOperation {
 
     // MARK: - Shared functions
 
-    func getProfileWithEmail() async throws -> ProfileQuery {
-        let email = try await emailService.getEmail()
-        return query.profileQuery.copy(email: email)
+    var actionAwaitTime: TimeInterval {
+        return 1.0
+    }
+    func getProfileWithEmail() async throws {
+
     }
 
     func runNextAction(_ action: Action) async {
         if let emailConfirmationAction = action as? EmailConfirmationAction {
             try? await runEmailConfirmationAction(action: emailConfirmationAction)
+            await executeNextStep()
             return
         }
 
@@ -67,19 +72,23 @@ extension DataBrokerOperation {
 
         if action.needsEmail {
             do {
-                query.profileQuery = try await getProfileWithEmail()
+                extractedProfile?.email = try await emailService.getEmail()
             } catch {
                 onError(error: .emailError(error as? EmailError))
                 return
             }
         }
 
-        await webViewHandler?.execute(action: action, profileData: .profile(query.profileQuery))
+        if let extractedProfile = self.extractedProfile {
+            await webViewHandler?.execute(action: action, profileData: .extractedProfile(extractedProfile))
+        } else {
+            await webViewHandler?.execute(action: action, profileData: .profile(query.profileQuery))
+        }
     }
 
     private func runEmailConfirmationAction(action: EmailConfirmationAction) async throws {
         do {
-            if let email = query.profileQuery.email {
+            if let email = extractedProfile?.email {
                 let url =  try await emailService.getConfirmationLink(
                     from: email,
                     pollingIntervalInSeconds: action.pollingTime)
@@ -117,9 +126,14 @@ extension DataBrokerOperation {
         }
     }
 
-    func success(actionId: String) {
+    func success(actionId: String, actionType: ActionType) {
         Task {
-            await executeNextStep()
+            switch actionType {
+            case .click:
+                try? await webViewHandler?.waitForWebViewLoad(timeoutInSeconds: 30)
+                await executeNextStep()
+            default: await executeNextStep()
+            }
         }
     }
 

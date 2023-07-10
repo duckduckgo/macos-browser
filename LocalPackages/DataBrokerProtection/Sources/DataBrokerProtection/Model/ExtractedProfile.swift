@@ -18,8 +18,7 @@
 
 import Foundation
 
-struct ExtractedProfile: Codable, Sendable {
-    let id: UUID = UUID()
+struct ExtractProfileSelectors: Codable, Sendable {
     let name: String?
     let alternativeNamesList: String?
     let addressFull: String?
@@ -31,6 +30,60 @@ struct ExtractedProfile: Codable, Sendable {
     let profileUrl: String?
     let reportId: String?
     let age: String?
+
+    enum CodingKeys: CodingKey {
+        case name
+        case alternativeNamesList
+        case addressFull
+        case addressCityState
+        case addressCityStateList
+        case phone
+        case phoneList
+        case relativesList
+        case profileUrl
+        case reportId
+        case age
+    }
+
+    init(name: String? = nil,
+         alternativeNamesList: String? = nil,
+         addressFull: String? = nil,
+         addressCityState: String? = nil,
+         addressCityStateList: String? = nil,
+         phone: String? = nil,
+         phoneList: String? = nil,
+         relativesList: String? = nil,
+         profileUrl: String? = nil,
+         reportId: String? = nil,
+         age: String? = nil) {
+        self.name = name
+        self.alternativeNamesList = alternativeNamesList
+        self.addressFull = addressFull
+        self.addressCityState = addressCityState
+        self.addressCityStateList = addressCityStateList
+        self.phone = phone
+        self.phoneList = phoneList
+        self.relativesList = relativesList
+        self.profileUrl = profileUrl
+        self.reportId = reportId
+        self.age = age
+    }
+}
+
+struct ExtractedProfile: Codable, Sendable {
+    let id: UUID = UUID()
+    let name: String?
+    let alternativeNamesList: [String]?
+    let addressFull: String?
+    let addressCityState: String?
+    let addressCityStateList: [String]?
+    let phone: String?
+    let phoneList: String?
+    let relativesList: [String]?
+    let profileUrl: String?
+    let reportId: String?
+    let age: String?
+    var email: String?
     var removedDate: Date?
 
     enum CodingKeys: CodingKey {
@@ -45,20 +98,22 @@ struct ExtractedProfile: Codable, Sendable {
         case profileUrl
         case reportId
         case age
+        case email
         case removedDate
     }
 
     init(name: String? = nil,
-         alternativeNamesList: String? = nil,
+         alternativeNamesList: [String]? = nil,
          addressFull: String? = nil,
          addressCityState: String? = nil,
-         addressCityStateList: String? = nil,
+         addressCityStateList: [String]? = nil,
          phone: String? = nil,
          phoneList: String? = nil,
-         relativesList: String? = nil,
+         relativesList: [String]? = nil,
          profileUrl: String? = nil,
          reportId: String? = nil,
          age: String? = nil,
+         email: String? = nil,
          removedDate: Date? = nil) {
         self.name = name
         self.alternativeNamesList = alternativeNamesList
@@ -71,6 +126,7 @@ struct ExtractedProfile: Codable, Sendable {
         self.profileUrl = profileUrl
         self.reportId = reportId
         self.age = age
+        self.email = email
         self.removedDate = removedDate
     }
 }
