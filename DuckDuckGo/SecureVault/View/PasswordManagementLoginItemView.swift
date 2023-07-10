@@ -293,6 +293,7 @@ private struct PrivateEmailMessage: View {
                         .lineLimit(nil)
                         .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: true)
+                        .animation(.easeInOut) 
                 } else {
 
                     if #available(macOS 12.0, *) {
