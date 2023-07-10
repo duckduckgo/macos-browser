@@ -26,7 +26,7 @@ protocol CCFCommunicationDelegate: AnyObject {
     func loadURL(url: URL)
     func extractedProfiles(profiles: [ExtractedProfile])
     func captchaInformation(captchaInfo: GetCaptchaInfoResponse)
-    func success(actionId: String)
+    func success(actionId: String, actionType: ActionType)
     func onError(error: DataBrokerProtectionError)
 }
 
@@ -104,7 +104,7 @@ struct DataBrokerProtectionFeature: Subfeature {
         case .getCaptchaInfo(let captchaInfo):
             delegate?.captchaInformation(captchaInfo: captchaInfo)
         case .fillForm, .click, .expectation, .solveCaptcha:
-            delegate?.success(actionId: success.actionID)
+            delegate?.success(actionId: success.actionID, actionType: success.actionType)
         default: return
         }
     }

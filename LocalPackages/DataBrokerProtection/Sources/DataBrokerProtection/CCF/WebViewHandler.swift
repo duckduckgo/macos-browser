@@ -73,7 +73,7 @@ final class WebViewHandler: NSObject {
         webView = nil
     }
 
-    private func waitForWebViewLoad(timeoutInSeconds: Int = 0) async throws {
+    func waitForWebViewLoad(timeoutInSeconds: Int = 0) async throws {
         try await withCheckedThrowingContinuation { continuation in
             self.activeContinuation = continuation
 

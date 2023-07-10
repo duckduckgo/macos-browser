@@ -125,9 +125,14 @@ extension DataBrokerOperation {
         }
     }
 
-    func success(actionId: String) {
+    func success(actionId: String, actionType: ActionType) {
         Task {
-            await executeNextStep()
+            switch actionType {
+            case .click:
+                try? await webViewHandler?.waitForWebViewLoad(timeoutInSeconds: 30)
+                await executeNextStep()
+            default: await executeNextStep()
+            }
         }
     }
 
