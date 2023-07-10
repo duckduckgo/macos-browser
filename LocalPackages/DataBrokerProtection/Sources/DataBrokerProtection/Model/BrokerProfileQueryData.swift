@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Common
 
 final class BrokerProfileQueryData: Sendable {
     let id: UUID
@@ -55,16 +56,20 @@ final class BrokerProfileQueryData: Sendable {
         extractedProfiles.forEach { extractedProfile in
             // If the profile was already removed, we create a new one even if we find it again
             let isExistingProfile = optOutsData.contains {
-                $0.extractedProfile == extractedProfile && $0.extractedProfile.removedDate == nil
+                $0.extractedProfile.profileUrl == extractedProfile.profileUrl && $0.extractedProfile.removedDate == nil
             }
 
             if !isExistingProfile {
+                os_log("Creating new opt-out operation data for: %@ %@", log: .dataBrokerProtection, String(describing: extractedProfile.name), extractedProfile.id.uuidString)
+
                 let optOutOperationData = OptOutOperationData(brokerProfileQueryID: id,
                                                               historyEvents: [HistoryEvent](),
                                                               extractedProfile: extractedProfile)
                 // If it's a new found profile, we'd like to opt-out ASAP
                 optOutOperationData.preferredRunDate = Date()
                 optOutsData.append(optOutOperationData)
+            } else {
+                os_log("Extracted profile already exists in database: %@ %@", log: .dataBrokerProtection, String(describing: extractedProfile.name), extractedProfile.id.uuidString)
             }
         }
 
@@ -75,7 +80,7 @@ final class BrokerProfileQueryData: Sendable {
             addHistoryEvent(event, for: removedProfileData)
             removedProfileData.extractedProfile.removedDate = Date()
             removedProfileData.preferredRunDate = nil
-            print("Profile removed from optOutsData: \(removedProfileData.extractedProfile)")
+            os_log("Profile removed from optOutsData: %@", log: .dataBrokerProtection, String(describing: removedProfileData.extractedProfile))
         }
     }
 
