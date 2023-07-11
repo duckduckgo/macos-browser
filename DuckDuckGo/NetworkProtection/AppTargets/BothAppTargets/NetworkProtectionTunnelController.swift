@@ -320,9 +320,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             }
         } catch OSSystemExtensionError.requestSuperseded {
             await stop()
-            // Even if the installation request is superseeded we want to show the message that tells the user
+            // Even if the installation request is superseded we want to show the message that tells the user
             // to go to System Settings to allow the extension
-            controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseAllowSystemExtension
+            controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
         } catch {
             await stop()
             controllerErrorStore.lastErrorMessage = error.localizedDescription
