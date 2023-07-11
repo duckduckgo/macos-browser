@@ -272,14 +272,6 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }()
 
-    private func connectivityIssuesStarted() {
-
-    }
-
-    private func connectivityIssuesEnded() {
-
-    }
-
     @MainActor
     private func startLatencyReporter() {
         guard let lastSelectedServerInfo,
