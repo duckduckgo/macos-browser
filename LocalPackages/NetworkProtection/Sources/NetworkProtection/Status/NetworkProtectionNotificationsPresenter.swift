@@ -34,4 +34,8 @@ public protocol NetworkProtectionNotificationsPresenter {
     /// Present a "Superceded by another App" notification to the user.
     func showSupercededNotification()
 
+    /// Present a test notification, triggered by the Debug menu in the app.
+    /// This is never visible to end users.
+    func showTestNotification()
+
 }
