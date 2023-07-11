@@ -112,8 +112,6 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
                 button: UserText.pmActivate)
     }
 
-    private var previousUsername: String = ""
-
     var shouldShowPrivateEmailToggle: Bool {
         hasValidPrivateEmail && (privateEmailStatus == .active || privateEmailStatus == .inactive)
     }
@@ -158,11 +156,6 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         credentials.password = password.data(using: .utf8)! // let it crash?
         hasValidPrivateEmail = emailManager.isPrivateEmail(email: username)
         onSaveRequested(credentials)
-        if emailManager.isPrivateEmail(email: previousUsername) &&
-            hasValidPrivateEmail &&
-            (privateEmailStatus == .active || privateEmailStatus == .inactive) {
-            isShowingDuckRemovalAlert = true
-        }
     }
 
     func requestDelete() {
@@ -170,8 +163,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         onDeleteRequested(credentials)
     }
 
-    func edit() {
-        previousUsername = username
+    func edit() {        
         isEditing = true
     }
 

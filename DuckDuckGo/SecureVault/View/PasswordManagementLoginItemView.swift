@@ -77,7 +77,7 @@ struct PasswordManagementLoginItemView: View {
 
             }
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
-            .background(EmptyView().alert(isPresented: $model.isShowingAddressUpdateConfirmAlert) {
+            .alert(isPresented: $model.isShowingAddressUpdateConfirmAlert) {
                 let btnLabel = Text(model.toggleConfirmationAlert.button)
                 let btnAction = model.togglePrivateEmailStatus
                 let button = Alert.Button.default(btnLabel, action: btnAction)
@@ -90,14 +90,7 @@ struct PasswordManagementLoginItemView: View {
                     primaryButton: button,
                     secondaryButton: cancelButton
                 )
-            })
-            .background(EmptyView().alert(isPresented: $model.isShowingDuckRemovalAlert) {
-                Alert(
-                    title: Text(UserText.pmRemovedDuckAddressTitle),
-                    message: Text(UserText.pmRemovedDuckAddressContent),
-                    dismissButton: .default(Text(UserText.pmRemovedDuckAddressButton))
-                )
-            })
+            }
         }
     }
 
@@ -249,7 +242,7 @@ private struct PrivateEmailImage: View {
 
     var image: NSImage? {
         if !model.isSignedIn {
-            return NSImage(imageLiteralResourceName: "Email-16")
+            return nil
         } else {
             switch model.privateEmailStatus {
             case .error:
@@ -293,7 +286,7 @@ private struct PrivateEmailMessage: View {
                         .lineLimit(nil)
                         .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: true)
-                        .animation(.easeInOut) 
+                        .animation(.easeInOut)
                 } else {
 
                     if #available(macOS 12.0, *) {
