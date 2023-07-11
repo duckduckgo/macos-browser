@@ -42,6 +42,7 @@ final class FirePopoverViewController: NSViewController {
     private var firePopoverViewModel: FirePopoverViewModel
     private let historyCoordinating: HistoryCoordinating
 
+    @IBOutlet weak var infoLabel: NSTextField!
     @IBOutlet weak var optionsButton: NSPopUpButton!
     @IBOutlet weak var optionsButtonWidthConstraint: NSLayoutConstraint!
     @IBOutlet weak var openDetailsButton: NSButton!
@@ -124,6 +125,25 @@ final class FirePopoverViewController: NSViewController {
         toggleDetails()
     }
 
+    private func updateInfoLabel() {
+        guard !firePopoverViewModel.selected.isEmpty else {
+            infoLabel.stringValue = UserText.nothingToClearInfo
+            return
+        }
+
+        let sites = firePopoverViewModel.selected.count
+        switch firePopoverViewModel.clearingOption {
+        case .allData:
+            let tabs = WindowControllersManager.shared.allTabViewModels.count
+            infoLabel.stringValue = UserText.activeTabsInfo(tabs: tabs, sites: sites)
+        case .currentWindow:
+            let tabs = firePopoverViewModel.tabCollectionViewModel?.tabs.count ?? 0
+            infoLabel.stringValue = UserText.activeTabsInfo(tabs: tabs, sites: sites)
+        case .currentTab:
+            infoLabel.stringValue = UserText.oneTabInfo(sites: sites)
+        }
+    }
+
     private func updateCloseDetailsButton() {
         guard firePopoverViewModel.areAllSelected else {
             closeDetailsButton.title = "     \(UserText.selectedDomainsDescription)"
@@ -178,6 +198,7 @@ final class FirePopoverViewController: NSViewController {
                 if self.firePopoverViewModel.selectable.isEmpty && !self.detailsWrapperView.isHidden {
                     self.toggleDetails()
                 }
+                self.updateInfoLabel()
                 self.adjustContentHeight()
                 self.updateOpenDetailsButton()
             }
@@ -190,6 +211,7 @@ final class FirePopoverViewController: NSViewController {
                 guard let self = self else { return }
                 let selectionIndexPaths = Set(selected.map {IndexPath(item: $0, section: self.firePopoverViewModel.selectableSectionIndex)})
                 self.collectionView.selectionIndexPaths = selectionIndexPaths
+                self.updateInfoLabel()
                 self.updateCloseDetailsButton()
                 self.updateClearButton()
             }

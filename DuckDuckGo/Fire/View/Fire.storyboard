@@ -125,14 +125,14 @@
             <objects>
                 <viewController storyboardIdentifier="FirePopoverViewController" id="DMI-mh-xLJ" customClass="FirePopoverViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="dGd-Gc-P2e" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="328" height="270"/>
+                        <rect key="frame" x="0.0" y="0.0" width="328" height="304"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="3Jn-h4-fXL" userLabel="Header Wrapper View">
-                                <rect key="frame" x="0.0" y="102" width="328" height="168"/>
+                                <rect key="frame" x="0.0" y="102" width="328" height="202"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="acV-lE-jVh">
-                                        <rect key="frame" x="100" y="84" width="128" height="64"/>
+                                        <rect key="frame" x="100" y="118" width="128" height="64"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="128" id="jv0-mb-KeT"/>
                                             <constraint firstAttribute="height" constant="64" id="zhN-YS-juD"/>
@@ -140,15 +140,15 @@
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="FireHeader" id="Dql-dm-pHB"/>
                                     </imageView>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gVh-tG-Gue">
-                                        <rect key="frame" x="71" y="53" width="187" height="16"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Clear Browsing History &amp; Data" id="98U-sP-UUR">
+                                        <rect key="frame" x="64" y="87" width="200" height="16"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Clear Browsing History and Data" id="98U-sP-UUR">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
                                     <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="ckJ-6G-38h">
-                                        <rect key="frame" x="43" y="11" width="243" height="37"/>
+                                        <rect key="frame" x="43" y="45" width="243" height="37"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="AOr-Ku-GpD"/>
                                             <constraint firstAttribute="width" constant="237" id="f5G-AU-bU2"/>
@@ -169,11 +169,25 @@
                                             <action selector="optionsButtonAction:" target="DMI-mh-xLJ" id="4KY-AK-Ajq"/>
                                         </connections>
                                     </popUpButton>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YMk-Hq-WfZ">
+                                        <rect key="frame" x="18" y="9" width="292" height="32"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="288" id="mLo-nE-gZE"/>
+                                            <constraint firstAttribute="height" constant="32" id="oMx-F3-AUv"/>
+                                        </constraints>
+                                        <textFieldCell key="cell" alignment="center" title="Close X active tabs, and clear all browsing history and cookies (Y sites)?" id="qea-gI-2jD">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="ckJ-6G-38h" firstAttribute="top" secondItem="gVh-tG-Gue" secondAttribute="bottom" constant="8" symbolic="YES" id="8kx-GV-lIj"/>
-                                    <constraint firstAttribute="height" constant="168" id="KFj-xA-het"/>
+                                    <constraint firstAttribute="height" constant="202" id="KFj-xA-het"/>
+                                    <constraint firstItem="YMk-Hq-WfZ" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" id="Kpg-KV-X8x"/>
                                     <constraint firstItem="acV-lE-jVh" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="top" constant="20" id="TNw-m8-oz1"/>
+                                    <constraint firstItem="YMk-Hq-WfZ" firstAttribute="top" secondItem="ckJ-6G-38h" secondAttribute="bottom" constant="8" symbolic="YES" id="ZSq-dY-LaB"/>
                                     <constraint firstItem="gVh-tG-Gue" firstAttribute="top" secondItem="acV-lE-jVh" secondAttribute="bottom" constant="15" id="dzE-fi-9Qb"/>
                                     <constraint firstItem="ckJ-6G-38h" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" id="eVG-pj-q6k"/>
                                     <constraint firstItem="acV-lE-jVh" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" id="jdZ-Ii-nMi"/>
@@ -446,6 +460,7 @@ Gw
                         <outlet property="contentHeightConstraint" destination="hbg-4i-hjT" id="mC2-Ot-onY"/>
                         <outlet property="detailsWrapperView" destination="6vZ-d2-qnR" id="TKb-Ux-TIk"/>
                         <outlet property="detailsWrapperViewHeightContraint" destination="sJt-dl-rlH" id="7pa-Kc-9xB"/>
+                        <outlet property="infoLabel" destination="YMk-Hq-WfZ" id="JHL-r4-1VT"/>
                         <outlet property="openDetailsButton" destination="ACx-m8-z0K" id="cu4-zz-MhA"/>
                         <outlet property="openDetailsButtonImageView" destination="8qK-6q-RQT" id="ezj-KU-kE6"/>
                         <outlet property="openWrapperView" destination="sbc-pJ-bul" id="dUO-6T-MLY"/>
@@ -457,7 +472,7 @@ Gw
                 </viewController>
                 <customObject id="fzV-LM-GvK" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1054" y="512"/>
+            <point key="canvasLocation" x="1054" y="556"/>
         </scene>
         <!--Fire Popover Wrapper View Controller-->
         <scene sceneID="lY9-rI-KGe">
