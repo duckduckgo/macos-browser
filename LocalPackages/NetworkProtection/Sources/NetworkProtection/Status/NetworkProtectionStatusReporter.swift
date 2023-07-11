@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-import AppKit
 import Combine
 import NetworkExtension
 import Common
@@ -51,6 +50,8 @@ public struct NetworkProtectionStatusServerInfo: Codable, Equatable {
         self.serverAddress = serverAddress
     }
 }
+
+#if os(macOS)
 
 /// This is the default status reporter.
 ///
@@ -185,3 +186,5 @@ public final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStat
         }
     }
 }
+
+#endif

@@ -1,12 +1,21 @@
 {
   "pins" : [
     {
+      "identity" : "bloom_cpp",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/bloom_cpp.git",
+      "state" : {
+        "revision" : "8076199456290b61b4544bf2f4caf296759906a0",
+        "version" : "3.0.0"
+      }
+    },
+    {
       "identity" : "browserserviceskit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "f3fffd9ab145fce92014294de92d3923e218d4fe",
-        "version" : "62.0.3"
+        "revision" : "bff444d6f54bdb904c1f16e5152bcfe515d32977",
+        "version" : "64.0.0"
       }
     },
     {
@@ -14,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "1b5548805ed1d5af4bb6432ea23890797540fbdd",
-        "version" : "4.22.1"
+        "revision" : "630eb2c4cf94055e630fd5b7daae71bed893ad0a",
+        "version" : "4.22.4"
       }
     },
     {

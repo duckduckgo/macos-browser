@@ -24,12 +24,12 @@ import Common
 final class NetworkProtectionTunnelHealthStore {
     private static let isHavingConnectivityIssuesKey = "com.duckduckgo.isHavingConnectivityIssues"
     private let userDefaults: UserDefaults
-    private let distributedNotificationCenter: DistributedNotificationCenter
+    private let notificationCenter: NetworkProtectionNotificationCenter
 
     init(userDefaults: UserDefaults = .standard,
-         distributedNotificationCenter: DistributedNotificationCenter = .forType(.networkProtection)) {
+         notificationCenter: NetworkProtectionNotificationCenter) {
         self.userDefaults = userDefaults
-        self.distributedNotificationCenter = distributedNotificationCenter
+        self.notificationCenter = notificationCenter
     }
 
     var isHavingConnectivityIssues: Bool {
@@ -40,19 +40,16 @@ final class NetworkProtectionTunnelHealthStore {
             guard newValue != userDefaults.bool(forKey: Self.isHavingConnectivityIssuesKey) else {
                 return
             }
-
             userDefaults.set(newValue, forKey: Self.isHavingConnectivityIssuesKey)
             postIssueChangeNotification(newValue: newValue)
         }
     }
-
     // MARK: - Posting Issue Notifications
-
     private func postIssueChangeNotification(newValue: Bool) {
         if newValue {
-            distributedNotificationCenter.post(.issuesStarted)
+            notificationCenter.post(.issuesStarted)
         } else {
-            distributedNotificationCenter.post(.issuesResolved)
+            notificationCenter.post(.issuesResolved)
         }
     }
 }

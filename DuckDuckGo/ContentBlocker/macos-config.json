@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1687789841911,
+    "version": 1689016054868,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -246,6 +246,10 @@
                 {
                     "domain": "upstart.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/897"
+                },
+                {
+                    "domain": "granit.com",
+                    "reason": "https://github.com/duckduckgo/autoconsent/issues/200"
                 }
             ],
             "settings": {
@@ -255,7 +259,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "1d01334077a08d69f450adba9b278f35"
+            "hash": "558792e54daecddf71939b03b238c49c"
         },
         "autofill": {
             "exceptions": [
@@ -1093,10 +1097,6 @@
             "state": "enabled",
             "exceptions": [
                 {
-                    "domain": "foxnews.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
-                },
-                {
                     "domain": "strava.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/748"
                 },
@@ -1105,7 +1105,7 @@
                     "reason": "Video pauses at about 13-15 seconds in. Playing the video again results in a single frame rendering without progressing to the next frame."
                 }
             ],
-            "hash": "7550837006dcfeed61c9dabcc0a0012c"
+            "hash": "8d35648bb7862913ed30243074e6b6f1"
         },
         "cookie": {
             "settings": {
@@ -1229,7 +1229,7 @@
                 }
             ],
             "settings": {
-                "useStrictHideStyleTag": false,
+                "useStrictHideStyleTag": true,
                 "rules": [
                     {
                         "selector": "[id*='gpt-']",
@@ -1528,7 +1528,16 @@
                         "type": "hide-empty"
                     }
                 ],
-                "styleTagExceptions": [],
+                "styleTagExceptions": [
+                    {
+                        "domain": "github.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1058"
+                    },
+                    {
+                        "domain": "duckduckgo.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1058"
+                    }
+                ],
                 "mediaAndFormSelectors": "video,canvas,embed,object,audio,map,form,input,textarea,select,option",
                 "adLabelStrings": [
                     "ad",
@@ -1590,6 +1599,15 @@
                             {
                                 "selector": ".leaderboard-ad-placeholder",
                                 "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "bestbuy.com",
+                        "rules": [
+                            {
+                                "selector": "#credential_picker_container",
+                                "type": "override"
                             }
                         ]
                     },
@@ -1834,100 +1852,52 @@
                         "domain": "google.com",
                         "rules": [
                             {
-                                "selector": "iframe[src*='prid=19026802']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19026802']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19026802']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19015398']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19015398']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19015398']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19026796']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19026796']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19026796']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19018053']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19018053']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19018053']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19018054']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19018054']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19018054']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19016403']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19016403']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19016403']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19015972']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19015972']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19015972']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19016223']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19016223']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19016223']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19015952']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19015952']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19015952']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19030391']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19030391']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19030391']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19030389']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19030389']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19030389']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19030167']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19030167']))",
                                 "type": "hide"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19030167']",
-                                "type": "closest-empty"
                             }
                         ]
                     },
@@ -2368,7 +2338,7 @@
                                 "type": "hide"
                             },
                             {
-                                "selector": ".mxEhR",
+                                "selector": ".ZkqhQ",
                                 "type": "hide"
                             }
                         ]
@@ -2381,7 +2351,7 @@
                                 "type": "hide"
                             },
                             {
-                                "selector": ".mxEhR",
+                                "selector": ".ZkqhQ",
                                 "type": "hide"
                             }
                         ]
@@ -2570,7 +2540,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "1f903524775596b863a5b4c1f2e0e3eb"
+            "hash": "54168b98398c3f2d142ea50cbb7adb7b"
         },
         "exceptionHandler": {
             "exceptions": [],
@@ -2701,8 +2671,8 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/499"
                 }
             ],
-            "state": "enabled",
-            "hash": "2f880f7ca6db5218c28eb6c421bfa6cb"
+            "state": "disabled",
+            "hash": "4cbf5510157399d16404475be76e5980"
         },
         "fingerprintingHardware": {
             "settings": {
@@ -2800,8 +2770,8 @@
                     "reason": "After entering login details and clicking to log in, the site shows an adwall and prevents login."
                 }
             ],
-            "state": "enabled",
-            "hash": "e1ffe29047b2f96b52fd59399b7f034b"
+            "state": "disabled",
+            "hash": "6542908e0907b22d495b68c0bd351e65"
         },
         "fingerprintingTemporaryStorage": {
             "exceptions": [
@@ -2848,6 +2818,109 @@
                 ]
             },
             "hash": "470c77b05c99b8f0986cc40422a59c91"
+        },
+        "harmfulApis": {
+            "settings": {
+                "deviceOrientation": {
+                    "state": "enabled",
+                    "filterEvents": [
+                        "deviceorientation",
+                        "devicemotion"
+                    ]
+                },
+                "GenericSensor": {
+                    "state": "enabled",
+                    "filterPermissions": [
+                        "accelerometer",
+                        "ambient-light-sensor",
+                        "gyroscope",
+                        "magnetometer"
+                    ],
+                    "blockSensorStart": true
+                },
+                "UaClientHints": {
+                    "state": "enabled",
+                    "highEntropyValues": {
+                        "trimBrands": true,
+                        "model": "",
+                        "trimPlatformVersion": 2,
+                        "trimUaFullVersion": 1,
+                        "trimFullVersionList": 1
+                    }
+                },
+                "NetworkInformation": {
+                    "state": "enabled"
+                },
+                "getInstalledRelatedApps": {
+                    "state": "enabled",
+                    "returnValue": []
+                },
+                "FileSystemAccess": {
+                    "state": "enabled",
+                    "disableOpenFilePicker": true,
+                    "disableSaveFilePicker": true,
+                    "disableDirectoryPicker": true,
+                    "disableGetAsFileSystemHandle": true
+                },
+                "WindowPlacement": {
+                    "state": "enabled",
+                    "filterPermissions": [
+                        "window-placement",
+                        "window-management"
+                    ],
+                    "screenIsExtended": false
+                },
+                "WebBluetooth": {
+                    "state": "enabled",
+                    "filterPermissions": [
+                        "bluetooth"
+                    ],
+                    "filterEvents": [
+                        "availabilitychanged"
+                    ],
+                    "blockGetAvailability": true,
+                    "blockRequestDevice": true
+                },
+                "WebUsb": {
+                    "state": "enabled"
+                },
+                "WebSerial": {
+                    "state": "enabled"
+                },
+                "WebHid": {
+                    "state": "enabled"
+                },
+                "WebMidi": {
+                    "state": "enabled",
+                    "filterPermissions": [
+                        "midi"
+                    ]
+                },
+                "IdleDetection": {
+                    "state": "enabled",
+                    "filterPermissions": [
+                        "idle-detection"
+                    ]
+                },
+                "WebNfc": {
+                    "state": "enabled",
+                    "disableNdefReader": true,
+                    "disableNdefMessage": true,
+                    "disableNdefRecord": true
+                },
+                "StorageManager": {
+                    "state": "enabled",
+                    "allowedQuotaValues": [
+                        1073741824,
+                        4294967296,
+                        9999999999
+                    ]
+                },
+                "domains": []
+            },
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "40ccb9ae93e37d9c2c991a5fadabded7"
         },
         "https": {
             "state": "enabled",
@@ -3098,9 +3171,10 @@
                                 "domains": [
                                     "corriere.it",
                                     "eurogamer.net",
-                                    "seattletimes.com"
+                                    "seattletimes.com",
+                                    "wcvb.com"
                                 ],
-                                "reason": "corriere.it - ,Example URL: https://www.corriere.it/video-articoli/2022/07/13/missione-wwf-liberare-mare-plastica/9abb64de-029d-11ed-a0cc-ad3c68cacbae.shtml;,Clicking on the video to play causes a still frame to show and the video does not continue.,eurogamer.net, seattletimes.com - An unskippable adwall appears which prevents interaction with the page."
+                                "reason": "corriere.it - ,Example URL: https://www.corriere.it/video-articoli/2022/07/13/missione-wwf-liberare-mare-plastica/9abb64de-029d-11ed-a0cc-ad3c68cacbae.shtml;,Clicking on the video to play causes a still frame to show and the video does not continue.,eurogamer.net, seattletimes.com - An unskippable adwall appears which prevents interaction with the page.,wcvb.com - https://github.com/duckduckgo/privacy-configuration/issues/1088"
                             }
                         ]
                     },
@@ -3640,6 +3714,17 @@
                             }
                         ]
                     },
+                    "ezodn.com": {
+                        "rules": [
+                            {
+                                "rule": "ezodn.com/cmp",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/468"
+                            }
+                        ]
+                    },
                     "ezoic.com": {
                         "rules": [
                             {
@@ -4037,6 +4122,17 @@
                                     "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/489"
+                            }
+                        ]
+                    },
+                    "heapanalytics.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn.heapanalytics.com",
+                                "domains": [
+                                    "mejuri.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1081"
                             }
                         ]
                     },
@@ -4621,6 +4717,17 @@
                                     "aternos.org"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/328"
+                            }
+                        ]
+                    },
+                    "quantcast.com": {
+                        "rules": [
+                            {
+                                "rule": "cmp.quantcast.com",
+                                "domains": [
+                                    "express.co.uk"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1068"
                             }
                         ]
                     },
@@ -13412,7 +13519,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "b560b07a337eb315764a8a7e36c48916"
+            "hash": "19a678adcbf2ed8b2b9110226ba8c9ab"
         },
         "trackingCookies1p": {
             "settings": {
@@ -13807,6 +13914,22 @@
         {
             "domain": "ticketmaster.com",
             "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
+        },
+        {
+            "domain": "livenation.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1053"
+        },
+        {
+            "domain": "bank.marksandspencer.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
+        },
+        {
+            "domain": "www7.marksandspencer.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
+        },
+        {
+            "domain": "paramountplus.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1085"
         }
     ]
 }

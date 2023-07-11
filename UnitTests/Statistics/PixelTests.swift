@@ -74,9 +74,7 @@ class PixelTests: XCTestCase {
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
 
-        var headers = APIRequest.Headers().default
-        headers[userAgentName] = testAgent
-
+        let headers = APIRequest.Headers(userAgent: testAgent)
         Pixel.shared!.fire(pixelNamed: "test", withHeaders: headers)
 
         wait(for: [expectation], timeout: 1.0)

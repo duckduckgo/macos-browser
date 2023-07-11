@@ -70,27 +70,41 @@ extension HomePage.Views {
     struct Description: View {
         var body: some View {
             VStack(alignment: .leading, spacing: 15) {
-                let description1 = UserText.burnerHomepageDescription1.split(separator: " ",
-                                                                                 maxSplits: 1,
-                                                                                 omittingEmptySubsequences: true)
-                Text((description1.first ?? "") + " ")
+
+                let firstLine = firstLine
+                let secondLine = secondLine
+
+                Text(firstLine.boldText)
                     .font(.system(size: 15, weight: .bold))
                     .foregroundColor(Color.primary)
-                + Text(description1.last ?? "")
+                + Text(firstLine.regularText)
                     .font(.system(size: 15))
                     .foregroundColor(Color.primary)
 
-                let description2 = UserText.burnerHomepageDescription2.split(separator: " ",
-                                                                                 maxSplits: 2,
-                                                                                 omittingEmptySubsequences: true)
-
-                Text((description2[safe: 0] ?? "") + " " + (description2[safe: 1] ?? "") + " ")
+                Text(secondLine.boldText)
                     .font(.system(size: 15, weight: .bold))
                     .foregroundColor(Color.primary)
-                + Text(description2[safe: 2] ?? "")
+                + Text(secondLine.regularText)
                     .font(.system(size: 15))
                     .foregroundColor(Color.primary)
             }
+        }
+
+        var firstLine: (boldText: String, regularText: String) {
+            let description1 = UserText.burnerHomepageDescription1.split(separator: " ",
+                                                                             maxSplits: 1,
+                                                                             omittingEmptySubsequences: true)
+            return (String(description1.first ?? "") + " ", String(description1.last ?? ""))
+        }
+
+        var secondLine: (boldText: String, regularText: String) {
+            let description2 = UserText.burnerHomepageDescription2.split(separator: " ",
+                                                                             maxSplits: 2,
+                                                                             omittingEmptySubsequences: true)
+            return (
+                boldText: String(description2[safe: 0] ?? "") + " " + String(description2[safe: 1] ?? "") + " ",
+                regularText: String(description2[safe: 2] ?? "")
+            )
         }
     }
 

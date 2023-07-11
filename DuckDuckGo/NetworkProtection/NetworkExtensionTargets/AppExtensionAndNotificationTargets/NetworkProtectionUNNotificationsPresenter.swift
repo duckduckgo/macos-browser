@@ -18,8 +18,6 @@
 
 import Foundation
 import UserNotifications
-import AppKit
-import AppIntents
 import NetworkProtection
 
 extension UNNotificationAction {

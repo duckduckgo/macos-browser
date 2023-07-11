@@ -28,7 +28,7 @@ extension HomePage.Views {
         let targetWidth: CGFloat = 482
         let isBurner: Bool
 
-        @EnvironmentObject var model: HomePage.Models.HomePageRootViewModel
+        @EnvironmentObject var model: AppearancePreferences
         @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
         @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
 
@@ -137,7 +137,7 @@ extension HomePage.Views {
     }
 
     struct HomeContentPopoverView: View {
-        @EnvironmentObject var model: HomePage.Models.HomePageRootViewModel
+        @EnvironmentObject var model: AppearancePreferences
         @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
         @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
         let iconSize = 16.02
@@ -152,7 +152,7 @@ extension HomePage.Views {
                     HStack {
                         Image("RocketNoColor")
                             .frame(width: iconSize, height: iconSize)
-                        Text(UserText.newTabMenuItemShowContinuteSetUp)
+                        Text(UserText.newTabSetUpSectionTitle)
                     }
                 })
                 .visibility(continueSetUpModel.hasContent ? .visible : .gone)

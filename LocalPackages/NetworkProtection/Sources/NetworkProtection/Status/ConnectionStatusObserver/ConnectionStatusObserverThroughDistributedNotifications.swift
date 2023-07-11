@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if os(macOS)
+
 import Combine
 import Foundation
 import NetworkExtension
@@ -25,7 +27,7 @@ import Common
 /// Observes the tunnel status through Distributed Notifications.
 ///
 public class ConnectionStatusObserverThroughDistributedNotifications: ConnectionStatusObserver {
-    public let publisher = CurrentValueSubject<ConnectionStatus, Never>(.unknown)
+    public let publisher = CurrentValueSubject<ConnectionStatus, Never>(.disconnected)
 
     // MARK: - Network Path Monitoring
 
@@ -145,3 +147,5 @@ public class ConnectionStatusObserverThroughDistributedNotifications: Connection
         os_log("%{public}@: connection status is now %{public}@", log: log, type: .debug, String(describing: self), String(describing: status))
     }
 }
+
+#endif

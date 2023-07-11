@@ -349,7 +349,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             // Restart NetP SysEx on app update
             if await provider.isConnected() {
                 await provider.stop()
-                try? await provider.start()
+                await provider.start()
             }
         }
     }

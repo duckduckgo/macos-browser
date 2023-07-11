@@ -37,4 +37,9 @@ extension UserText {
     // MARK: - Navigation Bar Status View
 
     static let networkProtectionNavBarStatusViewShareFeedback = NSLocalizedString("network.protection.navbar.status.view.share.feedback", value: "Share Feedback...", comment: "Menu item for 'Share Feedback' in the Network Protection status view that's shown in the navigation bar")
+
+    // MARK: - System Extension Installation Messages
+
+    static let networkProtectionPleaseAllowSystemExtension = NSLocalizedString("network.protection.system.extension.please.allow", value: "Go to Security & Privacy in System Settings to allow Network Protection to activate", comment: "Message shown to users when they try to enable NetP and they need to allow the system extension to run in macOS")
+    static let networkProtectionPleaseReboot = NSLocalizedString("network.protection.system.extension.please.reboot", value: "Please reboot to activate Network Protection", comment: "Message shown to users when they try to enable NetP and they need to reboot the computer to complete the installation")
 }
