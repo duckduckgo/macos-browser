@@ -51,7 +51,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         return EventMapping { event, _, _, _ in
             let domainEvent: NetworkProtectionPixelEvent
 #if DEBUG
-            // Makes sure we see the assertion failure in the yellow NetP alert.
+            // Makes sure we see the error in the yellow NetP alert.
             controllerErrorStore.lastErrorMessage = "[Debug] Error event: \(event.localizedDescription)"
 #endif
             switch event {
@@ -144,22 +144,24 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - NEPacketTunnelProvider
 
-    public override func loadVendorOptions(from provider: NETunnelProviderProtocol?) {
-        guard let vendorOptions = provider?.providerConfiguration else {
-            os_log("🔵 Provider is nil, or providerConfiguration is not set", log: .networkProtection)
-            assertionFailure("Provider is nil, or providerConfiguration is not set")
-            return
-        }
-
-        loadDefaultPixelHeaders(from: vendorOptions)
+    enum ConfigurationError: Error {
+        case missingProviderConfiguration
+        case missingPixelHeaders
     }
 
-    private func loadDefaultPixelHeaders(from options: [String: Any]) {
-        guard let defaultPixelHeaders = options[NetworkProtectionOptionKey.defaultPixelHeaders.rawValue] as? [String: String] else {
+    public override func loadVendorOptions(from provider: NETunnelProviderProtocol?) throws {
+        guard let vendorOptions = provider?.providerConfiguration else {
+            os_log("🔵 Provider is nil, or providerConfiguration is not set", log: .networkProtection)
+            throw ConfigurationError.missingProviderConfiguration
+        }
 
+        try loadDefaultPixelHeaders(from: vendorOptions)
+    }
+
+    private func loadDefaultPixelHeaders(from options: [String: Any]) throws {
+        guard let defaultPixelHeaders = options[NetworkProtectionOptionKey.defaultPixelHeaders.rawValue] as? [String: String] else {
             os_log("🔵 Pixel options are not set", log: .networkProtection)
-            assertionFailure("Default pixel headers are not set")
-            return
+            throw ConfigurationError.missingPixelHeaders
         }
 
         setupPixels(defaultHeaders: defaultPixelHeaders)
