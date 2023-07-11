@@ -31,7 +31,7 @@ public protocol NetworkProtectionNotificationsPresenter {
     /// Present a "connection failure" notification to the user.
     func showConnectionFailureNotification()
 
-    /// Present a "Superceded by another App" notification to the user.
-    func showSupercededNotification()
+    /// Present a "Superseded by another App" notification to the user.
+    func showSupersededNotification()
 
 }

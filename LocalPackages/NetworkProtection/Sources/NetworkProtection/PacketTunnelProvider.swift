@@ -272,6 +272,14 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
         }
     }()
 
+    private func connectivityIssuesStarted() {
+
+    }
+
+    private func connectivityIssuesEnded() {
+
+    }
+
     @MainActor
     private func startLatencyReporter() {
         guard let lastSelectedServerInfo,
@@ -514,7 +522,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
                     await self.appLauncher?.launchApp(withCommand: .stopVPN)
 
                 case .superceded:
-                    self.notificationsPresenter.showSupercededNotification()
+                    self.notificationsPresenter.showSupersededNotification()
 
                 default:
                     break

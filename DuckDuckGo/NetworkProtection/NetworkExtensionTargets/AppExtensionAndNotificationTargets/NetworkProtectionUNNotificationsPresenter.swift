@@ -28,7 +28,7 @@ extension UNNotificationAction {
 
     /// "Reconnect" notification action button
     static let reconnectAction = UNNotificationAction(identifier: Identifier.reconnect.rawValue,
-                                                      title: UserText.networkProtectionSupercededReconnectActionTitle,
+                                                      title: UserText.networkProtectionSupersededReconnectActionTitle,
                                                       options: [.authenticationRequired])
 
 }
@@ -118,9 +118,9 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
         showNotification(content)
     }
 
-    func showSupercededNotification() {
-        let content = notificationContent(title: UserText.networkProtectioSupercededNotificationTitle,
-                                          subtitle: UserText.networkProtectionSupercededNotificationSubtitle,
+    func showSupersededNotification() {
+        let content = notificationContent(title: UserText.networkProtectioSupersededNotificationTitle,
+                                          subtitle: UserText.networkProtectionSupersededNotificationSubtitle,
                                           category: .superceded)
         showNotification(content)
     }

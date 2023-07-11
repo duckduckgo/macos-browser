@@ -44,7 +44,9 @@ final class NetworkProtectionTunnelHealthStore {
             postIssueChangeNotification(newValue: newValue)
         }
     }
+
     // MARK: - Posting Issue Notifications
+
     private func postIssueChangeNotification(newValue: Bool) {
         if newValue {
             notificationCenter.post(.issuesStarted)

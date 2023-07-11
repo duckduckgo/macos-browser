@@ -23,6 +23,8 @@ import Common
 
 extension DistributedNotificationCenter.CenterType {
     public static let networkProtection = DistributedNotificationCenter.CenterType("com.duckduckgo.DistributedNotificationCenter.CenterType.networkProtection")
+
+    public static let networkProtectionUserNotifications = DistributedNotificationCenter.CenterType("com.duckduckgo.DistributedNotificationCenter.CenterType.networkProtectionUserNotifications")
 }
 
 extension DistributedNotificationCenter {
@@ -53,8 +55,8 @@ public protocol NetworkProtectionNotificationPosting: AnyObject {
     func post(_ networkProtectionNotification: NetworkProtectionNotificationName, object: String?, log: OSLog)
 }
 
-extension NetworkProtectionNotificationPosting {
-    func post(_ networkProtectionNotification: NetworkProtectionNotificationName, object: String? = nil) {
+public extension NetworkProtectionNotificationPosting {
+    public func post(_ networkProtectionNotification: NetworkProtectionNotificationName, object: String? = nil) {
         post(networkProtectionNotification, object: object, log: .networkProtectionDistributedNotificationsLog)
     }
 }
@@ -82,11 +84,14 @@ public enum NetworkProtectionNotificationName: String {
     case issuesStarted = "com.duckduckgo.network-protection.NetworkProtectionNotification.issuesStarted"
     case issuesResolved = "com.duckduckgo.network-protection.NetworkProtectionNotification.issuesResolved"
 
+    // User Notification Events
+    case showIssuesStartedNotification = "com.duckduckgo.network-protection.NetworkProtectionNotification.showIssuesStartedNotification"
+    case showIssuesResolvedNotification = "com.duckduckgo.network-protection.NetworkProtectionNotification.showIssuesResolvedNotification"
+    case showIssuesNotResolvedNotification = "com.duckduckgo.network-protection.NetworkProtectionNotification.showIssuesNotResolvedNotification"
+    case showVPNSupersededNotification = "com.duckduckgo.network-protection.NetworkProtectionNotification.showVPNSupersededNotification"
+
     // Server Selection
     case serverSelected = "com.duckduckgo.network-protection.NetworkProtectionNotification.serverSelected"
-
-    // XPC Service
-    case ipcListenerStarted = "com.duckduckgo.network-protection.NetworkProtectionNotification.ipcListenerStarted"
 
     // Error Events
     case tunnelErrorChanged = "com.duckduckgo.network-protection.NetworkProtectionNotification.tunnelErrorChanged"

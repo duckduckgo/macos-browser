@@ -27,9 +27,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     private static func makeNotificationsPresenter() -> NetworkProtectionNotificationsPresenter {
 #if NETP_SYSTEM_EXTENSION
-        let ipcConnection = IPCConnection(log: .networkProtectionIPCLog, memoryManagementLog: .networkProtectionMemoryLog)
-        ipcConnection.startListener()
-        return NetworkProtectionIPCNotificationsPresenter(ipcConnection: ipcConnection)
+        return NetworkProtectionAgentNotificationsPresenter(notificationCenter: DistributedNotificationCenter.forType(.networkProtectionUserNotifications))
 #else
         let parentBundlePath = "../../../"
         let mainAppURL: URL

@@ -32,7 +32,7 @@ import Common
     func reconnecting()
     func connectionFailure()
     func statusChanged(status: NEVPNStatus)
-    func superceded()
+    func superseded()
 }
 
 /// The IPCConnection class is used by both the app and the system extension to communicate with each other
@@ -73,7 +73,6 @@ final class IPCConnection: NSObject {
         newListener.resume()
         listener = newListener
 
-        distributedNotificationCenter.post(.ipcListenerStarted)
         os_log("Listener started", log: log, type: .debug, Self.className())
     }
 
@@ -154,7 +153,7 @@ final class IPCConnection: NSObject {
     }
 
     func superceded() {
-        appProxy()?.superceded()
+        appProxy()?.superseded()
     }
 
 }
