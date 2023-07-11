@@ -29,8 +29,8 @@ final class ScanOperation: DataBrokerOperation {
     let privacyConfig: PrivacyConfigurationManaging
     let prefs: ContentScopeProperties
     let query: BrokerProfileQueryData
-    let emailService: EmailService
-    let captchaService: CaptchaService
+    let emailService: EmailServiceProtocol
+    let captchaService: CaptchaServiceProtocol
     var webViewHandler: WebViewHandler?
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<[ExtractedProfile], Error>?
@@ -39,8 +39,8 @@ final class ScanOperation: DataBrokerOperation {
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
          query: BrokerProfileQueryData,
-         emailService: EmailService = EmailService(),
-         captchaService: CaptchaService = CaptchaService()
+         emailService: EmailServiceProtocol = EmailService(),
+         captchaService: CaptchaServiceProtocol = CaptchaService()
     ) {
         self.privacyConfig = privacyConfig
         self.prefs = prefs
@@ -49,15 +49,21 @@ final class ScanOperation: DataBrokerOperation {
         self.captchaService = captchaService
     }
 
-    func run(inputValue: Void) async throws -> [ExtractedProfile] {
+    func run(inputValue: Void,
+             webViewHandler: WebViewHandler? = nil,
+             actionsHandler: ActionsHandler? = nil) async throws -> [ExtractedProfile] {
         try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
             Task {
-                await initialize()
+                await initialize(handler: webViewHandler)
 
                 do {
                     let scanStep = try query.dataBroker.scanStep()
-                    actionsHandler = ActionsHandler(step: scanStep)
+                    if let actionsHandler = actionsHandler {
+                        self.actionsHandler = actionsHandler
+                    } else {
+                        self.actionsHandler = ActionsHandler(step: scanStep)
+                    }
                     await executeNextStep()
                 } catch {
                     failed(with: DataBrokerProtectionError.unknown(error.localizedDescription))
@@ -66,12 +72,9 @@ final class ScanOperation: DataBrokerOperation {
         }
     }
 
-    func extractedProfiles(profiles: [ExtractedProfile]) {
+    func extractedProfiles(profiles: [ExtractedProfile]) async {
         complete(profiles)
-
-        Task {
-            await executeNextStep()
-        }
+        await executeNextStep()
     }
 
     func executeNextStep() async {

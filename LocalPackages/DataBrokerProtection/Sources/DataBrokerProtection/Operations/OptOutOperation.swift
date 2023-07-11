@@ -29,8 +29,8 @@ final class OptOutOperation: DataBrokerOperation {
     let privacyConfig: PrivacyConfigurationManaging
     let prefs: ContentScopeProperties
     let query: BrokerProfileQueryData
-    let emailService: EmailService
-    let captchaService: CaptchaService
+    let emailService: EmailServiceProtocol
+    let captchaService: CaptchaServiceProtocol
     var webViewHandler: WebViewHandler?
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<Void, Error>?
@@ -39,8 +39,8 @@ final class OptOutOperation: DataBrokerOperation {
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
          query: BrokerProfileQueryData,
-         emailService: EmailService = EmailService(),
-         captchaService: CaptchaService = CaptchaService()
+         emailService: EmailServiceProtocol = EmailService(),
+         captchaService: CaptchaServiceProtocol = CaptchaService()
     ) {
         self.privacyConfig = privacyConfig
         self.prefs = prefs
@@ -49,18 +49,24 @@ final class OptOutOperation: DataBrokerOperation {
         self.captchaService = captchaService
     }
 
-    func run(inputValue: ExtractedProfile) async throws {
+    func run(inputValue: ExtractedProfile,
+             webViewHandler: WebViewHandler? = nil,
+             actionsHandler: ActionsHandler? = nil) async throws {
         try await withCheckedThrowingContinuation { continuation in
             self.extractedProfile = inputValue
             self.continuation = continuation
 
             Task {
-
-                await initialize()
+                await initialize(handler: webViewHandler)
 
                 do {
                     if let optOutStep = try query.dataBroker.optOutStep() {
-                        actionsHandler = ActionsHandler(step: optOutStep)
+                        if let actionsHandler = actionsHandler {
+                            self.actionsHandler = actionsHandler
+                        } else {
+                            self.actionsHandler = ActionsHandler(step: optOutStep)
+                        }
+
                         await executeNextStep()
                     } else {
                         // If we try to run an optout on a broker without an optout step, we throw.
@@ -73,7 +79,7 @@ final class OptOutOperation: DataBrokerOperation {
         }
     }
 
-    func extractedProfiles(profiles: [ExtractedProfile]) {
+    func extractedProfiles(profiles: [ExtractedProfile]) async {
         // No - op
     }
 
@@ -84,8 +90,8 @@ final class OptOutOperation: DataBrokerOperation {
         if let action = actionsHandler?.nextAction() {
             await runNextAction(action)
         } else {
-            complete(())
             await webViewHandler?.finish() // If we executed all steps we release the web view
+            complete(())
         }
     }
 }
