@@ -463,6 +463,15 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         try? activeSession.sendProviderMessage(request)
     }
 
+    static func sendTestNotificationRequest() async throws {
+        guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
+            return
+        }
+
+        let request = Data([ExtensionMessage.triggerTestNotification.rawValue])
+        try? activeSession.sendProviderMessage(request)
+    }
+
     private static let registrationKeyValidityKey = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
 
     /// Retrieves the registration key validity time interval.

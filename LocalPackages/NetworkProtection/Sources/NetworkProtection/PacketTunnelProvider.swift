@@ -651,6 +651,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - App Messages
 
+    // swiftlint:disable:next cyclomatic_complexity
     public override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
         guard let message = ExtensionMessage(rawValue: messageData[0]) else {
             completionHandler?(nil)
@@ -676,6 +677,8 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
             handleSetKeyValidity(messageData, completionHandler: completionHandler)
         case .resetAllState:
             handleResetAllState(messageData, completionHandler: completionHandler)
+        case .triggerTestNotification:
+            handleTriggerTestNotification(messageData, completionHandler: completionHandler)
         }
     }
 
@@ -784,6 +787,10 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
             setKeyValidity(keyValidity)
             completionHandler?(nil)
         }
+    }
+
+    private func handleTriggerTestNotification(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
+        notificationsPresenter.showTestNotification()
     }
 
     // MARK: - Adapter start completion handling
