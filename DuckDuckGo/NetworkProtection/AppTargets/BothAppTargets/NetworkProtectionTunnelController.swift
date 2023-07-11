@@ -55,7 +55,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     // MARK: - Connection Status
 
-    private let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusObserver: ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter, platformDidWakeNotification: NSWorkspace.didWakeNotification), transitionTimeout: .seconds(30))
+    private let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusObserver: ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter, platformDidWakeNotification: NSWorkspace.didWakeNotification), transitionTimeout: .seconds(4))
 
     // MARK: - Tunnel Manager
 
@@ -190,21 +190,22 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// - Returns: `true` if the system extension and the background agent were activated successfully
     ///
     private func ensureSystemExtensionIsActivated() async throws -> Bool {
+        var activated = false
+
         for try await event in SystemExtensionManager().activate() {
             switch event {
             case .waitingForUserApproval:
                 self.controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseAllowSystemExtension
             case .activated:
                 self.controllerErrorStore.lastErrorMessage = nil
-                return true
+                activated = true
             case .willActivateAfterReboot:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseReboot
-                return false
             }
         }
 
-        controllerErrorStore.lastErrorMessage = nil
-        return true
+        try? await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
+        return activated
     }
 #endif
 

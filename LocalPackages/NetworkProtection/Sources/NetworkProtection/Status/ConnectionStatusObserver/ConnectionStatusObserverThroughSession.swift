@@ -26,7 +26,7 @@ import Common
 /// NEVPNStatusDidChange notifications or tunnel session.
 ///
 public class ConnectionStatusObserverThroughSession: ConnectionStatusObserver {
-    public let publisher = CurrentValueSubject<ConnectionStatus, Never>(.unknown)
+    public let publisher = CurrentValueSubject<ConnectionStatus, Never>(.disconnected)
 
     // MARK: - Notifications
 
@@ -149,7 +149,7 @@ public class ConnectionStatusObserverThroughSession: ConnectionStatusObserver {
         case .disconnecting:
             status = .disconnecting
         @unknown default:
-            status = .unknown
+            status = .disconnected
         }
 
         return status
