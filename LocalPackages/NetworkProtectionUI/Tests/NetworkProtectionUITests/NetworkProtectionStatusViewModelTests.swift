@@ -68,11 +68,11 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
             connected
         }
 
-        func start() async throws {
+        func start() async {
             startCallback?()
         }
 
-        func stop() async throws {
+        func stop() async {
             stopCallback?()
         }
     }
@@ -81,6 +81,7 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
 
     /// We expect that the model will be initialized correctly (with status .uknown by default).
     ///
+    @MainActor
     func testProperInitialization() async throws {
         let controller = MockTunnelController()
         let statusReporter = MockStatusReporter(status: .unknown)
@@ -89,8 +90,8 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
             statusReporter: statusReporter,
             menuItems: [])
 
-        let isRunning = await model.isRunning.wrappedValue
-        XCTAssertFalse(isRunning)
+        let isToggleOn = model.isToggleOn.wrappedValue
+        XCTAssertFalse(isToggleOn)
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusDisconnected)
         XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
         XCTAssertEqual(model.featureStatusDescription, UserText.networkProtectionStatusViewFeatureOff)
@@ -99,6 +100,7 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
 
     /// We expect the model to properly reflect the disconnected status.
     ///
+    @MainActor
     func testProperlyReflectsStatusDisconnected() async throws {
         let controller = MockTunnelController()
         let statusReporter = MockStatusReporter(status: .disconnected)
@@ -107,8 +109,8 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
             statusReporter: statusReporter,
             menuItems: [])
 
-        let isRunning = await model.isRunning.wrappedValue
-        XCTAssertFalse(isRunning)
+        let isToggleOn = model.isToggleOn.wrappedValue
+        XCTAssertFalse(isToggleOn)
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusDisconnected)
         XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
         XCTAssertEqual(model.featureStatusDescription, UserText.networkProtectionStatusViewFeatureOff)
@@ -117,6 +119,7 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
 
     /// We expect the model to properly reflect the disconnecting status.
     ///
+    @MainActor
     func testProperlyReflectsStatusDisconnecting() async throws {
         let controller = MockTunnelController()
         let statusReporter = MockStatusReporter(status: .disconnecting)
@@ -135,6 +138,7 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
 
     /// We expect the model to properly reflect the connected status.
     ///
+    @MainActor
     func testProperlyReflectsStatusConnected() async throws {
         let mockServerLocation = "Los Angeles, United States"
         let mockServerIP = "127.0.0.1"
@@ -151,8 +155,8 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
             statusReporter: statusReporter,
             menuItems: [])
 
-        let isRunning = await model.isRunning.wrappedValue
-        XCTAssertTrue(isRunning)
+        let isToggleOn = model.isToggleOn.wrappedValue
+        XCTAssertTrue(isToggleOn)
         XCTAssertTrue(model.connectionStatusDescription.hasPrefix(UserText.networkProtectionStatusConnected))
         XCTAssertEqual(model.timeLapsed, mockDateString)
         XCTAssertEqual(model.featureStatusDescription, UserText.networkProtectionStatusViewFeatureOn)
@@ -163,6 +167,7 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
 
     /// We expect the model to properly reflect the connecting status.
     ///
+    @MainActor
     func testProperlyReflectsStatusConnecting() async throws {
         let controller = MockTunnelController()
         let statusReporter = MockStatusReporter(status: .connecting)
@@ -177,6 +182,7 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
 
     /// We expect that setting the model's `isRunning` to `true`, will start network protection.
     ///
+    @MainActor
     func testStartsNetworkProtection() async throws {
         let controller = MockTunnelController()
         let statusReporter = MockStatusReporter(status: .disconnected)
@@ -189,7 +195,7 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
         }
 
         Task { @MainActor in
-            model.isRunning.wrappedValue = true
+            model.isToggleOn.wrappedValue = true
         }
 
         await fulfillment(of: [networkProtectionWasStarted], timeout: 0.1)
@@ -197,6 +203,7 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
 
     /// We expect that setting the model's `isRunning` to `false`, will stop network protection.
     ///
+    @MainActor
     func testStopsNetworkProtection() async throws {
         let mockDate = Date().addingTimeInterval(-59)
         let mockServerLocation = "Los Angeles, United States"
@@ -216,7 +223,7 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
         }
 
         Task { @MainActor in
-            model.isRunning.wrappedValue = false
+            model.isToggleOn.wrappedValue = false
         }
 
         await fulfillment(of: [networkProtectionWasStopped], timeout: 0.1)

@@ -53,35 +53,24 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// Auth token store
     private let tokenStore: NetworkProtectionTokenStore
 
-    /// The actual storage for our tunnel manager.
-    ///
-    private var internalTunnelManager: NETunnelProviderManager?
+    // MARK: - Connection Status
+
+    private let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusObserver: ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter, platformDidWakeNotification: NSWorkspace.didWakeNotification), transitionTimeout: .seconds(4))
+
+    // MARK: - Tunnel Manager
 
     /// The tunnel manager: will try to load if it its not loaded yet, but if one can't be loaded from preferences,
-    /// a new one will not be created.  This is useful for querying the connection state and information without triggering
+    /// a new one will NOT be created.  This is useful for querying the connection state and information without triggering
     /// a VPN-access popup to the user.
     ///
-    private var tunnelManager: NETunnelProviderManager? {
-        get async {
-            guard let tunnelManager = internalTunnelManager else {
-                let tunnelManager = await loadTunnelManager()
-                internalTunnelManager = tunnelManager
-                return tunnelManager
-            }
-
-            return tunnelManager
-        }
-    }
-
     private func loadTunnelManager() async -> NETunnelProviderManager? {
         try? await NETunnelProviderManager.loadAllFromPreferences().first
     }
 
     private func loadOrMakeTunnelManager() async throws -> NETunnelProviderManager {
-        guard let tunnelManager = await tunnelManager else {
+        guard let tunnelManager = await loadTunnelManager() else {
             let tunnelManager = NETunnelProviderManager()
             try await setupAndSave(tunnelManager)
-            internalTunnelManager = tunnelManager
             return tunnelManager
         }
 
@@ -110,11 +99,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         self.logger = logger
         self.tokenStore = tokenStore
 
-        startObservingVPNConfigChanges(notificationCenter: notificationCenter)
-
         Task {
             // Make sure the tunnel is loaded
-            _ = await tunnelManager
+            _ = await loadTunnelManager()
         }
     }
 
@@ -124,17 +111,22 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     private func startObservingVPNConfigChanges(notificationCenter: NotificationCenter) {
         configChangeCancellable = notificationCenter.publisher(for: .NEVPNConfigurationChange)
-            .compactMap { $0.object as? NETunnelProviderManager }
-            .assign(to: \.internalTunnelManager, onWeaklyHeld: self)
+            .sink(receiveValue: { _ in
+                Task {
+                    // As crazy as it seems, this calls fixes an issue with tunnel session
+                    // having a nil manager, when in theory it should never be `nil`.  I don't know
+                    // why this happens, but I believe it may be because we run multiple instances
+                    // of our App controlling the session, and if any modification is made to the
+                    // session, other instances should reload it from preferences.
+                    //
+                    // For better or worse, this line ensures the session's manager is not nil.
+                    //
+                    try? await NETunnelProviderManager.loadAllFromPreferences()
+                }
+            })
     }
 
     // MARK: - Tunnel Configuration
-
-    /// Reloads the tunnel manager from preferences.
-    ///
-    private func reloadTunnelManager() {
-        internalTunnelManager = nil
-    }
 
     /// Setups the tunnel manager if it's not set up already.
     ///
@@ -152,7 +144,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
             protocolConfiguration.providerBundleIdentifier = NetworkProtectionBundle.extensionBundle().bundleIdentifier
             protocolConfiguration.providerConfiguration = [
-                NetworkProtectionOptionKey.defaultPixelHeaders.rawValue: APIRequest.Headers().default
+                NetworkProtectionOptionKey.defaultPixelHeaders.rawValue: APIRequest.Headers().httpHeaders
             ]
 
             // always-on
@@ -162,7 +154,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }()
 
         // reconnect on reboot
-        tunnelManager.isOnDemandEnabled = true
         tunnelManager.onDemandRules = [NEOnDemandRuleConnect(interfaceType: .any)]
     }
 
@@ -173,7 +164,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// - Returns: `true` if the VPN is connected, connecting or reasserting, and `false` otherwise.
     ///
     func isConnected() async -> Bool {
-        guard let tunnelManager = await tunnelManager else {
+        guard let tunnelManager = await loadTunnelManager() else {
             return false
         }
 
@@ -199,21 +190,23 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// - Returns: `true` if the system extension and the background agent were activated successfully
     ///
     private func ensureSystemExtensionIsActivated() async throws -> Bool {
+        var activated = false
+
         for try await event in SystemExtensionManager().activate() {
             switch event {
             case .waitingForUserApproval:
                 self.controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
             case .activated:
                 self.controllerErrorStore.lastErrorMessage = nil
-                return true
+                activated = true
             case .willActivateAfterReboot:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseReboot
                 return false
             }
         }
 
-        controllerErrorStore.lastErrorMessage = nil
-        return true
+        try? await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
+        return activated
     }
 #endif
 
@@ -255,19 +248,21 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         Task {
             try await Task.sleep(interval: interval)
 
-            os_log(.error, log: .networkProtection, "🟢 checking login agents")
+            os_log(.info, log: .networkProtection, "Checking whether login agents are enabled and running")
+
             for item in Self.loginItems {
                 guard !item.isRunning && (condition.shouldIgnoreItemStatus || item.status.isEnabled) else {
-                    os_log(.error, log: .networkProtection, "🟢 %{public}s: ok", item.debugDescription)
+                    os_log(.info, log: .networkProtection, "Login item with ID '%{public}s': ok", item.debugDescription)
                     continue
                 }
-                os_log(.error, log: .networkProtection, "🔴 %{public}s is not running, launching manually", item.debugDescription)
+
+                os_log(.error, log: .networkProtection, "%{public}s is not running, launching manually", item.debugDescription)
 
                 do {
                     try await item.launch()
-                    os_log("🔴 launched %{public}s", item.debugDescription)
+                    os_log(.info, log: .networkProtection, "Launched login item with ID '%{public}s'", item.debugDescription)
                 } catch {
-                    os_log(.error, log: .networkProtection, "🔴 %{public}s could not be launched. %{public}s", item.debugDescription, "\(error)")
+                    os_log(.error, log: .networkProtection, "Login item with ID '%{public}s' could not be launched. Error: %{public}s", item.debugDescription, "\(error)")
                 }
             }
         }
@@ -276,10 +271,17 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     // MARK: - Starting & Stopping the VPN
 
     enum StartError: LocalizedError {
+        case connectionStatusInvalid
         case simulateControllerFailureError
 
         var errorDescription: String? {
             switch self {
+            case .connectionStatusInvalid:
+                #if DEBUG
+                return "[DEBUG] Connection status invalid"
+                #else
+                return "An unexpected error occurred, please try again"
+                #endif
             case .simulateControllerFailureError:
                 return "Simulated a controller error as requested"
             }
@@ -288,46 +290,47 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     /// Starts the VPN connection used for Network Protection
     ///
-    func start() async throws {
-        try await start(enableLoginItems: true)
+    func start() async {
+        await start(enableLoginItems: true)
     }
 
-    func start(enableLoginItems: Bool) async throws {
+    func start(enableLoginItems: Bool) async {
         controllerErrorStore.lastErrorMessage = nil
 
         if enableLoginItems {
             Self.enableLoginItems()
         }
 
+        do {
 #if NETP_SYSTEM_EXTENSION
-
-        guard try await ensureSystemExtensionIsActivated() else {
-            return
-        }
+            guard try await ensureSystemExtensionIsActivated() else {
+                return
+            }
 #endif
 
-        let tunnelManager: NETunnelProviderManager
+            let tunnelManager = try await loadOrMakeTunnelManager()
 
-        do {
-            tunnelManager = try await loadOrMakeTunnelManager()
+            switch tunnelManager.connection.status {
+            case .invalid:
+                throw StartError.connectionStatusInvalid
+            case .connected:
+                // Intentional no-op
+                break
+            default:
+                try await start(tunnelManager)
+            }
+        } catch OSSystemExtensionError.requestSuperseded {
+            await stop()
+            // Even if the installation request is superseeded we want to show the message that tells the user
+            // to go to System Settings to allow the extension
+            controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseAllowSystemExtension
         } catch {
+            await stop()
             controllerErrorStore.lastErrorMessage = error.localizedDescription
-            throw error
-        }
-
-        switch tunnelManager.connection.status {
-        case .invalid:
-            reloadTunnelManager()
-            try await start()
-        case .connected:
-            // Intentional no-op
-            break
-        default:
-            try start(tunnelManager)
         }
     }
 
-    private func start(_ tunnelManager: NETunnelProviderManager) throws {
+    private func start(_ tunnelManager: NETunnelProviderManager) async throws {
         var options = [String: NSObject]()
 
         options["activationAttemptId"] = UUID().uuidString as NSString
@@ -340,26 +343,30 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             options["tunnelFailureSimulation"] = "true" as NSString
         }
 
-        do {
-            if Self.simulationOptions.isEnabled(.controllerFailure) {
-                Self.simulationOptions.setEnabled(false, option: .controllerFailure)
-                throw StartError.simulateControllerFailureError
-            }
-
-            try tunnelManager.connection.startVPNTunnel(options: options)
-        } catch {
-            controllerErrorStore.lastErrorMessage = error.localizedDescription
-            throw error
+        if Self.simulationOptions.isEnabled(.controllerFailure) {
+            Self.simulationOptions.setEnabled(false, option: .controllerFailure)
+            throw StartError.simulateControllerFailureError
         }
+
+        try tunnelManager.connection.startVPNTunnel(options: options)
+        try await statusTransitionAwaiter.waitUntilConnectionStarted()
     }
 
     /// Stops the VPN connection used for Network Protection
     ///
     func stop() async {
-        guard let tunnelManager = await tunnelManager else {
+        guard let tunnelManager = await loadTunnelManager() else {
             return
         }
 
+        do {
+            try await stop(tunnelManager: tunnelManager)
+        } catch {
+            controllerErrorStore.lastErrorMessage = error.localizedDescription
+        }
+    }
+
+    func stop(tunnelManager: NEVPNManager) async throws {
         // disable reconnect on demand if requested to stop
         if tunnelManager.isOnDemandEnabled {
             tunnelManager.isOnDemandEnabled = false
@@ -369,9 +376,19 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         switch tunnelManager.connection.status {
         case .connected, .connecting, .reasserting:
             tunnelManager.connection.stopVPNTunnel()
+            try await statusTransitionAwaiter.waitUntilConnectionStopped()
         default:
             break
         }
+    }
+
+    // MARK: - On Demand
+
+    func enableOnDemand() async throws {
+        let manager = try await loadOrMakeTunnelManager()
+
+        manager.isOnDemandEnabled = true
+        try await manager.saveToPreferences()
     }
 
     // MARK: - Debug commands for the extension

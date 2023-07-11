@@ -41,19 +41,7 @@ public class ConnectionSessionUtilities {
     /// Retrieves a session from a `NEVPNStatusDidChange` notification.
     ///
     public static func session(from notification: Notification) -> NETunnelProviderSession? {
-        guard let session = (notification.object as? NETunnelProviderSession),
-              session.manager.protocolConfiguration is NETunnelProviderProtocol else {
-            return nil
-        }
-
-        /// Some situations can cause the connection status in the session's manager to be invalid.
-        /// This just means we need to reload the manager from preferences.  That will trigger another status change
-        /// notification that will provide a valid connection status.
-        guard session.manager.connection.status != .invalid else {
-            Task {
-                try await session.manager.loadFromPreferences()
-            }
-
+        guard let session = (notification.object as? NETunnelProviderSession) else {
             return nil
         }
 

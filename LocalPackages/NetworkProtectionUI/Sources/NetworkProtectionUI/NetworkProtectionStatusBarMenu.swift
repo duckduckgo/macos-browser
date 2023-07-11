@@ -43,26 +43,17 @@ public final class StatusBarMenu {
     ///     - statusItem: (meant for testing) this allows us to inject our own status `NSStatusItem` to make automated testing easier..
     ///
     public init(statusItem: NSStatusItem? = nil,
-                statusReporter: NetworkProtectionStatusReporter? = nil) {
+                statusReporter: NetworkProtectionStatusReporter? = nil,
+                appLauncher: AppLaunching) {
 
         let statusReporter = statusReporter ?? DefaultNetworkProtectionStatusReporter(
-            statusObserver: ConnectionStatusObserverThroughIPC(),
-            serverInfoObserver: ConnectionServerInfoObserverThroughIPC(),
-            connectionErrorObserver: ConnectionErrorObserverThroughIPC())
+            statusObserver: ConnectionStatusObserverThroughDistributedNotifications(),
+            serverInfoObserver: ConnectionServerInfoObserverThroughDistributedNotifications(),
+            connectionErrorObserver: ConnectionErrorObserverThroughDistributedNotifications())
 
         self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter, isForStatusBar: true)
 
-        let parentBundlePath = "../../../../"
-        let appBundleURL: URL
-
-        if #available(macOS 13, *) {
-            appBundleURL = URL(filePath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
-        } else {
-            appBundleURL = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
-        }
-
-        let appLauncher = AppLauncher(appBundleURL: appBundleURL)
         let controller = AppLaunchingController(appLauncher: appLauncher)
 
         let menuItems = [

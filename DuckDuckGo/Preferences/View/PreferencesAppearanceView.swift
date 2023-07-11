@@ -103,6 +103,15 @@ extension Preferences {
                     ToggleMenuItem(title: UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
                 }
 
+                // SECTION 3: New Tab Page
+                PreferencePaneSection {
+                    TextMenuItemHeader(text: UserText.newTabBottomPopoverTitle)
+                    ToggleMenuItem(title: UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
+                    ToggleMenuItem(title: UserText.newTabFavoriteSectionTitle, isOn: $model.isFavoriteVisible)
+                    ToggleMenuItem(title: UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
+                }
+
+                // SECTION 4: Zoom Setting
                 PreferencePaneSection {
                     Text(UserText.zoomSettingTitle)
                         .font(Const.Fonts.preferencePaneSectionHeader)

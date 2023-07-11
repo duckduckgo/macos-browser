@@ -21,9 +21,10 @@ import Foundation
 import SwiftUI
 import BrowserServicesKit
 import SwiftUIExtensions
+import Combine
 
-private let interItemSpacing: CGFloat = 23
-private let itemSpacing: CGFloat = 13
+private let interItemSpacing: CGFloat = 20
+private let itemSpacing: CGFloat = 6
 
 struct PasswordManagementLoginItemView: View {
 
@@ -48,32 +49,43 @@ struct PasswordManagementLoginItemView: View {
 
                 VStack(alignment: .leading, spacing: 0) {
 
-                    HeaderView()
-                        .padding(.bottom, editMode ? 20 : 30)
+                    ScrollView(.vertical) {
+                        VStack(alignment: .leading, spacing: 0) {
 
-                    if model.isEditing || model.isNew {
-                        Divider()
-                            .padding(.bottom, 10)
-                    }
+                            HeaderView()
+                                .padding(.bottom, editMode ? 20 : 30)
 
-                    UsernameView()
+                            if model.isEditing || model.isNew {
+                                Divider()
+                                    .padding(.bottom, 10)
+                            }
 
-                    PasswordView()
+                            UsernameView()
 
-                    WebsiteView()
+                            PasswordView()
 
-                    if !model.isEditing && !model.isNew {
-                        DatesView()
+                            WebsiteView()
+
+                            NotesView()
+
+                            if !model.isEditing && !model.isNew {
+                                DatesView()
+                            }
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .padding()
                     }
 
                     Spacer(minLength: 0)
 
+                    if model.isEditing {
+                        Divider()
+                    }
+
                     Buttons()
+                        .padding()
 
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding()
-
             }
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
 
@@ -297,6 +309,109 @@ private struct WebsiteView: View {
 
 }
 
+private struct NotesView: View {
+
+    @EnvironmentObject var model: PasswordManagementLoginModel
+    let cornerRadius: CGFloat = 8.0
+    let borderWidth: CGFloat = 0.4
+    let characterLimit: Int = 10000
+
+    var body: some View {
+
+        Text(UserText.pmNotes)
+            .bold()
+            .padding(.bottom, itemSpacing)
+
+        if model.isEditing || model.isNew {
+            if #available(macOS 12, *) {
+                FocusableTextEditor()
+            } else if #available(macOS 11, *) {
+                TextEditor(text: $model.notes)
+                    .frame(height: 197.0)
+                    .font(.body)
+                    .foregroundColor(.primary)
+                    .onChange(of: model.notes) {
+                        model.notes = String($0.prefix(characterLimit))
+                    }
+                    .padding(EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 0.0))
+                    .clipShape(RoundedRectangle(cornerRadius: cornerRadius,
+                                                style: .continuous))
+                    .background(
+                        ZStack {
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .stroke(Color(NSColor.textEditorBorderColor), lineWidth: borderWidth)
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .fill(Color(NSColor.textEditorBackgroundColor))
+                        }
+                    )
+            } else {
+                EditableTextView(text: $model.notes)
+                    .frame(height: 197.0)
+                    .onReceive(Just(model.notes)) {
+                        model.notes = String($0.prefix(characterLimit))
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: cornerRadius,
+                                                style: .continuous))
+                    .overlay(
+                        ZStack {
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .stroke(Color(NSColor.textEditorBorderColor), lineWidth: borderWidth)
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .fill(Color(NSColor.textEditorBackgroundColor))
+                        }
+                        .allowsHitTesting(false)
+                    )
+            }
+        } else {
+            Text(model.notes)
+                .padding(.bottom, interItemSpacing)
+                .fixedSize(horizontal: false, vertical: true)
+                .contextMenu(ContextMenu(menuItems: {
+                    Button(UserText.copy, action: {
+                        NSPasteboard.general.copy(model.notes)
+                    })
+                }))
+        }
+
+    }
+
+}
+
+@available(macOS 12, *)
+struct FocusableTextEditor: View {
+
+    @EnvironmentObject var model: PasswordManagementLoginModel
+    @FocusState var isFocused: Bool
+
+    let cornerRadius: CGFloat = 8.0
+    let borderWidth: CGFloat = 0.4
+    let characterLimit: Int = 10000
+
+    var body: some View {
+        TextEditor(text: $model.notes)
+            .frame(height: 197.0)
+            .font(.body)
+            .foregroundColor(.primary)
+            .focused($isFocused)
+            .padding(EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 0.0))
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius,
+                                        style: .continuous))
+            .onChange(of: model.notes) {
+                model.notes = String($0.prefix(characterLimit))
+            }
+            .background(
+                ZStack {
+                    RoundedRectangle(cornerRadius: cornerRadius).stroke(Color.accentColor.opacity(0.5), lineWidth: 4).opacity(isFocused ? 1 : 0).scaleEffect(isFocused ? 1 : 1.04)
+                        .animation(isFocused ? .easeIn(duration: 0.2) : .easeOut(duration: 0.0), value: isFocused)
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .stroke(Color(NSColor.textEditorBorderColor), lineWidth: borderWidth)
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .fill(Color(NSColor.textEditorBackgroundColor))
+                }
+            )
+    }
+}
+
 private struct DatesView: View {
 
     @EnvironmentObject var model: PasswordManagementLoginModel
@@ -354,4 +469,14 @@ private struct HeaderView: View {
 
     }
 
+}
+
+/// Needed to override TextEditor background
+extension NSTextView {
+  open override var frame: CGRect {
+    didSet {
+      backgroundColor = .clear
+      drawsBackground = true
+    }
+  }
 }

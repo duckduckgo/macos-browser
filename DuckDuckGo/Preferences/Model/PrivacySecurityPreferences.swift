@@ -24,7 +24,7 @@ final class PrivacySecurityPreferences {
 
     private init() {}
 
-    @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: true)
+    @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: false)
     var loginDetectionEnabled: Bool
 
     @Published

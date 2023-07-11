@@ -122,6 +122,11 @@ extension Pixel {
         case setAsDefaultInitial
         case importDataInitial
 
+        // New Tab section removed
+        case favoriteSectionHidden
+        case recentActivitySectionHidden
+        case continueSetUpSectionHidden
+
         enum Debug {
 
             case assertionFailure(message: String, file: StaticString, line: UInt)
@@ -237,6 +242,7 @@ extension Pixel {
             case bookmarksSaveFailed
             case bookmarksSaveFailedOnImport
             case bookmarksCleanupFailed
+            case orphanedBookmarksPresent
 
             case bookmarksCouldNotLoadDatabase
             case bookmarksCouldNotPrepareDatabase
@@ -334,6 +340,12 @@ extension Pixel.Event {
             return "m_mac.new-tab-opened.initial"
         case .networkProtectionSystemExtensionUnknownActivationResult:
             return "m_mac_netp_system_extension_unknown_activation_result"
+        case .favoriteSectionHidden:
+            return "m_mac.favorite-section-hidden"
+        case .recentActivitySectionHidden:
+            return "m_mac.recent-activity-section-hidden"
+        case .continueSetUpSectionHidden:
+            return "m_mac.continue-setup-section-hidden"
         }
     }
 }
@@ -551,6 +563,7 @@ extension Pixel.Event.Debug {
         case .bookmarksSaveFailed: return "bookmarks_save_failed"
         case .bookmarksSaveFailedOnImport: return "bookmarks_save_failed_on_import"
         case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
+        case .orphanedBookmarksPresent: return "bookmarks_orphans_present"
 
         case .bookmarksCouldNotLoadDatabase: return "bookmarks_could_not_load_database"
         case .bookmarksCouldNotPrepareDatabase: return "bookmarks_could_not_prepare_database"

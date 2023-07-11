@@ -775,6 +775,11 @@
     }
 
     const hostname = getTopLevelURL().hostname
+    const fbExcludedDomains = fbConfig['Facebook'].excludedDomains.map(x => x.domain);
+    if (fbExcludedDomains.includes(hostname)) {
+        // console.warn('BAILING ON excludedDomains');
+        return;
+    }
     window.webkit.messageHandlers.initClickToLoad.postMessage(hostname).then((blocked) => {
         if (!blocked || hostname === '') {
             return

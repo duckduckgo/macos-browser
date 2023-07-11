@@ -56,13 +56,17 @@ extension HomePage.Models {
         @Published var favorites: [Bookmark] = [] {
             didSet {
                 var favorites = self.favorites.map { FavoriteModel(id: $0.id, favoriteType: .bookmark($0)) }
-                favorites.append(.init(id: UUID().uuidString, favoriteType: .addButton))
 
-                let lastRowCount = favorites.count % HomePage.favoritesPerRow
-                let missing = lastRowCount > 0 ? HomePage.favoritesPerRow - lastRowCount : 0
+                let numberOfRows = favorites.count / HomePage.favoritesPerRow
+                if numberOfRows < 1 {
+                    favorites.append(.init(id: UUID().uuidString, favoriteType: .addButton))
 
-                (0 ..< missing).forEach { _ in
-                    favorites.append(FavoriteModel(id: UUID().uuidString, favoriteType: .ghostButton))
+                    let lastRowCount = favorites.count % HomePage.favoritesPerRow
+                    let missing = lastRowCount > 0 ? HomePage.favoritesPerRow - lastRowCount : 0
+
+                    (0 ..< missing).forEach { _ in
+                        favorites.append(FavoriteModel(id: UUID().uuidString, favoriteType: .ghostButton))
+                    }
                 }
 
                 models = favorites

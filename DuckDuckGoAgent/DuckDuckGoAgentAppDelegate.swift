@@ -51,7 +51,20 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
     ///
     /// For some reason the App will crash if this is initialized right away, which is why it was changed to be lazy.
     ///
-    private lazy var networkProtectionMenu = NetworkProtectionUI.StatusBarMenu()
+    private lazy var networkProtectionMenu: StatusBarMenu = {
+
+        let parentBundlePath = "../../../../"
+        let appBundleURL: URL
+
+        if #available(macOS 13, *) {
+            appBundleURL = URL(filePath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
+        } else {
+            appBundleURL = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
+        }
+
+        let appLauncher = AppLauncher(appBundleURL: appBundleURL)
+        return StatusBarMenu(appLauncher: appLauncher)
+    }()
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         os_log("DuckDuckGoAgent started", log: .networkProtectionLoginItemLog, type: .info)

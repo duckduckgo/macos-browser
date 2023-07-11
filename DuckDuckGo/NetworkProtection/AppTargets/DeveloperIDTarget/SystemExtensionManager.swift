@@ -45,41 +45,39 @@ struct SystemExtensionManager {
     func deactivate() async throws {
         for try await _ in SystemExtensionRequest.deactivationRequest(forExtensionWithIdentifier: bundleID, manager: manager).submit() {}
     }
-
 }
 
 final class SystemExtensionRequest: NSObject {
-
     typealias Event = SystemExtensionManager.ActivationRequestEvent
 
-    private let activationRequest: OSSystemExtensionRequest
+    private let request: OSSystemExtensionRequest
     private let manager: OSSystemExtensionManager
 
     private var continuation: AsyncThrowingStream<Event, Error>.Continuation?
 
-    private init(activationRequest: OSSystemExtensionRequest, manager: OSSystemExtensionManager) {
+    private init(request: OSSystemExtensionRequest, manager: OSSystemExtensionManager) {
         self.manager = manager
-        self.activationRequest = activationRequest
+        self.request = request
 
         super.init()
     }
 
     static func activationRequest(forExtensionWithIdentifier bundleId: String, manager: OSSystemExtensionManager) -> Self {
-        self.init(activationRequest: .activationRequest(forExtensionWithIdentifier: bundleId, queue: .global()), manager: manager)
+        self.init(request: .activationRequest(forExtensionWithIdentifier: bundleId, queue: .global()), manager: manager)
     }
 
     static func deactivationRequest(forExtensionWithIdentifier bundleId: String, manager: OSSystemExtensionManager) -> Self {
-        self.init(activationRequest: .deactivationRequest(forExtensionWithIdentifier: bundleId, queue: .global()), manager: manager)
+        self.init(request: .deactivationRequest(forExtensionWithIdentifier: bundleId, queue: .global()), manager: manager)
     }
 
     /// submitting the request returns an Async Iterator providing the OSSystemExtensionRequest state change events
-    /// until an `ActivationRequestEvent` event is received.
+    /// until an Event is received.
     func submit() -> AsyncThrowingStream<Event, Error> {
         assert(continuation == nil, "Request can only be submitted once")
 
         defer {
-            activationRequest.delegate = self
-            manager.submitRequest(activationRequest)
+            request.delegate = self
+            manager.submitRequest(request)
         }
         return AsyncThrowingStream { [self /* keep the request delegate alive */] continuation in
             continuation.onTermination = { _ in
@@ -88,7 +86,6 @@ final class SystemExtensionRequest: NSObject {
             self.continuation = continuation
         }
     }
-
 }
 
 extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
