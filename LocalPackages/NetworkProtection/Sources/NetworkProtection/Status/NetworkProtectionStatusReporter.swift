@@ -93,7 +93,7 @@ public final class DefaultNetworkProtectionStatusReporter: NetworkProtectionStat
     public init(statusObserver: ConnectionStatusObserver,
                 serverInfoObserver: ConnectionServerInfoObserver,
                 connectionErrorObserver: ConnectionErrorObserver,
-                distributedNotificationCenter: DistributedNotificationCenter = .forType(.networkProtection),
+                distributedNotificationCenter: DistributedNotificationCenter = .default(),
                 log: OSLog = .networkProtectionStatusReporterLog) {
 
         self.statusObserver = statusObserver

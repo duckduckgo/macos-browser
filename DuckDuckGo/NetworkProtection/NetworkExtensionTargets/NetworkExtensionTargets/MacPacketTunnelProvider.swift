@@ -27,7 +27,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     private static func makeNotificationsPresenter() -> NetworkProtectionNotificationsPresenter {
 #if NETP_SYSTEM_EXTENSION
-        return NetworkProtectionAgentNotificationsPresenter(notificationCenter: DistributedNotificationCenter.forType(.networkProtectionUserNotifications))
+        return NetworkProtectionAgentNotificationsPresenter(notificationCenter: DistributedNotificationCenter.default())
 #else
         let parentBundlePath = "../../../"
         let mainAppURL: URL
@@ -130,7 +130,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     // MARK: - Initialization
 
     @objc public init() {
-        let distributedNotificationCenter = DistributedNotificationCenter.forType(.networkProtection)
+        let distributedNotificationCenter = DistributedNotificationCenter.default()
         controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: distributedNotificationCenter)
         super.init(notificationCenter: distributedNotificationCenter,
                    notificationsPresenter: Self.makeNotificationsPresenter(),

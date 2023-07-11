@@ -49,7 +49,7 @@ public class ConnectionStatusObserverThroughDistributedNotifications: Connection
 
     // MARK: - Initialization
 
-    public init(distributedNotificationCenter: DistributedNotificationCenter = .forType(.networkProtection),
+    public init(distributedNotificationCenter: DistributedNotificationCenter = .default(),
                 workspaceNotificationCenter: NotificationCenter = NSWorkspace.shared.notificationCenter,
                 log: OSLog = .networkProtectionStatusReporterLog) {
 

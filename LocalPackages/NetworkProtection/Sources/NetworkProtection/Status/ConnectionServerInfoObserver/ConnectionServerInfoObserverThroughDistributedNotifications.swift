@@ -40,7 +40,7 @@ public class ConnectionServerInfoObserverThroughDistributedNotifications: Connec
 
     // MARK: - Initialization
 
-    public init(distributedNotificationCenter: DistributedNotificationCenter = .forType(.networkProtection),
+    public init(distributedNotificationCenter: DistributedNotificationCenter = .default(),
                 log: OSLog = .networkProtection) {
 
         self.distributedNotificationCenter = distributedNotificationCenter
