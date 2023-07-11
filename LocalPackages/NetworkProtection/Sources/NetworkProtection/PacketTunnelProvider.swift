@@ -651,6 +651,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - App Messages
 
+    // swiftlint:disable:next cyclomatic_complexity
     public override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
         guard let message = ExtensionMessage(rawValue: messageData[0]) else {
             completionHandler?(nil)
