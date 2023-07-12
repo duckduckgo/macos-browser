@@ -244,15 +244,13 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "NewWindow"))
 
         // New Burner Window
-        if internalUserDecider.isInternalUser {
-            let burnerWindowItem = NSMenuItem(title: UserText.newBurnerWindowMenuItem,
-                                                  action: #selector(newBurnerWindow(_:)),
-                                                  target: self)
-            burnerWindowItem.keyEquivalent = "n"
-            burnerWindowItem.keyEquivalentModifierMask = [.command, .shift]
-            burnerWindowItem.image = NSImage(named: "NewBurnerWindow")
-            addItem(burnerWindowItem)
-        }
+        let burnerWindowItem = NSMenuItem(title: UserText.newBurnerWindowMenuItem,
+                                          action: #selector(newBurnerWindow(_:)),
+                                          target: self)
+        burnerWindowItem.keyEquivalent = "n"
+        burnerWindowItem.keyEquivalentModifierMask = [.command, .shift]
+        burnerWindowItem.image = NSImage(named: "NewBurnerWindow")
+        addItem(burnerWindowItem)
 
         addItem(NSMenuItem.separator())
     }
