@@ -117,6 +117,10 @@ final class FirePopoverViewController: NSViewController {
         updateWarningWrapperView()
     }
 
+    @IBAction func openNewFireWindowAction(_ sender: Any) {
+        (NSApp.delegate as? AppDelegate)?.newBurnerWindow(self)
+    }
+
     @IBAction func openDetailsButtonAction(_ sender: Any) {
         toggleDetails()
     }
