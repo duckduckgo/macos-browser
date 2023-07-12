@@ -21,9 +21,16 @@ import DataBrokerProtection
 import BrowserServicesKit
 import AppKit
 import Common
+import SwiftUI
 
 final class DBPHomeViewController: NSViewController {
     private var scheduler: DataBrokerProtectionScheduler?
+    let userProfileViewController = DataBrokerUserProfileViewController()
+    let profileQueryViewController = DataBrokerProfileQueryViewController()
+    var startSchedulerButton: NSButton!
+    var startScanButton: NSButton!
+    var resetDataButton: NSButton!
+
     override func loadView() {
         view = NSView()
     }
@@ -31,23 +38,55 @@ final class DBPHomeViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let button1 = NSButton(title: "Start Scan", target: self, action: #selector(scanButtonClicked(_:)))
-        button1.frame = NSRect(x: 50, y: 50, width: 200, height: 30)
-        view.addSubview(button1)
-
-        let button2 = NSButton(title: "Start Scheduler", target: self, action: #selector(schedulerButtonClicked(_:)))
-        button2.frame = NSRect(x: 50, y: 100, width: 200, height: 30)
-        view.addSubview(button2)
-
         setupScheduler()
+
+        addChild(userProfileViewController)
+        view.addSubview(userProfileViewController.view)
+
+        addChild(profileQueryViewController)
+        view.addSubview(profileQueryViewController.view)
+
+        startSchedulerButton = NSButton(title: "Start Scheduler", target: self, action: #selector(startSchedulerButtonPressed))
+
+        startScanButton = NSButton(title: "Start Scan", target: self, action: #selector(startScanButtonPressed))
+
+        resetDataButton = NSButton(title: "Reset All Data", target: self, action: #selector(resetDataButtonPressed))
+
+        view.addSubview(startSchedulerButton)
+        view.addSubview(startScanButton)
+        view.addSubview(resetDataButton)
     }
 
-    @objc func scanButtonClicked(_ sender: NSButton) {
+    override func viewDidLayout() {
+        super.viewDidLayout()
+
+        profileQueryViewController.view.frame = CGRect(x: 0, y: 0, width: view.bounds.width * 0.6, height: view.bounds.height)
+        profileQueryViewController.view.autoresizingMask = [.width, .height]
+
+        userProfileViewController.view.frame = CGRect(x: profileQueryViewController.view.frame.width, y: 0, width: view.bounds.width * 0.4, height: view.bounds.height)
+        userProfileViewController.view.autoresizingMask = [.width, .height]
+
+        let buttonWidth: CGFloat = 200
+        let buttonHeight: CGFloat = 30
+        let spacing: CGFloat = 10
+        let buttonY = view.bounds.height - CGFloat(3) * (buttonHeight + spacing)
+
+        startSchedulerButton.frame = CGRect(x: view.bounds.width - buttonWidth - spacing, y: buttonY, width: buttonWidth, height: buttonHeight)
+
+        startScanButton.frame = CGRect(x: view.bounds.width - buttonWidth - spacing, y: buttonY + buttonHeight + spacing, width: buttonWidth, height: buttonHeight)
+
+        resetDataButton.frame = CGRect(x: view.bounds.width - buttonWidth - spacing, y: buttonY + 2 * (buttonHeight + spacing), width: buttonWidth, height: buttonHeight)
+    }
+
+    @objc func startSchedulerButtonPressed() {
+        scheduler?.start()
+    }
+
+    @objc func startScanButtonPressed() {
         scheduler?.scanAllBrokers()
     }
 
-    @objc func schedulerButtonClicked(_ sender: NSButton) {
-        scheduler?.start()
+    @objc func resetDataButtonPressed() {
     }
 
     private func setupScheduler() {
