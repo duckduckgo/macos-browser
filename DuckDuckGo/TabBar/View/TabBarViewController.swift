@@ -57,9 +57,6 @@ final class TabBarViewController: NSViewController {
     private var selectionIndexCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
-    @IBOutlet weak var burnerWindowButton: MouseOverButton!
-    var burnerWindowPopover: BurnerWindowPopover?
-
     @IBOutlet weak var shadowView: TabShadowView!
 
     @IBOutlet weak var rightSideStackView: NSStackView!
@@ -95,7 +92,6 @@ final class TabBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setupBackgroundView()
         scrollView.updateScrollElasticity(with: tabMode)
         observeToScrollNotifications()
         subscribeToSelectionIndex()
@@ -103,7 +99,6 @@ final class TabBarViewController: NSViewController {
         setupPinnedTabsView()
         subscribeToTabModeChanges()
         setupAddTabButton()
-        setupBurnerWindowButton()
     }
 
     override func viewWillAppear() {
@@ -140,15 +135,6 @@ final class TabBarViewController: NSViewController {
         tabCollectionViewModel.appendNewTab(with: .homePage)
     }
 
-    @IBAction func burnerWindowAction(_ sender: NSButton) {
-        if !(burnerWindowPopover?.isShown ?? false) {
-            burnerWindowPopover = BurnerWindowPopover()
-            burnerWindowPopover?.showBelow(sender)
-            burnerWindowPopover?.originatingWindow = view.window
-            burnerWindowPopover?.delegate = self
-        }
-    }
-
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
         collectionView.scrollToEnd()
     }
@@ -163,26 +149,9 @@ final class TabBarViewController: NSViewController {
         }
     }
 
-    private func setupBackgroundView() {
-        visualEffectBackgroundView.isHidden = tabCollectionViewModel.isBurner
-        gradientBackgroundView.isHidden = !tabCollectionViewModel.isBurner
-    }
-
     private func setupFireButton() {
-        if tabCollectionViewModel.isBurner {
-            fireButton.isHidden = true
-            return
-        }
         fireButton.toolTip = UserText.clearBrowsingHistoryTooltip
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
-    }
-
-    private func setupBurnerWindowButton() {
-        burnerWindowButton.isHidden = !tabCollectionViewModel.isBurner
-        burnerWindowButton.toolTip = UserText.burnerWindowButtonTooltip
-        burnerWindowButton.normalTintColor = .alternateSelectedControlTextColor
-        burnerWindowButton.mouseOverColor = .burnerWindowMouseOverColor
-        burnerWindowButton.mouseDownColor = .burnerWindowMouseDownColor
     }
 
     private func setupPinnedTabsView() {
@@ -564,12 +533,6 @@ final class TabBarViewController: NSViewController {
         addTabButton.target = self
         addTabButton.action = #selector(addButtonAction(_:))
         addTabButton.toolTip = UserText.newTabTooltip
-        if tabCollectionViewModel.isBurner {
-            addTabButton.normalTintColor = .alternateSelectedControlTextColor
-            addTabButton.contentTintColor = .alternateSelectedControlTextColor
-            addTabButton.mouseOverColor = .burnerWindowMouseOverColor
-            addTabButton.mouseDownColor = .burnerWindowMouseDownColor
-        }
     }
 
     private func subscribeToTabModeChanges() {
@@ -866,12 +829,6 @@ extension TabBarViewController: NSCollectionViewDataSource {
             footer.addButton?.target = self
             footer.addButton?.action = #selector(addButtonAction(_:))
             footer.toolTip = UserText.newTabTooltip
-            if tabCollectionViewModel.isBurner {
-                footer.addButton.normalTintColor = .alternateSelectedControlTextColor
-                footer.addButton.contentTintColor = .alternateSelectedControlTextColor
-                footer.addButton.mouseOverColor = .burnerWindowMouseOverColor
-                footer.addButton.mouseDownColor = .burnerWindowMouseDownColor
-            }
         }
 
         return view
@@ -1166,14 +1123,6 @@ final class TabBarViewItemPasteboardWriter: NSObject, NSPasteboardWriting {
 
     func pasteboardPropertyList(forType type: NSPasteboard.PasteboardType) -> Any? {
         [String: Any]()
-    }
-
-}
-
-extension TabBarViewController: NSPopoverDelegate {
-
-    func popoverDidClose(_ notification: Notification) {
-        self.burnerWindowPopover = nil
     }
 
 }

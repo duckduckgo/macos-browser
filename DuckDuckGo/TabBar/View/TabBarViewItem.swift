@@ -358,27 +358,10 @@ final class TabBarViewItem: NSCollectionViewItem {
         }
 
         // Adjust colors for burner window
-        if isBurner {
-            rightSeparatorView.backgroundColor = .burnerWindowTabSeparatorColor
-            if isSelected {
-                if faviconImageView.image === TabViewModel.Favicon.burnerHome {
+        if isBurner && faviconImageView.image === TabViewModel.Favicon.burnerHome {
                     faviconImageView.contentTintColor = .textColor
-                } else {
-                    faviconImageView.contentTintColor = nil
-                }
-                titleTextField.textColor = .textColor
-                closeButton.normalTintColor = .buttonColor
-                permissionButton.contentTintColor = .buttonColor
-            } else {
-                if faviconImageView.image === TabViewModel.Favicon.burnerHome {
-                    faviconImageView.contentTintColor = .alternateSelectedControlTextColor
-                } else {
-                    faviconImageView.contentTintColor = nil
-                }
-                titleTextField.textColor = .alternateSelectedControlTextColor
-                closeButton.normalTintColor = .alternateSelectedControlTextColor
-                permissionButton.contentTintColor = .alternateSelectedControlTextColor
-            }
+        } else {
+            faviconImageView.contentTintColor = nil
         }
     }
 
