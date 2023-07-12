@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "graeme/add-netp-package",
-        "revision" : "1139bcdb0512d037a0426c9423e0443853745d50"
+        "revision" : "41b65b0d7ea427ccb60412e80a92d74f6d5f210a",
+        "version" : "65.1.0"
       }
     },
     {
