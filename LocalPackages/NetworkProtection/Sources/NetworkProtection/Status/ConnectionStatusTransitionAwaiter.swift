@@ -106,11 +106,23 @@ public final class ConnectionStatusTransitionAwaiter {
     }
 
     private func waitUntilTargetStatus(_ targetStatus: TargetStatus) async throws {
+        var count = 0
+
         while await !expect(targetStatus, within: transitionTimeout) {
             let currentStatus = statusObserver.publisher.value
 
             if targetStatus.sameStatus(as: currentStatus) {
                 return
+            }
+
+            if targetStatus.acceptsIntermediateStatus(currentStatus) {
+                // Since we'll allow this to extend, we wanna put a limit to that
+                guard count < 4 else {
+                    throw TransitionError.timeout
+                }
+
+                count += 1
+                continue
             }
 
             throw TransitionError.timeout

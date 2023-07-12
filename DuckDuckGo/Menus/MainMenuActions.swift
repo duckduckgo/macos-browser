@@ -267,6 +267,18 @@ extension AppDelegate {
 #endif
     }
 
+    @IBAction func sendTestNetworkProtectionNotification(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        Task { @MainActor in
+            do {
+                try await NetworkProtectionTunnelController.sendTestNotificationRequest()
+            } catch {
+                await NSAlert(error: error).runModal()
+            }
+        }
+#endif
+    }
+
     @IBAction func networkProtectionPreferredServerChanged(_ sender: Any?) {
 #if NETWORK_PROTECTION
         guard let title = (sender as? NSMenuItem)?.title else {

@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1688408440977,
+    "version": 1689016054868,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -246,6 +246,10 @@
                 {
                     "domain": "upstart.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/897"
+                },
+                {
+                    "domain": "granit.com",
+                    "reason": "https://github.com/duckduckgo/autoconsent/issues/200"
                 }
             ],
             "settings": {
@@ -255,7 +259,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "1d01334077a08d69f450adba9b278f35"
+            "hash": "558792e54daecddf71939b03b238c49c"
         },
         "autofill": {
             "exceptions": [
@@ -1200,10 +1204,6 @@
                     "reason": "Adblocker wall"
                 },
                 {
-                    "domain": "google.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
-                },
-                {
                     "domain": "wiwo.de",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
                 },
@@ -1603,6 +1603,15 @@
                         ]
                     },
                     {
+                        "domain": "bestbuy.com",
+                        "rules": [
+                            {
+                                "selector": "#credential_picker_container",
+                                "type": "override"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "bleacherreport.com",
                         "rules": [
                             {
@@ -1843,100 +1852,52 @@
                         "domain": "google.com",
                         "rules": [
                             {
-                                "selector": "iframe[src*='prid=19026802']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19026802']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19026802']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19015398']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19015398']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19015398']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19026796']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19026796']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19026796']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19018053']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19018053']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19018053']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19018054']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19018054']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19018054']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19016403']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19016403']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19016403']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19015972']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19015972']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19015972']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19016223']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19016223']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19016223']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19015952']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19015952']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19015952']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19030391']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19030391']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19030391']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19030389']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19030389']))",
                                 "type": "hide"
                             },
                             {
-                                "selector": "iframe[src*='prid=19030389']",
-                                "type": "closest-empty"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19030167']",
+                                "selector": ":is(div:has(> iframe[src*='prid=19030167']))",
                                 "type": "hide"
-                            },
-                            {
-                                "selector": "iframe[src*='prid=19030167']",
-                                "type": "closest-empty"
                             }
                         ]
                     },
@@ -2579,7 +2540,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "1ccdd6d65eae016eba128cdac7253174"
+            "hash": "54168b98398c3f2d142ea50cbb7adb7b"
         },
         "exceptionHandler": {
             "exceptions": [],
@@ -3210,9 +3171,10 @@
                                 "domains": [
                                     "corriere.it",
                                     "eurogamer.net",
-                                    "seattletimes.com"
+                                    "seattletimes.com",
+                                    "wcvb.com"
                                 ],
-                                "reason": "corriere.it - ,Example URL: https://www.corriere.it/video-articoli/2022/07/13/missione-wwf-liberare-mare-plastica/9abb64de-029d-11ed-a0cc-ad3c68cacbae.shtml;,Clicking on the video to play causes a still frame to show and the video does not continue.,eurogamer.net, seattletimes.com - An unskippable adwall appears which prevents interaction with the page."
+                                "reason": "corriere.it - ,Example URL: https://www.corriere.it/video-articoli/2022/07/13/missione-wwf-liberare-mare-plastica/9abb64de-029d-11ed-a0cc-ad3c68cacbae.shtml;,Clicking on the video to play causes a still frame to show and the video does not continue.,eurogamer.net, seattletimes.com - An unskippable adwall appears which prevents interaction with the page.,wcvb.com - https://github.com/duckduckgo/privacy-configuration/issues/1088"
                             }
                         ]
                     },
@@ -4160,6 +4122,17 @@
                                     "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/489"
+                            }
+                        ]
+                    },
+                    "heapanalytics.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn.heapanalytics.com",
+                                "domains": [
+                                    "mejuri.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1081"
                             }
                         ]
                     },
@@ -13546,7 +13519,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "752de074680af7cbe994a47713f769c6"
+            "hash": "19a678adcbf2ed8b2b9110226ba8c9ab"
         },
         "trackingCookies1p": {
             "settings": {
@@ -13953,6 +13926,10 @@
         {
             "domain": "www7.marksandspencer.com",
             "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
+        },
+        {
+            "domain": "paramountplus.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1085"
         }
     ]
 }

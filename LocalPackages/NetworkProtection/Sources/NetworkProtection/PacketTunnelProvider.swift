@@ -357,7 +357,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
         try loadAuthToken(from: options)
     }
 
-    open func loadVendorOptions(from provider: NETunnelProviderProtocol?) {
+    open func loadVendorOptions(from provider: NETunnelProviderProtocol?) throws {
         /* Implement in subclass */
     }
 
@@ -407,20 +407,24 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
                     }
                     return
                 }
+
+                completionHandler(error)
+                return
             }
 
             if !isOnDemand {
                 Task { [self] in
-                    // This completion handler signals a coorect connection.  We want to signal this before turning
-                    // on-demand ON so that it won't interfere with the current connection.
-                    completionHandler(error)
+                    // We're handling a successful connection started by request.
+                    // We want to call the completion handler before turning on-demand
+                    // ON so that on-demand won't start the connection on its own.
+                    completionHandler(nil)
 
                     await self?.appLauncher?.launchApp(withCommand: .enableOnDemand)
                     return
                 }
             }
 
-            completionHandler(error)
+            completionHandler(nil)
         }
 
         tunnelHealth.isHavingConnectivityIssues = false
@@ -436,9 +440,9 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
 
         do {
             try load(options: options)
-            loadVendorOptions(from: tunnelProviderProtocol)
+            try loadVendorOptions(from: tunnelProviderProtocol)
         } catch {
-            internalCompletionHandler(NEVPNError(.configurationInvalid))
+            internalCompletionHandler(error)
             return
         }
 
@@ -524,7 +528,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
                 //
                 // Ref: https://app.asana.com/0/72649045549333/1204668639086684/f
                 //
-                exit(0)
+                exit(EXIT_SUCCESS)
                 #endif
             }
         }
@@ -647,6 +651,7 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
 
     // MARK: - App Messages
 
+    // swiftlint:disable:next cyclomatic_complexity
     public override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
         guard let message = ExtensionMessage(rawValue: messageData[0]) else {
             completionHandler?(nil)
@@ -672,6 +677,8 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
             handleSetKeyValidity(messageData, completionHandler: completionHandler)
         case .resetAllState:
             handleResetAllState(messageData, completionHandler: completionHandler)
+        case .triggerTestNotification:
+            handleTriggerTestNotification(messageData, completionHandler: completionHandler)
         }
     }
 
@@ -780,6 +787,10 @@ open class PacketTunnelProvider: NEPacketTunnelProvider {
             setKeyValidity(keyValidity)
             completionHandler?(nil)
         }
+    }
+
+    private func handleTriggerTestNotification(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
+        notificationsPresenter.showTestNotification()
     }
 
     // MARK: - Adapter start completion handling
