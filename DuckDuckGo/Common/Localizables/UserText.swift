@@ -132,7 +132,7 @@ struct UserText {
     static let allDataDescription = NSLocalizedString("fire.all-data.description", value: "Clear all tabs and related site data", comment: "Description of the 'All Data' configuration option for the fire button")
     static let currentWindowDescription = NSLocalizedString("fire.current-window.description", value: "Clear current window and related site data", comment: "Description of the 'Current Window' configuration option for the fire button")
     static let selectedDomainsDescription = NSLocalizedString("fire.selected-domains.description", value: "Clear data only for selected domains", comment: "Description of the 'Current Window' configuration option for the fire button")
-    static let nothingToClearInfo = NSLocalizedString("fire.nothing-to-clear-info", value: "There is nothing to clear.", comment: "Info label in the fire button popover")
+    static let selectSiteToClear = NSLocalizedString("fire.select-site-to-clear", value: "Select a site to clear its data.", comment: "Info label in the fire button popover")
     static func activeTabsInfo(tabs: Int, sites: Int) -> String {
         let siteString = sites == 1 ? "site" : "sites"
         let tabsString = tabs == 1 ? "tab" : "tabs"

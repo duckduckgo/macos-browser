@@ -126,8 +126,13 @@ final class FirePopoverViewController: NSViewController {
     }
 
     private func updateInfoLabel() {
+        guard !firePopoverViewModel.selectable.isEmpty else {
+            infoLabel.stringValue = ""
+            return
+        }
+
         guard !firePopoverViewModel.selected.isEmpty else {
-            infoLabel.stringValue = UserText.nothingToClearInfo
+            infoLabel.stringValue = UserText.selectSiteToClear
             return
         }
 
