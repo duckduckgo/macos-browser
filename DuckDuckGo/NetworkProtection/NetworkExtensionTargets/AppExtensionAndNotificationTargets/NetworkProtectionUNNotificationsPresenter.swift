@@ -35,8 +35,8 @@ extension UNNotificationAction {
 
 extension UNNotificationCategory {
 
-    /// Actions for `superceded` (by another app) notification category
-    static let superceded = UNNotificationCategory(identifier: "supercededActionCategory",
+    /// Actions for `superseded` (by another app) notification category
+    static let superseded = UNNotificationCategory(identifier: "supersededActionCategory",
                                                    actions: [.reconnectAction],
                                                    intentIdentifiers: [],
                                                    options: [])
@@ -66,7 +66,7 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
     }
 
     private lazy var registerNotificationCategoriesOnce: Void = {
-        userNotificationCenter.setNotificationCategories([.superceded])
+        userNotificationCenter.setNotificationCategories([.superseded])
     }()
 
     // MARK: - Notification Utility methods
@@ -121,7 +121,7 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
     func showSupersededNotification() {
         let content = notificationContent(title: UserText.networkProtectioSupersededNotificationTitle,
                                           subtitle: UserText.networkProtectionSupersededNotificationSubtitle,
-                                          category: .superceded)
+                                          category: .superseded)
         showNotification(content)
     }
 
