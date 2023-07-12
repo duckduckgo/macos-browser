@@ -160,5 +160,10 @@ extension DuckDuckGoNotificationsAppDelegate: AppCommunication {
         notificationsPresenter.showSupercededNotification()
     }
 
+    func testNotification() {
+        os_log("Presenting test notification", log: .networkProtection, type: .info)
+        notificationsPresenter.showTestNotification()
+    }
+
 }
 #endif

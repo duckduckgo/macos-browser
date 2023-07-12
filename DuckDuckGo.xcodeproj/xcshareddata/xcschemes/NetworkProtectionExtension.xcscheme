@@ -15,7 +15,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "7B02C7F1292BA77300E677CF"
+               BlueprintIdentifier = "4B4D603C2A0B290200BCD287"
                BuildableName = "NetworkProtectionAppExtension.appex"
                BlueprintName = "NetworkProtectionAppExtension"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
@@ -91,7 +91,7 @@
       buildConfiguration = "Debug">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Debug"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>
