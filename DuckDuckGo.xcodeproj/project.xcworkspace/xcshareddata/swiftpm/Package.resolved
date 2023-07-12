@@ -15,7 +15,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "dominik/sync-logins",
-        "revision" : "b7c0e3bdc3b1b67b8948fdb2af93aa80becba4f6"
+        "revision" : "a63a43b5cece3871ad63b7c197d12403d9362bad"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "630eb2c4cf94055e630fd5b7daae71bed893ad0a",
-        "version" : "4.22.4"
+        "revision" : "0cfcedb9c8aefa52c7f3a36a2b3793a2c44de764",
+        "version" : "4.22.5"
       }
     },
     {
