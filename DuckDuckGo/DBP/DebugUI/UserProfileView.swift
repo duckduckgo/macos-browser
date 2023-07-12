@@ -18,6 +18,7 @@
 
 import SwiftUI
 import Combine
+import DataBrokerProtection
 
 struct UserProfileView: View {
     @State private var firstName: String = ""
@@ -35,6 +36,7 @@ struct UserProfileView: View {
     @State private var isSaveDisabled: Bool = true
 
     private let userDataKey = "UserData"
+    let dataManager: DataBrokerProtectionDataManager
 
     private struct FieldData {
         let label: String
@@ -164,29 +166,27 @@ struct UserProfileView: View {
     }
 
     private func saveData() {
-        let userData: [String: Any] = [
-            "firstName": firstName,
-            "lastName": lastName,
-            "city": city,
-            "state": state,
-            "age": age
-        ]
-        UserDefaults.standard.set(userData, forKey: userDataKey)
+        let name = DataBrokerProtectionProfile.Name(firstName: firstName, lastName: lastName)
+        let address = DataBrokerProtectionProfile.Address(city: city, state: state)
+
+        let profile = DataBrokerProtectionProfile(names: [name],
+                                                  addresses: [address],
+                                                  age: Int(age)!)
+
+        dataManager.saveProfile(profile)
     }
 
     func restoreData() {
-        if let userData = UserDefaults.standard.dictionary(forKey: userDataKey) {
-            firstName = userData["firstName"] as? String ?? ""
-            lastName = userData["lastName"] as? String ?? ""
-            city = userData["city"] as? String ?? ""
-            state = userData["state"] as? String ?? ""
-            age = userData["age"] as? String ?? ""
-        }
-    }
-}
+         let profile = dataManager.fetchProfile()
+            firstName = profile?.names.first?.firstName ?? ""
+            lastName = profile?.names.first?.lastName ?? ""
+            city = profile?.addresses.first?.city ?? ""
+            state = profile?.addresses.first?.state ?? ""
 
-struct UserProfileView_Previews: PreviewProvider {
-    static var previews: some View {
-        UserProfileView()
+        if let profileAge = profile?.age {
+            age = String("\(profileAge)")
+        } else {
+            age = ""
+        }
     }
 }

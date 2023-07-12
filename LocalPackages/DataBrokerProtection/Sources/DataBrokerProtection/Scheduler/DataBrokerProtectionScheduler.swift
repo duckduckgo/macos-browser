@@ -23,7 +23,7 @@ import BrowserServicesKit
 public final class DataBrokerProtectionScheduler {
     private let privacyConfigManager: PrivacyConfigurationManaging
     private let contentScopeProperties: ContentScopeProperties
-
+    private let dataManager: DataBrokerProtectionDataManager
     private let activity: NSBackgroundActivityScheduler
     private let errorHandler: EventMapping<DataBrokerProtectionOperationError>
     private let schedulerIdentifier = "com.duckduckgo.macos.browser.databroker-protection-scheduler"
@@ -33,7 +33,7 @@ public final class DataBrokerProtectionScheduler {
         let runnerProvider = DataBrokerOperationRunnerProvider(privacyConfigManager: privacyConfigManager,
                                                                contentScopeProperties: contentScopeProperties)
 
-        return DataBrokerProtectionProcessor(database: DataBrokerProtectionDataBase(),
+        return DataBrokerProtectionProcessor(database: dataManager.database,
                                              config: DataBrokerProtectionSchedulerConfig(),
                                              operationRunnerProvider: runnerProvider,
                                              errorHandler: errorHandler)
@@ -41,6 +41,7 @@ public final class DataBrokerProtectionScheduler {
 
     public init(privacyConfigManager: PrivacyConfigurationManaging,
                 contentScopeProperties: ContentScopeProperties,
+                dataManager: DataBrokerProtectionDataManager,
                 errorHandler: EventMapping<DataBrokerProtectionOperationError>) {
 
         activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
@@ -51,6 +52,8 @@ public final class DataBrokerProtectionScheduler {
         activity.tolerance = 15 * 60
 
         activity.qualityOfService = QualityOfService.utility
+
+        self.dataManager = dataManager
         self.privacyConfigManager = privacyConfigManager
         self.contentScopeProperties = contentScopeProperties
         self.errorHandler = errorHandler

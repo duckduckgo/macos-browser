@@ -25,11 +25,15 @@ import SwiftUI
 
 final class DBPHomeViewController: NSViewController {
     private var scheduler: DataBrokerProtectionScheduler?
-    let userProfileViewController = DataBrokerUserProfileViewController()
+    lazy var userProfileViewController: DataBrokerUserProfileViewController = {
+        DataBrokerUserProfileViewController(dataManager: dataManager)
+    }()
+
     let profileQueryViewController = DataBrokerProfileQueryViewController()
     var startSchedulerButton: NSButton!
     var startScanButton: NSButton!
     var resetDataButton: NSButton!
+    private let dataManager = DataBrokerProtectionDataManager()
 
     override func loadView() {
         view = NSView()
@@ -109,6 +113,7 @@ final class DBPHomeViewController: NSViewController {
 
         scheduler = DataBrokerProtectionScheduler(privacyConfigManager: privacyConfigurationManager,
                                                   contentScopeProperties: prefs,
+                                                  dataManager: dataManager,
                                                   errorHandler: DataBrokerProtectionErrorHandling())
     }
 }

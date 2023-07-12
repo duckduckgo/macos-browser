@@ -18,6 +18,7 @@
 
 import Foundation
 import SwiftUI
+import DataBrokerProtection
 
 final class DataBrokerProfileQueryViewController: NSViewController {
     override func loadView() {
@@ -27,8 +28,19 @@ final class DataBrokerProfileQueryViewController: NSViewController {
 }
 
 final class DataBrokerUserProfileViewController: NSViewController {
+    let dataManager: DataBrokerProtectionDataManager
+
+    internal init(dataManager: DataBrokerProtectionDataManager) {
+        self.dataManager = dataManager
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     override func loadView() {
-        let hostingController = NSHostingController(rootView: UserProfileView())
+        let hostingController = NSHostingController(rootView: UserProfileView(dataManager: dataManager))
         view = hostingController.view
     }
 }

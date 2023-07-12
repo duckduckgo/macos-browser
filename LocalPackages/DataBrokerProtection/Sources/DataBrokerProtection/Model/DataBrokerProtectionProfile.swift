@@ -18,20 +18,38 @@
 
 import Foundation
 
-public struct DataBrokerProtectionProfile {
-    struct Address {
-        let city: String
-        let state: String
+public struct DataBrokerProtectionProfile: Codable {
+    public struct Address: Codable {
+        public let city: String
+        public let state: String
+        
+        public init(city: String, state: String) {
+            self.city = city
+            self.state = state
+        }
     }
 
-    struct Name {
-        let firstName: String
-        let lastName: String
+    public struct Name: Codable {
+        public let firstName: String
+        public let lastName: String
+
+        public init(firstName: String, lastName: String) {
+            self.firstName = firstName
+            self.lastName = lastName
+        }
     }
 
-    let names: [Name]
-    let addresses: [Address]
-    let age: Int
+    public let names: [Name]
+    public let addresses: [Address]
+    public let age: Int
+
+    public init(names: [DataBrokerProtectionProfile.Name],
+                addresses: [DataBrokerProtectionProfile.Address],
+                age: Int) {
+        self.names = names
+        self.addresses = addresses
+        self.age = age
+    }
 }
 
 internal extension DataBrokerProtectionProfile {
