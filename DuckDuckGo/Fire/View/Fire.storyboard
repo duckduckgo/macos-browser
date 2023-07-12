@@ -154,7 +154,7 @@
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Oiy-AY-h7p">
                                         <rect key="frame" x="58" y="27" width="268" height="14"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="An isolated window that doesn’t save any data" id="56V-TF-ueO">
-                                            <font key="font" metaFont="system" size="11"/>
+                                            <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
@@ -456,6 +456,9 @@
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="fSV-XR-8Dh" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="344" height="60"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="60" id="wng-57-tbc"/>
+                                        </constraints>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
                                                 <color key="value" name="InterfaceBackgroundColor"/>
@@ -495,7 +498,6 @@ Gw
                                 <constraints>
                                     <constraint firstItem="wam-tC-iBG" firstAttribute="leading" secondItem="nId-He-RIU" secondAttribute="leading" constant="20" symbolic="YES" id="AuD-PM-TDS"/>
                                     <constraint firstAttribute="trailing" secondItem="fSV-XR-8Dh" secondAttribute="trailing" id="FKa-ym-q6d"/>
-                                    <constraint firstItem="fSV-XR-8Dh" firstAttribute="top" secondItem="nId-He-RIU" secondAttribute="top" id="NE5-jE-jH4"/>
                                     <constraint firstItem="dqq-R5-UUp" firstAttribute="top" secondItem="nId-He-RIU" secondAttribute="top" id="PGZ-Bu-97k"/>
                                     <constraint firstAttribute="bottom" secondItem="fSV-XR-8Dh" secondAttribute="bottom" id="TBV-Rc-0cG"/>
                                     <constraint firstItem="fSV-XR-8Dh" firstAttribute="leading" secondItem="nId-He-RIU" secondAttribute="leading" id="TbY-vY-ucm"/>
@@ -516,6 +518,7 @@ Gw
                             <constraint firstItem="qlI-3L-uej" firstAttribute="top" secondItem="dGd-Gc-P2e" secondAttribute="top" id="DP4-qx-7jH"/>
                             <constraint firstItem="qlI-3L-uej" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="JfE-xH-UFd"/>
                             <constraint firstAttribute="trailing" secondItem="6vZ-d2-qnR" secondAttribute="trailing" id="Kyw-38-ua5"/>
+                            <constraint firstItem="nId-He-RIU" firstAttribute="top" secondItem="qlI-3L-uej" secondAttribute="bottom" priority="250" id="NSp-j7-c7a"/>
                             <constraint firstItem="nId-He-RIU" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="R5q-Fw-y3V"/>
                             <constraint firstItem="6vZ-d2-qnR" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="bottom" id="SiT-y0-otC"/>
                             <constraint firstAttribute="trailing" secondItem="nId-He-RIU" secondAttribute="trailing" id="UP0-3m-4QV"/>
@@ -546,7 +549,9 @@ Gw
                         <outlet property="contentHeightConstraint" destination="hbg-4i-hjT" id="mC2-Ot-onY"/>
                         <outlet property="detailsWrapperView" destination="6vZ-d2-qnR" id="TKb-Ux-TIk"/>
                         <outlet property="detailsWrapperViewHeightContraint" destination="sJt-dl-rlH" id="7pa-Kc-9xB"/>
+                        <outlet property="headerWrapperView" destination="3Jn-h4-fXL" id="P5R-o0-Fdg"/>
                         <outlet property="infoLabel" destination="YMk-Hq-WfZ" id="JHL-r4-1VT"/>
+                        <outlet property="mainButtonsToBurnerWindowContraint" destination="NSp-j7-c7a" id="lZx-hi-FXs"/>
                         <outlet property="openDetailsButton" destination="ACx-m8-z0K" id="cu4-zz-MhA"/>
                         <outlet property="openDetailsButtonImageView" destination="8qK-6q-RQT" id="ezj-KU-kE6"/>
                         <outlet property="openWrapperView" destination="sbc-pJ-bul" id="dUO-6T-MLY"/>

@@ -42,6 +42,8 @@ final class FirePopoverViewController: NSViewController {
     private var firePopoverViewModel: FirePopoverViewModel
     private let historyCoordinating: HistoryCoordinating
 
+    @IBOutlet weak var headerWrapperView: NSView!
+    @IBOutlet weak var mainButtonsToBurnerWindowContraint: NSLayoutConstraint!
     @IBOutlet weak var infoLabel: NSTextField!
     @IBOutlet weak var optionsButton: NSPopUpButton!
     @IBOutlet weak var optionsButtonWidthConstraint: NSLayoutConstraint!
@@ -92,6 +94,16 @@ final class FirePopoverViewController: NSViewController {
         collectionView.register(nib, forItemWithIdentifier: FirePopoverCollectionViewItem.identifier)
         collectionView.delegate = self
         collectionView.dataSource = self
+
+        if firePopoverViewModel.tabCollectionViewModel?.isBurner ?? false {
+            contentHeightConstraint.isActive = false
+            headerWrapperView.isHidden = true
+            openWrapperView.isHidden = true
+            detailsWrapperView.isHidden = true
+            warningWrapperView.isHidden = true
+            mainButtonsToBurnerWindowContraint.priority = .required
+            return
+        }
         setupOptionsButton()
         updateCloseDetailsButton()
         updateWarningWrapperView()
