@@ -60,6 +60,8 @@ final class FirePopoverViewController: NSViewController {
     @IBOutlet weak var warningWrapperView: NSView!
     @IBOutlet weak var warningButton: NSButton!
     @IBOutlet weak var clearButton: NSButton!
+    @IBOutlet weak var cancelButton: NSButton!
+    @IBOutlet weak var closeFireWindowButton: NSButton!
 
     private var appearanceCancellable: AnyCancellable?
     private var viewModelCancellable: AnyCancellable?
@@ -96,14 +98,11 @@ final class FirePopoverViewController: NSViewController {
         collectionView.dataSource = self
 
         if firePopoverViewModel.tabCollectionViewModel?.isBurner ?? false {
-            contentHeightConstraint.isActive = false
-            headerWrapperView.isHidden = true
-            openWrapperView.isHidden = true
-            detailsWrapperView.isHidden = true
-            warningWrapperView.isHidden = true
-            mainButtonsToBurnerWindowContraint.priority = .required
+            adjustViewForFireWindow()
             return
         }
+
+        updateClearButtonAppearance()
         setupOptionsButton()
         updateCloseDetailsButton()
         updateWarningWrapperView()
@@ -141,6 +140,30 @@ final class FirePopoverViewController: NSViewController {
         toggleDetails()
     }
 
+    @IBAction func closeFireWindowButtonAction(_ sender: Any) {
+        let windowControllersManager = WindowControllersManager.shared
+        guard let tabCollectionViewModel = firePopoverViewModel.tabCollectionViewModel,
+              let windowController = windowControllersManager.windowController(for: tabCollectionViewModel) else {
+            assertionFailure("No TabCollectionViewModel or MainWindowController")
+            return
+        }
+        windowController.window?.performClose(self)
+    }
+
+    private func adjustViewForFireWindow() {
+        updateCloseFireWindowButtonAppearance()
+        clearButton.isHidden = true
+        cancelButton.isHidden = true
+        closeFireWindowButton.isHidden = false
+
+        contentHeightConstraint.isActive = false
+        headerWrapperView.isHidden = true
+        openWrapperView.isHidden = true
+        detailsWrapperView.isHidden = true
+        warningWrapperView.isHidden = true
+        mainButtonsToBurnerWindowContraint.priority = .required
+    }
+
     private func updateInfoLabel() {
         guard !firePopoverViewModel.selectable.isEmpty else {
             infoLabel.stringValue = ""
@@ -163,6 +186,26 @@ final class FirePopoverViewController: NSViewController {
         case .currentTab:
             infoLabel.stringValue = UserText.oneTabInfo(sites: sites)
         }
+    }
+
+    private func updateClearButtonAppearance() {
+        setRedTintColor(button: clearButton)
+    }
+
+    private func updateCloseFireWindowButtonAppearance() {
+        setRedTintColor(button: closeFireWindowButton)
+    }
+
+    private func setRedTintColor(button: NSButton) {
+        let attrTitle = NSMutableAttributedString(string: button.title)
+        let range = NSRange(location: 0, length: button.title.count)
+
+        attrTitle.addAttributes([
+            .foregroundColor: NSColor.redButtonTintColor,
+            .font: NSFont.systemFont(ofSize: NSFont.systemFontSize)],
+            range: range)
+
+        button.attributedTitle = attrTitle
     }
 
     private func updateCloseDetailsButton() {

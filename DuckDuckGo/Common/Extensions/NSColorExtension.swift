@@ -184,4 +184,8 @@ extension NSColor {
         CIColor(color: self)!
     }
 
+    static var redButtonTintColor: NSColor {
+        NSColor(named: "RedButtonTintColor")!
+    }
+
 }

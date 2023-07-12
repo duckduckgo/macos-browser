@@ -281,7 +281,7 @@ final class Fire {
     private func closeWindows(entity: BurningEntity) {
 
         func closeWindow(of tabCollectionViewModel: TabCollectionViewModel) {
-            guard let windowController = windowControllerManager.mainWindowControllers.first(where: { tabCollectionViewModel === $0.mainViewController.tabCollectionViewModel}) else {
+            guard let windowController = windowControllerManager.windowController(for: tabCollectionViewModel) else {
                 return
             }
             windowController.close()

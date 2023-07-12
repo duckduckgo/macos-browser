@@ -251,8 +251,8 @@
                                             <constraint firstAttribute="height" constant="32" id="oMx-F3-AUv"/>
                                         </constraints>
                                         <textFieldCell key="cell" alignment="center" title="Close X active tabs, and clear all browsing history and cookies (Y sites)?" id="qea-gI-2jD">
-                                            <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <font key="font" metaFont="system" size="11"/>
+                                            <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
@@ -468,14 +468,21 @@
                                     <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="dqq-R5-UUp">
                                         <rect key="frame" x="0.0" y="57" width="344" height="5"/>
                                     </box>
+                                    <button hidden="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mDi-x7-CLM">
+                                        <rect key="frame" x="14" y="10" width="316" height="40"/>
+                                        <buttonCell key="cell" type="push" title="Close and Burn This Window" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="CGf-qF-nIr">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="closeFireWindowButtonAction:" target="DMI-mh-xLJ" id="NJL-eQ-ELc"/>
+                                        </connections>
+                                    </button>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Sam-GO-uzw">
                                         <rect key="frame" x="170" y="10" width="160" height="40"/>
                                         <buttonCell key="cell" type="push" title="Clear" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tCs-Mx-t1s">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
-                                            <string key="keyEquivalent" base64-UTF8="YES">
-DQ
-</string>
                                         </buttonCell>
                                         <connections>
                                             <action selector="clearButtonAction:" target="DMI-mh-xLJ" id="icO-xH-Gnq"/>
@@ -496,8 +503,10 @@ Gw
                                     </button>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstItem="mDi-x7-CLM" firstAttribute="leading" secondItem="nId-He-RIU" secondAttribute="leading" constant="20" symbolic="YES" id="5mS-Rt-cig"/>
                                     <constraint firstItem="wam-tC-iBG" firstAttribute="leading" secondItem="nId-He-RIU" secondAttribute="leading" constant="20" symbolic="YES" id="AuD-PM-TDS"/>
                                     <constraint firstAttribute="trailing" secondItem="fSV-XR-8Dh" secondAttribute="trailing" id="FKa-ym-q6d"/>
+                                    <constraint firstAttribute="trailing" secondItem="mDi-x7-CLM" secondAttribute="trailing" constant="20" symbolic="YES" id="OXl-93-tkI"/>
                                     <constraint firstItem="dqq-R5-UUp" firstAttribute="top" secondItem="nId-He-RIU" secondAttribute="top" id="PGZ-Bu-97k"/>
                                     <constraint firstAttribute="bottom" secondItem="fSV-XR-8Dh" secondAttribute="bottom" id="TBV-Rc-0cG"/>
                                     <constraint firstItem="fSV-XR-8Dh" firstAttribute="leading" secondItem="nId-He-RIU" secondAttribute="leading" id="TbY-vY-ucm"/>
@@ -506,6 +515,7 @@ Gw
                                     <constraint firstItem="Sam-GO-uzw" firstAttribute="centerY" secondItem="nId-He-RIU" secondAttribute="centerY" id="eOp-LI-mk2"/>
                                     <constraint firstItem="Sam-GO-uzw" firstAttribute="width" secondItem="wam-tC-iBG" secondAttribute="width" id="f6X-EJ-v6s"/>
                                     <constraint firstAttribute="trailing" secondItem="Sam-GO-uzw" secondAttribute="trailing" constant="20" symbolic="YES" id="jSP-YU-j67"/>
+                                    <constraint firstAttribute="bottom" secondItem="mDi-x7-CLM" secondAttribute="bottom" constant="16" id="jcb-sD-fwV"/>
                                     <constraint firstItem="Sam-GO-uzw" firstAttribute="leading" secondItem="wam-tC-iBG" secondAttribute="trailing" constant="8" id="mPK-5a-aZP"/>
                                     <constraint firstItem="dqq-R5-UUp" firstAttribute="leading" secondItem="nId-He-RIU" secondAttribute="leading" id="mW9-Ra-VSw"/>
                                     <constraint firstAttribute="height" constant="60" id="onw-qY-te8"/>
@@ -541,8 +551,10 @@ Gw
                         </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
+                        <outlet property="cancelButton" destination="wam-tC-iBG" id="nf2-bs-GRH"/>
                         <outlet property="clearButton" destination="Sam-GO-uzw" id="zbv-kv-WkC"/>
                         <outlet property="closeDetailsButton" destination="cgG-hF-FAP" id="PDY-tj-zma"/>
+                        <outlet property="closeFireWindowButton" destination="mDi-x7-CLM" id="pII-bK-pgn"/>
                         <outlet property="closeWrapperView" destination="553-P8-fEM" id="vUO-wA-3ME"/>
                         <outlet property="collectionView" destination="u7v-Gt-FjR" id="zeu-lV-usx"/>
                         <outlet property="collectionViewBottomConstraint" destination="anE-16-8X8" id="Yt9-1O-5Hq"/>

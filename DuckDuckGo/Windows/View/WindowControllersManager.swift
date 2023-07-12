@@ -233,4 +233,10 @@ extension WindowControllersManager {
         }
     }
 
+    func windowController(for tabCollectionViewModel: TabCollectionViewModel) -> MainWindowController? {
+        return mainWindowControllers.first(where: {
+            tabCollectionViewModel === $0.mainViewController.tabCollectionViewModel
+        })
+    }
+
 }
