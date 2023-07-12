@@ -18,6 +18,7 @@
 
 import Foundation
 import Combine
+import Common
 import SwiftUI
 import BrowserServicesKit
 
@@ -175,6 +176,7 @@ final class PasswordManagementViewController: NSViewController {
     private func toggleLockScreen(hidden: Bool) {
         if hidden {
             hideLockScreen()
+            requestSync(dataChanged: false)
         } else {
             displayLockScreen()
         }
@@ -462,6 +464,7 @@ final class PasswordManagementViewController: NSViewController {
                 syncModelsOnCredentials(savedCredentials)
             }
             postChange()
+            requestSync(dataChanged: true)
 
         } catch {
             if let window = view.window, case SecureVaultError.duplicateRecord = error {
@@ -907,6 +910,18 @@ final class PasswordManagementViewController: NSViewController {
         emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.isHidden = true
         emptyStateButton.isHidden = true
+    }
+
+    private func requestSync(dataChanged: Bool) {
+        guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
+            return
+        }
+        os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+        if dataChanged {
+            syncService.scheduler.notifyDataChanged()
+        } else {
+            syncService.scheduler.notifyAppLifecycleEvent()
+        }
     }
 
 }
