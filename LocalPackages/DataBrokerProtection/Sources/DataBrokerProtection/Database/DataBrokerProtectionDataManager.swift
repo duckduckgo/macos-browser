@@ -18,14 +18,22 @@
 
 import Foundation
 
-public struct DataBrokerProtectionDataManager {
+public protocol DataBrokerProtectionDataManagerDelegate: AnyObject {
+    func dataBrokerProtectionDataManagerDidUpdateData()
+}
+
+public class DataBrokerProtectionDataManager {
+    public weak var delegate: DataBrokerProtectionDataManagerDelegate?
+
     internal let database: DataBrokerProtectionDataBase
     private let userDataKey = "DataBrokerProtectionProfile"
 
     public init() {
         self.database = DataBrokerProtectionDataBase()
+        setupNotifications()
+
     }
-    
+
     public func saveProfile(_ profile: DataBrokerProtectionProfile) {
         do {
             let encoder = JSONEncoder()
@@ -50,7 +58,7 @@ public struct DataBrokerProtectionDataManager {
                 // Test
                 self.database.testProfileQuery = profile.profileQueries.first
                 database.setupFakeData()
-                
+
                 return profile
             } catch {
                 print("Error decoding profile: \(error)")
@@ -58,4 +66,52 @@ public struct DataBrokerProtectionDataManager {
         }
         return nil
     }
+
+    public func fetchDataBrokerInfoData() -> [DataBrokerInfoData] {
+        let profileQueriesData = database.brokerProfileQueriesData
+        let result = profileQueriesData.map { brokerProfileQuery in
+            let scanData = DataBrokerInfoData.ScanData(historyEvents: brokerProfileQuery.scanData.historyEvents)
+
+            let optOutsData = brokerProfileQuery.optOutsData.map {
+                DataBrokerInfoData.OptOutData(historyEvents: $0.historyEvents, extractedProfileName: $0.extractedProfile.name ?? "No name")
+            }
+
+            return DataBrokerInfoData(userFirstName: brokerProfileQuery.profileQuery.firstName,
+                               userLastName: brokerProfileQuery.profileQuery.lastName,
+                               dataBrokerName: brokerProfileQuery.dataBroker.name,
+                               scanData: scanData,
+                               optOutsData: optOutsData)
+        }
+        return result
+    }
+
+     @objc private func setupFakeData() {
+        delegate?.dataBrokerProtectionDataManagerDidUpdateData()
+         print("DATA UPDATED")
+    }
+
+    private func setupNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(setupFakeData), name: DataBrokerProtectionNotifications.didFinishOptOut, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(setupFakeData), name: DataBrokerProtectionNotifications.didFinishScan, object: nil)
+    }
+}
+
+public struct DataBrokerInfoData: Identifiable {
+    public struct ScanData: Identifiable {
+        public let id = UUID()
+        public let historyEvents: [HistoryEvent]
+    }
+
+    public struct OptOutData: Identifiable {
+        public let id = UUID()
+        public let historyEvents: [HistoryEvent]
+        public let extractedProfileName: String
+    }
+
+    public let id = UUID()
+    public let userFirstName: String
+    public let userLastName: String
+    public let dataBrokerName: String
+    public let scanData: ScanData
+    public let optOutsData: [OptOutData]
 }

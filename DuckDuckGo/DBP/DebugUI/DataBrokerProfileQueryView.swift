@@ -17,16 +17,39 @@
 //
 
 import SwiftUI
+import DataBrokerProtection
+
+public final class DataBrokerProfileQueryViewModel: ObservableObject, DataBrokerProtectionDataManagerDelegate {
+    public func dataBrokerProtectionDataManagerDidUpdateData() {
+        DispatchQueue.main.async {
+            self.setupData()
+        }
+    }
+
+    private let dataManager: DataBrokerProtectionDataManager
+    @Published var dataInfo = [DataBrokerInfoData]()
+
+    init(dataManager: DataBrokerProtectionDataManager) {
+        self.dataManager = dataManager
+        self.dataManager.delegate = self
+        setupData()
+    }
+
+    private func setupData() {
+        self.dataInfo = self.dataManager.fetchDataBrokerInfoData()
+        print("AAAAAA")
+    }
+}
 
 struct DataBrokerProfileQueryView: View {
-    let items = ["Item 1", "Item 2", "Item 3"]
-    @State private var selectedItem: String?
+    @State private var selectedItem: DataBrokerInfoData?
+    @ObservedObject var viewModel: DataBrokerProfileQueryViewModel
 
     var body: some View {
         NavigationView {
-            List(items, id: \.self) { item in
+            List(viewModel.dataInfo) { item in
                 NavigationLink(destination: DetailView(item: item)) {
-                    Text(item)
+                    Text(item.dataBrokerName)
                 }
             }
             .frame(minWidth: 200)
@@ -39,16 +62,19 @@ struct DataBrokerProfileQueryView: View {
 }
 
 struct DetailView: View {
-    let item: String
+    let item: DataBrokerInfoData
 
     var body: some View {
         VStack {
-            Text("Detail for \(item)")
+            Text("Detail for \(item.dataBrokerName)")
                 .font(.title)
                 .padding()
 
-            List(0..<3) { index in
-                DetailViewSubItem(item: "\(item) - SubItem \(index + 1)")
+            DetailViewSubItem(historyItems: item.scanData.historyEvents, title: "Scan Operation")
+
+            List(item.optOutsData) { item in
+                DetailViewSubItem(historyItems: item.historyEvents, title: "OptOut \(item.extractedProfileName)")
+
             }
             .frame(minWidth: 200)
         }
@@ -56,34 +82,43 @@ struct DetailView: View {
 }
 
 struct DetailViewSubItem: View {
-    let item: String
+    let historyItems: [HistoryEvent]
+    let title: String
     @State private var showModal = false
 
     var body: some View {
-        Button(action: {
-            showModal = true
-        }) {
-            Text(item)
-                .padding()
-                .cornerRadius(8)
+        VStack {
+            Button(action: {
+                showModal = true
+            }) {
+                Text(title)
+                    .padding()
+                    .cornerRadius(8)
+            }
         }
         .padding()
         .sheet(isPresented: $showModal) {
-            ModalView(text: item, showModal: $showModal)
+            ModalView(title: title, historyItems: historyItems, showModal: $showModal)
+                .frame(width: 600, height: 400)
         }
     }
 }
 
 struct ModalView: View {
-    let text: String
+    let title: String
+    let historyItems: [HistoryEvent]
     @Binding var showModal: Bool
 
     var body: some View {
         VStack {
-            Text(text)
-                .font(.title)
-                .padding()
-
+            Text(title)
+            List(historyItems) { item in
+                HStack {
+                    Text("⚠️")
+                    Text(formatDate(item.date))
+                    Text(labelForEvent(item))
+                }
+            }
             Button(action: {
                 dismissModal()
             }) {
@@ -91,19 +126,39 @@ struct ModalView: View {
                     .padding()
                     .cornerRadius(8)
             }
-            .padding()
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding()
         .background(Color.gray.opacity(0.2))
     }
 
     func dismissModal() {
         showModal = false
     }
-}
 
-struct DataBrokerProfileQueryViewPreviews: PreviewProvider {
-    static var previews: some View {
-        DataBrokerProfileQueryView()
+    func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
+    }
+
+    private func labelForEvent(_ event: HistoryEvent) -> String {
+        switch event.type {
+
+        case .noMatchFound:
+            return "No match found"
+        case .matchFound(extractedProfileID: let extractedProfileID):
+            return "Match found \(extractedProfileID)"
+        case .error:
+            return "Error"
+        case .optOutStarted(extractedProfileID: let extractedProfileID):
+            return "Opt-out started \(extractedProfileID)"
+        case .optOutRequested(extractedProfileID: let extractedProfileID):
+            return "Opt-out requested \(extractedProfileID)"
+        case .optOutConfirmed(extractedProfileID: let extractedProfileID):
+            return "Opt-out confirmed \(extractedProfileID)"
+        case .scanStarted:
+            return "Scan Started"
+        }
     }
 }

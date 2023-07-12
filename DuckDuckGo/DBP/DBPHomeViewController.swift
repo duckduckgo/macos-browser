@@ -29,7 +29,10 @@ final class DBPHomeViewController: NSViewController {
         DataBrokerUserProfileViewController(dataManager: dataManager)
     }()
 
-    let profileQueryViewController = DataBrokerProfileQueryViewController()
+    lazy var profileQueryViewController: DataBrokerProfileQueryViewController = {
+        DataBrokerProfileQueryViewController(dataManager: dataManager)
+    }()
+
     var startSchedulerButton: NSButton!
     var startScanButton: NSButton!
     var resetDataButton: NSButton!
@@ -114,6 +117,7 @@ final class DBPHomeViewController: NSViewController {
         scheduler = DataBrokerProtectionScheduler(privacyConfigManager: privacyConfigurationManager,
                                                   contentScopeProperties: prefs,
                                                   dataManager: dataManager,
+                                                  notificationCenter: NotificationCenter.default,
                                                   errorHandler: DataBrokerProtectionErrorHandling())
     }
 }
