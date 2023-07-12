@@ -39,7 +39,9 @@ public final class DataBrokerProtectionScheduler {
                                              errorHandler: errorHandler)
     }()
 
-    public init(privacyConfigManager: PrivacyConfigurationManaging, contentScopeProperties: ContentScopeProperties, errorHandler: EventMapping<DataBrokerProtectionOperationError>) {
+    public init(privacyConfigManager: PrivacyConfigurationManaging,
+                contentScopeProperties: ContentScopeProperties,
+                errorHandler: EventMapping<DataBrokerProtectionOperationError>) {
 
         activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
         activity.repeats = true
