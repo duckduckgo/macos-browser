@@ -10,15 +10,6 @@
       }
     },
     {
-      "identity" : "browserserviceskit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/BrowserServicesKit",
-      "state" : {
-        "branch" : "daniel/private-email-autofill",
-        "revision" : "e3a3eefce0daf14b50e74c1fffd901b04f5a4cbe"
-      }
-    },
-    {
       "identity" : "content-scope-scripts",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
@@ -32,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "branch" : "shane/email-protection-saving",
-        "revision" : "c1c18ca7589f61a092ff4b0cee45f1b82b0f1479"
+        "branch" : "shane/email-saving-2",
+        "revision" : "bec2c6788bb561c32c6b337cedbd99cc49ca4a2e"
       }
     },
     {
