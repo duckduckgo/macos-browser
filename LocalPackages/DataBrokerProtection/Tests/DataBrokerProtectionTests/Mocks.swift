@@ -61,7 +61,7 @@ final class PrivacyConfigurationMock: PrivacyConfiguration {
 
     var tempUnprotectedDomains = [String]()
 
-    var trackerAllowlist = BrowserServicesKit.PrivacyConfigurationData.TrackerAllowlist(entries: [String : [PrivacyConfigurationData.TrackerAllowlist.Entry]](), state: "mock")
+    var trackerAllowlist = BrowserServicesKit.PrivacyConfigurationData.TrackerAllowlist(entries: [String: [PrivacyConfigurationData.TrackerAllowlist.Entry]](), state: "mock")
 
     func isEnabled(featureKey: BrowserServicesKit.PrivacyFeature, versionProvider: BrowserServicesKit.AppVersionProvider) -> Bool {
         false
@@ -245,4 +245,3 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
         wasSubmitCaptchaToBeResolvedCalled = false
     }
 }
-
