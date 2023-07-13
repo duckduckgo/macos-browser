@@ -19,7 +19,6 @@
 import Foundation
 import Common
 import BrowserServicesKit
-import Common
 
 protocol OperationRunnerProvider {
     func getOperationRunner() -> WebOperationRunner

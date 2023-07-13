@@ -9,16 +9,19 @@ let package = Package(
     products: [
         .library(
             name: "DataBrokerProtection",
-            targets: ["DataBrokerProtection"]),
+            targets: ["DataBrokerProtection"])
     ],
     dependencies: [
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "64.0.0")
     ],
     targets: [
         .target(
             name: "DataBrokerProtection",
-            dependencies: []),
+            dependencies: [
+                .product(name: "BrowserServicesKit", package: "BrowserServicesKit")
+            ]),
         .testTarget(
             name: "DataBrokerProtectionTests",
-            dependencies: ["DataBrokerProtection"]),
+            dependencies: ["DataBrokerProtection"])
     ]
 )

@@ -83,7 +83,7 @@ final class DataBrokerProtectionDataBase: DataBase {
 private struct TestData {
 
     var profileQuery: ProfileQuery {
-        ProfileQuery(firstName: "John", lastName: "Smith", city: "Miami", state: "FL", age: 65)
+        ProfileQuery(firstName: "Ben", lastName: "Smith", city: "Dallas", state: "TX", age: 44)
     }
 
     let verecorJSONString = """
