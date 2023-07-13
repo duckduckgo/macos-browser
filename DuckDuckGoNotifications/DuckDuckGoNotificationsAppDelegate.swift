@@ -79,25 +79,31 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
         distributedNotificationCenter.publisher(for: .showIssuesStartedNotification)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.notificationsPresenter.showReconnectingNotification()
+                self?.showReconnectingNotification()
             }.store(in: &cancellables)
 
         distributedNotificationCenter.publisher(for: .showIssuesResolvedNotification)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.notificationsPresenter.showReconnectedNotification()
+                self?.showReconnectedNotification()
             }.store(in: &cancellables)
 
         distributedNotificationCenter.publisher(for: .showIssuesNotResolvedNotification)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.notificationsPresenter.showConnectionFailureNotification()
+                self?.showConnectionFailureNotification()
             }.store(in: &cancellables)
 
         distributedNotificationCenter.publisher(for: .showVPNSupersededNotification)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.notificationsPresenter.showSupersededNotification()
+                self?.showSupersededNotification()
+            }.store(in: &cancellables)
+
+        distributedNotificationCenter.publisher(for: .showTestNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.showTestNotification()
             }.store(in: &cancellables)
 
         distributedNotificationCenter.publisher(for: .serverSelected).sink { [weak self] _ in
@@ -109,4 +115,32 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
         return true
     }
+
+    // MARK: - Showing Notifications
+
+    func showReconnectedNotification() {
+        os_log("Presenting reconnected notification", log: .networkProtection, type: .info)
+        notificationsPresenter.showReconnectedNotification()
+    }
+
+    func showReconnectingNotification() {
+        os_log("Presenting reconnecting notification", log: .networkProtection, type: .info)
+        notificationsPresenter.showReconnectingNotification()
+    }
+
+    func showConnectionFailureNotification() {
+        os_log("Presenting failure notification", log: .networkProtection, type: .info)
+        notificationsPresenter.showConnectionFailureNotification()
+    }
+
+    func showSupersededNotification() {
+        os_log("Presenting Superseded notification", log: .networkProtection, type: .info)
+        notificationsPresenter.showSupersededNotification()
+    }
+
+    func showTestNotification() {
+        os_log("Presenting test notification", log: .networkProtection, type: .info)
+        notificationsPresenter.showTestNotification()
+    }
+
 }
