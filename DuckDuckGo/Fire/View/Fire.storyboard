@@ -251,7 +251,7 @@
                                             <constraint firstAttribute="height" constant="32" id="oMx-F3-AUv"/>
                                         </constraints>
                                         <textFieldCell key="cell" alignment="center" title="Close X active tabs, and clear all browsing history and cookies (Y sites)?" id="qea-gI-2jD">
-                                            <font key="font" metaFont="system" size="11"/>
+                                            <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
@@ -624,7 +624,7 @@ Gw
                 <customObject id="2D4-gy-3jN" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <viewController id="hqb-gn-5gp" customClass="FireInfoViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="1se-D0-4zU" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="363"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vOP-zm-6FL">
@@ -644,7 +644,7 @@ DQ
                                 </connections>
                             </button>
                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wWB-fA-JGV">
-                                <rect key="frame" x="96" y="166" width="128" height="64"/>
+                                <rect key="frame" x="96" y="219" width="128" height="64"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="64" id="KbY-ZC-c5P"/>
                                     <constraint firstAttribute="width" constant="128" id="hUg-eV-t0D"/>
@@ -652,7 +652,7 @@ DQ
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="FireHeader" id="bCv-vD-xuT"/>
                             </imageView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AsC-eN-HNp">
-                                <rect key="frame" x="18" y="69" width="284" height="48"/>
+                                <rect key="frame" x="18" y="126" width="284" height="48"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="280" id="YS3-eh-JOs"/>
                                 </constraints>
@@ -663,7 +663,7 @@ DQ
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cPr-2R-bkx">
-                                <rect key="frame" x="18" y="123" width="284" height="19"/>
+                                <rect key="frame" x="18" y="180" width="284" height="19"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="280" id="LLa-XW-6PH"/>
                                 </constraints>
@@ -679,10 +679,10 @@ DQ
                             <constraint firstItem="AsC-eN-HNp" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="9zn-kw-ecJ"/>
                             <constraint firstItem="vOP-zm-6FL" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="B9B-bo-9be"/>
                             <constraint firstItem="wWB-fA-JGV" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="V4f-UG-ojf"/>
-                            <constraint firstItem="wWB-fA-JGV" firstAttribute="top" secondItem="1se-D0-4zU" secondAttribute="top" constant="20" symbolic="YES" id="Wiy-76-7IF"/>
+                            <constraint firstItem="wWB-fA-JGV" firstAttribute="top" secondItem="1se-D0-4zU" secondAttribute="top" constant="80" id="Wiy-76-7IF"/>
                             <constraint firstAttribute="bottom" secondItem="vOP-zm-6FL" secondAttribute="bottom" constant="16" id="da0-dI-nQN"/>
-                            <constraint firstItem="vOP-zm-6FL" firstAttribute="top" secondItem="AsC-eN-HNp" secondAttribute="bottom" constant="25" id="nqi-H2-ZOR"/>
                             <constraint firstItem="cPr-2R-bkx" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="r5H-V6-ZB0"/>
+                            <constraint firstItem="cPr-2R-bkx" firstAttribute="top" secondItem="wWB-fA-JGV" secondAttribute="bottom" constant="20" id="tF0-FJ-Ps6"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -692,7 +692,7 @@ DQ
                     </view>
                 </viewController>
             </objects>
-            <point key="canvasLocation" x="622" y="512"/>
+            <point key="canvasLocation" x="622" y="568.5"/>
         </scene>
     </scenes>
     <resources>
