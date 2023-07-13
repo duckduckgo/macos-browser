@@ -276,6 +276,7 @@ extension MainWindowController: NSWindowDelegate {
             return true
         }
         Task {
+            moveTabBarView(toTitlebarView: false)
             await mainViewController.fireViewController.animateFireWhenClosing()
             sender.close()
         }
