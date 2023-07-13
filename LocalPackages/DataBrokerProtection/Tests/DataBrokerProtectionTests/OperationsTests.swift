@@ -87,8 +87,10 @@ final class OperationsTests: XCTestCase {
             dataBroker: dataBroker,
             database: database)
 
-        let expectedExtractedProfiles = [ExtractedProfile(name: "Profile1"),
-            ExtractedProfile(name: "Profile2")]
+        let expectedExtractedProfiles = [
+            ExtractedProfile(name: "Profile1", profileUrl: "profile1"),
+            ExtractedProfile(name: "Profile2", profileUrl: "profile2")
+        ]
 
         var expectedEvents: [HistoryEvent.EventType] = [.scanStarted]
 
@@ -503,7 +505,7 @@ struct MockRunner: WebOperationRunner {
         return scanResults
     }
 
-    func optOut(_ extractedProfile: ExtractedProfile) async throws {
+    func optOut(profileQuery: DataBrokerProtection.BrokerProfileQueryData, extractedProfile: DataBrokerProtection.ExtractedProfile) async throws {
         try optOutAction?()
     }
 }

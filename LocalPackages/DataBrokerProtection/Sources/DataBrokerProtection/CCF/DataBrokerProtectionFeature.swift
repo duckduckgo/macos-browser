@@ -23,11 +23,11 @@ import UserScript
 import Common
 
 protocol CCFCommunicationDelegate: AnyObject {
-    func loadURL(url: URL)
-    func extractedProfiles(profiles: [ExtractedProfile])
-    func captchaInformation(captchaInfo: GetCaptchaInfoResponse)
-    func success(actionId: String, actionType: ActionType)
-    func onError(error: DataBrokerProtectionError)
+    func loadURL(url: URL) async
+    func extractedProfiles(profiles: [ExtractedProfile]) async
+    func captchaInformation(captchaInfo: GetCaptchaInfoResponse) async
+    func success(actionId: String, actionType: ActionType) async
+    func onError(error: DataBrokerProtectionError) async
 }
 
 enum CCFSubscribeActionName: String {
@@ -67,44 +67,44 @@ struct DataBrokerProtectionFeature: Subfeature {
     func onActionCompleted(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         os_log("Action completed", log: .action)
 
-        parseActionCompleted(params: params)
+        await parseActionCompleted(params: params)
         return nil
     }
 
-    func parseActionCompleted(params: Any) {
+    func parseActionCompleted(params: Any) async {
         os_log("Parse action completed", log: .action)
 
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(CCFResult.self, from: data) else {
-            delegate?.onError(error: .parsingErrorObjectFailed)
+            await delegate?.onError(error: .parsingErrorObjectFailed)
             return
         }
 
         switch result.result {
         case .success(let successResponse):
-            parseSuccess(success: successResponse)
+            await parseSuccess(success: successResponse)
         case .error(let error):
             let dataBrokerError: DataBrokerProtectionError = .actionFailed(actionID: error.actionID, message: error.message)
-            delegate?.onError(error: dataBrokerError)
+            await delegate?.onError(error: dataBrokerError)
         }
     }
 
-    func parseSuccess(success: CCFSuccessResponse) {
+    func parseSuccess(success: CCFSuccessResponse) async {
         os_log("Parse success: %{public}@", log: .action, String(describing: success.actionType.rawValue))
 
         switch success.response {
         case .navigate(let navigate):
             if let url = URL(string: navigate.url) {
-                delegate?.loadURL(url: url)
+                await delegate?.loadURL(url: url)
             } else {
-                delegate?.onError(error: .malformedURL)
+                await delegate?.onError(error: .malformedURL)
             }
         case .extract(let profiles):
-            delegate?.extractedProfiles(profiles: profiles)
+            await delegate?.extractedProfiles(profiles: profiles)
         case .getCaptchaInfo(let captchaInfo):
-            delegate?.captchaInformation(captchaInfo: captchaInfo)
+            await delegate?.captchaInformation(captchaInfo: captchaInfo)
         case .fillForm, .click, .expectation, .solveCaptcha:
-            delegate?.success(actionId: success.actionID, actionType: success.actionType)
+            await delegate?.success(actionId: success.actionID, actionType: success.actionType)
         default: return
         }
     }
@@ -113,7 +113,7 @@ struct DataBrokerProtectionFeature: Subfeature {
         let error = DataBrokerProtectionError.parse(params: params)
         os_log("Action Error: %{public}@", log: .action, String(describing: error.localizedDescription))
 
-        delegate?.onError(error: error)
+        await delegate?.onError(error: error)
         return nil
     }
 
@@ -123,7 +123,6 @@ struct DataBrokerProtectionFeature: Subfeature {
 
     func pushAction(method: CCFSubscribeActionName, webView: WKWebView, params: Encodable) {
         guard let broker = broker else {
-            delegate?.onError(error: .userScriptMessageBrokerNotSet)
             assertionFailure("Cannot continue without broker instance")
             return
         }
