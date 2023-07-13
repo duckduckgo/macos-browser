@@ -18,7 +18,7 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "e1a8ca233008fbd6edab9feece0d71b892ba1ff0")
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "ea59d11bd7b2964c9f5a9f6afb786f10a6861153")
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
