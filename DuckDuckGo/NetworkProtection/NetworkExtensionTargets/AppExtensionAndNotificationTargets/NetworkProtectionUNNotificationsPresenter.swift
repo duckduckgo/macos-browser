@@ -119,7 +119,7 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
     }
 
     func showSupersededNotification() {
-        let content = notificationContent(title: UserText.networkProtectioSupersededNotificationTitle,
+        let content = notificationContent(title: UserText.networkProtectionSupersededNotificationTitle,
                                           subtitle: UserText.networkProtectionSupersededNotificationSubtitle,
                                           category: .superseded)
         showNotification(content)
