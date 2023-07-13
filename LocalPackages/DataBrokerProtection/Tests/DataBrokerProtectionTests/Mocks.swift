@@ -162,8 +162,8 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         wasFinishCalled = true
     }
 
-    func execute(action: DataBrokerProtection.Action, profileData: DataBrokerProtection.CCFRequestData) async {
-        switch profileData {
+    func execute(action: DataBrokerProtection.Action, data: DataBrokerProtection.CCFRequestData) async {
+        switch data {
         case .profile:
             wasExecuteCalledForExtractedProfile = false
             wasExecuteCalledForSolveCaptcha = false
