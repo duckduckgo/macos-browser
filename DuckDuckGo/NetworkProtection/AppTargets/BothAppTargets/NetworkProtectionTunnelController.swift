@@ -195,7 +195,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         for try await event in SystemExtensionManager().activate() {
             switch event {
             case .waitingForUserApproval:
-                self.controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseAllowSystemExtension
+                self.controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
             case .activated:
                 self.controllerErrorStore.lastErrorMessage = nil
                 activated = true
@@ -320,9 +320,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             }
         } catch OSSystemExtensionError.requestSuperseded {
             await stop()
-            // Even if the installation request is superseeded we want to show the message that tells the user
+            // Even if the installation request is superseded we want to show the message that tells the user
             // to go to System Settings to allow the extension
-            controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseAllowSystemExtension
+            controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
         } catch {
             await stop()
             controllerErrorStore.lastErrorMessage = error.localizedDescription
@@ -460,6 +460,15 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }
 
         let request = Data([ExtensionMessage.expireRegistrationKey.rawValue])
+        try? activeSession.sendProviderMessage(request)
+    }
+
+    static func sendTestNotificationRequest() async throws {
+        guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
+            return
+        }
+
+        let request = Data([ExtensionMessage.triggerTestNotification.rawValue])
         try? activeSession.sendProviderMessage(request)
     }
 

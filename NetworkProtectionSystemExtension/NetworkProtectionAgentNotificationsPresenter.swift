@@ -48,4 +48,7 @@ final class NetworkProtectionAgentNotificationsPresenter: NetworkProtectionNotif
         notificationCenter.post(.showVPNSupersededNotification)
     }
 
+    func showTestNotification() {
+        notificationCenter.post(.showTestNotification)
+    }
 }
