@@ -86,6 +86,12 @@ private struct TestData {
     let verecorJSONString = """
                {
                  "name": "verecor",
+               "schedulingConfig" : {
+                    "retryError": 100,
+                    "confirmOptOutScan": 40,
+                    "maintenanceScan": 60,
+                    "emailConfirmation": 60,
+               },
                  "steps": [
                    {
                      "stepType": "scan",

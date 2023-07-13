@@ -37,7 +37,6 @@ public final class DataBrokerProfileQueryViewModel: ObservableObject, DataBroker
 
     private func setupData() {
         self.dataInfo = self.dataManager.fetchDataBrokerInfoData()
-        print("AAAAAA")
     }
 }
 

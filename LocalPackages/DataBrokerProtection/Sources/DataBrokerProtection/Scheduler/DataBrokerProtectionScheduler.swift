@@ -21,6 +21,14 @@ import Common
 import BrowserServicesKit
 
 public final class DataBrokerProtectionScheduler {
+    private enum SchedulerCycle {
+        // TODO: Arbitrary numbers for now
+        // Scheduling an activity to fire between 15 and 45 minutes from now
+
+        static let interval: TimeInterval = 5 * 60 // 5 minutes
+        static let tolerance: TimeInterval = 60 // 1 minute
+    }
+
     private let privacyConfigManager: PrivacyConfigurationManaging
     private let contentScopeProperties: ContentScopeProperties
     private let dataManager: DataBrokerProtectionDataManager
@@ -49,11 +57,8 @@ public final class DataBrokerProtectionScheduler {
 
         activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
         activity.repeats = true
-        // TODO: Arbitrary numbers for now
-        // Scheduling an activity to fire between 15 and 45 minutes from now
-        activity.interval = 30 * 60
-        activity.tolerance = 15 * 60
-
+        activity.interval = SchedulerCycle.interval
+        activity.tolerance = SchedulerCycle.tolerance
         activity.qualityOfService = QualityOfService.utility
 
         self.dataManager = dataManager
@@ -63,7 +68,7 @@ public final class DataBrokerProtectionScheduler {
         self.notificationCenter = notificationCenter
     }
 
-    public func start(debug: Bool = true) {
+    public func start(debug: Bool = false) {
         os_log("Starting scheduler...", log: .dataBrokerProtection)
         if debug {
             self.dataBrokerProcessor.runQueuedOperations()
