@@ -133,6 +133,9 @@
                <Test
                   Identifier = "HTTPSUpgradeIntegrationTests">
                </Test>
+               <Test
+                  Identifier = "NavigationProtectionIntegrationTests/testAMPLinks()">
+               </Test>
             </SkippedTests>
          </TestableReference>
          <TestableReference

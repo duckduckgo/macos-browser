@@ -339,7 +339,7 @@ extension NetworkProtectionStatusView {
         // MARK: - Connection Status: Toggle State
 
         @frozen
-        enum ToggleTransition {
+        enum ToggleTransition: Equatable {
             case idle
             case switchingOn(locallyInitiated: Bool)
             case switchingOff(locallyInitiated: Bool)
@@ -409,7 +409,7 @@ extension NetworkProtectionStatusView {
                 return "\(UserText.networkProtectionStatusConnected) · \(timeLapsed)"
             case .connecting, .reasserting:
                 return UserText.networkProtectionStatusConnecting
-            case .disconnected, .notConfigured, .unknown:
+            case .disconnected, .notConfigured:
                 return UserText.networkProtectionStatusDisconnected
             case .disconnecting:
                 return UserText.networkProtectionStatusDisconnecting
