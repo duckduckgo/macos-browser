@@ -23,43 +23,41 @@ extension HomePage.Views {
 
     struct BurnerHomePageView: View {
 
+        static let height: CGFloat = 273
+
         @Environment(\.colorScheme) var colorScheme
 
         private var backgroundColor: Color {
-            return colorScheme == .dark ? Color.black.opacity(0.15) : Color.white
+            return colorScheme == .dark ? Color.black.opacity(0.15) : Color.primary
         }
 
         var body: some View {
             ZStack {
-                Image("BurnerWindowBackground")
-                    .resizable()
-                    .scaledToFill()
-                    .edgesIgnoringSafeArea(.all)
+                backgroundColor.edgesIgnoringSafeArea(.all)
 
-                VStack(alignment: .leading, spacing: 15) {
+                VStack(alignment: .leading, spacing: 16) {
                     HStack {
-                        Image("BurnerWindowPopoverImage")
+                        Image("BurnerWindowHomepageImage")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 64, height: 48)
                             .padding(.leading, -15)
+                            .padding(.top, -5)
 
                         Text(UserText.burnerWindowHeader)
                             .font(.system(size: 22, weight: .bold))
                             .foregroundColor(Color.primary)
                             .padding(.leading, -10)
-                            .padding(.top, 15)
                     }
-
-                    Description()
-                        .padding(.top, 3)
 
                     FeaturesBox()
                         .padding(.top, 10)
                 }
-                .frame(width: 480, height: 260, alignment: .center)
-                .padding()
-                .padding(10)
+                .frame(width: HomePage.Views.RootView.targetWidth,
+                       height: Self.height,
+                       alignment: .leading)
+                .padding(.horizontal, 40)
+                .padding(.vertical, 20)
                 .background(RoundedRectangle(cornerRadius: 8).fill(backgroundColor))
                 .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3), lineWidth: 1))
                 .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 2)
@@ -67,71 +65,51 @@ extension HomePage.Views {
         }
     }
 
-    struct Description: View {
-        var body: some View {
-            VStack(alignment: .leading, spacing: 15) {
-
-                let firstLine = firstLine
-                let secondLine = secondLine
-
-                Text(firstLine.boldText)
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundColor(Color.primary)
-                + Text(firstLine.regularText)
-                    .font(.system(size: 15))
-                    .foregroundColor(Color.primary)
-
-                Text(secondLine.boldText)
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundColor(Color.primary)
-                + Text(secondLine.regularText)
-                    .font(.system(size: 15))
-                    .foregroundColor(Color.primary)
-            }
-        }
-
-        var firstLine: (boldText: String, regularText: String) {
-            let description1 = UserText.burnerHomepageDescription1.split(separator: " ",
-                                                                             maxSplits: 1,
-                                                                             omittingEmptySubsequences: true)
-            return (String(description1.first ?? "") + " ", String(description1.last ?? ""))
-        }
-
-        var secondLine: (boldText: String, regularText: String) {
-            let description2 = UserText.burnerHomepageDescription2.split(separator: " ",
-                                                                             maxSplits: 2,
-                                                                             omittingEmptySubsequences: true)
-            return (
-                boldText: String(description2[safe: 0] ?? "") + " " + String(description2[safe: 1] ?? "") + " ",
-                regularText: String(description2[safe: 2] ?? "")
-            )
-        }
-    }
-
     struct FeaturesBox: View {
 
             var body: some View {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(UserText.burnerHomepageDescription3)
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundColor(Color.primary)
-
+                VStack(alignment: .leading, spacing: 16) {
                     HStack {
-                        Image("BurnerWindowPopoverIcon1")
+                        Image("FireWindowIcon1")
                             .resizable()
                             .frame(width: 16, height: 16)
-                        Text(UserText.burnerHomepageDescription4)
+                            .foregroundColor(Color.primary)
+                        Text(UserText.burnerHomepageDescription1)
                             .font(.system(size: 13))
                             .foregroundColor(Color.primary)
 
                     }
 
                     HStack {
-                        Image("BurnerWindowPopoverIcon2")
+                        Image("FireWindowIcon2")
                             .resizable()
                             .frame(width: 16, height: 16)
                             .foregroundColor(Color.primary)
-                        Text(UserText.burnerHomepageDescription5)
+                        Text(UserText.burnerHomepageDescription2)
+                            .font(.system(size: 13))
+                            .foregroundColor(Color.primary)
+                    }
+
+                    HStack {
+                        Image("FireWindowIcon3")
+                            .resizable()
+                            .frame(width: 16, height: 16)
+                            .foregroundColor(Color.primary)
+                        Text(UserText.burnerHomepageDescription3)
+                            .font(.system(size: 13))
+                            .foregroundColor(Color.primary)
+                    }
+
+                    Divider()
+
+                    HStack {
+                        Image("FireWindowIcon4")
+                            .resizable()
+                            .frame(width: 16, height: 16)
+                            .foregroundColor(Color.primary)
+                            .opacity(0.6)
+                            .padding(.top, -20)
+                        Text(UserText.burnerHomepageDescription4)
                             .font(.system(size: 13))
                             .foregroundColor(Color.primary)
                     }

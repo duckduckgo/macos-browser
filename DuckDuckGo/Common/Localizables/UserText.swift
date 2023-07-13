@@ -691,8 +691,6 @@ struct UserText {
 
     static let newTabTooltip = NSLocalizedString("tooltip.tab.new-tab", value: "Open a new tab", comment: "Tooltip for the New Tab button")
     static let clearBrowsingHistoryTooltip = NSLocalizedString("tooltip.fire.clear-browsing-history", value: "Clear browsing history", comment: "Tooltip for the Fire button")
-    static let burnerWindowButtonTooltip = NSLocalizedString("tooltip.burner.button", value: "Burner Window", comment: "Tooltip for the burner window button")
-
     static let navigateBackTooltip = NSLocalizedString("tooltip.navigation.back", value: "Show the previous page\nHold to show history", comment: "Tooltip for the Back button")
     static let navigateForwardTooltip = NSLocalizedString("tooltip.navigation.forward", value: "Show the next page\nHold to show history", comment: "Tooltip for the Forward button")
     static let refreshPageTooltip = NSLocalizedString("tooltip.navigation.refresh", value: "Reload this page", comment: "Tooltip for the Refresh button")
@@ -789,12 +787,11 @@ struct UserText {
 
     // Recent Activity
     static let newTabRecentActivitySectionTitle = NSLocalizedString("newTab.recent.activity.section.title", value: "Recent Activity", comment: "Title of the RecentActivity section in the home page")
-    static let burnerWindowHeader = NSLocalizedString("burner.window.header", value: "Burner Window", comment: "Header shown on the hompage of the burner window")
+    static let burnerWindowHeader = NSLocalizedString("burner.window.header", value: "Fire Window", comment: "Header shown on the hompage of the burner window")
     static let burnerTabHomeTitle = NSLocalizedString("burner.tab.home.title", value: "New Burner Tab", comment: "Tab title for burner tab")
-    static let burnerHomepageDescription1 = NSLocalizedString("burner.homepage.description.1", value: "All DuckDuckGo windows block most hidden trackers so websites can't spy on you.", comment: "")
-    static let burnerHomepageDescription2 = NSLocalizedString("burner.homepage.description.2", value: "Burner windows are temporary: they don't access existing cookies or remember websites you visit after you close the window.", comment: "")
-    static let burnerHomepageDescription3 = NSLocalizedString("burner.homepage.description.3", value: "Burner Windows make it easier to:", comment: "")
-    static let burnerHomepageDescription4 = NSLocalizedString("burner.homepage.description.4", value: "Sign into a site with a different account", comment: "")
-    static let burnerHomepageDescription5 = NSLocalizedString("burner.homepage.description.5", value: "View websites without signing in", comment: "")
+    static let burnerHomepageDescription1 = NSLocalizedString("burner.homepage.description.1", value: "Browse without saving local history", comment: "")
+    static let burnerHomepageDescription2 = NSLocalizedString("burner.homepage.description.2", value: "Sign in to a site with a different account", comment: "")
+    static let burnerHomepageDescription3 = NSLocalizedString("burner.homepage.description.3", value: "Troubleshoot websites", comment: "")
+    static let burnerHomepageDescription4 = NSLocalizedString("burner.homepage.description.4", value: "Fire windows are isolated from other browser data, and their data is burned when you close them. They have the same tracking protection as other windows.", comment: "")
 }
 

@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "burner-window-picto-light-96x64.pdf",
+      "filename" : "Icon 7.pdf",
       "idiom" : "universal"
     },
     {
@@ -11,7 +11,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "burner-window-picto-dark-96x64.pdf",
+      "filename" : "Icon 8.pdf",
       "idiom" : "universal"
     }
   ],
