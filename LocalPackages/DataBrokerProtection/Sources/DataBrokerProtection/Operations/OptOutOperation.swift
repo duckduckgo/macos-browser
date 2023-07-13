@@ -35,18 +35,21 @@ final class OptOutOperation: DataBrokerOperation {
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<Void, Error>?
     var extractedProfile: ExtractedProfile?
+    private let operationAwaitTime: TimeInterval
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
          query: BrokerProfileQueryData,
          emailService: EmailServiceProtocol = EmailService(),
-         captchaService: CaptchaServiceProtocol = CaptchaService()
+         captchaService: CaptchaServiceProtocol = CaptchaService(),
+         operationAwaitTime: TimeInterval = 1
     ) {
         self.privacyConfig = privacyConfig
         self.prefs = prefs
         self.query = query
         self.emailService = emailService
         self.captchaService = captchaService
+        self.operationAwaitTime = operationAwaitTime
     }
 
     func run(inputValue: ExtractedProfile,
@@ -84,8 +87,8 @@ final class OptOutOperation: DataBrokerOperation {
     }
 
     func executeNextStep() async {
-        os_log("OPTOUT Waiting %{public}f seconds...", log: .action, actionAwaitTime)
-        try? await Task.sleep(nanoseconds: UInt64(actionAwaitTime) * 1_000_000_000)
+        os_log("OPTOUT Waiting %{public}f seconds...", log: .action, operationAwaitTime)
+        try? await Task.sleep(nanoseconds: UInt64(operationAwaitTime) * 1_000_000_000)
 
         if let action = actionsHandler?.nextAction() {
             await runNextAction(action)

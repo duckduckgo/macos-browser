@@ -35,18 +35,21 @@ final class ScanOperation: DataBrokerOperation {
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<[ExtractedProfile], Error>?
     var extractedProfile: ExtractedProfile?
+    private let operationAwaitTime: TimeInterval
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
          query: BrokerProfileQueryData,
          emailService: EmailServiceProtocol = EmailService(),
-         captchaService: CaptchaServiceProtocol = CaptchaService()
+         captchaService: CaptchaServiceProtocol = CaptchaService(),
+         operationAwaitTime: TimeInterval = 1
     ) {
         self.privacyConfig = privacyConfig
         self.prefs = prefs
         self.query = query
         self.emailService = emailService
         self.captchaService = captchaService
+        self.operationAwaitTime = operationAwaitTime
     }
 
     func run(inputValue: Void,
@@ -78,9 +81,9 @@ final class ScanOperation: DataBrokerOperation {
     }
 
     func executeNextStep() async {
-        os_log("SCAN Waiting %{public}f seconds...", log: .action, actionAwaitTime)
+        os_log("SCAN Waiting %{public}f seconds...", log: .action, operationAwaitTime)
 
-        try? await Task.sleep(nanoseconds: UInt64(actionAwaitTime) * 1_000_000_000)
+        try? await Task.sleep(nanoseconds: UInt64(operationAwaitTime) * 1_000_000_000)
 
         if let action = actionsHandler?.nextAction() {
             os_log("Next action: %{public}@", log: .action, String(describing: action.actionType.rawValue))

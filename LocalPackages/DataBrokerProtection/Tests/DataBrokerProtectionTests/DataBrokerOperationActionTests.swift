@@ -1,5 +1,5 @@
 //
-//  DataBrokerOperationTests.swift
+//  DataBrokerOperationActionTests.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,7 @@ import BrowserServicesKit
 import Combine
 @testable import DataBrokerProtection
 
-final class DataBrokerOperationTests: XCTestCase {
+final class DataBrokerOperationActionTests: XCTestCase {
     let webViewHandler = WebViewHandlerMock()
     let emailService = EmailServiceMock()
     let captchaService = CaptchaServiceMock()
@@ -33,7 +33,7 @@ final class DataBrokerOperationTests: XCTestCase {
         captchaService.reset()
     }
 
-    func testWhenEmailConfirmationActionSucceds_thenExtractedLinkIsOpened() async {
+    func testWhenEmailConfirmationActionSucceeds_thenExtractedLinkIsOpened() async {
         let emailConfirmationAction = EmailConfirmationAction(id: "", actionType: .emailConfirmation, pollingTime: 1)
         let step = Step(type: .optOut, actions: [emailConfirmationAction])
         let extractedProfile = ExtractedProfile(email: "test@duck.com")
@@ -41,7 +41,8 @@ final class DataBrokerOperationTests: XCTestCase {
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
-            emailService: emailService
+            emailService: emailService,
+            operationAwaitTime: 0
         )
 
         do {
@@ -61,7 +62,8 @@ final class DataBrokerOperationTests: XCTestCase {
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
-            emailService: emailService
+            emailService: emailService,
+            operationAwaitTime: 0
         )
 
         do {
@@ -88,7 +90,8 @@ final class DataBrokerOperationTests: XCTestCase {
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
-            emailService: emailService
+            emailService: emailService,
+            operationAwaitTime: 0
         )
 
         do {
@@ -113,7 +116,8 @@ final class DataBrokerOperationTests: XCTestCase {
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
-            emailService: emailService
+            emailService: emailService,
+            operationAwaitTime: 0
         )
         sut.webViewHandler = webViewHandler
         sut.extractedProfile = ExtractedProfile()
@@ -131,7 +135,8 @@ final class DataBrokerOperationTests: XCTestCase {
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
-            emailService: emailService
+            emailService: emailService,
+            operationAwaitTime: 0
         )
         emailService.shouldThrow = true
 
@@ -149,12 +154,13 @@ final class DataBrokerOperationTests: XCTestCase {
         }
     }
 
-    func testWhenClickActionSucceds_thenWeWaitForWebViewToLoad() async {
+    func testWhenClickActionSucceeds_thenWeWaitForWebViewToLoad() async {
         let sut = OptOutOperation(
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
-            emailService: emailService
+            emailService: emailService,
+            operationAwaitTime: 0
         )
         sut.webViewHandler = webViewHandler
 
@@ -164,12 +170,13 @@ final class DataBrokerOperationTests: XCTestCase {
         XCTAssertTrue(webViewHandler.wasFinishCalled)
     }
 
-    func testWhenAnActionThatIsNotClickSucceds_thenWeDoNotWaitForWebViewToLoad() async {
+    func testWhenAnActionThatIsNotClickSucceeds_thenWeDoNotWaitForWebViewToLoad() async {
         let sut = OptOutOperation(
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
-            emailService: emailService
+            emailService: emailService,
+            operationAwaitTime: 0
         )
         sut.webViewHandler = webViewHandler
 
@@ -179,14 +186,15 @@ final class DataBrokerOperationTests: XCTestCase {
         XCTAssertTrue(webViewHandler.wasFinishCalled)
     }
 
-    func testWhenSolveCapchaActionIsRun_thenCaptchaIsResolved() async {
+    func testWhenSolveCaptchaActionIsRun_thenCaptchaIsResolved() async {
         let solveCaptchaAction = SolveCaptchaAction(id: "1", actionType: .solveCaptcha, selector: "g-captcha")
         let step = Step(type: .optOut, actions: [solveCaptchaAction])
         let sut = OptOutOperation(
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
-            captchaService: captchaService
+            captchaService: captchaService,
+            operationAwaitTime: 0
         )
         sut.webViewHandler = webViewHandler
         sut.actionsHandler = ActionsHandler(step: step)
@@ -204,7 +212,8 @@ final class DataBrokerOperationTests: XCTestCase {
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
-            captchaService: captchaService
+            captchaService: captchaService,
+            operationAwaitTime: 0
         )
         let actionsHandler = ActionsHandler(step: step)
         actionsHandler.captchaTransactionId = "transactionId"
@@ -229,7 +238,8 @@ final class DataBrokerOperationTests: XCTestCase {
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
-            captchaService: captchaService
+            captchaService: captchaService,
+            operationAwaitTime: 0
         )
         sut.webViewHandler = webViewHandler
         sut.actionsHandler = ActionsHandler(step: step)
@@ -247,7 +257,8 @@ final class DataBrokerOperationTests: XCTestCase {
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
-            captchaService: captchaService
+            captchaService: captchaService,
+            operationAwaitTime: 0
         )
         captchaService.shouldThrow = true
         sut.webViewHandler = webViewHandler
@@ -265,7 +276,8 @@ final class DataBrokerOperationTests: XCTestCase {
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
-            emailService: emailService
+            emailService: emailService,
+            operationAwaitTime: 0
         )
         sut.webViewHandler = webViewHandler
 
@@ -279,7 +291,8 @@ final class DataBrokerOperationTests: XCTestCase {
             privacyConfig: PrivacyConfigurationManagingMock(),
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
-            emailService: emailService
+            emailService: emailService,
+            operationAwaitTime: 0
         )
         sut.webViewHandler = webViewHandler
 

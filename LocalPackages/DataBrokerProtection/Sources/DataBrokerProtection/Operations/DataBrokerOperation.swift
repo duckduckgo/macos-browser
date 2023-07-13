@@ -45,10 +45,6 @@ extension DataBrokerOperation {
 
     // MARK: - Shared functions
 
-    var actionAwaitTime: TimeInterval {
-        return 1.0
-    }
-
     func runNextAction(_ action: Action) async {
         if let emailConfirmationAction = action as? EmailConfirmationAction {
             do {
