@@ -29,35 +29,44 @@ final class ScanOperation: DataBrokerOperation {
     let privacyConfig: PrivacyConfigurationManaging
     let prefs: ContentScopeProperties
     let query: BrokerProfileQueryData
-    let emailService: EmailService
-    let captchaService: CaptchaService
+    let emailService: EmailServiceProtocol
+    let captchaService: CaptchaServiceProtocol
     var webViewHandler: WebViewHandler?
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<[ExtractedProfile], Error>?
     var extractedProfile: ExtractedProfile?
+    private let operationAwaitTime: TimeInterval
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
          query: BrokerProfileQueryData,
-         emailService: EmailService = EmailService(),
-         captchaService: CaptchaService = CaptchaService()
+         emailService: EmailServiceProtocol = EmailService(),
+         captchaService: CaptchaServiceProtocol = CaptchaService(),
+         operationAwaitTime: TimeInterval = 1
     ) {
         self.privacyConfig = privacyConfig
         self.prefs = prefs
         self.query = query
         self.emailService = emailService
         self.captchaService = captchaService
+        self.operationAwaitTime = operationAwaitTime
     }
 
-    func run(inputValue: Void) async throws -> [ExtractedProfile] {
+    func run(inputValue: Void,
+             webViewHandler: WebViewHandler? = nil,
+             actionsHandler: ActionsHandler? = nil) async throws -> [ExtractedProfile] {
         try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
             Task {
-                await initialize()
+                await initialize(handler: webViewHandler)
 
                 do {
                     let scanStep = try query.dataBroker.scanStep()
-                    actionsHandler = ActionsHandler(step: scanStep)
+                    if let actionsHandler = actionsHandler {
+                        self.actionsHandler = actionsHandler
+                    } else {
+                        self.actionsHandler = ActionsHandler(step: scanStep)
+                    }
                     await executeNextStep()
                 } catch {
                     failed(with: DataBrokerProtectionError.unknown(error.localizedDescription))
@@ -66,18 +75,15 @@ final class ScanOperation: DataBrokerOperation {
         }
     }
 
-    func extractedProfiles(profiles: [ExtractedProfile]) {
+    func extractedProfiles(profiles: [ExtractedProfile]) async {
         complete(profiles)
-
-        Task {
-            await executeNextStep()
-        }
+        await executeNextStep()
     }
 
     func executeNextStep() async {
-        os_log("SCAN Waiting %{public}f seconds...", log: .action, actionAwaitTime)
+        os_log("SCAN Waiting %{public}f seconds...", log: .action, operationAwaitTime)
 
-        try? await Task.sleep(nanoseconds: UInt64(actionAwaitTime) * 1_000_000_000)
+        try? await Task.sleep(nanoseconds: UInt64(operationAwaitTime) * 1_000_000_000)
 
         if let action = actionsHandler?.nextAction() {
             os_log("Next action: %{public}@", log: .action, String(describing: action.actionType.rawValue))

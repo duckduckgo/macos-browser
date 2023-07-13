@@ -63,14 +63,18 @@ public final class DataBrokerProtectionScheduler {
         self.notificationCenter = notificationCenter
     }
 
-    public func start() {
+    public func start(debug: Bool = true) {
         os_log("Starting scheduler...", log: .dataBrokerProtection)
-      //  activity.schedule { completion in
-            os_log("Scheduler runnning...", log: .dataBrokerProtection)
-            self.dataBrokerProcessor.runQueuedOperations {
-             //   completion(.finished)
+        if debug {
+            self.dataBrokerProcessor.runQueuedOperations()
+        } else {
+            activity.schedule { completion in
+                os_log("Scheduler runnning...", log: .dataBrokerProtection)
+                self.dataBrokerProcessor.runQueuedOperations {
+                    completion(.finished)
+                }
             }
-      //  }
+        }
     }
 
     public func stop() {
