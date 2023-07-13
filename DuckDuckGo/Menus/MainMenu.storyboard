@@ -820,6 +820,12 @@ CQ
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem isSeparatorItem="YES" id="FSc-gX-vGh"/>
+                                                    <menuItem title="Send Test Notification" id="3rB-n0-ZjS">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="sendTestNetworkProtectionNotification:" target="Ady-hI-5gd" id="XIg-P0-PDP"/>
+                                                        </connections>
+                                                    </menuItem>
                                                     <menuItem title="Preferred Server Location" id="Zh6-DO-H1c">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <menu key="submenu" title="Preferred Server Location" id="jbT-17-qgW">

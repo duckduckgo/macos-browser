@@ -19,6 +19,7 @@
 import Foundation
 
 extension UserText {
+
     static let networkProtectionTunnelName = NSLocalizedString("network.protection.tunnel.name", value: "DuckDuckGo Network Protection", comment: "The name of the NetP VPN that will be visible in the system to the user")
     static let networkProtection = NSLocalizedString("network.protection", value: "Network Protection", comment: "Menu item for opening Network Protection")
 
@@ -40,6 +41,17 @@ extension UserText {
 
     // MARK: - System Extension Installation Messages
 
-    static let networkProtectionPleaseAllowSystemExtension = NSLocalizedString("network.protection.system.extension.please.allow", value: "Go to Security & Privacy in System Settings to allow Network Protection to activate", comment: "Message shown to users when they try to enable NetP and they need to allow the system extension to run in macOS")
+    private static let networkProtectionSystemSettingsLegacy = NSLocalizedString("network.protection.configuration.system-settings.legacy", value: "Go to Security & Privacy in System Preferences to allow Network Protection to activate", comment: "Text for a label in the Network Protection popover, displayed after attempting to enable Network Protection for the first time while using macOS 12 and below")
+    private static let networkProtectionSystemSettingsModern = NSLocalizedString("network.protection.configuration.system-settings.modern", value: "Go to Privacy & Security in System Settings to allow Network Protection to activate", comment: "Text for a label in the Network Protection popover, displayed after attempting to enable Network Protection for the first time while using macOS 13 and above")
+
+    static var networkProtectionSystemSettings: String {
+        if #available(macOS 13.0, *) {
+            return networkProtectionSystemSettingsModern
+        } else {
+            return networkProtectionSystemSettingsLegacy
+        }
+    }
+
     static let networkProtectionPleaseReboot = NSLocalizedString("network.protection.system.extension.please.reboot", value: "Please reboot to activate Network Protection", comment: "Message shown to users when they try to enable NetP and they need to reboot the computer to complete the installation")
+
 }
