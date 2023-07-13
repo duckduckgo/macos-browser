@@ -29,38 +29,47 @@ final class OptOutOperation: DataBrokerOperation {
     let privacyConfig: PrivacyConfigurationManaging
     let prefs: ContentScopeProperties
     let query: BrokerProfileQueryData
-    let emailService: EmailService
-    let captchaService: CaptchaService
+    let emailService: EmailServiceProtocol
+    let captchaService: CaptchaServiceProtocol
     var webViewHandler: WebViewHandler?
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<Void, Error>?
     var extractedProfile: ExtractedProfile?
+    private let operationAwaitTime: TimeInterval
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
          query: BrokerProfileQueryData,
-         emailService: EmailService = EmailService(),
-         captchaService: CaptchaService = CaptchaService()
+         emailService: EmailServiceProtocol = EmailService(),
+         captchaService: CaptchaServiceProtocol = CaptchaService(),
+         operationAwaitTime: TimeInterval = 1
     ) {
         self.privacyConfig = privacyConfig
         self.prefs = prefs
         self.query = query
         self.emailService = emailService
         self.captchaService = captchaService
+        self.operationAwaitTime = operationAwaitTime
     }
 
-    func run(inputValue: ExtractedProfile) async throws {
+    func run(inputValue: ExtractedProfile,
+             webViewHandler: WebViewHandler? = nil,
+             actionsHandler: ActionsHandler? = nil) async throws {
         try await withCheckedThrowingContinuation { continuation in
             self.extractedProfile = inputValue
             self.continuation = continuation
 
             Task {
-
-                await initialize()
+                await initialize(handler: webViewHandler)
 
                 do {
                     if let optOutStep = try query.dataBroker.optOutStep() {
-                        actionsHandler = ActionsHandler(step: optOutStep)
+                        if let actionsHandler = actionsHandler {
+                            self.actionsHandler = actionsHandler
+                        } else {
+                            self.actionsHandler = ActionsHandler(step: optOutStep)
+                        }
+
                         await executeNextStep()
                     } else {
                         // If we try to run an optout on a broker without an optout step, we throw.
@@ -73,19 +82,19 @@ final class OptOutOperation: DataBrokerOperation {
         }
     }
 
-    func extractedProfiles(profiles: [ExtractedProfile]) {
+    func extractedProfiles(profiles: [ExtractedProfile]) async {
         // No - op
     }
 
     func executeNextStep() async {
-        os_log("OPTOUT Waiting %{public}f seconds...", log: .action, actionAwaitTime)
-        try? await Task.sleep(nanoseconds: UInt64(actionAwaitTime) * 1_000_000_000)
+        os_log("OPTOUT Waiting %{public}f seconds...", log: .action, operationAwaitTime)
+        try? await Task.sleep(nanoseconds: UInt64(operationAwaitTime) * 1_000_000_000)
 
         if let action = actionsHandler?.nextAction() {
             await runNextAction(action)
         } else {
-            complete(())
             await webViewHandler?.finish() // If we executed all steps we release the web view
+            complete(())
         }
     }
 }
