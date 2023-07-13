@@ -35,7 +35,7 @@ final class DBPHomeViewController: NSViewController {
 
     var startSchedulerButton: NSButton!
     var startScanButton: NSButton!
-    var resetDataButton: NSButton!
+    private var isSchedulerRunning = false
     private let dataManager = DataBrokerProtectionDataManager()
 
     override func loadView() {
@@ -53,15 +53,11 @@ final class DBPHomeViewController: NSViewController {
         addChild(profileQueryViewController)
         view.addSubview(profileQueryViewController.view)
 
-        startSchedulerButton = NSButton(title: "Start Scheduler", target: self, action: #selector(startSchedulerButtonPressed))
-
+        startSchedulerButton = NSButton(title: "Start Scheduler", target: self, action: #selector(schedulerActionToggleButtonPressed))
         startScanButton = NSButton(title: "Start Scan", target: self, action: #selector(startScanButtonPressed))
-
-        resetDataButton = NSButton(title: "Reset All Data", target: self, action: #selector(resetDataButtonPressed))
 
         view.addSubview(startSchedulerButton)
         view.addSubview(startScanButton)
-        view.addSubview(resetDataButton)
     }
 
     override func viewDidLayout() {
@@ -81,19 +77,26 @@ final class DBPHomeViewController: NSViewController {
         startSchedulerButton.frame = CGRect(x: view.bounds.width - buttonWidth - spacing, y: buttonY, width: buttonWidth, height: buttonHeight)
 
         startScanButton.frame = CGRect(x: view.bounds.width - buttonWidth - spacing, y: buttonY + buttonHeight + spacing, width: buttonWidth, height: buttonHeight)
-
-        resetDataButton.frame = CGRect(x: view.bounds.width - buttonWidth - spacing, y: buttonY + 2 * (buttonHeight + spacing), width: buttonWidth, height: buttonHeight)
     }
 
-    @objc func startSchedulerButtonPressed() {
-        scheduler?.start()
+    @objc func schedulerActionToggleButtonPressed() {
+        if isSchedulerRunning {
+            scheduler?.stop()
+        } else {
+            scheduler?.start()
+        }
+        isSchedulerRunning.toggle()
+
+        updateSchedulerButton()
+    }
+
+    private func updateSchedulerButton() {
+        let startSchedulerButtonLabel = isSchedulerRunning ? "Stop Scheduler" : "Start Scheduler"
+        startSchedulerButton.title = startSchedulerButtonLabel
     }
 
     @objc func startScanButtonPressed() {
         scheduler?.scanAllBrokers()
-    }
-
-    @objc func resetDataButtonPressed() {
     }
 
     private func setupScheduler() {
