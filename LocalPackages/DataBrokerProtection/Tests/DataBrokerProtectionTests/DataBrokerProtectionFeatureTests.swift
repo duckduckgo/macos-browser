@@ -27,78 +27,78 @@ final class DataBrokerProtectionFeatureTests: XCTestCase {
         mockCSSDelegate.reset()
     }
 
-    func testWhenParseActionCompletedFailsOnParsing_thenDelegateSendsBackTheCorrectError() {
+    func testWhenParseActionCompletedFailsOnParsing_thenDelegateSendsBackTheCorrectError() async {
         let params = ["result": "something"]
         let sut = DataBrokerProtectionFeature(delegate: mockCSSDelegate)
 
-        sut.parseActionCompleted(params: params)
+        await sut.parseActionCompleted(params: params)
 
         XCTAssertEqual(mockCSSDelegate.lastError, .parsingErrorObjectFailed)
     }
 
-    func testWhenErrorIsParsed_thenDelegateSendsBackActionFailedError() {
+    func testWhenErrorIsParsed_thenDelegateSendsBackActionFailedError() async {
         let params = ["result": ["error": ["actionID": "someActionID", "message": "some message"]]]
         let sut = DataBrokerProtectionFeature(delegate: mockCSSDelegate)
 
-        sut.parseActionCompleted(params: params)
+        await sut.parseActionCompleted(params: params)
 
         XCTAssertEqual(mockCSSDelegate.lastError, .actionFailed(actionID: "someActionID", message: "some message"))
     }
 
-    func testWhenNavigateActionIsParsed_thenDelegateSendsBackURL() {
+    func testWhenNavigateActionIsParsed_thenDelegateSendsBackURL() async {
         let params = ["result": ["success": ["actionID": "1", "actionType": "navigate", "response": ["url": "www.duckduckgo.com"]] as [String: Any]]]
         let sut = DataBrokerProtectionFeature(delegate: mockCSSDelegate)
 
-        sut.parseActionCompleted(params: params)
+        await sut.parseActionCompleted(params: params)
 
         XCTAssertNil(mockCSSDelegate.lastError)
         XCTAssertEqual(mockCSSDelegate.url?.absoluteString, "www.duckduckgo.com")
     }
 
-    func testWhenExtractActionIsParsed_thenDelegateSendsExtractedProfiles() {
+    func testWhenExtractActionIsParsed_thenDelegateSendsExtractedProfiles() async {
         let profiles = NSArray(objects: ["name": "John"], ["name": "Ben"])
         let params = ["result": ["success": ["actionID": "1", "actionType": "extract", "response": profiles] as [String: Any]]]
         let sut = DataBrokerProtectionFeature(delegate: mockCSSDelegate)
 
-        sut.parseActionCompleted(params: params)
+        await sut.parseActionCompleted(params: params)
 
         XCTAssertNil(mockCSSDelegate.lastError)
         XCTAssertNotNil(mockCSSDelegate.profiles)
         XCTAssertEqual(mockCSSDelegate.profiles?.count, 2)
     }
 
-    func testWhenUnknownActionIsParsed_thenDelegateSendsParsingError() {
+    func testWhenUnknownActionIsParsed_thenDelegateSendsParsingError() async {
         let params = ["result": ["success": ["actionID": "1", "actionType": "unknown"] as [String: Any]]]
         let sut = DataBrokerProtectionFeature(delegate: mockCSSDelegate)
 
-        sut.parseActionCompleted(params: params)
+        await sut.parseActionCompleted(params: params)
 
         XCTAssertEqual(mockCSSDelegate.lastError, .parsingErrorObjectFailed)
     }
 
-    func testWhenClickActionIsParsed_thenDelegateSendsSuccessWithCorrectActionId() {
+    func testWhenClickActionIsParsed_thenDelegateSendsSuccessWithCorrectActionId() async {
         let params = ["result": ["success": ["actionID": "click", "actionType": "click"] as [String: Any]]]
         let sut = DataBrokerProtectionFeature(delegate: mockCSSDelegate)
 
-        sut.parseActionCompleted(params: params)
+        await sut.parseActionCompleted(params: params)
 
         XCTAssertEqual(mockCSSDelegate.successActionId, "click")
     }
 
-    func testWhenExpectationActionIsParsed_thenDelegateSendsSuccessWithCorrectActionId() {
+    func testWhenExpectationActionIsParsed_thenDelegateSendsSuccessWithCorrectActionId() async {
         let params = ["result": ["success": ["actionID": "expectation", "actionType": "expectation"] as [String: Any]]]
         let sut = DataBrokerProtectionFeature(delegate: mockCSSDelegate)
 
-        sut.parseActionCompleted(params: params)
+        await sut.parseActionCompleted(params: params)
 
         XCTAssertEqual(mockCSSDelegate.successActionId, "expectation")
     }
 
-    func testWhenGetCaptchaInfoIsParsed_thenTheCorrectCaptchaInfoIsParsed() {
+    func testWhenGetCaptchaInfoIsParsed_thenTheCorrectCaptchaInfoIsParsed() async {
         let params = ["result": ["success": ["actionID": "getCaptchaInfo", "actionType": "getCaptchaInfo", "response": ["siteKey": "1234", "url": "www.test.com", "type": "g-captcha"]] as [String: Any]]]
         let sut = DataBrokerProtectionFeature(delegate: mockCSSDelegate)
 
-        sut.parseActionCompleted(params: params)
+        await sut.parseActionCompleted(params: params)
 
         XCTAssertEqual(mockCSSDelegate.captchaInfo?.siteKey, "1234")
         XCTAssertEqual(mockCSSDelegate.captchaInfo?.url, "www.test.com")
@@ -121,7 +121,7 @@ final class MockCSSCommunicationDelegate: CCFCommunicationDelegate {
         self.profiles = profiles
     }
 
-    func success(actionId: String) {
+    func success(actionId: String, actionType: ActionType) {
         self.successActionId = actionId
     }
 
