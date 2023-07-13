@@ -27,6 +27,7 @@ public final class DataBrokerProtectionScheduler {
     private let activity: NSBackgroundActivityScheduler
     private let errorHandler: EventMapping<DataBrokerProtectionOperationError>
     private let schedulerIdentifier = "com.duckduckgo.macos.browser.databroker-protection-scheduler"
+    private let notificationCenter: NotificationCenter
 
     lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
@@ -36,12 +37,14 @@ public final class DataBrokerProtectionScheduler {
         return DataBrokerProtectionProcessor(database: dataManager.database,
                                              config: DataBrokerProtectionSchedulerConfig(),
                                              operationRunnerProvider: runnerProvider,
+                                             notificationCenter: notificationCenter,
                                              errorHandler: errorHandler)
     }()
 
     public init(privacyConfigManager: PrivacyConfigurationManaging,
                 contentScopeProperties: ContentScopeProperties,
                 dataManager: DataBrokerProtectionDataManager,
+                notificationCenter: NotificationCenter = NotificationCenter.default,
                 errorHandler: EventMapping<DataBrokerProtectionOperationError>) {
 
         activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
@@ -57,6 +60,7 @@ public final class DataBrokerProtectionScheduler {
         self.privacyConfigManager = privacyConfigManager
         self.contentScopeProperties = contentScopeProperties
         self.errorHandler = errorHandler
+        self.notificationCenter = notificationCenter
     }
 
     public func start() {
