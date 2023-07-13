@@ -29,15 +29,15 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     var privacyConfig: PrivacyConfigurationManaging { get }
     var prefs: ContentScopeProperties { get }
     var query: BrokerProfileQueryData { get }
-    var emailService: EmailService { get }
-    var captchaService: CaptchaService { get }
+    var emailService: EmailServiceProtocol { get }
+    var captchaService: CaptchaServiceProtocol { get }
 
     var webViewHandler: WebViewHandler? { get set }
     var actionsHandler: ActionsHandler? { get }
     var continuation: CheckedContinuation<ReturnValue, Error>? { get set }
     var extractedProfile: ExtractedProfile? { get set }
 
-    func run(inputValue: InputValue) async throws -> ReturnValue
+    func run(inputValue: InputValue, webViewHandler: WebViewHandler?, actionsHandler: ActionsHandler?) async throws -> ReturnValue
     func executeNextStep() async
 }
 
@@ -45,17 +45,15 @@ extension DataBrokerOperation {
 
     // MARK: - Shared functions
 
-    var actionAwaitTime: TimeInterval {
-        return 1.0
-    }
-    func getProfileWithEmail() async throws {
-
-    }
-
     func runNextAction(_ action: Action) async {
         if let emailConfirmationAction = action as? EmailConfirmationAction {
-            try? await runEmailConfirmationAction(action: emailConfirmationAction)
-            await executeNextStep()
+            do {
+                try await runEmailConfirmationAction(action: emailConfirmationAction)
+                await executeNextStep()
+            } catch {
+                await onError(error: .emailError(error as? EmailError))
+            }
+
             return
         }
 
@@ -64,7 +62,7 @@ extension DataBrokerOperation {
             if let captchaData = try? await captchaService.submitCaptchaToBeResolved(for: captchaTransactionId) {
                 await webViewHandler?.execute(action: action, profileData: .solveCaptcha(CaptchaToken(token: captchaData)))
             } else {
-                onError(error: .captchaServiceError(CaptchaServiceError.nilDataWhenFetchingCaptchaResult))
+                await onError(error: .captchaServiceError(CaptchaServiceError.nilDataWhenFetchingCaptchaResult))
             }
 
             return
@@ -74,7 +72,7 @@ extension DataBrokerOperation {
             do {
                 extractedProfile?.email = try await emailService.getEmail()
             } catch {
-                onError(error: .emailError(error as? EmailError))
+                await onError(error: .emailError(error as? EmailError))
                 return
             }
         }
@@ -87,22 +85,17 @@ extension DataBrokerOperation {
     }
 
     private func runEmailConfirmationAction(action: EmailConfirmationAction) async throws {
-        do {
-            if let email = extractedProfile?.email {
-                let url =  try await emailService.getConfirmationLink(
-                    from: email,
-                    pollingIntervalInSeconds: action.pollingTime)
-                try? await webViewHandler?.load(url: url)
-            } else {
-                assertionFailure("Trying to run email confirmation without an email.")
-                throw EmailError.cantFindEmail
-            }
-        } catch {
-            onError(error: .emailError(error as? EmailError))
+        if let email = extractedProfile?.email {
+            let url =  try await emailService.getConfirmationLink(
+                from: email,
+                numberOfRetries: 100, // Move to constant
+                pollingIntervalInSeconds: action.pollingTime
+            )
+            try? await webViewHandler?.load(url: url)
+        } else {
+            throw EmailError.cantFindEmail
         }
     }
-
-    // MARK: - CSSCommunicationDelegate
 
     func complete(_ value: ReturnValue) {
         self.continuation?.resume(returning: value)
@@ -114,49 +107,47 @@ extension DataBrokerOperation {
         self.continuation = nil
     }
 
-    func initialize() async {
-        webViewHandler = await WebViewHandler(privacyConfig: privacyConfig, prefs: prefs, delegate: self)
-        await webViewHandler?.initializeWebView()
+    func initialize(handler: WebViewHandler?) async {
+        if let handler = handler { // This help us swapping up the WebViewHandler on tests
+            self.webViewHandler = handler
+        } else {
+            self.webViewHandler = await DataBrokerProtectionWebViewHandler(privacyConfig: privacyConfig, prefs: prefs, delegate: self)
+        }
+
+        await webViewHandler?.initializeWebView(debug: true)
     }
 
-    func loadURL(url: URL) {
-        Task {
-            try? await webViewHandler?.load(url: url)
+    // MARK: - CSSCommunicationDelegate
+
+    func loadURL(url: URL) async {
+        try? await webViewHandler?.load(url: url)
+        await executeNextStep()
+    }
+
+    func success(actionId: String, actionType: ActionType) async {
+        switch actionType {
+        case .click:
+            try? await webViewHandler?.waitForWebViewLoad(timeoutInSeconds: 30)
             await executeNextStep()
+        default: await executeNextStep()
         }
     }
 
-    func success(actionId: String, actionType: ActionType) {
-        Task {
-            switch actionType {
-            case .click:
-                try? await webViewHandler?.waitForWebViewLoad(timeoutInSeconds: 30)
-                await executeNextStep()
-            default: await executeNextStep()
+    func captchaInformation(captchaInfo: GetCaptchaInfoResponse) async {
+        do {
+            actionsHandler?.captchaTransactionId = try await captchaService.submitCaptchaInformation(captchaInfo)
+            await executeNextStep()
+        } catch {
+            if let captchaError = error as? CaptchaServiceError {
+                await onError(error: DataBrokerProtectionError.captchaServiceError(captchaError))
+            } else {
+                await onError(error: DataBrokerProtectionError.captchaServiceError(.errorWhenSubmittingCaptcha))
             }
         }
     }
 
-    func captchaInformation(captchaInfo: GetCaptchaInfoResponse) {
-        Task {
-            do {
-                actionsHandler?.captchaTransactionId = try await captchaService.submitCaptchaInformation(captchaInfo)
-                await executeNextStep()
-            } catch {
-                if let captchaError = error as? CaptchaServiceError {
-                    onError(error: DataBrokerProtectionError.captchaServiceError(captchaError))
-                } else {
-                    onError(error: DataBrokerProtectionError.captchaServiceError(.errorWhenSubmittingCaptcha))
-                }
-            }
-        }
-    }
-
-    func onError(error: DataBrokerProtectionError) {
+    func onError(error: DataBrokerProtectionError) async {
+        await webViewHandler?.finish()
         failed(with: error)
-
-        Task {
-            await webViewHandler?.finish()
-        }
     }
 }

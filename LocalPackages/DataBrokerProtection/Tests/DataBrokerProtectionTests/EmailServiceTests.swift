@@ -44,7 +44,7 @@ final class EmailServiceTests: XCTestCase {
             _ = try await sut.getEmail()
             XCTFail("Expected an error to be thrown")
         } catch {
-            if let error = error as? EmailService.EmailError,
+            if let error = error as? EmailError,
                     case .cantFindEmail = error,
                     case .cantGenerateURL = error {
                 XCTFail("Unexpected error thrown: \(error).")
@@ -65,7 +65,7 @@ final class EmailServiceTests: XCTestCase {
             _ = try await sut.getEmail()
             XCTFail("Expected an error to be thrown")
         } catch {
-            if let error = error as? EmailService.EmailError, case .cantFindEmail = error {
+            if let error = error as? EmailError, case .cantFindEmail = error {
                 return
             }
 
@@ -104,7 +104,7 @@ final class EmailServiceTests: XCTestCase {
                 pollingIntervalInSeconds: 2
             )
         } catch {
-            if let error = error as? EmailService.EmailError, case .linkExtractionTimedOut = error {
+            if let error = error as? EmailError, case .linkExtractionTimedOut = error {
                 return
             }
 
@@ -150,7 +150,7 @@ final class EmailServiceTests: XCTestCase {
                 pollingIntervalInSeconds: 2
             )
         } catch {
-            if let error = error as? EmailService.EmailError, case .cantDecodeEmailLink = error {
+            if let error = error as? EmailError, case .cantDecodeEmailLink = error {
                 return
             }
 
@@ -172,7 +172,7 @@ final class EmailServiceTests: XCTestCase {
                 pollingIntervalInSeconds: 1
             )
         } catch {
-            if let error = error as? EmailService.EmailError, case .invalidEmailLink = error {
+            if let error = error as? EmailError, case .invalidEmailLink = error {
                 return
             }
 

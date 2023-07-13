@@ -27,7 +27,14 @@ public enum EmailError: Error, Equatable {
     case cantDecodeEmailLink
 }
 
-struct EmailService {
+protocol EmailServiceProtocol {
+    func getEmail() async throws -> String
+    func getConfirmationLink(from email: String,
+                             numberOfRetries: Int,
+                             pollingIntervalInSeconds: Int) async throws -> URL
+}
+
+struct EmailService: EmailServiceProtocol {
     private struct Constants {
         static let baseUrl = "https://dbp.duckduckgo.com/dbp/em/v0"
     }
