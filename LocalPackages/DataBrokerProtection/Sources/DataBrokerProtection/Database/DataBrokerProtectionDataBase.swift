@@ -87,9 +87,9 @@ private struct TestData {
                {
                  "name": "verecor",
                "schedulingConfig" : {
-                    "retryError": 100,
-                    "confirmOptOutScan": 40,
-                    "maintenanceScan": 60,
+                    "retryError": 700,
+                    "confirmOptOutScan": 480,
+                    "maintenanceScan": 600,
                     "emailConfirmation": 60,
                },
                  "steps": [

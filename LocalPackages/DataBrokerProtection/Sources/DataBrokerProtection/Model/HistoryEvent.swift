@@ -37,7 +37,6 @@ public struct HistoryEvent: Sendable, Identifiable {
         self.id = UUID()
         self.date = Date()
         self.type = type
-        print("NEW EVENT CREATED \(type)")
     }
 }
 
