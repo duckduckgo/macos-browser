@@ -188,4 +188,18 @@ extension NSColor {
         NSColor(named: "RedButtonTintColor")!
     }
 
+    static var fireButtonRedBackgroundColor: NSColor {
+        NSColor(named: "FireButtonRedBackgroundColor")!
+    }
+
+    static var fireButtonRedHoverColor: NSColor {
+        NSColor(named: "FireButtonRedHoverColor")!
+    }
+
+    static var fireButtonRedPressedColor: NSColor {
+        NSColor(named: "FireButtonRedPressedColor")!
+    }
+
+
+
 }
