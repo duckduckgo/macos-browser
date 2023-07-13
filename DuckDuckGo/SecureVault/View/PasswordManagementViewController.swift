@@ -550,6 +550,7 @@ final class PasswordManagementViewController: NSViewController {
             switch response {
             case .alertFirstButtonReturn:
                 try? self.secureVault?.deleteWebsiteCredentialsFor(accountId: id)
+                self.requestSync(dataChanged: true)
                 self.refreshData()
 
             default:
