@@ -22,8 +22,16 @@ import BrowserServicesKit
 import UserScript
 import Common
 
+protocol WebViewHandler: NSObject {
+    func initializeWebView(debug: Bool) async
+    func load(url: URL) async throws
+    func waitForWebViewLoad(timeoutInSeconds: Int) async throws
+    func finish() async
+    func execute(action: Action, profileData: CCFRequestData) async
+}
+
 @MainActor
-final class WebViewHandler: NSObject {
+final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     private var activeContinuation: CheckedContinuation<Void, Error>?
 
     let webViewConfiguration: WKWebViewConfiguration
@@ -100,7 +108,7 @@ final class WebViewHandler: NSObject {
     }
 }
 
-extension WebViewHandler: WKNavigationDelegate {
+extension DataBrokerProtectionWebViewHandler: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
     }
