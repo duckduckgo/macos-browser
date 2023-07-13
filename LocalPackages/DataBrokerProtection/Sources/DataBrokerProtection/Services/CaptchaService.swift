@@ -74,7 +74,39 @@ struct CaptchaResult: Codable {
     let meta: Meta
 }
 
-struct CaptchaService {
+protocol CaptchaServiceProtocol {
+
+    /// Submits captcha information to the backend to start solving it,
+    ///
+    /// - Parameters:
+    ///   - captchaInfo: A struct that containers a `siteKey`, `url` and `type`
+    /// - Returns: `CaptchaTransactionId` an identifier so we can later use to fetch the resolved captcha information
+    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse,
+                                  retries: Int) async throws -> CaptchaTransactionId
+
+    /// Fetches the resolved captcha information with the passed transaction ID.
+    ///
+    /// - Parameters:
+    ///   - transactionID: The transaction ID of the previous submitted captcha information
+    ///   - retries: The number of retries until we timed out. Defaults to 100
+    ///   - pollingInterval: The time between each poll in seconds. Defaults to 40 seconds
+    /// - Returns: `CaptchaResolveData` a string containing the data to resolve the captcha
+    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId,
+                                   retries: Int,
+                                   pollingInterval: Int) async throws -> CaptchaResolveData
+}
+
+extension CaptchaServiceProtocol {
+    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse) async throws -> CaptchaTransactionId {
+        try await submitCaptchaInformation(captchaInfo, retries: 5)
+    }
+
+    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId) async throws -> CaptchaResolveData {
+        try await submitCaptchaToBeResolved(for: transactionID, retries: 100, pollingInterval: 40)
+    }
+}
+
+struct CaptchaService: CaptchaServiceProtocol {
 
     private struct Constants {
         struct URL {
@@ -95,11 +127,6 @@ struct CaptchaService {
         self.urlSession = urlSession
     }
 
-    /// Submits captcha information to the backend to start solving it,
-    ///
-    /// - Parameters:
-    ///   - captchaInfo: A struct that containers a `siteKey`, `url` and `type`
-    /// - Returns: `CaptchaTransactionId` an identifier so we can later use to fetch the resolved captcha information
     func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse,
                                   retries: Int = 5) async throws -> CaptchaTransactionId {
         guard let captchaSubmitResult = try? await submitCaptchaInformationRequest(captchaInfo) else {
@@ -150,13 +177,6 @@ struct CaptchaService {
         return result
     }
 
-    /// Fetches the resolved captcha information with the passed transaction ID.
-    ///
-    /// - Parameters:
-    ///   - transactionID: The transaction ID of the previous submitted captcha information
-    ///   - retries: The number of retries until we timed out. Defaults to 100
-    ///   - pollingInterval: The time between each poll in seconds. Defaults to 40 seconds
-    /// - Returns: `CaptchaResolveData` a string containing the data to resolve the captcha
     func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId,
                                    retries: Int = 100,
                                    pollingInterval: Int = 40) async throws -> CaptchaResolveData {
