@@ -70,10 +70,13 @@ public class DataBrokerProtectionDataManager {
     public func fetchDataBrokerInfoData() -> [DataBrokerInfoData] {
         let profileQueriesData = database.brokerProfileQueriesData
         let result = profileQueriesData.map { brokerProfileQuery in
-            let scanData = DataBrokerInfoData.ScanData(historyEvents: brokerProfileQuery.scanData.historyEvents)
+            let scanData = DataBrokerInfoData.ScanData(historyEvents: brokerProfileQuery.scanData.historyEvents,
+                                                       preferredRunDate: brokerProfileQuery.scanData.preferredRunDate)
 
             let optOutsData = brokerProfileQuery.optOutsData.map {
-                DataBrokerInfoData.OptOutData(historyEvents: $0.historyEvents, extractedProfileName: $0.extractedProfile.name ?? "No name")
+                DataBrokerInfoData.OptOutData(historyEvents: $0.historyEvents,
+                                              extractedProfileName: $0.extractedProfile.name ?? "No name",
+                                              preferredRunDate: $0.preferredRunDate)
             }
 
             return DataBrokerInfoData(userFirstName: brokerProfileQuery.profileQuery.firstName,
@@ -87,7 +90,6 @@ public class DataBrokerProtectionDataManager {
 
      @objc private func setupFakeData() {
         delegate?.dataBrokerProtectionDataManagerDidUpdateData()
-         print("DATA UPDATED")
     }
 
     private func setupNotifications() {
@@ -100,12 +102,14 @@ public struct DataBrokerInfoData: Identifiable {
     public struct ScanData: Identifiable {
         public let id = UUID()
         public let historyEvents: [HistoryEvent]
+        public let preferredRunDate: Date?
     }
 
     public struct OptOutData: Identifiable {
         public let id = UUID()
         public let historyEvents: [HistoryEvent]
         public let extractedProfileName: String
+        public let preferredRunDate: Date?
     }
 
     public let id = UUID()

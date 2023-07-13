@@ -70,11 +70,15 @@ struct DetailView: View {
                 .font(.title)
                 .padding()
 
-            DetailViewSubItem(historyItems: item.scanData.historyEvents, title: "Scan Operation")
+
+            DetailViewSubItem(viewData: ViewData(title: "Scan Operation",
+                                                 events: item.scanData.historyEvents,
+                                                 preferredRunDate: item.scanData.preferredRunDate))
 
             List(item.optOutsData) { item in
-                DetailViewSubItem(historyItems: item.historyEvents, title: "OptOut \(item.extractedProfileName)")
-
+                DetailViewSubItem(viewData: ViewData(title: "OptOut Operation \(item.extractedProfileName)",
+                                                     events: item.historyEvents,
+                                                     preferredRunDate: item.preferredRunDate))
             }
             .frame(minWidth: 200)
         }
@@ -82,8 +86,7 @@ struct DetailView: View {
 }
 
 struct DetailViewSubItem: View {
-    let historyItems: [HistoryEvent]
-    let title: String
+    let viewData: ViewData
     @State private var showModal = false
 
     var body: some View {
@@ -91,34 +94,34 @@ struct DetailViewSubItem: View {
             Button(action: {
                 showModal = true
             }) {
-                Text(title)
+                Text(viewData.title)
                     .padding()
                     .cornerRadius(8)
             }
         }
         .padding()
         .sheet(isPresented: $showModal) {
-            ModalView(title: title, historyItems: historyItems, showModal: $showModal)
+            ModalView(viewData: viewData, showModal: $showModal)
                 .frame(width: 600, height: 400)
         }
     }
 }
 
 struct ModalView: View {
-    let title: String
-    let historyItems: [HistoryEvent]
+    let viewData: ViewData
     @Binding var showModal: Bool
 
     var body: some View {
         VStack {
-            Text(title)
-            List(historyItems) { item in
+            Text(viewData.title)
+            List(viewData.events) { item in
                 HStack {
                     Text("⚠️")
                     Text(formatDate(item.date))
                     Text(labelForEvent(item))
                 }
             }
+            Text("🗓️ PreferredRunDate \(viewData.formattedRunDate)")
             Button(action: {
                 dismissModal()
             }) {
@@ -160,5 +163,26 @@ struct ModalView: View {
         case .scanStarted:
             return "Scan Started"
         }
+    }
+}
+
+struct ViewData {
+    let title: String
+    let events: [HistoryEvent]
+    let preferredRunDate: Date?
+
+    var formattedRunDate: String {
+        if let date = preferredRunDate {
+            return formatDate(date)
+        } else {
+            return "No date set"
+        }
+    }
+
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
     }
 }
