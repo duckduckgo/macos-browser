@@ -134,7 +134,6 @@ private struct MockDataBase: DataBase {
     var brokerProfileQueryDataList: [BrokerProfileQueryData]
     var mockBrokerProfileQueryData: BrokerProfileQueryData?
     let commonScheduleConfig = DataBrokerScheduleConfig(
-        emailConfirmation: 10 * 60 * 60,
         retryError: 48 * 60 * 60,
         confirmOptOutScan: 72 * 60 * 60,
         maintenanceScan: 240 * 60 * 60

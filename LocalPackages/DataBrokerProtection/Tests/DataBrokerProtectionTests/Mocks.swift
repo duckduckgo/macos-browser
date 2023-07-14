@@ -37,7 +37,7 @@ extension BrokerProfileQueryData {
 
 extension DataBrokerScheduleConfig {
     static var mock: DataBrokerScheduleConfig {
-        DataBrokerScheduleConfig(emailConfirmation: TimeInterval.pi, retryError: TimeInterval.pi, confirmOptOutScan: TimeInterval.pi, maintenanceScan: TimeInterval.pi)
+        DataBrokerScheduleConfig(retryError: TimeInterval.pi, confirmOptOutScan: TimeInterval.pi, maintenanceScan: TimeInterval.pi)
     }
 }
 
@@ -162,8 +162,8 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         wasFinishCalled = true
     }
 
-    func execute(action: DataBrokerProtection.Action, profileData: DataBrokerProtection.CCFRequestData) async {
-        switch profileData {
+    func execute(action: DataBrokerProtection.Action, data: DataBrokerProtection.CCFRequestData) async {
+        switch data {
         case .profile:
             wasExecuteCalledForExtractedProfile = false
             wasExecuteCalledForSolveCaptcha = false
