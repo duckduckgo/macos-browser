@@ -171,6 +171,10 @@ final class PasswordManagementViewController: NSViewController {
         NotificationCenter.default.addObserver(forName: .dataImportComplete, object: nil, queue: .main) { [weak self] _ in
             self?.refreshData()
         }
+
+        NotificationCenter.default.addObserver(forName: .credentialsSyncComplete, object: nil, queue: .main) { [weak self] _ in
+            self?.refreshData()
+        }
     }
 
     private func toggleLockScreen(hidden: Bool) {

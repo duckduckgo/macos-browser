@@ -23,6 +23,13 @@ import DDGSync
 import Persistence
 import SyncDataProviders
 
+
+extension NSNotification.Name {
+
+    static let credentialsSyncComplete = NSNotification.Name("CredentialsSyncComplete")
+
+}
+
 final class SyncLoginsAdapter {
 
     private(set) var provider: LoginsProvider?
@@ -36,7 +43,9 @@ final class SyncLoginsAdapter {
             let provider = try LoginsProvider(
                 secureVaultFactory: secureVaultFactory,
                 metadataStore: metadataStore,
-                reloadLoginsAfterSync: {}
+                reloadLoginsAfterSync: {
+                    NotificationCenter.default.post(name: .credentialsSyncComplete, object: nil)
+                }
             )
 
             syncErrorCancellable = provider.syncErrorPublisher
