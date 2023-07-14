@@ -28,12 +28,10 @@ protocol DataBase {
 }
 
 final class DataBrokerProtectionDataBase: DataBase {
-    private var dataBrokers = [DataBroker]()
-    private var brokerProfileQueriesData = [BrokerProfileQueryData]()
-
-    init() {
-        setupFakeData()
-    }
+    // Data in memory for tests
+    public var dataBrokers = [DataBroker]()
+    public var brokerProfileQueriesData = [BrokerProfileQueryData]()
+    public var testProfileQuery: ProfileQuery?
 
     func brokerProfileQueryData(for profileQuery: ProfileQuery, dataBroker: DataBroker) -> BrokerProfileQueryData? {
         brokerProfileQueriesData.filter {
@@ -70,9 +68,12 @@ final class DataBrokerProtectionDataBase: DataBase {
         return brokerProfileQueriesData
     }
 
-    private func setupFakeData() {
+    func setupFakeData() {
+        self.dataBrokers.removeAll()
+        self.brokerProfileQueriesData.removeAll()
+
         let dataBroker = TestData().dataBroker
-        let profileQuery = TestData().profileQuery
+        let profileQuery = testProfileQuery!
         let queryData = BrokerProfileQueryData(id: UUID(), profileQuery: profileQuery, dataBroker: dataBroker)
 
         self.dataBrokers.append(dataBroker)
@@ -82,13 +83,15 @@ final class DataBrokerProtectionDataBase: DataBase {
 
 private struct TestData {
 
-    var profileQuery: ProfileQuery {
-        ProfileQuery(firstName: "Ben", lastName: "Smith", city: "Dallas", state: "TX", age: 44)
-    }
-
     let verecorJSONString = """
                {
                  "name": "verecor",
+               "schedulingConfig" : {
+                    "retryError": 700,
+                    "confirmOptOutScan": 480,
+                    "maintenanceScan": 600,
+                    "emailConfirmation": 60,
+               },
                  "steps": [
                    {
                      "stepType": "scan",

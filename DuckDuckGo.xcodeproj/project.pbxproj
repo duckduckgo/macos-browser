@@ -83,6 +83,9 @@
 		3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */; };
 		310E79BF294A19A8007C49E8 /* FireproofingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */; };
 		311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B262628E73E0A00FD181A /* TabShadowConfig.swift */; };
+		311CFB8D2A5EE99700579619 /* UserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311CFB8C2A5EE99700579619 /* UserProfileView.swift */; };
+		311CFB8F2A5EE9BA00579619 /* DataBrokerProfileQueryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311CFB8E2A5EE9BA00579619 /* DataBrokerProfileQueryView.swift */; };
+		311CFB912A5EEA0400579619 /* SwiftUIWrappers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311CFB902A5EEA0400579619 /* SwiftUIWrappers.swift */; };
 		313AEDA1287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */; };
 		3154FD1428E6011A00909769 /* TabShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3154FD1328E6011A00909769 /* TabShadowView.swift */; };
 		315AA07028CA5CC800200030 /* YoutubePlayerNavigationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */; };
@@ -2947,6 +2950,9 @@
 		3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionViewController.swift; sourceTree = "<group>"; };
 		310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofingReferenceTests.swift; sourceTree = "<group>"; };
 		311B262628E73E0A00FD181A /* TabShadowConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowConfig.swift; sourceTree = "<group>"; };
+		311CFB8C2A5EE99700579619 /* UserProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileView.swift; sourceTree = "<group>"; };
+		311CFB8E2A5EE9BA00579619 /* DataBrokerProfileQueryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProfileQueryView.swift; sourceTree = "<group>"; };
+		311CFB902A5EEA0400579619 /* SwiftUIWrappers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIWrappers.swift; sourceTree = "<group>"; };
 		313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionView.swift; sourceTree = "<group>"; };
 		3154FD1328E6011A00909769 /* TabShadowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowView.swift; sourceTree = "<group>"; };
 		315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubePlayerNavigationHandler.swift; sourceTree = "<group>"; };
@@ -4320,6 +4326,7 @@
 		3192EC862A4DCF0E001E97A5 /* DBP */ = {
 			isa = PBXGroup;
 			children = (
+				311CFB8B2A5EE98400579619 /* DebugUI */,
 				3192EC872A4DCF21001E97A5 /* DBPHomeViewController.swift */,
 			);
 			path = DBP;
@@ -8638,10 +8645,12 @@
 				31929FF52A4C4CFF0084EA89 /* PopUpButton.swift in Sources */,
 				31929FF62A4C4CFF0084EA89 /* NetworkProtectionInviteDialog.swift in Sources */,
 				31929FF72A4C4CFF0084EA89 /* SuggestionViewController.swift in Sources */,
+				311CFB912A5EEA0400579619 /* SwiftUIWrappers.swift in Sources */,
 				31929FF82A4C4CFF0084EA89 /* AddEditFavoriteWindow.swift in Sources */,
 				31929FF92A4C4CFF0084EA89 /* NetworkProtectionInviteSuccessView.swift in Sources */,
 				31929FFA2A4C4CFF0084EA89 /* BWKeyStorage.swift in Sources */,
 				31929FFB2A4C4CFF0084EA89 /* VisitViewModel.swift in Sources */,
+				311CFB8D2A5EE99700579619 /* UserProfileView.swift in Sources */,
 				31929FFC2A4C4CFF0084EA89 /* Atb.swift in Sources */,
 				31929FFD2A4C4CFF0084EA89 /* BrowserTabView.swift in Sources */,
 				31929FFE2A4C4CFF0084EA89 /* DownloadsViewController.swift in Sources */,
@@ -8977,6 +8986,7 @@
 				3192A1472A4C4CFF0084EA89 /* TabBarFooter.swift in Sources */,
 				3192A1482A4C4CFF0084EA89 /* JSAlertViewModel.swift in Sources */,
 				3192A1492A4C4CFF0084EA89 /* BookmarksBarCollectionViewItem.swift in Sources */,
+				311CFB8F2A5EE9BA00579619 /* DataBrokerProfileQueryView.swift in Sources */,
 				3192A14A2A4C4CFF0084EA89 /* FileDownloadError.swift in Sources */,
 				3192A14B2A4C4CFF0084EA89 /* MoreOrLessView.swift in Sources */,
 				3192A14C2A4C4CFF0084EA89 /* DateExtension.swift in Sources */,

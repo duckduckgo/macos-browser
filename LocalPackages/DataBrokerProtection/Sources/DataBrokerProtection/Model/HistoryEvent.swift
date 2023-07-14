@@ -18,8 +18,8 @@
 
 import Foundation
 
-struct HistoryEvent: Sendable {
-    enum EventType {
+public struct HistoryEvent: Sendable, Identifiable {
+    public enum EventType {
         case noMatchFound
         case matchFound(extractedProfileID: UUID)
         case error
@@ -29,9 +29,9 @@ struct HistoryEvent: Sendable {
         case scanStarted
     }
 
-    let id: UUID
-    let type: EventType
-    let date: Date
+    public let id: UUID
+    public let type: EventType
+    public let date: Date
 
     init(type: EventType) {
         self.id = UUID()
@@ -41,7 +41,7 @@ struct HistoryEvent: Sendable {
 }
 
 extension HistoryEvent.EventType: Equatable {
-    static func == (lhs: HistoryEvent.EventType, rhs: HistoryEvent.EventType) -> Bool {
+    public static func == (lhs: HistoryEvent.EventType, rhs: HistoryEvent.EventType) -> Bool {
         switch (lhs, rhs) {
         case (.noMatchFound, .noMatchFound),
              (.error, .error),
