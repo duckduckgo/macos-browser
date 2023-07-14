@@ -60,7 +60,7 @@ extension DataBrokerOperation {
         if action as? SolveCaptchaAction != nil, let captchaTransactionId = actionsHandler?.captchaTransactionId {
             actionsHandler?.captchaTransactionId = nil
             if let captchaData = try? await captchaService.submitCaptchaToBeResolved(for: captchaTransactionId) {
-                await webViewHandler?.execute(action: action, profileData: .solveCaptcha(CaptchaToken(token: captchaData)))
+                await webViewHandler?.execute(action: action, data: .solveCaptcha(CaptchaToken(token: captchaData)))
             } else {
                 await onError(error: .captchaServiceError(CaptchaServiceError.nilDataWhenFetchingCaptchaResult))
             }
@@ -78,9 +78,9 @@ extension DataBrokerOperation {
         }
 
         if let extractedProfile = self.extractedProfile {
-            await webViewHandler?.execute(action: action, profileData: .extractedProfile(extractedProfile))
+            await webViewHandler?.execute(action: action, data: .extractedProfile(extractedProfile))
         } else {
-            await webViewHandler?.execute(action: action, profileData: .profile(query.profileQuery))
+            await webViewHandler?.execute(action: action, data: .profile(query.profileQuery))
         }
     }
 

@@ -27,7 +27,7 @@ protocol WebViewHandler: NSObject {
     func load(url: URL) async throws
     func waitForWebViewLoad(timeoutInSeconds: Int) async throws
     func finish() async
-    func execute(action: Action, profileData: CCFRequestData) async
+    func execute(action: Action, data: CCFRequestData) async
 }
 
 @MainActor
@@ -97,13 +97,13 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
         }
     }
 
-    func execute(action: Action, profileData: CCFRequestData) {
+    func execute(action: Action, data: CCFRequestData) {
         os_log("Executing action: %{public}@", log: .action, String(describing: action.actionType.rawValue))
 
         userContentController?.dataBrokerUserScripts.dataBrokerFeature.pushAction(
             method: .onActionReceived,
             webView: self.webView!,
-            params: Params(state: State(action: action, profileData: profileData))
+            params: Params(state: State(action: action, data: data))
         )
     }
 }
