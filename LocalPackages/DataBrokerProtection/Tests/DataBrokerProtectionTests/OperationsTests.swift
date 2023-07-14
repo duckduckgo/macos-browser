@@ -38,7 +38,7 @@ final class OperationsTests: XCTestCase {
         let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
         let dataBroker = DataBroker(name: "Test Broker",
             steps: [Step](),
-            schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+            schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 48 * 60 * 60,
                 confirmOptOutScan: 72 * 60 * 60,
                 maintenanceScan: 240 * 60 * 60))
@@ -77,7 +77,7 @@ final class OperationsTests: XCTestCase {
         let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
         let dataBroker = DataBroker(name: "Test Broker",
             steps: [Step](),
-            schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+            schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 48 * 60 * 60,
                 confirmOptOutScan: 72 * 60 * 60,
                 maintenanceScan: 240 * 60 * 60))
@@ -125,7 +125,7 @@ final class OperationsTests: XCTestCase {
         let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
         let dataBroker = DataBroker(name: "Test Broker",
             steps: [Step](),
-            schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+            schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 48 * 60 * 60,
                 confirmOptOutScan: 72 * 60 * 60,
                 maintenanceScan: 240 * 60 * 60))
@@ -164,7 +164,7 @@ final class OperationsTests: XCTestCase {
         let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
         let dataBroker = DataBroker(name: "Test Broker",
             steps: [Step](),
-            schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+            schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 48 * 60 * 60,
                 confirmOptOutScan: 72 * 60 * 60,
                 maintenanceScan: 240 * 60 * 60))
@@ -216,7 +216,7 @@ final class OperationsTests: XCTestCase {
         let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
         let dataBroker = DataBroker(name: "Test Broker",
             steps: [Step](),
-            schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+            schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 48 * 60 * 60,
                 confirmOptOutScan: 72 * 60 * 60,
                 maintenanceScan: 240 * 60 * 60))
@@ -266,7 +266,7 @@ final class OperationsTests: XCTestCase {
         let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
         let dataBroker = DataBroker(name: "Test Broker",
             steps: [Step](),
-            schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+            schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 48 * 60 * 60,
                 confirmOptOutScan: 72 * 60 * 60,
                 maintenanceScan: 240 * 60 * 60))
@@ -328,7 +328,7 @@ final class OperationsTests: XCTestCase {
         let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
         let dataBroker = DataBroker(name: "Test Broker",
             steps: [Step](),
-            schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+            schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 48 * 60 * 60,
                 confirmOptOutScan: 72 * 60 * 60,
                 maintenanceScan: 240 * 60 * 60))
@@ -382,7 +382,7 @@ final class OperationsTests: XCTestCase {
         let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
         let dataBroker = DataBroker(name: "Test Broker",
             steps: [Step](),
-            schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+            schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 48 * 60 * 60,
                 confirmOptOutScan: 72 * 60 * 60,
                 maintenanceScan: 240 * 60 * 60))
@@ -457,7 +457,7 @@ private struct MockDataBase: DataBase {
             profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46),
             dataBroker: DataBroker(name: "batata",
                 steps: [Step](),
-                schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+                schedulingConfig: DataBrokerScheduleConfig(
                     retryError: 48 * 60 * 60,
                     confirmOptOutScan: 72 * 60 * 60,
                     maintenanceScan: 240 * 60 * 60)))
@@ -489,7 +489,7 @@ private struct MockDataBase: DataBase {
             profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46),
             dataBroker: DataBroker(name: "batata",
                 steps: [Step](),
-                schedulingConfig: DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
+                schedulingConfig: DataBrokerScheduleConfig(
                     retryError: 48 * 60 * 60,
                     confirmOptOutScan: 72 * 60 * 60,
                     maintenanceScan: 240 * 60 * 60)))
