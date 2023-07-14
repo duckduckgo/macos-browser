@@ -19,7 +19,6 @@
 import Foundation
 
 struct DataBrokerScheduleConfig: Codable {
-    let emailConfirmation: TimeInterval
     let retryError: TimeInterval
     let confirmOptOutScan: TimeInterval
     let maintenanceScan: TimeInterval
@@ -65,6 +64,14 @@ struct DataBroker: Codable, Sendable {
         }
 
         return optOutStep
+    }
+
+    static func initFromResource(_ brokerName: String) -> DataBroker {
+         let jsonUrl = Bundle.module.url(forResource: brokerName, withExtension: "json", subdirectory: "Resources")!
+        // swiftlint:disable:next force_try
+        let data = try! Data(contentsOf: jsonUrl)
+        // swiftlint:disable:next force_try
+        return try! JSONDecoder().decode(DataBroker.self, from: data)
     }
 }
 
