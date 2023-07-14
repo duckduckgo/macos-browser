@@ -26,10 +26,10 @@ final class FaviconReferenceCache {
     private let storing: FaviconStoring
 
     // References to favicon URLs for whole domains
-    private var hostReferences = [String: FaviconHostReference]()
+    private(set) var hostReferences = [String: FaviconHostReference]()
 
     // References to favicon URLs for special URLs
-    private var urlReferences = [URL: FaviconUrlReference]()
+    private(set) var urlReferences = [URL: FaviconUrlReference]()
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -193,21 +193,24 @@ final class FaviconReferenceCache {
         }
     }
 
-    func burnDomains(_ domains: Set<String>,
+    func burnDomains(_ baseDomains: Set<String>,
                      exceptBookmarks bookmarkManager: BookmarkManager,
-                     exceptSavedLogins: Set<String>,
+                     exceptSavedLogins logins: Set<String>,
+                     exceptHistoryDomains history: Set<String>,
+                     tld: TLD,
                      completion: @escaping () -> Void) {
         // Remove host references
         removeHostReferences(filter: { hostReference in
             let host = hostReference.host
-            return domains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host) && !exceptSavedLogins.contains(host)
+            let baseDomain = tld.eTLDplus1(host) ?? ""
+            return baseDomains.contains(baseDomain) && !bookmarkManager.isHostInBookmarks(host: host) && !logins.contains(host) && !history.contains(host)
         }) {
             // Remove URL references
             self.removeUrlReferences(filter: { urlReference in
                 guard let host = urlReference.documentUrl.host else {
                     return false
                 }
-                return domains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host) && !exceptSavedLogins.contains(host)
+                return baseDomains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host) && !logins.contains(host) && !history.contains(host)
             }, completionHandler: completion)
         }
     }

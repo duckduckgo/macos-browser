@@ -18,6 +18,7 @@
 
 import Foundation
 import Combine
+import Common
 
 @MainActor
 protocol RecentlyClosedCoordinating: AnyObject {
@@ -25,7 +26,7 @@ protocol RecentlyClosedCoordinating: AnyObject {
     var cache: [RecentlyClosedCacheItem] { get }
 
     func reopenItem(_ cacheItem: RecentlyClosedCacheItem?)
-    func burnCache(domains: Set<String>?)
+    func burnCache(baseDomains: Set<String>?, tld: TLD)
 
 }
 
@@ -214,9 +215,9 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         cache.removeAll(where: { $0 === recentlyClosedWindow })
     }
 
-    func burnCache(domains: Set<String>? = nil) {
-        if let domains = domains {
-            cache.burn(for: domains)
+    func burnCache(baseDomains: Set<String>? = nil, tld: TLD) {
+        if let baseDomains = baseDomains {
+            cache.burn(for: baseDomains, tld: tld)
         } else {
             cache.removeAll()
         }

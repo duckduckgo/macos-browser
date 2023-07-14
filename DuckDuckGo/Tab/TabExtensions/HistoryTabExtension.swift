@@ -27,7 +27,22 @@ final class HistoryTabExtension: NSObject {
     private let historyCoordinating: HistoryCoordinating
     private let isBurner: Bool
 
-    private(set) var localHistory = Set<String>()
+    private(set) var localHistory: [Visit] {
+        get {
+            loadRestoredLocalHistoryIfNeeded()
+            return _localHistory
+        }
+        set {
+            _localHistory = newValue
+        }
+    }
+
+    // swiftlint:disable:next identifier_name
+    private(set) var _localHistory = [Visit]()
+
+    // Used to identify visits of the tab from previous app sessions
+    private var localHistoryIDs = [Visit.ID]()
+
     private var cancellables = Set<AnyCancellable>()
 
     private var url: URL? {
@@ -97,11 +112,9 @@ final class HistoryTabExtension: NSObject {
         }
 
         // Add to global history
-        historyCoordinating.addVisit(of: url)
-
-        // Add to local history
-        if let host = url.host?.droppingWwwPrefix(), !host.isEmpty {
-            localHistory.insert(host)
+        if let visit = historyCoordinating.addVisit(of: url) {
+            // Add to local history
+            localHistory.append(visit)
         }
 
         self.visitState = .added
@@ -121,6 +134,18 @@ final class HistoryTabExtension: NSObject {
         historyCoordinating.commitChanges(url: url)
     }
 
+    private func loadRestoredLocalHistoryIfNeeded() {
+        if !localHistoryIDs.isEmpty {
+            let storedLocalHistory = localHistoryIDs.compactMap { id in
+                historyCoordinating.allHistoryVisits?.first(where: { visit in
+                    visit.identifier == id
+                })
+            }
+            localHistoryIDs = []
+            _localHistory.append(contentsOf: storedLocalHistory)
+        }
+    }
+
     @objc private func applicationWillTerminate(_: Notification) {
         commitBeforeClosing()
     }
@@ -138,12 +163,12 @@ extension HistoryTabExtension: NSCodingExtension {
     }
 
     func awakeAfter(using decoder: NSCoder) {
-        let visitedDomains = decoder.decodeObject(of: [NSArray.self, NSString.self], forKey: NSSecureCodingKeys.visitedDomains) as? [String] ?? []
-        self.localHistory = Set(visitedDomains)
+        localHistoryIDs = decoder.decodeObject(of: [NSArray.self, NSURL.self], forKey: NSSecureCodingKeys.visitedDomains) as? [URL] ?? []
     }
 
     func encode(using coder: NSCoder) {
-        coder.encode(Array(localHistory), forKey: NSSecureCodingKeys.visitedDomains)
+        let ids = localHistory.compactMap { $0.identifier }
+        coder.encode(ids, forKey: NSSecureCodingKeys.visitedDomains)
     }
 
 }
@@ -169,9 +194,7 @@ extension HistoryTabExtension: NavigationResponder {
               navigation.url.isHypertextURL,
               case .expected = visitState else { return }
 
-        guard !navigation.navigationAction.navigationType.isBackForward,
-              !navigation.navigationAction.navigationType.isSessionRestoration,
-              navigation.navigationAction.navigationType != .reload else {
+        guard !navigation.navigationAction.navigationType.isBackForward else {
             // mark navigation visit as already added to ignore possible next same-document navigations
             self.visitState = .added
             return
@@ -202,7 +225,7 @@ extension HistoryTabExtension: NavigationResponder {
 }
 
 protocol HistoryExtensionProtocol: AnyObject, NavigationResponder {
-    var localHistory: Set<String> { get }
+    var localHistory: [Visit] { get }
 }
 
 extension HistoryTabExtension: HistoryExtensionProtocol, TabExtension {
@@ -214,7 +237,19 @@ extension TabExtensions {
 }
 
 extension Tab {
-    var localHistory: Set<String> {
+
+    var localHistory: [Visit] {
         self.history?.localHistory ?? []
     }
+
+    var localHistoryDomains: Set<String> {
+        var localHistoryDomains = Set<String>()
+        for visit in localHistory {
+            if let host = visit.historyEntry?.url.host {
+                localHistoryDomains.insert(host)
+            }
+        }
+        return localHistoryDomains
+    }
+
 }
