@@ -28,15 +28,15 @@ extension UNNotificationAction {
 
     /// "Reconnect" notification action button
     static let reconnectAction = UNNotificationAction(identifier: Identifier.reconnect.rawValue,
-                                                      title: UserText.networkProtectionSupercededReconnectActionTitle,
+                                                      title: UserText.networkProtectionSupersededReconnectActionTitle,
                                                       options: [.authenticationRequired])
 
 }
 
 extension UNNotificationCategory {
 
-    /// Actions for `superceded` (by another app) notification category
-    static let superceded = UNNotificationCategory(identifier: "supercededActionCategory",
+    /// Actions for `superseded` (by another app) notification category
+    static let superseded = UNNotificationCategory(identifier: "supersededActionCategory",
                                                    actions: [.reconnectAction],
                                                    intentIdentifiers: [],
                                                    options: [])
@@ -66,7 +66,7 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
     }
 
     private lazy var registerNotificationCategoriesOnce: Void = {
-        userNotificationCenter.setNotificationCategories([.superceded])
+        userNotificationCenter.setNotificationCategories([.superseded])
     }()
 
     // MARK: - Notification Utility methods
@@ -118,10 +118,10 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
         showNotification(content)
     }
 
-    func showSupercededNotification() {
-        let content = notificationContent(title: UserText.networkProtectioSupercededNotificationTitle,
-                                          subtitle: UserText.networkProtectionSupercededNotificationSubtitle,
-                                          category: .superceded)
+    func showSupersededNotification() {
+        let content = notificationContent(title: UserText.networkProtectionSupersededNotificationTitle,
+                                          subtitle: UserText.networkProtectionSupersededNotificationSubtitle,
+                                          category: .superseded)
         showNotification(content)
     }
 
