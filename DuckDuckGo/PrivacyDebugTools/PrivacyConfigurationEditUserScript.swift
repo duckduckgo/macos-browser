@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Configuration
 import WebKit
+import Combine
 import Common
 import UserScript
 
@@ -26,11 +27,58 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
 
     let messageOriginPolicy: MessageOriginPolicy = .all
     let featureName: String = "debugToolsPage"
-    var broker: UserScriptMessageBroker?
+    weak var broker: UserScriptMessageBroker?
+    weak var webView: WKWebView?
+
     let configurationURLProvider: ConfigurationURLProviding
 
-    init(configurationURLProvider: ConfigurationURLProviding) {
+    @MainActor
+    var isActive: Bool = false {
+        didSet {
+            if isActive {
+                if !oldValue {
+                    openTabsURLsCancellable = subscribeToTabsURLs()
+                }
+            } else {
+                openTabsURLsCancellable = nil
+            }
+        }
+    }
+
+    private var openTabsURLsCancellable: AnyCancellable?
+    private weak var windowControllersManager: WindowControllersManager?
+
+    @MainActor
+    init(configurationURLProvider: ConfigurationURLProviding, windowControllersManager: WindowControllersManager = .shared) {
         self.configurationURLProvider = configurationURLProvider
+        self.windowControllersManager = windowControllersManager
+    }
+
+    @MainActor
+    private func subscribeToTabsURLs() -> AnyCancellable? {
+        windowControllersManager?.$mainWindowControllers
+            .flatMap { controllers -> AnyPublisher<[Tab], Never> in
+                let tabsPublishers = controllers.map { $0.mainViewController.tabCollectionViewModel.tabCollection.$tabs.eraseToAnyPublisher() }
+                return tabsPublishers.reduce(Just([Tab]()).eraseToAnyPublisher()) { partialResult, publisher -> AnyPublisher<[Tab], Never> in
+                    partialResult.combineLatest(publisher, { $0 + $1 }).eraseToAnyPublisher()
+                }
+            }
+            .flatMap { tabs -> AnyPublisher<[Tab.TabContent], Never> in
+                let contentPublishers = tabs.map { $0.$content.eraseToAnyPublisher() }
+                return contentPublishers.reduce(Just([Tab.TabContent]()).eraseToAnyPublisher()) { partialResult, publisher -> AnyPublisher<[Tab.TabContent], Never> in
+                    partialResult.combineLatest(publisher, { $0 + [$1] }).eraseToAnyPublisher()
+                }
+            }
+            .map { $0.compactMap(\.url).removingDuplicates(byKey: \.absoluteString).filter { $0.scheme != PrivacyDebugTools.urlScheme } }
+            .removeDuplicates()
+            .sink { [weak self] urls in
+                guard let self, let webView else {
+                    return
+                }
+                print("Open tab URLs:")
+                print(urls)
+                self.broker?.push(method: "onTabsUpdated", params: GetTabsResponse(urls: urls), for: self, into: webView)
+            }
     }
 
     // MARK: - Subfeature
@@ -42,12 +90,15 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
     // MARK: - MessageNames
 
     enum MessageNames: String, CaseIterable {
+        case getTabs
         case getFeatures
         case updateResource
     }
 
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
         switch MessageNames(rawValue: methodName) {
+        case .getTabs:
+            return handleGetTabs
         case .getFeatures:
             return handleGetFeatures
         case .updateResource:
@@ -56,6 +107,21 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
             assertionFailure("PrivacyConfigurationEditUserScript: Failed to parse User Script message: \(methodName)")
             return nil
         }
+    }
+
+    @MainActor
+    func handleGetTabs(params: Any, message: UserScriptMessage) -> Encodable? {
+        guard let windowControllersManager else {
+            assertionFailure("windowControllersManager is nil")
+            return nil
+        }
+
+        let urls = windowControllersManager.mainWindowControllers
+            .map(\.mainViewController.tabCollectionViewModel.tabs)
+            .flatMap { $0 }
+            .compactMap(\.content.url)
+
+        return GetTabsResponse.init(urls: urls.removingDuplicates(byKey: \.absoluteString).filter { $0.scheme != PrivacyDebugTools.urlScheme })
     }
 
     @MainActor
@@ -122,6 +188,20 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
 
 struct UpdateResourceError: Error {
     let message: String
+}
+
+// MARK: - GetTabsResponse
+
+struct GetTabsResponse: Encodable {
+    let tabs: [TabResponse]
+
+    init(urls: [URL]) {
+        tabs = urls.map(TabResponse.init)
+    }
+
+    struct TabResponse: Encodable {
+        let url: URL
+    }
 }
 
 // MARK: - UpdateResource

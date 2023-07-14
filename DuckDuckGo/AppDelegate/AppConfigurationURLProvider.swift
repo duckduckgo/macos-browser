@@ -20,6 +20,13 @@ import Foundation
 import Configuration
 
 final class AppConfigurationURLProvider: ConfigurationURLProviding {
+    func url(for configuration: Configuration, allowOverrides: Bool) -> URL {
+        if allowOverrides, let overriddenURL = overrides[configuration] {
+            return overriddenURL
+        }
+        return urls[configuration]!
+    }
+
 
     func url(for configuration: Configuration) -> URL {
         if let overriddenURL = overrides[configuration] {

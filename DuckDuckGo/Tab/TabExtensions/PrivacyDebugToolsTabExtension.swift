@@ -32,15 +32,31 @@ final class PrivacyDebugToolsTabExtension {
     private var cancellables = Set<AnyCancellable>()
     private weak var privacyConfigurationEditUserScript: PrivacyConfigurationEditUserScript?
 
+    private weak var webView: WKWebView? {
+        didSet {
+            privacyConfigurationEditUserScript?.webView = webView
+        }
+    }
+
     init(
         privacyDebugTools: PrivacyDebugTools,
-        scriptsPublisher: some Publisher<some PrivacyDebugToolsScriptsProvider, Never>
+        scriptsPublisher: some Publisher<some PrivacyDebugToolsScriptsProvider, Never>,
+        webViewPublisher: some Publisher<WKWebView, Never>
     ) {
         self.privacyDebugTools = privacyDebugTools
 
-        scriptsPublisher.sink { [weak self] scripts in
-            self?.privacyConfigurationEditUserScript = scripts.privacyConfigurationEditUserScript
-        }.store(in: &cancellables)
+        scriptsPublisher
+            .sink { [weak self] scripts in
+                self?.privacyConfigurationEditUserScript = scripts.privacyConfigurationEditUserScript
+                self?.privacyConfigurationEditUserScript?.webView = self?.webView
+            }
+            .store(in: &cancellables)
+
+        webViewPublisher
+            .sink { [weak self] webView in
+                self?.webView = webView
+            }
+            .store(in: &cancellables)
     }
 }
 
@@ -52,7 +68,8 @@ extension PrivacyDebugToolsTabExtension: NavigationResponder {
             return .next
         }
         // Always allow loading Privacy Debug Tools URLs (from CCF)
-        if navigationAction.url.isPrivacyDebugToolsScheme {
+        privacyConfigurationEditUserScript?.isActive = navigationAction.url.isPrivacyDebugToolsScheme
+        if privacyConfigurationEditUserScript?.isActive == true {
             return .allow
         }
         return .next
