@@ -27,11 +27,11 @@ final class DataBrokerProfileQueryViewController: NSViewController {
         self.dataManager = dataManager
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func loadView() {
         let viewModel = DataBrokerProfileQueryViewModel(dataManager: dataManager)
 

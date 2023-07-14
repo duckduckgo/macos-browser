@@ -156,7 +156,6 @@ private struct MockDataBase: DataBase {
             schedulingConfig: commonScheduleConfig
         )
 
-        
         let brokerProfileQueryID1 = UUID()
         let brokerProfileQueryID2 = UUID()
 
@@ -178,7 +177,6 @@ private struct MockDataBase: DataBase {
                                                       preferredRunDate: Date(),
                                                       historyEvents: historyEvents,
                                                       extractedProfile: extractedProfile)
-
 
         let data1 = BrokerProfileQueryData(
             id: brokerProfileQueryID1,

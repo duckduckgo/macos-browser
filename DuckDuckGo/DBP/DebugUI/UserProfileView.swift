@@ -153,7 +153,7 @@ struct UserProfileView: View {
     }
 
     private func validateAge(_ value: String) {
-        if let _ = Int(value) {
+        if Int(value) != nil {
             ageError = ""
         } else {
             ageError = "Invalid Age."

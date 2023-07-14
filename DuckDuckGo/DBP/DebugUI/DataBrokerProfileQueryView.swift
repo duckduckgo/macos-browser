@@ -69,7 +69,6 @@ struct DetailView: View {
                 .font(.title)
                 .padding()
 
-
             DetailViewSubItem(viewData: ViewData(title: "Scan Operation",
                                                  events: item.scanData.historyEvents,
                                                  preferredRunDate: item.scanData.preferredRunDate))
