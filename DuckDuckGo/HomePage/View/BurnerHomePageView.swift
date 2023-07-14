@@ -27,8 +27,9 @@ extension HomePage.Views {
 
         @Environment(\.colorScheme) var colorScheme
 
-        private var backgroundColor: Color {
-            return colorScheme == .dark ? Color.black.opacity(0.15) : Color.primary
+        let backgroundColor = Color("NewTabPageBackgroundColor")
+        private var infoBackgroundColor: Color {
+            return colorScheme == .dark ? Color.black.opacity(0.15) : backgroundColor
         }
 
         var body: some View {
@@ -58,7 +59,7 @@ extension HomePage.Views {
                        alignment: .leading)
                 .padding(.horizontal, 40)
                 .padding(.vertical, 20)
-                .background(RoundedRectangle(cornerRadius: 8).fill(backgroundColor))
+                .background(RoundedRectangle(cornerRadius: 8).fill(infoBackgroundColor))
                 .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3), lineWidth: 1))
                 .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 2)
             }
