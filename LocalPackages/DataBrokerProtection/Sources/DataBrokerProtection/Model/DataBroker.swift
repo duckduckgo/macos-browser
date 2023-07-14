@@ -18,7 +18,7 @@
 
 import Foundation
 
-struct DataBrokerScheduleConfig {
+struct DataBrokerScheduleConfig: Codable {
     let emailConfirmation: TimeInterval
     let retryError: TimeInterval
     let confirmOptOutScan: TimeInterval
@@ -29,25 +29,25 @@ struct DataBroker: Codable, Sendable {
     let id = UUID()
     let name: String
     let steps: [Step]
-    let schedulingConfig = DataBrokerScheduleConfig(emailConfirmation: 10 * 60 * 60,
-                                                    retryError: 48 * 60 * 60,
-                                                    confirmOptOutScan: 72 * 60 * 60,
-                                                    maintenanceScan: 240 * 60 * 60)
+    let schedulingConfig: DataBrokerScheduleConfig
 
     enum CodingKeys: CodingKey {
         case name
         case steps
+        case schedulingConfig
     }
 
     init(name: String, steps: [Step], schedulingConfig: DataBrokerScheduleConfig) {
         self.name = name
         self.steps = steps
+        self.schedulingConfig = schedulingConfig
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = try container.decode(String.self, forKey: .name)
         steps = try container.decode([Step].self, forKey: .steps)
+        schedulingConfig = try container.decode(DataBrokerScheduleConfig.self, forKey: .schedulingConfig)
     }
 
     func scanStep() throws -> Step {

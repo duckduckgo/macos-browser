@@ -21,40 +21,54 @@ import Common
 import BrowserServicesKit
 
 public final class DataBrokerProtectionScheduler {
+    private enum SchedulerCycle {
+        // TODO: Arbitrary numbers for now
+        // Scheduling an activity to fire between 15 and 45 minutes from now
+
+        static let interval: TimeInterval = 5 * 60 // 5 minutes
+        static let tolerance: TimeInterval = 60 // 1 minute
+    }
+
     private let privacyConfigManager: PrivacyConfigurationManaging
     private let contentScopeProperties: ContentScopeProperties
-
+    private let dataManager: DataBrokerProtectionDataManager
     private let activity: NSBackgroundActivityScheduler
     private let errorHandler: EventMapping<DataBrokerProtectionOperationError>
     private let schedulerIdentifier = "com.duckduckgo.macos.browser.databroker-protection-scheduler"
+    private let notificationCenter: NotificationCenter
 
     lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
         let runnerProvider = DataBrokerOperationRunnerProvider(privacyConfigManager: privacyConfigManager,
                                                                contentScopeProperties: contentScopeProperties)
 
-        return DataBrokerProtectionProcessor(database: DataBrokerProtectionDataBase(),
+        return DataBrokerProtectionProcessor(database: dataManager.database,
                                              config: DataBrokerProtectionSchedulerConfig(),
                                              operationRunnerProvider: runnerProvider,
+                                             notificationCenter: notificationCenter,
                                              errorHandler: errorHandler)
     }()
 
-    public init(privacyConfigManager: PrivacyConfigurationManaging, contentScopeProperties: ContentScopeProperties, errorHandler: EventMapping<DataBrokerProtectionOperationError>) {
+    public init(privacyConfigManager: PrivacyConfigurationManaging,
+                contentScopeProperties: ContentScopeProperties,
+                dataManager: DataBrokerProtectionDataManager,
+                notificationCenter: NotificationCenter = NotificationCenter.default,
+                errorHandler: EventMapping<DataBrokerProtectionOperationError>) {
 
         activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
         activity.repeats = true
-        // TODO: Arbitrary numbers for now
-        // Scheduling an activity to fire between 15 and 45 minutes from now
-        activity.interval = 30 * 60
-        activity.tolerance = 15 * 60
-
+        activity.interval = SchedulerCycle.interval
+        activity.tolerance = SchedulerCycle.tolerance
         activity.qualityOfService = QualityOfService.utility
+
+        self.dataManager = dataManager
         self.privacyConfigManager = privacyConfigManager
         self.contentScopeProperties = contentScopeProperties
         self.errorHandler = errorHandler
+        self.notificationCenter = notificationCenter
     }
 
-    public func start(debug: Bool = true) {
+    public func start(debug: Bool = false) {
         os_log("Starting scheduler...", log: .dataBrokerProtection)
         if debug {
             self.dataBrokerProcessor.runQueuedOperations()
