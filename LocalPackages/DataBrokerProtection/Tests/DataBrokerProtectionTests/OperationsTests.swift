@@ -180,6 +180,9 @@ final class OperationsTests: XCTestCase {
             dataBroker: dataBroker,
             optOutOperationsData: [optOutOperationData])
 
+        // Setting it nil to force the opt-out operation to set its own date on the scan once it finishes
+        profileQueryData.scanData.preferredRunDate = nil
+
         let database = MockDataBase(mockBrokerProfileQueryData: profileQueryData)
 
         let brokerProfileQueryData = brokerProfileQueryData(for: profileQuery,

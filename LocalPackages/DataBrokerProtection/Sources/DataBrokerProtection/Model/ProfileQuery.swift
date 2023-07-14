@@ -41,8 +41,8 @@ struct ProfileQuery: Encodable, Sendable {
         self.lastName = lastName
         self.city = city
         self.state = state
-        self.addresses = [Address(city: city, state: state)]
         self.age = age
+        self.addresses = [Address(city: city, state: state)]
         self.fullName = "\(firstName) \(lastName)"
     }
 }
