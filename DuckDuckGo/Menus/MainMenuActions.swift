@@ -541,8 +541,8 @@ extension MainViewController {
         }
 
         let alert = NSAlert.clearAllHistoryAndDataAlert()
-        alert.beginSheetModal(for: window, completionHandler: { [weak self] response in
-            guard case .alertFirstButtonReturn = response, let self = self else {
+        alert.beginSheetModal(for: window, completionHandler: { response in
+            guard case .alertFirstButtonReturn = response else {
                 return
             }
             FireCoordinator.fireViewModel.fire.burnAll()
