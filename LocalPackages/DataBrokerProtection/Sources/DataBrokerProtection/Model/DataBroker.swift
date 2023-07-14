@@ -19,7 +19,6 @@
 import Foundation
 
 struct DataBrokerScheduleConfig: Codable {
-    let emailConfirmation: TimeInterval
     let retryError: TimeInterval
     let confirmOptOutScan: TimeInterval
     let maintenanceScan: TimeInterval

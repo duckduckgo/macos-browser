@@ -37,7 +37,7 @@ extension BrokerProfileQueryData {
 
 extension DataBrokerScheduleConfig {
     static var mock: DataBrokerScheduleConfig {
-        DataBrokerScheduleConfig(emailConfirmation: TimeInterval.pi, retryError: TimeInterval.pi, confirmOptOutScan: TimeInterval.pi, maintenanceScan: TimeInterval.pi)
+        DataBrokerScheduleConfig(retryError: TimeInterval.pi, confirmOptOutScan: TimeInterval.pi, maintenanceScan: TimeInterval.pi)
     }
 }
 
