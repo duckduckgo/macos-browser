@@ -35,24 +35,24 @@ struct InitParams: Encodable {
 
 struct State: Encodable {
     let action: Action
-    let profileData: CCFRequestData?
+    let data: CCFRequestData?
 
     enum CodingKeys: String, CodingKey {
         case action
-        case profileData
+        case data
     }
 
     // swiftlint:disable:next cyclomatic_complexity
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        switch profileData {
+        switch data {
         case .profile(let profileQuery):
-            try container.encode(profileQuery, forKey: .profileData)
+            try container.encode(profileQuery, forKey: .data)
         case .solveCaptcha(let captchaToken):
-            try container.encode(captchaToken, forKey: .profileData)
+            try container.encode(captchaToken, forKey: .data)
         case .extractedProfile(let extractedProfile):
-            try container.encode(extractedProfile, forKey: .profileData)
+            try container.encode(extractedProfile, forKey: .data)
         default:
             assertionFailure("We sure have a profile data. Soon to be renamed just to data")
         }
