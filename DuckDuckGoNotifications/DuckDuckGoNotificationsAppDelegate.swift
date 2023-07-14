@@ -60,7 +60,7 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
         return NetworkProtectionUNNotificationsPresenter(appLauncher: AppLauncher(appBundleURL: mainAppURL))
     }()
 
-    private let distributedNotificationCenter = DistributedNotificationCenter.forType(.networkProtection)
+    private let distributedNotificationCenter = DistributedNotificationCenter.default()
 
     // MARK: - Notifications: Observation Tokens
 

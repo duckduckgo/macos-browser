@@ -32,7 +32,7 @@ final class NetworkProtectionControllerErrorStore {
     private let distributedNotificationCenter: DistributedNotificationCenter
 
     init(userDefaults: UserDefaults = .standard,
-         distributedNotificationCenter: DistributedNotificationCenter = .forType(.networkProtection)) {
+         distributedNotificationCenter: DistributedNotificationCenter = .default()) {
         self.userDefaults = userDefaults
         self.distributedNotificationCenter = distributedNotificationCenter
     }
