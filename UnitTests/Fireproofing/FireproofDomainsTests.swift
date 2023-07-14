@@ -21,7 +21,7 @@ import XCTest
 
 final class FireproofDomainsTests: XCTestCase {
     let store = FireproofDomainsStoreMock()
-    lazy var logins: FireproofDomains = FireproofDomains(store: store)
+    lazy var logins: FireproofDomains = FireproofDomains(store: store, tld: ContentBlocking.shared.tld)
 
     override func setUp() {
         UserDefaultsWrapper<Any>.clearAll()

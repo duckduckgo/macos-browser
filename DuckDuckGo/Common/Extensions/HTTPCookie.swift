@@ -1,7 +1,7 @@
 //
-//  RecentlyClosedCoordinatorMock.swift
+//  HTTPCookie.swift
 //
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,23 +16,20 @@
 //  limitations under the License.
 //
 
-import XCTest
-import BrowserServicesKit
-@testable import DuckDuckGo_Privacy_Browser
-import Common
+import Foundation
 
-final class RecentlyClosedCoordinatorMock: RecentlyClosedCoordinating {
+extension HTTPCookie {
 
-    var cache: [RecentlyClosedCacheItem] = []
+    func belongsTo(_ eTLDPlus1Domain: String) -> Bool {
+        let cookieDomain = self.domain
 
-    var reopenItemCalled = false
-    func reopenItem(_ cacheItem: RecentlyClosedCacheItem?) {
-        reopenItemCalled = true
-    }
+        // Check if the cookie's domain is the same as the given eTLD+1 domain
+        if cookieDomain == eTLDPlus1Domain { return true }
 
-    var burnCacheCalled = false
-    func burnCache(baseDomains: Set<String>?, tld: Common.TLD) {
-        burnCacheCalled = true
+        // Check if the cookie's domain is a subdomain of the given eTLD+1 domain
+        if cookieDomain.hasSuffix(".\(eTLDPlus1Domain)") { return true }
+
+        return false
     }
 
 }

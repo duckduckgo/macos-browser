@@ -57,12 +57,14 @@ final class HistoryEntry {
 
     var visits: Set<Visit>
 
-    func addVisit() {
+    func addVisit() -> Visit {
         let visit = Visit(date: Date(), historyEntry: self)
         visits.insert(visit)
 
         numberOfTotalVisits += 1
         lastVisit = Date.startOfMinuteNow
+
+        return visit
     }
 
     // Used for migration

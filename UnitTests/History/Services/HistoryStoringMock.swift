@@ -72,11 +72,16 @@ final class HistoryStoringMock: HistoryStoring {
 
     var saveCalled = false
     var savedHistoryEntries = [HistoryEntry]()
-    func save(entry: HistoryEntry) -> Future<Void, Error> {
+    func save(entry: DuckDuckGo_Privacy_Browser.HistoryEntry) -> Future<[(id: DuckDuckGo_Privacy_Browser.Visit.ID, date: Date)], Error> {
         saveCalled = true
         savedHistoryEntries.append(entry)
+        for visit in entry.visits {
+            visit.identifier = URL(string: "x-coredata://FBEAB2C4-8C32-4F3F-B34F-B79F293CDADD/VisitManagedObject/\(arc4random())")
+        }
+
         return Future { promise in
-            promise(.success(()))
+            let result = entry.visits.map { ($0.identifier!, $0.date) }
+            promise(.success(result))
         }
     }
 
