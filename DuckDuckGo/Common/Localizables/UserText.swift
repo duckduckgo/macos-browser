@@ -91,14 +91,14 @@ struct UserText {
     static let reloadPage = NSLocalizedString("reload.page", value: "Reload Page", comment: "Context menu item")
 
     static let openLinkInNewTab = NSLocalizedString("open.link.in.new.tab", value: "Open Link in New Tab", comment: "Context menu item")
-    static let openLinkInNewBurnerTab = NSLocalizedString("open.link.in.new.burner.tab", value: "Open Link in New Burner Tab", comment: "Context menu item")
-    static let openLinkInNewBurnerWindow = NSLocalizedString("open.link.in.new.burner.window", value: "Open Link in New Burner Window", comment: "Context menu item")
+    static let openLinkInNewBurnerTab = NSLocalizedString("open.link.in.new.burner.tab", value: "Open Link in New Fire Tab", comment: "Context menu item")
+    static let openLinkInNewBurnerWindow = NSLocalizedString("open.link.in.new.burner.window", value: "Open Link in New Fire Window", comment: "Context menu item")
     static let openImageInNewTab = NSLocalizedString("open.image.in.new.tab", value: "Open Image in New Tab", comment: "Context menu item")
-    static let openImageInNewBurnerTab = NSLocalizedString("open.image.in.new.burner.tab", value: "Open Image in New Burner Tab", comment: "Context menu item")
-    static let openImageInNewBurnerWindow = NSLocalizedString("open.image.in.new.burner.window", value: "Open Image in New Burner Window", comment: "Context menu item")
-    static let openFrameInNewBurnerWindow = NSLocalizedString("open.frame.in.new.burner.window", value: "Open Frame in New Burner Window", comment: "Context menu item")
+    static let openImageInNewBurnerTab = NSLocalizedString("open.image.in.new.burner.tab", value: "Open Image in New Fire Tab", comment: "Context menu item")
+    static let openImageInNewBurnerWindow = NSLocalizedString("open.image.in.new.burner.window", value: "Open Image in New Fire Window", comment: "Context menu item")
+    static let openFrameInNewBurnerWindow = NSLocalizedString("open.frame.in.new.burner.window", value: "Open Frame in New Fire Window", comment: "Context menu item")
     static let moveTabToNewBurnerWindow = NSLocalizedString("options.menu.move.tab.to.new.burner.window",
-                                                      value: "Move Tab to New Burner Window",
+                                                      value: "Move Tab to New Fire Window",
                                                       comment: "Context menu item")
     static let copyImageAddress = NSLocalizedString("copy.image.address", value: "Copy Image Address", comment: "Context menu item")
     static let saveImageAs = NSLocalizedString("save.image.as", value: "Save Image As…", comment: "Context menu item")
@@ -117,7 +117,7 @@ struct UserText {
     static let shareViaQRCodeMenuItem = NSLocalizedString("share.menu.item.qr.code", value: "Create QR Code", comment: "Menu item title")
     static let printMenuItem = NSLocalizedString("print.menu.item", value: "Print…", comment: "Menu item title")
     static let newWindowMenuItem = NSLocalizedString("new.window.menu.item", value: "New Window", comment: "Menu item title")
-    static let newBurnerWindowMenuItem = NSLocalizedString("new.burner.window.menu.item", value: "New Burner Window", comment: "Menu item title")
+    static let newBurnerWindowMenuItem = NSLocalizedString("new.burner.window.menu.item", value: "New Fire Window", comment: "Menu item title")
 
     static let fireproofSites = NSLocalizedString("fireproof.sites", value: "Fireproof Sites", comment: "Fireproof sites list title")
     static let fireproofCheckboxTitle = NSLocalizedString("fireproof.checkbox.title", value: "Ask to Fireproof websites when signing in", comment: "Fireproof settings checkbox title")
@@ -787,8 +787,8 @@ struct UserText {
 
     // Recent Activity
     static let newTabRecentActivitySectionTitle = NSLocalizedString("newTab.recent.activity.section.title", value: "Recent Activity", comment: "Title of the RecentActivity section in the home page")
-    static let burnerWindowHeader = NSLocalizedString("burner.window.header", value: "Fire Window", comment: "Header shown on the hompage of the burner window")
-    static let burnerTabHomeTitle = NSLocalizedString("burner.tab.home.title", value: "New Burner Tab", comment: "Tab title for burner tab")
+    static let burnerWindowHeader = NSLocalizedString("burner.window.header", value: "Fire Window", comment: "Header shown on the hompage of the Fire Window")
+    static let burnerTabHomeTitle = NSLocalizedString("burner.tab.home.title", value: "New Fire Tab", comment: "Tab title for Fire Tab")
     static let burnerHomepageDescription1 = NSLocalizedString("burner.homepage.description.1", value: "Browse without saving local history", comment: "")
     static let burnerHomepageDescription2 = NSLocalizedString("burner.homepage.description.2", value: "Sign in to a site with a different account", comment: "")
     static let burnerHomepageDescription3 = NSLocalizedString("burner.homepage.description.3", value: "Troubleshoot websites", comment: "")
