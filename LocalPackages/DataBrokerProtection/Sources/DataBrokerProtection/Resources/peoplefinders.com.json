@@ -1,0 +1,126 @@
+{
+  "name": "peoplefinders.com",
+  "addedDatetime": 1677121200000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "7d8d3e5e-86d5-4425-a79f-19d50f955a19",
+          "url": "https://www.peoplefinders.com/people/${firstName}-${lastName}/${state}/${city}?landing=all&age=${age}"
+        },
+        {
+          "actionType": "extract",
+          "id": "099fed62-c70c-47ff-b9b0-0a5f24b76661",
+          "selector": ".record",
+          "profile": {
+            "name": ".record__title",
+            "alternativeNamesList": "ul.clean-list.mb-0.mt-2",
+            "age": ".col-lg-1",
+            "addressCityStateList": "ul.clean-list.mb-0",
+            "profileUrl": "a"
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "9249e462-20a6-4739-ac97-f83dffffebe6",
+          "url": "https://www.peoplefinders.com/opt-out"
+        },
+        {
+          "actionType": "click",
+          "id": "dfc3f072-6b8e-4345-a407-a36e3c46db1a",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//button[@class='btn btn-success opt-out-button']"
+            }
+          ]
+        },
+        {
+          "actionType": "fillForm",
+          "id": "1ab4ef56-7805-4424-8b7b-c2e6fe0023f3",
+          "selector": ".opt-out-form",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "#Email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#Url"
+            }
+          ]
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "id": "0c4db932-13c4-430f-a974-742aba25ea1f",
+          "selector": ".g-recaptcha"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "id": "0193b63f-9a4f-4ca1-9518-58c7d6e0b2d0",
+          "selector": ".g-recaptcha"
+        },
+        {
+          "actionType": "click",
+          "id": "99378094-cfae-48e0-a979-13d701e836ae",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//button[@class='btn btn-primary mt-3']"
+            }
+          ]
+        },
+        {
+          "actionType": "emailConfirmation",
+          "id": "e535f987-c25d-4252-9ab4-1466a092ad58",
+          "pollingTime": 30
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "id": "266fead5-2369-41e0-bf35-02aa1551e40e",
+          "selector": ".g-recaptcha"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "id": "e9455e4a-543d-4aba-9d7a-ee80469ec63a",
+          "selector": ".g-recaptcha"
+        },
+        {
+          "actionType": "click",
+          "id": "74feb25a-3f5c-4ae1-9453-3b67dc0d3434",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//button[@class='btn btn-primary mt-3']"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "d0ed698f-5fb0-48c5-9328-cc30defacb59",
+          "expectations": [
+            {
+              "type": "url",
+              "expect": "https://www.peoplefinders.com/opt-out/confirmation"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}
+
