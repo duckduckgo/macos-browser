@@ -48,6 +48,7 @@ final class BrokerProfileQueryData: Sendable {
             self.scanData = scanData
         } else {
             self.scanData = ScanOperationData(brokerProfileQueryID: id,
+                                              preferredRunDate: Date(),
                                               historyEvents: [HistoryEvent]())
         }
     }
