@@ -449,7 +449,17 @@ final class PasswordManagementViewController: NSViewController {
     private func doSaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
         let isNew = credentials.account.id == nil
 
+        func showDuplicateAlert() {
+            if let window = view.window {
+                NSAlert.passwordManagerDuplicateLogin().beginSheetModal(for: window)
+            }
+        }
+
         do {
+            if try secureVault?.hasAccountFor(username: credentials.account.username, domain: credentials.account.domain) == true {
+                showDuplicateAlert()
+                return
+            }
             guard let id = try secureVault?.storeWebsiteCredentials(credentials),
                   let savedCredentials = try secureVault?.websiteCredentialsFor(accountId: id) else {
                 return
@@ -467,8 +477,8 @@ final class PasswordManagementViewController: NSViewController {
             requestSync(dataChanged: true)
 
         } catch {
-            if let window = view.window, case SecureVaultError.duplicateRecord = error {
-                NSAlert.passwordManagerDuplicateLogin().beginSheetModal(for: window)
+            if case SecureVaultError.duplicateRecord = error {
+                showDuplicateAlert()
             }
         }
     }
