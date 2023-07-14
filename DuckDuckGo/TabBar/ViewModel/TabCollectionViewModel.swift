@@ -698,7 +698,7 @@ extension TabCollectionViewModel {
     var localHistory: [Visit] {
         var history = tabCollection.localHistory
         history += tabCollection.localHistoryOfRemovedTabs
-        if let pinnedTabs = pinnedTabsCollection {
+        if pinnedTabsCollection != nil {
             history += pinnedTabsCollection?.localHistory ?? []
             history += pinnedTabsCollection?.localHistoryOfRemovedTabs ?? []
         }
