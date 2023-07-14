@@ -22,7 +22,7 @@ public struct DataBrokerProtectionProfile: Codable {
     public struct Address: Codable {
         public let city: String
         public let state: String
-        
+
         public init(city: String, state: String) {
             self.city = city
             self.state = state

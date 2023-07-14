@@ -19,7 +19,7 @@
 import XCTest
 @testable import DataBrokerProtection
 
-class DataBrokerProtectionProfileTests: XCTestCase {
+final class DataBrokerProtectionProfileTests: XCTestCase {
     func testProfileQueriesWithSingleAddressMultipleNames() {
         let profile = DataBrokerProtectionProfile(
             names: [
