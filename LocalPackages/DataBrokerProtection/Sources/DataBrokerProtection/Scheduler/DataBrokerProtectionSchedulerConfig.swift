@@ -19,14 +19,12 @@
 import Foundation
 
 protocol SchedulerConfig {
-    var runFrequency: TimeInterval { get }
     var concurrentOperationsDifferentBrokers: Int { get }
     var intervalBetweenSameBrokerOperations: TimeInterval { get }
 }
 
 struct DataBrokerProtectionSchedulerConfig: SchedulerConfig {
     // TODO: Arbitrary numbers for now
-    var runFrequency: TimeInterval = 4 * 60 * 60
     var concurrentOperationsDifferentBrokers: Int = 1
     var intervalBetweenSameBrokerOperations: TimeInterval = 2
 }
