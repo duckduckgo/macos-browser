@@ -74,14 +74,18 @@ final class ProcessorTests: XCTestCase {
         var notificationCounter = 0
         let expectedScanDate = Date().addingTimeInterval(database.commonScheduleConfig.confirmOptOutScan)
 
+        let optOutDataRemovedFirst = database.brokerProfileQueryDataList.flatMap { $0.optOutsData }.filter { $0.extractedProfile.name == "ProfileToRemoveFirst"}.first!
+        let optOutDataRemovedSecond = database.brokerProfileQueryDataList.flatMap { $0.optOutsData }.filter { $0.extractedProfile.name == "ProfileToRemoveSecond"}.first!
+
+        let scanDataRemovedFirst = database.brokerProfileQueryDataList.compactMap { $0.scanData }.filter { $0.brokerProfileQueryID == optOutDataRemovedFirst.brokerProfileQueryID }.first!
+        let scanDataRemovedSecond = database.brokerProfileQueryDataList.compactMap { $0.scanData }.filter { $0.brokerProfileQueryID == optOutDataRemovedSecond.brokerProfileQueryID }.first!
+
+        // Setting it nil to force the opt-out operation to set its own date on the scan once it finishes
+        scanDataRemovedFirst.preferredRunDate = nil
+        scanDataRemovedSecond.preferredRunDate = nil
+
         let handler: (Notification) -> Bool = { _ in
             notificationCounter += 1
-
-            let optOutDataRemovedFirst = database.brokerProfileQueryDataList.flatMap { $0.optOutsData }.filter { $0.extractedProfile.name == "ProfileToRemoveFirst"}.first!
-            let optOutDataRemovedSecond = database.brokerProfileQueryDataList.flatMap { $0.optOutsData }.filter { $0.extractedProfile.name == "ProfileToRemoveSecond"}.first!
-
-            let scanDataRemovedFirst = database.brokerProfileQueryDataList.compactMap { $0.scanData }.filter { $0.brokerProfileQueryID == optOutDataRemovedFirst.brokerProfileQueryID }.first!
-            let scanDataRemovedSecond = database.brokerProfileQueryDataList.compactMap { $0.scanData }.filter { $0.brokerProfileQueryID == optOutDataRemovedSecond.brokerProfileQueryID }.first!
 
             if notificationCounter == 1 {
                 XCTAssertTrue(optOutDataRemovedFirst.historyEvents.last?.type == .optOutRequested(extractedProfileID: optOutDataRemovedFirst.extractedProfile.id))
@@ -114,7 +118,6 @@ final class ProcessorTests: XCTestCase {
 }
 
 struct MockSchedulerConfig: SchedulerConfig {
-    var runFrequency: TimeInterval = 4 * 60 * 60
     var concurrentOperationsDifferentBrokers: Int = 2
     var intervalBetweenSameBrokerOperations: TimeInterval = 0.1
 }
@@ -154,12 +157,18 @@ private struct MockDataBase: DataBase {
         )
 
         let brokerProfileQueryID1 = UUID()
+        let brokerProfileQueryID2 = UUID()
+
+        let optOutToRemoveFirst = OptOutOperationData(brokerProfileQueryID: brokerProfileQueryID2,
+                                                      preferredRunDate: Date().addingTimeInterval(-1000),
+                                                      historyEvents: [HistoryEvent](),
+                                                      extractedProfile: ExtractedProfile(name: "ProfileToRemoveFirst"))
+
         let optOutToRemoveSecond = OptOutOperationData(brokerProfileQueryID: brokerProfileQueryID1,
                                                       preferredRunDate: Date().addingTimeInterval(-100),
                                                       historyEvents: [HistoryEvent](),
                                                       extractedProfile: ExtractedProfile(name: "ProfileToRemoveSecond"))
 
-        let brokerProfileQueryID2 = UUID()
         var extractedProfile = ExtractedProfile(name: "ProfileAlreadyRemoved")
         extractedProfile.removedDate = Date()
 
@@ -168,11 +177,6 @@ private struct MockDataBase: DataBase {
                                                       preferredRunDate: Date(),
                                                       historyEvents: historyEvents,
                                                       extractedProfile: extractedProfile)
-
-        let optOutToRemoveFirst = OptOutOperationData(brokerProfileQueryID: brokerProfileQueryID2,
-                                                      preferredRunDate: Date().addingTimeInterval(-1000),
-                                                      historyEvents: [HistoryEvent](),
-                                                      extractedProfile: ExtractedProfile(name: "ProfileToRemoveFirst"))
 
         let data1 = BrokerProfileQueryData(
             id: brokerProfileQueryID1,
