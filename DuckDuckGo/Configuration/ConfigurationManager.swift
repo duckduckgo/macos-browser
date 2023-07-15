@@ -189,7 +189,7 @@ final class ConfigurationManager {
         guard [Configuration.privacyConfiguration, .trackerDataSet].contains(configuration) else {
             throw Error.configurationNotSupportedForOnDemandRefreshing
         }
-        try await fetcher.fetch(configuration)
+        try await fetcher.fetch(configuration, honoringEtag: false)
         updateTrackerBlockingDependencies()
     }
 
