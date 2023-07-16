@@ -172,7 +172,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
             return
         }
 
-        let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, isBurner: false, shouldLoadFromCache: true)
+        let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner, shouldLoadFromCache: true)
         tabCollectionViewModel.insert(tab, at: .unpinned(tabIndex), selected: true)
     }
 
