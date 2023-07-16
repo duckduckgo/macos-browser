@@ -79,7 +79,7 @@ extension HomePage.Views {
             var body: some View {
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
-                        Image("FireWindowIcon1")
+                        Image("BurnerWindowIcon1")
                             .resizable()
                             .frame(width: 16, height: 16)
                             .foregroundColor(Color.primary)
@@ -90,7 +90,7 @@ extension HomePage.Views {
                     }
 
                     HStack {
-                        Image("FireWindowIcon2")
+                        Image("BurnerWindowIcon2")
                             .resizable()
                             .frame(width: 16, height: 16)
                             .foregroundColor(Color.primary)
@@ -100,7 +100,7 @@ extension HomePage.Views {
                     }
 
                     HStack {
-                        Image("FireWindowIcon3")
+                        Image("BurnerWindowIcon3")
                             .resizable()
                             .frame(width: 16, height: 16)
                             .foregroundColor(Color.primary)
@@ -112,7 +112,7 @@ extension HomePage.Views {
                     Divider()
 
                     HStack {
-                        Image("FireWindowIcon4")
+                        Image("BurnerWindowIcon4")
                             .resizable()
                             .frame(width: 16, height: 16)
                             .foregroundColor(Color.primary)

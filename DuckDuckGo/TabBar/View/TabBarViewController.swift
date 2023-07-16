@@ -44,7 +44,7 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var fireButton: MouseOverAnimationButton!
     @IBOutlet weak var draggingSpace: NSView!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var fireWindowBackgroundView: NSImageView!
+    @IBOutlet weak var burnerWindowBackgroundView: NSImageView!
 
     @IBOutlet weak var addTabButton: MouseOverButton!
     let tabCollectionViewModel: TabCollectionViewModel
@@ -100,7 +100,7 @@ final class TabBarViewController: NSViewController {
         setupPinnedTabsView()
         subscribeToTabModeChanges()
         setupAddTabButton()
-        setupAsFireWindowIfNeeded()
+        setupAsBurnerWindowIfNeeded()
     }
 
     override func viewWillAppear() {
@@ -156,9 +156,9 @@ final class TabBarViewController: NSViewController {
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
     }
 
-    private func setupAsFireWindowIfNeeded() {
+    private func setupAsBurnerWindowIfNeeded() {
         if tabCollectionViewModel.isBurner {
-            fireWindowBackgroundView.isHidden = false
+            burnerWindowBackgroundView.isHidden = false
             fireButton.isAnimationEnabled = false
             fireButton.backgroundColor = NSColor.fireButtonRedBackgroundColor
             fireButton.mouseOverColor = NSColor.fireButtonRedHoverColor
