@@ -57,7 +57,7 @@ final class PrivacyDebugToolsSchemeHandler: NSObject, WKURLSchemeHandler {
             return nil
         }
 
-        guard let data = try? String(contentsOfFile: file).utf8data else {
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: file)) else {
             return nil
         }
 
@@ -67,6 +67,7 @@ final class PrivacyDebugToolsSchemeHandler: NSObject, WKURLSchemeHandler {
             case "css": return "text/css"
             case "js": return "text/javascript"
             case "svg": return "image/svg+xml"
+            case "ttf": return "font/ttf"
             default: return nil
             }
         }()
