@@ -29,7 +29,15 @@ extension HomePage.Views {
 
         let backgroundColor = Color("NewTabPageBackgroundColor")
         private var infoBackgroundColor: Color {
-            return colorScheme == .dark ? Color.black.opacity(0.15) : backgroundColor
+            return colorScheme == .dark ? Color.white.opacity(0.03) : backgroundColor
+        }
+
+        private var infoStrokeColor: Color {
+            return colorScheme == .dark ? Color.white.opacity(0.03) : Color.gray.opacity(0.09)
+        }
+
+        private var infoShadowColor: Color {
+            return colorScheme == .dark ? Color.black.opacity(0.12) : Color.black.opacity(0.05)
         }
 
         var body: some View {
@@ -60,8 +68,8 @@ extension HomePage.Views {
                 .padding(.horizontal, 40)
                 .padding(.vertical, 20)
                 .background(RoundedRectangle(cornerRadius: 8).fill(infoBackgroundColor))
-                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3), lineWidth: 1))
-                .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 2)
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(infoStrokeColor, lineWidth: 1))
+                .shadow(color: infoShadowColor, radius: 2, x: 0, y: 2)
             }
         }
     }
