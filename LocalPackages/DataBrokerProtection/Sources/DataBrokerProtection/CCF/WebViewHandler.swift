@@ -66,7 +66,7 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
             window?.makeKeyAndOrderFront(nil)
         }
 
-        try? await load(url: URL(string: "https://www.example.com/")!)
+        try? await load(url: URL(string: "\(WebViewSchemeHandler.dataBrokerProtectionScheme)://example.com")!)
     }
 
     func load(url: URL) async throws {
