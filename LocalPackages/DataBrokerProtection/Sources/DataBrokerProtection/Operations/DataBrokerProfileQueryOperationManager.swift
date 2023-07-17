@@ -114,16 +114,20 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         if data.preferredRunDate == nil || data.preferredRunDate! > date {
             data.preferredRunDate = date
             os_log("Updating preferredRunDate on %@", log: .dataBrokerProtection, data.id.uuidString)
-
         }
     }
 
     private func handleOperationError(brokerProfileQuery: BrokerProfileQueryData, operationData: BrokerOperationData, error: Error) {
-        let event = HistoryEvent(type: .error)
-        brokerProfileQuery.addHistoryEvent(event, for: operationData)
-        // TODO: Send error pixel
-        os_log("Error : %{public}@", log: .dataBrokerProtection, error.localizedDescription)
 
+        let event: HistoryEvent
+        if let error = error as? DataBrokerProtectionError {
+            event = HistoryEvent(type: .error(error: error))
+        } else {
+            event = HistoryEvent(type: .error(error: .unknown(error.localizedDescription)))
+        }
+
+        brokerProfileQuery.addHistoryEvent(event, for: operationData)
+        os_log("Error : %{public}@", log: .dataBrokerProtection, error.localizedDescription)
     }
 
     // If the last time we removed the profile has a bigger time difference than the current date + maintenance we should schedule for a new optout
