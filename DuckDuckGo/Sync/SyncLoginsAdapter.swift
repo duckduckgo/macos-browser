@@ -1,5 +1,5 @@
 //
-//  SyncLoginsAdapter.swift
+//  SyncCredentialsAdapter.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -30,9 +30,9 @@ extension NSNotification.Name {
 
 }
 
-final class SyncLoginsAdapter {
+final class SyncCredentialsAdapter {
 
-    private(set) var provider: LoginsProvider?
+    private(set) var provider: CredentialsProvider?
 
     func setUpProviderIfNeeded(secureVaultFactory: SecureVaultFactory, metadataStore: SyncMetadataStore) {
         guard provider == nil else {
@@ -40,10 +40,10 @@ final class SyncLoginsAdapter {
         }
 
         do {
-            let provider = try LoginsProvider(
+            let provider = try CredentialsProvider(
                 secureVaultFactory: secureVaultFactory,
                 metadataStore: metadataStore,
-                reloadLoginsAfterSync: {
+                reloadCredentialsAfterSync: {
                     NotificationCenter.default.post(name: .credentialsSyncComplete, object: nil)
                 }
             )
