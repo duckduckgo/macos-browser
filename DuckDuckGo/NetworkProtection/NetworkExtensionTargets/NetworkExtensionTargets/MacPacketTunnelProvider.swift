@@ -19,11 +19,16 @@
 import Foundation
 import NetworkProtection
 import NetworkExtension
+import Combine
 import Common
 import Networking
 import PixelKit
 
 final class MacPacketTunnelProvider: PacketTunnelProvider {
+
+    // MARK: - Notifications: Observation Tokens
+
+    private var requestStatusUpdateCancellable: AnyCancellable!
 
     private static func makeNotificationsPresenter() -> NetworkProtectionNotificationsPresenter {
 #if NETP_SYSTEM_EXTENSION
@@ -39,8 +44,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         return NetworkProtectionUNNotificationsPresenter(appLauncher: AppLauncher(appBundleURL: mainAppURL))
 #endif
     }
-
-    private let controllerErrorStore: NetworkProtectionTunnelErrorStore
 
     // MARK: - Error Reporting
 
@@ -114,6 +117,39 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
     }
 
+    private let notificationCenter: NetworkProtectionNotificationCenter = DistributedNotificationCenter.default()
+
+    /// Holds the date when the status was last changed so we can send it out as additional information
+    /// in our status-change notifications.
+    ///
+    private var lastStatusChangeDate = Date()
+
+    override var connectionStatus: ConnectionStatus {
+        get {
+            super.connectionStatus
+        }
+
+        set {
+            guard super.connectionStatus != newValue else {
+                return
+            }
+
+            super.connectionStatus = newValue
+            lastStatusChangeDate = Date()
+            broadcastConnectionStatus()
+        }
+    }
+
+    override var lastSelectedServerInfo: NetworkProtectionServerInfo? {
+        get {
+            super.lastSelectedServerInfo
+        }
+
+        set {
+            broadcastLastSelectedServerInfo()
+        }
+    }
+
     // MARK: - PacketTunnelProvider.Event reporting
 
     private static var packetTunnelProviderEvents: EventMapping<PacketTunnelProvider.Event> = .init { event, _, _, _ in
@@ -130,14 +166,41 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     // MARK: - Initialization
 
     @objc public init() {
-        let distributedNotificationCenter = DistributedNotificationCenter.default()
-        controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: distributedNotificationCenter)
-        super.init(notificationCenter: distributedNotificationCenter,
-                   notificationsPresenter: Self.makeNotificationsPresenter(),
+        let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
+        let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
+
+        super.init(notificationsPresenter: Self.makeNotificationsPresenter(),
+                   tunnelHealthStore: tunnelHealthStore,
+                   controllerErrorStore: controllerErrorStore,
                    useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
                    debugEvents: Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore),
                    providerEvents: Self.packetTunnelProviderEvents,
                    appLauncher: AppLauncher(appBundleURL: .mainAppBundleURL))
+
+        requestStatusUpdateCancellable = notificationCenter.publisher(for: .requestStatusUpdate).sink { [weak self] _ in
+            self?.broadcastConnectionStatus()
+            self?.broadcastLastSelectedServerInfo()
+        }
+    }
+
+    // MARK: - Providing status information through distributed notifications
+
+    private func broadcastConnectionStatus() {
+        let lastStatusChange = ConnectionStatusChange(status: connectionStatus, on: lastStatusChangeDate)
+        let payload = ConnectionStatusChangeEncoder().encode(lastStatusChange)
+
+        notificationCenter.post(.statusDidChange, object: payload)
+    }
+
+    private func broadcastLastSelectedServerInfo() {
+        guard let serverInfo = lastSelectedServerInfo else {
+            return
+        }
+
+        let serverStatusInfo = NetworkProtectionStatusServerInfo(serverLocation: serverInfo.serverLocation, serverAddress: serverInfo.endpoint?.description)
+        let payload = ServerSelectedNotificationObjectEncoder().encode(serverStatusInfo)
+
+        notificationCenter.post(.serverSelected, object: payload)
     }
 
     // MARK: - NEPacketTunnelProvider
