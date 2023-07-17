@@ -19,7 +19,7 @@
 import SwiftUI
 
 @available(macOS 11.0, *)
-public struct GettingStartedView: View {
+struct GettingStartedView: View {
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
