@@ -111,11 +111,7 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
 
     public func secureVaultManager(_: BrowserServicesKit.SecureVaultManager, didReceivePixel pixel: AutofillUserScript.JSPixel) {
         Pixel.fire(.jsPixel(pixel))
-    }
-
-    func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager, shouldSilentlySave: Bool) -> Bool {
-        return true
-    }
+    }    
 
     func secureVaultManager(_: SecureVaultManager, promptUserToUseGeneratedPasswordForDomain: String, withGeneratedPassword generatedPassword: String, completionHandler: @escaping (Bool) -> Void) {
         // no-op on macOS

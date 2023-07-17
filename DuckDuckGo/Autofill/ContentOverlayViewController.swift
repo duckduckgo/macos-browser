@@ -247,10 +247,6 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
     }
 
-    public func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager, shouldSilentlySave: Bool) -> Bool {
-        return true
-    }
-
     public func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
         DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { authenticationResult in
             handler(authenticationResult.authenticated)
