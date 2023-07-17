@@ -170,12 +170,12 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
             let host = endpoint.host
 
-            if "\(host)".hasPrefix("109.200.208") {
-                let port = 9999
-                let serverString = "\(host):\(port)"
+            //if "\(host)".hasPrefix("109.200.208") {
+            let port = 9999
+            let serverString = "\(host):\(port)"
 
-                runTCPTunneler(cmd: "cmd", args: ["-l", "127.0.0.1:8888", "-s", serverString, "-v"])
-            }
+            runTCPTunneler(cmd: "cmd", args: ["-l", "127.0.0.1:8888", "-s", serverString, "-v"])
+            //}
         }
         super.startTunnel(with: tunnelConfiguration, completionHandler: completionHandler)
     }
