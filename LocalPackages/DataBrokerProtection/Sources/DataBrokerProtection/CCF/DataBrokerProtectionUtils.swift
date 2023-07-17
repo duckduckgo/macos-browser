@@ -78,6 +78,22 @@ final class DataBrokerUserScript: UserScriptsProvider {
     }
 }
 
+final class WebViewSchemeHandler: NSObject, WKURLSchemeHandler {
+
+    static let dataBrokerProtectionScheme = "dbp"
+
+    func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
+        let request = urlSchemeTask.request
+        let response = URLResponse(url: request.url!, mimeType: "text/plain", expectedContentLength: 200, textEncodingName: nil)
+        let responseData = "This is a simulated response".data(using: .utf8)!
+        urlSchemeTask.didReceive(response)
+        urlSchemeTask.didReceive(responseData)
+        urlSchemeTask.didFinish()
+    }
+
+    func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {}
+}
+
 @MainActor
 extension WKUserContentController {
 
@@ -101,6 +117,7 @@ extension WKWebViewConfiguration {
 
     @MainActor
     func applyDataBrokerConfiguration(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate) {
+        setURLSchemeHandler(WebViewSchemeHandler(), forURLScheme: WebViewSchemeHandler.dataBrokerProtectionScheme)
         preferences.isFraudulentWebsiteWarningEnabled = false
         let userContentController = DataBrokerUserContentController(with: privacyConfig, prefs: prefs, delegate: delegate)
         self.userContentController = userContentController
