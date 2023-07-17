@@ -34,18 +34,20 @@ protocol WebViewHandler: NSObject {
 final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     private var activeContinuation: CheckedContinuation<Void, Error>?
 
-    let webViewConfiguration: WKWebViewConfiguration
-    let userContentController: DataBrokerUserContentController?
+    private let isFakeBroker: Bool
+    private let webViewConfiguration: WKWebViewConfiguration
+    private let userContentController: DataBrokerUserContentController?
 
-    var webView: WKWebView?
-    var window: NSWindow?
+    private var webView: WKWebView?
+    private var window: NSWindow?
 
-    init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate) {
+    init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate, isFakeBroker: Bool = false) {
         let configuration = WKWebViewConfiguration()
         configuration.applyDataBrokerConfiguration(privacyConfig: privacyConfig, prefs: prefs, delegate: delegate)
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
 
         self.webViewConfiguration = configuration
+        self.isFakeBroker = isFakeBroker
 
         let userContentController = configuration.userContentController as? DataBrokerUserContentController
         assert(userContentController != nil)
@@ -124,5 +126,31 @@ extension DataBrokerProtectionWebViewHandler: WKNavigationDelegate {
         os_log("WebViewHandler didFail: %{public}@", log: .action, String(describing: error.localizedDescription))
         self.activeContinuation?.resume(throwing: error)
         self.activeContinuation = nil
+    }
+
+    func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge,
+                 completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        if !isFakeBroker {
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+
+        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
+            guard let serverTrust = challenge.protectionSpace.serverTrust else {
+                completionHandler(.cancelAuthenticationChallenge, nil)
+                return
+            }
+
+            let credential = URLCredential(trust: serverTrust)
+            completionHandler(.useCredential, credential)
+        } else if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic ||
+                    challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest {
+
+            let fakeBrokerCredentials = HTTPUtils.fetchFakeBrokerCredentials()
+            let credential = URLCredential(user: fakeBrokerCredentials.username, password: fakeBrokerCredentials.password, persistence: .none)
+            completionHandler(.useCredential, credential)
+        } else {
+            completionHandler(.cancelAuthenticationChallenge, nil)
+        }
     }
 }

@@ -31,7 +31,6 @@ public class DataBrokerProtectionDataManager {
     public init() {
         self.database = DataBrokerProtectionDataBase()
         setupNotifications()
-
     }
 
     public func saveProfile(_ profile: DataBrokerProtectionProfile) {
@@ -42,8 +41,6 @@ public class DataBrokerProtectionDataManager {
 
             // Test
             self.database.testProfileQuery = profile.profileQueries.first
-            database.setupFakeData()
-
         } catch {
             print("Error encoding profile: \(error)")
         }
@@ -57,7 +54,6 @@ public class DataBrokerProtectionDataManager {
 
                 // Test
                 self.database.testProfileQuery = profile.profileQueries.first
-                database.setupFakeData()
 
                 return profile
             } catch {
