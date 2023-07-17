@@ -32,6 +32,7 @@ struct UserProfileView: View {
     @State private var cityError: String = ""
     @State private var stateError: String = ""
     @State private var ageError: String = ""
+    @State var isSaveAlertOn = false
 
     @State private var isSaveDisabled: Bool = true
 
@@ -102,13 +103,18 @@ struct UserProfileView: View {
     var body: some View {
         VStack {
             textFields
-
-            Button {
+            let button = Button {
                 saveData()
             } label: {
                 Text("Save")
             }
             .disabled(isSaveDisabled)
+
+            if #available(macOS 12, *) {
+                button.alert("Profile Saved", isPresented: $isSaveAlertOn) {
+                    Button("OK", role: .cancel) { }
+                }
+            }
         }
         .padding()
         .onAppear(perform: {
@@ -174,6 +180,7 @@ struct UserProfileView: View {
                                                   age: Int(age)!)
 
         dataManager.saveProfile(profile)
+        isSaveAlertOn = true
     }
 
     func restoreData() {
