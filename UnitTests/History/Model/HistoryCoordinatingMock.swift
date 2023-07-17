@@ -18,17 +18,21 @@
 
 import XCTest
 import BrowserServicesKit
+import Common
 @testable import DuckDuckGo_Privacy_Browser
 
 final class HistoryCoordinatingMock: HistoryCoordinating {
 
     var history: History?
+    var allHistoryVisits: [DuckDuckGo_Privacy_Browser.Visit]?
     @Published private(set) var historyDictionary: [URL: DuckDuckGo_Privacy_Browser.HistoryEntry]?
     var historyDictionaryPublisher: Published<[URL: DuckDuckGo_Privacy_Browser.HistoryEntry]?>.Publisher { $historyDictionary }
 
     var addVisitCalled = false
-    func addVisit(of url: URL) {
+    var visit: Visit?
+    func addVisit(of url: URL) -> DuckDuckGo_Privacy_Browser.Visit? {
         addVisitCalled = true
+        return visit
     }
 
     var updateTitleIfNeededCalled = false
@@ -52,8 +56,14 @@ final class HistoryCoordinatingMock: HistoryCoordinating {
         completion()
     }
 
+    var burnAllCalled = false
+    func burnAll(completion: @escaping () -> Void) {
+        burnAllCalled = true
+        completion()
+    }
+
     var burnDomainsCalled = false
-    func burnDomains(_ domains: Set<String>, completion: @escaping () -> Void) {
+    func burnDomains(_ baseDomains: Set<String>, tld: Common.TLD, completion: @escaping () -> Void) {
         burnDomainsCalled = true
         completion()
     }

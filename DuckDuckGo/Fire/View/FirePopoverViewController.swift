@@ -42,6 +42,7 @@ final class FirePopoverViewController: NSViewController {
     private var firePopoverViewModel: FirePopoverViewModel
     private let historyCoordinating: HistoryCoordinating
 
+    @IBOutlet weak var infoLabel: NSTextField!
     @IBOutlet weak var optionsButton: NSPopUpButton!
     @IBOutlet weak var optionsButtonWidthConstraint: NSLayoutConstraint!
     @IBOutlet weak var openDetailsButton: NSButton!
@@ -61,7 +62,6 @@ final class FirePopoverViewController: NSViewController {
     private var appearanceCancellable: AnyCancellable?
     private var viewModelCancellable: AnyCancellable?
     private var selectedCancellable: AnyCancellable?
-    private var areOtherTabsInfluencedCancellable: AnyCancellable?
 
     required init?(coder: NSCoder) {
         fatalError("FirePopoverViewController: Bad initializer")
@@ -79,7 +79,8 @@ final class FirePopoverViewController: NSViewController {
                                                          tabCollectionViewModel: tabCollectionViewModel,
                                                          historyCoordinating: historyCoordinating,
                                                          fireproofDomains: fireproofDomains,
-                                                         faviconManagement: faviconManagement)
+                                                         faviconManagement: faviconManagement,
+                                                         tld: ContentBlocking.shared.tld)
 
         super.init(coder: coder)
     }
@@ -98,7 +99,12 @@ final class FirePopoverViewController: NSViewController {
         appearanceCancellable = view.subscribeForAppApperanceUpdates()
         subscribeToViewModel()
         subscribeToSelected()
-        subscribeToAreOtherTabsInfluenced()
+    }
+
+    override func viewWillAppear() {
+        super.viewWillAppear()
+
+        firePopoverViewModel.refreshItems()
     }
 
     @IBAction func optionsButtonAction(_ sender: NSPopUpButton) {
@@ -119,6 +125,30 @@ final class FirePopoverViewController: NSViewController {
         toggleDetails()
     }
 
+    private func updateInfoLabel() {
+        guard !firePopoverViewModel.selectable.isEmpty else {
+            infoLabel.stringValue = ""
+            return
+        }
+
+        guard !firePopoverViewModel.selected.isEmpty else {
+            infoLabel.stringValue = UserText.selectSiteToClear
+            return
+        }
+
+        let sites = firePopoverViewModel.selected.count
+        switch firePopoverViewModel.clearingOption {
+        case .allData:
+            let tabs = WindowControllersManager.shared.allTabViewModels.count
+            infoLabel.stringValue = UserText.activeTabsInfo(tabs: tabs, sites: sites)
+        case .currentWindow:
+            let tabs = firePopoverViewModel.tabCollectionViewModel?.tabs.count ?? 0
+            infoLabel.stringValue = UserText.activeTabsInfo(tabs: tabs, sites: sites)
+        case .currentTab:
+            infoLabel.stringValue = UserText.oneTabInfo(sites: sites)
+        }
+    }
+
     private func updateCloseDetailsButton() {
         guard firePopoverViewModel.areAllSelected else {
             closeDetailsButton.title = "     \(UserText.selectedDomainsDescription)"
@@ -129,15 +159,24 @@ final class FirePopoverViewController: NSViewController {
     }
 
     private func updateWarningWrapperView() {
-        warningWrapperView.isHidden = firePopoverViewModel.clearingOption == .allData ||
-        !firePopoverViewModel.areOtherTabsInfluenced || detailsWrapperView.isHidden
+        warningWrapperView.isHidden = detailsWrapperView.isHidden
 
         if !warningWrapperView.isHidden {
-            if firePopoverViewModel.hasPinnedTabs {
-                warningButton.title = "   \(UserText.fireDialogAllUnpinnedTabsWillClose)"
-            } else {
-                warningButton.title = "   \(UserText.fireDialogAllTabsWillClose)"
+            let title: String
+            switch firePopoverViewModel.clearingOption {
+            case .currentTab:
+                if firePopoverViewModel.tabCollectionViewModel?.selectedTab?.isPinned ?? false {
+                    title = UserText.fireDialogPinnedTabWillReload
+                } else {
+                    title = UserText.fireDialogTabWillClose
+                }
+            case .currentWindow:
+                title = UserText.fireDialogWindowWillClose
+            case .allData:
+                title = UserText.fireDialogAllWindowsWillClose
             }
+
+            warningButton.title = "   \(title)"
         }
 
         collectionViewBottomConstraint.constant = warningWrapperView.isHidden ? 0 : 32
@@ -164,6 +203,7 @@ final class FirePopoverViewController: NSViewController {
                 if self.firePopoverViewModel.selectable.isEmpty && !self.detailsWrapperView.isHidden {
                     self.toggleDetails()
                 }
+                self.updateInfoLabel()
                 self.adjustContentHeight()
                 self.updateOpenDetailsButton()
             }
@@ -176,17 +216,9 @@ final class FirePopoverViewController: NSViewController {
                 guard let self = self else { return }
                 let selectionIndexPaths = Set(selected.map {IndexPath(item: $0, section: self.firePopoverViewModel.selectableSectionIndex)})
                 self.collectionView.selectionIndexPaths = selectionIndexPaths
+                self.updateInfoLabel()
                 self.updateCloseDetailsButton()
                 self.updateClearButton()
-            }
-    }
-
-    private func subscribeToAreOtherTabsInfluenced() {
-        areOtherTabsInfluencedCancellable = firePopoverViewModel.$areOtherTabsInfluenced
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                guard let self = self else { return }
-                self.updateWarningWrapperView()
             }
     }
 
@@ -236,20 +268,18 @@ final class FirePopoverViewController: NSViewController {
         var maxWidth: CGFloat = 0
 
         FirePopoverViewModel.ClearingOption.allCases.forEach { option in
-            if firePopoverViewModel.availableClearingOptions.contains(option) {
-                if option == .allData {
-                    menu.addItem(.separator())
-                }
-
-                let item = NSMenuItem(title: option.string)
-                item.tag = option.rawValue
-                menu.addItem(item)
-
-                let width = (option.string as NSString)
-                    .boundingRect(with: constraintSize, options: .usesDeviceMetrics, attributes: attributes, context: nil)
-                    .width
-                maxWidth = max(maxWidth, width)
+            if option == .allData {
+                menu.addItem(.separator())
             }
+
+            let item = NSMenuItem(title: option.string)
+            item.tag = option.rawValue
+            menu.addItem(item)
+
+            let width = (option.string as NSString)
+                .boundingRect(with: constraintSize, options: .usesDeviceMetrics, attributes: attributes, context: nil)
+                .width
+            maxWidth = max(maxWidth, width)
         }
 
         optionsButtonWidthConstraint.constant = maxWidth + 32

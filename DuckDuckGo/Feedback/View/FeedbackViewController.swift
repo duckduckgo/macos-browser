@@ -314,7 +314,8 @@ final class FeedbackViewController: NSViewController {
                                                   installedSurrogates: installedSurrogates,
                                                   isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
                                                   ampURL: ampURL,
-                                                  urlParametersRemoved: urlParametersRemoved)
+                                                  urlParametersRemoved: urlParametersRemoved,
+                                                  reportFlow: .native)
             websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
         }
     }

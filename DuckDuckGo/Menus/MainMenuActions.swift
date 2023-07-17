@@ -267,6 +267,18 @@ extension AppDelegate {
 #endif
     }
 
+    @IBAction func sendTestNetworkProtectionNotification(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        Task { @MainActor in
+            do {
+                try await NetworkProtectionTunnelController.sendTestNotificationRequest()
+            } catch {
+                await NSAlert(error: error).runModal()
+            }
+        }
+#endif
+    }
+
     @IBAction func networkProtectionPreferredServerChanged(_ sender: Any?) {
 #if NETWORK_PROTECTION
         guard let title = (sender as? NSMenuItem)?.title else {
@@ -529,11 +541,11 @@ extension MainViewController {
         }
 
         let alert = NSAlert.clearAllHistoryAndDataAlert()
-        alert.beginSheetModal(for: window, completionHandler: { [weak self] response in
-            guard case .alertFirstButtonReturn = response, let self = self else {
+        alert.beginSheetModal(for: window, completionHandler: { response in
+            guard case .alertFirstButtonReturn = response else {
                 return
             }
-            FireCoordinator.fireViewModel.fire.burnAll(tabCollectionViewModel: self.tabCollectionViewModel)
+            FireCoordinator.fireViewModel.fire.burnAll()
         })
     }
 
@@ -668,7 +680,7 @@ extension MainViewController {
         WindowsManager.closeWindows(except: view.window)
 
         tabCollectionViewModel.append(tabs: otherTabs)
-        tabCollectionViewModel.tabCollection.localHistoryOfRemovedTabs.formUnion(otherLocalHistoryOfRemovedTabs)
+        tabCollectionViewModel.tabCollection.localHistoryOfRemovedTabs += otherLocalHistoryOfRemovedTabs
     }
 
     // MARK: - Edit

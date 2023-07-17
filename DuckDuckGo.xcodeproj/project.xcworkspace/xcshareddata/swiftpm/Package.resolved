@@ -14,7 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "00478127c77258f81767dd393373ea7efae5d77b"
+        "revision" : "84cf076cb8b9b9d733c59a89ee5536296c38a7d2",
+        "version" : "67.1.0"
       }
     },
     {
@@ -22,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "612a4446b7e69122d6d25fa3b20ce10cad446626",
-        "version" : "4.25.0"
+        "revision" : "0cfcedb9c8aefa52c7f3a36a2b3793a2c44de764",
+        "version" : "4.22.5"
       }
     },
     {
@@ -40,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/GRDB.swift.git",
       "state" : {
-        "revision" : "4475888676cfe1aabb1a35f379cd079ea692da1e",
-        "version" : "2.1.1"
+        "revision" : "77d9a83191a74e319a5cfa27b0e3145d15607573",
+        "version" : "2.2.0"
       }
     },
     {
@@ -139,8 +140,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/wireguard-apple",
       "state" : {
-        "revision" : "156abe15063b35b633363ec33fc2c040f81f9326",
-        "version" : "1.0.0"
+        "revision" : "cf3c0f5132dbb8de08c46155a1bbd5e5bb6a47c1",
+        "version" : "1.1.0"
       }
     }
   ],

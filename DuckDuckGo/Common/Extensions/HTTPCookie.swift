@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionLastVersionRunStore.swift
+//  HTTPCookie.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,22 +18,18 @@
 
 import Foundation
 
-public final class NetworkProtectionLastVersionRunStore {
-    private let userDefaults: UserDefaults
+extension HTTPCookie {
 
-    static let lastVersionRunKey = "com.duckduckgo.network-protection.NetworkProtectionVersionStore.lastVersionRunKey"
+    func belongsTo(_ eTLDPlus1Domain: String) -> Bool {
+        let cookieDomain = self.domain
 
-    public init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
+        // Check if the cookie's domain is the same as the given eTLD+1 domain
+        if cookieDomain == eTLDPlus1Domain { return true }
+
+        // Check if the cookie's domain is a subdomain of the given eTLD+1 domain
+        if cookieDomain.hasSuffix(".\(eTLDPlus1Domain)") { return true }
+
+        return false
     }
 
-    public var lastVersionRun: String? {
-        get {
-            userDefaults.string(forKey: Self.lastVersionRunKey)
-        }
-
-        set {
-            userDefaults.set(newValue, forKey: Self.lastVersionRunKey)
-        }
-    }
 }

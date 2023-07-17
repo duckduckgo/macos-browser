@@ -19,6 +19,7 @@
 import XCTest
 import BrowserServicesKit
 @testable import DuckDuckGo_Privacy_Browser
+import Common
 
 final class RecentlyClosedCoordinatorMock: RecentlyClosedCoordinating {
 
@@ -30,7 +31,7 @@ final class RecentlyClosedCoordinatorMock: RecentlyClosedCoordinating {
     }
 
     var burnCacheCalled = false
-    func burnCache(domains: Set<String>?) {
+    func burnCache(baseDomains: Set<String>?, tld: Common.TLD) {
         burnCacheCalled = true
     }
 

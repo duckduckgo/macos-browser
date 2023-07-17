@@ -26,6 +26,12 @@ SYSEX_BUNDLE_ID_BASE[config=Review][sdk=*] = com.duckduckgo.macos.browser.review
 SYSEX_BUNDLE_ID_BASE[config=Debug][sdk=*] = com.duckduckgo.macos.browser.debug.network-protection-extension
 SYSEX_BUNDLE_ID_BASE[config=Release][sdk=*] = com.duckduckgo.macos.browser.network-protection-extension
 
+DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE = com.duckduckgo.macos.browser.network-protection.distributed-notification
+DISTRIBUTED_NOTIFICATIONS_PREFIX[config=CI][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE).ci
+DISTRIBUTED_NOTIFICATIONS_PREFIX[config=Review][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE).review
+DISTRIBUTED_NOTIFICATIONS_PREFIX[config=Debug][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE).debug
+DISTRIBUTED_NOTIFICATIONS_PREFIX[config=Release][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE)
+
 NETP_BASE_APP_GROUP = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.system-extension
 NETP_APP_GROUP[config=CI][sdk=*] = $(NETP_BASE_APP_GROUP).debug
 NETP_APP_GROUP[config=Review][sdk=*] = $(NETP_BASE_APP_GROUP).review

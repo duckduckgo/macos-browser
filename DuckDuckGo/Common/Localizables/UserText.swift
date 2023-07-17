@@ -127,17 +127,34 @@ struct UserText {
     static let fireDialogFireproofSites = NSLocalizedString("fire.dialog.fireproof.sites", value: "Fireproof sites won't be cleared", comment: "Category of domains in fire button dialog")
     static let fireDialogClearSites = NSLocalizedString("fire.dialog.clear.sites", value: "Selected sites will be cleared", comment: "Category of domains in fire button dialog")
     static let allData = NSLocalizedString("fire.all-sites", value: "All sites", comment: "Configuration option for fire button")
-    static let currentSite = NSLocalizedString("fire.currentSite", value: "Current site", comment: "Configuration option for fire button")
     static let currentTab = NSLocalizedString("fire.currentTab", value: "All sites visited in current tab", comment: "Configuration option for fire button")
     static let currentWindow = NSLocalizedString("fire.currentWindow", value: "All sites visited in current window", comment: "Configuration option for fire button")
     static let allDataDescription = NSLocalizedString("fire.all-data.description", value: "Clear all tabs and related site data", comment: "Description of the 'All Data' configuration option for the fire button")
     static let currentWindowDescription = NSLocalizedString("fire.current-window.description", value: "Clear current window and related site data", comment: "Description of the 'Current Window' configuration option for the fire button")
-    static let selectedDomainsDescription = NSLocalizedString("fire.selected-domains.description", value: "Clear selected domains and related site data", comment: "Description of the 'Current Window' configuration option for the fire button")
+    static let selectedDomainsDescription = NSLocalizedString("fire.selected-domains.description", value: "Clear data only for selected domains", comment: "Description of the 'Current Window' configuration option for the fire button")
+    static let selectSiteToClear = NSLocalizedString("fire.select-site-to-clear", value: "Select a site to clear its data.", comment: "Info label in the fire button popover")
+    static func activeTabsInfo(tabs: Int, sites: Int) -> String {
+        let siteString = sites == 1 ? "site" : "sites"
+        let tabsString = tabs == 1 ? "tab" : "tabs"
+        let localized = NSLocalizedString("fire.active-tabs-info",
+                                          value: "Close %d active %@ and clear all browsing history and cookies (%d %@).",
+                                          comment: "Info in the Fire Button popover")
+        return String(format: localized, tabs, tabsString, sites, siteString)
+    }
+    static func oneTabInfo(sites: Int) -> String {
+        let siteString = sites == 1 ? "site" : "sites"
+        let localized = NSLocalizedString("fire.one-tab-info",
+                                          value: "Close this tab and clear its browsing history and cookies (%d %@).",
+                                          comment: "Info in the Fire Button popover")
+        return String(format: localized, sites, siteString)
+    }
     static let fireDialogNothingToBurn = NSLocalizedString("fire.dialog.nothing-to-burn", value: "No data to clear", comment: "Information label to inform there is no domain for burning")
     static let fireDialogSiteIsFireproof = NSLocalizedString("fire.dialog.site-is-fireproof", value: "Nothing to clear. This is one of your Fireproof Sites.", comment: "Information label to inform that a fireproof website won't be burned")
     static let fireDialogDetails = NSLocalizedString("fire.dialog.details", value: "Details", comment: "Button to show more details")
-    static let fireDialogAllTabsWillClose = NSLocalizedString("fire.dialog.all-tabs-will-close", value: "All tabs open to selected sites will close", comment: "Warning label shown in an expanded view of the fire popover")
-    static let fireDialogAllUnpinnedTabsWillClose = NSLocalizedString("fire.dialog.all-unpinned-tabs-will-close", value: "All unpinned tabs open to selected sites will close", comment: "Warning label shown in an expanded view of the fire popover")
+    static let fireDialogWindowWillClose = NSLocalizedString("fire.dialog.window-will-close", value: "Current window will close", comment: "Warning label shown in an expanded view of the fire popover")
+    static let fireDialogTabWillClose = NSLocalizedString("fire.dialog.tab-will-close", value: "Current tab will close", comment: "Warning label shown in an expanded view of the fire popover")
+    static let fireDialogPinnedTabWillReload = NSLocalizedString("fire.dialog.tab-will-reload", value: "Pinned tab will reload", comment: "Warning label shown in an expanded view of the fire popover")
+    static let fireDialogAllWindowsWillClose = NSLocalizedString("fire.dialog.all-windows-will-close", value: "All windows will close", comment: "Warning label shown in an expanded view of the fire popover")
     static let fireproofSite = NSLocalizedString("options.menu.fireproof-site", value: "Fireproof This Site", comment: "Context menu item")
     static let removeFireproofing = NSLocalizedString("options.menu.remove-fireproofing", value: "Remove Fireproofing", comment: "Context menu item")
     static let fireproof = NSLocalizedString("fireproof", value: "Fireproof", comment: "Fireproof button")
@@ -724,7 +741,18 @@ struct UserText {
     }
 
     static let noAccessToDownloadsFolderHeader = NSLocalizedString("no.access.to.downloads.folder.header", value: "DuckDuckGo needs permission to access your Downloads folder", comment: "Header of the alert dialog informing user about failed download")
-    static let noAccessToDownloadsFolder = NSLocalizedString("no.access.to.downloads.folder", value: "Grant access in Security & Privacy preferences in System Settings.", comment: "Alert presented to user if the app doesn't have rights to access Downloads folder")
+
+    private static let noAccessToDownloadsFolderLegacy = NSLocalizedString("no.access.to.downloads.folder.legacy", value: "Grant access in Security & Privacy preferences in System Settings.", comment: "Alert presented to user if the app doesn't have rights to access Downloads folder. This is used for macOS version 12 and below")
+    private static let noAccessToDownloadsFolderModern = NSLocalizedString("no.access.to.downloads.folder.modern", value: "Grant access in Privacy & Security preferences in System Settings.", comment: "Alert presented to user if the app doesn't have rights to access Downloads folder. This is used for macOS version 13 and above")
+
+    static var noAccessToDownloadsFolder: String {
+        if #available(macOS 13.0, *) {
+            return noAccessToDownloadsFolderModern
+        } else {
+            return noAccessToDownloadsFolderLegacy
+        }
+    }
+
     static let noAccessToSelectedFolderHeader = NSLocalizedString("no.access.to.selected.folder.header", value: "DuckDuckGo needs permission to access selected folder", comment: "Header of the alert dialog informing user about failed download")
     static let noAccessToSelectedFolder = NSLocalizedString("no.access.to.selected.folder", value: "Grant access to the location of download.", comment: "Alert presented to user if the app doesn't have rights to access selected folder")
 
