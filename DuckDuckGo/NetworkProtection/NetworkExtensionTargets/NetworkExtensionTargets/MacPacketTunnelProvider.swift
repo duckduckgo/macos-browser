@@ -17,18 +17,27 @@
 //
 
 import Foundation
-import NetworkProtection
-import NetworkExtension
 import Combine
 import Common
+import NetworkProtection
+import NetworkExtension
 import Networking
 import PixelKit
 
 final class MacPacketTunnelProvider: PacketTunnelProvider {
 
+    // MARK: - Additional Status Info
+
+    /// Holds the date when the status was last changed so we can send it out as additional information
+    /// in our status-change notifications.
+    ///
+    private var lastStatusChangeDate = Date()
+
     // MARK: - Notifications: Observation Tokens
 
-    private var requestStatusUpdateCancellable: AnyCancellable!
+    private var cancellables = Set<AnyCancellable>()
+
+    // MARK: - User Notifications
 
     private static func makeNotificationsPresenter() -> NetworkProtectionNotificationsPresenter {
 #if NETP_SYSTEM_EXTENSION
@@ -119,37 +128,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     private let notificationCenter: NetworkProtectionNotificationCenter = DistributedNotificationCenter.default()
 
-    /// Holds the date when the status was last changed so we can send it out as additional information
-    /// in our status-change notifications.
-    ///
-    private var lastStatusChangeDate = Date()
-
-    override var connectionStatus: ConnectionStatus {
-        get {
-            super.connectionStatus
-        }
-
-        set {
-            guard super.connectionStatus != newValue else {
-                return
-            }
-
-            super.connectionStatus = newValue
-            lastStatusChangeDate = Date()
-            broadcastConnectionStatus()
-        }
-    }
-
-    override var lastSelectedServerInfo: NetworkProtectionServerInfo? {
-        get {
-            super.lastSelectedServerInfo
-        }
-
-        set {
-            broadcastLastSelectedServerInfo()
-        }
-    }
-
     // MARK: - PacketTunnelProvider.Event reporting
 
     private static var packetTunnelProviderEvents: EventMapping<PacketTunnelProvider.Event> = .init { event, _, _, _ in
@@ -177,23 +155,72 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    providerEvents: Self.packetTunnelProviderEvents,
                    appLauncher: AppLauncher(appBundleURL: .mainAppBundleURL))
 
-        requestStatusUpdateCancellable = notificationCenter.publisher(for: .requestStatusUpdate).sink { [weak self] _ in
+        observeConnectionStatusChanges()
+        observeServerChanges()
+        observeStatusUpdateRequests()
+    }
+
+    // MARK: - Observing Changes & Requests
+
+    /// Observe connection status changes to broadcast those changes through distributed notifications.
+    ///
+    private func observeConnectionStatusChanges() {
+        connectionStatusPublisher.sink { [weak self] status in
+            self?.lastStatusChangeDate = Date()
+            self?.broadcast(status)
+        }
+        .store(in: &cancellables)
+    }
+
+    /// Observe server changes to broadcast those changes through distributed notifications.
+    ///
+    private func observeServerChanges() {
+        lastSelectedServerInfoPublisher.sink { [weak self] server in
+            self?.lastStatusChangeDate = Date()
+            self?.broadcast(server)
+        }
+        .store(in: &cancellables)
+
+        broadcastLastSelectedServerInfo()
+    }
+
+    /// Observe status update requests to broadcast connection status
+    ///
+    private func observeStatusUpdateRequests() {
+        notificationCenter.publisher(for: .requestStatusUpdate).sink { [weak self] _ in
             self?.broadcastConnectionStatus()
             self?.broadcastLastSelectedServerInfo()
         }
+        .store(in: &cancellables)
     }
 
-    // MARK: - Providing status information through distributed notifications
+    // MARK: - Broadcasting Status and Information
 
+    /// Broadcasts the current connection status.
+    ///
     private func broadcastConnectionStatus() {
+        broadcast(connectionStatus)
+    }
+
+    /// Broadcasts the specified connection status.
+    ///
+    private func broadcast(_ connectionStatus: ConnectionStatus) {
         let lastStatusChange = ConnectionStatusChange(status: connectionStatus, on: lastStatusChangeDate)
         let payload = ConnectionStatusChangeEncoder().encode(lastStatusChange)
 
         notificationCenter.post(.statusDidChange, object: payload)
     }
 
+    /// Broadcasts the current server information.
+    ///
     private func broadcastLastSelectedServerInfo() {
-        guard let serverInfo = lastSelectedServerInfo else {
+        broadcast(lastSelectedServerInfo)
+    }
+
+    /// Broadcasts the specified server information.
+    ///
+    private func broadcast(_ serverInfo: NetworkProtectionServerInfo?) {
+        guard let serverInfo else {
             return
         }
 
