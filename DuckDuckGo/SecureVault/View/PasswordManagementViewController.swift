@@ -460,7 +460,7 @@ final class PasswordManagementViewController: NSViewController {
         }
 
         do {
-            if try secureVault?.hasAccountFor(username: credentials.account.username, domain: credentials.account.domain) == true {
+            if try secureVault?.hasAccountFor(username: credentials.account.username, domain: credentials.account.domain) == true && isNew {
                 showDuplicateAlert()
                 return
             }
