@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Combine
 import Foundation
+import SecureStorage
 
 final class AutofillTabExtension: TabExtension {
 
@@ -105,7 +106,7 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         }
     }
 
-    func secureVaultInitFailed(_ error: SecureVaultError) {
+    func secureVaultInitFailed(_ error: SecureStorageError) {
         SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
     }
 

@@ -27,10 +27,10 @@ protocol DataImportStatusProviding {
 
 final class BookmarksAndPasswordsImportStatusProvider: DataImportStatusProviding {
 
-    let secureVault: SecureVault?
+    let secureVault: (any SecureVault)?
     let bookmarkManager: BookmarkManager
 
-    init(secureVault: SecureVault? = try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared),
+    init(secureVault: (any SecureVault)? = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared),
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.secureVault = secureVault
         self.bookmarkManager = bookmarkManager
