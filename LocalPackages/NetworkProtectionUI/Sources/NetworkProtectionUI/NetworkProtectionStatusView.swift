@@ -168,6 +168,20 @@ fileprivate extension View {
     }
 }
 
+fileprivate extension View {
+
+    /// We only support text selection in `Text` views iOS 15+ and macOS 12+ right now
+    /// as there's no simple way to offer this in lower versions.
+    ///
+    func makeSelectable() -> AnyView {
+        guard #available(iOS 15.0, macOS 12.0, *) else {
+            return AnyView(self)
+        }
+
+        return AnyView(self.textSelection(.enabled))
+    }
+}
+
 public struct NetworkProtectionStatusView: View {
 
     @Environment(\.colorScheme) var colorScheme
@@ -234,6 +248,9 @@ public struct NetworkProtectionStatusView: View {
                 /// the alert bubble won't shrink if there's not enough text.
                 HStack(spacing: 0) {
                     Text(message)
+                        .makeSelectable()
+                        .foregroundColor(defaultTextColor)
+
                     Spacer()
                 }
             }
@@ -337,6 +354,7 @@ public struct NetworkProtectionStatusView: View {
             Spacer(minLength: 16)
 
             Text(details)
+                .makeSelectable()
                 .applyConnectionStatusDetailAttributes(colorScheme: colorScheme)
                 .fixedSize()
         }
