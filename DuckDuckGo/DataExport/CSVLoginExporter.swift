@@ -25,10 +25,10 @@ final class CSVLoginExporter {
         case failedToEncodeLogins
     }
 
-    private let secureVault: any SecureVault
+    private let secureVault: any AutofillSecureVault
     private let fileStore: FileStore
 
-    init(secureVault: any SecureVault, fileStore: FileStore = FileManager.default) {
+    init(secureVault: any AutofillSecureVault, fileStore: FileStore = FileManager.default) {
         self.secureVault = secureVault
         self.fileStore = fileStore
     }

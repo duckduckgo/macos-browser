@@ -22,9 +22,9 @@ import SecureStorage
 
 final class SecureVaultLoginImporter: LoginImporter {
 
-    private let secureVault: any SecureVault
+    private let secureVault: any AutofillSecureVault
 
-    init(secureVault: any SecureVault) {
+    init(secureVault: any AutofillSecureVault) {
         self.secureVault = secureVault
     }
 

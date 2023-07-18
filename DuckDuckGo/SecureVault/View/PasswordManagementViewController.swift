@@ -140,7 +140,7 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
-    var secureVault: (any SecureVault)? {
+    var secureVault: (any AutofillSecureVault)? {
         try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
     }
 
