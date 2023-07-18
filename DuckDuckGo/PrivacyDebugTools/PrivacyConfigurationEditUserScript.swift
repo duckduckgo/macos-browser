@@ -170,7 +170,7 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
 
         return RemoteResource(
             id: "privacy-configuration",
-            url: urlProvider.url(for: .privacyConfiguration).absoluteString,
+            url: urlProvider.url(for: .privacyConfiguration, allowOverrides: false).absoluteString,
             name: "Privacy Config",
             current: .init(
                 source: source,
