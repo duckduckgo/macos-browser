@@ -23,7 +23,6 @@ import DDGSync
 import Persistence
 import SyncDataProviders
 
-
 extension NSNotification.Name {
 
     static let credentialsSyncComplete = NSNotification.Name("CredentialsSyncComplete")
@@ -33,6 +32,24 @@ extension NSNotification.Name {
 final class SyncCredentialsAdapter {
 
     private(set) var provider: CredentialsProvider?
+    let databaseCleaner: CredentialsDatabaseCleaner
+
+    init(secureVaultFactory: SecureVaultFactory = .default) {
+        databaseCleaner = CredentialsDatabaseCleaner(
+            secureVaultFactory: secureVaultFactory,
+            errorEvents: CredentialsCleanupErrorHandling(),
+            log: .passwordManager
+        )
+    }
+
+    func updateDatabaseCleanupSchedule(shouldEnable: Bool) {
+        databaseCleaner.cleanUpDatabaseNow()
+        if shouldEnable {
+            databaseCleaner.scheduleRegularCleaning()
+        } else {
+            databaseCleaner.cancelCleaningSchedule()
+        }
+    }
 
     func setUpProviderIfNeeded(secureVaultFactory: SecureVaultFactory, metadataStore: SyncMetadataStore) {
         guard provider == nil else {
@@ -71,7 +88,6 @@ final class SyncCredentialsAdapter {
             let params = processedErrors.errorPixelParameters
             Pixel.fire(.debug(event: .syncCredentialsProviderInitializationFailed, error: error), withAdditionalParameters: params)
         }
-
     }
 
     private var syncErrorCancellable: AnyCancellable?
