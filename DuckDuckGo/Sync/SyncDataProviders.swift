@@ -25,6 +25,7 @@ import SyncDataProviders
 final class SyncDataProviders: DataProvidersSource {
     public let bookmarksAdapter: SyncBookmarksAdapter
     public let credentialsAdapter: SyncCredentialsAdapter
+    public let credentialsDatabaseCleaner: CredentialsDatabaseCleaner
 
     func makeDataProviders() -> [DataProviding] {
         initializeMetadataDatabaseIfNeeded()
@@ -49,6 +50,16 @@ final class SyncDataProviders: DataProvidersSource {
         self.secureVaultFactory = secureVaultFactory
         bookmarksAdapter = SyncBookmarksAdapter()
         credentialsAdapter = SyncCredentialsAdapter()
+        credentialsDatabaseCleaner = CredentialsDatabaseCleaner(secureVaultFactory: .default, errorEvents: nil, log: .passwordManager)
+    }
+
+    func updateCredentialsDatabaseCleanupSchedule(shouldEnable: Bool) {
+        credentialsDatabaseCleaner.cleanUpDatabaseNow()
+        if shouldEnable {
+            credentialsDatabaseCleaner.scheduleRegularCleaning()
+        } else {
+            credentialsDatabaseCleaner.cancelCleaningSchedule()
+        }
     }
 
     private func initializeMetadataDatabaseIfNeeded() {
