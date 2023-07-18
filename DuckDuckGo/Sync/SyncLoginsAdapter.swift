@@ -52,16 +52,16 @@ final class SyncCredentialsAdapter {
                 .sink { error in
                     switch error {
                     case let syncError as SyncError:
-                        Pixel.fire(.debug(event: .syncLoginsFailed, error: syncError))
+                        Pixel.fire(.debug(event: .syncCredentialsFailed, error: syncError))
                     default:
                         let nsError = error as NSError
                         if nsError.domain != NSURLErrorDomain {
                             let processedErrors = CoreDataErrorsParser.parse(error: error as NSError)
                             let params = processedErrors.errorPixelParameters
-                            Pixel.fire(.debug(event: .syncLoginsFailed, error: error), withAdditionalParameters: params)
+                            Pixel.fire(.debug(event: .syncCredentialsFailed, error: error), withAdditionalParameters: params)
                         }
                     }
-                    os_log(.error, log: OSLog.sync, "Bookmarks Sync error: %{public}s", String(reflecting: error))
+                    os_log(.error, log: OSLog.sync, "Credentials Sync error: %{public}s", String(reflecting: error))
                 }
 
             self.provider = provider
@@ -69,7 +69,7 @@ final class SyncCredentialsAdapter {
         } catch let error as NSError {
             let processedErrors = CoreDataErrorsParser.parse(error: error)
             let params = processedErrors.errorPixelParameters
-            Pixel.fire(.debug(event: .syncLoginsProviderInitializationFailed, error: error), withAdditionalParameters: params)
+            Pixel.fire(.debug(event: .syncCredentialsProviderInitializationFailed, error: error), withAdditionalParameters: params)
         }
 
     }
