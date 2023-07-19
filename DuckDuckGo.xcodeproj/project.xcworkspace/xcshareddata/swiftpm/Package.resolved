@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "687d881b82eb293bf30a2aed0ee62fa005a22b8d",
-        "version" : "68.1.0"
+        "branch" : "daniel/email-capitalization",
+        "revision" : "2fb5c872105cc66a3a25da7437b99a16cc8995a6"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "44cd844b6bb5d8ccfefbd6e025817d800c26ad76",
-        "version" : "7.2.0"
+        "branch" : "shane/email-saving-2",
+        "revision" : "7cc75bc0da1e135577e394c9304f2f3bbcf1e24b"
       }
     },
     {
@@ -129,7 +129,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
       "state" : {
         "revision" : "4684440d03304e7638a2c8086895367e90987463",
         "version" : "1.2.1"
