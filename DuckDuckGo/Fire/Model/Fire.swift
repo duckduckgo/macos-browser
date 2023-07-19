@@ -527,7 +527,7 @@ final class Fire {
 
     private func burnDeletedBookmarks() {
         if syncService?.authState == .inactive {
-            LocalBookmarkManager.shared.cleanUpBookmarksDatabase()
+            bookmarkManager.cleanUpBookmarksDatabase()
         }
     }
 }

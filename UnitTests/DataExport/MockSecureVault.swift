@@ -122,16 +122,12 @@ final class MockSecureVault: SecureVault {
 
     func inDatabaseTransaction(_ block: @escaping (Database) throws -> Void) throws {}
 
-    func modifiedWebsiteCredentials() throws -> [SecureVaultModels.WebsiteAccountSyncMetadata] {
+    func modifiedSyncableCredentials() throws -> [SecureVaultModels.SyncableCredentials] {
         []
     }
 
-    func deleteWebsiteCredentialsFor(accountId: Int64, in database: Database) throws {
-        try deleteWebsiteCredentialsFor(accountId: accountId)
-    }
-
-    func deleteWebsiteCredentialsMetadata(_ metadata: SecureVaultModels.WebsiteAccountSyncMetadata, in database: Database) throws {
-        if let accountId = metadata.objectId {
+    func deleteSyncableCredentials(_ syncableCredentials: SecureVaultModels.SyncableCredentials, in database: Database) throws {
+        if let accountId = syncableCredentials.metadata.objectId {
             try deleteWebsiteCredentialsFor(accountId: accountId)
         }
     }
@@ -140,13 +136,13 @@ final class MockSecureVault: SecureVault {
         try storeWebsiteCredentials(credentials)
     }
 
-    func storeWebsiteCredentialsMetadata(_ metadata: SecureVaultModels.WebsiteAccountSyncMetadata, clearModifiedAt: Bool, in database: Database) throws {}
+    func storeSyncableCredentials(_ syncableCredentials: SecureVaultModels.SyncableCredentials, in database: Database) throws {}
 
-    func websiteCredentialsForSyncIds(_ syncIds: any Sequence<String>, in database: Database) throws -> [SecureVaultModels.WebsiteAccountSyncMetadata] {
+    func syncableCredentialsForSyncIds(_ syncIds: any Sequence<String>, in database: Database) throws -> [SecureVaultModels.SyncableCredentials] {
         []
     }
 
-    func websiteCredentialsMetadataForAccountId(_ accountId: Int64, in database: Database) throws -> SecureVaultModels.WebsiteAccountSyncMetadata? {
+    func syncableCredentialsForAccountId(_ accountId: Int64, in database: Database) throws -> SecureVaultModels.SyncableCredentials? {
         nil
     }
 
@@ -154,4 +150,19 @@ final class MockSecureVault: SecureVault {
         try accountsFor(domain: domain)
     }
 
+    func getEncryptionKey() throws -> Data {
+        Data()
+    }
+
+    func encrypt(_ data: Data, using key: Data) throws -> Data {
+        data
+    }
+
+    func decrypt(_ data: Data, using key: Data) throws -> Data {
+        data
+    }
+
+    func hasAccountFor(username: String?, domain: String?) throws -> Bool {
+        storedAccounts.contains(where: { $0.username == username && $0.domain == domain })
+    }
 }
