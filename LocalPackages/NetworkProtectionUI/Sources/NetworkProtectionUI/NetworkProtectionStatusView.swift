@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 import Combine
 import NetworkProtection
 
@@ -165,20 +166,6 @@ fileprivate extension View {
         opacity(Opacity.title(colorScheme: colorScheme))
             .font(.NetworkProtection.title)
             .foregroundColor(defaultTextColor)
-    }
-}
-
-fileprivate extension View {
-
-    /// We only support text selection in `Text` views iOS 15+ and macOS 12+ right now
-    /// as there's no simple way to offer this in lower versions.
-    ///
-    func makeSelectable() -> AnyView {
-        guard #available(iOS 15.0, macOS 12.0, *) else {
-            return AnyView(self)
-        }
-
-        return AnyView(self.textSelection(.enabled))
     }
 }
 
