@@ -17,9 +17,10 @@
 //
 
 import Foundation
-import XCTest
+import Combine
 import SwiftUI
 import NetworkProtection
+import XCTest
 @testable import NetworkProtectionUI
 
 final class StatusBarMenuTests: XCTestCase {
@@ -30,9 +31,25 @@ final class StatusBarMenuTests: XCTestCase {
         }
     }
 
+    private final class TestStatusReporter: NetworkProtectionStatusReporter {
+        var statusPublisher = CurrentValueSubject<NetworkProtection.ConnectionStatus, Never>(.disconnected)
+        var connectivityIssuesPublisher = CurrentValueSubject<Bool, Never>(false)
+        var serverInfoPublisher = CurrentValueSubject<NetworkProtection.NetworkProtectionStatusServerInfo, Never>(.unknown)
+        var connectionErrorPublisher = CurrentValueSubject<String?, Never>(nil)
+        var controllerErrorMessagePublisher = CurrentValueSubject<String?, Never>(nil)
+
+        func forceRefresh() {
+            // no-op
+        }
+    }
+
     func testShowStatusBarMenu() {
         let item = NSStatusItem()
-        let menu = StatusBarMenu(statusItem: item, appLauncher: TestAppLauncher(), iconProvider: MenuIconProvider())
+        let menu = StatusBarMenu(
+            statusItem: item,
+            statusReporter: TestStatusReporter(),
+            appLauncher: TestAppLauncher(),
+            iconProvider: MenuIconProvider())
 
         menu.show()
 
@@ -41,7 +58,11 @@ final class StatusBarMenuTests: XCTestCase {
 
     func testHideStatusBarMenu() {
         let item = NSStatusItem()
-        let menu = StatusBarMenu(statusItem: item, appLauncher: TestAppLauncher(), iconProvider: MenuIconProvider())
+        let menu = StatusBarMenu(
+            statusItem: item,
+            statusReporter: TestStatusReporter(),
+            appLauncher: TestAppLauncher(),
+            iconProvider: MenuIconProvider())
 
         menu.hide()
 
