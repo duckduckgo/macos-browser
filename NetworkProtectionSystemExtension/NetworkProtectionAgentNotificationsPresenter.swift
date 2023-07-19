@@ -22,29 +22,33 @@ import NetworkProtection
 /// Notifications presenter for the system extension.  This really just asks for the running agent to present a notification using
 /// the established IPC connection.
 ///
-final class NetworkProtectionIPCNotificationsPresenter: NetworkProtectionNotificationsPresenter {
-    private let ipcConnection: IPCConnection
+final class NetworkProtectionAgentNotificationsPresenter: NetworkProtectionNotificationsPresenter {
 
-    init(ipcConnection: IPCConnection) {
-        self.ipcConnection = ipcConnection
+    private let notificationCenter: NetworkProtectionNotificationCenter
+
+    init(notificationCenter: NetworkProtectionNotificationCenter) {
+        self.notificationCenter = notificationCenter
     }
 
     // MARK: - Presenting user notifications
 
     func showReconnectedNotification() {
-        ipcConnection.reconnected()
+        notificationCenter.post(.showIssuesResolvedNotification)
     }
 
     func showReconnectingNotification() {
-        ipcConnection.reconnecting()
+        notificationCenter.post(.showIssuesStartedNotification)
     }
 
     func showConnectionFailureNotification() {
-        ipcConnection.connectionFailure()
+        notificationCenter.post(.showIssuesNotResolvedNotification)
     }
 
-    func showSupercededNotification() {
-        ipcConnection.superceded()
+    func showSupersededNotification() {
+        notificationCenter.post(.showVPNSupersededNotification)
     }
 
+    func showTestNotification() {
+        notificationCenter.post(.showTestNotification)
+    }
 }

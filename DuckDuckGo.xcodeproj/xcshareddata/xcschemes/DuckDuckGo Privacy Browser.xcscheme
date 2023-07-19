@@ -101,6 +101,9 @@
                   Identifier = "CBRCompileTimeReporterTests">
                </Test>
                <Test
+                  Identifier = "FireproofingReferenceTests/testFireproofing()">
+               </Test>
+               <Test
                   Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">
                </Test>
                <Test
@@ -132,6 +135,9 @@
                </Test>
                <Test
                   Identifier = "HTTPSUpgradeIntegrationTests">
+               </Test>
+               <Test
+                  Identifier = "NavigationProtectionIntegrationTests/testAMPLinks()">
                </Test>
             </SkippedTests>
          </TestableReference>

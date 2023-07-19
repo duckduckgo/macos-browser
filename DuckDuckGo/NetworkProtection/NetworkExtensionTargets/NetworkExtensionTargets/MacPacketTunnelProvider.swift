@@ -17,19 +17,31 @@
 //
 
 import Foundation
+import Combine
+import Common
 import NetworkProtection
 import NetworkExtension
-import Common
 import Networking
 import PixelKit
 
 final class MacPacketTunnelProvider: PacketTunnelProvider {
 
+    // MARK: - Additional Status Info
+
+    /// Holds the date when the status was last changed so we can send it out as additional information
+    /// in our status-change notifications.
+    ///
+    private var lastStatusChangeDate = Date()
+
+    // MARK: - Notifications: Observation Tokens
+
+    private var cancellables = Set<AnyCancellable>()
+
+    // MARK: - User Notifications
+
     private static func makeNotificationsPresenter() -> NetworkProtectionNotificationsPresenter {
 #if NETP_SYSTEM_EXTENSION
-        let ipcConnection = IPCConnection(log: .networkProtectionIPCLog, memoryManagementLog: .networkProtectionMemoryLog)
-        ipcConnection.startListener()
-        return NetworkProtectionIPCNotificationsPresenter(ipcConnection: ipcConnection)
+        return NetworkProtectionAgentNotificationsPresenter(notificationCenter: DistributedNotificationCenter.default())
 #else
         let parentBundlePath = "../../../"
         let mainAppURL: URL
@@ -42,8 +54,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 #endif
     }
 
-    private let controllerErrorStore: NetworkProtectionTunnelErrorStore
-
     // MARK: - Error Reporting
 
     // swiftlint:disable:next cyclomatic_complexity function_body_length
@@ -51,7 +61,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         return EventMapping { event, _, _, _ in
             let domainEvent: NetworkProtectionPixelEvent
 #if DEBUG
-            // Makes sure we see the assertion failure in the yellow NetP alert.
+            // Makes sure we see the error in the yellow NetP alert.
             controllerErrorStore.lastErrorMessage = "[Debug] Error event: \(event.localizedDescription)"
 #endif
             switch event {
@@ -116,6 +126,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
     }
 
+    private let notificationCenter: NetworkProtectionNotificationCenter = DistributedNotificationCenter.default()
+
     // MARK: - PacketTunnelProvider.Event reporting
 
     private static var packetTunnelProviderEvents: EventMapping<PacketTunnelProvider.Event> = .init { event, _, _, _ in
@@ -132,34 +144,112 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     // MARK: - Initialization
 
     @objc public init() {
-        let distributedNotificationCenter = DistributedNotificationCenter.forType(.networkProtection)
-        controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: distributedNotificationCenter)
-        super.init(notificationCenter: distributedNotificationCenter,
-                   notificationsPresenter: Self.makeNotificationsPresenter(),
+        let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
+        let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
+
+        super.init(notificationsPresenter: Self.makeNotificationsPresenter(),
+                   tunnelHealthStore: tunnelHealthStore,
+                   controllerErrorStore: controllerErrorStore,
                    useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
                    debugEvents: Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore),
                    providerEvents: Self.packetTunnelProviderEvents,
                    appLauncher: AppLauncher(appBundleURL: .mainAppBundleURL))
+
+        observeConnectionStatusChanges()
+        observeServerChanges()
+        observeStatusUpdateRequests()
+    }
+
+    // MARK: - Observing Changes & Requests
+
+    /// Observe connection status changes to broadcast those changes through distributed notifications.
+    ///
+    private func observeConnectionStatusChanges() {
+        connectionStatusPublisher.sink { [weak self] status in
+            self?.lastStatusChangeDate = Date()
+            self?.broadcast(status)
+        }
+        .store(in: &cancellables)
+    }
+
+    /// Observe server changes to broadcast those changes through distributed notifications.
+    ///
+    private func observeServerChanges() {
+        lastSelectedServerInfoPublisher.sink { [weak self] server in
+            self?.lastStatusChangeDate = Date()
+            self?.broadcast(server)
+        }
+        .store(in: &cancellables)
+
+        broadcastLastSelectedServerInfo()
+    }
+
+    /// Observe status update requests to broadcast connection status
+    ///
+    private func observeStatusUpdateRequests() {
+        notificationCenter.publisher(for: .requestStatusUpdate).sink { [weak self] _ in
+            self?.broadcastConnectionStatus()
+            self?.broadcastLastSelectedServerInfo()
+        }
+        .store(in: &cancellables)
+    }
+
+    // MARK: - Broadcasting Status and Information
+
+    /// Broadcasts the current connection status.
+    ///
+    private func broadcastConnectionStatus() {
+        broadcast(connectionStatus)
+    }
+
+    /// Broadcasts the specified connection status.
+    ///
+    private func broadcast(_ connectionStatus: ConnectionStatus) {
+        let lastStatusChange = ConnectionStatusChange(status: connectionStatus, on: lastStatusChangeDate)
+        let payload = ConnectionStatusChangeEncoder().encode(lastStatusChange)
+
+        notificationCenter.post(.statusDidChange, object: payload)
+    }
+
+    /// Broadcasts the current server information.
+    ///
+    private func broadcastLastSelectedServerInfo() {
+        broadcast(lastSelectedServerInfo)
+    }
+
+    /// Broadcasts the specified server information.
+    ///
+    private func broadcast(_ serverInfo: NetworkProtectionServerInfo?) {
+        guard let serverInfo else {
+            return
+        }
+
+        let serverStatusInfo = NetworkProtectionStatusServerInfo(serverLocation: serverInfo.serverLocation, serverAddress: serverInfo.endpoint?.description)
+        let payload = ServerSelectedNotificationObjectEncoder().encode(serverStatusInfo)
+
+        notificationCenter.post(.serverSelected, object: payload)
     }
 
     // MARK: - NEPacketTunnelProvider
 
-    public override func loadVendorOptions(from provider: NETunnelProviderProtocol?) {
-        guard let vendorOptions = provider?.providerConfiguration else {
-            os_log("🔵 Provider is nil, or providerConfiguration is not set", log: .networkProtection)
-            assertionFailure("Provider is nil, or providerConfiguration is not set")
-            return
-        }
-
-        loadDefaultPixelHeaders(from: vendorOptions)
+    enum ConfigurationError: Error {
+        case missingProviderConfiguration
+        case missingPixelHeaders
     }
 
-    private func loadDefaultPixelHeaders(from options: [String: Any]) {
-        guard let defaultPixelHeaders = options[NetworkProtectionOptionKey.defaultPixelHeaders.rawValue] as? [String: String] else {
+    public override func loadVendorOptions(from provider: NETunnelProviderProtocol?) throws {
+        guard let vendorOptions = provider?.providerConfiguration else {
+            os_log("🔵 Provider is nil, or providerConfiguration is not set", log: .networkProtection)
+            throw ConfigurationError.missingProviderConfiguration
+        }
 
+        try loadDefaultPixelHeaders(from: vendorOptions)
+    }
+
+    private func loadDefaultPixelHeaders(from options: [String: Any]) throws {
+        guard let defaultPixelHeaders = options[NetworkProtectionOptionKey.defaultPixelHeaders.rawValue] as? [String: String] else {
             os_log("🔵 Pixel options are not set", log: .networkProtection)
-            assertionFailure("Default pixel headers are not set")
-            return
+            throw ConfigurationError.missingPixelHeaders
         }
 
         setupPixels(defaultHeaders: defaultPixelHeaders)

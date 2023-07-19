@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "daniel/private-email-autofill",
-        "revision" : "8bcff7e090b102c139c181781b0c25aeaa6a4cf9"
+        "revision" : "687d881b82eb293bf30a2aed0ee62fa005a22b8d",
+        "version" : "68.1.0"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "630eb2c4cf94055e630fd5b7daae71bed893ad0a",
-        "version" : "4.22.4"
+        "revision" : "0cfcedb9c8aefa52c7f3a36a2b3793a2c44de764",
+        "version" : "4.22.5"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "branch" : "shane/email-saving-2",
-        "revision" : "bec2c6788bb561c32c6b337cedbd99cc49ca4a2e"
+        "revision" : "44cd844b6bb5d8ccfefbd6e025817d800c26ad76",
+        "version" : "7.2.0"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/GRDB.swift.git",
       "state" : {
-        "revision" : "4475888676cfe1aabb1a35f379cd079ea692da1e",
-        "version" : "2.1.1"
+        "revision" : "77d9a83191a74e319a5cfa27b0e3145d15607573",
+        "version" : "2.2.0"
       }
     },
     {
@@ -129,7 +129,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
       "state" : {
         "revision" : "4684440d03304e7638a2c8086895367e90987463",
         "version" : "1.2.1"
@@ -140,8 +140,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/wireguard-apple",
       "state" : {
-        "revision" : "156abe15063b35b633363ec33fc2c040f81f9326",
-        "version" : "1.0.0"
+        "revision" : "cf3c0f5132dbb8de08c46155a1bbd5e5bb6a47c1",
+        "version" : "1.1.0"
       }
     }
   ],

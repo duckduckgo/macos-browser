@@ -172,6 +172,14 @@ extension NSColor {
         NSColor(named: "LogoBackgroundColor")!
     }
 
+    static var textEditorBackgroundColor: NSColor {
+        NSColor(named: "BlackWhite5")!
+    }
+
+    static var textEditorBorderColor: NSColor {
+        NSColor(named: "BlackWhite10")!
+    }
+
     var ciColor: CIColor {
         CIColor(color: self)!
     }

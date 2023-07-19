@@ -32,6 +32,11 @@ struct WebsiteBreakage {
         case somethingElse = "other"
     }
 
+    enum ReportFlow: String {
+        case native
+        case privacyDashboard = "dashboard"
+    }
+
     let category: Category?
     let description: String?
     let siteUrlString: String
@@ -44,6 +49,7 @@ struct WebsiteBreakage {
     let ampURL: String
     let urlParametersRemoved: Bool
     let manufacturer: String
+    let reportFlow: ReportFlow
 
     init(
         category: Category?,
@@ -57,7 +63,8 @@ struct WebsiteBreakage {
         isGPCEnabled: Bool,
         ampURL: String,
         urlParametersRemoved: Bool,
-        manufacturer: String = "Apple"
+        manufacturer: String = "Apple",
+        reportFlow: ReportFlow = .native
     ) {
         self.category = category
         self.description = description
@@ -71,6 +78,7 @@ struct WebsiteBreakage {
         self.ampURL = ampURL
         self.urlParametersRemoved = urlParametersRemoved
         self.manufacturer = manufacturer
+        self.reportFlow = reportFlow
     }
 
     var requestParameters: [String: String] {
@@ -87,7 +95,7 @@ struct WebsiteBreakage {
             "urlParametersRemoved": urlParametersRemoved ? "true" : "false",
             "os": osVersion,
             "manufacturer": manufacturer,
-            "reportFlow": "native"
+            "reportFlow": reportFlow.rawValue
         ]
     }
 }

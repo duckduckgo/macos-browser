@@ -49,6 +49,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     @Published var username: String = ""
     @Published var password: String = ""
     @Published var domain: String = ""
+    @Published var notes: String = ""
     @Published var isEditing = false
     @Published var isNew = false
 
@@ -153,6 +154,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         credentials.account.title = title
         credentials.account.username = username
         credentials.account.domain = urlMatcher.normalizeUrlForWeb(domain)
+        credentials.account.notes = notes
         credentials.password = password.data(using: .utf8)! // let it crash?
         hasValidPrivateEmail = emailManager.isPrivateEmail(email: username)
         onSaveRequested(credentials)
@@ -197,6 +199,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         username = credentials?.account.username ?? ""
         password = String(data: credentials?.password ?? Data(), encoding: .utf8) ?? ""
         domain =  urlMatcher.normalizeUrlForWeb(credentials?.account.domain ?? "")
+        notes = credentials?.account.notes ?? ""
         isNew = credentials?.account.id == nil
 
         // Determine Private Email Status when required

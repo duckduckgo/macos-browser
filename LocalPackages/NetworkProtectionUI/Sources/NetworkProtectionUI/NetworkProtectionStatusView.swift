@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 import Combine
 import NetworkProtection
 
@@ -234,6 +235,9 @@ public struct NetworkProtectionStatusView: View {
                 /// the alert bubble won't shrink if there's not enough text.
                 HStack(spacing: 0) {
                     Text(message)
+                        .makeSelectable()
+                        .foregroundColor(defaultTextColor)
+
                     Spacer()
                 }
             }
@@ -337,6 +341,7 @@ public struct NetworkProtectionStatusView: View {
             Spacer(minLength: 16)
 
             Text(details)
+                .makeSelectable()
                 .applyConnectionStatusDetailAttributes(colorScheme: colorScheme)
                 .fixedSize()
         }

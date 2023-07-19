@@ -44,14 +44,14 @@ final class TabCollection: NSObject {
         return true
     }
 
-    func removeTab(at index: Int, published: Bool = true) -> Bool {
+    func removeTab(at index: Int, published: Bool = true, forced: Bool = false) -> Bool {
         guard tabs.indices.contains(index) else {
             assertionFailure("TabCollection: Index out of bounds")
             return false
         }
 
         let tab = tabs[index]
-        tabWillClose(at: index)
+        tabWillClose(at: index, forced: forced)
         tabs.remove(at: index)
         if published {
             didRemoveTabPublisher.send((tab, index))
@@ -91,7 +91,7 @@ final class TabCollection: NSObject {
         }
 
         for i in indexSet {
-            tabWillClose(at: i)
+            tabWillClose(at: i, forced: false)
         }
         tabs.remove(atOffsets: indexSet)
     }
@@ -101,8 +101,10 @@ final class TabCollection: NSObject {
         tabs = newOrder
     }
 
-    private func tabWillClose(at index: Int) {
-        keepLocalHistory(of: tabs[index])
+    private func tabWillClose(at index: Int, forced: Bool) {
+        if !forced {
+            keepLocalHistory(of: tabs[index])
+        }
     }
 
     private func tabsWillClose(range: Range<Int>) {
@@ -140,11 +142,13 @@ final class TabCollection: NSObject {
 
     // MARK: - Fire button
 
-    // Visited domains of removed tabs used for fire button logic
-    var localHistoryOfRemovedTabs = Set<String>()
+    // Visits of removed tabs used for fire button logic
+    var localHistoryOfRemovedTabs = [Visit]()
 
     private func keepLocalHistory(of tab: Tab) {
-        localHistoryOfRemovedTabs.formUnion(tab.localHistory)
+        for visit in tab.localHistory where !localHistoryOfRemovedTabs.contains(visit) {
+            localHistoryOfRemovedTabs.append(visit)
+        }
     }
 
 }
