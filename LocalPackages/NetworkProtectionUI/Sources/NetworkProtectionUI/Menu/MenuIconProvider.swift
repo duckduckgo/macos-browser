@@ -19,6 +19,8 @@
 import AppKit
 import Foundation
 
+/// Release build status menu icons.
+///
 public final class MenuIconProvider: IconProvider {
     public init() {}
 
@@ -35,6 +37,8 @@ public final class MenuIconProvider: IconProvider {
     }
 }
 
+/// Debug build status menu icons.
+///
 public final class DebugMenuIconProvider: IconProvider {
     public init() {}
 
@@ -51,6 +55,8 @@ public final class DebugMenuIconProvider: IconProvider {
     }
 }
 
+/// Review build status menu icons.
+///
 public final class ReviewMenuIconProvider: IconProvider {
     public init() {}
 
