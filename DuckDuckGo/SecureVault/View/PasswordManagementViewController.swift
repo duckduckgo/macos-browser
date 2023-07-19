@@ -19,6 +19,7 @@
 import Foundation
 import Combine
 import Common
+import DDGSync
 import SwiftUI
 import BrowserServicesKit
 
@@ -101,6 +102,7 @@ final class PasswordManagementViewController: NSViewController {
     var emptyStateCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
     var appearanceCancellable: AnyCancellable?
+    var reloadDataAfterSyncCancellable: AnyCancellable?
 
     var domain: String?
     var isEditing = false
@@ -152,6 +154,7 @@ final class PasswordManagementViewController: NSViewController {
         createLoginItemView()
 
         appearanceCancellable = view.subscribeForAppApperanceUpdates()
+        reloadDataAfterSyncCancellable = bindSyncDidFinish()
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
@@ -171,10 +174,14 @@ final class PasswordManagementViewController: NSViewController {
         NotificationCenter.default.addObserver(forName: .dataImportComplete, object: nil, queue: .main) { [weak self] _ in
             self?.refreshData()
         }
+    }
 
-        NotificationCenter.default.addObserver(forName: .credentialsSyncComplete, object: nil, queue: .main) { [weak self] _ in
-            self?.refreshData()
-        }
+    private func bindSyncDidFinish() -> AnyCancellable? {
+        (NSApp.delegate as? AppDelegate)?.syncDataProviders?.credentialsAdapter.syncDidCompletePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.refreshData()
+            }
     }
 
     private func toggleLockScreen(hidden: Bool) {

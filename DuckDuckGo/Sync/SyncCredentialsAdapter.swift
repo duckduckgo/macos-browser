@@ -23,18 +23,14 @@ import DDGSync
 import Persistence
 import SyncDataProviders
 
-extension NSNotification.Name {
-
-    static let credentialsSyncComplete = NSNotification.Name("CredentialsSyncComplete")
-
-}
-
 final class SyncCredentialsAdapter {
 
     private(set) var provider: CredentialsProvider?
     let databaseCleaner: CredentialsDatabaseCleaner
+    let syncDidCompletePublisher: AnyPublisher<Void, Never>
 
     init(secureVaultFactory: SecureVaultFactory = .default) {
+        syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
         databaseCleaner = CredentialsDatabaseCleaner(
             secureVaultFactory: secureVaultFactory,
             errorEvents: CredentialsCleanupErrorHandling(),
@@ -60,8 +56,8 @@ final class SyncCredentialsAdapter {
             let provider = try CredentialsProvider(
                 secureVaultFactory: secureVaultFactory,
                 metadataStore: metadataStore,
-                reloadCredentialsAfterSync: {
-                    NotificationCenter.default.post(name: .credentialsSyncComplete, object: nil)
+                reloadCredentialsAfterSync: { [weak self] in
+                    self?.syncDidCompleteSubject.send()
                 }
             )
 
@@ -90,5 +86,6 @@ final class SyncCredentialsAdapter {
         }
     }
 
+    private var syncDidCompleteSubject = PassthroughSubject<Void, Never>()
     private var syncErrorCancellable: AnyCancellable?
 }
