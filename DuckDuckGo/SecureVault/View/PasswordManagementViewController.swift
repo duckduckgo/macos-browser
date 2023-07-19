@@ -187,7 +187,7 @@ final class PasswordManagementViewController: NSViewController {
     private func toggleLockScreen(hidden: Bool) {
         if hidden {
             hideLockScreen()
-            requestSync(dataChanged: false)
+            requestSync()
         } else {
             displayLockScreen()
         }
@@ -485,7 +485,7 @@ final class PasswordManagementViewController: NSViewController {
                 syncModelsOnCredentials(savedCredentials)
             }
             postChange()
-            requestSync(dataChanged: true)
+            requestSync()
 
         } catch {
             if case SecureVaultError.duplicateRecord = error {
@@ -571,7 +571,7 @@ final class PasswordManagementViewController: NSViewController {
             switch response {
             case .alertFirstButtonReturn:
                 try? self.secureVault?.deleteWebsiteCredentialsFor(accountId: id)
-                self.requestSync(dataChanged: true)
+                self.requestSync()
                 self.refreshData()
 
             default:
@@ -934,16 +934,12 @@ final class PasswordManagementViewController: NSViewController {
         emptyStateButton.isHidden = true
     }
 
-    private func requestSync(dataChanged: Bool) {
+    private func requestSync() {
         guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
             return
         }
         os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
-        if dataChanged {
-            syncService.scheduler.notifyDataChanged()
-        } else {
-            syncService.scheduler.notifyAppLifecycleEvent()
-        }
+        syncService.scheduler.requestSyncImmediately()
     }
 
 }
