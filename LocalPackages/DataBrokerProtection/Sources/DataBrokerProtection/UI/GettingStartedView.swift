@@ -53,16 +53,6 @@ struct GettingStartedView: View {
     }
 }
 
-private struct BlueButtonStyle: ButtonStyle {
-    func makeBody(configuration: Self.Configuration) -> some View {
-        configuration.label
-            .foregroundColor(configuration.isPressed ? Color.primary : Color.white)
-            .background(configuration.isPressed ? Color.secondary : Color.accentColor)
-            .cornerRadius(6.0)
-            .padding()
-    }
-}
-
 private struct CTAButton: View {
     let title: String
     var body: some View {
@@ -72,7 +62,7 @@ private struct CTAButton: View {
                 .bold()
                 .frame(maxWidth: 440, maxHeight: 44)
         }
-        .buttonStyle(BlueButtonStyle())
+        .buttonStyle(CTAButtonStyle())
     }
 }
 
