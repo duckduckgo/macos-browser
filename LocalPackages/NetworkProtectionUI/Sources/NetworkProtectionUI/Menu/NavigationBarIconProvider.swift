@@ -19,6 +19,8 @@
 import AppKit
 import Foundation
 
+/// Network Protection icon shown in the navigation bar.
+///
 public final class NavigationBarIconProvider: IconProvider {
 
     public init() {}
