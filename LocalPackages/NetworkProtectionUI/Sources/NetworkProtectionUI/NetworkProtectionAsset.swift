@@ -30,8 +30,14 @@ public enum NetworkProtectionAsset: String {
     case appVPNOffIcon = "app-vpn-off"
     case appVPNIssueIcon = "app-vpn-issue"
 
-    // Status Bar Specific
+    // Status Bar Icons: Release builds
     case statusbarVPNOnIcon = "statusbar-vpn-on"
     case statusbarVPNOffIcon = "statusbar-vpn-off"
     case statusbarVPNIssueIcon = "statusbar-vpn-issue"
+
+    // Status Bar Icons: Debug & Review builds
+    case statusbarReviewVPNOnIcon = "statusbar-review-vpn-on"
+    case statusbarDebugVPNOnIcon = "statusbar-debug-vpn-on"
+    case statusbarBrandedVPNOffIcon = "statusbar-branded-vpn-off"
+    case statusbarBrandedVPNIssueIcon = "statusbar-branded-vpn-issue"
 }
