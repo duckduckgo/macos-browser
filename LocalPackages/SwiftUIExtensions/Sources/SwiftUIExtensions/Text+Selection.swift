@@ -1,7 +1,7 @@
 //
-//  RecentlyClosedCoordinatorMock.swift
+//  Text+Selection.swift
 //
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,23 +16,19 @@
 //  limitations under the License.
 //
 
-import XCTest
-import BrowserServicesKit
-@testable import DuckDuckGo_Privacy_Browser
-import Common
+import SwiftUI
 
-final class RecentlyClosedCoordinatorMock: RecentlyClosedCoordinating {
+public extension Text {
 
-    var cache: [RecentlyClosedCacheItem] = []
-
-    var reopenItemCalled = false
-    func reopenItem(_ cacheItem: RecentlyClosedCacheItem?) {
-        reopenItemCalled = true
+    /// We only support text selection in `Text` views iOS 15+ and macOS 12+ right now
+    /// as there's no simple way to offer this in lower versions.
+    ///
+    @ViewBuilder
+    func makeSelectable() -> some View {
+        if #available(iOS 15.0, macOS 12.0, *) {
+            textSelection(.enabled)
+        } else {
+            self
+        }
     }
-
-    var burnCacheCalled = false
-    func burnCache(baseDomains: Set<String>?, tld: Common.TLD) {
-        burnCacheCalled = true
-    }
-
 }

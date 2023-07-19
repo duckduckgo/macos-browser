@@ -32,7 +32,7 @@ final class DuckDuckGoNotificationsApplication: NSApplication {
         // prevent agent from running twice
         if let anotherInstance = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!).first(where: { $0 != .current }) {
             os_log(.error, log: .networkProtection, "🔴 Stopping: another instance is running: %{public}d.", anotherInstance.processIdentifier)
-            exit(0)
+            exit(EXIT_SUCCESS)
         }
 
         super.init()
@@ -60,11 +60,7 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
         return NetworkProtectionUNNotificationsPresenter(appLauncher: AppLauncher(appBundleURL: mainAppURL))
     }()
 
-#if NETP_SYSTEM_EXTENSION
-    private let ipcConnection = IPCConnection(log: .networkProtectionIPCLoginItemLog, memoryManagementLog: .networkProtectionMemoryLog)
-#endif
-
-    private let distributedNotificationCenter = DistributedNotificationCenter.forType(.networkProtection)
+    private let distributedNotificationCenter = DistributedNotificationCenter.default()
 
     // MARK: - Notifications: Observation Tokens
 
@@ -74,18 +70,40 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
         os_log("Login item finished launching", log: .networkProtectionLoginItemLog, type: .info)
 
         startObservingVPNStatusChanges()
-        registerConnection(listenerStarted: false)
         os_log("Login item listening")
     }
 
     private func startObservingVPNStatusChanges() {
         os_log("Register with sysex")
 
-        distributedNotificationCenter.publisher(for: .ipcListenerStarted)
+        distributedNotificationCenter.publisher(for: .showIssuesStartedNotification)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                os_log("Got notification: listener started")
-                self?.registerConnection(listenerStarted: true)
+                self?.showReconnectingNotification()
+            }.store(in: &cancellables)
+
+        distributedNotificationCenter.publisher(for: .showIssuesResolvedNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.showReconnectedNotification()
+            }.store(in: &cancellables)
+
+        distributedNotificationCenter.publisher(for: .showIssuesNotResolvedNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.showConnectionFailureNotification()
+            }.store(in: &cancellables)
+
+        distributedNotificationCenter.publisher(for: .showVPNSupersededNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.showSupersededNotification()
+            }.store(in: &cancellables)
+
+        distributedNotificationCenter.publisher(for: .showTestNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.showTestNotification()
             }.store(in: &cancellables)
 
         distributedNotificationCenter.publisher(for: .serverSelected).sink { [weak self] _ in
@@ -94,76 +112,35 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
         }.store(in: &cancellables)
     }
 
-    private var machServiceName: String {
-        let agentBundleIDInfoPlistKey = "SYSEX_MACH_SERVICE_NAME"
-
-        guard let agentBundleID = Bundle.main.object(forInfoDictionaryKey: agentBundleIDInfoPlistKey) as? String else {
-            fatalError("Please make sure that this target has key \(agentBundleIDInfoPlistKey) in its Info.plist file.")
-        }
-
-        return agentBundleID
-    }
-
-    /// Registers an IPC connection with the system extension
-    ///
-    /// - Parameters:
-    ///     - listenerStarted: this should be true if the registration request comes as the result of us learning that the IPC service has been
-    ///         started by the system extension.  This is purely for more precise logging.
-    ///
-    private func registerConnection(listenerStarted: Bool) {
-#if NETP_SYSTEM_EXTENSION
-        ipcConnection.register(machServiceName: machServiceName, delegate: self) { success in
-            DispatchQueue.main.async {
-                if success {
-                    os_log("IPC connection with system extension succeeded")
-                } else {
-                    os_log("IPC connection with system extension failed")
-
-                    if listenerStarted {
-                        os_log("IPC connection should have succeeded")
-                    }
-                }
-            }
-        }
-#endif
-    }
-
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
         return true
     }
-}
 
-#if NETP_SYSTEM_EXTENSION
-extension DuckDuckGoNotificationsAppDelegate: AppCommunication {
+    // MARK: - Showing Notifications
 
-    func reconnected() {
+    func showReconnectedNotification() {
         os_log("Presenting reconnected notification", log: .networkProtection, type: .info)
         notificationsPresenter.showReconnectedNotification()
     }
 
-    func reconnecting() {
+    func showReconnectingNotification() {
         os_log("Presenting reconnecting notification", log: .networkProtection, type: .info)
         notificationsPresenter.showReconnectingNotification()
     }
 
-    func connectionFailure() {
+    func showConnectionFailureNotification() {
         os_log("Presenting failure notification", log: .networkProtection, type: .info)
         notificationsPresenter.showConnectionFailureNotification()
     }
 
-    func statusChanged(status: NEVPNStatus) {
-        os_log("Status changed", log: .networkProtection, type: .info)
+    func showSupersededNotification() {
+        os_log("Presenting Superseded notification", log: .networkProtection, type: .info)
+        notificationsPresenter.showSupersededNotification()
     }
 
-    func superceded() {
-        os_log("Presenting Superceded notification", log: .networkProtection, type: .info)
-        notificationsPresenter.showSupercededNotification()
-    }
-
-    func testNotification() {
+    func showTestNotification() {
         os_log("Presenting test notification", log: .networkProtection, type: .info)
         notificationsPresenter.showTestNotification()
     }
 
 }
-#endif

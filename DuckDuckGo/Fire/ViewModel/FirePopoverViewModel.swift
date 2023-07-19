@@ -18,20 +18,19 @@
 
 import Cocoa
 import BrowserServicesKit
+import Common
 
 @MainActor
 final class FirePopoverViewModel {
 
     enum ClearingOption: Int, CaseIterable {
 
-        case currentSite
         case currentTab
         case currentWindow
         case allData
 
         var string: String {
             switch self {
-            case .currentSite: return UserText.currentSite
             case .currentTab: return UserText.currentTab
             case .currentWindow: return UserText.currentWindow
             case .allData: return UserText.allData
@@ -50,7 +49,8 @@ final class FirePopoverViewModel {
          historyCoordinating: HistoryCoordinating,
          fireproofDomains: FireproofDomains,
          faviconManagement: FaviconManagement,
-         initialClearingOption: ClearingOption = .allData) {
+         initialClearingOption: ClearingOption = .allData,
+         tld: TLD) {
 
         self.fireViewModel = fireViewModel
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -58,9 +58,7 @@ final class FirePopoverViewModel {
         self.fireproofDomains = fireproofDomains
         self.faviconManagement = faviconManagement
         self.clearingOption = initialClearingOption
-
-        updateAvailableClearingOptions()
-        updateItems(for: initialClearingOption)
+        self.tld = tld
     }
 
     var clearingOption = ClearingOption.allData {
@@ -72,92 +70,66 @@ final class FirePopoverViewModel {
     private(set) var shouldShowPinnedTabsInfo: Bool = false
 
     private let fireViewModel: FireViewModel
-    private weak var tabCollectionViewModel: TabCollectionViewModel?
+    private(set) weak var tabCollectionViewModel: TabCollectionViewModel?
     private let historyCoordinating: HistoryCoordinating
     private let fireproofDomains: FireproofDomains
     private let faviconManagement: FaviconManagement
+    private let tld: TLD
 
-    private(set) var availableClearingOptions = ClearingOption.allCases
     private(set) var hasOnlySingleFireproofDomain: Bool = false
     @Published private(set) var selectable: [Item] = []
     @Published private(set) var fireproofed: [Item] = []
-    @Published private(set) var selected: Set<Int> = Set() {
-        didSet {
-            updateAreOtherTabsInfluenced()
-        }
-    }
+    @Published private(set) var selected: Set<Int> = Set()
 
     let selectableSectionIndex = 0
     let fireproofedSectionIndex = 1
 
     // MARK: - Options
 
-    private func updateAvailableClearingOptions() {
-        guard let viewModel = tabCollectionViewModel else {
-            assertionFailure("FirePopoverViewModel: TabCollectionViewModel is not present")
-            return
-        }
-
-        var options: [ClearingOption] = []
-
-        let urlTabsCount = viewModel.tabCollection.tabs.filter(\.content.isUrl).count + (viewModel.pinnedTabsCollection?.tabs.count ?? 0)
-
-        if urlTabsCount == 1, let currentTab = viewModel.selectedTabViewModel?.tab, currentTab.localHistory.count == 1 {
-            options.append(.currentSite)
-        } else {
-            options.append(.currentTab)
-            if urlTabsCount > 1 {
-                options.append(.currentWindow)
-            }
-        }
-
-        options.append(.allData)
-
-        availableClearingOptions = options
-    }
-
     private func updateItems(for clearingOption: ClearingOption) {
 
         func visitedDomains(basedOn clearingOption: ClearingOption) -> Set<String> {
             switch clearingOption {
-            case .currentTab, .currentSite:
+            case .currentTab:
                 guard let tab = tabCollectionViewModel?.selectedTabViewModel?.tab else {
                     assertionFailure("No tab selected")
                     return Set<String>()
                 }
 
-                return tab.localHistory
+                return tab.localHistoryDomains
             case .currentWindow:
                 guard let tabCollectionViewModel = tabCollectionViewModel else {
                     return []
                 }
 
-                return tabCollectionViewModel.localHistory
+                return tabCollectionViewModel.localHistoryDomains
             case .allData:
-                return historyCoordinating.history?.visitedDomains ?? Set<String>()
+                return (historyCoordinating.history?.visitedDomains(tld: tld) ?? Set<String>())
+                    .union(tabCollectionViewModel?.localHistoryDomains ?? Set<String>())
             }
         }
 
         let visitedDomains = visitedDomains(basedOn: clearingOption)
+        let visitedETLDPlus1Domains = Set(visitedDomains.compactMap { tld.eTLDplus1($0) })
 
-        let fireproofed = visitedDomains
+        let fireproofed = visitedETLDPlus1Domains
             .filter { domain in
                 fireproofDomains.isFireproof(fireproofDomain: domain)
             }
-        let selectable = visitedDomains
+        let selectable = visitedETLDPlus1Domains
             .subtracting(fireproofed)
 
-        if visitedDomains.count == 1, let domain = visitedDomains.first, fireproofed.contains(domain) {
+        if visitedETLDPlus1Domains.count == 1, let domain = visitedETLDPlus1Domains.first, fireproofed.contains(domain) {
             self.hasOnlySingleFireproofDomain = true
         } else {
             self.hasOnlySingleFireproofDomain = false
         }
 
         self.selectable = selectable
-            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, sizeCategory: .small)?.image) }
+            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(forDomainOrAnySubdomain: $0, sizeCategory: .small)?.image) }
             .sorted { $0.domain < $1.domain }
         self.fireproofed = fireproofed
-            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(for: $0, sizeCategory: .small)?.image) }
+            .map { Item(domain: $0, favicon: faviconManagement.getCachedFavicon(forDomainOrAnySubdomain: $0, sizeCategory: .small)?.image) }
             .sorted { $0.domain < $1.domain }
 
         selectAll()
@@ -199,9 +171,11 @@ final class FirePopoverViewModel {
         })
     }
 
-    // MARK: - Warning
+    func refreshItems() {
+        updateItems(for: clearingOption)
+    }
 
-    @Published private(set) var areOtherTabsInfluenced = false
+    // MARK: - Warning
 
     var hasPinnedTabs: Bool {
         guard let pinnedTabsManager = tabCollectionViewModel?.pinnedTabsManager else {
@@ -210,35 +184,50 @@ final class FirePopoverViewModel {
         return pinnedTabsManager.tabCollection.tabs.isEmpty
     }
 
-    private func updateAreOtherTabsInfluenced() {
-        let selectedTab = tabCollectionViewModel?.selectedTabViewModel?.tab
-        var allTabs = WindowControllersManager.shared.mainWindowControllers.flatMap {
-            $0.mainViewController.tabCollectionViewModel.tabCollection.tabs
-        }
-        if let pinnedTabs = tabCollectionViewModel?.pinnedTabsManager?.tabCollection.tabs {
-            allTabs.append(contentsOf: pinnedTabs)
-        }
-        let otherTabs = allTabs.filter({ $0 != selectedTab })
-
-        let otherTabsLocalHistory = otherTabs.reduce(Set<String>()) { result, tab in
-            return result.union(tab.localHistory)
-        }
-
-        areOtherTabsInfluenced = !otherTabsLocalHistory.isDisjoint(with: selectedDomains)
-    }
-
     // MARK: - Burning
 
     func burn() {
-        if clearingOption == .allData && areAllSelected {
-            if let tabCollectionViewModel = tabCollectionViewModel {
-                // Burn everything
-                fireViewModel.fire.burnAll(tabCollectionViewModel: tabCollectionViewModel)
+        switch (clearingOption, areAllSelected) {
+        case (.currentTab, _):
+            guard let tabCollectionViewModel = tabCollectionViewModel,
+                  let tabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+                assertionFailure("No tab selected")
+                return
             }
-        } else {
-            // Burn selected domains
-            fireViewModel.fire.burnDomains(selectedDomains)
+            let burningEntity = Fire.BurningEntity.tab(tabViewModel: tabViewModel,
+                                                       selectedDomains: selectedDomains,
+                                                       parentTabCollectionViewModel: tabCollectionViewModel)
+            fireViewModel.fire.burnEntity(entity: burningEntity)
+        case (.currentWindow, _):
+            guard let tabCollectionViewModel = tabCollectionViewModel else {
+                assertionFailure("FirePopoverViewModel: TabCollectionViewModel is not present")
+                return
+            }
+            let burningEntity = Fire.BurningEntity.window(tabCollectionViewModel: tabCollectionViewModel,
+                                                          selectedDomains: selectedDomains)
+            fireViewModel.fire.burnEntity(entity: burningEntity)
+
+        case (.allData, true):
+            fireViewModel.fire.burnAll()
+
+        case (.allData, false):
+            fireViewModel.fire.burnEntity(entity: .allWindows(mainWindowControllers: WindowControllersManager.shared.mainWindowControllers,
+                                                              selectedDomains: selectedDomains))
         }
+    }
+
+}
+
+extension History {
+
+    func visitedDomains(tld: TLD) -> Set<String> {
+        return reduce(Set<String>(), { result, historyEntry in
+            if let host = historyEntry.url.host, let eTLDPlus1Domain = tld.eTLDplus1(host) {
+                return result.union([eTLDPlus1Domain])
+            } else {
+                return result
+            }
+        })
     }
 
 }

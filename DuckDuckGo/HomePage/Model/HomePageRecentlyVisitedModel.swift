@@ -98,7 +98,8 @@ final class RecentlyVisitedModel: ObservableObject {
 
     @MainActor
     func burn(_ site: RecentlyVisitedSiteModel) {
-        fire.burnDomains(Set<String>([site.domain]))
+        let domains = Set<String>([site.domain]).transformedToETLDPlus1(tld: ContentBlocking.shared.tld)
+        fire.burnEntity(entity: .none(selectedDomains: domains))
         recentSites = recentSites.filter { $0.domain != site.domain }
         numberOfTrackersBlocked -= site.numberOfTrackersBlocked
     }

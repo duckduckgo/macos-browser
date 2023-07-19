@@ -343,7 +343,7 @@ extension TabViewModel {
 extension TabViewModel: TabDataClearing {
 
     @MainActor
-    func prepareForDataClearing(caller: TabDataCleaner) {
+    func prepareForDataClearing(caller: TabCleanupPreparer) {
         tab.prepareForDataClearing(caller: caller)
     }
 

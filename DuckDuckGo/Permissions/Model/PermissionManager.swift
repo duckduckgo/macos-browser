@@ -29,7 +29,7 @@ protocol PermissionManagerProtocol: AnyObject {
     func setPermission(_ decision: PersistedPermissionDecision, forDomain domain: String, permissionType: PermissionType)
 
     func burnPermissions(except fireproofDomains: FireproofDomains, completion: @escaping () -> Void)
-    func burnPermissions(of domains: Set<String>, completion: @escaping () -> Void)
+    func burnPermissions(of baseDomains: Set<String>, tld: TLD, completion: @escaping () -> Void)
 
 }
 
@@ -113,11 +113,12 @@ final class PermissionManager: PermissionManagerProtocol {
         })
     }
 
-    func burnPermissions(of domains: Set<String>, completion: @escaping () -> Void) {
+    func burnPermissions(of baseDomains: Set<String>, tld: TLD, completion: @escaping () -> Void) {
         dispatchPrecondition(condition: .onQueue(.main))
 
         permissions = permissions.filter { permission in
-            !domains.contains(permission.key)
+            let baseDomain = tld.eTLDplus1(permission.key) ?? ""
+            return !baseDomains.contains(baseDomain)
         }
         store.clear(except: permissions.values.reduce(into: [StoredPermission](), {
             $0.append(contentsOf: $1.values)
