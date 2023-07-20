@@ -55,11 +55,9 @@ private struct HeaderTitleView: View {
                 Text("Data Broker Protection")
                     .font(.title)
                     .bold()
-                    .foregroundColor(.black)
 
                 Text(viewModel.statusText)
                     .font(.body)
-                    .foregroundColor(.black)
             }
         }
     }
@@ -75,7 +73,7 @@ private struct CTAHeaderView: View {
                 Text("FAQs")
             }
             .buttonStyle(.borderless)
-            .foregroundColor(.black)
+            .foregroundColor(.primary)
 
             Button {
                 print("Edit Profile")

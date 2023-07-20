@@ -20,7 +20,6 @@ import SwiftUI
 
 @available(macOS 11.0, *)
 struct GettingStartedView: View {
-    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         VStack(alignment: .center, spacing: Constants.ContainerView.verticalSpacing) {
@@ -45,7 +44,7 @@ struct GettingStartedView: View {
             CTAButton(title: "Get Started")
         }
         .padding(Constants.ContainerView.padding)
-        .background(colorScheme == .dark ? Color.black : Color.white) // .background color is macOS 12+
+        .background(Color("modal-background-color", bundle: .module))
         .cornerRadius(Constants.ContainerView.cornerRadius)
         .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 4)
         .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
@@ -76,6 +75,7 @@ private struct TitleView: View {
                 .bold()
 
             Text(subtitle)
+                .frame(minHeight: 32)
                 .foregroundColor(.secondary)
         }
     }
@@ -169,6 +169,6 @@ private enum Constants {
 @available(macOS 11.0, *)
 struct GettingStartedView_Previews: PreviewProvider {
     static var previews: some View {
-        GettingStartedView().frame(width: 600, height: 700)
+        GettingStartedView().frame(width: 600, height: 400)
     }
 }

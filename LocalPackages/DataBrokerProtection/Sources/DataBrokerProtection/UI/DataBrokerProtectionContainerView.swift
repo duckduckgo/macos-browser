@@ -36,7 +36,7 @@ public struct DataBrokerProtectionContainerView: View {
                     .padding(.top, 200)
                 Spacer()
             }
-        }.background(Color("container-background-color", bundle: .module))
+        }.background(Color("background-color", bundle: .module))
     }
 }
 
