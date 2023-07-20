@@ -9,7 +9,7 @@ jobs:
 
   release-build:
 
-    name: Build in Release Configuration
+    name: Make Release Build
 
     runs-on: macos-13
     timeout-minutes: 30
@@ -106,13 +106,13 @@ jobs:
       continue-on-error: true
       run: brew install xcbeautify
 
-    - name: Build and test
+    - name: Build the app
       run: |
         export OS_ACTIVITY_MODE=debug
         set -o pipefail && xcodebuild \
           -scheme "DuckDuckGo Privacy Browser" \
           -derivedDataPath "DerivedData" \
-          -configuration "Release"
+          -configuration "Release" \
           | tee release-xcodebuild.log \
           | xcbeautify
 
