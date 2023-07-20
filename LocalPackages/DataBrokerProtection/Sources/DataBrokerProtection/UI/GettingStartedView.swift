@@ -23,7 +23,7 @@ struct GettingStartedView: View {
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-        VStack(alignment: .center, spacing: 24) {
+        VStack(alignment: .center, spacing: Constants.ContainerView.verticalSpacing) {
             TitleView(title: "Getting Started",
                       subtitle: "Data brokers and people-search sites publish personal info online.\nDiscover where you’re exposed and automatically remove your data.")
             DividerView()
@@ -44,9 +44,9 @@ struct GettingStartedView: View {
 
             CTAButton(title: "Get Started")
         }
-        .padding(48)
+        .padding(Constants.ContainerView.padding)
         .background(colorScheme == .dark ? Color.black : Color.white) // .background color is macOS 12+
-        .cornerRadius(16)
+        .cornerRadius(Constants.ContainerView.cornerRadius)
         .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 4)
         .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
         .padding(.all)
@@ -60,7 +60,7 @@ private struct CTAButton: View {
         }) {
             Text(title)
                 .bold()
-                .frame(maxWidth: 440, maxHeight: 44)
+                .frame(width: Constants.CTA.width, height: Constants.CTA.height)
         }
         .buttonStyle(CTAButtonStyle())
     }
@@ -70,7 +70,7 @@ private struct TitleView: View {
     let title: String
     let subtitle: String
     var body: some View {
-        VStack(alignment: .center, spacing: 16) {
+        VStack(alignment: .center, spacing: Constants.titleViewSpacing) {
             Text(title)
                 .font(.title)
                 .bold()
@@ -85,7 +85,7 @@ private struct DividerView: View {
     var body: some View {
         Rectangle()
             .foregroundColor(.clear)
-            .frame(width: 440, height: 2)
+            .frame(width: Constants.Divider.width, height: Constants.Divider.height)
             .background(
                 LinearGradient(
                     stops: [
@@ -112,7 +112,7 @@ private struct BodyView: View {
     let rowItems: [RowItem]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: Constants.bodyViewSpacing) {
             ForEach(rowItems) { item in
                 RowItemView(item: item)
             }
@@ -124,14 +124,12 @@ private struct BodyView: View {
 private struct RowItemView: View {
     let item: RowItem
 
-    private let imageSize = CGSize(width: 24, height: 24)
-
     var body: some View {
-        HStack(alignment: .top, spacing: 16) {
+        HStack(alignment: .top, spacing: Constants.RowItem.horizontalSpacing) {
             Image(systemName: item.imageName)
                 .resizable()
-                .frame(width: imageSize.width, height: imageSize.height)
-            VStack(alignment: .leading, spacing: 2) {
+                .frame(width: Constants.RowItem.imageSize.width, height: Constants.RowItem.imageSize.height)
+            VStack(alignment: .leading, spacing: Constants.RowItem.textVerticalSpacing) {
                 Text(item.title)
                     .font(.title2)
                 Text(item.subtitle)
@@ -141,10 +139,36 @@ private struct RowItemView: View {
     }
 }
 
+private enum Constants {
+    enum CTA {
+        static let width: CGFloat = 440
+        static let height: CGFloat = 44
+    }
+
+    enum Divider {
+        static let width: CGFloat = 440
+        static let height: CGFloat = 2
+    }
+
+    enum RowItem {
+        static let horizontalSpacing: CGFloat = 16
+        static let textVerticalSpacing: CGFloat = 2
+        static let imageSize = CGSize(width: 24, height: 24)
+    }
+
+    enum ContainerView {
+        static let padding: CGFloat = 48
+        static let cornerRadius: CGFloat = 16
+        static let verticalSpacing: CGFloat = 24
+    }
+
+    static let bodyViewSpacing: CGFloat = 16
+    static let titleViewSpacing: CGFloat = 16
+}
+
 @available(macOS 11.0, *)
 struct GettingStartedView_Previews: PreviewProvider {
     static var previews: some View {
-        GettingStartedView().frame(width: 600, height: 500)
-
+        GettingStartedView().frame(width: 600, height: 700)
     }
 }

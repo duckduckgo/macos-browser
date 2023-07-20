@@ -33,6 +33,10 @@ final class DBPHomeViewController: NSViewController {
         DataBrokerProfileQueryViewController(dataManager: dataManager)
     }()
 
+    lazy var dataBrokerContainerView: DataBrokeContainerViewController = {
+        DataBrokeContainerViewController()
+    }()
+
     var startSchedulerButton: NSButton!
     var startScanButton: NSButton!
     private var isSchedulerRunning = false
@@ -45,6 +49,19 @@ final class DBPHomeViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+
+        addChild(dataBrokerContainerView)
+        view.addSubview(dataBrokerContainerView.view)
+
+    }
+
+    override func viewDidLayout() {
+        super.viewDidLayout()
+
+        dataBrokerContainerView.view.frame = view.bounds
+    }
+
+    private func setupDebugScreen() {
         setupScheduler()
 
         addChild(userProfileViewController)
@@ -60,9 +77,7 @@ final class DBPHomeViewController: NSViewController {
         view.addSubview(startScanButton)
     }
 
-    override func viewDidLayout() {
-        super.viewDidLayout()
-
+    private func layoutDebugScreen() {
         profileQueryViewController.view.frame = CGRect(x: 0, y: 0, width: view.bounds.width * 0.6, height: view.bounds.height)
         profileQueryViewController.view.autoresizingMask = [.width, .height]
 

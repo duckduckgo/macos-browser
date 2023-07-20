@@ -24,9 +24,10 @@ private enum Constants {
 }
 
 @available(macOS 11.0, *)
-public struct DashboardHeaderView: View {
-    public init() { }
-    public var body: some View {
+struct DashboardHeaderView: View {
+    @ObservedObject var viewModel: DashboardHeaderViewModel
+
+    var body: some View {
         ZStack {
             Image("header-background", bundle: .module).resizable()
 
@@ -35,7 +36,7 @@ public struct DashboardHeaderView: View {
                     Spacer()
                     CTAHeaderView()
                 }
-                HeaderTitleView()
+                HeaderTitleView(viewModel: viewModel)
                 Spacer()
             }
         }
@@ -44,6 +45,8 @@ public struct DashboardHeaderView: View {
 
 @available(macOS 11.0, *)
 private struct HeaderTitleView: View {
+    @ObservedObject var viewModel: DashboardHeaderViewModel
+
     var body: some View {
         VStack(spacing: 0) {
             Image("header-hero", bundle: .module)
@@ -54,7 +57,7 @@ private struct HeaderTitleView: View {
                     .bold()
                     .foregroundColor(.black)
 
-                Text("Full scan in progress...")
+                Text(viewModel.statusText)
                     .font(.body)
                     .foregroundColor(.black)
             }
@@ -90,7 +93,11 @@ private struct CTAHeaderView: View {
 @available(macOS 11.0, *)
 struct DashboardHeaderView_Previews: PreviewProvider {
     static var previews: some View {
-        DashboardHeaderView()
+        let viewModel = DashboardHeaderViewModel(statusText: "Scanning...",
+                                                 faqButtonClicked: {},
+                                                 editProfileClicked: {})
+
+        DashboardHeaderView(viewModel: viewModel)
             .frame(width: 1000, height: 300)
     }
 }
