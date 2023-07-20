@@ -21,20 +21,7 @@ import DataBrokerProtection
 import AppKit
 
 final class DBPHomeViewController: NSViewController {
-    private lazy var debugWindow: NSWindow = {
-        let windowRect = NSRect(x: 0, y: 0, width: 1024, height: 768)
-        let window = NSWindow(contentRect: windowRect,
-                              styleMask: [.titled, .closable, .resizable],
-                              backing: .buffered,
-                              defer: false)
-        window.title = "Debug Window"
-        window.center()
-
-        let debugViewController = DataBrokerProtectionDebugViewController()
-        window.contentViewController = debugViewController
-
-        return window
-    }()
+    private var debugWindowController: NSWindowController?
 
     lazy var dataBrokerContainerView: DataBrokeContainerViewController = {
         DataBrokeContainerViewController()
@@ -62,6 +49,21 @@ final class DBPHomeViewController: NSViewController {
     }
 
     private func openDebugUI() {
-        debugWindow.makeKeyAndOrderFront(nil)
+        if debugWindowController == nil {
+            let windowRect = NSRect(x: 0, y: 0, width: 1024, height: 768)
+            let debugWindow = NSWindow(contentRect: windowRect,
+                                  styleMask: [.titled, .closable, .resizable],
+                                  backing: .buffered,
+                                  defer: false)
+            debugWindow.title = "Debug Window"
+            debugWindow.center()
+            debugWindow.hidesOnDeactivate = true
+            let debugViewController = DataBrokerProtectionDebugViewController()
+            debugWindow.contentViewController = debugViewController
+
+            debugWindowController = NSWindowController(window: debugWindow)
+        }
+
+        debugWindowController?.showWindow(self)
     }
 }
