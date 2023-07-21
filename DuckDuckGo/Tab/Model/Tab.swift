@@ -381,21 +381,19 @@ protocol NewWindowPolicyDecisionMaker {
 
         webView.onDeinit { [weak self] in
             // Tab should deallocate with the WebView
-            self?.assertObjectDeallocated(after: 1.0)
+            self?.ensureObjectDeallocated(after: 1.0, do: .interrupt)
 
             // unregister WebView from the ProcessPool
             processPool.webViewsUsingProcessPool.remove(webViewValue)
 
             if processPool.webViewsUsingProcessPool.isEmpty {
                 // when the last WebView is deallocated the ProcessPool should be deallocated
-                processPool.assertObjectDeallocated(after: 1)
+                processPool.ensureObjectDeallocated(after: 1, do: .log)
                 // by the moment the ProcessPool is dead all the UserContentControllers that were using it should be deallocated
                 let knownUserContentControllers = processPool.knownUserContentControllers
                 processPool.onDeinit {
-                    for controller in knownUserContentControllers {
-                        if controller.userContentController != nil {
-                            breakByRaisingSigInt("\(controller) has not been deallocated. Ensure there‘s no retain cycle added.")
-                        }
+                    for controller in knownUserContentControllers where controller.userContentController != nil {
+                        breakByRaisingSigInt("\(controller) has not been deallocated. Ensure there‘s no retain cycle added.")
                     }
                 }
             }
