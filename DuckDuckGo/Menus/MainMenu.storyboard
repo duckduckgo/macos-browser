@@ -7,10 +7,15 @@
         <!--Application-->
         <scene sceneID="JPo-4y-FX3">
             <objects>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <connections>
+                        <outlet property="networkProtectionDebugMenuActionsHandler" destination="jWm-XD-4k5" id="abb-35-fx7"/>
+                    </connections>
+                </customObject>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <customObject id="WIK-gq-Ncg" customClass="CopyHandler" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
+                <customObject id="jWm-XD-4k5" userLabel="NetworkProtectionDebugMenuController" customClass="NetworkProtectionDebugMenuController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
                 <application id="hnw-xV-0zn" sceneMemberID="viewController">
                     <menu key="mainMenu" title="Main Menu" systemMenu="main" id="AYu-sK-qS6" customClass="MainMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                         <items>
@@ -810,20 +815,20 @@ CQ
                                                     <menuItem title="Reset Network Protection State" id="p4h-oC-tpw">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="resetNetworkProtectionState:" target="Ady-hI-5gd" id="mIO-RZ-oSp"/>
+                                                            <action selector="resetAllState:" target="jWm-XD-4k5" id="KjP-nC-NdE"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem title="Remove System Extension and Login Items" id="bKT-dU-DaE" userLabel="Remove System Extension">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="removeNetworkProtectionSystemExtensionAndAgents:" target="Ady-hI-5gd" id="S7i-iV-WN0"/>
+                                                            <action selector="removeSystemExtensionAndAgents:" target="jWm-XD-4k5" id="GYd-Is-Jpm"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem isSeparatorItem="YES" id="FSc-gX-vGh"/>
                                                     <menuItem title="Send Test Notification" id="3rB-n0-ZjS">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="sendTestNetworkProtectionNotification:" target="Ady-hI-5gd" id="XIg-P0-PDP"/>
+                                                            <action selector="sendTestNotification:" target="jWm-XD-4k5" id="R3Z-Xd-DqK"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem title="Preferred Server Location" id="Zh6-DO-H1c">
@@ -833,7 +838,7 @@ CQ
                                                                 <menuItem title="Automatic" id="0j8-SE-pRP">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="networkProtectionPreferredServerChanged:" target="Ady-hI-5gd" id="3eT-N4-yyJ"/>
+                                                                        <action selector="setSelectedServer:" target="jWm-XD-4k5" id="Oe3-I5-99x"/>
                                                                     </connections>
                                                                 </menuItem>
                                                             </items>
@@ -846,7 +851,7 @@ CQ
                                                                 <menuItem title="Expire Now" id="104-Zf-0KB">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="networkProtectionExpireRegistrationKeyNow:" target="Ady-hI-5gd" id="PZ4-J7-0am"/>
+                                                                        <action selector="expireRegistrationKeyNow:" target="jWm-XD-4k5" id="o87-U0-4Bt"/>
                                                                     </connections>
                                                                 </menuItem>
                                                                 <menuItem isSeparatorItem="YES" id="MEg-4g-gji"/>
@@ -857,7 +862,7 @@ CQ
                                                                             <menuItem title="Automatic" id="Hsh-im-6Cc">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                                 <connections>
-                                                                                    <action selector="networkProtectionSetRegistrationKeyValidity:" target="Ady-hI-5gd" id="oVF-DB-lPW"/>
+                                                                                    <action selector="setRegistrationKeyValidity:" target="jWm-XD-4k5" id="6fa-of-hJz"/>
                                                                                 </connections>
                                                                             </menuItem>
                                                                         </items>
@@ -873,13 +878,13 @@ CQ
                                                                 <menuItem title="Enable NetP &gt; Controller Failure" id="xyA-ob-gEy">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="networkProtectionSimulateControllerFailure:" target="Ady-hI-5gd" id="7Ez-Oa-zkP"/>
+                                                                        <action selector="simulateControllerFailure:" target="jWm-XD-4k5" id="02v-bD-cWE"/>
                                                                     </connections>
                                                                 </menuItem>
                                                                 <menuItem title="Enable NetP &gt; Tunnel Failure" id="kVa-n8-UNx">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="networkProtectionSimulateTunnelFailure:" target="Ady-hI-5gd" id="4Pb-oF-nwr"/>
+                                                                        <action selector="simulateTunnelFailure:" target="jWm-XD-4k5" id="h0z-W6-uza"/>
                                                                     </connections>
                                                                 </menuItem>
                                                             </items>

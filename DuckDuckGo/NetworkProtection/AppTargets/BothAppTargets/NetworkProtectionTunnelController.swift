@@ -57,6 +57,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     private let loginItemsManager = NetworkProtectionLoginItemsManager()
 
+    // MARK: - Debug Options Support
+
+    private let debugUtilities = NetworkProtectionDebugUtilities()
+
     // MARK: - Connection Status
 
     private let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusObserver: ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter, platformDidWakeNotification: NSWorkspace.didWakeNotification), transitionTimeout: .seconds(4))
@@ -272,8 +276,8 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
         options["activationAttemptId"] = UUID().uuidString as NSString
         options["authToken"] = try tokenStore.fetchToken() as NSString?
-        options["selectedServer"] = Self.selectedServerName() as NSString?
-        options["keyValidity"] = Self.registrationKeyValidity().map(String.init(describing:)) as NSString?
+        options["selectedServer"] = debugUtilities.selectedServerName() as NSString?
+        options["keyValidity"] = debugUtilities.registrationKeyValidity().map(String.init(describing:)) as NSString?
 
         if Self.simulationOptions.isEnabled(.tunnelFailure) {
             Self.simulationOptions.setEnabled(false, option: .tunnelFailure)
@@ -327,82 +331,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         manager.isOnDemandEnabled = true
         try await manager.saveToPreferences()
     }
-
-    static func setSelectedServer(selectedServer: SelectedNetworkProtectionServer) {
-        NetworkProtectionSelectedServerUserDefaultsStore().selectedServer = selectedServer
-
-        let selectedServerName: String?
-
-        if case .endpoint(let serverName) = selectedServer {
-            selectedServerName = serverName
-        } else {
-            selectedServerName = nil
-        }
-
-        Task {
-            guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
-                return
-            }
-
-            var request = Data([ExtensionMessage.setSelectedServer.rawValue])
-
-            if let selectedServerName = selectedServerName {
-                let serverNameData = selectedServerName.data(using: ExtensionMessage.preferredStringEncoding)!
-                request.append(serverNameData)
-            }
-
-            try? activeSession.sendProviderMessage(request)
-        }
-    }
-
-    static func expireRegistrationKeyNow() async throws {
-        guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
-            return
-        }
-
-        let request = Data([ExtensionMessage.expireRegistrationKey.rawValue])
-        try? activeSession.sendProviderMessage(request)
-    }
-
-    private static let registrationKeyValidityKey = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
-
-    /// Retrieves the registration key validity time interval.
-    ///
-    /// - Returns: the validity time interval if it was overridden, or `nil` if NetP is using defaults.
-    ///
-    static func registrationKeyValidity(defaults: UserDefaults = .standard) -> TimeInterval? {
-        defaults.object(forKey: Self.registrationKeyValidityKey) as? TimeInterval
-    }
-
-    /// Sets the registration key validity time interval.
-    ///
-    /// - Parameters:
-    ///     - validity: the default registration key validity time interval.  A `nil` value means it will be automatically
-    ///         defined by NetP using its standard configuration.
-    ///
-    static func setRegistrationKeyValidity(_ validity: TimeInterval?, defaults: UserDefaults = .standard) async throws {
-        guard let activeSession = try await ConnectionSessionUtilities.activeSession() else {
-            return
-        }
-
-        var request = Data([ExtensionMessage.setKeyValidity.rawValue])
-
-        if let validity = validity {
-            defaults.set(validity, forKey: Self.registrationKeyValidityKey)
-
-            let validityData = withUnsafeBytes(of: UInt(validity).littleEndian) { Data($0) }
-            request.append(validityData)
-        } else {
-            defaults.removeObject(forKey: Self.registrationKeyValidityKey)
-        }
-
-        try activeSession.sendProviderMessage(request)
-    }
-
-    static func selectedServerName() -> String? {
-        NetworkProtectionSelectedServerUserDefaultsStore().selectedServer.stringValue
-    }
-
 }
 
 #endif
