@@ -53,6 +53,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// Auth token store
     private let tokenStore: NetworkProtectionTokenStore
 
+    // MARK: - Login Items
+
+    private let loginItemsManager = NetworkProtectionLoginItemsManager()
+
     // MARK: - Connection Status
 
     private let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusObserver: ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter, platformDidWakeNotification: NSWorkspace.didWakeNotification), transitionTimeout: .seconds(4))
@@ -178,14 +182,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     // MARK: - Ensure things are working
 
-    private static var loginItems: [LoginItem] {
-#if NETP_SYSTEM_EXTENSION
-        [.notificationsAgent, .vpnMenu]
-#else
-        [.vpnMenu]
-#endif
-    }
-
 #if NETP_SYSTEM_EXTENSION
     /// - Returns: `true` if the system extension and the background agent were activated successfully
     ///
@@ -208,64 +204,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         return activated
     }
 #endif
-
-    static func enableLoginItems() {
-        updateLoginItems("enable", using: LoginItem.enable)
-        ensureLoginItemsAreRunning()
-    }
-
-    static func resetLoginItems() {
-        updateLoginItems("reset", using: LoginItem.reset)
-        ensureLoginItemsAreRunning(.ifLoginItemsAreEnabled)
-    }
-
-    static func disableLoginItems() {
-        for item in loginItems {
-            try? item.disable()
-        }
-    }
-
-    private static func updateLoginItems(_ whatAreWeDoing: String, using enable: (LoginItem) -> () throws -> Void) {
-        for item in loginItems {
-            do {
-                try enable(item)()
-            } catch let error as NSError {
-                logOrAssertionFailure("🔴 Could not \(whatAreWeDoing) \(item): \(error.debugDescription)")
-            }
-        }
-    }
-
-    enum LoginItemCheckCondition {
-        case none
-        case ifLoginItemsAreEnabled
-
-        var shouldIgnoreItemStatus: Bool {
-            self == .none
-        }
-    }
-    static func ensureLoginItemsAreRunning(_ condition: LoginItemCheckCondition = .none, after interval: TimeInterval = .seconds(5)) {
-        Task {
-            try await Task.sleep(interval: interval)
-
-            os_log(.info, log: .networkProtection, "Checking whether login agents are enabled and running")
-
-            for item in Self.loginItems {
-                guard !item.isRunning && (condition.shouldIgnoreItemStatus || item.status.isEnabled) else {
-                    os_log(.info, log: .networkProtection, "Login item with ID '%{public}s': ok", item.debugDescription)
-                    continue
-                }
-
-                os_log(.error, log: .networkProtection, "%{public}s is not running, launching manually", item.debugDescription)
-
-                do {
-                    try await item.launch()
-                    os_log(.info, log: .networkProtection, "Launched login item with ID '%{public}s'", item.debugDescription)
-                } catch {
-                    os_log(.error, log: .networkProtection, "Login item with ID '%{public}s' could not be launched. Error: %{public}s", item.debugDescription, "\(error)")
-                }
-            }
-        }
-    }
 
     // MARK: - Starting & Stopping the VPN
 
@@ -297,7 +235,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         controllerErrorStore.lastErrorMessage = nil
 
         if enableLoginItems {
-            Self.enableLoginItems()
+            loginItemsManager.enableLoginItems()
         }
 
         do {
@@ -390,43 +328,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         try await manager.saveToPreferences()
     }
 
-    // MARK: - Debug commands for the extension
-
-    static func resetAllState() async throws {
-        if let activeSession = try? await ConnectionSessionUtilities.activeSession() {
-            try? activeSession.sendProviderMessage(Data([ExtensionMessage.resetAllState.rawValue])) { _ in
-                os_log("Status was reset in the extension", log: .networkProtection)
-            }
-        }
-
-        // ☝️ Take care of resetting all state within the extension first, and wait half a second
-        try? await Task.sleep(interval: 0.5)
-        // 👇 And only afterwards turn off the tunnel and removing it from prefernces
-
-        let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
-
-        if let tunnels = tunnels {
-            for tunnel in tunnels {
-                tunnel.connection.stopVPNTunnel()
-                try? await tunnel.removeFromPreferences()
-            }
-        }
-
-        NetworkProtectionSelectedServerUserDefaultsStore().reset()
-
-        try await removeSystemExtensionAndAgents()
-    }
-
-    static func removeSystemExtensionAndAgents() async throws {
-        loginItems.forEach { loginItem in
-            try? loginItem.disable()
-        }
-
-#if NETP_SYSTEM_EXTENSION
-        try await SystemExtensionManager().deactivate()
-#endif
-    }
-
     static func setSelectedServer(selectedServer: SelectedNetworkProtectionServer) {
         NetworkProtectionSelectedServerUserDefaultsStore().selectedServer = selectedServer
 
@@ -460,15 +361,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }
 
         let request = Data([ExtensionMessage.expireRegistrationKey.rawValue])
-        try? activeSession.sendProviderMessage(request)
-    }
-
-    static func sendTestNotificationRequest() async throws {
-        guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
-            return
-        }
-
-        let request = Data([ExtensionMessage.triggerTestNotification.rawValue])
         try? activeSession.sendProviderMessage(request)
     }
 

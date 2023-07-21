@@ -309,7 +309,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         let networkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
 
         guard networkProtectionFeatureVisibility.isFeatureActivated else {
-            NetworkProtectionTunnelController.disableLoginItems()
+            NetworkProtectionLoginItemsManager().disableLoginItems()
             LocalPinningManager.shared.unpin(.networkProtection)
             return
         }
@@ -333,15 +333,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         if lastVersionRun != currentVersion {
             os_log(.info, log: .networkProtection, "App updated from %{public}s to %{public}s: updating login items", lastVersionRun, currentVersion)
-            updateNetworkProtectionTunnelAndMenu()
+            restartNetworkProtectionTunnelAndMenu()
         } else {
             // If login items failed to launch (e.g. because of the App bundle rename), launch using NSWorkspace
-            NetworkProtectionTunnelController.ensureLoginItemsAreRunning(.ifLoginItemsAreEnabled, after: 1)
+            NetworkProtectionLoginItemsManager().ensureLoginItemsAreRunning(.ifLoginItemsAreEnabled, after: 1)
         }
     }
 
-    private func updateNetworkProtectionTunnelAndMenu() {
-        NetworkProtectionTunnelController.resetLoginItems()
+    private func restartNetworkProtectionTunnelAndMenu() {
+        NetworkProtectionLoginItemsManager().restartLoginItems()
 
         Task {
             let provider = NetworkProtectionTunnelController()

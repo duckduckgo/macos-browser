@@ -245,7 +245,7 @@ extension AppDelegate {
             guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
 
             do {
-                try await NetworkProtectionTunnelController.resetAllState()
+                try await NetworkProtectionDebugUtilities().resetAllState()
             } catch {
                 await NSAlert(error: error).runModal()
             }
@@ -259,7 +259,7 @@ extension AppDelegate {
             guard case .alertFirstButtonReturn = await NSAlert.removeSystemExtensionAndAgentsAlert().runModal() else { return }
 
             do {
-                try await NetworkProtectionTunnelController.removeSystemExtensionAndAgents()
+                try await NetworkProtectionDebugUtilities().removeSystemExtensionAndAgents()
             } catch {
                 await NSAlert(error: error).runModal()
             }
@@ -271,7 +271,7 @@ extension AppDelegate {
 #if NETWORK_PROTECTION
         Task { @MainActor in
             do {
-                try await NetworkProtectionTunnelController.sendTestNotificationRequest()
+                try await NetworkProtectionDebugUtilities().sendTestNotificationRequest()
             } catch {
                 await NSAlert(error: error).runModal()
             }

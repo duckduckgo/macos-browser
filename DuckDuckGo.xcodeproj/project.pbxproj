@@ -1337,6 +1337,10 @@
 		7B838C382A1DD8DD00E05A13 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B2D06522A11D19B00DE1F49 /* Assets.xcassets */; };
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
 		7BB108592A43375D000AB95F /* PFMoveApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BB108582A43375D000AB95F /* PFMoveApplication.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		7BBD45B12A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */; };
+		7BBD45B22A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */; };
+		7BBD45B42A691C3A00C83CA9 /* NetworkProtectionLoginItemsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B32A691C3A00C83CA9 /* NetworkProtectionLoginItemsManager.swift */; };
+		7BBD45B52A691C3A00C83CA9 /* NetworkProtectionLoginItemsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B32A691C3A00C83CA9 /* NetworkProtectionLoginItemsManager.swift */; };
 		85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */; };
 		8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */ = {isa = PBXBuildFile; fileRef = 8511E18325F82B34002F516B /* 01_Fire_really_small.json */; };
 		853014D625E671A000FB8205 /* PageObserverUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 853014D525E671A000FB8205 /* PageObserverUserScript.swift */; };
@@ -2561,6 +2565,8 @@
 		7B9459632A4A5BAF0012535A /* NetworkProtectionEnableOnDemand.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionEnableOnDemand.xcconfig; sourceTree = "<group>"; };
 		7BB108572A43375D000AB95F /* PFMoveApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFMoveApplication.h; sourceTree = "<group>"; };
 		7BB108582A43375D000AB95F /* PFMoveApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFMoveApplication.m; sourceTree = "<group>"; };
+		7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionDebugUtilities.swift; sourceTree = "<group>"; };
+		7BBD45B32A691C3A00C83CA9 /* NetworkProtectionLoginItemsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionLoginItemsManager.swift; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
 		8511E18325F82B34002F516B /* 01_Fire_really_small.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 01_Fire_really_small.json; sourceTree = "<group>"; };
 		853014D525E671A000FB8205 /* PageObserverUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageObserverUserScript.swift; sourceTree = "<group>"; };
@@ -3964,6 +3970,8 @@
 			isa = PBXGroup;
 			children = (
 				4B4D60642A0B29FA00BCD287 /* LoginItem.swift */,
+				7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */,
+				7BBD45B32A691C3A00C83CA9 /* NetworkProtectionLoginItemsManager.swift */,
 				B602E81C2A1E25B0006D261F /* NEOnDemandRuleExtension.swift */,
 				4B4D60652A0B29FA00BCD287 /* NetworkProtectionNavBarButtonModel.swift */,
 				4B8F52402A18326600BE7131 /* NetworkProtectionTunnelController.swift */,
@@ -7677,6 +7685,7 @@
 				3706FB7E293F65D500E42796 /* FireCoordinator.swift in Sources */,
 				3706FB7F293F65D500E42796 /* GeolocationProvider.swift in Sources */,
 				B603FD9F2A02712E00F3FCA9 /* CIImageExtension.swift in Sources */,
+				7BBD45B52A691C3A00C83CA9 /* NetworkProtectionLoginItemsManager.swift in Sources */,
 				3706FB80293F65D500E42796 /* NSAlert+ActiveDownloadsTermination.swift in Sources */,
 				3707C717294B5D0F00682A9F /* FindInPageTabExtension.swift in Sources */,
 				3706FB81293F65D500E42796 /* IndexPathExtension.swift in Sources */,
@@ -7691,6 +7700,7 @@
 				3706FB84293F65D500E42796 /* NSWindowExtension.swift in Sources */,
 				3706FB85293F65D500E42796 /* BookmarkPopover.swift in Sources */,
 				3706FB86293F65D500E42796 /* PreferencesDownloadsView.swift in Sources */,
+				7BBD45B22A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */,
 				3706FB87293F65D500E42796 /* ProcessExtension.swift in Sources */,
 				3706FB88293F65D500E42796 /* PermissionAuthorizationQuery.swift in Sources */,
 				3706FB89293F65D500E42796 /* BadgeAnimationView.swift in Sources */,
@@ -8543,6 +8553,7 @@
 				4B59024026B35F3600489384 /* ChromiumDataImporter.swift in Sources */,
 				B6A924DE2664CA09001A28CA /* LegacyWebKitDownloadDelegate.swift in Sources */,
 				AAA0CC3C25337FAB0079BC96 /* WKBackForwardListItemViewModel.swift in Sources */,
+				7BBD45B42A691C3A00C83CA9 /* NetworkProtectionLoginItemsManager.swift in Sources */,
 				1D43EB3429297D760065E5D6 /* BWNotRespondingAlert.swift in Sources */,
 				4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */,
 				AAC6881928626BF800D54247 /* RecentlyClosedTab.swift in Sources */,
@@ -8659,6 +8670,7 @@
 				AA840A9827319D1600E63CDD /* FirePopoverWrapperViewController.swift in Sources */,
 				4B85A48028821CC500FC4C39 /* NSPasteboardItemExtension.swift in Sources */,
 				37CD54CA27F2FDD100F1F7B9 /* AutofillPreferencesModel.swift in Sources */,
+				7BBD45B12A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */,
 				B657841F25FA497600D8DB33 /* NSException+Catch.swift in Sources */,
 				4BE65481271FCD4D008D1D63 /* PasswordManagementNoteModel.swift in Sources */,
 				3184AC6F288F2A1100C35E4B /* CookieNotificationAnimationModel.swift in Sources */,
