@@ -50,7 +50,6 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
     override func loadView() {
         let view = NSView(frame: NSRect(x: 0, y: 0, width: 1024, height: 768))
         view.wantsLayer = true
-        view.layer?.backgroundColor = NSColor.white.cgColor
         self.view = view
     }
 
