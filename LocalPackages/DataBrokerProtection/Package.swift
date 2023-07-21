@@ -37,7 +37,7 @@ let package = Package(
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit")
             ],
-            resources: [.copy("Resources")]
+            resources: [.process("Resources")]
         ),
         .testTarget(
             name: "DataBrokerProtectionTests",

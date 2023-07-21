@@ -67,7 +67,7 @@ struct DataBroker: Codable, Sendable {
     }
 
     static func initFromResource(_ brokerName: String) -> DataBroker {
-         let jsonUrl = Bundle.module.url(forResource: brokerName, withExtension: "json", subdirectory: "Resources")!
+        let jsonUrl = Bundle.module.url(forResource: brokerName, withExtension: "json")!
         // swiftlint:disable:next force_try
         let data = try! Data(contentsOf: jsonUrl)
         // swiftlint:disable:next force_try
