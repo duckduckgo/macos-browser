@@ -57,3 +57,13 @@ final class DataBrokerUserProfileViewController: NSViewController {
         view = hostingController.view
     }
 }
+
+final class DataBrokerContainerViewController: NSViewController {
+
+    override func loadView() {
+        if #available(macOS 11.0, *) {
+            let hostingController = NSHostingController(rootView: DataBrokerProtectionContainerView())
+            view = hostingController.view
+        } 
+    }
+}
