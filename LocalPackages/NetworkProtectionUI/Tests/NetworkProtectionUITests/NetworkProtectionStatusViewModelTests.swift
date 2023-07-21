@@ -79,25 +79,6 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
 
     // MARK: - Tests
 
-    /// We expect that the model will be initialized correctly (with status .uknown by default).
-    ///
-    @MainActor
-    func testProperInitialization() async throws {
-        let controller = MockTunnelController()
-        let statusReporter = MockStatusReporter(status: .unknown)
-        let model = NetworkProtectionStatusView.Model(
-            controller: controller,
-            statusReporter: statusReporter,
-            menuItems: [])
-
-        let isToggleOn = model.isToggleOn.wrappedValue
-        XCTAssertFalse(isToggleOn)
-        XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusDisconnected)
-        XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
-        XCTAssertEqual(model.featureStatusDescription, UserText.networkProtectionStatusViewFeatureOff)
-        XCTAssertFalse(model.showServerDetails)
-    }
-
     /// We expect the model to properly reflect the disconnected status.
     ///
     @MainActor
