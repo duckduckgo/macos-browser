@@ -10101,7 +10101,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "daniel/email-capitalization";
+				branch = "daniel/private-email-autofill";
 				kind = branch;
 			};
 		};
