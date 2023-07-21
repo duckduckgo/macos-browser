@@ -56,46 +56,6 @@ final class NetworkProtectionLoginItemsManager {
         Self.loginItems.forEach { loginItem in
             try? loginItem.disable()
         }
-
-        // The code below this point requires elevated privileges to run.
-
-        do {
-            // Create a FileDescriptor for stdError to capture any error messages
-            var stdError: FileHandle?
-            var pipe: Pipe?
-            if let stderr = fopen("/dev/stderr", "w") {
-                stdError = FileHandle(fileDescriptor: fileno(stderr), closeOnDealloc: true)
-                pipe = Pipe()
-            }
-
-            let command = "launchctl remove HKE973VLUW.com.duckduckgo.macos.browser.network-protection.system-extension.agent.review"
-
-            // Create a Task
-            let task = Process()
-            task.launchPath = "/bin/bash"
-            task.arguments = ["-c", command]
-            task.standardError = stdError
-
-            // Execute the command
-            task.launch()
-            task.waitUntilExit()
-
-            // Check the termination status
-            let terminationStatus = task.terminationStatus
-            if terminationStatus == 0 {
-                print("Command executed successfully")
-            } else {
-                /*
-                 let errorData = try pipe?.fileHandleForReading.readToEnd()
-                 if let errorString = String(data: errorData!, encoding: .utf8) {
-                 print("Command execution failed with error: \(errorString)")
-                 } else {
-                 print("Command execution failed")
-                 }*/
-            }
-        } catch {
-            print(error.localizedDescription)
-        }
     }
 
     // MARK: - Misc Utility
