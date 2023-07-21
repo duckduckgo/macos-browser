@@ -25,7 +25,11 @@ import NetworkProtection
 @objc
 final class NetworkProtectionDebugMenuController: NSObject {
 
+    // MARK: - Debug Logic
+
     private let debugUtilities = NetworkProtectionDebugUtilities()
+
+    // MARK: - Debug Menu IBActions
 
     /// Resets all state for NetworkProtection.
     ///
