@@ -31,7 +31,7 @@ struct DashboardHeaderView: View {
         ZStack {
             Image("header-background", bundle: .module).resizable()
 
-            VStack (spacing: 0) {
+            VStack(spacing: 0) {
                 HStack {
                     Spacer()
                     CTAHeaderView()
