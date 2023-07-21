@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.developer.networking.networkextension</key>
 	<array>
-		<string>packet-tunnel-provider</string>
+		<string>packet-tunnel-provider-systemextension</string>
 	</array>
 	<key>com.apple.developer.system-extension.install</key>
 	<true/>
@@ -24,8 +24,8 @@
 	<true/>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)com.duckduckgo.macos.browser.debug</string>
-		<string>$(AppIdentifierPrefix)com.duckduckgo.network-protection.debug</string>
+		<string>$(AppIdentifierPrefix)com.duckduckgo.macos.browser.review</string>
+		<string>$(AppIdentifierPrefix)com.duckduckgo.network-protection.review</string>
 	</array>
 </dict>
 </plist>

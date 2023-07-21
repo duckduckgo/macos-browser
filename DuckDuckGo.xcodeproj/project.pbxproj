@@ -2563,6 +2563,7 @@
 		7BB108582A43375D000AB95F /* PFMoveApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFMoveApplication.m; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
 		8511E18325F82B34002F516B /* 01_Fire_really_small.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 01_Fire_really_small.json; sourceTree = "<group>"; };
+		852C324F2A6B200100FE5F03 /* DuckDuckGo Privacy BrowserReview.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "DuckDuckGo Privacy BrowserReview.entitlements"; sourceTree = "<group>"; };
 		853014D525E671A000FB8205 /* PageObserverUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageObserverUserScript.swift; sourceTree = "<group>"; };
 		85308E24267FC9F2001ABD76 /* NSAlertExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAlertExtension.swift; sourceTree = "<group>"; };
 		85378D9B274E61B8007C5CBF /* MessageViews.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MessageViews.storyboard; sourceTree = "<group>"; };
@@ -5037,6 +5038,7 @@
 				AAD86E502678D104005C11BE /* DuckDuckGoCI.entitlements */,
 				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
 				4B5F15032A1570F10060320F /* DuckDuckGoDebug.entitlements */,
+				852C324F2A6B200100FE5F03 /* DuckDuckGo Privacy BrowserReview.entitlements */,
 				37D9BBA329376EE8000B99F9 /* DuckDuckGoAppStore.entitlements */,
 				377E54382937B7C400780A0A /* DuckDuckGoAppStoreCI.entitlements */,
 				4B4D609E2A0B2C2300BCD287 /* DuckDuckGo_NetP_Debug.entitlements */,
@@ -9806,6 +9808,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "DuckDuckGo/DuckDuckGo Privacy BrowserReview.entitlements";
 			};
 			name = Review;
 		};
