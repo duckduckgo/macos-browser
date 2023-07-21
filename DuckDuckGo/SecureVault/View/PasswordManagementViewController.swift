@@ -19,6 +19,7 @@
 import Foundation
 import Combine
 import Common
+import DDGSync
 import SwiftUI
 import BrowserServicesKit
 
@@ -101,6 +102,7 @@ final class PasswordManagementViewController: NSViewController {
     var emptyStateCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
     var appearanceCancellable: AnyCancellable?
+    var reloadDataAfterSyncCancellable: AnyCancellable?
 
     var domain: String?
     var isEditing = false
@@ -152,6 +154,7 @@ final class PasswordManagementViewController: NSViewController {
         createLoginItemView()
 
         appearanceCancellable = view.subscribeForAppApperanceUpdates()
+        reloadDataAfterSyncCancellable = bindSyncDidFinish()
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
@@ -171,16 +174,20 @@ final class PasswordManagementViewController: NSViewController {
         NotificationCenter.default.addObserver(forName: .dataImportComplete, object: nil, queue: .main) { [weak self] _ in
             self?.refreshData()
         }
+    }
 
-        NotificationCenter.default.addObserver(forName: .credentialsSyncComplete, object: nil, queue: .main) { [weak self] _ in
-            self?.refreshData()
-        }
+    private func bindSyncDidFinish() -> AnyCancellable? {
+        (NSApp.delegate as? AppDelegate)?.syncDataProviders?.credentialsAdapter.syncDidCompletePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.refreshData()
+            }
     }
 
     private func toggleLockScreen(hidden: Bool) {
         if hidden {
             hideLockScreen()
-            requestSync(dataChanged: false)
+            requestSync()
         } else {
             displayLockScreen()
         }
@@ -478,7 +485,7 @@ final class PasswordManagementViewController: NSViewController {
                 syncModelsOnCredentials(savedCredentials)
             }
             postChange()
-            requestSync(dataChanged: true)
+            requestSync()
 
         } catch {
             if case SecureVaultError.duplicateRecord = error {
@@ -564,7 +571,7 @@ final class PasswordManagementViewController: NSViewController {
             switch response {
             case .alertFirstButtonReturn:
                 try? self.secureVault?.deleteWebsiteCredentialsFor(accountId: id)
-                self.requestSync(dataChanged: true)
+                self.requestSync()
                 self.refreshData()
 
             default:
@@ -927,16 +934,12 @@ final class PasswordManagementViewController: NSViewController {
         emptyStateButton.isHidden = true
     }
 
-    private func requestSync(dataChanged: Bool) {
+    private func requestSync() {
         guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
             return
         }
         os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
-        if dataChanged {
-            syncService.scheduler.notifyDataChanged()
-        } else {
-            syncService.scheduler.notifyAppLifecycleEvent()
-        }
+        syncService.scheduler.requestSyncImmediately()
     }
 
 }

@@ -26,13 +26,13 @@ final class WebsiteBreakageReporter {
         self.tabViewModel = tabViewModel
     }
 
-    public func reportBreakage(category: String, description: String) {
-        let websiteBreakage = makeWebsiteBreakage(category: category, description: description, currentTab: tabViewModel?.tab)
+    public func reportBreakage(category: String, description: String, reportFlow: WebsiteBreakage.ReportFlow) {
+        let websiteBreakage = makeWebsiteBreakage(category: category, description: description, currentTab: tabViewModel?.tab, reportFlow: reportFlow)
         let websiteBreakageSender = WebsiteBreakageSender()
         websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
     }
 
-    private func makeWebsiteBreakage(category: String, description: String, currentTab: Tab?) -> WebsiteBreakage {
+    private func makeWebsiteBreakage(category: String, description: String, currentTab: Tab?, reportFlow: WebsiteBreakage.ReportFlow) -> WebsiteBreakage {
         // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
         let currentURL = currentTab?.content.url?.trimmingQueryItemsAndFragment()?.absoluteString ?? ""
 
@@ -51,7 +51,8 @@ final class WebsiteBreakageReporter {
                                               installedSurrogates: installedSurrogates,
                                               isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
                                               ampURL: ampURL,
-                                              urlParametersRemoved: urlParametersRemoved)
+                                              urlParametersRemoved: urlParametersRemoved,
+                                              reportFlow: reportFlow)
         return websiteBreakage
     }
 }

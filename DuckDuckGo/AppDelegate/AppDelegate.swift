@@ -288,6 +288,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             .removeDuplicates()
             .sink { isSyncDisabled in
                 LocalBookmarkManager.shared.updateBookmarkDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
+                syncDataProviders.credentialsAdapter.updateDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
             }
 
         // This is also called in applicationDidBecomeActive, but we're also calling it here, since

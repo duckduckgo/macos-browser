@@ -48,7 +48,7 @@ final class SyncDataProviders: DataProvidersSource {
         self.bookmarksDatabase = bookmarksDatabase
         self.secureVaultFactory = secureVaultFactory
         bookmarksAdapter = SyncBookmarksAdapter()
-        credentialsAdapter = SyncCredentialsAdapter()
+        credentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: secureVaultFactory)
     }
 
     private func initializeMetadataDatabaseIfNeeded() {

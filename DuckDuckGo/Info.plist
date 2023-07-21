@@ -116,5 +116,7 @@
 	<string>$(AGENT_PRODUCT_NAME)</string>
 	<key>NETP_APP_GROUP</key>
 	<string>$(NETP_APP_GROUP)</string>
+	<key>DISTRIBUTED_NOTIFICATIONS_PREFIX</key>
+	<string>$(DISTRIBUTED_NOTIFICATIONS_PREFIX)</string>
 </dict>
 </plist>

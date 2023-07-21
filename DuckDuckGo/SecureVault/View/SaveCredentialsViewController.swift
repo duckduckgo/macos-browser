@@ -106,10 +106,14 @@ final class SaveCredentialsViewController: NSViewController {
         self.visiblePasswordField.stringValue = self.hiddenPasswordField.stringValue
         self.loadFaviconForDomain(credentials.account.domain)
 
-        fireproofCheck.state = credentials.account.domain.flatMap(FireproofDomains.shared.isFireproof(fireproofDomain:)) == true ? .on : .off
+        if let domain = credentials.account.domain, FireproofDomains.shared.isFireproof(fireproofDomain: domain) {
+            fireproofCheck.state = .on
+        } else {
+            fireproofCheck.state = .off
+        }
 
         // Only use the non-editable state if a credential was automatically saved and it didn't already exist.
-        let condition = credentials.account.id != nil && credentials.account.username?.isEmpty == false && automaticallySaved
+        let condition = credentials.account.id != nil && !(credentials.account.username?.isEmpty ?? true) && automaticallySaved
         updateViewState(editable: !condition)
     }
 

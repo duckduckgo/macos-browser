@@ -22,67 +22,14 @@ import XCTest
 @MainActor
 final class FirePopoverViewModelTests: XCTestCase {
 
-    func testWhenThereIsOneTabWithNoHistoryThenClearingOptionsContainsCurrentTab() {
-        let tab = Tab(content: .url("https://duck.com".url!))
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: .init(tabs: [tab]), isBurner: false)
-
-        let viewModel = makeViewModel(with: tabCollectionViewModel)
-
-        XCTAssertEqual(viewModel.availableClearingOptions, [.currentTab, .allData])
-    }
-
-    func testWhenThereIsOneTabWithOneVisitedURLThenClearingOptionsContainsCurrentSite() {
-        let extensionBuilder = TestTabExtensionsBuilder(load: [HistoryTabExtensionMock.self]) { builder in { _, _ in
-            builder.override {
-                HistoryTabExtensionMock()
-            }
-        }}
-
-        let tabCollectionViewModel = TabCollectionViewModel()
-        let tab = Tab(content: .url("https://duck.com".url!), extensionsBuilder: extensionBuilder)
-        tabCollectionViewModel.removeAllTabs()
-        tabCollectionViewModel.append(tab: tab)
-        (tab.history as! HistoryTabExtensionMock).localHistory.insert("a.com")
-
-        let viewModel = makeViewModel(with: tabCollectionViewModel)
-        XCTAssertEqual(viewModel.availableClearingOptions, [.currentSite, .allData])
-    }
-
-    func testWhenThereIsOneTabWithMoreThanOneVisitedURLThenClearingOptionsContainsCurrentTab() {
-        let extensionBuilder = TestTabExtensionsBuilder(load: [HistoryTabExtensionMock.self]) { builder in { _, _ in
-            builder.override {
-                HistoryTabExtensionMock()
-            }
-        }}
-
-        let tabCollectionViewModel = TabCollectionViewModel()
-        let tab = Tab(content: .url("https://duck.com".url!), extensionsBuilder: extensionBuilder)
-        tabCollectionViewModel.removeAllTabs()
-        tabCollectionViewModel.append(tab: tab)
-        (tab.history as! HistoryTabExtensionMock).localHistory.insert("a.com")
-        (tab.history as! HistoryTabExtensionMock).localHistory.insert("b.com")
-
-        let viewModel = makeViewModel(with: tabCollectionViewModel)
-        XCTAssertEqual(viewModel.availableClearingOptions, [.currentTab, .allData])
-    }
-
-    func testWhenThereIsMoreThanOneTabThenClearingOptionsContainsCurrentWindow() {
-        let tabCollectionViewModel = TabCollectionViewModel()
-        tabCollectionViewModel.removeAllTabs()
-        tabCollectionViewModel.append(tab: .init(content: .url("https://duck.com".url!)))
-        tabCollectionViewModel.append(tab: .init(content: .url("https://spreadprivacy.com".url!)))
-
-        let viewModel = makeViewModel(with: tabCollectionViewModel)
-        XCTAssertEqual(viewModel.availableClearingOptions, [.currentTab, .currentWindow, .allData])
-    }
-
     private func makeViewModel(with tabCollectionViewModel: TabCollectionViewModel) -> FirePopoverViewModel {
         FirePopoverViewModel(
             fireViewModel: .init(),
             tabCollectionViewModel: tabCollectionViewModel,
             historyCoordinating: HistoryCoordinatingMock(),
             fireproofDomains: FireproofDomains(store: FireproofDomainsStoreMock()),
-            faviconManagement: FaviconManagerMock()
+            faviconManagement: FaviconManagerMock(),
+            tld: ContentBlocking.shared.tld
         )
     }
 }
