@@ -392,8 +392,8 @@ protocol NewWindowPolicyDecisionMaker {
                 // by the moment the ProcessPool is dead all the UserContentControllers that were using it should be deallocated
                 let knownUserContentControllers = processPool.knownUserContentControllers
                 processPool.onDeinit {
-                    for controller in knownUserContentControllers where controller.userContentController != nil {
-                        breakByRaisingSigInt("\(controller) has not been deallocated. Ensure there‘s no retain cycle added.")
+                    for controller in knownUserContentControllers {
+                        assert(controller.userContentController == nil, "\(controller) has not been deallocated")
                     }
                 }
             }
