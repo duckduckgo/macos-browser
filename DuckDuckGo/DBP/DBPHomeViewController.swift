@@ -23,8 +23,8 @@ import AppKit
 final class DBPHomeViewController: NSViewController {
     private var debugWindowController: NSWindowController?
 
-    lazy var dataBrokerContainerView: DataBrokeContainerViewController = {
-        DataBrokeContainerViewController()
+    lazy var dataBrokerContainerView: DataBrokerContainerViewController = {
+        DataBrokerContainerViewController()
     }()
 
     override func loadView() {

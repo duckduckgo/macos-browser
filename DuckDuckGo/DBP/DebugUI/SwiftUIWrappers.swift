@@ -58,7 +58,7 @@ final class DataBrokerUserProfileViewController: NSViewController {
     }
 }
 
-final class DataBrokeContainerViewController: NSViewController {
+final class DataBrokerContainerViewController: NSViewController {
 
     override func loadView() {
         if #available(macOS 11.0, *) {
