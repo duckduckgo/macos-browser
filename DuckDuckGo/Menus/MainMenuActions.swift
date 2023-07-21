@@ -844,32 +844,11 @@ extension AppDelegate: NSMenuItemValidation {
         case #selector(AppDelegate.openExportLogins(_:)):
             return areTherePasswords
 
-        case #selector(NetworkProtectionDebugMenuController.setSelectedServer(_:)):
-            return networkProtectionDebugMenuController.validateSetSelectedServer(menuItem: menuItem)
-
-        case #selector(NetworkProtectionDebugMenuController.expireRegistrationKeyNow(_:)):
-            return true
-
-        case #selector(NetworkProtectionDebugMenuController.setRegistrationKeyValidity(_:)):
-            return networkProtectionDebugMenuController.validateSetRegistrationKeyValidity(menuItem: menuItem)
-
-        case #selector(NetworkProtectionDebugMenuController.simulateControllerFailure(_:)):
-#if NETWORK_PROTECTION
-            menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.controllerFailure) ? .on : .off
-            return true
-#else
-            return false
-#endif
-
-        case #selector(NetworkProtectionDebugMenuController.simulateTunnelFailure(_:)):
-#if NETWORK_PROTECTION
-            menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
-            return true
-#else
-            return false
-#endif
-
         default:
+            if case .validated(let enable) = networkProtectionDebugMenuController.validate(menuItem: menuItem) {
+                return enable
+            }
+
             return true
         }
     }

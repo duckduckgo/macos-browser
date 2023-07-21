@@ -180,50 +180,79 @@ final class NetworkProtectionDebugMenuController: NSObject {
 
     // MARK: - Menu Item Validation
 
-    func validateSetSelectedServer(menuItem: NSMenuItem) -> Bool {
-#if NETWORK_PROTECTION
-        let selectedServerName = debugUtilities.selectedServerName()
-
-        switch menuItem.title {
-        case "Automatic":
-            menuItem.state = selectedServerName == nil ? .on : .off
-        default:
-            guard let selectedServerName = selectedServerName else {
-                menuItem.state = .off
-                break
-            }
-
-            menuItem.state = (menuItem.title.hasPrefix("\(selectedServerName) ")) ? .on : .off
-        }
-
-        return true
-#else
-        return false
-#endif
+    enum ValidationResult {
+        case validated(enable: Bool)
+        case unknownMenuItem
     }
 
-    func validateSetRegistrationKeyValidity(menuItem: NSMenuItem) -> Bool {
+    func validate(menuItem: NSMenuItem) -> ValidationResult {
+        switch menuItem.action {
+        case #selector(NetworkProtectionDebugMenuController.setSelectedServer(_:)):
 #if NETWORK_PROTECTION
-        let selectedValidity = debugUtilities.registrationKeyValidity()
+            let selectedServerName = debugUtilities.selectedServerName()
 
-        switch menuItem.title {
-        case "Automatic":
-            menuItem.state = selectedValidity == nil ? .on : .off
-        default:
-            guard let selectedValidity = selectedValidity,
-                  let menuItemValidity = menuItem.representedObject as? TimeInterval,
-                  selectedValidity == menuItemValidity else {
+            switch menuItem.title {
+            case "Automatic":
+                menuItem.state = selectedServerName == nil ? .on : .off
+            default:
+                guard let selectedServerName = selectedServerName else {
+                    menuItem.state = .off
+                    break
+                }
 
-                menuItem.state = .off
-                break
+                menuItem.state = (menuItem.title.hasPrefix("\(selectedServerName) ")) ? .on : .off
             }
 
-            menuItem.state =  .on
-        }
-
-        return true
+            return .validated(enable: true)
 #else
-        return false
+            return .validated(enable: false)
 #endif
+
+        case #selector(NetworkProtectionDebugMenuController.expireRegistrationKeyNow(_:)):
+            return .validated(enable: true)
+
+        case #selector(NetworkProtectionDebugMenuController.setRegistrationKeyValidity(_:)):
+#if NETWORK_PROTECTION
+            let selectedValidity = debugUtilities.registrationKeyValidity()
+
+            switch menuItem.title {
+            case "Automatic":
+                menuItem.state = selectedValidity == nil ? .on : .off
+            default:
+                guard let selectedValidity = selectedValidity,
+                      let menuItemValidity = menuItem.representedObject as? TimeInterval,
+                      selectedValidity == menuItemValidity else {
+
+                    menuItem.state = .off
+                    break
+                }
+
+                menuItem.state =  .on
+            }
+
+            return .validated(enable: true)
+#else
+            return .validated(enabled: false)
+#endif
+
+        case #selector(NetworkProtectionDebugMenuController.simulateControllerFailure(_:)):
+#if NETWORK_PROTECTION
+            menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.controllerFailure) ? .on : .off
+            return .validated(enable: true)
+#else
+            return .validated(enabled: false)
+#endif
+
+        case #selector(NetworkProtectionDebugMenuController.simulateTunnelFailure(_:)):
+#if NETWORK_PROTECTION
+            menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
+            return .validated(enable: true)
+#else
+            return .validated(enabled: false)
+#endif
+
+        default:
+            return .unknownMenuItem
+        }
     }
 }
