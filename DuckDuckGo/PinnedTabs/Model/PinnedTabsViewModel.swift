@@ -128,7 +128,6 @@ extension PinnedTabsViewModel {
 
     func isFireproof(_ tab: Tab) -> Bool {
         guard let host = tab.url?.host else {
-            os_log("PinnedTabsViewModel: Failed to get url of a tab", type: .error)
             return false
         }
         return fireproofDomains.isFireproof(fireproofDomain: host)
