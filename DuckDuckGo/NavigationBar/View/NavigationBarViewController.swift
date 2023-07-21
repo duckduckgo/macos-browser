@@ -23,6 +23,7 @@ import BrowserServicesKit
 
 #if NETWORK_PROTECTION
 import NetworkProtection
+import NetworkProtectionUI
 #endif
 
 // swiftlint:disable:next type_body_length

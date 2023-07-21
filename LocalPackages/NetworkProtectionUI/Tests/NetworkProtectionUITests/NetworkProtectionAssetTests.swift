@@ -33,5 +33,9 @@ final class NetworkProtectionAssetTests: XCTestCase {
         XCTAssertEqual(NetworkProtectionAsset.statusbarVPNOnIcon.rawValue, "statusbar-vpn-on")
         XCTAssertEqual(NetworkProtectionAsset.statusbarVPNOffIcon.rawValue, "statusbar-vpn-off")
         XCTAssertEqual(NetworkProtectionAsset.statusbarVPNIssueIcon.rawValue, "statusbar-vpn-issue")
+        XCTAssertEqual(NetworkProtectionAsset.statusbarReviewVPNOnIcon.rawValue, "statusbar-review-vpn-on")
+        XCTAssertEqual(NetworkProtectionAsset.statusbarDebugVPNOnIcon.rawValue, "statusbar-debug-vpn-on")
+        XCTAssertEqual(NetworkProtectionAsset.statusbarBrandedVPNOffIcon.rawValue, "statusbar-branded-vpn-off")
+        XCTAssertEqual(NetworkProtectionAsset.statusbarBrandedVPNIssueIcon.rawValue, "statusbar-branded-vpn-issue")
     }
 }
