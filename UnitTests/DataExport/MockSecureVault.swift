@@ -165,4 +165,16 @@ final class MockSecureVault: SecureVault {
     func hasAccountFor(username: String?, domain: String?) throws -> Bool {
         storedAccounts.contains(where: { $0.username == username && $0.domain == domain })
     }
+
+    func getHashingSalt() throws -> Data? {
+        nil
+    }
+
+    func storeWebsiteCredentials(_ credentials: BrowserServicesKit.SecureVaultModels.WebsiteCredentials, in database: GRDB.Database, encryptedUsing l2Key: Data, hashedUsing salt: Data?) throws -> Int64 {
+        1
+    }
+
+    func storeSyncableCredentials(_ syncableCredentials: BrowserServicesKit.SecureVaultModels.SyncableCredentials, in database: GRDB.Database, encryptedUsing l2Key: Data, hashedUsing salt: Data?) throws {
+    }
+
 }
