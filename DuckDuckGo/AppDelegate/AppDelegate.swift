@@ -69,12 +69,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var bookmarksSyncErrorCancellable: AnyCancellable?
     let bookmarksManager = LocalBookmarkManager.shared
 
-    // MARK: - Network Protection
-
-    /// Network Protection controller for the debug menu.
-    ///
-    @IBOutlet var networkProtectionDebugMenuController: NetworkProtectionDebugMenuController! = NetworkProtectionDebugMenuController()
-
 #if !APPSTORE
     var updateController: UpdateController!
 #endif

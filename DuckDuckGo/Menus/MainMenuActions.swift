@@ -845,10 +845,6 @@ extension AppDelegate: NSMenuItemValidation {
             return areTherePasswords
 
         default:
-            if case .validated(let enable) = networkProtectionDebugMenuController.validate(menuItem: menuItem) {
-                return enable
-            }
-
             return true
         }
     }

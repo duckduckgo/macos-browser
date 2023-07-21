@@ -177,15 +177,13 @@ final class NetworkProtectionDebugMenuController: NSObject {
         NetworkProtectionTunnelController.simulationOptions.setEnabled(menuItem.state == .on, option: .tunnelFailure)
 #endif
     }
+}
 
-    // MARK: - Menu Item Validation
+extension NetworkProtectionDebugMenuController: NSMenuItemValidation {
 
-    enum ValidationResult {
-        case validated(enable: Bool)
-        case unknownMenuItem
-    }
-
-    func validate(menuItem: NSMenuItem) -> ValidationResult {
+    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable function_body_length
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         switch menuItem.action {
         case #selector(NetworkProtectionDebugMenuController.setSelectedServer(_:)):
 #if NETWORK_PROTECTION
@@ -203,13 +201,13 @@ final class NetworkProtectionDebugMenuController: NSObject {
                 menuItem.state = (menuItem.title.hasPrefix("\(selectedServerName) ")) ? .on : .off
             }
 
-            return .validated(enable: true)
+            return true
 #else
-            return .validated(enable: false)
+            return false
 #endif
 
         case #selector(NetworkProtectionDebugMenuController.expireRegistrationKeyNow(_:)):
-            return .validated(enable: true)
+            return true
 
         case #selector(NetworkProtectionDebugMenuController.setRegistrationKeyValidity(_:)):
 #if NETWORK_PROTECTION
@@ -230,29 +228,29 @@ final class NetworkProtectionDebugMenuController: NSObject {
                 menuItem.state =  .on
             }
 
-            return .validated(enable: true)
+            return true
 #else
-            return .validated(enabled: false)
+            return false
 #endif
 
         case #selector(NetworkProtectionDebugMenuController.simulateControllerFailure(_:)):
 #if NETWORK_PROTECTION
             menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.controllerFailure) ? .on : .off
-            return .validated(enable: true)
+            return true
 #else
-            return .validated(enabled: false)
+            return false
 #endif
 
         case #selector(NetworkProtectionDebugMenuController.simulateTunnelFailure(_:)):
 #if NETWORK_PROTECTION
             menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
-            return .validated(enable: true)
+            return true
 #else
-            return .validated(enabled: false)
+            return false
 #endif
 
         default:
-            return .unknownMenuItem
+            return true
         }
     }
 }

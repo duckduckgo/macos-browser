@@ -84,7 +84,11 @@ final class MainMenu: NSMenu {
     // MARK: - Debug
 
     @IBOutlet weak var debugMenuItem: NSMenuItem?
-    @IBOutlet weak var networkProtectionMenuItem: NSMenuItem?
+    @IBOutlet weak var networkProtectionMenuItem: NSMenuItem? {
+        didSet {
+            networkProtectionMenuItem?.target = networkProtectionDebugMenuController
+        }
+    }
 
     private func setupDebugMenuItem(with featureFlagger: FeatureFlagger) {
         guard let debugMenuItem else {
@@ -118,6 +122,14 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var helpMenuItem: NSMenuItem?
     @IBOutlet weak var helpSeparatorMenuItem: NSMenuItem?
     @IBOutlet weak var sendFeedbackMenuItem: NSMenuItem?
+
+    // MARK: - Menu Controllers
+
+    /// Network Protection controller for the debug menu.
+    ///
+    @IBOutlet var networkProtectionDebugMenuController: NetworkProtectionDebugMenuController?
+
+    // MARK: - Setup
 
     private func setupHelpMenuItem() {
 #if !FEEDBACK
@@ -328,7 +340,7 @@ final class MainMenu: NSMenu {
                     title = "\(server.serverInfo.name) (\(server.serverInfo.serverLocation))"
                 }
 
-                return NSMenuItem(title: title, action: automaticItem.action, keyEquivalent: "")
+                return NSMenuItem(title: title, action: automaticItem.action, target: networkProtectionDebugMenuController, keyEquivalent: "")
             })
         }
     }
@@ -361,7 +373,7 @@ final class MainMenu: NSMenu {
             submenu.items = [automaticItem]
         } else {
             submenu.items = [automaticItem, NSMenuItem.separator()] + Self.networkProtectionRegistrationKeyValidityOptions.map { option in
-                let menuItem = NSMenuItem(title: option.title, action: automaticItem.action, keyEquivalent: "")
+                let menuItem = NSMenuItem(title: option.title, action: automaticItem.action, target: networkProtectionDebugMenuController, keyEquivalent: "")
                 menuItem.representedObject = option.validity
                 return menuItem
             }
@@ -513,7 +525,6 @@ final class MainMenu: NSMenu {
             NSAlert(error: error).runModal()
         }
     }
-
 }
 
 extension MainMenu: NSMenuDelegate {
@@ -529,5 +540,4 @@ extension MainMenu: NSMenuDelegate {
         shareMenuItem.submenu = sharingMenu
         return false
     }
-
 }
