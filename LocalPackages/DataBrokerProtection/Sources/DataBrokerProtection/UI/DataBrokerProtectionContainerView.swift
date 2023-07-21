@@ -23,20 +23,22 @@ public struct DataBrokerProtectionContainerView: View {
     public init() { }
 
     public var body: some View {
-        ZStack {
-            VStack {
-                DashboardHeaderView(viewModel: DashboardHeaderViewModel(statusText: "Scanning...",
-                                                                        faqButtonClicked: {},
-                                                                        editProfileClicked: {}))
-                .frame(height: 300)
-                Spacer()
-            }
-            VStack {
-                GettingStartedView()
-                    .padding(.top, 200)
-                Spacer()
-            }
-        }.background(Color("background-color", bundle: .module))
+        ScrollView {
+            ZStack {
+                VStack {
+                    DashboardHeaderView(viewModel: DashboardHeaderViewModel(statusText: "1Scanning...",
+                                                                            faqButtonClicked: {},
+                                                                            editProfileClicked: {}))
+                    .frame(height: 300)
+                    Spacer()
+                }
+                VStack {
+                    GettingStartedView()
+                        .padding(.top, 200)
+                    Spacer()
+                }
+            }.background(Color("background-color", bundle: .module))
+        }
     }
 }
 
