@@ -73,7 +73,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     /// Network Protection controller for the debug menu.
     ///
-    @IBOutlet var networkProtectionDebugMenuController: NetworkProtectionDebugMenuController!
+    @IBOutlet var networkProtectionDebugMenuController: NetworkProtectionDebugMenuController! = NetworkProtectionDebugMenuController()
 
 #if !APPSTORE
     var updateController: UpdateController!

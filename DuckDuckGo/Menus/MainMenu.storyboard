@@ -7,11 +7,7 @@
         <!--Application-->
         <scene sceneID="JPo-4y-FX3">
             <objects>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                    <connections>
-                        <outlet property="networkProtectionDebugMenuActionsHandler" destination="jWm-XD-4k5" id="abb-35-fx7"/>
-                    </connections>
-                </customObject>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <customObject id="WIK-gq-Ncg" customClass="CopyHandler" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
