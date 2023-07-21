@@ -19,6 +19,8 @@
 import Common
 import Foundation
 
+#if NETWORK_PROTECTION
+
 /// Class to manage the login items for Network Protection
 /// 
 final class NetworkProtectionLoginItemsManager {
@@ -108,3 +110,5 @@ final class NetworkProtectionLoginItemsManager {
         }
     }
 }
+
+#endif

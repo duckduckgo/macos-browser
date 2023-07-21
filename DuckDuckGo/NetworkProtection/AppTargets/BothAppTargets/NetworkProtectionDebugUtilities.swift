@@ -22,6 +22,8 @@ import NetworkExtension
 import NetworkProtection
 import SystemExtensions
 
+#if NETWORK_PROTECTION
+
 /// Utility code to help implement our debug menu options for Network Protection.
 ///
 final class NetworkProtectionDebugUtilities {
@@ -171,3 +173,5 @@ final class NetworkProtectionDebugUtilities {
         }
     }
 }
+
+#endif

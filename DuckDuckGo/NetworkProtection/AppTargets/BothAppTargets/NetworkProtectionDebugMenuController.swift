@@ -27,7 +27,9 @@ final class NetworkProtectionDebugMenuController: NSObject {
 
     // MARK: - Debug Logic
 
+#if NETWORK_PROTECTION
     private let debugUtilities = NetworkProtectionDebugUtilities()
+#endif
 
     // MARK: - Debug Menu IBActions
 
