@@ -15,7 +15,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "sam/secure-storage",
-        "revision" : "b36acc33850a3cc2b14e5df82b4db10fe0b13552"
+        "revision" : "efefad0e26f70bc5630d926300bc77099fbbe621"
       }
     },
     {
