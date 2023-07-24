@@ -25,7 +25,7 @@ struct ScanStartedView: View {
                     .font(.title)
                     .bold()
             }
-            Text("This should take about 5 minutes.")
+            Text("We should have some results for you shortly.")
                 .font(.body)
                 .foregroundColor(.secondary)
         }
