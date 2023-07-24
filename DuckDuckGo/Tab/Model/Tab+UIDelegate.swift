@@ -80,12 +80,9 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         switch newWindowPolicy(for: navigationAction) {
         // popup kind is known, action doesn‘t require Popup Permission
         case .allow(let targetKind):
-            guard !isBurner else {
-                completionHandler(nil)
-                createIndependentBurnerTab(for: navigationAction, kind: targetKind)
-                return
-            }
             // proceed to web view creation
+            // in case of burner tab, we aren't using existing configuration in order to create separate context
+            let configuration = isBurner ? nil : configuration
             completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
             return
         // action doesn‘t require Popup Permission as it‘s user-initiated
@@ -145,36 +142,37 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     }
 
     /// create a new Tab returning its WebView to a createWebViewWithConfiguration callback
+    /// return nil for burner tab
     @MainActor
-    private func createWebView(from webView: WKWebView, with configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, of kind: NewWindowPolicy) -> WKWebView? {
+    private func createWebView(from webView: WKWebView, with configuration: WKWebViewConfiguration?, for navigationAction: WKNavigationAction, of kind: NewWindowPolicy) -> WKWebView? {
         guard let delegate else { return nil }
 
-        let tab = Tab(content: .none,
-                      webViewConfiguration: configuration,
+        let tab: Tab
+
+        if let config = configuration {
+            tab = Tab(content: .none,
+                      webViewConfiguration: config,
                       parentTab: self,
                       isBurner: isBurner,
                       canBeClosedWithBack: kind.isSelectedTab,
                       webViewSize: webView.superview?.bounds.size ?? .zero)
-        delegate.tab(self, createdChild: tab, of: kind)
+        } else {
+            assert(isBurner)
+            guard let url = navigationAction.request.url else {
+                return nil
+            }
 
-        let webView = tab.webView
-
-        // WebKit automatically loads the request in the returned web view.
-        return webView
-    }
-
-    @MainActor
-    private func createIndependentBurnerTab(for navigationAction: WKNavigationAction, kind: NewWindowPolicy) {
-        guard let url = navigationAction.request.url, let delegate else {
-            return
+            tab = Tab(content: .url(url),
+                      parentTab: self,
+                      isBurner: isBurner,
+                      canBeClosedWithBack: kind.isSelectedTab,
+                      webViewSize: webView.superview?.bounds.size ?? .zero)
         }
 
-        let tab = Tab(content: .url(url),
-                      parentTab: self,
-                      isBurner: isBurner,
-                      canBeClosedWithBack: kind.isSelectedTab,
-                      webViewSize: webView.superview?.bounds.size ?? .zero)
         delegate.tab(self, createdChild: tab, of: kind)
+
+        // If the tab was created with a configuration, we return its WebView. Otherwise, return nil.
+        return configuration != nil ? tab.webView : nil
     }
 
     @objc(_webView:checkUserMediaPermissionForURL:mainFrameURL:frameIdentifier:decisionHandler:)
