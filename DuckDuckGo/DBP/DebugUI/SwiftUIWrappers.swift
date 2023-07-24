@@ -64,6 +64,6 @@ final class DataBrokerContainerViewController: NSViewController {
         if #available(macOS 11.0, *) {
             let hostingController = NSHostingController(rootView: DataBrokerProtectionContainerView())
             view = hostingController.view
-        } 
+        }
     }
 }
