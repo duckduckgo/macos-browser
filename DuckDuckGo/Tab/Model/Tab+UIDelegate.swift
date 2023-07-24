@@ -80,6 +80,11 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         switch newWindowPolicy(for: navigationAction) {
         // popup kind is known, action doesn‘t require Popup Permission
         case .allow(let targetKind):
+            guard !isBurner else {
+                completionHandler(nil)
+                createIndependentBurnerTab(for: navigationAction, kind: targetKind)
+                return
+            }
             // proceed to web view creation
             completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
             return
@@ -156,6 +161,20 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
         // WebKit automatically loads the request in the returned web view.
         return webView
+    }
+
+    @MainActor
+    private func createIndependentBurnerTab(for navigationAction: WKNavigationAction, kind: NewWindowPolicy) {
+        guard let url = navigationAction.request.url, let delegate else {
+            return
+        }
+
+        let tab = Tab(content: .url(url),
+                      parentTab: self,
+                      isBurner: isBurner,
+                      canBeClosedWithBack: kind.isSelectedTab,
+                      webViewSize: webView.superview?.bounds.size ?? .zero)
+        delegate.tab(self, createdChild: tab, of: kind)
     }
 
     @objc(_webView:checkUserMediaPermissionForURL:mainFrameURL:frameIdentifier:decisionHandler:)

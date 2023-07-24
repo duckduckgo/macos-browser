@@ -24,7 +24,7 @@ extension WKWebViewConfiguration {
 
     @MainActor
     func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, isBurner: Bool) {
-        if isBurner, websiteDataStore.isPersistent {
+        if isBurner {
             websiteDataStore = .nonPersistent()
         }
         allowsAirPlayForMediaPlayback = true
