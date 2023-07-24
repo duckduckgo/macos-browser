@@ -33,7 +33,7 @@ struct InitParams: Encodable {
     let dataBrokerData: DataBroker
 }
 
-struct State: Encodable {
+struct ActionRequest: Encodable {
     let action: Action
     let data: CCFRequestData?
 
@@ -79,5 +79,5 @@ struct State: Encodable {
 }
 
 struct Params: Encodable {
-    let state: State
+    let state: ActionRequest
 }

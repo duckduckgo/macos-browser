@@ -24,6 +24,5 @@ struct CTAButtonStyle: ButtonStyle {
             .foregroundColor(configuration.isPressed ? Color.primary : Color.white)
             .background(configuration.isPressed ? Color.secondary : Color.accentColor)
             .cornerRadius(6.0)
-            .padding()
     }
 }

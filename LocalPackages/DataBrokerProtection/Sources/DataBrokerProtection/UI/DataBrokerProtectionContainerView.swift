@@ -18,27 +18,41 @@
 
 import SwiftUI
 
+private enum BodyViewType {
+    case gettingStarted
+    case noResults
+}
+
 @available(macOS 11.0, *)
 public struct DataBrokerProtectionContainerView: View {
+    @State private var bodyViewType = BodyViewType.noResults
+
     public init() { }
 
     public var body: some View {
         ScrollView {
             ZStack {
                 VStack {
-                    DashboardHeaderView(viewModel: DashboardHeaderViewModel(statusText: "1Scanning...",
+                    DashboardHeaderView(viewModel: DashboardHeaderViewModel(statusText: "Scanning...",
                                                                             faqButtonClicked: {},
                                                                             editProfileClicked: {}))
                     .frame(height: 300)
                     Spacer()
                 }
                 VStack {
-                    GettingStartedView()
-                        .padding(.top, 200)
+                    switch bodyViewType {
+                    case .gettingStarted:
+                        GettingStartedView()
+                            .padding(.top, 200)
+                    case .noResults:
+                        NoResultsFoundView()
+                            .padding(.top, 330)
+                    }
+
                     Spacer()
                 }
-            }.background(Color("background-color", bundle: .module))
-        }
+            }
+        }.background(Color("background-color", bundle: .module))
     }
 }
 
