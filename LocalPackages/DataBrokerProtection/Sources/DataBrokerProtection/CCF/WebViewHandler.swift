@@ -103,7 +103,7 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
         userContentController?.dataBrokerUserScripts.dataBrokerFeature.pushAction(
             method: .onActionReceived,
             webView: self.webView!,
-            params: Params(state: State(action: action, data: data))
+            params: Params(state: ActionRequest(action: action, data: data))
         )
     }
 }
