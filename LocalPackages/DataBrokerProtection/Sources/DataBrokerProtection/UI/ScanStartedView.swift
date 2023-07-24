@@ -1,5 +1,5 @@
 //
-//  CTAButtonStyle.swift
+//  ScanStartedView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -15,14 +15,25 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
-
 import SwiftUI
 
-struct CTAButtonStyle: ButtonStyle {
-    func makeBody(configuration: Self.Configuration) -> some View {
-        configuration.label
-            .foregroundColor(configuration.isPressed ? Color.primary : Color.white)
-            .background(configuration.isPressed ? Color.secondary : Color.accentColor)
-            .cornerRadius(6.0)
+struct ScanStartedView: View {
+    var body: some View {
+        VStack (spacing: 10) {
+            HStack {
+                Text("We've started scanning your profile info on Data Brokers.")
+                    .font(.title)
+                    .bold()
+            }
+            Text("We should have some results for you shortly.")
+                .font(.body)
+                .foregroundColor(.secondary)
+        }
+    }
+}
+
+struct ScanStartedView_Previews: PreviewProvider {
+    static var previews: some View {
+        ScanStartedView()
     }
 }
