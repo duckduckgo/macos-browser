@@ -32,8 +32,12 @@ extension HomePage.Views {
             return colorScheme == .dark ? Color.white.opacity(0.03) : backgroundColor
         }
 
-        private var infoStrokeColor: Color {
-            return colorScheme == .dark ? Color.white.opacity(0.03) : Color.gray.opacity(0.09)
+        private var infoStrokeColor1: Color {
+            return colorScheme == .dark ? Color.white.opacity(0.03) : Color.clear
+        }
+
+        private var infoStrokeColor2: Color {
+            return colorScheme == .dark ? Color.black.opacity(0.12) : Color.gray.opacity(0.09)
         }
 
         private var infoShadowColor: Color {
@@ -68,7 +72,8 @@ extension HomePage.Views {
                 .padding(.horizontal, 40)
                 .padding(.vertical, 20)
                 .background(RoundedRectangle(cornerRadius: 8).fill(infoBackgroundColor))
-                .overlay(RoundedRectangle(cornerRadius: 8).stroke(infoStrokeColor, lineWidth: 1))
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(infoStrokeColor2, lineWidth: 1))
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(infoStrokeColor1, lineWidth: 1).padding(1)) // Add this line
                 .shadow(color: infoShadowColor, radius: 2, x: 0, y: 2)
             }
         }
