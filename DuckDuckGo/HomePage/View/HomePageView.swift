@@ -45,9 +45,11 @@ extension HomePage.Views {
                     ScrollView {
                         VStack(spacing: 0) {
                             Group {
-                                ContinueSetUpView()
-                                    .padding(.top, 72)
-                                    .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+                                if #available(macOS 12.0, *) {
+                                    ContinueSetUpView()
+                                        .padding(.top, 72)
+                                        .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+                                }
 
                                 Favorites()
                                     .padding(.top, 72)

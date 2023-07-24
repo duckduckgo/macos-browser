@@ -20,7 +20,7 @@ import SwiftUI
 import SwiftUIExtensions
 
 extension HomePage.Views {
-
+    @available(macOS 12.0, *)
     struct ContinueSetUpView: View {
 
         @EnvironmentObject var model: HomePage.Models.ContinueSetUpModel
