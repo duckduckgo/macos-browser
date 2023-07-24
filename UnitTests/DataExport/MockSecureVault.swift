@@ -348,7 +348,7 @@ class MockKeyStoreProvider: SecureStorageKeyStoreProvider {
         return ""
     }
 
-    func attributesForEntry(named: String, serviceName: String) -> [String : Any] {
+    func attributesForEntry(named: String, serviceName: String) -> [String: Any] {
         return [:]
     }
 
@@ -379,4 +379,3 @@ class MockKeyStoreProvider: SecureStorageKeyStoreProvider {
     }
 
 }
-
