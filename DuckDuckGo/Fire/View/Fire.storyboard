@@ -215,8 +215,8 @@
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="FireHeader" id="Dql-dm-pHB"/>
                                     </imageView>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gVh-tG-Gue">
-                                        <rect key="frame" x="72" y="87" width="200" height="16"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Clear Browsing History and Data" id="98U-sP-UUR">
+                                        <rect key="frame" x="90" y="87" width="164" height="16"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Close Tabs and Clear Data" id="98U-sP-UUR">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
