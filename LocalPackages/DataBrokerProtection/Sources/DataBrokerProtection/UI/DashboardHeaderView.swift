@@ -84,6 +84,7 @@ private struct CTAHeaderView: View {
                 }
                 .frame(maxWidth: 110, maxHeight: 26)
             }.buttonStyle(CTAButtonStyle())
+                .padding()
         }
     }
 }
