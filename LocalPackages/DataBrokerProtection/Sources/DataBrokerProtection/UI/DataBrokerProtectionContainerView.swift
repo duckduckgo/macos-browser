@@ -21,6 +21,7 @@ import SwiftUI
 private enum BodyViewType {
     case gettingStarted
     case noResults
+    case scanStarted
 }
 
 @available(macOS 11.0, *)
@@ -46,6 +47,9 @@ public struct DataBrokerProtectionContainerView: View {
                             .padding(.top, 200)
                     case .noResults:
                         NoResultsFoundView()
+                            .padding(.top, 330)
+                    case .scanStarted:
+                        ScanStartedView()
                             .padding(.top, 330)
                     }
 
