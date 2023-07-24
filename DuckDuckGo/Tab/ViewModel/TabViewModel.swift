@@ -309,10 +309,12 @@ final class TabViewModel {
     // MARK: - Privacy icon animation
 
     let trackersAnimationTriggerPublisher = PassthroughSubject<Void, Never>()
+    let privacyEntryPointIconUpdateTrigger = PassthroughSubject<Void, Never>()
 
     private var trackerAnimationTimer: Timer?
 
     private func sendAnimationTrigger() {
+        privacyEntryPointIconUpdateTrigger.send()
         if self.tab.privacyInfo?.trackerInfo.trackersBlocked.count ?? 0 > 0 {
             self.trackersAnimationTriggerPublisher.send()
         }

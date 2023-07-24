@@ -168,6 +168,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private var effectiveAppearanceCancellable: AnyCancellable?
     private var permissionsCancellables = Set<AnyCancellable>()
     private var trackerAnimationTriggerCancellable: AnyCancellable?
+    private var privacyEntryPointIconUpdateCancellable: AnyCancellable?
     private var isMouseOverAnimationVisibleCancellable: AnyCancellable?
     private var privacyInfoCancellable: AnyCancellable?
 
@@ -379,7 +380,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
         clearButton.isHidden = !(isTextFieldEditorFirstResponder && !(textFieldValue?.isEmpty ?? true))
 
-        updatePrivacyEntryPoint()
+        updatePrivacyEntryPointButton()
         updateImageButton()
         updatePermissionButtons()
         updateBookmarkButtonVisibility()
@@ -579,8 +580,10 @@ final class AddressBarButtonsViewController: NSViewController {
             self?.stopAnimations()
             self?.subscribeToUrl()
             self?.subscribeToPermissions()
+            self?.subscribeToPrivacyEntryPointIconUpdateTrigger()
             self?.subscribeToTrackerAnimationTrigger()
             self?.closePopover()
+            self?.updatePrivacyEntryPointIcon()
         }
     }
 
@@ -620,6 +623,15 @@ final class AddressBarButtonsViewController: NSViewController {
         trackerAnimationTriggerCancellable = tabCollectionViewModel.selectedTabViewModel?.trackersAnimationTriggerPublisher
             .sink { [weak self] _ in
                 self?.animateTrackers()
+        }
+    }
+
+    private func subscribeToPrivacyEntryPointIconUpdateTrigger() {
+        privacyEntryPointIconUpdateCancellable?.cancel()
+
+        privacyEntryPointIconUpdateCancellable = tabCollectionViewModel.selectedTabViewModel?.privacyEntryPointIconUpdateTrigger
+            .sink { [weak self] _ in
+                self?.updatePrivacyEntryPointIcon()
         }
     }
 
@@ -726,11 +738,6 @@ final class AddressBarButtonsViewController: NSViewController {
 
     }
 
-    private func updatePrivacyEntryPoint() {
-        self.updatePrivacyEntryPointButton()
-        self.updatePrivacyEntryPointIcon()
-    }
-
     private func updatePrivacyEntryPointButton() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             return
@@ -756,12 +763,13 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func updatePrivacyEntryPointIcon() {
         guard !NSApp.isRunningUnitTests else { return }
+        privacyEntryPointButton.image = nil
+
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             return
         }
 
         guard !isAnyShieldAnimationPlaying else {
-            privacyEntryPointButton.image = nil
             return
         }
 
