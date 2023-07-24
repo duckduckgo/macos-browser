@@ -87,6 +87,8 @@
 		311CFB8F2A5EE9BA00579619 /* DataBrokerProfileQueryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311CFB8E2A5EE9BA00579619 /* DataBrokerProfileQueryView.swift */; };
 		311CFB912A5EEA0400579619 /* SwiftUIWrappers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311CFB902A5EEA0400579619 /* SwiftUIWrappers.swift */; };
 		313AEDA1287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */; };
+		313B6A4F2A6EB19C00601B75 /* TabCleanupPreparer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D36F4232A3B85C50052B527 /* TabCleanupPreparer.swift */; };
+		313B6A502A6EB1B900601B75 /* HTTPCookie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA6D0FC2A1FF9A100540406 /* HTTPCookie.swift */; };
 		3154FD1428E6011A00909769 /* TabShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3154FD1328E6011A00909769 /* TabShadowView.swift */; };
 		315AA07028CA5CC800200030 /* YoutubePlayerNavigationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */; };
 		3171D6B82889849F0068632A /* CookieManagedNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */; };
@@ -8657,6 +8659,7 @@
 				3192A01F2A4C4CFF0084EA89 /* SafariBookmarksReader.swift in Sources */,
 				3192A0202A4C4CFF0084EA89 /* SafariVersionReader.swift in Sources */,
 				3192A0212A4C4CFF0084EA89 /* LoginFaviconView.swift in Sources */,
+				313B6A4F2A6EB19C00601B75 /* TabCleanupPreparer.swift in Sources */,
 				3192A0222A4C4CFF0084EA89 /* FireproofDomainsViewController.swift in Sources */,
 				3192A0232A4C4CFF0084EA89 /* URLEventHandler.swift in Sources */,
 				3192A0242A4C4CFF0084EA89 /* WKWebViewExtension.swift in Sources */,
@@ -8907,6 +8910,7 @@
 				3192A1182A4C4CFF0084EA89 /* SavePaymentMethodViewController.swift in Sources */,
 				3192A1192A4C4CFF0084EA89 /* BWStatus.swift in Sources */,
 				3192A11A2A4C4CFF0084EA89 /* WebKitVersionProvider.swift in Sources */,
+				313B6A502A6EB1B900601B75 /* HTTPCookie.swift in Sources */,
 				3192A11B2A4C4CFF0084EA89 /* NSCoderExtensions.swift in Sources */,
 				3192A11C2A4C4CFF0084EA89 /* RunningApplicationCheck.swift in Sources */,
 				3192A11D2A4C4CFF0084EA89 /* StatePersistenceService.swift in Sources */,
