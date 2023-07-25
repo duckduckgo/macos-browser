@@ -27,7 +27,7 @@ protocol WebOperationRunner {
 }
 
 @MainActor
-final class TestOperationRunner: WebOperationRunner {
+final class DataBrokerOperationRunner: WebOperationRunner {
     var privacyConfigManager: PrivacyConfigurationManaging
     var contentScopeProperties: ContentScopeProperties
 
