@@ -48,27 +48,28 @@ final class DataBrokerProtectionProcessor {
     }
 
     // MARK: - Public functions
-    func runScanOnAllDataBrokers(completion: (() -> Void)? = nil ) {
+    func runScanOnAllDataBrokers(useFakeBroker: Bool, completion: (() -> Void)? = nil ) {
         operationQueue.cancelAllOperations()
-        runOperations(operationType: .scan, priorityDate: nil) {
+        runOperations(useFakeBroker: useFakeBroker, operationType: .scan, priorityDate: nil) {
             os_log("Scans done", log: .dataBrokerProtection)
             completion?()
         }
     }
 
-    func runQueuedOperations(completion: (() -> Void)? = nil ) {
-        runOperations(operationType: .all, priorityDate: Date()) {
+    func runQueuedOperations(useFakeBroker: Bool, completion: (() -> Void)? = nil ) {
+        runOperations(useFakeBroker: useFakeBroker, operationType: .all, priorityDate: Date()) {
             os_log("Queued operations done", log: .dataBrokerProtection)
             completion?()
         }
     }
 
     // MARK: - Private functions
-    private func runOperations(operationType: DataBrokerOperationsCollection.OperationType,
+    private func runOperations(useFakeBroker: Bool,
+                               operationType: DataBrokerOperationsCollection.OperationType,
                                priorityDate: Date?,
                                completion: @escaping () -> Void) {
 
-        let brokersProfileData = database.fetchAllBrokerProfileQueryData()
+        let brokersProfileData = database.fetchAllBrokerProfileQueryData(useFakeBroker: useFakeBroker)
         let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
                                                                                   operationType: operationType,
                                                                                   priorityDate: priorityDate)

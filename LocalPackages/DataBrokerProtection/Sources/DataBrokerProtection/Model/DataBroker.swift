@@ -30,6 +30,10 @@ struct DataBroker: Codable, Sendable {
     let steps: [Step]
     let schedulingConfig: DataBrokerScheduleConfig
 
+    var isFakeBroker: Bool {
+        name.contains("fake") // A future improvement will be to add a property in the JSON file.
+    }
+
     enum CodingKeys: CodingKey {
         case name
         case steps

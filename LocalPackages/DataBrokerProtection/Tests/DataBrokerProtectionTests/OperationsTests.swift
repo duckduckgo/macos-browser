@@ -484,7 +484,7 @@ private struct MockDataBase: DataBase {
         return [data]
     }
 
-    func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
+    func fetchAllBrokerProfileQueryData(useFakeBroker: Bool) -> [BrokerProfileQueryData] {
         let data = BrokerProfileQueryData(id: UUID(),
             profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46),
             dataBroker: DataBroker(name: "batata",
