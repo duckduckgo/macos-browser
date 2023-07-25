@@ -40,7 +40,7 @@ final class ProcessorTests: XCTestCase {
 
         let expectedScanDate = Date().addingTimeInterval(database.commonScheduleConfig.maintenanceScan)
 
-        scheduler.runScanOnAllDataBrokers {
+        scheduler.runScanOnAllDataBrokers(useFakeBroker: false) {
             database.brokerProfileQueryDataList.forEach {
                 XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: $0.scanData.preferredRunDate))
             }
@@ -69,7 +69,7 @@ final class ProcessorTests: XCTestCase {
 
         let expectation = XCTestExpectation(description: "All opt out finished.")
 
-        scheduler.runQueuedOperations()
+        scheduler.runQueuedOperations(useFakeBroker: false)
 
         var notificationCounter = 0
         let expectedScanDate = Date().addingTimeInterval(database.commonScheduleConfig.confirmOptOutScan)
@@ -247,7 +247,7 @@ private struct MockDataBase: DataBase {
         return [data]
     }
 
-    func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
+    func fetchAllBrokerProfileQueryData(useFakeBroker: Bool) -> [BrokerProfileQueryData] {
         brokerProfileQueryDataList
     }
 

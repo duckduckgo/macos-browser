@@ -159,7 +159,7 @@ struct CaptchaService: CaptchaServiceProtocol {
         }
         os_log("Submitting captcha request ...", log: .service)
         var request = URLRequest(url: url)
-        request.setValue(Headers.authorizationHeader, forHTTPHeaderField: "Authorization")
+        request.setValue(HTTPUtils.authorizationHeader, forHTTPHeaderField: "Authorization")
         request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
 
         let bodyObject: [String: Any] = [
@@ -214,7 +214,7 @@ struct CaptchaService: CaptchaServiceProtocol {
         }
 
         var request = URLRequest(url: url)
-        request.setValue(Headers.authorizationHeader, forHTTPHeaderField: "Authorization")
+        request.setValue(HTTPUtils.authorizationHeader, forHTTPHeaderField: "Authorization")
         request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "GET"
 
