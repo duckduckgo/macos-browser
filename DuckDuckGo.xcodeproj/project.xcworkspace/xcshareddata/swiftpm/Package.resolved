@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "108c35936ebf8847709e8e33c1ce69e25366cea6",
-        "version" : "68.1.1"
+        "branch" : "bartek/attribution-pixels",
+        "revision" : "1ea5d159eaca95b35eac267223e66227347c61a2"
       }
     },
     {
