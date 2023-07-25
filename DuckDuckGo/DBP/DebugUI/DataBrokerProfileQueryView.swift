@@ -145,13 +145,12 @@ struct ModalView: View {
 
     private func labelForEvent(_ event: HistoryEvent) -> String {
         switch event.type {
-
         case .noMatchFound:
             return "No match found"
         case .matchFound(extractedProfileID: let extractedProfileID):
             return "Match found \(extractedProfileID)"
-        case .error:
-            return "Error"
+        case .error(error: let error):
+            return labelForErrorEvent(error)
         case .optOutStarted(extractedProfileID: let extractedProfileID):
             return "Opt-out started \(extractedProfileID)"
         case .optOutRequested(extractedProfileID: let extractedProfileID):
@@ -160,6 +159,33 @@ struct ModalView: View {
             return "Opt-out confirmed \(extractedProfileID)"
         case .scanStarted:
             return "Scan Started"
+        }
+    }
+
+    private func labelForErrorEvent(_ error: DataBrokerProtectionError) -> String {
+        switch error {
+        case .malformedURL:
+            return "malformedURL"
+        case .noActionFound:
+            return "noActionFound"
+        case .actionFailed(actionID: let actionID, message: let message):
+            return "actionFailed \(actionID) \(message)"
+        case .parsingErrorObjectFailed:
+            return "parsingErrorObjectFailed"
+        case .unknownMethodName:
+            return "unknownMethodName"
+        case .userScriptMessageBrokerNotSet:
+            return "userScriptMessageBrokerNotSet"
+        case .unknown(let value):
+            return "unknown \(value)"
+        case .unrecoverableError:
+            return "unrecoverableError"
+        case .noOptOutStep:
+            return "noOptOutStep"
+        case .captchaServiceError(let captchaError):
+            return "captchaServiceError \(captchaError)"
+        case .emailError(let emailError):
+            return "emailError \(String(describing: emailError))"
         }
     }
 }
