@@ -339,10 +339,10 @@ final class TabTests: XCTestCase {
 
     @MainActor
     func testIfTabIsBurner_ThenFaviconManagerIsInMemory() throws {
-        let tab = Tab(content: .homePage, isBurner: false)
+        let tab = Tab(content: .homePage)
         XCTAssertTrue(tab.faviconManagement === FaviconManager.shared)
 
-        let burnerTab = Tab(content: .homePage, isBurner: true)
+        let burnerTab = Tab(content: .homePage, burnerStatus: BurnerStatus(isBurner: true))
         XCTAssertTrue(burnerTab.faviconManagement !== FaviconManager.shared)
     }
 
