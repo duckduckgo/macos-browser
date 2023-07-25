@@ -938,6 +938,9 @@ extension TabBarViewController: NSCollectionViewDelegate {
         // dropping a tab, dropping of url handled in collectionView:acceptDrop:
         guard session.draggingPasteboard.types == [TabBarViewItemPasteboardWriter.utiInternalType] else { return }
 
+        // Don't allow drag and drop from Burner Window
+        guard !tabCollectionViewModel.burnerStatus.isBurner else { return }
+
         defer {
             TabDragAndDropManager.shared.clear()
         }
