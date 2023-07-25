@@ -53,8 +53,6 @@ final class NetworkProtectionLoginItemsManager {
     // MARK: - Debug Interactions
 
     func resetLoginItems() async throws {
-        // Since dispatch queues are non-reentrant, we'll just run this asynchronously whenever there's
-        //
         Self.loginItems.forEach { loginItem in
             try? loginItem.disable()
         }
