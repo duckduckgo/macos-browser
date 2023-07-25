@@ -176,7 +176,7 @@ final class NetworkProtectionDebugMenuController: NSObject {
 
 extension NetworkProtectionDebugMenuController: NSMenuItemValidation {
 
-    // swiftlint:disable:next function_body_length cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         switch menuItem.action {
         case #selector(NetworkProtectionDebugMenuController.setSelectedServer(_:)):
