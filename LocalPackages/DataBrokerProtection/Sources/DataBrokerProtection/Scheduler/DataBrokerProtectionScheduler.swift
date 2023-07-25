@@ -68,14 +68,14 @@ public final class DataBrokerProtectionScheduler {
         self.notificationCenter = notificationCenter
     }
 
-    public func start(debug: Bool = false) {
+    public func start(useFakeBrokers: Bool, debug: Bool = true) {
         os_log("Starting scheduler...", log: .dataBrokerProtection)
         if debug {
-            self.dataBrokerProcessor.runQueuedOperations()
+            self.dataBrokerProcessor.runQueuedOperations(useFakeBroker: useFakeBrokers)
         } else {
             activity.schedule { completion in
                 os_log("Scheduler runnning...", log: .dataBrokerProtection)
-                self.dataBrokerProcessor.runQueuedOperations {
+                self.dataBrokerProcessor.runQueuedOperations(useFakeBroker: useFakeBrokers) {
                     completion(.finished)
                 }
             }
@@ -87,9 +87,9 @@ public final class DataBrokerProtectionScheduler {
         activity.invalidate()
     }
 
-    public func scanAllBrokers() {
+    public func scanAllBrokers(useFakeBrokers: Bool) {
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
-        self.dataBrokerProcessor.runScanOnAllDataBrokers()
+        self.dataBrokerProcessor.runScanOnAllDataBrokers(useFakeBroker: useFakeBrokers)
     }
 
 }
