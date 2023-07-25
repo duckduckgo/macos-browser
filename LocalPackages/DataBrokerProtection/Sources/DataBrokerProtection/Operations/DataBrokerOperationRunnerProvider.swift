@@ -25,7 +25,7 @@ struct DataBrokerOperationRunnerProvider: OperationRunnerProvider {
 
     @MainActor
     func getOperationRunner() -> WebOperationRunner {
-        TestOperationRunner(privacyConfigManager: privacyConfigManager,
+        DataBrokerOperationRunner(privacyConfigManager: privacyConfigManager,
                             contentScopeProperties: contentScopeProperties)
     }
 }
