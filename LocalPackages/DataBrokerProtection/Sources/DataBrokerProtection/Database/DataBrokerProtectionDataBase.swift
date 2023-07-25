@@ -18,12 +18,16 @@
 
 import Foundation
 
+public struct DataBrokerProtectionDataBaseKeys {
+    public static let useFakeBrokerKey = "useFakeBrokerKey"
+}
+
 protocol DataBase {
     func brokerProfileQueryData(for profileQuery: ProfileQuery, dataBroker: DataBroker) -> BrokerProfileQueryData?
     func saveOperationData(_ data: BrokerOperationData)
     func scanOperationData(for profileQueryID: UUID) -> ScanOperationData
     func optOutOperationData(for profileQueryID: UUID) -> [OptOutOperationData]
-    func fetchAllBrokerProfileQueryData(useFakeBroker: Bool) -> [BrokerProfileQueryData]
+    func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData]
     func brokerProfileQueryData(for id: UUID) -> BrokerProfileQueryData?
 }
 
@@ -64,13 +68,18 @@ final class DataBrokerProtectionDataBase: DataBase {
         return [data]
     }
 
-    func fetchAllBrokerProfileQueryData(useFakeBroker: Bool) -> [BrokerProfileQueryData] {
+    func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
+        return brokerProfileQueriesData
+    }
+
+    func setupFakeData() {
         self.dataBrokers.removeAll()
         self.brokerProfileQueriesData.removeAll()
 
+        let shouldUseFakeBroker = UserDefaults.standard.bool(forKey: DataBrokerProtectionDataBaseKeys.useFakeBrokerKey)
         var dataBroker: DataBroker
 
-        if useFakeBroker {
+        if shouldUseFakeBroker {
             dataBroker = DataBroker.initFromResource("fake.verecor.com")
         } else {
             dataBroker = DataBroker.initFromResource("verecor.com")
@@ -81,7 +90,5 @@ final class DataBrokerProtectionDataBase: DataBase {
 
         self.dataBrokers.append(dataBroker)
         self.brokerProfileQueriesData.append(queryData)
-
-        return brokerProfileQueriesData
     }
 }

@@ -28,7 +28,6 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
     var fakeBrokerSwitch: NSSwitch!
 
     private var isSchedulerRunning = false
-    private var shouldUseFakeBroker = false
     private let dataManager = DataBrokerProtectionDataManager()
 
     private var scheduler: DataBrokerProtectionScheduler?
@@ -78,7 +77,14 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
         fakeBrokerTitle.drawsBackground = false
 
         fakeBrokerSwitch = NSSwitch()
-        fakeBrokerSwitch.state = NSControl.StateValue.off
+
+        let isFakeBrokerSwitchTurnedOn = UserDefaults.standard.bool(forKey: DataBrokerProtectionDataBaseKeys.useFakeBrokerKey)
+        if  isFakeBrokerSwitchTurnedOn {
+            fakeBrokerSwitch.state = NSSwitch.StateValue.on
+        } else {
+            fakeBrokerSwitch.state = NSSwitch.StateValue.off
+        }
+
         fakeBrokerSwitch.action = #selector(useFakeBrokerValueChanged(_:))
         fakeBrokerSwitch.target = self
 
@@ -111,7 +117,7 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
         if isSchedulerRunning {
             scheduler?.stop()
         } else {
-            scheduler?.start(useFakeBrokers: shouldUseFakeBroker)
+            scheduler?.start()
         }
         isSchedulerRunning.toggle()
 
@@ -124,15 +130,18 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
     }
 
     @objc func startScanButtonPressed() {
-        scheduler?.scanAllBrokers(useFakeBrokers: shouldUseFakeBroker)
+        scheduler?.scanAllBrokers()
     }
 
     @objc func useFakeBrokerValueChanged(_ sender: NSSwitch) {
         if sender.state == NSControl.StateValue.on {
-            shouldUseFakeBroker = true
+            UserDefaults.standard.set(true, forKey: DataBrokerProtectionDataBaseKeys.useFakeBrokerKey)
         } else {
-            shouldUseFakeBroker = false
+            UserDefaults.standard.set(false, forKey: DataBrokerProtectionDataBaseKeys.useFakeBrokerKey)
         }
+
+        // This kicks a reload in the fake database
+        _ = dataManager.fetchProfile()
     }
 
     private func setupScheduler() {

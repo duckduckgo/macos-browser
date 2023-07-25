@@ -41,6 +41,7 @@ public class DataBrokerProtectionDataManager {
 
             // Test
             self.database.testProfileQuery = profile.profileQueries.first
+            self.database.setupFakeData()
         } catch {
             fatalError("Should never happen")
         }
@@ -54,6 +55,7 @@ public class DataBrokerProtectionDataManager {
 
                 // Test
                 self.database.testProfileQuery = profile.profileQueries.first
+                self.database.setupFakeData()
 
                 return profile
             } catch {
