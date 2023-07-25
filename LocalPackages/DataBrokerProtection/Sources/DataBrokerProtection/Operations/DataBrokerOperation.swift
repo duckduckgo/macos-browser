@@ -107,11 +107,11 @@ extension DataBrokerOperation {
         self.continuation = nil
     }
 
-    func initialize(handler: WebViewHandler?) async {
+    func initialize(handler: WebViewHandler?, isFakeBroker: Bool = false) async {
         if let handler = handler { // This help us swapping up the WebViewHandler on tests
             self.webViewHandler = handler
         } else {
-            self.webViewHandler = await DataBrokerProtectionWebViewHandler(privacyConfig: privacyConfig, prefs: prefs, delegate: self)
+            self.webViewHandler = await DataBrokerProtectionWebViewHandler(privacyConfig: privacyConfig, prefs: prefs, delegate: self, isFakeBroker: isFakeBroker)
         }
 
         await webViewHandler?.initializeWebView(debug: true)
