@@ -51,7 +51,7 @@ struct EmailService: EmailServiceProtocol {
         }
 
         var request = URLRequest(url: url)
-        request.setValue(Headers.authorizationHeader, forHTTPHeaderField: "Authorization")
+        request.setValue(HTTPUtils.authorizationHeader, forHTTPHeaderField: "Authorization")
 
         let (data, _) = try await urlSession.data(for: request)
 
@@ -93,7 +93,7 @@ struct EmailService: EmailServiceProtocol {
         }
 
         var request = URLRequest(url: url)
-        request.setValue(Headers.authorizationHeader, forHTTPHeaderField: "Authorization")
+        request.setValue(HTTPUtils.authorizationHeader, forHTTPHeaderField: "Authorization")
 
         let (data, _) = try await urlSession.data(for: request)
 

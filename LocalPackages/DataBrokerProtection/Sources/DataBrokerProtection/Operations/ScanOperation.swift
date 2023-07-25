@@ -58,7 +58,7 @@ final class ScanOperation: DataBrokerOperation {
         try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
             Task {
-                await initialize(handler: webViewHandler)
+                await initialize(handler: webViewHandler, isFakeBroker: query.dataBroker.isFakeBroker)
 
                 do {
                     let scanStep = try query.dataBroker.scanStep()

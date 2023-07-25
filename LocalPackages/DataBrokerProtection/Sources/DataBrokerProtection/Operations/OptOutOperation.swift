@@ -60,7 +60,7 @@ final class OptOutOperation: DataBrokerOperation {
             self.continuation = continuation
 
             Task {
-                await initialize(handler: webViewHandler)
+                await initialize(handler: webViewHandler, isFakeBroker: query.dataBroker.isFakeBroker)
 
                 do {
                     if let optOutStep = try query.dataBroker.optOutStep() {
