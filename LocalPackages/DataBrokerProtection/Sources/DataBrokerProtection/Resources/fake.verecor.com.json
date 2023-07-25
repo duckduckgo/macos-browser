@@ -1,0 +1,113 @@
+{
+    "name": "verecor.com (fake)",
+    "addedDatetime": 1677128400000,
+    "steps": [
+      {
+        "stepType": "scan",
+        "searchType": "templatedUrl",
+        "actions": [
+          {
+            "actionType": "navigate",
+            "id": "aae65490-62b2-4463-ba85-b831ede5f569",
+            "url": "https://testbroker.ddh.gg/verecor/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age}"
+          },
+          {
+            "actionType": "extract",
+            "id": "71b9ec11-6f83-49a9-843a-bd9d3f96d32e",
+            "selector": ".search-item",
+            "profile": {
+              "name": "div.col-sm-24.col-md-19.col-text",
+              "alternativeNamesList": ".name",
+              "age": ".age",
+              "addressCityStateList": ".location",
+              "profileUrl": "a"
+            }
+          }
+        ]
+      },
+      {
+        "stepType": "optOut",
+        "optOutType": "formOptOut",
+        "actions": [
+          {
+            "actionType": "navigate",
+            "id": "b4f0fa35-e658-4bec-8de1-d4c08448d5e7",
+            "url": "https://testbroker.ddh.gg/verecor/optout"
+          },
+          {
+            "actionType": "fillForm",
+            "id": "a69223f8-4b46-45b6-8141-91e095196567",
+            "selector": ".ahm",
+            "elements": [
+              {
+                "type": "fullName",
+                "selector": "#user_name"
+              },
+              {
+                "type": "email",
+                "selector": "#user_email"
+              },
+              {
+                "type": "profileUrl",
+                "selector": "#url"
+              }
+            ]
+          },
+          {
+            "actionType": "getCaptchaInfo",
+            "id": "21f76551-ffc1-4da2-94bb-bf03599f3fe7",
+            "selector": ".g-recaptcha"
+          },
+          {
+            "actionType": "solveCaptcha",
+            "id": "22bd8b72-4067-403e-8034-f3b69fb277c7",
+            "selector": ".g-recaptcha"
+          },
+          {
+            "actionType": "click",
+            "id": "7f037d47-55ea-4213-8a73-5953ebabb5ec",
+            "elements": [
+              {
+                "type": "button",
+                "selector": ".btn-sbmt"
+              }
+            ]
+          },
+          {
+            "actionType": "expectation",
+            "id": "8a85f9be-5aab-44f6-b11c-a9051d3a74c8",
+            "expectations": [
+              {
+                "type": "text",
+                "selector": "body",
+                "expect": "Your removal request has been received"
+              }
+            ]
+          },
+          {
+            "actionType": "emailConfirmation",
+            "id": "381209d7-6fd9-44fe-b73a-99d8e44fd83a",
+            "pollingTime": 30
+          },
+          {
+            "actionType": "expectation",
+            "id": "a98e7a72-a56c-4f5d-b501-bd46c42b930c",
+            "expectations": [
+              {
+                "type": "text",
+                "selector": "body",
+                "expect": "Your information control request has been confirmed."
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "schedulingConfig": {
+      "retryError": 48,
+      "confirmOptOutScan": 72,
+      "maintenanceScan": 240
+    }
+  }
+  
+  

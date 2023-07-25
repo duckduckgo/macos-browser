@@ -24,7 +24,11 @@ import Common
 final class DataBrokerProtectionDebugViewController: NSViewController {
     var startSchedulerButton: NSButton!
     var startScanButton: NSButton!
+    var fakeBrokerTitle: NSTextField!
+    var fakeBrokerSwitch: NSSwitch!
+
     private var isSchedulerRunning = false
+    private var shouldUseFakeBroker = false
     private let dataManager = DataBrokerProtectionDataManager()
 
     private var scheduler: DataBrokerProtectionScheduler?
@@ -65,8 +69,23 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
         startSchedulerButton = NSButton(title: "Start Scheduler", target: self, action: #selector(schedulerActionToggleButtonPressed))
         startScanButton = NSButton(title: "Start Scan", target: self, action: #selector(startScanButtonPressed))
 
+        fakeBrokerTitle = NSTextField()
+        fakeBrokerTitle.stringValue = "Use Fake Brokers?"
+        fakeBrokerTitle.alignment = .left
+        fakeBrokerTitle.isEditable = false
+        fakeBrokerTitle.isSelectable = false
+        fakeBrokerTitle.isBezeled = false
+        fakeBrokerTitle.drawsBackground = false
+
+        fakeBrokerSwitch = NSSwitch()
+        fakeBrokerSwitch.state = NSControl.StateValue.off
+        fakeBrokerSwitch.action = #selector(useFakeBrokerValueChanged(_:))
+        fakeBrokerSwitch.target = self
+
         view.addSubview(startSchedulerButton)
         view.addSubview(startScanButton)
+        view.addSubview(fakeBrokerTitle)
+        view.addSubview(fakeBrokerSwitch)
     }
 
     private func layoutDebugScreen() {
@@ -82,15 +101,17 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
         let buttonY = view.bounds.height - CGFloat(3) * (buttonHeight + spacing)
 
         startSchedulerButton.frame = CGRect(x: view.bounds.width - buttonWidth - spacing, y: buttonY, width: buttonWidth, height: buttonHeight)
-
         startScanButton.frame = CGRect(x: view.bounds.width - buttonWidth - spacing, y: buttonY + buttonHeight + spacing, width: buttonWidth, height: buttonHeight)
+
+        fakeBrokerTitle.frame = NSRect(x: view.bounds.width - buttonWidth - spacing, y: buttonY - (buttonHeight + buttonHeight * 0.3), width: buttonWidth, height: buttonHeight)
+        fakeBrokerSwitch.frame = NSRect(x: view.bounds.width - buttonWidth - spacing + 32, y: buttonY - buttonHeight, width: buttonWidth, height: buttonHeight)
     }
 
     @objc func schedulerActionToggleButtonPressed() {
         if isSchedulerRunning {
             scheduler?.stop()
         } else {
-            scheduler?.start()
+            scheduler?.start(useFakeBrokers: shouldUseFakeBroker)
         }
         isSchedulerRunning.toggle()
 
@@ -103,7 +124,15 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
     }
 
     @objc func startScanButtonPressed() {
-        scheduler?.scanAllBrokers()
+        scheduler?.scanAllBrokers(useFakeBrokers: shouldUseFakeBroker)
+    }
+
+    @objc func useFakeBrokerValueChanged(_ sender: NSSwitch) {
+        if sender.state == NSControl.StateValue.on {
+            shouldUseFakeBroker = true
+        } else {
+            shouldUseFakeBroker = false
+        }
     }
 
     private func setupScheduler() {
