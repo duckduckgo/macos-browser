@@ -16,9 +16,20 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Common
 import Foundation
 import NetworkProtection
+
+#if !NETWORK_PROTECTION
+
+/// App store placedholder.  Should be replaced with the actual thing once we enable NetP in App Store builds.
+///
+@objc
+final class NetworkProtectionDebugMenuController: NSObject {
+}
+
+#else
 
 /// Controller for the Network Protection debug menu.
 ///
@@ -27,9 +38,7 @@ final class NetworkProtectionDebugMenuController: NSObject {
 
     // MARK: - Debug Logic
 
-#if NETWORK_PROTECTION
     private let debugUtilities = NetworkProtectionDebugUtilities()
-#endif
 
     // MARK: - Debug Menu IBActions
 
@@ -37,7 +46,6 @@ final class NetworkProtectionDebugMenuController: NSObject {
     ///
     @IBAction
     func resetAllState(_ sender: Any?) {
-#if NETWORK_PROTECTION
         Task { @MainActor in
             guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
 
@@ -47,14 +55,12 @@ final class NetworkProtectionDebugMenuController: NSObject {
                 await NSAlert(error: error).runModal()
             }
         }
-#endif
     }
 
     /// Removes the system extension and agents for Network Protection.
     ///
     @IBAction
     func removeSystemExtensionAndAgents(_ sender: Any?) {
-#if NETWORK_PROTECTION
         Task { @MainActor in
             guard case .alertFirstButtonReturn = await NSAlert.removeSystemExtensionAndAgentsAlert().runModal() else { return }
 
@@ -64,14 +70,12 @@ final class NetworkProtectionDebugMenuController: NSObject {
                 await NSAlert(error: error).runModal()
             }
         }
-#endif
     }
 
     /// Sends a test user notification.
     ///
     @IBAction
     func sendTestNotification(_ sender: Any?) {
-#if NETWORK_PROTECTION
         Task { @MainActor in
             do {
                 try await debugUtilities.sendTestNotificationRequest()
@@ -79,14 +83,12 @@ final class NetworkProtectionDebugMenuController: NSObject {
                 await NSAlert(error: error).runModal()
             }
         }
-#endif
     }
 
     /// Sets the selected server.
     ///
     @IBAction
     func setSelectedServer(_ sender: Any?) {
-#if NETWORK_PROTECTION
         guard let title = (sender as? NSMenuItem)?.title else {
             assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
             return
@@ -102,25 +104,21 @@ final class NetworkProtectionDebugMenuController: NSObject {
         }
 
         debugUtilities.setSelectedServer(selectedServer: selectedServer)
-#endif
     }
 
     /// Expires the registration key immediately.
     ///
     @IBAction
     func expireRegistrationKeyNow(_ sender: Any?) {
-#if NETWORK_PROTECTION
         Task {
             try? await debugUtilities.expireRegistrationKeyNow()
         }
-#endif
     }
 
     /// Sets the registration key validity.
     ///
     @IBAction
     func setRegistrationKeyValidity(_ sender: Any?) {
-#if NETWORK_PROTECTION
         guard let menuItem = sender as? NSMenuItem else {
             assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
             return
@@ -137,14 +135,12 @@ final class NetworkProtectionDebugMenuController: NSObject {
                 os_log("Could not override the key validity due to an error: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
             }
         }
-#endif
     }
 
     /// Simulates a controller failure the next time Network Protection is started.
     ///
     @IBAction
     func simulateControllerFailure(_ sender: Any?) {
-#if NETWORK_PROTECTION
         guard let menuItem = sender as? NSMenuItem else {
             assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
             return
@@ -157,14 +153,12 @@ final class NetworkProtectionDebugMenuController: NSObject {
         }
 
         NetworkProtectionTunnelController.simulationOptions.setEnabled(menuItem.state == .on, option: .controllerFailure)
-#endif
     }
 
     /// Simulates a tunnel failure the next time Network Protection is started.
     ///
     @IBAction
     func simulateTunnelFailure(_ sender: Any?) {
-#if NETWORK_PROTECTION
         guard let menuItem = sender as? NSMenuItem else {
             assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
             return
@@ -177,7 +171,6 @@ final class NetworkProtectionDebugMenuController: NSObject {
         }
 
         NetworkProtectionTunnelController.simulationOptions.setEnabled(menuItem.state == .on, option: .tunnelFailure)
-#endif
     }
 }
 
@@ -187,7 +180,6 @@ extension NetworkProtectionDebugMenuController: NSMenuItemValidation {
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         switch menuItem.action {
         case #selector(NetworkProtectionDebugMenuController.setSelectedServer(_:)):
-#if NETWORK_PROTECTION
             let selectedServerName = debugUtilities.selectedServerName()
 
             switch menuItem.title {
@@ -203,15 +195,11 @@ extension NetworkProtectionDebugMenuController: NSMenuItemValidation {
             }
 
             return true
-#else
-            return false
-#endif
 
         case #selector(NetworkProtectionDebugMenuController.expireRegistrationKeyNow(_:)):
             return true
 
         case #selector(NetworkProtectionDebugMenuController.setRegistrationKeyValidity(_:)):
-#if NETWORK_PROTECTION
             let selectedValidity = debugUtilities.registrationKeyValidity()
 
             switch menuItem.title {
@@ -230,28 +218,19 @@ extension NetworkProtectionDebugMenuController: NSMenuItemValidation {
             }
 
             return true
-#else
-            return false
-#endif
 
         case #selector(NetworkProtectionDebugMenuController.simulateControllerFailure(_:)):
-#if NETWORK_PROTECTION
             menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.controllerFailure) ? .on : .off
             return true
-#else
-            return false
-#endif
 
         case #selector(NetworkProtectionDebugMenuController.simulateTunnelFailure(_:)):
-#if NETWORK_PROTECTION
             menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
             return true
-#else
-            return false
-#endif
 
         default:
             return true
         }
     }
 }
+
+#endif
