@@ -33,22 +33,22 @@ final class DuckPlayerTests: XCTestCase {
         )
     }
 
-//    func testThatImageForFaviconViewReturnsHardcodedFaviconForDuckPlayer() {
-//        let duckPlayerFaviconView = FaviconView(url: DuckPlayer.commonName)
-//        let otherFaviconView = FaviconView(url: URL(string: "example.com"))
-//
-//        duckPlayer.mode = .enabled
-//        XCTAssertEqual(duckPlayer.image(for: duckPlayerFaviconView), NSImage.duckPlayer)
-//        XCTAssertNil(duckPlayer.image(for: otherFaviconView))
-//
-//        duckPlayer.mode = .alwaysAsk
-//        XCTAssertEqual(duckPlayer.image(for: duckPlayerFaviconView), NSImage.duckPlayer)
-//        XCTAssertNil(duckPlayer.image(for: otherFaviconView))
-//
-//        duckPlayer.mode = .disabled
-//        XCTAssertNil(duckPlayer.image(for: duckPlayerFaviconView))
-//        XCTAssertNil(duckPlayer.image(for: otherFaviconView))
-//    }
+    func testThatImageForFaviconViewReturnsHardcodedFaviconForDuckPlayer() {
+        let duckPlayerFaviconView = FaviconView(url: duckPlayerURL())
+        let otherFaviconView = FaviconView(url: URL(string: "example.com"))
+
+        duckPlayer.mode = .enabled
+        XCTAssertEqual(duckPlayer.image(for: duckPlayerFaviconView), NSImage.duckPlayer)
+        XCTAssertNil(duckPlayer.image(for: otherFaviconView))
+
+        duckPlayer.mode = .alwaysAsk
+        XCTAssertEqual(duckPlayer.image(for: duckPlayerFaviconView), NSImage.duckPlayer)
+        XCTAssertNil(duckPlayer.image(for: otherFaviconView))
+
+        duckPlayer.mode = .disabled
+        XCTAssertNil(duckPlayer.image(for: duckPlayerFaviconView))
+        XCTAssertNil(duckPlayer.image(for: otherFaviconView))
+    }
 
     func testThatDomainForRecentlyVisitedSiteIsReturnedForDuckPlayerURLs() {
         duckPlayer.mode = .enabled
