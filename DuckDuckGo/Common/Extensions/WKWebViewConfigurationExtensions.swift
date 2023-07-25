@@ -23,10 +23,9 @@ import BrowserServicesKit
 extension WKWebViewConfiguration {
 
     @MainActor
-    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, isBurner: Bool) {
-        if isBurner {
-            // Set a new independent website data store for each burner tab
-            websiteDataStore = .nonPersistent()
+    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, burnerStatus: BurnerStatus) {
+        if case .burner(let websiteDataStore) = burnerStatus {
+            self.websiteDataStore = websiteDataStore
         }
         allowsAirPlayForMediaPlayback = true
         if #available(macOS 12.3, *) {

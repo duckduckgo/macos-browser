@@ -306,7 +306,7 @@ final class AddressBarTextField: NSTextField {
 
         let tab = Tab(content: .url(url, userEntered: userEnteredValue),
                       shouldLoadInBackground: true,
-                      isBurner: isBurner)
+                      burnerStatus: tabCollectionViewModel.burnerStatus)
         tabCollectionViewModel.append(tab: tab, selected: selected)
     }
 

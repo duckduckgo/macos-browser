@@ -81,8 +81,6 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         // popup kind is known, action doesn‘t require Popup Permission
         case .allow(let targetKind):
             // proceed to web view creation
-            // in case of burner tab, we aren't using existing configuration in order to create separate context
-            let configuration = isBurner ? nil : configuration
             completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
             return
         // action doesn‘t require Popup Permission as it‘s user-initiated
@@ -91,7 +89,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         case .none where navigationAction.isUserInitiated == true:
             // try to guess popup kind from provided windowFeatures
             let shouldSelectNewTab = !NSApp.isCommandPressed // this is actually not correct, to be fixed later
-            let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab, isBurner: isBurner)
+            let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab, isBurner: burnerStatus.isBurner)
             // proceed to web view creation
             completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
             return
@@ -135,44 +133,29 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         // allow popups opened from an empty window console
         let sourceUrl = navigationAction.safeSourceFrame?.safeRequest?.url ?? self.url ?? .empty
         if sourceUrl.isEmpty || sourceUrl.scheme == URL.NavigationalScheme.about.rawValue {
-            return .allow(.tab(selected: true, burner: isBurner))
+            return .allow(.tab(selected: true, burner: burnerStatus.isBurner))
         }
 
         return nil
     }
 
     /// create a new Tab returning its WebView to a createWebViewWithConfiguration callback
-    /// return nil for burner tab
     @MainActor
-    private func createWebView(from webView: WKWebView, with configuration: WKWebViewConfiguration?, for navigationAction: WKNavigationAction, of kind: NewWindowPolicy) -> WKWebView? {
+    private func createWebView(from webView: WKWebView, with configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, of kind: NewWindowPolicy) -> WKWebView? {
         guard let delegate else { return nil }
 
-        let tab: Tab
-
-        if let config = configuration {
-            tab = Tab(content: .none,
-                      webViewConfiguration: config,
+        let tab = Tab(content: .none,
+                      webViewConfiguration: configuration,
                       parentTab: self,
-                      isBurner: isBurner,
+                      burnerStatus: burnerStatus,
                       canBeClosedWithBack: kind.isSelectedTab,
                       webViewSize: webView.superview?.bounds.size ?? .zero)
-        } else {
-            assert(isBurner)
-            guard let url = navigationAction.request.url else {
-                return nil
-            }
-
-            tab = Tab(content: .url(url),
-                      parentTab: self,
-                      isBurner: isBurner,
-                      canBeClosedWithBack: kind.isSelectedTab,
-                      webViewSize: webView.superview?.bounds.size ?? .zero)
-        }
-
         delegate.tab(self, createdChild: tab, of: kind)
 
-        // If the tab was created with a configuration, we return its WebView. Otherwise, return nil.
-        return configuration != nil ? tab.webView : nil
+        let webView = tab.webView
+
+        // WebKit automatically loads the request in the returned web view.
+        return webView
     }
 
     @objc(_webView:checkUserMediaPermissionForURL:mainFrameURL:frameIdentifier:decisionHandler:)

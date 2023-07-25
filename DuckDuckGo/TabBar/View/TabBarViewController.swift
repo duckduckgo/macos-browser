@@ -388,7 +388,7 @@ final class TabBarViewController: NSViewController {
 
         let tab = tabViewModel.tab
         tabCollectionViewModel.remove(at: .unpinned(index), published: false)
-        WindowsManager.openNewWindow(with: tab, isBurner: burner, droppingPoint: droppingPoint)
+        WindowsManager.openNewWindow(with: tab, droppingPoint: droppingPoint)
     }
 
     // MARK: - Mouse Monitor
@@ -917,7 +917,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
         if let url = draggingInfo.draggingPasteboard.url {
             // dropping URL or file
             tabCollectionViewModel.insert(Tab(content: .url(url),
-                                              isBurner: tabCollectionViewModel.isBurner),
+                                              burnerStatus: tabCollectionViewModel.burnerStatus),
                                           at: .unpinned(newIndex),
                                           selected: true)
 

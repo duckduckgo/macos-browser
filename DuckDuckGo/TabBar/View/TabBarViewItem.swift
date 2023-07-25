@@ -448,12 +448,9 @@ extension TabBarViewItem: NSMenuDelegate {
         addCloseMenuItem(to: menu)
         addCloseOtherMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
         addCloseTabsToTheRightMenuItem(to: menu, areThereTabsToTheRight: otherItemsState.hasItemsToTheRight)
-        if isBurner {
-            addMoveToNewBurnerWindowMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
-        } else {
+        if !isBurner {
             addMoveToNewWindowMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
         }
-
     }
 
     private func addDuplicateMenuItem(to menu: NSMenu) {
@@ -516,13 +513,6 @@ extension TabBarViewItem: NSMenuDelegate {
         moveToNewWindowMenuItem.target = self
         moveToNewWindowMenuItem.isEnabled = areThereOtherTabs
         menu.addItem(moveToNewWindowMenuItem)
-    }
-
-    private func addMoveToNewBurnerWindowMenuItem(to menu: NSMenu, areThereOtherTabs: Bool) {
-        let moveToNewBurnerWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewBurnerWindow, action: #selector(moveToNewBurnerWindowAction(_:)), keyEquivalent: "")
-        moveToNewBurnerWindowMenuItem.target = self
-        moveToNewBurnerWindowMenuItem.isEnabled = areThereOtherTabs
-        menu.addItem(moveToNewBurnerWindowMenuItem)
     }
 
 }

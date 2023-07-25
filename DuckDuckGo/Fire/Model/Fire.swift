@@ -427,7 +427,6 @@ final class Fire {
         func replacementPinnedTab(from pinnedTab: Tab) -> Tab {
             return Tab(content: pinnedTab.content,
                        shouldLoadInBackground: true,
-                       isBurner: false,
                        shouldLoadFromCache: true)
         }
 

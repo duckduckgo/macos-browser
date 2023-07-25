@@ -63,9 +63,8 @@ final class MainViewController: NSViewController {
     }
 
     required init?(coder: NSCoder) {
-        let isBurner = false
-        self.tabCollectionViewModel = TabCollectionViewModel(isBurner: isBurner)
-        self.isBurner = isBurner
+        self.tabCollectionViewModel = TabCollectionViewModel()
+        self.isBurner = tabCollectionViewModel.isBurner
         super.init(coder: coder)
     }
 

@@ -223,7 +223,7 @@ protocol NewWindowPolicyDecisionMaker {
                      interactionStateData: Data? = nil,
                      parentTab: Tab? = nil,
                      shouldLoadInBackground: Bool = false,
-                     isBurner: Bool = false,
+                     burnerStatus: BurnerStatus = .regular,
                      shouldLoadFromCache: Bool = false,
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,
@@ -237,7 +237,7 @@ protocol NewWindowPolicyDecisionMaker {
         let privacyFeatures = privacyFeatures ?? PrivacyFeatures
         let internalUserDecider = (NSApp.delegate as? AppDelegate)?.internalUserDecider
         var faviconManager = faviconManagement
-        if isBurner {
+        if burnerStatus.isBurner {
             faviconManager = FaviconManager(cacheType: .inMemory)
         }
 
@@ -262,7 +262,7 @@ protocol NewWindowPolicyDecisionMaker {
                   interactionStateData: interactionStateData,
                   parentTab: parentTab,
                   shouldLoadInBackground: shouldLoadInBackground,
-                  isBurner: isBurner,
+                  burnerStatus: burnerStatus,
                   shouldLoadFromCache: shouldLoadFromCache,
                   canBeClosedWithBack: canBeClosedWithBack,
                   lastSelectedAt: lastSelectedAt,
@@ -292,7 +292,7 @@ protocol NewWindowPolicyDecisionMaker {
          interactionStateData: Data?,
          parentTab: Tab?,
          shouldLoadInBackground: Bool,
-         isBurner: Bool,
+         burnerStatus: BurnerStatus,
          shouldLoadFromCache: Bool,
          canBeClosedWithBack: Bool,
          lastSelectedAt: Date?,
@@ -307,14 +307,14 @@ protocol NewWindowPolicyDecisionMaker {
         self.title = title
         self.favicon = favicon
         self.parentTab = parentTab
-        self.isBurner = isBurner
+        self.burnerStatus = burnerStatus
         self._canBeClosedWithBack = canBeClosedWithBack
         self.interactionState = (interactionStateData != nil || shouldLoadFromCache) ? .loadCachedFromTabContent(interactionStateData) : .none
         self.lastSelectedAt = lastSelectedAt
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
-                                                 isBurner: isBurner)
+                                                 burnerStatus: burnerStatus)
         self.webViewConfiguration = configuration
         let userContentController = configuration.userContentController as? UserContentController
         assert(userContentController != nil)
@@ -337,7 +337,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.extensions = extensionsBuilder
             .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
                           isTabPinned: { tabGetter().map { tab in pinnedTabsManager.isTabPinned(tab) } ?? false },
-                          isTabBurner: isBurner,
+                          isTabBurner: burnerStatus.isBurner,
                           contentPublisher: _content.projectedValue.eraseToAnyPublisher(),
                           titlePublisher: _title.projectedValue.eraseToAnyPublisher(),
                           userScriptsPublisher: userScriptsPublisher,
@@ -489,7 +489,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     var isLazyLoadingInProgress = false
 
-    let isBurner: Bool
+    let burnerStatus: BurnerStatus
 
     @Published private(set) var content: TabContent {
         didSet {

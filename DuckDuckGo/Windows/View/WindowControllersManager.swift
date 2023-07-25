@@ -150,7 +150,7 @@ extension WindowControllersManager {
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
                 tab.setContent(url.map { .url($0) } ?? .homePage)
             } else {
-                let newTab = Tab(content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
+                let newTab = Tab(content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true, burnerStatus: tabCollectionViewModel.burnerStatus)
                 newTab.setContent(url.map { .url($0) } ?? .homePage)
                 tabCollectionViewModel.append(tab: newTab)
             }
@@ -175,7 +175,7 @@ extension WindowControllersManager {
         if let url = url {
             WindowsManager.openNewWindow(with: url, isBurner: false)
         } else {
-            WindowsManager.openNewWindow(isBurner: false)
+            WindowsManager.openNewWindow(burnerStatus: .regular)
         }
     }
 
