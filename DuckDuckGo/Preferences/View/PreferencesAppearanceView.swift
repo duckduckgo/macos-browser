@@ -83,6 +83,15 @@ extension Preferences {
     struct AppearanceView: View {
         @ObservedObject var model: AppearancePreferences
 
+        @State var bookmarksBarOn: Bool = false
+        var bookmarksOptionBinding: Binding<BookmarksBarAppearance> {
+            .init {
+                .disabled
+            } set: { newValue in
+                model.bookmarksBar = bookmarksBarOn ? newValue : .disabled
+            }
+        }
+
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
 
@@ -113,7 +122,27 @@ extension Preferences {
                     ToggleMenuItem(title: UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
                 }
 
-                // SECTION 4: Zoom Setting
+                // SECTION 4: Bookmarks Bar
+                PreferencePaneSection {
+                    TextMenuItemHeader(text: "Bookmarks Bar")
+                    HStack {
+                        ToggleMenuItem(title: "Show Bookmarks Bar", isOn: $bookmarksBarOn)
+                        NSPopUpButtonView(selection: bookmarksOptionBinding) {
+                            let button = NSPopUpButton()
+                            button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+
+                            let alwaysOn = button.menu?.addItem(withTitle: "Always Show", action: nil, keyEquivalent: "")
+                            alwaysOn?.representedObject = BookmarksBarAppearance.alwaysOn
+
+                            let newTabOnly = button.menu?.addItem(withTitle: "Only Show on New Tab", action: nil, keyEquivalent: "")
+                            newTabOnly?.representedObject = BookmarksBarAppearance.newTabOnly
+
+                            return button
+                        }
+                    }
+                }
+
+                // SECTION 5: Zoom Setting
                 PreferencePaneSection {
                     Text(UserText.zoomSettingTitle)
                         .font(Const.Fonts.preferencePaneSectionHeader)

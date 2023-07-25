@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import AppKit
 
 protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
@@ -26,6 +27,7 @@ protocol AppearancePreferencesPersistor {
     var isFavoriteVisible: Bool { get set }
     var isContinueSetUpVisible: Bool { get set }
     var isRecentActivityVisible: Bool { get set }
+    var bookmarksBar: BookmarksBarAppearance { get set }
 }
 
 struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
@@ -49,6 +51,18 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .homePageIsRecentActivityVisible, defaultValue: true)
     var isRecentActivityVisible: Bool
+
+    @UserDefaultsWrapper(key: .bookmarksBarAppearance, defaultValue: BookmarksBarAppearance.disabled.rawValue)
+    private var bookmarksBarValue: String
+    var bookmarksBar: BookmarksBarAppearance {
+        get {
+            return BookmarksBarAppearance(rawValue: bookmarksBarValue) ?? .disabled
+        }
+
+        set {
+            bookmarksBarValue = newValue.rawValue
+        }
+    }
 }
 
 enum DefaultZoomValue: CGFloat, CaseIterable {
@@ -170,6 +184,13 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    @Published var bookmarksBar: BookmarksBarAppearance {
+        didSet {
+            persistor.bookmarksBar = bookmarksBar
+            // TODO fire pixel
+        }
+    }
+
     func updateUserInterfaceStyle() {
         NSApp.appearance = currentThemeName.appearance
     }
@@ -183,6 +204,7 @@ final class AppearancePreferences: ObservableObject {
         isRecentActivityVisible = persistor.isRecentActivityVisible
         isContinueSetUpVisible = persistor.isContinueSetUpVisible
         defaultPageZoom =  .init(rawValue: persistor.defaultPageZoom) ?? .percent100
+        bookmarksBar = persistor.bookmarksBar
     }
 
     private var persistor: AppearancePreferencesPersistor
