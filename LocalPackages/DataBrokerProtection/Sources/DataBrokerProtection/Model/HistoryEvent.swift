@@ -22,7 +22,7 @@ public struct HistoryEvent: Sendable, Identifiable {
     public enum EventType {
         case noMatchFound
         case matchFound(extractedProfileID: UUID)
-        case error
+        case error(error: DataBrokerProtectionError)
         case optOutStarted(extractedProfileID: UUID)
         case optOutRequested(extractedProfileID: UUID)
         case optOutConfirmed(extractedProfileID: UUID)

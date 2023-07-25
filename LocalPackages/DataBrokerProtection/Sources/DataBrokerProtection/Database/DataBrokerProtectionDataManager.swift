@@ -45,7 +45,7 @@ public class DataBrokerProtectionDataManager {
             database.setupFakeData()
 
         } catch {
-            print("Error encoding profile: \(error)")
+            fatalError("Should never happen")
         }
     }
 
