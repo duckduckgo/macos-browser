@@ -245,7 +245,7 @@ jobs:
         task-url: ${{ env.asana-task-url }}
 
     - name: Upload dSYMs to S3
-      if: ${{ startsWith(github.ref_name, 'release') || startsWith(github.ref_name, 'hotfix') }}
+      if: ${{ env.release-type == 'release' && (startsWith(github.ref_name, 'release') || startsWith(github.ref_name, 'hotfix')) }}
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
