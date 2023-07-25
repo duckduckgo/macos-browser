@@ -255,7 +255,7 @@ jobs:
       run: |
         aws s3 cp \
           ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip \
-          s3://${{ env.DSYM_BUCKET_NAME }}/${{ env.DSYM_BUCKET_PREFIX }}
+          s3://${{ env.DSYM_BUCKET_NAME }}/${{ env.DSYM_BUCKET_PREFIX }}/
 
   create-dmg:
 
