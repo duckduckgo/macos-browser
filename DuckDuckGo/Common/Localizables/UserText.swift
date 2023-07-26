@@ -607,10 +607,10 @@ struct UserText {
     static let clearDataTodayHeader = NSLocalizedString("history.menu.clear.data.today.question", value: "Clear history for today \nand close all tabs?", comment: "Alert with the confirmation to clear all data")
     static let clearDataTodayDescription = NSLocalizedString("history.menu.clear.data.today.description", value: "Cookies and other data for sites visited today will also be cleared unless the site is Fireproof. History from other days will not be cleared.", comment: "Description in the alert with the confirmation to clear browsing history")
 
-    static let showBookmarksBar = NSLocalizedString("bookmarks.bar.show", value: "Show Bookmarks Bar", comment: "Menu item and preference item for showing the bookmarks bar")
+    static let showBookmarksBar = NSLocalizedString("bookmarks.bar.show", value: "Bookmarks Bar", comment: "Menu item and preference item for showing the bookmarks bar")
     static let showBookmarksBarAlways = NSLocalizedString("bookmarks.bar.show.always", value: "Always Show", comment: "Preference for always showing the bookmarks bar")
     static let showBookmarksBarNewTabOnly = NSLocalizedString("bookmarks.bar.show.new-tab-only", value: "Only Show on New Tab", comment: "Preference for only showing the bookmarks bar on new tab")
-    static let showBookmarksBarNever = NSLocalizedString("bookmarks.bar.show.never", value: "Never", comment: "Preference for never showing the bookmarks bar on new tab")
+    static let showBookmarksBarNever = NSLocalizedString("bookmarks.bar.show.never", value: "Never Show", comment: "Preference for never showing the bookmarks bar on new tab")
     static let bookmarksBarFolderEmpty = NSLocalizedString("bookmarks.bar.folder.empty", value: "Empty", comment: "Empty state for a bookmarks bar folder")
     static let bookmarksBarContextMenuCopy = NSLocalizedString("bookmarks.bar.context-menu.copy", value: "Copy", comment: "Copy menu item for the bookmarks bar context menu")
     static let bookmarksBarContextMenuDelete = NSLocalizedString("bookmarks.bar.context-menu.delete", value: "Delete", comment: "Delete menu item for the bookmarks bar context menu")
