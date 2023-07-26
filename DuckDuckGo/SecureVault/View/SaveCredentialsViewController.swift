@@ -182,6 +182,7 @@ final class SaveCredentialsViewController: NSViewController {
             }
         } catch {
             os_log("%s:%s: failed to store credentials %s", type: .error, className, #function, error.localizedDescription)
+            Pixel.fire(.debug(event: .autofillFailedToSaveItem(kind: .password), error: error))
         }
 
         Pixel.fire(.autofillItemSaved(kind: .password))

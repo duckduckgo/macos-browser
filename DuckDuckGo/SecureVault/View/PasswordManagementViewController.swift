@@ -492,6 +492,8 @@ final class PasswordManagementViewController: NSViewController {
         } catch {
             if case SecureVaultError.duplicateRecord = error {
                 showDuplicateAlert()
+            } else {
+                Pixel.fire(.debug(event: .autofillFailedToSaveItem(kind: .password), error: error))
             }
         }
     }
@@ -514,7 +516,7 @@ final class PasswordManagementViewController: NSViewController {
             postChange()
 
         } catch {
-            // Which errors can occur when saving identities?
+            Pixel.fire(.debug(event: .autofillFailedToSaveItem(kind: .identity), error: error))
         }
     }
 
@@ -558,7 +560,7 @@ final class PasswordManagementViewController: NSViewController {
             postChange()
 
         } catch {
-            // Which errors can occur when saving cards?
+            Pixel.fire(.debug(event: .autofillFailedToSaveItem(kind: .card), error: error))
         }
     }
 
