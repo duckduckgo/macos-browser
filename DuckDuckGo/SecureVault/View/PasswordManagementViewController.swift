@@ -574,9 +574,13 @@ final class PasswordManagementViewController: NSViewController {
 
             switch response {
             case .alertFirstButtonReturn:
-                try? self.secureVault?.deleteWebsiteCredentialsFor(accountId: id)
-                self.requestSync()
-                self.refreshData()
+                do {
+                    try self.secureVault?.deleteWebsiteCredentialsFor(accountId: id)
+                    self.requestSync()
+                    self.refreshData()
+                } catch {
+                    Pixel.fire(.debug(event: .autofillFailedToDeleteItem(kind: .password), error: error))
+                }
 
             default:
                 break // cancel, do nothing
@@ -594,8 +598,12 @@ final class PasswordManagementViewController: NSViewController {
 
             switch response {
             case .alertFirstButtonReturn:
-                try? self.secureVault?.deleteIdentityFor(identityId: id)
-                self.refreshData()
+                do {
+                    try self.secureVault?.deleteIdentityFor(identityId: id)
+                    self.refreshData()
+                } catch {
+                    Pixel.fire(.debug(event: .autofillFailedToDeleteItem(kind: .identity), error: error))
+                }
 
             default:
                 break // cancel, do nothing
@@ -632,8 +640,12 @@ final class PasswordManagementViewController: NSViewController {
 
             switch response {
             case .alertFirstButtonReturn:
-                try? self.secureVault?.deleteCreditCardFor(cardId: id)
-                self.refreshData()
+                do {
+                    try self.secureVault?.deleteCreditCardFor(cardId: id)
+                    self.refreshData()
+                } catch {
+                    Pixel.fire(.debug(event: .autofillFailedToDeleteItem(kind: .card), error: error))
+                }
 
             default:
                 break // cancel, do nothing
@@ -758,29 +770,34 @@ final class PasswordManagementViewController: NSViewController {
 
     private func fetchSecureVaultItems(category: SecureVaultSorting.Category = .allItems, completion: @escaping ([SecureVaultItem]) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
-            var items: [SecureVaultItem]
+            var items: [SecureVaultItem] = []
 
-            switch category {
-            case .allItems:
-                let accounts = (try? self.secureVault?.accounts()) ?? []
-                let cards = (try? self.secureVault?.creditCards()) ?? []
-                let notes = (try? self.secureVault?.notes()) ?? []
-                let identities = (try? self.secureVault?.identities()) ?? []
+            do {
+                switch category {
+                case .allItems:
+                    let accounts = try self.secureVault?.accounts() ?? []
+                    let cards = try self.secureVault?.creditCards() ?? []
+                    let notes = try self.secureVault?.notes() ?? []
+                    let identities = try self.secureVault?.identities() ?? []
 
-                items = accounts.map(SecureVaultItem.account) +
-                    cards.map(SecureVaultItem.card) +
-                    notes.map(SecureVaultItem.note) +
-                    identities.map(SecureVaultItem.identity)
-            case .logins:
-                let accounts = (try? self.secureVault?.accounts()) ?? []
-                items = accounts.map(SecureVaultItem.account)
-            case .identities:
-                let identities = (try? self.secureVault?.identities()) ?? []
-                items = identities.map(SecureVaultItem.identity)
-            case .cards:
-                let cards = (try? self.secureVault?.creditCards()) ?? []
-                items = cards.map(SecureVaultItem.card)
+                    items = accounts.map(SecureVaultItem.account) +
+                        cards.map(SecureVaultItem.card) +
+                        notes.map(SecureVaultItem.note) +
+                        identities.map(SecureVaultItem.identity)
+                case .logins:
+                    let accounts = try self.secureVault?.accounts() ?? []
+                    items = accounts.map(SecureVaultItem.account)
+                case .identities:
+                    let identities = try self.secureVault?.identities() ?? []
+                    items = identities.map(SecureVaultItem.identity)
+                case .cards:
+                    let cards = try self.secureVault?.creditCards() ?? []
+                    items = cards.map(SecureVaultItem.card)
+                }
+            } catch {
+                Pixel.fire(.debug(event: .autofillFailedToFetchData, error: error))
             }
+
 
             DispatchQueue.main.async {
                 self.emptyState.isHidden = !items.isEmpty

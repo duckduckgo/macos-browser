@@ -260,7 +260,9 @@ extension Pixel {
             case syncCredentialsFailed
             case credentialsDatabaseCleanupFailed
 
+            case autofillFailedToFetchData
             case autofillFailedToSaveItem(kind: FormAutofillKind)
+            case autofillFailedToDeleteItem(kind: FormAutofillKind)
 
             case invalidPayload(Configuration)
 
@@ -587,7 +589,9 @@ extension Pixel.Event.Debug {
         case .syncCredentialsFailed: return "sync_credentials_failed"
         case .credentialsDatabaseCleanupFailed: return "credentials_database_cleanup_failed"
 
+        case .autofillFailedToFetchData: return "autofill_failed_to_fetch_data"
         case .autofillFailedToSaveItem(let kind): return "autofill_failed_to_save_\(kind)"
+        case .autofillFailedToDeleteItem(let kind): return "autofill_failed_to_delete_\(kind)"
 
         case .invalidPayload(let configuration): return "m_d_\(configuration.rawValue)_invalid_payload".lowercased()
 

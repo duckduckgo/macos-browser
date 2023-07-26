@@ -34,20 +34,23 @@ final class CSVLoginExporter {
     }
 
     func exportVaultLogins(to url: URL) throws {
-        guard let accounts = try? secureVault.accounts() else {
-            return
-        }
-
         var credentialsToExport: [SecureVaultModels.WebsiteCredentials] = []
 
-        for account in accounts {
-            guard let accountID = account.id, let accountIDInt = Int64(accountID) else {
-                continue
-            }
+        do {
+            let accounts = try secureVault.accounts()
 
-            if let credentials = try? secureVault.websiteCredentialsFor(accountId: accountIDInt) {
-                credentialsToExport.append(credentials)
+            for account in accounts {
+                guard let accountID = account.id, let accountIDInt = Int64(accountID) else {
+                    continue
+                }
+
+                if let credentials = try secureVault.websiteCredentialsFor(accountId: accountIDInt) {
+                    credentialsToExport.append(credentials)
+                }
             }
+        } catch {
+            Pixel.fire(.debug(event: .autofillFailedToFetchData, error: error))
+            throw error
         }
 
         try save(credentials: credentialsToExport, to: url)
