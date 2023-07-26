@@ -311,6 +311,8 @@ final class PasswordManagementViewController: NSViewController {
             } else if self?.isDirty == false {
                 if let selectItemMatchingDomain = selectItemMatchingDomain {
                     self?.listModel?.selectLoginWithDomainOrFirst(domain: selectItemMatchingDomain)
+                } else if let selectedItem = self?.listModel?.selected {
+                    self?.listModel?.select(item: selectedItem)
                 } else {
                     self?.listModel?.selectFirst()
                 }

@@ -306,8 +306,10 @@ final class PasswordManagementItemListModel: ObservableObject {
         for section in displayedItems {
             if let first = section.items.first(where: { $0 == item }) {
                 selected(item: first, notify: notify)
+                return
             }
         }
+        selectFirst()
     }
 
     func selectLoginWithDomainOrFirst(domain: String, notify: Bool = true) {
