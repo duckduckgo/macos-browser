@@ -33,6 +33,7 @@ final class SyncCredentialsAdapter {
         syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
         databaseCleaner = CredentialsDatabaseCleaner(
             secureVaultFactory: secureVaultFactory,
+            secureVaultErrorReporter: SecureVaultErrorReporter.shared,
             errorEvents: CredentialsCleanupErrorHandling(),
             log: .passwordManager
         )
@@ -55,6 +56,7 @@ final class SyncCredentialsAdapter {
         do {
             let provider = try CredentialsProvider(
                 secureVaultFactory: secureVaultFactory,
+                secureVaultErrorReporter: SecureVaultErrorReporter.shared,
                 metadataStore: metadataStore,
                 syncDidUpdateData: { [weak self] in
                     self?.syncDidCompleteSubject.send()
