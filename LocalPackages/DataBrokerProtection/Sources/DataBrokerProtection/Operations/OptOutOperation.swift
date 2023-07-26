@@ -56,7 +56,7 @@ final class OptOutOperation: DataBrokerOperation {
              webViewHandler: WebViewHandler? = nil,
              actionsHandler: ActionsHandler? = nil) async throws {
         try await withCheckedThrowingContinuation { continuation in
-            self.extractedProfile = inputValue
+            self.extractedProfile = inputValue.merge(with: query.profileQuery)
             self.continuation = continuation
 
             Task {
