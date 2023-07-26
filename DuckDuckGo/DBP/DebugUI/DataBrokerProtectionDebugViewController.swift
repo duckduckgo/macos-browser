@@ -27,11 +27,14 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
     var fakeBrokerTitle: NSTextField!
     var fakeBrokerSwitch: NSSwitch!
 
-    private var isSchedulerRunning = false
-    private var shouldUseFakeBroker = false
-    private let dataManager = DataBrokerProtectionDataManager()
+    private let fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()
 
+    private var isSchedulerRunning = false
     private var scheduler: DataBrokerProtectionScheduler?
+
+    lazy var dataManager: DataBrokerProtectionDataManager = {
+        DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
+    }()
     lazy var userProfileViewController: DataBrokerUserProfileViewController = {
         DataBrokerUserProfileViewController(dataManager: dataManager)
     }()
@@ -78,7 +81,13 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
         fakeBrokerTitle.drawsBackground = false
 
         fakeBrokerSwitch = NSSwitch()
-        fakeBrokerSwitch.state = NSControl.StateValue.off
+
+        if fakeBrokerFlag.isFakeBrokerFlagOn() {
+            fakeBrokerSwitch.state = NSSwitch.StateValue.on
+        } else {
+            fakeBrokerSwitch.state = NSSwitch.StateValue.off
+        }
+
         fakeBrokerSwitch.action = #selector(useFakeBrokerValueChanged(_:))
         fakeBrokerSwitch.target = self
 
@@ -111,7 +120,7 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
         if isSchedulerRunning {
             scheduler?.stop()
         } else {
-            scheduler?.start(useFakeBrokers: shouldUseFakeBroker)
+            scheduler?.start()
         }
         isSchedulerRunning.toggle()
 
@@ -124,15 +133,18 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
     }
 
     @objc func startScanButtonPressed() {
-        scheduler?.scanAllBrokers(useFakeBrokers: shouldUseFakeBroker)
+        scheduler?.scanAllBrokers()
     }
 
     @objc func useFakeBrokerValueChanged(_ sender: NSSwitch) {
         if sender.state == NSControl.StateValue.on {
-            shouldUseFakeBroker = true
+            fakeBrokerFlag.setFakeBrokerFlag(true)
         } else {
-            shouldUseFakeBroker = false
+            fakeBrokerFlag.setFakeBrokerFlag(false)
         }
+
+        // This kicks a reload in the fake database
+        _ = dataManager.fetchProfile()
     }
 
     private func setupScheduler() {
