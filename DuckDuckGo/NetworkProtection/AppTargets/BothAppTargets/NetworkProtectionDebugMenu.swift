@@ -187,7 +187,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
         let validity: TimeInterval
     }
 
-    private static let networkProtectionRegistrationKeyValidityOptions: [NetworkProtectionKeyValidityOption] = [
+    private static let registrationKeyValidityOptions: [NetworkProtectionKeyValidityOption] = [
         .init(title: "15 seconds", validity: .seconds(15)),
         .init(title: "30 seconds", validity: .seconds(30)),
         .init(title: "1 minute", validity: .minutes(1)),
@@ -205,11 +205,11 @@ final class NetworkProtectionDebugMenu: NSMenu {
             return
         }
 
-        if Self.networkProtectionRegistrationKeyValidityOptions.isEmpty {
+        if Self.registrationKeyValidityOptions.isEmpty {
             // Not likely to happen as it's hard-coded, but still...
             menu.items = [automaticItem]
         } else {
-            menu.items = [automaticItem, NSMenuItem.separator()] + Self.networkProtectionRegistrationKeyValidityOptions.map { option in
+            menu.items = [automaticItem, NSMenuItem.separator()] + Self.registrationKeyValidityOptions.map { option in
                 let menuItem = NSMenuItem(title: option.title,
                                           action: #selector(setRegistrationKeyValidity(_:)),
                                           target: self,
