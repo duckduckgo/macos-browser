@@ -194,7 +194,8 @@ final class MainViewController: NSViewController {
         return bookmarksBarViewController
     }
 
-    private func updateBookmarksBarViewVisibility(visible: Bool) {
+    // Can be updated via keyboard shortcut so needs to be internal visibility
+    func updateBookmarksBarViewVisibility(visible: Bool) {
         let showBookmarksBar = isInPopUpWindow ? false : visible
 
         if visible {

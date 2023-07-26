@@ -468,7 +468,15 @@ extension MainViewController {
     @IBAction func toggleBookmarksBarFromMenu(_ sender: Any) {
         // Leaving this keyboard shortcut in place.  When toggled on it will use the previously set appearence which defaults to "always".
         //  If the user sets it to "new tabs only" somewhere (e.g. preferences), then it'll be that.
-        AppearancePreferences.shared.showBookmarksBar.toggle()
+        guard let mainVC = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else { return }
+
+        let prefs = AppearancePreferences.shared
+        if prefs.showBookmarksBar && prefs.bookmarksBarAppearance == .newTabOnly {
+            // show bookmarks bar but don't change the setting
+            mainVC.updateBookmarksBarViewVisibility(visible: true)
+        } else {
+            prefs.showBookmarksBar.toggle()
+        }
     }
 
     @IBAction func toggleAutofillShortcut(_ sender: Any) {
