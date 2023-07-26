@@ -86,7 +86,7 @@ final class NetworkProtectionLoginItemsManager {
     func ensureLoginItemsAreRunning(_ condition: LoginItemCheckCondition = .none, after interval: TimeInterval = .seconds(5)) {
 
         Task {
-            try? await Task.sleep(interval: interval)
+            try await Task.sleep(interval: interval)
 
             os_log(.info, log: .networkProtection, "Checking whether login agents are enabled and running")
 

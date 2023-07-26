@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionDebugMenuController.swift
+//  NetworkProtectionDebugMenu.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -26,7 +26,7 @@ import NetworkProtection
 /// App store placedholder.  Should be replaced with the actual thing once we enable NetP in App Store builds.
 ///
 @objc
-final class NetworkProtectionDebugMenuController: NSObject {
+final class NetworkProtectionDebugMenu: NSMenu {
 }
 
 #else
@@ -34,26 +34,27 @@ final class NetworkProtectionDebugMenuController: NSObject {
 /// Controller for the Network Protection debug menu.
 ///
 @objc
-final class NetworkProtectionDebugMenuController: NSObject {
+final class NetworkProtectionDebugMenu: NSMenu {
 
     // MARK: - Outlets
 
     @IBOutlet weak var preferredServerMenu: NSMenu? {
         didSet {
             populateNetworkProtectionServerListMenuItems()
-            preferredServerMenu?.delegate = self
         }
     }
 
     @IBOutlet weak var registrationKeyValidityMenu: NSMenu? {
         didSet {
             populateNetworkProtectionRegistrationKeyValidityMenuItems()
-            registrationKeyValidityMenu?.delegate = self
         }
     }
 
-    @IBOutlet weak var networkProtectionRegistrationKeyValidityMenuSeparatorItem: NSMenuItem?
-    @IBOutlet weak var networkProtectionRegistrationKeyValidityMenuItem: NSMenuItem?
+    /// This is just present so we can remove this menu item in App Store builds.
+    ///
+    @IBOutlet weak var mainMenuItem: NSMenuItem?
+    @IBOutlet weak var registrationKeyValidityMenuSeparatorItem: NSMenuItem?
+    @IBOutlet weak var registrationKeyValidityMenuItem: NSMenuItem?
 
     // MARK: - Debug Logic
 
@@ -189,8 +190,8 @@ final class NetworkProtectionDebugMenuController: NSObject {
 
     private func populateNetworkProtectionRegistrationKeyValidityMenuItems() {
         #if DEBUG
-        guard let submenu = networkProtectionRegistrationKeyValidityMenuItem?.submenu,
-              let automaticItem = submenu.items.first else {
+        guard let menu = registrationKeyValidityMenu,
+              let automaticItem = menu.items.first else {
 
             assertionFailure("\(#function): Failed to get submenu")
             return
@@ -198,9 +199,9 @@ final class NetworkProtectionDebugMenuController: NSObject {
 
         if Self.networkProtectionRegistrationKeyValidityOptions.isEmpty {
             // Not likely to happen as it's hard-coded, but still...
-            submenu.items = [automaticItem]
+            menu.items = [automaticItem]
         } else {
-            submenu.items = [automaticItem, NSMenuItem.separator()] + Self.networkProtectionRegistrationKeyValidityOptions.map { option in
+            menu.items = [automaticItem, NSMenuItem.separator()] + Self.networkProtectionRegistrationKeyValidityOptions.map { option in
                 let menuItem = NSMenuItem(title: option.title,
                                           action: #selector(setRegistrationKeyValidity(_:)),
                                           target: self,
@@ -224,7 +225,17 @@ final class NetworkProtectionDebugMenuController: NSObject {
 
     // MARK: - Menu State Update
 
-    private func updatePreferredServerMenu(_ menu: NSMenu) {
+    override func update() {
+        updatePreferredServerMenu()
+        updateRekeyValidityMenu()
+    }
+
+    private func updatePreferredServerMenu() {
+        guard let menu = preferredServerMenu else {
+            assertionFailure("Outlet not connected for preferredServerMenu")
+            return
+        }
+
         let selectedServerName = debugUtilities.selectedServerName()
 
         if selectedServerName == nil {
@@ -247,7 +258,12 @@ final class NetworkProtectionDebugMenuController: NSObject {
         }
     }
 
-    private func updateRekeyValidityMenu(_ menu: NSMenu) {
+    private func updateRekeyValidityMenu() {
+        guard let menu = registrationKeyValidityMenu else {
+            assertionFailure("Outlet not connected for preferredServerMenu")
+            return
+        }
+
         let selectedValidity = debugUtilities.registrationKeyValidity
 
         if selectedValidity == nil {
@@ -266,19 +282,6 @@ final class NetworkProtectionDebugMenuController: NSObject {
             } else {
                 item.state = .off
             }
-        }
-    }
-}
-
-extension NetworkProtectionDebugMenuController: NSMenuDelegate {
-    @MainActor func menuNeedsUpdate(_ menu: NSMenu) {
-        switch menu {
-        case preferredServerMenu:
-            updatePreferredServerMenu(menu)
-        case registrationKeyValidityMenu:
-            updateRekeyValidityMenu(menu)
-        default:
-            break
         }
     }
 }
