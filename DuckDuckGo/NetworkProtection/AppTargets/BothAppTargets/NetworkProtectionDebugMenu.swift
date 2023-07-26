@@ -27,6 +27,14 @@ import NetworkProtection
 ///
 @objc
 final class NetworkProtectionDebugMenu: NSMenu {
+    /// This is just present so we can remove this menu item in App Store builds.
+    ///
+    @IBOutlet weak var mainMenuItem: NSMenuItem?
+
+    override func awakeFromNib() {
+        // Hide the entire NetP debug menu when the feature is disabled:
+        mainMenuItem?.removeFromParent()
+    }
 }
 
 #else

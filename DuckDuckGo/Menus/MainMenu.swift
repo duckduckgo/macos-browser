@@ -102,11 +102,6 @@ final class MainMenu: NSMenu {
         if debugMenuItem.submenu?.items.contains(loggingMenuItem) == false {
             debugMenuItem.submenu!.addItem(loggingMenuItem)
         }
-
-#if !NETWORK_PROTECTION
-        // Hide the entire NetP debug menu when the feature is disabled:
-        networkProtectionMenuItem?.removeFromParent()
-#endif
     }
 
     // MARK: - Help

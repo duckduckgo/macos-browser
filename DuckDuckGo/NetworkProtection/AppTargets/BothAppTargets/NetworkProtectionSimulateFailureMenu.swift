@@ -19,6 +19,14 @@
 import Foundation
 import NetworkProtection
 
+#if !NETWORK_PROTECTION
+
+@objc
+final class NetworkProtectionSimulateFailureMenu: NSMenu {
+}
+
+#else
+
 /// Implements the logic for Network Protection's simulate failures menu.
 ///
 @objc
@@ -49,3 +57,5 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
         simulateTunnelFailureMenuItem?.state = simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
     }
 }
+
+#endif
