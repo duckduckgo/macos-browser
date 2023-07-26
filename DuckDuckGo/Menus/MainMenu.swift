@@ -84,11 +84,7 @@ final class MainMenu: NSMenu {
     // MARK: - Debug
 
     @IBOutlet weak var debugMenuItem: NSMenuItem?
-    @IBOutlet weak var networkProtectionMenuItem: NSMenuItem? {
-        didSet {
-            networkProtectionMenuItem?.target = networkProtectionDebugMenuController
-        }
-    }
+    @IBOutlet weak var networkProtectionMenuItem: NSMenuItem?
 
     private func setupDebugMenuItem(with featureFlagger: FeatureFlagger) {
         guard let debugMenuItem else {

@@ -30,7 +30,14 @@ final class NetworkProtectionDebugUtilities {
 
     // MARK: - Registration Key Validity
 
-    static let registrationKeyValidityKey = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
+    @UserDefaultsWrapper(key: .networkProtectionRegistrationKeyValidity, defaultValue: nil)
+    var registrationKeyValidity: TimeInterval? {
+        didSet {
+            Task {
+                await sendRegistrationKeyValidityToProvider()
+            }
+        }
+    }
 
     // MARK: - Login Items Management
 
@@ -96,42 +103,24 @@ final class NetworkProtectionDebugUtilities {
         try? activeSession.sendProviderMessage(request)
     }
 
-    // MARK: - Registration Key
+    // MARK: - Registation Key
 
-    /// Retrieves the registration key validity time interval.
-    ///
-    /// - Returns: the validity time interval if it was overridden, or `nil` if NetP is using defaults.
-    ///
-    func registrationKeyValidity(defaults: UserDefaults = .standard) -> TimeInterval? {
-        defaults.object(forKey: Self.registrationKeyValidityKey) as? TimeInterval
-    }
-
-    /// Sets the registration key validity time interval.
-    ///
-    /// - Parameters:
-    ///     - validity: the default registration key validity time interval.  A `nil` value means it will be automatically
-    ///         defined by NetP using its standard configuration.
-    ///
-    func setRegistrationKeyValidity(_ validity: TimeInterval?, defaults: UserDefaults = .standard) async throws {
-        guard let activeSession = try await ConnectionSessionUtilities.activeSession() else {
+    private func sendRegistrationKeyValidityToProvider() async {
+        guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
             return
         }
 
         var request = Data([ExtensionMessage.setKeyValidity.rawValue])
 
-        if let validity = validity {
-            defaults.set(validity, forKey: Self.registrationKeyValidityKey)
-
+        if let validity = registrationKeyValidity {
             let validityData = withUnsafeBytes(of: UInt(validity).littleEndian) { Data($0) }
             request.append(validityData)
-        } else {
-            defaults.removeObject(forKey: Self.registrationKeyValidityKey)
         }
 
-        try activeSession.sendProviderMessage(request)
+        try? activeSession.sendProviderMessage(request)
     }
 
-    func expireRegistrationKeyNow() async throws {
+    func expireRegistrationKeyNow() async {
         guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
             return
         }

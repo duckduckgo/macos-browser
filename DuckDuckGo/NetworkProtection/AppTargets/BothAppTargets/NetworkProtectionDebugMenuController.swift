@@ -130,7 +130,7 @@ final class NetworkProtectionDebugMenuController: NSObject {
     @IBAction
     func expireRegistrationKeyNow(_ sender: Any?) {
         Task {
-            try? await debugUtilities.expireRegistrationKeyNow()
+            await debugUtilities.expireRegistrationKeyNow()
         }
     }
 
@@ -146,14 +146,7 @@ final class NetworkProtectionDebugMenuController: NSObject {
         // nil means automatic
         let validity = menuItem.representedObject as? TimeInterval
 
-        Task {
-            do {
-                try await debugUtilities.setRegistrationKeyValidity(validity)
-            } catch {
-                assertionFailure("Could not override the key validity due to an error: \(error.localizedDescription)")
-                os_log("Could not override the key validity due to an error: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
-            }
-        }
+        debugUtilities.registrationKeyValidity = validity
     }
 
     /// Simulates a controller failure the next time Network Protection is started.
@@ -300,7 +293,7 @@ final class NetworkProtectionDebugMenuController: NSObject {
     }
 
     func updateRekeyValidityMenu(_ menu: NSMenu) {
-        let selectedValidity = debugUtilities.registrationKeyValidity()
+        let selectedValidity = debugUtilities.registrationKeyValidity
 
         if selectedValidity == nil {
             menu.items.first?.state = .on
