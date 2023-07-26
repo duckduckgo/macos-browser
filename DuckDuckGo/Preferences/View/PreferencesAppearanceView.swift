@@ -117,7 +117,7 @@ extension Preferences {
                 PreferencePaneSection {
                     TextMenuItemHeader(text: "Bookmarks Bar")
                     HStack {
-                        ToggleMenuItem(title: UserText.showBookmarksBar, isOn: $model.showBookmarksBar)
+                        ToggleMenuItem(title: UserText.showBookmarksBarPreference, isOn: $model.showBookmarksBar)
                         NSPopUpButtonView(selection: $model.bookmarksBarAppearance) {
                             let button = NSPopUpButton()
                             button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
