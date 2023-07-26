@@ -20,10 +20,6 @@ import Cocoa
 import BrowserServicesKit
 import Common
 
-#if NETWORK_PROTECTION
-import NetworkProtection
-#endif
-
 // Actions are sent to objects of responder chain
 
 // MARK: - Main Menu Actions

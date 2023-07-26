@@ -107,8 +107,8 @@ final class NetworkProtectionDebugMenuController: NSObject {
     /// Sets the selected server.
     ///
     @IBAction
-    func setSelectedServer(_ sender: Any?) {
-        guard let title = (sender as? NSMenuItem)?.title else {
+    func setSelectedServer(_ menuItem: NSMenuItem?) {
+        guard let title = menuItem?.title else {
             assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
             return
         }
@@ -137,8 +137,8 @@ final class NetworkProtectionDebugMenuController: NSObject {
     /// Sets the registration key validity.
     ///
     @IBAction
-    func setRegistrationKeyValidity(_ sender: Any?) {
-        guard let menuItem = sender as? NSMenuItem else {
+    func setRegistrationKeyValidity(_ menuItem: NSMenuItem?) {
+        guard let menuItem else {
             assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
             return
         }
@@ -159,8 +159,8 @@ final class NetworkProtectionDebugMenuController: NSObject {
     /// Simulates a controller failure the next time Network Protection is started.
     ///
     @IBAction
-    func simulateControllerFailure(_ sender: Any?) {
-        guard let menuItem = sender as? NSMenuItem else {
+    func simulateControllerFailure(_ menuItem: NSMenuItem?) {
+        guard let menuItem else {
             assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
             return
         }
