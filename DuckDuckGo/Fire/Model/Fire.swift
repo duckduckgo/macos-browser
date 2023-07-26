@@ -253,6 +253,8 @@ final class Fire {
                 domains.insert(domain)
             }
         }
+        // Convert to eTLD+1 domains
+        domains = domains.convertedToETLDPlus1(tld: tld)
 
         historyCoordinating.burnVisits(visits) {
             self.burnEntity(entity: .none(selectedDomains: domains),
@@ -552,7 +554,7 @@ extension TabCollection {
 
 extension Set where Element == String {
 
-    func transformedToETLDPlus1(tld: TLD) -> Set<String> {
+    func convertedToETLDPlus1(tld: TLD) -> Set<String> {
         var transformedSet = Set<String>()
         for domain in self {
             if let eTLDPlus1Domain = tld.eTLDplus1(domain) {
