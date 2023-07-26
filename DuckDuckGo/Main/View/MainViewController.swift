@@ -194,8 +194,12 @@ final class MainViewController: NSViewController {
         return bookmarksBarViewController
     }
 
+    func toggleBookmarksBarVisibility() {
+        updateBookmarksBarViewVisibility(visible: !(bookmarksBarHeightConstraint.constant > 0))
+    }
+
     // Can be updated via keyboard shortcut so needs to be internal visibility
-    func updateBookmarksBarViewVisibility(visible: Bool) {
+    private func updateBookmarksBarViewVisibility(visible: Bool) {
         let showBookmarksBar = isInPopUpWindow ? false : visible
 
         if visible {

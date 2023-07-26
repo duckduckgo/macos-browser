@@ -473,7 +473,7 @@ extension MainViewController {
         let prefs = AppearancePreferences.shared
         if prefs.showBookmarksBar && prefs.bookmarksBarAppearance == .newTabOnly {
             // show bookmarks bar but don't change the setting
-            mainVC.updateBookmarksBarViewVisibility(visible: true)
+            mainVC.toggleBookmarksBarVisibility()
         } else {
             prefs.showBookmarksBar.toggle()
         }
