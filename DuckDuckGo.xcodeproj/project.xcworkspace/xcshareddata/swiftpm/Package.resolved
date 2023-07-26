@@ -14,8 +14,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "tom/fire-window2",
-        "revision" : "03148954fa83cee819c9310232568d3b6b073bf6"
+        "revision" : "12936bbff846c3276546b5d901a639345a46eb6c"
       }
     },
     {

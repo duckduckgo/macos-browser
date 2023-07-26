@@ -10083,8 +10083,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "tom/fire-window2";
-				kind = branch;
+				kind = revision;
+				revision = 12936bbff846c3276546b5d901a639345a46eb6c;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
