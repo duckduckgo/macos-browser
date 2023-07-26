@@ -65,7 +65,6 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
         set {
             bookmarksBarValue = newValue.rawValue
-            // TODO fire a pixel
         }
     }
 }
