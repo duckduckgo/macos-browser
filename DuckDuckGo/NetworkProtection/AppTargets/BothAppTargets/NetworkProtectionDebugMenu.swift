@@ -220,8 +220,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
             }
         }
         #else
-        guard let separator = networkProtectionRegistrationKeyValidityMenuSeparatorItem,
-              let validityMenu = networkProtectionRegistrationKeyValidityMenuItem else {
+        guard let separator = registrationKeyValidityMenuSeparatorItem,
+              let validityMenu = registrationKeyValidityMenuItem else {
             assertionFailure("\(#function): Failed to get submenu")
             return
         }
