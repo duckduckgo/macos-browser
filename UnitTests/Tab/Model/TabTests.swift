@@ -342,7 +342,7 @@ final class TabTests: XCTestCase {
         let tab = Tab(content: .homePage)
         XCTAssertTrue(tab.faviconManagement === FaviconManager.shared)
 
-        let burnerTab = Tab(content: .homePage, burnerStatus: BurnerStatus(isBurner: true))
+        let burnerTab = Tab(content: .homePage, burnerMode: BurnerMode(isBurner: true))
         XCTAssertTrue(burnerTab.faviconManagement !== FaviconManager.shared)
     }
 

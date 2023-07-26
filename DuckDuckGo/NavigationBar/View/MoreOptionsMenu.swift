@@ -156,7 +156,7 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @objc func newBurnerWindow(_ sender: NSMenuItem) {
-        WindowsManager.openNewWindow(burnerStatus: BurnerStatus(isBurner: true))
+        WindowsManager.openNewWindow(burnerMode: BurnerMode(isBurner: true))
     }
 
     @objc func toggleFireproofing(_ sender: NSMenuItem) {
@@ -383,7 +383,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
-        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, burnerStatus: tabCollectionViewModel.burnerStatus)
+        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab)
     }
 

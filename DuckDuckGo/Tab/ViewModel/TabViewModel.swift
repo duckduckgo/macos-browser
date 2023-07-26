@@ -252,7 +252,7 @@ final class TabViewModel {
         case .bookmarks:
             title = UserText.tabBookmarksTitle
         case .homePage:
-            if tab.burnerStatus.isBurner {
+            if tab.burnerMode.isBurner {
                 title = UserText.burnerTabHomeTitle
             } else {
                 title = UserText.tabHomeTitle
@@ -279,7 +279,7 @@ final class TabViewModel {
 
         switch tab.content {
         case .homePage:
-            if tab.burnerStatus.isBurner {
+            if tab.burnerMode.isBurner {
                 favicon = Favicon.burnerHome
             } else {
                 favicon = Favicon.home

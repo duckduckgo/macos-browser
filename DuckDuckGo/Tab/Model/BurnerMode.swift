@@ -1,5 +1,5 @@
 //
-//  BurnerStatus.swift
+//  BurnerMode.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,9 @@
 import Foundation
 import WebKit
 
-enum BurnerStatus: Equatable {
+// Identifies whether Tab or TabCollectionViewModel are regular or Burner (isolated)
+// Also, it provides a way to pass shared website data store to related entities.
+enum BurnerMode: Equatable {
 
     case regular
     case burner(websiteDataStore: WKWebsiteDataStore)

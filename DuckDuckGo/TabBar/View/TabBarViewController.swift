@@ -917,7 +917,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
         if let url = draggingInfo.draggingPasteboard.url {
             // dropping URL or file
             tabCollectionViewModel.insert(Tab(content: .url(url),
-                                              burnerStatus: tabCollectionViewModel.burnerStatus),
+                                              burnerMode: tabCollectionViewModel.burnerMode),
                                           at: .unpinned(newIndex),
                                           selected: true)
 
@@ -939,7 +939,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
         guard session.draggingPasteboard.types == [TabBarViewItemPasteboardWriter.utiInternalType] else { return }
 
         // Don't allow drag and drop from Burner Window
-        guard !tabCollectionViewModel.burnerStatus.isBurner else { return }
+        guard !tabCollectionViewModel.burnerMode.isBurner else { return }
 
         defer {
             TabDragAndDropManager.shared.clear()

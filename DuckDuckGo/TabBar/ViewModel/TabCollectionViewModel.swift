@@ -61,7 +61,7 @@ final class TabCollectionViewModel: NSObject {
         }
     }
 
-    let burnerStatus: BurnerStatus
+    let burnerMode: BurnerMode
 
     var changesEnabled = true
 
@@ -102,11 +102,11 @@ final class TabCollectionViewModel: NSObject {
         tabCollection: TabCollection,
         selectionIndex: Int = 0,
         pinnedTabsManager: PinnedTabsManager?,
-        burnerStatus: BurnerStatus = .regular
+        burnerMode: BurnerMode = .regular
     ) {
         self.tabCollection = tabCollection
         self.pinnedTabsManager = pinnedTabsManager
-        self.burnerStatus = burnerStatus
+        self.burnerMode = burnerMode
         super.init()
 
         subscribeToTabs()
@@ -120,18 +120,18 @@ final class TabCollectionViewModel: NSObject {
 
     convenience init(tabCollection: TabCollection,
                      selectionIndex: Int = 0,
-                     burnerStatus: BurnerStatus = .regular) {
+                     burnerMode: BurnerMode = .regular) {
         self.init(tabCollection: tabCollection,
                   selectionIndex: selectionIndex,
                   pinnedTabsManager: WindowControllersManager.shared.pinnedTabsManager,
-                  burnerStatus: burnerStatus)
+                  burnerMode: burnerMode)
     }
 
-    convenience init(burnerStatus: BurnerStatus = .regular) {
+    convenience init(burnerMode: BurnerMode = .regular) {
         let tabCollection = TabCollection()
         self.init(tabCollection: tabCollection,
                   pinnedTabsManager: WindowControllersManager.shared.pinnedTabsManager,
-                  burnerStatus: burnerStatus)
+                  burnerMode: burnerMode)
     }
 
     func setUpLazyLoadingIfNeeded() {
@@ -267,7 +267,7 @@ final class TabCollectionViewModel: NSObject {
         if selectDisplayableTabIfPresent(content) {
             return
         }
-        append(tab: Tab(content: content, shouldLoadInBackground: true, burnerStatus: burnerStatus), selected: selected, forceChange: forceChange)
+        append(tab: Tab(content: content, shouldLoadInBackground: true, burnerMode: burnerMode), selected: selected, forceChange: forceChange)
     }
 
     func append(tab: Tab, selected: Bool = true, forceChange: Bool = false) {
@@ -465,7 +465,7 @@ final class TabCollectionViewModel: NSObject {
     func removeAllTabsAndAppendNew(forceChange: Bool = false) {
         guard changesEnabled || forceChange else { return }
 
-        tabCollection.removeAll(andAppend: Tab(content: .homePage, burnerStatus: burnerStatus))
+        tabCollection.removeAll(andAppend: Tab(content: .homePage, burnerMode: burnerMode))
         selectUnpinnedTab(at: 0, forceChange: forceChange)
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
@@ -480,7 +480,7 @@ final class TabCollectionViewModel: NSObject {
 
         tabCollection.removeTabs(at: indexSet)
         if tabCollection.tabs.isEmpty {
-            tabCollection.append(tab: Tab(content: .homePage, burnerStatus: burnerStatus))
+            tabCollection.append(tab: Tab(content: .homePage, burnerMode: burnerMode))
             selectUnpinnedTab(at: 0, forceChange: forceChange)
         } else {
             let selectionDiff = indexSet.reduce(0) { result, index in
@@ -517,7 +517,7 @@ final class TabCollectionViewModel: NSObject {
             return
         }
 
-        let tabCopy = Tab(content: tab.content, favicon: tab.favicon, interactionStateData: tab.getActualInteractionStateData(), shouldLoadInBackground: true, burnerStatus: burnerStatus, shouldLoadFromCache: true)
+        let tabCopy = Tab(content: tab.content, favicon: tab.favicon, interactionStateData: tab.getActualInteractionStateData(), shouldLoadInBackground: true, burnerMode: burnerMode, shouldLoadFromCache: true)
         let newIndex = tabIndex.makeNext()
 
         tabCollection(for: tabIndex)?.insert(tabCopy, at: newIndex.item)
@@ -618,7 +618,7 @@ final class TabCollectionViewModel: NSObject {
             self.addTabViewModels(new.subtracting(old))
 
             // Make sure the tab is burner if it is supposed to be
-            if newTabs.first(where: { $0.burnerStatus != self.burnerStatus }) != nil {
+            if newTabs.first(where: { $0.burnerMode != self.burnerMode }) != nil {
                 Pixel.fire(.debug(event: .burnerTabMisplaced))
                 fatalError("Error in burner tab management")
             }
@@ -720,7 +720,7 @@ extension TabCollectionViewModel {
 extension TabCollectionViewModel {
 
     var isBurner: Bool {
-        burnerStatus.isBurner
+        burnerMode.isBurner
     }
 
 }

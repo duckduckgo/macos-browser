@@ -383,7 +383,7 @@ final class BrowserTabViewController: NSViewController {
 
         let tab = Tab(content: content,
                       shouldLoadInBackground: true,
-                      burnerStatus: tabCollectionViewModel.burnerStatus,
+                      burnerMode: tabCollectionViewModel.burnerMode,
                       webViewSize: view.frame.size)
         tabCollectionViewModel.append(tab: tab, selected: true)
     }
@@ -604,7 +604,7 @@ extension BrowserTabViewController: TabDelegate {
         case .popup(size: let windowContentSize):
             WindowsManager.openPopUpWindow(with: childTab, contentSize: windowContentSize)
         case .window(active: let active, let isBurner):
-            assert(isBurner == childTab.burnerStatus.isBurner)
+            assert(isBurner == childTab.burnerMode.isBurner)
             WindowsManager.openNewWindow(with: childTab, showWindow: active)
         case .tab(selected: let selected, _):
             self.tabCollectionViewModel.insert(childTab, after: parentTab, selected: selected)

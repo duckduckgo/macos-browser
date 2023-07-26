@@ -45,7 +45,7 @@ extension AppDelegate {
     }
 
     @IBAction func newBurnerWindow(_ sender: Any?) {
-        WindowsManager.openNewWindow(burnerStatus: BurnerStatus(isBurner: true))
+        WindowsManager.openNewWindow(burnerMode: BurnerMode(isBurner: true))
     }
 
     @IBAction func newTab(_ sender: Any?) {
@@ -608,7 +608,7 @@ extension MainViewController {
         let tabs = models.compactMap { ($0.entity as? Bookmark)?.urlObject }.map {
             Tab(content: .url($0),
                 shouldLoadInBackground: true,
-                burnerStatus: tabCollectionViewModel.burnerStatus)
+                burnerMode: tabCollectionViewModel.burnerMode)
         }
         tabCollectionViewModel.append(tabs: tabs)
     }

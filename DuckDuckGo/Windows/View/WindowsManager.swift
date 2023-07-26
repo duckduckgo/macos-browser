@@ -34,7 +34,7 @@ final class WindowsManager {
 
     @discardableResult
     class func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
-                             burnerStatus: BurnerStatus = .regular,
+                             burnerMode: BurnerMode = .regular,
                              droppingPoint: NSPoint? = nil,
                              contentSize: NSSize? = nil,
                              showWindow: Bool = true,
@@ -42,7 +42,7 @@ final class WindowsManager {
                              lazyLoadTabs: Bool = false) -> MainWindow? {
         let mainWindowController = makeNewWindow(tabCollectionViewModel: tabCollectionViewModel,
                                                  popUp: popUp,
-                                                 burnerStatus: burnerStatus)
+                                                 burnerMode: burnerMode)
 
         if let droppingPoint = droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
@@ -75,13 +75,13 @@ final class WindowsManager {
 
         let tabCollectionViewModel: TabCollectionViewModel = {
             if popUp {
-                return .init(tabCollection: tabCollection, pinnedTabsManager: nil, burnerStatus: tab.burnerStatus)
+                return .init(tabCollection: tabCollection, pinnedTabsManager: nil, burnerMode: tab.burnerMode)
             }
-            return .init(tabCollection: tabCollection, burnerStatus: tab.burnerStatus)
+            return .init(tabCollection: tabCollection, burnerMode: tab.burnerMode)
         }()
 
         return openNewWindow(with: tabCollectionViewModel,
-                             burnerStatus: tab.burnerStatus,
+                             burnerMode: tab.burnerMode,
                              droppingPoint: droppingPoint,
                              contentSize: contentSize,
                              showWindow: showWindow,
@@ -89,14 +89,14 @@ final class WindowsManager {
     }
 
     class func openNewWindow(with initialUrl: URL, isBurner: Bool, parentTab: Tab? = nil) {
-        openNewWindow(with: Tab(content: .contentFromURL(initialUrl), parentTab: parentTab, shouldLoadInBackground: true, burnerStatus: BurnerStatus(isBurner: isBurner)))
+        openNewWindow(with: Tab(content: .contentFromURL(initialUrl), parentTab: parentTab, shouldLoadInBackground: true, burnerMode: BurnerMode(isBurner: isBurner)))
     }
 
     class func openNewWindow(with tabCollection: TabCollection, isBurner: Bool, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) {
-        let burnerStatus = BurnerStatus(isBurner: isBurner)
-        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, burnerStatus: burnerStatus)
+        let burnerMode = BurnerMode(isBurner: isBurner)
+        let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection, burnerMode: burnerMode)
         openNewWindow(with: tabCollectionViewModel,
-                      burnerStatus: burnerStatus,
+                      burnerMode: burnerMode,
                       droppingPoint: droppingPoint,
                       contentSize: contentSize,
                       popUp: popUp)
@@ -116,14 +116,14 @@ final class WindowsManager {
     private class func makeNewWindow(tabCollectionViewModel: TabCollectionViewModel? = nil,
                                      contentSize: NSSize? = nil,
                                      popUp: Bool = false,
-                                     burnerStatus: BurnerStatus) -> MainWindowController {
+                                     burnerMode: BurnerMode) -> MainWindowController {
         let mainViewController: MainViewController
         do {
             mainViewController = try NSException.catch {
                 NSStoryboard(name: "Main", bundle: .main)
                     .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
-                        let model = tabCollectionViewModel ?? TabCollectionViewModel(burnerStatus: burnerStatus)
-                        assert(model.burnerStatus == burnerStatus)
+                        let model = tabCollectionViewModel ?? TabCollectionViewModel(burnerMode: burnerMode)
+                        assert(model.burnerMode == burnerMode)
                         return MainViewController(coder: coder, tabCollectionViewModel: model)
                     }
             }
