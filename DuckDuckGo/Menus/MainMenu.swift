@@ -283,9 +283,8 @@ final class MainMenu: NSMenu {
     // swiftlint:enable function_body_length
 
     private func updateBookmarksBarMenuItem() {
-        let title = PersistentAppInterfaceSettings.shared.showBookmarksBar ? UserText.hideBookmarksBar : UserText.showBookmarksBar
-        toggleBookmarksBarMenuItem?.title = title
-        bookmarksMenuToggleBookmarksBarMenuItem?.title = title
+        toggleBookmarksBarMenuItem = BookmarksBarMenuFactory.replace(toggleBookmarksBarMenuItem)
+        bookmarksMenuToggleBookmarksBarMenuItem = BookmarksBarMenuFactory.replace(bookmarksMenuToggleBookmarksBarMenuItem)
     }
 
     private func updateShortcutMenuItems() {

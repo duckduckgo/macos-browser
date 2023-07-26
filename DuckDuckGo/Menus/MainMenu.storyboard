@@ -389,7 +389,7 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="hB3-LF-h0Y"/>
-                                        <menuItem title="Show Bookmarks Bar" keyEquivalent="B" id="z3f-ie-l71">
+                                        <menuItem title="Bookmarks Bar Menu Placeholder" keyEquivalent="B" id="z3f-ie-l71">
                                             <connections>
                                                 <action selector="toggleBookmarksBarFromMenu:" target="Ady-hI-5gd" id="dCK-ha-Oqf"/>
                                             </connections>
@@ -543,7 +543,7 @@ CA
                                                 <action selector="showManageBookmarks:" target="Ady-hI-5gd" id="meV-V2-zJ2"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Toggle Bookmarks Bar" keyEquivalent="B" id="SwH-Sh-zIJ">
+                                        <menuItem title="Bookmarks Bar Menu Placeholder" keyEquivalent="B" id="SwH-Sh-zIJ">
                                             <connections>
                                                 <action selector="toggleBookmarksBarFromMenu:" target="Ady-hI-5gd" id="K35-ch-3LK"/>
                                             </connections>

@@ -83,15 +83,6 @@ extension Preferences {
     struct AppearanceView: View {
         @ObservedObject var model: AppearancePreferences
 
-        @State var bookmarksBarOn: Bool = false
-        var bookmarksOptionBinding: Binding<BookmarksBarAppearance> {
-            .init {
-                .disabled
-            } set: { newValue in
-                model.bookmarksBar = bookmarksBarOn ? newValue : .disabled
-            }
-        }
-
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
 
@@ -126,15 +117,15 @@ extension Preferences {
                 PreferencePaneSection {
                     TextMenuItemHeader(text: "Bookmarks Bar")
                     HStack {
-                        ToggleMenuItem(title: "Show Bookmarks Bar", isOn: $bookmarksBarOn)
-                        NSPopUpButtonView(selection: bookmarksOptionBinding) {
+                        ToggleMenuItem(title: UserText.showBookmarksBar, isOn: $model.showBookmarksBar)
+                        NSPopUpButtonView(selection: $model.bookmarksBarAppearance) {
                             let button = NSPopUpButton()
                             button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
-                            let alwaysOn = button.menu?.addItem(withTitle: "Always Show", action: nil, keyEquivalent: "")
+                            let alwaysOn = button.menu?.addItem(withTitle: UserText.showBookmarksBarAlways, action: nil, keyEquivalent: "")
                             alwaysOn?.representedObject = BookmarksBarAppearance.alwaysOn
 
-                            let newTabOnly = button.menu?.addItem(withTitle: "Only Show on New Tab", action: nil, keyEquivalent: "")
+                            let newTabOnly = button.menu?.addItem(withTitle: UserText.showBookmarksBarNewTabOnly, action: nil, keyEquivalent: "")
                             newTabOnly?.representedObject = BookmarksBarAppearance.newTabOnly
 
                             return button

@@ -20,7 +20,6 @@ import Foundation
 
 enum BookmarksBarAppearance: String, CaseIterable {
 
-    case disabled
     case alwaysOn
     case newTabOnly
 
