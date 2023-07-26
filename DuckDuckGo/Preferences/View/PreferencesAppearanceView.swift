@@ -130,6 +130,7 @@ extension Preferences {
 
                             return button
                         }
+                        .disabled(!model.showBookmarksBar)
                     }
                 }
 
