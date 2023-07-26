@@ -45,15 +45,15 @@ final class NetworkProtectionDebugMenuController: NSObject {
         }
     }
 
-    @IBOutlet weak var networkProtectionRegistrationKeyValidityMenuSeparatorItem: NSMenuItem?
-    @IBOutlet weak var networkProtectionRegistrationKeyValidityMenuItem: NSMenuItem?
-
     @IBOutlet weak var registrationKeyValidityMenu: NSMenu? {
         didSet {
             populateNetworkProtectionRegistrationKeyValidityMenuItems()
             registrationKeyValidityMenu?.delegate = self
         }
     }
+
+    @IBOutlet weak var networkProtectionRegistrationKeyValidityMenuSeparatorItem: NSMenuItem?
+    @IBOutlet weak var networkProtectionRegistrationKeyValidityMenuItem: NSMenuItem?
 
     // MARK: - Debug Logic
 
@@ -107,12 +107,8 @@ final class NetworkProtectionDebugMenuController: NSObject {
     /// Sets the selected server.
     ///
     @IBAction
-    func setSelectedServer(_ menuItem: NSMenuItem?) {
-        guard let title = menuItem?.title else {
-            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
-            return
-        }
-
+    func setSelectedServer(_ menuItem: NSMenuItem) {
+        let title = menuItem.title
         let selectedServer: SelectedNetworkProtectionServer
 
         if title == "Automatic" {
@@ -137,52 +133,11 @@ final class NetworkProtectionDebugMenuController: NSObject {
     /// Sets the registration key validity.
     ///
     @IBAction
-    func setRegistrationKeyValidity(_ menuItem: NSMenuItem?) {
-        guard let menuItem else {
-            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
-            return
-        }
-
+    func setRegistrationKeyValidity(_ menuItem: NSMenuItem) {
         // nil means automatic
         let validity = menuItem.representedObject as? TimeInterval
 
         debugUtilities.registrationKeyValidity = validity
-    }
-
-    /// Simulates a controller failure the next time Network Protection is started.
-    ///
-    @IBAction
-    func simulateControllerFailure(_ menuItem: NSMenuItem?) {
-        guard let menuItem else {
-            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
-            return
-        }
-
-        if menuItem.state == .on {
-            menuItem.state = .off
-        } else {
-            menuItem.state = .on
-        }
-
-        NetworkProtectionTunnelController.simulationOptions.setEnabled(menuItem.state == .on, option: .controllerFailure)
-    }
-
-    /// Simulates a tunnel failure the next time Network Protection is started.
-    ///
-    @IBAction
-    func simulateTunnelFailure(_ sender: Any?) {
-        guard let menuItem = sender as? NSMenuItem else {
-            assertionFailure("\(#function): Failed to cast sender to NSMenuItem")
-            return
-        }
-
-        if menuItem.state == .on {
-            menuItem.state = .off
-        } else {
-            menuItem.state = .on
-        }
-
-        NetworkProtectionTunnelController.simulationOptions.setEnabled(menuItem.state == .on, option: .tunnelFailure)
     }
 
     // MARK: Populating Menu Items
@@ -269,7 +224,7 @@ final class NetworkProtectionDebugMenuController: NSObject {
 
     // MARK: - Menu State Update
 
-    func updatePreferredServerMenu(_ menu: NSMenu) {
+    private func updatePreferredServerMenu(_ menu: NSMenu) {
         let selectedServerName = debugUtilities.selectedServerName()
 
         if selectedServerName == nil {
@@ -292,7 +247,7 @@ final class NetworkProtectionDebugMenuController: NSObject {
         }
     }
 
-    func updateRekeyValidityMenu(_ menu: NSMenu) {
+    private func updateRekeyValidityMenu(_ menu: NSMenu) {
         let selectedValidity = debugUtilities.registrationKeyValidity
 
         if selectedValidity == nil {

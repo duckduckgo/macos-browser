@@ -17,6 +17,7 @@
                         <outlet property="networkProtectionRegistrationKeyValidityMenuSeparatorItem" destination="MEg-4g-gji" id="12H-fj-mJw"/>
                         <outlet property="preferredServerMenu" destination="jbT-17-qgW" id="dva-NZ-YGG"/>
                         <outlet property="registrationKeyValidityMenu" destination="HwX-wm-4zf" id="CYc-Hg-5yx"/>
+                        <outlet property="simulateFailureMenu" destination="iLs-sj-2Gd" id="MYW-mC-NQE"/>
                     </connections>
                 </customObject>
                 <application id="hnw-xV-0zn" sceneMemberID="viewController">
@@ -876,21 +877,25 @@ CQ
                                                     </menuItem>
                                                     <menuItem title="Simulate Failure" id="K5h-D4-For">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Simulate Failure" id="iLs-sj-2Gd">
+                                                        <menu key="submenu" title="Simulate Failure" id="iLs-sj-2Gd" customClass="NetworkProtectionSimulateFailureMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                             <items>
                                                                 <menuItem title="Enable NetP &gt; Controller Failure" id="xyA-ob-gEy">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="simulateControllerFailure:" target="jWm-XD-4k5" id="02v-bD-cWE"/>
+                                                                        <action selector="simulateControllerFailure:" target="iLs-sj-2Gd" id="TAQ-Pa-g6K"/>
                                                                     </connections>
                                                                 </menuItem>
                                                                 <menuItem title="Enable NetP &gt; Tunnel Failure" id="kVa-n8-UNx">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="simulateTunnelFailure:" target="jWm-XD-4k5" id="h0z-W6-uza"/>
+                                                                        <action selector="simulateTunnelFailure:" target="iLs-sj-2Gd" id="0cL-54-a2k"/>
                                                                     </connections>
                                                                 </menuItem>
                                                             </items>
+                                                            <connections>
+                                                                <outlet property="simulateControllerFailureMenuItem" destination="xyA-ob-gEy" id="tsj-ii-WRa"/>
+                                                                <outlet property="simulateTunnelFailureMenuItem" destination="kVa-n8-UNx" id="ngb-Aa-bR0"/>
+                                                            </connections>
                                                         </menu>
                                                     </menuItem>
                                                 </items>
@@ -976,19 +981,6 @@ CQ
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
                     </connections>
                 </application>
-                <menu id="013-wG-YGZ">
-                    <items>
-                        <menuItem title="Item 1" id="m8E-kO-TwB">
-                            <modifierMask key="keyEquivalentModifierMask"/>
-                        </menuItem>
-                        <menuItem title="Item 2" id="gKX-rb-enP">
-                            <modifierMask key="keyEquivalentModifierMask"/>
-                        </menuItem>
-                        <menuItem title="Item 3" id="MNz-ve-jnh">
-                            <modifierMask key="keyEquivalentModifierMask"/>
-                        </menuItem>
-                    </items>
-                </menu>
             </objects>
             <point key="canvasLocation" x="-222" y="-258"/>
         </scene>
