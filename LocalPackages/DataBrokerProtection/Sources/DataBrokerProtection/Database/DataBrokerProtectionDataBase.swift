@@ -23,7 +23,7 @@ protocol DataBase {
     func saveOperationData(_ data: BrokerOperationData)
     func scanOperationData(for profileQueryID: UUID) -> ScanOperationData
     func optOutOperationData(for profileQueryID: UUID) -> [OptOutOperationData]
-    func fetchAllBrokerProfileQueryData(useFakeBroker: Bool) -> [BrokerProfileQueryData]
+    func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData]
     func brokerProfileQueryData(for id: UUID) -> BrokerProfileQueryData?
 }
 
@@ -32,6 +32,12 @@ final class DataBrokerProtectionDataBase: DataBase {
     public var dataBrokers = [DataBroker]()
     public var brokerProfileQueriesData = [BrokerProfileQueryData]()
     public var testProfileQuery: ProfileQuery?
+
+    private let fakeBrokerFlag: FakeBrokerFlag
+
+    init(fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()) {
+        self.fakeBrokerFlag = fakeBrokerFlag
+    }
 
     func brokerProfileQueryData(for profileQuery: ProfileQuery, dataBroker: DataBroker) -> BrokerProfileQueryData? {
         brokerProfileQueriesData.filter {
@@ -64,13 +70,17 @@ final class DataBrokerProtectionDataBase: DataBase {
         return [data]
     }
 
-    func fetchAllBrokerProfileQueryData(useFakeBroker: Bool) -> [BrokerProfileQueryData] {
+    func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
+        return brokerProfileQueriesData
+    }
+
+    func setupFakeData() {
         self.dataBrokers.removeAll()
         self.brokerProfileQueriesData.removeAll()
 
         var dataBroker: DataBroker
 
-        if useFakeBroker {
+        if fakeBrokerFlag.isFakeBrokerFlagOn() {
             dataBroker = DataBroker.initFromResource("fake.verecor.com")
         } else {
             dataBroker = DataBroker.initFromResource("verecor.com")
@@ -81,7 +91,5 @@ final class DataBrokerProtectionDataBase: DataBase {
 
         self.dataBrokers.append(dataBroker)
         self.brokerProfileQueriesData.append(queryData)
-
-        return brokerProfileQueriesData
     }
 }
