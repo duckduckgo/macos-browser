@@ -148,8 +148,6 @@ struct UserText {
                                           comment: "Info in the Fire Button popover")
         return String(format: localized, sites, siteString)
     }
-    static let fireDialogNothingToBurn = NSLocalizedString("fire.dialog.nothing-to-burn", value: "No data to clear", comment: "Information label to inform there is no domain for burning")
-    static let fireDialogSiteIsFireproof = NSLocalizedString("fire.dialog.site-is-fireproof", value: "Nothing to clear. This is one of your Fireproof Sites.", comment: "Information label to inform that a fireproof website won't be burned")
     static let fireDialogDetails = NSLocalizedString("fire.dialog.details", value: "Details", comment: "Button to show more details")
     static let fireDialogWindowWillClose = NSLocalizedString("fire.dialog.window-will-close", value: "Current window will close", comment: "Warning label shown in an expanded view of the fire popover")
     static let fireDialogTabWillClose = NSLocalizedString("fire.dialog.tab-will-close", value: "Current tab will close", comment: "Warning label shown in an expanded view of the fire popover")
