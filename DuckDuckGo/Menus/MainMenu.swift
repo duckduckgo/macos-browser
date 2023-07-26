@@ -284,7 +284,17 @@ final class MainMenu: NSMenu {
 
     private func updateBookmarksBarMenuItem() {
         toggleBookmarksBarMenuItem = BookmarksBarMenuFactory.replace(toggleBookmarksBarMenuItem)
+        toggleBookmarksBarMenuItem?.target = self
+        toggleBookmarksBarMenuItem?.action = #selector(toggleBookmarksBarFromMenu(_:))
+
         bookmarksMenuToggleBookmarksBarMenuItem = BookmarksBarMenuFactory.replace(bookmarksMenuToggleBookmarksBarMenuItem)
+    }
+
+    @MainActor
+    @objc
+    private func toggleBookmarksBarFromMenu(_ sender: Any) {
+        guard let mainVC = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else { return }
+        mainVC.toggleBookmarksBarFromMenu(sender)
     }
 
     private func updateShortcutMenuItems() {
