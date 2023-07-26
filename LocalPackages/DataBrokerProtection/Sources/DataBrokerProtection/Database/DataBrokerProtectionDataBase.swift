@@ -18,10 +18,6 @@
 
 import Foundation
 
-public struct DataBrokerProtectionDataBaseKeys {
-    public static let useFakeBrokerKey = "useFakeBrokerKey"
-}
-
 protocol DataBase {
     func brokerProfileQueryData(for profileQuery: ProfileQuery, dataBroker: DataBroker) -> BrokerProfileQueryData?
     func saveOperationData(_ data: BrokerOperationData)
@@ -36,6 +32,12 @@ final class DataBrokerProtectionDataBase: DataBase {
     public var dataBrokers = [DataBroker]()
     public var brokerProfileQueriesData = [BrokerProfileQueryData]()
     public var testProfileQuery: ProfileQuery?
+
+    private let fakeBrokerFlag: FakeBrokerFlag
+
+    init(fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()) {
+        self.fakeBrokerFlag = fakeBrokerFlag
+    }
 
     func brokerProfileQueryData(for profileQuery: ProfileQuery, dataBroker: DataBroker) -> BrokerProfileQueryData? {
         brokerProfileQueriesData.filter {
@@ -76,10 +78,9 @@ final class DataBrokerProtectionDataBase: DataBase {
         self.dataBrokers.removeAll()
         self.brokerProfileQueriesData.removeAll()
 
-        let shouldUseFakeBroker = UserDefaults.standard.bool(forKey: DataBrokerProtectionDataBaseKeys.useFakeBrokerKey)
         var dataBroker: DataBroker
 
-        if shouldUseFakeBroker {
+        if fakeBrokerFlag.isFakeBrokerFlagOn() {
             dataBroker = DataBroker.initFromResource("fake.verecor.com")
         } else {
             dataBroker = DataBroker.initFromResource("verecor.com")

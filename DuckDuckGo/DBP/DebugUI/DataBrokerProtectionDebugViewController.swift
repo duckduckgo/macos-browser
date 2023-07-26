@@ -27,10 +27,14 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
     var fakeBrokerTitle: NSTextField!
     var fakeBrokerSwitch: NSSwitch!
 
-    private var isSchedulerRunning = false
-    private let dataManager = DataBrokerProtectionDataManager()
+    private let fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()
 
+    private var isSchedulerRunning = false
     private var scheduler: DataBrokerProtectionScheduler?
+
+    lazy var dataManager: DataBrokerProtectionDataManager = {
+        DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
+    }()
     lazy var userProfileViewController: DataBrokerUserProfileViewController = {
         DataBrokerUserProfileViewController(dataManager: dataManager)
     }()
@@ -78,8 +82,7 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
 
         fakeBrokerSwitch = NSSwitch()
 
-        let isFakeBrokerSwitchTurnedOn = UserDefaults.standard.bool(forKey: DataBrokerProtectionDataBaseKeys.useFakeBrokerKey)
-        if  isFakeBrokerSwitchTurnedOn {
+        if fakeBrokerFlag.isFakeBrokerFlagOn() {
             fakeBrokerSwitch.state = NSSwitch.StateValue.on
         } else {
             fakeBrokerSwitch.state = NSSwitch.StateValue.off
@@ -135,9 +138,9 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
 
     @objc func useFakeBrokerValueChanged(_ sender: NSSwitch) {
         if sender.state == NSControl.StateValue.on {
-            UserDefaults.standard.set(true, forKey: DataBrokerProtectionDataBaseKeys.useFakeBrokerKey)
+            fakeBrokerFlag.setFakeBrokerFlag(true)
         } else {
-            UserDefaults.standard.set(false, forKey: DataBrokerProtectionDataBaseKeys.useFakeBrokerKey)
+            fakeBrokerFlag.setFakeBrokerFlag(false)
         }
 
         // This kicks a reload in the fake database
