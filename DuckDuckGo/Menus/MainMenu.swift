@@ -114,10 +114,6 @@ final class MainMenu: NSMenu {
 #endif
     }
 
-    @IBOutlet weak var networkProtectionPreferredServerLocationItem: NSMenuItem?
-    @IBOutlet weak var networkProtectionRegistrationKeyValidityMenuSeparatorItem: NSMenuItem?
-    @IBOutlet weak var networkProtectionRegistrationKeyValidityMenuItem: NSMenuItem?
-
     // MARK: - Help
     @IBOutlet weak var helpMenuItem: NSMenuItem?
     @IBOutlet weak var helpSeparatorMenuItem: NSMenuItem?
@@ -167,11 +163,6 @@ final class MainMenu: NSMenu {
         updateShortcutMenuItems()
         updateLoggingMenuItems()
         updateBurnerWindowMenuItem()
-
-#if NETWORK_PROTECTION
-        updateNetworkProtectionServerListMenuItems()
-        updateNetworkProtectionRegistrationKeyValidityMenuItems()
-#endif
     }
 
     @MainActor
@@ -317,79 +308,6 @@ final class MainMenu: NSMenu {
         toggleNetworkProtectionShortcutMenuItem?.isHidden = true
 #endif
     }
-
-#if NETWORK_PROTECTION
-    private func updateNetworkProtectionServerListMenuItems() {
-        guard let submenu = networkProtectionPreferredServerLocationItem?.submenu, let automaticItem = submenu.items.first else {
-            assertionFailure("\(#function): Failed to get submenu")
-            return
-        }
-
-        let networkProtectionServerStore = NetworkProtectionServerListFileSystemStore(errorEvents: nil)
-        let servers = (try? networkProtectionServerStore.storedNetworkProtectionServerList()) ?? []
-
-        if servers.isEmpty {
-            submenu.items = [automaticItem]
-        } else {
-            submenu.items = [automaticItem, NSMenuItem.separator()] + servers.map({ server in
-                let title: String
-
-                if server.isRegistered {
-                    title = "\(server.serverInfo.name) (\(server.serverInfo.serverLocation) – Public Key Registered)"
-                } else {
-                    title = "\(server.serverInfo.name) (\(server.serverInfo.serverLocation))"
-                }
-
-                return NSMenuItem(title: title, action: automaticItem.action, target: networkProtectionDebugMenuController, keyEquivalent: "")
-            })
-        }
-    }
-
-    private struct NetworkProtectionKeyValidityOption {
-        let title: String
-        let validity: TimeInterval
-    }
-
-    private static let networkProtectionRegistrationKeyValidityOptions: [NetworkProtectionKeyValidityOption] = [
-        .init(title: "15 seconds", validity: .seconds(15)),
-        .init(title: "30 seconds", validity: .seconds(30)),
-        .init(title: "1 minute", validity: .minutes(1)),
-        .init(title: "5 minutes", validity: .minutes(5)),
-        .init(title: "30 minutes", validity: .minutes(30)),
-        .init(title: "1 hour", validity: .hours(1))
-    ]
-
-    private func updateNetworkProtectionRegistrationKeyValidityMenuItems() {
-        #if DEBUG
-        guard let submenu = networkProtectionRegistrationKeyValidityMenuItem?.submenu,
-              let automaticItem = submenu.items.first else {
-
-            assertionFailure("\(#function): Failed to get submenu")
-            return
-        }
-
-        if Self.networkProtectionRegistrationKeyValidityOptions.isEmpty {
-            // Not likely to happen as it's hard-coded, but still...
-            submenu.items = [automaticItem]
-        } else {
-            submenu.items = [automaticItem, NSMenuItem.separator()] + Self.networkProtectionRegistrationKeyValidityOptions.map { option in
-                let menuItem = NSMenuItem(title: option.title, action: automaticItem.action, target: networkProtectionDebugMenuController, keyEquivalent: "")
-                menuItem.representedObject = option.validity
-                return menuItem
-            }
-        }
-        #else
-        guard let separator = networkProtectionRegistrationKeyValidityMenuSeparatorItem,
-              let validityMenu = networkProtectionRegistrationKeyValidityMenuItem else {
-            assertionFailure("\(#function): Failed to get submenu")
-            return
-        }
-
-        separator.isHidden = true
-        validityMenu.isHidden = true
-        #endif
-    }
-#endif
 
     @MainActor
     private func updateBurnerWindowMenuItem() {

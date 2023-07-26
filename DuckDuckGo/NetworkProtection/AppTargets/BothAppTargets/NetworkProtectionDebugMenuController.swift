@@ -36,6 +36,25 @@ final class NetworkProtectionDebugMenuController: NSObject {
 @objc
 final class NetworkProtectionDebugMenuController: NSObject {
 
+    // MARK: - Outlets
+
+    @IBOutlet weak var preferredServerMenu: NSMenu? {
+        didSet {
+            populateNetworkProtectionServerListMenuItems()
+            preferredServerMenu?.delegate = self
+        }
+    }
+
+    @IBOutlet weak var networkProtectionRegistrationKeyValidityMenuSeparatorItem: NSMenuItem?
+    @IBOutlet weak var networkProtectionRegistrationKeyValidityMenuItem: NSMenuItem?
+
+    @IBOutlet weak var registrationKeyValidityMenu: NSMenu? {
+        didSet {
+            populateNetworkProtectionRegistrationKeyValidityMenuItems()
+            registrationKeyValidityMenu?.delegate = self
+        }
+    }
+
     // MARK: - Debug Logic
 
     private let debugUtilities = NetworkProtectionDebugUtilities()
@@ -172,63 +191,146 @@ final class NetworkProtectionDebugMenuController: NSObject {
 
         NetworkProtectionTunnelController.simulationOptions.setEnabled(menuItem.state == .on, option: .tunnelFailure)
     }
+
+    // MARK: Populating Menu Items
+
+    private func populateNetworkProtectionServerListMenuItems() {
+        guard let submenu = preferredServerMenu,
+              let automaticItem = submenu.items.first else {
+            assertionFailure("\(#function): Failed to get submenu")
+            return
+        }
+
+        let networkProtectionServerStore = NetworkProtectionServerListFileSystemStore(errorEvents: nil)
+        let servers = (try? networkProtectionServerStore.storedNetworkProtectionServerList()) ?? []
+
+        if servers.isEmpty {
+            submenu.items = [automaticItem]
+        } else {
+            submenu.items = [automaticItem, NSMenuItem.separator()] + servers.map({ server in
+                let title: String
+
+                if server.isRegistered {
+                    title = "\(server.serverInfo.name) (\(server.serverInfo.serverLocation) – Public Key Registered)"
+                } else {
+                    title = "\(server.serverInfo.name) (\(server.serverInfo.serverLocation))"
+                }
+
+                return NSMenuItem(title: title,
+                                  action: #selector(setSelectedServer(_:)),
+                                  target: self,
+                                  keyEquivalent: "")
+
+            })
+        }
+    }
+
+    private struct NetworkProtectionKeyValidityOption {
+        let title: String
+        let validity: TimeInterval
+    }
+
+    private static let networkProtectionRegistrationKeyValidityOptions: [NetworkProtectionKeyValidityOption] = [
+        .init(title: "15 seconds", validity: .seconds(15)),
+        .init(title: "30 seconds", validity: .seconds(30)),
+        .init(title: "1 minute", validity: .minutes(1)),
+        .init(title: "5 minutes", validity: .minutes(5)),
+        .init(title: "30 minutes", validity: .minutes(30)),
+        .init(title: "1 hour", validity: .hours(1))
+    ]
+
+    private func populateNetworkProtectionRegistrationKeyValidityMenuItems() {
+        #if DEBUG
+        guard let submenu = networkProtectionRegistrationKeyValidityMenuItem?.submenu,
+              let automaticItem = submenu.items.first else {
+
+            assertionFailure("\(#function): Failed to get submenu")
+            return
+        }
+
+        if Self.networkProtectionRegistrationKeyValidityOptions.isEmpty {
+            // Not likely to happen as it's hard-coded, but still...
+            submenu.items = [automaticItem]
+        } else {
+            submenu.items = [automaticItem, NSMenuItem.separator()] + Self.networkProtectionRegistrationKeyValidityOptions.map { option in
+                let menuItem = NSMenuItem(title: option.title,
+                                          action: #selector(setRegistrationKeyValidity(_:)),
+                                          target: self,
+                                          keyEquivalent: "")
+
+                menuItem.representedObject = option.validity
+                return menuItem
+            }
+        }
+        #else
+        guard let separator = networkProtectionRegistrationKeyValidityMenuSeparatorItem,
+              let validityMenu = networkProtectionRegistrationKeyValidityMenuItem else {
+            assertionFailure("\(#function): Failed to get submenu")
+            return
+        }
+
+        separator.isHidden = true
+        validityMenu.isHidden = true
+        #endif
+    }
+
+    // MARK: - Menu State Update
+
+    func updatePreferredServerMenu(_ menu: NSMenu) {
+        let selectedServerName = debugUtilities.selectedServerName()
+
+        if selectedServerName == nil {
+            menu.items.first?.state = .on
+        } else {
+            menu.items.first?.state = .off
+        }
+
+        // We're skipping the first two items because they're the automatic menu item and
+        // the separator line.
+        let serverItems = menu.items.suffix(menu.items.count - 2)
+
+        for item in serverItems {
+            if let selectedServerName,
+               item.title.hasPrefix(selectedServerName) {
+                item.state = .on
+            } else {
+                item.state = .off
+            }
+        }
+    }
+
+    func updateRekeyValidityMenu(_ menu: NSMenu) {
+        let selectedValidity = debugUtilities.registrationKeyValidity()
+
+        if selectedValidity == nil {
+            menu.items.first?.state = .on
+        } else {
+            menu.items.first?.state = .off
+        }
+
+        // We're skipping the first two items because they're the automatic menu item and
+        // the separator line.
+        let serverItems = menu.items.suffix(menu.items.count - 2)
+
+        for item in serverItems {
+            if item.representedObject as? TimeInterval == selectedValidity {
+                item.state = .on
+            } else {
+                item.state = .off
+            }
+        }
+    }
 }
 
-extension NetworkProtectionDebugMenuController: NSMenuItemValidation {
-
-    // swiftlint:disable:next cyclomatic_complexity
-    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
-        switch menuItem.action {
-        case #selector(NetworkProtectionDebugMenuController.setSelectedServer(_:)):
-            let selectedServerName = debugUtilities.selectedServerName()
-
-            switch menuItem.title {
-            case "Automatic":
-                menuItem.state = selectedServerName == nil ? .on : .off
-            default:
-                guard let selectedServerName = selectedServerName else {
-                    menuItem.state = .off
-                    break
-                }
-
-                menuItem.state = (menuItem.title.hasPrefix("\(selectedServerName) ")) ? .on : .off
-            }
-
-            return true
-
-        case #selector(NetworkProtectionDebugMenuController.expireRegistrationKeyNow(_:)):
-            return true
-
-        case #selector(NetworkProtectionDebugMenuController.setRegistrationKeyValidity(_:)):
-            let selectedValidity = debugUtilities.registrationKeyValidity()
-
-            switch menuItem.title {
-            case "Automatic":
-                menuItem.state = selectedValidity == nil ? .on : .off
-            default:
-                guard let selectedValidity = selectedValidity,
-                      let menuItemValidity = menuItem.representedObject as? TimeInterval,
-                      selectedValidity == menuItemValidity else {
-
-                    menuItem.state = .off
-                    break
-                }
-
-                menuItem.state =  .on
-            }
-
-            return true
-
-        case #selector(NetworkProtectionDebugMenuController.simulateControllerFailure(_:)):
-            menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.controllerFailure) ? .on : .off
-            return true
-
-        case #selector(NetworkProtectionDebugMenuController.simulateTunnelFailure(_:)):
-            menuItem.state = NetworkProtectionTunnelController.simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
-            return true
-
+extension NetworkProtectionDebugMenuController: NSMenuDelegate {
+    @MainActor func menuNeedsUpdate(_ menu: NSMenu) {
+        switch menu {
+        case preferredServerMenu:
+            updatePreferredServerMenu(menu)
+        case registrationKeyValidityMenu:
+            updateRekeyValidityMenu(menu)
         default:
-            return true
+            break
         }
     }
 }
