@@ -136,7 +136,7 @@ final class OperationsTests: XCTestCase {
             database: database)
 
         let expectedExtractedProfiles = [ExtractedProfile]()
-        let expectedHistoryTypes: [HistoryEvent.EventType] = [.scanStarted, .error]
+        let expectedHistoryTypes: [HistoryEvent.EventType] = [.scanStarted, .error(error: .unknown("Some"))]
         let expectedScanPreferredDate = Date().addingTimeInterval(dataBroker.schedulingConfig.retryError)
 
         let runner = MockRunner(optOutAction: nil,
@@ -251,7 +251,7 @@ final class OperationsTests: XCTestCase {
 
         let optOutDataOperationData = profileQueryData.optOutsData.filter({ $0.id == optOutOperationData.id }).first
 
-        let expectedHistoryTypes: [HistoryEvent.EventType] = [.optOutStarted(extractedProfileID: extractedProfile.id), .error]
+        let expectedHistoryTypes: [HistoryEvent.EventType] = [.optOutStarted(extractedProfileID: extractedProfile.id), .error(error: .unknown("Some"))]
 
         let expectedOptOutPreferredDate = Date().addingTimeInterval(dataBroker.schedulingConfig.retryError)
 
@@ -484,7 +484,7 @@ private struct MockDataBase: DataBase {
         return [data]
     }
 
-    func fetchAllBrokerProfileQueryData(useFakeBroker: Bool) -> [BrokerProfileQueryData] {
+    func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
         let data = BrokerProfileQueryData(id: UUID(),
             profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46),
             dataBroker: DataBroker(name: "batata",

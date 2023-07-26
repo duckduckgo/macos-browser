@@ -28,8 +28,8 @@ public class DataBrokerProtectionDataManager {
     internal let database: DataBrokerProtectionDataBase
     private let userDataKey = "DataBrokerProtectionProfile"
 
-    public init() {
-        self.database = DataBrokerProtectionDataBase()
+    public init(fakeBrokerFlag: FakeBrokerFlag) {
+        self.database = DataBrokerProtectionDataBase(fakeBrokerFlag: fakeBrokerFlag)
         setupNotifications()
     }
 
@@ -41,6 +41,7 @@ public class DataBrokerProtectionDataManager {
 
             // Test
             self.database.testProfileQuery = profile.profileQueries.first
+            self.database.setupFakeData()
         } catch {
             fatalError("Should never happen")
         }
@@ -54,6 +55,7 @@ public class DataBrokerProtectionDataManager {
 
                 // Test
                 self.database.testProfileQuery = profile.profileQueries.first
+                self.database.setupFakeData()
 
                 return profile
             } catch {
