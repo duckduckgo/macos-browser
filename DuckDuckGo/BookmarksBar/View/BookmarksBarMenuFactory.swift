@@ -59,18 +59,3 @@ struct BookmarksBarMenuFactory {
     }
 
 }
-
-final class BlockMenuItem: NSMenuItem {
-    var block: (() -> Void)?
-
-    convenience init(title: String, keyEquivalent: String = "", isChecked: Bool, block: (() -> Void)?) {
-        self.init(title: title, action: #selector(performBlockAction(_:)), keyEquivalent: keyEquivalent)
-        self.block = block
-        self.target = self
-        self.state = isChecked ? .on : .off
-    }
-
-    @objc func performBlockAction(_ sender: NSMenuItem) {
-        block?()
-    }
-}
