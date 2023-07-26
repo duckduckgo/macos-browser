@@ -381,14 +381,14 @@ protocol NewWindowPolicyDecisionMaker {
 
         webView.onDeinit { [weak self] in
             // Tab should deallocate with the WebView
-            self?.assertObjectDeallocated(after: 1.0)
+            self?.ensureObjectDeallocated(after: 1.0, do: .interrupt)
 
             // unregister WebView from the ProcessPool
             processPool.webViewsUsingProcessPool.remove(webViewValue)
 
             if processPool.webViewsUsingProcessPool.isEmpty {
                 // when the last WebView is deallocated the ProcessPool should be deallocated
-                processPool.assertObjectDeallocated(after: 1)
+                processPool.ensureObjectDeallocated(after: 1, do: .log)
                 // by the moment the ProcessPool is dead all the UserContentControllers that were using it should be deallocated
                 let knownUserContentControllers = processPool.knownUserContentControllers
                 processPool.onDeinit {
@@ -444,10 +444,7 @@ protocol NewWindowPolicyDecisionMaker {
     @MainActor(unsafe)
     private func cleanUpBeforeClosing(onDeinit: Bool) {
         let job = { [webView, userContentController] in
-            webView.stopLoading()
-            webView.stopMediaCapture()
-            webView.stopAllMediaPlayback()
-            webView.fullscreenWindowController?.close()
+            webView.stopAllMediaAndLoading()
 
             userContentController?.cleanUpBeforeClosing()
             webView.assertObjectDeallocated(after: 4.0)
@@ -461,6 +458,10 @@ protocol NewWindowPolicyDecisionMaker {
             return
         }
         job()
+    }
+
+    func stopAllMediaAndLoading() {
+        webView.stopAllMediaAndLoading()
     }
 
 #if DEBUG
@@ -494,9 +495,7 @@ protocol NewWindowPolicyDecisionMaker {
     @Published private(set) var content: TabContent {
         didSet {
             if !content.displaysContentInWebView && oldValue.displaysContentInWebView {
-                webView.stopLoading()
-                webView.stopMediaCapture()
-                webView.stopAllMediaPlayback()
+                webView.stopAllMediaAndLoading()
             }
             handleFavicon()
             invalidateInteractionStateData()
@@ -576,8 +575,6 @@ protocol NewWindowPolicyDecisionMaker {
             if error == nil || error?.isFrameLoadInterrupted == true || error?.isNavigationCancelled == true {
                 return
             }
-            webView.stopLoading()
-            webView.stopMediaCapture()
             webView.stopAllMediaPlayback()
         }
     }
@@ -1125,7 +1122,7 @@ extension Tab: TabDataClearing {
     func prepareForDataClearing(caller: TabCleanupPreparer) {
         webViewCancellables.removeAll()
 
-        webView.stopLoading()
+        self.stopAllMediaAndLoading()
         (webView.configuration.userContentController as? UserContentController)?.cleanUpBeforeClosing()
 
         webView.navigationDelegate = caller

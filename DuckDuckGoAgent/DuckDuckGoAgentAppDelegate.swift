@@ -63,7 +63,16 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
         }
 
         let appLauncher = AppLauncher(appBundleURL: appBundleURL)
-        return StatusBarMenu(appLauncher: appLauncher)
+
+        #if DEBUG
+        let iconProvider = DebugMenuIconProvider()
+        #elseif REVIEW
+        let iconProvider = ReviewMenuIconProvider()
+        #else
+        let iconProvider = MenuIconProvider()
+        #endif
+
+        return StatusBarMenu(appLauncher: appLauncher, iconProvider: iconProvider)
     }()
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {

@@ -762,6 +762,12 @@ CQ
                                                             <action selector="resetMakeDuckDuckGoYoursUserSettings:" target="Ady-hI-5gd" id="maa-qG-0Bx"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Reset Email Protection InContext Signup Prompt" id="cQF-Np-0vk">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetEmailProtectionInContextPrompt:" target="Ady-hI-5gd" id="bRN-Eo-xL1"/>
+                                                        </connections>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>

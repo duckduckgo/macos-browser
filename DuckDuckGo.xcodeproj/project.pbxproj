@@ -6564,7 +6564,7 @@
 			buildPhases = (
 				4B2537562A11BE7300610219 /* Sources */,
 				4B2537572A11BE7300610219 /* Frameworks */,
-				B6BD8F0A2A260E5900B6A41F /* ShellScript */,
+				B6BD8F0A2A260E5900B6A41F /* embed libswift_Concurrency.dylib */,
 			);
 			buildRules = (
 			);
@@ -7323,8 +7323,9 @@
 			shellPath = /bin/zsh;
 			shellScript = "./lint.sh\n";
 		};
-		B6BD8F0A2A260E5900B6A41F /* ShellScript */ = {
+		B6BD8F0A2A260E5900B6A41F /* embed libswift_Concurrency.dylib */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -7332,6 +7333,7 @@
 			);
 			inputPaths = (
 			);
+			name = "embed libswift_Concurrency.dylib";
 			outputFileListPaths = (
 			);
 			outputPaths = (
