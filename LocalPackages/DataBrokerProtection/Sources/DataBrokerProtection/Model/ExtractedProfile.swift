@@ -85,6 +85,7 @@ struct ExtractedProfile: Codable, Sendable {
     let age: String?
     var email: String?
     var removedDate: Date?
+    let fullName: String?
 
     enum CodingKeys: CodingKey {
         case name
@@ -100,6 +101,7 @@ struct ExtractedProfile: Codable, Sendable {
         case age
         case email
         case removedDate
+        case fullName
     }
 
     init(name: String? = nil,
@@ -128,6 +130,24 @@ struct ExtractedProfile: Codable, Sendable {
         self.age = age
         self.email = email
         self.removedDate = removedDate
+        self.fullName = name
+    }
+
+    func merge(with profile: ProfileQuery) -> ExtractedProfile {
+        ExtractedProfile(
+            name: self.name ?? profile.fullName,
+            alternativeNamesList: self.alternativeNamesList,
+            addressFull: self.addressFull,
+            addressCityState: self.addressCityState,
+            addressCityStateList: self.addressCityStateList,
+            phone: self.phone,
+            relativesList: self.relativesList,
+            profileUrl: self.profileUrl,
+            reportId: self.reportId,
+            age: self.age ?? String(profile.age),
+            email: self.email,
+            removedDate: self.removedDate
+        )
     }
 }
 
