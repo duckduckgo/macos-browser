@@ -35,7 +35,7 @@ final class SyncBookmarksAdapter {
             let provider = try BookmarksProvider(
                 database: database,
                 metadataStore: metadataStore,
-                reloadBookmarksAfterSync: LocalBookmarkManager.shared.loadBookmarks
+                syncDidUpdateData: LocalBookmarkManager.shared.loadBookmarks
             )
 
             syncErrorCancellable = provider.syncErrorPublisher

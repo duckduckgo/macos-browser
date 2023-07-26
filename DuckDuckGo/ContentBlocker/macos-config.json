@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1689349922686,
+    "version": 1689975156286,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -254,6 +254,10 @@
                 {
                     "domain": "granit.com",
                     "reason": "https://github.com/duckduckgo/autoconsent/issues/200"
+                },
+                {
+                    "domain": "kia.com",
+                    "reason": "https://github.com/duckduckgo/autoconsent/issues/210"
                 }
             ],
             "settings": {
@@ -263,7 +267,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "8c25a069731bb0f0f99c991def05f1b7"
+            "hash": "061ae814a3faa191155c79e8ead6a836"
         },
         "autofill": {
             "exceptions": [
@@ -1233,6 +1237,14 @@
                 },
                 {
                     "domain": "bizjournals.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+                },
+                {
+                    "domain": "slate.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+                },
+                {
+                    "domain": "dailycaller.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
                 },
                 {
@@ -2620,7 +2632,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "d053eb0e0faa73d237a4212ce44a4452"
+            "hash": "ca0a16bb802ad81255fea1099c28b5d5"
         },
         "exceptionHandler": {
             "exceptions": [],
@@ -3208,6 +3220,17 @@
                             }
                         ]
                     },
+                    "adthrive.com": {
+                        "rules": [
+                            {
+                                "rule": "adthrive.com",
+                                "domains": [
+                                    "gardeningknowhow.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1122"
+                            }
+                        ]
+                    },
                     "ahacdn.me": {
                         "rules": [
                             {
@@ -3631,6 +3654,13 @@
                                     "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/486"
+                            },
+                            {
+                                "rule": "p.cquotient.com/pebble",
+                                "domains": [
+                                    "scheels.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/486"
                             }
                         ]
                     },
@@ -3688,11 +3718,25 @@
                     "cxense.com": {
                         "rules": [
                             {
-                                "rule": "api.cxense.com/public/widget/data",
+                                "rule": "cxense.com/public/widget",
                                 "domains": [
-                                    "wsj.com"
+                                    "<all>"
                                 ],
-                                "reason": "Opinion section article elements do not render. Note that Firefox Enhanced Tracking Protection may prevent mitigation from succeeding on Firefox."
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1143"
+                            },
+                            {
+                                "rule": "cxense.com/cx.js",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1143"
+                            },
+                            {
+                                "rule": "cxense.com/cx.cce.js",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1143"
                             }
                         ]
                     },
@@ -3754,11 +3798,12 @@
                             {
                                 "rule": "pubads.g.doubleclick.net/gampad/ads",
                                 "domains": [
+                                    "crunchyroll.com",
                                     "nhl.com",
                                     "rocketnews24.com",
                                     "viki.com"
                                 ],
-                                "reason": "nhl.com - Videos show a spinner and never load.,viki.com - after a video has played for a few seconds an adwall pops up. Clicking 'I've turned off my adblocker' resets the video, then after a few seconds the adwall pops up again.,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846"
+                                "reason": "nhl.com - Videos show a spinner and never load.,viki.com - after a video has played for a few seconds an adwall pops up. Clicking 'I've turned off my adblocker' resets the video, then after a few seconds the adwall pops up again.,rocketnews24.com - https://github.com/duckduckgo/privacy-configuration/issues/846,crunchyroll.com - https://github.com/duckduckgo/privacy-configuration/issues/1140"
                             },
                             {
                                 "rule": "pubads.g.doubleclick.net/ssai/event/",
@@ -4269,23 +4314,6 @@
                                     "abril.com.br"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/929"
-                            },
-                            {
-                                "rule": "googletagmanager.com/gtm.js",
-                                "domains": [
-                                    "aeromexico.com",
-                                    "ah.nl",
-                                    "al.com",
-                                    "bbcgoodfood.com",
-                                    "dailyherald.com",
-                                    "emirates.com",
-                                    "garnethill.com",
-                                    "iltalehti.fi",
-                                    "kingarthurbaking.com",
-                                    "pickfu.com",
-                                    "rbcroyalbank.com"
-                                ],
-                                "reason": "ah.nl - 'Bonus offer' elements do not render and are not clickable.,aeromexico.com, al.com, bbcgoodfood.com, garnethill.com - https://github.com/duckduckgo/privacy-configuration/issues/921,dailyherald.com - Article images render as grey boxes.,emirates.com - After filling out login details and clicking to proceed, a loading spinners shows on the proceed button and the login does not progress.,iltalehti.fi - Article video renders as a blank box.,kingarthurbaking.com - https://github.com/duckduckgo/privacy-configuration/issues/348,pickfu.com - https://github.com/duckduckgo/privacy-configuration/issues/346,rbcroyalbank.com - Investments page renders blank."
                             }
                         ]
                     },
@@ -4973,9 +5001,9 @@
                             {
                                 "rule": "cmp.quantcast.com",
                                 "domains": [
-                                    "express.co.uk"
+                                    "<all>"
                                 ],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1068"
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1125"
                             }
                         ]
                     },
@@ -5451,6 +5479,13 @@
                                     "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/830"
+                            },
+                            {
+                                "rule": "rapid-cdn.yottaa.com/rapid/lib/ows8CdAyrC5lTw.js",
+                                "domains": [
+                                    "scheels.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/492"
                             }
                         ]
                     },
@@ -5530,7 +5565,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "76aa3976f5a8a11d146cd009db47a755"
+            "hash": "55c3cd5ccfe7bb70f0e6a532f9e93df9"
         },
         "trackingCookies1p": {
             "settings": {
