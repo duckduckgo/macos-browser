@@ -609,7 +609,7 @@ struct UserText {
 
     static let showBookmarksBar = NSLocalizedString("bookmarks.bar.show", value: "Show Bookmarks Bar", comment: "Menu item and preference item for showing the bookmarks bar")
     static let showBookmarksBarAlways = NSLocalizedString("bookmarks.bar.show.always", value: "Always Show", comment: "Preference for always showing the bookmarks bar")
-    static let showBookmarksBarNewTabOnly = NSLocalizedString("bookmarks.bar.show.new-tab-only", value: "New Tab Only", comment: "Preference for only showing the bookmarks bar on new tab")
+    static let showBookmarksBarNewTabOnly = NSLocalizedString("bookmarks.bar.show.new-tab-only", value: "Only Show on New Tab", comment: "Preference for only showing the bookmarks bar on new tab")
     static let showBookmarksBarNever = NSLocalizedString("bookmarks.bar.show.never", value: "Never", comment: "Preference for never showing the bookmarks bar on new tab")
     static let bookmarksBarFolderEmpty = NSLocalizedString("bookmarks.bar.folder.empty", value: "Empty", comment: "Empty state for a bookmarks bar folder")
     static let bookmarksBarContextMenuCopy = NSLocalizedString("bookmarks.bar.context-menu.copy", value: "Copy", comment: "Copy menu item for the bookmarks bar context menu")
