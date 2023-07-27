@@ -38,7 +38,7 @@ struct ResultsView: View {
         PendingProfile(dataBroker: "MNO Data Broker", profile: "Olivia Taylor", address: "987 Lemon Drive", error: "Error", errorDescription: "Error Description")]
 
     var body: some View {
-        VStack(spacing: 40) {
+        VStack(spacing: Const.verticalSpacing) {
             PendingProfilesView(profiles: pendingProfiles)
             RemovedProfilesView(profiles: removedProfiles)
         }
@@ -50,7 +50,7 @@ private struct RemovedProfilesView: View {
     let profiles: [RemovedProfile]
 
     var body: some View {
-        VStack(spacing: 40) {
+        VStack(spacing: Const.verticalSpacing) {
             HeaderView(title: "\(profiles.count) Profiles Removed",
                        subtitle: "We will re-scan these sites on a regular basis and send removal requests if your data resurfaces.",
                        iconName: "checkmark.circle.fill",
@@ -74,7 +74,7 @@ private struct PendingProfilesView: View {
     let profiles: [PendingProfile]
 
     var body: some View {
-        VStack(spacing: 40) {
+        VStack(spacing: Const.verticalSpacing) {
             HeaderView(title: "\(profiles.count) Profiles Pending Removal",
                        subtitle: "We automatically requested these sites to remove your data. This can take 2–3 weeks.",
                        iconName: "clock.fill",
@@ -156,14 +156,12 @@ private struct PendingProfileRow: View {
     }
 }
 
-@available(macOS 11.0, *)
-struct ResultsView_Previews: PreviewProvider {
-    static var previews: some View {
-        ResultsView().frame(height: 700)
-            .padding()
-    }
+// MARK: - Constants
+private enum Const {
+    static let verticalSpacing: CGFloat = 40
 }
 
+// MARK: - Modifier
 private struct ListBackground: ViewModifier {
     func body(content: Content) -> some View {
         content
@@ -182,6 +180,7 @@ private extension View {
     }
 }
 
+// MARK: - Data
 private struct RemovedProfile: Identifiable {
     let id = UUID()
     let dataBroker: String
@@ -205,5 +204,14 @@ private struct PendingProfile: Identifiable {
 
     var hasError: Bool {
         error != nil
+    }
+}
+
+// MARK: - Preview
+@available(macOS 11.0, *)
+struct ResultsView_Previews: PreviewProvider {
+    static var previews: some View {
+        ResultsView().frame(height: 700)
+            .padding()
     }
 }
