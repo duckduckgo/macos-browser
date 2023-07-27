@@ -25,6 +25,7 @@ public enum EmailError: Error, Equatable {
     case invalidEmailLink
     case linkExtractionTimedOut
     case cantDecodeEmailLink
+    case unknownStatusReceived(email: String)
 }
 
 protocol EmailServiceProtocol {
@@ -68,26 +69,32 @@ struct EmailService: EmailServiceProtocol {
                              pollingIntervalInSeconds: Int = 30) async throws -> URL {
         let pollingTimeInNanoSecondsSeconds = UInt64(pollingIntervalInSeconds) * NSEC_PER_SEC
 
-        for _ in 1...numberOfRetries {
-            os_log("Getting email confirmation link ...", log: .service)
-            if let emailLink = try await extractEmailLink(email: email) {
-                if let url = URL(string: emailLink) {
-                    os_log("Email received", log: .service)
-                    return url
-                } else {
-                    os_log("Invalid email link", log: .service)
-                    throw EmailError.invalidEmailLink
-                }
-            } else {
-                os_log("No email, waiting for a new request ...", log: .service)
-                try await Task.sleep(nanoseconds: pollingTimeInNanoSecondsSeconds)
-            }
+        guard let emailResult = try? await extractEmailLink(email: email) else {
+            throw EmailError.cantFindEmail
         }
 
-        throw EmailError.linkExtractionTimedOut
+        switch emailResult.status {
+        case .ready:
+            if let link = emailResult.link, let url = URL(string: link) {
+                os_log("Email received", log: .service)
+                return url
+            } else {
+                os_log("Invalid email link", log: .service)
+                throw EmailError.invalidEmailLink
+            }
+        case .pending:
+            if numberOfRetries == 0 {
+                throw EmailError.linkExtractionTimedOut
+            }
+            os_log("No email yet. Waiting for a new request ...", log: .service)
+            try await Task.sleep(nanoseconds: pollingTimeInNanoSecondsSeconds)
+            return try await getConfirmationLink(from: email, numberOfRetries: numberOfRetries - 1, pollingIntervalInSeconds: pollingIntervalInSeconds)
+        case .unknown:
+            throw EmailError.unknownStatusReceived(email: email)
+        }
     }
 
-    private func extractEmailLink(email: String) async throws -> String? {
+    private func extractEmailLink(email: String) async throws -> EmailResponse {
         guard let url = URL(string: Constants.baseUrl + "/links?e=\(email)") else {
             throw EmailError.cantGenerateURL
         }
@@ -97,15 +104,17 @@ struct EmailService: EmailServiceProtocol {
 
         let (data, _) = try await urlSession.data(for: request)
 
-        do {
-            let result = try JSONDecoder().decode(EmailLink.self, from: data)
-            return result.link
-        } catch {
-            throw EmailError.cantDecodeEmailLink
-        }
+        return try JSONDecoder().decode(EmailResponse.self, from: data)
     }
 }
 
-internal struct EmailLink: Codable {
+internal struct EmailResponse: Codable {
+    enum Status: String, Codable {
+        case ready
+        case unknown
+        case pending
+    }
+
+    let status: Status
     let link: String?
 }

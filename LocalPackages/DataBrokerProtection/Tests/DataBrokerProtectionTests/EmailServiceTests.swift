@@ -88,10 +88,34 @@ final class EmailServiceTests: XCTestCase {
         }
     }
 
+    func testWhenEmailExtractingIsUnknown_thenUnknownErrorIsThrown() async {
+        let responseDictionary = ["status": "unknown"]
+        let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
+        let unknownResponse: RequestHandler = { _ in (HTTPURLResponse.ok, responseData) }
+        MockURLProtocol.requestHandlerQueue.append(unknownResponse)
+
+        let sut = EmailService(urlSession: mockURLSession)
+
+        do {
+            _ = try await sut.getConfirmationLink(
+                from: "some@email.com",
+                numberOfRetries: 2,
+                pollingIntervalInSeconds: 2
+            )
+        } catch {
+            if let error = error as? EmailError, case .unknownStatusReceived = error {
+                return
+            }
+
+            XCTFail("Unexpected error thrown: \(error).")
+        }
+    }
+
     func testWhenEmailExtractingExceedesRetries_thenTimeOutErrorIsThrown() async {
-        let responseDictionary = ["response": "Not ready"]
+        let responseDictionary = ["status": "pending"]
         let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
         let notReadyResponse: RequestHandler = { _ in (HTTPURLResponse.ok, responseData) }
+        MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
         MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
         MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
 
@@ -113,12 +137,13 @@ final class EmailServiceTests: XCTestCase {
     }
 
     func testWhenEmailSuccedesInLastRetry_thenSuccessIsReturned() async {
-        let validURL = EmailLink(link: "www.duckduckgo.com")
+        let validURL = EmailResponse(status: .ready, link: "www.duckduckgo.com")
         let successResponseData = try? JSONEncoder().encode(validURL)
-        let responseDictionary = ["response": "Not ready"]
+        let responseDictionary = ["status": "pending"]
         let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
         let notReadyResponse: RequestHandler = { _ in (HTTPURLResponse.ok, responseData) }
         let successResponse: RequestHandler = { _ in (HTTPURLResponse.ok, successResponseData) }
+        MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
         MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
         MockURLProtocol.requestHandlerQueue.append(successResponse)
 
@@ -136,7 +161,7 @@ final class EmailServiceTests: XCTestCase {
         }
     }
 
-    func testWhenEmailCannotBeDecoded_thenCannotBeDecodedErrorIsThrown() async {
+    func testWhenEmailCannotBeDecoded_thenCantFindEmailErrorIsThrown() async {
         let responseDictionary = ["link": ["test": "test"]]
         let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
@@ -150,7 +175,7 @@ final class EmailServiceTests: XCTestCase {
                 pollingIntervalInSeconds: 2
             )
         } catch {
-            if let error = error as? EmailError, case .cantDecodeEmailLink = error {
+            if let error = error as? EmailError, case .cantFindEmail = error {
                 return
             }
 
@@ -159,7 +184,7 @@ final class EmailServiceTests: XCTestCase {
     }
 
     func testWhenEmailLinkIsInvalid_thenInvalidEmailLinkErrorIsThrown() async {
-        let invalidLink = EmailLink(link: "invalidURL")
+        let invalidLink = EmailResponse(status: .ready, link: "invalidURL")
         let responseData = try? JSONEncoder().encode(invalidLink)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
@@ -181,7 +206,7 @@ final class EmailServiceTests: XCTestCase {
     }
 
     func testWhenEmailLinkIsValid_thenTheURLIsReturned() async {
-        let validURL = EmailLink(link: "www.duckduckgo.com")
+        let validURL = EmailResponse(status: .ready, link: "www.duckduckgo.com")
         let responseData = try? JSONEncoder().encode(validURL)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
