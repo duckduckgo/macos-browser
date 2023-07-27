@@ -116,6 +116,9 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
+        
+        // TODO remove
+        updateBookmarksBarViewVisibility(visible: true)
     }
 
     func windowDidResignKey() {

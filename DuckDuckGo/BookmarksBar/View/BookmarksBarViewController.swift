@@ -24,6 +24,7 @@ final class BookmarksBarViewController: NSViewController {
 
     @IBOutlet private var bookmarksBarCollectionView: NSCollectionView!
     @IBOutlet private var clippedItemsIndicator: NSButton!
+    @IBOutlet private var promptAnchor: NSView!
 
     private let bookmarkManager = LocalBookmarkManager.shared
     private let viewModel: BookmarksBarViewModel
@@ -71,6 +72,8 @@ final class BookmarksBarViewController: NSViewController {
         bookmarksBarCollectionView.collectionViewLayout = createCenteredCollectionViewLayout()
 
         view.postsFrameChangedNotifications = true
+
+        view.addGestureRecognizer(NSClickGestureRecognizer(target: self, action: #selector(showBookmarksBarPrompt)))
     }
 
     private func addContextMenu() {
@@ -88,6 +91,11 @@ final class BookmarksBarViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         frameChangeNotification()
+    }
+
+    @objc // temporary for testing
+    func showBookmarksBarPrompt() {
+        BookmarksBarPromptPopover().showBelow(promptAnchor) // .show(relativeTo: promptAnchor.bounds, of: promptAnchor, preferredEdge: .maxY)
     }
 
     private func subscribeToViewModel() {
