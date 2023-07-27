@@ -277,7 +277,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         options["activationAttemptId"] = UUID().uuidString as NSString
         options["authToken"] = try tokenStore.fetchToken() as NSString?
         options["selectedServer"] = debugUtilities.selectedServerName() as NSString?
-        options["keyValidity"] = debugUtilities.registrationKeyValidity().map(String.init(describing:)) as NSString?
+        options["keyValidity"] = debugUtilities.registrationKeyValidity.map(String.init(describing:)) as NSString?
 
         if Self.simulationOptions.isEnabled(.tunnelFailure) {
             Self.simulationOptions.setEnabled(false, option: .tunnelFailure)

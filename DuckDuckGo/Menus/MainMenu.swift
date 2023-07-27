@@ -84,11 +84,6 @@ final class MainMenu: NSMenu {
     // MARK: - Debug
 
     @IBOutlet weak var debugMenuItem: NSMenuItem?
-    @IBOutlet weak var networkProtectionMenuItem: NSMenuItem? {
-        didSet {
-            networkProtectionMenuItem?.target = networkProtectionDebugMenuController
-        }
-    }
 
     private func setupDebugMenuItem(with featureFlagger: FeatureFlagger) {
         guard let debugMenuItem else {
@@ -107,23 +102,12 @@ final class MainMenu: NSMenu {
         if debugMenuItem.submenu?.items.contains(loggingMenuItem) == false {
             debugMenuItem.submenu!.addItem(loggingMenuItem)
         }
-
-#if !NETWORK_PROTECTION
-        // Hide the entire NetP debug menu when the feature is disabled:
-        networkProtectionMenuItem?.removeFromParent()
-#endif
     }
 
     // MARK: - Help
     @IBOutlet weak var helpMenuItem: NSMenuItem?
     @IBOutlet weak var helpSeparatorMenuItem: NSMenuItem?
     @IBOutlet weak var sendFeedbackMenuItem: NSMenuItem?
-
-    // MARK: - Menu Controllers
-
-    /// Network Protection controller for the debug menu.
-    ///
-    @IBOutlet var networkProtectionDebugMenuController: NetworkProtectionDebugMenuController?
 
     // MARK: - Setup
 

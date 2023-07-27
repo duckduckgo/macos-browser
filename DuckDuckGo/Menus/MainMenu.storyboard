@@ -11,14 +11,6 @@
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <customObject id="WIK-gq-Ncg" customClass="CopyHandler" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
-                <customObject id="jWm-XD-4k5" userLabel="NetworkProtectionDebugMenuController" customClass="NetworkProtectionDebugMenuController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                    <connections>
-                        <outlet property="networkProtectionRegistrationKeyValidityMenuItem" destination="iPz-EO-Nv6" id="t4e-i6-rYy"/>
-                        <outlet property="networkProtectionRegistrationKeyValidityMenuSeparatorItem" destination="MEg-4g-gji" id="12H-fj-mJw"/>
-                        <outlet property="preferredServerMenu" destination="jbT-17-qgW" id="dva-NZ-YGG"/>
-                        <outlet property="registrationKeyValidityMenu" destination="HwX-wm-4zf" id="CYc-Hg-5yx"/>
-                    </connections>
-                </customObject>
                 <application id="hnw-xV-0zn" sceneMemberID="viewController">
                     <menu key="mainMenu" title="Main Menu" systemMenu="main" id="AYu-sK-qS6" customClass="MainMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                         <items>
@@ -819,25 +811,25 @@ CQ
                                         </menuItem>
                                         <menuItem title="Network Protection" id="Dt6-sj-4hn">
                                             <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Network Protection" id="Rah-lS-gno">
+                                            <menu key="submenu" title="Network Protection" id="Rah-lS-gno" customClass="NetworkProtectionDebugMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <items>
                                                     <menuItem title="Reset Network Protection State" id="p4h-oC-tpw">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="resetAllState:" target="jWm-XD-4k5" id="KjP-nC-NdE"/>
+                                                            <action selector="resetAllState:" target="Rah-lS-gno" id="TDN-VH-bgV"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem title="Remove System Extension and Login Items" id="bKT-dU-DaE" userLabel="Remove System Extension">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="removeSystemExtensionAndAgents:" target="jWm-XD-4k5" id="GYd-Is-Jpm"/>
+                                                            <action selector="removeSystemExtensionAndAgents:" target="Rah-lS-gno" id="1Yo-Qj-wxo"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem isSeparatorItem="YES" id="FSc-gX-vGh"/>
                                                     <menuItem title="Send Test Notification" id="3rB-n0-ZjS">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="sendTestNotification:" target="jWm-XD-4k5" id="R3Z-Xd-DqK"/>
+                                                            <action selector="sendTestNotification:" target="Rah-lS-gno" id="Hea-8E-9VU"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem title="Preferred Server" id="Zh6-DO-H1c">
@@ -847,7 +839,7 @@ CQ
                                                                 <menuItem title="Automatic" id="0j8-SE-pRP">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="setSelectedServer:" target="jWm-XD-4k5" id="BTe-lq-aw5"/>
+                                                                        <action selector="setSelectedServer:" target="Rah-lS-gno" id="aXQ-qW-U5G"/>
                                                                     </connections>
                                                                 </menuItem>
                                                             </items>
@@ -860,7 +852,7 @@ CQ
                                                                 <menuItem title="Expire Now" id="104-Zf-0KB">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="expireRegistrationKeyNow:" target="jWm-XD-4k5" id="o87-U0-4Bt"/>
+                                                                        <action selector="expireRegistrationKeyNow:" target="Rah-lS-gno" id="gZT-ua-1Mu"/>
                                                                     </connections>
                                                                 </menuItem>
                                                                 <menuItem isSeparatorItem="YES" id="MEg-4g-gji"/>
@@ -871,7 +863,7 @@ CQ
                                                                             <menuItem title="Automatic" id="Hsh-im-6Cc">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                                 <connections>
-                                                                                    <action selector="setRegistrationKeyValidity:" target="jWm-XD-4k5" id="Sdt-TF-oif"/>
+                                                                                    <action selector="setRegistrationKeyValidity:" target="Rah-lS-gno" id="xGL-zk-E3i"/>
                                                                                 </connections>
                                                                             </menuItem>
                                                                         </items>
@@ -882,24 +874,33 @@ CQ
                                                     </menuItem>
                                                     <menuItem title="Simulate Failure" id="K5h-D4-For">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Simulate Failure" id="iLs-sj-2Gd">
+                                                        <menu key="submenu" title="Simulate Failure" id="iLs-sj-2Gd" customClass="NetworkProtectionSimulateFailureMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                             <items>
                                                                 <menuItem title="Enable NetP &gt; Controller Failure" id="xyA-ob-gEy">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="simulateControllerFailure:" target="jWm-XD-4k5" id="02v-bD-cWE"/>
+                                                                        <action selector="simulateControllerFailure:" target="iLs-sj-2Gd" id="qO6-8J-ER0"/>
                                                                     </connections>
                                                                 </menuItem>
                                                                 <menuItem title="Enable NetP &gt; Tunnel Failure" id="kVa-n8-UNx">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="simulateTunnelFailure:" target="jWm-XD-4k5" id="h0z-W6-uza"/>
+                                                                        <action selector="simulateTunnelFailure:" target="iLs-sj-2Gd" id="tZL-Vl-6mu"/>
                                                                     </connections>
                                                                 </menuItem>
                                                             </items>
                                                         </menu>
                                                     </menuItem>
                                                 </items>
+                                                <connections>
+                                                    <outlet property="mainMenuItem" destination="Dt6-sj-4hn" id="vwa-T8-0ak"/>
+                                                    <outlet property="preferredServerAutomaticItem" destination="0j8-SE-pRP" id="APF-zT-6Qd"/>
+                                                    <outlet property="preferredServerMenu" destination="jbT-17-qgW" id="6qH-9G-SrT"/>
+                                                    <outlet property="registrationKeyValidityAutomaticItem" destination="Hsh-im-6Cc" id="k4w-9T-ny9"/>
+                                                    <outlet property="registrationKeyValidityMenu" destination="HwX-wm-4zf" id="Dpg-p8-nQ0"/>
+                                                    <outlet property="registrationKeyValidityMenuItem" destination="iPz-EO-Nv6" id="XbK-zy-EGv"/>
+                                                    <outlet property="registrationKeyValidityMenuSeparatorItem" destination="MEg-4g-gji" id="Pos-zQ-wJJ"/>
+                                                </connections>
                                             </menu>
                                         </menuItem>
                                         <menuItem title="Trigger Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">
@@ -955,7 +956,6 @@ CQ
                             <outlet property="importBookmarksMenuItem" destination="tNX-Bv-yM3" id="NI1-on-lCU"/>
                             <outlet property="importBrowserDataMenuItem" destination="gTV-od-6G5" id="2R0-Pa-qG4"/>
                             <outlet property="manageBookmarksMenuItem" destination="BaO-sP-wbQ" id="rn7-HX-04s"/>
-                            <outlet property="networkProtectionDebugMenuController" destination="jWm-XD-4k5" id="DtX-jo-O5U"/>
                             <outlet property="networkProtectionMenuItem" destination="Dt6-sj-4hn" id="rwK-fl-TRh"/>
                             <outlet property="newBurnerWindowMenuItem" destination="fx4-EK-KRg" id="52V-eM-hzi"/>
                             <outlet property="newTabMenuItem" destination="9qI-62-tsd" id="6SI-rG-P34"/>
