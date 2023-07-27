@@ -103,8 +103,9 @@ final class FaviconManager: FaviconManagement {
     func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink],
                             documentUrl: URL,
                             completion: @escaping (Favicon?) -> Void) {
+
         // Manually add favicon.ico into links
-        let faviconLinks = addingFaviconIco(into: faviconLinks, documentUrl: documentUrl)
+        let faviconLinks = createFallbackLinksIfNeeded(faviconLinks, documentUrl: documentUrl)
 
         // Fetch favicons if needed
         let faviconLinksToFetch = filteringAlreadyFetchedFaviconLinks(from: faviconLinks)
@@ -268,14 +269,12 @@ final class FaviconManager: FaviconManagement {
 
     // MARK: - Private
 
-    private func addingFaviconIco(into faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL) -> [FaviconUserScript.FaviconLink] {
-        var faviconLinks = faviconLinks
-        if let host = documentUrl.host {
-            let faviconIcoLink = FaviconUserScript.FaviconLink(href: "\(URL.NavigationalScheme.https.separated())\(host)/favicon.ico",
-                                                               rel: "favicon.ico")
-            faviconLinks.append(faviconIcoLink)
-        }
-        return faviconLinks
+    private func createFallbackLinksIfNeeded(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL) -> [FaviconUserScript.FaviconLink] {
+        guard faviconLinks.isEmpty, let host = documentUrl.host else { return faviconLinks }
+        return [
+            FaviconUserScript.FaviconLink(href: "\(URL.NavigationalScheme.https.separated())\(host)/favicon.ico",
+                                          rel: "favicon.ico")
+        ]
     }
 
     private func filteringAlreadyFetchedFaviconLinks(from faviconLinks: [FaviconUserScript.FaviconLink]) -> [FaviconUserScript.FaviconLink] {

@@ -76,7 +76,7 @@ final class FaviconUserScript: NSObject, StaticUserScript {
     function findFavicons() {
          var selectors = [
             "link[rel='favicon']",
-            "link[rel~='icon']",
+            "link[rel*='icon']",
             "link[rel='apple-touch-icon']",
             "link[rel='apple-touch-icon-precomposed']"
         ];

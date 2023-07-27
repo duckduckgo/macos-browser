@@ -497,7 +497,7 @@ protocol NewWindowPolicyDecisionMaker {
             if !content.displaysContentInWebView && oldValue.displaysContentInWebView {
                 webView.stopAllMediaAndLoading()
             }
-            handleFavicon()
+            handleFavicon(oldValue: oldValue)
             invalidateInteractionStateData()
             error = nil
         }
@@ -931,7 +931,7 @@ protocol NewWindowPolicyDecisionMaker {
     @Published var favicon: NSImage?
     let faviconManagement: FaviconManagement
 
-    private func handleFavicon() {
+    private func handleFavicon(oldValue: TabContent? = nil) {
         guard content.isUrl, let url = content.urlForWebView else {
             favicon = nil
             return
@@ -948,7 +948,8 @@ protocol NewWindowPolicyDecisionMaker {
             if cachedFavicon != favicon {
                 favicon = cachedFavicon
             }
-        } else {
+        } else if oldValue?.url?.host != url.host {
+            // If the domain matches the previous value, just keep the same favicon
             favicon = nil
         }
     }

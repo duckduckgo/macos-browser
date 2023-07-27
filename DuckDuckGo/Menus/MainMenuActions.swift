@@ -390,9 +390,10 @@ extension MainViewController {
         // when close is triggered by a keyboard shortcut,
         // instead of closing a pinned tab we select the first regular tab
         // (this is in line with Safari behavior)
+        // If there are no regular tabs, we close the window.
         if isHandlingKeyDownEvent, tabCollectionViewModel.selectionIndex?.isPinnedTab == true {
             if tabCollectionViewModel.tabCollection.tabs.isEmpty {
-                tabCollectionViewModel.append(tab: Tab(content: .homePage), selected: true)
+                view.window?.performClose(sender)
             } else {
                 tabCollectionViewModel.select(at: .unpinned(0))
             }

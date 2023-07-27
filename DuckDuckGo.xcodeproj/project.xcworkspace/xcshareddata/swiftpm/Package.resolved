@@ -14,7 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "12936bbff846c3276546b5d901a639345a46eb6c"
+        "revision" : "188ba0cc3a6f5f6600318da948e8ad844d56de45",
+        "version" : "69.0.0"
       }
     },
     {
@@ -94,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sparkle-project/Sparkle.git",
       "state" : {
-        "revision" : "9d85a02fe7916caa7531847452c4933d331503a5",
-        "version" : "2.3.1"
+        "revision" : "87e4fcbac39912f9cdb9a9acf205cad60e1ca3bc",
+        "version" : "2.4.2"
       }
     },
     {
@@ -128,7 +129,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
       "state" : {
         "revision" : "4684440d03304e7638a2c8086895367e90987463",
         "version" : "1.2.1"
