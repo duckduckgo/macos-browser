@@ -23,6 +23,7 @@ import BrowserServicesKit
 
 #if NETWORK_PROTECTION
 import NetworkProtection
+import NetworkProtectionUI
 #endif
 
 // swiftlint:disable:next type_body_length
@@ -223,7 +224,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func openNewChildTab(with url: URL) {
-        let tab = Tab(content: .url(url), parentTab: tabCollectionViewModel.selectedTabViewModel?.tab, shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
+        let tab = Tab(content: .url(url), parentTab: tabCollectionViewModel.selectedTabViewModel?.tab, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.insert(tab, selected: false)
     }
 

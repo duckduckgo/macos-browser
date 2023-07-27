@@ -68,7 +68,8 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     init(popovers: NavigationBarPopovers,
          pinningManager: PinningManager = LocalPinningManager.shared,
-         statusReporter: NetworkProtectionStatusReporter? = nil) {
+         statusReporter: NetworkProtectionStatusReporter? = nil,
+         iconProvider: IconProvider = NavigationBarIconProvider()) {
 
         let statusObserver = ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
                                                                     platformDidWakeNotification: NSWorkspace.didWakeNotification)
@@ -81,7 +82,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
             serverInfoObserver: statusInfoObserver,
             connectionErrorObserver: connectionErrorObserver
         )
-        self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, isForStatusBar: false)
+        self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, iconProvider: iconProvider)
         self.popovers = popovers
         self.pinningManager = pinningManager
         isPinned = pinningManager.isPinned(.networkProtection)

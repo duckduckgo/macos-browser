@@ -27,9 +27,7 @@ final class ApplicationDockMenu: NSMenu {
         addItem(withTitle: UserText.newWindowMenuItem, action: #selector(AppDelegate.newWindow), keyEquivalent: "")
 
         // New Burner Window
-        if internalUserDecider.isInternalUser {
-            addItem(withTitle: UserText.newBurnerWindowMenuItem, action: #selector(AppDelegate.newBurnerWindow), keyEquivalent: "")
-        }
+        addItem(withTitle: UserText.newBurnerWindowMenuItem, action: #selector(AppDelegate.newBurnerWindow), keyEquivalent: "")
     }
 
     required init(coder: NSCoder) {

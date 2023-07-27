@@ -52,10 +52,14 @@ final class AutofillTabExtension: TabExtension {
     }
     private var emailManager: AutofillEmailDelegate?
     private var vaultManager: AutofillSecureVaultDelegate?
+    private let isBurner: Bool
 
     @Published var autofillDataToSave: AutofillData?
 
-    init(autofillUserScriptPublisher: some Publisher<WebsiteAutofillUserScript?, Never>) {
+    init(autofillUserScriptPublisher: some Publisher<WebsiteAutofillUserScript?, Never>,
+         isBurner: Bool) {
+        self.isBurner = isBurner
+
         autofillUserScriptCancellable = autofillUserScriptPublisher.sink { [weak self] autofillScript in
             guard let self, let autofillScript else { return }
 
@@ -77,6 +81,10 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
 
     public func secureVaultManagerIsEnabledStatus(_: SecureVaultManager) -> Bool {
         return true
+    }
+
+    func secureVaultManagerShouldSaveData(_: BrowserServicesKit.SecureVaultManager) -> Bool {
+        return !isBurner
     }
 
     func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData, hasGeneratedPassword generatedPassword: Bool, withTrigger trigger: AutofillUserScript.GetTriggerType?) {

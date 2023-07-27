@@ -358,27 +358,10 @@ final class TabBarViewItem: NSCollectionViewItem {
         }
 
         // Adjust colors for burner window
-        if isBurner {
-            rightSeparatorView.backgroundColor = .burnerWindowTabSeparatorColor
-            if isSelected {
-                if faviconImageView.image === TabViewModel.Favicon.burnerHome {
+        if isBurner && faviconImageView.image === TabViewModel.Favicon.burnerHome {
                     faviconImageView.contentTintColor = .textColor
-                } else {
-                    faviconImageView.contentTintColor = nil
-                }
-                titleTextField.textColor = .textColor
-                closeButton.normalTintColor = .buttonColor
-                permissionButton.contentTintColor = .buttonColor
-            } else {
-                if faviconImageView.image === TabViewModel.Favicon.burnerHome {
-                    faviconImageView.contentTintColor = .alternateSelectedControlTextColor
-                } else {
-                    faviconImageView.contentTintColor = nil
-                }
-                titleTextField.textColor = .alternateSelectedControlTextColor
-                closeButton.normalTintColor = .alternateSelectedControlTextColor
-                permissionButton.contentTintColor = .alternateSelectedControlTextColor
-            }
+        } else {
+            faviconImageView.contentTintColor = nil
         }
     }
 
@@ -465,12 +448,9 @@ extension TabBarViewItem: NSMenuDelegate {
         addCloseMenuItem(to: menu)
         addCloseOtherMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
         addCloseTabsToTheRightMenuItem(to: menu, areThereTabsToTheRight: otherItemsState.hasItemsToTheRight)
-        if isBurner {
-            addMoveToNewBurnerWindowMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
-        } else {
+        if !isBurner {
             addMoveToNewWindowMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
         }
-
     }
 
     private func addDuplicateMenuItem(to menu: NSMenu) {
@@ -533,13 +513,6 @@ extension TabBarViewItem: NSMenuDelegate {
         moveToNewWindowMenuItem.target = self
         moveToNewWindowMenuItem.isEnabled = areThereOtherTabs
         menu.addItem(moveToNewWindowMenuItem)
-    }
-
-    private func addMoveToNewBurnerWindowMenuItem(to menu: NSMenu, areThereOtherTabs: Bool) {
-        let moveToNewBurnerWindowMenuItem = NSMenuItem(title: UserText.moveTabToNewBurnerWindow, action: #selector(moveToNewBurnerWindowAction(_:)), keyEquivalent: "")
-        moveToNewBurnerWindowMenuItem.target = self
-        moveToNewBurnerWindowMenuItem.isEnabled = areThereOtherTabs
-        menu.addItem(moveToNewBurnerWindowMenuItem)
     }
 
 }
