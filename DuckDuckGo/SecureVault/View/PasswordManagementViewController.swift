@@ -675,23 +675,27 @@ final class PasswordManagementViewController: NSViewController {
             }
 
             func loadNewItemWithID() {
-                switch newValue {
-                case .account:
-                    guard let credentials = try? self?.secureVault?.websiteCredentialsFor(accountId: id) else { return }
-                    self?.createLoginItemView()
-                    self?.syncModelsOnCredentials(credentials)
-                case .card:
-                    guard let card = try? self?.secureVault?.creditCardFor(id: id) else { return }
-                    self?.createCreditCardItemView()
-                    self?.syncModelsOnCreditCard(card)
-                case .identity:
-                    guard let identity = try? self?.secureVault?.identityFor(id: id) else { return }
-                    self?.createIdentityItemView()
-                    self?.syncModelsOnIdentity(identity)
-                case .note:
-                    guard let note = try? self?.secureVault?.noteFor(id: id) else { return }
-                    self?.createNoteItemView()
-                    self?.syncModelsOnNote(note)
+                do {
+                    switch newValue {
+                    case .account:
+                        guard let credentials = try self?.secureVault?.websiteCredentialsFor(accountId: id) else { return }
+                        self?.createLoginItemView()
+                        self?.syncModelsOnCredentials(credentials)
+                    case .card:
+                        guard let card = try self?.secureVault?.creditCardFor(id: id) else { return }
+                        self?.createCreditCardItemView()
+                        self?.syncModelsOnCreditCard(card)
+                    case .identity:
+                        guard let identity = try self?.secureVault?.identityFor(id: id) else { return }
+                        self?.createIdentityItemView()
+                        self?.syncModelsOnIdentity(identity)
+                    case .note:
+                        guard let note = try self?.secureVault?.noteFor(id: id) else { return }
+                        self?.createNoteItemView()
+                        self?.syncModelsOnNote(note)
+                    }
+                } catch {
+                    Pixel.fire(.debug(event: .autofillFailedToFetchData, error: error))
                 }
             }
 
