@@ -88,11 +88,20 @@ final class MainViewController: NSViewController {
         registerForBookmarkBarPromptNotifications()
     }
 
+    var bookmarkBarPromptObserver: Any?
     func registerForBookmarkBarPromptNotifications() {
-        NotificationCenter.default.addObserver(forName: .bookmarkPromptShouldShow,
-                                               object: nil,
-                                               queue: .main) { [weak self] _ in
-            self?.showBookmarkPromptIfNeeded()
+        bookmarkBarPromptObserver = NotificationCenter.default.addObserver(
+            forName: .bookmarkPromptShouldShow,
+            object: nil,
+            queue: .main) { [weak self] _ in
+                self?.showBookmarkPromptIfNeeded()
+        }
+    }
+
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        if let bookmarkBarPromptObserver {
+            NotificationCenter.default.removeObserver(bookmarkBarPromptObserver)
         }
     }
 
