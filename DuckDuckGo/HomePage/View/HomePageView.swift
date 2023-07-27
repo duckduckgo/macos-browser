@@ -65,16 +65,16 @@ extension HomePage.Views {
                         Group {
                             if includingContinueSetUpCards {
                                 ContinueSetUpView()
-                                    .padding(.top, 72)
+                                    .padding(.top, 64)
                                     .visibility(model.isContinueSetUpVisible ? .visible : .gone)
                             }
 
                             Favorites()
-                                .padding(.top, 72)
+                                .padding(.top, 24)
                                 .visibility(model.isFavoriteVisible ? .visible : .gone)
 
                             RecentlyVisited()
-                                .padding(.top, 66)
+                                .padding(.top, 24)
                                 .padding(.bottom, 16)
                                 .visibility(model.isRecentActivityVisible ? .visible : .gone)
 

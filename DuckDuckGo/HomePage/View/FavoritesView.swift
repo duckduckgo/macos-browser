@@ -84,7 +84,7 @@ struct FavoritesGrid: View {
         }
 
         MoreOrLess(isExpanded: $model.showAllFavorites)
-            .padding(.top, 2)
+            .padding(.top, -3)
             .visibility(moreOrLessButtonVisibility)
     }
 
