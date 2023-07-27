@@ -197,7 +197,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     ]
 
     private func populateNetworkProtectionRegistrationKeyValidityMenuItems() {
-        #if DEBUG
+#if DEBUG
         guard let menu = registrationKeyValidityMenu,
               let automaticItem = menu.items.first else {
 
@@ -219,7 +219,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
                 return menuItem
             }
         }
-        #else
+#else
         guard let separator = registrationKeyValidityMenuSeparatorItem,
               let validityMenu = registrationKeyValidityMenuItem else {
             assertionFailure("\(#function): Failed to get submenu")
@@ -228,7 +228,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
         separator.isHidden = true
         validityMenu.isHidden = true
-        #endif
+#endif
     }
 
     // MARK: - Menu State Update
