@@ -84,6 +84,16 @@ final class MainViewController: NSViewController {
         findInPageContainerView.applyDropShadow()
 
         view.registerForDraggedTypes([.URL, .fileURL])
+
+        registerForBookmarkBarPromptNotifications()
+    }
+
+    func registerForBookmarkBarPromptNotifications() {
+        NotificationCenter.default.addObserver(forName: .bookmarkPromptShouldShow,
+                                               object: nil,
+                                               queue: .main) { [weak self] _ in
+            self?.showBookmarkPromptIfNeeded()
+        }
     }
 
     override func viewWillAppear() {
@@ -115,14 +125,21 @@ final class MainViewController: NSViewController {
         updateForwardMenuItem()
         updateReloadMenuItem()
         updateStopMenuItem()
-        browserTabViewController.windowDidBecomeKey()
-        
-        // TODO remove
-        updateBookmarksBarViewVisibility(visible: true)
+        browserTabViewController.windowDidBecomeKey()        
     }
 
     func windowDidResignKey() {
         browserTabViewController.windowDidResignKey()
+    }
+
+    func showBookmarkPromptIfNeeded() {
+        // TODO check it hasn't been seen already
+        updateBookmarksBarViewVisibility(visible: true)
+
+        // This won't work until the bookmarks bar is visible
+        DispatchQueue.main.async {
+            self.bookmarksBarViewController.showBookmarksBarPrompt()
+        }
     }
 
     override func encodeRestorableState(with coder: NSCoder) {

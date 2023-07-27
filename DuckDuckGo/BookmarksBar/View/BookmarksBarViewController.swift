@@ -72,8 +72,6 @@ final class BookmarksBarViewController: NSViewController {
         bookmarksBarCollectionView.collectionViewLayout = createCenteredCollectionViewLayout()
 
         view.postsFrameChangedNotifications = true
-
-        view.addGestureRecognizer(NSClickGestureRecognizer(target: self, action: #selector(showBookmarksBarPrompt)))
     }
 
     private func addContextMenu() {
@@ -93,9 +91,8 @@ final class BookmarksBarViewController: NSViewController {
         frameChangeNotification()
     }
 
-    @objc // temporary for testing
     func showBookmarksBarPrompt() {
-        BookmarksBarPromptPopover().showBelow(promptAnchor) // .show(relativeTo: promptAnchor.bounds, of: promptAnchor, preferredEdge: .maxY)
+        BookmarksBarPromptPopover().showBelow(promptAnchor)
     }
 
     private func subscribeToViewModel() {
@@ -296,5 +293,11 @@ extension BookmarksBarViewController: AddBookmarkModalViewControllerDelegate, Ad
         bookmarkManager.update(bookmark: bookmark)
         _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
     }
+
+}
+
+extension Notification.Name {
+
+    static let bookmarkPromptShouldShow = Notification.Name(rawValue: "bookmarkPromptShouldShow")
 
 }

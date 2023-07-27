@@ -96,6 +96,8 @@ struct BookmarksBarPromptView: View {
                     model.onNotNow()
                 } label: {
                     Text("Not Now")
+                        .font(Font.custom("SF Pro Text", size: 13))
+                        .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
                         .frame(height: 28)
                 }
@@ -106,6 +108,8 @@ struct BookmarksBarPromptView: View {
                     model.onShow()
                 } label: {
                     Text("Show")
+                        .font(Font.custom("SF Pro Text", size: 13))
+                        .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
                         .frame(height: 28)
 

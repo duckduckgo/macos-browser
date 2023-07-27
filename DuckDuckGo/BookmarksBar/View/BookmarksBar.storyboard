@@ -3,7 +3,6 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
-        <capability name="System colors introduced in macOS 10.13" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -15,6 +14,13 @@
                         <rect key="frame" x="0.0" y="0.0" width="676" height="56"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="cjE-4p-vxI">
+                                <rect key="frame" x="328" y="18" width="20" height="20"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="20" id="GSP-kG-54V"/>
+                                    <constraint firstAttribute="width" constant="20" id="yib-Jv-zJp"/>
+                                </constraints>
+                            </customView>
                             <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="0.0" horizontalPageScroll="0.0" verticalLineScroll="0.0" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="D39-Of-BIh">
                                 <rect key="frame" x="0.0" y="2" width="676" height="52"/>
                                 <clipView key="contentView" drawsBackground="NO" id="yvk-6W-sd0">
@@ -52,18 +58,6 @@
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="X6g-3K-JDi">
                                 <rect key="frame" x="0.0" y="-2" width="676" height="5"/>
                             </box>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="cjE-4p-vxI" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="328" y="18" width="20" height="20"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="20" id="GSP-kG-54V"/>
-                                    <constraint firstAttribute="width" constant="20" id="yib-Jv-zJp"/>
-                                </constraints>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                        <color key="value" name="findHighlightColor" catalog="System" colorSpace="catalog"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </customView>
                         </subviews>
                         <constraints>
                             <constraint firstItem="X6g-3K-JDi" firstAttribute="leading" secondItem="R54-3G-cms" secondAttribute="leading" id="0AB-Ps-M7N"/>
