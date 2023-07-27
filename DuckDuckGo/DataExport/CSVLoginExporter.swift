@@ -49,7 +49,7 @@ final class CSVLoginExporter {
                 }
             }
         } catch {
-            Pixel.fire(.debug(event: .autofillFailedToFetchData, error: error))
+            Pixel.fire(.debug(event: .secureVaultError, error: error))
             throw error
         }
 

@@ -493,7 +493,7 @@ final class PasswordManagementViewController: NSViewController {
             if case SecureVaultError.duplicateRecord = error {
                 showDuplicateAlert()
             } else {
-                Pixel.fire(.debug(event: .autofillFailedToSaveItem(kind: .password), error: error))
+                Pixel.fire(.debug(event: .secureVaultError, error: error))
             }
         }
     }
@@ -516,7 +516,7 @@ final class PasswordManagementViewController: NSViewController {
             postChange()
 
         } catch {
-            Pixel.fire(.debug(event: .autofillFailedToSaveItem(kind: .identity), error: error))
+            Pixel.fire(.debug(event: .secureVaultError, error: error))
         }
     }
 
@@ -560,7 +560,7 @@ final class PasswordManagementViewController: NSViewController {
             postChange()
 
         } catch {
-            Pixel.fire(.debug(event: .autofillFailedToSaveItem(kind: .card), error: error))
+            Pixel.fire(.debug(event: .secureVaultError, error: error))
         }
     }
 
@@ -579,7 +579,7 @@ final class PasswordManagementViewController: NSViewController {
                     self.requestSync()
                     self.refreshData()
                 } catch {
-                    Pixel.fire(.debug(event: .autofillFailedToDeleteItem(kind: .password), error: error))
+                    Pixel.fire(.debug(event: .secureVaultError, error: error))
                 }
 
             default:
@@ -602,7 +602,7 @@ final class PasswordManagementViewController: NSViewController {
                     try self.secureVault?.deleteIdentityFor(identityId: id)
                     self.refreshData()
                 } catch {
-                    Pixel.fire(.debug(event: .autofillFailedToDeleteItem(kind: .identity), error: error))
+                    Pixel.fire(.debug(event: .secureVaultError, error: error))
                 }
 
             default:
@@ -644,7 +644,7 @@ final class PasswordManagementViewController: NSViewController {
                     try self.secureVault?.deleteCreditCardFor(cardId: id)
                     self.refreshData()
                 } catch {
-                    Pixel.fire(.debug(event: .autofillFailedToDeleteItem(kind: .card), error: error))
+                    Pixel.fire(.debug(event: .secureVaultError, error: error))
                 }
 
             default:
@@ -695,7 +695,7 @@ final class PasswordManagementViewController: NSViewController {
                         self?.syncModelsOnNote(note)
                     }
                 } catch {
-                    Pixel.fire(.debug(event: .autofillFailedToFetchData, error: error))
+                    Pixel.fire(.debug(event: .secureVaultError, error: error))
                 }
             }
 
@@ -799,7 +799,7 @@ final class PasswordManagementViewController: NSViewController {
                     items = cards.map(SecureVaultItem.card)
                 }
             } catch {
-                Pixel.fire(.debug(event: .autofillFailedToFetchData, error: error))
+                Pixel.fire(.debug(event: .secureVaultError, error: error))
             }
 
 

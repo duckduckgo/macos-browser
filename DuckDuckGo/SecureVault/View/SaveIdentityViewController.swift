@@ -72,7 +72,7 @@ final class SaveIdentityViewController: NSViewController {
             Pixel.fire(.autofillItemSaved(kind: .identity))
         } catch {
             os_log("%s:%s: failed to store identity %s", type: .error, className, #function, error.localizedDescription)
-            Pixel.fire(.debug(event: .autofillFailedToSaveItem(kind: .identity), error: error))
+            Pixel.fire(.debug(event: .secureVaultError, error: error))
         }
     }
 

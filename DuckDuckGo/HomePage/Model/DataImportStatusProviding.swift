@@ -78,7 +78,7 @@ final class BookmarksAndPasswordsImportStatusProvider: DataImportStatusProviding
             let identitiesDates = try secureVault.identities().map(\.created)
             dates.append(contentsOf: identitiesDates)
         } catch {
-            Pixel.fire(.debug(event: .autofillFailedToFetchData, error: error))
+            Pixel.fire(.debug(event: .secureVaultError, error: error))
         }
         guard dates.count >= 2 else {
             return false

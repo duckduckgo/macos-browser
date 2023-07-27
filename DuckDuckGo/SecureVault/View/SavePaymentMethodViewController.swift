@@ -87,7 +87,7 @@ final class SavePaymentMethodViewController: NSViewController {
             try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeCreditCard(paymentMethod)
         } catch {
             os_log("%s:%s: failed to store payment method %s", type: .error, className, #function, error.localizedDescription)
-            Pixel.fire(.debug(event: .autofillFailedToSaveItem(kind: .card), error: error))
+            Pixel.fire(.debug(event: .secureVaultError, error: error))
         }
     }
 
