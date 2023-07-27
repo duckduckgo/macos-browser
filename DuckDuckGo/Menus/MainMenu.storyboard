@@ -892,7 +892,9 @@ CQ
                                                 </items>
                                                 <connections>
                                                     <outlet property="mainMenuItem" destination="Dt6-sj-4hn" id="Tl7-wW-1d3"/>
+                                                    <outlet property="preferredServerAutomaticItem" destination="0j8-SE-pRP" id="gkd-mv-dvx"/>
                                                     <outlet property="preferredServerMenu" destination="jbT-17-qgW" id="s2S-lE-kPD"/>
+                                                    <outlet property="registrationKeyValidityAutomaticItem" destination="Hsh-im-6Cc" id="U7k-pm-wMn"/>
                                                     <outlet property="registrationKeyValidityMenu" destination="HwX-wm-4zf" id="ZmB-Kc-jEo"/>
                                                     <outlet property="registrationKeyValidityMenuItem" destination="iPz-EO-Nv6" id="5jp-0O-tNg"/>
                                                     <outlet property="registrationKeyValidityMenuSeparatorItem" destination="MEg-4g-gji" id="g65-Bl-dsN"/>

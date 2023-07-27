@@ -44,7 +44,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 @objc
 final class NetworkProtectionDebugMenu: NSMenu {
 
-    // MARK: - Outlets
+    // MARK: - Outlets: Menus
 
     @IBOutlet weak var preferredServerMenu: NSMenu? {
         didSet {
@@ -58,11 +58,15 @@ final class NetworkProtectionDebugMenu: NSMenu {
         }
     }
 
+    // MARK: - Outlets: Menu Items
+
     /// This is just present so we can remove this menu item in App Store builds.
     ///
     @IBOutlet weak var mainMenuItem: NSMenuItem?
     @IBOutlet weak var registrationKeyValidityMenuSeparatorItem: NSMenuItem?
     @IBOutlet weak var registrationKeyValidityMenuItem: NSMenuItem?
+    @IBOutlet weak var registrationKeyValidityAutomaticItem: NSMenuItem?
+    @IBOutlet weak var preferredServerAutomaticItem: NSMenuItem?
 
     // MARK: - Debug Logic
 
@@ -153,7 +157,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     private func populateNetworkProtectionServerListMenuItems() {
         guard let submenu = preferredServerMenu,
-              let automaticItem = submenu.items.first else {
+              let automaticItem = preferredServerAutomaticItem else {
             assertionFailure("\(#function): Failed to get submenu")
             return
         }
@@ -199,9 +203,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private func populateNetworkProtectionRegistrationKeyValidityMenuItems() {
 #if DEBUG
         guard let menu = registrationKeyValidityMenu,
-              let automaticItem = menu.items.first else {
+              let automaticItem = registrationKeyValidityAutomaticItem else {
 
-            assertionFailure("\(#function): Failed to get submenu")
+            assertionFailure("\(#function): Failed to get menu or automatic item")
             return
         }
 
@@ -222,7 +226,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 #else
         guard let separator = registrationKeyValidityMenuSeparatorItem,
               let validityMenu = registrationKeyValidityMenuItem else {
-            assertionFailure("\(#function): Failed to get submenu")
+            assertionFailure("\(#function): Failed to get menu or automatic item")
             return
         }
 
