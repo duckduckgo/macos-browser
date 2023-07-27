@@ -22,11 +22,12 @@ private enum BodyViewType {
     case gettingStarted
     case noResults
     case scanStarted
+    case results
 }
 
 @available(macOS 11.0, *)
 public struct DataBrokerProtectionContainerView: View {
-    @State private var bodyViewType = BodyViewType.noResults
+    @State private var bodyViewType = BodyViewType.results
 
     public init() { }
 
@@ -51,8 +52,12 @@ public struct DataBrokerProtectionContainerView: View {
                     case .scanStarted:
                         ScanStartedView()
                             .padding(.top, 330)
+                    case .results:
+                        ResultsView()
+                            .frame(width: 800)
+                            .padding(.top, 330)
+                            .padding(.bottom, 100)
                     }
-
                     Spacer()
                 }
             }

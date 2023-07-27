@@ -20,76 +20,87 @@ import SwiftUI
 
 @available(macOS 11.0, *)
 struct ResultsView: View {
+
+    private let removedProfiles: [RemovedProfile] = [
+        RemovedProfile(dataBroker: "ABC Data Broker", scheduledDate: Date()),
+        RemovedProfile(dataBroker: "XYZ Data Broker", scheduledDate: Date().addingTimeInterval(86400)),
+        RemovedProfile(dataBroker: "DEF Data Broker", scheduledDate: Date().addingTimeInterval(86400 * 2)),
+        RemovedProfile(dataBroker: "GHI Data Broker", scheduledDate: Date().addingTimeInterval(86400 * 3)),
+        RemovedProfile(dataBroker: "JKL Data Broker", scheduledDate: Date().addingTimeInterval(86400 * 4))
+    ]
+
+    private let pendingProfiles: [PendingProfile] = [
+        PendingProfile(dataBroker: "ABC Data Broker", profile: "John Doe", address: "123 Apple Street", error: nil, errorDescription: nil),
+        PendingProfile(dataBroker: "XYZ Data Broker", profile: "Jane Smith", address: "456 Cherry Avenue", error: "Error", errorDescription: "Error Description"),
+        PendingProfile(dataBroker: "DEF Data Broker", profile: "Michael Johnson", address: "789 Orange Road", error: nil, errorDescription: nil),
+        PendingProfile(dataBroker: "GHI Data Broker", profile: "Emily Davis", address: "321 Banana Boulevard", error: "Error", errorDescription: "Error Description"),
+        PendingProfile(dataBroker: "JKL Data Broker", profile: "Matthew Wilson", address: "654 Grape Lane", error: nil, errorDescription: nil),
+        PendingProfile(dataBroker: "MNO Data Broker", profile: "Olivia Taylor", address: "987 Lemon Drive", error: "Error", errorDescription: "Error Description")]
+
     var body: some View {
         VStack(spacing: 40) {
-            PendingProfilesView()
-            RemovedProfilesView()
+            PendingProfilesView(profiles: pendingProfiles)
+            RemovedProfilesView(profiles: removedProfiles)
         }
     }
 }
 
 @available(macOS 11.0, *)
 private struct RemovedProfilesView: View {
+    let profiles: [RemovedProfile]
+
     var body: some View {
         VStack(spacing: 40) {
-            HeaderView(title: "10 Profiles Removed",
+            HeaderView(title: "\(profiles.count) Profiles Removed",
                        subtitle: "We will re-scan these sites on a regular basis and send removal requests if your data resurfaces.",
                        iconName: "checkmark.circle.fill",
                        iconColor: .green)
 
-            VStack (spacing: 10) {
-                RemovedProfileRow()
-                RemovedProfileRow()
-                RemovedProfileRow()
-                RemovedProfileRow()
-            }
+            VStack {
+                ForEach(profiles) { profile in
+                    RemovedProfileRow(removedProfile: profile)
+                        .padding()
+                    Divider()
+                        .foregroundColor(Color.secondary)
+
+                }
+            }.listBackgroundStyle()
         }
     }
 }
 
 @available(macOS 11.0, *)
 private struct PendingProfilesView: View {
+    let profiles: [PendingProfile]
+
     var body: some View {
         VStack(spacing: 40) {
-            HeaderView(title: "3 Profiles Pending Removal",
+            HeaderView(title: "\(profiles.count) Profiles Pending Removal",
                        subtitle: "We automatically requested these sites to remove your data. This can take 2–3 weeks.",
                        iconName: "clock.fill",
                        iconColor: .yellow)
 
             VStack {
-                PendingProfileRow()
-                    .padding()
-                Divider()
-                    .foregroundColor(Color.secondary)
+                ForEach(profiles) { profile in
+                    PendingProfileRow(pendingProfile: profile)
+                        .padding()
 
-                PendingProfileRow()
-                    .padding()
-
-                Divider()
-                    .foregroundColor(Color.secondary)
-
-                PendingProfileRow()
-                    .padding()
-
-                Divider()
-                    .foregroundColor(Color.secondary)
-            }
-            .background(Color("background-color", bundle: .module))
-            .cornerRadius(8)
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                )
+                    Divider()
+                        .foregroundColor(Color.secondary)
+                }
+            }.listBackgroundStyle()
         }
     }
 }
 
 @available(macOS 11.0, *)
 private struct RemovedProfileRow: View {
+    let removedProfile: RemovedProfile
+
     var body: some View {
         HStack {
             Label {
-                Text("Verecor")
+                Text(removedProfile.dataBroker)
             } icon: {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.green)
@@ -99,7 +110,7 @@ private struct RemovedProfileRow: View {
             HStack {
                 Text("Re-scan scheduled")
                 Text("-")
-                Text("15 Jun 23")
+                Text(removedProfile.formattedDate)
             }
         }
     }
@@ -107,15 +118,15 @@ private struct RemovedProfileRow: View {
 
 @available(macOS 11.0, *)
 private struct PendingProfileRow: View {
-    let hasError = true
+    let pendingProfile: PendingProfile
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(alignment: .leading, spacing: 20) {
             HStack {
                 Label {
-                    Text("Verecor")
+                    Text(pendingProfile.dataBroker)
                 } icon: {
-                    Image(systemName: hasError ? "exclamationmark.triangle.fill" : "clock.fill")
+                    Image(systemName: pendingProfile.hasError ? "exclamationmark.triangle.fill" : "clock.fill")
                         .foregroundColor(.yellow)
                 }
                 Spacer()
@@ -128,17 +139,18 @@ private struct PendingProfileRow: View {
                 Spacer()
 
                 Label {
-                    Text("4564 N Isle Royale St, Rocklin, CA ")
+                    Text(pendingProfile.address)
                         .lineLimit(1)
-                        .frame(width: 180)
+                        .frame(width: 180, alignment: .leading)
+
                 } icon: {
                     Image(systemName: "house")
                 }
             }
-            if hasError {
-
-                Text("\(Text("Error 123").bold()) - Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
+            if pendingProfile.hasError {
+                Text("\(Text(pendingProfile.error ?? "unknown").bold()) - \(pendingProfile.errorDescription ?? "unkonwn")")
                     .layoutPriority(1)
+                    .padding(.leading, 24)
             }
         }
     }
@@ -149,5 +161,49 @@ struct ResultsView_Previews: PreviewProvider {
     static var previews: some View {
         ResultsView().frame(height: 700)
             .padding()
+    }
+}
+
+private struct ListBackground: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .background(Color("list-background-color", bundle: .module))
+            .cornerRadius(8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+            )
+    }
+}
+
+private extension View {
+    func listBackgroundStyle() -> some View {
+        modifier(ListBackground())
+    }
+}
+
+private struct RemovedProfile: Identifiable {
+    let id = UUID()
+    let dataBroker: String
+    let scheduledDate: Date
+
+    var formattedDate: String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .none
+        formatter.dateStyle = .short
+        return formatter.string(from: scheduledDate)
+    }
+}
+
+private struct PendingProfile: Identifiable {
+    let id = UUID()
+    let dataBroker: String
+    let profile: String
+    let address: String
+    let error: String?
+    let errorDescription: String?
+
+    var hasError: Bool {
+        error != nil
     }
 }
