@@ -106,6 +106,7 @@ public struct UserDefaultsWrapper<T> {
 
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"
 
+        case bookmarksBarPromptShown = "bookmarks.bar.prompt.shown"
         case showBookmarksBar = "bookmarks.bar.show"
         case lastBookmarksBarUsagePixelSendDate = "bookmarks.bar.last-usage-pixel-send-date"
 

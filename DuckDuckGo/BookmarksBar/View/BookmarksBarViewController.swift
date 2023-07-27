@@ -37,6 +37,9 @@ final class BookmarksBarViewController: NSViewController {
         return view.frame.width - viewWidthWithoutClipIndicator - 3
     }
 
+    @UserDefaultsWrapper(key: .bookmarksBarPromptShown, defaultValue: false)
+    var bookmarksBarPromptShown: Bool
+
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.viewModel = BookmarksBarViewModel(bookmarkManager: LocalBookmarkManager.shared, tabCollectionViewModel: tabCollectionViewModel)
@@ -93,6 +96,7 @@ final class BookmarksBarViewController: NSViewController {
 
     func showBookmarksBarPrompt() {
         BookmarksBarPromptPopover().showBelow(promptAnchor)
+        self.bookmarksBarPromptShown = true
     }
 
     private func subscribeToViewModel() {

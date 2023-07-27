@@ -134,7 +134,7 @@ final class MainViewController: NSViewController {
         updateForwardMenuItem()
         updateReloadMenuItem()
         updateStopMenuItem()
-        browserTabViewController.windowDidBecomeKey()        
+        browserTabViewController.windowDidBecomeKey()
     }
 
     func windowDidResignKey() {
@@ -142,10 +142,9 @@ final class MainViewController: NSViewController {
     }
 
     func showBookmarkPromptIfNeeded() {
-        // TODO check it hasn't been seen already
+        guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
         updateBookmarksBarViewVisibility(visible: true)
-
-        // This won't work until the bookmarks bar is visible
+        // This won't work until the bookmarks bar is actually visible
         DispatchQueue.main.async {
             self.bookmarksBarViewController.showBookmarksBarPrompt()
         }
