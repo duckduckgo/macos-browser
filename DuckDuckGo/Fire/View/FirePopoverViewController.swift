@@ -264,7 +264,6 @@ final class FirePopoverViewController: NSViewController {
                 }
                 self.updateInfoLabel()
                 self.adjustContentHeight()
-                self.updateOpenDetailsButton()
             }
     }
 
@@ -277,7 +276,6 @@ final class FirePopoverViewController: NSViewController {
                 self.collectionView.selectionIndexPaths = selectionIndexPaths
                 self.updateInfoLabel()
                 self.updateCloseDetailsButton()
-                self.updateClearButton()
             }
     }
 
@@ -343,18 +341,6 @@ final class FirePopoverViewController: NSViewController {
 
         optionsButtonWidthConstraint.constant = maxWidth + 32
         optionsButton.selectItem(at: optionsButton.numberOfItems - 1)
-    }
-
-    private func updateClearButton() {
-        clearButton.isEnabled = !firePopoverViewModel.selected.isEmpty
-    }
-
-    private func updateOpenDetailsButton() {
-        let hasDataToBurn = !firePopoverViewModel.selectable.isEmpty
-        let nothingToBurn = firePopoverViewModel.hasOnlySingleFireproofDomain ? UserText.fireDialogSiteIsFireproof : UserText.fireDialogNothingToBurn
-        openDetailsButton.title = hasDataToBurn ? UserText.fireDialogDetails : nothingToBurn
-        openDetailsButton.isEnabled = hasDataToBurn
-        openDetailsButtonImageView.isHidden = !hasDataToBurn
     }
 
 }

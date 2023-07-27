@@ -253,6 +253,8 @@ final class Fire {
                 domains.insert(domain)
             }
         }
+        // Convert to eTLD+1 domains
+        domains = domains.convertedToETLDPlus1(tld: tld)
 
         historyCoordinating.burnVisits(visits) {
             self.burnEntity(entity: .none(selectedDomains: domains),
@@ -333,31 +335,17 @@ final class Fire {
 
     @MainActor
     private func burnHistory(ofEntity entity: BurningEntity, completion: @escaping () -> Void) {
-        func filterVisits(visits: [Visit], domains: Set<String>) -> [Visit] {
-            return visits.filter({ visit in
-                guard let host = visit.historyEntry?.url.host,
-                      let eTLDPLus1Host = tld.eTLDplus1(host) else {
-                    return false
-                }
-                return domains.contains(eTLDPLus1Host)
-            })
-        }
-
         let visits: [Visit]
         switch entity {
         case .none(selectedDomains: let domains):
             burnHistory(of: domains, completion: completion)
             return
-        case .tab(tabViewModel: let tabViewModel, selectedDomains: let domains, parentTabCollectionViewModel: _):
-            visits = filterVisits(visits: tabViewModel.tab.localHistory, domains: domains)
-
-        case .window(tabCollectionViewModel: let tabCollectionViewModel, selectedDomains: let domains):
-            var result = [Visit]()
-            let existingTabsVisits = filterVisits(visits: tabCollectionViewModel.localHistory, domains: domains)
-            result.append(contentsOf: existingTabsVisits)
-            visits = result
-        case .allWindows(mainWindowControllers: _, selectedDomains: let domains):
-            burnHistory(of: domains, completion: completion)
+        case .tab(tabViewModel: let tabViewModel, selectedDomains: _, parentTabCollectionViewModel: _):
+            visits = tabViewModel.tab.localHistory
+        case .window(tabCollectionViewModel: let tabCollectionViewModel, selectedDomains: _):
+            visits = tabCollectionViewModel.localHistory
+        case .allWindows:
+            burnAllHistory(completion: completion)
             return
         }
 
@@ -366,6 +354,10 @@ final class Fire {
 
     private func burnHistory(of baseDomains: Set<String>, completion: @escaping () -> Void) {
         historyCoordinating.burnDomains(baseDomains, tld: ContentBlocking.shared.tld, completion: completion)
+    }
+
+    private func burnAllHistory(completion: @escaping () -> Void) {
+        historyCoordinating.burnAll(completion: completion)
     }
 
     // MARK: - Permissions
@@ -561,7 +553,7 @@ extension TabCollection {
 
 extension Set where Element == String {
 
-    func transformedToETLDPlus1(tld: TLD) -> Set<String> {
+    func convertedToETLDPlus1(tld: TLD) -> Set<String> {
         var transformedSet = Set<String>()
         for domain in self {
             if let eTLDPlus1Domain = tld.eTLDplus1(domain) {
