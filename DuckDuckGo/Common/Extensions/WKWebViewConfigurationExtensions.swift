@@ -23,9 +23,9 @@ import BrowserServicesKit
 extension WKWebViewConfiguration {
 
     @MainActor
-    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, isBurner: Bool) {
-        if isBurner, websiteDataStore.isPersistent {
-            websiteDataStore = .nonPersistent()
+    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, burnerMode: BurnerMode) {
+        if case .burner(let websiteDataStore) = burnerMode {
+            self.websiteDataStore = websiteDataStore
         }
         allowsAirPlayForMediaPlayback = true
         if #available(macOS 12.3, *) {
