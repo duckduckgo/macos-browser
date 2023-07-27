@@ -816,20 +816,20 @@ CQ
                                                     <menuItem title="Reset Network Protection State" id="p4h-oC-tpw">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="resetAllState:" target="Rah-lS-gno" id="PS7-6K-lwJ"/>
+                                                            <action selector="resetAllState:" target="Rah-lS-gno" id="TDN-VH-bgV"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem title="Remove System Extension and Login Items" id="bKT-dU-DaE" userLabel="Remove System Extension">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="removeSystemExtensionAndAgents:" target="Rah-lS-gno" id="OQz-pj-QUN"/>
+                                                            <action selector="removeSystemExtensionAndAgents:" target="Rah-lS-gno" id="1Yo-Qj-wxo"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem isSeparatorItem="YES" id="FSc-gX-vGh"/>
                                                     <menuItem title="Send Test Notification" id="3rB-n0-ZjS">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="sendTestNotification:" target="Rah-lS-gno" id="GRE-zt-PgK"/>
+                                                            <action selector="sendTestNotification:" target="Rah-lS-gno" id="Hea-8E-9VU"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem title="Preferred Server" id="Zh6-DO-H1c">
@@ -839,7 +839,7 @@ CQ
                                                                 <menuItem title="Automatic" id="0j8-SE-pRP">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="setSelectedServer:" target="Rah-lS-gno" id="nYd-YH-xwX"/>
+                                                                        <action selector="setSelectedServer:" target="Rah-lS-gno" id="aXQ-qW-U5G"/>
                                                                     </connections>
                                                                 </menuItem>
                                                             </items>
@@ -852,7 +852,7 @@ CQ
                                                                 <menuItem title="Expire Now" id="104-Zf-0KB">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="expireRegistrationKeyNow:" target="Rah-lS-gno" id="qx8-wS-pHj"/>
+                                                                        <action selector="expireRegistrationKeyNow:" target="Rah-lS-gno" id="gZT-ua-1Mu"/>
                                                                     </connections>
                                                                 </menuItem>
                                                                 <menuItem isSeparatorItem="YES" id="MEg-4g-gji"/>
@@ -863,7 +863,7 @@ CQ
                                                                             <menuItem title="Automatic" id="Hsh-im-6Cc">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                                 <connections>
-                                                                                    <action selector="setRegistrationKeyValidity:" target="Rah-lS-gno" id="Oiv-3O-M4o"/>
+                                                                                    <action selector="setRegistrationKeyValidity:" target="Rah-lS-gno" id="xGL-zk-E3i"/>
                                                                                 </connections>
                                                                             </menuItem>
                                                                         </items>
@@ -879,31 +879,27 @@ CQ
                                                                 <menuItem title="Enable NetP &gt; Controller Failure" id="xyA-ob-gEy">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="simulateControllerFailure:" target="iLs-sj-2Gd" id="TAQ-Pa-g6K"/>
+                                                                        <action selector="simulateControllerFailure:" target="iLs-sj-2Gd" id="qO6-8J-ER0"/>
                                                                     </connections>
                                                                 </menuItem>
                                                                 <menuItem title="Enable NetP &gt; Tunnel Failure" id="kVa-n8-UNx">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="simulateTunnelFailure:" target="iLs-sj-2Gd" id="0cL-54-a2k"/>
+                                                                        <action selector="simulateTunnelFailure:" target="iLs-sj-2Gd" id="tZL-Vl-6mu"/>
                                                                     </connections>
                                                                 </menuItem>
                                                             </items>
-                                                            <connections>
-                                                                <outlet property="simulateControllerFailureMenuItem" destination="xyA-ob-gEy" id="tsj-ii-WRa"/>
-                                                                <outlet property="simulateTunnelFailureMenuItem" destination="kVa-n8-UNx" id="ngb-Aa-bR0"/>
-                                                            </connections>
                                                         </menu>
                                                     </menuItem>
                                                 </items>
                                                 <connections>
-                                                    <outlet property="mainMenuItem" destination="Dt6-sj-4hn" id="Tl7-wW-1d3"/>
-                                                    <outlet property="preferredServerAutomaticItem" destination="0j8-SE-pRP" id="gkd-mv-dvx"/>
-                                                    <outlet property="preferredServerMenu" destination="jbT-17-qgW" id="s2S-lE-kPD"/>
-                                                    <outlet property="registrationKeyValidityAutomaticItem" destination="Hsh-im-6Cc" id="U7k-pm-wMn"/>
-                                                    <outlet property="registrationKeyValidityMenu" destination="HwX-wm-4zf" id="ZmB-Kc-jEo"/>
-                                                    <outlet property="registrationKeyValidityMenuItem" destination="iPz-EO-Nv6" id="5jp-0O-tNg"/>
-                                                    <outlet property="registrationKeyValidityMenuSeparatorItem" destination="MEg-4g-gji" id="g65-Bl-dsN"/>
+                                                    <outlet property="mainMenuItem" destination="Dt6-sj-4hn" id="vwa-T8-0ak"/>
+                                                    <outlet property="preferredServerAutomaticItem" destination="0j8-SE-pRP" id="APF-zT-6Qd"/>
+                                                    <outlet property="preferredServerMenu" destination="jbT-17-qgW" id="6qH-9G-SrT"/>
+                                                    <outlet property="registrationKeyValidityAutomaticItem" destination="Hsh-im-6Cc" id="k4w-9T-ny9"/>
+                                                    <outlet property="registrationKeyValidityMenu" destination="HwX-wm-4zf" id="Dpg-p8-nQ0"/>
+                                                    <outlet property="registrationKeyValidityMenuItem" destination="iPz-EO-Nv6" id="XbK-zy-EGv"/>
+                                                    <outlet property="registrationKeyValidityMenuSeparatorItem" destination="MEg-4g-gji" id="Pos-zQ-wJJ"/>
                                                 </connections>
                                             </menu>
                                         </menuItem>
@@ -986,6 +982,19 @@ CQ
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
                     </connections>
                 </application>
+                <menu id="013-wG-YGZ">
+                    <items>
+                        <menuItem title="Item 1" id="m8E-kO-TwB">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                        </menuItem>
+                        <menuItem title="Item 2" id="gKX-rb-enP">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                        </menuItem>
+                        <menuItem title="Item 3" id="MNz-ve-jnh">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                        </menuItem>
+                    </items>
+                </menu>
             </objects>
             <point key="canvasLocation" x="-222" y="-258"/>
         </scene>
