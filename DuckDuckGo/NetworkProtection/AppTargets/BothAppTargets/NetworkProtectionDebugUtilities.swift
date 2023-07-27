@@ -64,7 +64,7 @@ final class NetworkProtectionDebugUtilities {
 
         // ☝️ Take care of resetting all state within the extension first, and wait half a second
         try? await Task.sleep(interval: 0.5)
-        // 👇 And only afterwards turn off the tunnel and remove it from prefernces
+        // 👇 And only afterwards turn off the tunnel and remove it from preferences
 
         let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
 
