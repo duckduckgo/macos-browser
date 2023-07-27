@@ -74,10 +74,6 @@ extension UpdateController: SPUStandardUserDriverDelegate {
 extension UpdateController: SPUUpdaterDelegate {
 
     func allowedChannels(for updater: SPUUpdater) -> Set<String> {
-        guard updater == self.updater.updater else {
-            return Set()
-        }
-
         if internalUserDecider.isInternalUser {
             return Set([Constants.internalChannelName])
         } else {

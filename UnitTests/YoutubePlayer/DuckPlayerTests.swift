@@ -34,8 +34,8 @@ final class DuckPlayerTests: XCTestCase {
     }
 
     func testThatImageForFaviconViewReturnsHardcodedFaviconForDuckPlayer() {
-        let duckPlayerFaviconView = FaviconView(domain: DuckPlayer.commonName)
-        let otherFaviconView = FaviconView(domain: "example.com")
+        let duckPlayerFaviconView = FaviconView(url: duckPlayerURL())
+        let otherFaviconView = FaviconView(url: URL(string: "example.com"))
 
         duckPlayer.mode = .enabled
         XCTAssertEqual(duckPlayer.image(for: duckPlayerFaviconView), NSImage.duckPlayer)

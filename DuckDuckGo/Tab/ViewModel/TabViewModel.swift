@@ -252,7 +252,7 @@ final class TabViewModel {
         case .bookmarks:
             title = UserText.tabBookmarksTitle
         case .homePage:
-            if tab.isBurner {
+            if tab.burnerMode.isBurner {
                 title = UserText.burnerTabHomeTitle
             } else {
                 title = UserText.tabHomeTitle
@@ -279,7 +279,7 @@ final class TabViewModel {
 
         switch tab.content {
         case .homePage:
-            if tab.isBurner {
+            if tab.burnerMode.isBurner {
                 favicon = Favicon.burnerHome
             } else {
                 favicon = Favicon.home
@@ -309,10 +309,12 @@ final class TabViewModel {
     // MARK: - Privacy icon animation
 
     let trackersAnimationTriggerPublisher = PassthroughSubject<Void, Never>()
+    let privacyEntryPointIconUpdateTrigger = PassthroughSubject<Void, Never>()
 
     private var trackerAnimationTimer: Timer?
 
     private func sendAnimationTrigger() {
+        privacyEntryPointIconUpdateTrigger.send()
         if self.tab.privacyInfo?.trackerInfo.trackersBlocked.count ?? 0 > 0 {
             self.trackersAnimationTriggerPublisher.send()
         }

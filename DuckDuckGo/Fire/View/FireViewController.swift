@@ -114,6 +114,8 @@ final class FireViewController: NSViewController {
         NSLayoutConstraint.activate(constraints)
         fireAnimationView = animationView
 
+        animationView.animationSpeed = fireAnimationSpeed
+
         fakeFireButton.wantsLayer = true
         fakeFireButton.layer?.backgroundColor = NSColor.buttonMouseDownColor.cgColor
 
@@ -144,6 +146,10 @@ final class FireViewController: NSViewController {
         presentAsModalWindow(fireDialogViewController)
     }
 
+    private let fireAnimationSpeed = 1.2
+    private let fireAnimationBeginning = 0.1
+    private let fireAnimationEnd = 0.63
+
     func animateFireWhenClosing() async {
         await waitForFireAnimationViewIfNeeded()
         await withUnsafeContinuation { (continuation: UnsafeContinuation<Void, Never>) in
@@ -151,7 +157,8 @@ final class FireViewController: NSViewController {
             fakeFireButton.isHidden = true
             fireViewModel.isAnimationPlaying = true
 
-            fireAnimationView?.play(toProgress: 0.63) { [weak self] _ in
+            fireAnimationView?.currentProgress = 0
+            fireAnimationView?.play(fromProgress: fireAnimationBeginning, toProgress: fireAnimationEnd) { [weak self] _ in
                 guard let self = self else { return }
 
                 self.fireViewModel.isAnimationPlaying = false
@@ -179,7 +186,8 @@ final class FireViewController: NSViewController {
             fireViewModel.isAnimationPlaying = true
 
             fireViewModel.fire.fireAnimationDidStart()
-            fireAnimationView?.play { [weak self] _ in
+            fireAnimationView?.currentProgress = 0
+            fireAnimationView?.play(fromProgress: fireAnimationBeginning, toProgress: fireAnimationEnd) { [weak self] _ in
                 guard let self = self else { return }
 
                 self.fireViewModel.isAnimationPlaying = false
