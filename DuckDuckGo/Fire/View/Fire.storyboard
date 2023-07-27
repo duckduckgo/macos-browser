@@ -125,14 +125,88 @@
             <objects>
                 <viewController storyboardIdentifier="FirePopoverViewController" id="DMI-mh-xLJ" customClass="FirePopoverViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="dGd-Gc-P2e" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="328" height="304"/>
+                        <rect key="frame" x="0.0" y="0.0" width="344" height="388"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="3Jn-h4-fXL" userLabel="Header Wrapper View">
-                                <rect key="frame" x="0.0" y="102" width="328" height="202"/>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="qlI-3L-uej">
+                                <rect key="frame" x="0.0" y="304" width="344" height="84"/>
                                 <subviews>
+                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="GTJ-4U-z5f">
+                                        <rect key="frame" x="24" y="26" width="32" height="32"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="32" id="7DG-33-WXT"/>
+                                            <constraint firstAttribute="height" constant="32" id="CJE-5W-yio"/>
+                                        </constraints>
+                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="BurnerWindowButtonIcon" id="BZd-q6-uGA"/>
+                                        <color key="contentTintColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    </imageView>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="W2S-mS-R1N">
+                                        <rect key="frame" x="60" y="43" width="266" height="16"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="16" id="3i2-os-2Vr"/>
+                                        </constraints>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Open New Fire Window" id="7Sk-yJ-PYl">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Oiy-AY-h7p">
+                                        <rect key="frame" x="60" y="27" width="266" height="14"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="An isolated window that doesn’t save any data" id="56V-TF-ueO">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hDS-1f-O3D" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <rect key="frame" x="20" y="16" width="304" height="52"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="52" id="0XQ-BR-Cvd"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" alignment="center" imageScaling="proportionallyDown" inset="2" id="eX6-Bz-xnr">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                                <color key="value" name="ButtonMouseOverColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                                <color key="value" name="ButtonMouseDownColor"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="4"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="openNewBurnerWindowAction:" target="DMI-mh-xLJ" id="L5w-xo-5Ry"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="GTJ-4U-z5f" firstAttribute="leading" secondItem="qlI-3L-uej" secondAttribute="leading" constant="24" id="3gm-SA-uID"/>
+                                    <constraint firstItem="hDS-1f-O3D" firstAttribute="leading" secondItem="qlI-3L-uej" secondAttribute="leading" constant="20" symbolic="YES" id="EsW-fw-FbV"/>
+                                    <constraint firstItem="W2S-mS-R1N" firstAttribute="top" secondItem="qlI-3L-uej" secondAttribute="top" constant="25" id="KSF-fN-sVq"/>
+                                    <constraint firstAttribute="trailing" secondItem="hDS-1f-O3D" secondAttribute="trailing" constant="20" symbolic="YES" id="KpZ-eW-OG7"/>
+                                    <constraint firstItem="GTJ-4U-z5f" firstAttribute="top" secondItem="qlI-3L-uej" secondAttribute="top" constant="26" id="O5k-Uo-Lhd"/>
+                                    <constraint firstItem="Oiy-AY-h7p" firstAttribute="leading" secondItem="GTJ-4U-z5f" secondAttribute="trailing" constant="6" id="RPi-O2-JZo"/>
+                                    <constraint firstItem="W2S-mS-R1N" firstAttribute="leading" secondItem="GTJ-4U-z5f" secondAttribute="trailing" constant="6" id="eQW-6Z-VR8"/>
+                                    <constraint firstItem="hDS-1f-O3D" firstAttribute="top" secondItem="qlI-3L-uej" secondAttribute="top" constant="16" id="fm0-tj-3a6"/>
+                                    <constraint firstAttribute="trailing" secondItem="W2S-mS-R1N" secondAttribute="trailing" constant="20" id="lx0-S9-8ls"/>
+                                    <constraint firstAttribute="height" constant="84" id="m6u-dN-ps3"/>
+                                    <constraint firstItem="Oiy-AY-h7p" firstAttribute="top" secondItem="W2S-mS-R1N" secondAttribute="bottom" constant="2" id="nuB-l8-g2J"/>
+                                    <constraint firstAttribute="trailing" secondItem="Oiy-AY-h7p" secondAttribute="trailing" constant="20" id="q42-vt-Q6Q"/>
+                                </constraints>
+                            </customView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="3Jn-h4-fXL" userLabel="Header Wrapper View">
+                                <rect key="frame" x="0.0" y="102" width="344" height="202"/>
+                                <subviews>
+                                    <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Lru-AG-Hl2">
+                                        <rect key="frame" x="20" y="199" width="304" height="5"/>
+                                    </box>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="acV-lE-jVh">
-                                        <rect key="frame" x="100" y="118" width="128" height="64"/>
+                                        <rect key="frame" x="108" y="118" width="128" height="64"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="128" id="jv0-mb-KeT"/>
                                             <constraint firstAttribute="height" constant="64" id="zhN-YS-juD"/>
@@ -140,15 +214,15 @@
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="FireHeader" id="Dql-dm-pHB"/>
                                     </imageView>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gVh-tG-Gue">
-                                        <rect key="frame" x="64" y="87" width="200" height="16"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Clear Browsing History and Data" id="98U-sP-UUR">
+                                        <rect key="frame" x="90" y="87" width="164" height="16"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Close Tabs and Clear Data" id="98U-sP-UUR">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
                                     <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="ckJ-6G-38h">
-                                        <rect key="frame" x="43" y="45" width="243" height="37"/>
+                                        <rect key="frame" x="51" y="45" width="243" height="37"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="AOr-Ku-GpD"/>
                                             <constraint firstAttribute="width" constant="237" id="f5G-AU-bU2"/>
@@ -170,14 +244,14 @@
                                         </connections>
                                     </popUpButton>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YMk-Hq-WfZ">
-                                        <rect key="frame" x="18" y="9" width="292" height="32"/>
+                                        <rect key="frame" x="18" y="9" width="308" height="32"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="288" id="mLo-nE-gZE"/>
+                                            <constraint firstAttribute="width" constant="304" id="mLo-nE-gZE"/>
                                             <constraint firstAttribute="height" constant="32" id="oMx-F3-AUv"/>
                                         </constraints>
                                         <textFieldCell key="cell" alignment="center" title="Close X active tabs, and clear all browsing history and cookies (Y sites)?" id="qea-gI-2jD">
-                                            <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
@@ -190,24 +264,29 @@
                                     <constraint firstItem="YMk-Hq-WfZ" firstAttribute="top" secondItem="ckJ-6G-38h" secondAttribute="bottom" constant="8" symbolic="YES" id="ZSq-dY-LaB"/>
                                     <constraint firstItem="gVh-tG-Gue" firstAttribute="top" secondItem="acV-lE-jVh" secondAttribute="bottom" constant="15" id="dzE-fi-9Qb"/>
                                     <constraint firstItem="ckJ-6G-38h" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" id="eVG-pj-q6k"/>
+                                    <constraint firstAttribute="trailing" secondItem="Lru-AG-Hl2" secondAttribute="trailing" constant="20" symbolic="YES" id="gTj-Xj-Ngb"/>
+                                    <constraint firstAttribute="trailing" secondItem="YMk-Hq-WfZ" secondAttribute="trailing" constant="20" id="hOC-gE-s8w"/>
                                     <constraint firstItem="acV-lE-jVh" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" id="jdZ-Ii-nMi"/>
+                                    <constraint firstItem="Lru-AG-Hl2" firstAttribute="leading" secondItem="3Jn-h4-fXL" secondAttribute="leading" constant="20" symbolic="YES" id="oEC-CF-1xA"/>
+                                    <constraint firstItem="Lru-AG-Hl2" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="top" id="r42-iC-7KT"/>
+                                    <constraint firstItem="YMk-Hq-WfZ" firstAttribute="leading" secondItem="3Jn-h4-fXL" secondAttribute="leading" constant="20" id="tNu-UE-LU6"/>
                                     <constraint firstItem="gVh-tG-Gue" firstAttribute="centerX" secondItem="3Jn-h4-fXL" secondAttribute="centerX" id="tyz-0E-3Lc"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="sbc-pJ-bul" userLabel="Open Wrapper View">
-                                <rect key="frame" x="0.0" y="60" width="328" height="42"/>
+                                <rect key="frame" x="0.0" y="60" width="344" height="42"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8qK-6q-RQT">
-                                        <rect key="frame" x="296" y="13" width="32" height="16"/>
+                                        <rect key="frame" x="306" y="13" width="38" height="16"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="16" id="CF5-0A-jcP"/>
-                                            <constraint firstAttribute="width" constant="32" id="br4-Fc-8RE"/>
+                                            <constraint firstAttribute="width" constant="38" id="br4-Fc-8RE"/>
                                         </constraints>
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="ExpandDownPadding" id="GO4-t8-rcv"/>
                                         <color key="contentTintColor" name="GreyTextColor"/>
                                     </imageView>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="ACx-m8-z0K" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="328" height="42"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="344" height="42"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="42" id="lCs-Fg-DUS"/>
                                         </constraints>
@@ -240,13 +319,13 @@
                                 </constraints>
                             </customView>
                             <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6vZ-d2-qnR" userLabel="Details Wrapper View">
-                                <rect key="frame" x="0.0" y="-161" width="328" height="263"/>
+                                <rect key="frame" x="0.0" y="-161" width="344" height="263"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="553-P8-fEM">
-                                        <rect key="frame" x="0.0" y="221" width="328" height="42"/>
+                                        <rect key="frame" x="0.0" y="221" width="344" height="42"/>
                                         <subviews>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="41J-2u-8fZ" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="328" height="42"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="344" height="42"/>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
                                                         <color key="value" name="FirePopoverPanelBackground"/>
@@ -254,15 +333,15 @@
                                                 </userDefinedRuntimeAttributes>
                                             </customView>
                                             <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="zrk-pB-b5b">
-                                                <rect key="frame" x="0.0" y="39" width="320" height="5"/>
+                                                <rect key="frame" x="0.0" y="39" width="344" height="5"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             </box>
                                             <box verticalHuggingPriority="750" fixedFrame="YES" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="L0W-XS-gts">
-                                                <rect key="frame" x="0.0" y="-2" width="320" height="5"/>
+                                                <rect key="frame" x="0.0" y="-2" width="344" height="5"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             </box>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="cgG-hF-FAP" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="328" height="42"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="344" height="42"/>
                                                 <buttonCell key="cell" type="square" title="     Close all tabs and clear site data" bezelStyle="shadowlessSquare" image="CondenseUpPadding" imagePosition="trailing" alignment="left" inset="2" id="5VP-Yt-jB8">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="smallSystem"/>
@@ -274,6 +353,9 @@
                                                     </userDefinedRuntimeAttribute>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
                                                         <color key="value" name="ButtonMouseDownColorLight"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="point" keyPath="contentInset">
+                                                        <point key="value" x="-6" y="0.0"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                                 <connections>
@@ -294,13 +376,13 @@
                                         </constraints>
                                     </customView>
                                     <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XmN-jm-YAB">
-                                        <rect key="frame" x="0.0" y="0.0" width="328" height="221"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="344" height="221"/>
                                         <clipView key="contentView" drawsBackground="NO" id="TlT-bV-Znt">
-                                            <rect key="frame" x="0.0" y="0.0" width="328" height="221"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="344" height="221"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <collectionView selectable="YES" allowsMultipleSelection="YES" id="u7v-Gt-FjR">
-                                                    <rect key="frame" x="0.0" y="0.0" width="328" height="221"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="344" height="221"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                                     <collectionViewFlowLayout key="collectionViewLayout" id="VZx-7u-HhL">
                                                         <size key="itemSize" width="318" height="24"/>
@@ -332,10 +414,10 @@
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="r7f-Ig-GcB">
-                                <rect key="frame" x="0.0" y="60" width="328" height="32"/>
+                                <rect key="frame" x="0.0" y="60" width="344" height="32"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="R2h-Oh-HRn" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="328" height="32"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="344" height="32"/>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
                                                 <color key="value" name="FirePopoverPanelBackground"/>
@@ -369,10 +451,13 @@
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="nId-He-RIU" userLabel="Main Buttons Wrapper View">
-                                <rect key="frame" x="0.0" y="0.0" width="328" height="60"/>
+                                <rect key="frame" x="0.0" y="0.0" width="344" height="60"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="fSV-XR-8Dh" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="328" height="60"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="344" height="60"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="60" id="wng-57-tbc"/>
+                                        </constraints>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
                                                 <color key="value" name="InterfaceBackgroundColor"/>
@@ -380,23 +465,30 @@
                                         </userDefinedRuntimeAttributes>
                                     </customView>
                                     <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="dqq-R5-UUp">
-                                        <rect key="frame" x="0.0" y="57" width="328" height="5"/>
+                                        <rect key="frame" x="0.0" y="57" width="344" height="5"/>
                                     </box>
+                                    <button hidden="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mDi-x7-CLM">
+                                        <rect key="frame" x="14" y="10" width="316" height="40"/>
+                                        <buttonCell key="cell" type="push" title="Close and Burn This Window" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="CGf-qF-nIr">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="closeBurnerWindowButtonAction:" target="DMI-mh-xLJ" id="NJL-eQ-ELc"/>
+                                        </connections>
+                                    </button>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Sam-GO-uzw">
-                                        <rect key="frame" x="162" y="10" width="152" height="40"/>
+                                        <rect key="frame" x="170" y="10" width="160" height="40"/>
                                         <buttonCell key="cell" type="push" title="Clear" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tCs-Mx-t1s">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
-                                            <string key="keyEquivalent" base64-UTF8="YES">
-DQ
-</string>
                                         </buttonCell>
                                         <connections>
                                             <action selector="clearButtonAction:" target="DMI-mh-xLJ" id="icO-xH-Gnq"/>
                                         </connections>
                                     </button>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wam-tC-iBG">
-                                        <rect key="frame" x="14" y="10" width="152" height="40"/>
+                                        <rect key="frame" x="14" y="10" width="160" height="40"/>
                                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vN9-d2-hnK">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -410,9 +502,10 @@ Gw
                                     </button>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstItem="mDi-x7-CLM" firstAttribute="leading" secondItem="nId-He-RIU" secondAttribute="leading" constant="20" symbolic="YES" id="5mS-Rt-cig"/>
                                     <constraint firstItem="wam-tC-iBG" firstAttribute="leading" secondItem="nId-He-RIU" secondAttribute="leading" constant="20" symbolic="YES" id="AuD-PM-TDS"/>
                                     <constraint firstAttribute="trailing" secondItem="fSV-XR-8Dh" secondAttribute="trailing" id="FKa-ym-q6d"/>
-                                    <constraint firstItem="fSV-XR-8Dh" firstAttribute="top" secondItem="nId-He-RIU" secondAttribute="top" id="NE5-jE-jH4"/>
+                                    <constraint firstAttribute="trailing" secondItem="mDi-x7-CLM" secondAttribute="trailing" constant="20" symbolic="YES" id="OXl-93-tkI"/>
                                     <constraint firstItem="dqq-R5-UUp" firstAttribute="top" secondItem="nId-He-RIU" secondAttribute="top" id="PGZ-Bu-97k"/>
                                     <constraint firstAttribute="bottom" secondItem="fSV-XR-8Dh" secondAttribute="bottom" id="TBV-Rc-0cG"/>
                                     <constraint firstItem="fSV-XR-8Dh" firstAttribute="leading" secondItem="nId-He-RIU" secondAttribute="leading" id="TbY-vY-ucm"/>
@@ -421,6 +514,7 @@ Gw
                                     <constraint firstItem="Sam-GO-uzw" firstAttribute="centerY" secondItem="nId-He-RIU" secondAttribute="centerY" id="eOp-LI-mk2"/>
                                     <constraint firstItem="Sam-GO-uzw" firstAttribute="width" secondItem="wam-tC-iBG" secondAttribute="width" id="f6X-EJ-v6s"/>
                                     <constraint firstAttribute="trailing" secondItem="Sam-GO-uzw" secondAttribute="trailing" constant="20" symbolic="YES" id="jSP-YU-j67"/>
+                                    <constraint firstAttribute="bottom" secondItem="mDi-x7-CLM" secondAttribute="bottom" constant="16" id="jcb-sD-fwV"/>
                                     <constraint firstItem="Sam-GO-uzw" firstAttribute="leading" secondItem="wam-tC-iBG" secondAttribute="trailing" constant="8" id="mPK-5a-aZP"/>
                                     <constraint firstItem="dqq-R5-UUp" firstAttribute="leading" secondItem="nId-He-RIU" secondAttribute="leading" id="mW9-Ra-VSw"/>
                                     <constraint firstAttribute="height" constant="60" id="onw-qY-te8"/>
@@ -430,20 +524,24 @@ Gw
                         <constraints>
                             <constraint firstItem="sbc-pJ-bul" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="bottom" id="67G-na-i7a"/>
                             <constraint firstItem="6vZ-d2-qnR" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="Anc-Gh-sNK"/>
+                            <constraint firstItem="qlI-3L-uej" firstAttribute="top" secondItem="dGd-Gc-P2e" secondAttribute="top" id="DP4-qx-7jH"/>
+                            <constraint firstItem="qlI-3L-uej" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="JfE-xH-UFd"/>
                             <constraint firstAttribute="trailing" secondItem="6vZ-d2-qnR" secondAttribute="trailing" id="Kyw-38-ua5"/>
+                            <constraint firstItem="nId-He-RIU" firstAttribute="top" secondItem="qlI-3L-uej" secondAttribute="bottom" priority="250" id="NSp-j7-c7a"/>
                             <constraint firstItem="nId-He-RIU" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="R5q-Fw-y3V"/>
                             <constraint firstItem="6vZ-d2-qnR" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="bottom" id="SiT-y0-otC"/>
                             <constraint firstAttribute="trailing" secondItem="nId-He-RIU" secondAttribute="trailing" id="UP0-3m-4QV"/>
                             <constraint firstAttribute="trailing" secondItem="sbc-pJ-bul" secondAttribute="trailing" id="VG0-5p-cwB"/>
+                            <constraint firstItem="3Jn-h4-fXL" firstAttribute="top" secondItem="qlI-3L-uej" secondAttribute="bottom" id="Xcj-za-zev"/>
                             <constraint firstItem="3Jn-h4-fXL" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="ZK2-xe-fKM"/>
                             <constraint firstItem="r7f-Ig-GcB" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="ZOG-ov-blY"/>
-                            <constraint firstItem="3Jn-h4-fXL" firstAttribute="top" secondItem="dGd-Gc-P2e" secondAttribute="top" id="bUr-Qo-pGT"/>
                             <constraint firstItem="nId-He-RIU" firstAttribute="top" secondItem="r7f-Ig-GcB" secondAttribute="bottom" id="f1V-n7-jhp"/>
                             <constraint firstItem="nId-He-RIU" firstAttribute="top" secondItem="3Jn-h4-fXL" secondAttribute="bottom" constant="42" id="hbg-4i-hjT"/>
                             <constraint firstAttribute="trailing" secondItem="r7f-Ig-GcB" secondAttribute="trailing" id="kNz-fP-3Iv"/>
                             <constraint firstAttribute="trailing" secondItem="3Jn-h4-fXL" secondAttribute="trailing" id="nnI-mg-tvm"/>
                             <constraint firstAttribute="bottom" secondItem="nId-He-RIU" secondAttribute="bottom" id="oF4-VF-B5Y"/>
                             <constraint firstItem="sbc-pJ-bul" firstAttribute="leading" secondItem="dGd-Gc-P2e" secondAttribute="leading" id="pKH-pe-Sua"/>
+                            <constraint firstAttribute="trailing" secondItem="qlI-3L-uej" secondAttribute="trailing" id="z4J-kk-e06"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -452,7 +550,9 @@ Gw
                         </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
+                        <outlet property="cancelButton" destination="wam-tC-iBG" id="nf2-bs-GRH"/>
                         <outlet property="clearButton" destination="Sam-GO-uzw" id="zbv-kv-WkC"/>
+                        <outlet property="closeBurnerWindowButton" destination="mDi-x7-CLM" id="pII-bK-pgn"/>
                         <outlet property="closeDetailsButton" destination="cgG-hF-FAP" id="PDY-tj-zma"/>
                         <outlet property="closeWrapperView" destination="553-P8-fEM" id="vUO-wA-3ME"/>
                         <outlet property="collectionView" destination="u7v-Gt-FjR" id="zeu-lV-usx"/>
@@ -460,7 +560,9 @@ Gw
                         <outlet property="contentHeightConstraint" destination="hbg-4i-hjT" id="mC2-Ot-onY"/>
                         <outlet property="detailsWrapperView" destination="6vZ-d2-qnR" id="TKb-Ux-TIk"/>
                         <outlet property="detailsWrapperViewHeightContraint" destination="sJt-dl-rlH" id="7pa-Kc-9xB"/>
+                        <outlet property="headerWrapperView" destination="3Jn-h4-fXL" id="P5R-o0-Fdg"/>
                         <outlet property="infoLabel" destination="YMk-Hq-WfZ" id="JHL-r4-1VT"/>
+                        <outlet property="mainButtonsToBurnerWindowContraint" destination="NSp-j7-c7a" id="lZx-hi-FXs"/>
                         <outlet property="openDetailsButton" destination="ACx-m8-z0K" id="cu4-zz-MhA"/>
                         <outlet property="openDetailsButtonImageView" destination="8qK-6q-RQT" id="ezj-KU-kE6"/>
                         <outlet property="openWrapperView" destination="sbc-pJ-bul" id="dUO-6T-MLY"/>
@@ -521,7 +623,7 @@ Gw
                 <customObject id="2D4-gy-3jN" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <viewController id="hqb-gn-5gp" customClass="FireInfoViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="1se-D0-4zU" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="363"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vOP-zm-6FL">
@@ -541,7 +643,7 @@ DQ
                                 </connections>
                             </button>
                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wWB-fA-JGV">
-                                <rect key="frame" x="96" y="166" width="128" height="64"/>
+                                <rect key="frame" x="96" y="219" width="128" height="64"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="64" id="KbY-ZC-c5P"/>
                                     <constraint firstAttribute="width" constant="128" id="hUg-eV-t0D"/>
@@ -549,7 +651,7 @@ DQ
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="FireHeader" id="bCv-vD-xuT"/>
                             </imageView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="AsC-eN-HNp">
-                                <rect key="frame" x="18" y="69" width="284" height="48"/>
+                                <rect key="frame" x="18" y="126" width="284" height="48"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="280" id="YS3-eh-JOs"/>
                                 </constraints>
@@ -560,7 +662,7 @@ DQ
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cPr-2R-bkx">
-                                <rect key="frame" x="18" y="123" width="284" height="19"/>
+                                <rect key="frame" x="18" y="180" width="284" height="19"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="280" id="LLa-XW-6PH"/>
                                 </constraints>
@@ -576,10 +678,10 @@ DQ
                             <constraint firstItem="AsC-eN-HNp" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="9zn-kw-ecJ"/>
                             <constraint firstItem="vOP-zm-6FL" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="B9B-bo-9be"/>
                             <constraint firstItem="wWB-fA-JGV" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="V4f-UG-ojf"/>
-                            <constraint firstItem="wWB-fA-JGV" firstAttribute="top" secondItem="1se-D0-4zU" secondAttribute="top" constant="20" symbolic="YES" id="Wiy-76-7IF"/>
+                            <constraint firstItem="wWB-fA-JGV" firstAttribute="top" secondItem="1se-D0-4zU" secondAttribute="top" constant="80" id="Wiy-76-7IF"/>
                             <constraint firstAttribute="bottom" secondItem="vOP-zm-6FL" secondAttribute="bottom" constant="16" id="da0-dI-nQN"/>
-                            <constraint firstItem="vOP-zm-6FL" firstAttribute="top" secondItem="AsC-eN-HNp" secondAttribute="bottom" constant="25" id="nqi-H2-ZOR"/>
                             <constraint firstItem="cPr-2R-bkx" firstAttribute="centerX" secondItem="1se-D0-4zU" secondAttribute="centerX" id="r5H-V6-ZB0"/>
+                            <constraint firstItem="cPr-2R-bkx" firstAttribute="top" secondItem="wWB-fA-JGV" secondAttribute="bottom" constant="20" id="tF0-FJ-Ps6"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -589,12 +691,13 @@ DQ
                     </view>
                 </viewController>
             </objects>
-            <point key="canvasLocation" x="622" y="512"/>
+            <point key="canvasLocation" x="622" y="568.5"/>
         </scene>
     </scenes>
     <resources>
         <image name="Burn" width="18" height="18"/>
         <image name="BurnAlert" width="64" height="64"/>
+        <image name="BurnerWindowButtonIcon" width="32" height="32"/>
         <image name="CondenseUpPadding" width="32" height="16"/>
         <image name="ExpandDownPadding" width="32" height="16"/>
         <image name="FireHeader" width="96" height="64"/>
@@ -602,8 +705,14 @@ DQ
         <namedColor name="ButtonColor">
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
+        <namedColor name="ButtonMouseDownColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.18000000715255737" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <namedColor name="ButtonMouseDownColorLight">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.10000000149011612" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="ButtonMouseOverColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.05000000074505806" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="ButtonMouseOverColorLight">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.05000000074505806" colorSpace="custom" customColorSpace="sRGB"/>

@@ -151,6 +151,16 @@
                ReferencedContainer = "container:LocalPackages/SyncUI">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "NetworkProtectionUITests"
+               BuildableName = "NetworkProtectionUITests"
+               BlueprintName = "NetworkProtectionUITests"
+               ReferencedContainer = "container:LocalPackages/NetworkProtectionUI">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

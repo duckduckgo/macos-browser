@@ -86,7 +86,7 @@
                                                 <action selector="newWindow:" target="Ady-hI-5gd" id="nK2-0w-B4c"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="New Burner Window" keyEquivalent="N" id="fx4-EK-KRg">
+                                        <menuItem title="New Fire Window" keyEquivalent="N" id="fx4-EK-KRg">
                                             <connections>
                                                 <action selector="newBurnerWindow:" target="Ady-hI-5gd" id="vLy-E3-sFd"/>
                                             </connections>
@@ -768,6 +768,12 @@ CQ
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="resetMakeDuckDuckGoYoursUserSettings:" target="Ady-hI-5gd" id="maa-qG-0Bx"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Reset Email Protection InContext Signup Prompt" id="cQF-Np-0vk">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetEmailProtectionInContextPrompt:" target="Ady-hI-5gd" id="bRN-Eo-xL1"/>
                                                         </connections>
                                                     </menuItem>
                                                 </items>

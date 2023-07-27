@@ -41,7 +41,7 @@ final class FireTests: XCTestCase {
                         tld: ContentBlocking.shared.tld)
 
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
-        let window = WindowsManager.openNewWindow(with: tabCollectionViewModel, isBurner: false, lazyLoadTabs: true)
+        let window = WindowsManager.openNewWindow(with: tabCollectionViewModel, lazyLoadTabs: true)
 
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 3)
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.first?.content, .homePage)
@@ -77,7 +77,7 @@ final class FireTests: XCTestCase {
                         pinnedTabsManager: pinnedTabsManager,
                         tld: ContentBlocking.shared.tld)
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel(with: pinnedTabsManager)
-        let window = WindowsManager.openNewWindow(with: tabCollectionViewModel, isBurner: false, lazyLoadTabs: true)
+        let window = WindowsManager.openNewWindow(with: tabCollectionViewModel, lazyLoadTabs: true)
 
         let burningExpectation = expectation(description: "Burning")
         fire.burnAll {
@@ -105,7 +105,7 @@ final class FireTests: XCTestCase {
                         recentlyClosedCoordinator: recentlyClosedCoordinator,
                         tld: ContentBlocking.shared.tld)
         let tabCollectionViewModel = TabCollectionViewModel.makeTabCollectionViewModel()
-        let window = WindowsManager.openNewWindow(with: tabCollectionViewModel, isBurner: false, lazyLoadTabs: true)
+        let window = WindowsManager.openNewWindow(with: tabCollectionViewModel, lazyLoadTabs: true)
 
         let finishedBurningExpectation = expectation(description: "Finished burning")
         fire.burnAll {

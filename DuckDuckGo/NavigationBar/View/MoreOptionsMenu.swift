@@ -152,11 +152,11 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @objc func newWindow(_ sender: NSMenuItem) {
-        WindowsManager.openNewWindow(isBurner: false)
+        WindowsManager.openNewWindow()
     }
 
     @objc func newBurnerWindow(_ sender: NSMenuItem) {
-        WindowsManager.openNewWindow(isBurner: true)
+        WindowsManager.openNewWindow(burnerMode: BurnerMode(isBurner: true))
     }
 
     @objc func toggleFireproofing(_ sender: NSMenuItem) {
@@ -244,15 +244,13 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "NewWindow"))
 
         // New Burner Window
-        if internalUserDecider.isInternalUser {
-            let burnerWindowItem = NSMenuItem(title: UserText.newBurnerWindowMenuItem,
-                                                  action: #selector(newBurnerWindow(_:)),
-                                                  target: self)
-            burnerWindowItem.keyEquivalent = "n"
-            burnerWindowItem.keyEquivalentModifierMask = [.command, .shift]
-            burnerWindowItem.image = NSImage(named: "NewBurnerWindow")
-            addItem(burnerWindowItem)
-        }
+        let burnerWindowItem = NSMenuItem(title: UserText.newBurnerWindowMenuItem,
+                                          action: #selector(newBurnerWindow(_:)),
+                                          target: self)
+        burnerWindowItem.keyEquivalent = "n"
+        burnerWindowItem.keyEquivalentModifierMask = [.command, .shift]
+        burnerWindowItem.image = NSImage(named: "NewBurnerWindow")
+        addItem(burnerWindowItem)
 
         addItem(NSMenuItem.separator())
     }
@@ -385,7 +383,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
-        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
+        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab)
     }
 

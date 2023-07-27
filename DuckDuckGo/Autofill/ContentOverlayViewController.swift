@@ -223,6 +223,10 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         return true
     }
 
+    public func secureVaultManagerShouldSaveData(_: SecureVaultManager) -> Bool {
+        return true
+    }
+
     public func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData, hasGeneratedPassword generatedPassword: Bool, withTrigger trigger: AutofillUserScript.GetTriggerType?) {
         // No-op, the content overlay view controller should not be prompting the user to store data
     }

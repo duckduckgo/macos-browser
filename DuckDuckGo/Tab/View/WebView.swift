@@ -28,6 +28,16 @@ final class WebView: WKWebView {
 
     weak var contextMenuDelegate: WebViewContextMenuDelegate?
 
+    func stopAllMediaAndLoading() {
+        stopLoading()
+        stopMediaCapture()
+        stopAllMediaPlayback()
+        fullscreenWindowController?.close()
+        if isInspectorShown {
+            closeDeveloperTools()
+        }
+    }
+
     deinit {
         self.configuration.userContentController.removeAllUserScripts()
     }

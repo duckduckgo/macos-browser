@@ -162,7 +162,6 @@ final class MainMenu: NSMenu {
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
         updateLoggingMenuItems()
-        updateBurnerWindowMenuItem()
     }
 
     @MainActor
@@ -178,7 +177,6 @@ final class MainMenu: NSMenu {
         setupDebugMenuItem(with: featureFlagger)
         subscribeToBookmarkList()
         subscribeToFavicons()
-        updateBurnerWindowMenuItem()
     }
 
     // MARK: - Bookmarks
@@ -307,15 +305,6 @@ final class MainMenu: NSMenu {
 #else
         toggleNetworkProtectionShortcutMenuItem?.isHidden = true
 #endif
-    }
-
-    @MainActor
-    private func updateBurnerWindowMenuItem() {
-        if let appDelegate = NSApplication.shared.delegate as? AppDelegate,
-           let internalUserDecider = appDelegate.internalUserDecider,
-           !internalUserDecider.isInternalUser {
-            newBurnerWindowMenuItem.isHidden = true
-        }
     }
 
     // MARK: - Logging
