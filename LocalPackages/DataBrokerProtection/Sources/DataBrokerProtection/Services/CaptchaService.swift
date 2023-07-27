@@ -122,9 +122,12 @@ struct CaptchaService: CaptchaServiceProtocol {
     }
 
     private let urlSession: URLSession
+    private let redeemUseCase: RedeemUseCaseProtocol
 
-    init(urlSession: URLSession = URLSession.shared) {
+    init(urlSession: URLSession = URLSession.shared,
+         redeemUseCase: RedeemUseCaseProtocol = RedeemUseCase()) {
         self.urlSession = urlSession
+        self.redeemUseCase = redeemUseCase
     }
 
     func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse,
@@ -159,7 +162,8 @@ struct CaptchaService: CaptchaServiceProtocol {
         }
         os_log("Submitting captcha request ...", log: .service)
         var request = URLRequest(url: url)
-        request.setValue(HTTPUtils.authorizationHeader, forHTTPHeaderField: "Authorization")
+        let authHeader = try await redeemUseCase.getAuthHeader()
+        request.setValue(authHeader, forHTTPHeaderField: "Authorization")
         request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
 
         let bodyObject: [String: Any] = [
@@ -214,7 +218,8 @@ struct CaptchaService: CaptchaServiceProtocol {
         }
 
         var request = URLRequest(url: url)
-        request.setValue(HTTPUtils.authorizationHeader, forHTTPHeaderField: "Authorization")
+        let authHeader = try await redeemUseCase.getAuthHeader()
+        request.setValue(authHeader, forHTTPHeaderField: "Authorization")
         request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "GET"
 

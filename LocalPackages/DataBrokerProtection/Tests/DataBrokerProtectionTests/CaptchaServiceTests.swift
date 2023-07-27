@@ -39,7 +39,7 @@ final class CaptchaServiceTests: XCTestCase {
 
     func testWhenSessionThrowsOnSubmittingCaptchaInfo_thenTheCorrectErrorIsThrown() async {
         MockURLProtocol.requestHandlerQueue.append({ _ in throw MockError.someError })
-        let sut = CaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock)
@@ -56,7 +56,7 @@ final class CaptchaServiceTests: XCTestCase {
     func testWhenFailureCriticalIsReturnedOnSubmittingCaptchaInfo_thenCriticalErrorWhenSubmittingCaptchaIsThrown() async {
         let response = CaptchaTransaction(message: .failureCritical, transactionId: nil)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(response)) })
-        let sut = CaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock)
@@ -73,7 +73,7 @@ final class CaptchaServiceTests: XCTestCase {
     func testWhenInvalidRequestIsReturnedOnSubmittingCaptchaInfo_thenInvalidRequestWhenSubmittingCaptchaIsThrown() async {
         let response = CaptchaTransaction(message: .invalidRequest, transactionId: nil)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(response)) })
-        let sut = CaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock)
@@ -94,7 +94,7 @@ final class CaptchaServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = CaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             _ = try await sut.submitCaptchaInformation(GetCaptchaInfoResponse.mock, retries: 2)
@@ -113,7 +113,7 @@ final class CaptchaServiceTests: XCTestCase {
         let requestHandler: RequestHandler = { _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(captchaResult)) }
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = CaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             _ = try await sut.submitCaptchaToBeResolved(for: "123456")
@@ -132,7 +132,7 @@ final class CaptchaServiceTests: XCTestCase {
         let requestHandler: RequestHandler = { _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(captchaResult)) }
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = CaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             _ = try await sut.submitCaptchaToBeResolved(for: "123456")
@@ -151,7 +151,7 @@ final class CaptchaServiceTests: XCTestCase {
         let requestHandler: RequestHandler = { _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(captchaResult)) }
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = CaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             _ = try await sut.submitCaptchaToBeResolved(for: "123456")
@@ -172,7 +172,7 @@ final class CaptchaServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = CaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             _ = try await sut.submitCaptchaToBeResolved(for: "123456", retries: 2, pollingInterval: 1)
@@ -191,7 +191,7 @@ final class CaptchaServiceTests: XCTestCase {
         let requestHandler: RequestHandler = { _ in (HTTPURLResponse.ok, try? self.jsonEncoder.encode(captchaResult)) }
         MockURLProtocol.requestHandlerQueue.append(requestHandler)
 
-        let sut = CaptchaService(urlSession: mockURLSession)
+        let sut = CaptchaService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             let data = try await sut.submitCaptchaToBeResolved(for: "123456", retries: 2, pollingInterval: 1)

@@ -40,9 +40,12 @@ struct EmailService: EmailServiceProtocol {
     }
 
     public let urlSession: URLSession
+    private let redeemUseCase: RedeemUseCaseProtocol
 
-    init(urlSession: URLSession = URLSession.shared) {
+    init(urlSession: URLSession = URLSession.shared,
+         redeemUseCase: RedeemUseCaseProtocol = RedeemUseCase()) {
         self.urlSession = urlSession
+        self.redeemUseCase = redeemUseCase
     }
 
     func getEmail() async throws -> String {
@@ -51,7 +54,8 @@ struct EmailService: EmailServiceProtocol {
         }
 
         var request = URLRequest(url: url)
-        request.setValue(HTTPUtils.authorizationHeader, forHTTPHeaderField: "Authorization")
+        let authHeader = try await redeemUseCase.getAuthHeader()
+        request.setValue(authHeader, forHTTPHeaderField: "Authorization")
 
         let (data, _) = try await urlSession.data(for: request)
 
@@ -93,7 +97,8 @@ struct EmailService: EmailServiceProtocol {
         }
 
         var request = URLRequest(url: url)
-        request.setValue(HTTPUtils.authorizationHeader, forHTTPHeaderField: "Authorization")
+        let authHeader = try await redeemUseCase.getAuthHeader()
+        request.setValue(authHeader, forHTTPHeaderField: "Authorization")
 
         let (data, _) = try await urlSession.data(for: request)
 

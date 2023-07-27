@@ -36,11 +36,15 @@ public final class DataBrokerProtectionScheduler {
     private let errorHandler: EventMapping<DataBrokerProtectionOperationError>
     private let schedulerIdentifier = "com.duckduckgo.macos.browser.databroker-protection-scheduler"
     private let notificationCenter: NotificationCenter
+    private let emailService: EmailServiceProtocol
+    private let captchaService: CaptchaServiceProtocol
 
     lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
         let runnerProvider = DataBrokerOperationRunnerProvider(privacyConfigManager: privacyConfigManager,
-                                                               contentScopeProperties: contentScopeProperties)
+                                                               contentScopeProperties: contentScopeProperties,
+                                                               emailService: emailService,
+                                                               captchaService: captchaService)
 
         return DataBrokerProtectionProcessor(database: dataManager.database,
                                              config: DataBrokerProtectionSchedulerConfig(),
@@ -53,7 +57,9 @@ public final class DataBrokerProtectionScheduler {
                 contentScopeProperties: ContentScopeProperties,
                 dataManager: DataBrokerProtectionDataManager,
                 notificationCenter: NotificationCenter = NotificationCenter.default,
-                errorHandler: EventMapping<DataBrokerProtectionOperationError>) {
+                errorHandler: EventMapping<DataBrokerProtectionOperationError>,
+                redeemUseCase: RedeemUseCaseProtocol
+    ) {
 
         activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
         activity.repeats = true
@@ -66,6 +72,9 @@ public final class DataBrokerProtectionScheduler {
         self.contentScopeProperties = contentScopeProperties
         self.errorHandler = errorHandler
         self.notificationCenter = notificationCenter
+
+        self.emailService = EmailService(redeemUseCase: redeemUseCase)
+        self.captchaService = CaptchaService(redeemUseCase: redeemUseCase)
     }
 
     public func start(debug: Bool = true) {
