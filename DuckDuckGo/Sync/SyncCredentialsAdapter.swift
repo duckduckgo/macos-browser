@@ -29,7 +29,7 @@ final class SyncCredentialsAdapter {
     let databaseCleaner: CredentialsDatabaseCleaner
     let syncDidCompletePublisher: AnyPublisher<Void, Never>
 
-    init(secureVaultFactory: SecureVaultFactory = .default) {
+    init(secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory) {
         syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
         databaseCleaner = CredentialsDatabaseCleaner(
             secureVaultFactory: secureVaultFactory,
@@ -48,7 +48,7 @@ final class SyncCredentialsAdapter {
         }
     }
 
-    func setUpProviderIfNeeded(secureVaultFactory: SecureVaultFactory, metadataStore: SyncMetadataStore) {
+    func setUpProviderIfNeeded(secureVaultFactory: AutofillVaultFactory, metadataStore: SyncMetadataStore) {
         guard provider == nil else {
             return
         }

@@ -175,7 +175,11 @@ struct FavoritesGrid: View {
     private func pointConstrainedToFavoritesView(_ point: CGPoint) -> CGPoint {
         let rowCount: Int = {
             if model.showAllFavorites {
-                return model.models.count / HomePage.favoritesPerRow
+                var count = model.models.count / HomePage.favoritesPerRow
+                if model.models.count % HomePage.favoritesPerRow > 0 {
+                    count += 1
+                }
+                return count
             }
             return HomePage.favoritesRowCountWhenCollapsed
         }()

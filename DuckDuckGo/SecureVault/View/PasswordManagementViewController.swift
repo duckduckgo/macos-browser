@@ -22,6 +22,7 @@ import Common
 import DDGSync
 import SwiftUI
 import BrowserServicesKit
+import SecureStorage
 
 protocol PasswordManagementDelegate: AnyObject {
 
@@ -142,8 +143,8 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
-    var secureVault: SecureVault? {
-        try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+    var secureVault: (any AutofillSecureVault)? {
+        try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
     }
 
     private let passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
@@ -490,7 +491,7 @@ final class PasswordManagementViewController: NSViewController {
             requestSync()
 
         } catch {
-            if case SecureVaultError.duplicateRecord = error {
+            if case SecureStorageError.duplicateRecord = error {
                 showDuplicateAlert()
             } else {
                 Pixel.fire(.debug(event: .secureVaultError, error: error))

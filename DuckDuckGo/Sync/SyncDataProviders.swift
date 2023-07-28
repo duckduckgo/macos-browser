@@ -33,18 +33,18 @@ final class SyncDataProviders: DataProvidersSource {
             return []
         }
 
-//        bookmarksAdapter.setUpProviderIfNeeded(database: bookmarksDatabase, metadataStore: syncMetadata)
+        bookmarksAdapter.setUpProviderIfNeeded(database: bookmarksDatabase, metadataStore: syncMetadata)
         credentialsAdapter.setUpProviderIfNeeded(secureVaultFactory: secureVaultFactory, metadataStore: syncMetadata)
 
         let providers: [Any] = [
-//            bookmarksAdapter.provider as Any,
+            bookmarksAdapter.provider as Any,
             credentialsAdapter.provider as Any
         ]
 
         return providers.compactMap { $0 as? DataProviding }
     }
 
-    init(bookmarksDatabase: CoreDataDatabase, secureVaultFactory: SecureVaultFactory = .default) {
+    init(bookmarksDatabase: CoreDataDatabase, secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory) {
         self.bookmarksDatabase = bookmarksDatabase
         self.secureVaultFactory = secureVaultFactory
         bookmarksAdapter = SyncBookmarksAdapter()
@@ -77,5 +77,5 @@ final class SyncDataProviders: DataProvidersSource {
 
     private let syncMetadataDatabase: SyncMetadataDatabase = SyncMetadataDatabase()
     private let bookmarksDatabase: CoreDataDatabase
-    private let secureVaultFactory: SecureVaultFactory
+    private let secureVaultFactory: AutofillVaultFactory
 }

@@ -32,8 +32,10 @@ extension TabCollectionViewModel: NSSecureCoding {
         }
         let index = coder.decodeIfPresent(at: NSSecureCodingKeys.selectionIndex) ?? 0
         // Burner tabs aren't stored
-        let isBurner = false
-        self.init(tabCollection: tabCollection, selectionIndex: index, isBurner: isBurner)
+        let burnerMode = BurnerMode.regular
+        self.init(tabCollection: tabCollection,
+                  selectionIndex: index,
+                  burnerMode: burnerMode)
     }
 
     func encode(with coder: NSCoder) {
