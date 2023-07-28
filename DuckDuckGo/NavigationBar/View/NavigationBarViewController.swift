@@ -687,8 +687,7 @@ extension NavigationBarViewController: NSMenuDelegate {
     public func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
 
-        let bookmarksBarTitle = PersistentAppInterfaceSettings.shared.showBookmarksBar ? UserText.hideBookmarksBar : UserText.showBookmarksBar
-        menu.addItem(withTitle: bookmarksBarTitle, action: #selector(toggleBookmarksBar), keyEquivalent: "B")
+        BookmarksBarMenuFactory.addToMenu(menu)
 
         menu.addItem(NSMenuItem.separator())
 
@@ -709,11 +708,6 @@ extension NavigationBarViewController: NSMenuDelegate {
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
         }
 #endif
-    }
-
-    @objc
-    private func toggleBookmarksBar(_ sender: NSMenuItem) {
-        PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
     }
 
     @objc
@@ -777,10 +771,6 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         popovers.showBookmarkListPopover(usingView: bookmarkListButton,
                                          withDelegate: self,
                                          forTab: tabCollectionViewModel.selectedTabViewModel?.tab)
-    }
-
-    func optionsButtonMenuRequestedToggleBookmarksBar(_ menu: NSMenu) {
-        PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
     }
 
     func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu) {
