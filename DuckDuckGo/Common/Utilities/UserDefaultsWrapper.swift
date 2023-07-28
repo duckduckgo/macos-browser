@@ -119,6 +119,15 @@ public struct UserDefaultsWrapper<T> {
         // Temporary for activetion pixel
         case firstLaunchDate = "first.app.launch.date"
 
+        // Network Protection
+        case networkProtectionOnDemandActivation = "netp.ondemand"
+        case networkProtectionShouldEnforceRoutes = "netp.enforce-routes"
+
+        case networkProtectionShouldExcludeDDGRoute = "netp.exclude-ddg-route"
+        case networkProtectionShouldExcludeLocalRoutes = "netp.exclude-local-routes"
+
+        case networkProtectionConnectOnLogIn = "netp.connect-on-login"
+
         case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
     }
 
@@ -138,10 +147,10 @@ public struct UserDefaultsWrapper<T> {
 
     static var sharedDefaults: UserDefaults {
 #if DEBUG && !(NETP_SYSTEM_EXTENSION && NETWORK_EXTENSION) // Avoid looking up special user defaults when running inside the system extension
-        if case .normal = NSApp.runType {
+        if case .normal = NSApplication.runType {
             return .standard
         } else {
-            return UserDefaults(suiteName: Bundle.main.bundleIdentifier! + "." + NSApp.runType.description)!
+            return UserDefaults(suiteName: Bundle.main.bundleIdentifier! + "." + NSApplication.runType.description)!
         }
 #else
         return .standard
@@ -193,6 +202,18 @@ public struct UserDefaultsWrapper<T> {
 
     static func clear(_ key: Key) {
         sharedDefaults.removeObject(forKey: key.rawValue)
+    }
+
+    func clear() {
+        defaults.removeObject(forKey: key.rawValue)
+    }
+
+}
+
+extension UserDefaultsWrapper where T: OptionalProtocol {
+
+    init(key: Key, defaults: UserDefaults? = nil) {
+        self.init(key: key, defaultValue: .none, defaults: defaults)
     }
 
 }

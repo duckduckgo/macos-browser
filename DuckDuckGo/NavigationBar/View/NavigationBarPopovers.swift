@@ -93,6 +93,7 @@ final class NavigationBarPopovers {
         }
     }
 
+    @available(macOS 11.0, *)
     func toggleNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
 #if NETWORK_PROTECTION
         if let networkProtectionPopover = networkProtectionPopover,
@@ -263,6 +264,7 @@ final class NavigationBarPopovers {
     // MARK: - Network Protection
 
 #if NETWORK_PROTECTION
+    @available(macOS 11.0, *)
     func showNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         let popover = networkProtectionPopover ?? {
             let controller = NetworkProtectionTunnelController()

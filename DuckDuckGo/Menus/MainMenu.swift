@@ -16,16 +16,18 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
+import Common
 import Combine
 import OSLog // swiftlint:disable:this enforce_os_log_wrapper
 import WebKit
-import BrowserServicesKit
 
 #if NETWORK_PROTECTION
 import NetworkProtection
 #endif
 
+@MainActor
 final class MainMenu: NSMenu {
 
     enum Constants {

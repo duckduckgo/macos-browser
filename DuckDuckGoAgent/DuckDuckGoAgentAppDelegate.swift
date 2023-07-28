@@ -47,6 +47,10 @@ final class DuckDuckGoAgentApplication: NSApplication {
 @main
 final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
 
+    /// when enabled VPN connection will be automatically initiated on launch even if disconnected manually (Always On rule disabled)
+    @UserDefaultsWrapper(key: .networkProtectionConnectOnLogIn, defaultValue: NetworkProtectionUserDefaultsConstants.shouldConnectOnLogIn)
+    private var shouldAutoConnect: Bool
+
     /// The status bar NetworkProtection menu
     ///
     /// For some reason the App will crash if this is initialized right away, which is why it was changed to be lazy.
@@ -78,5 +82,25 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         os_log("DuckDuckGoAgent started", log: .networkProtectionLoginItemLog, type: .info)
         networkProtectionMenu.show()
+
+        if shouldAutoConnect {
+            Task {
+                await AppLauncher(appBundleURL: Bundle.main.bundleURL).launchApp(withCommand: .startVPN)
+            }
+        }
     }
+}
+
+extension NSApplication {
+
+    enum RunType: Int, CustomStringConvertible {
+        case normal
+        var description: String {
+            switch self {
+            case .normal: return "normal"
+            }
+        }
+    }
+    static var runType: RunType { .normal }
+
 }

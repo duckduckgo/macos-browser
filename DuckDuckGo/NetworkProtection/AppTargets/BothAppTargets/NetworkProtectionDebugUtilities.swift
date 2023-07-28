@@ -57,7 +57,7 @@ final class NetworkProtectionDebugUtilities {
 
     func resetAllState() async throws {
         if let activeSession = try? await ConnectionSessionUtilities.activeSession() {
-            try? activeSession.sendProviderMessage(Data([ExtensionMessage.resetAllState.rawValue])) { _ in
+            try? activeSession.sendProviderMessage(.resetAllState) {
                 os_log("Status was reset in the extension", log: .networkProtection)
             }
         }
@@ -99,8 +99,7 @@ final class NetworkProtectionDebugUtilities {
             return
         }
 
-        let request = Data([ExtensionMessage.triggerTestNotification.rawValue])
-        try? activeSession.sendProviderMessage(request)
+        try? activeSession.sendProviderMessage(.triggerTestNotification)
     }
 
     // MARK: - Registation Key
@@ -110,14 +109,7 @@ final class NetworkProtectionDebugUtilities {
             return
         }
 
-        var request = Data([ExtensionMessage.setKeyValidity.rawValue])
-
-        if let validity = registrationKeyValidity {
-            let validityData = withUnsafeBytes(of: UInt(validity).littleEndian) { Data($0) }
-            request.append(validityData)
-        }
-
-        try? activeSession.sendProviderMessage(request)
+        try? activeSession.sendProviderMessage(.setKeyValidity(registrationKeyValidity))
     }
 
     func expireRegistrationKeyNow() async {
@@ -125,8 +117,7 @@ final class NetworkProtectionDebugUtilities {
             return
         }
 
-        let request = Data([ExtensionMessage.expireRegistrationKey.rawValue])
-        try? activeSession.sendProviderMessage(request)
+        try? activeSession.sendProviderMessage(.expireRegistrationKey)
     }
 
     // MARK: - Server Selection
@@ -138,27 +129,12 @@ final class NetworkProtectionDebugUtilities {
     func setSelectedServer(selectedServer: SelectedNetworkProtectionServer) {
         selectedServerStore.selectedServer = selectedServer
 
-        let selectedServerName: String?
-
-        if case .endpoint(let serverName) = selectedServer {
-            selectedServerName = serverName
-        } else {
-            selectedServerName = nil
-        }
-
         Task {
             guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
                 return
             }
 
-            var request = Data([ExtensionMessage.setSelectedServer.rawValue])
-
-            if let selectedServerName = selectedServerName {
-                let serverNameData = selectedServerName.data(using: ExtensionMessage.preferredStringEncoding)!
-                request.append(serverNameData)
-            }
-
-            try? activeSession.sendProviderMessage(request)
+            try? activeSession.sendProviderMessage(.setSelectedServer(selectedServer.stringValue))
         }
     }
 }

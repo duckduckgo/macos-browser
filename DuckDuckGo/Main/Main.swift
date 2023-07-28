@@ -39,6 +39,10 @@ final class AppMain {
 
     static func main() {
 #if NETWORK_PROTECTION
+        guard #available(macOS 11, *) else {
+            _=NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)
+            return
+        }
         switch (CommandLine.arguments.first! as NSString).lastPathComponent {
         case "startVPN":
             swizzleMainBundle()
@@ -63,7 +67,7 @@ final class AppMain {
 
             Task {
                 do {
-                    try await NetworkProtectionTunnelController().enableOnDemand()
+                    try await NetworkProtectionTunnelController().enableOnDemandRequestedByExtension()
                     exit(0)
                 } catch {
                     fatalError("Could not enable on demand due to error: \(String(describing: error))")
@@ -85,5 +89,8 @@ final class AppMain {
         let m1 = class_getClassMethod(Bundle.self, #selector(getter: Bundle.main))!
         let m2 = class_getClassMethod(Bundle.self, #selector(Bundle.nonMain))!
         method_exchangeImplementations(m1, m2)
+
+        // since initially our bundle id doesn‘t match the main app, UserDefaults won‘t be loaded by default
+        UserDefaults.standard.addSuite(named: Bundle.main.bundleIdentifier!)
     }
 }

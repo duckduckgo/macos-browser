@@ -54,6 +54,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 #endif
     }
 
+    private let appLauncher: AppLaunching?
+
     // MARK: - Error Reporting
 
     // swiftlint:disable:next cyclomatic_complexity function_body_length
@@ -144,6 +146,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     // MARK: - Initialization
 
     @objc public init() {
+        self.appLauncher = AppLauncher(appBundleURL: .mainAppBundleURL)
+
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
 
@@ -152,8 +156,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    controllerErrorStore: controllerErrorStore,
                    useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
                    debugEvents: Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore),
-                   providerEvents: Self.packetTunnelProviderEvents,
-                   appLauncher: AppLauncher(appBundleURL: .mainAppBundleURL))
+                   providerEvents: Self.packetTunnelProviderEvents)
 
         observeConnectionStatusChanges()
         observeServerChanges()
@@ -232,27 +235,96 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - NEPacketTunnelProvider
 
-    enum ConfigurationError: Error {
-        case missingProviderConfiguration
-        case missingPixelHeaders
-    }
+    struct MissingPixelHeaders: Error { }
 
     public override func loadVendorOptions(from provider: NETunnelProviderProtocol?) throws {
+        try super.loadVendorOptions(from: provider)
+
         guard let vendorOptions = provider?.providerConfiguration else {
             os_log("🔵 Provider is nil, or providerConfiguration is not set", log: .networkProtection)
-            throw ConfigurationError.missingProviderConfiguration
+            throw MissingProviderConfiguration()
         }
 
         try loadDefaultPixelHeaders(from: vendorOptions)
     }
 
     private func loadDefaultPixelHeaders(from options: [String: Any]) throws {
-        guard let defaultPixelHeaders = options[NetworkProtectionOptionKey.defaultPixelHeaders.rawValue] as? [String: String] else {
+        guard let defaultPixelHeaders = options[NetworkProtectionOptionKey.defaultPixelHeaders] as? [String: String] else {
             os_log("🔵 Pixel options are not set", log: .networkProtection)
-            throw ConfigurationError.missingPixelHeaders
+            throw MissingPixelHeaders()
         }
 
         setupPixels(defaultHeaders: defaultPixelHeaders)
+    }
+
+    // MARK: - Start/Stop Tunnel
+
+    override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
+
+        // when activated by system "on-demand" the option is set
+        var isOnDemand: Bool {
+            options?[NetworkProtectionOptionKey.isOnDemand] as? Bool == true
+        }
+
+        super.startTunnel(options: options) { [self] error in
+            guard error == nil else {
+                // if connection is failing when activated by system on-demand
+                // ask the Main App to disable the on-demand rule to prevent activation loop
+                if isOnDemand, !self.isKillSwitchEnabled {
+                    Task { [self] in
+                        await self.appLauncher?.launchApp(withCommand: .stopVPN)
+                        completionHandler(error)
+                    }
+                    return
+                }
+                completionHandler(error)
+                return
+            }
+
+            completionHandler(nil)
+            if !isOnDemand {
+                Task { [self] in
+                    // We're handling a successful connection started by request.
+                    // We want to call the completion handler before turning on-demand
+                    // ON so that on-demand won't start the connection on its own.
+                    await self.appLauncher?.launchApp(withCommand: .enableOnDemand)
+                }
+            }
+        }
+    }
+
+    override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
+        super.stopTunnel(with: reason) {
+            Task { [self] in
+                if case .userInitiated = reason {
+                    // stop requested by user from System Settings
+                    // we can‘t prevent a respawn with on-demand rule ON
+                    // request the main app to reconfigure with on-demand OFF
+
+                    await self.appLauncher?.launchApp(withCommand: .stopVPN)
+                }
+                completionHandler()
+
+                // From what I'm seeing in my tests the next call to start the tunnel is MUCH
+                // less likely to fail if we force this extension to exit when the tunnel is killed.
+                //
+                // Ref: https://app.asana.com/0/72649045549333/1204668639086684/f
+                //
+                exit(EXIT_SUCCESS)
+            }
+        }
+    }
+
+    override func cancelTunnelWithError(_ error: Error?) {
+        Task {
+            if !isKillSwitchEnabled {
+                // ensure on-demand rule is taken down on connection retry failure
+                await self.appLauncher?.launchApp(withCommand: .stopVPN)
+            }
+
+            super.cancelTunnelWithError(error)
+            exit(EXIT_SUCCESS)
+        }
     }
 
     // MARK: - Pixels
@@ -280,4 +352,5 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             }
         }
     }
+
 }

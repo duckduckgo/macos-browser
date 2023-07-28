@@ -29,7 +29,9 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
 
 /// Implements the logic for Network Protection's simulate failures menu.
 ///
+@available(macOS 11.0, *)
 @objc
+@MainActor
 final class NetworkProtectionSimulateFailureMenu: NSMenu {
     @IBOutlet weak var simulateControllerFailureMenuItem: NSMenuItem?
     @IBOutlet weak var simulateTunnelFailureMenuItem: NSMenuItem?
@@ -42,7 +44,13 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
     ///
     @IBAction
     func simulateControllerFailure(_ menuItem: NSMenuItem) {
-        simulationOptions.setEnabled(menuItem.state == .off, option: .controllerFailure)
+        Task {
+            do {
+                try await NetworkProtectionTunnelController().toggleShouldSimulateTunnelFailure()
+            } catch {
+                await NSAlert(error: error).runModal()
+            }
+        }
     }
 
     /// Simulates a tunnel failure the next time Network Protection is started.

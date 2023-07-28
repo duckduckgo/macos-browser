@@ -268,11 +268,12 @@ final class NavigationBarViewController: NSViewController {
         popovers.passwordManagementButtonPressed(usingView: passwordManagementButton, withDelegate: self)
     }
 
-    @IBAction func networkProtectionButtonAction(_ sender: NSButton) {
 #if NETWORK_PROTECTION
+    @available(macOS 11.0, *)
+    @IBAction func networkProtectionButtonAction(_ sender: NSButton) {
         popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
-#endif
     }
+#endif
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
         toggleDownloadsPopover(keepButtonVisible: false)
@@ -740,11 +741,13 @@ extension NavigationBarViewController: NSMenuDelegate {
 
 #if NETWORK_PROTECTION
     func showNetworkProtectionStatus() {
+        guard #available(macOS 11.0, *) else { return }
         popovers.showNetworkProtectionPopover(usingView: networkProtectionButton,
                                               withDelegate: networkProtectionButtonModel)
     }
 
     private func setupNetworkProtectionButton() {
+        guard #available(macOS 11.0, *) else { return }
         networkProtectionCancellable = networkProtectionButtonModel.$showButton
             .receive(on: RunLoop.main)
             .sink { [weak self] show in

@@ -41,8 +41,16 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
 /// Controller for the Network Protection debug menu.
 ///
+@available(macOS 11.0, *)
 @objc
+@MainActor
 final class NetworkProtectionDebugMenu: NSMenu {
+
+    override func awakeFromNib() {
+        if #unavailable(macOS 11.0) {
+            mainMenuItem?.removeFromParent()
+        }
+    }
 
     // MARK: - Outlets: Menus
 
@@ -62,11 +70,18 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     /// This is just present so we can remove this menu item in App Store builds.
     ///
-    @IBOutlet weak var mainMenuItem: NSMenuItem?
-    @IBOutlet weak var registrationKeyValidityMenuSeparatorItem: NSMenuItem?
-    @IBOutlet weak var registrationKeyValidityMenuItem: NSMenuItem?
-    @IBOutlet weak var registrationKeyValidityAutomaticItem: NSMenuItem?
-    @IBOutlet weak var preferredServerAutomaticItem: NSMenuItem?
+    @IBOutlet weak var mainMenuItem: NSMenuItem!
+    @IBOutlet weak var registrationKeyValidityMenuSeparatorItem: NSMenuItem!
+    @IBOutlet weak var registrationKeyValidityMenuItem: NSMenuItem!
+    @IBOutlet weak var registrationKeyValidityAutomaticItem: NSMenuItem!
+    @IBOutlet weak var preferredServerAutomaticItem: NSMenuItem!
+
+    @IBOutlet weak var enableConnectOnDemandMenuItem: NSMenuItem!
+    @IBOutlet weak var shouldEnforceRoutesMenuItem: NSMenuItem!
+    @IBOutlet weak var connectOnLogInMenuItem: NSMenuItem!
+
+    @IBOutlet weak var excludeDDGRouteMenuItem: NSMenuItem!
+    @IBOutlet weak var excludeLocalNetworksMenuItem: NSMenuItem!
 
     // MARK: - Debug Logic
 
@@ -151,6 +166,31 @@ final class NetworkProtectionDebugMenu: NSMenu {
         let validity = menuItem.representedObject as? TimeInterval
 
         debugUtilities.registrationKeyValidity = validity
+    }
+
+    @IBAction
+    func toggleConnectOnDemandAction(_ sender: Any?) {
+        NetworkProtectionTunnelController().toggleOnDemandEnabled()
+    }
+
+    @IBAction
+    func toggleEnforceRoutesAction(_ sender: Any?) {
+        NetworkProtectionTunnelController().toggleShouldEnforceRoutes()
+    }
+
+    @IBAction
+    func toggleExcludeDDGAction(_ sender: Any?) {
+        NetworkProtectionTunnelController().toggleShouldExcludeDDGRoute()
+    }
+
+    @IBAction
+    func toggleShouldExcludeLocalRoutes(_ sender: Any?) {
+        NetworkProtectionTunnelController().toggleShouldExcludeLocalRoutes()
+    }
+
+    @IBAction
+    func toggleConnectOnLogInAction(_ sender: Any?) {
+        NetworkProtectionTunnelController().toggleShouldAutoConnectOnLogIn()
     }
 
     // MARK: Populating Menu Items
@@ -240,6 +280,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     override func update() {
         updatePreferredServerMenu()
         updateRekeyValidityMenu()
+        updateNetworkProtectionMenuItemsState()
     }
 
     private func updatePreferredServerMenu() {
@@ -296,6 +337,21 @@ final class NetworkProtectionDebugMenu: NSMenu {
             }
         }
     }
+
+    private func updateNetworkProtectionMenuItemsState() {
+        let controller = NetworkProtectionTunnelController()
+
+        enableConnectOnDemandMenuItem.state = controller.isOnDemandEnabled ? .on : .off
+        // On-Demand should always be enabled for the Kill Switch to work
+        enableConnectOnDemandMenuItem.isEnabled = !controller.shouldEnforceRoutes
+
+        shouldEnforceRoutesMenuItem.state = controller.shouldEnforceRoutes ? .on : .off
+        connectOnLogInMenuItem.state = controller.shouldAutoConnectOnLogIn ? .on : .off
+
+        excludeDDGRouteMenuItem.state = controller.shouldExcludeDDGRoute ? .on : .off
+        excludeLocalNetworksMenuItem.state = controller.shouldExcludeLocalRoutes ? .on : .off
+    }
+
 }
 
 #endif

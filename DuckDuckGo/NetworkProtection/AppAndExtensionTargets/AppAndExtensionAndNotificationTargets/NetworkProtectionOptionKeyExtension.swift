@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionAppCommunication.swift
+//  NetworkProtectionOptionKeyExtension.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,9 +16,8 @@
 //  limitations under the License.
 //
 
-import Foundation
-import NetworkExtension
+import NetworkProtection
 
-enum NetworkProtectionOptionKey: String {
-    case defaultPixelHeaders
+extension NetworkProtectionOptionKey {
+    public static let defaultPixelHeaders = "defaultPixelHeaders"
 }

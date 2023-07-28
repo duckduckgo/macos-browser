@@ -396,6 +396,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 }
 
+@MainActor
 final class ZoomSubMenu: NSMenu {
 
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
