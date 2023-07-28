@@ -20,6 +20,7 @@ import Cocoa
 import WebKit
 import Combine
 import BrowserServicesKit
+import SecureStorage
 import Autofill
 
 @MainActor
@@ -263,7 +264,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         }
     }
 
-    public func secureVaultInitFailed(_ error: SecureVaultError) {
+    public func secureVaultInitFailed(_ error: SecureStorageError) {
         SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
     }
 

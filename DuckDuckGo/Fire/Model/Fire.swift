@@ -22,6 +22,7 @@ import BrowserServicesKit
 import DDGSync
 import PrivacyDashboard
 import WebKit
+import SecureStorage
 
 final class Fire {
 
@@ -38,7 +39,7 @@ final class Fire {
     let bookmarkManager: BookmarkManager
     let syncService: DDGSyncing?
     let tabCleanupPreparer = TabCleanupPreparer()
-    let secureVaultFactory: SecureVaultFactory
+    let secureVaultFactory: AutofillVaultFactory
     let tld: TLD
 
     private var dispatchGroup: DispatchGroup?
@@ -95,7 +96,7 @@ final class Fire {
          tld: TLD,
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
          syncService: DDGSyncing? = nil,
-         secureVaultFactory: SecureVaultFactory = SecureVaultFactory.default
+         secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory
     ) {
         self.webCacheManager = cacheManager
         self.historyCoordinating = historyCoordinating

@@ -18,17 +18,18 @@
 
 import Foundation
 import BrowserServicesKit
+import SecureStorage
 
 final class SecureVaultLoginImporter: LoginImporter {
 
-    private let secureVault: SecureVault
+    private let secureVault: any AutofillSecureVault
 
-    init(secureVault: SecureVault) {
+    init(secureVault: any AutofillSecureVault) {
         self.secureVault = secureVault
     }
 
     func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.CompletedLoginsResult {
-        let vault = try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        let vault = try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
 
         var successful: [String] = []
         var duplicates: [String] = []
@@ -47,10 +48,10 @@ final class SecureVaultLoginImporter: LoginImporter {
             }
 
             do {
-                try vault.storeWebsiteCredentials(credentials)
+                _ = try vault.storeWebsiteCredentials(credentials)
                 successful.append(importSummaryValue)
             } catch {
-                if case .duplicateRecord = error as? SecureVaultError {
+                if case .duplicateRecord = error as? SecureStorageError {
                     duplicates.append(importSummaryValue)
                 } else {
                     failed.append(importSummaryValue)
