@@ -1349,6 +1349,8 @@
 		85480F8A25CDC360009424E3 /* MainMenu.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85480F8925CDC360009424E3 /* MainMenu.storyboard */; };
 		85480FCF25D1AA22009424E3 /* ConfigurationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85480FCE25D1AA22009424E3 /* ConfigurationStore.swift */; };
 		854DAAAE2A72B613001E2E24 /* BookmarksBarPromptAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 859F30662A72B38500C20372 /* BookmarksBarPromptAssets.xcassets */; };
+		854DAAB12A731C07001E2E24 /* ExperimentCohort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 854DAAB02A731C07001E2E24 /* ExperimentCohort.swift */; };
+		854DAAB22A73300B001E2E24 /* ExperimentCohort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 854DAAB02A731C07001E2E24 /* ExperimentCohort.swift */; };
 		85589E7F27BBB8630038AD11 /* AddEditFavoriteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85589E7927BBB8620038AD11 /* AddEditFavoriteViewController.swift */; };
 		85589E8027BBB8630038AD11 /* AddEditFavoriteWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85589E7A27BBB8620038AD11 /* AddEditFavoriteWindow.swift */; };
 		85589E8127BBB8630038AD11 /* HomePage.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85589E7B27BBB8630038AD11 /* HomePage.storyboard */; };
@@ -2580,6 +2582,7 @@
 		8546DE6125C03056000CA5E1 /* UserAgentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAgentTests.swift; sourceTree = "<group>"; };
 		85480F8925CDC360009424E3 /* MainMenu.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainMenu.storyboard; sourceTree = "<group>"; };
 		85480FCE25D1AA22009424E3 /* ConfigurationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationStore.swift; sourceTree = "<group>"; };
+		854DAAB02A731C07001E2E24 /* ExperimentCohort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExperimentCohort.swift; sourceTree = "<group>"; };
 		8553FF51257523760029327F /* URLSuggestedFilenameTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSuggestedFilenameTests.swift; sourceTree = "<group>"; };
 		85589E7927BBB8620038AD11 /* AddEditFavoriteViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddEditFavoriteViewController.swift; sourceTree = "<group>"; };
 		85589E7A27BBB8620038AD11 /* AddEditFavoriteWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddEditFavoriteWindow.swift; sourceTree = "<group>"; };
@@ -4549,6 +4552,14 @@
 			path = MessageViews;
 			sourceTree = "<group>";
 		};
+		854DAAAF2A731BE6001E2E24 /* Experiments */ = {
+			isa = PBXGroup;
+			children = (
+				854DAAB02A731C07001E2E24 /* ExperimentCohort.swift */,
+			);
+			path = Experiments;
+			sourceTree = "<group>";
+		};
 		8553FF50257523630029327F /* FileDownload */ = {
 			isa = PBXGroup;
 			children = (
@@ -5020,6 +5031,7 @@
 				4B723DF826B0002B00E14D75 /* DataExport */,
 				4B379C1C27BDB7EA008A968E /* DeviceAuthentication */,
 				4B65143C26392483005B46EB /* Email */,
+				854DAAAF2A731BE6001E2E24 /* Experiments */,
 				AA5FA695275F823900DCE9C9 /* Favicons */,
 				1D36E651298A84F600AA485D /* FeatureFlagging */,
 				AA3863C227A1E1C000749AB5 /* Feedback */,
@@ -7827,6 +7839,7 @@
 				3706FBDE293F65D500E42796 /* EncryptionKeyStoring.swift in Sources */,
 				4B4D60E32A0C883A00BCD287 /* Main.swift in Sources */,
 				37197EA12942441700394917 /* Tab+UIDelegate.swift in Sources */,
+				854DAAB22A73300B001E2E24 /* ExperimentCohort.swift in Sources */,
 				56D6A3D729DB2BAB0055215A /* ContinueSetUpView.swift in Sources */,
 				3706FBDF293F65D500E42796 /* String+Punycode.swift in Sources */,
 				3706FBE0293F65D500E42796 /* NSException+Catch.m in Sources */,
@@ -8914,6 +8927,7 @@
 				B6040856274B830F00680351 /* DictionaryExtension.swift in Sources */,
 				B684592725C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift in Sources */,
 				B6DA06E62913F39400225DE2 /* MenuItemSelectors.swift in Sources */,
+				854DAAB12A731C07001E2E24 /* ExperimentCohort.swift in Sources */,
 				85589E9A27BFE3C30038AD11 /* FaviconView.swift in Sources */,
 				85707F2C276A364E00DC0649 /* OnboardingFlow.swift in Sources */,
 				4BE65480271FCD4D008D1D63 /* PasswordManagementLoginModel.swift in Sources */,

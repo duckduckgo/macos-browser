@@ -85,7 +85,6 @@ extension Pixel.Event {
 
             return params
 
-        // Don't use default to force new items to be thought about
         case .crash,
              .brokenSiteReport,
              .compileRulesWait,
@@ -117,7 +116,14 @@ extension Pixel.Event {
              .continueSetUpSectionHidden:
 
             return nil
+            if ExperimentCohort.isAllocated {
+                for pixel in ExperimentCohort.pixels where self.name == pixel.name {
+                    return ["cohort": ExperimentCohort.allocated.rawValue]
+                }
+            }
         }
+
+        return nil
     }
 
 }

@@ -120,6 +120,9 @@ public struct UserDefaultsWrapper<T> {
 
         // Temporary for activetion pixel
         case firstLaunchDate = "first.app.launch.date"
+
+        // experiments
+        case experimentCohort = "experiment.cohort"
     }
 
     enum RemovedKeys: String, CaseIterable {
