@@ -889,6 +889,10 @@ CQ
                                                                     </connections>
                                                                 </menuItem>
                                                             </items>
+                                                            <connections>
+                                                                <outlet property="simulateControllerFailureMenuItem" destination="xyA-ob-gEy" id="1VV-xV-wsB"/>
+                                                                <outlet property="simulateTunnelFailureMenuItem" destination="kVa-n8-UNx" id="3Ie-Ed-VtG"/>
+                                                            </connections>
                                                         </menu>
                                                     </menuItem>
                                                 </items>
