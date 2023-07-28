@@ -61,7 +61,6 @@ private struct RemovedProfilesView: View {
 @available(macOS 11.0, *)
 private struct PendingProfilesView: View {
     let profiles: [ResultsViewModel.PendingProfile]
-    let id = 0
 
     var body: some View {
         VStack(spacing: Const.verticalSpacing) {
@@ -69,8 +68,6 @@ private struct PendingProfilesView: View {
                        subtitle: "We automatically requested these sites to remove your data. This can take 2–3 weeks.",
                        iconName: "clock.fill",
                        iconColor: .yellow)
-            .animation(nil, value: UUID())
-            .id(id)
 
             VStack {
                 ForEach(profiles) { profile in
