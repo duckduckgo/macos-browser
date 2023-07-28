@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="uSf-9n-QMw">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="uSf-9n-QMw">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -33,6 +33,14 @@
                                     <constraint firstItem="T1A-KU-P4c" firstAttribute="top" secondItem="8Av-Au-VBq" secondAttribute="top" id="vLF-of-F3h"/>
                                 </constraints>
                             </visualEffectView>
+                            <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8kJ-Ja-bmu">
+                                <rect key="frame" x="749" y="-7" width="96" height="41"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="96" id="CLi-Qs-wE3"/>
+                                    <constraint firstAttribute="height" constant="41" id="Yzj-6H-7vS"/>
+                                </constraints>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" image="BurnerWindowGraphic" id="Hjo-W6-Cql"/>
+                            </imageView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="efe-Pc-ueP" userLabel="Window Dragging View" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="845" height="34"/>
                             </customView>
@@ -91,13 +99,13 @@
                                 </customSpacing>
                             </stackView>
                             <scrollView wantsLayer="YES" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasVerticalScroller="NO" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="O0X-yp-zLn" customClass="TabBarScrollView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="76" y="1" width="556" height="34"/>
+                                <rect key="frame" x="76" y="1" width="683" height="34"/>
                                 <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zdf-RD-hTG">
-                                    <rect key="frame" x="0.0" y="0.0" width="556" height="34"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="683" height="34"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <collectionView selectable="YES" allowsEmptySelection="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OEu-5P-cRF" customClass="TabBarCollectionView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="556" height="34"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="683" height="34"/>
                                             <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
                                             <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" id="oAv-jh-KDw">
                                                 <size key="itemSize" width="120" height="32"/>
@@ -117,7 +125,7 @@
                                 </constraints>
                                 <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
                                 <scroller key="horizontalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="f6A-N1-Ed1">
-                                    <rect key="frame" x="0.0" y="18" width="556" height="16"/>
+                                    <rect key="frame" x="0.0" y="18" width="683" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="tXZ-5R-7cy">
@@ -126,7 +134,7 @@
                                 </scroller>
                             </scrollView>
                             <stackView distribution="fillEqually" orientation="horizontal" alignment="top" spacing="2" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dN1-y1-5Xe">
-                                <rect key="frame" x="636" y="4" width="197" height="28"/>
+                                <rect key="frame" x="763" y="4" width="70" height="28"/>
                                 <subviews>
                                     <button hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2da-G7-xcP" userLabel="Right Scroll Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
@@ -184,7 +192,7 @@
                                             <constraint firstAttribute="height" constant="28" id="zmV-VF-tQ1"/>
                                         </constraints>
                                     </customView>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="XV4-Ze-5j7" userLabel="Burn Button" customClass="MouseOverAnimationButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="XV4-Ze-5j7" userLabel="Fire Button" customClass="MouseOverAnimationButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="42" y="0.0" width="28" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="28" id="9Ii-rC-Eca"/>
@@ -210,38 +218,8 @@
                                             <action selector="fireButtonAction:" target="7J5-0H-rHB" id="4O7-R9-MHU"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="tGc-5h-IAO" userLabel="Burner Window Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                        <rect key="frame" x="72" y="0.0" width="125" height="28"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="28" id="kZL-e0-AYV"/>
-                                            <constraint firstAttribute="width" constant="125" id="ujJ-9M-MNv"/>
-                                        </constraints>
-                                        <buttonCell key="cell" type="square" title="Burner Window" bezelStyle="shadowlessSquare" image="BurnerWindowPopoverButton" imagePosition="leading" alignment="left" imageScaling="proportionallyDown" inset="2" id="snH-6d-eTQ">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <color key="contentTintColor" name="alternateSelectedControlTextColor" catalog="System" colorSpace="catalog"/>
-                                        <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
-                                                <color key="value" name="ButtonMouseOverColor"/>
-                                            </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                                <real key="value" value="4"/>
-                                            </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
-                                                <color key="value" name="ButtonMouseDownColor"/>
-                                            </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="point" keyPath="contentInset">
-                                                <point key="value" x="0.0" y="0.0"/>
-                                            </userDefinedRuntimeAttribute>
-                                        </userDefinedRuntimeAttributes>
-                                        <connections>
-                                            <action selector="burnerWindowAction:" target="uSf-9n-QMw" id="g5U-kh-HrG"/>
-                                        </connections>
-                                    </button>
                                 </subviews>
                                 <visibilityPriorities>
-                                    <integer value="1000"/>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
@@ -252,11 +230,10 @@
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
-                                    <real value="3.4028234663852886e+38"/>
                                 </customSpacing>
                             </stackView>
                             <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="u4N-Qc-LMf" userLabel="Right Shadow Image">
-                                <rect key="frame" x="627" y="0.0" width="5" height="34"/>
+                                <rect key="frame" x="754" y="0.0" width="5" height="34"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="5" id="tqI-pU-ZWB"/>
                                 </constraints>
@@ -279,7 +256,7 @@
                                 <rect key="frame" x="76" y="1" width="0.0" height="34"/>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="efe-Pc-ueT" userLabel="Window Dragging View" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="76" y="0.0" width="560" height="34"/>
+                                <rect key="frame" x="76" y="0.0" width="687" height="34"/>
                             </customView>
                         </subviews>
                         <constraints>
@@ -287,6 +264,7 @@
                             <constraint firstItem="efe-Pc-ueT" firstAttribute="leading" secondItem="O0X-yp-zLn" secondAttribute="leading" priority="250" id="5k3-uY-xby"/>
                             <constraint firstAttribute="trailing" secondItem="yvS-k9-opP" secondAttribute="trailing" id="5ph-Hy-ZaL"/>
                             <constraint firstItem="1Zn-JZ-2g3" firstAttribute="trailing" secondItem="G3c-kC-Gu9" secondAttribute="trailing" id="6rJ-2P-FZy"/>
+                            <constraint firstItem="8kJ-Ja-bmu" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="9c1-aQ-lfw"/>
                             <constraint firstAttribute="bottom" secondItem="O0X-yp-zLn" secondAttribute="bottom" constant="1" id="9nu-uZ-CjI"/>
                             <constraint firstItem="u4N-Qc-LMf" firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" id="Bd1-0P-xDt"/>
                             <constraint firstItem="zsA-or-9Xo" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="CKr-JO-cA6"/>
@@ -313,7 +291,9 @@
                             <constraint firstAttribute="trailing" secondItem="efe-Pc-ueP" secondAttribute="trailing" id="etm-VT-0k2"/>
                             <constraint firstItem="1Zn-JZ-2g3" firstAttribute="bottom" secondItem="G3c-kC-Gu9" secondAttribute="bottom" id="hCx-vd-PYo"/>
                             <constraint firstItem="dN1-y1-5Xe" firstAttribute="leading" secondItem="efe-Pc-ueT" secondAttribute="trailing" id="hWs-AC-dwE"/>
+                            <constraint firstItem="kOb-4q-pAe" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" priority="600" constant="76" id="i6Z-BW-hhH"/>
                             <constraint firstAttribute="bottom" secondItem="efe-Pc-ueP" secondAttribute="bottom" id="iYT-Di-UlL"/>
+                            <constraint firstAttribute="trailing" secondItem="8kJ-Ja-bmu" secondAttribute="trailing" id="jKc-Ox-sjo"/>
                             <constraint firstItem="1Zn-JZ-2g3" firstAttribute="leading" secondItem="G3c-kC-Gu9" secondAttribute="leading" id="kBj-jh-X0L"/>
                             <constraint firstItem="efe-Pc-ueT" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" priority="750" id="kNA-2I-L0U"/>
                             <constraint firstAttribute="bottom" secondItem="G3d-9f-GhJ" secondAttribute="bottom" id="m1b-9d-wVV"/>
@@ -327,7 +307,7 @@
                     </view>
                     <connections>
                         <outlet property="addTabButton" destination="Avv-iY-qO8" id="Rku-SK-49j"/>
-                        <outlet property="burnerWindowButton" destination="tGc-5h-IAO" id="iTr-b0-4YU"/>
+                        <outlet property="burnerWindowBackgroundView" destination="8kJ-Ja-bmu" id="l4s-4i-8eV"/>
                         <outlet property="collectionView" destination="OEu-5P-cRF" id="b95-c4-JM0"/>
                         <outlet property="draggingSpace" destination="Ako-KX-AM9" id="yya-hb-te7"/>
                         <outlet property="fireButton" destination="XV4-Ze-5j7" id="ZCC-wX-7hC"/>
@@ -354,7 +334,7 @@
     <resources>
         <image name="Add" width="16" height="16"/>
         <image name="Burn" width="18" height="18"/>
-        <image name="BurnerWindowPopoverButton" width="28" height="28"/>
+        <image name="BurnerWindowGraphic" width="96" height="41"/>
         <image name="TabBarShadowLeft" width="5" height="34"/>
         <image name="TabBarShadowRight" width="5" height="34"/>
         <image name="TabOverflowBack" width="16" height="16"/>

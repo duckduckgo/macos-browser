@@ -118,6 +118,8 @@ public struct UserDefaultsWrapper<T> {
 
         // Temporary for activetion pixel
         case firstLaunchDate = "first.app.launch.date"
+
+        case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
     }
 
     enum RemovedKeys: String, CaseIterable {

@@ -272,10 +272,11 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {
         // Animate fire for Burner Window when closing
-        guard mainViewController.tabCollectionViewModel.isBurner else {
+        guard mainViewController.tabCollectionViewModel.isBurner && !sender.isPopUpWindow else {
             return true
         }
         Task {
+            moveTabBarView(toTitlebarView: false)
             await mainViewController.fireViewController.animateFireWhenClosing()
             sender.close()
         }
