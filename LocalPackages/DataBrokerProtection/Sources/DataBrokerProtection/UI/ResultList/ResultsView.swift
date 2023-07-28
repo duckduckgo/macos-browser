@@ -20,34 +20,24 @@ import SwiftUI
 
 @available(macOS 11.0, *)
 struct ResultsView: View {
-
-    private let removedProfiles: [RemovedProfile] = [
-        RemovedProfile(dataBroker: "ABC Data Broker", scheduledDate: Date()),
-        RemovedProfile(dataBroker: "XYZ Data Broker", scheduledDate: Date().addingTimeInterval(86400)),
-        RemovedProfile(dataBroker: "DEF Data Broker", scheduledDate: Date().addingTimeInterval(86400 * 2)),
-        RemovedProfile(dataBroker: "GHI Data Broker", scheduledDate: Date().addingTimeInterval(86400 * 3)),
-        RemovedProfile(dataBroker: "JKL Data Broker", scheduledDate: Date().addingTimeInterval(86400 * 4))
-    ]
-
-    private let pendingProfiles: [PendingProfile] = [
-        PendingProfile(dataBroker: "ABC Data Broker", profile: "John Doe", address: "123 Apple Street", error: nil, errorDescription: nil),
-        PendingProfile(dataBroker: "XYZ Data Broker", profile: "Jane Smith", address: "456 Cherry Avenue", error: "Error", errorDescription: "Error Description"),
-        PendingProfile(dataBroker: "DEF Data Broker", profile: "Michael Johnson", address: "789 Orange Road", error: nil, errorDescription: nil),
-        PendingProfile(dataBroker: "GHI Data Broker", profile: "Emily Davis", address: "321 Banana Boulevard", error: "Error", errorDescription: "Error Description"),
-        PendingProfile(dataBroker: "JKL Data Broker", profile: "Matthew Wilson", address: "654 Grape Lane", error: nil, errorDescription: nil),
-        PendingProfile(dataBroker: "MNO Data Broker", profile: "Olivia Taylor", address: "987 Lemon Drive", error: "Error", errorDescription: "Error Description")]
+    @ObservedObject var viewModel: ResultsViewModel
 
     var body: some View {
         VStack(spacing: Const.verticalSpacing) {
-            PendingProfilesView(profiles: pendingProfiles)
-            RemovedProfilesView(profiles: removedProfiles)
+            if !viewModel.pendingProfiles.isEmpty {
+                PendingProfilesView(profiles: viewModel.pendingProfiles)
+            }
+
+            if !viewModel.removedProfiles.isEmpty {
+                RemovedProfilesView(profiles: viewModel.removedProfiles)
+            }
         }
     }
 }
 
 @available(macOS 11.0, *)
 private struct RemovedProfilesView: View {
-    let profiles: [RemovedProfile]
+    let profiles: [ResultsViewModel.RemovedProfile]
 
     var body: some View {
         VStack(spacing: Const.verticalSpacing) {
@@ -55,7 +45,6 @@ private struct RemovedProfilesView: View {
                        subtitle: "We will re-scan these sites on a regular basis and send removal requests if your data resurfaces.",
                        iconName: "checkmark.circle.fill",
                        iconColor: .green)
-
             VStack {
                 ForEach(profiles) { profile in
                     RemovedProfileRow(removedProfile: profile)
@@ -71,7 +60,8 @@ private struct RemovedProfilesView: View {
 
 @available(macOS 11.0, *)
 private struct PendingProfilesView: View {
-    let profiles: [PendingProfile]
+    let profiles: [ResultsViewModel.PendingProfile]
+    let id = 0
 
     var body: some View {
         VStack(spacing: Const.verticalSpacing) {
@@ -79,6 +69,8 @@ private struct PendingProfilesView: View {
                        subtitle: "We automatically requested these sites to remove your data. This can take 2–3 weeks.",
                        iconName: "clock.fill",
                        iconColor: .yellow)
+            .animation(nil, value: UUID())
+            .id(id)
 
             VStack {
                 ForEach(profiles) { profile in
@@ -89,13 +81,14 @@ private struct PendingProfilesView: View {
                         .foregroundColor(Color.secondary)
                 }
             }.listBackgroundStyle()
+                .transition(.opacity)
         }
     }
 }
 
 @available(macOS 11.0, *)
 private struct RemovedProfileRow: View {
-    let removedProfile: RemovedProfile
+    let removedProfile: ResultsViewModel.RemovedProfile
 
     var body: some View {
         HStack {
@@ -118,7 +111,7 @@ private struct RemovedProfileRow: View {
 
 @available(macOS 11.0, *)
 private struct PendingProfileRow: View {
-    let pendingProfile: PendingProfile
+    let pendingProfile: ResultsViewModel.PendingProfile
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -180,38 +173,11 @@ private extension View {
     }
 }
 
-// MARK: - Data
-private struct RemovedProfile: Identifiable {
-    let id = UUID()
-    let dataBroker: String
-    let scheduledDate: Date
-
-    var formattedDate: String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .none
-        formatter.dateStyle = .short
-        return formatter.string(from: scheduledDate)
-    }
-}
-
-private struct PendingProfile: Identifiable {
-    let id = UUID()
-    let dataBroker: String
-    let profile: String
-    let address: String
-    let error: String?
-    let errorDescription: String?
-
-    var hasError: Bool {
-        error != nil
-    }
-}
-
 // MARK: - Preview
 @available(macOS 11.0, *)
 struct ResultsView_Previews: PreviewProvider {
     static var previews: some View {
-        ResultsView().frame(height: 700)
+        ResultsView(viewModel: ResultsViewModel()).frame(height: 700)
             .padding()
     }
 }

@@ -53,7 +53,7 @@ public struct DataBrokerProtectionContainerView: View {
                         ScanStartedView()
                             .padding(.top, 330)
                     case .results:
-                        ResultsView()
+                        ResultsView(viewModel: ResultsViewModel())
                             .frame(width: 800)
                             .padding(.top, 330)
                             .padding(.bottom, 100)
