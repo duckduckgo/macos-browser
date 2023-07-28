@@ -101,6 +101,7 @@ extension Pixel {
 
         case adClickAttributionDetected
         case adClickAttributionActive
+        case adClickAttributionPageLoads
 
         case emailEnabled
         case emailDisabled
@@ -311,6 +312,9 @@ extension Pixel.Event {
 
         case .adClickAttributionActive:
             return "m_mac_ad_click_active"
+
+        case .adClickAttributionPageLoads:
+            return "m_mac_ad_click_page_loads"
 
         // Deliberately omit the `m_mac_` prefix in order to format these pixels the same way as other platforms
         case .emailEnabled: return "email_enabled_macos_desktop"
