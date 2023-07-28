@@ -156,6 +156,8 @@ final class AppContentBlocking {
             domainEvent = .adClickAttributionDetected
         case .adAttributionActive:
             domainEvent = .adClickAttributionActive
+        case .adAttributionPageLoads:
+            domainEvent = .adClickAttributionPageLoads
         }
 
         Pixel.fire(domainEvent, withAdditionalParameters: parameters ?? [:])

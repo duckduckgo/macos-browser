@@ -72,7 +72,7 @@ final class DataImportViewController: NSViewController {
     }
 
     private func secureVaultImporter() throws -> SecureVaultLoginImporter {
-        let secureVault = try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        let secureVault = try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
         return SecureVaultLoginImporter(secureVault: secureVault)
     }
 
@@ -470,7 +470,7 @@ extension DataImportViewController: FileImportViewControllerDelegate {
         }
 
         do {
-            let secureVault = try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+            let secureVault = try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
             let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault)
             self.dataImporter = CSVImporter(fileURL: url,
                                             loginImporter: secureVaultImporter,

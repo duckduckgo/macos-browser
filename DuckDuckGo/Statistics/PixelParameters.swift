@@ -98,6 +98,7 @@ extension Pixel.Event {
              .ampBlockingRulesCompilationFailed,
              .adClickAttributionDetected,
              .adClickAttributionActive,
+             .adClickAttributionPageLoads,
              .emailEnabled,
              .emailDisabled,
              .emailUserCreatedAlias,

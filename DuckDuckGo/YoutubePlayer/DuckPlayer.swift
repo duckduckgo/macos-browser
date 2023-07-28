@@ -167,7 +167,7 @@ final class DuckPlayer {
 extension DuckPlayer {
 
     func image(for faviconView: FaviconView) -> NSImage? {
-        guard isAvailable, mode != .disabled, faviconView.domain == Self.commonName else {
+        guard isAvailable, mode != .disabled, faviconView.url?.isDuckPlayer == true else {
             return nil
         }
         return .duckPlayer

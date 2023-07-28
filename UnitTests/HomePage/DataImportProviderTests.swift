@@ -23,7 +23,7 @@ import BrowserServicesKit
 final class DataImportProviderTests: XCTestCase {
 
     var provider: DataImportStatusProviding!
-    var vault: MockSecureVault!
+    var vault: MockSecureVault<MockDatabaseProvider>!
     var bookmarkManager: MockBookmarkManager!
 
     let key = "home.page.continue.set.up.import"
@@ -55,7 +55,7 @@ final class DataImportProviderTests: XCTestCase {
     override func setUp() {
         UserDefaultsWrapper<Any>.clearAll()
 
-        vault = MockSecureVault()
+        vault = try! MockSecureVaultFactory.makeVault(errorReporter: nil)
         vault.storedAccounts = notImportedAccounts
         vault.storedIdentities = []
         vault.storedCards = []
