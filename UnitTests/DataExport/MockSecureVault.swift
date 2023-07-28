@@ -19,6 +19,7 @@
 import Foundation
 import BrowserServicesKit
 import SecureStorage
+import GRDB
 
 typealias MockVaultFactory = SecureVaultFactory<MockSecureVault<MockDatabaseProvider>>
 
@@ -152,9 +153,12 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
     var _forDomain = [String]()
     var _credentialsDict = [Int64: SecureVaultModels.WebsiteCredentials]()
     var _note: SecureVaultModels.Note?
+    var db: GRDB.DatabaseWriter
     // swiftlint:enable identifier_name
 
-    required init(file: URL = URL(string: "https://duckduckgo.com/")!, key: Data = Data()) throws {}
+    required init(file: URL = URL(string: "https://duckduckgo.com/")!, key: Data = Data()) throws {
+        db = try! DatabaseQueue(named: "TestQueue")
+    }
 
     static func recreateDatabase(withKey key: Data) throws -> Self {
         return try MockDatabaseProvider(file: URL(string: "https://duck.com")!, key: Data()) as! Self
