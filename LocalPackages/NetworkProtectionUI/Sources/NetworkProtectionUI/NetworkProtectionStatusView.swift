@@ -177,7 +177,7 @@ public struct NetworkProtectionStatusView: View {
 
             bottomMenuView()
         }
-        .padding(EdgeInsets(top: 5, leading: 5, bottom: 15, trailing: 5))
+        .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
         .frame(maxWidth: 350)
     }
 

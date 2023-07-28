@@ -39,31 +39,7 @@ public extension EnvironmentValues {
     }
 }
 
-extension NSView {
-    func changeBackgroundColor(_ color: NSColor) {
-        wantsLayer = true
-        layer?.backgroundColor = color.cgColor
-    }
-}
-
 public final class NetworkProtectionPopover: NSPopover {
-
-    final class TestViewController<T: View>: NSHostingController<T>  {
-
-        override init(rootView: T) {
-            super.init(rootView: rootView)
-            view.translatesAutoresizingMaskIntoConstraints = false
-        }
-
-        @MainActor required dynamic init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
-
-        override func viewDidLoad() {
-            super.viewDidLoad()
-            view.translatesAutoresizingMaskIntoConstraints = false
-        }
-    }
 
     public typealias MenuItem = NetworkProtectionStatusView.Model.MenuItem
 
@@ -96,6 +72,7 @@ public final class NetworkProtectionPopover: NSPopover {
         let view = NetworkProtectionStatusView(model: model).environment(\.dismiss, { [weak self] in
             self?.close()
         }).fixedSize()
+            .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 0))
         controller = NSHostingController(rootView: view)
 
         contentViewController = controller
