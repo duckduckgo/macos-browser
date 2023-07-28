@@ -31,8 +31,8 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
 ///
 @objc
 final class NetworkProtectionSimulateFailureMenu: NSMenu {
-    @IBOutlet weak var simulateControllerFailureMenuItem: NSMenuItem?
-    @IBOutlet weak var simulateTunnelFailureMenuItem: NSMenuItem?
+    @IBOutlet weak var simulateControllerFailureMenuItem: NSMenuItem!
+    @IBOutlet weak var simulateTunnelFailureMenuItem: NSMenuItem!
 
     private var simulationOptions: NetworkProtectionSimulationOptions {
         NetworkProtectionTunnelController.simulationOptions
@@ -53,8 +53,8 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
     }
 
     override func update() {
-        simulateControllerFailureMenuItem?.state = simulationOptions.isEnabled(.controllerFailure) ? .on : .off
-        simulateTunnelFailureMenuItem?.state = simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
+        simulateControllerFailureMenuItem.state = simulationOptions.isEnabled(.controllerFailure) ? .on : .off
+        simulateTunnelFailureMenuItem.state = simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
     }
 }
 
