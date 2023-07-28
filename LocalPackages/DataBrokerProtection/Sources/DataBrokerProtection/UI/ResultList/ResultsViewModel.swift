@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 final class ResultsViewModel: ObservableObject {
 
@@ -91,9 +92,10 @@ final class ResultsViewModel: ObservableObject {
 
     private func moveProfileToRemoved() {
         if let profile = pendingProfiles.first {
-
-            pendingProfiles.removeFirst()
-            removedProfiles.append(RemovedProfile(dataBroker: profile.dataBroker, scheduledDate: Date()))
+            withAnimation {
+                pendingProfiles.removeFirst()
+                removedProfiles.append(RemovedProfile(dataBroker: profile.dataBroker, scheduledDate: Date()))
+            }
         }
     }
 }

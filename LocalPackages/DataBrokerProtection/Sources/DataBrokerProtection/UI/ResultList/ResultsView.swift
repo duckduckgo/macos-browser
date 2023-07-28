@@ -45,6 +45,8 @@ private struct RemovedProfilesView: View {
                        subtitle: "We will re-scan these sites on a regular basis and send removal requests if your data resurfaces.",
                        iconName: "checkmark.circle.fill",
                        iconColor: .green)
+            .textAnimationDisabled(true)
+
             VStack {
                 ForEach(profiles) { profile in
                     RemovedProfileRow(removedProfile: profile)
@@ -68,6 +70,7 @@ private struct PendingProfilesView: View {
                        subtitle: "We automatically requested these sites to remove your data. This can take 2–3 weeks.",
                        iconName: "clock.fill",
                        iconColor: .yellow)
+            .textAnimationDisabled(true)
 
             VStack {
                 ForEach(profiles) { profile in
@@ -176,5 +179,16 @@ struct ResultsView_Previews: PreviewProvider {
     static var previews: some View {
         ResultsView(viewModel: ResultsViewModel()).frame(height: 700)
             .padding()
+    }
+}
+
+extension View {
+    @ViewBuilder
+    func textAnimationDisabled(_ disabled: Bool = true) -> some View {
+        if #available(macOS 13.0, *) {
+            contentTransition(disabled ? .identity : .opacity)
+        } else {
+            self
+        }
     }
 }
