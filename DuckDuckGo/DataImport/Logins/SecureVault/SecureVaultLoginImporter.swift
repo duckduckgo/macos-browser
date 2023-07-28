@@ -48,7 +48,7 @@ final class SecureVaultLoginImporter: LoginImporter {
             }
 
             do {
-                try vault.storeWebsiteCredentials(credentials)
+                _ = try vault.storeWebsiteCredentials(credentials)
                 successful.append(importSummaryValue)
             } catch {
                 if case .duplicateRecord = error as? SecureStorageError {
