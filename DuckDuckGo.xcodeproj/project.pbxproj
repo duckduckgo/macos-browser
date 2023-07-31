@@ -18,6 +18,8 @@
 		1D02633628D8A9A9005CBB41 /* BWEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D02633528D8A9A9005CBB41 /* BWEncryption.m */; };
 		1D074B272909A433006E4AC3 /* PasswordManagerCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D074B262909A433006E4AC3 /* PasswordManagerCoordinator.swift */; };
 		1D12F2E2298BC660009A65FD /* InternalUserDeciderStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D12F2E1298BC660009A65FD /* InternalUserDeciderStoreMock.swift */; };
+		1D1A33492A6FEB170080ACED /* BurnerMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D1A33482A6FEB170080ACED /* BurnerMode.swift */; };
+		1D1A334A2A6FEB170080ACED /* BurnerMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D1A33482A6FEB170080ACED /* BurnerMode.swift */; };
 		1D1C36E329FAE8DA001FA40C /* FaviconManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D1C36E229FAE8DA001FA40C /* FaviconManagerTests.swift */; };
 		1D1C36E429FAE8DA001FA40C /* FaviconManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D1C36E229FAE8DA001FA40C /* FaviconManagerTests.swift */; };
 		1D1C36E629FB019C001FA40C /* HistoryTabExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D1C36E529FB019C001FA40C /* HistoryTabExtensionTests.swift */; };
@@ -46,16 +48,10 @@
 		1D43EB3C292B664A0065E5D6 /* BWMessageIdGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB3B292B664A0065E5D6 /* BWMessageIdGenerator.swift */; };
 		1D6216B229069BBF00386B2C /* BWKeyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6216B129069BBF00386B2C /* BWKeyStorage.swift */; };
 		1D69C553291302F200B75945 /* BWVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D69C552291302F200B75945 /* BWVault.swift */; };
-		1D6A491A29CF75290011DF74 /* BurnerWindowPopover.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1D6A491929CF75290011DF74 /* BurnerWindowPopover.storyboard */; };
-		1D6A491B29CF75290011DF74 /* BurnerWindowPopover.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1D6A491929CF75290011DF74 /* BurnerWindowPopover.storyboard */; };
-		1D6A491D29CF75530011DF74 /* BurnerWindowPopoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6A491C29CF75530011DF74 /* BurnerWindowPopoverViewController.swift */; };
-		1D6A491E29CF75530011DF74 /* BurnerWindowPopoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6A491C29CF75530011DF74 /* BurnerWindowPopoverViewController.swift */; };
 		1D6A492029CF7A490011DF74 /* NSPopoverExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6A491F29CF7A490011DF74 /* NSPopoverExtension.swift */; };
 		1D6A492129CF7A490011DF74 /* NSPopoverExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6A491F29CF7A490011DF74 /* NSPopoverExtension.swift */; };
 		1D77921828FDC54C00BE0210 /* FaviconReferenceCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D77921728FDC54C00BE0210 /* FaviconReferenceCacheTests.swift */; };
 		1D77921A28FDC79800BE0210 /* FaviconStoringMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D77921928FDC79800BE0210 /* FaviconStoringMock.swift */; };
-		1D7D5B6A29C9DED80054A4DC /* BurnerWindowPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D7D5B6929C9DED80054A4DC /* BurnerWindowPopover.swift */; };
-		1D7D5B7129CA04560054A4DC /* BurnerWindowPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D7D5B6929C9DED80054A4DC /* BurnerWindowPopover.swift */; };
 		1D8B7D6A2A38BF050045C6F6 /* FireproofDomainsStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF1712744CE36004F850E /* FireproofDomainsStoreMock.swift */; };
 		1D8B7D6B2A38BF060045C6F6 /* FireproofDomainsStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BBF1712744CE36004F850E /* FireproofDomainsStoreMock.swift */; };
 		1DA6D0FD2A1FF9A100540406 /* HTTPCookie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA6D0FC2A1FF9A100540406 /* HTTPCookie.swift */; };
@@ -228,7 +224,6 @@
 		3706FB01293F65D500E42796 /* NSEventExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4AF522901A4F20013585E /* NSEventExtension.swift */; };
 		3706FB02293F65D500E42796 /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85707F25276A335700DC0649 /* Onboarding.swift */; };
 		3706FB03293F65D500E42796 /* PopUpWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68C92C0274E3EF4002AC6B0 /* PopUpWindow.swift */; };
-		3706FB04293F65D500E42796 /* PersistentAppInterfaceSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B17E2D3287380390003BD39 /* PersistentAppInterfaceSettings.swift */; };
 		3706FB05293F65D500E42796 /* Favicons.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AA5FA69E275F948900DCE9C9 /* Favicons.xcdatamodeld */; };
 		3706FB07293F65D500E42796 /* Publisher.asVoid.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684592125C93BE000DC17B6 /* Publisher.asVoid.swift */; };
 		3706FB08293F65D500E42796 /* NavigationButtonMenuDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA0CC32252F181A0079BC96 /* NavigationButtonMenuDelegate.swift */; };
@@ -1028,7 +1023,6 @@
 		4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */; };
 		4B117F7D276C0CB5002F3D8C /* LocalStatisticsStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B117F7C276C0CB5002F3D8C /* LocalStatisticsStoreTests.swift */; };
 		4B139AFD26B60BD800894F82 /* NSImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B139AFC26B60BD800894F82 /* NSImageExtensions.swift */; };
-		4B17E2D4287380390003BD39 /* PersistentAppInterfaceSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B17E2D3287380390003BD39 /* PersistentAppInterfaceSettings.swift */; };
 		4B1AD8D525FC38DD00261379 /* EncryptionKeyStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6EA258C288C00F6F690 /* EncryptionKeyStoreTests.swift */; };
 		4B1AD8E225FC390B00261379 /* EncryptionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */; };
 		4B1AD91725FC46FB00261379 /* CoreDataEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1AD91625FC46FB00261379 /* CoreDataEncryptionTests.swift */; };
@@ -1331,13 +1325,22 @@
 		7B1E819F27C8874900FF0E60 /* ContentOverlay.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */; };
 		7B1E81A027C8874900FF0E60 /* ContentOverlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */; };
 		7B2E52252A5FEC09000C6D39 /* NetworkProtectionAgentNotificationsPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B2E52242A5FEC09000C6D39 /* NetworkProtectionAgentNotificationsPresenter.swift */; };
+		7B430EA12A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */; };
+		7B430EA22A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */; };
 		7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4CE8E626F02134009134B1 /* TabBarTests.swift */; };
 		7B736E582A4A22B700F9922A /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5F14C52A145D6A0060320F /* Main.swift */; };
 		7B736E6A2A4A22FC00F9922A /* enableOnDemand.app in Embed NetP Controller Apps */ = {isa = PBXBuildFile; fileRef = 7B736E5F2A4A22B700F9922A /* enableOnDemand.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7B838C382A1DD8DD00E05A13 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B2D06522A11D19B00DE1F49 /* Assets.xcassets */; };
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
 		7BB108592A43375D000AB95F /* PFMoveApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BB108582A43375D000AB95F /* PFMoveApplication.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		7BBD45B12A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */; };
+		7BBD45B22A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */; };
+		7BBD45B42A691C3A00C83CA9 /* NetworkProtectionLoginItemsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B32A691C3A00C83CA9 /* NetworkProtectionLoginItemsManager.swift */; };
+		7BBD45B52A691C3A00C83CA9 /* NetworkProtectionLoginItemsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B32A691C3A00C83CA9 /* NetworkProtectionLoginItemsManager.swift */; };
+		7BE146072A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */; };
+		7BE146082A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */; };
 		85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */; };
+		850E8DFB2A6FEC5E00691187 /* BookmarksBarAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */; };
 		8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */ = {isa = PBXBuildFile; fileRef = 8511E18325F82B34002F516B /* 01_Fire_really_small.json */; };
 		853014D625E671A000FB8205 /* PageObserverUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 853014D525E671A000FB8205 /* PageObserverUserScript.swift */; };
 		85308E25267FC9F2001ABD76 /* NSAlertExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85308E24267FC9F2001ABD76 /* NSAlertExtension.swift */; };
@@ -1345,6 +1348,7 @@
 		85378D9E274E664C007C5CBF /* PopoverMessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85378D9D274E664C007C5CBF /* PopoverMessageViewController.swift */; };
 		85378DA0274E6F42007C5CBF /* NSNotificationName+EmailManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85378D9F274E6F42007C5CBF /* NSNotificationName+EmailManager.swift */; };
 		85378DA2274E7F25007C5CBF /* EmailManagerRequestDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85378DA1274E7F25007C5CBF /* EmailManagerRequestDelegate.swift */; };
+		85393C872A6FF1B600F11EB3 /* BookmarksBarAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */; };
 		8546DE6225C03056000CA5E1 /* UserAgentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8546DE6125C03056000CA5E1 /* UserAgentTests.swift */; };
 		85480F8A25CDC360009424E3 /* MainMenu.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85480F8925CDC360009424E3 /* MainMenu.storyboard */; };
 		85480FCF25D1AA22009424E3 /* ConfigurationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85480FCE25D1AA22009424E3 /* ConfigurationStore.swift */; };
@@ -1375,6 +1379,10 @@
 		85707F2A276A35FE00DC0649 /* ActionSpeech.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85707F29276A35FE00DC0649 /* ActionSpeech.swift */; };
 		85707F2C276A364E00DC0649 /* OnboardingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85707F2B276A364E00DC0649 /* OnboardingFlow.swift */; };
 		85707F31276A7DCA00DC0649 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85707F30276A7DCA00DC0649 /* OnboardingViewModel.swift */; };
+		85774AFF2A713D3B00DE0561 /* BookmarksBarMenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85774AFE2A713D3B00DE0561 /* BookmarksBarMenuFactory.swift */; };
+		85774B002A713D3B00DE0561 /* BookmarksBarMenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85774AFE2A713D3B00DE0561 /* BookmarksBarMenuFactory.swift */; };
+		85774B032A71CDD000DE0561 /* BlockMenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85774B022A71CDD000DE0561 /* BlockMenuItem.swift */; };
+		85774B042A71CDD000DE0561 /* BlockMenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85774B022A71CDD000DE0561 /* BlockMenuItem.swift */; };
 		85799C1825DEBB3F0007EC87 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85799C1725DEBB3F0007EC87 /* Logging.swift */; };
 		857FFEC027D239DC00415E7A /* HyperLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857FFEBF27D239DC00415E7A /* HyperLink.swift */; };
 		8589063A267BCD8E00D23B0D /* SaveCredentialsPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */; };
@@ -2104,6 +2112,7 @@
 		1D02633528D8A9A9005CBB41 /* BWEncryption.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BWEncryption.m; sourceTree = "<group>"; };
 		1D074B262909A433006E4AC3 /* PasswordManagerCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordManagerCoordinator.swift; sourceTree = "<group>"; };
 		1D12F2E1298BC660009A65FD /* InternalUserDeciderStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalUserDeciderStoreMock.swift; sourceTree = "<group>"; };
+		1D1A33482A6FEB170080ACED /* BurnerMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BurnerMode.swift; sourceTree = "<group>"; };
 		1D1C36E229FAE8DA001FA40C /* FaviconManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconManagerTests.swift; sourceTree = "<group>"; };
 		1D1C36E529FB019C001FA40C /* HistoryTabExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTabExtensionTests.swift; sourceTree = "<group>"; };
 		1D36E657298AA3BA00AA485D /* InternalUserDeciderStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalUserDeciderStore.swift; sourceTree = "<group>"; };
@@ -2123,13 +2132,10 @@
 		1D43EB3B292B664A0065E5D6 /* BWMessageIdGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWMessageIdGenerator.swift; sourceTree = "<group>"; };
 		1D6216B129069BBF00386B2C /* BWKeyStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWKeyStorage.swift; sourceTree = "<group>"; };
 		1D69C552291302F200B75945 /* BWVault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWVault.swift; sourceTree = "<group>"; };
-		1D6A491929CF75290011DF74 /* BurnerWindowPopover.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BurnerWindowPopover.storyboard; sourceTree = "<group>"; };
-		1D6A491C29CF75530011DF74 /* BurnerWindowPopoverViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BurnerWindowPopoverViewController.swift; sourceTree = "<group>"; };
 		1D6A491F29CF7A490011DF74 /* NSPopoverExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPopoverExtension.swift; sourceTree = "<group>"; };
 		1D77921728FDC54C00BE0210 /* FaviconReferenceCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconReferenceCacheTests.swift; sourceTree = "<group>"; };
 		1D77921928FDC79800BE0210 /* FaviconStoringMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconStoringMock.swift; sourceTree = "<group>"; };
 		1D77921C28FFF27C00BE0210 /* RunningApplicationCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationCheck.swift; sourceTree = "<group>"; };
-		1D7D5B6929C9DED80054A4DC /* BurnerWindowPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BurnerWindowPopover.swift; sourceTree = "<group>"; };
 		1DA6D0FC2A1FF9A100540406 /* HTTPCookie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPCookie.swift; sourceTree = "<group>"; };
 		1DA6D0FF2A1FF9DC00540406 /* HTTPCookieTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPCookieTests.swift; sourceTree = "<group>"; };
 		1DB9617929F1D06D00CF5568 /* InternalUserDeciderMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalUserDeciderMock.swift; sourceTree = "<group>"; };
@@ -2292,7 +2298,6 @@
 		4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataEncryptionTests.swift; sourceTree = "<group>"; };
 		4B117F7C276C0CB5002F3D8C /* LocalStatisticsStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStatisticsStoreTests.swift; sourceTree = "<group>"; };
 		4B139AFC26B60BD800894F82 /* NSImageExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSImageExtensions.swift; sourceTree = "<group>"; };
-		4B17E2D3287380390003BD39 /* PersistentAppInterfaceSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentAppInterfaceSettings.swift; sourceTree = "<group>"; };
 		4B18E3232A1D32B1005D0AAA /* NetworkProtectionStartVPN.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = NetworkProtectionStartVPN.xcconfig; path = Configuration/App/NetworkProtection/NetworkProtectionStartVPN.xcconfig; sourceTree = SOURCE_ROOT; };
 		4B18E3252A1D3581005D0AAA /* NetworkProtectionStopVPN.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = NetworkProtectionStopVPN.xcconfig; path = Configuration/App/NetworkProtection/NetworkProtectionStopVPN.xcconfig; sourceTree = SOURCE_ROOT; };
 		4B18E3272A1D3896005D0AAA /* NetworkProtectionVPNHelpersBase.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionVPNHelpersBase.xcconfig; sourceTree = "<group>"; };
@@ -2552,6 +2557,7 @@
 		7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ContentOverlay.storyboard; sourceTree = "<group>"; };
 		7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayViewController.swift; sourceTree = "<group>"; };
 		7B2E52242A5FEC09000C6D39 /* NetworkProtectionAgentNotificationsPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionAgentNotificationsPresenter.swift; sourceTree = "<group>"; };
+		7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionSimulateFailureMenu.swift; sourceTree = "<group>"; };
 		7B4CE8DA26F02108009134B1 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B4CE8DE26F02108009134B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B4CE8E626F02134009134B1 /* TabBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarTests.swift; sourceTree = "<group>"; };
@@ -2561,7 +2567,11 @@
 		7B9459632A4A5BAF0012535A /* NetworkProtectionEnableOnDemand.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionEnableOnDemand.xcconfig; sourceTree = "<group>"; };
 		7BB108572A43375D000AB95F /* PFMoveApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFMoveApplication.h; sourceTree = "<group>"; };
 		7BB108582A43375D000AB95F /* PFMoveApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFMoveApplication.m; sourceTree = "<group>"; };
+		7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionDebugUtilities.swift; sourceTree = "<group>"; };
+		7BBD45B32A691C3A00C83CA9 /* NetworkProtectionLoginItemsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionLoginItemsManager.swift; sourceTree = "<group>"; };
+		7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionDebugMenu.swift; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
+		850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarAppearance.swift; sourceTree = "<group>"; };
 		8511E18325F82B34002F516B /* 01_Fire_really_small.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 01_Fire_really_small.json; sourceTree = "<group>"; };
 		853014D525E671A000FB8205 /* PageObserverUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageObserverUserScript.swift; sourceTree = "<group>"; };
 		85308E24267FC9F2001ABD76 /* NSAlertExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAlertExtension.swift; sourceTree = "<group>"; };
@@ -2601,6 +2611,8 @@
 		85707F29276A35FE00DC0649 /* ActionSpeech.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionSpeech.swift; sourceTree = "<group>"; };
 		85707F2B276A364E00DC0649 /* OnboardingFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFlow.swift; sourceTree = "<group>"; };
 		85707F30276A7DCA00DC0649 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
+		85774AFE2A713D3B00DE0561 /* BookmarksBarMenuFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarMenuFactory.swift; sourceTree = "<group>"; };
+		85774B022A71CDD000DE0561 /* BlockMenuItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockMenuItem.swift; sourceTree = "<group>"; };
 		85799C1725DEBB3F0007EC87 /* Logging.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		857FFEBF27D239DC00415E7A /* HyperLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperLink.swift; sourceTree = "<group>"; };
 		85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveCredentialsPopover.swift; sourceTree = "<group>"; };
@@ -3425,16 +3437,6 @@
 			path = RunningApplication;
 			sourceTree = "<group>";
 		};
-		1D7D5B6829C9DA7D0054A4DC /* BurnerWindow */ = {
-			isa = PBXGroup;
-			children = (
-				1D7D5B6929C9DED80054A4DC /* BurnerWindowPopover.swift */,
-				1D6A491C29CF75530011DF74 /* BurnerWindowPopoverViewController.swift */,
-				1D6A491929CF75290011DF74 /* BurnerWindowPopover.storyboard */,
-			);
-			path = BurnerWindow;
-			sourceTree = "<group>";
-		};
 		313AED9F287CAC5A00E1E8F4 /* UI */ = {
 			isa = PBXGroup;
 			children = (
@@ -3964,6 +3966,10 @@
 			isa = PBXGroup;
 			children = (
 				4B4D60642A0B29FA00BCD287 /* LoginItem.swift */,
+				7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */,
+				7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */,
+				7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */,
+				7BBD45B32A691C3A00C83CA9 /* NetworkProtectionLoginItemsManager.swift */,
 				B602E81C2A1E25B0006D261F /* NEOnDemandRuleExtension.swift */,
 				4B4D60652A0B29FA00BCD287 /* NetworkProtectionNavBarButtonModel.swift */,
 				4B8F52402A18326600BE7131 /* NetworkProtectionTunnelController.swift */,
@@ -4421,6 +4427,7 @@
 				4BE5336A286912D40019DBFD /* BookmarksBarCollectionViewItem.swift */,
 				4BE53369286912D40019DBFD /* BookmarksBarCollectionViewItem.xib */,
 				4BE5336D286915A10019DBFD /* HorizontallyCenteredLayout.swift */,
+				85774AFE2A713D3B00DE0561 /* BookmarksBarMenuFactory.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -4448,6 +4455,7 @@
 			isa = PBXGroup;
 			children = (
 				4BD18F02283F0F1000058124 /* View */,
+				850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */,
 			);
 			path = BookmarksBar;
 			sourceTree = "<group>";
@@ -4629,7 +4637,7 @@
 				B693954226F04BE90015B914 /* ShadowView.swift */,
 				B693954526F04BEA0015B914 /* WindowDraggingView.swift */,
 				4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */,
-				4B17E2D3287380390003BD39 /* PersistentAppInterfaceSettings.swift */,
+				85774B022A71CDD000DE0561 /* BlockMenuItem.swift */,
 			);
 			path = AppKit;
 			sourceTree = "<group>";
@@ -4987,7 +4995,6 @@
 				AA4D700525545EDE00C3411E /* AppDelegate */,
 				AAC5E4C025D6A6A9007F5990 /* Bookmarks */,
 				4BFD356E283ADE8B00CE9234 /* BookmarksBar */,
-				1D7D5B6829C9DA7D0054A4DC /* BurnerWindow */,
 				AA86491324D831B9001BABEE /* Common */,
 				85D33F1025C82E93002B91A6 /* Configuration */,
 				4B6160D125B14E5E007DE5B2 /* ContentBlocker */,
@@ -5451,6 +5458,7 @@
 				B6C00ED6292FB4B4009C73A6 /* TabExtensionsBuilder.swift */,
 				983DFB2428B67036006B7E34 /* UserContentUpdating.swift */,
 				B634DBE2293C8FFF00C3C99E /* UserDialogRequest.swift */,
+				1D1A33482A6FEB170080ACED /* BurnerMode.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -6973,7 +6981,6 @@
 				3706FCCC293F65D500E42796 /* TabBar.storyboard in Resources */,
 				3706FCCD293F65D500E42796 /* shield-dot.json in Resources */,
 				3706FCCE293F65D500E42796 /* CookieConsent.storyboard in Resources */,
-				1D6A491B29CF75290011DF74 /* BurnerWindowPopover.storyboard in Resources */,
 				3706FCCF293F65D500E42796 /* Bookmarks.storyboard in Resources */,
 				3706FCD0293F65D500E42796 /* BookmarksBarCollectionViewItem.xib in Resources */,
 				3706FCD1293F65D500E42796 /* PrivacyDashboard.storyboard in Resources */,
@@ -7110,7 +7117,6 @@
 				AA80EC79256C46AA007083E7 /* TabBar.storyboard in Resources */,
 				AA34396D2754D4E300B241FA /* shield-dot.json in Resources */,
 				31B7C84F288008E00049841F /* CookieConsent.storyboard in Resources */,
-				1D6A491A29CF75290011DF74 /* BurnerWindowPopover.storyboard in Resources */,
 				AAC5E4C925D6A6E8007F5990 /* Bookmarks.storyboard in Resources */,
 				4BE5336B286912D40019DBFD /* BookmarksBarCollectionViewItem.xib in Resources */,
 				B6FA893D269C423100588ECD /* PrivacyDashboard.storyboard in Resources */,
@@ -7454,6 +7460,7 @@
 				3706FAAF293F65D500E42796 /* PasteboardWriting.swift in Sources */,
 				3706FAB0293F65D500E42796 /* BookmarkOutlineViewCell.swift in Sources */,
 				3706FAB1293F65D500E42796 /* UnprotectedDomains.xcdatamodeld in Sources */,
+				85393C872A6FF1B600F11EB3 /* BookmarksBarAppearance.swift in Sources */,
 				3706FAB2293F65D500E42796 /* TabInstrumentation.swift in Sources */,
 				3706FAB3293F65D500E42796 /* BrowserImportViewController.swift in Sources */,
 				3706FAB4293F65D500E42796 /* NSPopUpButtonExtension.swift in Sources */,
@@ -7548,7 +7555,6 @@
 				B60C6F8E29B200AB007BFAA8 /* SavePanelAccessoryView.swift in Sources */,
 				3706FB03293F65D500E42796 /* PopUpWindow.swift in Sources */,
 				CB24F70D29A3D9CB006DCC58 /* AppConfigurationURLProvider.swift in Sources */,
-				3706FB04293F65D500E42796 /* PersistentAppInterfaceSettings.swift in Sources */,
 				3706FB05293F65D500E42796 /* Favicons.xcdatamodeld in Sources */,
 				3706FB07293F65D500E42796 /* Publisher.asVoid.swift in Sources */,
 				3706FB08293F65D500E42796 /* NavigationButtonMenuDelegate.swift in Sources */,
@@ -7567,6 +7573,7 @@
 				3706FB15293F65D500E42796 /* NSNotificationName+DataImport.swift in Sources */,
 				3706FB16293F65D500E42796 /* StoredPermission.swift in Sources */,
 				3706FB17293F65D500E42796 /* FirePopoverCollectionViewHeader.swift in Sources */,
+				85774B042A71CDD000DE0561 /* BlockMenuItem.swift in Sources */,
 				3706FB19293F65D500E42796 /* FireViewController.swift in Sources */,
 				4B4D60D42A0C84F700BCD287 /* UserText+NetworkProtection.swift in Sources */,
 				3707C71F294B5D2900682A9F /* WKUserContentControllerExtension.swift in Sources */,
@@ -7656,6 +7663,7 @@
 				3706FB67293F65D500E42796 /* DownloadListCoordinator.swift in Sources */,
 				3706FB68293F65D500E42796 /* NSNotificationName+Debug.swift in Sources */,
 				3706FB69293F65D500E42796 /* NavigationBarBadgeAnimationView.swift in Sources */,
+				1D1A334A2A6FEB170080ACED /* BurnerMode.swift in Sources */,
 				B603971B29BA084C00902A34 /* JSAlertController.swift in Sources */,
 				3706FB6A293F65D500E42796 /* AddressBarButton.swift in Sources */,
 				3706FB6B293F65D500E42796 /* HistoryEntry.swift in Sources */,
@@ -7679,12 +7687,12 @@
 				3706FB7E293F65D500E42796 /* FireCoordinator.swift in Sources */,
 				3706FB7F293F65D500E42796 /* GeolocationProvider.swift in Sources */,
 				B603FD9F2A02712E00F3FCA9 /* CIImageExtension.swift in Sources */,
+				7BBD45B52A691C3A00C83CA9 /* NetworkProtectionLoginItemsManager.swift in Sources */,
 				3706FB80293F65D500E42796 /* NSAlert+ActiveDownloadsTermination.swift in Sources */,
 				3707C717294B5D0F00682A9F /* FindInPageTabExtension.swift in Sources */,
 				3706FB81293F65D500E42796 /* IndexPathExtension.swift in Sources */,
 				B6685E3D29A602D90043D2EE /* ExternalAppSchemeHandler.swift in Sources */,
 				B6E1491029A5C30500AAFBE8 /* ContentBlockingTabExtension.swift in Sources */,
-				1D7D5B7129CA04560054A4DC /* BurnerWindowPopover.swift in Sources */,
 				3706FB82293F65D500E42796 /* PasswordManagementNoteItemView.swift in Sources */,
 				3706FEC5293F6F0600E42796 /* BWInstallationService.swift in Sources */,
 				3775912E29AAC72700E26367 /* SyncPreferences.swift in Sources */,
@@ -7693,6 +7701,7 @@
 				3706FB84293F65D500E42796 /* NSWindowExtension.swift in Sources */,
 				3706FB85293F65D500E42796 /* BookmarkPopover.swift in Sources */,
 				3706FB86293F65D500E42796 /* PreferencesDownloadsView.swift in Sources */,
+				7BBD45B22A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */,
 				3706FB87293F65D500E42796 /* ProcessExtension.swift in Sources */,
 				3706FB88293F65D500E42796 /* PermissionAuthorizationQuery.swift in Sources */,
 				3706FB89293F65D500E42796 /* BadgeAnimationView.swift in Sources */,
@@ -7768,6 +7777,7 @@
 				3706FBC5293F65D500E42796 /* CallToAction.swift in Sources */,
 				3706FBC6293F65D500E42796 /* MouseOverView.swift in Sources */,
 				56D145EC29E6C99B00E3488A /* DataImportStatusProviding.swift in Sources */,
+				85774B002A713D3B00DE0561 /* BookmarksBarMenuFactory.swift in Sources */,
 				B602E81E2A1E25B1006D261F /* NEOnDemandRuleExtension.swift in Sources */,
 				3706FBC7293F65D500E42796 /* HistoryStore.swift in Sources */,
 				3706FBC8293F65D500E42796 /* FirePopoverCollectionViewItem.swift in Sources */,
@@ -7784,13 +7794,13 @@
 				3706FBD2293F65D500E42796 /* RunningApplicationCheck.swift in Sources */,
 				3706FBD3293F65D500E42796 /* StatePersistenceService.swift in Sources */,
 				3706FBD4293F65D500E42796 /* WindowManager+StateRestoration.swift in Sources */,
+				7B430EA22A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */,
 				3706FBD5293F65D500E42796 /* TabCollection+NSSecureCoding.swift in Sources */,
 				3706FBD6293F65D500E42796 /* Instruments.swift in Sources */,
 				569277C229DDCBB500B633EF /* HomePageContinueSetUpModel.swift in Sources */,
 				3706FBD7293F65D500E42796 /* ContentBlockerRulesLists.swift in Sources */,
 				3706FBD8293F65D500E42796 /* NSViewControllerExtension.swift in Sources */,
 				3706FBD9293F65D500E42796 /* NSAppearanceExtension.swift in Sources */,
-				1D6A491E29CF75530011DF74 /* BurnerWindowPopoverViewController.swift in Sources */,
 				3706FBDA293F65D500E42796 /* PermissionManager.swift in Sources */,
 				3706FBDB293F65D500E42796 /* DefaultBrowserPreferences.swift in Sources */,
 				3706FBDC293F65D500E42796 /* Permissions.xcdatamodeld in Sources */,
@@ -7940,6 +7950,7 @@
 				3706FC5C293F65D500E42796 /* AppDelegate.swift in Sources */,
 				3706FC5D293F65D500E42796 /* ContentOverlayViewController.swift in Sources */,
 				3706FC5E293F65D500E42796 /* OnboardingViewController.swift in Sources */,
+				7BE146082A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */,
 				3706FC5F293F65D500E42796 /* DeviceAuthenticator.swift in Sources */,
 				3706FEB9293F6EFF00E42796 /* BWVault.swift in Sources */,
 				3706FC60293F65D500E42796 /* TabBarCollectionView.swift in Sources */,
@@ -8464,6 +8475,7 @@
 				B6106BAD26A7BF390013B453 /* PermissionState.swift in Sources */,
 				371C0A2927E33EDC0070591F /* FeedbackPresenter.swift in Sources */,
 				B66260DD29AC5D4300E9E3EE /* NavigationProtectionTabExtension.swift in Sources */,
+				1D1A33492A6FEB170080ACED /* BurnerMode.swift in Sources */,
 				14505A08256084EF00272CC6 /* UserAgent.swift in Sources */,
 				987799F12999993C005D8EB6 /* LegacyBookmarkStore.swift in Sources */,
 				4B8AC93526B3B2FD00879451 /* NSAlert+DataImport.swift in Sources */,
@@ -8502,7 +8514,6 @@
 				31B7C85128800A5D0049841F /* CookieConsentPopover.swift in Sources */,
 				85D885B026A590A90077C374 /* NSNotificationName+PasswordManager.swift in Sources */,
 				B610F2BB27A145C500FCEBE9 /* RulesCompilationMonitor.swift in Sources */,
-				1D7D5B6A29C9DED80054A4DC /* BurnerWindowPopover.swift in Sources */,
 				B6D574B429472253008ED1B6 /* FBProtectionTabExtension.swift in Sources */,
 				AAC30A28268E045400D2D9CD /* CrashReportReader.swift in Sources */,
 				85AC3B3525DA82A600C7D2AA /* DataTaskProviding.swift in Sources */,
@@ -8545,6 +8556,7 @@
 				4B59024026B35F3600489384 /* ChromiumDataImporter.swift in Sources */,
 				B6A924DE2664CA09001A28CA /* LegacyWebKitDownloadDelegate.swift in Sources */,
 				AAA0CC3C25337FAB0079BC96 /* WKBackForwardListItemViewModel.swift in Sources */,
+				7BBD45B42A691C3A00C83CA9 /* NetworkProtectionLoginItemsManager.swift in Sources */,
 				1D43EB3429297D760065E5D6 /* BWNotRespondingAlert.swift in Sources */,
 				4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */,
 				AAC6881928626BF800D54247 /* RecentlyClosedTab.swift in Sources */,
@@ -8567,11 +8579,11 @@
 				4B0511CA262CAA5A00F6079C /* FireproofDomainsViewController.swift in Sources */,
 				AA4D700725545EF800C3411E /* URLEventHandler.swift in Sources */,
 				AA92127725ADA07900600CD4 /* WKWebViewExtension.swift in Sources */,
-				1D6A491D29CF75530011DF74 /* BurnerWindowPopoverViewController.swift in Sources */,
 				AAAB9114288EB1D600A057A9 /* CleanThisHistoryMenuItem.swift in Sources */,
 				B6A9E499261474120067D1B9 /* TimedPixel.swift in Sources */,
 				B6C0B23626E732000031CB7F /* DownloadListItem.swift in Sources */,
 				B6B1E87E26D5DA0E0062C350 /* DownloadsPopover.swift in Sources */,
+				85774AFF2A713D3B00DE0561 /* BookmarksBarMenuFactory.swift in Sources */,
 				4B9292A026670D2A00AD2C21 /* SpacerNode.swift in Sources */,
 				B6E61EE8263ACE16004E11AB /* UTType.swift in Sources */,
 				4B2D06342A11CC4600DE1F49 /* SystemExtensionManager.swift in Sources */,
@@ -8581,7 +8593,6 @@
 				31B4AF532901A4F20013585E /* NSEventExtension.swift in Sources */,
 				85707F26276A335700DC0649 /* Onboarding.swift in Sources */,
 				B68C92C1274E3EF4002AC6B0 /* PopUpWindow.swift in Sources */,
-				4B17E2D4287380390003BD39 /* PersistentAppInterfaceSettings.swift in Sources */,
 				AA5FA6A0275F948900DCE9C9 /* Favicons.xcdatamodeld in Sources */,
 				B684592225C93BE000DC17B6 /* Publisher.asVoid.swift in Sources */,
 				AAA0CC33252F181A0079BC96 /* NavigationButtonMenuDelegate.swift in Sources */,
@@ -8652,6 +8663,7 @@
 				B693954C26F04BEB0015B914 /* FocusRingView.swift in Sources */,
 				4BE41A5E28446EAD00760399 /* BookmarksBarViewModel.swift in Sources */,
 				4B1E6EF127AB5E5D00F51793 /* NSPopUpButtonView.swift in Sources */,
+				85774B032A71CDD000DE0561 /* BlockMenuItem.swift in Sources */,
 				4B9292DB2667125D00AD2C21 /* ContextualMenu.swift in Sources */,
 				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,
 				AA585DAF2490E6E600E9A3E2 /* MainViewController.swift in Sources */,
@@ -8661,6 +8673,7 @@
 				AA840A9827319D1600E63CDD /* FirePopoverWrapperViewController.swift in Sources */,
 				4B85A48028821CC500FC4C39 /* NSPasteboardItemExtension.swift in Sources */,
 				37CD54CA27F2FDD100F1F7B9 /* AutofillPreferencesModel.swift in Sources */,
+				7BBD45B12A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */,
 				B657841F25FA497600D8DB33 /* NSException+Catch.swift in Sources */,
 				4BE65481271FCD4D008D1D63 /* PasswordManagementNoteModel.swift in Sources */,
 				3184AC6F288F2A1100C35E4B /* CookieNotificationAnimationModel.swift in Sources */,
@@ -8752,6 +8765,7 @@
 				4B0511BD262CAA5A00F6079C /* PrivacySecurityPreferences.swift in Sources */,
 				B6BE9FAA293F7955006363C6 /* ModalSheetCancellable.swift in Sources */,
 				B6830963274CDEC7004B46BB /* FireproofDomainsStore.swift in Sources */,
+				7B430EA12A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */,
 				1E7E2E942902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift in Sources */,
 				AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */,
 				AAC5E4D125D6A709007F5990 /* BookmarkManager.swift in Sources */,
@@ -8775,6 +8789,7 @@
 				B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */,
 				4B4D60C02A0C848D00BCD287 /* NetworkProtectionControllerErrorStore.swift in Sources */,
 				4B723E1226B0006E00E14D75 /* DataImport.swift in Sources */,
+				7BE146072A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */,
 				B6085D092743AAB600A9C456 /* FireproofDomains.xcdatamodeld in Sources */,
 				3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */,
 				85589E8227BBB8630038AD11 /* HomePageView.swift in Sources */,
@@ -9007,6 +9022,7 @@
 				AA9FF95924A1ECF20039E328 /* Tab.swift in Sources */,
 				4BBDEE9228FC14760092FAA6 /* ConnectBitwardenView.swift in Sources */,
 				B63D467125BFA6C100874977 /* DispatchQueueExtensions.swift in Sources */,
+				850E8DFB2A6FEC5E00691187 /* BookmarksBarAppearance.swift in Sources */,
 				B64C84EB2692DD650048FEBE /* PermissionAuthorizationPopover.swift in Sources */,
 				85378D9E274E664C007C5CBF /* PopoverMessageViewController.swift in Sources */,
 				AA6FFB4624DC3B5A0028F4D0 /* WebView.swift in Sources */,
@@ -10104,7 +10120,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 69.0.0;
+				version = 71.0.0;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {

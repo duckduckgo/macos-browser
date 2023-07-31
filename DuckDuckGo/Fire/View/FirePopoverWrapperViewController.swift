@@ -69,8 +69,13 @@ final class FirePopoverWrapperViewController: NSViewController {
     }
 
     private func hideInfoContainerViewIfNeeded() {
-        infoView.isHidden = infoPresentedOnce
-        popoverView.isHidden = !infoPresentedOnce
+        guard let tabCollectionViewModel else {
+            return
+        }
+
+        let infoIsVisible = !infoPresentedOnce && !tabCollectionViewModel.isBurner
+        infoView.isHidden = !infoIsVisible
+        popoverView.isHidden = infoIsVisible
     }
 
 }

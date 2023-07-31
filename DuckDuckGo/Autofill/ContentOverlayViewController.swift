@@ -20,6 +20,7 @@ import Cocoa
 import WebKit
 import Combine
 import BrowserServicesKit
+import SecureStorage
 import Autofill
 
 @MainActor
@@ -223,6 +224,10 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         return true
     }
 
+    public func secureVaultManagerShouldSaveData(_: SecureVaultManager) -> Bool {
+        return true
+    }
+
     public func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData, hasGeneratedPassword generatedPassword: Bool, withTrigger trigger: AutofillUserScript.GetTriggerType?) {
         // No-op, the content overlay view controller should not be prompting the user to store data
     }
@@ -259,7 +264,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         }
     }
 
-    public func secureVaultInitFailed(_ error: SecureVaultError) {
+    public func secureVaultInitFailed(_ error: SecureStorageError) {
         SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
     }
 

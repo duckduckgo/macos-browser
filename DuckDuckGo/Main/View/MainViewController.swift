@@ -63,9 +63,8 @@ final class MainViewController: NSViewController {
     }
 
     required init?(coder: NSCoder) {
-        let isBurner = false
-        self.tabCollectionViewModel = TabCollectionViewModel(isBurner: isBurner)
-        self.isBurner = isBurner
+        self.tabCollectionViewModel = TabCollectionViewModel()
+        self.isBurner = tabCollectionViewModel.isBurner
         super.init(coder: coder)
     }
 
@@ -99,7 +98,7 @@ final class MainViewController: NSViewController {
 
             resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage, animated: false)
 
-            let bookmarksBarVisible = PersistentAppInterfaceSettings.shared.showBookmarksBar
+            let bookmarksBarVisible = AppearancePreferences.shared.showBookmarksBar
             updateBookmarksBarViewVisibility(visible: bookmarksBarVisible)
         }
 
@@ -194,6 +193,11 @@ final class MainViewController: NSViewController {
         return bookmarksBarViewController
     }
 
+    func toggleBookmarksBarVisibility() {
+        updateBookmarksBarViewVisibility(visible: !(bookmarksBarHeightConstraint.constant > 0))
+    }
+
+    // Can be updated via keyboard shortcut so needs to be internal visibility
     private func updateBookmarksBarViewVisibility(visible: Bool) {
         let showBookmarksBar = isInPopUpWindow ? false : visible
 
@@ -249,9 +253,9 @@ final class MainViewController: NSViewController {
 
     private func subscribeToAppSettingsNotifications() {
         bookmarksBarVisibilityChangedCancellable = NotificationCenter.default
-            .publisher(for: PersistentAppInterfaceSettings.showBookmarksBarSettingChanged)
+            .publisher(for: AppearancePreferences.Notifications.showBookmarksBarSettingChanged)
             .sink { [weak self] _ in
-                self?.updateBookmarksBarViewVisibility(visible: PersistentAppInterfaceSettings.shared.showBookmarksBar)
+                self?.updateBookmarksBarViewVisibility(visible: AppearancePreferences.shared.showBookmarksBar)
             }
     }
 
@@ -274,9 +278,18 @@ final class MainViewController: NSViewController {
         tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] content in
             guard let self = self else { return }
             self.resizeNavigationBarForHomePage(content == .homePage, animated: content == .homePage && self.lastTabContent != .homePage)
+            self.updateBookmarksBar(content)
             self.lastTabContent = content
             self.adjustFirstResponderOnContentChange(content: content)
         }).store(in: &self.navigationalCancellables)
+    }
+
+    private func updateBookmarksBar(_ content: Tab.TabContent, _ prefs: AppearancePreferences = AppearancePreferences.shared) {
+        if content.isUrl && prefs.bookmarksBarAppearance == .newTabOnly {
+            updateBookmarksBarViewVisibility(visible: false)
+        } else if prefs.showBookmarksBar {
+            updateBookmarksBarViewVisibility(visible: true)
+        }
     }
 
     private func subscribeToFindInPage() {

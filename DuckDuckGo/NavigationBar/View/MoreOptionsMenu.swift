@@ -28,7 +28,6 @@ protocol OptionsButtonMenuDelegate: AnyObject {
 
     func optionsButtonMenuRequestedBookmarkThisPage(_ sender: NSMenuItem)
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu)
-    func optionsButtonMenuRequestedToggleBookmarksBar(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkImportInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkExportInterface(_ menu: NSMenu)
@@ -152,11 +151,11 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @objc func newWindow(_ sender: NSMenuItem) {
-        WindowsManager.openNewWindow(isBurner: false)
+        WindowsManager.openNewWindow()
     }
 
     @objc func newBurnerWindow(_ sender: NSMenuItem) {
-        WindowsManager.openNewWindow(isBurner: true)
+        WindowsManager.openNewWindow(burnerMode: BurnerMode(isBurner: true))
     }
 
     @objc func toggleFireproofing(_ sender: NSMenuItem) {
@@ -178,10 +177,6 @@ final class MoreOptionsMenu: NSMenu {
 
     @objc func openBookmarksManagementInterface(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedBookmarkManagementInterface(self)
-    }
-
-    @objc func toggleBookmarksBar(_ sender: NSMenuItem) {
-        actionDelegate?.optionsButtonMenuRequestedToggleBookmarksBar(self)
     }
 
     @objc func openBookmarkImportInterface(_ sender: NSMenuItem) {
@@ -244,15 +239,13 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "NewWindow"))
 
         // New Burner Window
-        if internalUserDecider.isInternalUser {
-            let burnerWindowItem = NSMenuItem(title: UserText.newBurnerWindowMenuItem,
-                                                  action: #selector(newBurnerWindow(_:)),
-                                                  target: self)
-            burnerWindowItem.keyEquivalent = "n"
-            burnerWindowItem.keyEquivalentModifierMask = [.command, .shift]
-            burnerWindowItem.image = NSImage(named: "NewBurnerWindow")
-            addItem(burnerWindowItem)
-        }
+        let burnerWindowItem = NSMenuItem(title: UserText.newBurnerWindowMenuItem,
+                                          action: #selector(newBurnerWindow(_:)),
+                                          target: self)
+        burnerWindowItem.keyEquivalent = "n"
+        burnerWindowItem.keyEquivalentModifierMask = [.command, .shift]
+        burnerWindowItem.image = NSImage(named: "NewBurnerWindow")
+        addItem(burnerWindowItem)
 
         addItem(NSMenuItem.separator())
     }
@@ -385,7 +378,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
-        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
+        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab)
     }
 
@@ -441,14 +434,14 @@ final class BookmarksSubMenu: NSMenu {
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
         super.init(title: UserText.passwordManagement)
         self.autoenablesItems = false
-        updateMenuItems(with: tabCollectionViewModel, target: target)
+        addMenuItems(with: tabCollectionViewModel, target: target)
     }
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel, target: AnyObject) {
+    private func addMenuItems(with tabCollectionViewModel: TabCollectionViewModel, target: AnyObject) {
         let bookmarkPageItem = addItem(withTitle: UserText.bookmarkThisPage, action: #selector(MoreOptionsMenu.bookmarkPage(_:)), keyEquivalent: "d")
             .withModifierMask([.command])
             .targetting(target)
@@ -459,6 +452,8 @@ final class BookmarksSubMenu: NSMenu {
 
         addItem(withTitle: UserText.bookmarksShowToolbarPanel, action: #selector(MoreOptionsMenu.openBookmarks(_:)), keyEquivalent: "")
             .targetting(target)
+
+        BookmarksBarMenuFactory.addToMenu(self)
 
         addItem(NSMenuItem.separator())
 

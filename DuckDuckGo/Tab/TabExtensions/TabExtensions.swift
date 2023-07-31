@@ -138,7 +138,8 @@ extension TabExtensionsBuilder {
         }
 
         add {
-            AutofillTabExtension(autofillUserScriptPublisher: userScripts.map(\.?.autofillScript))
+            AutofillTabExtension(autofillUserScriptPublisher: userScripts.map(\.?.autofillScript),
+                                 isBurner: args.isTabBurner)
         }
         add {
             ContextMenuManager(contextMenuScriptPublisher: userScripts.map(\.?.contextMenuScript))
