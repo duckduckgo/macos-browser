@@ -35,6 +35,24 @@ extension HomePage.Models {
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
 
         let privacyConfig = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
+        var isDay0SurveyEnabled: Bool {
+            let newTabContinueSetUpSettings = privacyConfig.settings(for: .newTabContinueSetUp)
+            if let day0SurveyString =  newTabContinueSetUpSettings["surveyCardDay0"] as? String {
+                if day0SurveyString == "enabled" {
+                    return true
+                }
+            }
+            return false
+        }
+        var isDay7SurveyEnabled: Bool {
+            let newTabContinueSetUpSettings = privacyConfig.settings(for: .newTabContinueSetUp)
+            if let day7SurveyString =  newTabContinueSetUpSettings["surveyCardDay7"] as? String {
+                if day7SurveyString == "enabled" {
+                    return true
+                }
+            }
+            return false
+        }
         var duckPlayerURL: String {
             let duckPlayerSettings = privacyConfig.settings(for: .duckPlayer)
             return duckPlayerSettings["tryDuckPlayerLink"] as? String ?? "https://www.youtube.com/watch?v=yKWIA-Pys4c"
@@ -287,16 +305,16 @@ extension HomePage.Models {
         }
 
         private var shouldSurveyDay0BeVisible: Bool {
-            print(firstLaunchDate)
             let oneDayAgo = Calendar.current.date(byAdding: .weekday, value: -1, to: Date())!
-            return shouldShowSurveyDay0 &&
+            return isDay0SurveyEnabled &&
+            shouldShowSurveyDay0 &&
             firstLaunchDate > oneDayAgo
         }
 
         private var shouldSurveyDay7BeVisible: Bool {
-            print(firstLaunchDate)
             let oneWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())!
-            return shouldShowSurveyDay7 &&
+            return isDay7SurveyEnabled &&
+            shouldShowSurveyDay7 &&
             firstLaunchDate <= oneWeekAgo
         }
 

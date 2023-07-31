@@ -82,7 +82,6 @@ final class ContinueSetUpModelTests: XCTestCase {
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
         privacyPreferences.autoconsentEnabled = true
         vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences)
-        print(vm.visibleFeaturesMatrix)
         XCTAssertFalse(vm.isMoreOrLessButtonNeeded)
     }
 

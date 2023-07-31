@@ -204,6 +204,11 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    var isContinueSetUpAvailable: Bool {
+        let privacyConfig = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
+        return privacyConfig.isEnabled(featureKey: .newTabContinueSetUp)
+    }
+
     func updateUserInterfaceStyle() {
         NSApp.appearance = currentThemeName.appearance
     }

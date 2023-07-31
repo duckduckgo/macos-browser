@@ -106,7 +106,7 @@ extension Preferences {
                 // SECTION 3: New Tab Page
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.newTabBottomPopoverTitle)
-                    if #available(macOS 11.0, *) {
+                    if #available(macOS 11.0, *), model.isContinueSetUpAvailable {
                         ToggleMenuItem(title: UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
                     }
                     ToggleMenuItem(title: UserText.newTabFavoriteSectionTitle, isOn: $model.isFavoriteVisible)
