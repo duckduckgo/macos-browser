@@ -19,12 +19,15 @@
 import Foundation
 import DataBrokerProtection
 import AppKit
+import SwiftUI
 
 final class DBPHomeViewController: NSViewController {
     private var debugWindowController: NSWindowController?
     private let authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData()
     private let authenticationService: AuthenticationServiceProtocol = AuthenticationService()
     private let redeemUseCase: RedeemUseCaseProtocol
+    
+    private var presentedInviteViewController: NSViewController?
 
     lazy var dataBrokerContainerView: DataBrokerContainerViewController = {
         DataBrokerContainerViewController()
@@ -47,8 +50,7 @@ final class DBPHomeViewController: NSViewController {
         super.viewDidLoad()
 
         if redeemUseCase.shouldAskForInviteCode() {
-            // Show dialog asking for invite code
-            print("We should ask for the invite code.")
+            presentInviteCodeFlow()
         } else {
             attachDataBrokerContainerView()
         }
@@ -64,12 +66,31 @@ final class DBPHomeViewController: NSViewController {
 
         if !redeemUseCase.shouldAskForInviteCode() {
             openDebugUI()
+        } else {
+            presentInviteCodeFlow()
         }
     }
 
     override func viewDidLayout() {
         super.viewDidLayout()
         dataBrokerContainerView.view.frame = view.bounds
+    }
+
+    private func presentInviteCodeFlow() {
+        let viewModel = DataBrokerProtectionInviteDialogsViewModel(delegate: self)
+
+        let view = DataBrokerProtectionInviteDialogsView(viewModel: viewModel)
+        let hostingVC = NSHostingController(rootView: view)
+        presentedInviteViewController = hostingVC
+        let newWindowController = hostingVC.wrappedInWindowController()
+
+        guard let newWindow = newWindowController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        else {
+            assertionFailure("Failed to present \(hostingVC)")
+            return
+        }
+        parentWindowController.window?.beginSheet(newWindow)
     }
 
     private func openDebugUI() {
@@ -89,5 +110,19 @@ final class DBPHomeViewController: NSViewController {
         }
 
         debugWindowController?.showWindow(self)
+    }
+}
+
+extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDelegate {
+    func dataBrokerProtectionInviteDialogsViewModelDidReedemSuccessfully(_ viewModel: DataBrokerProtectionInviteDialogsViewModel) {
+        presentedInviteViewController?.dismiss()
+        presentedInviteViewController = nil
+        attachDataBrokerContainerView()
+        openDebugUI()
+    }
+
+    func dataBrokerProtectionInviteDialogsViewModelDidCancel(_ viewModel: DataBrokerProtectionInviteDialogsViewModel) {
+        presentedInviteViewController?.dismiss()
+        presentedInviteViewController = nil
     }
 }
