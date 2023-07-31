@@ -93,6 +93,8 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"
         case homePageShowCookie = "home.page.show.cookie"
+        case homePageShowSurveyDay0 = "home.page.show.survey.0"
+        case homePageShowSurveyDay7 = "home.page.show.survey.7"
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"
         case homePageContinueSetUpImport = "home.page.continue.set.up.import"
@@ -116,7 +118,6 @@ public struct UserDefaultsWrapper<T> {
         case loggingEnabledDate = "logging.enabled.date"
         case loggingCategories = "logging.categories"
 
-        // Temporary for activetion pixel
         case firstLaunchDate = "first.app.launch.date"
     }
 
