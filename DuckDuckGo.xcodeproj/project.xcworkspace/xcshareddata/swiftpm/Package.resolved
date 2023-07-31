@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "shane/messsage-handler-fix",
-        "revision" : "ec4bb5132252eb62274890282ed01221917d9ace"
+        "revision" : "76727feb7f3c4293214dcd2a340ce4b24ed00758",
+        "version" : "71.1.0"
       }
     },
     {
