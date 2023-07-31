@@ -29,6 +29,7 @@ final class UserScripts: UserScriptsProvider {
     let printingUserScript = PrintingUserScript()
     let hoverUserScript = HoverUserScript()
     let debugScript = DebugUserScript()
+    let subscriptionPagesUserScript = SubscriptionPagesUserScript()
     let clickToLoadScript: ClickToLoadUserScript
 
     let contentBlockerRulesScript: ContentBlockerRulesUserScript
@@ -86,6 +87,9 @@ final class UserScripts: UserScriptsProvider {
                 userScripts.append(specialPages)
             }
         }
+
+        let feature = SubscriptionFooFeature();
+        subscriptionPagesUserScript.registerSubfeature(delegate: feature)
     }
 
     lazy var userScripts: [UserScript] = [
@@ -100,7 +104,8 @@ final class UserScripts: UserScriptsProvider {
         clickToLoadScript,
         contentScopeUserScript,
         contentScopeUserScriptIsolated,
-        autofillScript
+        autofillScript,
+        subscriptionPagesUserScript
     ]
 
     @MainActor
@@ -120,4 +125,79 @@ final class UserScripts: UserScriptsProvider {
         }
     }
 
+}
+
+
+///
+/// The user script that will be the broker for all subscription features
+///
+public final class SubscriptionPagesUserScript: NSObject, UserScript, UserScriptMessaging {
+    public var source: String = "";
+
+    public static let context = "subscriptionPages"
+
+    // special pages messaging cannot be isolated as we'll want regular page-scripts to be able to communicate
+    public let broker = UserScriptMessageBroker(context: SubscriptionPagesUserScript.context, requiresRunInPageContentWorld: true );
+
+    public let messageNames: [String] = [
+        SubscriptionPagesUserScript.context
+    ]
+
+    public let injectionTime: WKUserScriptInjectionTime = .atDocumentStart
+    public let forMainFrameOnly = true
+    public let requiresRunInPageContentWorld = true
+}
+
+@available(macOS 11.0, iOS 14.0, *)
+extension SubscriptionPagesUserScript: WKScriptMessageHandlerWithReply {
+    @MainActor
+    public func userContentController(_ userContentController: WKUserContentController,
+                                      didReceive message: WKScriptMessage) async -> (Any?, String?) {
+        let action = broker.messageHandlerFor(message)
+        do {
+            let json = try await broker.execute(action: action, original: message)
+            return (json, nil)
+        } catch {
+            // forward uncaught errors to the client
+            return (nil, error.localizedDescription)
+        }
+    }
+}
+
+// MARK: - Fallback for macOS 10.15
+extension SubscriptionPagesUserScript: WKScriptMessageHandler {
+    public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        // unsupported
+    }
+}
+
+
+///
+/// An example sub-feature
+///
+///
+struct SubscriptionFooFeature: Subfeature {
+    weak var broker: UserScriptMessageBroker?
+    var featureName = "fooFeature"
+    var messageOriginPolicy: MessageOriginPolicy = .all
+
+    /// An example of how to provide different handlers bad on name
+    func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
+        switch methodName {
+        case "responseExample": return responseExample
+        default:
+            return nil
+        }
+    }
+
+    /// An example of a simple Encodable data type that can be used directly in replies
+    struct Person: Encodable {
+        let name: String
+    }
+
+    /// An example of how a handler can reply with any Encodable data type
+    func responseExample(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        let person = Person(name: "Kittie")
+        return person
+    }
 }
