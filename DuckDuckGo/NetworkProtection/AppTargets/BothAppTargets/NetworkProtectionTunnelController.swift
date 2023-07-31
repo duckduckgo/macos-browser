@@ -71,22 +71,30 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     /// Applies enforceRoutes setting, sets up excludedRoutes in MacPacketTunnelProvider and disables disconnect on failure
     @MainActor
-    @UserDefaultsWrapper(key: .networkProtectionShouldEnforceRoutes, defaultValue: NetworkProtectionUserDefaultsConstants.isKillSwitchEnabled)
+    @UserDefaultsWrapper(key: .networkProtectionShouldEnforceRoutes, defaultValue: NetworkProtectionUserDefaultsConstants.shouldEnforceRoutes)
     private(set) var shouldEnforceRoutes: Bool
+
+    @MainActor
+    @UserDefaultsWrapper(key: .networkProtectionShouldIncludeAllNetworks, defaultValue: NetworkProtectionUserDefaultsConstants.shouldIncludeAllNetworks)
+    private(set) var shouldIncludeAllNetworks
 
     /// Test setting to exclude duckduckgo route from VPN
     @MainActor
-    @UserDefaultsWrapper(key: .networkProtectionShouldExcludeDDGRoute, defaultValue: false)
-    private(set) var shouldExcludeDDGRoute: Bool
+    @UserDefaultsWrapper(key: .networkProtectionExcludedRoutes, defaultValue: [:])
+    private(set) var excludedRoutesPreferences: [String: Bool]
 
     @MainActor
-    @UserDefaultsWrapper(key: .networkProtectionShouldExcludeLocalRoutes, defaultValue: false)
+    @UserDefaultsWrapper(key: .networkProtectionShouldExcludeLocalRoutes, defaultValue: NetworkProtectionUserDefaultsConstants.shouldExcludeLocalRoutes)
     private(set) var shouldExcludeLocalRoutes: Bool
 
     /// When enabled VPN connection will be automatically initiated by DuckDuckGoAgentAppDelegate on launch even if disconnected manually (Always On rule disabled)
     @MainActor
-    @UserDefaultsWrapper(key: .networkProtectionConnectOnLogIn, defaultValue: NetworkProtectionUserDefaultsConstants.shouldConnectOnLogIn)
+    @UserDefaultsWrapper(key: .networkProtectionConnectOnLogIn, defaultValue: NetworkProtectionUserDefaultsConstants.shouldConnectOnLogIn, defaults: .shared)
     private(set) var shouldAutoConnectOnLogIn: Bool
+
+    @MainActor
+    @UserDefaultsWrapper(key: .networkProtectionConnectionTesterEnabled, defaultValue: NetworkProtectionUserDefaultsConstants.isConnectionTesterEnabled, defaults: .shared)
+    private(set) var isConnectionTesterEnabled: Bool
 
     // MARK: - Connection Status
 
@@ -178,6 +186,8 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             protocolConfiguration.providerConfiguration = [
                 NetworkProtectionOptionKey.defaultPixelHeaders: APIRequest.Headers().httpHeaders,
                 NetworkProtectionOptionKey.excludedRoutes: excludedRoutes().map(\.stringRepresentation) as NSArray,
+                NetworkProtectionOptionKey.includedRoutes: includedRoutes().map(\.stringRepresentation) as NSArray,
+                NetworkProtectionOptionKey.connectionTesterEnabled: NSNumber(value: isConnectionTesterEnabled)
             ]
 
             // always-on
@@ -186,7 +196,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             // kill switch
             protocolConfiguration.enforceRoutes = shouldEnforceRoutes
             // this setting breaks Connection Tester
-            protocolConfiguration.includeAllNetworks = false
+            protocolConfiguration.includeAllNetworks = shouldIncludeAllNetworks
 
             protocolConfiguration.excludeLocalNetworks = shouldExcludeLocalRoutes
 
@@ -410,6 +420,27 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     @MainActor
+    @available(macOS 11, *)
+    func enableIncludeAllNetworks() async throws {
+        isOnDemandEnabled = true
+        shouldIncludeAllNetworks = true
+
+        // calls setupAndSave where configuration is done
+        _=try await loadOrMakeTunnelManager()
+    }
+
+    @MainActor
+    @available(macOS 11, *)
+    func disableIncludeAllNetworks() async throws {
+        shouldIncludeAllNetworks = false
+
+        guard let tunnelManager = await loadTunnelManager(),
+              tunnelManager.protocolConfiguration?.enforceRoutes == true else { return }
+
+        try await setupAndSave(tunnelManager)
+    }
+
+    @MainActor
     func toggleOnDemandEnabled() {
         isOnDemandEnabled.toggle()
         if !isOnDemandEnabled {
@@ -445,41 +476,112 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }
     }
 
-    static let customExcludedRoutes: [NetworkProtection.IPAddressRange] = [
-        // duckduckgo.com
-        "52.142.124.215/32",
-        "52.250.42.157/32",
-        "40.114.177.156/32",
+    @MainActor
+    @available(macOS 11, *)
+    func toggleShouldIncludeAllNetworks() {
+        shouldIncludeAllNetworks.toggle()
+
+        // update configuration if connected
+        Task { [shouldIncludeAllNetworks] in
+            guard await isConnected else { return }
+
+            if shouldIncludeAllNetworks {
+                try await enableIncludeAllNetworks()
+            } else {
+                try await disableIncludeAllNetworks()
+            }
+        }
+    }
+
+    // TO BE Refactored when the Exclusion List is added
+    enum ExclusionListItem {
+        case section(String)
+        case exclusion(range: NetworkProtection.IPAddressRange, description: String? = nil, `default`: Bool)
+    }
+    static let exclusionList: [ExclusionListItem] = [
+        .section("IPv4 Local Routes"),
+
+        .exclusion(range: "10.0.0.0/8"     /* 255.0.0.0 */, default: true),
+        .exclusion(range: "169.254.0.0/16" /* 255.255.0.0 */, description: "Link-local", default: true),
+        .exclusion(range: "172.16.0.0/12"  /* 255.240.0.0 */, default: true),
+        .exclusion(range: "192.168.0.0/16" /* 255.255.0.0 */, default: true),
+        .exclusion(range: "127.0.0.0/8"    /* 255.0.0.0 */, description: "Loopback", default: true),
+        .exclusion(range: "224.0.0.0/4"    /* 240.0.0.0 (corrected subnet mask) */, description: "Multicast", default: true),
+        .exclusion(range: "100.64.0.0/16"  /* 255.255.0.0 */, description: "Shared Address Space", default: true),
+
+        .section("IPv6 Local Routes"),
+        .exclusion(range: "fe80::/10", description: "link local", default: false),
+        .exclusion(range: "ff00::/8", description: "multicast", default: false),
+        .exclusion(range: "fc00::/7", description: "local unicast", default: false),
+        .exclusion(range: "::1/128", description: "loopback", default: false),
+
+        .section("duckduckgo.com"),
+        .exclusion(range: "52.142.124.215/32", default: false),
+        .exclusion(range: "52.250.42.157/32", default: false),
+        .exclusion(range: "40.114.177.156/32", default: false),
     ]
 
     @MainActor
     private func excludedRoutes() -> [NetworkProtection.IPAddressRange] {
-        (shouldExcludeDDGRoute ? Self.customExcludedRoutes : [])
+        Self.exclusionList.compactMap { [excludedRoutesPreferences] item -> NetworkProtection.IPAddressRange? in
+            guard case .exclusion(range: let range, description: _, default: let defaultValue) = item,
+                  excludedRoutesPreferences[range.stringRepresentation, default: defaultValue] == true
+            else { return nil }
+
+            return range
+        }
     }
 
     @MainActor
-    func toggleShouldExcludeDDGRoute() {
-        shouldExcludeDDGRoute.toggle()
-
-        Task { [shouldExcludeDDGRoute] in
-            guard let activeSession = try await ConnectionSessionUtilities.activeSession() else { return }
-
-            if shouldExcludeDDGRoute {
-                try activeSession.sendProviderMessage(.setExcludedRoutes(excludedRoutes()))
-            } else {
-                try activeSession.sendProviderMessage(.setExcludedRoutes([]))
-            }
-
-        }
+    private func includedRoutes() -> [NetworkProtection.IPAddressRange] {
+        ["0.0.0.0/0"]
     }
+
     @MainActor
     func toggleShouldExcludeLocalRoutes() {
         shouldExcludeLocalRoutes.toggle()
+        updateRoutes()
     }
 
     @MainActor
     func toggleShouldAutoConnectOnLogIn() {
         shouldAutoConnectOnLogIn.toggle()
+        updateRoutes()
+    }
+
+    @MainActor
+    func setExcludedRoute(_ route: String, enabled: Bool) {
+        excludedRoutesPreferences[route] = enabled
+        updateRoutes()
+    }
+
+    @MainActor
+    func isExcludedRouteEnabled(_ route: String) -> Bool {
+        guard let range = IPAddressRange(from: route),
+              let exclusionListItem = Self.exclusionList.first(where: {
+                  if case .exclusion(range: range, description: _, default: _) = $0 { return true }
+                  return false
+              }),
+              case .exclusion(range: _, description: _, default: let defaultValue) = exclusionListItem else {
+
+            assertionFailure("Invalid route \(route)")
+            return false
+        }
+        return excludedRoutesPreferences[route, default: defaultValue]
+    }
+
+    func updateRoutes() {
+        Task {
+            guard let activeSession = try await ConnectionSessionUtilities.activeSession() else { return }
+
+            try await activeSession.sendProviderMessage(.setIncludedRoutes(includedRoutes()))
+            try await activeSession.sendProviderMessage(.setExcludedRoutes(excludedRoutes()))
+        }
+    }
+
+    @MainActor
+    func toggleConnectionTesterEnabled() {
+        isConnectionTesterEnabled.toggle()
     }
 
     @MainActor

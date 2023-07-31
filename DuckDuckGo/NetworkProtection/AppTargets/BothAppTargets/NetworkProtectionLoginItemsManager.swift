@@ -32,9 +32,15 @@ final class NetworkProtectionLoginItemsManager {
 #endif
     }
 
+    @UserDefaultsWrapper(key: .agentLaunchTime, defaults: .shared)
+    private var agentLaunchTime: Date?
+
     // MARK: - Main Interactions
 
     func enableLoginItems() {
+        // Save agent launch time to distinguish between log-in launch and main app launch
+        agentLaunchTime = Date()
+
         updateLoginItems("enable", using: LoginItem.enable)
         ensureLoginItemsAreRunning()
     }
@@ -99,6 +105,10 @@ final class NetworkProtectionLoginItemsManager {
                 os_log(.error, log: .networkProtection, "%{public}s is not running, launching manually", item.debugDescription)
 
                 do {
+                    // Save agent launch time to distinguish between log-in launch and main app launch
+                    if item == .vpnMenu {
+                        agentLaunchTime = Date()
+                    }
                     try await item.launch()
                     os_log(.info, log: .networkProtection, "Launched login item with ID '%{public}s'", item.debugDescription)
                 } catch {

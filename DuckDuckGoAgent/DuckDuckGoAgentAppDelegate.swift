@@ -48,17 +48,17 @@ final class DuckDuckGoAgentApplication: NSApplication {
 final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
 
     /// when enabled VPN connection will be automatically initiated on launch even if disconnected manually (Always On rule disabled)
-    @UserDefaultsWrapper(key: .networkProtectionConnectOnLogIn, defaultValue: NetworkProtectionUserDefaultsConstants.shouldConnectOnLogIn)
+    @UserDefaultsWrapper(key: .networkProtectionConnectOnLogIn, defaultValue: NetworkProtectionUserDefaultsConstants.shouldConnectOnLogIn, defaults: .shared)
     private var shouldAutoConnect: Bool
 
-    /// The status bar NetworkProtection menu
-    ///
-    /// For some reason the App will crash if this is initialized right away, which is why it was changed to be lazy.
-    ///
-    private lazy var networkProtectionMenu: StatusBarMenu = {
+    /// Agent launch time saved by the main app to distinguish between log-in launch and main app launch
+    @UserDefaultsWrapper(key: .agentLaunchTime, defaultValue: .distantPast, defaults: .shared)
+    private var agentLaunchTime: Date
+    private static let recentThreshold: TimeInterval = 5.0
 
-        let parentBundlePath = "../../../../"
+    private lazy var appLauncher: AppLauncher = {
         let appBundleURL: URL
+        let parentBundlePath = "../../../../"
 
         if #available(macOS 13, *) {
             appBundleURL = URL(filePath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
@@ -66,8 +66,14 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
             appBundleURL = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
         }
 
-        let appLauncher = AppLauncher(appBundleURL: appBundleURL)
+        return AppLauncher(appBundleURL: appBundleURL)
+    }()
 
+    /// The status bar NetworkProtection menu
+    ///
+    /// For some reason the App will crash if this is initialized right away, which is why it was changed to be lazy.
+    ///
+    private lazy var networkProtectionMenu: StatusBarMenu = {
         #if DEBUG
         let iconProvider = DebugMenuIconProvider()
         #elseif REVIEW
@@ -83,9 +89,12 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
         os_log("DuckDuckGoAgent started", log: .networkProtectionLoginItemLog, type: .info)
         networkProtectionMenu.show()
 
-        if shouldAutoConnect {
+        // Connect on Log In
+        if shouldAutoConnect,
+           // are we launched by the system?
+           agentLaunchTime.addingTimeInterval(Self.recentThreshold) > Date() {
             Task {
-                await AppLauncher(appBundleURL: Bundle.main.bundleURL).launchApp(withCommand: .startVPN)
+                await appLauncher.launchApp(withCommand: .startVPN)
             }
         }
     }

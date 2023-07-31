@@ -66,6 +66,12 @@ final class NetworkProtectionDebugMenu: NSMenu {
         }
     }
 
+    @IBOutlet weak var exclusionsMenu: NSMenu! {
+        didSet {
+            populateExclusionsMenuItems()
+        }
+    }
+
     // MARK: - Outlets: Menu Items
 
     /// This is just present so we can remove this menu item in App Store builds.
@@ -78,10 +84,13 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     @IBOutlet weak var enableConnectOnDemandMenuItem: NSMenuItem!
     @IBOutlet weak var shouldEnforceRoutesMenuItem: NSMenuItem!
+    @IBOutlet weak var shouldIncludeAllNetworksMenuItem: NSMenuItem!
     @IBOutlet weak var connectOnLogInMenuItem: NSMenuItem!
 
     @IBOutlet weak var excludeDDGRouteMenuItem: NSMenuItem!
     @IBOutlet weak var excludeLocalNetworksMenuItem: NSMenuItem!
+
+    @IBOutlet weak var connectionTesterEnabledMenuItem: NSMenuItem!
 
     // MARK: - Debug Logic
 
@@ -179,8 +188,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     @IBAction
-    func toggleExcludeDDGAction(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleShouldExcludeDDGRoute()
+    func toggleIncludeAllNetworks(_ sender: Any?) {
+        NetworkProtectionTunnelController().toggleShouldIncludeAllNetworks()
     }
 
     @IBAction
@@ -191,6 +200,20 @@ final class NetworkProtectionDebugMenu: NSMenu {
     @IBAction
     func toggleConnectOnLogInAction(_ sender: Any?) {
         NetworkProtectionTunnelController().toggleShouldAutoConnectOnLogIn()
+    }
+
+    @IBAction
+    func toggleExclusionAction(_ sender: NSMenuItem) {
+        guard let addressRange = sender.representedObject as? String else {
+            assertionFailure("Unexpected representedObject")
+            return
+        }
+        NetworkProtectionTunnelController().setExcludedRoute(addressRange, enabled: sender.state == .off)
+    }
+
+    @IBAction
+    func toggleConnectionTesterEnabled(_ sender: Any) {
+        NetworkProtectionTunnelController().toggleConnectionTesterEnabled()
     }
 
     // MARK: Populating Menu Items
@@ -275,6 +298,25 @@ final class NetworkProtectionDebugMenu: NSMenu {
 #endif
     }
 
+    private func populateExclusionsMenuItems() {
+        exclusionsMenu.removeAllItems()
+
+        for item in NetworkProtectionTunnelController.exclusionList {
+            let menuItem: NSMenuItem
+            switch item {
+            case .section(let title):
+                menuItem = NSMenuItem(title: title, action: nil, target: nil)
+
+            case .exclusion(range: let range, description: let description, default: _):
+                menuItem = NSMenuItem(title: "\(range)\(description != nil ? " (\(description!))" : "")",
+                                      action: #selector(toggleExclusionAction),
+                                      target: self,
+                                      representedObject: range.stringRepresentation)
+            }
+            exclusionsMenu.addItem(menuItem)
+        }
+    }
+
     // MARK: - Menu State Update
 
     override func update() {
@@ -346,10 +388,25 @@ final class NetworkProtectionDebugMenu: NSMenu {
         enableConnectOnDemandMenuItem.isEnabled = !controller.shouldEnforceRoutes
 
         shouldEnforceRoutesMenuItem.state = controller.shouldEnforceRoutes ? .on : .off
+        shouldIncludeAllNetworksMenuItem.state = controller.shouldIncludeAllNetworks ? .on : .off
         connectOnLogInMenuItem.state = controller.shouldAutoConnectOnLogIn ? .on : .off
 
-        excludeDDGRouteMenuItem.state = controller.shouldExcludeDDGRoute ? .on : .off
         excludeLocalNetworksMenuItem.state = controller.shouldExcludeLocalRoutes ? .on : .off
+        connectionTesterEnabledMenuItem.state = controller.isConnectionTesterEnabled ? .on : .off
+    }
+
+}
+@available(macOS 11.0, *)
+extension NetworkProtectionDebugMenu: NSMenuDelegate {
+
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        if menu === exclusionsMenu {
+            let controller = NetworkProtectionTunnelController()
+            for item in menu.items {
+                guard let route = item.representedObject as? String else { continue }
+                item.state = controller.isExcludedRouteEnabled(route) ? .on : .off
+            }
+        }
     }
 
 }

@@ -19,6 +19,11 @@
 import AppKit
 import Foundation
 
+extension UserDefaults {
+    /// The app group's shared UserDefaults
+    static let shared = UserDefaults(suiteName: Bundle.main.appGroupName)
+}
+
 @propertyWrapper
 public struct UserDefaultsWrapper<T> {
 
@@ -122,13 +127,17 @@ public struct UserDefaultsWrapper<T> {
         // Network Protection
         case networkProtectionOnDemandActivation = "netp.ondemand"
         case networkProtectionShouldEnforceRoutes = "netp.enforce-routes"
+        case networkProtectionShouldIncludeAllNetworks = "netp.include-all-networks"
 
-        case networkProtectionShouldExcludeDDGRoute = "netp.exclude-ddg-route"
+        case networkProtectionExcludedRoutes = "netp.excluded-routes"
         case networkProtectionShouldExcludeLocalRoutes = "netp.exclude-local-routes"
+        case networkProtectionConnectionTesterEnabled = "netp.connection-tester-enabled"
 
         case networkProtectionConnectOnLogIn = "netp.connect-on-login"
 
         case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
+
+        case agentLaunchTime = "netp.agent.launch-time"
     }
 
     enum RemovedKeys: String, CaseIterable {

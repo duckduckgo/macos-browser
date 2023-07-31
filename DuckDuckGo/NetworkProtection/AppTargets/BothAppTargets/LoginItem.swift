@@ -34,7 +34,7 @@ extension LoginItem {
 
 /// Takes care of enabling and disabling a login item.
 ///
-struct LoginItem {
+struct LoginItem: Equatable {
 
     let agentBundleID: String
     let url: URL

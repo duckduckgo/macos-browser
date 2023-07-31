@@ -22,6 +22,9 @@ enum NetworkProtectionUserDefaultsConstants {
 
     static let onDemandActivation = true
     static let shouldConnectOnLogIn = false
-    static let isKillSwitchEnabled = false
+    static let shouldEnforceRoutes = false
+    static let shouldIncludeAllNetworks = false
+    static let shouldExcludeLocalRoutes = false
+    static let isConnectionTesterEnabled = true
 
 }
