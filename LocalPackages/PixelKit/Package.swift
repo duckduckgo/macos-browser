@@ -16,14 +16,11 @@ let package = Package(
             targets: ["PixelKit"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "68.1.1"),
     ],
     targets: [
         .target(
             name: "PixelKit",
-            dependencies: [
-                .product(name: "Common", package: "BrowserServicesKit"),
-            ]),
+            dependencies: []),
         .testTarget(
             name: "PixelKitTests",
             dependencies: ["PixelKit"])
