@@ -95,6 +95,7 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowEmailProtection = "home.page.show.email.protection"
         case homePageShowCookie = "home.page.show.cookie"
         case homePageShowSurveyDay0 = "home.page.show.survey.0"
+        case homePageUserInteractedWithSurveyDay0 = "home.page.user.interacted.with.survey.0"
         case homePageShowSurveyDay7 = "home.page.show.survey.7"
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"

@@ -33,8 +33,8 @@ extension HomePage.Models {
         let itemsRowCountWhenCollapsed = HomePage.featureRowCountWhenCollapsed
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
+        let privacyConfig: PrivacyConfiguration
 
-        let privacyConfig = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
         var isDay0SurveyEnabled: Bool {
             let newTabContinueSetUpSettings = privacyConfig.settings(for: .newTabContinueSetUp)
             if let day0SurveyString =  newTabContinueSetUpSettings["surveyCardDay0"] as? String {
@@ -96,6 +96,9 @@ extension HomePage.Models {
         @UserDefaultsWrapper(key: .homePageShowSurveyDay0, defaultValue: true)
         private var shouldShowSurveyDay0: Bool
 
+        @UserDefaultsWrapper(key: .homePageUserInteractedWithSurveyDay0, defaultValue: false)
+        private var userInteractedWithSurveyDay0: Bool
+
         @UserDefaultsWrapper(key: .homePageShowSurveyDay7, defaultValue: true)
         private var shouldShowSurveyDay7: Bool
 
@@ -131,7 +134,8 @@ extension HomePage.Models {
              emailManager: EmailManager = EmailManager(),
              privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
              cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
-             duckPlayerPreferences: DuckPlayerPreferencesPersistor) {
+             duckPlayerPreferences: DuckPlayerPreferencesPersistor,
+             privacyConfig: PrivacyConfiguration = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
@@ -139,6 +143,7 @@ extension HomePage.Models {
             self.privacyPreferences = privacyPreferences
             self.cookieConsentPopoverManager = cookieConsentPopoverManager
             self.duckPlayerPreferences = duckPlayerPreferences
+            self.privacyConfig = privacyConfig
             refreshFeaturesMatrix()
             NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
             NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeKey(_:)), name: NSWindow.didBecomeKeyNotification, object: nil)
@@ -308,13 +313,18 @@ extension HomePage.Models {
             let oneDayAgo = Calendar.current.date(byAdding: .weekday, value: -1, to: Date())!
             return isDay0SurveyEnabled &&
             shouldShowSurveyDay0 &&
+            !userInteractedWithSurveyDay0 &&
             firstLaunchDate > oneDayAgo
         }
 
         private var shouldSurveyDay7BeVisible: Bool {
             let oneWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())!
+            print(isDay7SurveyEnabled)
+            print(shouldShowSurveyDay7)
+            print(userInteractedWithSurveyDay0)
             return isDay7SurveyEnabled &&
             shouldShowSurveyDay7 &&
+            !userInteractedWithSurveyDay0 &&
             firstLaunchDate <= oneWeekAgo
         }
 
@@ -340,7 +350,7 @@ extension HomePage.Models {
                 tabCollectionViewModel.append(tab: tab)
                 switch day {
                 case .day0:
-                    shouldShowSurveyDay0 = false
+                    userInteractedWithSurveyDay0 = true
                 case .day7:
                     shouldShowSurveyDay7 = false
                 }

@@ -31,11 +31,13 @@ final class ContinueSetUpModelTests: XCTestCase {
     var privacyPreferences: PrivacySecurityPreferences!
     var duckPlayerPreferences: DuckPlayerPreferencesPersistor!
     var delegate: CapturingSetUpVewModelDelegate!
+    var privacyConfig: MockPrivacyConfiguration!
     let userDefaults = UserDefaults(suiteName: Bundle.main.bundleIdentifier! + "." + NSApp.runType.description)!
 
     @MainActor override func setUp() {
         UserDefaultsWrapper<Any>.clearAll()
         userDefaults.set(Date(), forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+        userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
         capturingDefaultBrowserProvider = CapturingDefaultBrowserProvider()
         capturingDataImportProvider = CapturingDataImportProvider()
         tabCollectionVM = TabCollectionViewModel()
@@ -43,9 +45,14 @@ final class ContinueSetUpModelTests: XCTestCase {
         emailManager = EmailManager(storage: emailStorage)
         privacyPreferences = PrivacySecurityPreferences.shared
         duckPlayerPreferences = DuckPlayerPreferencesPersistorMock()
+        privacyConfig = MockPrivacyConfiguration()
+        privacyConfig.featureSettings = [
+            "surveyCardDay0": "enabled",
+            "surveyCardDay7": "enabled"
+        ] as! [String: String]
         delegate = CapturingSetUpVewModelDelegate()
 
-        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences)
+        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences, privacyConfig: privacyConfig)
         vm.delegate = delegate
     }
 
@@ -122,6 +129,19 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay0))
         XCTAssertTrue(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay7))
+    }
+
+    @MainActor func testWhenInstallDateIsMoreThanAWeekAgoAndUserInteractedWithDay0SurveyDay7SurveyCardIsNotShown() {
+        let statisticStore = MockStatisticsStore()
+        vm.statisticsStore = statisticStore
+        vm.performAction(for: .surveyDay0)
+        let aDayAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
+        userDefaults.set(aDayAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+        vm = HomePage.Models.ContinueSetUpModel.fixture()
+        vm.shouldShowAllFeatures = true
+
+        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay0))
+        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay7))
     }
 
     @MainActor func testWhenInitializedNotForTheFirstTimeTheMatrixHasAllElementsInTheRightOrder() {
@@ -434,14 +454,20 @@ extension HomePage.Models.ContinueSetUpModel {
         dataImportProvider: DataImportStatusProviding = CapturingDataImportProvider(),
         emailManager: EmailManager = EmailManager(storage: MockEmailStorage()),
         privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
-        duckPlayerPreferences: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesPersistorMock()
+        duckPlayerPreferences: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesPersistorMock(),
+        privacyConfig: MockPrivacyConfiguration = MockPrivacyConfiguration()
     ) -> HomePage.Models.ContinueSetUpModel {
-        HomePage.Models.ContinueSetUpModel(
+        privacyConfig.featureSettings = [
+            "surveyCardDay0": "enabled",
+            "surveyCardDay7": "enabled"
+        ] as! [String: String]
+        return HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: defaultBrowserProvider,
             dataImportProvider: dataImportProvider,
             tabCollectionViewModel: TabCollectionViewModel(),
             emailManager: emailManager,
             privacyPreferences: privacyPreferences,
-            duckPlayerPreferences: duckPlayerPreferences)
+            duckPlayerPreferences: duckPlayerPreferences,
+            privacyConfig: privacyConfig)
     }
 }
