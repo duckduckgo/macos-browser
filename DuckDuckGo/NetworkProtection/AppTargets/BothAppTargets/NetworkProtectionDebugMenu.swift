@@ -258,7 +258,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
         // We're skipping the first two items because they're the automatic menu item and
         // the separator line.
-        let serverItems = menu.items.suffix(menu.items.count - 2)
+        let serverItems = menu.items.dropFirst(2)
 
         for item in serverItems {
             if let selectedServerName,
@@ -286,7 +286,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
         // We're skipping the first two items because they're the automatic menu item and
         // the separator line.
-        let serverItems = menu.items.suffix(menu.items.count - 2)
+        let serverItems = menu.items.dropFirst(2)
 
         for item in serverItems {
             if item.representedObject as? TimeInterval == selectedValidity {
