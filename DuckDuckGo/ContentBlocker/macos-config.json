@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1689975156286,
+    "version": 1690819077465,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -258,16 +258,33 @@
                 {
                     "domain": "kia.com",
                     "reason": "https://github.com/duckduckgo/autoconsent/issues/210"
+                },
+                {
+                    "domain": "pcworld.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
+                },
+                {
+                    "domain": "windowscentral.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
+                },
+                {
+                    "domain": "driving.co.uk",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
+                },
+                {
+                    "domain": "news.sky.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/326"
                 }
             ],
             "settings": {
                 "disabledCMPs": [
                     "Sourcepoint-top",
-                    "generic-cosmetic"
+                    "generic-cosmetic",
+                    "usercentrics-api"
                 ]
             },
             "state": "enabled",
-            "hash": "061ae814a3faa191155c79e8ead6a836"
+            "hash": "863e99b38db54a2058e4de07d87d550f"
         },
         "autofill": {
             "exceptions": [
@@ -1245,6 +1262,30 @@
                 },
                 {
                     "domain": "dailycaller.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+                },
+                {
+                    "domain": "dailymail.co.uk",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+                },
+                {
+                    "domain": "eltiempo.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+                },
+                {
+                    "domain": "dailyherald.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+                },
+                {
+                    "domain": "publico.es",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+                },
+                {
+                    "domain": "rawstory.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
+                },
+                {
+                    "domain": "allgemeine-zeitung.de",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/592"
                 },
                 {
@@ -2632,7 +2673,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "ca0a16bb802ad81255fea1099c28b5d5"
+            "hash": "5568171dfb10187ccabb0ca602449e3f"
         },
         "exceptionHandler": {
             "exceptions": [],
@@ -2888,8 +2929,16 @@
                     "reason": "Example URL: https://www.allegiantair.com/seating-checking-boarding; Clicking the 'show details' button in the FAQ sections does nothing."
                 },
                 {
+                    "domain": "boston.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/700"
+                },
+                {
                     "domain": "costco.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/644"
+                },
+                {
+                    "domain": "eventbrite.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/700"
                 },
                 {
                     "domain": "duluthtrading.com",
@@ -2909,7 +2958,7 @@
                     "privacy-test-pages.glitch.me"
                 ]
             },
-            "hash": "470c77b05c99b8f0986cc40422a59c91"
+            "hash": "38034ac4789cd0aa516f7a6848227613"
         },
         "harmfulApis": {
             "settings": {
@@ -3016,8 +3065,13 @@
         },
         "https": {
             "state": "enabled",
-            "exceptions": [],
-            "hash": "697382e31649d84b01166f1dc6f790d6"
+            "exceptions": [
+                {
+                    "domain": "act.alz.org",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1158"
+                }
+            ],
+            "hash": "150c8d7e1b9c95d412568b28deb10451"
         },
         "incontextSignup": {
             "exceptions": [],
@@ -3035,6 +3089,15 @@
             },
             "state": "enabled",
             "hash": "831a734e08585b40a38556ad9d108e7b"
+        },
+        "newTabContinueSetUp": {
+            "exceptions": [],
+            "state": "enabled",
+            "settings": {
+                "surveyCardDay0": "enabled",
+                "surveyCardDay7": "enabled"
+            },
+            "hash": "967581d96a32e2871b03715f718f60a6"
         },
         "nonTracking3pCookies": {
             "settings": {
@@ -3294,27 +3357,7 @@
                             {
                                 "rule": "prime.amazon.dev",
                                 "domains": [
-                                    "amazon.ae",
-                                    "amazon.ca",
-                                    "amazon.cn",
-                                    "amazon.co.jp",
-                                    "amazon.co.uk",
-                                    "amazon.com",
-                                    "amazon.com.au",
-                                    "amazon.com.be",
-                                    "amazon.com.br",
-                                    "amazon.com.mx",
-                                    "amazon.com.tr",
-                                    "amazon.eg",
-                                    "amazon.es",
-                                    "amazon.fr",
-                                    "amazon.in",
-                                    "amazon.it",
-                                    "amazon.nl",
-                                    "amazon.pl",
-                                    "amazon.sa",
-                                    "amazon.se",
-                                    "amazon.sg"
+                                    "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/943"
                             }
@@ -3328,6 +3371,17 @@
                                     "cigna.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/820"
+                            }
+                        ]
+                    },
+                    "analytics-egain.com": {
+                        "rules": [
+                            {
+                                "rule": "analytics.analytics-egain.com/onetag/",
+                                "domains": [
+                                    "support.norton.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1156"
                             }
                         ]
                     },
@@ -4184,6 +4238,13 @@
                                     "doterra.com"
                                 ],
                                 "reason": "For doterra.com/login/loading, the page shows a loading indicator and never redirects."
+                            },
+                            {
+                                "rule": "www.google-analytics.com/collect",
+                                "domains": [
+                                    "youmath.it"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1147"
                             }
                         ]
                     },
@@ -5565,7 +5626,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "55c3cd5ccfe7bb70f0e6a532f9e93df9"
+            "hash": "1ba5432dfee85f56743e1726db86b0a5"
         },
         "trackingCookies1p": {
             "settings": {
@@ -5928,9 +5989,35 @@
             "settings": {
                 "windowSizing": "enabled",
                 "navigatorCredentials": "enabled",
-                "safariObject": "enabled"
+                "safariObject": "enabled",
+                "messageHandlers": {
+                    "state": "disabled",
+                    "handlerStrategies": {
+                        "reflect": [
+                            "trackerDetectedMessage",
+                            "printHandler",
+                            "specialPages"
+                        ],
+                        "polyfill": [
+                            "*"
+                        ],
+                        "undefined": []
+                    }
+                },
+                "domains": [
+                    {
+                        "domain": "www.cbsnews.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/messageHandlers/state",
+                                "value": "enabled"
+                            }
+                        ]
+                    }
+                ]
             },
-            "hash": "6f867852a633ba23d8b0e79d782c0418"
+            "hash": "c974f70390be61f9ca4c183311231ac9"
         },
         "windowsPermissionUsage": {
             "exceptions": [],
