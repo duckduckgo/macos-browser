@@ -94,6 +94,8 @@ extension Pixel.Event {
              .faviconImportFailed,
              .formAutofilled,
              .autofillItemSaved,
+             .bitwardenPasswordAutofilled,
+             .bitwardenPasswordSaved,
              .autoconsentOptOutFailed,
              .autoconsentSelfTestFailed,
              .ampBlockingRulesCompilationFailed,

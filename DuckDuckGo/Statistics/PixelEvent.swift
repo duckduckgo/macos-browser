@@ -94,6 +94,9 @@ extension Pixel {
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
 
+        case bitwardenPasswordAutofilled
+        case bitwardenPasswordSaved
+
         case autoconsentOptOutFailed
         case autoconsentSelfTestFailed
 
@@ -294,6 +297,12 @@ extension Pixel.Event {
 
         case .autofillItemSaved(kind: let kind):
             return "m_mac_save_\(kind)"
+
+        case .bitwardenPasswordAutofilled:
+            return "m_mac_bitwarden_autofill_password"
+
+        case .bitwardenPasswordSaved:
+            return "m_mac_bitwarden_save_password"
 
         case .debug(event: let event, error: _):
             return "m_mac_debug_\(event.name)"
