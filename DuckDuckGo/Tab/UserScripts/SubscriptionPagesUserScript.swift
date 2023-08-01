@@ -76,7 +76,7 @@ extension SubscriptionPagesUserScript: WKScriptMessageHandler {
 ///
 /// Use Email sub-feature
 ///
-struct SubscriptionPagesUseEmailFeature: Subfeature {
+struct SubscriptionPagesUseSubscriptionFeature: Subfeature {
     weak var broker: UserScriptMessageBroker?
 
     var featureName = "useSubscription"
@@ -88,6 +88,10 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
         case "getSubscription": return getSubscription
         case "setSubscription": return setSubscription
         case "backToSettings": return backToSettings
+        case "getSubscriptionOptions": return getSubscriptionOptions
+        case "subscriptionSelected": return subscriptionSelected
+        case "activateSubscription": return activateSubscription
+        case "featureSelected": return featureSelected
         default:
             return nil
         }
@@ -116,6 +120,73 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
         let cohort: String
     }
 
+    struct SubscriptionCost: Codable {
+        enum CodingKeys: String, CodingKey {
+            case displayPrice
+            case price
+            case currency
+            case recurrence
+        }
+        let displayPrice: String
+        let price: Int
+        let currency: String
+        let recurrence: String
+    }
+
+    struct SubscriptionFeature: Codable {
+        enum CodingKeys: String, CodingKey {
+            case name
+        }
+        let name: String
+    }
+
+    struct SubscriptionOption: Codable {
+        enum CodingKeys: String, CodingKey {
+            case id
+            case type
+            case cost
+        }
+        let id: String
+        let type: String
+        let cost: SubscriptionCost
+    }
+
+    struct SubscriptionSelection: Codable {
+        enum CodingKeys: String, CodingKey {
+            case id
+        }
+        let id: String
+    }
+
+    struct FeatureSelection: Codable {
+        enum CodingKeys: String, CodingKey {
+            case feature
+        }
+        let feature: String
+    }
+
+    struct SubscriptionOptionsData: Codable {
+        enum CodingKeys: String, CodingKey {
+            case platform
+            case features
+            case options
+        }
+        let platform: String
+        let features: [SubscriptionFeature]
+        let options: [SubscriptionOption]
+    }
+
+    enum SubscribeActionName: String {
+        case onPurchaseUpdate
+    }
+
+    struct PurchaseUpdate: Codable {
+        enum CodingKeys: String, CodingKey {
+            case type
+        }
+        let type: String
+    }
+
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let token = AccountManager().shortLivedToken ?? ""
         let subscription = Subscription(token: token)
@@ -139,6 +210,75 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
 
         return nil
     }
+
+    func getSubscriptionOptions(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        let features = [
+            SubscriptionFeature(name: "private-browsing"),
+            SubscriptionFeature(name: "private-search"),
+            SubscriptionFeature(name: "email-protection"),
+            SubscriptionFeature(name: "app-tracking-protection"),
+            SubscriptionFeature(name: "vpn"),
+            SubscriptionFeature(name: "personal-information-removal"),
+            SubscriptionFeature(name: "identity-theft-restoration"),
+        ]
+        let subscriptionOptions = [
+            SubscriptionOption(
+                id: "bundle_1",
+                type: "auto-renewable",
+                cost: SubscriptionCost(displayPrice: "$9.99", price: 999, currency: "USD", recurrence: "monthly")
+            ),
+            SubscriptionOption(
+                id: "bundle_2",
+                type: "auto-renewable",
+                cost: SubscriptionCost(displayPrice: "$99.99", price: 9999, currency: "USD", recurrence: "yearly")
+            )
+        ]
+
+        return SubscriptionOptionsData(
+            platform: "macos",
+            features: features,
+            options: subscriptionOptions
+        )
+    }
+
+    func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let subscriptionSelection: SubscriptionSelection = DecodableHelper.decode(from: params) else {
+            assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionSelection")
+            return nil
+        }
+
+        print(">>> Selected subscription", subscriptionSelection.id)
+
+        // Demo delay before messaging the web front-end
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { // Change `2.0` to the desired number of seconds.
+            pushAction(method: SubscribeActionName.onPurchaseUpdate, webView: original.webView!, params: PurchaseUpdate(type: "completed"))
+        }
+
+        return nil
+    }
+
+    func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        print(">>> Selected to activate a subscription -- show the activation settings screen")
+        return nil
+    }
+
+    func featureSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let featureSelection: FeatureSelection = DecodableHelper.decode(from: params) else {
+            assertionFailure("SubscriptionPagesUserScript: expected JSON representation of FeatureSelection")
+            return nil
+        }
+
+        print(">>> Selected a feature -- show the corresponding UI", featureSelection)
+        return nil
+    }
+
+    func pushAction(method: SubscribeActionName, webView: WKWebView, params: Encodable) {
+        let broker = UserScriptMessageBroker(context: SubscriptionPagesUserScript.context, requiresRunInPageContentWorld: true )
+
+        print(">>> Pushing into WebView:", method.rawValue, String(describing: params))
+        broker.push(method: method.rawValue, params: params, for: self, into: webView)
+    }
+
 }
 
 #endif
