@@ -1387,6 +1387,8 @@
 		85799C1825DEBB3F0007EC87 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85799C1725DEBB3F0007EC87 /* Logging.swift */; };
 		857E5AF52A79045800FC0FB4 /* PixelExperiment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857E5AF42A79045800FC0FB4 /* PixelExperiment.swift */; };
 		857E5AF62A790B7000FC0FB4 /* PixelExperiment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857E5AF42A79045800FC0FB4 /* PixelExperiment.swift */; };
+		857E5AFA2A7961FF00FC0FB4 /* PixelExperimentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857E5AF82A79618100FC0FB4 /* PixelExperimentTests.swift */; };
+		857E5AFB2A79628A00FC0FB4 /* PixelExperimentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857E5AF82A79618100FC0FB4 /* PixelExperimentTests.swift */; };
 		857FFEC027D239DC00415E7A /* HyperLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857FFEBF27D239DC00415E7A /* HyperLink.swift */; };
 		8589063A267BCD8E00D23B0D /* SaveCredentialsPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */; };
 		8589063C267BCDC000D23B0D /* SaveCredentialsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */; };
@@ -2621,6 +2623,7 @@
 		85774B022A71CDD000DE0561 /* BlockMenuItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockMenuItem.swift; sourceTree = "<group>"; };
 		85799C1725DEBB3F0007EC87 /* Logging.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		857E5AF42A79045800FC0FB4 /* PixelExperiment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelExperiment.swift; sourceTree = "<group>"; };
+		857E5AF82A79618100FC0FB4 /* PixelExperimentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelExperimentTests.swift; sourceTree = "<group>"; };
 		857FFEBF27D239DC00415E7A /* HyperLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperLink.swift; sourceTree = "<group>"; };
 		85890639267BCD8E00D23B0D /* SaveCredentialsPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveCredentialsPopover.swift; sourceTree = "<group>"; };
 		8589063B267BCDC000D23B0D /* SaveCredentialsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveCredentialsViewController.swift; sourceTree = "<group>"; };
@@ -4619,6 +4622,14 @@
 			path = Experiment;
 			sourceTree = "<group>";
 		};
+		857E5AF72A79617100FC0FB4 /* PixelExperiment */ = {
+			isa = PBXGroup;
+			children = (
+				857E5AF82A79618100FC0FB4 /* PixelExperimentTests.swift */,
+			);
+			path = PixelExperiment;
+			sourceTree = "<group>";
+		};
 		8585B63526D6E5F600C1416F /* SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
@@ -6386,6 +6397,7 @@
 		B6DA440F2616C0F200DD1EC2 /* Statistics */ = {
 			isa = PBXGroup;
 			children = (
+				857E5AF72A79617100FC0FB4 /* PixelExperiment */,
 				B69B50402726C3F400758A2B /* ATB */,
 				B6DA44102616C0FC00DD1EC2 /* PixelTests.swift */,
 				4BC2621C293996410087A482 /* PixelEventTests.swift */,
@@ -8230,6 +8242,7 @@
 				3706FE61293F661700E42796 /* PinnedTabsViewModelTests.swift in Sources */,
 				3706FE62293F661700E42796 /* PasswordManagementListSectionTests.swift in Sources */,
 				3706FE63293F661700E42796 /* RecentlyClosedCoordinatorMock.swift in Sources */,
+				857E5AFB2A79628A00FC0FB4 /* PixelExperimentTests.swift in Sources */,
 				3706FE64293F661700E42796 /* DownloadListStoreTests.swift in Sources */,
 				3706FE65293F661700E42796 /* ContentBlockingUpdatingTests.swift in Sources */,
 				3706FE67293F661700E42796 /* EncryptionMocks.swift in Sources */,
@@ -9218,6 +9231,7 @@
 				B60C6F7E29B1B41D007BFAA8 /* TestRunHelperInitializer.m in Sources */,
 				37479F152891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift in Sources */,
 				AA63745424C9BF9A00AB2AC4 /* SuggestionContainerTests.swift in Sources */,
+				857E5AFA2A7961FF00FC0FB4 /* PixelExperimentTests.swift in Sources */,
 				AAC9C01524CAFBCE00AD1325 /* TabTests.swift in Sources */,
 				B69B504C2726CA2900758A2B /* MockVariantManager.swift in Sources */,
 				310E79BF294A19A8007C49E8 /* FireproofingReferenceTests.swift in Sources */,

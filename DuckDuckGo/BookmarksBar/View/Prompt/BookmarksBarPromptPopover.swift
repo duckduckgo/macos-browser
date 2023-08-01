@@ -81,15 +81,18 @@ struct BookmarksBarPromptView: View {
     @ObservedObject var model = BookmarksBarPromptViewModel()
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 0) {
             Image("BookmarksBarIllustration")
+                .padding(.bottom, 16)
 
             Text("Show Bookmarks Bar for quick access to your bookmarks")
                 .font(Font.custom("SF Pro Text", size: 15)
                     .weight(.semibold))
+                .padding(.bottom, 16)
 
             Text("Manage Bookmarks Bar in Settings > Appearance.")
                 .font(Font.custom("SF Pro Text", size: 13))
+                .padding(.bottom, 20)
 
             HStack {
                 Button {
@@ -123,7 +126,8 @@ struct BookmarksBarPromptView: View {
         .padding(.horizontal, 16)
         .padding(.top, 20)
         .padding(.bottom, 16)
-        .frame(width: 356, height: 268)
+        .frame(width: 356, height: 272)
+        .background(Color("InterfaceBackgroundColor"))
     }
 
 }

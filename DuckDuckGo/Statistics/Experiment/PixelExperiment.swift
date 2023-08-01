@@ -18,51 +18,19 @@
 
 import Foundation
 
-/// When `cohort` is accessed for the first time, allocate and return a cohort.  Subsequently, return the same cohort.
 enum PixelExperiment: String, CaseIterable {
 
+    fileprivate static let logic = PixelExperimentLogic {
+        Pixel.fire($0)
+    }
+
+    /// When `cohort` is accessed for the first time, allocate and return a cohort.  Subsequently, return the same cohort.
     static var cohort: PixelExperiment {
-        if let allocatedCohort,
-            // if the stored cohort doesn't match, allocate a new one
-           let cohort = Self.init(rawValue: allocatedCohort) {
-            return cohort
-        }
-
-        // For now, just use equal distribution of all cohorts.
-        let cohort = allCases.randomElement()!
-        allocatedCohort = cohort.rawValue
-        enrollmentDate = Date()
-        fireEnrollmentPixel()
-        return cohort
+        logic.cohort
     }
 
-    @UserDefaultsWrapper(key: .pixelExperimentCohort, defaultValue: nil)
-    fileprivate static var allocatedCohort: String?
-
-    @UserDefaultsWrapper(key: .pixelExperimentEnrollmentDate, defaultValue: nil)
-    fileprivate static var enrollmentDate: Date?
-
-    fileprivate static var daysSinceEnrollment: Int {
-        guard let enrollmentDate else { return 0 }
-        let diff = Date().timeIntervalSince1970 - enrollmentDate.timeIntervalSince1970
-        let days = Int(diff / 60 / 60 / 24)
-        return days
-    }
-
-    @UserDefaultsWrapper(key: .pixelExperimentFiredPixels, defaultValue: [])
-    private static var firedPixelsStorage: [String]
-
-    fileprivate static var firedPixels: Set<String> {
-        get {
-            Set<String>(firedPixelsStorage)
-        }
-
-        set {
-            firedPixelsStorage = Array(newValue)
-        }
-    }
-
-    // These are the variants. Rename or add/remove them as needed.
+    // These are the variants. Rename or add/remove them as needed.  If you change the string value
+    //  remember to keep it clear for privacy triage.
     case control
     case showBookmarksBarPrompt = "variant1"
 
@@ -72,26 +40,96 @@ enum PixelExperiment: String, CaseIterable {
 extension PixelExperiment {
 
     static func fireEnrollmentPixel() {
-        if firedPixels.insert(Pixel.Event.bookmarksBarOnboardingEnrollment(cohort: "").name).inserted {
-            Pixel.fire(.bookmarksBarOnboardingEnrollment(cohort: cohort.rawValue))
-        }
+        logic.fireEnrollmentPixel()
     }
 
     static func fireSearchOnDay4to8Pixel() {
-        guard allocatedCohort != nil else { return }
-        guard 4...8 ~= daysSinceEnrollment else { return }
-        if firedPixels.insert(Pixel.Event.bookmarksBarOnboardingSearched4to8days(cohort: "").name).inserted {
-            Pixel.fire(.bookmarksBarOnboardingSearched4to8days(cohort: cohort.rawValue))
-        }
+        logic.fireSearchOnDay4to8Pixel()
     }
 
     static func fireBookmarksBarInteractionPixel() {
+        logic.fireBookmarksBarInteractionPixel()
+    }
+
+}
+
+final internal class PixelExperimentLogic {
+
+    var cohort: PixelExperiment {
+        if let allocatedCohort,
+           // if the stored cohort doesn't match, allocate a new one
+           let cohort = PixelExperiment(rawValue: allocatedCohort) {
+            return cohort
+        }
+
+        // For now, just use equal distribution of all cohorts.
+        let cohort = PixelExperiment.showBookmarksBarPrompt // PixelExperiment.allCases.randomElement()!
+        allocatedCohort = cohort.rawValue
+        enrollmentDate = Date()
+        fireEnrollmentPixel()
+        return cohort
+    }
+
+    @UserDefaultsWrapper(key: .pixelExperimentCohort, defaultValue: nil)
+    var allocatedCohort: String?
+
+    @UserDefaultsWrapper(key: .pixelExperimentEnrollmentDate, defaultValue: nil)
+    var enrollmentDate: Date?
+
+    private var daysSinceEnrollment: Int {
+        guard let enrollmentDate else { return 0 }
+        let diff = Date().timeIntervalSince1970 - enrollmentDate.timeIntervalSince1970
+        let days = Int(diff / 60 / 60 / 24)
+        return days
+    }
+
+    @UserDefaultsWrapper(key: .pixelExperimentFiredPixels, defaultValue: [])
+    private var firedPixelsStorage: [String]
+
+    private var firedPixels: Set<String> {
+        get {
+            Set<String>(firedPixelsStorage)
+        }
+
+        set {
+            firedPixelsStorage = Array(newValue)
+        }
+    }
+
+    private let fire: (Pixel.Event) -> Void
+
+    init(fire: @escaping (Pixel.Event) -> Void) {
+        self.fire = fire
+    }
+
+    func fireEnrollmentPixel() {
+        guard allocatedCohort != nil else { return }
+        if firedPixels.insert(Pixel.Event.bookmarksBarOnboardingEnrollment(cohort: "").name).inserted {
+            fire(.bookmarksBarOnboardingEnrollment(cohort: cohort.rawValue))
+        }
+    }
+
+    func fireSearchOnDay4to8Pixel() {
+        guard allocatedCohort != nil else { return }
+        guard 4...8 ~= daysSinceEnrollment else { return }
+        if firedPixels.insert(Pixel.Event.bookmarksBarOnboardingSearched4to8days(cohort: "").name).inserted {
+            fire(.bookmarksBarOnboardingSearched4to8days(cohort: cohort.rawValue))
+        }
+    }
+
+    func fireBookmarksBarInteractionPixel() {
         guard allocatedCohort != nil else { return }
         if firedPixels.insert(Pixel.Event.bookmarksBarOnboardingFirstInteraction(cohort: "").name).inserted {
-            Pixel.fire(.bookmarksBarOnboardingFirstInteraction(cohort: cohort.rawValue))
+            fire(.bookmarksBarOnboardingFirstInteraction(cohort: cohort.rawValue))
         } else if 2...8 ~= daysSinceEnrollment && firedPixels.insert(Pixel.Event.bookmarksBarOnboardingInteraction2to8days(cohort: "").name).inserted {
-            Pixel.fire(.bookmarksBarOnboardingInteraction2to8days(cohort: cohort.rawValue))
+            fire(.bookmarksBarOnboardingInteraction2to8days(cohort: cohort.rawValue))
         }
+    }
+
+    func reset() {
+        allocatedCohort = nil
+        enrollmentDate = nil
+        firedPixelsStorage = []
     }
 
 }
