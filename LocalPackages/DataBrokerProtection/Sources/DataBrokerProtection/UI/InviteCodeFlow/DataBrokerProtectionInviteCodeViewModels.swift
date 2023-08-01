@@ -19,61 +19,6 @@
 import SwiftUI
 import SwiftUIExtensions
 
-enum DataBrokerProtectionInviteDialogKind {
-    case codeEntry, success
-}
-
-public struct DataBrokerProtectionInviteDialogsView: View {
-
-    @ObservedObject var viewModel: DataBrokerProtectionInviteDialogsViewModel
-
-    public init(viewModel: DataBrokerProtectionInviteDialogsViewModel) {
-        self.viewModel = viewModel
-    }
-
-    public var body: some View {
-        switch viewModel.currentDialogKind {
-        case .codeEntry:
-            let codeViewModel = DataBrokerProtectionInviteCodeViewModel(delegate: viewModel)
-            InviteCodeView(viewModel: codeViewModel)
-        case .success:
-            let successViewModel = DataBrokerProtectionInviteCodeSuccessViewModel(delegate: viewModel)
-            InviteCodeSuccessView(viewModel: successViewModel)
-        }
-    }
-}
-
-public protocol DataBrokerProtectionInviteDialogsViewModelDelegate: AnyObject {
-    func dataBrokerProtectionInviteDialogsViewModelDidReedemSuccessfully(_ viewModel: DataBrokerProtectionInviteDialogsViewModel)
-    func dataBrokerProtectionInviteDialogsViewModelDidCancel(_ viewModel: DataBrokerProtectionInviteDialogsViewModel)
-}
-
-public final class DataBrokerProtectionInviteDialogsViewModel: ObservableObject {
-    @Published var currentDialogKind: DataBrokerProtectionInviteDialogKind = .codeEntry
-    private weak var delegate: DataBrokerProtectionInviteDialogsViewModelDelegate?
-
-    public init(delegate: DataBrokerProtectionInviteDialogsViewModelDelegate) {
-        self.delegate = delegate
-    }
-}
-
-extension DataBrokerProtectionInviteDialogsViewModel: DataBrokerProtectionInviteCodeViewModelDelegate {
-    func dataBrokerProtectionInviteCodeViewModelDidReedemSuccessfully(_ viewModel: DataBrokerProtectionInviteCodeViewModel) {
-        currentDialogKind = .success
-    }
-
-    func dataBrokerProtectionInviteCodeViewModelDidCancel(_ viewModel: DataBrokerProtectionInviteCodeViewModel) {
-        delegate?.dataBrokerProtectionInviteDialogsViewModelDidCancel(self)
-    }
-}
-
-extension DataBrokerProtectionInviteDialogsViewModel: DataBrokerProtectionInviteCodeSuccessViewModelDelegate {
-    func dataBrokerProtectionInviteCodeSuccessViewModelDidCancel(_ viewModel: DataBrokerProtectionInviteCodeSuccessViewModel) {
-        delegate?.dataBrokerProtectionInviteDialogsViewModelDidCancel(self)
-    }
-}
-
-
 protocol DataBrokerProtectionInviteCodeViewModelDelegate: AnyObject {
     func dataBrokerProtectionInviteCodeViewModelDidReedemSuccessfully(_ viewModel: DataBrokerProtectionInviteCodeViewModel)
     func dataBrokerProtectionInviteCodeViewModelDidCancel(_ viewModel: DataBrokerProtectionInviteCodeViewModel)
