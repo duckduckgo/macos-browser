@@ -20,6 +20,6 @@ import Foundation
 
 @main
 final class AppMain {
-    static func main() async throws {
+    static func main() throws {
     }
 }
