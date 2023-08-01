@@ -68,7 +68,7 @@ extension DataBrokerProtectionInviteDialogsViewModel: DataBrokerProtectionInvite
 }
 
 extension DataBrokerProtectionInviteDialogsViewModel: DataBrokerProtectionInviteCodeSuccessViewModelDelegate {
-    func dataBrokerProtectionInviteCodeSuccessViewModelDidCancel(_ viewModel: DataBrokerProtectionInviteCodeSuccessViewModel) {
-        delegate?.dataBrokerProtectionInviteDialogsViewModelDidCancel(self)
+    func dataBrokerProtectionInviteCodeSuccessViewModelDidConfirm(_ viewModel: DataBrokerProtectionInviteCodeSuccessViewModel) {
+        delegate?.dataBrokerProtectionInviteDialogsViewModelDidReedemSuccessfully(self)
     }
 }
