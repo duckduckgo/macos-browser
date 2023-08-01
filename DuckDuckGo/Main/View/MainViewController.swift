@@ -141,6 +141,10 @@ final class MainViewController: NSViewController {
     }
 
     func showBookmarkPromptIfNeeded() {
+        guard #available(macOS 11, *) else { return }
+
+        // TODO only show if this is in the experiment group
+
         guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
         updateBookmarksBarViewVisibility(visible: true)
         // This won't work until the bookmarks bar is actually visible
