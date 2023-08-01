@@ -32,13 +32,14 @@ final class NetworkProtectionLoginItemsManager {
 #endif
     }
 
+    /// Save agent last launch time to distinguish between system launch at Log In and Main App launch
+    /// Used for the Connect On Log In feature to prevent connection when started by the Main App
     @UserDefaultsWrapper(key: .agentLaunchTime, defaults: .shared)
     private var agentLaunchTime: Date?
 
     // MARK: - Main Interactions
 
     func enableLoginItems() {
-        // Save agent launch time to distinguish between log-in launch and main app launch
         agentLaunchTime = Date()
 
         updateLoginItems("enable", using: LoginItem.enable)
@@ -105,7 +106,6 @@ final class NetworkProtectionLoginItemsManager {
                 os_log(.error, log: .networkProtection, "%{public}s is not running, launching manually", item.debugDescription)
 
                 do {
-                    // Save agent launch time to distinguish between log-in launch and main app launch
                     if item == .vpnMenu {
                         agentLaunchTime = Date()
                     }

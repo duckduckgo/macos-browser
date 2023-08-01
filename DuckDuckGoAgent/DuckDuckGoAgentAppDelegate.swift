@@ -51,7 +51,7 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
     @UserDefaultsWrapper(key: .networkProtectionConnectOnLogIn, defaultValue: NetworkProtectionUserDefaultsConstants.shouldConnectOnLogIn, defaults: .shared)
     private var shouldAutoConnect: Bool
 
-    /// Agent launch time saved by the main app to distinguish between log-in launch and main app launch
+    /// Agent launch time saved by the main app to distinguish between Log In launch and Main App launch to prevent connection when started by the Main App
     @UserDefaultsWrapper(key: .agentLaunchTime, defaultValue: .distantPast, defaults: .shared)
     private var agentLaunchTime: Date
     private static let recentThreshold: TimeInterval = 5.0

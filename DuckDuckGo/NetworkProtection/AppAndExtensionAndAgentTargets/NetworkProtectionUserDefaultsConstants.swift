@@ -18,6 +18,7 @@
 
 import Foundation
 
+/// Constants representing default values for NetP settings to be both accessible from Controller and Main Menu
 enum NetworkProtectionUserDefaultsConstants {
 
     static let onDemandActivation = true

@@ -39,44 +39,42 @@ final class AppMain {
 
     static func main() {
 #if NETWORK_PROTECTION
-        guard #available(macOS 11, *) else {
-            _=NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)
-            return
-        }
-        switch (CommandLine.arguments.first! as NSString).lastPathComponent {
-        case "startVPN":
-            swizzleMainBundle()
+        if #available(macOS 11, *) {
+            switch (CommandLine.arguments.first! as NSString).lastPathComponent {
+            case "startVPN":
+                swizzleMainBundle()
 
-            Task {
-                await NetworkProtectionTunnelController().start(enableLoginItems: false)
-                exit(0)
-            }
-
-            dispatchMain()
-        case "stopVPN":
-            swizzleMainBundle()
-
-            Task {
-                await NetworkProtectionTunnelController().stop()
-                exit(0)
-            }
-
-            dispatchMain()
-        case "enableOnDemand":
-            swizzleMainBundle()
-
-            Task {
-                do {
-                    try await NetworkProtectionTunnelController().enableOnDemandRequestedByExtension()
+                Task {
+                    await NetworkProtectionTunnelController().start(enableLoginItems: false)
                     exit(0)
-                } catch {
-                    fatalError("Could not enable on demand due to error: \(String(describing: error))")
                 }
-            }
 
-            dispatchMain()
-        default:
-            break
+                dispatchMain()
+            case "stopVPN":
+                swizzleMainBundle()
+
+                Task {
+                    await NetworkProtectionTunnelController().stop()
+                    exit(0)
+                }
+
+                dispatchMain()
+            case "enableOnDemand":
+                swizzleMainBundle()
+
+                Task {
+                    do {
+                        try await NetworkProtectionTunnelController().enableOnDemandRequestedByExtension()
+                        exit(0)
+                    } catch {
+                        fatalError("Could not enable on demand due to error: \(String(describing: error))")
+                    }
+                }
+
+                dispatchMain()
+            default:
+                break
+            }
         }
 #endif
 

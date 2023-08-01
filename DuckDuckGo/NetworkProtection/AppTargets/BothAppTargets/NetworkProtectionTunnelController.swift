@@ -111,12 +111,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     private func loadOrMakeTunnelManager() async throws -> NETunnelProviderManager {
-        let tunnelManager = await {
-            if let tunnelManager = await loadTunnelManager() {
-                return tunnelManager
-            }
-            return NETunnelProviderManager()
-        }()
+        let tunnelManager = await loadTunnelManager() ?? NETunnelProviderManager()
 
         try await setupAndSave(tunnelManager)
         return tunnelManager
