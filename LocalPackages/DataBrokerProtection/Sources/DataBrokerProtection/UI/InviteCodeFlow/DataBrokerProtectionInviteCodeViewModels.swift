@@ -87,7 +87,7 @@ final class DataBrokerProtectionInviteCodeViewModel: InviteCodeViewModel {
 }
 
 protocol DataBrokerProtectionInviteCodeSuccessViewModelDelegate: AnyObject {
-    func dataBrokerProtectionInviteCodeSuccessViewModelDidCancel(_ viewModel: DataBrokerProtectionInviteCodeSuccessViewModel)
+    func dataBrokerProtectionInviteCodeSuccessViewModelDidConfirm(_ viewModel: DataBrokerProtectionInviteCodeSuccessViewModel)
 }
 
 final class DataBrokerProtectionInviteCodeSuccessViewModel: InviteCodeSuccessViewModel {
@@ -111,6 +111,6 @@ final class DataBrokerProtectionInviteCodeSuccessViewModel: InviteCodeSuccessVie
     }
 
     func onConfirm() {
-        delegate?.dataBrokerProtectionInviteCodeSuccessViewModelDidCancel(self)
+        delegate?.dataBrokerProtectionInviteCodeSuccessViewModelDidConfirm(self)
     }
 }
