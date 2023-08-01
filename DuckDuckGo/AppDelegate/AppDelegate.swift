@@ -81,8 +81,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         PFMoveToApplicationsFolderIfNecessary()
 #endif
 
-        print("***", ExperimentCohort.allocated)
-
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
         Configuration.setURLProvider(AppConfigurationURLProvider())
 

@@ -89,7 +89,6 @@ final class MainViewController: NSViewController {
 
     var bookmarkBarPromptObserver: Any?
     func registerForBookmarkBarPromptNotifications() {
-        guard #available(macOS 11, *) else { return }
         bookmarkBarPromptObserver = NotificationCenter.default.addObserver(
             forName: .bookmarkPromptShouldShow,
             object: nil,

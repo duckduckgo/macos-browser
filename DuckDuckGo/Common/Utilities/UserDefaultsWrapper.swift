@@ -123,8 +123,6 @@ public struct UserDefaultsWrapper<T> {
 
         case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
 
-        // experiments
-        case experimentCohort = "experiment.cohort"
     }
 
     enum RemovedKeys: String, CaseIterable {
