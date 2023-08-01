@@ -21,6 +21,11 @@ import DataBrokerProtection
 import AppKit
 import SwiftUI
 
+public extension Notification.Name {
+    static let dbpDidClose = Notification.Name("com.duckduckgo.DBP.DBPDidClose")
+}
+
+
 final class DBPHomeViewController: NSViewController {
     private var debugWindowController: NSWindowController?
     private let authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData()
@@ -121,5 +126,6 @@ extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDeleg
     func dataBrokerProtectionInviteDialogsViewModelDidCancel(_ viewModel: DataBrokerProtectionInviteDialogsViewModel) {
         presentedWindowController?.window?.close()
         presentedWindowController = nil
+        NotificationCenter.default.post(name: .dbpDidClose, object: nil)
     }
 }
