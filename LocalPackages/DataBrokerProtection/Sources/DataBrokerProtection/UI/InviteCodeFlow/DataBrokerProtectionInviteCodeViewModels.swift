@@ -26,9 +26,6 @@ protocol DataBrokerProtectionInviteCodeViewModelDelegate: AnyObject {
 
 final class DataBrokerProtectionInviteCodeViewModel: InviteCodeViewModel {
 
-    // TODO naughty naughty
-    private let authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData()
-    private let authenticationService: AuthenticationServiceProtocol = AuthenticationService()
     private let redeemUseCase: RedeemUseCaseProtocol
     private weak var delegate: DataBrokerProtectionInviteCodeViewModelDelegate?
 
@@ -64,7 +61,9 @@ final class DataBrokerProtectionInviteCodeViewModel: InviteCodeViewModel {
 
     @Published var errorText: String?
 
-    init(delegate: DataBrokerProtectionInviteCodeViewModelDelegate) {
+    init(delegate: DataBrokerProtectionInviteCodeViewModelDelegate,
+         authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData(),
+         authenticationService: AuthenticationServiceProtocol = AuthenticationService()) {
         self.delegate = delegate
         self.redeemUseCase = RedeemUseCase(authenticationService: authenticationService, authenticationRepository: authenticationRepository)
     }
@@ -90,7 +89,6 @@ final class DataBrokerProtectionInviteCodeViewModel: InviteCodeViewModel {
 protocol DataBrokerProtectionInviteCodeSuccessViewModelDelegate: AnyObject {
     func dataBrokerProtectionInviteCodeSuccessViewModelDidCancel(_ viewModel: DataBrokerProtectionInviteCodeSuccessViewModel)
 }
-
 
 final class DataBrokerProtectionInviteCodeSuccessViewModel: InviteCodeSuccessViewModel {
 
