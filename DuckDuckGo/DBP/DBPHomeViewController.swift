@@ -25,13 +25,12 @@ public extension Notification.Name {
     static let dbpDidClose = Notification.Name("com.duckduckgo.DBP.DBPDidClose")
 }
 
-
 final class DBPHomeViewController: NSViewController {
     private var debugWindowController: NSWindowController?
     private let authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData()
     private let authenticationService: AuthenticationServiceProtocol = AuthenticationService()
     private let redeemUseCase: RedeemUseCaseProtocol
-    
+
     private var presentedWindowController: NSWindowController?
 
     lazy var dataBrokerContainerView: DataBrokerContainerViewController = {
