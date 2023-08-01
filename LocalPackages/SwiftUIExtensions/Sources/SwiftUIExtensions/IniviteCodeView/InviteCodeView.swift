@@ -36,7 +36,11 @@ public struct InviteCodeView<ViewModel>: View where ViewModel: InviteCodeViewMod
                 Text(viewModel.messageText)
                     .font(.system(size: 13))
                     .multilineTextAlignment(.center)
-                TextField(viewModel.textFieldPlaceholder, text: $viewModel.textFieldText)
+                TextField(viewModel.textFieldPlaceholder, text: $viewModel.textFieldText, onCommit: {
+                    Task {
+                        await viewModel.onConfirm()
+                    }
+                })
                     .frame(width: 96)
                     .textFieldStyle(.roundedBorder)
                 if let errorText = viewModel.errorText {
