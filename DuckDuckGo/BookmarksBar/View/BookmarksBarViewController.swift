@@ -181,6 +181,7 @@ final class BookmarksBarViewController: NSViewController {
 extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
 
     func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem) {
+        PixelExperiment.fireBookmarksBarInteractionPixel()
         guard let indexPath = bookmarksBarCollectionView.indexPath(for: item) else {
             assertionFailure("Failed to look up index path for clicked item")
             return
@@ -236,7 +237,6 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
     }
 
     private func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for folder: BookmarkFolder, item: BookmarksBarCollectionViewItem) {
-        PixelExperiment.fireBookmarksBarInteractionPixel()
         switch action {
         case .clickItem:
             let childEntities = folder.children

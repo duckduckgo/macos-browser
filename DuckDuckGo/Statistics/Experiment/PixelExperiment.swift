@@ -31,7 +31,7 @@ enum PixelExperiment: String, CaseIterable {
         // For now, just use equal distribution of all cohorts.
         let cohort = allCases.randomElement()!
         allocatedCohort = cohort.rawValue
-        enrollmentDate = Date().timeIntervalSince1970
+        enrollmentDate = Date()
         fireEnrollmentPixel()
         return cohort
     }
@@ -40,23 +40,25 @@ enum PixelExperiment: String, CaseIterable {
     fileprivate static var allocatedCohort: String?
 
     @UserDefaultsWrapper(key: .pixelExperimentEnrollmentDate, defaultValue: nil)
-    fileprivate static var enrollmentDate: TimeInterval?
+    fileprivate static var enrollmentDate: Date?
 
     fileprivate static var daysSinceEnrollment: Int {
         guard let enrollmentDate else { return 0 }
-        let diff = enrollmentDate - Date().timeIntervalSince1970
-        let days = Int(diff / 60 / 24)
+        let diff = Date().timeIntervalSince1970 - enrollmentDate.timeIntervalSince1970
+        let days = Int(diff / 60 / 60 / 24)
         return days
     }
 
-    private static var firedPixelsStorage = Set<String>()
+    @UserDefaultsWrapper(key: .pixelExperimentFiredPixels, defaultValue: [])
+    private static var firedPixelsStorage: [String]
+
     fileprivate static var firedPixels: Set<String> {
         get {
-            firedPixelsStorage
+            Set<String>(firedPixelsStorage)
         }
 
         set {
-            firedPixelsStorage = newValue
+            firedPixelsStorage = Array(newValue)
         }
     }
 
