@@ -27,7 +27,7 @@ final class DBPHomeViewController: NSViewController {
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     
-    private var presentedInviteViewController: NSViewController?
+    private var presentedWindowController: NSWindowController?
 
     lazy var dataBrokerContainerView: DataBrokerContainerViewController = {
         DataBrokerContainerViewController()
@@ -49,9 +49,7 @@ final class DBPHomeViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if redeemUseCase.shouldAskForInviteCode() {
-            presentInviteCodeFlow()
-        } else {
+        if !redeemUseCase.shouldAskForInviteCode() {
             attachDataBrokerContainerView()
         }
     }
@@ -81,10 +79,9 @@ final class DBPHomeViewController: NSViewController {
 
         let view = DataBrokerProtectionInviteDialogsView(viewModel: viewModel)
         let hostingVC = NSHostingController(rootView: view)
-        presentedInviteViewController = hostingVC
-        let newWindowController = hostingVC.wrappedInWindowController()
+        presentedWindowController = hostingVC.wrappedInWindowController()
 
-        guard let newWindow = newWindowController.window,
+        guard let newWindow = presentedWindowController?.window,
               let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         else {
             assertionFailure("Failed to present \(hostingVC)")
@@ -115,14 +112,14 @@ final class DBPHomeViewController: NSViewController {
 
 extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDelegate {
     func dataBrokerProtectionInviteDialogsViewModelDidReedemSuccessfully(_ viewModel: DataBrokerProtectionInviteDialogsViewModel) {
-        presentedInviteViewController?.dismiss()
-        presentedInviteViewController = nil
+        presentedWindowController?.window?.close()
+        presentedWindowController = nil
         attachDataBrokerContainerView()
         openDebugUI()
     }
 
     func dataBrokerProtectionInviteDialogsViewModelDidCancel(_ viewModel: DataBrokerProtectionInviteDialogsViewModel) {
-        presentedInviteViewController?.dismiss()
-        presentedInviteViewController = nil
+        presentedWindowController?.window?.close()
+        presentedWindowController = nil
     }
 }
