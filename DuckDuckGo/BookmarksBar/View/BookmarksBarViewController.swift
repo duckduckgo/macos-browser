@@ -236,6 +236,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
     }
 
     private func handle(_ action: BookmarksBarViewModel.BookmarksBarItemAction, for folder: BookmarkFolder, item: BookmarksBarCollectionViewItem) {
+        PixelExperiment.fireBookmarksBarInteractionPixel()
         switch action {
         case .clickItem:
             let childEntities = folder.children

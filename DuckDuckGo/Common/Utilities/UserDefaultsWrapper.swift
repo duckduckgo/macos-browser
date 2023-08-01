@@ -123,6 +123,9 @@ public struct UserDefaultsWrapper<T> {
 
         case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
 
+        // Experiments
+        case pixelExperimentCohort = "pixel.experiment.cohort"
+        case pixelExperimentEnrollmentDate = "pixel.experiment.enrollment.date"
     }
 
     enum RemovedKeys: String, CaseIterable {

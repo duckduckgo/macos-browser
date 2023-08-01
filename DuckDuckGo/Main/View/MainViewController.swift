@@ -142,12 +142,10 @@ final class MainViewController: NSViewController {
 
     func showBookmarkPromptIfNeeded() {
         guard #available(macOS 11, *) else { return }
-
-        // TODO only show if this is in the experiment group
-
+        guard PixelExperiment.cohort == .showBookmarksBarPrompt else { return }
         guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
         updateBookmarksBarViewVisibility(visible: true)
-        // This won't work until the bookmarks bar is actually visible
+        // This won't work until the bookmarks bar is actually visible which it isn't until the next ui cycle
         DispatchQueue.main.async {
             self.bookmarksBarViewController.showBookmarksBarPrompt()
         }
