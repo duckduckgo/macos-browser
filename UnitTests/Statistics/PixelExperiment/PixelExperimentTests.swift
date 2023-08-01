@@ -26,6 +26,11 @@ class PixelExperimentTests: XCTestCase {
         PixelExperimentLogic { _ in }.reset()
     }
 
+    func testWhenNotInstalledThenCohortIsNill() {
+        let logic = PixelExperimentLogic { _ in }
+        XCTAssertNil(logic.cohort)
+    }
+
     func testWhenSecondInteractionWithBookmarksBarOnDayThenCorrectPixelFired() {
         let logic = PixelExperimentLogic { _ in }
 
@@ -63,28 +68,12 @@ class PixelExperimentTests: XCTestCase {
         logic.reset()
     }
 
-    func assertWhenSecondInteractionWithBookmarksBarOnDayThenNoPixelFired(_ daysAgo: Int) {
-        var pixelEvent: Pixel.Event?
-        let logic = PixelExperimentLogic {
-            pixelEvent = $0
-        }
-
-        _ = logic.cohort
-        logic.enrollmentDate = Date.daysAgo(daysAgo)
-
-        logic.fireBookmarksBarInteractionPixel()
-        pixelEvent = nil
-        logic.fireBookmarksBarInteractionPixel()
-
-        XCTAssertNil(pixelEvent)
-    }
-
     func testWhenFirstInteractionWithBookmarksBarThenCorrectPixelFired() {
         var pixelEvent: Pixel.Event?
         let logic = PixelExperimentLogic {
             pixelEvent = $0
         }
-
+        logic.install()
         _ = logic.cohort
 
         logic.fireBookmarksBarInteractionPixel()
@@ -137,6 +126,7 @@ class PixelExperimentTests: XCTestCase {
         let logic = PixelExperimentLogic {
             pixelEvent = $0
         }
+        logic.install()
         let originalCohort = logic.cohort
 
         pixelEvent = nil
@@ -151,6 +141,7 @@ class PixelExperimentTests: XCTestCase {
         let logic = PixelExperimentLogic {
             pixelEvent = $0
         }
+        logic.install()
         XCTAssertNil(logic.allocatedCohort)
         XCTAssertNil(pixelEvent)
         _ = logic.cohort
@@ -169,7 +160,7 @@ class PixelExperimentTests: XCTestCase {
         let logic = PixelExperimentLogic {
             pixelEvent = $0
         }
-
+        logic.install()
         logic.fireEnrollmentPixel()
         logic.fireSearchOnDay4to8Pixel()
         logic.fireBookmarksBarInteractionPixel()
@@ -181,6 +172,7 @@ class PixelExperimentTests: XCTestCase {
         let logic = PixelExperimentLogic {
             pixelEvent = $0
         }
+        logic.install()
         _ = logic.cohort
         logic.enrollmentDate = Date.daysAgo(daysAgo)
         pixelEvent = nil
@@ -199,6 +191,7 @@ class PixelExperimentTests: XCTestCase {
         let logic = PixelExperimentLogic {
             pixelEvent = $0
         }
+        logic.install()
         _ = logic.cohort
         pixelEvent = nil
 
@@ -213,7 +206,7 @@ class PixelExperimentTests: XCTestCase {
         let logic = PixelExperimentLogic {
             pixelEvent = $0
         }
-
+        logic.install()
         _ = logic.cohort
         logic.enrollmentDate = Date.daysAgo(daysAgo)
 
@@ -227,6 +220,22 @@ class PixelExperimentTests: XCTestCase {
             XCTFail("Unexpected pixel \(String(describing: pixelEvent))", file: file, line: line)
         }
 
+    }
+
+    func assertWhenSecondInteractionWithBookmarksBarOnDayThenNoPixelFired(_ daysAgo: Int) {
+        var pixelEvent: Pixel.Event?
+        let logic = PixelExperimentLogic {
+            pixelEvent = $0
+        }
+        logic.install()
+        _ = logic.cohort
+        logic.enrollmentDate = Date.daysAgo(daysAgo)
+
+        logic.fireBookmarksBarInteractionPixel()
+        pixelEvent = nil
+        logic.fireBookmarksBarInteractionPixel()
+
+        XCTAssertNil(pixelEvent)
     }
 
 }

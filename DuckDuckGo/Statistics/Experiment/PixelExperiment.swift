@@ -24,9 +24,15 @@ enum PixelExperiment: String, CaseIterable {
         Pixel.fire($0)
     }
 
-    /// When `cohort` is accessed for the first time, allocate and return a cohort.  Subsequently, return the same cohort.
-    static var cohort: PixelExperiment {
+    /// When `cohort` is accessed for the first time after the experiment is installed with `install()`,
+    ///  allocate and return a cohort.  Subsequently, return the same cohort.
+    static var cohort: PixelExperiment? {
         logic.cohort
+    }
+
+    /// Enables this experiment for new users when called from the new installation path.
+    static func install() {
+        logic.install()
     }
 
     // These are the variants. Rename or add/remove them as needed.  If you change the string value
@@ -55,7 +61,9 @@ extension PixelExperiment {
 
 final internal class PixelExperimentLogic {
 
-    var cohort: PixelExperiment {
+    var cohort: PixelExperiment? {
+        guard installed else { return nil }
+
         if let allocatedCohort,
            // if the stored cohort doesn't match, allocate a new one
            let cohort = PixelExperiment(rawValue: allocatedCohort) {
@@ -69,6 +77,9 @@ final internal class PixelExperimentLogic {
         fireEnrollmentPixel()
         return cohort
     }
+
+    @UserDefaultsWrapper(key: .pixelExperimentInstalled, defaultValue: false)
+    var installed: Bool
 
     @UserDefaultsWrapper(key: .pixelExperimentCohort, defaultValue: nil)
     var allocatedCohort: String?
@@ -102,15 +113,19 @@ final internal class PixelExperimentLogic {
         self.fire = fire
     }
 
+    func install() {
+        installed = true
+    }
+
     func fireEnrollmentPixel() {
-        guard allocatedCohort != nil else { return }
+        guard allocatedCohort != nil, let cohort else { return }
         if firedPixels.insert(Pixel.Event.bookmarksBarOnboardingEnrollment(cohort: "").name).inserted {
             fire(.bookmarksBarOnboardingEnrollment(cohort: cohort.rawValue))
         }
     }
 
     func fireSearchOnDay4to8Pixel() {
-        guard allocatedCohort != nil else { return }
+        guard allocatedCohort != nil, let cohort else { return }
         guard 4...8 ~= daysSinceEnrollment else { return }
         if firedPixels.insert(Pixel.Event.bookmarksBarOnboardingSearched4to8days(cohort: "").name).inserted {
             fire(.bookmarksBarOnboardingSearched4to8days(cohort: cohort.rawValue))
@@ -118,7 +133,7 @@ final internal class PixelExperimentLogic {
     }
 
     func fireBookmarksBarInteractionPixel() {
-        guard allocatedCohort != nil else { return }
+        guard allocatedCohort != nil, let cohort else { return }
         if firedPixels.insert(Pixel.Event.bookmarksBarOnboardingFirstInteraction(cohort: "").name).inserted {
             fire(.bookmarksBarOnboardingFirstInteraction(cohort: cohort.rawValue))
         } else if 2...8 ~= daysSinceEnrollment && firedPixels.insert(Pixel.Event.bookmarksBarOnboardingInteraction2to8days(cohort: "").name).inserted {
@@ -127,6 +142,7 @@ final internal class PixelExperimentLogic {
     }
 
     func reset() {
+        installed = false
         allocatedCohort = nil
         enrollmentDate = nil
         firedPixelsStorage = []

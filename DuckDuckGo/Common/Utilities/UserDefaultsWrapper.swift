@@ -124,6 +124,7 @@ public struct UserDefaultsWrapper<T> {
         case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
 
         // Experiments
+        case pixelExperimentInstalled = "pixel.experiment.installed"
         case pixelExperimentCohort = "pixel.experiment.cohort"
         case pixelExperimentEnrollmentDate = "pixel.experiment.enrollment.date"
         case pixelExperimentFiredPixels = "pixel.experiment.pixels.fired"
