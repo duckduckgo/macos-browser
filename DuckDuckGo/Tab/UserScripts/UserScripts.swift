@@ -29,6 +29,7 @@ final class UserScripts: UserScriptsProvider {
     let printingUserScript = PrintingUserScript()
     let hoverUserScript = HoverUserScript()
     let debugScript = DebugUserScript()
+    let subscriptionPagesUserScript = SubscriptionPagesUserScript()
     let clickToLoadScript: ClickToLoadUserScript
 
     let contentBlockerRulesScript: ContentBlockerRulesUserScript
@@ -86,6 +87,8 @@ final class UserScripts: UserScriptsProvider {
                 userScripts.append(specialPages)
             }
         }
+
+        subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseEmailFeature())
     }
 
     lazy var userScripts: [UserScript] = [
@@ -100,7 +103,8 @@ final class UserScripts: UserScriptsProvider {
         clickToLoadScript,
         contentScopeUserScript,
         contentScopeUserScriptIsolated,
-        autofillScript
+        autofillScript,
+        subscriptionPagesUserScript
     ]
 
     @MainActor
@@ -119,5 +123,4 @@ final class UserScripts: UserScriptsProvider {
             return wkUserScripts
         }
     }
-
 }

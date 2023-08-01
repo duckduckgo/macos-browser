@@ -107,6 +107,8 @@
 		31F28C5128C8EEC500119F70 /* YoutubeOverlayUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */; };
 		31F28C5328C8EECA00119F70 /* DuckPlayerSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C5228C8EECA00119F70 /* DuckPlayerSchemeHandler.swift */; };
 		31F7F2A6288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */; };
+		33422CE22A795E9D00823A04 /* SubscriptionPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33422CE12A795E9D00823A04 /* SubscriptionPagesUserScript.swift */; };
+		33422CE32A795E9D00823A04 /* SubscriptionPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33422CE12A795E9D00823A04 /* SubscriptionPagesUserScript.swift */; };
 		3701C9CE29BD040C00305B15 /* FirefoxBerkeleyDatabaseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */; };
 		3701C9CF29BD040C00305B15 /* FirefoxBerkeleyDatabaseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */; };
 		37054FC92873301700033B6F /* PinnedTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37054FC82873301700033B6F /* PinnedTabView.swift */; };
@@ -2205,6 +2207,7 @@
 		31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YoutubeOverlayUserScript.swift; sourceTree = "<group>"; };
 		31F28C5228C8EECA00119F70 /* DuckPlayerSchemeHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckPlayerSchemeHandler.swift; sourceTree = "<group>"; };
 		31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarBadgeAnimationView.swift; sourceTree = "<group>"; };
+		33422CE12A795E9D00823A04 /* SubscriptionPagesUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPagesUserScript.swift; sourceTree = "<group>"; };
 		336B39E22726B4B700C417D3 /* LocalUnprotectedDomains.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalUnprotectedDomains.swift; sourceTree = "<group>"; };
 		3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxBerkeleyDatabaseReader.swift; sourceTree = "<group>"; };
 		37054FC82873301700033B6F /* PinnedTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedTabView.swift; sourceTree = "<group>"; };
@@ -6383,6 +6386,7 @@
 				856CADEF271710F400E79BB0 /* HoverUserScript.swift */,
 				4B2E7D6226FF9D6500D2DB17 /* PrintingUserScript.swift */,
 				85AC3AEE25D5CE9800C7D2AA /* UserScripts.swift */,
+				33422CE12A795E9D00823A04 /* SubscriptionPagesUserScript.swift */,
 			);
 			path = UserScripts;
 			sourceTree = "<group>";
@@ -7840,6 +7844,7 @@
 				3706FBAE293F65D500E42796 /* DataImport.swift in Sources */,
 				3706FBAF293F65D500E42796 /* FireproofDomains.xcdatamodeld in Sources */,
 				3706FBB0293F65D500E42796 /* CookieConsentUserPermissionViewController.swift in Sources */,
+				33422CE32A795E9D00823A04 /* SubscriptionPagesUserScript.swift in Sources */,
 				B626A7552991413000053070 /* SerpHeadersNavigationResponder.swift in Sources */,
 				3706FBB1293F65D500E42796 /* HomePageView.swift in Sources */,
 				3706FBB2293F65D500E42796 /* WebKitDownloadTask.swift in Sources */,
@@ -9123,6 +9128,7 @@
 				B603FD9E2A02712E00F3FCA9 /* CIImageExtension.swift in Sources */,
 				AA6EF9B3250785D5004754E6 /* NSMenuExtension.swift in Sources */,
 				AA7412B524D1536B00D22FE0 /* MainWindowController.swift in Sources */,
+				33422CE22A795E9D00823A04 /* SubscriptionPagesUserScript.swift in Sources */,
 				AA9FF95924A1ECF20039E328 /* Tab.swift in Sources */,
 				4BBDEE9228FC14760092FAA6 /* ConnectBitwardenView.swift in Sources */,
 				B63D467125BFA6C100874977 /* DispatchQueueExtensions.swift in Sources */,
