@@ -19,7 +19,6 @@
 import AppKit
 import Common
 import Foundation
-import NetworkProtection
 
 #if !NETWORK_PROTECTION
 
@@ -38,6 +37,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
 }
 
 #else
+
+import NetworkProtection
 
 /// Controller for the Network Protection debug menu.
 ///
