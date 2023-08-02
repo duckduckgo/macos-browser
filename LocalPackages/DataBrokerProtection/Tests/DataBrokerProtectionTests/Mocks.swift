@@ -246,7 +246,7 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
     }
 }
 
-final class MockRedeemUseCase: RedeemUseCaseProtocol {
+final class MockRedeemUseCase: DataBrokerProtectionRedeemUseCase {
 
     func shouldAskForInviteCode() -> Bool {
         false
@@ -261,7 +261,7 @@ final class MockRedeemUseCase: RedeemUseCaseProtocol {
     }
 }
 
-final class MockAuthenticationService: AuthenticationServiceProtocol {
+final class MockAuthenticationService: DataBrokerProtectionAuthenticationService {
 
     var wasRedeemCalled = false
     var shouldThrow = false
