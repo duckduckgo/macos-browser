@@ -28,6 +28,7 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
     var fakeBrokerSwitch: NSSwitch!
 
     private let fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()
+    private let reedemUseCase: DataBrokerProtectionRedeemUseCase
 
     private var isSchedulerRunning = false
     private var scheduler: DataBrokerProtectionScheduler?
@@ -42,6 +43,15 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
     lazy var profileQueryViewController: DataBrokerProfileQueryViewController = {
         DataBrokerProfileQueryViewController(dataManager: dataManager)
     }()
+
+    init(reedemUseCase: DataBrokerProtectionRedeemUseCase) {
+        self.reedemUseCase = reedemUseCase
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -169,7 +179,9 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
                                                   contentScopeProperties: prefs,
                                                   dataManager: dataManager,
                                                   notificationCenter: NotificationCenter.default,
-                                                  errorHandler: DataBrokerProtectionErrorHandling())
+                                                  errorHandler: DataBrokerProtectionErrorHandling(),
+                                                  redeemUseCase: reedemUseCase
+        )
     }
 }
 
