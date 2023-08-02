@@ -39,11 +39,7 @@ final class BookmarksBarPromptPopover: NSPopover {
     private func setupContentController() {
         let controller = BookmarksBarPromptViewController.create()
         contentViewController = controller
-
-        let detach = NSSelectorFromString("detach")
-        if responds(to: detach) {
-            perform(detach)
-        }
+        contentViewController?.preferredContentSize = NSSize(width: 356, height: 272)
     }
 
 }
@@ -126,7 +122,7 @@ struct BookmarksBarPromptView: View {
         .padding(.horizontal, 16)
         .padding(.top, 20)
         .padding(.bottom, 16)
-        .frame(width: 356, height: 272)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color("InterfaceBackgroundColor"))
     }
 
