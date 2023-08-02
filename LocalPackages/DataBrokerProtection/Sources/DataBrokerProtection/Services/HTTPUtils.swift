@@ -19,11 +19,8 @@
 import Foundation
 
 struct HTTPUtils {
-    private static let authToken = "" // Use DBP API Dev Access Token on Bitwarden
     private static let fakeBrokerUsername = ""
     private static let fakeBrokerPassword = ""
-
-    static let authorizationHeader = "bearer \(authToken)"
 
     static func fetchFakeBrokerCredentials() -> (username: String, password: String) {
         if fakeBrokerUsername.isEmpty || fakeBrokerPassword.isEmpty {

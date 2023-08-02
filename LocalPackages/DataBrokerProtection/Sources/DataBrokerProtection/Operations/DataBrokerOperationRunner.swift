@@ -28,22 +28,40 @@ protocol WebOperationRunner {
 
 @MainActor
 final class DataBrokerOperationRunner: WebOperationRunner {
-    var privacyConfigManager: PrivacyConfigurationManaging
-    var contentScopeProperties: ContentScopeProperties
+    let privacyConfigManager: PrivacyConfigurationManaging
+    let contentScopeProperties: ContentScopeProperties
+    let emailService: EmailServiceProtocol
+    let captchaService: CaptchaServiceProtocol
 
     internal init(privacyConfigManager: PrivacyConfigurationManaging,
-                  contentScopeProperties: ContentScopeProperties) {
+                  contentScopeProperties: ContentScopeProperties,
+                  emailService: EmailServiceProtocol,
+                  captchaService: CaptchaServiceProtocol) {
         self.privacyConfigManager = privacyConfigManager
         self.contentScopeProperties = contentScopeProperties
+        self.emailService = emailService
+        self.captchaService = captchaService
     }
 
     func scan(_ profileQuery: BrokerProfileQueryData) async throws -> [ExtractedProfile] {
-        let scan = ScanOperation(privacyConfig: privacyConfigManager, prefs: contentScopeProperties, query: profileQuery)
+        let scan = ScanOperation(
+            privacyConfig: privacyConfigManager,
+            prefs: contentScopeProperties,
+            query: profileQuery,
+            emailService: emailService,
+            captchaService: captchaService
+        )
         return try await scan.run(inputValue: ())
     }
 
     func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile) async throws {
-        let optOut = OptOutOperation(privacyConfig: privacyConfigManager, prefs: contentScopeProperties, query: profileQuery)
+        let optOut = OptOutOperation(
+            privacyConfig: privacyConfigManager,
+            prefs: contentScopeProperties,
+            query: profileQuery,
+            emailService: emailService,
+            captchaService: captchaService
+        )
         try await optOut.run(inputValue: extractedProfile)
     }
 
