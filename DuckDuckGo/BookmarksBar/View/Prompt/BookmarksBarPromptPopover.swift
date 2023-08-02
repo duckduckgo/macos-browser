@@ -105,7 +105,7 @@ struct BookmarksBarPromptView: View {
                 Button {
                     model.onNotNow()
                 } label: {
-                    Text("Not Now")
+                    Text("No Thanks")
                         .font(Font.custom("SF Pro Text", size: 13))
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
