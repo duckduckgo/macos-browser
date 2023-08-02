@@ -49,7 +49,7 @@ extension BookmarksBarPromptPopover: NSPopoverDelegate {
 
     func popoverDidClose(_ notification: Notification) {
         if !viewController.rootView.model.userDidDismiss {
-            viewController.rootView.model.delegate?.rejectBookmarksBar()
+            viewController.rootView.model.rejectBookmarksBar()
         }
     }
 
@@ -70,16 +70,6 @@ final class BookmarksBarPromptViewController: NSHostingController<BookmarksBarPr
 }
 
 extension BookmarksBarPromptViewController: BookmarksBarPromptDelegate {
-
-    func rejectBookmarksBar() {
-        AppearancePreferences.shared.showBookmarksBar = false
-        dismiss()
-    }
-
-    func acceptBookmarksBar() {
-        AppearancePreferences.shared.showBookmarksBar = true
-        dismiss()
-    }
 
 }
 
@@ -105,7 +95,7 @@ struct BookmarksBarPromptView: View {
 
             HStack {
                 Button {
-                    model.onNotNow()
+                    model.rejectBookmarksBar()
                 } label: {
                     Text("No Thanks")
                         .font(Font.custom("SF Pro Text", size: 13))
@@ -117,7 +107,7 @@ struct BookmarksBarPromptView: View {
                 .padding(0)
 
                 Button {
-                    model.onShow()
+                    model.acceptBookmarksBar()
                 } label: {
                     Text("Show")
                         .font(Font.custom("SF Pro Text", size: 13))
@@ -145,24 +135,29 @@ final class BookmarksBarPromptViewModel: ObservableObject {
 
     weak var delegate: BookmarksBarPromptDelegate?
 
+    let prefs: AppearancePreferences
     var userDidDismiss = false
 
-    func onNotNow() {
-        userDidDismiss = true
-        delegate?.rejectBookmarksBar()
+    init(prefs: AppearancePreferences = AppearancePreferences.shared) {
+        self.prefs = prefs
     }
 
-    func onShow() {
+    func rejectBookmarksBar() {
         userDidDismiss = true
-        delegate?.acceptBookmarksBar()
+        AppearancePreferences.shared.showBookmarksBar = false
+        delegate?.dismiss()
+    }
+
+    func acceptBookmarksBar() {
+        userDidDismiss = true
+        AppearancePreferences.shared.showBookmarksBar = true
+        delegate?.dismiss()
     }
 
 }
 
 protocol BookmarksBarPromptDelegate: AnyObject {
 
-    func rejectBookmarksBar()
-
-    func acceptBookmarksBar()
+    func dismiss()
 
 }
