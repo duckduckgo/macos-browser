@@ -140,7 +140,7 @@ final class MoreOptionsMenu: NSMenu {
                                                   action: #selector(openDataBrokerProtection),
                                                   keyEquivalent: "")
             .targetting(self)
-            .withImage(NSImage(named: "BurnerWindowPopoverIcon1")) // PLACEHOLDER: Change it once we have the final icon
+            .withImage(NSImage(named: "BurnerWindowIcon2")) // PLACEHOLDER: Change it once we have the final icon
         addItem(dataBrokerProtectionItem)
 #endif // DBP
 
