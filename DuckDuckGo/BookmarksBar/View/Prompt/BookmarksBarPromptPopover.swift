@@ -25,6 +25,7 @@ final class BookmarksBarPromptPopover: NSPopover {
     override init() {
         super.init()
         self.behavior = .semitransient
+        self.delegate = self
         setupContentController()
     }
 
@@ -40,6 +41,16 @@ final class BookmarksBarPromptPopover: NSPopover {
         let controller = BookmarksBarPromptViewController.create()
         contentViewController = controller
         contentViewController?.preferredContentSize = NSSize(width: 356, height: 272)
+    }
+
+}
+
+extension BookmarksBarPromptPopover: NSPopoverDelegate {
+
+    func popoverDidClose(_ notification: Notification) {
+        if !viewController.rootView.model.userDidDismiss {
+            viewController.rootView.model.delegate?.rejectBookmarksBar()
+        }
     }
 
 }
@@ -132,11 +143,15 @@ final class BookmarksBarPromptViewModel: ObservableObject {
 
     weak var delegate: BookmarksBarPromptDelegate?
 
+    var userDidDismiss = false
+
     func onNotNow() {
+        userDidDismiss = true
         delegate?.rejectBookmarksBar()
     }
 
     func onShow() {
+        userDidDismiss = true
         delegate?.acceptBookmarksBar()
     }
 
