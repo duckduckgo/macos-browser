@@ -84,12 +84,12 @@ struct BookmarksBarPromptView: View {
                 .frame(width: 256, height: 96)
                 .padding(.bottom, 16)
 
-            Text("Show Bookmarks Bar for quick access to your bookmarks")
+            Text("Show Bookmarks Bar?")
                 .font(Font.custom("SF Pro Text", size: 15)
                     .weight(.semibold))
                 .padding(.bottom, 16)
 
-            Text("Manage Bookmarks Bar in Settings > Appearance.")
+            Text("Show the Bookmarks Bar for quick access to your new bookmarks.")
                 .font(Font.custom("SF Pro Text", size: 13))
                 .padding(.bottom, 20)
 
@@ -97,7 +97,7 @@ struct BookmarksBarPromptView: View {
                 Button {
                     model.rejectBookmarksBar()
                 } label: {
-                    Text("No Thanks")
+                    Text("Hide")
                         .font(Font.custom("SF Pro Text", size: 13))
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
