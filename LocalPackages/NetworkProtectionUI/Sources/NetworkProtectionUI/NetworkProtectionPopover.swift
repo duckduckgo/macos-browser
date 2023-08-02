@@ -71,14 +71,11 @@ public final class NetworkProtectionPopover: NSPopover {
 
         let view = NetworkProtectionStatusView(model: model).environment(\.dismiss, { [weak self] in
             self?.close()
-        })
+        }).fixedSize()
+            .padding(.vertical, 10)
         controller = NSHostingController(rootView: view)
 
         contentViewController = controller
-
-        // It's important to set the frame at least once here.  If we don't the popover
-        // fails to get the right width and the popover can exceed the screen's limits.
-        controller.view.frame = CGRect(origin: .zero, size: controller.view.intrinsicContentSize)
     }
 
     // MARK: - Forcing Status Refresh
