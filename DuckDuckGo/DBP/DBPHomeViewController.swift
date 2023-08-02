@@ -22,10 +22,22 @@ import AppKit
 
 final class DBPHomeViewController: NSViewController {
     private var debugWindowController: NSWindowController?
+    private let authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData()
+    private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
+    private let redeemUseCase: DataBrokerProtectionRedeemUseCase
 
     lazy var dataBrokerContainerView: DataBrokerContainerViewController = {
         DataBrokerContainerViewController()
     }()
+
+    init() {
+        self.redeemUseCase = RedeemUseCase(authenticationService: authenticationService, authenticationRepository: authenticationRepository)
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func loadView() {
         view = NSView()
@@ -34,13 +46,25 @@ final class DBPHomeViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        if redeemUseCase.shouldAskForInviteCode() {
+            // Show dialog asking for invite code
+            print("We should ask for the invite code.")
+        } else {
+            attachDataBrokerContainerView()
+        }
+    }
+
+    private func attachDataBrokerContainerView() {
         addChild(dataBrokerContainerView)
         view.addSubview(dataBrokerContainerView.view)
     }
 
     override func viewDidAppear() {
         super.viewDidAppear()
-        openDebugUI()
+
+        if !redeemUseCase.shouldAskForInviteCode() {
+            openDebugUI()
+        }
     }
 
     override func viewDidLayout() {
@@ -58,7 +82,7 @@ final class DBPHomeViewController: NSViewController {
             debugWindow.title = "Debug Window"
             debugWindow.center()
             debugWindow.hidesOnDeactivate = true
-            let debugViewController = DataBrokerProtectionDebugViewController()
+            let debugViewController = DataBrokerProtectionDebugViewController(reedemUseCase: redeemUseCase)
             debugWindow.contentViewController = debugViewController
 
             debugWindowController = NSWindowController(window: debugWindow)

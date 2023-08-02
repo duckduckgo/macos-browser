@@ -38,7 +38,7 @@ final class EmailServiceTests: XCTestCase {
 
     func testWhenSessionThrows_thenTheCorrectErrorIsThrown() async {
         MockURLProtocol.requestHandlerQueue.append({ _ in throw MockError.someError })
-        let sut = EmailService(urlSession: mockURLSession)
+        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             _ = try await sut.getEmail()
@@ -59,7 +59,7 @@ final class EmailServiceTests: XCTestCase {
         let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
-        let sut = EmailService(urlSession: mockURLSession)
+        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             _ = try await sut.getEmail()
@@ -78,7 +78,7 @@ final class EmailServiceTests: XCTestCase {
         let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
-        let sut = EmailService(urlSession: mockURLSession)
+        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             let email = try await sut.getEmail()
@@ -119,7 +119,7 @@ final class EmailServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
         MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
 
-        let sut = EmailService(urlSession: mockURLSession)
+        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             _ = try await sut.getConfirmationLink(
@@ -147,7 +147,7 @@ final class EmailServiceTests: XCTestCase {
         MockURLProtocol.requestHandlerQueue.append(notReadyResponse)
         MockURLProtocol.requestHandlerQueue.append(successResponse)
 
-        let sut = EmailService(urlSession: mockURLSession)
+        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             let url = try await sut.getConfirmationLink(
@@ -166,7 +166,7 @@ final class EmailServiceTests: XCTestCase {
         let responseData = try? JSONSerialization.data(withJSONObject: responseDictionary, options: .prettyPrinted)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
-        let sut = EmailService(urlSession: mockURLSession)
+        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             _ = try await sut.getConfirmationLink(
@@ -188,7 +188,7 @@ final class EmailServiceTests: XCTestCase {
         let responseData = try? JSONEncoder().encode(invalidLink)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
-        let sut = EmailService(urlSession: mockURLSession)
+        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             _ = try await sut.getConfirmationLink(
@@ -210,7 +210,7 @@ final class EmailServiceTests: XCTestCase {
         let responseData = try? JSONEncoder().encode(validURL)
         MockURLProtocol.requestHandlerQueue.append({ _ in (HTTPURLResponse.ok, responseData) })
 
-        let sut = EmailService(urlSession: mockURLSession)
+        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             let url = try await sut.getConfirmationLink(
