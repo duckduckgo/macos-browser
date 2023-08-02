@@ -44,6 +44,13 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
     ///
     @IBAction
     func simulateControllerFailure(_ menuItem: NSMenuItem) {
+        simulationOptions.setEnabled(menuItem.state == .off, option: .controllerFailure)
+    }
+
+    /// Simulates a tunnel failure the next time Network Protection is started.
+    ///
+    @IBAction
+    func simulateTunnelFailure(_ menuItem: NSMenuItem) {
         Task {
             do {
                 try await NetworkProtectionTunnelController().toggleShouldSimulateTunnelFailure()
@@ -51,13 +58,6 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
                 await NSAlert(error: error).runModal()
             }
         }
-    }
-
-    /// Simulates a tunnel failure the next time Network Protection is started.
-    ///
-    @IBAction
-    func simulateTunnelFailure(_ menuItem: NSMenuItem) {
-        simulationOptions.setEnabled(menuItem.state == .off, option: .tunnelFailure)
     }
 
     override func update() {

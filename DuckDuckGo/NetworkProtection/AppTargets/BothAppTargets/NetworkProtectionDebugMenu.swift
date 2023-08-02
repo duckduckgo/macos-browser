@@ -306,6 +306,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
             switch item {
             case .section(let title):
                 menuItem = NSMenuItem(title: title, action: nil, target: nil)
+                menuItem.isEnabled = false
 
             case .exclusion(range: let range, description: let description, default: _):
                 menuItem = NSMenuItem(title: "\(range)\(description != nil ? " (\(description!))" : "")",
@@ -405,6 +406,8 @@ extension NetworkProtectionDebugMenu: NSMenuDelegate {
             for item in menu.items {
                 guard let route = item.representedObject as? String else { continue }
                 item.state = controller.isExcludedRouteEnabled(route) ? .on : .off
+                // TO BE fixed: see NetworkProtectionTunnelController.excludedRoutes()
+                item.isEnabled = !(controller.shouldEnforceRoutes && route == "10.0.0.0/8")
             }
         }
     }

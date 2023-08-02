@@ -826,49 +826,27 @@ CQ
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem isSeparatorItem="YES" id="FSc-gX-vGh"/>
-                                                    <menuItem title="Enable On-Demand (required for Kill Switch)" id="u0h-YJ-J4H" userLabel="Connect On Demand">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="toggleConnectOnDemandAction:" target="Rah-lS-gno" id="beL-Aq-2Xu"/>
-                                                        </connections>
-                                                    </menuItem>
                                                     <menuItem title="Connect on Log In" id="fSA-hH-Vum" userLabel="Connect On Log In">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="toggleConnectOnLogInAction:" target="Rah-lS-gno" id="ZCH-Qd-oYZ"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem isSeparatorItem="YES" id="kCo-m1-HGV"/>
-                                                    <menuItem title="Kill Switch:" enabled="NO" id="Gdx-Ng-vit">
+                                                    <menuItem title="Enable On-Demand (required for Kill Switch)" id="u0h-YJ-J4H" userLabel="Connect On Demand">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="toggleConnectOnDemandAction:" target="Rah-lS-gno" id="beL-Aq-2Xu"/>
+                                                        </connections>
                                                     </menuItem>
-                                                    <menuItem title="enforceRoutes (Kill Switch preferred)" id="9HJ-tK-AOs" userLabel="Enforce Routes">
+                                                    <menuItem title="Kill Switch (enforceRoutes)" id="9HJ-tK-AOs" userLabel="Enforce Routes">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="toggleEnforceRoutesAction:" target="Rah-lS-gno" id="B4i-GF-9nw"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="includeAllNetworks (Kill Switch alternative)" id="mSZ-AV-Dee" userLabel="Include All Networks">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="toggleIncludeAllNetworks:" target="Rah-lS-gno" id="c1r-Fw-0ca"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="enable Connection Tester" id="L06-y6-zv3">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="toggleConnectionTesterEnabled:" target="Rah-lS-gno" id="iei-t7-7pG"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="excludeLocalNetworks flag" id="Zak-JJ-7hc" userLabel="Exclude Local Networks">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="toggleShouldExcludeLocalRoutes:" target="Rah-lS-gno" id="Wdd-D6-yWy"/>
-                                                        </connections>
-                                                    </menuItem>
                                                     <menuItem title="Excluded Routes" id="jr6-YD-fe7">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" id="j7y-fb-xa6">
+                                                        <menu key="submenu" autoenablesItems="NO" id="j7y-fb-xa6">
                                                             <items>
                                                                 <menuItem title="Item 1" id="RmV-if-bZK">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -942,7 +920,7 @@ CQ
                                                                         <action selector="simulateControllerFailure:" target="iLs-sj-2Gd" id="qO6-8J-ER0"/>
                                                                     </connections>
                                                                 </menuItem>
-                                                                <menuItem title="Enable NetP &gt; Tunnel Failure" id="kVa-n8-UNx" userLabel="Tunnel Failure">
+                                                                <menuItem title="Tunnel Failure" id="kVa-n8-UNx" userLabel="Tunnel Failure">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
                                                                         <action selector="simulateTunnelFailure:" target="iLs-sj-2Gd" id="tZL-Vl-6mu"/>
@@ -953,6 +931,32 @@ CQ
                                                                 <outlet property="simulateControllerFailureMenuItem" destination="xyA-ob-gEy" id="1VV-xV-wsB"/>
                                                                 <outlet property="simulateTunnelFailureMenuItem" destination="kVa-n8-UNx" id="3Ie-Ed-VtG"/>
                                                             </connections>
+                                                        </menu>
+                                                    </menuItem>
+                                                    <menuItem isSeparatorItem="YES" id="7LI-vT-hd9"/>
+                                                    <menuItem title="Kill Switch (alternative approach)" id="Gdx-Ng-vit">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Kill Switch (alternative approach)" id="wo0-bZ-WF3">
+                                                            <items>
+                                                                <menuItem title="includeAllNetworks" id="mSZ-AV-Dee" userLabel="Include All Networks">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="toggleIncludeAllNetworks:" target="Rah-lS-gno" id="c1r-Fw-0ca"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="excludeLocalNetworks" id="Zak-JJ-7hc" userLabel="Exclude Local Networks">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="toggleShouldExcludeLocalRoutes:" target="Rah-lS-gno" id="Wdd-D6-yWy"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="enable Connection Tester" id="L06-y6-zv3">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="toggleConnectionTesterEnabled:" target="Rah-lS-gno" id="iei-t7-7pG"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                            </items>
                                                         </menu>
                                                     </menuItem>
                                                 </items>

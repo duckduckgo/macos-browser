@@ -490,7 +490,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     static let exclusionList: [ExclusionListItem] = [
         .section("IPv4 Local Routes"),
 
-        .exclusion(range: "10.0.0.0/8"     /* 255.0.0.0 */, default: true),
+        .exclusion(range: "10.0.0.0/8"     /* 255.0.0.0 */, description: "disabled for enforceRoutes", default: true),
         .exclusion(range: "169.254.0.0/16" /* 255.255.0.0 */, description: "Link-local", default: true),
         .exclusion(range: "172.16.0.0/12"  /* 255.240.0.0 */, default: true),
         .exclusion(range: "192.168.0.0/16" /* 255.255.0.0 */, default: true),
@@ -516,6 +516,12 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             guard case .exclusion(range: let range, description: _, default: let defaultValue) = item,
                   excludedRoutesPreferences[range.stringRepresentation, default: defaultValue] == true
             else { return nil }
+            // TO BE fixed:
+            // when 10.11.12.1 DNS is used 10.0.0.0/8 should be included (not excluded)
+            // but marking 10.11.12.1 as an Included Route breaks tunnel (probably these routes are conflicting)
+            if shouldEnforceRoutes && range == "10.0.0.0/8" {
+                return nil
+            }
 
             return range
         }
