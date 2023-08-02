@@ -306,7 +306,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #if NETWORK_PROTECTION
 
     private func startupNetworkProtection() {
-        guard #available(macOS 11.0, *) else { return }
+        guard #available(macOS 11.4, *) else { return }
 
         let loginItemsManager = NetworkProtectionLoginItemsManager()
         let networkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
@@ -321,7 +321,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         refreshNetworkProtectionServers()
     }
 
-    @available(macOS 11.0, *)
+    @available(macOS 11.4, *)
     private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: NetworkProtectionLoginItemsManager) {
         let currentVersion = AppVersion.shared.versionNumber
         let versionStore = NetworkProtectionLastVersionRunStore()
@@ -344,7 +344,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         }
     }
 
-    @available(macOS 11.0, *)
+    @available(macOS 11.4, *)
     private func restartNetworkProtectionTunnelAndMenu(using loginItemsManager: NetworkProtectionLoginItemsManager) {
         loginItemsManager.restartLoginItems()
 
@@ -360,7 +360,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     /// Fetches a new list of Network Protection servers, and updates the existing set.
-    @available(macOS 11.0, *)
+    @available(macOS 11.4, *)
     private func refreshNetworkProtectionServers() {
         Task {
             let serverCount: Int

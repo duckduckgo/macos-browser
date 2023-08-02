@@ -39,7 +39,7 @@ final class AppMain {
 
     static func main() {
 #if NETWORK_PROTECTION
-        if #available(macOS 11, *) {
+        if #available(macOS 11.4, *) {
             switch (CommandLine.arguments.first! as NSString).lastPathComponent {
             case "startVPN":
                 swizzleMainBundle()

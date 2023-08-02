@@ -29,7 +29,7 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
 
 /// Implements the logic for Network Protection's simulate failures menu.
 ///
-@available(macOS 11.0, *)
+@available(macOS 11.4, *)
 @objc
 @MainActor
 final class NetworkProtectionSimulateFailureMenu: NSMenu {

@@ -30,7 +30,7 @@ import Networking
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
-@available(macOS 11.0, *)
+@available(macOS 11.4, *)
 final class NetworkProtectionTunnelController: NetworkProtection.TunnelController {
 
     // MARK: - Debug Helpers
@@ -394,7 +394,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     @MainActor
-    @available(macOS 11, *)
     func enableEnforceRoutes() async throws {
         isOnDemandEnabled = true
         shouldEnforceRoutes = true
@@ -404,7 +403,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     @MainActor
-    @available(macOS 11, *)
     func disableEnforceRoutes() async throws {
         shouldEnforceRoutes = false
 
@@ -415,7 +413,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     @MainActor
-    @available(macOS 11, *)
     func enableIncludeAllNetworks() async throws {
         isOnDemandEnabled = true
         shouldIncludeAllNetworks = true
@@ -425,7 +422,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     @MainActor
-    @available(macOS 11, *)
     func disableIncludeAllNetworks() async throws {
         shouldIncludeAllNetworks = false
 
@@ -455,7 +451,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     @MainActor
-    @available(macOS 11, *)
     func toggleShouldEnforceRoutes() {
         shouldEnforceRoutes.toggle()
 
@@ -472,7 +467,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     @MainActor
-    @available(macOS 11, *)
     func toggleShouldIncludeAllNetworks() {
         shouldIncludeAllNetworks.toggle()
 
@@ -560,6 +554,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
               case .exclusion(range: _, description: _, default: let defaultValue) = exclusionListItem else {
 
             assertionFailure("Invalid route \(route)")
+            return false
+        }
+        // TO BE fixed: see excludedRoutes()
+        if shouldEnforceRoutes && route == "10.0.0.0/8" {
             return false
         }
         return excludedRoutesPreferences[route, default: defaultValue]

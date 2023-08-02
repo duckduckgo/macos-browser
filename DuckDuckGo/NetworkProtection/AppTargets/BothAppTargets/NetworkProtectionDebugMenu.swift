@@ -41,13 +41,13 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
 /// Controller for the Network Protection debug menu.
 ///
-@available(macOS 11.0, *)
+@available(macOS 11.4, *)
 @objc
 @MainActor
 final class NetworkProtectionDebugMenu: NSMenu {
 
     override func awakeFromNib() {
-        if #unavailable(macOS 11.0) {
+        if #unavailable(macOS 11.4) {
             mainMenuItem?.removeFromParent()
         }
     }
@@ -396,7 +396,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
 }
-@available(macOS 11.0, *)
+@available(macOS 11.4, *)
 extension NetworkProtectionDebugMenu: NSMenuDelegate {
 
     func menuNeedsUpdate(_ menu: NSMenu) {
