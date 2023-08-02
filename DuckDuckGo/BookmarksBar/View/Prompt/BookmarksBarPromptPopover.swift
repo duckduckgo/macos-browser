@@ -90,6 +90,8 @@ struct BookmarksBarPromptView: View {
     var body: some View {
         VStack(spacing: 0) {
             Image("BookmarksBarIllustration")
+                .resizable()
+                .frame(width: 256, height: 96)
                 .padding(.bottom, 16)
 
             Text("Show Bookmarks Bar for quick access to your bookmarks")
