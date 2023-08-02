@@ -22,10 +22,15 @@ import BrowserServicesKit
 struct DataBrokerOperationRunnerProvider: OperationRunnerProvider {
     var privacyConfigManager: PrivacyConfigurationManaging
     var contentScopeProperties: ContentScopeProperties
+    var emailService: EmailServiceProtocol
+    var captchaService: CaptchaServiceProtocol
 
     @MainActor
     func getOperationRunner() -> WebOperationRunner {
         DataBrokerOperationRunner(privacyConfigManager: privacyConfigManager,
-                            contentScopeProperties: contentScopeProperties)
+                                  contentScopeProperties: contentScopeProperties,
+                                  emailService: emailService,
+                                  captchaService: captchaService
+        )
     }
 }
