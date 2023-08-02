@@ -28,7 +28,7 @@ final class TabViewModel {
         static let preferences = NSImage(named: "Preferences")!
         static let bookmarks = NSImage(named: "Bookmarks")!
 #if DBP
-        static let dataBrokerProtection = NSImage(named: "BurnerWindowPopoverIcon1")! // PLACEHOLDER: Change it once we have the final icon
+        static let dataBrokerProtection = NSImage(named: "BurnerWindowIcon2")! // PLACEHOLDER: Change it once we have the final icon
 #endif
     }
 
