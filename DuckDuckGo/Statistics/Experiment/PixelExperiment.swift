@@ -71,7 +71,7 @@ final internal class PixelExperimentLogic {
         }
 
         // For now, just use equal distribution of all cohorts.
-        let cohort = PixelExperiment.showBookmarksBarPrompt // PixelExperiment.allCases.randomElement()!
+        let cohort = PixelExperiment.allCases.randomElement()!
         allocatedCohort = cohort.rawValue
         enrollmentDate = Date()
         fireEnrollmentPixel()
