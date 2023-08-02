@@ -26,7 +26,6 @@ public class DataBrokerProtectionDataManager {
     public weak var delegate: DataBrokerProtectionDataManagerDelegate?
 
     internal let database: DataBrokerProtectionDataBase
-    private let userDataKey = "DataBrokerProtectionProfile"
 
     public init(fakeBrokerFlag: FakeBrokerFlag) {
         self.database = DataBrokerProtectionDataBase(fakeBrokerFlag: fakeBrokerFlag)
@@ -34,34 +33,42 @@ public class DataBrokerProtectionDataManager {
     }
 
     public func saveProfile(_ profile: DataBrokerProtectionProfile) {
-        do {
-            let encoder = JSONEncoder()
-            let data = try encoder.encode(profile)
-            UserDefaults.standard.set(data, forKey: userDataKey)
+        // Setup the fakes data
+        self.database.testProfileQuery = profile.profileQueries.first
+        self.database.setupFakeData()
 
-            // Test
-            self.database.testProfileQuery = profile.profileQueries.first
-            self.database.setupFakeData()
+        // Save profile in the secure database
+        do {
+            let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            if let profile = try vault.fetchProfile(with: 1) { // // We use 1 because (for testing purposes) we are only working with the first profile
+                _ = try vault.saveProfile(profile: profile)
+                print("Profile updated")
+            } else {
+                let id = try vault.saveProfile(profile: profile.mapToDB())
+                print("Profile saved with ID: \(id)")
+            }
+
         } catch {
-            fatalError("Should never happen")
+            print("ERROR: Secure storage \(error)")
         }
     }
 
     public func fetchProfile() -> DataBrokerProtectionProfile? {
-        if let data = UserDefaults.standard.data(forKey: userDataKey) {
-            do {
-                let decoder = JSONDecoder()
-                let profile = try decoder.decode(DataBrokerProtectionProfile.self, from: data)
-
-                // Test
+        do {
+            let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            if let dbProfile = try vault.fetchProfile(with: 1) { // We return 1 because (for testing purposes) we are only working with the first profile
+                let profile = dbProfile.toProfile()
                 self.database.testProfileQuery = profile.profileQueries.first
                 self.database.setupFakeData()
 
                 return profile
-            } catch {
-                print("Error decoding profile: \(error)")
+            } else {
+                print("Profile does not exist in the database")
             }
+        } catch {
+            print("Error fetching profile from the database: \(error)")
         }
+
         return nil
     }
 
@@ -78,15 +85,15 @@ public class DataBrokerProtectionDataManager {
             }
 
             return DataBrokerInfoData(userFirstName: brokerProfileQuery.profileQuery.firstName,
-                               userLastName: brokerProfileQuery.profileQuery.lastName,
-                               dataBrokerName: brokerProfileQuery.dataBroker.name,
-                               scanData: scanData,
-                               optOutsData: optOutsData)
+                                      userLastName: brokerProfileQuery.profileQuery.lastName,
+                                      dataBrokerName: brokerProfileQuery.dataBroker.name,
+                                      scanData: scanData,
+                                      optOutsData: optOutsData)
         }
         return result
     }
 
-     @objc private func setupFakeData() {
+    @objc private func setupFakeData() {
         delegate?.dataBrokerProtectionDataManagerDidUpdateData()
     }
 
