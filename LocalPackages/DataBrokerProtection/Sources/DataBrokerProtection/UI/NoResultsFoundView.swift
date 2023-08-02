@@ -27,28 +27,13 @@ struct NoResultsFoundView: View {
 
     var body: some View {
         VStack {
-            HeaderView()
+            HeaderView(title: "No Results Found!",
+                       subtitle: "We were unable to find any matches with the information you provided.",
+                       iconName: "clock.fill",
+                       iconColor: .yellow)
                 .padding(.bottom, 30)
 
             InfoView(rowItems: items)
-        }
-    }
-}
-
-@available(macOS 11.0, *)
-private struct HeaderView: View {
-    var body: some View {
-        VStack (spacing: 10) {
-            HStack {
-                Image(systemName: "clock.fill")
-                    .foregroundColor(.yellow)
-                Text("No Results Found!")
-                    .font(.title)
-                    .bold()
-            }
-            Text("We were unable to find any matches with the information you provided")
-                .font(.body)
-                .foregroundColor(.secondary)
         }
     }
 }
