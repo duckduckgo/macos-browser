@@ -1,5 +1,5 @@
 //
-//  Main.swift
+//  BookmarksBarAppearance.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,8 +18,9 @@
 
 import Foundation
 
-@main
-final class AppMain {
-    static func main() throws {
-    }
+enum BookmarksBarAppearance: String, CaseIterable {
+
+    case alwaysOn
+    case newTabOnly
+
 }

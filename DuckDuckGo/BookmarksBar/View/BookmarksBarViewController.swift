@@ -263,17 +263,7 @@ extension BookmarksBarViewController: NSMenuDelegate {
 
     public func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
-
-        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
-            menu.addItem(withTitle: UserText.hideBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
-        } else {
-            menu.addItem(withTitle: UserText.showBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
-        }
-    }
-
-    @objc
-    private func toggleBookmarksBar(_ sender: NSMenuItem) {
-        PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
+        BookmarksBarMenuFactory.addToMenu(menu)
     }
 
 }
