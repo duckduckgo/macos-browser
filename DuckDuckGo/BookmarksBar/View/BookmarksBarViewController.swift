@@ -95,7 +95,7 @@ final class BookmarksBarViewController: NSViewController {
     }
 
     func showBookmarksBarPrompt() {
-        BookmarksBarPromptPopover().showBelow(promptAnchor)
+        BookmarksBarPromptPopover().show(relativeTo: promptAnchor.bounds, of: promptAnchor, preferredEdge: .minY)
         self.bookmarksBarPromptShown = true
     }
 
