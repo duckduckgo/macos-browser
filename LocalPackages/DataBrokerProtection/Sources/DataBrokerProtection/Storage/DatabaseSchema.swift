@@ -28,15 +28,6 @@ struct ProfileDB {
     let city: Data
     let state: Data
     let age: Data
-
-    init(id: Int64?, firstName: Data, lastName: Data, city: Data, state: Data, age: Data) {
-        self.id = id
-        self.firstName = firstName
-        self.lastName = lastName
-        self.city = city
-        self.state = state
-        self.age = age
-    }
 }
 
 extension ProfileDB: PersistableRecord, FetchableRecord {
@@ -68,7 +59,7 @@ extension ProfileDB: PersistableRecord, FetchableRecord {
         container[Columns.state] = state
         container[Columns.age] = age
     }
-    
+
     func encrypt(_ mechanism: (Data) throws -> Data) throws -> ProfileDB {
         .init(
             id: id,

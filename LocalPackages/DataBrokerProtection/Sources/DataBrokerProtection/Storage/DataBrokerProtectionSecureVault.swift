@@ -22,6 +22,7 @@ import SecureStorage
 
 typealias DataBrokerProtectionVaultFactory = SecureVaultFactory<DefaultDataBrokerProtectionSecureVault<DefaultDataBrokerProtectionDatabaseProvider>>
 
+// swiftlint:disable identifier_name
 let DataBrokerProtectionSecureVaultFactory: DataBrokerProtectionVaultFactory = SecureVaultFactory<DefaultDataBrokerProtectionSecureVault>(
     makeCryptoProvider: {
         return DataBrokerProtectionCryptoProvider()
@@ -31,6 +32,7 @@ let DataBrokerProtectionSecureVaultFactory: DataBrokerProtectionVaultFactory = S
         return try DefaultDataBrokerProtectionDatabaseProvider(key: key)
     }
 )
+// swiftlint:enable identifier_name
 
 protocol DataBrokerProtectionSecureVault: SecureVault {
     func saveProfile(profile: ProfileDB) throws -> Int64
