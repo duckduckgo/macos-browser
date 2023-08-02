@@ -94,7 +94,7 @@ final class EmailServiceTests: XCTestCase {
         let unknownResponse: RequestHandler = { _ in (HTTPURLResponse.ok, responseData) }
         MockURLProtocol.requestHandlerQueue.append(unknownResponse)
 
-        let sut = EmailService(urlSession: mockURLSession)
+        let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
             _ = try await sut.getConfirmationLink(
