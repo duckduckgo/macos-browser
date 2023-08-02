@@ -245,3 +245,77 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
         wasSubmitCaptchaToBeResolvedCalled = false
     }
 }
+
+final class MockRedeemUseCase: RedeemUseCaseProtocol {
+
+    func shouldAskForInviteCode() -> Bool {
+        false
+    }
+
+    func redeem(inviteCode: String) async throws {
+
+    }
+
+    func getAuthHeader() async throws -> String {
+        return "auth header"
+    }
+}
+
+final class MockAuthenticationService: AuthenticationServiceProtocol {
+
+    var wasRedeemCalled = false
+    var shouldThrow = false
+
+    func redeem(inviteCode: String) async throws -> String {
+        wasRedeemCalled = true
+        if shouldThrow {
+            throw AuthenticationError.issueRedeemingInviteCode(error: "mock")
+        }
+
+        return "accessToken"
+    }
+
+    func reset() {
+        wasRedeemCalled = false
+        shouldThrow = false
+    }
+}
+
+final class MockAuthenticationRepository: AuthenticationRepository {
+
+    var shouldSendNilInviteCode = false
+    var shouldSendNilAccessToken = false
+    var wasInviteCodeSaveCalled = false
+    var wasAccessTokenSaveCalled = false
+
+    func getInviteCode() -> String? {
+        if shouldSendNilInviteCode {
+            return nil
+        }
+
+        return "inviteCode"
+    }
+
+    func getAccessToken() -> String? {
+        if shouldSendNilAccessToken {
+            return nil
+        }
+
+        return "accessToken"
+    }
+
+    func save(inviteCode: String) {
+        wasInviteCodeSaveCalled = true
+    }
+
+    func save(accessToken: String) {
+        wasAccessTokenSaveCalled = true
+    }
+
+    func reset() {
+        shouldSendNilInviteCode = false
+        shouldSendNilAccessToken = false
+        wasInviteCodeSaveCalled = false
+        wasAccessTokenSaveCalled = false
+    }
+}
