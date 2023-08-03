@@ -193,6 +193,7 @@ public struct NetworkProtectionStatusView: View {
                 HStack(spacing: 0) {
                     Text(message)
                         .makeSelectable()
+                        .multilineText()
                         .foregroundColor(defaultTextColor)
 
                     Spacer()
@@ -215,12 +216,14 @@ public struct NetworkProtectionStatusView: View {
             }
 
             Text(model.featureStatusDescription)
+                .multilineText()
                 .applyTitleAttributes(colorScheme: colorScheme)
                 .padding([.top], 8)
 
             Text(UserText.networkProtectionStatusViewFeatureDesc)
-                .applyDescriptionAttributes(colorScheme: colorScheme)
+                .multilineText()
                 .multilineTextAlignment(.center)
+                .applyDescriptionAttributes(colorScheme: colorScheme)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(EdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 16))
         }
