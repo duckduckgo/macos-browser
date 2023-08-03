@@ -323,6 +323,7 @@ extension URL {
     }
 
     static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email-protection")!
+    static var duckDuckGoEmailLogin = URL(string: "https://duckduckgo.com/email")!
 
     static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 
