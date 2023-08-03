@@ -216,7 +216,6 @@ public struct NetworkProtectionStatusView: View {
             }
 
             Text(model.featureStatusDescription)
-                .multilineText()
                 .applyTitleAttributes(colorScheme: colorScheme)
                 .padding([.top], 8)
 
