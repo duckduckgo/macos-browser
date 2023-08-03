@@ -165,7 +165,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         onDeleteRequested(credentials)
     }
 
-    func edit() {        
+    func edit() {
         isEditing = true
     }
 
