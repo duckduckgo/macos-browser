@@ -144,13 +144,13 @@ final class BookmarksBarPromptViewModel: ObservableObject {
 
     func rejectBookmarksBar() {
         userDidDismiss = true
-        AppearancePreferences.shared.showBookmarksBar = false
+        prefs.showBookmarksBar = false
         delegate?.dismiss()
     }
 
     func acceptBookmarksBar() {
         userDidDismiss = true
-        AppearancePreferences.shared.showBookmarksBar = true
+        prefs.showBookmarksBar = true
         delegate?.dismiss()
     }
 
