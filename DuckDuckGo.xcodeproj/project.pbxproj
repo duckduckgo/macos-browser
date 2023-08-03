@@ -1981,7 +1981,6 @@
 		EAFAD6CA2728BD1200F9DF00 /* clickToLoad.js in Resources */ = {isa = PBXBuildFile; fileRef = EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */; };
 		EE339228291BDEFD009F62C1 /* JSAlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE339227291BDEFD009F62C1 /* JSAlertController.swift */; };
 		EE7295E32A545B9A008C0991 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = EE7295E22A545B9A008C0991 /* NetworkProtection */; };
-		EE7295E52A545BAA008C0991 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = EE7295E42A545BAA008C0991 /* NetworkProtection */; };
 		EE7295E72A545BBB008C0991 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = EE7295E62A545BBB008C0991 /* NetworkProtection */; };
 		EE7295E92A545BC4008C0991 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = EE7295E82A545BC4008C0991 /* NetworkProtection */; };
 		EE7295EB2A545BFC008C0991 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = EE7295EA2A545BFC008C0991 /* NetworkProtection */; };
@@ -3148,7 +3147,6 @@
 			files = (
 				B6F7128229F6820A00594A45 /* QuickLookUI.framework in Frameworks */,
 				984FD3BF299ACF35007334DD /* Bookmarks in Frameworks */,
-				EE7295E52A545BAA008C0991 /* NetworkProtection in Frameworks */,
 				37A5E2F0298AA1B20047046B /* Persistence in Frameworks */,
 				378F44E629B4BDEE00899924 /* SwiftUIExtensions in Frameworks */,
 				3706FCA7293F65D500E42796 /* BrowserServicesKit in Frameworks */,
@@ -6510,7 +6508,6 @@
 				378F44E529B4BDEE00899924 /* SwiftUIExtensions */,
 				B6EC37FE29B8D915001ACE79 /* Configuration */,
 				37DF000629F9C061002B7D3E /* SyncDataProviders */,
-				EE7295E42A545BAA008C0991 /* NetworkProtection */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -6761,6 +6758,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA585DA4248FD31500E9A3E2 /* Build configuration list for PBXNativeTarget "DuckDuckGo Privacy Browser" */;
 			buildPhases = (
+				B6F2C8722A7A4C7D000498CF /* Make /Applications symlink, remove app on Clean build */,
 				CBCCF59E299667B700C02DFE /* Assert Xcode version */,
 				3705272528992C8A000C06A2 /* Check Embedded Config URLs */,
 				AA585D7A248FD31100E9A3E2 /* Sources */,
@@ -7363,6 +7361,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "FRAMEWORKS_DIR=\"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\nDYLIB_TARGET_PATH=\"${FRAMEWORKS_DIR}/libswift_Concurrency.dylib\"\n\nif [ ! -e \"${DYLIB_TARGET_PATH}\" ]; then\n\n    DYLIB_PATH=$(find \"${TOOLCHAIN_DIR}/usr/lib\" -path \"*/${HOST_PLATFORM}/libswift_Concurrency.dylib\")\n    echo \"copy ${DYLIB_PATH} to ${DYLIB_TARGET_PATH}\"\n\n    mkdir -p \"${FRAMEWORKS_DIR}\"\n    cp \"${DYLIB_PATH}\" \"${DYLIB_TARGET_PATH}\" || exit 1\n\nelse\n    echo \"${DYLIB_TARGET_PATH} exists\"\nfi\n";
+		};
+		B6F2C8722A7A4C7D000498CF /* Make /Applications symlink, remove app on Clean build */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Make /Applications symlink, remove app on Clean build";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# if Xcode created real Applications directory inside BUILT_PRODUCTS_DIR \nif [[ ! -L ${BUILT_PRODUCTS_DIR}/Applications ]]; then\n    # we only get here on clean build, remove an existing app in /Applications/DEBUG on clean build\n    echo \"rm -rf /${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n    rm -rf \"/${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n\n    # create /Applications/DEBUG dir\n    echo \"mkdir -p /${INSTALL_PATH}\"\n    mkdir -p \"/${INSTALL_PATH}\"\n\n    # move the app bundle to /Applications/DEBUG\n    echo \"mv ${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app /${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n    mv \"${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app\" \"/${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n\n    # rm ${BUILT_PRODUCTS_DIR}/Applications directory created by Xcode\n    echo \"rm -rf ${BUILT_PRODUCTS_DIR}/Applications\" \n    rm -rf \"${BUILT_PRODUCTS_DIR}/Applications\"\n    # create ${BUILT_PRODUCTS_DIR}/Applications symlink to /Applications\n    echo \"ln -s /Applications ${BUILT_PRODUCTS_DIR}/Applications\"\n    ln -s /Applications \"${BUILT_PRODUCTS_DIR}/Applications\"\nfi\n";
 		};
 		CBCCF59E299667B700C02DFE /* Assert Xcode version */ = {
 			isa = PBXShellScriptBuildPhase;
