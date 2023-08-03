@@ -30,7 +30,7 @@ final class DBPHomeViewController: NSViewController {
     private let authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData()
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
-    
+
     private var presentedWindowController: NSWindowController?
 
     lazy var dataBrokerContainerView: DataBrokerContainerViewController = {

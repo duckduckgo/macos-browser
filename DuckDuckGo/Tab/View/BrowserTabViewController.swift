@@ -115,7 +115,7 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onCloseDuckDuckGoEmailProtection),
                                                name: .emailDidCloseEmailProtection,
                                                object: nil)
-        
+
 #if DBP
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onCloseDataBrokerProtection),

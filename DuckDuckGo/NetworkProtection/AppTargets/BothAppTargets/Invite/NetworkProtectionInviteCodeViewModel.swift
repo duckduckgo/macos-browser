@@ -152,25 +152,25 @@ protocol NetworkProtectionInviteSuccessViewModelDelegate: AnyObject {
 }
 
 final class NetworkProtectionInviteSuccessViewModel: InviteCodeSuccessViewModel {
-    
+
     weak var delegate: NetworkProtectionInviteSuccessViewModelDelegate?
-    
+
     var titleText: String {
         UserText.networkProtectionInviteSuccessTitle
     }
-    
+
     var messageText: String {
         UserText.networkProtectionInviteSuccessMessage
     }
-    
+
     var confirmButtonText: String {
         UserText.inviteDialogGetStartedButton
     }
-    
+
     func onConfirm() {
         delegate?.networkProtectionInviteSuccessViewModelDidConfirm(self)
     }
-    
+
 }
 
 #endif
