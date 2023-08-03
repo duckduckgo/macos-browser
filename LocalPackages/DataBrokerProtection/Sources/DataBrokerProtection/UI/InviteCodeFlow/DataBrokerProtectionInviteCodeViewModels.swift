@@ -26,7 +26,7 @@ protocol DataBrokerProtectionInviteCodeViewModelDelegate: AnyObject {
 
 final class DataBrokerProtectionInviteCodeViewModel: InviteCodeViewModel {
 
-    private let redeemUseCase: RedeemUseCaseProtocol
+    private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private weak var delegate: DataBrokerProtectionInviteCodeViewModelDelegate?
 
     var titleText: String {
@@ -63,7 +63,7 @@ final class DataBrokerProtectionInviteCodeViewModel: InviteCodeViewModel {
 
     init(delegate: DataBrokerProtectionInviteCodeViewModelDelegate,
          authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData(),
-         authenticationService: AuthenticationServiceProtocol = AuthenticationService()) {
+         authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()) {
         self.delegate = delegate
         self.redeemUseCase = RedeemUseCase(authenticationService: authenticationService, authenticationRepository: authenticationRepository)
     }
