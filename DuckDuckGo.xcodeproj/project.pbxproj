@@ -10414,6 +10414,11 @@
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = NetworkProtection;
 		};
+		EE7295E42A545BAA008C0991 /* NetworkProtection */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = NetworkProtection;
+		};
 		EE7295E62A545BBB008C0991 /* NetworkProtection */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
