@@ -18,11 +18,11 @@
 
 import Common
 import Foundation
-import NetworkExtension
-import NetworkProtection
-import SystemExtensions
 
 #if NETWORK_PROTECTION
+import NetworkProtection
+import NetworkExtension
+import SystemExtensions
 
 /// Utility code to help implement our debug menu options for Network Protection.
 ///

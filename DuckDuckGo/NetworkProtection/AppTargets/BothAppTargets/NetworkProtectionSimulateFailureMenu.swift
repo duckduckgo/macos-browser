@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
-import NetworkProtection
 
 #if !NETWORK_PROTECTION
 
@@ -26,6 +26,8 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
 }
 
 #else
+
+import NetworkProtection
 
 /// Implements the logic for Network Protection's simulate failures menu.
 ///
