@@ -35,7 +35,8 @@ let package = Package(
         .target(
             name: "DataBrokerProtection",
             dependencies: [
-                .product(name: "BrowserServicesKit", package: "BrowserServicesKit")
+                .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
+                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
             ],
             resources: [.process("Resources")]
         ),
