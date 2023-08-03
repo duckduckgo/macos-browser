@@ -51,7 +51,7 @@ final class SuggestionContainerViewModel {
 
     private var shouldSelectTopSuggestion: Bool {
         guard let result = suggestionContainer.result, !result.isEmpty else { return false }
-        
+
         if self.isTopSuggestionSelectionExpected,
            result.canBeAutocompleted,
            let userStringValue = self.userStringValue,
