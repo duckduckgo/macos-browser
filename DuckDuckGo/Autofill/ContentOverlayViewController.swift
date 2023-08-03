@@ -228,7 +228,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         return true
     }
 
-    public func secureVaultManager(_: SecureVaultManager, 
+    public func secureVaultManager(_: SecureVaultManager,
                                    promptUserToStoreAutofillData data: AutofillData,
                                    withTrigger trigger: AutofillUserScript.GetTriggerType?) {
         // No-op, the content overlay view controller should not be prompting the user to store data
