@@ -72,7 +72,7 @@ public final class NetworkProtectionPopover: NSPopover {
         let view = NetworkProtectionStatusView(model: model).environment(\.dismiss, { [weak self] in
             self?.close()
         }).fixedSize()
-            .padding(.vertical, 10)
+
         controller = NSHostingController(rootView: view)
 
         contentViewController = controller

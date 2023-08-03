@@ -161,11 +161,20 @@ public struct NetworkProtectionStatusView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
+            /*
             if let healthWarning = model.issueDescription {
                 connectionHealthWarningView(message: healthWarning)
-            }
+            }*/
+
+            AllowSystemExtensionView(model: .init())
+                .padding(.horizontal, 5)
+                .padding(.top, 5)
+                .layoutPriority(1)
+
+            Spacer()
 
             headerView()
+
             featureToggleRow()
 
             Divider()
@@ -177,8 +186,8 @@ public struct NetworkProtectionStatusView: View {
 
             bottomMenuView()
         }
-        .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
-        .frame(maxWidth: 350)
+        .padding(5)
+        .frame(maxWidth: 350, alignment: .top)
     }
 
     // MARK: - Composite Views
@@ -217,11 +226,12 @@ public struct NetworkProtectionStatusView: View {
             Text(model.featureStatusDescription)
                 .applyTitleAttributes(colorScheme: colorScheme)
                 .padding([.top], 8)
+                .multilineText()
 
             Text(UserText.networkProtectionStatusViewFeatureDesc)
                 .applyDescriptionAttributes(colorScheme: colorScheme)
                 .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
+                .multilineText()
                 .padding(EdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 16))
         }
     }
