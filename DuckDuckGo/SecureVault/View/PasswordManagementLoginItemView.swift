@@ -88,9 +88,21 @@ struct PasswordManagementLoginItemView: View {
                 }
             }
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
-
+            .alert(isPresented: $model.isShowingAddressUpdateConfirmAlert) {
+                let btnLabel = Text(model.toggleConfirmationAlert.button)
+                let btnAction = model.togglePrivateEmailStatus
+                let button = Alert.Button.default(btnLabel, action: btnAction)
+                let cancelBtnLabel = Text(UserText.cancel)
+                let cancelBtnAction = { model.refreshprivateEmailStatusBool() }
+                let cancelButton = Alert.Button.cancel(cancelBtnLabel, action: cancelBtnAction)
+                return Alert(
+                    title: Text(model.toggleConfirmationAlert.title),
+                    message: Text(model.toggleConfirmationAlert.message),
+                    primaryButton: button,
+                    secondaryButton: cancelButton
+                )
+            }
         }
-
     }
 
 }
@@ -148,7 +160,8 @@ private struct UsernameView: View {
 
     @EnvironmentObject var model: PasswordManagementLoginModel
 
-    @State var isHovering = false
+    @State private var isHovering = false
+    @State private var isPrivateEmailEnabled: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -159,36 +172,168 @@ private struct UsernameView: View {
 
             if model.isEditing || model.isNew {
 
-                 TextField("", text: $model.username)
+                TextField("", text: $model.username)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.bottom, interItemSpacing)
 
             } else {
 
-                HStack(spacing: 6) {
-                    Text(model.username)
-
-                    if isHovering {
-                        Button {
-                            model.copy(model.username)
-                        } label: {
-                            Image("Copy")
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .tooltip(UserText.copyUsernameTooltip)
-                    }
-
+                HStack(alignment: .top) {
+                    UsernameLabel(isHovering: $isHovering)
                     Spacer()
+                    if model.shouldShowPrivateEmailToggle {
+                        Toggle("", isOn: $model.privateEmailStatusBool)
+                            .frame(width: 40)
+                            .toggleStyle(.switch)
+                    }
                 }
-                .padding(.bottom, interItemSpacing)
+            }
+        }
+        .padding(.bottom, interItemSpacing)
+        .onHover { hovering in
+            isHovering = hovering
+        }
+    }
+}
+
+private struct UsernameLabel: View {
+
+    @EnvironmentObject var model: PasswordManagementLoginModel
+    @Binding var isHovering: Bool
+
+    var body: some View {
+
+        VStack(alignment: .leading, spacing: 7) {
+
+            HStack(spacing: 8) {
+
+                if model.usernameIsPrivateEmail {
+                    PrivateEmailImage()
+                }
+
+                Text(model.username)
+
+                if isHovering && model.username != "" {
+                    Button {
+                        model.copy(model.username)
+                    } label: {
+                        Image("Copy")
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .tooltip(UserText.copyUsernameTooltip)
+                }
             }
 
+            PrivateEmailMessage()
         }
-        .onHover {
-            isHovering = $0
+    }
+}
+
+private struct PrivateEmailActivationButton: View {
+
+    @EnvironmentObject var model: PasswordManagementLoginModel
+
+    var body: some View {
+        let status = model.privateEmailStatus
+        if model.isSignedIn && (status == .active || status == .inactive) {
+            VStack(alignment: .leading) {
+                Button(status == .active ? UserText.pmDeactivateAddress : UserText.pmActivateAddress ) {
+                    model.isShowingAddressUpdateConfirmAlert = true
+                }
+                .buttonStyle(StandardButtonStyle())
+            }
         }
     }
 
+}
+
+private struct PrivateEmailImage: View {
+
+    @EnvironmentObject var model: PasswordManagementLoginModel
+
+    var image: NSImage? {
+        if !model.isSignedIn {
+            return nil
+        } else {
+            switch model.privateEmailStatus {
+            case .error:
+                return NSImage(imageLiteralResourceName: "Alert-Color-16")
+            default:
+                return nil
+            }
+
+        }
+    }
+
+    var body: some View {
+        if let image {
+            Image(nsImage: image)
+                .aspectRatio(contentMode: .fit)
+        }
+    }
+}
+
+private struct PrivateEmailMessage: View {
+    @EnvironmentObject var model: PasswordManagementLoginModel
+
+    @State private var hover: Bool = false
+
+    @available(macOS 12, *)
+    var attributedString: AttributedString {
+        let text = String(format: UserText.pmSignInToManageEmail, UserText.pmEnableEmailProtection)
+        var attributedString = AttributedString(text)
+        if let range = attributedString.range(of: UserText.pmEnableEmailProtection) {
+            attributedString[range].foregroundColor = Color("LinkBlueColor")
+        }
+        return attributedString
+    }
+
+    var body: some View {
+        VStack {
+            if model.shouldShowPrivateEmailSignedOutMesage {
+                if model.isSignedIn {
+                    Text(model.privateEmailMessage)
+                        .font(.subheadline)
+                        .lineLimit(nil)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .animation(.easeInOut)
+                } else {
+
+                    if #available(macOS 12.0, *) {
+                        let combinedText = Text(attributedString)
+                            .font(.subheadline)
+                            .lineLimit(nil)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                        combinedText
+                            .onTapGesture {
+                                model.enableEmailProtection()
+                            }
+                            .onHover { isHovered in
+                                self.hover = isHovered
+                                DispatchQueue.main.async {
+                                    if hover {
+                                        NSCursor.pointingHand.push()
+                                    } else {
+                                        NSCursor.pop()
+                                    }
+                                }
+                            }
+                    } else {
+                        Text(String(format: UserText.pmSignInToManageEmail, UserText.pmEnableEmailProtection))
+                            .font(.subheadline)
+                            .lineLimit(nil)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .onTapGesture {
+                                model.enableEmailProtection()
+                            }
+                    }
+                }
+            }
+        }
+    }
 }
 
 private struct PasswordView: View {
@@ -243,7 +388,7 @@ private struct PasswordView: View {
                         Text(model.password.isEmpty ? "" : "••••••••••••")
                     }
 
-                    if isHovering || isPasswordVisible {
+                    if (isHovering || isPasswordVisible) && model.password != "" {
                         Button {
                             isPasswordVisible = !isPasswordVisible
                         } label: {
@@ -253,7 +398,7 @@ private struct PasswordView: View {
                         .tooltip(isPasswordVisible ? UserText.hidePasswordTooltip : UserText.showPasswordTooltip)
                     }
 
-                    if isHovering {
+                    if isHovering && model.password != "" {
                         Button {
                             model.copy(model.password)
                         } label: {

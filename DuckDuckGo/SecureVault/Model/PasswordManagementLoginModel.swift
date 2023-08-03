@@ -33,18 +33,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var onSaveRequested: (SecureVaultModels.WebsiteCredentials) -> Void
     var onDeleteRequested: (SecureVaultModels.WebsiteCredentials) -> Void
     var urlMatcher: AutofillUrlMatcher
-
-    func setSecureVaultModel<Model>(_ modelObject: Model) {
-        guard let modelObject = modelObject as? SecureVaultModels.WebsiteCredentials else {
-            return
-        }
-
-        credentials = modelObject
-    }
-
-    func clearSecureVaultModel() {
-        credentials = nil
-    }
+    var emailManager: EmailManager
 
     var isEditingPublisher: Published<Bool>.Publisher {
         return $isEditing
@@ -71,12 +60,89 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     var lastUpdatedDate: String = ""
     var createdDate: String = ""
 
+    // MARK: Private Email Management
+    @Published var privateEmailRequestInProgress: Bool = false
+    @Published var usernameIsPrivateEmail: Bool = false
+    @Published var hasValidPrivateEmail: Bool = false
+    @Published var privateEmailStatus: EmailAliasStatus = .unknown
+    @Published var isShowingAddressUpdateConfirmAlert: Bool = false
+    @Published var isShowingDuckRemovalAlert: Bool = false
+    @Published var isSignedIn: Bool = false
+    @Published var privateEmailStatusBool: Bool = false {
+        didSet {
+            let status = privateEmailStatus == .active ? true : false
+            if status != privateEmailStatusBool {
+                isShowingAddressUpdateConfirmAlert = true
+            }
+        }
+    }
+
+    var userDuckAddress: String {
+        return emailManager.userEmail ?? ""
+    }
+
+    var privateEmailMessage: String {
+        var message: String
+        if isSignedIn {
+            switch privateEmailStatus {
+            case .error:
+                message = UserText.pmEmailMessageError
+            case .active:
+                message = UserText.pmEmailMessageActive
+            case .inactive:
+                message = UserText.pmEmailMessageInactive
+            case .notFound:
+                message = ""
+            default:
+                message = ""
+            }
+        } else {
+            message = UserText.pmSignInToManageEmail
+        }
+        return message
+    }
+
+    var toggleConfirmationAlert: (title: String, message: String, button: String) {
+        if privateEmailStatus == .active {
+            return (title: UserText.pmEmailDeactivateConfirmTitle,
+                    message: String(format: UserText.pmEmailDeactivateConfirmContent, username),
+                    button: UserText.pmDeactivate)
+        }
+        return (title: UserText.pmEmailActivateConfirmTitle,
+                message: String(format: UserText.pmEmailActivateConfirmContent, username),
+                button: UserText.pmActivate)
+    }
+
+    var shouldShowPrivateEmailToggle: Bool {
+        hasValidPrivateEmail && (privateEmailStatus == .active || privateEmailStatus == .inactive)
+    }
+
+    var shouldShowPrivateEmailSignedOutMesage: Bool {
+        usernameIsPrivateEmail && privateEmailMessage != ""
+    }
+
     init(onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
          onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
-         urlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher()) {
+         urlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher(),
+         emailManager: EmailManager = EmailManager()) {
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested
         self.urlMatcher = urlMatcher
+        self.emailManager = emailManager
+        self.emailManager.requestDelegate = self
+
+    }
+
+    func setSecureVaultModel<Model>(_ modelObject: Model) {
+        guard let modelObject = modelObject as? SecureVaultModels.WebsiteCredentials else {
+            return
+        }
+
+        credentials = modelObject
+    }
+
+    func clearSecureVaultModel() {
+        credentials = nil
     }
 
     func copy(_ value: String) {
@@ -90,6 +156,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         credentials.account.domain = urlMatcher.normalizeUrlForWeb(domain)
         credentials.account.notes = notes
         credentials.password = password.data(using: .utf8)! // let it crash?
+        hasValidPrivateEmail = emailManager.isPrivateEmail(email: username)
         onSaveRequested(credentials)
     }
 
@@ -98,7 +165,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         onDeleteRequested(credentials)
     }
 
-    func edit() {
+    func edit() {        
         isEditing = true
     }
 
@@ -122,6 +189,10 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         WindowControllersManager.shared.show(url: url, newTab: true)
     }
 
+    func togglePrivateEmailStatus() {
+        Task { try await togglePrivateEmailStatus() }
+    }
+
     private func populateViewModelFromCredentials() {
         let titleString = credentials?.account.title ?? ""
         title = titleString
@@ -130,6 +201,15 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         domain =  urlMatcher.normalizeUrlForWeb(credentials?.account.domain ?? "")
         notes = credentials?.account.notes ?? ""
         isNew = credentials?.account.id == nil
+
+        // Determine Private Email Status when required
+        usernameIsPrivateEmail = emailManager.isPrivateEmail(email: username)
+        if emailManager.isSignedIn {
+            isSignedIn = true
+            if usernameIsPrivateEmail {
+                Task { try? await getPrivateEmailStatus() }
+            }
+        }
 
         if let date = credentials?.account.created {
             createdDate = Self.dateFormatter.string(from: date)
@@ -142,5 +222,86 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         } else {
             lastUpdatedDate = ""
         }
+
     }
+
+    private func getPrivateEmailStatus() async throws {
+        guard emailManager.isSignedIn else {
+            throw AliasRequestError.signedOut
+        }
+
+        guard username != "",
+              emailManager.isPrivateEmail(email: username) else {
+            throw AliasRequestError.notFound
+        }
+
+        do {
+            await setLoadingStatus(true)
+            let result = try await emailManager.getStatusFor(email: username)
+            await setLoadingStatus(false)
+            await setPrivateEmailStatus(result)
+        } catch {
+            await setLoadingStatus(false)
+            await setPrivateEmailStatus(.error)
+        }
+    }
+
+    private func togglePrivateEmailStatus() async throws {
+        guard emailManager.isSignedIn else {
+            throw AliasRequestError.signedOut
+        }
+
+        guard username != "",
+              emailManager.isPrivateEmail(email: username) else {
+            throw AliasRequestError.notFound
+        }
+        do {
+            await setLoadingStatus(true)
+            var result: EmailAliasStatus
+            if privateEmailStatus == .active {
+                result = try await emailManager.setStatusFor(email: username, active: false)
+            } else {
+                result = try await emailManager.setStatusFor(email: username, active: true)
+            }
+            await setPrivateEmailStatus(result)
+            await setLoadingStatus(false)
+        } catch {
+            await setLoadingStatus(false)
+            await setPrivateEmailStatus(.error)
+        }
+
+    }
+
+    func enableEmailProtection() {
+        NSApp.sendAction(#selector(NSPopover.performClose(_:)), to: nil, from: nil)
+        NSApp.sendAction(#selector(AppDelegate.navigateToPrivateEmail(_:)), to: nil, from: nil)
+    }
+
+    @MainActor
+    private func setPrivateEmailStatus(_ status: EmailAliasStatus) {
+        hasValidPrivateEmail = true
+        privateEmailStatus = status
+        privateEmailStatusBool = status == .active ? true : false
+    }
+
+    @MainActor
+    private func setLoadingStatus(_ status: Bool) {
+        if status == true {
+            privateEmailRequestInProgress = true
+        } else {
+            privateEmailRequestInProgress = false
+        }
+
+    }
+
+    func refreshprivateEmailStatusBool() {
+        privateEmailStatusBool = privateEmailStatus == .active ? true : false
+    }
+
+    @objc func showLoader() {
+        privateEmailRequestInProgress = true
+    }
+
 }
+
+extension PasswordManagementLoginModel: EmailManagerRequestDelegate {}
