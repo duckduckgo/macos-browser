@@ -18,7 +18,7 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "166ea28010c37245115e63090114dd492794fc04"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "605136aac40c03364cfa5e1f87f118abdd57b37f"),
         .package(path: "../SwiftUIExtensions")
     ],
     targets: [
