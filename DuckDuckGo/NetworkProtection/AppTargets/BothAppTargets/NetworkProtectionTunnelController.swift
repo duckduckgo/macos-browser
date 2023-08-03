@@ -491,9 +491,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         .section("IPv4 Local Routes"),
 
         .exclusion(range: "10.0.0.0/8"     /* 255.0.0.0 */, description: "disabled for enforceRoutes", default: true),
-        .exclusion(range: "169.254.0.0/16" /* 255.255.0.0 */, description: "Link-local", default: true),
         .exclusion(range: "172.16.0.0/12"  /* 255.240.0.0 */, default: true),
         .exclusion(range: "192.168.0.0/16" /* 255.255.0.0 */, default: true),
+        .exclusion(range: "169.254.0.0/16" /* 255.255.0.0 */, description: "Link-local", default: true),
         .exclusion(range: "127.0.0.0/8"    /* 255.0.0.0 */, description: "Loopback", default: true),
         .exclusion(range: "224.0.0.0/4"    /* 240.0.0.0 (corrected subnet mask) */, description: "Multicast", default: true),
         .exclusion(range: "100.64.0.0/16"  /* 255.255.0.0 */, description: "Shared Address Space", default: true),
@@ -527,9 +527,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }
     }
 
+    /// extra Included Routes appended to 0.0.0.0, ::/0 (peers) and interface.addresses
     @MainActor
     private func includedRoutes() -> [NetworkProtection.IPAddressRange] {
-        ["0.0.0.0/0"]
+        []
     }
 
     @MainActor
