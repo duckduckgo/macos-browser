@@ -116,10 +116,12 @@ final class BrowserTabViewController: NSViewController {
                                                name: .emailDidCloseEmailProtection,
                                                object: nil)
 
+#if DBP
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onCloseDataBrokerProtection),
                                                name: .dbpDidClose,
                                                object: nil)
+#endif
     }
 
     @objc
@@ -156,9 +158,6 @@ final class BrowserTabViewController: NSViewController {
 
         if let previouslySelectedTab = self.previouslySelectedTab {
             tabCollectionViewModel.select(tab: previouslySelectedTab)
-            if #available(macOS 11.0, *) {
-                previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
-            }
             self.previouslySelectedTab = nil
         }
     }
