@@ -319,9 +319,6 @@ extension HomePage.Models {
 
         private var shouldSurveyDay7BeVisible: Bool {
             let oneWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())!
-            print(isDay7SurveyEnabled)
-            print(shouldShowSurveyDay7)
-            print(userInteractedWithSurveyDay0)
             return isDay7SurveyEnabled &&
             shouldShowSurveyDay7 &&
             !userInteractedWithSurveyDay0 &&
