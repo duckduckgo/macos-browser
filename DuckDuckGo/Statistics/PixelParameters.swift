@@ -38,6 +38,10 @@ extension Pixel {
         static let assertionMessage = "message"
         static let assertionFile = "file"
         static let assertionLine = "line"
+
+        // Pixel experiments
+        static let experimentCohort = "cohort"
+
     }
 
     enum Values {
@@ -84,6 +88,15 @@ extension Pixel.Event {
             }
 
             return params
+
+        case .bookmarksBarOnboardingEnrollment(let cohort):
+            return [Pixel.Parameters.experimentCohort: cohort]
+        case .bookmarksBarOnboardingSearched4to8days(let cohort):
+            return [Pixel.Parameters.experimentCohort: cohort]
+        case .bookmarksBarOnboardingFirstInteraction(let cohort):
+            return [Pixel.Parameters.experimentCohort: cohort]
+        case .bookmarksBarOnboardingInteraction2to8days(let cohort):
+            return [Pixel.Parameters.experimentCohort: cohort]
 
         // Don't use default to force new items to be thought about
         case .crash,
