@@ -172,7 +172,7 @@ final class SaveCredentialsViewController: NSViewController {
                     }
                 }
             } else {
-                try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeWebsiteCredentials(credentials)
+                _ = try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeWebsiteCredentials(credentials)
             }
         } catch {
             os_log("%s:%s: failed to store credentials %s", type: .error, className, #function, error.localizedDescription)

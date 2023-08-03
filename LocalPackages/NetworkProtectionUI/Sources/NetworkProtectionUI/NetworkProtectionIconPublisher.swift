@@ -16,13 +16,24 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 import Combine
 import NetworkProtection
 
+public protocol IconProvider {
+    var onIcon: NetworkProtectionAsset { get }
+    var offIcon: NetworkProtectionAsset { get }
+    var issueIcon: NetworkProtectionAsset { get }
+}
+
 public final class NetworkProtectionIconPublisher {
 
-    private let isForStatusBar: Bool
+    // MARK: - Icon
+
+    /// The object that provides the icons to use.
+    ///
+    private let iconProvider: IconProvider
 
     @Published
     public var icon: NetworkProtectionAsset
@@ -36,10 +47,10 @@ public final class NetworkProtectionIconPublisher {
     private var statusChangeCancellable: AnyCancellable?
     private var connectivityIssuesCancellable: AnyCancellable?
 
-    public init(statusReporter: NetworkProtectionStatusReporter, isForStatusBar: Bool) {
+    public init(statusReporter: NetworkProtectionStatusReporter, iconProvider: IconProvider) {
         self.statusReporter = statusReporter
-        self.isForStatusBar = isForStatusBar
-        icon = isForStatusBar ? .statusbarVPNOffIcon : .appVPNOffIcon
+        self.iconProvider = iconProvider
+        icon = iconProvider.offIcon
 
         updateMenuIcon()
         subscribeToConnectionStatusChanges()
@@ -66,14 +77,14 @@ public final class NetworkProtectionIconPublisher {
     ///
     private func menuIcon() -> NetworkProtectionAsset {
         guard !statusReporter.connectivityIssuesPublisher.value else {
-            return isForStatusBar ? .statusbarVPNIssueIcon : .appVPNIssueIcon
+            return iconProvider.issueIcon
         }
 
         switch statusReporter.statusPublisher.value {
         case .connected:
-            return isForStatusBar ? .statusbarVPNOnIcon : .appVPNOnIcon
+            return iconProvider.onIcon
         default:
-            return isForStatusBar ? .statusbarVPNOffIcon : .appVPNOffIcon
+            return iconProvider.offIcon
         }
     }
 

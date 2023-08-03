@@ -18,12 +18,13 @@
 
 import Foundation
 import BrowserServicesKit
+import SecureStorage
 
 final class SecureVaultErrorReporter: SecureVaultErrorReporting {
     static let shared = SecureVaultErrorReporter()
     private init() {}
 
-    func secureVaultInitFailed(_ error: SecureVaultError) {
+    func secureVaultInitFailed(_ error: SecureStorageError) {
 #if DEBUG
         guard !NSApp.isRunningUnitTests else { return }
 #endif

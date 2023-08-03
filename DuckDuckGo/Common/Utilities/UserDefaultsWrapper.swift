@@ -70,6 +70,7 @@ public struct UserDefaultsWrapper<T> {
         case showFullURL = "preferences.appearance.show-full-url"
         case showAutocompleteSuggestions = "preferences.appearance.show-autocomplete-suggestions"
         case defaultPageZoom = "preferences.appearance.default-page-zoom"
+        case bookmarksBarAppearance = "preferences.appearance.bookmarks-bar"
 
         // ATB
         case installDate = "statistics.installdate.key"
@@ -118,6 +119,8 @@ public struct UserDefaultsWrapper<T> {
 
         // Temporary for activetion pixel
         case firstLaunchDate = "first.app.launch.date"
+
+        case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
     }
 
     enum RemovedKeys: String, CaseIterable {

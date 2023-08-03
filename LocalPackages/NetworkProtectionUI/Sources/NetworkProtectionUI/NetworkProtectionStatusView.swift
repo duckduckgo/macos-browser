@@ -21,35 +21,6 @@ import SwiftUIExtensions
 import Combine
 import NetworkProtection
 
-/// This view helps us fix the height of a view that's meant to be shown inside a `NSHostingView`.
-///
-/// It seems the `NSHostingView` uses the max height of the SwiftUI View for its own height, which for multi-line
-/// `Text` views is the maximum number of lines that it could show (which makes the hosting view become huge).
-/// This view updates it's max height to it's actual height after layout, meaning the hosting view will be sized correctly.
-///
-/// If the view supports multiple heights, you'll probably need to adapt it with a solution that's similar to the collapsed/expanded
-/// solution that's included.
-///
-struct PopoverHeightFixer<Content: View>: View {
-    @Binding var popoverHeight: CGFloat
-    @ViewBuilder var content: () -> Content
-
-    var body: some View {
-        VStack(spacing: 0, content: content)
-            .frame(maxHeight: popoverHeight)
-            .fixedSize(horizontal: false, vertical: true)
-            .background(GeometryReader { geometry in
-                /// Since .onAppear is only called once, we'll use a different view for the collapsed and expanded states.
-                /// so that the proper height is calculated for both.
-                Color.clear.onReceive(Just(popoverHeight)) { _ in
-                    if popoverHeight == .infinity {
-                        popoverHeight = geometry.size.height
-                    }
-                }
-            })
-    }
-}
-
 private let defaultTextColor = Color("TextColor", bundle: .module)
 
 fileprivate extension Font {
@@ -180,8 +151,6 @@ public struct NetworkProtectionStatusView: View {
     ///
     @ObservedObject var model: Model
 
-    @State private var popoverHeight = CGFloat.infinity
-
     // MARK: - Initializers
 
     public init(model: Model) {
@@ -191,36 +160,24 @@ public struct NetworkProtectionStatusView: View {
     // MARK: - View Contents
 
     public var body: some View {
-        PopoverHeightFixer(popoverHeight: $popoverHeight) {
-            VStack(spacing: 0) {
-                if let healthWarning = model.issueDescription {
-                    connectionHealthWarningView(message: healthWarning).onAppear {
-                        popoverHeight = .infinity
-                    }
-                    .onDisappear {
-                        popoverHeight = .infinity
-                    }
-                }
-
-                headerView()
-                featureToggleRow()
-
-                Divider()
-                    .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
-
-                if model.showServerDetails {
-                    connectionStatusView().onAppear {
-                        popoverHeight = .infinity
-                    }
-                    .onDisappear {
-                        popoverHeight = .infinity
-                    }
-                }
-
-                bottomMenuView()
+        VStack(spacing: 0) {
+            if let healthWarning = model.issueDescription {
+                connectionHealthWarningView(message: healthWarning)
             }
-            .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
+
+            headerView()
+            featureToggleRow()
+
+            Divider()
+                .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
+
+            if model.showServerDetails {
+                connectionStatusView()
+            }
+
+            bottomMenuView()
         }
+        .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
         .frame(maxWidth: 350)
     }
 

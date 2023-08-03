@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Combine
 import Foundation
+import SecureStorage
 
 final class AutofillTabExtension: TabExtension {
 
@@ -52,10 +53,14 @@ final class AutofillTabExtension: TabExtension {
     }
     private var emailManager: AutofillEmailDelegate?
     private var vaultManager: AutofillSecureVaultDelegate?
+    private let isBurner: Bool
 
     @Published var autofillDataToSave: AutofillData?
 
-    init(autofillUserScriptPublisher: some Publisher<WebsiteAutofillUserScript?, Never>) {
+    init(autofillUserScriptPublisher: some Publisher<WebsiteAutofillUserScript?, Never>,
+         isBurner: Bool) {
+        self.isBurner = isBurner
+
         autofillUserScriptCancellable = autofillUserScriptPublisher.sink { [weak self] autofillScript in
             guard let self, let autofillScript else { return }
 
@@ -77,6 +82,10 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
 
     public func secureVaultManagerIsEnabledStatus(_: SecureVaultManager) -> Bool {
         return true
+    }
+
+    func secureVaultManagerShouldSaveData(_: BrowserServicesKit.SecureVaultManager) -> Bool {
+        return !isBurner
     }
 
     func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData, withTrigger trigger: AutofillUserScript.GetTriggerType?) {
@@ -105,7 +114,7 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         }
     }
 
-    func secureVaultInitFailed(_ error: SecureVaultError) {
+    func secureVaultInitFailed(_ error: SecureStorageError) {
         SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
     }
 

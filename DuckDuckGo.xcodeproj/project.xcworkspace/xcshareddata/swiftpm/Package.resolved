@@ -15,7 +15,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "daniel/private-email-autofill",
-        "revision" : "83ebb3c2a2a5fdb3fb7a4d133811bdebc2e03c3b"
+        "revision" : "80e0d6f634c3775b2bee633462c6e2de5eba6c97"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "0cfcedb9c8aefa52c7f3a36a2b3793a2c44de764",
-        "version" : "4.22.5"
+        "revision" : "a4f35ad23ac4a0eb9b36b94f1f2aa0f0ebf2855d",
+        "version" : "4.30.0"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sparkle-project/Sparkle.git",
       "state" : {
-        "revision" : "9d85a02fe7916caa7531847452c4933d331503a5",
-        "version" : "2.3.1"
+        "revision" : "87e4fcbac39912f9cdb9a9acf205cad60e1ca3bc",
+        "version" : "2.4.2"
       }
     },
     {
@@ -129,7 +129,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
       "state" : {
         "revision" : "4684440d03304e7638a2c8086895367e90987463",
         "version" : "1.2.1"
