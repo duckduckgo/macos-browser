@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "graeme/network-protection-test-utils",
-        "revision" : "4299cee3b8c7aa4f5f245a42e1c6d5131531a723"
+        "revision" : "005949a099121192f55b4b5d33ed5d7ce4a12934",
+        "version" : "71.3.0"
       }
     },
     {
