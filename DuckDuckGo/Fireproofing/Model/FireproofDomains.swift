@@ -59,7 +59,7 @@ internal class FireproofDomains {
     private func loadFireproofDomains() -> FireproofDomainsContainer {
         dispatchPrecondition(condition: .onQueue(.main))
         do {
-            if let domains = legacyUserDefaultsFireproofDomains?.map({ $0.droppingWwwPrefix() }),
+            if let domains = legacyUserDefaultsFireproofDomains,
                !domains.isEmpty {
 
                 var container = FireproofDomainsContainer()

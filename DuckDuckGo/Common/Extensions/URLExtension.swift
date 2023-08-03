@@ -201,6 +201,12 @@ extension URL {
 
     func toString(decodePunycode: Bool,
                   dropScheme: Bool,
+                  dropTrailingSlash: Bool) -> String {
+        toString(decodePunycode: decodePunycode, dropScheme: dropScheme, needsWWW: nil, dropTrailingSlash: dropTrailingSlash)
+    }
+
+    private func toString(decodePunycode: Bool,
+                  dropScheme: Bool,
                   needsWWW: Bool? = nil,
                   dropTrailingSlash: Bool) -> String {
         guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
@@ -255,8 +261,7 @@ extension URL {
         return self.toString(decodePunycode: decodePunycode,
                              dropScheme: input.isEmpty || !(hasInputScheme && !hasInputHost),
                              needsWWW: !input.dropping(prefix: self.separatedScheme ?? "").isEmpty
-                                && hasInputWww
-                                && !hasInputHost,
+                                && hasInputWww,
                              dropTrailingSlash: !input.hasSuffix("/"))
     }
 

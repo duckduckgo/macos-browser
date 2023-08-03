@@ -236,7 +236,7 @@ final class TabViewModel {
         if showURL {
             passiveAddressBarString = url.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: true)
         } else {
-            passiveAddressBarString = hostURL.toString(decodePunycode: true, dropScheme: true, needsWWW: false, dropTrailingSlash: true)
+            passiveAddressBarString = hostURL.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true).droppingWwwPrefix()
         }
     }
 
