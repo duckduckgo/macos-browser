@@ -235,14 +235,17 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - NEPacketTunnelProvider
 
-    struct MissingPixelHeaders: Error { }
+    enum ConfigurationError: Error {
+        case missingProviderConfiguration
+        case missingPixelHeaders
+    }
 
     public override func loadVendorOptions(from provider: NETunnelProviderProtocol?) throws {
         try super.loadVendorOptions(from: provider)
 
         guard let vendorOptions = provider?.providerConfiguration else {
             os_log("🔵 Provider is nil, or providerConfiguration is not set", log: .networkProtection)
-            throw MissingProviderConfiguration()
+            throw ConfigurationError.missingProviderConfiguration
         }
 
         try loadDefaultPixelHeaders(from: vendorOptions)
@@ -251,7 +254,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     private func loadDefaultPixelHeaders(from options: [String: Any]) throws {
         guard let defaultPixelHeaders = options[NetworkProtectionOptionKey.defaultPixelHeaders] as? [String: String] else {
             os_log("🔵 Pixel options are not set", log: .networkProtection)
-            throw MissingPixelHeaders()
+            throw ConfigurationError.missingPixelHeaders
         }
 
         setupPixels(defaultHeaders: defaultPixelHeaders)
