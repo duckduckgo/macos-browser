@@ -31,7 +31,7 @@ private struct MultilineTextHeightFixer: ViewModifier {
             .frame(height: textHeight)
             .background(
                 GeometryReader { geometry in
-                    Color.clear // This is just to have something to attach .onAppear to.
+                    Color.clear // This is just to have something to attach .onReceive to.
                         .onReceive(Just(geometry.size)) { _ in
                             textHeight = geometry.size.height
                         }
