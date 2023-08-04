@@ -783,8 +783,8 @@ struct UserText {
     static let newTabSetUpDuckPlayerSummary = NSLocalizedString("newTab.setup.duck.player.summary", value: "Enjoy a clean viewing experience without personalized ads.", comment: "Summary of the Duck Player card of the Set Up section in the home page")
     static let newTabSetUpEmailProtectionSummary = NSLocalizedString("newTab.setup.email.protection.summary", value: "Generate custom @duck.com addresses that clean trackers from incoming email.", comment: "Summary of the Email Protection card of the Set Up section in the home page")
     static let newTabSetUpCookieManagerSummary = NSLocalizedString("newTab.setup.cookie.manager.summary", value: "We need your permission to say no to cookies on your behalf. Easy choice.", comment: "Summary of the Cookie Manager card of the Set Up section in the home page")
-    static let newTabSetUpSurveyDay0Summary = NSLocalizedString("newTab.setup.survey.day.0.summary", value: "Take our short survey and help us build the best user experience.", comment: "Summary of the Day 0 durvey of the Set Up section in the home page")
-    static let newTabSetUpSurveyDay7Summary = NSLocalizedString("newTab.setup.survey.day.7.summary", value: "Take our short survey and help us build the best private browser.", comment: "Summary of the Day 7 durvey of the Set Up section in the home page")
+    static let newTabSetUpSurveyDay0Summary = NSLocalizedString("newTab.setup.survey.day.0.summary", value: "Take our short survey and help us build the best browser.", comment: "Summary of the Day 0 durvey of the Set Up section in the home page")
+    static let newTabSetUpSurveyDay7Summary = NSLocalizedString("newTab.setup.survey.day.7.summary", value: "Take our short survey and help us build the best browser.", comment: "Summary of the Day 7 durvey of the Set Up section in the home page")
 
     // Recent Activity
     static let newTabRecentActivitySectionTitle = NSLocalizedString("newTab.recent.activity.section.title", value: "Recent Activity", comment: "Title of the RecentActivity section in the home page")
