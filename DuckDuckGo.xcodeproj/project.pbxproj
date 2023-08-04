@@ -10119,7 +10119,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "graeme/network-protection-test-utils";
+				branch = "graeme/create-tunnelcontroller-mock";
 				kind = branch;
 			};
 		};

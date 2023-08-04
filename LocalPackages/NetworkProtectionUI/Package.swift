@@ -35,6 +35,9 @@ let package = Package(
             ]),
         .testTarget(
             name: "NetworkProtectionUITests",
-            dependencies: ["NetworkProtectionUI"])
+            dependencies: [
+                "NetworkProtectionUI",
+                .product(name: "NetworkProtectionTestUtils", package: "BrowserServicesKit")
+            ])
     ]
 )
