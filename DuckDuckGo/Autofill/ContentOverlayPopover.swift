@@ -23,6 +23,7 @@ import BrowserServicesKit
 @MainActor
 public final class ContentOverlayPopover {
 
+    // Test change
     public var zoomFactor: CGFloat?
     public weak var currentTabView: NSView?
 
