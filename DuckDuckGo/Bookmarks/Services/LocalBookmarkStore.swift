@@ -356,11 +356,7 @@ final class LocalBookmarkStore: BookmarkStore {
     func update(folder: BookmarkFolder) {
 
         do {
-            _ = try applyChangesAndSave(changes: { [weak self] context in
-                guard let self = self else {
-                    throw BookmarkStoreError.storeDeallocated
-                }
-
+            _ = try applyChangesAndSave(changes: { context in
                 let folderFetchRequest = BaseBookmarkEntity.singleEntity(with: folder.id)
                 let folderFetchRequestResults = try? context.fetch(folderFetchRequest)
 
