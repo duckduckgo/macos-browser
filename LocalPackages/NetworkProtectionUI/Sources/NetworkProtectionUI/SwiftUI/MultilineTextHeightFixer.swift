@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 import SwiftUI
 
@@ -29,16 +30,17 @@ private struct MultilineTextHeightFixer: ViewModifier {
         content
             .frame(height: textHeight)
             .background(
-                GeometryReader { proxy in
+                GeometryReader { geometry in
                     Color.clear // This is just to have something to attach .onAppear to.
-                        .onAppear {
-                            textHeight = proxy.size.height
+                        .onReceive(Just(geometry.size)) { _ in
+                            textHeight = geometry.size.height
                         }
                 })
     }
 }
 
 extension View {
+
     /// Meant to be used for multiline-text.  This is currently only applying a modifier
     ///
     @ViewBuilder
