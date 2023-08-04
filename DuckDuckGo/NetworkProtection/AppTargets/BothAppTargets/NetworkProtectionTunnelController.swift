@@ -139,27 +139,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         self.tokenStore = tokenStore
     }
 
-    // MARK: - VPN Config Change Notifications
-
-    private var configChangeCancellable: AnyCancellable?
-
-    private func startObservingVPNConfigChanges(notificationCenter: NotificationCenter) {
-        configChangeCancellable = notificationCenter.publisher(for: .NEVPNConfigurationChange)
-            .sink(receiveValue: { _ in
-                Task {
-                    // As crazy as it seems, this calls fixes an issue with tunnel session
-                    // having a nil manager, when in theory it should never be `nil`.  I don't know
-                    // why this happens, but I believe it may be because we run multiple instances
-                    // of our App controlling the session, and if any modification is made to the
-                    // session, other instances should reload it from preferences.
-                    //
-                    // For better or worse, this line ensures the session's manager is not nil.
-                    //
-                    try? await NETunnelProviderManager.loadAllFromPreferences()
-                }
-            })
-    }
-
     // MARK: - Tunnel Configuration
 
     /// Setups the tunnel manager if it's not set up already.
@@ -426,7 +405,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         shouldIncludeAllNetworks = false
 
         guard let tunnelManager = await loadTunnelManager(),
-              tunnelManager.protocolConfiguration?.enforceRoutes == true else { return }
+              tunnelManager.protocolConfiguration?.includeAllNetworks == true else { return }
 
         try await setupAndSave(tunnelManager)
     }
@@ -540,12 +519,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     @MainActor
-    func toggleShouldAutoConnectOnLogIn() {
-        shouldAutoConnectOnLogIn.toggle()
-        updateRoutes()
-    }
-
-    @MainActor
     func setExcludedRoute(_ route: String, enabled: Bool) {
         excludedRoutesPreferences[route] = enabled
         updateRoutes()
@@ -577,6 +550,11 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             try await activeSession.sendProviderMessage(.setIncludedRoutes(includedRoutes()))
             try await activeSession.sendProviderMessage(.setExcludedRoutes(excludedRoutes()))
         }
+    }
+
+    @MainActor
+    func toggleShouldAutoConnectOnLogIn() {
+        shouldAutoConnectOnLogIn.toggle()
     }
 
     @MainActor
