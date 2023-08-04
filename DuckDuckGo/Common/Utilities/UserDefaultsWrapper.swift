@@ -111,6 +111,7 @@ public struct UserDefaultsWrapper<T> {
 
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"
 
+        case bookmarksBarPromptShown = "bookmarks.bar.prompt.shown"
         case showBookmarksBar = "bookmarks.bar.show"
         case lastBookmarksBarUsagePixelSendDate = "bookmarks.bar.last-usage-pixel-send-date"
 
@@ -139,6 +140,12 @@ public struct UserDefaultsWrapper<T> {
         case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
 
         case agentLaunchTime = "netp.agent.launch-time"
+
+        // Experiments
+        case pixelExperimentInstalled = "pixel.experiment.installed"
+        case pixelExperimentCohort = "pixel.experiment.cohort"
+        case pixelExperimentEnrollmentDate = "pixel.experiment.enrollment.date"
+        case pixelExperimentFiredPixels = "pixel.experiment.pixels.fired"
     }
 
     enum RemovedKeys: String, CaseIterable {
