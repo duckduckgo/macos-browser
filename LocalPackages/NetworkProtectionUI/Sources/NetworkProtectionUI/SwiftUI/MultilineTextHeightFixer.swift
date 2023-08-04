@@ -28,7 +28,6 @@ private struct MultilineTextHeightFixer: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .frame(height: textHeight)
             .background(
                 GeometryReader { geometry in
                     Color.clear // This is just to have something to attach .onReceive to.
@@ -36,6 +35,7 @@ private struct MultilineTextHeightFixer: ViewModifier {
                             textHeight = geometry.size.height
                         }
                 })
+            .frame(height: textHeight)
     }
 }
 
