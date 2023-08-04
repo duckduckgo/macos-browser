@@ -29,10 +29,6 @@ final class ShadowView: NSView {
         static let bottom = ShadowSide(rawValue: 1 << 3)
 
         static let all    = ShadowSide(rawValue: 0xF)
-
-        init(rawValue: UInt8) {
-            self.rawValue = rawValue
-        }
     }
 
     @IBInspectable var shadowColor: NSColor? {
