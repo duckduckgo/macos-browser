@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
-import Cocoa
 import BrowserServicesKit
+import Cocoa
 import Common
+import WebKit
 
 // Actions are sent to objects of responder chain
 
