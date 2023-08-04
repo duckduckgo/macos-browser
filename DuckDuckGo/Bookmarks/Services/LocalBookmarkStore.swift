@@ -270,7 +270,7 @@ final class LocalBookmarkStore: BookmarkStore {
             if let parent = parent,
                let parentFetchRequestResult = try? context.fetch(BaseBookmarkEntity.singleEntity(with: parent.id)).first {
                 parentEntity = parentFetchRequestResult
-            } else if let root = BookmarkUtils.fetchRootFolder(context) {
+            } else if let root = bookmarksRoot(in: context) {
                 parentEntity = root
             } else {
                 Pixel.fire(.debug(event: .missingParent))
