@@ -187,7 +187,11 @@ final class TabViewModel {
     }
 
     private var tabURL: URL? {
-        return tab.content.url ?? tab.parentTab?.content.url
+        if tab.content.url?.isDuckPlayer ?? false || tab.content.url?.isDuckPlayerScheme ?? false {
+            return nil
+        } else {
+            return tab.content.url ?? tab.parentTab?.content.url
+        }
     }
 
     private var tabHostURL: URL? {
