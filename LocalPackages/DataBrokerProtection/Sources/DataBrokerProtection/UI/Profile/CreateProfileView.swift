@@ -387,6 +387,7 @@ private struct ProfileComponentRow<SavedItemsView: View, EditItemView: View>: Vi
 
             if isEditViewVisible {
                 editView
+                    .padding(.top, 12)
                     .transition(.opacity)
             }
         }
@@ -399,6 +400,7 @@ private struct ProfileComponentRow<SavedItemsView: View, EditItemView: View>: Vi
                 Text(title)
                     .font(.title3)
                     .bold()
+
                 if isValidated {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.green)
@@ -408,6 +410,7 @@ private struct ProfileComponentRow<SavedItemsView: View, EditItemView: View>: Vi
 
             Text(subtitle)
                 .font(.body)
+                .fixedSize(horizontal: false, vertical: true)
                 .foregroundColor(.secondary)
         }
     }
