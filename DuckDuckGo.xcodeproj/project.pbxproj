@@ -88,6 +88,12 @@
 		313B6A502A6EB1B900601B75 /* HTTPCookie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA6D0FC2A1FF9A100540406 /* HTTPCookie.swift */; };
 		3154FD1428E6011A00909769 /* TabShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3154FD1328E6011A00909769 /* TabShadowView.swift */; };
 		315AA07028CA5CC800200030 /* YoutubePlayerNavigationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */; };
+		316C7A832A7E9BEE00AA3BAE /* BookmarksBarAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */; };
+		316C7A842A7E9C1700AA3BAE /* PixelExperiment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857E5AF42A79045800FC0FB4 /* PixelExperiment.swift */; };
+		316C7A852A7E9C2300AA3BAE /* BookmarksBarMenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85774AFE2A713D3B00DE0561 /* BookmarksBarMenuFactory.swift */; };
+		316C7A862A7E9C2F00AA3BAE /* NetworkProtectionUserDefaultsConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F92BA42A691A44002ABA6B /* NetworkProtectionUserDefaultsConstants.swift */; };
+		316C7A872A7E9C3B00AA3BAE /* BlockMenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85774B022A71CDD000DE0561 /* BlockMenuItem.swift */; };
+		316C7A882A7E9C4D00AA3BAE /* BookmarksBarPromptPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 859F30632A72A7BB00C20372 /* BookmarksBarPromptPopover.swift */; };
 		3171D6B82889849F0068632A /* CookieManagedNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */; };
 		3171D6BA288984D00068632A /* BadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B9288984D00068632A /* BadgeAnimationView.swift */; };
 		3171D6DB2889B64D0068632A /* CookieManagedNotificationContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6DA2889B64D0068632A /* CookieManagedNotificationContainerView.swift */; };
@@ -218,7 +224,6 @@
 		3192A0152A4C4CFF0084EA89 /* HistoryMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7E919628746BCC00AB6B62 /* HistoryMenu.swift */; };
 		3192A0162A4C4CFF0084EA89 /* ContentScopeFeatureFlagging.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A6198B283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift */; };
 		3192A0172A4C4CFF0084EA89 /* OnboardingButtonStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85707F23276A332A00DC0649 /* OnboardingButtonStyles.swift */; };
-		3192A0182A4C4CFF0084EA89 /* String+ArrayConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D605A2A0B29FA00BCD287 /* String+ArrayConversion.swift */; };
 		3192A0192A4C4CFF0084EA89 /* SaveIdentityPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A4E0027C8447E005F40E8 /* SaveIdentityPopover.swift */; };
 		3192A01A2A4C4CFF0084EA89 /* AuthenticationAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637273A26CBC8AF00C8CB02 /* AuthenticationAlert.swift */; };
 		3192A01B2A4C4CFF0084EA89 /* YoutubePlayerNavigationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */; };
@@ -244,7 +249,6 @@
 		3192A0302A4C4CFF0084EA89 /* NSEventExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4AF522901A4F20013585E /* NSEventExtension.swift */; };
 		3192A0312A4C4CFF0084EA89 /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85707F25276A335700DC0649 /* Onboarding.swift */; };
 		3192A0322A4C4CFF0084EA89 /* PopUpWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68C92C0274E3EF4002AC6B0 /* PopUpWindow.swift */; };
-		3192A0332A4C4CFF0084EA89 /* PersistentAppInterfaceSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B17E2D3287380390003BD39 /* PersistentAppInterfaceSettings.swift */; };
 		3192A0342A4C4CFF0084EA89 /* Favicons.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AA5FA69E275F948900DCE9C9 /* Favicons.xcdatamodeld */; };
 		3192A0352A4C4CFF0084EA89 /* Publisher.asVoid.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684592125C93BE000DC17B6 /* Publisher.asVoid.swift */; };
 		3192A0362A4C4CFF0084EA89 /* NavigationButtonMenuDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA0CC32252F181A0079BC96 /* NavigationButtonMenuDelegate.swift */; };
@@ -265,7 +269,6 @@
 		3192A0452A4C4CFF0084EA89 /* PasswordManagementItemList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1E6EF027AB5E5D00F51793 /* PasswordManagementItemList.swift */; };
 		3192A0462A4C4CFF0084EA89 /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4CD25D6A709007F5990 /* Bookmark.swift */; };
 		3192A0472A4C4CFF0084EA89 /* ConnectBitwardenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDEE8F28FC14760092FAA6 /* ConnectBitwardenViewModel.swift */; };
-		3192A0482A4C4CFF0084EA89 /* TunnelConfiguration+WgQuickConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60592A0B29FA00BCD287 /* TunnelConfiguration+WgQuickConfig.swift */; };
 		3192A0492A4C4CFF0084EA89 /* NSNotificationName+DataImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A4F4B27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift */; };
 		3192A04A2A4C4CFF0084EA89 /* StoredPermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C853726944B880048FEBE /* StoredPermission.swift */; };
 		3192A04B2A4C4CFF0084EA89 /* FirePopoverCollectionViewHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE246F7270A406200BEEAEE /* FirePopoverCollectionViewHeader.swift */; };
@@ -640,7 +643,7 @@
 		3192A1BD2A4C4CFF0084EA89 /* BraveDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023C26B35F3600489384 /* BraveDataImporter.swift */; };
 		3192A1BE2A4C4CFF0084EA89 /* OperatingSystemVersionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E46A2614618A0067D1B9 /* OperatingSystemVersionExtension.swift */; };
 		3192A1BF2A4C4CFF0084EA89 /* ToggleableScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */; };
-		3192A1C02A4C4CFF0084EA89 /* NetworkProtectionSharedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D605F2A0B29FA00BCD287 /* NetworkProtectionSharedState.swift */; };
+		3192A1C02A4C4CFF0084EA89 /* NetworkProtectionOptionKeyExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D605F2A0B29FA00BCD287 /* NetworkProtectionOptionKeyExtension.swift */; };
 		3192A1C12A4C4CFF0084EA89 /* UserScripts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AC3AEE25D5CE9800C7D2AA /* UserScripts.swift */; };
 		3192A1C22A4C4CFF0084EA89 /* NSWorkspaceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B643BF1327ABF772000BACEC /* NSWorkspaceExtension.swift */; };
 		3192A1C32A4C4CFF0084EA89 /* AutofillTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C00ECA292F839D009C73A6 /* AutofillTabExtension.swift */; };
@@ -8601,6 +8604,7 @@
 				31929FBE2A4C4CFF0084EA89 /* NavigationProtectionTabExtension.swift in Sources */,
 				31929FBF2A4C4CFF0084EA89 /* UserAgent.swift in Sources */,
 				31929FC02A4C4CFF0084EA89 /* LegacyBookmarkStore.swift in Sources */,
+				316C7A842A7E9C1700AA3BAE /* PixelExperiment.swift in Sources */,
 				31929FC12A4C4CFF0084EA89 /* NSAlert+DataImport.swift in Sources */,
 				31929FC22A4C4CFF0084EA89 /* MainWindow.swift in Sources */,
 				31929FC32A4C4CFF0084EA89 /* CrashReportPromptViewController.swift in Sources */,
@@ -8614,6 +8618,7 @@
 				31929FCB2A4C4CFF0084EA89 /* BWRequest.swift in Sources */,
 				31929FCC2A4C4CFF0084EA89 /* WKWebViewConfigurationExtensions.swift in Sources */,
 				31929FCD2A4C4CFF0084EA89 /* HomePageDefaultBrowserModel.swift in Sources */,
+				316C7A872A7E9C3B00AA3BAE /* BlockMenuItem.swift in Sources */,
 				31929FCE2A4C4CFF0084EA89 /* CrashReporter.swift in Sources */,
 				31929FCF2A4C4CFF0084EA89 /* BadgeNotificationAnimationModel.swift in Sources */,
 				31929FD02A4C4CFF0084EA89 /* HyperLink.swift in Sources */,
@@ -8653,6 +8658,7 @@
 				31929FF22A4C4CFF0084EA89 /* TabLazyLoader.swift in Sources */,
 				31929FF32A4C4CFF0084EA89 /* FileImportViewController.swift in Sources */,
 				31929FF42A4C4CFF0084EA89 /* SaveCredentialsViewController.swift in Sources */,
+				316C7A832A7E9BEE00AA3BAE /* BookmarksBarAppearance.swift in Sources */,
 				31929FF52A4C4CFF0084EA89 /* PopUpButton.swift in Sources */,
 				31929FF62A4C4CFF0084EA89 /* NetworkProtectionInviteDialog.swift in Sources */,
 				31929FF72A4C4CFF0084EA89 /* SuggestionViewController.swift in Sources */,
@@ -8689,7 +8695,6 @@
 				3192A0152A4C4CFF0084EA89 /* HistoryMenu.swift in Sources */,
 				3192A0162A4C4CFF0084EA89 /* ContentScopeFeatureFlagging.swift in Sources */,
 				3192A0172A4C4CFF0084EA89 /* OnboardingButtonStyles.swift in Sources */,
-				3192A0182A4C4CFF0084EA89 /* String+ArrayConversion.swift in Sources */,
 				3192A0192A4C4CFF0084EA89 /* SaveIdentityPopover.swift in Sources */,
 				3192A01A2A4C4CFF0084EA89 /* AuthenticationAlert.swift in Sources */,
 				3192A01B2A4C4CFF0084EA89 /* YoutubePlayerNavigationHandler.swift in Sources */,
@@ -8708,6 +8713,7 @@
 				3192A0282A4C4CFF0084EA89 /* DownloadListItem.swift in Sources */,
 				3192A0292A4C4CFF0084EA89 /* DownloadsPopover.swift in Sources */,
 				3192A02A2A4C4CFF0084EA89 /* SpacerNode.swift in Sources */,
+				316C7A862A7E9C2F00AA3BAE /* NetworkProtectionUserDefaultsConstants.swift in Sources */,
 				3192A02B2A4C4CFF0084EA89 /* UTType.swift in Sources */,
 				3192A02C2A4C4CFF0084EA89 /* SystemExtensionManager.swift in Sources */,
 				3192A02D2A4C4CFF0084EA89 /* SyncManagementDialogViewController.swift in Sources */,
@@ -8716,7 +8722,6 @@
 				3192A0302A4C4CFF0084EA89 /* NSEventExtension.swift in Sources */,
 				3192A0312A4C4CFF0084EA89 /* Onboarding.swift in Sources */,
 				3192A0322A4C4CFF0084EA89 /* PopUpWindow.swift in Sources */,
-				3192A0332A4C4CFF0084EA89 /* PersistentAppInterfaceSettings.swift in Sources */,
 				3192A0342A4C4CFF0084EA89 /* Favicons.xcdatamodeld in Sources */,
 				3192A0352A4C4CFF0084EA89 /* Publisher.asVoid.swift in Sources */,
 				3192A0362A4C4CFF0084EA89 /* NavigationButtonMenuDelegate.swift in Sources */,
@@ -8737,7 +8742,6 @@
 				3192A0452A4C4CFF0084EA89 /* PasswordManagementItemList.swift in Sources */,
 				3192A0462A4C4CFF0084EA89 /* Bookmark.swift in Sources */,
 				3192A0472A4C4CFF0084EA89 /* ConnectBitwardenViewModel.swift in Sources */,
-				3192A0482A4C4CFF0084EA89 /* TunnelConfiguration+WgQuickConfig.swift in Sources */,
 				3192A0492A4C4CFF0084EA89 /* NSNotificationName+DataImport.swift in Sources */,
 				3192A04A2A4C4CFF0084EA89 /* StoredPermission.swift in Sources */,
 				3192A04B2A4C4CFF0084EA89 /* FirePopoverCollectionViewHeader.swift in Sources */,
@@ -8816,6 +8820,7 @@
 				3192A0932A4C4CFF0084EA89 /* TemporaryFileHandler.swift in Sources */,
 				3192A0942A4C4CFF0084EA89 /* URL+NetworkProtection.swift in Sources */,
 				3192A0952A4C4CFF0084EA89 /* PrivacyFeatures.swift in Sources */,
+				316C7A852A7E9C2300AA3BAE /* BookmarksBarMenuFactory.swift in Sources */,
 				3192A0962A4C4CFF0084EA89 /* MouseClickView.swift in Sources */,
 				3192A0972A4C4CFF0084EA89 /* View+RoundedCorners.swift in Sources */,
 				3192A0982A4C4CFF0084EA89 /* AVCaptureDevice+SwizzledAuthState.swift in Sources */,
@@ -9118,7 +9123,7 @@
 				3192A1BD2A4C4CFF0084EA89 /* BraveDataImporter.swift in Sources */,
 				3192A1BE2A4C4CFF0084EA89 /* OperatingSystemVersionExtension.swift in Sources */,
 				3192A1BF2A4C4CFF0084EA89 /* ToggleableScrollView.swift in Sources */,
-				3192A1C02A4C4CFF0084EA89 /* NetworkProtectionSharedState.swift in Sources */,
+				3192A1C02A4C4CFF0084EA89 /* NetworkProtectionOptionKeyExtension.swift in Sources */,
 				3192A1C12A4C4CFF0084EA89 /* UserScripts.swift in Sources */,
 				3192A1C22A4C4CFF0084EA89 /* NSWorkspaceExtension.swift in Sources */,
 				3192A1C32A4C4CFF0084EA89 /* AutofillTabExtension.swift in Sources */,
@@ -9138,6 +9143,7 @@
 				3192A1D12A4C4CFF0084EA89 /* SecureVaultErrorReporter.swift in Sources */,
 				3192A1D22A4C4CFF0084EA89 /* NSImageExtensions.swift in Sources */,
 				3192A1D32A4C4CFF0084EA89 /* PasswordManagementViewController.swift in Sources */,
+				316C7A882A7E9C4D00AA3BAE /* BookmarksBarPromptPopover.swift in Sources */,
 				3192A1D42A4C4CFF0084EA89 /* ImportedBookmarks.swift in Sources */,
 				3192A1D52A4C4CFF0084EA89 /* NavigationActionPolicyExtension.swift in Sources */,
 				3192A1D62A4C4CFF0084EA89 /* CIImageExtension.swift in Sources */,
