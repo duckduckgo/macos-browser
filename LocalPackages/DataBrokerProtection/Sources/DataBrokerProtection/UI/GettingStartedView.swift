@@ -43,12 +43,7 @@ struct GettingStartedView: View {
 
             CTAButton(title: "Get Started")
         }
-        .padding(Constants.ContainerView.padding)
-        .background(Color("modal-background-color", bundle: .module))
-        .cornerRadius(Constants.ContainerView.cornerRadius)
-        .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 4)
-        .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
-        .padding(.all)
+        .shadedBorderedPanel()
     }
 }
 
