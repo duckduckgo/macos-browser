@@ -38,6 +38,10 @@ final class ProfileViewModel: ObservableObject {
     @Published var birthYear: Int?
     @Published var addresses = [Address]()
 
+    var isBirthdayValid: Bool {
+        birthYear != nil
+    }
+
     init() {
         // Create 4 fake profiles with unique names
         let profileNames = ["John Doe", "Jane Smith", "Peter Parker", "Alice Johnson"]

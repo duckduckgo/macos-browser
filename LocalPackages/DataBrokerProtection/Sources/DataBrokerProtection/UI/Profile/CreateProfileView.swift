@@ -45,6 +45,100 @@ struct CreateProfileView: View {
     }
 }
 
+// MARK: - Birthday
+
+@available(macOS 11.0, *)
+private struct BirthYearComponentView: View {
+    @ObservedObject var viewModel: ProfileViewModel
+    @State var isEditViewVisible = false
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            ComponentHeaderView(title: "Birth Year",
+                                subtitle: "The year you were born helps to bring back more accurate matches.",
+                                isValidated: viewModel.isBirthdayValid)
+
+            if isEditViewVisible {
+                BirthYearFormView(viewModel: viewModel) {
+                    withAnimation {
+                        isEditViewVisible = false
+                    }
+                }
+            } else {
+                if let birthYear = viewModel.birthYear {
+                    EditFieldView(enabled: true, label: "\(birthYear)") {
+                        withAnimation {
+                            isEditViewVisible = true
+                        }
+                    }
+                } else {
+                    Button(action: {
+                        withAnimation {
+                            self.isEditViewVisible.toggle()
+                        }
+                    }) {
+                        Text("Add birth year")
+                            .padding(.horizontal, Consts.Button.horizontalPadding)
+                            .padding(.vertical, Consts.Button.verticalPadding)
+
+                    }.buttonStyle(CTAButtonStyle())
+                        .padding(.top, 12)
+                }
+            }
+        }
+        .frame(width: Consts.Form.width)
+    }
+}
+
+private extension Date {
+    var year: Int {
+        let calendar = Calendar.current
+        return calendar.component(.year, from: self)
+    }
+}
+
+private struct BirthYearFormView: View {
+    @ObservedObject var viewModel: ProfileViewModel
+    @State private var selectedYear = Date().year
+    let completion: () -> Void
+
+    var body: some View {
+        VStack(spacing: 15) {
+
+            VStack(alignment: .leading) {
+                Text("Birth Year*")
+                    .foregroundColor(.secondary)
+
+                Picker(selection: $selectedYear) {
+                    ForEach((Date().year - 110)...(Date().year), id: \.self) { year in
+                        Text(String(year))
+                            .tag(year)
+                    }
+                } label: { }
+            }
+            .padding(.bottom, 20)
+            CTAFooterView(
+                saveButtonClicked: {
+                    withAnimation {
+                        viewModel.birthYear = selectedYear
+                    }
+                    completion()
+                },
+                cancelButtonClicked: completion)
+
+        }
+        .padding(Consts.Form.padding)
+        .borderedRoundedCorner()
+        .onAppear {
+            if let birthYear = viewModel.birthYear {
+                selectedYear = birthYear
+            }
+        }
+    }
+}
+
+// MARK: - Header / Footer
+
 private struct FormHeaderView: View {
     var body: some View {
         VStack(spacing: 16) {
@@ -92,7 +186,7 @@ private struct ComponentsContainerView: View {
                 Divider()
                     .padding(.horizontal)
 
-                BirthYearComponentView()
+                BirthYearComponentView(viewModel: viewModel)
                     .padding()
 
                 Divider()
@@ -118,9 +212,9 @@ private struct NameComponentView: View {
                             isValidated: true,
                             isEditViewVisible: $isSubviewVisible) {
 
-            ForEach(viewModel.profiles) { profile in
-                EditFieldView(label: profile.firstName)
-            }
+//            ForEach(viewModel.profiles) { profile in
+//                EditFieldView(label: profile.firstName)
+//            }
 
         } editView: {
             NameFormView {
@@ -195,66 +289,6 @@ private struct AddressFormView: View {
     }
 }
 
-@available(macOS 11.0, *)
-private struct BirthYearComponentView: View {
-    @State private var isSubviewVisible = false
-
-    var body: some View {
-        ProfileComponentRow(title: "Birth Year",
-                            subtitle: "The year you were born helps to bring back more accurate matches.",
-                            buttonTitle: "Add birth year",
-                            isValidated: true,
-                            isEditViewVisible: $isSubviewVisible) {
-            EditFieldView(label: "Testing")
-        } editView: {
-            BirthYearFormView {
-                withAnimation {
-                    isSubviewVisible.toggle()
-                }
-            } cancelButtonClicked: {
-                withAnimation {
-                    isSubviewVisible.toggle()
-                }
-            }
-        }.frame(width: Consts.Form.width)
-    }
-}
-
-extension Date {
-    var year: Int {
-        let calendar = Calendar.current
-        return calendar.component(.year, from: self)
-    }
-}
-
-private struct BirthYearFormView: View {
-    let saveButtonClicked: () -> Void
-    let cancelButtonClicked: () -> Void
-    @State private var selectedYear = Date().year
-    var body: some View {
-        VStack(spacing: 15) {
-
-            VStack(alignment: .leading) {
-                Text("Birth Year*")
-                    .foregroundColor(.secondary)
-
-                Picker(selection: $selectedYear) {
-                    ForEach((Date().year - 110)...(Date().year), id: \.self) { year in
-                        Text(String(year))
-                            .tag(year)
-                    }
-                } label: { }
-            }
-            .padding(.bottom, 20)
-            CTAFooterView(saveButtonClicked: saveButtonClicked,
-                          cancelButtonClicked: cancelButtonClicked)
-
-        }
-        .padding(Consts.Form.padding)
-        .borderedRoundedCorner()
-    }
-}
-
 private struct NameFormView: View {
     let saveButtonClicked: () -> Void
     let cancelButtonClicked: () -> Void
@@ -298,7 +332,9 @@ struct TextFieldWithLabel: View {
 }
 
 private struct EditFieldView: View {
+    let enabled: Bool
     let label: String
+    let editAction: () -> Void
 
     var body: some View {
         HStack {
@@ -307,7 +343,7 @@ private struct EditFieldView: View {
             Spacer()
 
             Button {
-
+                editAction()
             } label: {
                 Text("Edit")
                     .padding(.horizontal, Consts.Button.horizontalPadding)
@@ -412,6 +448,37 @@ private struct ProfileComponentRow<SavedItemsView: View, EditItemView: View>: Vi
                 .font(.body)
                 .fixedSize(horizontal: false, vertical: true)
                 .foregroundColor(.secondary)
+        }
+    }
+}
+
+@available(macOS 11.0, *)
+private struct ComponentHeaderView: View {
+    let title: String
+    let subtitle: String
+    let isValidated: Bool
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Text(title)
+                        .font(.title3)
+                        .bold()
+
+                    if isValidated {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                            .font(.title3)
+                    }
+                }
+
+                Text(subtitle)
+                    .font(.body)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .foregroundColor(.secondary)
+            }
+            Spacer()
         }
     }
 }
