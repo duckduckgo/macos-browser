@@ -23,19 +23,25 @@ struct CreateProfileView: View {
     @StateObject var viewModel = ProfileViewModel()
 
     var body: some View {
-        VStack {
-            FormHeaderView()
-                .padding()
-                .padding(.horizontal, Consts.OuterForm.horizontalPadding)
+        ZStack {
+            VStack {
+                FormHeaderView()
+                    .padding(.horizontal, Consts.OuterForm.horizontalPadding)
 
-            ComponentsContainerView(viewModel: viewModel)
-                .padding()
+                ComponentsContainerView(viewModel: viewModel)
+                    .padding()
 
-            FormFooterView()
-                .padding()
-                .padding(.horizontal, Consts.OuterForm.horizontalPadding)
+                FormFooterView()
+                    .padding()
+                    .padding(.horizontal, Consts.OuterForm.horizontalPadding)
+            }
+            .shadedBorderedPanel()
+
+            VStack {
+                Image("header-hero", bundle: .module)
+                Spacer()
+            }
         }
-        .shadedBorderedPanel()
     }
 }
 
@@ -126,7 +132,7 @@ private struct NameComponentView: View {
                     isSubviewVisible.toggle()
                 }
             }
-        }.frame(width: 500)
+        }.frame(width: Consts.Form.width)
     }
 }
 
@@ -151,7 +157,7 @@ private struct AddressComponentView: View {
                     isSubviewVisible.toggle()
                 }
             }
-        }.frame(width: 500)
+        }.frame(width: Consts.Form.width)
     }
 }
 
@@ -210,7 +216,7 @@ private struct BirthYearComponentView: View {
                     isSubviewVisible.toggle()
                 }
             }
-        }.frame(width: 500)
+        }.frame(width: Consts.Form.width)
     }
 }
 
@@ -416,6 +422,7 @@ private enum Consts {
 
     enum Form {
         static let padding: CGFloat = 24
+        static let width: CGFloat = 500
     }
 
     enum OuterForm {
@@ -427,5 +434,6 @@ private enum Consts {
 struct CreateProfileView_Previews: PreviewProvider {
     static var previews: some View {
         CreateProfileView()
+            .padding(30)
     }
 }
