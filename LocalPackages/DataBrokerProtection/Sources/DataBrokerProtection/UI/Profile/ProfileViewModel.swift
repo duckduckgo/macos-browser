@@ -19,12 +19,12 @@
 import Foundation
 
 final class ProfileViewModel: ObservableObject {
-    final class Profile: Identifiable {
+    final class Name: Identifiable, ObservableObject {
         let id = UUID()
-        var firstName = ""
-        var middleName: String? = ""
-        var lastName = ""
-        var suffix: String? = ""
+        @Published var firstName = ""
+        @Published var middleName: String? = ""
+        @Published var lastName = ""
+        @Published var suffix: String? = ""
     }
 
     final class Address: Identifiable {
@@ -34,23 +34,29 @@ final class ProfileViewModel: ObservableObject {
         var state =  ""
     }
 
-    @Published var profiles = [Profile]()
+    @Published var names = [Name]()
     @Published var birthYear: Int?
     @Published var addresses = [Address]()
 
+    @Published var selectedName: Name?
+
     var isBirthdayValid: Bool {
         birthYear != nil
+    }
+
+    var isNameValid: Bool {
+        names.count > 0
     }
 
     init() {
         // Create 4 fake profiles with unique names
         let profileNames = ["John Doe", "Jane Smith", "Peter Parker", "Alice Johnson"]
         for name in profileNames {
-            let fakeProfile = Profile()
+            let fakeProfile = Name()
             let components = name.components(separatedBy: " ")
             fakeProfile.firstName = components.first ?? ""
             fakeProfile.lastName = components.last ?? ""
-            profiles.append(fakeProfile)
+            names.append(fakeProfile)
         }
 
         // Create 3 fake addresses with unique names

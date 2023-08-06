@@ -72,17 +72,17 @@ private struct BirthYearComponentView: View {
                         }
                     }
                 } else {
-                    Button(action: {
+                    Button {
                         withAnimation {
-                            self.isEditViewVisible.toggle()
+                            isEditViewVisible.toggle()
                         }
-                    }) {
+                    } label: {
                         Text("Add birth year")
                             .padding(.horizontal, Consts.Button.horizontalPadding)
                             .padding(.vertical, Consts.Button.verticalPadding)
-
-                    }.buttonStyle(CTAButtonStyle())
-                        .padding(.top, 12)
+                    }
+                    .buttonStyle(CTAButtonStyle())
+                    .padding(.top, 12)
                 }
             }
         }
@@ -117,6 +117,7 @@ private struct BirthYearFormView: View {
                 } label: { }
             }
             .padding(.bottom, 20)
+
             CTAFooterView(
                 saveButtonClicked: {
                     withAnimation {
@@ -137,98 +138,91 @@ private struct BirthYearFormView: View {
     }
 }
 
-// MARK: - Header / Footer
-
-private struct FormHeaderView: View {
-    var body: some View {
-        VStack(spacing: 16) {
-            Text("Your Profile")
-                .font(.title)
-                .bold()
-
-            Text("The following information is required for Data Broker Protection. We’ll scan Data Broker sites for matching info and have it removed.")
-                .multilineTextAlignment(.center)
-                .font(.body)
-                .foregroundColor(.secondary)
-        }
-    }
-}
-
-private struct FormFooterView: View {
-    var body: some View {
-        VStack(spacing: 16) {
-            Button {
-               print("Scan")
-            } label: {
-                Text("Scan")
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 44)
-            }.buttonStyle(CTAButtonStyle(style: .secundary))
-
-            Text("The information you've entered stays on your device, it does not go through DuckDuckGo's servers.")
-                .multilineTextAlignment(.center)
-                .font(.body)
-                .foregroundColor(.secondary)
-        }
-    }
-}
-
-@available(macOS 11.0, *)
-private struct ComponentsContainerView: View {
-    @Environment(\.colorScheme) var colorScheme
-    @ObservedObject var viewModel: ProfileViewModel
-
-    var body: some View {
-            VStack {
-                NameComponentView(viewModel: viewModel)
-                    .padding()
-
-                Divider()
-                    .padding(.horizontal)
-
-                BirthYearComponentView(viewModel: viewModel)
-                    .padding()
-
-                Divider()
-                    .padding(.horizontal)
-
-                AddressComponentView()
-                    .padding()
-            }
-            .padding()
-            .borderedRoundedCorner()
-    }
-}
+// MARK: - Name
 
 @available(macOS 11.0, *)
 private struct NameComponentView: View {
     @ObservedObject var viewModel: ProfileViewModel
-    @State private var isSubviewVisible = false
+    @State private var isEditViewVisible = true
 
     var body: some View {
-        ProfileComponentRow(title: "Name",
-                            subtitle: "Providing your full name, nicknames, and maiden name, if applicable, can help us find additional matches.",
-                            buttonTitle: "Add name",
-                            isValidated: true,
-                            isEditViewVisible: $isSubviewVisible) {
-
-//            ForEach(viewModel.profiles) { profile in
-//                EditFieldView(label: profile.firstName)
-//            }
-
-        } editView: {
-            NameFormView {
-                withAnimation {
-                    isSubviewVisible.toggle()
-                }
-            } cancelButtonClicked: {
-                withAnimation {
-                    isSubviewVisible.toggle()
+        VStack(alignment: .leading) {
+            ComponentHeaderView(title: "Name",
+                                subtitle: "Providing your full name, nicknames, and maiden name, if applicable, can help us find additional matches.",
+                                isValidated: viewModel.isNameValid)
+            ForEach(viewModel.names) { name in
+                EditFieldView(enabled: !isEditViewVisible, label: name.firstName) {
+                    print("NAME \(name.firstName)")
+                    viewModel.selectedName = name
+                    withAnimation {
+                        isEditViewVisible = true
+                    }
                 }
             }
-        }.frame(width: Consts.Form.width)
+            if isEditViewVisible {
+                NameFormView(viewModel: viewModel) {
+                    print("save")
+                    withAnimation {
+                        isEditViewVisible = false
+                    }
+                } cancelButtonClicked: {
+                    print("cancel")
+                    withAnimation {
+                        isEditViewVisible = false
+                    }
+                }
+            } else {
+                Button {
+                    withAnimation {
+                        isEditViewVisible.toggle()
+                    }
+                } label: {
+                    Text("Add name")
+                        .padding(.horizontal, Consts.Button.horizontalPadding)
+                        .padding(.vertical, Consts.Button.verticalPadding)
+                }
+                .buttonStyle(CTAButtonStyle())
+                .padding(.top, 12)
+            }
+
+        }
+        .frame(width: Consts.Form.width)
     }
 }
+
+private struct NameFormView: View {
+    @ObservedObject var viewModel: ProfileViewModel
+    let saveButtonClicked: () -> Void
+    let cancelButtonClicked: () -> Void
+
+    @State private var firstName = ""
+    @State private var middleName = ""
+    @State private var lastName = ""
+    @State private var suffix = ""
+
+    var body: some View {
+        VStack(spacing: 15) {
+            TextFieldWithLabel(label: "First Name*", text: $firstName)
+            TextFieldWithLabel(label: "Middle Name", text: $middleName)
+            TextFieldWithLabel(label: "Last Name*", text: $lastName)
+            TextFieldWithLabel(label: "Suffix", text: $suffix)
+            CTAFooterView(saveButtonClicked: saveButtonClicked,
+                          cancelButtonClicked: cancelButtonClicked)
+        }
+        .padding(Consts.Form.padding)
+        .borderedRoundedCorner()
+        .onAppear {
+            if let selectedName = viewModel.selectedName {
+                firstName = selectedName.firstName
+                middleName = selectedName.middleName ?? ""
+                lastName = selectedName.lastName
+                suffix = selectedName.suffix ?? ""
+            }
+        }
+    }
+}
+
+// MARK: - Address
 
 @available(macOS 11.0, *)
 private struct AddressComponentView: View {
@@ -289,26 +283,69 @@ private struct AddressFormView: View {
     }
 }
 
-private struct NameFormView: View {
-    let saveButtonClicked: () -> Void
-    let cancelButtonClicked: () -> Void
+// MARK: - Header / Footer
 
-    @State private var firstName = ""
-    @State private var middleName = ""
-    @State private var lastName = ""
-    @State private var suffix = ""
+private struct FormHeaderView: View {
+    var body: some View {
+        VStack(spacing: 16) {
+            Text("Your Profile")
+                .font(.title)
+                .bold()
+
+            Text("The following information is required for Data Broker Protection. We’ll scan Data Broker sites for matching info and have it removed.")
+                .multilineTextAlignment(.center)
+                .font(.body)
+                .foregroundColor(.secondary)
+        }
+    }
+}
+
+private struct FormFooterView: View {
+    var body: some View {
+        VStack(spacing: 16) {
+            Button {
+               print("Scan")
+            } label: {
+                Text("Scan")
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 44)
+            }.buttonStyle(CTAButtonStyle(style: .secundary))
+
+            Text("The information you've entered stays on your device, it does not go through DuckDuckGo's servers.")
+                .multilineTextAlignment(.center)
+                .font(.body)
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+// MARK: - Helpers
+
+@available(macOS 11.0, *)
+private struct ComponentsContainerView: View {
+    @Environment(\.colorScheme) var colorScheme
+    @ObservedObject var viewModel: ProfileViewModel
 
     var body: some View {
-        VStack(spacing: 15) {
-            TextFieldWithLabel(label: "First Name*", text: $firstName)
-            TextFieldWithLabel(label: "Middle Name", text: $middleName)
-            TextFieldWithLabel(label: "Last Name*", text: $lastName)
-            TextFieldWithLabel(label: "Suffix", text: $suffix)
-            CTAFooterView(saveButtonClicked: saveButtonClicked,
-                          cancelButtonClicked: cancelButtonClicked)
-        }
-        .padding(Consts.Form.padding)
-        .borderedRoundedCorner()
+            VStack {
+                NameComponentView(viewModel: viewModel)
+                    .padding()
+
+                Divider()
+                    .padding(.horizontal)
+
+                BirthYearComponentView(viewModel: viewModel)
+                    .padding()
+
+                Divider()
+                    .padding(.horizontal)
+
+                AddressComponentView()
+                    .padding()
+            }
+            .padding()
+            .borderedRoundedCorner()
     }
 }
 
@@ -349,7 +386,9 @@ private struct EditFieldView: View {
                     .padding(.horizontal, Consts.Button.horizontalPadding)
                     .padding(.vertical, Consts.Button.verticalPadding)
 
-            }.buttonStyle(CTAButtonStyle())
+            }
+            .buttonStyle(CTAButtonStyle())
+            .disabled(!enabled)
 
         }
         .padding(16)
