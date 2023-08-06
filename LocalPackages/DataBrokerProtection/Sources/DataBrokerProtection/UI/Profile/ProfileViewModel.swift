@@ -79,6 +79,10 @@ final class ProfileViewModel: ObservableObject {
         addresses.count > 0
     }
 
+    var isProfileValid: Bool {
+        [isBirthdayValid, isNameValid, isAddressValid].allSatisfy { $0 }
+    }
+
     func saveName(id: UUID?, firstName: String, middleName: String?, lastName: String, suffix: String?) {
         if let id = id, let name = names.filter({ $0.id == id}).first {
             name.firstName = firstName

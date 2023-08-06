@@ -31,7 +31,7 @@ struct CreateProfileView: View {
                 ComponentsContainerView(viewModel: viewModel)
                     .padding()
 
-                FormFooterView()
+                FormFooterView(viewModel: viewModel)
                     .padding()
                     .padding(.horizontal, Consts.OuterForm.horizontalPadding)
             }
@@ -400,6 +400,8 @@ private struct FormHeaderView: View {
 }
 
 private struct FormFooterView: View {
+    @ObservedObject var viewModel: ProfileViewModel
+
     var body: some View {
         VStack(spacing: 16) {
             Button {
@@ -408,7 +410,9 @@ private struct FormFooterView: View {
                 Text("Scan")
                     .frame(maxWidth: .infinity)
                     .frame(height: 44)
-            }.buttonStyle(CTAButtonStyle(style: .secondary))
+            }
+            .buttonStyle(CTAButtonStyle(style: .primary))
+            .disabled(!viewModel.isProfileValid)
 
             Text("The information you've entered stays on your device, it does not go through DuckDuckGo's servers.")
                 .multilineTextAlignment(.center)
