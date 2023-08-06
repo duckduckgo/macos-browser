@@ -43,7 +43,7 @@ struct GettingStartedView: View {
 
             CTAButton(title: "Get Started")
         }
-        .shadedBorderedPanel()
+        .shadedBorderedPanel(backgroundColor: Color("modal-background-color", bundle: .module))
     }
 }
 

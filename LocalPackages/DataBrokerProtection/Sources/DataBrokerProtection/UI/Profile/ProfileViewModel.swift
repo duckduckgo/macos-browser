@@ -19,6 +19,7 @@
 import Foundation
 
 final class ProfileViewModel: ObservableObject {
+
     final class Name: Identifiable {
         let id = UUID()
         @Trimmed var firstName = ""

@@ -21,6 +21,7 @@ import SwiftUI
 @available(macOS 11.0, *)
 struct CreateProfileView: View {
     @StateObject var viewModel = ProfileViewModel()
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         ZStack {
@@ -35,7 +36,7 @@ struct CreateProfileView: View {
                     .padding()
                     .padding(.horizontal, Consts.OuterForm.horizontalPadding)
             }
-            .shadedBorderedPanel()
+            .shadedBorderedPanel(backgroundColor: Color("background-color", bundle: .module))
 
             VStack {
                 Image("header-hero", bundle: .module)
@@ -60,9 +61,7 @@ private struct BirthYearComponentView: View {
 
             if isEditViewVisible {
                 BirthYearFormView(viewModel: viewModel) {
-                    withAnimation {
-                        isEditViewVisible = false
-                    }
+                   setEditViewVisible(false)
                 }
             } else {
                 if let birthYear = viewModel.birthYear {
@@ -71,11 +70,13 @@ private struct BirthYearComponentView: View {
                             isEditViewVisible = true
                         }
                     }
+                    .padding(.horizontal, Consts.EditField.horizontalPadding)
+                    .padding(.vertical, Consts.EditField.verticalPadding)
+                    .borderedRoundedCorner(backgroundColor: Color("modal-background-color", bundle: .module))
+
                 } else {
                     Button {
-                        withAnimation {
-                            isEditViewVisible.toggle()
-                        }
+                        setEditViewVisible(true)
                     } label: {
                         Text("Add birth year")
                             .padding(.horizontal, Consts.Button.horizontalPadding)
@@ -87,6 +88,12 @@ private struct BirthYearComponentView: View {
             }
         }
         .frame(width: Consts.Form.width)
+    }
+
+    private func setEditViewVisible(_ visible: Bool) {
+        withAnimation {
+            isEditViewVisible = visible
+        }
     }
 }
 
@@ -118,15 +125,15 @@ private struct BirthYearFormView: View {
             }
             .padding(.bottom, 20)
 
-            CTAFooterView(
-                saveButtonClicked: {
-                    withAnimation {
-                        viewModel.birthYear = selectedYear
-                    }
-                    completion()
-                },
-                cancelButtonClicked: completion)
-
+            CTAFooterView(showDeleteButton: false,
+                          saveButtonEnabled: true) {
+                withAnimation {
+                    viewModel.birthYear = selectedYear
+                }
+                completion()
+            } cancelButtonClicked: {
+                completion()
+            } deleteButtonClicked: { }
         }
         .padding(Consts.Form.padding)
         .borderedRoundedCorner()
@@ -151,13 +158,13 @@ private struct NameComponentView: View {
                                 subtitle: "Providing your full name, nicknames, and maiden name, if applicable, can help us find additional matches.",
                                 isValidated: viewModel.isNameValid)
 
-            ForEach(viewModel.names) { name in
-                EditFieldView(enabled: !isEditViewVisible,
-                              label: name.fullName) {
+            EditViewList(viewModel.names) { name in
+                EditFieldView(enabled: !isEditViewVisible, label: name.fullName) {
                     viewModel.selectedName = name
                     setEditViewVisible(true)
                 }
             }
+
             if isEditViewVisible {
                 NameFormView(viewModel: viewModel) {
                     setEditViewVisible(false)
@@ -202,7 +209,7 @@ private struct NameFormView: View {
             TextFieldWithLabel(label: "Last Name*", text: $lastName)
             TextFieldWithLabel(label: "Suffix", text: $suffix)
 
-            CTAFooterView2(showDeleteButton: shouldShowDeleteButton,
+            CTAFooterView(showDeleteButton: shouldShowDeleteButton,
                            saveButtonEnabled: areRequiredFormsFilled()) {
                 save()
                 completion()
@@ -266,13 +273,14 @@ private struct AddressComponentView: View {
                                 subtitle: "Providing your full address can help us find a match faster. You can add up to 3 previous addresses.",
                                 isValidated: viewModel.isAddressValid)
 
-            ForEach(viewModel.addresses) { address in
+            EditViewList(viewModel.addresses) { address in
                 EditFieldView(enabled: !isEditViewVisible,
                               label: address.fullAddress) {
                     viewModel.selectedAddress = address
                     setEditViewVisible(true)
                 }
             }
+
             if isEditViewVisible {
                 AddressFormView(viewModel: viewModel) {
                     setEditViewVisible(false)
@@ -331,7 +339,7 @@ private struct AddressFormView: View {
             }
             .padding(.bottom, 20)
 
-            CTAFooterView2(
+            CTAFooterView(
                 showDeleteButton: shouldShowDeleteButton,
                 saveButtonEnabled: areRequiredFormsFilled()) {
                     save()
@@ -426,8 +434,35 @@ private struct FormFooterView: View {
 // MARK: - Helpers
 
 @available(macOS 11.0, *)
+struct EditViewList<Data, Content: View>: View where Data: RandomAccessCollection, Data.Element: Identifiable {
+    let data: Data
+    let content: (Data.Element) -> Content
+
+    init(_ data: Data, @ViewBuilder content: @escaping (Data.Element) -> Content) {
+        self.data = data
+        self.content = content
+    }
+
+    var body: some View {
+        if !data.isEmpty {
+            VStack {
+                ForEach(Array(data.enumerated()), id: \.element.id) { index, item in
+                    self.content(item)
+                        .padding(.horizontal, Consts.EditField.horizontalPadding)
+                    if index != self.data.count - 1 {
+                        Divider()
+                    }
+                }
+            }
+            .padding(.vertical, Consts.EditField.verticalPadding)
+            .borderedRoundedCorner(backgroundColor: Color("modal-background-color", bundle: .module))
+            .transition(.opacity)
+        }
+    }
+}
+
+@available(macOS 11.0, *)
 private struct ComponentsContainerView: View {
-    @Environment(\.colorScheme) var colorScheme
     @ObservedObject var viewModel: ProfileViewModel
 
     var body: some View {
@@ -492,44 +527,11 @@ private struct EditFieldView: View {
             }
             .buttonStyle(CTAButtonStyle())
             .disabled(!enabled)
-
         }
-        .padding(16)
-        .frame(height: 56)
-        .borderedRoundedCorner(backgroundColor: .secondary)
     }
 }
 
 private struct CTAFooterView: View {
-    let saveButtonClicked: () -> Void
-    let cancelButtonClicked: () -> Void
-
-    var body: some View {
-        HStack {
-            Button {
-                cancelButtonClicked()
-            } label: {
-                Text("Cancel")
-                    .padding(.horizontal, Consts.Button.horizontalPadding)
-                    .padding(.vertical, Consts.Button.verticalPadding)
-
-            }.buttonStyle(CTAButtonStyle(style: .secondary))
-
-            Spacer()
-
-            Button {
-                saveButtonClicked()
-            } label: {
-                Text("Save")
-                    .padding(.horizontal, Consts.Button.horizontalPadding)
-                    .padding(.vertical, Consts.Button.verticalPadding)
-            }
-            .buttonStyle(CTAButtonStyle())
-        }
-    }
-}
-
-private struct CTAFooterView2: View {
     let showDeleteButton: Bool
     let saveButtonEnabled: Bool
     let saveButtonClicked: () -> Void
@@ -622,6 +624,11 @@ private enum Consts {
         static let width: CGFloat = 500
     }
 
+    enum EditField {
+        static let horizontalPadding: CGFloat = 16
+        static let verticalPadding: CGFloat = 10
+
+    }
     enum OuterForm {
         static let horizontalPadding: CGFloat = 40
     }

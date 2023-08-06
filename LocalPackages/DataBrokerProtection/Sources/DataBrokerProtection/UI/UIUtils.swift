@@ -94,7 +94,6 @@ struct BorderedRoundedCorner: ViewModifier {
                     if let color = backgroundColor {
                         RoundedRectangle(cornerRadius: 8)
                             .fill(color)
-                            .opacity(0.1)
                     }
 
                     RoundedRectangle(cornerRadius: 8)
@@ -106,10 +105,12 @@ struct BorderedRoundedCorner: ViewModifier {
 }
 
 struct ShadedBorderedPanel: ViewModifier {
+    let backgroundColor: Color
+
     func body(content: Content) -> some View {
         content
             .padding(48)
-            .background(Color("modal-background-color", bundle: .module))
+            .background(backgroundColor)
             .cornerRadius(16)
             .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 4)
             .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
@@ -126,7 +127,7 @@ extension View {
         modifier(BorderedRoundedCorner(backgroundColor: backgroundColor))
     }
 
-    func shadedBorderedPanel() -> some View {
-        modifier(ShadedBorderedPanel())
+    func shadedBorderedPanel(backgroundColor: Color) -> some View {
+        modifier(ShadedBorderedPanel(backgroundColor: backgroundColor))
     }
 }
