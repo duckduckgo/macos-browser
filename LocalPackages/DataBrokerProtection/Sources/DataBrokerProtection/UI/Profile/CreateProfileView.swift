@@ -193,7 +193,6 @@ private struct NameFormView: View {
     @State private var middleName = ""
     @State private var lastName = ""
     @State private var suffix = ""
-
     @State private var shouldShowDeleteButton = false
 
     var body: some View {
@@ -220,9 +219,9 @@ private struct NameFormView: View {
             if let selectedName = viewModel.selectedName {
                 shouldShowDeleteButton = true
                 firstName = selectedName.firstName
-                middleName = selectedName.middleName ?? ""
+                middleName = selectedName.middleName
                 lastName = selectedName.lastName
-                suffix = selectedName.suffix ?? ""
+                suffix = selectedName.suffix
             }
         }
     }
@@ -307,10 +306,12 @@ private struct AddressFormView: View {
 
     @State private var street = ""
     @State private var city = ""
-    @State private var state = ""
+    @State private var state = AddressFormView.selectStateTag
     @State private var shouldShowDeleteButton = false
 
-    private let states = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
+    private static let selectStateTag = "Select"
+
+    private let states = [AddressFormView.selectStateTag, "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
 
     var body: some View {
         VStack(spacing: 15) {
@@ -324,6 +325,7 @@ private struct AddressFormView: View {
                 Picker(selection: $state) {
                     ForEach(states, id: \.self) { state in
                         Text(state)
+                            .tag(state)
                     }
                 } label: { }
             }
@@ -346,7 +348,7 @@ private struct AddressFormView: View {
         .onAppear {
             if let selectedAddress = viewModel.selectedAddress {
                 shouldShowDeleteButton = true
-                street = selectedAddress.street ?? ""
+                street = selectedAddress.street
                 city = selectedAddress.city
                 state = selectedAddress.state
             }
@@ -371,6 +373,9 @@ private struct AddressFormView: View {
     }
 
     private func areRequiredFormsFilled() -> Bool {
+        if state == AddressFormView.selectStateTag {
+            return false
+        }
         return [city, state]
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines)}
             .allSatisfy { !$0.isEmpty }

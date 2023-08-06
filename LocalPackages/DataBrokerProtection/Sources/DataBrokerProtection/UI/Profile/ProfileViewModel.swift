@@ -21,20 +21,20 @@ import Foundation
 final class ProfileViewModel: ObservableObject {
     final class Name: Identifiable {
         let id = UUID()
-        var firstName = ""
-        var middleName: String? = ""
-        var lastName = ""
-        var suffix: String? = ""
+        @Trimmed var firstName = ""
+        @Trimmed var middleName = ""
+        @Trimmed var lastName = ""
+        @Trimmed var suffix = ""
 
         var fullName: String {
-            let components = [suffix, firstName, middleName, lastName].compactMap { $0 }
+            let components = [suffix, firstName, middleName, lastName].filter { !$0.isEmpty }
             return components.joined(separator: " ")
         }
 
         internal init(firstName: String,
-                      middleName: String? = "",
+                      middleName: String = "",
                       lastName: String,
-                      suffix: String? = "") {
+                      suffix: String = "") {
             self.firstName = firstName
             self.middleName = middleName
             self.lastName = lastName
@@ -44,18 +44,18 @@ final class ProfileViewModel: ObservableObject {
 
     final class Address: Identifiable {
         let id = UUID()
-        var street: String? = ""
-        var city = ""
-        var state =  ""
+        @Trimmed var street = ""
+        @Trimmed var city = ""
+        @Trimmed var state =  ""
 
-        internal init(street: String? = "", city: String = "", state: String = "") {
+        internal init(street: String = "", city: String, state: String) {
             self.street = street
             self.city = city
             self.state = state
         }
 
         var fullAddress: String {
-            let components = [street, city, state].compactMap { $0 }
+            let components = [street, city, state].filter { !$0.isEmpty }
             return components.joined(separator: ", ")
         }
     }
@@ -82,11 +82,14 @@ final class ProfileViewModel: ObservableObject {
     func saveName(id: UUID?, firstName: String, middleName: String?, lastName: String, suffix: String?) {
         if let id = id, let name = names.filter({ $0.id == id}).first {
             name.firstName = firstName
-            name.middleName = middleName
+            name.middleName = middleName ?? ""
             name.lastName = lastName
-            name.suffix = suffix
+            name.suffix = suffix ?? ""
         } else {
-            let name = Name(firstName: firstName, middleName: middleName, lastName: lastName, suffix: suffix)
+            let name = Name(firstName: firstName,
+                            middleName: middleName ?? "",
+                            lastName: lastName,
+                            suffix: suffix ?? "")
             names.append(name)
         }
     }
@@ -97,11 +100,13 @@ final class ProfileViewModel: ObservableObject {
 
     func saveAddress(id: UUID?, street: String? = nil, city: String, state: String) {
         if let id = id, let address = addresses.filter({ $0.id == id}).first {
-            address.street = street
+            address.street = street ?? ""
             address.city = city
             address.state = state
         } else {
-            let address = Address(street: street, city: city, state: state)
+            let address = Address(street: street ?? "",
+                                  city: city,
+                                  state: state)
             addresses.append(address)
         }
     }
@@ -110,4 +115,18 @@ final class ProfileViewModel: ObservableObject {
         addresses.removeAll(where: {$0.id == id})
     }
 
+}
+
+@propertyWrapper
+struct Trimmed {
+    private var value: String
+
+    var wrappedValue: String {
+        get { value }
+        set { value = newValue.trimmingCharacters(in: .whitespacesAndNewlines) }
+    }
+
+    init(wrappedValue initialValue: String) {
+        value = initialValue.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 }
