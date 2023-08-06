@@ -19,12 +19,12 @@
 import Foundation
 
 final class ProfileViewModel: ObservableObject {
-    final class Name: Identifiable, ObservableObject {
+    final class Name: Identifiable {
         let id = UUID()
-        @Published var firstName = ""
-        @Published var middleName: String? = ""
-        @Published var lastName = ""
-        @Published var suffix: String? = ""
+        var firstName = ""
+        var middleName: String? = ""
+        var lastName = ""
+        var suffix: String? = ""
 
         var fullName: String {
             let components = [suffix, firstName, middleName, lastName].compactMap { $0 }
@@ -47,6 +47,17 @@ final class ProfileViewModel: ObservableObject {
         var street: String? = ""
         var city = ""
         var state =  ""
+
+        internal init(street: String? = "", city: String = "", state: String = "") {
+            self.street = street
+            self.city = city
+            self.state = state
+        }
+
+        var fullAddress: String {
+            let components = [street, city, state].compactMap { $0 }
+            return components.joined(separator: ", ")
+        }
     }
 
     @Published var names = [Name]()
@@ -54,6 +65,7 @@ final class ProfileViewModel: ObservableObject {
     @Published var addresses = [Address]()
 
     @Published var selectedName: Name?
+    @Published var selectedAddress: Address?
 
     var isBirthdayValid: Bool {
         birthYear != nil
@@ -63,28 +75,11 @@ final class ProfileViewModel: ObservableObject {
         names.count > 0
     }
 
-    init() {
-      // Create 4 fake profiles with unique names
-        let profileNames = ["John Doe", "Jane Smith", "Peter Parker", "Alice Johnson"]
-        for name in profileNames {
-            let components = name.components(separatedBy: " ")
-            let fn = components.first ?? ""
-            let ln = components.last ?? ""
-            names.append(Name(firstName: fn, lastName: ln))
-        }
-
-        // Create 3 fake addresses with unique names
-        let addressNames = ["123 Main St", "456 Elm St", "789 Oak St"]
-        for name in addressNames {
-            let fakeAddress = Address()
-            fakeAddress.street = name
-            fakeAddress.city = "Some City"
-            fakeAddress.state = "Sample State"
-            addresses.append(fakeAddress)
-        }
+    var isAddressValid: Bool {
+        addresses.count > 0
     }
 
-    func save(id: UUID?, firstName: String, middleName: String?, lastName: String, suffix: String?) {
+    func saveName(id: UUID?, firstName: String, middleName: String?, lastName: String, suffix: String?) {
         if let id = id, let name = names.filter({ $0.id == id}).first {
             name.firstName = firstName
             name.middleName = middleName
@@ -99,4 +94,20 @@ final class ProfileViewModel: ObservableObject {
     func deleteName(_ id: UUID) {
         names.removeAll(where: {$0.id == id})
     }
+
+    func saveAddress(id: UUID?, street: String? = nil, city: String, state: String) {
+        if let id = id, let address = addresses.filter({ $0.id == id}).first {
+            address.street = street
+            address.city = city
+            address.state = state
+        } else {
+            let address = Address(street: street, city: city, state: state)
+            addresses.append(address)
+        }
+    }
+
+    func deleteAddress(_ id: UUID) {
+        addresses.removeAll(where: {$0.id == id})
+    }
+
 }

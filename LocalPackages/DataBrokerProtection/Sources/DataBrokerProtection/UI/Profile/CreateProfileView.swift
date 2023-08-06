@@ -150,6 +150,7 @@ private struct NameComponentView: View {
             ComponentHeaderView(title: "Name",
                                 subtitle: "Providing your full name, nicknames, and maiden name, if applicable, can help us find additional matches.",
                                 isValidated: viewModel.isNameValid)
+
             ForEach(viewModel.names) { name in
                 EditFieldView(enabled: !isEditViewVisible,
                               label: name.fullName) {
@@ -204,12 +205,12 @@ private struct NameFormView: View {
 
             CTAFooterView2(showDeleteButton: shouldShowDeleteButton,
                            saveButtonEnabled: areRequiredFormsFilled()) {
-                saveName()
+                save()
                 completion()
             } cancelButtonClicked: {
                 completion()
             } deleteButtonClicked: {
-                deleteName()
+                delete()
                 completion()
             }
         }
@@ -226,9 +227,9 @@ private struct NameFormView: View {
         }
     }
 
-    private func saveName() {
+    private func save() {
         withAnimation {
-            viewModel.save(
+            viewModel.saveName(
                 id: viewModel.selectedName?.id,
                 firstName: firstName,
                 middleName: middleName,
@@ -237,7 +238,7 @@ private struct NameFormView: View {
         }
     }
 
-    private func deleteName() {
+    private func delete() {
         if let id = viewModel.selectedName?.id {
             withAnimation {
                 viewModel.deleteName(id)
@@ -246,7 +247,9 @@ private struct NameFormView: View {
     }
 
     private func areRequiredFormsFilled() -> Bool {
-        return [firstName, lastName].allSatisfy { !$0.isEmpty }
+        return [firstName, lastName]
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines)}
+            .allSatisfy { !$0.isEmpty }
     }
 }
 
@@ -254,38 +257,60 @@ private struct NameFormView: View {
 
 @available(macOS 11.0, *)
 private struct AddressComponentView: View {
-    @State private var isSubviewVisible = false
+    @ObservedObject var viewModel: ProfileViewModel
+    @State private var isEditViewVisible = false
 
     var body: some View {
-        ProfileComponentRow(title: "Address",
-                            subtitle: "Providing your full address can help us find a match faster. You can add up to 3 previous addresses.",
-                            buttonTitle: "Add address",
-                            isValidated: true,
-                            isEditViewVisible: $isSubviewVisible) {
-           // EditFieldView(label: "Testing")
-        } editView: {
-            AddressFormView {
-                withAnimation {
-                    isSubviewVisible.toggle()
-                }
-            } cancelButtonClicked: {
-                withAnimation {
-                    isSubviewVisible.toggle()
+
+        VStack(alignment: .leading) {
+            ComponentHeaderView(title: "Address",
+                                subtitle: "Providing your full address can help us find a match faster. You can add up to 3 previous addresses.",
+                                isValidated: viewModel.isAddressValid)
+
+            ForEach(viewModel.addresses) { address in
+                EditFieldView(enabled: !isEditViewVisible,
+                              label: address.fullAddress) {
+                    viewModel.selectedAddress = address
+                    setEditViewVisible(true)
                 }
             }
-        }.frame(width: Consts.Form.width)
+            if isEditViewVisible {
+                AddressFormView(viewModel: viewModel) {
+                    setEditViewVisible(false)
+                }
+            } else {
+                Button {
+                    viewModel.selectedAddress = nil
+                    setEditViewVisible(true)
+                } label: {
+                    Text("Add address")
+                        .padding(.horizontal, Consts.Button.horizontalPadding)
+                        .padding(.vertical, Consts.Button.verticalPadding)
+                }
+                .buttonStyle(CTAButtonStyle())
+                .padding(.top, 12)
+            }
+        }
+        .frame(width: Consts.Form.width)
+    }
+
+    private func setEditViewVisible(_ visible: Bool) {
+        withAnimation {
+            isEditViewVisible = visible
+        }
     }
 }
 
 private struct AddressFormView: View {
-    let saveButtonClicked: () -> Void
-    let cancelButtonClicked: () -> Void
+    @ObservedObject var viewModel: ProfileViewModel
+    let completion: () -> Void
+
     @State private var street = ""
     @State private var city = ""
     @State private var state = ""
-    @State private var selectedState = "Select a State"
+    @State private var shouldShowDeleteButton = false
 
-    let states = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
+    private let states = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
 
     var body: some View {
         VStack(spacing: 15) {
@@ -296,7 +321,7 @@ private struct AddressFormView: View {
                 Text("State*")
                     .foregroundColor(.secondary)
 
-                Picker(selection: $selectedState) {
+                Picker(selection: $state) {
                     ForEach(states, id: \.self) { state in
                         Text(state)
                     }
@@ -304,10 +329,51 @@ private struct AddressFormView: View {
             }
             .padding(.bottom, 20)
 
-            CTAFooterView(saveButtonClicked: saveButtonClicked,
-                          cancelButtonClicked: cancelButtonClicked)
-        }.padding(Consts.Form.padding)
-            .borderedRoundedCorner()
+            CTAFooterView2(
+                showDeleteButton: shouldShowDeleteButton,
+                saveButtonEnabled: areRequiredFormsFilled()) {
+                    save()
+                    completion()
+                } cancelButtonClicked: {
+                    completion()
+                } deleteButtonClicked: {
+                    delete()
+                    completion()
+                }
+        }
+        .padding(Consts.Form.padding)
+        .borderedRoundedCorner()
+        .onAppear {
+            if let selectedAddress = viewModel.selectedAddress {
+                shouldShowDeleteButton = true
+                street = selectedAddress.street ?? ""
+                city = selectedAddress.city
+                state = selectedAddress.state
+            }
+        }
+    }
+
+    private func save() {
+        withAnimation {
+            viewModel.saveAddress(id: viewModel.selectedAddress?.id,
+                                  street: street,
+                                  city: city,
+                                  state: state)
+        }
+    }
+
+    private func delete() {
+        if let id = viewModel.selectedAddress?.id {
+            withAnimation {
+                viewModel.deleteAddress(id)
+            }
+        }
+    }
+
+    private func areRequiredFormsFilled() -> Bool {
+        return [city, state]
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines)}
+            .allSatisfy { !$0.isEmpty }
     }
 }
 
@@ -369,7 +435,7 @@ private struct ComponentsContainerView: View {
                 Divider()
                     .padding(.horizontal)
 
-                AddressComponentView()
+                AddressComponentView(viewModel: viewModel)
                     .padding()
             }
             .padding()
@@ -501,71 +567,6 @@ private struct CTAFooterView2: View {
         }
         .buttonStyle(CTAButtonStyle(style: style))
         .disabled(!enabled)
-    }
-}
-
-@available(macOS 11.0, *)
-private struct ProfileComponentRow<SavedItemsView: View, EditItemView: View>: View {
-    let title: String
-    let subtitle: String
-    let buttonTitle: String
-    let isValidated: Bool
-
-    @Binding var isEditViewVisible: Bool
-    @ViewBuilder var savedItemsView: SavedItemsView
-    @ViewBuilder var editView: EditItemView
-
-    var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                headerView
-                Spacer()
-            }
-
-            if !isEditViewVisible {
-                savedItemsView
-
-                Button(action: {
-                    withAnimation {
-                        self.isEditViewVisible.toggle()
-                    }
-                }) {
-                    Text(buttonTitle)
-                        .padding(.horizontal, Consts.Button.horizontalPadding)
-                        .padding(.vertical, Consts.Button.verticalPadding)
-
-                }.buttonStyle(CTAButtonStyle())
-                    .padding(.top, 12)
-            }
-
-            if isEditViewVisible {
-                editView
-                    .padding(.top, 12)
-                    .transition(.opacity)
-            }
-        }
-    }
-
-    @available(macOS 11.0, *)
-    private var headerView: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text(title)
-                    .font(.title3)
-                    .bold()
-
-                if isValidated {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
-                        .font(.title3)
-                }
-            }
-
-            Text(subtitle)
-                .font(.body)
-                .fixedSize(horizontal: false, vertical: true)
-                .foregroundColor(.secondary)
-        }
     }
 }
 
