@@ -21,7 +21,8 @@ import SwiftUI
 struct CTAButtonStyle: ButtonStyle {
     enum Style {
         case primary
-        case secundary
+        case secondary
+        case destructive
     }
 
     @Environment(\.colorScheme) var colorScheme
@@ -46,14 +47,19 @@ struct CTAButtonStyle: ButtonStyle {
             return Color.secondary
         }
 
-        if style == .secundary {
+        switch style {
+        case .primary:
+            return configuration.isPressed ? Color.primary : Color.white
+
+        case .secondary:
             if colorScheme == .dark {
                 return configuration.isPressed ? Color.primary : Color.white
             } else {
                 return configuration.isPressed ? Color.white: Color.primary
             }
-        } else {
-           return configuration.isPressed ? Color.primary : Color.white
+
+        case .destructive:
+            return configuration.isPressed ? .black : .red
         }
     }
 
@@ -64,10 +70,15 @@ struct CTAButtonStyle: ButtonStyle {
             return opacitySecondaryColor
         }
 
-        if style == .secundary {
-            return configuration.isPressed ? Color.secondary : opacitySecondaryColor
-        } else {
+        switch style {
+        case .primary:
             return configuration.isPressed ? Color.secondary : Color.accentColor
+
+        case .secondary:
+            return configuration.isPressed ? Color.secondary : opacitySecondaryColor
+
+        case .destructive:
+            return .clear
         }
     }
 }

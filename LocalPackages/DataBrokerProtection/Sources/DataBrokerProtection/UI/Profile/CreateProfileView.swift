@@ -143,7 +143,7 @@ private struct BirthYearFormView: View {
 @available(macOS 11.0, *)
 private struct NameComponentView: View {
     @ObservedObject var viewModel: ProfileViewModel
-    @State private var isEditViewVisible = true
+    @State private var isEditViewVisible = false
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -151,31 +151,20 @@ private struct NameComponentView: View {
                                 subtitle: "Providing your full name, nicknames, and maiden name, if applicable, can help us find additional matches.",
                                 isValidated: viewModel.isNameValid)
             ForEach(viewModel.names) { name in
-                EditFieldView(enabled: !isEditViewVisible, label: name.firstName) {
-                    print("NAME \(name.firstName)")
+                EditFieldView(enabled: !isEditViewVisible,
+                              label: name.fullName) {
                     viewModel.selectedName = name
-                    withAnimation {
-                        isEditViewVisible = true
-                    }
+                    setEditViewVisible(true)
                 }
             }
             if isEditViewVisible {
                 NameFormView(viewModel: viewModel) {
-                    print("save")
-                    withAnimation {
-                        isEditViewVisible = false
-                    }
-                } cancelButtonClicked: {
-                    print("cancel")
-                    withAnimation {
-                        isEditViewVisible = false
-                    }
+                    setEditViewVisible(false)
                 }
             } else {
                 Button {
-                    withAnimation {
-                        isEditViewVisible.toggle()
-                    }
+                    viewModel.selectedName = nil
+                    setEditViewVisible(true)
                 } label: {
                     Text("Add name")
                         .padding(.horizontal, Consts.Button.horizontalPadding)
@@ -184,21 +173,27 @@ private struct NameComponentView: View {
                 .buttonStyle(CTAButtonStyle())
                 .padding(.top, 12)
             }
-
         }
         .frame(width: Consts.Form.width)
+    }
+
+    private func setEditViewVisible(_ visible: Bool) {
+        withAnimation {
+            isEditViewVisible = visible
+        }
     }
 }
 
 private struct NameFormView: View {
     @ObservedObject var viewModel: ProfileViewModel
-    let saveButtonClicked: () -> Void
-    let cancelButtonClicked: () -> Void
+    let completion: () -> Void
 
     @State private var firstName = ""
     @State private var middleName = ""
     @State private var lastName = ""
     @State private var suffix = ""
+
+    @State private var shouldShowDeleteButton = false
 
     var body: some View {
         VStack(spacing: 15) {
@@ -206,19 +201,52 @@ private struct NameFormView: View {
             TextFieldWithLabel(label: "Middle Name", text: $middleName)
             TextFieldWithLabel(label: "Last Name*", text: $lastName)
             TextFieldWithLabel(label: "Suffix", text: $suffix)
-            CTAFooterView(saveButtonClicked: saveButtonClicked,
-                          cancelButtonClicked: cancelButtonClicked)
+
+            CTAFooterView2(showDeleteButton: shouldShowDeleteButton,
+                           saveButtonEnabled: areRequiredFormsFilled()) {
+                saveName()
+                completion()
+            } cancelButtonClicked: {
+                completion()
+            } deleteButtonClicked: {
+                deleteName()
+                completion()
+            }
         }
         .padding(Consts.Form.padding)
         .borderedRoundedCorner()
         .onAppear {
             if let selectedName = viewModel.selectedName {
+                shouldShowDeleteButton = true
                 firstName = selectedName.firstName
                 middleName = selectedName.middleName ?? ""
                 lastName = selectedName.lastName
                 suffix = selectedName.suffix ?? ""
             }
         }
+    }
+
+    private func saveName() {
+        withAnimation {
+            viewModel.save(
+                id: viewModel.selectedName?.id,
+                firstName: firstName,
+                middleName: middleName,
+                lastName: lastName,
+                suffix: suffix)
+        }
+    }
+
+    private func deleteName() {
+        if let id = viewModel.selectedName?.id {
+            withAnimation {
+                viewModel.deleteName(id)
+            }
+        }
+    }
+
+    private func areRequiredFormsFilled() -> Bool {
+        return [firstName, lastName].allSatisfy { !$0.isEmpty }
     }
 }
 
@@ -309,7 +337,7 @@ private struct FormFooterView: View {
                 Text("Scan")
                     .frame(maxWidth: .infinity)
                     .frame(height: 44)
-            }.buttonStyle(CTAButtonStyle(style: .secundary))
+            }.buttonStyle(CTAButtonStyle(style: .secondary))
 
             Text("The information you've entered stays on your device, it does not go through DuckDuckGo's servers.")
                 .multilineTextAlignment(.center)
@@ -410,7 +438,7 @@ private struct CTAFooterView: View {
                     .padding(.horizontal, Consts.Button.horizontalPadding)
                     .padding(.vertical, Consts.Button.verticalPadding)
 
-            }.buttonStyle(CTAButtonStyle(style: .secundary))
+            }.buttonStyle(CTAButtonStyle(style: .secondary))
 
             Spacer()
 
@@ -423,6 +451,56 @@ private struct CTAFooterView: View {
             }
             .buttonStyle(CTAButtonStyle())
         }
+    }
+}
+
+private struct CTAFooterView2: View {
+    let showDeleteButton: Bool
+    let saveButtonEnabled: Bool
+    let saveButtonClicked: () -> Void
+    let cancelButtonClicked: () -> Void
+    let deleteButtonClicked: (() -> Void)?
+
+    var body: some View {
+        HStack {
+            if showDeleteButton {
+                button(title: "Delete",
+                       style: .destructive) {
+                    deleteButtonClicked?()
+                }
+                Spacer()
+            }
+
+            button(title: "Cancel",
+                   style: .secondary) {
+                cancelButtonClicked()
+            }
+
+            if !showDeleteButton {
+                Spacer()
+            }
+
+            button(title: "Save",
+                   enabled: saveButtonEnabled,
+                   style: .primary) {
+                saveButtonClicked()
+            }
+        }
+    }
+
+    private func button(title: String,
+                        enabled: Bool = true,
+                        style: CTAButtonStyle.Style,
+                        completion: @escaping  () -> Void) -> some View {
+        Button {
+            completion()
+        } label: {
+            Text(title)
+                .padding(.horizontal, Consts.Button.horizontalPadding)
+                .padding(.vertical, Consts.Button.verticalPadding)
+        }
+        .buttonStyle(CTAButtonStyle(style: style))
+        .disabled(!enabled)
     }
 }
 
@@ -543,6 +621,7 @@ private enum Consts {
 struct CreateProfileView_Previews: PreviewProvider {
     static var previews: some View {
         CreateProfileView()
+            .frame(width: 500, height: 1400)
             .padding(30)
     }
 }

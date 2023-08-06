@@ -25,6 +25,21 @@ final class ProfileViewModel: ObservableObject {
         @Published var middleName: String? = ""
         @Published var lastName = ""
         @Published var suffix: String? = ""
+
+        var fullName: String {
+            let components = [suffix, firstName, middleName, lastName].compactMap { $0 }
+            return components.joined(separator: " ")
+        }
+
+        internal init(firstName: String,
+                      middleName: String? = "",
+                      lastName: String,
+                      suffix: String? = "") {
+            self.firstName = firstName
+            self.middleName = middleName
+            self.lastName = lastName
+            self.suffix = suffix
+        }
     }
 
     final class Address: Identifiable {
@@ -49,14 +64,13 @@ final class ProfileViewModel: ObservableObject {
     }
 
     init() {
-        // Create 4 fake profiles with unique names
+      // Create 4 fake profiles with unique names
         let profileNames = ["John Doe", "Jane Smith", "Peter Parker", "Alice Johnson"]
         for name in profileNames {
-            let fakeProfile = Name()
             let components = name.components(separatedBy: " ")
-            fakeProfile.firstName = components.first ?? ""
-            fakeProfile.lastName = components.last ?? ""
-            names.append(fakeProfile)
+            let fn = components.first ?? ""
+            let ln = components.last ?? ""
+            names.append(Name(firstName: fn, lastName: ln))
         }
 
         // Create 3 fake addresses with unique names
@@ -68,5 +82,21 @@ final class ProfileViewModel: ObservableObject {
             fakeAddress.state = "Sample State"
             addresses.append(fakeAddress)
         }
+    }
+
+    func save(id: UUID?, firstName: String, middleName: String?, lastName: String, suffix: String?) {
+        if let id = id, let name = names.filter({ $0.id == id}).first {
+            name.firstName = firstName
+            name.middleName = middleName
+            name.lastName = lastName
+            name.suffix = suffix
+        } else {
+            let name = Name(firstName: firstName, middleName: middleName, lastName: lastName, suffix: suffix)
+            names.append(name)
+        }
+    }
+
+    func deleteName(_ id: UUID) {
+        names.removeAll(where: {$0.id == id})
     }
 }
