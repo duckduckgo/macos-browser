@@ -341,9 +341,15 @@ final class EmailOptionsButtonSubMenu: NSMenu {
                 .targetting(self)
                 .withImage(NSImage(named: "OptionsButtonMenuEmailGenerateAddress"))
 
+            addItem(withTitle: UserText.emailOptionsMenuManageAccountSubItem, action: #selector(manageAccountAction(_:)), keyEquivalent: "")
+                .targetting(self)
+                .withImage(NSImage(named: "Identity-16"))
+
+            addItem(.separator())
+
             addItem(withTitle: UserText.emailOptionsMenuTurnOffSubItem, action: #selector(turnOffEmailAction(_:)), keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "OptionsButtonMenuEmailDisabled"))
+                .withImage(NSImage(named: "Email-Disabled-16"))
 
         } else {
             addItem(withTitle: UserText.emailOptionsMenuTurnOnSubItem, action: #selector(turnOnEmailAction(_:)), keyEquivalent: "")
@@ -351,6 +357,11 @@ final class EmailOptionsButtonSubMenu: NSMenu {
                 .withImage(NSImage(named: "OptionsButtonMenuEmail"))
 
         }
+    }
+
+    @objc func manageAccountAction(_ sender: NSMenuItem) {
+        let tab = Tab(content: .url(EmailUrls().emailProtectionAccountLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
+        tabCollectionViewModel.append(tab: tab)
     }
 
     @objc func createAddressAction(_ sender: NSMenuItem) {
@@ -374,7 +385,11 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     @objc func turnOffEmailAction(_ sender: NSMenuItem) {
-        emailManager.signOut()
+        let alert = NSAlert.disableEmailProtection()
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn {
+            emailManager.signOut()
+        }
     }
 
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
@@ -391,6 +406,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 }
 
+@MainActor
 final class ZoomSubMenu: NSMenu {
 
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {

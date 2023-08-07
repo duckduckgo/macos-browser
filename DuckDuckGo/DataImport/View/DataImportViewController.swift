@@ -115,6 +115,8 @@ final class DataImportViewController: NSViewController {
     private weak var currentChildViewController: NSViewController?
     private var browserImportViewController: BrowserImportViewController?
 
+    private var bookmarkCount = 0
+
     private var dataImporter: DataImporter?
     private var selectedImportSourceCancellable: AnyCancellable?
 
@@ -174,6 +176,13 @@ final class DataImportViewController: NSViewController {
 
         selectedImportSourceCancellable = importSourcePopUpButton.selectionPublisher.sink { [weak self] _ in
             self?.refreshViewState()
+        }
+    }
+
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        if bookmarkCount > 0 {
+            NotificationCenter.default.post(name: .bookmarkPromptShouldShow, object: nil)
         }
     }
 
@@ -393,6 +402,7 @@ final class DataImportViewController: NSViewController {
                 if summary.isEmpty {
                     self.dismiss()
                 } else {
+                    self.bookmarkCount += summary.bookmarksResult?.successful ?? 0
                     self.viewState.interactionState = .completedImport(summary)
                 }
 

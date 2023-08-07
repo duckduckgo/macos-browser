@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
-import Cocoa
 import BrowserServicesKit
+import Cocoa
 import Common
+import WebKit
 
 // Actions are sent to objects of responder chain
 
@@ -232,6 +233,16 @@ extension AppDelegate {
     @IBAction func fireButtonAction(_ sender: NSButton) {
         FireCoordinator.fireButtonAction()
     }
+
+    @IBAction func navigateToPrivateEmail(_ sender: Any?) {
+        guard let window = NSApplication.shared.keyWindow,
+              let windowController = window.windowController as? MainWindowController else {
+            assertionFailure("No reference to main window controller")
+            return
+        }
+    windowController.mainViewController.browserTabViewController.openNewTab(with: .url(URL.duckDuckGoEmailLogin))
+    }
+
 }
 
 extension MainViewController {

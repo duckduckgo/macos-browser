@@ -54,6 +54,7 @@ final class StatisticsLoader {
                     }
                 }
                 Pixel.fire(.serp)
+                PixelExperiment.fireSearchOnDay4to8Pixel()
             } else if !self.statisticsStore.isAppRetentionFiredToday {
                 self.refreshAppRetentionAtb(completion: completion)
             } else {

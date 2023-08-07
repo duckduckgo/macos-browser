@@ -16,16 +16,18 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
+import Common
 import Combine
 import OSLog // swiftlint:disable:this enforce_os_log_wrapper
 import WebKit
-import BrowserServicesKit
 
 #if NETWORK_PROTECTION
 import NetworkProtection
 #endif
 
+@MainActor
 final class MainMenu: NSMenu {
 
     enum Constants {
@@ -289,7 +291,8 @@ final class MainMenu: NSMenu {
 
 #if NETWORK_PROTECTION
         let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
-        if networkProtectionFeatureVisibility.isFeatureActivated {
+        if #available(macOS 11.4, *),
+           networkProtectionFeatureVisibility.isFeatureActivated {
             toggleNetworkProtectionShortcutMenuItem?.isHidden = false
             toggleNetworkProtectionShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
         } else {
