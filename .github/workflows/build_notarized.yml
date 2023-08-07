@@ -88,6 +88,7 @@ jobs:
     name: Export Notarized App
 
     runs-on: macos-13
+    timeout-minutes: 30
 
     outputs:
       app-version: ${{ steps.set-outputs.outputs.app-version }}
@@ -204,6 +205,12 @@ jobs:
       if: failure()
       run: |
         find release/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/Product Review Release/InstallationBuildProductsLocation/Applications/DuckDuckGo Review.app/Contents/Resources/PrivacyDashboardResources_PrivacyDashboard-resources.bundle/
+
+    - name: Setup tmate session
+      if: failure()
+      uses: mxschmitt/action-tmate@v3
+      with:
+        limit-access-to-actor: true
 
     - name: Set app name and version
       id: set-outputs
