@@ -200,6 +200,11 @@ jobs:
 
         ./scripts/archive.sh ${{ env.release-type }}
 
+    - name: List PD resources
+      if: failure()
+      run: |
+        find release/DerivedData/Build/Intermediates.noindex/ArchiveIntermediates/Product\ Review\ Release/IntermediateBuildFilesPath/UninstalledProducts/macosx/PrivacyDashboardResources_PrivacyDashboard-resources.bundle
+
     - name: Set app name and version
       id: set-outputs
       run: |
