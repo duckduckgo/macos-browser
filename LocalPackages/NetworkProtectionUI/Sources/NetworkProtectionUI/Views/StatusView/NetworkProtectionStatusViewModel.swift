@@ -45,6 +45,10 @@ extension NetworkProtectionStatusView {
         ///
         private let tunnelController: TunnelController
 
+        /// The type of extension that's being used for NetP
+        ///
+        let onboardingStatus: OnboardingStatus
+
         /// The NetP status reporter
         ///
         private let statusReporter: NetworkProtectionStatusReporter
@@ -93,11 +97,13 @@ extension NetworkProtectionStatusView {
         // MARK: - Initialization & Deinitialization
 
         public init(controller: TunnelController,
+                    onboardingStatus: OnboardingStatus,
                     statusReporter: NetworkProtectionStatusReporter,
                     menuItems: [MenuItem],
                     runLoopMode: RunLoop.Mode? = nil) {
 
             self.tunnelController = controller
+            self.onboardingStatus = onboardingStatus
             self.statusReporter = statusReporter
             self.menuItems = menuItems
             self.runLoopMode = runLoopMode
@@ -544,6 +550,17 @@ extension NetworkProtectionStatusView {
                 await tunnelController.stop()
                 toggleTransition = .idle
                 refreshInternalIsRunning()
+            }
+        }
+
+        // MARK: - Onboarding
+
+        var onboardingStepViewModel: OnboardingStepView.Model? {
+            switch onboardingStatus {
+            case .completed:
+                return nil
+            case .isOnboarding(let step):
+                return OnboardingStepView.Model(step: step)
             }
         }
     }

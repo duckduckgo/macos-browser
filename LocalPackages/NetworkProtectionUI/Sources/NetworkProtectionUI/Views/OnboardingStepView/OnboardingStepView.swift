@@ -1,5 +1,5 @@
 //
-//  AllowSystemExtensionView.swift
+//  OnboardingStepView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,11 +19,7 @@
 import Foundation
 import SwiftUI
 
-struct AllowSystemExtensionView: View {
-
-    final class Model {
-
-    }
+struct OnboardingStepView: View {
 
     private let model: Model
 
@@ -40,21 +36,19 @@ struct AllowSystemExtensionView: View {
 
             HStack(alignment: .top, spacing: 0) {
 
-                Image(.appleVPNIcon)
+                Image(model.icon)
                     .resizable() // Just a note that this is only necessary right now due to the asset being a really small placeholder.  This attribute should go away when we replace with the final assets.
                     .frame(width: 40, height: 40)
                     .padding(.trailing, 12)
 
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("Enable System Extension")
+                    Text(model.title)
                         .multilineText()
 
-                    Text("Go to System Settings and click Allow under Privacy & Security")
+                    Text(model.description)
                         .multilineText()
 
-                    Button("Open System Settings") {
-                        // no-op: to be implemented
-                    }
+                    Button(model.title, action: model.action)
 
                     Spacer()
                 }

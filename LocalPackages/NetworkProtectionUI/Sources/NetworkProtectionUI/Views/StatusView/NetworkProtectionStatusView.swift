@@ -159,17 +159,21 @@ public struct NetworkProtectionStatusView: View {
 
     // MARK: - View Contents
 
+    var onboardingStatus: OnboardingStatus = .completed
+
     public var body: some View {
         VStack(spacing: 0) {
-            /*
-            if let healthWarning = model.issueDescription {
-                connectionHealthWarningView(message: healthWarning)
-            }*/
 
-            AllowSystemExtensionView(model: .init())
-                .padding(.horizontal, 5)
-                .padding(.top, 5)
-                .layoutPriority(1)
+            if let onboardingStepViewModel = model.onboardingStepViewModel {
+                OnboardingStepView(model: onboardingStepViewModel)
+                    .padding(.horizontal, 5)
+                    .padding(.top, 5)
+                    .layoutPriority(1)
+            } else {
+                if let healthWarning = model.issueDescription {
+                    connectionHealthWarningView(message: healthWarning)
+                }
+            }
 
             Spacer()
 
@@ -354,6 +358,7 @@ struct NetworkProtectionStatusView_Previews: PreviewProvider {
             NetworkProtectionStatusView.Model.MenuItem(name: "Share Feedback...", action: {})
         ]
         let model = NetworkProtectionStatusView.Model(controller: PreviewController(),
+                                                      onboardingStatus: .userNeedsToAllowExtension,
                                                       statusReporter: statusReporter,
                                                       menuItems: menuItems)
 

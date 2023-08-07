@@ -66,7 +66,7 @@ public final class StatusBarMenu {
             })
         ]
 
-        popover = NetworkProtectionPopover(controller: controller, statusReporter: statusReporter, menuItems: menuItems)
+        popover = NetworkProtectionPopover(controller: controller, onboardingStatus: .userNeedsToAllowExtension, statusReporter: statusReporter, menuItems: menuItems)
         popover.behavior = .transient
 
         self.statusItem.button?.image = .image(for: iconPublisher.icon)
