@@ -68,7 +68,7 @@ public struct InviteCodeView<ViewModel>: View where ViewModel: InviteCodeViewMod
 public protocol InviteCodeViewModel: ObservableObject {
 
     var titleText: String { get }
-    var messageText: String  { get }
+    var messageText: String { get }
     var textFieldPlaceholder: String { get }
     var cancelButtonText: String { get }
     var confirmButtonText: String { get }
@@ -111,7 +111,7 @@ public struct InviteCodeSuccessView<ViewModel>: View where ViewModel: InviteCode
 public protocol InviteCodeSuccessViewModel: ObservableObject {
 
     var titleText: String { get }
-    var messageText: String  { get }
+    var messageText: String { get }
     var confirmButtonText: String { get }
 
     func onConfirm()
