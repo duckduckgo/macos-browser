@@ -24,7 +24,7 @@ struct CreateProfileView: View {
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
-        ZStack {
+        ZStack (alignment: .top) {
             VStack {
                 FormHeaderView()
                     .padding(.horizontal, Consts.OuterForm.horizontalPadding)
@@ -36,12 +36,10 @@ struct CreateProfileView: View {
                     .padding()
                     .padding(.horizontal, Consts.OuterForm.horizontalPadding)
             }
-            .shadedBorderedPanel(backgroundColor: Color("background-color", bundle: .module))
+            .shadedBorderedPanel(backgroundColor: Color("profile-background-color", bundle: .module))
 
-            VStack {
-                Image("header-hero", bundle: .module)
-                Spacer()
-            }
+            Image("header-hero", bundle: .module)
+                .offset(y: -15)
         }
     }
 }

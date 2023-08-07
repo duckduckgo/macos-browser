@@ -45,17 +45,23 @@ private enum BodyViewType: CaseIterable {
 public struct DataBrokerProtectionContainerView: View {
     @State private var bodyViewType = BodyViewType.createProfile
 
+    private var shouldShowHeader: Bool {
+        bodyViewType != .createProfile
+    }
+
     public init() { }
 
     public var body: some View {
         ScrollView {
             ZStack {
-                VStack {
-                    DashboardHeaderView(viewModel: DashboardHeaderViewModel(statusText: "Scanning...",
-                                                                            faqButtonClicked: {},
-                                                                            editProfileClicked: {}))
-                    .frame(height: 300)
-                    Spacer()
+                if shouldShowHeader {
+                    VStack {
+                        DashboardHeaderView(viewModel: DashboardHeaderViewModel(statusText: "Scanning...",
+                                                                                faqButtonClicked: {},
+                                                                                editProfileClicked: {}))
+                        .frame(height: 300)
+                        Spacer()
+                    }
                 }
                 VStack {
                     switch bodyViewType {
@@ -76,7 +82,7 @@ public struct DataBrokerProtectionContainerView: View {
                     case .createProfile:
                         CreateProfileView()
                             .frame(width: 670)
-                            .padding(.top, 200)
+                            .padding(.top, 73)
                     }
                     Spacer()
                 }
@@ -94,10 +100,22 @@ public struct DataBrokerProtectionContainerView: View {
 
                         Spacer()
                     }
-                 Spacer()
+                    Spacer()
                 }.padding()
             }
-        }.background(Color("background-color", bundle: .module))
+        }.background(
+           backgroundView()
+        )
+    }
+
+    @ViewBuilder
+    func backgroundView() -> some View {
+        if shouldShowHeader {
+            Color("background-color", bundle: .module)
+        } else {
+            Image("background-pattern", bundle: .module)
+                .resizable()
+        }
     }
 }
 
