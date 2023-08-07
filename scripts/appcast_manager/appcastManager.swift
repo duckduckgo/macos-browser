@@ -1,7 +1,7 @@
 #!/usr/bin/swift
 
 // swiftlint:disable line_length
-// swiftlint:disable file_length
+// swiftlint:disable file_header
 
 import Foundation
 
@@ -168,7 +168,7 @@ case .releaseToPublicChannel:
 
 // MARK: - Downloading of Appcast and Files
 
-class AppcastDownloader {
+final class AppcastDownloader {
 
     private let dispatchGroup = DispatchGroup()
 
@@ -246,7 +246,7 @@ class AppcastDownloader {
         }
     }
 
-    class AppcastXMLParserDelegate: NSObject, XMLParserDelegate {
+    final class AppcastXMLParserDelegate: NSObject, XMLParserDelegate {
         var currentElement: String = ""
         var enclosureURL: String = ""
         var releaseNotesHTML: String?
