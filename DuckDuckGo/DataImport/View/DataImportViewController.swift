@@ -72,7 +72,7 @@ final class DataImportViewController: NSViewController {
     }
 
     private func secureVaultImporter() throws -> SecureVaultLoginImporter {
-        let secureVault = try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        let secureVault = try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
         return SecureVaultLoginImporter(secureVault: secureVault)
     }
 
@@ -114,6 +114,8 @@ final class DataImportViewController: NSViewController {
 
     private weak var currentChildViewController: NSViewController?
     private var browserImportViewController: BrowserImportViewController?
+
+    private var bookmarkCount = 0
 
     private var dataImporter: DataImporter?
     private var selectedImportSourceCancellable: AnyCancellable?
@@ -174,6 +176,13 @@ final class DataImportViewController: NSViewController {
 
         selectedImportSourceCancellable = importSourcePopUpButton.selectionPublisher.sink { [weak self] _ in
             self?.refreshViewState()
+        }
+    }
+
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        if bookmarkCount > 0 {
+            NotificationCenter.default.post(name: .bookmarkPromptShouldShow, object: nil)
         }
     }
 
@@ -393,6 +402,7 @@ final class DataImportViewController: NSViewController {
                 if summary.isEmpty {
                     self.dismiss()
                 } else {
+                    self.bookmarkCount += summary.bookmarksResult?.successful ?? 0
                     self.viewState.interactionState = .completedImport(summary)
                 }
 
@@ -460,7 +470,7 @@ extension DataImportViewController: FileImportViewControllerDelegate {
         }
 
         do {
-            let secureVault = try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+            let secureVault = try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
             let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault)
             self.dataImporter = CSVImporter(fileURL: url,
                                             loginImporter: secureVaultImporter,

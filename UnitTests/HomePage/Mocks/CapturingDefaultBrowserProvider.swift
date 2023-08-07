@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Common
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 

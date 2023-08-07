@@ -78,7 +78,7 @@
                                                 <action selector="newWindow:" target="Ady-hI-5gd" id="nK2-0w-B4c"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="New Burner Window" keyEquivalent="N" id="fx4-EK-KRg">
+                                        <menuItem title="New Fire Window" keyEquivalent="N" id="fx4-EK-KRg">
                                             <connections>
                                                 <action selector="newBurnerWindow:" target="Ady-hI-5gd" id="vLy-E3-sFd"/>
                                             </connections>
@@ -389,7 +389,7 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="hB3-LF-h0Y"/>
-                                        <menuItem title="Show Bookmarks Bar" keyEquivalent="B" id="z3f-ie-l71">
+                                        <menuItem title="Bookmarks Bar Menu Placeholder" keyEquivalent="B" id="z3f-ie-l71">
                                             <connections>
                                                 <action selector="toggleBookmarksBarFromMenu:" target="Ady-hI-5gd" id="dCK-ha-Oqf"/>
                                             </connections>
@@ -543,7 +543,7 @@ CA
                                                 <action selector="showManageBookmarks:" target="Ady-hI-5gd" id="meV-V2-zJ2"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Toggle Bookmarks Bar" keyEquivalent="B" id="SwH-Sh-zIJ">
+                                        <menuItem title="Bookmarks Bar Menu Placeholder" keyEquivalent="B" id="SwH-Sh-zIJ">
                                             <connections>
                                                 <action selector="toggleBookmarksBarFromMenu:" target="Ady-hI-5gd" id="K35-ch-3LK"/>
                                             </connections>
@@ -762,6 +762,31 @@ CQ
                                                             <action selector="resetMakeDuckDuckGoYoursUserSettings:" target="Ady-hI-5gd" id="maa-qG-0Bx"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Change Activation Date" id="Emw-LJ-v7W">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Change Activation Date" id="0Qi-HZ-AJt">
+                                                            <items>
+                                                                <menuItem title="Today" keyEquivalent="N" id="0lm-tL-hli">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="changeInstallDateToToday:" target="Ady-hI-5gd" id="Lsi-xW-usu"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="Less Than a Week Ago" id="KhK-Zf-YHA">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="changeInstallDateToLessThanAWeekAgo:" target="Ady-hI-5gd" id="J0j-gf-bhG"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="More Than a Week Ago" id="mYW-2j-Ckg">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="changeInstallDateToMoreThanAWeekAgo:" target="Ady-hI-5gd" id="Ygn-GW-JkY"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                            </items>
+                                                        </menu>
+                                                    </menuItem>
                                                     <menuItem title="Reset Email Protection InContext Signup Prompt" id="cQF-Np-0vk">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
@@ -811,35 +836,73 @@ CQ
                                         </menuItem>
                                         <menuItem title="Network Protection" id="Dt6-sj-4hn">
                                             <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Network Protection" id="Rah-lS-gno">
+                                            <menu key="submenu" title="Network Protection" id="Rah-lS-gno" customClass="NetworkProtectionDebugMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <items>
                                                     <menuItem title="Reset Network Protection State" id="p4h-oC-tpw">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="resetNetworkProtectionState:" target="Ady-hI-5gd" id="mIO-RZ-oSp"/>
+                                                            <action selector="resetAllState:" target="Rah-lS-gno" id="TDN-VH-bgV"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem title="Remove System Extension and Login Items" id="bKT-dU-DaE" userLabel="Remove System Extension">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="removeNetworkProtectionSystemExtensionAndAgents:" target="Ady-hI-5gd" id="S7i-iV-WN0"/>
+                                                            <action selector="removeSystemExtensionAndAgents:" target="Rah-lS-gno" id="1Yo-Qj-wxo"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem isSeparatorItem="YES" id="FSc-gX-vGh"/>
+                                                    <menuItem title="Connect on Log In" id="fSA-hH-Vum" userLabel="Connect On Log In">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="toggleConnectOnLogInAction:" target="Rah-lS-gno" id="ZCH-Qd-oYZ"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Enable On-Demand (required for Kill Switch)" id="u0h-YJ-J4H" userLabel="Connect On Demand">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="toggleConnectOnDemandAction:" target="Rah-lS-gno" id="beL-Aq-2Xu"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Kill Switch (enforceRoutes)" id="9HJ-tK-AOs" userLabel="Enforce Routes">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="toggleEnforceRoutesAction:" target="Rah-lS-gno" id="B4i-GF-9nw"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Excluded Routes" id="jr6-YD-fe7">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" autoenablesItems="NO" id="j7y-fb-xa6">
+                                                            <items>
+                                                                <menuItem title="Item 1" id="RmV-if-bZK">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                </menuItem>
+                                                                <menuItem title="Item 2" id="BqB-a0-uua">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                </menuItem>
+                                                                <menuItem title="Item 3" id="CA5-Tt-ZNp">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                </menuItem>
+                                                            </items>
+                                                            <connections>
+                                                                <outlet property="delegate" destination="Rah-lS-gno" id="Aeg-l2-mSM"/>
+                                                            </connections>
+                                                        </menu>
+                                                    </menuItem>
+                                                    <menuItem isSeparatorItem="YES" id="Rgl-Eu-PPS"/>
                                                     <menuItem title="Send Test Notification" id="3rB-n0-ZjS">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
-                                                            <action selector="sendTestNetworkProtectionNotification:" target="Ady-hI-5gd" id="XIg-P0-PDP"/>
+                                                            <action selector="sendTestNotification:" target="Rah-lS-gno" id="Hea-8E-9VU"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="Preferred Server Location" id="Zh6-DO-H1c">
+                                                    <menuItem title="Preferred Server" id="Zh6-DO-H1c">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Preferred Server Location" id="jbT-17-qgW">
+                                                        <menu key="submenu" title="Preferred Server" autoenablesItems="NO" id="jbT-17-qgW">
                                                             <items>
                                                                 <menuItem title="Automatic" id="0j8-SE-pRP">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="networkProtectionPreferredServerChanged:" target="Ady-hI-5gd" id="3eT-N4-yyJ"/>
+                                                                        <action selector="setSelectedServer:" target="Rah-lS-gno" id="aXQ-qW-U5G"/>
                                                                     </connections>
                                                                 </menuItem>
                                                             </items>
@@ -852,7 +915,7 @@ CQ
                                                                 <menuItem title="Expire Now" id="104-Zf-0KB">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="networkProtectionExpireRegistrationKeyNow:" target="Ady-hI-5gd" id="PZ4-J7-0am"/>
+                                                                        <action selector="expireRegistrationKeyNow:" target="Rah-lS-gno" id="gZT-ua-1Mu"/>
                                                                     </connections>
                                                                 </menuItem>
                                                                 <menuItem isSeparatorItem="YES" id="MEg-4g-gji"/>
@@ -863,7 +926,7 @@ CQ
                                                                             <menuItem title="Automatic" id="Hsh-im-6Cc">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                                 <connections>
-                                                                                    <action selector="networkProtectionSetRegistrationKeyValidity:" target="Ady-hI-5gd" id="oVF-DB-lPW"/>
+                                                                                    <action selector="setRegistrationKeyValidity:" target="Rah-lS-gno" id="xGL-zk-E3i"/>
                                                                                 </connections>
                                                                             </menuItem>
                                                                         </items>
@@ -874,24 +937,70 @@ CQ
                                                     </menuItem>
                                                     <menuItem title="Simulate Failure" id="K5h-D4-For">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Simulate Failure" id="iLs-sj-2Gd">
+                                                        <menu key="submenu" title="Simulate Failure" id="iLs-sj-2Gd" customClass="NetworkProtectionSimulateFailureMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                             <items>
-                                                                <menuItem title="Enable NetP &gt; Controller Failure" id="xyA-ob-gEy">
+                                                                <menuItem title="Enable NetP &gt; Controller Failure" id="xyA-ob-gEy" userLabel="Controller Failure">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="networkProtectionSimulateControllerFailure:" target="Ady-hI-5gd" id="7Ez-Oa-zkP"/>
+                                                                        <action selector="simulateControllerFailure:" target="iLs-sj-2Gd" id="qO6-8J-ER0"/>
                                                                     </connections>
                                                                 </menuItem>
-                                                                <menuItem title="Enable NetP &gt; Tunnel Failure" id="kVa-n8-UNx">
+                                                                <menuItem title="Tunnel Failure" id="kVa-n8-UNx" userLabel="Tunnel Failure">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="networkProtectionSimulateTunnelFailure:" target="Ady-hI-5gd" id="4Pb-oF-nwr"/>
+                                                                        <action selector="simulateTunnelFailure:" target="iLs-sj-2Gd" id="tZL-Vl-6mu"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                            </items>
+                                                            <connections>
+                                                                <outlet property="simulateControllerFailureMenuItem" destination="xyA-ob-gEy" id="1VV-xV-wsB"/>
+                                                                <outlet property="simulateTunnelFailureMenuItem" destination="kVa-n8-UNx" id="3Ie-Ed-VtG"/>
+                                                            </connections>
+                                                        </menu>
+                                                    </menuItem>
+                                                    <menuItem isSeparatorItem="YES" id="7LI-vT-hd9"/>
+                                                    <menuItem title="Kill Switch (alternative approach)" id="Gdx-Ng-vit">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Kill Switch (alternative approach)" id="wo0-bZ-WF3">
+                                                            <items>
+                                                                <menuItem title="includeAllNetworks" id="mSZ-AV-Dee" userLabel="Include All Networks">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="toggleIncludeAllNetworks:" target="Rah-lS-gno" id="c1r-Fw-0ca"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="excludeLocalNetworks" id="Zak-JJ-7hc" userLabel="Exclude Local Networks">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="toggleShouldExcludeLocalRoutes:" target="Rah-lS-gno" id="Wdd-D6-yWy"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="enable Connection Tester" id="L06-y6-zv3">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="toggleConnectionTesterEnabled:" target="Rah-lS-gno" id="iei-t7-7pG"/>
                                                                     </connections>
                                                                 </menuItem>
                                                             </items>
                                                         </menu>
                                                     </menuItem>
                                                 </items>
+                                                <connections>
+                                                    <outlet property="connectOnLogInMenuItem" destination="fSA-hH-Vum" id="HSf-v8-MYh"/>
+                                                    <outlet property="connectionTesterEnabledMenuItem" destination="L06-y6-zv3" id="uhM-4n-eOm"/>
+                                                    <outlet property="enableConnectOnDemandMenuItem" destination="u0h-YJ-J4H" id="Ufg-Pq-PYy"/>
+                                                    <outlet property="excludeLocalNetworksMenuItem" destination="Zak-JJ-7hc" id="vYu-wC-dTl"/>
+                                                    <outlet property="exclusionsMenu" destination="j7y-fb-xa6" id="igE-bU-qW4"/>
+                                                    <outlet property="mainMenuItem" destination="Dt6-sj-4hn" id="vwa-T8-0ak"/>
+                                                    <outlet property="preferredServerAutomaticItem" destination="0j8-SE-pRP" id="APF-zT-6Qd"/>
+                                                    <outlet property="preferredServerMenu" destination="jbT-17-qgW" id="6qH-9G-SrT"/>
+                                                    <outlet property="registrationKeyValidityAutomaticItem" destination="Hsh-im-6Cc" id="k4w-9T-ny9"/>
+                                                    <outlet property="registrationKeyValidityMenu" destination="HwX-wm-4zf" id="Dpg-p8-nQ0"/>
+                                                    <outlet property="registrationKeyValidityMenuItem" destination="iPz-EO-Nv6" id="XbK-zy-EGv"/>
+                                                    <outlet property="registrationKeyValidityMenuSeparatorItem" destination="MEg-4g-gji" id="Pos-zQ-wJJ"/>
+                                                    <outlet property="shouldEnforceRoutesMenuItem" destination="9HJ-tK-AOs" id="kjL-wl-sji"/>
+                                                    <outlet property="shouldIncludeAllNetworksMenuItem" destination="mSZ-AV-Dee" id="IL0-vZ-MUC"/>
+                                                </connections>
                                             </menu>
                                         </menuItem>
                                         <menuItem title="Trigger Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">
@@ -948,9 +1057,6 @@ CQ
                             <outlet property="importBrowserDataMenuItem" destination="gTV-od-6G5" id="2R0-Pa-qG4"/>
                             <outlet property="manageBookmarksMenuItem" destination="BaO-sP-wbQ" id="rn7-HX-04s"/>
                             <outlet property="networkProtectionMenuItem" destination="Dt6-sj-4hn" id="rwK-fl-TRh"/>
-                            <outlet property="networkProtectionPreferredServerLocationItem" destination="Zh6-DO-H1c" id="3wy-2a-ACt"/>
-                            <outlet property="networkProtectionRegistrationKeyValidityMenuItem" destination="iPz-EO-Nv6" id="Sw3-Bt-aZt"/>
-                            <outlet property="networkProtectionRegistrationKeyValidityMenuSeparatorItem" destination="MEg-4g-gji" id="yWq-Rz-B9B"/>
                             <outlet property="newBurnerWindowMenuItem" destination="fx4-EK-KRg" id="52V-eM-hzi"/>
                             <outlet property="newTabMenuItem" destination="9qI-62-tsd" id="6SI-rG-P34"/>
                             <outlet property="newWindowMenuItem" destination="Was-JA-tGl" id="uyQ-qR-DFk"/>
@@ -976,19 +1082,6 @@ CQ
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
                     </connections>
                 </application>
-                <menu id="013-wG-YGZ">
-                    <items>
-                        <menuItem title="Item 1" id="m8E-kO-TwB">
-                            <modifierMask key="keyEquivalentModifierMask"/>
-                        </menuItem>
-                        <menuItem title="Item 2" id="gKX-rb-enP">
-                            <modifierMask key="keyEquivalentModifierMask"/>
-                        </menuItem>
-                        <menuItem title="Item 3" id="MNz-ve-jnh">
-                            <modifierMask key="keyEquivalentModifierMask"/>
-                        </menuItem>
-                    </items>
-                </menu>
             </objects>
             <point key="canvasLocation" x="-222" y="-258"/>
         </scene>

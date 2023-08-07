@@ -27,6 +27,8 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
     var showAutocompleteSuggestions: Bool
     var currentThemeName: String
     var defaultPageZoom: CGFloat
+    var showBookmarksBar: Bool
+    var bookmarksBarAppearance: BookmarksBarAppearance
 
     init(
         showFullURL: Bool = false,
@@ -35,7 +37,9 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         defaultPageZoom: CGFloat = DefaultZoomValue.percent100.rawValue,
         isContinueSetUpVisible: Bool = true,
         isFavoriteVisible: Bool = true,
-        isRecentActivityVisible: Bool = true
+        isRecentActivityVisible: Bool = true,
+        showBookmarksBar: Bool = true,
+        bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn
     ) {
         self.showFullURL = showFullURL
         self.showAutocompleteSuggestions = showAutocompleteSuggestions
@@ -44,6 +48,8 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         self.isContinueSetUpVisible = isContinueSetUpVisible
         self.isFavoriteVisible = isFavoriteVisible
         self.isRecentActivityVisible = isRecentActivityVisible
+        self.showBookmarksBar = showBookmarksBar
+        self.bookmarksBarAppearance = bookmarksBarAppearance
     }
 }
 

@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import SwiftUI
 import BrowserServicesKit
+import SecureStorage
 
 protocol PasswordManagementDelegate: AnyObject {
 
@@ -139,8 +140,8 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
-    var secureVault: SecureVault? {
-        try? SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+    var secureVault: (any AutofillSecureVault)? {
+        try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
     }
 
     private let passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
@@ -464,7 +465,7 @@ final class PasswordManagementViewController: NSViewController {
             postChange()
 
         } catch {
-            if let window = view.window, case SecureVaultError.duplicateRecord = error {
+            if let window = view.window, case SecureStorageError.duplicateRecord = error {
                 NSAlert.passwordManagerDuplicateLogin().beginSheetModal(for: window)
             }
         }

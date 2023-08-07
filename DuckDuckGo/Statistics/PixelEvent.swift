@@ -101,6 +101,7 @@ extension Pixel {
 
         case adClickAttributionDetected
         case adClickAttributionActive
+        case adClickAttributionPageLoads
 
         case emailEnabled
         case emailDisabled
@@ -126,6 +127,12 @@ extension Pixel {
         case favoriteSectionHidden
         case recentActivitySectionHidden
         case continueSetUpSectionHidden
+
+        // Bookmarks bar onboarding
+        case bookmarksBarOnboardingEnrollment(cohort: String)
+        case bookmarksBarOnboardingSearched4to8days(cohort: String)
+        case bookmarksBarOnboardingFirstInteraction(cohort: String)
+        case bookmarksBarOnboardingInteraction2to8days(cohort: String)
 
         enum Debug {
 
@@ -312,6 +319,9 @@ extension Pixel.Event {
         case .adClickAttributionActive:
             return "m_mac_ad_click_active"
 
+        case .adClickAttributionPageLoads:
+            return "m_mac_ad_click_page_loads"
+
         // Deliberately omit the `m_mac_` prefix in order to format these pixels the same way as other platforms
         case .emailEnabled: return "email_enabled_macos_desktop"
         case .emailDisabled: return "email_disabled_macos_desktop"
@@ -346,6 +356,16 @@ extension Pixel.Event {
             return "m_mac.recent-activity-section-hidden"
         case .continueSetUpSectionHidden:
             return "m_mac.continue-setup-section-hidden"
+
+        // Bookmarks bar experiement
+        case .bookmarksBarOnboardingEnrollment:
+            return "m_mac_bookmarksbarexperiment_enrollment"
+        case .bookmarksBarOnboardingSearched4to8days:
+            return "m_mac_bookmarksbarexperiment_searched4to8days"
+        case .bookmarksBarOnboardingFirstInteraction:
+            return "m_mac_bookmarksbarexperiment_firstinteraction"
+        case .bookmarksBarOnboardingInteraction2to8days:
+            return "m_mac_bookmarksbarexperiment_interaction2to8days"
         }
     }
 }

@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Combine
 import Foundation
+import SecureStorage
 
 final class AutofillTabExtension: TabExtension {
 
@@ -52,10 +53,14 @@ final class AutofillTabExtension: TabExtension {
     }
     private var emailManager: AutofillEmailDelegate?
     private var vaultManager: AutofillSecureVaultDelegate?
+    private let isBurner: Bool
 
     @Published var autofillDataToSave: AutofillData?
 
-    init(autofillUserScriptPublisher: some Publisher<WebsiteAutofillUserScript?, Never>) {
+    init(autofillUserScriptPublisher: some Publisher<WebsiteAutofillUserScript?, Never>,
+         isBurner: Bool) {
+        self.isBurner = isBurner
+
         autofillUserScriptCancellable = autofillUserScriptPublisher.sink { [weak self] autofillScript in
             guard let self, let autofillScript else { return }
 
@@ -79,7 +84,11 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         return true
     }
 
-    func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData, hasGeneratedPassword generatedPassword: Bool, withTrigger trigger: AutofillUserScript.GetTriggerType?) {
+    func secureVaultManagerShouldSaveData(_: BrowserServicesKit.SecureVaultManager) -> Bool {
+        return !isBurner
+    }
+
+    func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData, withTrigger trigger: AutofillUserScript.GetTriggerType?) {
         self.autofillDataToSave = data
     }
 
@@ -105,20 +114,12 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         }
     }
 
-    func secureVaultInitFailed(_ error: SecureVaultError) {
+    func secureVaultInitFailed(_ error: SecureStorageError) {
         SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
     }
 
     public func secureVaultManager(_: BrowserServicesKit.SecureVaultManager, didReceivePixel pixel: AutofillUserScript.JSPixel) {
         Pixel.fire(.jsPixel(pixel))
-    }
-
-    func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager, shouldSilentlySave: Bool) -> Bool {
-        return true
-    }
-
-    func secureVaultManagerShouldSilentlySaveGeneratedPassword(_: SecureVaultManager) -> Bool {
-        return false
     }
 
     func secureVaultManager(_: SecureVaultManager, promptUserToUseGeneratedPasswordForDomain: String, withGeneratedPassword generatedPassword: String, completionHandler: @escaping (Bool) -> Void) {

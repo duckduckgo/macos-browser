@@ -224,7 +224,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func openNewChildTab(with url: URL) {
-        let tab = Tab(content: .url(url), parentTab: tabCollectionViewModel.selectedTabViewModel?.tab, shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
+        let tab = Tab(content: .url(url), parentTab: tabCollectionViewModel.selectedTabViewModel?.tab, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.insert(tab, selected: false)
     }
 
@@ -268,11 +268,12 @@ final class NavigationBarViewController: NSViewController {
         popovers.passwordManagementButtonPressed(usingView: passwordManagementButton, withDelegate: self)
     }
 
-    @IBAction func networkProtectionButtonAction(_ sender: NSButton) {
 #if NETWORK_PROTECTION
+    @available(macOS 11.4, *)
+    @IBAction func networkProtectionButtonAction(_ sender: NSButton) {
         popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
-#endif
     }
+#endif
 
     @IBAction func downloadsButtonAction(_ sender: NSButton) {
         toggleDownloadsPopover(keepButtonVisible: false)
@@ -687,8 +688,7 @@ extension NavigationBarViewController: NSMenuDelegate {
     public func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
 
-        let bookmarksBarTitle = PersistentAppInterfaceSettings.shared.showBookmarksBar ? UserText.hideBookmarksBar : UserText.showBookmarksBar
-        menu.addItem(withTitle: bookmarksBarTitle, action: #selector(toggleBookmarksBar), keyEquivalent: "B")
+        BookmarksBarMenuFactory.addToMenu(menu)
 
         menu.addItem(NSMenuItem.separator())
 
@@ -709,11 +709,6 @@ extension NavigationBarViewController: NSMenuDelegate {
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
         }
 #endif
-    }
-
-    @objc
-    private func toggleBookmarksBar(_ sender: NSMenuItem) {
-        PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
     }
 
     @objc
@@ -740,11 +735,13 @@ extension NavigationBarViewController: NSMenuDelegate {
 
 #if NETWORK_PROTECTION
     func showNetworkProtectionStatus() {
+        guard #available(macOS 11.4, *) else { return }
         popovers.showNetworkProtectionPopover(usingView: networkProtectionButton,
                                               withDelegate: networkProtectionButtonModel)
     }
 
     private func setupNetworkProtectionButton() {
+        guard #available(macOS 11.4, *) else { return }
         networkProtectionCancellable = networkProtectionButtonModel.$showButton
             .receive(on: RunLoop.main)
             .sink { [weak self] show in
@@ -777,10 +774,6 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         popovers.showBookmarkListPopover(usingView: bookmarkListButton,
                                          withDelegate: self,
                                          forTab: tabCollectionViewModel.selectedTabViewModel?.tab)
-    }
-
-    func optionsButtonMenuRequestedToggleBookmarksBar(_ menu: NSMenu) {
-        PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
     }
 
     func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu) {

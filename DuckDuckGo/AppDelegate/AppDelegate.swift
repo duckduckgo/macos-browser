@@ -177,6 +177,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         if LocalStatisticsStore().atb == nil {
             Pixel.firstLaunchDate = Date()
+            PixelExperiment.install()
         }
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
@@ -191,7 +192,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         if WindowsManager.windows.isEmpty,
            case .normal = NSApp.runType {
-            WindowsManager.openNewWindow(isBurner: false, lazyLoadTabs: true)
+            WindowsManager.openNewWindow(lazyLoadTabs: true)
         }
 
         grammarFeaturesManager.manage()
@@ -252,7 +253,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         if WindowControllersManager.shared.mainWindowControllers.isEmpty {
-            WindowsManager.openNewWindow(isBurner: false)
+            WindowsManager.openNewWindow()
             return true
         }
         return true
@@ -306,19 +307,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #if NETWORK_PROTECTION
 
     private func startupNetworkProtection() {
+        guard #available(macOS 11.4, *) else { return }
+
+        let loginItemsManager = NetworkProtectionLoginItemsManager()
         let networkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
 
         guard networkProtectionFeatureVisibility.isFeatureActivated else {
-            NetworkProtectionTunnelController.disableLoginItems()
+            loginItemsManager.disableLoginItems()
             LocalPinningManager.shared.unpin(.networkProtection)
             return
         }
 
-        updateNetworkProtectionIfVersionChanged()
+        restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
         refreshNetworkProtectionServers()
     }
 
-    private func updateNetworkProtectionIfVersionChanged() {
+    @available(macOS 11.4, *)
+    private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: NetworkProtectionLoginItemsManager) {
         let currentVersion = AppVersion.shared.versionNumber
         let versionStore = NetworkProtectionLastVersionRunStore()
         defer {
@@ -333,21 +338,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         if lastVersionRun != currentVersion {
             os_log(.info, log: .networkProtection, "App updated from %{public}s to %{public}s: updating login items", lastVersionRun, currentVersion)
-            updateNetworkProtectionTunnelAndMenu()
+            restartNetworkProtectionTunnelAndMenu(using: loginItemsManager)
         } else {
             // If login items failed to launch (e.g. because of the App bundle rename), launch using NSWorkspace
-            NetworkProtectionTunnelController.ensureLoginItemsAreRunning(.ifLoginItemsAreEnabled, after: 1)
+            loginItemsManager.ensureLoginItemsAreRunning(.ifLoginItemsAreEnabled, after: 1)
         }
     }
 
-    private func updateNetworkProtectionTunnelAndMenu() {
-        NetworkProtectionTunnelController.resetLoginItems()
+    @available(macOS 11.4, *)
+    private func restartNetworkProtectionTunnelAndMenu(using loginItemsManager: NetworkProtectionLoginItemsManager) {
+        loginItemsManager.restartLoginItems()
 
         Task {
             let provider = NetworkProtectionTunnelController()
 
             // Restart NetP SysEx on app update
-            if await provider.isConnected() {
+            if await provider.isConnected {
                 await provider.stop()
                 await provider.start()
             }
@@ -355,6 +361,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     /// Fetches a new list of Network Protection servers, and updates the existing set.
+    @available(macOS 11.4, *)
     private func refreshNetworkProtectionServers() {
         Task {
             let serverCount: Int

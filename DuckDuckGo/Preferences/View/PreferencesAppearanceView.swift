@@ -106,14 +106,35 @@ extension Preferences {
                 // SECTION 3: New Tab Page
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.newTabBottomPopoverTitle)
-                    if #available(macOS 11.0, *) {
+                    if #available(macOS 11.0, *), model.isContinueSetUpAvailable {
                         ToggleMenuItem(title: UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
                     }
                     ToggleMenuItem(title: UserText.newTabFavoriteSectionTitle, isOn: $model.isFavoriteVisible)
                     ToggleMenuItem(title: UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
                 }
 
-                // SECTION 4: Zoom Setting
+                // SECTION 4: Bookmarks Bar
+                PreferencePaneSection {
+                    TextMenuItemHeader(text: "Bookmarks Bar")
+                    HStack {
+                        ToggleMenuItem(title: UserText.showBookmarksBarPreference, isOn: $model.showBookmarksBar)
+                        NSPopUpButtonView(selection: $model.bookmarksBarAppearance) {
+                            let button = NSPopUpButton()
+                            button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+
+                            let alwaysOn = button.menu?.addItem(withTitle: UserText.showBookmarksBarAlways, action: nil, keyEquivalent: "")
+                            alwaysOn?.representedObject = BookmarksBarAppearance.alwaysOn
+
+                            let newTabOnly = button.menu?.addItem(withTitle: UserText.showBookmarksBarNewTabOnly, action: nil, keyEquivalent: "")
+                            newTabOnly?.representedObject = BookmarksBarAppearance.newTabOnly
+
+                            return button
+                        }
+                        .disabled(!model.showBookmarksBar)
+                    }
+                }
+
+                // SECTION 5: Zoom Setting
                 PreferencePaneSection {
                     Text(UserText.zoomSettingTitle)
                         .font(Const.Fonts.preferencePaneSectionHeader)

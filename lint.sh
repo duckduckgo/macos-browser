@@ -32,10 +32,10 @@ run_swiftlint_for_modified_files () {
 
     if [ -n "${CODE_FILES}" ]; then
         # replace  back #001 with space and feed to swiftlint
-        echo "${CODE_FILES}"  | tr '\001' ' ' | xargs swiftlint lint
+        echo "${CODE_FILES}"  | tr '\001' ' ' | xargs swiftlint lint --force-exclude
     fi
     if [ -n "${TEST_FILES}" ]; then
-        echo "${TEST_FILES}" | tr '\001' ' ' | xargs swiftlint lint --config .swiftlint.tests.yml
+        echo "${TEST_FILES}" | tr '\001' ' ' | xargs swiftlint lint --force-exclude --config .swiftlint.tests.yml
     fi
 }
 

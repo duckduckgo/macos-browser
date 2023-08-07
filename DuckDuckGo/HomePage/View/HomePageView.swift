@@ -25,7 +25,7 @@ extension HomePage.Views {
     struct RootView: View {
 
         let backgroundColor = Color("NewTabPageBackgroundColor")
-        let targetWidth: CGFloat = 482
+        static let targetWidth: CGFloat = 508
         let isBurner: Bool
 
         @EnvironmentObject var model: AppearancePreferences
@@ -41,11 +41,13 @@ extension HomePage.Views {
 
             } else {
                 if #available(macOS 11.0, *) {
-                    regularHomePageView(includingContinueSetUpCards: true)
+                    regularHomePageView(includingContinueSetUpCards: model.isContinueSetUpAvailable)
                         .contextMenu(ContextMenu(menuItems: {
-                            Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
-                                .toggleStyle(.checkbox)
-                                .visibility(continueSetUpModel.hasContent ? .visible : .gone)
+                            if model.isContinueSetUpAvailable {
+                                Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
+                                    .toggleStyle(.checkbox)
+                                    .visibility(continueSetUpModel.hasContent ? .visible : .gone)
+                            }
                             Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavoriteVisible)
                                 .toggleStyle(.checkbox)
                             Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
@@ -65,21 +67,21 @@ extension HomePage.Views {
                         Group {
                             if includingContinueSetUpCards {
                                 ContinueSetUpView()
-                                    .padding(.top, 72)
+                                    .padding(.top, 64)
                                     .visibility(model.isContinueSetUpVisible ? .visible : .gone)
                             }
 
                             Favorites()
-                                .padding(.top, 72)
+                                .padding(.top, 24)
                                 .visibility(model.isFavoriteVisible ? .visible : .gone)
 
                             RecentlyVisited()
-                                .padding(.top, 66)
+                                .padding(.top, 24)
                                 .padding(.bottom, 16)
                                 .visibility(model.isRecentActivityVisible ? .visible : .gone)
 
                         }
-                        .frame(width: 508)
+                        .frame(width: Self.targetWidth)
                     }
                     .frame(maxWidth: .infinity)
                 }

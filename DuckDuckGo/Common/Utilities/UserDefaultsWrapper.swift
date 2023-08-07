@@ -19,6 +19,11 @@
 import AppKit
 import Foundation
 
+extension UserDefaults {
+    /// The app group's shared UserDefaults
+    static let shared = UserDefaults(suiteName: Bundle.main.appGroupName)
+}
+
 @propertyWrapper
 public struct UserDefaultsWrapper<T> {
 
@@ -70,6 +75,7 @@ public struct UserDefaultsWrapper<T> {
         case showFullURL = "preferences.appearance.show-full-url"
         case showAutocompleteSuggestions = "preferences.appearance.show-autocomplete-suggestions"
         case defaultPageZoom = "preferences.appearance.default-page-zoom"
+        case bookmarksBarAppearance = "preferences.appearance.bookmarks-bar"
 
         // ATB
         case installDate = "statistics.installdate.key"
@@ -93,6 +99,9 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"
         case homePageShowCookie = "home.page.show.cookie"
+        case homePageShowSurveyDay0 = "home.page.show.survey.0"
+        case homePageUserInteractedWithSurveyDay0 = "home.page.user.interacted.with.survey.0"
+        case homePageShowSurveyDay7 = "home.page.show.survey.7"
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"
         case homePageContinueSetUpImport = "home.page.continue.set.up.import"
@@ -105,6 +114,7 @@ public struct UserDefaultsWrapper<T> {
 
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"
 
+        case bookmarksBarPromptShown = "bookmarks.bar.prompt.shown"
         case showBookmarksBar = "bookmarks.bar.show"
         case lastBookmarksBarUsagePixelSendDate = "bookmarks.bar.last-usage-pixel-send-date"
 
@@ -116,8 +126,28 @@ public struct UserDefaultsWrapper<T> {
         case loggingEnabledDate = "logging.enabled.date"
         case loggingCategories = "logging.categories"
 
-        // Temporary for activetion pixel
         case firstLaunchDate = "first.app.launch.date"
+
+        // Network Protection
+        case networkProtectionOnDemandActivation = "netp.ondemand"
+        case networkProtectionShouldEnforceRoutes = "netp.enforce-routes"
+        case networkProtectionShouldIncludeAllNetworks = "netp.include-all-networks"
+
+        case networkProtectionExcludedRoutes = "netp.excluded-routes"
+        case networkProtectionShouldExcludeLocalRoutes = "netp.exclude-local-routes"
+        case networkProtectionConnectionTesterEnabled = "netp.connection-tester-enabled"
+
+        case networkProtectionConnectOnLogIn = "netp.connect-on-login"
+
+        case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
+
+        case agentLaunchTime = "netp.agent.launch-time"
+
+        // Experiments
+        case pixelExperimentInstalled = "pixel.experiment.installed"
+        case pixelExperimentCohort = "pixel.experiment.cohort"
+        case pixelExperimentEnrollmentDate = "pixel.experiment.enrollment.date"
+        case pixelExperimentFiredPixels = "pixel.experiment.pixels.fired"
     }
 
     enum RemovedKeys: String, CaseIterable {
@@ -136,10 +166,10 @@ public struct UserDefaultsWrapper<T> {
 
     static var sharedDefaults: UserDefaults {
 #if DEBUG && !(NETP_SYSTEM_EXTENSION && NETWORK_EXTENSION) // Avoid looking up special user defaults when running inside the system extension
-        if case .normal = NSApp.runType {
+        if case .normal = NSApplication.runType {
             return .standard
         } else {
-            return UserDefaults(suiteName: Bundle.main.bundleIdentifier! + "." + NSApp.runType.description)!
+            return UserDefaults(suiteName: Bundle.main.bundleIdentifier! + "." + NSApplication.runType.description)!
         }
 #else
         return .standard
@@ -191,6 +221,18 @@ public struct UserDefaultsWrapper<T> {
 
     static func clear(_ key: Key) {
         sharedDefaults.removeObject(forKey: key.rawValue)
+    }
+
+    func clear() {
+        defaults.removeObject(forKey: key.rawValue)
+    }
+
+}
+
+extension UserDefaultsWrapper where T: OptionalProtocol {
+
+    init(key: Key, defaults: UserDefaults? = nil) {
+        self.init(key: key, defaultValue: .none, defaults: defaults)
     }
 
 }
