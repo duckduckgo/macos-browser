@@ -21,64 +21,135 @@ import BrowserServicesKit
 import SecureStorage
 import GRDB
 
-struct ProfileDB {
+struct ProfileDB: Codable {
     let id: Int64?
-    let firstName: Data
-    let lastName: Data
-    let city: Data
-    let state: Data
     let age: Data
 }
 
+struct NameDB: Codable {
+    let first: Data
+    let last: Data
+    let profileId: Int64
+    let middle: Data?
+    let suffix: Data?
+}
+
+struct AddressDB: Codable {
+    let city: Data
+    let state: Data
+    let profileId: Int64
+    let street: Data?
+    let zipCode: Data?
+}
+
+struct PhoneDB: Codable {
+    let phoneNumber: Data
+    let profileId: Int64
+}
+
+struct FullProfileDB: FetchableRecord, Decodable {
+    var profile: ProfileDB
+    var names: [NameDB]
+    var addresses: [AddressDB]
+    var phones: [PhoneDB]
+}
+
+extension PhoneDB: PersistableRecord, FetchableRecord {
+    static let databaseTableName: String = "phone"
+    static let profile = belongsTo(ProfileDB.self)
+
+    enum Columns: String, ColumnExpression {
+        case phoneNumber
+        case profileId
+    }
+
+    init(row: Row) throws {
+        phoneNumber = row[Columns.phoneNumber]
+        profileId = row[Columns.profileId]
+    }
+
+    func encode(to container: inout PersistenceContainer) throws {
+        container[Columns.phoneNumber] = phoneNumber
+        container[Columns.profileId] = profileId
+    }
+}
+
+extension AddressDB: PersistableRecord, FetchableRecord {
+    static let databaseTableName: String = "address"
+    static let profile = belongsTo(ProfileDB.self)
+
+    enum Columns: String, ColumnExpression {
+        case city
+        case state
+        case profileId
+        case street
+        case zipCode
+    }
+
+    init(row: Row) throws {
+        city = row[Columns.city]
+        state = row[Columns.state]
+        profileId = row[Columns.profileId]
+        street = row[Columns.street]
+        zipCode = row[Columns.zipCode]
+    }
+
+    func encode(to container: inout PersistenceContainer) throws {
+        container[Columns.city] = city
+        container[Columns.state] = state
+        container[Columns.profileId] = profileId
+        container[Columns.street] = street
+        container[Columns.zipCode] = zipCode
+    }
+}
+
+extension NameDB: PersistableRecord, FetchableRecord {
+    static let databaseTableName: String = "name"
+    static let profile = belongsTo(ProfileDB.self)
+
+    enum Columns: String, ColumnExpression {
+        case first
+        case last
+        case profileId
+        case middle
+        case suffix
+    }
+
+    init(row: Row) throws {
+        first = row[Columns.first]
+        last = row[Columns.last]
+        profileId = row[Columns.profileId]
+        middle = row[Columns.middle]
+        suffix = row[Columns.suffix]
+    }
+
+    func encode(to container: inout PersistenceContainer) throws {
+        container[Columns.first] = first
+        container[Columns.last] = last
+        container[Columns.profileId] = profileId
+        container[Columns.middle] = middle
+        container[Columns.suffix] = suffix
+    }
+}
+
 extension ProfileDB: PersistableRecord, FetchableRecord {
-    public static var databaseTableName: String = "dbp_profiles"
+    static let databaseTableName: String = "profile"
+    static let names = hasMany(NameDB.self)
+    static let addresses = hasMany(AddressDB.self)
+    static let phoneNumbers = hasMany(PhoneDB.self)
 
     enum Columns: String, ColumnExpression {
         case id
-        case firstName
-        case lastName
-        case city
-        case state
         case age
     }
 
     public init(row: Row) throws {
         id = row[Columns.id]
-        firstName = row[Columns.firstName]
-        lastName = row[Columns.lastName]
-        city = row[Columns.city]
-        state = row[Columns.state]
         age = row[Columns.age]
     }
 
     public func encode(to container: inout PersistenceContainer) throws {
         container[Columns.id] = id
-        container[Columns.firstName] = firstName
-        container[Columns.lastName] = lastName
-        container[Columns.city] = city
-        container[Columns.state] = state
         container[Columns.age] = age
-    }
-
-    func encrypt(_ mechanism: (Data) throws -> Data) throws -> ProfileDB {
-        .init(
-            id: id,
-            firstName: try mechanism(firstName),
-            lastName: try mechanism(lastName),
-            city: try mechanism(city),
-            state: try mechanism(state),
-            age: try mechanism(age)
-        )
-    }
-
-    func decrypt(_ mechanism: (Data) throws -> Data) throws -> ProfileDB {
-        .init(
-            id: id,
-            firstName: try mechanism(firstName),
-            lastName: try mechanism(lastName),
-            city: try mechanism(city),
-            state: try mechanism(state),
-            age: try mechanism(age)
-        )
     }
 }
