@@ -290,9 +290,7 @@ final class NavigationBarPopovers {
                 })
             ]
 
-            let onboardingStatusPublisher = UserDefaultPublisher(keyPath: \.networkProtectionOnboardingStatus, defaults: .shared!, defaultValue: 1).map { value in
-                OnboardingStatus(rawValue: value) ?? .default
-            }.eraseToAnyPublisher()
+            let onboardingStatusPublisher = UserDefaults.shared!.networkProtectionOnboardingStatusPublisher
 
             let popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, menuItems: menuItems)
             popover.delegate = delegate

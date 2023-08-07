@@ -40,7 +40,10 @@ final class NetworkProtectionOnboardingMenu: NSMenu {
     @IBOutlet weak var setStatusCompletedMenuItem: NSMenuItem!
     @IBOutlet weak var setStatusAllowSystemExtensionMenuItem: NSMenuItem!
     @IBOutlet weak var setStatusAllowVPNConfigurationMenuItem: NSMenuItem!
-
+/*
+    @UserDefaultsWrapper(key: .networkProtectionOnboardingStatus, defaultValue: 1, defaults: .shared)
+    var onboardingStatus2: OnboardingStatus.RawValue
+*/
     var onboardingStatus: OnboardingStatus {
         get {
             OnboardingStatus(rawValue: UserDefaults.shared!.networkProtectionOnboardingStatus) ?? .default
@@ -53,7 +56,7 @@ final class NetworkProtectionOnboardingMenu: NSMenu {
 
     @IBAction
     func reset(sender: NSMenuItem) {
-        onboardingStatus = .isOnboarding(step: .userNeedsToAllowExtension)
+        onboardingStatus = .default
     }
 
     @IBAction

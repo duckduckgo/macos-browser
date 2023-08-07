@@ -127,6 +127,7 @@ public struct UserDefaultsWrapper<T> {
         case firstLaunchDate = "first.app.launch.date"
 
         // Network Protection
+
         case networkProtectionOnDemandActivation = "netp.ondemand"
         case networkProtectionShouldEnforceRoutes = "netp.enforce-routes"
         case networkProtectionShouldIncludeAllNetworks = "netp.include-all-networks"
@@ -140,6 +141,13 @@ public struct UserDefaultsWrapper<T> {
         case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
 
         case agentLaunchTime = "netp.agent.launch-time"
+
+        // Network Protection: Shared Defaults
+        // ---
+        // Please note that shared defaults MUST have a name that matches exactly their value,
+        // or else KVO will just not work as of 2023-08-07
+
+        case networkProtectionOnboardingStatus = "networkProtectionOnboardingStatus"
 
         // Experiments
         case pixelExperimentInstalled = "pixel.experiment.installed"

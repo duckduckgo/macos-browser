@@ -19,50 +19,30 @@
 import Combine
 import Foundation
 import NetworkProtectionUI
-/*
-extension UserDefaultPublisher {
-    convenience init(key: UserDefaultsWrapper<T>.Key, defaults: UserDefaults, defaultValue: T) {
-        self.init(key: key.rawValue, defaults: defaults, defaultValue: defaultValue)
-    }
-}*/
 
 extension UserDefaults {
+    // Convenience declaration
+    var networkProtectionOnboardingStatusKey: String {
+        UserDefaultsWrapper<Any>.Key.networkProtectionOnboardingStatus.rawValue
+    }
+
+    /// For KVO to work across processes (Menu App + Main App) we need to declare this dynamic var in a `UserDefaults`
+    /// extension, and the key for this property must match its name exactly.
+    ///
     @objc
     dynamic var networkProtectionOnboardingStatus: Int {
         get {
-            value(forKey: "networkProtectionOnboardingStatus") as? Int ?? OnboardingStatus.default.rawValue
+            value(forKey: networkProtectionOnboardingStatusKey) as? Int ?? OnboardingStatus.default.rawValue
         }
 
         set {
-            set(newValue, forKey: "networkProtectionOnboardingStatus")
-            synchronize()
-        }
-    }
-}
-
-final class UserDefaultPublisher<T>: NSObject, Publisher {
-    private let defaults: UserDefaults
-    private let subject: CurrentValueSubject<T, Never>
-    var observation: NSKeyValueObservation?
-
-    init(keyPath: KeyPath<UserDefaults, T>, defaults: UserDefaults, defaultValue: T) {
-        self.defaults = defaults
-
-        subject = CurrentValueSubject<T, Never>(defaults[keyPath: keyPath])
-        super.init()
-
-        observation = defaults.observe(keyPath) { [weak self] defaults, _ in
-            // We're ignoring the change parameter as it seems to come in as `nil` for some strange reason
-            self?.subject.send(defaults[keyPath: keyPath])
+            set(newValue, forKey: networkProtectionOnboardingStatusKey)
         }
     }
 
-    // MARK: - Publisher Wrapping
-
-    typealias Output = T
-    typealias Failure = Never
-
-    func receive<S>(subscriber: S) where S: Subscriber, Never == S.Failure, T == S.Input {
-        subject.receive(subscriber: subscriber)
+    var networkProtectionOnboardingStatusPublisher: AnyPublisher<OnboardingStatus, Never> {
+        publisher(for: \.networkProtectionOnboardingStatus).map { value in
+            OnboardingStatus(rawValue: value) ?? .default
+        }.eraseToAnyPublisher()
     }
 }
