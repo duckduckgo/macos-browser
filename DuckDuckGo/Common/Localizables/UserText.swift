@@ -767,6 +767,8 @@ struct UserText {
     static let newTabSetUpDuckPlayerCardTitle = NSLocalizedString("newTab.setup.duck.player.title", value: "Clean Up YouTube", comment: "Title of the Duck Player card of the Set Up section in the home page")
     static let newTabSetUpEmailProtectionCardTitle = NSLocalizedString("newTab.setup.email.protection.title", value: "Protect Your Inbox", comment: "Title of the Email Protection card of the Set Up section in the home page")
     static let newTabSetUpCookieManagerCardTitle = NSLocalizedString("newTab.setup.cookie.manager.title", value: "Let Us Handle Cookie Pop-ups", comment: "Title of the Cookie Manager card of the Set Up section in the home page")
+    static let newTabSetUpSurveyDay0CardTitle = NSLocalizedString("newTab.setup.survey.day.0.title", value: "Tell Us What Brought You Here", comment: "Title of the Day 0 durvey of the Set Up section in the home page")
+    static let newTabSetUpSurveyDay7CardTitle = NSLocalizedString("newTab.setup.survey.day.7.title", value: "Help Us Improve", comment: "Title of the Day 7 durvey of the Set Up section in the home page")
 
     static let newTabSetUpDefaultBrowserAction = NSLocalizedString("newTab.setup.default.browser.action", value: "Make Default Browser", comment: "Action title on the action menu of the Default Browser card")
     static let newTabSetUpImportAction = NSLocalizedString("newTab.setup.Import.action", value: "Import Now", comment: "Action title on the action menu of the Import card of the Set Up section in the home page")
@@ -774,12 +776,16 @@ struct UserText {
     static let newTabSetUpEmailProtectionAction = NSLocalizedString("newTab.setup.email.protection.action", value: "Get a Duck Address", comment: "Action title on the action menu of the Email Protection card of the Set Up section in the home page")
     static let newTabSetUpCookieManagerAction = NSLocalizedString("newTab.setup.cookie.manager.action", value: "Handle Pop-ups For Me", comment: "Action title on the action menu of the Cookie Manager card of the Set Up section in the home page")
     static let newTabSetUpRemoveItemAction = NSLocalizedString("newTab.setup.remove.item", value: "Dismiss", comment: "Action title on the action menu of the set up cards card of the SetUp section in the home page to remove the item")
+    static let newTabSetUpSurveyDay0Action = NSLocalizedString("newTab.setup.survey.day.0.action", value: "Share Your Thoughts", comment: "Action title of the Day 0 durvey of the Set Up section in the home page")
+    static let newTabSetUpSurveyDay7Action = NSLocalizedString("newTab.setup.survey.day.7.action", value: "Share Your Thoughts", comment: "Action title of the Day 7 durvey of the Set Up section in the home page")
 
     static let newTabSetUpDefaultBrowserSummary = NSLocalizedString("newTab.setup.default.browser.summary", value: "We automatically block trackers as you browse. It's privacy, simplified.", comment: "Summary of the Default Browser card")
     static let newTabSetUpImportSummary = NSLocalizedString("newTab.setup.import.summary", value: "Import bookmarks, favorites, and passwords from your old browser.", comment: "Summary of the Import card of the Set Up section in the home page")
     static let newTabSetUpDuckPlayerSummary = NSLocalizedString("newTab.setup.duck.player.summary", value: "Enjoy a clean viewing experience without personalized ads.", comment: "Summary of the Duck Player card of the Set Up section in the home page")
     static let newTabSetUpEmailProtectionSummary = NSLocalizedString("newTab.setup.email.protection.summary", value: "Generate custom @duck.com addresses that clean trackers from incoming email.", comment: "Summary of the Email Protection card of the Set Up section in the home page")
     static let newTabSetUpCookieManagerSummary = NSLocalizedString("newTab.setup.cookie.manager.summary", value: "We need your permission to say no to cookies on your behalf. Easy choice.", comment: "Summary of the Cookie Manager card of the Set Up section in the home page")
+    static let newTabSetUpSurveyDay0Summary = NSLocalizedString("newTab.setup.survey.day.0.summary", value: "Take our short survey and help us build the best browser.", comment: "Summary of the Day 0 durvey of the Set Up section in the home page")
+    static let newTabSetUpSurveyDay7Summary = NSLocalizedString("newTab.setup.survey.day.7.summary", value: "Take our short survey and help us build the best browser.", comment: "Summary of the Day 7 durvey of the Set Up section in the home page")
 
     // Recent Activity
     static let newTabRecentActivitySectionTitle = NSLocalizedString("newTab.recent.activity.section.title", value: "Recent Activity", comment: "Title of the RecentActivity section in the home page")
