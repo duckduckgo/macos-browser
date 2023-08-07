@@ -16,8 +16,8 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
-import NetworkProtection
 
 #if !NETWORK_PROTECTION
 
@@ -27,9 +27,13 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
 
 #else
 
+import NetworkProtection
+
 /// Implements the logic for Network Protection's simulate failures menu.
 ///
+@available(macOS 11.4, *)
 @objc
+@MainActor
 final class NetworkProtectionSimulateFailureMenu: NSMenu {
     @IBOutlet weak var simulateControllerFailureMenuItem: NSMenuItem!
     @IBOutlet weak var simulateTunnelFailureMenuItem: NSMenuItem!
@@ -49,7 +53,13 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
     ///
     @IBAction
     func simulateTunnelFailure(_ menuItem: NSMenuItem) {
-        simulationOptions.setEnabled(menuItem.state == .off, option: .tunnelFailure)
+        Task {
+            do {
+                try await NetworkProtectionTunnelController().toggleShouldSimulateTunnelFailure()
+            } catch {
+                await NSAlert(error: error).runModal()
+            }
+        }
     }
 
     override func update() {

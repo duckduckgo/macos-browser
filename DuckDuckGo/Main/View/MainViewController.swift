@@ -83,6 +83,25 @@ final class MainViewController: NSViewController {
         findInPageContainerView.applyDropShadow()
 
         view.registerForDraggedTypes([.URL, .fileURL])
+
+        registerForBookmarkBarPromptNotifications()
+    }
+
+    var bookmarkBarPromptObserver: Any?
+    func registerForBookmarkBarPromptNotifications() {
+        bookmarkBarPromptObserver = NotificationCenter.default.addObserver(
+            forName: .bookmarkPromptShouldShow,
+            object: nil,
+            queue: .main) { [weak self] _ in
+                self?.showBookmarkPromptIfNeeded()
+        }
+    }
+
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        if let bookmarkBarPromptObserver {
+            NotificationCenter.default.removeObserver(bookmarkBarPromptObserver)
+        }
     }
 
     override func viewWillAppear() {
@@ -119,6 +138,17 @@ final class MainViewController: NSViewController {
 
     func windowDidResignKey() {
         browserTabViewController.windowDidResignKey()
+    }
+
+    func showBookmarkPromptIfNeeded() {
+        guard #available(macOS 11, *) else { return }
+        guard PixelExperiment.cohort == .showBookmarksBarPrompt else { return }
+        guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
+        updateBookmarksBarViewVisibility(visible: true)
+        // This won't work until the bookmarks bar is actually visible which it isn't until the next ui cycle
+        DispatchQueue.main.async {
+            self.bookmarksBarViewController.showBookmarksBarPrompt()
+        }
     }
 
     override func encodeRestorableState(with coder: NSCoder) {

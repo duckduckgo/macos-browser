@@ -177,6 +177,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         if LocalStatisticsStore().atb == nil {
             Pixel.firstLaunchDate = Date()
+            PixelExperiment.install()
         }
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
@@ -306,6 +307,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #if NETWORK_PROTECTION
 
     private func startupNetworkProtection() {
+        guard #available(macOS 11.4, *) else { return }
+
         let loginItemsManager = NetworkProtectionLoginItemsManager()
         let networkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
 
@@ -319,6 +322,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         refreshNetworkProtectionServers()
     }
 
+    @available(macOS 11.4, *)
     private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: NetworkProtectionLoginItemsManager) {
         let currentVersion = AppVersion.shared.versionNumber
         let versionStore = NetworkProtectionLastVersionRunStore()
@@ -341,6 +345,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         }
     }
 
+    @available(macOS 11.4, *)
     private func restartNetworkProtectionTunnelAndMenu(using loginItemsManager: NetworkProtectionLoginItemsManager) {
         loginItemsManager.restartLoginItems()
 
@@ -348,7 +353,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             let provider = NetworkProtectionTunnelController()
 
             // Restart NetP SysEx on app update
-            if await provider.isConnected() {
+            if await provider.isConnected {
                 await provider.stop()
                 await provider.start()
             }
@@ -356,6 +361,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     /// Fetches a new list of Network Protection servers, and updates the existing set.
+    @available(macOS 11.4, *)
     private func refreshNetworkProtectionServers() {
         Task {
             let serverCount: Int

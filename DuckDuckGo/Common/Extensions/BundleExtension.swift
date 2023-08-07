@@ -33,6 +33,7 @@ extension Bundle {
         static let notificationsAgentBundleId = "NOTIFICATIONS_AGENT_BUNDLE_ID"
         static let notificationsAgentProductName = "NOTIFICATIONS_AGENT_PRODUCT_NAME"
 #endif
+        static let appGroup = "NETP_APP_GROUP"
     }
 
     var displayName: String? {
@@ -77,5 +78,12 @@ extension Bundle {
         return loginItemsURL.appendingPathComponent(productName + ".app")
     }
 #endif
+
+    var appGroupName: String {
+        guard let appGroup = object(forInfoDictionaryKey: Keys.appGroup) as? String else {
+            fatalError("Info.plist is missing \(Keys.appGroup)")
+        }
+        return appGroup
+    }
 
 }
