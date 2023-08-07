@@ -54,15 +54,8 @@ public struct DataBrokerProtectionContainerView: View {
     public var body: some View {
         ScrollView {
             ZStack {
-                if shouldShowHeader {
-                    VStack {
-                        DashboardHeaderView(viewModel: DashboardHeaderViewModel(statusText: "Scanning...",
-                                                                                faqButtonClicked: {},
-                                                                                editProfileClicked: {}))
-                        .frame(height: 300)
-                        Spacer()
-                    }
-                }
+                headerView()
+
                 VStack {
                     switch bodyViewType {
                     case .gettingStarted:
@@ -106,6 +99,19 @@ public struct DataBrokerProtectionContainerView: View {
         }.background(
            backgroundView()
         )
+    }
+
+    @ViewBuilder
+    func headerView() -> some View {
+        if shouldShowHeader {
+            VStack {
+                DashboardHeaderView(viewModel: DashboardHeaderViewModel(statusText: "Scanning...",
+                                                                        faqButtonClicked: {},
+                                                                        editProfileClicked: {}))
+                .frame(height: 300)
+                Spacer()
+            }
+        }
     }
 
     @ViewBuilder
