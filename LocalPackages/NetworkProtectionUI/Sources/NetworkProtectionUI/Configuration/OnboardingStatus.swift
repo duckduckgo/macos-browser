@@ -19,23 +19,50 @@
 import Combine
 import Foundation
 
-typealias OnboardingStatusPublisher = CurrentValueSubject<OnboardingStatus, Never>
+public typealias OnboardingStatusPublisher = AnyPublisher<OnboardingStatus, Never>
 
 /// Whether the user is onboarding.
 ///
 @frozen
-public enum OnboardingStatus: Codable {
+public enum OnboardingStatus: RawRepresentable {
     /// The onboarding has been completed at least once
     ///
     case completed
 
     case isOnboarding(step: OnboardingStep)
+
+    /// The default onboarding status.
+    ///
+    public static let `default`: OnboardingStatus = .isOnboarding(step: .userNeedsToAllowExtension)
+
+    public init?(rawValue: Int) {
+        if rawValue == 0 {
+            self = .completed
+            return
+        }
+
+        let stepValue = rawValue - 1
+        guard let step = OnboardingStep(rawValue: stepValue) else {
+            return nil
+        }
+
+        self = .isOnboarding(step: step)
+    }
+
+    public var rawValue: Int {
+        switch self {
+        case .completed:
+            return 0
+        case .isOnboarding(let step):
+            return 1 + step.rawValue
+        }
+    }
 }
 
 /// A specific step in the onboarding process.
 ///
 @frozen
-public enum OnboardingStep: Codable {
+public enum OnboardingStep: Int {
     /// The user needs to allow the system extension in macOS
     ///
     case userNeedsToAllowExtension

@@ -159,8 +159,6 @@ public struct NetworkProtectionStatusView: View {
 
     // MARK: - View Contents
 
-    var onboardingStatus: OnboardingStatus = .completed
-
     public var body: some View {
         VStack(spacing: 0) {
 
@@ -353,12 +351,13 @@ struct NetworkProtectionStatusView_Previews: PreviewProvider {
     }
 
     static var previews: some View {
+        let onboardingStatusPublisher = CurrentValueSubject<OnboardingStatus, Never>(.isOnboarding(step: .userNeedsToAllowExtension)).eraseToAnyPublisher()
         let statusReporter = PreviewNetworkProtectionStatusReporter()
         let menuItems = [
             NetworkProtectionStatusView.Model.MenuItem(name: "Share Feedback...", action: {})
         ]
         let model = NetworkProtectionStatusView.Model(controller: PreviewController(),
-                                                      onboardingStatus: .userNeedsToAllowExtension,
+                                                      onboardingStatusPublisher: onboardingStatusPublisher,
                                                       statusReporter: statusReporter,
                                                       menuItems: menuItems)
 

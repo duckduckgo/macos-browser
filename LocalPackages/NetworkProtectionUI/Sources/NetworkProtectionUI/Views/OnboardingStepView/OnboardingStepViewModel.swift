@@ -22,7 +22,7 @@ extension OnboardingStepView {
 
     /// Model for AllowSystemExtensionView
     ///
-    final class Model {
+    final class Model: ObservableObject {
         private let step: OnboardingStep
 
         init(step: OnboardingStep) {

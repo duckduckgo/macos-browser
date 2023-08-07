@@ -47,7 +47,12 @@ extension NetworkProtectionStatusView {
 
         /// The type of extension that's being used for NetP
         ///
-        let onboardingStatus: OnboardingStatus
+        @Published
+        private var onboardingStatus: OnboardingStatus = .completed
+
+        /// The NetP onboarding status publisher
+        ///
+        private let onboardingStatusPublisher: OnboardingStatusPublisher
 
         /// The NetP status reporter
         ///
@@ -68,6 +73,7 @@ extension NetworkProtectionStatusView {
         private var serverInfoCancellable: AnyCancellable?
         private var tunnelErrorMessageCancellable: AnyCancellable?
         private var controllerErrorMessageCancellable: AnyCancellable?
+        private var cancellables = Set<AnyCancellable>()
 
         // MARK: - Dispatch Queues
 
@@ -97,13 +103,13 @@ extension NetworkProtectionStatusView {
         // MARK: - Initialization & Deinitialization
 
         public init(controller: TunnelController,
-                    onboardingStatus: OnboardingStatus,
+                    onboardingStatusPublisher: OnboardingStatusPublisher,
                     statusReporter: NetworkProtectionStatusReporter,
                     menuItems: [MenuItem],
                     runLoopMode: RunLoop.Mode? = nil) {
 
             self.tunnelController = controller
-            self.onboardingStatus = onboardingStatus
+            self.onboardingStatusPublisher = onboardingStatusPublisher
             self.statusReporter = statusReporter
             self.menuItems = menuItems
             self.runLoopMode = runLoopMode
@@ -123,6 +129,11 @@ extension NetworkProtectionStatusView {
             subscribeToTunnelErrorMessages()
             subscribeToControllerErrorMessages()
             subscribeToServerInfoChanges()
+
+            onboardingStatusPublisher.sink { [weak self] status in
+                self?.onboardingStatus = status
+            }
+            .store(in: &cancellables)
         }
 
         deinit {

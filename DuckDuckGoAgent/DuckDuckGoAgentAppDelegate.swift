@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import Combine
 import Common
 import NetworkExtension
 import NetworkProtection
@@ -54,6 +55,7 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
     /// Agent launch time saved by the main app to distinguish between Log In launch and Main App launch to prevent connection when started by the Main App
     @UserDefaultsWrapper(key: .agentLaunchTime, defaultValue: .distantPast, defaults: .shared)
     private var agentLaunchTime: Date
+
     private static let recentThreshold: TimeInterval = 5.0
 
     private lazy var appLauncher: AppLauncher = {
@@ -82,7 +84,16 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
         let iconProvider = MenuIconProvider()
         #endif
 
-        return StatusBarMenu(appLauncher: appLauncher, iconProvider: iconProvider)
+        let onboardingStatusPublisher = UserDefaults.shared!.publisher(for: \.networkProtectionOnboardingStatus).map { rawValue in
+            OnboardingStatus(rawValue: rawValue) ?? .default
+        }.eraseToAnyPublisher()
+
+        Task {
+            try? await Task.sleep(nanoseconds: 10 * NSEC_PER_SEC)
+            UserDefaults.shared!.networkProtectionOnboardingStatus = 0
+        }
+
+        return StatusBarMenu(onboardingStatusPublisher: onboardingStatusPublisher, appLauncher: appLauncher, iconProvider: iconProvider)
     }()
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {

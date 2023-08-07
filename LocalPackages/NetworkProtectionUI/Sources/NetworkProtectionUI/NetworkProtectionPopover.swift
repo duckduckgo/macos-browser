@@ -46,7 +46,7 @@ public final class NetworkProtectionPopover: NSPopover {
     private let statusReporter: NetworkProtectionStatusReporter
 
     public required init(controller: TunnelController,
-                         onboardingStatus: OnboardingStatus,
+                         onboardingStatusPublisher: OnboardingStatusPublisher,
                          statusReporter: NetworkProtectionStatusReporter,
                          menuItems: [MenuItem]) {
 
@@ -57,7 +57,7 @@ public final class NetworkProtectionPopover: NSPopover {
         self.animates = false
         self.behavior = .semitransient
 
-        setupContentController(controller: controller, onboardingStatus: onboardingStatus, statusReporter: statusReporter, menuItems: menuItems)
+        setupContentController(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, menuItems: menuItems)
     }
 
     required init?(coder: NSCoder) {
@@ -65,12 +65,12 @@ public final class NetworkProtectionPopover: NSPopover {
     }
 
     private func setupContentController(controller: TunnelController,
-                                        onboardingStatus: OnboardingStatus,
+                                        onboardingStatusPublisher: OnboardingStatusPublisher,
                                         statusReporter: NetworkProtectionStatusReporter,
                                         menuItems: [MenuItem]) {
 
         let model = NetworkProtectionStatusView.Model(controller: controller,
-                                                      onboardingStatus: onboardingStatus,
+                                                      onboardingStatusPublisher: onboardingStatusPublisher,
                                                       statusReporter: statusReporter,
                                                       menuItems: menuItems)
 
