@@ -28,7 +28,7 @@ final class ProfileViewModel: ObservableObject {
         @Trimmed var suffix = ""
 
         var fullName: String {
-            let components = [suffix, firstName, middleName, lastName].filter { !$0.isEmpty }
+            let components = [firstName, middleName, lastName, suffix].filter { !$0.isEmpty }
             return components.joined(separator: " ")
         }
 
