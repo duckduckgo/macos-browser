@@ -290,31 +290,9 @@ final class NavigationBarPopovers {
                 })
             ]
 
-            //let onboardingStatusPublisher = CurrentValueSubject<OnboardingStatus, Never>(.isOnboarding(step: .userNeedsToAllowExtension)).eraseToAnyPublisher()
-
-            let onboardingStatusPublisher = UserDefaults.shared!.publisher(for: \.networkProtectionOnboardingStatus).map({ value in
-                OnboardingStatus(rawValue: value) ?? .isOnboarding(step: .userNeedsToAllowExtension)
-            })
-            .eraseToAnyPublisher()
-
-
-            /*UserDefaultPublisher(
-                key: .networkProtectionOnboardingStatus,
-                defaults: .shared!,
-                defaultValue: OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue)
-                .map({ value in
-                    OnboardingStatus(rawValue: value) ?? .isOnboarding(step: .userNeedsToAllowExtension)
-                })
-                .eraseToAnyPublisher()*/
-/*
-            UserDefaults.shared?.networkProtectionOnboardingStatus2 = .isOnboarding(step: .userNeedsToAllowExtension)
-            let onboardingStatusPublisher = UserDefaults.shared!.publisher(for: \.networkProtectionOnboardingStatus2).eraseToAnyPublisher()
-            //let onboardingStatusPublisher = CurrentValueSubject<OnboardingStatus, Never>(.isOnboarding(step: .userNeedsToAllowExtension)).eraseToAnyPublisher()
-
-            Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 10 * NSEC_PER_SEC)
-                UserDefaults.shared?.networkProtectionOnboardingStatus2 = .completed
-            }*/
+            let onboardingStatusPublisher = UserDefaultPublisher(keyPath: \.networkProtectionOnboardingStatus, defaults: .shared!, defaultValue: 1).map { value in
+                OnboardingStatus(rawValue: value) ?? .default
+            }.eraseToAnyPublisher()
 
             let popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, menuItems: menuItems)
             popover.delegate = delegate

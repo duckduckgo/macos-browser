@@ -30,31 +30,30 @@ extension UserDefaults {
     @objc
     dynamic var networkProtectionOnboardingStatus: Int {
         get {
-            value(forKey: "netp.onboarding-status") as? Int ?? OnboardingStatus.default.rawValue
+            value(forKey: "networkProtectionOnboardingStatus") as? Int ?? OnboardingStatus.default.rawValue
         }
 
         set {
-            set(newValue, forKey: "netp.onboarding-status")
+            set(newValue, forKey: "networkProtectionOnboardingStatus")
             synchronize()
         }
     }
 }
-/*
+
 final class UserDefaultPublisher<T>: NSObject, Publisher {
     private let defaults: UserDefaults
+    private let subject: CurrentValueSubject<T, Never>
+    var observation: NSKeyValueObservation?
 
     init(keyPath: KeyPath<UserDefaults, T>, defaults: UserDefaults, defaultValue: T) {
         self.defaults = defaults
 
-        let subject = CurrentValueSubject<T, Never>(defaults[keyPath: keyPath])
+        subject = CurrentValueSubject<T, Never>(defaults[keyPath: keyPath])
         super.init()
 
-        defaults.publisher(for: keyPath).sink { value in
-            subject.send(value)
-        }
-
-        let token = defaults.observe(keyPath) { defaults, change in
-            subject.send(change.newValue ?? defaultValue)
+        observation = defaults.observe(keyPath) { [weak self] defaults, _ in
+            // We're ignoring the change parameter as it seems to come in as `nil` for some strange reason
+            self?.subject.send(defaults[keyPath: keyPath])
         }
     }
 
@@ -63,8 +62,7 @@ final class UserDefaultPublisher<T>: NSObject, Publisher {
     typealias Output = T
     typealias Failure = Never
 
-    func receive<S>(subscriber: S) where S : Subscriber, Never == S.Failure, T == S.Input {
+    func receive<S>(subscriber: S) where S: Subscriber, Never == S.Failure, T == S.Input {
         subject.receive(subscriber: subscriber)
     }
-}*/
-
+}
