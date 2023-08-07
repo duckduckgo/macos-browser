@@ -210,8 +210,8 @@ setup_log_formatter() {
 }
 
 archive_and_export() {
-	local log_formatter
-	setup_log_formatter
+	local log_formatter='tee'
+	#setup_log_formatter
 
 	echo "Building and archiving the app (version ${app_version}) ..."
 
