@@ -109,6 +109,9 @@
                <Test
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
                </Test>
+               <Test
+                  Identifier = "WindowManagerStateRestorationTests/testWindowManagerStateRestoration()">
+               </Test>
             </SkippedTests>
          </TestableReference>
          <TestableReference

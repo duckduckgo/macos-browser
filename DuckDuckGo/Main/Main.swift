@@ -39,40 +39,42 @@ final class AppMain {
 
     static func main() {
 #if NETWORK_PROTECTION
-        switch (CommandLine.arguments.first! as NSString).lastPathComponent {
-        case "startVPN":
-            swizzleMainBundle()
+        if #available(macOS 11.4, *) {
+            switch (CommandLine.arguments.first! as NSString).lastPathComponent {
+            case "startVPN":
+                swizzleMainBundle()
 
-            Task {
-                await NetworkProtectionTunnelController().start(enableLoginItems: false)
-                exit(0)
-            }
-
-            dispatchMain()
-        case "stopVPN":
-            swizzleMainBundle()
-
-            Task {
-                await NetworkProtectionTunnelController().stop()
-                exit(0)
-            }
-
-            dispatchMain()
-        case "enableOnDemand":
-            swizzleMainBundle()
-
-            Task {
-                do {
-                    try await NetworkProtectionTunnelController().enableOnDemand()
+                Task {
+                    await NetworkProtectionTunnelController().start(enableLoginItems: false)
                     exit(0)
-                } catch {
-                    fatalError("Could not enable on demand due to error: \(String(describing: error))")
                 }
-            }
 
-            dispatchMain()
-        default:
-            break
+                dispatchMain()
+            case "stopVPN":
+                swizzleMainBundle()
+
+                Task {
+                    await NetworkProtectionTunnelController().stop()
+                    exit(0)
+                }
+
+                dispatchMain()
+            case "enableOnDemand":
+                swizzleMainBundle()
+
+                Task {
+                    do {
+                        try await NetworkProtectionTunnelController().enableOnDemandRequestedByExtension()
+                        exit(0)
+                    } catch {
+                        fatalError("Could not enable on demand due to error: \(String(describing: error))")
+                    }
+                }
+
+                dispatchMain()
+            default:
+                break
+            }
         }
 #endif
 
@@ -85,5 +87,8 @@ final class AppMain {
         let m1 = class_getClassMethod(Bundle.self, #selector(getter: Bundle.main))!
         let m2 = class_getClassMethod(Bundle.self, #selector(Bundle.nonMain))!
         method_exchangeImplementations(m1, m2)
+
+        // since initially our bundle id doesn‘t match the main app, UserDefaults won‘t be loaded by default
+        UserDefaults.standard.addSuite(named: Bundle.main.bundleIdentifier!)
     }
 }

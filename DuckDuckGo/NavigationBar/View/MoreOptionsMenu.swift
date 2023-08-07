@@ -28,7 +28,6 @@ protocol OptionsButtonMenuDelegate: AnyObject {
 
     func optionsButtonMenuRequestedBookmarkThisPage(_ sender: NSMenuItem)
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu)
-    func optionsButtonMenuRequestedToggleBookmarksBar(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkImportInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkExportInterface(_ menu: NSMenu)
@@ -197,10 +196,6 @@ final class MoreOptionsMenu: NSMenu {
         actionDelegate?.optionsButtonMenuRequestedBookmarkManagementInterface(self)
     }
 
-    @objc func toggleBookmarksBar(_ sender: NSMenuItem) {
-        actionDelegate?.optionsButtonMenuRequestedToggleBookmarksBar(self)
-    }
-
     @objc func openBookmarkImportInterface(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedBookmarkImportInterface(self)
     }
@@ -363,9 +358,15 @@ final class EmailOptionsButtonSubMenu: NSMenu {
                 .targetting(self)
                 .withImage(NSImage(named: "OptionsButtonMenuEmailGenerateAddress"))
 
+            addItem(withTitle: UserText.emailOptionsMenuManageAccountSubItem, action: #selector(manageAccountAction(_:)), keyEquivalent: "")
+                .targetting(self)
+                .withImage(NSImage(named: "Identity-16"))
+
+            addItem(.separator())
+
             addItem(withTitle: UserText.emailOptionsMenuTurnOffSubItem, action: #selector(turnOffEmailAction(_:)), keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "OptionsButtonMenuEmailDisabled"))
+                .withImage(NSImage(named: "Email-Disabled-16"))
 
         } else {
             addItem(withTitle: UserText.emailOptionsMenuTurnOnSubItem, action: #selector(turnOnEmailAction(_:)), keyEquivalent: "")
@@ -373,6 +374,11 @@ final class EmailOptionsButtonSubMenu: NSMenu {
                 .withImage(NSImage(named: "OptionsButtonMenuEmail"))
 
         }
+    }
+
+    @objc func manageAccountAction(_ sender: NSMenuItem) {
+        let tab = Tab(content: .url(EmailUrls().emailProtectionAccountLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
+        tabCollectionViewModel.append(tab: tab)
     }
 
     @objc func createAddressAction(_ sender: NSMenuItem) {
@@ -396,7 +402,11 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     @objc func turnOffEmailAction(_ sender: NSMenuItem) {
-        emailManager.signOut()
+        let alert = NSAlert.disableEmailProtection()
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn {
+            emailManager.signOut()
+        }
     }
 
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
@@ -413,6 +423,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 }
 
+@MainActor
 final class ZoomSubMenu: NSMenu {
 
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
@@ -456,14 +467,14 @@ final class BookmarksSubMenu: NSMenu {
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
         super.init(title: UserText.passwordManagement)
         self.autoenablesItems = false
-        updateMenuItems(with: tabCollectionViewModel, target: target)
+        addMenuItems(with: tabCollectionViewModel, target: target)
     }
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel, target: AnyObject) {
+    private func addMenuItems(with tabCollectionViewModel: TabCollectionViewModel, target: AnyObject) {
         let bookmarkPageItem = addItem(withTitle: UserText.bookmarkThisPage, action: #selector(MoreOptionsMenu.bookmarkPage(_:)), keyEquivalent: "d")
             .withModifierMask([.command])
             .targetting(target)
@@ -474,6 +485,8 @@ final class BookmarksSubMenu: NSMenu {
 
         addItem(withTitle: UserText.bookmarksShowToolbarPanel, action: #selector(MoreOptionsMenu.openBookmarks(_:)), keyEquivalent: "")
             .targetting(target)
+
+        BookmarksBarMenuFactory.addToMenu(self)
 
         addItem(NSMenuItem.separator())
 

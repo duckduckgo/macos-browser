@@ -88,7 +88,7 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         return !isBurner
     }
 
-    func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData, hasGeneratedPassword generatedPassword: Bool, withTrigger trigger: AutofillUserScript.GetTriggerType?) {
+    func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData, withTrigger trigger: AutofillUserScript.GetTriggerType?) {
         self.autofillDataToSave = data
     }
 
@@ -120,14 +120,6 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
 
     public func secureVaultManager(_: BrowserServicesKit.SecureVaultManager, didReceivePixel pixel: AutofillUserScript.JSPixel) {
         Pixel.fire(.jsPixel(pixel))
-    }
-
-    func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager, shouldSilentlySave: Bool) -> Bool {
-        return true
-    }
-
-    func secureVaultManagerShouldSilentlySaveGeneratedPassword(_: SecureVaultManager) -> Bool {
-        return false
     }
 
     func secureVaultManager(_: SecureVaultManager, promptUserToUseGeneratedPasswordForDomain: String, withGeneratedPassword generatedPassword: String, completionHandler: @escaping (Bool) -> Void) {

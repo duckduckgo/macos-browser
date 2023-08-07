@@ -21,6 +21,15 @@ import Bookmarks
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+extension LocalBookmarkStore {
+
+    convenience init(context: NSManagedObjectContext) {
+        self.init {
+            context
+        }
+    }
+}
+
 final class LocalBookmarkStoreTests: XCTestCase {
 
     // MARK: Save/Delete
@@ -31,6 +40,11 @@ final class LocalBookmarkStoreTests: XCTestCase {
         super.setUp()
 
         BookmarkUtils.prepareFoldersStructure(in: container.viewContext)
+        do {
+            try container.viewContext.save()
+        } catch {
+            XCTFail("Could not prepare Bookmarks Structure")
+        }
     }
 
     func testWhenBookmarkIsSaved_ThenItMustBeLoadedFromStore() {

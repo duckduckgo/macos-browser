@@ -40,15 +40,16 @@ extension NSApplication {
             }
         }
     }
-    @objc dynamic var runType: RunType { .normal }
+    @objc dynamic class var runType: RunType { .normal }
+    var runType: RunType { Self.runType }
 
     var isRunningUnitTests: Bool {
-        if case .unitTests = runType { return true }
+        if case .unitTests = Self.runType { return true }
         return false
     }
 
     var isRunningIntegrationTests: Bool {
-        if case .integrationTests = runType { return true }
+        if case .integrationTests = Self.runType { return true }
         return false
     }
 

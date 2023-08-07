@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
-import Cocoa
 import BrowserServicesKit
+import Cocoa
 import Common
+import WebKit
 
 // Actions are sent to objects of responder chain
 
@@ -232,6 +233,16 @@ extension AppDelegate {
     @IBAction func fireButtonAction(_ sender: NSButton) {
         FireCoordinator.fireButtonAction()
     }
+
+    @IBAction func navigateToPrivateEmail(_ sender: Any?) {
+        guard let window = NSApplication.shared.keyWindow,
+              let windowController = window.windowController as? MainWindowController else {
+            assertionFailure("No reference to main window controller")
+            return
+        }
+    windowController.mainViewController.browserTabViewController.openNewTab(with: .url(URL.duckDuckGoEmailLogin))
+    }
+
 }
 
 extension MainViewController {
@@ -337,7 +348,17 @@ extension MainViewController {
     }
 
     @IBAction func toggleBookmarksBarFromMenu(_ sender: Any) {
-        PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
+        // Leaving this keyboard shortcut in place.  When toggled on it will use the previously set appearence which defaults to "always".
+        //  If the user sets it to "new tabs only" somewhere (e.g. preferences), then it'll be that.
+        guard let mainVC = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else { return }
+
+        let prefs = AppearancePreferences.shared
+        if prefs.showBookmarksBar && prefs.bookmarksBarAppearance == .newTabOnly {
+            // show bookmarks bar but don't change the setting
+            mainVC.toggleBookmarksBarVisibility()
+        } else {
+            prefs.showBookmarksBar.toggle()
+        }
     }
 
     @IBAction func toggleAutofillShortcut(_ sender: Any) {

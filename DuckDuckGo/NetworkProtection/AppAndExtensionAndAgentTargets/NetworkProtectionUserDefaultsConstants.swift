@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionAppCommunication.swift
+//  NetworkProtectionUserDefaultsConstants.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -17,8 +17,15 @@
 //
 
 import Foundation
-import NetworkExtension
 
-enum NetworkProtectionOptionKey: String {
-    case defaultPixelHeaders
+/// Constants representing default values for NetP settings to be both accessible from Controller and Main Menu
+enum NetworkProtectionUserDefaultsConstants {
+
+    static let onDemandActivation = true
+    static let shouldConnectOnLogIn = false
+    static let shouldEnforceRoutes = false
+    static let shouldIncludeAllNetworks = false
+    static let shouldExcludeLocalRoutes = false
+    static let isConnectionTesterEnabled = true
+
 }
