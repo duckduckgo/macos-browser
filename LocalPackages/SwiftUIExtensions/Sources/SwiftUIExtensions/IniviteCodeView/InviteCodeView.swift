@@ -36,13 +36,17 @@ public struct InviteCodeView<ViewModel>: View where ViewModel: InviteCodeViewMod
                 Text(viewModel.messageText)
                     .font(.system(size: 13))
                     .multilineTextAlignment(.center)
-                TextField(viewModel.textFieldPlaceholder, text: $viewModel.textFieldText, onCommit: {
-                    Task {
-                        await viewModel.onConfirm()
-                    }
-                })
+                if viewModel.showProgressView, #available(macOS 11.0, *) {
+                    ProgressView()
+                } else {
+                    TextField(viewModel.textFieldPlaceholder, text: $viewModel.textFieldText, onCommit: {
+                        Task {
+                            await viewModel.onConfirm()
+                        }
+                    })
                     .frame(width: 96)
                     .textFieldStyle(.roundedBorder)
+                }
                 if let errorText = viewModel.errorText {
                     Text(errorText)
                         .font(.system(size: 13))
@@ -75,6 +79,8 @@ public protocol InviteCodeViewModel: ObservableObject {
 
     var textFieldText: String { get set }
     var errorText: String? { get set }
+
+    var showProgressView: Bool { get set }
 
     func onConfirm() async
     func onCancel()

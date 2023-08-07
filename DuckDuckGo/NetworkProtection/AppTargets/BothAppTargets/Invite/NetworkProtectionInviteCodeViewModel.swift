@@ -116,6 +116,8 @@ final class NetworkProtectionInviteCodeViewModel: InviteCodeViewModel {
 
     @Published var errorText: String?
 
+    @Published var showProgressView = false
+
     private let redemptionCoordinator: NetworkProtectionCodeRedeeming
     private var textCancellable: AnyCancellable?
 
@@ -129,15 +131,19 @@ final class NetworkProtectionInviteCodeViewModel: InviteCodeViewModel {
     @MainActor
     func onConfirm() async {
         errorText = nil
+        showProgressView = true
         do {
             try await redemptionCoordinator.redeem(textFieldText.trimmingWhitespace())
         } catch NetworkProtectionClientError.invalidInviteCode {
             errorText = UserText.inviteDialogUnrecognizedCodeMessage
+            showProgressView = false
             return
         } catch {
             errorText = UserText.unknownErrorTryAgainMessage
+            showProgressView = false
             return
         }
+        showProgressView = false
         delegate?.networkProtectionInviteCodeViewModelDidReedemSuccessfully(self)
     }
 

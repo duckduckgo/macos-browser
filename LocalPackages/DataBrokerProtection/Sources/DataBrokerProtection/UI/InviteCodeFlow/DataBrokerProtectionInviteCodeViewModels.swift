@@ -61,6 +61,8 @@ final class DataBrokerProtectionInviteCodeViewModel: InviteCodeViewModel {
 
     @Published var errorText: String?
 
+    @Published var showProgressView = false
+
     init(delegate: DataBrokerProtectionInviteCodeViewModelDelegate,
          authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData(),
          authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()) {
@@ -68,17 +70,19 @@ final class DataBrokerProtectionInviteCodeViewModel: InviteCodeViewModel {
         self.redeemUseCase = RedeemUseCase(authenticationService: authenticationService, authenticationRepository: authenticationRepository)
     }
 
+    @MainActor
     func onConfirm() async {
+        errorText = nil
+        showProgressView = true
         do {
             try await redeemUseCase.redeem(inviteCode: textFieldText)
-            await MainActor.run {
-                delegate?.dataBrokerProtectionInviteCodeViewModelDidReedemSuccessfully(self)
-            }
         } catch {
-            await MainActor.run {
-                errorText = errorMessageText
-            }
+            errorText = errorMessageText
+            showProgressView = false
+            return
         }
+        showProgressView = false
+        delegate?.dataBrokerProtectionInviteCodeViewModelDidReedemSuccessfully(self)
     }
 
     func onCancel() {
