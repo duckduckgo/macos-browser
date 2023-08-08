@@ -14,7 +14,7 @@ jobs:
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: '1201037661562251'
-          action: 'create-asana-issue-task'
+          action: 'create-asana-task'
 
       - name: Ensure Action sees template files
         uses: actions/checkout@v2
