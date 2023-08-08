@@ -16,3 +16,4 @@ jobs:
           asana-project: '1201037661562251'
           asana-task-name: GH Workflow Failure
           action: 'create-asana-task'
+          asana-task-description: Checks failed
