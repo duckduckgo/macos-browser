@@ -276,10 +276,6 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         }
     }
 
-    public func secureVaultManager(_: SecureVaultManager, promptUserToUseGeneratedPasswordForDomain: String, withGeneratedPassword generatedPassword: String, completionHandler: @escaping (Bool) -> Void) {
-        // no-op on macOS
-    }
-
     public func secureVaultManager(_: SecureVaultManager, didRequestCreditCardsManagerForDomain domain: String) {
         autofillPreferencesModel.showAutofillPopover(.cards)
     }
