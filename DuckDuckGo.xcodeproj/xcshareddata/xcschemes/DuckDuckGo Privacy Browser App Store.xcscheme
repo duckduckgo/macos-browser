@@ -97,6 +97,9 @@
                   Identifier = "AutoconsentMessageProtocolTests/testEval()">
                </Test>
                <Test
+                  Identifier = "BrokenSiteReportingReferenceTests">
+               </Test>
+               <Test
                   Identifier = "CBRCompileTimeReporterTests">
                </Test>
                <Test
