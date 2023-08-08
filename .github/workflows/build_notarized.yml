@@ -180,6 +180,7 @@ jobs:
         submodules: recursive
 
     - name: Install xcbeautify
+      if: runner.debug != '1'
       continue-on-error: true
       run: brew install xcbeautify
 
@@ -198,7 +199,11 @@ jobs:
         export APPLE_API_KEY_PATH="$RUNNER_TEMP/apple_api_key.pem"
         echo -n "$APPLE_API_KEY_BASE64" | base64 --decode -o $APPLE_API_KEY_PATH
 
-        ./scripts/archive.sh ${{ env.release-type }}
+        if [[ "${{ runner.debug }}" == "1" ]]; then
+          ./scripts/archive.sh ${{ env.release-type }} -r
+        else
+          ./scripts/archive.sh ${{ env.release-type }}
+        fi
 
     - name: Set app name and version
       id: set-outputs

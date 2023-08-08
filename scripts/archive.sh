@@ -15,12 +15,13 @@ print_usage_and_exit() {
 
 	cat <<- EOF
 	Usage:
-	  $ $(basename "$0") <review|release|review-sandbox|release-sandbox> [-a <asana_task_url>] [-d] [-s] [-v <version>]
+	  $ $(basename "$0") <review|release|review-sandbox|release-sandbox> [-a <asana_task_url>] [-d] [-s] [-r] [-v <version>]
 
 	Options:
 	 -a <asana_task_url>  Update Asana task after building the app (implies -d)
 	 -d                   Create a DMG image alongside the zipped app and dSYMs
 	 -h                   Print this message
+	 -r                   Show raw output (don't use xcpretty or xcbeautify)
 	 -s                   Skip xcodebuild output in logs
 	 -v <version>         Override app version with <version> (does not update Xcode project)
 
@@ -68,7 +69,7 @@ read_command_line_arguments() {
 
 	shift 1
 
-	while getopts 'a:dhsv:' OPTION; do
+	while getopts 'a:dhrsv:' OPTION; do
 		case "${OPTION}" in
 			a)
 				asana_task_url="${OPTARG}"
@@ -81,6 +82,9 @@ read_command_line_arguments() {
 				;;
 			h)
 				print_usage_and_exit
+				;;
+			r)
+				disable_log_formatting=1
 				;;
 			s)
 				# Use silent_output function to redirect all output to /dev/null
@@ -197,9 +201,9 @@ prepare_export_options_plist() {
 }
 
 setup_log_formatter() {
-	if [[ -n ${ACTIONS_STEP_DEBUG} ]]; then
+	if [[ ${disable_log_formatting} ]]; then
 		echo
-		echo "Debug logging enabled - not prettifying Xcode logs."
+		echo "Log formatting disabled - not prettifying Xcode logs."
 		echo
 		log_formatter='tee'
 	elif command -v xcbeautify &> /dev/null; then
