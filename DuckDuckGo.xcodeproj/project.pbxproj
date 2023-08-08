@@ -158,7 +158,6 @@
 		31929FD62A4C4CFF0084EA89 /* BrowserImportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024226B35F7C00489384 /* BrowserImportViewController.swift */; };
 		31929FD72A4C4CFF0084EA89 /* NSPopUpButtonExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292D62667124000AD2C21 /* NSPopUpButtonExtension.swift */; };
 		31929FD82A4C4CFF0084EA89 /* ConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D33F1125C82EB3002B91A6 /* ConfigurationManager.swift */; };
-		31929FD92A4C4CFF0084EA89 /* NetworkProtectionInviteCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D606E2A0B29FA00BCD287 /* NetworkProtectionInviteCodeView.swift */; };
 		31929FDA2A4C4CFF0084EA89 /* YoutubePlayerUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */; };
 		31929FDB2A4C4CFF0084EA89 /* PixelParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E48326146AAB0067D1B9 /* PixelParameters.swift */; };
 		31929FDC2A4C4CFF0084EA89 /* ErrorWithParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A94B329C16294000C7D4C /* ErrorWithParameters.swift */; };
@@ -189,7 +188,6 @@
 		31929FF62A4C4CFF0084EA89 /* NetworkProtectionInviteDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D606C2A0B29FA00BCD287 /* NetworkProtectionInviteDialog.swift */; };
 		31929FF72A4C4CFF0084EA89 /* SuggestionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABEE6A424AA0A7F0043105B /* SuggestionViewController.swift */; };
 		31929FF82A4C4CFF0084EA89 /* AddEditFavoriteWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85589E7A27BBB8620038AD11 /* AddEditFavoriteWindow.swift */; };
-		31929FF92A4C4CFF0084EA89 /* NetworkProtectionInviteSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D606D2A0B29FA00BCD287 /* NetworkProtectionInviteSuccessView.swift */; };
 		31929FFA2A4C4CFF0084EA89 /* BWKeyStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6216B129069BBF00386B2C /* BWKeyStorage.swift */; };
 		31929FFB2A4C4CFF0084EA89 /* VisitViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7E919E287872EA00AB6B62 /* VisitViewModel.swift */; };
 		31929FFC2A4C4CFF0084EA89 /* Atb.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B50352726A11F00758A2B /* Atb.swift */; };
@@ -8582,7 +8580,6 @@
 				31929FD62A4C4CFF0084EA89 /* BrowserImportViewController.swift in Sources */,
 				31929FD72A4C4CFF0084EA89 /* NSPopUpButtonExtension.swift in Sources */,
 				31929FD82A4C4CFF0084EA89 /* ConfigurationManager.swift in Sources */,
-				31929FD92A4C4CFF0084EA89 /* NetworkProtectionInviteCodeView.swift in Sources */,
 				31929FDA2A4C4CFF0084EA89 /* YoutubePlayerUserScript.swift in Sources */,
 				31929FDB2A4C4CFF0084EA89 /* PixelParameters.swift in Sources */,
 				31929FDC2A4C4CFF0084EA89 /* ErrorWithParameters.swift in Sources */,
@@ -8615,7 +8612,6 @@
 				31929FF62A4C4CFF0084EA89 /* NetworkProtectionInviteDialog.swift in Sources */,
 				31929FF72A4C4CFF0084EA89 /* SuggestionViewController.swift in Sources */,
 				31929FF82A4C4CFF0084EA89 /* AddEditFavoriteWindow.swift in Sources */,
-				31929FF92A4C4CFF0084EA89 /* NetworkProtectionInviteSuccessView.swift in Sources */,
 				31929FFA2A4C4CFF0084EA89 /* BWKeyStorage.swift in Sources */,
 				31929FFB2A4C4CFF0084EA89 /* VisitViewModel.swift in Sources */,
 				31929FFC2A4C4CFF0084EA89 /* Atb.swift in Sources */,
