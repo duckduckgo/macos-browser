@@ -3,7 +3,7 @@ name: Create Asana Task on Test Failure
 on:
   pull_request:
     types:
-      - closed
+      - edited
 
 jobs:
   create_asana_task:
