@@ -21,6 +21,7 @@ import Foundation
 
 #if NETWORK_PROTECTION
 import NetworkProtection
+import NetworkProtectionUI
 import NetworkExtension
 import SystemExtensions
 
@@ -38,6 +39,9 @@ final class NetworkProtectionDebugUtilities {
             }
         }
     }
+
+    @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .shared)
+    private(set) var onboardingStatusRawValue: OnboardingStatus.RawValue
 
     // MARK: - Login Items Management
 
@@ -74,7 +78,7 @@ final class NetworkProtectionDebugUtilities {
                 try? await tunnel.removeFromPreferences()
             }
         }
-
+        onboardingStatusRawValue = OnboardingStatus.default.rawValue
         NetworkProtectionSelectedServerUserDefaultsStore().reset()
 
         try await removeSystemExtensionAndAgents()

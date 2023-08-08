@@ -278,10 +278,11 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 return
             }
 
-            await onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
+            onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
 #endif
 
             let tunnelManager = try await loadOrMakeTunnelManager()
+            onboardingStatusRawValue = OnboardingStatus.completed.rawValue
 
             switch tunnelManager.connection.status {
             case .invalid:
