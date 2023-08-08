@@ -24,6 +24,7 @@ final class BookmarksBarViewController: NSViewController {
 
     @IBOutlet private var bookmarksBarCollectionView: NSCollectionView!
     @IBOutlet private var clippedItemsIndicator: NSButton!
+    @IBOutlet private var promptAnchor: NSView!
 
     private let bookmarkManager = LocalBookmarkManager.shared
     private let viewModel: BookmarksBarViewModel
@@ -35,6 +36,9 @@ final class BookmarksBarViewController: NSViewController {
         let viewWidthWithoutClipIndicator = view.frame.width - clippedItemsIndicator.frame.minX
         return view.frame.width - viewWidthWithoutClipIndicator - 3
     }
+
+    @UserDefaultsWrapper(key: .bookmarksBarPromptShown, defaultValue: false)
+    var bookmarksBarPromptShown: Bool
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -88,6 +92,11 @@ final class BookmarksBarViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         frameChangeNotification()
+    }
+
+    func showBookmarksBarPrompt() {
+        BookmarksBarPromptPopover().show(relativeTo: promptAnchor.bounds, of: promptAnchor, preferredEdge: .minY)
+        self.bookmarksBarPromptShown = true
     }
 
     private func subscribeToViewModel() {
@@ -172,6 +181,7 @@ final class BookmarksBarViewController: NSViewController {
 extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
 
     func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem) {
+        PixelExperiment.fireBookmarksBarInteractionPixel()
         guard let indexPath = bookmarksBarCollectionView.indexPath(for: item) else {
             assertionFailure("Failed to look up index path for clicked item")
             return
@@ -288,5 +298,11 @@ extension BookmarksBarViewController: AddBookmarkModalViewControllerDelegate, Ad
         bookmarkManager.update(bookmark: bookmark)
         _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
     }
+
+}
+
+extension Notification.Name {
+
+    static let bookmarkPromptShouldShow = Notification.Name(rawValue: "bookmarkPromptShouldShow")
 
 }

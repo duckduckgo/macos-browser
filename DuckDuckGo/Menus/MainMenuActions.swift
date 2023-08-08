@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
-import Cocoa
 import BrowserServicesKit
+import Cocoa
 import Common
+import WebKit
 
 // Actions are sent to objects of responder chain
 
@@ -232,6 +233,16 @@ extension AppDelegate {
     @IBAction func fireButtonAction(_ sender: NSButton) {
         FireCoordinator.fireButtonAction()
     }
+
+    @IBAction func navigateToPrivateEmail(_ sender: Any?) {
+        guard let window = NSApplication.shared.keyWindow,
+              let windowController = window.windowController as? MainWindowController else {
+            assertionFailure("No reference to main window controller")
+            return
+        }
+    windowController.mainViewController.browserTabViewController.openNewTab(with: .url(URL.duckDuckGoEmailLogin))
+    }
+
 }
 
 extension MainViewController {
@@ -674,6 +685,23 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowDuckPlayer.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowCookie.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay0.rawValue)
+        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay7.rawValue)
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
+    }
+
+    @IBAction func changeInstallDateToToday(_ sender: Any?) {
+        UserDefaults.standard.set(Date(), forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    }
+
+    @IBAction func changeInstallDateToLessThanAWeekAgo(_ sender: Any?) {
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())
+        UserDefaults.standard.set(yesterday, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    }
+
+    @IBAction func changeInstallDateToMoreThanAWeekAgo(_ sender: Any?) {
+        let aWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())
+        UserDefaults.standard.set(aWeekAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {

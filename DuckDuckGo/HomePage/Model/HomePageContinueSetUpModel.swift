@@ -33,12 +33,32 @@ extension HomePage.Models {
         let itemsRowCountWhenCollapsed = HomePage.featureRowCountWhenCollapsed
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
+        let privacyConfig: PrivacyConfiguration
 
-        let privacyConfig = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
+        var isDay0SurveyEnabled: Bool {
+            let newTabContinueSetUpSettings = privacyConfig.settings(for: .newTabContinueSetUp)
+            if let day0SurveyString =  newTabContinueSetUpSettings["surveyCardDay0"] as? String {
+                if day0SurveyString == "enabled" {
+                    return true
+                }
+            }
+            return false
+        }
+        var isDay7SurveyEnabled: Bool {
+            let newTabContinueSetUpSettings = privacyConfig.settings(for: .newTabContinueSetUp)
+            if let day7SurveyString =  newTabContinueSetUpSettings["surveyCardDay7"] as? String {
+                if day7SurveyString == "enabled" {
+                    return true
+                }
+            }
+            return false
+        }
         var duckPlayerURL: String {
             let duckPlayerSettings = privacyConfig.settings(for: .duckPlayer)
             return duckPlayerSettings["tryDuckPlayerLink"] as? String ?? "https://www.youtube.com/watch?v=yKWIA-Pys4c"
         }
+        var day0SurveyURL: String = "https://selfserve.decipherinc.com/survey/selfserve/32ab/230701?list=1"
+        var day7SurveyURL: String = "https://selfserve.decipherinc.com/survey/selfserve/32ab/230702?list=1"
 
         private let defaultBrowserProvider: DefaultBrowserProvider
         private let dataImportProvider: DataImportStatusProviding
@@ -73,8 +93,20 @@ extension HomePage.Models {
         @UserDefaultsWrapper(key: .homePageShowCookie, defaultValue: true)
         private var shouldShowCookieSetting: Bool
 
+        @UserDefaultsWrapper(key: .homePageShowSurveyDay0, defaultValue: true)
+        private var shouldShowSurveyDay0: Bool
+
+        @UserDefaultsWrapper(key: .homePageUserInteractedWithSurveyDay0, defaultValue: false)
+        private var userInteractedWithSurveyDay0: Bool
+
+        @UserDefaultsWrapper(key: .homePageShowSurveyDay7, defaultValue: true)
+        private var shouldShowSurveyDay7: Bool
+
         @UserDefaultsWrapper(key: .homePageIsFirstSession, defaultValue: true)
         private var isFirstSession: Bool
+
+        @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Calendar.current.date(byAdding: .month, value: -1, to: Date())!)
+        private var firstLaunchDate: Date
 
         var isMoreOrLessButtonNeeded: Bool {
             return featuresMatrix.count > itemsRowCountWhenCollapsed
@@ -83,6 +115,8 @@ extension HomePage.Models {
         var hasContent: Bool {
             return !featuresMatrix.isEmpty
         }
+
+        lazy var statisticsStore: StatisticsStore = LocalStatisticsStore()
 
         lazy var listOfFeatures = isFirstSession ? FeatureType.allCases: randomiseFeatures()
 
@@ -100,7 +134,8 @@ extension HomePage.Models {
              emailManager: EmailManager = EmailManager(),
              privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
              cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
-             duckPlayerPreferences: DuckPlayerPreferencesPersistor) {
+             duckPlayerPreferences: DuckPlayerPreferencesPersistor,
+             privacyConfig: PrivacyConfiguration = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
@@ -108,11 +143,13 @@ extension HomePage.Models {
             self.privacyPreferences = privacyPreferences
             self.cookieConsentPopoverManager = cookieConsentPopoverManager
             self.duckPlayerPreferences = duckPlayerPreferences
+            self.privacyConfig = privacyConfig
             refreshFeaturesMatrix()
             NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
             NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeKey(_:)), name: NSWindow.didBecomeKeyNotification, object: nil)
         }
 
+        // swiftlint:disable cyclomatic_complexity
         @MainActor func performAction(for featureType: FeatureType) {
             switch featureType {
             case .defaultBrowser:
@@ -143,8 +180,13 @@ extension HomePage.Models {
                     })
                     cookiePopUpVisible = true
                 }
+            case .surveyDay0:
+                visitSurvey(day: .day0)
+            case .surveyDay7:
+                visitSurvey(day: .day7)
             }
         }
+        // swiftlint:enable cyclomatic_complexity
 
         func removeItem(for featureType: FeatureType) {
             switch featureType {
@@ -158,6 +200,10 @@ extension HomePage.Models {
                 shouldShowEmailProtectionSetting = false
             case .cookiePopUp:
                 shouldShowCookieSetting = false
+            case .surveyDay0:
+                shouldShowSurveyDay0 = false
+            case .surveyDay7:
+                shouldShowSurveyDay7 = false
             }
             refreshFeaturesMatrix()
         }
@@ -186,6 +232,14 @@ extension HomePage.Models {
                     }
                 case .cookiePopUp:
                     if shouldCookieCardBeVisible {
+                        features.append(feature)
+                    }
+                case .surveyDay0:
+                    if shouldSurveyDay0BeVisible {
+                        features.append(feature)
+                    }
+                case .surveyDay7:
+                    if shouldSurveyDay7BeVisible {
                         features.append(feature)
                     }
                 }
@@ -255,6 +309,50 @@ extension HomePage.Models {
             privacyPreferences.autoconsentEnabled != true
         }
 
+        private var shouldSurveyDay0BeVisible: Bool {
+            let oneDayAgo = Calendar.current.date(byAdding: .weekday, value: -1, to: Date())!
+            return isDay0SurveyEnabled &&
+            shouldShowSurveyDay0 &&
+            !userInteractedWithSurveyDay0 &&
+            firstLaunchDate > oneDayAgo
+        }
+
+        private var shouldSurveyDay7BeVisible: Bool {
+            let oneWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())!
+            return isDay7SurveyEnabled &&
+            shouldShowSurveyDay7 &&
+            !userInteractedWithSurveyDay0 &&
+            firstLaunchDate <= oneWeekAgo
+        }
+
+        private enum SurveyDay {
+            case day0
+            case day7
+        }
+
+        @MainActor private func visitSurvey(day: SurveyDay) {
+            var surveyURLString: String
+            switch day {
+            case .day0:
+                surveyURLString = day0SurveyURL
+            case .day7:
+                surveyURLString = day7SurveyURL
+            }
+            if let atb = statisticsStore.atb {
+                surveyURLString += "&atb=\(atb)"
+            }
+
+            if let url = URL(string: surveyURLString) {
+                let tab = Tab(content: .url(url), shouldLoadInBackground: true)
+                tabCollectionViewModel.append(tab: tab)
+                switch day {
+                case .day0:
+                    userInteractedWithSurveyDay0 = true
+                case .day7:
+                    shouldShowSurveyDay7 = false
+                }
+            }
+        }
     }
 
     // MARK: Feature Type
@@ -264,6 +362,9 @@ extension HomePage.Models {
         case emailProtection
         case defaultBrowser
         case importBookmarksAndPasswords
+        case surveyDay0
+        case surveyDay7
+
         var title: String {
             switch self {
             case .defaultBrowser:
@@ -276,6 +377,10 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionCardTitle
             case .cookiePopUp:
                 return UserText.newTabSetUpCookieManagerCardTitle
+            case .surveyDay0:
+                return UserText.newTabSetUpSurveyDay0CardTitle
+            case .surveyDay7:
+                return UserText.newTabSetUpSurveyDay7CardTitle
             }
         }
 
@@ -291,6 +396,10 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionSummary
             case .cookiePopUp:
                 return UserText.newTabSetUpCookieManagerSummary
+            case .surveyDay0:
+                return UserText.newTabSetUpSurveyDay0Summary
+            case .surveyDay7:
+                return UserText.newTabSetUpSurveyDay7Summary
             }
         }
 
@@ -306,6 +415,10 @@ extension HomePage.Models {
                 return UserText.newTabSetUpEmailProtectionAction
             case .cookiePopUp:
                 return UserText.newTabSetUpCookieManagerAction
+            case .surveyDay0:
+                return UserText.newTabSetUpSurveyDay0Action
+            case .surveyDay7:
+                return UserText.newTabSetUpSurveyDay7Action
             }
         }
 
@@ -323,6 +436,10 @@ extension HomePage.Models {
                 return NSImage(named: "inbox-128")!.resized(to: iconSize)!
             case .cookiePopUp:
                 return NSImage(named: "Cookie-Popups-128")!.resized(to: iconSize)!
+            case .surveyDay0:
+                return NSImage(named: "Survey-128")!.resized(to: iconSize)!
+            case .surveyDay7:
+                return NSImage(named: "Survey-128")!.resized(to: iconSize)!
             }
         }
     }

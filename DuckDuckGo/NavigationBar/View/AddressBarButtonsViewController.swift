@@ -281,7 +281,8 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     func openBookmarkPopover(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) {
-        guard let bookmark = bookmarkForCurrentUrl(setFavorite: setFavorite, accessPoint: accessPoint) else {
+        let result = bookmarkForCurrentUrl(setFavorite: setFavorite, accessPoint: accessPoint)
+        guard let bookmark = result.bookmark else {
             assertionFailure("Failed to get a bookmark for the popover")
             return
         }
@@ -289,6 +290,7 @@ final class AddressBarButtonsViewController: NSViewController {
         let bookmarkPopover = bookmarkPopoverCreatingIfNeeded()
         if !bookmarkPopover.isShown {
             bookmarkButton.isHidden = false
+            bookmarkPopover.isNew = result.isNew
             bookmarkPopover.viewController.bookmark = bookmark
             bookmarkPopover.show(relativeTo: bookmarkButton.bounds, of: bookmarkButton, preferredEdge: .maxY)
         } else {
@@ -321,9 +323,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 button = popupsButton
                 popover = popupBlockedPopoverCreatingIfNeeded()
             case .externalScheme:
-                guard !query.wasShownOnce else { return }
                 button = externalSchemeButton
-                popover.behavior = .transient
                 query.shouldShowAlwaysAllowCheckbox = true
                 query.shouldShowCancelInsteadOfDeny = true
             default:
@@ -901,11 +901,11 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) -> Bookmark? {
+    private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) -> (bookmark: Bookmark?, isNew: Bool) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
               let url = selectedTabViewModel.tab.content.url else {
             assertionFailure("No URL for bookmarking")
-            return nil
+            return (nil, false)
         }
 
         if let bookmark = bookmarkManager.getBookmark(forUrl: url.absoluteString) {
@@ -914,7 +914,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 bookmarkManager.update(bookmark: bookmark)
             }
 
-            return bookmark
+            return (bookmark, false)
         }
 
         let bookmark = bookmarkManager.makeBookmark(for: url,
@@ -922,7 +922,7 @@ final class AddressBarButtonsViewController: NSViewController {
                                                     isFavorite: setFavorite)
         updateBookmarkButtonImage(isUrlBookmarked: bookmark != nil)
 
-        return bookmark
+        return (bookmark, true)
     }
 
     private func subscribeToEffectiveAppearance() {
@@ -981,6 +981,9 @@ extension AddressBarButtonsViewController: NSPopoverDelegate {
     func popoverDidClose(_ notification: Notification) {
         switch notification.object as? NSPopover {
         case bookmarkPopover:
+            if bookmarkPopover?.isNew == true {
+                NotificationCenter.default.post(name: .bookmarkPromptShouldShow, object: nil)
+            }
             updateBookmarkButtonVisibility()
 
         case privacyDashboardPopover:

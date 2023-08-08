@@ -20,6 +20,8 @@ import Cocoa
 
 final class BookmarkPopover: NSPopover {
 
+    var isNew = false
+
     override init() {
         super.init()
 

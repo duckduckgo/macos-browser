@@ -1,0 +1,15 @@
+{
+  "images" : [
+    {
+      "filename" : "Email-Disabled-16@1.25@1x.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  },
+  "properties" : {
+    "template-rendering-intent" : "template"
+  }
+}
