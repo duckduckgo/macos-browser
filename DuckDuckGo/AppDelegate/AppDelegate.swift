@@ -133,7 +133,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             os_log("App Encryption Key could not be read: %s", "\(error)")
             fileStore = EncryptedFileStore()
         }
-        stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
+        stateRestorat ionManager = AppStateRestorationManager(fileStore: fileStore)
 //addsiwftlinet error
         
         
