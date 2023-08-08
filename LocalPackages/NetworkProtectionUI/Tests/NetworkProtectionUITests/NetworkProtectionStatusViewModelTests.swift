@@ -28,7 +28,7 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
 
     private class MockStatusReporter: NetworkProtectionStatusReporter {
         static let defaultServerInfo = NetworkProtectionStatusServerInfo(
-            serverLocation: "Nw York, USA",
+            serverLocation: "New York, USA",
             serverAddress: "127.0.0.1")
 
         let statusObserver: ConnectionStatusObserver
