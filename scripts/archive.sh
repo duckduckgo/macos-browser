@@ -197,7 +197,12 @@ prepare_export_options_plist() {
 }
 
 setup_log_formatter() {
-	if command -v xcbeautify &> /dev/null; then
+	if [[ -n ${ACTIONS_STEP_DEBUG} ]]; then
+		echo
+		echo "Debug logging enabled - not prettifying Xcode logs."
+		echo
+		log_formatter='tee'
+	elif command -v xcbeautify &> /dev/null; then
 		log_formatter='xcbeautify'
 	elif command -v xcpretty &> /dev/null; then
 		log_formatter='xcpretty'
