@@ -115,6 +115,13 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onCloseDuckDuckGoEmailProtection),
                                                name: .emailDidCloseEmailProtection,
                                                object: nil)
+
+#if DBP
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onCloseDataBrokerProtection),
+                                               name: .dbpDidClose,
+                                               object: nil)
+#endif
     }
 
     @objc
@@ -140,6 +147,17 @@ final class BrowserTabViewController: NSViewController {
             if #available(macOS 11.0, *) {
                 previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
             }
+            self.previouslySelectedTab = nil
+        }
+    }
+
+    @objc
+    private func onCloseDataBrokerProtection(_ notification: Notification) {
+        guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab else { return }
+        self.closeTab(activeTab)
+
+        if let previouslySelectedTab = self.previouslySelectedTab {
+            tabCollectionViewModel.select(tab: previouslySelectedTab)
             self.previouslySelectedTab = nil
         }
     }
@@ -461,6 +479,7 @@ final class BrowserTabViewController: NSViewController {
         case .dataBrokerProtection:
             removeAllTabContent()
             let dataBrokerProtectionViewController = dataBrokerProtectionHomeViewControllerCreatingIfNeeded()
+            self.previouslySelectedTab = tabCollectionViewModel.selectedTab
             addAndLayoutChild(dataBrokerProtectionViewController)
 #endif
         default:
