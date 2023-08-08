@@ -84,14 +84,9 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
         let iconProvider = MenuIconProvider()
         #endif
 
-        let onboardingStatusPublisher = UserDefaults.shared!.publisher(for: \.networkProtectionOnboardingStatus).map { rawValue in
+        let onboardingStatusPublisher = UserDefaults.shared!.publisher(for: \.networkProtectionOnboardingStatusRawValue).map { rawValue in
             OnboardingStatus(rawValue: rawValue) ?? .default
         }.eraseToAnyPublisher()
-
-        Task {
-            try? await Task.sleep(nanoseconds: 10 * NSEC_PER_SEC)
-            UserDefaults.shared!.networkProtectionOnboardingStatus = 0
-        }
 
         return StatusBarMenu(onboardingStatusPublisher: onboardingStatusPublisher, appLauncher: appLauncher, iconProvider: iconProvider)
     }()

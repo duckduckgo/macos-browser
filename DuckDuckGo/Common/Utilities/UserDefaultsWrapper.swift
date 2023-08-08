@@ -147,7 +147,7 @@ public struct UserDefaultsWrapper<T> {
         // Please note that shared defaults MUST have a name that matches exactly their value,
         // or else KVO will just not work as of 2023-08-07
 
-        case networkProtectionOnboardingStatus = "networkProtectionOnboardingStatus"
+        case networkProtectionOnboardingStatusRawValue = "networkProtectionOnboardingStatusRawValue"
 
         // Experiments
         case pixelExperimentInstalled = "pixel.experiment.installed"

@@ -46,11 +46,11 @@ final class NetworkProtectionOnboardingMenu: NSMenu {
 */
     var onboardingStatus: OnboardingStatus {
         get {
-            OnboardingStatus(rawValue: UserDefaults.shared!.networkProtectionOnboardingStatus) ?? .default
+            OnboardingStatus(rawValue: UserDefaults.shared!.networkProtectionOnboardingStatusRawValue) ?? .default
         }
 
         set {
-            UserDefaults.shared!.networkProtectionOnboardingStatus = newValue.rawValue
+            UserDefaults.shared!.networkProtectionOnboardingStatusRawValue = newValue.rawValue
         }
     }
 

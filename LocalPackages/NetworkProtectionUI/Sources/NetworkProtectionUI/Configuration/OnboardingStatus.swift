@@ -33,7 +33,16 @@ public enum OnboardingStatus: RawRepresentable {
 
     /// The default onboarding status.
     ///
-    public static let `default`: OnboardingStatus = .isOnboarding(step: .userNeedsToAllowExtension)
+    /// For AppStore builds the default is asking the user to allow the VPN configuration.
+    /// For DeveloperID builds the default is asking the user to allow the System Extension.
+    ///
+    public static let `default`: OnboardingStatus = {
+#if NETP_SYSTEM_EXTENSION
+        .isOnboarding(step: .userNeedsToAllowExtension)
+#else
+        .isOnboarding(step: .userNeedsToAllowVPNConfiguration)
+#endif
+    }()
 
     public init?(rawValue: Int) {
         if rawValue == 0 {
