@@ -98,10 +98,10 @@
                   Identifier = "AutoconsentMessageProtocolTests/testEval()">
                </Test>
                <Test
-                  Identifier = "CBRCompileTimeReporterTests">
+                  Identifier = "BrokenSiteReportingReferenceTests">
                </Test>
                <Test
-                  Identifier = "FireproofingReferenceTests/testFireproofing()">
+                  Identifier = "CBRCompileTimeReporterTests">
                </Test>
                <Test
                   Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">
@@ -129,6 +129,12 @@
                </Test>
                <Test
                   Identifier = "AutoconsentIntegrationTests/testCosmeticRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden()">
+               </Test>
+               <Test
+                  Identifier = "AutoconsentIntegrationTests/testWhenAutoconsentDisabled_promptIsDisplayed()">
+               </Test>
+               <Test
+                  Identifier = "AutoconsentIntegrationTests/testWhenAutoconsentEnabled_cookieConsentManaged()">
                </Test>
                <Test
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">

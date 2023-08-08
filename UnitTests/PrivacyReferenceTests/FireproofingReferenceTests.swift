@@ -19,6 +19,7 @@
 import XCTest
 import os.log
 @testable import DuckDuckGo_Privacy_Browser
+import Common
 
 final class FireproofingReferenceTests: XCTestCase {
     private var referenceTests = [Test]()
@@ -67,7 +68,7 @@ final class FireproofingReferenceTests: XCTestCase {
         os_log("Testing %s", test.name)
 
         let loginDomains = testData.fireButtonFireproofing.fireproofedSites.map { sanitizedSite($0) }
-        let logins = MockPreservedLogins(domains: loginDomains)
+        let logins = MockPreservedLogins(domains: loginDomains, tld: ContentBlocking.shared.tld)
 
         let webCacheManager = WebCacheManager(fireproofDomains: logins, websiteDataStore: dataStore)
 
@@ -115,11 +116,15 @@ final class FireproofingReferenceTests: XCTestCase {
 
     private class MockPreservedLogins: FireproofDomains {
 
-        init(domains: [String]) {
+        init(domains: [String], tld: TLD) {
             super.init(store: FireproofDomainsStoreMock())
 
             for domain in domains {
-                super.add(domain: domain)
+                guard let eTLDPlusOne = tld.eTLDplus1(domain) else {
+                    XCTFail("Can't create eTLD+1 domain")
+                    return
+                }
+                super.add(domain: eTLDPlusOne)
             }
         }
     }
