@@ -134,7 +134,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             fileStore = EncryptedFileStore()
         }
         stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
-
+//addsiwftlinet error
+        
+        
+        
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         let internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
         self.internalUserDecider = internalUserDecider
