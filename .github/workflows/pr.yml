@@ -303,3 +303,21 @@ jobs:
         run: |
           git update-index --refresh 
           git diff-index --quiet HEAD --
+
+  asana:
+    name: Create Asana Task
+    needs: [swiftlint, tests, release-build, verify-autoconsent-bundle, private-api]
+
+    if: ${{ failure() && github.ref == 'refs/heads/develop'}}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create Asana Task
+        uses: malmstein/github-asana-action@master
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: '1201037661562251'
+          asana-task-name: 'PR checks failed on develop'
+          action: create-asana-task
+          asana-task-description: Tests after merging have failed. See https://github.com/duckduckgo/macos-browser/actions/runs/${{ github.run_id }}
