@@ -166,7 +166,6 @@ public struct NetworkProtectionStatusView: View {
                 OnboardingStepView(model: onboardingStepViewModel)
                     .padding(.horizontal, 5)
                     .padding(.top, 5)
-                    .layoutPriority(1)
             } else {
                 if let healthWarning = model.issueDescription {
                     connectionHealthWarningView(message: healthWarning)

@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 
 extension OnboardingStepView {
@@ -23,6 +24,16 @@ extension OnboardingStepView {
     /// Model for AllowSystemExtensionView
     ///
     final class Model: ObservableObject {
+        struct StyledTextFragment {
+            let text: String
+            let isBold: Bool
+
+            init(text: String, isBold: Bool = false) {
+                self.text = text
+                self.isBold = isBold
+            }
+        }
+
         private let step: OnboardingStep
 
         init(step: OnboardingStep) {
@@ -41,27 +52,48 @@ extension OnboardingStepView {
         var title: String {
             switch step {
             case .userNeedsToAllowExtension:
-                return "Allow extension"
+                return "Step 1 of 2: Allow System Extension"
             case .userNeedsToAllowVPNConfiguration:
-                return "Allow configuration"
+                return "Step 2 of 2: Add VPN Configuration"
             }
         }
 
-        var description: String {
+        var description: [StyledTextFragment] {
             switch step {
             case .userNeedsToAllowExtension:
-                return "Allow extension description"
+                return [
+                    .init(text: "Open "),
+                    .init(text: "System Settings", isBold: true),
+                    .init(text: " to "),
+                    .init(text: "Privacy & Security", isBold: true),
+                    .init(text: ". Scroll and select "),
+                    .init(text: "Allow", isBold: true),
+                    .init(text: " for DuckDuckGo software.")
+                ]
             case .userNeedsToAllowVPNConfiguration:
-                return "Allow configuration description"
+                return [
+                    .init(text: "Select "),
+                    .init(text: "Allow", isBold: true),
+                    .init(text: " when prompted to finish setting up Network Protection.")
+                ]
             }
         }
 
         var actionTitle: String {
             switch step {
             case .userNeedsToAllowExtension:
-                return "Allow extension action"
+                return "Open System Settings..."
             case .userNeedsToAllowVPNConfiguration:
-                return "Allow configuration action"
+                return "Add VPN Configuration..."
+            }
+        }
+
+        var actionScreenshot: NetworkProtectionAsset? {
+            switch step {
+            case .userNeedsToAllowExtension:
+                return .allowSysexScreenshot
+            case .userNeedsToAllowVPNConfiguration:
+                return nil
             }
         }
 
@@ -69,7 +101,8 @@ extension OnboardingStepView {
             switch step {
             case .userNeedsToAllowExtension:
                 return {
-                    print("Allow extension clicked")
+                    let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Security")!
+                    NSWorkspace.shared.open(url)
                 }
             case .userNeedsToAllowVPNConfiguration:
                 return {

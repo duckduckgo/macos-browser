@@ -46,3 +46,21 @@ extension UserDefaults {
         }.eraseToAnyPublisher()
     }
 }
+
+extension NetworkProtectionUI.OnboardingStatus {
+    /// The default onboarding status.
+    ///
+    /// This default is defined in our browser app because it's inherently tied to the specific build-configuration of the browser
+    /// app:
+    /// - For AppStore builds the default is asking the user to allow the VPN configuration.
+    /// - For DeveloperID builds the default is asking the user to allow the System Extension.
+    ///
+    public static let `default`: OnboardingStatus = {
+#if NETP_SYSTEM_EXTENSION
+        .isOnboarding(step: .userNeedsToAllowExtension)
+#else
+        .isOnboarding(step: .userNeedsToAllowVPNConfiguration)
+#endif
+    }()
+}
+
