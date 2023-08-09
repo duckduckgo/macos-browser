@@ -76,6 +76,7 @@ update_task() {
 		--output /dev/null \
 		-d "{
 				\"data\": {
+					\"completed\": false,
 					\"custom_fields\": {
 						\"${occurrences_custom_field_id}\": \"${occurrences}\"
 					}
