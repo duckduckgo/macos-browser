@@ -274,11 +274,17 @@ final class PasswordManagementItemListModel: ObservableObject {
     @Published var canChangeCategory: Bool = true
 
     private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void
+    private let tld: TLD
+    private let urlSort: AutofillDomainNameUrlSort
 
     init(passwordManagerCoordinator: PasswordManagerCoordinating,
-         onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void) {
+         onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void,
+         urlSort: AutofillDomainNameUrlSort = AutofillDomainNameUrlSort(),
+         tld: TLD = ContentBlocking.shared.tld) {
         self.onItemSelected = onItemSelected
         self.passwordManagerCoordinator = passwordManagerCoordinator
+        self.urlSort = urlSort
+        self.tld = tld
     }
 
     func update(items: [SecureVaultItem]) {
@@ -447,6 +453,10 @@ final class PasswordManagementItemListModel: ObservableObject {
         case .logins: emptyState = .logins
         case .identities: emptyState = .identities
         }
+    }
+    
+    func firstLetterForAccount(account: SecureVaultModels.WebsiteAccount) -> String {
+        account.firstTLDLetter(tld: tld, autofillDomainNameUrlSort: urlSort) ?? ""
     }
 
 }

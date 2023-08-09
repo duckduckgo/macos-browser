@@ -17,25 +17,24 @@
 //
 
 import SwiftUI
+import BrowserServicesKit
 
-struct LoginFaviconView: View {
-
+struct LoginFaviconView: View {   
     let domain: String
-
-    let faviconManagement: FaviconManagement = FaviconManager.shared
-
+    let preferredFirstCharacter: String?
+    let faviconManagement: FaviconManagement = FaviconManager.shared    
+    
     var body: some View {
-
-        let favicon = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image ?? NSImage(named: "Login")
-
-        if let image = favicon {
+        if let image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image {
             Image(nsImage: image)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 32)
                 .cornerRadius(4.0)
+                .padding(.leading, 6)
+        } else {
+            let letter = preferredFirstCharacter ?? String(domain.first ?? "#")
+            AutofillIconLetterView(letter: letter)
         }
-
     }
-
 }

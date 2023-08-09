@@ -273,17 +273,30 @@ private struct ItemView: View {
             HStack(spacing: 2) {
 
                 switch item {
-                case .account(let account):
-                    LoginFaviconView(domain: account.domain)
-                        .padding(.leading, 6)
-                case .card:
-                    Image("Card")
-                        .frame(width: 32)
-                        .padding(.leading, 6)
-                case .identity:
-                    Image("Identity")
-                        .frame(width: 32)
-                        .padding(.leading, 6)
+                case .account:
+                    if let account = item.websiteAccount {
+                        LoginFaviconView(domain: account.domain, 
+                                         preferredFirstCharacter: model.firstLetterForAccount(account: account))
+                    }
+                    else {
+                        AutofillIconLetterView(letter: "#")
+                    }
+                case .card(let card):
+                    if let letter = card.title.first {
+                        AutofillIconLetterView(letter: String(letter))    
+                    } else {
+                        Image("Card")
+                            .frame(width: 32)
+                            .padding(.leading, 6)    
+                    }
+                case .identity(let identity):
+                    if let letter = identity.title.first {
+                        AutofillIconLetterView(letter: String(letter))
+                    } else {
+                        Image("Identity")
+                            .frame(width: 32)
+                            .padding(.leading, 6)
+                    }
                 case .note:
                     Image("Note")
                         .frame(width: 32)
