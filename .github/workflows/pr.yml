@@ -162,6 +162,7 @@ jobs:
       run: |
         yq < ${{ matrix.flavor }}.xml -p xml -o json -r \
           $'[.testsuites.testsuite[].testcase] | flatten | map(select(.failure) | .+@classname + " " + .+@name + " \'" + .failure.+@message + "\' ${{ env.WORKFLOW_URL }}") | .[]' \
+          | sort -u -k 1,2 # only keep failures unique by classname and name (column 1 and 2)
           | xargs -L 1 ./scripts/report-failed-unit-test.sh
 
     - name: Upload failed test log
