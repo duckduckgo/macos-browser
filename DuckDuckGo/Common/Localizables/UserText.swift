@@ -322,6 +322,14 @@ struct UserText {
 
     static let aboutDuckDuckGo = NSLocalizedString("preferences.about.about-duckduckgo", value: "About DuckDuckGo", comment: "About screen")
     static let privacySimplified = NSLocalizedString("preferences.about.privacy-simplified", value: "Privacy, simplified.", comment: "About screen")
+    static func aboutUnsupportedDeviceInfo1(version: String) -> String {
+        return String(format: NSLocalizedString("preferences.about.unsupported-device-info1", value: "DuckDuckGo no longer supports macOS version %@. You will\nno longer receive feature or security updates.", comment: ""), version)
+    }
+    static let aboutUnsupportedDeviceInfo2Part1 = NSLocalizedString("preferences.about.unsupported-device-info2-part1", value: "If possible, you can ", comment: "Second paragraph of unsupported device info - part 1")
+    static let aboutUnsupportedDeviceInfo2Part2 = NSLocalizedString("preferences.about.unsupported-device-info2-part2", value: "update to a macOS version of 11.3", comment: "Second paragraph of unsupported device info - part 2")
+    static let aboutUnsupportedDeviceInfo2Part3 = NSLocalizedString("preferences.about.unsupported-device-info2-part3", value: " or greater to", comment: "Second paragraph of unsupported device info - part 3")
+    static let aboutUnsupportedDeviceInfo2Part4 = NSLocalizedString("preferences.about.unsupported-device-info2-part3", value: "continue to receive updates.", comment: "Second paragraph of unsupported device info - part 4")
+
 
     static func moreAt(url: String) -> String {
         let localized = NSLocalizedString("preferences.about.more-at", value: "More at %@", comment: "Link to the about page")

@@ -40,6 +40,12 @@ extension Preferences {
                 Text(UserText.aboutDuckDuckGo)
                     .font(Const.Fonts.preferencePaneTitle)
 
+                if !SupportedOSChecker.isCurrentOsSupported {
+                    UnsupportedDeviceInfoBox()
+                        .padding(.top, 10)
+                        .padding(.leading, -20)
+                }
+
                 PreferencePaneSection {
                     HStack {
                         Image("AboutPageLogo")
@@ -76,6 +82,53 @@ extension Preferences {
                     #endif
                 }
             }
+        }
+    }
+
+    struct UnsupportedDeviceInfoBox: View {
+
+        static let appleSupportURL = URL(string: "https://support.apple.com/en-us/HT211238")!
+        let osVersion: String = {
+                let version = ProcessInfo.processInfo.operatingSystemVersion
+                return "\(version.majorVersion).\(version.minorVersion).\(version.patchVersion)"
+            }()
+
+        var body: some View {
+            HStack(alignment: .top) {
+                Image("Alert-Color-16")
+                    .resizable()
+                    .frame(width: 16, height: 16)
+                    .padding(.trailing, 4)
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(UserText.aboutUnsupportedDeviceInfo1(version: osVersion))
+                    VStack(alignment: .leading, spacing: 0) {
+                        HStack(alignment: .center, spacing: 0) {
+                            Text(UserText.aboutUnsupportedDeviceInfo2Part1)
+                            Button(action: {
+                                WindowControllersManager.shared.show(url: Self.appleSupportURL, newTab: true)
+                            }) {
+                                Text(UserText.aboutUnsupportedDeviceInfo2Part2)
+                                    .foregroundColor(Color.blue)
+                                    .underline()
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .onHover { hovering in
+                                if hovering {
+                                    NSCursor.pointingHand.set()
+                                } else {
+                                    NSCursor.arrow.set()
+                                }
+                            }
+                            Text(UserText.aboutUnsupportedDeviceInfo2Part3)
+                        }
+                        Text(UserText.aboutUnsupportedDeviceInfo2Part4)
+                    }
+                }
+            }
+            .padding()
+            .background(Color(red: 254/255, green: 240/255, blue: 199/255))
+            .cornerRadius(8)
+            .frame(width: 510, height: 130)
         }
     }
 
