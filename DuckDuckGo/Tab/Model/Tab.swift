@@ -117,7 +117,7 @@ protocol NewWindowPolicyDecisionMaker {
         }
         var userEditableUrl: URL? {
             switch self {
-            case .url(let url, credential: _, userEntered: _):
+            case .url(let url, credential: _, userEntered: _) where !(url.isDuckPlayer || url.isDuckPlayerScheme):
                 return url
             default:
                 return nil
