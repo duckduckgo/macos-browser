@@ -1032,19 +1032,18 @@ extension URL {
             "^fc00:.+",
             "^fe80:.+"
         ]
-
-        if self.scheme == "http" || self.scheme == "https" {
-            if let host = self.host {
-                for pattern in localPatterns {
-                    if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
-                        if regex.firstMatch(in: host, options: [], range: NSRange(location: 0, length: host.utf16.count)) != nil {
-                            return true
-                        }
+        
+        if let host = self.host {
+            for pattern in localPatterns {
+                if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+                    if regex.firstMatch(in: host, options: [], range: NSRange(location: 0, length: host.utf16.count)) != nil {
+                        return true
                     }
                 }
             }
+            
         }
-
+        
         return false
     }
 
