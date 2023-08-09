@@ -80,7 +80,8 @@ update_task() {
 					\"completed\": false,
 					\"custom_fields\": {
 						\"${occurrences_custom_field_id}\": \"${occurrences}\"
-					}
+					},
+					\"due_on\": \"${due_date}\"
 				}
 			}")"
 
@@ -131,7 +132,7 @@ add_subtask() {
 	local message=$4
 	local return_code
 
-	curl -X POST -s "${asana_api_url}/tasks/${parent_task_id}/subtasks" \
+	return_code=$(curl -X POST -s "${asana_api_url}/tasks/${parent_task_id}/subtasks" \
 		-H "Authorization: Bearer ${asana_personal_access_token}" \
     	-H 'content-type: application/json' \
 		--write-out '%{http_code}' \
@@ -143,14 +144,7 @@ add_subtask() {
     				\"notes\": \"Workflow URL: ${workflow_url}\n\n${message}\"
   				}
 			}
-		"
-
-	curl -X PUT -s "${asana_api_url}/tasks/${parent_task_id}" \
-		-H "Authorization: Bearer ${asana_personal_access_token}" \
-		-H 'content-type: application/json' \
-		--write-out '%{http_code}' \
-		--output /dev/null \
-	    -d "{\"data\": {\"due_on\": \"${due_date}\"}}"
+		")
 
 	[[ ${return_code} -eq 200 ]]
 }
