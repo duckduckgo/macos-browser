@@ -155,6 +155,7 @@ jobs:
         report_paths: ${{ matrix.flavor }}.xml
 
     - name: Update Asana with failed unit tests
+      if: always() # always run even if the previous step fails
       env:
         ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
