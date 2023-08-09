@@ -121,8 +121,6 @@ create_task() {
 		--write-out '%{http_code}' \
 		--output /dev/null \
 	    -d "{\"data\": {\"task\": \"${task_id}\"}}"
-
-	echo task_id
 }
 
 add_subtask() {
