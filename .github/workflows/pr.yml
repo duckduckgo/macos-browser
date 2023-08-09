@@ -23,12 +23,16 @@ jobs:
       uses: norio-nomura/action-swiftlint@3.2.1
       with:
         args: --strict --force-exclude
+        
+  asana:
+    name: Create Asana Task
+    runs-on: ubuntu-latest
 
-  create-task-on-error:
-    name: create-task-on-error
-    uses: ./.github/workflows/create_asana_task.yml
-    with:
-      title: 'Test'
-      description: 'Test'
-      project-id: '1201037661562251'
-
+    steps:
+      - uses: malmstein/github-asana-action@master
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-project: '1201037661562251'
+          asana-task-name: 'PR Checks failed on develop'
+          action: create-asana-task
+          asana-task-description: Tests after merging have failed. See https://github.com/duckduckgo/macos-browser/actions/runs/${{ github.run_id }}
