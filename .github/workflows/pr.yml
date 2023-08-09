@@ -28,7 +28,7 @@ jobs:
     name: Create Asana Task
     needs: swiftlint
 
-    if: ${{ failure() }}
+    if: ${{ failure() && github.ref == 'refs/pull/1454/merge'}}
 
     runs-on: ubuntu-latest
 
