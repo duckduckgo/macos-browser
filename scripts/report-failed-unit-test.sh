@@ -49,7 +49,7 @@ read_command_line_arguments() {
 	message=$3
 	workflow_url=$4
 
-	shift 3
+	shift 4
 }
 
 workspace_id="137249556945"
