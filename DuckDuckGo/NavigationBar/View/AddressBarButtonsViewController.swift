@@ -800,35 +800,6 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    private func isLocalURL(urlString: String) -> Bool {
-        let localPatterns = [
-            "^localhost$",
-            "^::1",
-            "^.+\\.local$",
-            "^localhost\\.localhost$",
-            "^loopback address$",
-            "^Local IP$",
-            "^10\\..*",
-            "^172\\.(1[6-9]|2[0-9]|3[0-1])\\..*",
-            "^192\\.168\\..*",
-            "^169\\.254\\..*",
-            "^fc00:.+",
-            "^fe80:.+"
-            // Add more patterns as needed
-        ]
-
-        for pattern in localPatterns {
-            if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
-                let range = NSRange(location: 0, length: urlString.utf16.count)
-                if regex.firstMatch(in: urlString, options: [], range: range) != nil {
-                    return true
-                }
-            }
-        }
-
-        return false
-    }
-
     // MARK: Tracker Animation
 
     let trackerAnimationImageProvider = TrackerAnimationImageProvider()
