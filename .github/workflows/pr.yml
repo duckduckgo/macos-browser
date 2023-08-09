@@ -27,8 +27,8 @@ jobs:
   asana:
     name: Create Asana Task
     needs: swiftlint
-    
-    if: ${{ failure() && github.ref == 'refs/heads/bunn/gha-test' }}
+
+    if: ${{ github.ref == 'refs/heads/bunn/gha-test' }}
 
     runs-on: ubuntu-latest
 
