@@ -28,13 +28,11 @@ jobs:
     name: Create Asana Task
     needs: swiftlint
 
+    if: ${{ failure() }}
 
     runs-on: ubuntu-latest
 
     steps:
-      - name: test echo
-        run: echo "hello world"
-
       - name: Create Asana Task
         uses: malmstein/github-asana-action@master
         with:
