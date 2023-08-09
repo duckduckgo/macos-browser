@@ -146,7 +146,7 @@ add_subtask() {
 			}
 		")
 
-	[[ ${return_code} -eq 200 ]]
+	[[ ${return_code} -eq 201 ]]
 }
 
 main() {
