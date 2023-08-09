@@ -35,7 +35,7 @@ jobs:
       - name: test echo
         run: echo "hello world"
       - name: echo2
-        run: echo "${{ github.ref }}" REPO"
+        run: echo "${{ github.ref }} REPO"
 
       - uses: malmstein/github-asana-action@master
         with:
