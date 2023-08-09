@@ -102,6 +102,7 @@ create_task() {
 					\"custom_fields\": {
 						\"${occurrences_custom_field_id}\": \"${occurrences}\"
 					},
+					\"due_date\": \"${due_date}\",
 					\"name\": \"${task_name}\",
 					\"resource_subtype\": \"default_task\",
 					\"notes\": \"Workflow URL: ${workflow_url}\n\n${message}\",
@@ -130,7 +131,7 @@ add_subtask() {
 	local message=$4
 	local return_code
 
-	return_code=$(curl -X POST -s "${asana_api_url}/tasks/${parent_task_id}/subtasks" \
+	curl -X POST -s "${asana_api_url}/tasks/${parent_task_id}/subtasks" \
 		-H "Authorization: Bearer ${asana_personal_access_token}" \
     	-H 'content-type: application/json' \
 		--write-out '%{http_code}' \
@@ -142,7 +143,14 @@ add_subtask() {
     				\"notes\": \"Workflow URL: ${workflow_url}\n\n${message}\"
   				}
 			}
-		")
+		"
+
+	curl -X PUT -s "${asana_api_url}/tasks/${parent_task_id}" \
+		-H "Authorization: Bearer ${asana_personal_access_token}" \
+		-H 'content-type: application/json' \
+		--write-out '%{http_code}' \
+		--output /dev/null \
+	    -d "{\"data\": {\"due_on\": \"${due_date}\"}}"
 
 	[[ ${return_code} -eq 200 ]]
 }
@@ -152,6 +160,8 @@ main() {
 	local testcase_name
 	local message
 	local workflow_url
+	local due_date
+	due_date=$(date -v +30d +%Y-%m-%d)
 
 	source "${cwd}/helpers/keychain.sh"
 	read_command_line_arguments "$@"
