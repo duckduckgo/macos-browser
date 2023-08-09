@@ -22,7 +22,7 @@ import Common
 typealias CaptchaTransactionId = String
 typealias CaptchaResolveData = String
 
-public enum CaptchaServiceError: Error {
+public enum CaptchaServiceError: Error, Codable {
     case cantGenerateCaptchaServiceURL
     case nilTransactionIdWhenSubmittingCaptcha
     case criticalFailureWhenSubmittingCaptcha

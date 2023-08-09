@@ -19,7 +19,7 @@
 import Foundation
 import Common
 
-public enum EmailError: Error, Equatable {
+public enum EmailError: Error, Equatable, Codable {
     case cantGenerateURL
     case cantFindEmail
     case invalidEmailLink

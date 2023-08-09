@@ -19,9 +19,9 @@
 import Foundation
 
 public struct HistoryEvent: Sendable, Identifiable {
-    public enum EventType {
+    public enum EventType: Codable {
         case noMatchFound
-        case matchFound(extractedProfileID: UUID)
+        case matchFound(extractedProfileID: UUID) // We will change this in follow-up changes to just log that we found scans.
         case error(error: DataBrokerProtectionError)
         case optOutStarted(extractedProfileID: UUID)
         case optOutRequested(extractedProfileID: UUID)
@@ -33,9 +33,9 @@ public struct HistoryEvent: Sendable, Identifiable {
     public let type: EventType
     public let date: Date
 
-    init(type: EventType) {
+    init(type: EventType, date: Date = Date()) {
         self.id = UUID()
-        self.date = Date()
+        self.date = date
         self.type = type
     }
 }

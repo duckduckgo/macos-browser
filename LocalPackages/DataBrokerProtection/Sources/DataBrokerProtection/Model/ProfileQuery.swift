@@ -26,22 +26,37 @@ struct Address: Encodable, Sendable {
 struct ProfileQuery: Encodable, Sendable {
     let firstName: String
     let lastName: String
+    let middleName: String?
+    let suffix: String?
     let city: String
     let state: String
+    let street: String?
+    let zipCode: String?
     let addresses: [Address]
     let age: Int
+    let phone: String?
     let fullName: String
 
     public init(firstName: String,
                 lastName: String,
+                middleName: String? = nil,
+                suffix: String? = nil,
                 city: String,
                 state: String,
+                street: String? = nil,
+                zipCode: String? = nil,
+                phone: String? = nil,
                 age: Int) {
         self.firstName = firstName
         self.lastName = lastName
         self.city = city
         self.state = state
         self.age = age
+        self.middleName = middleName
+        self.suffix = suffix
+        self.street = street
+        self.zipCode = zipCode
+        self.phone = phone
         self.addresses = [Address(city: city, state: state)]
         self.fullName = "\(firstName) \(lastName)"
     }
