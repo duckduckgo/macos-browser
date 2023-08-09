@@ -129,7 +129,7 @@ add_subtask() {
 	local parent_task_id=$1
 	local task_name=$2
 	local workflow_url=$3
-	local message=$4
+	local message="${4//\"/\\\"}"
 	local return_code
 
 	return_code=$(curl -X POST -s "${asana_api_url}/tasks/${parent_task_id}/subtasks" \
@@ -179,12 +179,11 @@ main() {
 		occurrences=$((occurrences+1))
 
 		update_task "${task_id}" "${occurrences}"
+		add_subtask "${task_id}" "${task_name}" "${workflow_url}" "${message}"
 	else
-		task_id=$(create_task "${task_name}" "${workflow_url}" "${message}")
+		create_task "${task_name}" "${workflow_url}" "${message}"
 		occurrences=1
 	fi
-
-	add_subtask "${task_id}" "${task_name}" "${workflow_url}" "${message}"
 }
 
 main "$@"
