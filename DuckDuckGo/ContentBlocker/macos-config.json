@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1690819077465,
+    "version": 1691186943127,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1756,6 +1756,15 @@
                         ]
                     },
                     {
+                        "domain": "cleartax.in",
+                        "rules": [
+                            {
+                                "selector": "#credential_picker_container",
+                                "type": "override"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "coingecko.com",
                         "rules": [
                             {
@@ -2007,6 +2016,15 @@
                             {
                                 "selector": ".connatix-player",
                                 "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "indeed.com",
+                        "rules": [
+                            {
+                                "selector": ".google-Only-Modal",
+                                "type": "hide"
                             }
                         ]
                     },
@@ -2499,6 +2517,15 @@
                         ]
                     },
                     {
+                        "domain": "vinted.fr",
+                        "rules": [
+                            {
+                                "selector": ".ad-container--leaderboard",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "wunderground.com",
                         "rules": [
                             {
@@ -2673,7 +2700,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "5568171dfb10187ccabb0ca602449e3f"
+            "hash": "214ef180c3de6b13185f015e63bbbb0a"
         },
         "exceptionHandler": {
             "exceptions": [],
@@ -3842,6 +3869,13 @@
                     "doubleclick.net": {
                         "rules": [
                             {
+                                "rule": "doubleclick.net/ondemand/hls/content/",
+                                "domains": [
+                                    "history.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1185"
+                            },
+                            {
                                 "rule": "securepubads.g.doubleclick.net/gampad/ads",
                                 "domains": [
                                     "ah.nl",
@@ -4386,6 +4420,154 @@
                                     "wp.pl"
                                 ],
                                 "reason": "Adwall appears which reappears when dismissed. The adwall prevents interaction with the page."
+                            },
+                            {
+                                "rule": "googletagservices.com/tag/js/gpt.js",
+                                "domains": [
+                                    "13wham.com",
+                                    "22thepoint.com",
+                                    "abc3340.com",
+                                    "abc45.com",
+                                    "abc6onyourside.com",
+                                    "abc7amarillo.com",
+                                    "abcnews4.com",
+                                    "abcstlouis.com",
+                                    "azteca48.com",
+                                    "bakersfieldnow.com",
+                                    "cbs12.com",
+                                    "cbs2iowa.com",
+                                    "cbs4local.com",
+                                    "cbs6albany.com",
+                                    "cbsaustin.com",
+                                    "chattanoogacw.com",
+                                    "cnycentral.com",
+                                    "cw14online.com",
+                                    "cw18milwaukee.com",
+                                    "cw23tv.com",
+                                    "cw34.com",
+                                    "cw35.com",
+                                    "cw7michigan.com",
+                                    "cwalbany.com",
+                                    "cwbaltimore.com",
+                                    "cwcentralpa.com",
+                                    "cwcincinnati.com",
+                                    "cwcolumbus.com",
+                                    "cwlasvegas.com",
+                                    "cwnashville.tv",
+                                    "cwokc.com",
+                                    "cwomaha.tv",
+                                    "cwrochester.com",
+                                    "cwtreasurevalley.com",
+                                    "dayton247now.com",
+                                    "fox11online.com",
+                                    "fox17.com",
+                                    "fox23maine.com",
+                                    "fox28savannah.com",
+                                    "fox38corpuschristi.com",
+                                    "fox42kptm.com",
+                                    "fox47.com",
+                                    "fox49.tv",
+                                    "fox4beaumont.com",
+                                    "fox56.com",
+                                    "foxbaltimore.com",
+                                    "foxchattanooga.com",
+                                    "foxillinois.com",
+                                    "foxkansas.com",
+                                    "foxnebraska.com",
+                                    "foxreno.com",
+                                    "foxrichmond.com",
+                                    "foxrochester.com",
+                                    "foxsanantonio.com",
+                                    "idahonews.com",
+                                    "katu.com",
+                                    "katv.com",
+                                    "kcby.com",
+                                    "kdsm17.com",
+                                    "keprtv.com",
+                                    "kfdm.com",
+                                    "kfoxtv.com",
+                                    "khqa.com",
+                                    "kimatv.com",
+                                    "kjzz.com",
+                                    "klewtv.com",
+                                    "kmph.com",
+                                    "kmyu.tv",
+                                    "komonews.com",
+                                    "kpic.com",
+                                    "krcgtv.com",
+                                    "ktul.com",
+                                    "ktvl.com",
+                                    "ktvo.com",
+                                    "ktxs.com",
+                                    "kunptv.com",
+                                    "kunwtv.com",
+                                    "kutv.com",
+                                    "kval.com",
+                                    "local12.com",
+                                    "local21news.com",
+                                    "midmichigannow.com",
+                                    "my15wtcn.com",
+                                    "my24milwaukee.com",
+                                    "my48.tv",
+                                    "mycbs4.com",
+                                    "myfox28columbus.com",
+                                    "mylvtv.com",
+                                    "mynbc15.com",
+                                    "mynews4.com",
+                                    "myrdctv.com",
+                                    "mytv30web.com",
+                                    "mytvbaltimore.com",
+                                    "mytvbuffalo.com",
+                                    "mytvcharleston.com",
+                                    "mytvrichmond.com",
+                                    "mytvwichita.com",
+                                    "mytvz.com",
+                                    "nbc16.com",
+                                    "nbc24.com",
+                                    "nbcmontana.com",
+                                    "nebraska.tv",
+                                    "nevadasportsnet.com",
+                                    "news3lv.com",
+                                    "news4sanantonio.com",
+                                    "newschannel20.com",
+                                    "newschannel9.com",
+                                    "okcfox.com",
+                                    "raleighcw.com",
+                                    "siouxlandnews.com",
+                                    "southernoregoncw.com",
+                                    "star64.tv",
+                                    "thecw38.com",
+                                    "thecw46.com",
+                                    "thecwtc.com",
+                                    "turnto10.com",
+                                    "univisionseattle.com",
+                                    "upnorthlive.com",
+                                    "utv44.com",
+                                    "wabm68.com",
+                                    "wach.com",
+                                    "wchstv.com",
+                                    "wcti12.com",
+                                    "wcyb.com",
+                                    "weartv.com",
+                                    "wfgxtv.com",
+                                    "wfxl.com",
+                                    "wgme.com",
+                                    "wgxa.tv",
+                                    "wjactv.com",
+                                    "wjla.com",
+                                    "wlos.com",
+                                    "wpde.com",
+                                    "wpgh53.com",
+                                    "wsbt.com",
+                                    "wset.com",
+                                    "wtov9.com",
+                                    "wtto21.com",
+                                    "wtwc40.com",
+                                    "wutv29.com",
+                                    "wvah.com",
+                                    "wwmt.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1173"
                             }
                         ]
                     },
@@ -4849,11 +5031,18 @@
                     "pardot.com": {
                         "rules": [
                             {
-                                "rule": "go.pardot.com/",
+                                "rule": "go.pardot.com",
                                 "domains": [
-                                    "klove.com"
+                                    "<all>"
                                 ],
-                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/625"
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1180"
+                            },
+                            {
+                                "rule": "storage.pardot.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1180"
                             }
                         ]
                     },
@@ -5054,6 +5243,17 @@
                                     "aternos.org"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/328"
+                            }
+                        ]
+                    },
+                    "qualtrics.com": {
+                        "rules": [
+                            {
+                                "rule": "qualtrics.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1196"
                             }
                         ]
                     },
@@ -5622,11 +5822,33 @@
                                 "reason": "CNAME ENTRY GENERATED FROM: liveperson.net"
                             }
                         ]
+                    },
+                    "canadapost-postescanada.ca": {
+                        "rules": [
+                            {
+                                "rule": "evaluation.canadapost-postescanada.ca",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "CNAME ENTRY GENERATED FROM: qualtrics.com"
+                            }
+                        ]
+                    },
+                    "goto.com": {
+                        "rules": [
+                            {
+                                "rule": "feedback.goto.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "CNAME ENTRY GENERATED FROM: qualtrics.com"
+                            }
+                        ]
                     }
                 }
             },
             "exceptions": [],
-            "hash": "1ba5432dfee85f56743e1726db86b0a5"
+            "hash": "7ab265aeb47cbefdf8f5e496c56cac4d"
         },
         "trackingCookies1p": {
             "settings": {
@@ -6047,6 +6269,14 @@
         {
             "domain": "earth.google.com",
             "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1099"
+        },
+        {
+            "domain": "iscorp.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/794"
+        },
+        {
+            "domain": "marvel.com",
+            "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1194"
         },
         {
             "domain": "ticketmaster.com",
