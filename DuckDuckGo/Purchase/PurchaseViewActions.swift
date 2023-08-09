@@ -70,8 +70,22 @@ public final class PurchaseViewActions {
             switch await AccountsService.createAccount() {
             case .success(let response):
                 print(response)
-//                self.model?.externalID = response.account.externalID
-//                self.model?.currentEntitlements = response.account.entitlements
+                self.model?.externalID = response.externalID
+                print("Got externalID: \(response.externalID)")
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+
+    @MainActor
+    func testSigningInWithUsingAppStoreHistory() {
+        Task {
+            guard let (payload, signature) = await manager.mostRecentTransaction() else { return }
+
+            switch await AccountsService.storeLogin(payload: payload, signature: signature) {
+            case .success(let response):
+                print(response)
             case .failure(let error):
                 print(error)
             }

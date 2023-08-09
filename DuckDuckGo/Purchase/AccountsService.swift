@@ -32,7 +32,11 @@ struct AccountsService {
 
 //    private static let baseURL = URL(string: "https://quackdev.duckduckgo.com/api/auth")!
     private static let baseURL = URL(string: "https://use-tstorey1.duckduckgo.com/api/auth")!
-    private static var session: URLSession! // = URLSession(configuration: .ephemeral)
+    private static let session = {
+        let configuration = URLSessionConfiguration.ephemeral
+
+        return URLSession(configuration: configuration)
+    }()
 
     // MARK: -
 
@@ -88,23 +92,41 @@ struct AccountsService {
         }
     }
 
+    // MARK: -
+
+    static func storeLogin(payload: String, signature: String) async -> Result<StoreLoginResponse, AccountsService.Error> {
+
+        let bodyDict = ["signature": signature,
+//                        "signed_data": payload,
+                        "store": "apple_app_store"]
+
+        let encoder = JSONEncoder()
+//        encoder.outputFormatting = .prettyPrinted
+        let bodyData = try! encoder.encode(bodyDict)
+
+        let s = String(data: bodyData, encoding: .utf8)
+        print(s)
+
+
+        return await executeAPICall(method: "POST", endpoint: "store-login", headers: [:], body: bodyData)
+    }
+
+    struct StoreLoginResponse: Decodable {
+        let authToken: String
+        let email: String
+        let externalID: String
+        let id: Int
+        let status: String
+
+        enum CodingKeys: String, CodingKey {
+            case authToken = "authToken", email, externalID = "externalId", id, status // no underscores due to keyDecodingStrategy = .convertFromSnakeCase
+        }
+    }
+
     // MARK: - Private API
 
-    private static func executeAPICall<T>(method: String, endpoint: String, headers: [String: String]) async -> Result<T, AccountsService.Error> where T: Decodable {
-        let request = makeAPIRequest(method: method, endpoint: endpoint, headers: headers)
-
-        if session == nil {
-            let configuration = URLSessionConfiguration.ephemeral
-
-            let cookie = HTTPCookie(properties: [.name: "_DUO_APER_LOCAL_",
-                                                 .value: "",
-                                                 .domain: "use-tstorey1.duckduckgo.com",
-                                                 .path: "/",
-                                                 .expires: "Session"])
-            configuration.httpCookieStorage?.setCookie(cookie!)
-
-            session = URLSession(configuration: configuration)
-        }
+    private static func executeAPICall<T>(method: String, endpoint: String, headers: [String: String], body: Data? = nil) async -> Result<T, AccountsService.Error> where T: Decodable {
+        let request = makeAPIRequest(method: method, endpoint: endpoint, headers: headers, body: body)
 
         do {
             let (data, urlResponse) = try await session.data(for: request)
@@ -135,11 +157,12 @@ struct AccountsService {
         let error: String
     }
 
-    private static func makeAPIRequest(method: String, endpoint: String, headers: [String: String]) -> URLRequest {
+    private static func makeAPIRequest(method: String, endpoint: String, headers: [String: String], body: Data?) -> URLRequest {
         let url = baseURL.appendingPathComponent(endpoint)
         var request = URLRequest(url: url)
         request.allHTTPHeaderFields = headers
         request.httpMethod = method
+        request.httpBody = body
 
         return request
     }

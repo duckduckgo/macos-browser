@@ -94,13 +94,14 @@ final class PurchaseViewController: NSViewController {
     }
 
     private var initialState: PurchaseViewModel.State {
-        if hasAuthServiceToken {
-            return .loadingProducts
-        } else if hasEmailProtection {
-            return .authenticating
-        } else {
-            return .noEmailProtection
-        }
+//        if hasAuthServiceToken {
+//            return .loadingProducts
+//        } else if hasEmailProtection {
+//            return .authenticating
+//        } else {
+//            return .noEmailProtection
+//        }
+        .loadingProducts
     }
 
     private var hasAuthServiceToken: Bool {
@@ -133,16 +134,16 @@ final class PurchaseViewController: NSViewController {
             }
         case .loadingProducts:
             Task {
-                switch await AccountsService.validateToken(accessToken: self.model.authServiceToken ?? "") {
-                case .success(let response):
-                    self.model.externalID = response.account.externalID
-                    self.model.currentEntitlements = response.account.entitlements
+//                switch await AccountsService.validateToken(accessToken: self.model.authServiceToken ?? "") {
+//                case .success(let response):
+//                    self.model.externalID = response.account.externalID
+//                    self.model.currentEntitlements = response.account.entitlements
                     await manager.updatePurchasedProducts()
                     await manager.updateAvailableProducts()
                     self.update(for: .readyToPurchase)
-                case .failure(let error):
-                    self.update(for: .errorOccurred(error: error))
-                }
+//                case .failure(let error):
+//                    self.update(for: .errorOccurred(error: error))
+//                }
             }
         default:
             return

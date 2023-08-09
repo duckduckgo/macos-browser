@@ -150,6 +150,51 @@ final class PurchaseManager: ObservableObject {
     }
 
     @MainActor
+    func mostRecentTransaction() async -> (String, String)? {
+        print(" -- [PurchaseManager] updatePurchasedProducts()")
+
+        var transactions: [VerificationResult<Transaction>] = []
+
+//        do {
+
+
+            for await result in Transaction.all {
+//                let transaction = try checkVerified(result)
+
+//                guard transaction.productType == .autoRenewable else { continue }
+//                guard transaction.revocationDate == nil else { continue }
+//
+//                if let expirationDate = transaction.expirationDate, expirationDate > .now {
+//                    purchasedSubscriptions.append(transaction.productID)
+//
+//                    if let token = transaction.appAccountToken {
+//                        print(" -- [PurchaseManager] updatePurchasedProducts(): \(transaction.productID) -- custom UUID: \(token)" )
+//                    }
+//                }
+                transactions.append(result)
+            }
+//        } catch {
+//            print("Error fetching transactions: \(error)")
+//        }
+
+        print(" -- [PurchaseManager] mostRecentTransaction(): fetched \(transactions.count) transactions")
+
+        guard let rawTransaction = transactions.first else { return nil }
+
+
+
+        guard let payload = String(data: rawTransaction.payloadData, encoding: .utf8) else { return nil}
+
+
+        print("External user ID: \(rawTransaction.unsafePayloadValue.appAccountToken)")
+//        let payload = rawTransaction.payloadData
+//        let signature = rawTransaction.signatureData
+
+
+        return (payload, rawTransaction.jwsRepresentation)
+    }
+
+    @MainActor
     func purchase(_ product: Product, customUUID: String) {
         print(" -- [PurchaseManager] buy: \(product.displayName) (customUUID: \(customUUID))")
 
@@ -192,8 +237,6 @@ final class PurchaseManager: ObservableObject {
             }
         }
     }
-
-    private var accessToken: String = ""
 
     private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
         // Check whether the JWS passes StoreKit verification.
