@@ -156,6 +156,7 @@ jobs:
 
     - name: Update Asana with failed unit tests
       env:
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
         yq < ${{ matrix.flavor }}.xml -p xml -o json -r \
