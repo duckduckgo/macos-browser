@@ -174,16 +174,19 @@ public struct NetworkProtectionStatusView: View {
 
             Spacer()
 
-            headerView()
+            Group {
+                headerView()
 
-            featureToggleRow()
+                featureToggleRow()
 
-            Divider()
-                .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
+                Divider()
+                    .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
 
-            if model.showServerDetails {
-                connectionStatusView()
+                if model.showServerDetails {
+                    connectionStatusView()
+                }
             }
+            .disabled(on: model.mainPanelDisabled)
 
             bottomMenuView()
         }

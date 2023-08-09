@@ -48,7 +48,11 @@ extension NetworkProtectionStatusView {
         /// The type of extension that's being used for NetP
         ///
         @Published
-        private var onboardingStatus: OnboardingStatus = .completed
+        private(set) var onboardingStatus: OnboardingStatus = .completed
+
+        var mainPanelDisabled: Bool {
+            onboardingStatus != .completed
+        }
 
         /// The NetP onboarding status publisher
         ///
