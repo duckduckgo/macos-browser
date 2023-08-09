@@ -750,6 +750,7 @@ final class AddressBarButtonsViewController: NSViewController {
         let isDuckDuckGoUrl = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
         let isEditingMode = controllerMode?.isEditing ?? false
         let isTextFieldValueText = textFieldValue?.isText ?? false
+        let isLocalUrl = selectedTabViewModel.tab.content.url?.isLocalURL ?? false
 
         // Privacy entry point button
         privacyEntryPointButton.isHidden = isEditingMode ||
@@ -757,7 +758,8 @@ final class AddressBarButtonsViewController: NSViewController {
             isDuckDuckGoUrl ||
             !isHypertextUrl ||
             selectedTabViewModel.errorViewState.isVisible ||
-            isTextFieldValueText
+            isTextFieldValueText ||
+            isLocalUrl
         imageButtonWrapper.isHidden = view.window?.isPopUpWindow == true
             || !privacyEntryPointButton.isHidden
             || isAnyTrackerAnimationPlaying
@@ -796,6 +798,35 @@ final class AddressBarButtonsViewController: NSViewController {
         default:
             break
         }
+    }
+
+    private func isLocalURL(urlString: String) -> Bool {
+        let localPatterns = [
+            "^localhost$",
+            "^::1",
+            "^.+\\.local$",
+            "^localhost\\.localhost$",
+            "^loopback address$",
+            "^Local IP$",
+            "^10\\..*",
+            "^172\\.(1[6-9]|2[0-9]|3[0-1])\\..*",
+            "^192\\.168\\..*",
+            "^169\\.254\\..*",
+            "^fc00:.+",
+            "^fe80:.+"
+            // Add more patterns as needed
+        ]
+
+        for pattern in localPatterns {
+            if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+                let range = NSRange(location: 0, length: urlString.utf16.count)
+                if regex.firstMatch(in: urlString, options: [], range: range) != nil {
+                    return true
+                }
+            }
+        }
+
+        return false
     }
 
     // MARK: Tracker Animation
@@ -1010,6 +1041,41 @@ final class TrackerAnimationImageProvider: AnimationImageProvider {
         case "img_3.png": return lastTrackerImages[safe: 3]
         default: return nil
         }
+    }
+
+}
+
+extension URL {
+    var isLocalURL: Bool {
+        let localPatterns = [
+            "^localhost$",
+            "^::1",
+            "^.+\\.local$",
+            "^localhost\\.localhost$",
+            "^loopback address$",
+            "^Local IP$",
+            "^10\\..*",
+            "^172\\.(1[6-9]|2[0-9]|3[0-1])\\..*",
+            "^192\\.168\\..*",
+            "^169\\.254\\..*",
+            "^fc00:.+",
+            "^fe80:.+"
+            // Add more patterns as needed
+        ]
+
+        if self.scheme == "http" || self.scheme == "https" {
+            if let host = self.host {
+                for pattern in localPatterns {
+                    if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+                        if regex.firstMatch(in: host, options: [], range: NSRange(location: 0, length: host.utf16.count)) != nil {
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+
+        return false
     }
 
 }
