@@ -27,7 +27,7 @@ jobs:
   asana:
     name: Create Asana Task
 
-    if: ${{ failure() && github.ref == 'refs/heads/bunn/gha-test' }}
+    if: ${{ failure() }}
 
     runs-on: ubuntu-latest
 
