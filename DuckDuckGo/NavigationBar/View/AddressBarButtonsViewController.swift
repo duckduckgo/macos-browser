@@ -1052,15 +1052,14 @@ extension URL {
             "^::1",
             "^.+\\.local$",
             "^localhost\\.localhost$",
-            "^loopback address$",
-            "^Local IP$",
+            "127.0.0.1",
+            "::1",
             "^10\\..*",
             "^172\\.(1[6-9]|2[0-9]|3[0-1])\\..*",
             "^192\\.168\\..*",
             "^169\\.254\\..*",
             "^fc00:.+",
             "^fe80:.+"
-            // Add more patterns as needed
         ]
 
         if self.scheme == "http" || self.scheme == "https" {
