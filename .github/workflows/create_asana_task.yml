@@ -2,7 +2,16 @@ name: Create Asana Task on Test Failure
 
 on:
   workflow_call:
-
+    inputs:
+      title:
+        required: true
+        type: string
+      description:
+        required: true
+        type: string
+      project-id:
+        required: true
+        type: string
 jobs:
   asana:
     name: Create Asana Task
@@ -12,9 +21,7 @@ jobs:
       - uses: malmstein/github-asana-action@master
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: "1201037661562251"
-          asana-task-name: GH Workflow Failure
+          asana-project: inputs.project-id
+          asana-task-name: inputs.title
           action: create-asana-task
-          asana-task-description: Tests after merging have failed. See
-            https://github.com/duckduckgo/macos-browser/actions/runs/${{
-            github.run_id }}
+          asana-task-description: inputs.description
