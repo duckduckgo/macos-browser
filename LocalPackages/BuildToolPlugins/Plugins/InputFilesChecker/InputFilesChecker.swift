@@ -45,7 +45,23 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("startVPN.app", .unknown),
         .init("stopVPN.app", .unknown),
         .init("enableOnDemand.app", .unknown),
-        .init("PFMoveApplication.m", .source)
+        .init("PFMoveApplication.m", .source),
+
+        .init("WaitlistRootView.swift", .source),
+        .init("WaitlistViewModel.swift", .source),
+        .init("WaitlistDialogView.swift", .source),
+        .init("JoinWaitlistView.swift", .source),
+        .init("JoinedWaitlistView.swift", .source),
+        .init("WaitlistModalViewController.swift", .source),
+        .init("NotificationService.swift", .source),
+        .init("WaitlistStorage.swift", .source),
+        .init("WaitlistKeychainStorage.swift", .source),
+        .init("WaitlistRequest.swift", .source),
+        .init("ProductWaitlistRequest.swift", .source),
+        .init("Waitlist.swift", .source),
+        .init("InvitedToWaitlistView.swift", .source),
+        .init("NetworkProtectionTermsAndConditionsView.swift", .source),
+        .init("EnableNetworkProtectionView.swift", .source)
     ],
 
     "DuckDuckGo Privacy Browser App Store": [],

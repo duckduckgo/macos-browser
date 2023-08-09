@@ -796,7 +796,9 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
     func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {
 #if NETWORK_PROTECTION
-        showNetworkProtectionStatus()
+        print("SHOWING NETP")
+        WaitlistModalViewController.show()
+        // showNetworkProtectionStatus()
 #else
         fatalError("Tried to open Network Protection when it was disabled")
 #endif
