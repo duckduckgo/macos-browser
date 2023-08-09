@@ -23,9 +23,12 @@ jobs:
       uses: norio-nomura/action-swiftlint@3.2.1
       with:
         args: --strict --force-exclude
-        
+
   asana:
     name: Create Asana Task
+
+    if: ${{ failure() && github.ref == 'refs/heads/bunn/gha-test' }}
+
     runs-on: ubuntu-latest
 
     steps:
