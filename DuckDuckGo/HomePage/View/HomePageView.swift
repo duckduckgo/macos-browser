@@ -41,11 +41,13 @@ extension HomePage.Views {
 
             } else {
                 if #available(macOS 11.0, *) {
-                    regularHomePageView(includingContinueSetUpCards: true)
+                    regularHomePageView(includingContinueSetUpCards: model.isContinueSetUpAvailable)
                         .contextMenu(ContextMenu(menuItems: {
-                            Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
-                                .toggleStyle(.checkbox)
-                                .visibility(continueSetUpModel.hasContent ? .visible : .gone)
+                            if model.isContinueSetUpAvailable {
+                                Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
+                                    .toggleStyle(.checkbox)
+                                    .visibility(continueSetUpModel.hasContent ? .visible : .gone)
+                            }
                             Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavoriteVisible)
                                 .toggleStyle(.checkbox)
                             Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)

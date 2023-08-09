@@ -319,6 +319,7 @@ public struct NetworkProtectionStatusView: View {
     }
 }
 
+/*
 struct NetworkProtectionStatusView_Previews: PreviewProvider {
 
     private class PreviewController: NetworkProtection.TunnelController {
@@ -363,3 +364,4 @@ struct NetworkProtectionStatusView_Previews: PreviewProvider {
         NetworkProtectionStatusView(model: model)
     }
 }
+*/

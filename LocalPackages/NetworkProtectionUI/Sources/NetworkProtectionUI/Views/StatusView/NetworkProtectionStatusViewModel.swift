@@ -114,12 +114,12 @@ extension NetworkProtectionStatusView {
             self.menuItems = menuItems
             self.runLoopMode = runLoopMode
 
-            connectionStatus = statusReporter.statusPublisher.value
-            isHavingConnectivityIssues = statusReporter.connectivityIssuesPublisher.value
-            internalServerAddress = statusReporter.serverInfoPublisher.value.serverAddress
-            internalServerLocation = statusReporter.serverInfoPublisher.value.serverLocation
-            lastTunnelErrorMessage = statusReporter.connectionErrorPublisher.value
-            lastControllerErrorMessage = statusReporter.controllerErrorMessagePublisher.value
+            connectionStatus = statusReporter.statusObserver.recentValue
+            isHavingConnectivityIssues = statusReporter.connectivityIssuesObserver.recentValue
+            internalServerAddress = statusReporter.serverInfoObserver.recentValue.serverAddress
+            internalServerLocation = statusReporter.serverInfoObserver.recentValue.serverLocation
+            lastTunnelErrorMessage = statusReporter.connectionErrorObserver.recentValue
+            lastControllerErrorMessage = statusReporter.controllerErrorMessageObserver.recentValue
 
             // Particularly useful when unit testing with an initial status of our choosing.
             refreshInternalIsRunning()
@@ -144,7 +144,7 @@ extension NetworkProtectionStatusView {
         // MARK: - Subscriptions
 
         private func subscribeToStatusChanges() {
-            statusChangeCancellable = statusReporter.statusPublisher
+            statusChangeCancellable = statusReporter.statusObserver.publisher
                 .subscribe(on: Self.statusDispatchQueue)
                 .sink { [weak self] status in
 
@@ -159,7 +159,7 @@ extension NetworkProtectionStatusView {
         }
 
         private func subscribeToConnectivityIssues() {
-            connectivityIssuesCancellable = statusReporter.connectivityIssuesPublisher
+            connectivityIssuesCancellable = statusReporter.connectivityIssuesObserver.publisher
                 .subscribe(on: Self.connectivityIssuesDispatchQueue)
                 .sink { [weak self] isHavingConnectivityIssues in
 
@@ -174,7 +174,7 @@ extension NetworkProtectionStatusView {
         }
 
         private func subscribeToTunnelErrorMessages() {
-            tunnelErrorMessageCancellable = statusReporter.connectionErrorPublisher
+            tunnelErrorMessageCancellable = statusReporter.connectionErrorObserver.publisher
                 .subscribe(on: Self.tunnelErrorDispatchQueue)
                 .sink { [weak self] errorMessage in
 
@@ -189,7 +189,7 @@ extension NetworkProtectionStatusView {
         }
 
         private func subscribeToControllerErrorMessages() {
-            controllerErrorMessageCancellable = statusReporter.controllerErrorMessagePublisher
+            controllerErrorMessageCancellable = statusReporter.controllerErrorMessageObserver.publisher
                 .subscribe(on: Self.controllerErrorDispatchQueue)
                 .sink { [weak self] errorMessage in
 
@@ -204,7 +204,7 @@ extension NetworkProtectionStatusView {
         }
 
         private func subscribeToServerInfoChanges() {
-            serverInfoCancellable = statusReporter.serverInfoPublisher
+            serverInfoCancellable = statusReporter.serverInfoObserver.publisher
                 .subscribe(on: Self.serverInfoDispatchQueue)
                 .sink { [weak self] serverInfo in
 
