@@ -128,7 +128,7 @@ final class BrowserTabViewController: NSViewController {
             return
         }
         self.previouslySelectedTab = tabCollectionViewModel.selectedTab
-        let tab = Tab(content: .url(EmailUrls().emailProtectionInContextSignupLink), shouldLoadInBackground: true)
+        let tab = Tab(content: .url(EmailUrls().emailProtectionInContextSignupLink), shouldLoadInBackground: false)
         tabCollectionViewModel.append(tab: tab)
     }
 
