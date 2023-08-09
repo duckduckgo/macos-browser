@@ -269,7 +269,28 @@ struct PurchaseView: View {
                         }
                     }
                 }
+
+                Button("Create Account") {
+                    Task {
+                        switch await AccountsService.createAccount() {
+                        case .success(let response):
+                            print("ok")
+                        case .failure(let error):
+                            print(error)
+                        }
+                    }
+                }
+
+                Button("Test") {
+                    Task {
+//                        print("AppStore.canMakePayments: \(AppStore.canMakePayments)")
+//                        print("Transaction.all: \(Transaction.all)")
+
+                        actions.testPurchaseWithCreatingNewAccount()
+                    }
+                }
             }
+            
             HStack {
                 Spacer()
                 Button("OK") { showingAlert = false }
@@ -321,7 +342,7 @@ struct SubscriptionRow: View {
             .buttonStyle(BuyButtonStyle(isPurchased: isPurchased))
 
         }
-        .disabled(isPurchased)
+//        .disabled(isPurchased)
     }
 }
 

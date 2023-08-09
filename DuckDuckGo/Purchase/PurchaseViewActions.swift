@@ -63,4 +63,18 @@ public final class PurchaseViewActions {
             }
         }
     }
+
+    @MainActor
+    func testPurchaseWithCreatingNewAccount() {
+        Task {
+            switch await AccountsService.createAccount() {
+            case .success(let response):
+                print(response)
+//                self.model?.externalID = response.account.externalID
+//                self.model?.currentEntitlements = response.account.entitlements
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
 }

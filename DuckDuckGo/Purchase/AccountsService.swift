@@ -30,8 +30,9 @@ struct AccountsService {
         var description: String { return String(reflecting: self) }
     }
 
-    private static let baseURL = URL(string: "https://quackdev.duckduckgo.com/api/auth")!
-    private static let session = URLSession(configuration: .ephemeral)
+//    private static let baseURL = URL(string: "https://quackdev.duckduckgo.com/api/auth")!
+    private static let baseURL = URL(string: "https://use-tstorey1.duckduckgo.com/api/auth")!
+    private static var session: URLSession! // = URLSession(configuration: .ephemeral)
 
     // MARK: -
 
@@ -59,7 +60,7 @@ struct AccountsService {
             let externalID: String
 
             enum CodingKeys: String, CodingKey {
-                case email, entitlements, externalID = "externalId"
+                case email, entitlements, externalID = "externalId" // no underscores due to keyDecodingStrategy = .convertFromSnakeCase
             }
         }
 
@@ -71,10 +72,39 @@ struct AccountsService {
     }
     // swiftlint:enable nesting
 
+    // MARK: -
+
+    static func createAccount() async -> Result<CreateAccountResponse, AccountsService.Error> {
+        await executeAPICall(method: "POST", endpoint: "account/create", headers: [:])
+    }
+
+    struct CreateAccountResponse: Decodable {
+        let authToken: String
+        let externalID: String
+        let status: String
+
+        enum CodingKeys: String, CodingKey {
+            case authToken = "authToken", externalID = "externalId", status // no underscores due to keyDecodingStrategy = .convertFromSnakeCase
+        }
+    }
+
     // MARK: - Private API
 
     private static func executeAPICall<T>(method: String, endpoint: String, headers: [String: String]) async -> Result<T, AccountsService.Error> where T: Decodable {
         let request = makeAPIRequest(method: method, endpoint: endpoint, headers: headers)
+
+        if session == nil {
+            let configuration = URLSessionConfiguration.ephemeral
+
+            let cookie = HTTPCookie(properties: [.name: "_DUO_APER_LOCAL_",
+                                                 .value: "",
+                                                 .domain: "use-tstorey1.duckduckgo.com",
+                                                 .path: "/",
+                                                 .expires: "Session"])
+            configuration.httpCookieStorage?.setCookie(cookie!)
+
+            session = URLSession(configuration: configuration)
+        }
 
         do {
             let (data, urlResponse) = try await session.data(for: request)
@@ -128,7 +158,7 @@ struct AccountsService {
 
 extension URLResponse {
 
-    var httpStatusCodeAsString : String? {
+    var httpStatusCodeAsString: String? {
         guard let httpStatusCode = (self as? HTTPURLResponse)?.statusCode else { return nil }
         return String(httpStatusCode)
     }

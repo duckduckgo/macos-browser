@@ -65,11 +65,16 @@ final class PurchaseManager: ObservableObject {
             do {
                 purchaseQueue.removeAll()
 
+                print("Before AppStore.sync()")
+
                 try await AppStore.sync()
+
+                print("After AppStore.sync()")
+
                 await updatePurchasedProducts()
                 await updateAvailableProducts()
             } catch {
-                print(error)
+                print("AppStore.sync error: \(error)")
             }
         }
     }
@@ -104,7 +109,7 @@ final class PurchaseManager: ObservableObject {
 
         session.dataTask(with: request) { (_, _, error) in
             if error != nil {
-                assertionFailure("PurchaseManager: Failed to send the purchase confirmation")
+//                assertionFailure("PurchaseManager: Failed to send the purchase confirmation")
             }
         }.resume()
     }
@@ -115,8 +120,8 @@ final class PurchaseManager: ObservableObject {
 
         var purchasedSubscriptions: [String] = []
 
-        for await result in Transaction.currentEntitlements {
-            do {
+        do {
+            for await result in Transaction.currentEntitlements {
                 let transaction = try checkVerified(result)
 
                 guard transaction.productType == .autoRenewable else { continue }
@@ -129,9 +134,9 @@ final class PurchaseManager: ObservableObject {
                         print(" -- [PurchaseManager] updatePurchasedProducts(): \(transaction.productID) -- custom UUID: \(token)" )
                     }
                 }
-            } catch {
-                print("Error updating purchased products: \(error)")
             }
+        } catch {
+            print("Error updating purchased products: \(error)")
         }
 
         print(" -- [PurchaseManager] updatePurchasedProducts(): have \(purchasedSubscriptions.count) active subscriptions")
