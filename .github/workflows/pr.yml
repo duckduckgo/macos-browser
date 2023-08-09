@@ -154,6 +154,14 @@ jobs:
         check_name: "Test Report: ${{ matrix.flavor }}"
         report_paths: ${{ matrix.flavor }}.xml
 
+    - name: Update Asana with failed unit tests
+      env:
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        yq < ${{ matrix.flavor }}.xml -p xml -o json -r \
+          $'[.testsuites.testsuite[].testcase] | flatten | map(select(.failure) | .+@classname + " " + .+@name + " \'" + .failure.+@message + "\' ${{ env.WORKFLOW_URL }}") | .[]' \
+          | xargs -L 1 ./scripts/report-failed-unit-test.sh
+
     - name: Upload failed test log
       uses: actions/upload-artifact@v3
       if: failure()
