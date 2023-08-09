@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -exo pipefail
+set -eo pipefail
 
 if ! [[ $common_sh ]]; then
 	cwd="$(dirname "${BASH_SOURCE[0]}")"
