@@ -1032,7 +1032,7 @@ extension URL {
             "^fc00:.+",
             "^fe80:.+"
         ]
-        
+
         if let host = self.host {
             for pattern in localPatterns {
                 if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
@@ -1041,9 +1041,7 @@ extension URL {
                     }
                 }
             }
-            
         }
-        
         return false
     }
 
