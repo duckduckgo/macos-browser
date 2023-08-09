@@ -318,6 +318,6 @@ jobs:
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: '1201037661562251'
-          asana-task-name: 'PR checks failed on develop'
+          asana-task-name: 'Tests failing on develop'
           action: create-asana-task
-          asana-task-description: Tests after merging have failed. See https://github.com/duckduckgo/macos-browser/actions/runs/${{ github.run_id }}
+          asana-task-description: The tests conducted after merging have failed.. See https://github.com/duckduckgo/macos-browser/actions/runs/${{ github.run_id }}
