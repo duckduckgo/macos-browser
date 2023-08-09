@@ -124,6 +124,9 @@ final class BrowserTabViewController: NSViewController {
 
     @objc
     private func onDuckDuckGoEmailIncontextSignup(_ notification: Notification) {
+        guard tabCollectionViewModel.selectedTab == WindowControllersManager.shared.selectedTab else {
+            return
+        }
         self.previouslySelectedTab = tabCollectionViewModel.selectedTab
         let tab = Tab(content: .url(EmailUrls().emailProtectionInContextSignupLink), shouldLoadInBackground: true)
         tabCollectionViewModel.append(tab: tab)
@@ -131,6 +134,9 @@ final class BrowserTabViewController: NSViewController {
 
     @objc
     private func onCloseDuckDuckGoEmailProtection(_ notification: Notification) {
+        guard tabCollectionViewModel.selectedTab == WindowControllersManager.shared.selectedTab else {
+            return
+        }
         guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab else { return }
         if activeTab.url != nil && EmailUrls().isDuckDuckGoEmailProtection(url: activeTab.url!) {
             self.closeTab(activeTab)
