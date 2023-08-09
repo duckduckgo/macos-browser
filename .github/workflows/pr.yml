@@ -33,6 +33,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Print Current Branch
+        run: |
+         echo "Current Branch: ${{ github.ref }}"
+
       - name: Create Asana Task
         uses: malmstein/github-asana-action@master
         with:
