@@ -35,7 +35,7 @@ jobs:
     steps:
       - name: Print Current Branch
         run: |
-         echo "Current Branch: ${{ github.ref }}"
+          echo "Current Branch: ${{ github.ref }}"
 
       - name: Create Asana Task
         uses: malmstein/github-asana-action@master
