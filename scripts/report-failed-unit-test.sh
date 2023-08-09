@@ -55,6 +55,7 @@ read_command_line_arguments() {
 workspace_id="137249556945"
 project_id="1205237866452338"
 occurrences_custom_field_id="1205237866452341"
+failing_tests_section_id="1205242009579904"
 asana_api_url="https://app.asana.com/api/1.0"
 
 find_task_and_occurrences() {
@@ -91,8 +92,9 @@ create_task() {
 	local workflow_url=$2
 	local message="${3//\"/\\\"}"
 	local occurrences=1
+	local task_id
 
-	curl -X POST -s "${asana_api_url}/tasks?opt_fields=gid" \
+	task_id=$(curl -X POST -s "${asana_api_url}/tasks?opt_fields=gid" \
 		-H "Authorization: Bearer ${asana_personal_access_token}" \
 		-H 'content-type: application/json' \
 		-d "{
@@ -109,7 +111,16 @@ create_task() {
 					\"workspace\": \"${workspace_id}\"
 				}
 			}" \
-		| jq -r '.data.gid'
+		| jq -r '.data.gid')
+
+	curl -X POST -s "${asana_api_url}/sections/${failing_tests_section_id}/addTask" \
+		-H "Authorization: Bearer ${asana_personal_access_token}" \
+		-H 'content-type: application/json' \
+		--write-out '%{http_code}' \
+		--output /dev/null \
+	    -d "{\"data\": {\"task\": \"${task_id}\"}}"
+
+	echo task_id
 }
 
 add_subtask() {
