@@ -40,14 +40,8 @@ public class DataBrokerProtectionDataManager {
         // Save profile in the secure database
         do {
             let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-            if let profile = try vault.fetchProfile(with: 1) { // // We use 1 because (for testing purposes) we are only working with the first profile
-                _ = try vault.saveProfile(profile: profile)
-                print("Profile updated")
-            } else {
-                let id = try vault.saveProfile(profile: profile.mapToDB())
-                print("Profile saved with ID: \(id)")
-            }
-
+            let id = try vault.saveProfile(profile: profile)
+            print("Profile id: \(id)")
         } catch {
             print("ERROR: Secure storage \(error)")
         }
@@ -56,17 +50,13 @@ public class DataBrokerProtectionDataManager {
     public func fetchProfile() -> DataBrokerProtectionProfile? {
         do {
             let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-            if let dbProfile = try vault.fetchProfile(with: 1) { // We return 1 because (for testing purposes) we are only working with the first profile
-                let profile = dbProfile.toProfile()
-                self.database.testProfileQuery = profile.profileQueries.first
-                self.database.setupFakeData()
-
+            if let profile = try vault.fetchProfile(with: 1) {
                 return profile
             } else {
-                print("Profile does not exist in the database")
+                print("No profile found")
             }
         } catch {
-            print("Error fetching profile from the database: \(error)")
+            print("ERROR: Secure storage \(error)")
         }
 
         return nil

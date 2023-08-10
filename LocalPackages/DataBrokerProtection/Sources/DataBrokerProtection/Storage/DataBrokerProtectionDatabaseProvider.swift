@@ -22,8 +22,8 @@ import SecureStorage
 import GRDB
 
 protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
-    func saveProfile(profile: ProfileDB) throws -> Int64
-    func fetchProfile(with id: Int64) throws -> ProfileDB?
+    func saveProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64
+    func fetchProfile(with id: Int64) throws -> FullProfileDB?
 }
 
 final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDatabaseProvider, DataBrokerProtectionDatabaseProvider {
@@ -41,32 +41,67 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     static func migrateV1(database: Database) throws {
         try database.create(table: ProfileDB.databaseTableName) {
             $0.autoIncrementedPrimaryKey(ProfileDB.Columns.id.name)
+            $0.column(ProfileDB.Columns.age.name, .integer).notNull()
+        }
 
-            $0.column(ProfileDB.Columns.firstName.name, .blob).notNull()
-            $0.column(ProfileDB.Columns.lastName.name, .blob).notNull()
-            $0.column(ProfileDB.Columns.city.name, .blob).notNull()
-            $0.column(ProfileDB.Columns.state.name, .blob).notNull()
-            $0.column(ProfileDB.Columns.age.name, .blob).notNull()
+        try database.create(table: NameDB.databaseTableName) {
+            $0.primaryKey([NameDB.Columns.first.name, NameDB.Columns.last.name, NameDB.Columns.middle.name, NameDB.Columns.profileId.name])
+            $0.foreignKey([NameDB.Columns.profileId.name], references: ProfileDB.databaseTableName)
+
+            $0.column(NameDB.Columns.first.name, .text).notNull()
+            $0.column(NameDB.Columns.last.name, .text).notNull()
+            $0.column(NameDB.Columns.profileId.name, .integer).notNull()
+            $0.column(NameDB.Columns.middle.name, .text)
+            $0.column(NameDB.Columns.suffix.name, .text)
+        }
+
+        try database.create(table: AddressDB.databaseTableName) {
+            $0.primaryKey([AddressDB.Columns.city.name, AddressDB.Columns.state.name, AddressDB.Columns.street.name, AddressDB.Columns.profileId.name])
+            $0.foreignKey([AddressDB.Columns.profileId.name], references: ProfileDB.databaseTableName)
+
+            $0.column(AddressDB.Columns.city.name, .text).notNull()
+            $0.column(AddressDB.Columns.state.name, .text).notNull()
+            $0.column(NameDB.Columns.profileId.name, .integer).notNull()
+            $0.column(AddressDB.Columns.street.name, .text)
+            $0.column(AddressDB.Columns.zipCode.name, .text)
+        }
+
+        try database.create(table: PhoneDB.databaseTableName) {
+            $0.primaryKey([PhoneDB.Columns.phoneNumber.name, PhoneDB.Columns.profileId.name])
+            $0.foreignKey([PhoneDB.Columns.profileId.name], references: ProfileDB.databaseTableName)
+
+            $0.column(PhoneDB.Columns.phoneNumber.name, .text).notNull()
+            $0.column(PhoneDB.Columns.profileId.name, .integer).notNull()
         }
     }
 
-    func saveProfile(profile: ProfileDB) throws -> Int64 {
+    func saveProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {
         try db.write { db in
-            if profile.id == nil {
-                try profile.insert(db)
-            } else {
-                try profile.update(db)
+            try mapperToDB.mapToDB(profile: profile).insert(db)
+            let profileId = db.lastInsertedRowID
+
+            for name in profile.names {
+                try mapperToDB.mapToDB(name, relatedTo: profileId).insert(db)
             }
 
-            return 1 // We return 1 because (for testing purposes) we are only working with the first profile
+            for address in profile.addresses {
+                try mapperToDB.mapToDB(address, relatedTo: profileId).insert(db)
+            }
+
+            for phone in profile.phones {
+                try mapperToDB.mapToDB(phone, relatedTo: profileId).insert(db)
+            }
+
+            return profileId
         }
     }
 
-    func fetchProfile(with id: Int64) throws -> ProfileDB? {
-        try db.read({ database in
-            let profile = try ProfileDB.fetchOne(database)
-
-            return profile
-        })
+    func fetchProfile(with id: Int64) throws -> FullProfileDB? {
+        try db.read { database in
+            let request = ProfileDB.including(all: ProfileDB.names)
+                .including(all: ProfileDB.addresses)
+                .including(all: ProfileDB.phoneNumbers)
+            return try FullProfileDB.fetchOne(database, request)
+        }
     }
 }
