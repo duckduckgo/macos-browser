@@ -35,9 +35,11 @@ extension OnboardingStepView {
         }
 
         private let step: OnboardingStep
+        let action: () -> Void
 
-        init(step: OnboardingStep) {
+        init(step: OnboardingStep, action: @escaping () -> Void) {
             self.step = step
+            self.action = action
         }
 
         var icon: NetworkProtectionAsset {
@@ -94,20 +96,6 @@ extension OnboardingStepView {
                 return .allowSysexScreenshot
             case .userNeedsToAllowVPNConfiguration:
                 return nil
-            }
-        }
-
-        var action: (() -> Void) {
-            switch step {
-            case .userNeedsToAllowExtension:
-                return {
-                    let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Security")!
-                    NSWorkspace.shared.open(url)
-                }
-            case .userNeedsToAllowVPNConfiguration:
-                return {
-                    print("Allow configuration clicked")
-                }
             }
         }
     }

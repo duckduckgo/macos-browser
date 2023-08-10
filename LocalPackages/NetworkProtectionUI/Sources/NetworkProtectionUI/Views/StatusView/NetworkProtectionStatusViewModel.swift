@@ -575,7 +575,9 @@ extension NetworkProtectionStatusView {
             case .completed:
                 return nil
             case .isOnboarding(let step):
-                return OnboardingStepView.Model(step: step)
+                return OnboardingStepView.Model(step: step) { [weak self] in
+                    self?.startNetworkProtection()
+                }
             }
         }
     }

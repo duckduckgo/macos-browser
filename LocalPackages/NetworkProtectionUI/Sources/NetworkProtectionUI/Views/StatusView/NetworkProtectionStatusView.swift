@@ -21,8 +21,6 @@ import SwiftUIExtensions
 import Combine
 import NetworkProtection
 
-private let defaultTextColor = Color("TextColor", bundle: .module)
-
 fileprivate extension Font {
     enum NetworkProtection {
         static var connectionStatusDetail: Font {
@@ -88,55 +86,55 @@ fileprivate extension View {
     func applyConnectionStatusDetailAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.connectionStatusDetail(colorScheme: colorScheme))
             .font(.NetworkProtection.connectionStatusDetail)
-            .foregroundColor(defaultTextColor)
+            .foregroundColor(Color(.defaultText))
     }
 
     func applyContentAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.content)
             .font(.NetworkProtection.content)
-            .foregroundColor(defaultTextColor)
+            .foregroundColor(Color(.defaultText))
     }
 
     func applyDescriptionAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.description)
             .font(.NetworkProtection.description)
-            .foregroundColor(defaultTextColor)
+            .foregroundColor(Color(.defaultText))
     }
 
     func applyMenuAttributes() -> some View {
         opacity(Opacity.menu)
             .font(.NetworkProtection.menu)
-            .foregroundColor(defaultTextColor)
+            .foregroundColor(Color(.defaultText))
     }
 
     func applyLinkAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.link)
             .font(.NetworkProtection.content)
-            .foregroundColor(defaultTextColor)
+            .foregroundColor(Color(.defaultText))
     }
 
     func applyLabelAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.label)
             .font(.NetworkProtection.label)
-            .foregroundColor(defaultTextColor)
+            .foregroundColor(Color(.defaultText))
     }
 
     func applySectionHeaderAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.sectionHeader(colorScheme: colorScheme))
             .font(.NetworkProtection.sectionHeader)
-            .foregroundColor(defaultTextColor)
+            .foregroundColor(Color(.defaultText))
     }
 
     func applyTimerAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.timer(colorScheme: colorScheme))
             .font(.NetworkProtection.timer)
-            .foregroundColor(defaultTextColor)
+            .foregroundColor(Color(.defaultText))
     }
 
     func applyTitleAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.title(colorScheme: colorScheme))
             .font(.NetworkProtection.title)
-            .foregroundColor(defaultTextColor)
+            .foregroundColor(Color(.defaultText))
     }
 }
 
@@ -207,7 +205,7 @@ public struct NetworkProtectionStatusView: View {
                     Text(message)
                         .makeSelectable()
                         .multilineText()
-                        .foregroundColor(defaultTextColor)
+                        .foregroundColor(Color(.defaultText))
 
                     Spacer()
                 }
@@ -264,7 +262,7 @@ public struct NetworkProtectionStatusView: View {
     private func bottomMenuView() -> some View {
         VStack(spacing: 0) {
             ForEach(model.menuItems, id: \.name) { menuItem in
-                MenuItemButton(menuItem.name, textColor: defaultTextColor) {
+                MenuItemButton(menuItem.name, textColor: Color(.defaultText)) {
                     await menuItem.action()
                     dismiss()
                 }

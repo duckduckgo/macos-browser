@@ -33,6 +33,7 @@ enum NetworkProtectionColor: String {
     case alertBubbleBackground = "AlertBubbleBackground"
     case defaultText = "TextColor"
     case linkColor = "LinkBlueColor"
+    case onboardingButtonBackgroundColor = "OnboardingButtonBackgroundColor"
     case onboardingStepBorder = "OnboardingStepBorderColor"
     case onboardingStepBackground = "OnboardingStepBackgroundColor"
 
