@@ -158,7 +158,7 @@ private enum Const {
 private struct ListBackground: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .background(Color("list-background-color", bundle: .module))
+            .background(Color("modal-background-color", bundle: .module))
             .cornerRadius(8)
             .overlay(
                 RoundedRectangle(cornerRadius: 8)

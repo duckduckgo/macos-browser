@@ -19,10 +19,115 @@
 import SwiftUI
 
 struct CTAButtonStyle: ButtonStyle {
+    enum Style {
+        case primary
+        case secondary
+        case destructive
+    }
+
+    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.isEnabled) private var isEnabled: Bool
+
+    let style: Style
+
+    init(style: Style = .primary) {
+        self.style = style
+    }
+
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
-            .foregroundColor(configuration.isPressed ? Color.primary : Color.white)
-            .background(configuration.isPressed ? Color.secondary : Color.accentColor)
+            .foregroundColor(foregroundColor(configuration))
+            .background(backgroundColor(configuration))
             .cornerRadius(6.0)
+    }
+
+    func foregroundColor(_ configuration: Self.Configuration) -> Color {
+
+        if !isEnabled {
+            return Color.secondary
+        }
+
+        switch style {
+        case .primary:
+            return configuration.isPressed ? Color.primary : Color.white
+
+        case .secondary:
+            if colorScheme == .dark {
+                return configuration.isPressed ? Color.primary : Color.white
+            } else {
+                return configuration.isPressed ? Color.white: Color.primary
+            }
+
+        case .destructive:
+            return configuration.isPressed ? .black : .red
+        }
+    }
+
+    func backgroundColor(_ configuration: Self.Configuration) -> Color {
+        let opacitySecondaryColor = Color.secondary.opacity(0.3)
+
+        if !isEnabled {
+            return opacitySecondaryColor
+        }
+
+        switch style {
+        case .primary:
+            return configuration.isPressed ? Color.secondary : Color.accentColor
+
+        case .secondary:
+            return configuration.isPressed ? Color.secondary : opacitySecondaryColor
+
+        case .destructive:
+            return .clear
+        }
+    }
+}
+
+// MARK: - Modifier
+struct BorderedRoundedCorner: ViewModifier {
+    let backgroundColor: Color?
+
+    func body(content: Content) -> some View {
+        content
+            .background(
+                ZStack {
+                    if let color = backgroundColor {
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(color)
+                    }
+
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.secondary, lineWidth: 1)
+                        .opacity(0.4)
+                }
+            )
+    }
+}
+
+struct ShadedBorderedPanel: ViewModifier {
+    let backgroundColor: Color
+
+    func body(content: Content) -> some View {
+        content
+            .padding(48)
+            .background(backgroundColor)
+            .cornerRadius(16)
+            .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 4)
+            .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+            .padding(.all)
+    }
+}
+
+extension View {
+    func borderedRoundedCorner() -> some View {
+        modifier(BorderedRoundedCorner(backgroundColor: nil))
+    }
+
+    func borderedRoundedCorner(backgroundColor: Color) -> some View {
+        modifier(BorderedRoundedCorner(backgroundColor: backgroundColor))
+    }
+
+    func shadedBorderedPanel(backgroundColor: Color) -> some View {
+        modifier(ShadedBorderedPanel(backgroundColor: backgroundColor))
     }
 }
