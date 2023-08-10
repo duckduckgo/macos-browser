@@ -179,6 +179,10 @@ final class SaveCredentialsViewController: NSViewController {
         }
 
         Pixel.fire(.autofillItemSaved(kind: .password))
+        if passwordManagerCoordinator.isEnabled {
+            passwordManagerCoordinator.reportPasswordSave()
+        }
+
         if self.fireproofCheck.state == .on {
             FireproofDomains.shared.add(domain: account.domain)
         } else {

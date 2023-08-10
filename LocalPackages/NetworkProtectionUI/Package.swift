@@ -15,7 +15,7 @@ let package = Package(
             targets: ["NetworkProtectionUI"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "72.0.1"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "73.0.0"),
         .package(path: "../SwiftUIExtensions")
     ],
     targets: [
@@ -30,6 +30,9 @@ let package = Package(
             ]),
         .testTarget(
             name: "NetworkProtectionUITests",
-            dependencies: ["NetworkProtectionUI"])
+            dependencies: [
+                "NetworkProtectionUI",
+                .product(name: "NetworkProtectionTestUtils", package: "BrowserServicesKit")
+            ])
     ]
 )
