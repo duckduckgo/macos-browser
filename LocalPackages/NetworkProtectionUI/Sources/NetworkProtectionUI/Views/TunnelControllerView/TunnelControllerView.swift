@@ -138,7 +138,7 @@ fileprivate extension View {
     }
 }
 
-public struct NetworkProtectionStatusView: View {
+public struct TunnelControllerView: View {
 
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) private var dismiss
@@ -147,70 +147,123 @@ public struct NetworkProtectionStatusView: View {
 
     /// The view model that this instance will use.
     ///
-    @ObservedObject var model: Model
+    @ObservedObject var model: TunnelControllerViewModel
 
     // MARK: - Initializers
 
-    public init(model: Model) {
+    public init(model: TunnelControllerViewModel) {
         self.model = model
     }
 
     // MARK: - View Contents
 
     public var body: some View {
-        VStack(spacing: 0) {
-            if let onboardingStepViewModel = model.onboardingStepViewModel {
-                OnboardingStepView(model: onboardingStepViewModel)
-                    .padding(.horizontal, 5)
-                    .padding(.top, 5)
-            } else {
-                if let healthWarning = model.issueDescription {
-                    connectionHealthWarningView(message: healthWarning)
-                }
+        Group {
+            headerView()
+
+            featureToggleRow()
+
+            Divider()
+                .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
+
+            if model.showServerDetails {
+                connectionStatusView()
             }
-
-            Spacer()
-
-            TunnelControllerView(model: model.tunnelControllerViewModel)
-
-            bottomMenuView()
         }
-        .padding(5)
-        .frame(maxWidth: 350, alignment: .top)
+        .disabled(on: model.viewDisabled)
     }
 
     // MARK: - Composite Views
 
-    private func connectionHealthWarningView(message: String) -> some View {
+    /// Main image, feature ON/OFF and feature description
+    ///
+    private func headerView() -> some View {
         VStack(spacing: 0) {
-            HStack(alignment: .top, spacing: 12) {
-                Image("WarningColored", bundle: Bundle.module)
-
-                /// Text elements in SwiftUI don't expand horizontally more than needed, so we're adding an "optional" spacer at the end so that
-                /// the alert bubble won't shrink if there's not enough text.
-                HStack(spacing: 0) {
-                    Text(message)
-                        .makeSelectable()
-                        .multilineText()
-                        .foregroundColor(Color(.defaultText))
-
-                    Spacer()
-                }
+            HStack {
+                Spacer()
+                Image(model.mainImageAsset)
+                Spacer()
             }
-            .padding(16)
-            .background(RoundedRectangle(cornerRadius: 8).fill(Color("AlertBubbleBackground", bundle: Bundle.module)))
+
+            Text(model.featureStatusDescription)
+                .applyTitleAttributes(colorScheme: colorScheme)
+                .padding([.top], 8)
+                .multilineText()
+
+            Text(UserText.networkProtectionStatusViewFeatureDesc)
+                .multilineText()
+                .multilineTextAlignment(.center)
+                .applyDescriptionAttributes(colorScheme: colorScheme)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(EdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 16))
         }
-        .padding(EdgeInsets(top: 8, leading: 8, bottom: 4, trailing: 8))
     }
 
-    private func bottomMenuView() -> some View {
-        VStack(spacing: 0) {
-            ForEach(model.menuItems, id: \.name) { menuItem in
-                MenuItemButton(menuItem.name, textColor: Color(.defaultText)) {
-                    await menuItem.action()
-                    dismiss()
-                }
+    /// Connection status: server IP address and location
+    ///
+    private func connectionStatusView() -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(UserText.networkProtectionStatusViewConnDetails)
+                .applySectionHeaderAttributes(colorScheme: colorScheme)
+                .padding(EdgeInsets(top: 6, leading: 9, bottom: 6, trailing: 9))
+
+            connectionStatusRow(icon: .serverLocationIcon,
+                                title: UserText.networkProtectionStatusViewLocation,
+                                details: model.serverLocation)
+            connectionStatusRow(icon: .ipAddressIcon,
+                                title: UserText.networkProtectionStatusViewIPAddress,
+                                details: model.serverAddress)
+
+            dividerRow()
+        }
+    }
+
+    // MARK: - Rows
+
+    private func dividerRow() -> some View {
+        Divider()
+            .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
+    }
+
+    private func featureToggleRow() -> some View {
+        Toggle(isOn: model.isToggleOn) {
+            HStack {
+                Text(UserText.networkProtectionStatusViewConnLabel)
+                    .applyLabelAttributes(colorScheme: colorScheme)
+                    .frame(alignment: .leading)
+                    .fixedSize()
+
+                Spacer(minLength: 8)
+
+                Text(model.connectionStatusDescription)
+                    .applyTimerAttributes(colorScheme: colorScheme)
+                    .fixedSize()
+
+                Spacer()
+                    .frame(width: 8)
             }
         }
+        .disabled(model.isToggleDisabled)
+        .toggleStyle(.switch)
+        .padding(EdgeInsets(top: 3, leading: 9, bottom: 3, trailing: 9))
+    }
+
+    private func connectionStatusRow(icon: NetworkProtectionAsset, title: String, details: String) -> some View {
+        HStack(spacing: 0) {
+            Image(icon)
+                .padding([.trailing], 8)
+
+            Text(title)
+                .applyLabelAttributes(colorScheme: colorScheme)
+                .fixedSize()
+
+            Spacer(minLength: 16)
+
+            Text(details)
+                .makeSelectable()
+                .applyConnectionStatusDetailAttributes(colorScheme: colorScheme)
+                .fixedSize()
+        }
+        .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 9))
     }
 }

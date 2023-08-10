@@ -45,6 +45,10 @@ extension NetworkProtectionStatusView {
         ///
         private let tunnelController: TunnelController
 
+        @MainActor
+        @Published
+        private var connectionStatus: NetworkProtection.ConnectionStatus = .disconnected
+
         /// The type of extension that's being used for NetP
         ///
         @Published
@@ -87,23 +91,6 @@ extension NetworkProtectionStatusView {
         private static let tunnelErrorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.tunnelErrorDispatchQueue", qos: .userInteractive)
         private static let controllerErrorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.controllerErrorDispatchQueue", qos: .userInteractive)
 
-        // MARK: - Feature Image
-
-        var mainImageAsset: NetworkProtectionAsset {
-            switch connectionStatus {
-            case .connected:
-                return .vpnEnabledImage
-            case .disconnecting:
-                if case .connected = previousConnectionStatus {
-                    return .vpnEnabledImage
-                } else {
-                    return .vpnDisabledImage
-                }
-            default:
-                return .vpnDisabledImage
-            }
-        }
-
         // MARK: - Initialization & Deinitialization
 
         public init(controller: TunnelController,
@@ -118,48 +105,26 @@ extension NetworkProtectionStatusView {
             self.menuItems = menuItems
             self.runLoopMode = runLoopMode
 
+            tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
+                                                                  onboardingStatusPublisher: onboardingStatusPublisher,
+                                                                  statusReporter: statusReporter)
+
             connectionStatus = statusReporter.statusObserver.recentValue
             isHavingConnectivityIssues = statusReporter.connectivityIssuesObserver.recentValue
-            internalServerAddress = statusReporter.serverInfoObserver.recentValue.serverAddress
-            internalServerLocation = statusReporter.serverInfoObserver.recentValue.serverLocation
             lastTunnelErrorMessage = statusReporter.connectionErrorObserver.recentValue
             lastControllerErrorMessage = statusReporter.controllerErrorMessageObserver.recentValue
 
             // Particularly useful when unit testing with an initial status of our choosing.
-            refreshInternalIsRunning()
-
-            subscribeToStatusChanges()
             subscribeToConnectivityIssues()
             subscribeToTunnelErrorMessages()
             subscribeToControllerErrorMessages()
-            subscribeToServerInfoChanges()
 
-            onboardingStatusPublisher.sink { [weak self] status in
+            onboardingStatusPublisher
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] status in
                 self?.onboardingStatus = status
             }
             .store(in: &cancellables)
-        }
-
-        deinit {
-            timer?.invalidate()
-            timer = nil
-        }
-
-        // MARK: - Subscriptions
-
-        private func subscribeToStatusChanges() {
-            statusChangeCancellable = statusReporter.statusObserver.publisher
-                .subscribe(on: Self.statusDispatchQueue)
-                .sink { [weak self] status in
-
-                guard let self else {
-                    return
-                }
-
-                Task { @MainActor in
-                    self.connectionStatus = status
-                }
-            }
         }
 
         private func subscribeToConnectivityIssues() {
@@ -207,180 +172,6 @@ extension NetworkProtectionStatusView {
             }
         }
 
-        private func subscribeToServerInfoChanges() {
-            serverInfoCancellable = statusReporter.serverInfoObserver.publisher
-                .subscribe(on: Self.serverInfoDispatchQueue)
-                .sink { [weak self] serverInfo in
-
-                guard let self else {
-                    return
-                }
-
-                Task { @MainActor in
-                    self.internalServerAddress = serverInfo.serverAddress
-                    self.internalServerLocation = serverInfo.serverLocation
-                }
-            }
-        }
-
-        // MARK: - ON/OFF Toggle
-
-        private func startTimer() {
-            guard timer == nil else {
-                return
-            }
-
-            refreshTimeLapsed()
-            let call = refreshTimeLapsed
-
-            let newTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-                Task { @MainActor in
-                    call()
-                }
-            }
-
-            timer = newTimer
-
-            if let runLoopMode = runLoopMode {
-                RunLoop.current.add(newTimer, forMode: runLoopMode)
-            }
-        }
-
-        private func stopTimer() {
-            timer?.invalidate()
-            timer = nil
-        }
-
-        /// Whether NetP is actually running.
-        ///
-        @Published
-        private var internalIsRunning = false {
-            didSet {
-                if internalIsRunning {
-                    startTimer()
-                } else {
-                    stopTimer()
-                }
-            }
-        }
-
-        @MainActor
-        private func refreshInternalIsRunning() {
-            switch connectionStatus {
-            case .connected, .connecting, .reasserting:
-                guard internalIsRunning == false else {
-                    return
-                }
-
-                internalIsRunning = true
-            case .disconnected, .disconnecting:
-                guard internalIsRunning == true else {
-                    return
-                }
-
-                internalIsRunning = false
-            default:
-                break
-            }
-        }
-
-        /// Convenience binding to be able to both query and toggle NetP.
-        ///
-        @MainActor
-        var isToggleOn: Binding<Bool> {
-            .init {
-                switch self.toggleTransition {
-                case .idle:
-                    break
-                case .switchingOn:
-                    return true
-                case .switchingOff:
-                    return false
-                }
-
-                return self.internalIsRunning
-            } set: { newValue in
-                guard newValue != self.internalIsRunning else {
-                    return
-                }
-
-                self.internalIsRunning = newValue
-
-                if newValue {
-                    self.startNetworkProtection()
-                } else {
-                    self.stopNetworkProtection()
-                }
-            }
-        }
-
-        // MARK: - Status & health
-
-        private weak var timer: Timer?
-
-        private var previousConnectionStatus: NetworkProtection.ConnectionStatus = .disconnected
-
-        @MainActor
-        @Published
-        private var connectionStatus: NetworkProtection.ConnectionStatus = .disconnected {
-            didSet {
-                detectAndRefreshExternalToggleSwitching()
-                previousConnectionStatus = oldValue
-                refreshInternalIsRunning()
-                refreshTimeLapsed()
-            }
-        }
-
-        /// This method serves as a simple mechanism to detect when the toggle is controlled by the agent app, or by another
-        /// external event causing the tunnel to start or stop, so we can disable the toggle as it's transitioning..
-        ///
-        private func detectAndRefreshExternalToggleSwitching() {
-            switch toggleTransition {
-            case .idle:
-                // When the toggle transition is idle, if the status changes to connecting or disconnecting
-                // it means the tunnel is being controlled from elsewhere.
-                if connectionStatus == .connecting {
-                    toggleTransition = .switchingOn(locallyInitiated: false)
-                } else if connectionStatus == .disconnecting {
-                    toggleTransition = .switchingOff(locallyInitiated: false)
-                }
-            case .switchingOn(let locallyInitiated), .switchingOff(let locallyInitiated):
-                guard !locallyInitiated else { break }
-
-                if connectionStatus == .connecting {
-                    toggleTransition = .switchingOn(locallyInitiated: false)
-                } else if connectionStatus == .disconnecting {
-                    toggleTransition = .switchingOff(locallyInitiated: false)
-                } else {
-                    toggleTransition = .idle
-                }
-            }
-        }
-
-        // MARK: - Connection Status: Toggle State
-
-        @frozen
-        enum ToggleTransition: Equatable {
-            case idle
-            case switchingOn(locallyInitiated: Bool)
-            case switchingOff(locallyInitiated: Bool)
-        }
-
-        /// Specifies a transition the toggle is undergoing, which will make sure the toggle stays in a position (either ON or OFF)
-        /// and ignores intermediate status updates until the transition completes and this is set back to .idle.
-        @Published
-        private(set) var toggleTransition = ToggleTransition.idle
-
-        /// The toggle is disabled while transitioning due to user interaction.
-        ///
-        var isToggleDisabled: Bool {
-            if case .idle = toggleTransition {
-                return false
-            }
-
-            return true
-        }
-
         // MARK: - Connection Status: Errors
 
         @Published
@@ -391,51 +182,6 @@ extension NetworkProtectionStatusView {
 
         @Published
         private var lastTunnelErrorMessage: String?
-
-        // MARK: - Connection Status: Timer
-
-        /// The description for the current connection status.
-        /// When the status is `connected` this description will also show the time lapsed since connection.
-        ///
-        @Published var timeLapsed = UserText.networkProtectionStatusViewTimerZero
-
-        private func refreshTimeLapsed() {
-            switch connectionStatus {
-            case .connected(let connectedDate):
-                timeLapsed = timeLapsedString(since: connectedDate)
-            case .disconnecting:
-                timeLapsed = UserText.networkProtectionStatusViewTimerZero
-            default:
-                timeLapsed = UserText.networkProtectionStatusViewTimerZero
-            }
-        }
-
-        /// The description for the current connection status.
-        /// When the status is `connected` this description will also show the time lapsed since connection.
-        ///
-        var connectionStatusDescription: String {
-            // If the user is toggling NetP ON or OFF we'll respect the toggle state
-            // until it's idle again
-            switch toggleTransition {
-            case .idle:
-                break
-            case .switchingOn:
-                return UserText.networkProtectionStatusConnecting
-            case .switchingOff:
-                return UserText.networkProtectionStatusDisconnecting
-            }
-
-            switch connectionStatus {
-            case .connected:
-                return "\(UserText.networkProtectionStatusConnected) · \(timeLapsed)"
-            case .connecting, .reasserting:
-                return UserText.networkProtectionStatusConnecting
-            case .disconnected, .notConfigured:
-                return UserText.networkProtectionStatusDisconnected
-            case .disconnecting:
-                return UserText.networkProtectionStatusDisconnecting
-            }
-        }
 
         var issueDescription: String? {
             if let lastControllerErrorMessage = lastControllerErrorMessage {
@@ -481,94 +227,9 @@ extension NetworkProtectionStatusView {
             }
         }
 
-        // MARK: - Server Information
+        // MARK: - Child View Models
 
-        var showServerDetails: Bool {
-            switch connectionStatus {
-            case .connected:
-                return true
-            case .disconnecting:
-                if case .connected = previousConnectionStatus {
-                    return true
-                } else {
-                    return false
-                }
-            default:
-                return false
-            }
-        }
-
-        @Published
-        private var internalServerAddress: String?
-
-        var serverAddress: String {
-            guard let internalServerAddress = internalServerAddress else {
-                return UserText.networkProtectionServerAddressUnknown
-            }
-
-            switch connectionStatus {
-            case .connected:
-                return internalServerAddress
-            case .disconnecting:
-                if case .connected = previousConnectionStatus {
-                    return internalServerAddress
-                } else {
-                    return UserText.networkProtectionServerAddressUnknown
-                }
-            default:
-                return UserText.networkProtectionServerAddressUnknown
-            }
-        }
-
-        @Published
-        var internalServerLocation: String?
-
-        var serverLocation: String {
-            guard let internalServerLocation = internalServerLocation else {
-                return UserText.networkProtectionServerLocationUnknown
-            }
-
-            switch connectionStatus {
-            case .connected:
-                return internalServerLocation
-            case .disconnecting:
-                if case .connected = previousConnectionStatus {
-                    return internalServerLocation
-                } else {
-                    return UserText.networkProtectionServerLocationUnknown
-                }
-            default:
-                return UserText.networkProtectionServerLocationUnknown
-            }
-        }
-
-        // MARK: - Toggling Network Protection
-
-        /// Start network protection.
-        ///
-        private func startNetworkProtection() {
-            toggleTransition = .switchingOn(locallyInitiated: true)
-
-            Task { @MainActor in
-                await tunnelController.start()
-                toggleTransition = .idle
-                refreshInternalIsRunning()
-            }
-        }
-
-        /// Stop network protection.
-        ///
-        private func stopNetworkProtection() {
-            toggleTransition = .switchingOff(locallyInitiated: true)
-
-            Task { @MainActor in
-                await tunnelController.stop()
-                toggleTransition = .idle
-                refreshInternalIsRunning()
-            }
-        }
-
-        // MARK: - Onboarding
+        let tunnelControllerViewModel: TunnelControllerViewModel
 
         var onboardingStepViewModel: OnboardingStepView.Model? {
             switch onboardingStatus {
@@ -576,7 +237,7 @@ extension NetworkProtectionStatusView {
                 return nil
             case .isOnboarding(let step):
                 return OnboardingStepView.Model(step: step) { [weak self] in
-                    self?.startNetworkProtection()
+                    self?.tunnelControllerViewModel.startNetworkProtection()
                 }
             }
         }
