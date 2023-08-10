@@ -177,6 +177,7 @@ struct UserProfileView: View {
 
         let profile = DataBrokerProtectionProfile(names: [name],
                                                   addresses: [address],
+                                                  phones: [String](),
                                                   age: Int(age)!)
 
         dataManager.saveProfile(profile)

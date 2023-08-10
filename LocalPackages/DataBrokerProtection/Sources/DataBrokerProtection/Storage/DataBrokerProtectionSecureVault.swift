@@ -35,8 +35,8 @@ let DataBrokerProtectionSecureVaultFactory: DataBrokerProtectionVaultFactory = S
 // swiftlint:enable identifier_name
 
 protocol DataBrokerProtectionSecureVault: SecureVault {
-    func saveProfile(profile: ProfileDB) throws -> Int64
-    func fetchProfile(with id: Int64) throws -> ProfileDB?
+    func saveProfile(profile: DataBrokerProtectionProfile) throws -> Int64
+    func fetchProfile(with id: Int64) throws -> DataBrokerProtectionProfile?
 }
 
 final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDatabaseProvider>: DataBrokerProtectionSecureVault {
@@ -49,15 +49,22 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         self.providers = providers
     }
 
-    func saveProfile(profile: ProfileDB) throws -> Int64 {
+    func saveProfile(profile: DataBrokerProtectionProfile) throws -> Int64 {
         try executeThrowingDatabaseOperation {
-            return try self.providers.database.saveProfile(profile: profile.encrypt(l2Encrypt))
+            return try self.providers.database.saveProfile(profile: profile, mapperToDB: MapperToDB(mechanism: l2Encrypt(data:)))
         }
     }
 
-    func fetchProfile(with id: Int64) throws -> ProfileDB? {
+    func fetchProfile(with id: Int64) throws -> DataBrokerProtectionProfile? {
         try executeThrowingDatabaseOperation {
-            return try self.providers.database.fetchProfile(with: id)?.decrypt(l2Decrypt)
+            let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+            let profile = try self.providers.database.fetchProfile(with: id)
+
+            if let profile = profile {
+                return try mapper.mapToModel(profile)
+            } else {
+                return nil // Profile not found
+            }
         }
     }
 
