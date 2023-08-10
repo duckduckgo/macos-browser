@@ -157,11 +157,11 @@ final class FutureExtensionTests: XCTestCase {
 
     func testFulfilledPromiseOnGlobalQueueHasValue() {
         let e = expectation(description: "background job done")
+        let eFulfilled = expectation(description: "fulfilled")
         DispatchQueue.global().async {
             let promise = Future<String, Never>.promise()
             var value: String?
 
-            let eFulfilled = self.expectation(description: "fulfilled")
             let c = promise.future.sink {
                 XCTAssertEqual($0, "test")
                 value = $0
@@ -175,16 +175,16 @@ final class FutureExtensionTests: XCTestCase {
 
             e.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        wait(for: [e], timeout: 1)
     }
 
     func testPromiseOnGlobalQueueFulfilledAsyncHasValue() {
         let e = expectation(description: "background job done")
+        let eFulfilled = expectation(description: "fulfilled")
         DispatchQueue.global().async {
             let promise = Future<String, Never>.promise()
             var value: String?
 
-            let eFulfilled = self.expectation(description: "fulfilled")
             let c = promise.future.sink {
                 XCTAssertEqual($0, "test")
                 value = $0
@@ -200,16 +200,16 @@ final class FutureExtensionTests: XCTestCase {
 
             e.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        wait(for: [e], timeout: 1)
     }
 
     func testPromiseOnGlobalQueueFulfilledInBackgroundHasValue() {
         let e = expectation(description: "background job done")
+        let eFulfilled = expectation(description: "fulfilled")
         DispatchQueue.global().async {
             let promise = Future<String, Never>.promise()
             var value: String?
 
-            let eFulfilled = self.expectation(description: "fulfilled")
             let c = promise.future.sink {
                 XCTAssertEqual($0, "test")
                 value = $0
@@ -225,7 +225,7 @@ final class FutureExtensionTests: XCTestCase {
 
             e.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        wait(for: [e], timeout: 1)
     }
 
     // - main queue async -
@@ -269,11 +269,11 @@ final class FutureExtensionTests: XCTestCase {
 
     func testFulfilledPromiseAsyncHasValue() {
         let e = expectation(description: "async job done")
+        let eFulfilled = expectation(description: "fulfilled")
         DispatchQueue.main.async {
             let promise = Future<String, Never>.promise()
             var value: String?
 
-            let eFulfilled = self.expectation(description: "fulfilled")
             let c = promise.future.sink {
                 XCTAssertEqual($0, "test")
                 value = $0
@@ -287,16 +287,16 @@ final class FutureExtensionTests: XCTestCase {
 
             e.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        wait(for: [e], timeout: 1)
     }
 
     func testPromiseAsyncFulfilledAsyncHasValue() {
         let e = expectation(description: "async job done")
+        let eFulfilled = expectation(description: "fulfilled")
         RunLoop.main.perform {
             let promise = Future<String, Never>.promise()
             var value: String?
 
-            let eFulfilled = self.expectation(description: "fulfilled")
             let c = promise.future.sink {
                 XCTAssertEqual($0, "test")
                 value = $0
@@ -312,16 +312,16 @@ final class FutureExtensionTests: XCTestCase {
 
             e.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        wait(for: [e], timeout: 1)
     }
 
     func testPromiseAsyncFulfilledInBackgroundHasValue() {
         let e = expectation(description: "async job done")
+        let eFulfilled = expectation(description: "fulfilled")
         DispatchQueue.main.async {
             let promise = Future<String, Never>.promise()
             var value: String?
 
-            let eFulfilled = self.expectation(description: "fulfilled")
             let c = promise.future.sink {
                 XCTAssertEqual($0, "test")
                 value = $0
@@ -337,7 +337,7 @@ final class FutureExtensionTests: XCTestCase {
 
             e.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        wait(for: [e], timeout: 1)
     }
 
     // MARK: - Publishers.First.get()
