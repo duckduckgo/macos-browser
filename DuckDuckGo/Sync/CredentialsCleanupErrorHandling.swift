@@ -25,10 +25,14 @@ public class CredentialsCleanupErrorHandling: EventMapping<CredentialsCleanupErr
 
     public init() {
         super.init { event, _, _, _ in
-            let processedErrors = CoreDataErrorsParser.parse(error: event.cleanupError as NSError)
-            let params = processedErrors.errorPixelParameters
+            if event.cleanupError is CredentialsCleanupErrorHandling {
+                Pixel.fire(.debug(event: .credentialsCleanupAttemptedWhileSyncWasEnabled))
+            } else {
+                let processedErrors = CoreDataErrorsParser.parse(error: event.cleanupError as NSError)
+                let params = processedErrors.errorPixelParameters
 
-            Pixel.fire(.debug(event: .credentialsDatabaseCleanupFailed, error: event.cleanupError), withAdditionalParameters: params)
+                Pixel.fire(.debug(event: .credentialsDatabaseCleanupFailed, error: event.cleanupError), withAdditionalParameters: params)
+            }
         }
     }
 

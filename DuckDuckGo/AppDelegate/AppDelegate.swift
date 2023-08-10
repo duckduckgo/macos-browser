@@ -301,6 +301,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         self.syncDataProviders = syncDataProviders
         self.syncService = syncService
+
+        bookmarksManager.bookmarkDatabaseCleaner.isSyncActive = { [weak self] in
+            self?.syncService?.authState == .active
+        }
+
+        syncDataProviders.credentialsAdapter.databaseCleaner.isSyncActive = { [weak self] in
+            self?.syncService?.authState == .active
+        }
     }
 
     // MARK: - Network Protection

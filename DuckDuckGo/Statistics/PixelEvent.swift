@@ -248,7 +248,6 @@ extension Pixel {
             case missingParent
             case bookmarksSaveFailed
             case bookmarksSaveFailedOnImport
-            case bookmarksCleanupFailed
             case orphanedBookmarksPresent
 
             case bookmarksCouldNotLoadDatabase
@@ -265,7 +264,12 @@ extension Pixel {
             case syncBookmarksFailed
             case syncCredentialsProviderInitializationFailed
             case syncCredentialsFailed
+
+            case bookmarksCleanupFailed
+            case bookmarksCleanupAttemptedWhileSyncWasEnabled
+
             case credentialsDatabaseCleanupFailed
+            case credentialsCleanupAttemptedWhileSyncWasEnabled
 
             case invalidPayload(Configuration)
 
@@ -585,7 +589,6 @@ extension Pixel.Event.Debug {
         case .missingParent: return "bookmark_missing_parent"
         case .bookmarksSaveFailed: return "bookmarks_save_failed"
         case .bookmarksSaveFailedOnImport: return "bookmarks_save_failed_on_import"
-        case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
         case .orphanedBookmarksPresent: return "bookmarks_orphans_present"
 
         case .bookmarksCouldNotLoadDatabase: return "bookmarks_could_not_load_database"
@@ -603,7 +606,12 @@ extension Pixel.Event.Debug {
         case .syncBookmarksFailed: return "sync_bookmarks_failed"
         case .syncCredentialsProviderInitializationFailed: return "sync_credentials_provider_initialization_failed"
         case .syncCredentialsFailed: return "sync_credentials_failed"
+
+        case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
+        case .bookmarksCleanupAttemptedWhileSyncWasEnabled: return "bookmarks_cleanup_attempted_while_sync_was_enabled"
+
         case .credentialsDatabaseCleanupFailed: return "credentials_database_cleanup_failed"
+        case .credentialsCleanupAttemptedWhileSyncWasEnabled: return "credentials_cleanup_attempted_while_sync_was_enabled"
 
         case .invalidPayload(let configuration): return "m_d_\(configuration.rawValue)_invalid_payload".lowercased()
 
