@@ -308,8 +308,11 @@ jobs:
     name: Create Asana Task
     needs: [swiftlint, tests, release-build, verify-autoconsent-bundle, private-api]
 
-    if: ${{ failure() && github.ref == 'refs/heads/develop'}}
-
+    if: failure() && github.ref_name == 'develop'
+    
+    env:
+      WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    
     runs-on: ubuntu-latest
 
     steps:
@@ -320,4 +323,4 @@ jobs:
           asana-project: ${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}
           asana-task-name: 'PR Check is failing on develop'
           action: create-asana-task
-          asana-task-description: PR Checks conducted after merging have failed.. See https://github.com/duckduckgo/macos-browser/actions/runs/${{ github.run_id }}
+          asana-task-description: PR Checks conducted after merging have failed.  See ${{ env.WORKFLOW_URL }}""
