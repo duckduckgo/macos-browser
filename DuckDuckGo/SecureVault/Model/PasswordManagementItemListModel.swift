@@ -276,6 +276,7 @@ final class PasswordManagementItemListModel: ObservableObject {
     private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void
     private let tld: TLD
     private let urlSort: AutofillDomainNameUrlSort
+    private static let randomColorsCount = 15
 
     init(passwordManagerCoordinator: PasswordManagerCoordinating,
          onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void,
@@ -457,6 +458,10 @@ final class PasswordManagementItemListModel: ObservableObject {
     
     func firstLetterForAccount(account: SecureVaultModels.WebsiteAccount) -> String {
         account.firstTLDLetter(tld: tld, autofillDomainNameUrlSort: urlSort) ?? ""
+    }
+    
+    func iconColorForAccount(account: SecureVaultModels.WebsiteAccount) -> Int {
+        ((Int(account.id ?? "") ?? 1) % Self.randomColorsCount) + 1
     }
 
 }

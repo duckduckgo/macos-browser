@@ -22,6 +22,7 @@ import BrowserServicesKit
 struct LoginFaviconView: View {   
     let domain: String
     let preferredFirstCharacter: String?
+    let preferredColor: Int = 1
     let faviconManagement: FaviconManagement = FaviconManager.shared    
     
     var body: some View {
@@ -33,8 +34,9 @@ struct LoginFaviconView: View {
                 .cornerRadius(4.0)
                 .padding(.leading, 6)
         } else {
-            let letter = preferredFirstCharacter ?? String(domain.first ?? "#")
-            AutofillIconLetterView(letter: letter)
+            let domainFirst = String(domain.first ?? "#")
+            let letter = preferredFirstCharacter ?? domainFirst
+            AutofillIconLetterView(title: domain, prefferedFirstCharacter: letter)
         }
     }
 }

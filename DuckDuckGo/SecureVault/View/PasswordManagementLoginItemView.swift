@@ -513,7 +513,7 @@ private struct NotesView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .contextMenu(ContextMenu(menuItems: {
                     Button(UserText.copy, action: {
-                        NSPasteboard.general.copy(model.notes)
+                        //NSPasteboard.general.copy(model.notes)
                     })
                 }))
         }
@@ -593,8 +593,7 @@ private struct HeaderView: View {
 
     var body: some View {
 
-        HStack(alignment: .center, spacing: 0) {
-
+        HStack(alignment: .center, spacing: 0) {            
             LoginFaviconView(domain: model.domain, preferredFirstCharacter: model.firstLetter)
                .padding(.trailing, 10)
 

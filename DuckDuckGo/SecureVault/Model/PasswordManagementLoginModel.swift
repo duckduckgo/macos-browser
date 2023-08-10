@@ -55,7 +55,8 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     @Published var isEditing = false
     @Published var isNew = false
     @Published var firstLetter = ""
-
+    @Published var iconColor: Int = 1
+    
     var isDirty: Bool {
         username != "" || password != "" || domain != ""
     }
@@ -126,6 +127,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     private let tld: TLD
     private let urlSort: AutofillDomainNameUrlSort
+    private static let randomColorsCount = 15
 
     init(onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
          onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
@@ -211,6 +213,8 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         notes = credentials?.account.notes ?? ""
         isNew = credentials?.account.id == nil
         firstLetter = credentials?.account.firstTLDLetter(tld: tld, autofillDomainNameUrlSort: urlSort) ?? ""
+        let accountID = Int(credentials?.account.id ?? "") ?? 1 
+        iconColor = (accountID % Self.randomColorsCount) + 1
 
         // Determine Private Email Status when required
         usernameIsPrivateEmail = emailManager.isPrivateEmail(email: username)
