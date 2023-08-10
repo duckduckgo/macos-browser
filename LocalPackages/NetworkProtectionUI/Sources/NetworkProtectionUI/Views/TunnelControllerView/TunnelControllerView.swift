@@ -35,10 +35,6 @@ fileprivate extension Font {
             .system(size: 13, weight: .regular, design: .default)
         }
 
-        static var menu: Font {
-            .system(size: 13, weight: .regular, design: .default)
-        }
-
         static var label: Font {
             .system(size: 13, weight: .regular, design: .default)
         }
@@ -66,7 +62,6 @@ private enum Opacity {
     static let content = Double(0.58)
     static let label = Double(0.9)
     static let description = Double(0.9)
-    static let menu = Double(0.9)
     static let link = Double(1)
 
     static func sectionHeader(colorScheme: ColorScheme) -> Double {
@@ -98,18 +93,6 @@ fileprivate extension View {
     func applyDescriptionAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.description)
             .font(.NetworkProtection.description)
-            .foregroundColor(Color(.defaultText))
-    }
-
-    func applyMenuAttributes() -> some View {
-        opacity(Opacity.menu)
-            .font(.NetworkProtection.menu)
-            .foregroundColor(Color(.defaultText))
-    }
-
-    func applyLinkAttributes(colorScheme: ColorScheme) -> some View {
-        opacity(Opacity.link)
-            .font(.NetworkProtection.content)
             .foregroundColor(Color(.defaultText))
     }
 

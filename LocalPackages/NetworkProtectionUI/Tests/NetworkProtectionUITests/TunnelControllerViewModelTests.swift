@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionStatusViewModelTests.swift
+//  TunnelControllerViewModelTests.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -24,7 +24,7 @@ import NetworkProtection
 @testable import NetworkProtectionUI
 import NetworkProtectionTestUtils
 
-final class NetworkProtectionStatusViewModelTests: XCTestCase {
+final class TunnelControllerViewModelTests: XCTestCase {
 
     private class MockStatusReporter: NetworkProtectionStatusReporter {
         static let defaultServerInfo = NetworkProtectionStatusServerInfo(
@@ -100,10 +100,9 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
     func testProperlyReflectsStatusDisconnected() async throws {
         let controller = MockTunnelController()
         let statusReporter = MockStatusReporter(status: .disconnected)
-        let model = NetworkProtectionStatusView.Model(
+        let model = TunnelControllerViewModel(
             controller: controller,
-            statusReporter: statusReporter,
-            menuItems: [])
+            statusReporter: statusReporter)
 
         let isToggleOn = model.isToggleOn.wrappedValue
         XCTAssertFalse(isToggleOn)
@@ -119,10 +118,9 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
     func testProperlyReflectsStatusDisconnecting() async throws {
         let controller = MockTunnelController()
         let statusReporter = MockStatusReporter(status: .disconnecting)
-        let model = NetworkProtectionStatusView.Model(
+        let model = TunnelControllerViewModel(
             controller: controller,
-            statusReporter: statusReporter,
-            menuItems: [])
+            statusReporter: statusReporter)
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusDisconnecting)
         XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
@@ -146,10 +144,9 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
             serverLocation: mockServerLocation,
             serverAddress: mockServerIP)
         let statusReporter = MockStatusReporter(status: .connected(connectedDate: mockDate), serverInfo: serverInfo)
-        let model = NetworkProtectionStatusView.Model(
+        let model = TunnelControllerViewModel(
             controller: controller,
-            statusReporter: statusReporter,
-            menuItems: [])
+            statusReporter: statusReporter)
 
         let isToggleOn = model.isToggleOn.wrappedValue
         XCTAssertTrue(isToggleOn)
@@ -167,8 +164,9 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
     func testProperlyReflectsStatusConnecting() async throws {
         let controller = MockTunnelController()
         let statusReporter = MockStatusReporter(status: .connecting)
-        let model = NetworkProtectionStatusView.Model(
-            controller: controller, statusReporter: statusReporter, menuItems: [])
+        let model = TunnelControllerViewModel(
+            controller: controller,
+            statusReporter: statusReporter)
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusConnecting)
         XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
@@ -182,8 +180,9 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
     func testStartsNetworkProtection() async throws {
         let controller = MockTunnelController()
         let statusReporter = MockStatusReporter(status: .disconnected)
-        let model = NetworkProtectionStatusView.Model(
-            controller: controller, statusReporter: statusReporter, menuItems: [])
+        let model = TunnelControllerViewModel(
+            controller: controller,
+            statusReporter: statusReporter)
         let networkProtectionWasStarted = expectation(description: "The model started network protection when appropriate")
 
         controller.startCallback = {
@@ -210,7 +209,9 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
         let statusReporter = MockStatusReporter(
             status: .connected(connectedDate: mockDate),
             serverInfo: serverInfo)
-        let model = NetworkProtectionStatusView.Model(controller: controller, statusReporter: statusReporter, menuItems: [])
+        let model = TunnelControllerViewModel(
+            controller: controller,
+            statusReporter: statusReporter)
 
         let networkProtectionWasStopped = expectation(description: "The model stopped network protection when appropriate")
 

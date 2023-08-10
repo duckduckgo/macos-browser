@@ -76,11 +76,6 @@ extension NetworkProtectionStatusView {
         ///
         private let runLoopMode: RunLoop.Mode?
 
-        private var statusChangeCancellable: AnyCancellable?
-        private var connectivityIssuesCancellable: AnyCancellable?
-        private var serverInfoCancellable: AnyCancellable?
-        private var tunnelErrorMessageCancellable: AnyCancellable?
-        private var controllerErrorMessageCancellable: AnyCancellable?
         private var cancellables = Set<AnyCancellable>()
 
         // MARK: - Dispatch Queues
@@ -128,7 +123,7 @@ extension NetworkProtectionStatusView {
         }
 
         private func subscribeToConnectivityIssues() {
-            connectivityIssuesCancellable = statusReporter.connectivityIssuesObserver.publisher
+            statusReporter.connectivityIssuesObserver.publisher
                 .subscribe(on: Self.connectivityIssuesDispatchQueue)
                 .sink { [weak self] isHavingConnectivityIssues in
 
@@ -139,11 +134,11 @@ extension NetworkProtectionStatusView {
                 Task { @MainActor in
                     self.isHavingConnectivityIssues = isHavingConnectivityIssues
                 }
-            }
+            }.store(in: &cancellables)
         }
 
         private func subscribeToTunnelErrorMessages() {
-            tunnelErrorMessageCancellable = statusReporter.connectionErrorObserver.publisher
+            statusReporter.connectionErrorObserver.publisher
                 .subscribe(on: Self.tunnelErrorDispatchQueue)
                 .sink { [weak self] errorMessage in
 
@@ -154,11 +149,11 @@ extension NetworkProtectionStatusView {
                 Task { @MainActor in
                     self.lastTunnelErrorMessage = errorMessage
                 }
-            }
+            }.store(in: &cancellables)
         }
 
         private func subscribeToControllerErrorMessages() {
-            controllerErrorMessageCancellable = statusReporter.controllerErrorMessageObserver.publisher
+            statusReporter.controllerErrorMessageObserver.publisher
                 .subscribe(on: Self.controllerErrorDispatchQueue)
                 .sink { [weak self] errorMessage in
 
@@ -169,7 +164,7 @@ extension NetworkProtectionStatusView {
                 Task { @MainActor in
                     self.lastControllerErrorMessage = errorMessage
                 }
-            }
+            }.store(in: &cancellables)
         }
 
         // MARK: - Connection Status: Errors
