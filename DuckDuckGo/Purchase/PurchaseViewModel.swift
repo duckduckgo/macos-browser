@@ -36,8 +36,8 @@ public final class PurchaseViewModel: ObservableObject {
 
     @Published var currentEntitlements: [AccountsService.ValidateTokenResponse.Entitlement] = []
 
-    var authServiceToken: String?
-    var externalID: String?
+    @Published var authServiceToken: String?
+    @Published var externalID: String?
 
     init() {
         print(" -- PurchaseViewModel init --")
@@ -45,6 +45,11 @@ public final class PurchaseViewModel: ObservableObject {
 
     deinit {
         print(" -- PurchaseViewModel deinit --")
+    }
+
+    var isAuthenticated: Bool {
+        guard let token = authServiceToken else { return false }
+        return !token.isEmpty
     }
 
     var hasOngoingPurchase: Bool { subscriptions.map { $0.isBeingPurchased }.contains(true) }

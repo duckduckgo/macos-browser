@@ -65,6 +65,25 @@ public final class PurchaseViewActions {
     }
 
     @MainActor
+    func signInUsingEmailProtection() {
+        Task {
+            switch await AccountsService.getAccessToken() {
+            case .success(let response):
+                self.model?.authServiceToken = response.accessToken
+                refreshEntitlements()
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+
+    @MainActor
+    func signOut() {
+        model?.authServiceToken = nil
+        model?.externalID = nil
+    }
+
+    @MainActor
     func testPurchaseWithCreatingNewAccount() {
         Task {
             switch await AccountsService.createAccount() {
@@ -85,7 +104,8 @@ public final class PurchaseViewActions {
 
             switch await AccountsService.storeLogin(payload: payload, signature: signature) {
             case .success(let response):
-                print(response)
+                model?.authServiceToken = response.authToken
+                model?.externalID = response.externalID
             case .failure(let error):
                 print(error)
             }

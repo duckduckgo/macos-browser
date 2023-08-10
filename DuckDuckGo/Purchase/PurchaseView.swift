@@ -84,17 +84,25 @@ struct PurchaseView: View {
         .padding(.all, 32)
     }
 
-    private var subscriptionsList: some View {
+    private var accountStateSection: some View {
         VStack {
+            Text("Account State")
+                .font(.largeTitle)
+
+            Text("Authenticated: \(model.isAuthenticated ? "YES" : "NO" )")
+            Text("User UUID: \(model.externalID ?? "-")")
+
             if !model.currentEntitlements.isEmpty {
                 entitlementsList
             }
+        }
+    }
 
-            Text("Subscriptions")
+    private var purchaseSubscriptionSection: some View {
+        VStack {
+            Text("Purchase Subscription")
                 .font(.largeTitle)
-
-            Spacer(minLength: 32)
-
+            Spacer(minLength: 16)
             ScrollView {
                 VStack(spacing: 32) {
                     ForEach(model.subscriptions, id: \.id) { rowModel in
@@ -107,18 +115,40 @@ struct PurchaseView: View {
             }
             .disabled(model.hasOngoingPurchase)
             .opacity(model.hasOngoingPurchase ? 0.5 : 1.0)
+        }
+    }
+
+    private var actionsSection: some View {
+        VStack(spacing: 16) {
+            Text("Actions")
+                .font(.largeTitle)
+
+            Button("Sign in with email protection", action: { actions.signInUsingEmailProtection() })
+                .buttonStyle(Onboarding.ActionButtonStyle())
+
+            Button("Sign in using Apple ID and purchase history", action: { actions.testSigningInWithUsingAppStoreHistory() })
+                .buttonStyle(Onboarding.ActionButtonStyle())
+
+            Button("Sign out", action: { actions.signOut() })
+                .buttonStyle(Onboarding.SkipButtonStyle())
+        }
+    }
+
+    private var subscriptionsList: some View {
+        VStack(spacing: 16) {
+            accountStateSection
+
+            purchaseSubscriptionSection
+
+            actionsSection
 
             Spacer()
 
-            Button {
-                actions.restorePurchases()
-            } label: {
-                Text("Restore Purchases")
-            }
+            Button("Restore Purchases", action: { actions.restorePurchases() })
 
             Spacer()
         }
-        .padding(.all, 48)
+        .padding(.all, 24)
     }
 
     var columns: [GridItem] = [GridItem(), GridItem(.flexible()), GridItem()]
