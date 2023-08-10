@@ -21,6 +21,14 @@ import SwiftUIExtensions
 import Combine
 import NetworkProtection
 
+fileprivate extension View {
+    func applyMenuAttributes() -> some View {
+        opacity(0.9)
+            .font(.system(size: 13, weight: .regular, design: .default))
+            .foregroundColor(Color(.defaultText))
+    }
+}
+
 public struct NetworkProtectionStatusView: View {
 
     @Environment(\.colorScheme) var colorScheme
@@ -86,7 +94,7 @@ public struct NetworkProtectionStatusView: View {
                 MenuItemButton(menuItem.name, textColor: Color(.defaultText)) {
                     await menuItem.action()
                     dismiss()
-                }
+                }.applyMenuAttributes()
             }
         }
     }
