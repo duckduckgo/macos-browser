@@ -197,8 +197,9 @@ final class TabViewModel {
     func updateAddressBarStrings() {
         guard !errorViewState.isVisible else {
             let failingUrl = tab.error?.failingUrl
-            addressBarString = failingUrl?.absoluteString ?? ""
-            passiveAddressBarString = appearancePreferences.showFullURL ? failingUrl?.host ?? "" : failingUrl?.host?.droppingWwwPrefix() ?? ""
+            let failingUrlString = failingUrl?.absoluteString ?? ""
+            let failingUrlHost = failingUrl?.host?.droppingWwwPrefix() ?? ""
+            passiveAddressBarString = appearancePreferences.showFullURL ? addressBarString : failingUrlHost
             return
         }
 
