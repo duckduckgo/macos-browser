@@ -1017,32 +1017,37 @@ final class TrackerAnimationImageProvider: AnimationImageProvider {
 }
 
 extension URL {
-    var isLocalURL: Bool {
-        let localPatterns = [
-            "^localhost$",
-            "^::1",
-            "^.+\\.local$",
-            "^localhost\\.localhost$",
-            "127.0.0.1",
-            "::1",
-            "^10\\..*",
-            "^172\\.(1[6-9]|2[0-9]|3[0-1])\\..*",
-            "^192\\.168\\..*",
-            "^169\\.254\\..*",
-            "^fc00:.+",
-            "^fe80:.+"
-        ]
+    private static let localPatterns = [
+        "^localhost$",
+        "^::1$",
+        "^.+\\.local$",
+        "^localhost\\.localhost$",
+        "^127\\.0\\.0\\.1$",
+        "^10\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)$",
+        "^172\\.(1[6-9]|2[0-9]|3[0-1])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)$",
+        "^192\\.168\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)$",
+        "^169\\.254\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)$",
+        "^fc[0-9a-fA-F]{2}:.+",
+        "^fe80:.+"
+    ]
 
+    private static var compiledRegexes: [NSRegularExpression] {
+        var regexes: [NSRegularExpression] = []
+        for pattern in localPatterns {
+            if let newRegex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+                regexes.append(newRegex)
+            }
+        }
+        return regexes
+    }
+
+    var isLocalURL: Bool {
         if let host = self.host {
-            for pattern in localPatterns {
-                if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
-                    if regex.firstMatch(in: host, options: [], range: NSRange(location: 0, length: host.utf16.count)) != nil {
-                        return true
-                    }
-                }
+            for regex in Self.compiledRegexes
+            where regex.firstMatch(in: host, options: [], range: NSRange(location: 0, length: host.utf16.count)) != nil {
+                return true
             }
         }
         return false
     }
-
 }
