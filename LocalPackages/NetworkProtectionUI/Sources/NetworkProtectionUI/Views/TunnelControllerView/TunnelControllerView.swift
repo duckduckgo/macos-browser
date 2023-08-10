@@ -107,12 +107,6 @@ fileprivate extension View {
             .foregroundColor(Color(.defaultText))
     }
 
-    func applyLinkAttributes(colorScheme: ColorScheme) -> some View {
-        opacity(Opacity.link)
-            .font(.NetworkProtection.content)
-            .foregroundColor(Color(.defaultText))
-    }
-
     func applyLabelAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.label)
             .font(.NetworkProtection.label)
