@@ -323,4 +323,4 @@ jobs:
           asana-project: ${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}
           asana-task-name: 'PR Check is failing on develop'
           action: create-asana-task
-          asana-task-description: PR Checks conducted after merging have failed.  See ${{ env.WORKFLOW_URL }}""
+          asana-task-description: PR Checks conducted after merging have failed.  See ${{ env.WORKFLOW_URL }}
