@@ -29,6 +29,7 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
             addresses: [
                 DataBrokerProtectionProfile.Address(city: "New York", state: "NY")
             ],
+            phones: [String](),
             age: 30
         )
 
@@ -65,6 +66,7 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
                 DataBrokerProtectionProfile.Address(city: "New York", state: "NY"),
                 DataBrokerProtectionProfile.Address(city: "Los Angeles", state: "CA")
             ],
+            phones: [String](),
             age: 30
         )
 
@@ -103,6 +105,7 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
                 DataBrokerProtectionProfile.Address(city: "New York", state: "NY"),
                 DataBrokerProtectionProfile.Address(city: "Los Angeles", state: "CA")
             ],
+            phones: [String](),
             age: 30
         )
 
@@ -144,7 +147,7 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
     }
 
     func testProfileQueriesWithNoNamesAndAddresses() {
-        let profile = DataBrokerProtectionProfile(names: [], addresses: [], age: 30)
+        let profile = DataBrokerProtectionProfile(names: [], addresses: [], phones: [String](), age: 30)
 
         let queries = profile.profileQueries
 
