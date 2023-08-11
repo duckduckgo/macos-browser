@@ -68,11 +68,12 @@ final class ProfileViewModel: ObservableObject {
     @Published var selectedName: Name?
     @Published var selectedAddress: Address?
 
-    static let defaultPickerSelection = "Select"
+    static let defaultSuffixSelection = "No suffix"
+    static let defaultStateSelection = ""
 
-    let states = [ProfileViewModel.defaultPickerSelection, "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
+    let states = [ProfileViewModel.defaultStateSelection, "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
 
-    let suffixes =  [ProfileViewModel.defaultPickerSelection, "Jr", "Sr", "I", "II", "III", "IV"]
+    let suffixes =  [ProfileViewModel.defaultSuffixSelection, "Jr", "Sr", "I", "II", "III", "IV"]
 
     let birthdayYearRange = (Date().year - 110)...ProfileViewModel.minimumBirthYear
 
@@ -95,7 +96,7 @@ final class ProfileViewModel: ObservableObject {
     }
 
     func saveName(id: UUID?, firstName: String, middleName: String?, lastName: String, suffix: String?) {
-        let chosenSuffix = suffix == ProfileViewModel.defaultPickerSelection ? nil : suffix
+        let chosenSuffix = suffix == ProfileViewModel.defaultSuffixSelection ? nil : suffix
 
         if let id = id, let name = names.filter({ $0.id == id}).first {
             name.firstName = firstName

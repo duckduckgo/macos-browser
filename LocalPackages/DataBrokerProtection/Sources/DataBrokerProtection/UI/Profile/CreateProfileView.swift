@@ -191,7 +191,7 @@ private struct NameFormView: View {
     @State private var firstName = ""
     @State private var middleName = ""
     @State private var lastName = ""
-    @State private var suffix = ProfileViewModel.defaultPickerSelection
+    @State private var suffix = ProfileViewModel.defaultSuffixSelection
     @State private var shouldShowDeleteButton = false
 
     var body: some View {
@@ -318,9 +318,9 @@ private struct AddressFormView: View {
 
     @State private var street = ""
     @State private var city = ""
-    @State private var state = ProfileViewModel.defaultPickerSelection
+    @State private var state = ""
     @State private var shouldShowDeleteButton = false
-    
+
     var body: some View {
         VStack(spacing: 15) {
             TextFieldWithLabel(label: "Street", text: $street)
@@ -332,8 +332,10 @@ private struct AddressFormView: View {
 
                 Picker(selection: $state) {
                     ForEach(viewModel.states, id: \.self) { state in
-                        Text(state)
-                            .tag(state)
+                        if state != ProfileViewModel.defaultStateSelection {
+                            Text(state)
+                                .tag(state)
+                        }
                     }
                 } label: { }
             }
@@ -381,7 +383,7 @@ private struct AddressFormView: View {
     }
 
     private func areRequiredFormsFilled() -> Bool {
-        if state == ProfileViewModel.defaultPickerSelection {
+        if state == ProfileViewModel.defaultStateSelection {
             return false
         }
         return [city, state]
