@@ -803,7 +803,6 @@ final class PasswordManagementViewController: NSViewController {
                 Pixel.fire(.debug(event: .secureVaultError, error: error))
             }
 
-
             DispatchQueue.main.async {
                 self.emptyState.isHidden = !items.isEmpty
                 completion(items)
