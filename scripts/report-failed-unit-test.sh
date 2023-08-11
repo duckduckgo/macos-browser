@@ -21,6 +21,7 @@ print_usage_and_exit() {
 	  <workflow_url>     URL of the workflow that failed
 	  -h                 Print this message
 
+	Note: This script is intended for CI use only. You shouldn't call it directly.
 	EOF
 
 	die "${reason}"
@@ -168,10 +169,10 @@ main() {
 	echo "Processing ${task_name}"
 
 	local task_and_occurrences
-	local task_id
-	local occurrences
 	task_and_occurrences=$(find_task_and_occurrences "${task_name}")
 	if [[ -n "${task_and_occurrences}" ]]; then
+		local task_id
+		local occurrences
 		task_id=$(cut -d ' ' -f 1 <<< "${task_and_occurrences}")
 		occurrences=$(cut -d ' ' -f 2 <<< "${task_and_occurrences}")
 		occurrences=$((occurrences+1))
@@ -180,7 +181,6 @@ main() {
 		add_subtask "${task_id}" "${task_name}" "${workflow_url}" "${message}"
 	else
 		create_task "${task_name}" "${workflow_url}" "${message}"
-		occurrences=1
 	fi
 }
 
