@@ -55,7 +55,6 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     @Published var isEditing = false
     @Published var isNew = false
     @Published var firstLetter = ""
-    @Published var iconColor: Int = 1
     
     var isDirty: Bool {
         username != "" || password != "" || domain != ""
@@ -212,9 +211,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         domain =  urlMatcher.normalizeUrlForWeb(credentials?.account.domain ?? "")
         notes = credentials?.account.notes ?? ""
         isNew = credentials?.account.id == nil
-        firstLetter = credentials?.account.firstTLDLetter(tld: tld, autofillDomainNameUrlSort: urlSort) ?? ""
-        let accountID = Int(credentials?.account.id ?? "") ?? 1 
-        iconColor = (accountID % Self.randomColorsCount) + 1
+        firstLetter = credentials?.account.firstTLDLetter(tld: tld, autofillDomainNameUrlSort: urlSort) ?? ""        
 
         // Determine Private Email Status when required
         usernameIsPrivateEmail = emailManager.isPrivateEmail(email: username)
