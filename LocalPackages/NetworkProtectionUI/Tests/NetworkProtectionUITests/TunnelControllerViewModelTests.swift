@@ -102,6 +102,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let statusReporter = MockStatusReporter(status: .disconnected)
         let model = TunnelControllerViewModel(
             controller: controller,
+            onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter)
 
         let isToggleOn = model.isToggleOn.wrappedValue
@@ -120,6 +121,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let statusReporter = MockStatusReporter(status: .disconnecting)
         let model = TunnelControllerViewModel(
             controller: controller,
+            onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter)
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusDisconnecting)
@@ -146,6 +148,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let statusReporter = MockStatusReporter(status: .connected(connectedDate: mockDate), serverInfo: serverInfo)
         let model = TunnelControllerViewModel(
             controller: controller,
+            onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter)
 
         let isToggleOn = model.isToggleOn.wrappedValue
@@ -166,6 +169,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let statusReporter = MockStatusReporter(status: .connecting)
         let model = TunnelControllerViewModel(
             controller: controller,
+            onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter)
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusConnecting)
@@ -182,6 +186,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let statusReporter = MockStatusReporter(status: .disconnected)
         let model = TunnelControllerViewModel(
             controller: controller,
+            onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter)
         let networkProtectionWasStarted = expectation(description: "The model started network protection when appropriate")
 
@@ -211,6 +216,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
             serverInfo: serverInfo)
         let model = TunnelControllerViewModel(
             controller: controller,
+            onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: statusReporter)
 
         let networkProtectionWasStopped = expectation(description: "The model stopped network protection when appropriate")

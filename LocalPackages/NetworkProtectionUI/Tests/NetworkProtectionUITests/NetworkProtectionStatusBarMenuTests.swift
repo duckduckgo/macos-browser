@@ -36,6 +36,7 @@ final class StatusBarMenuTests: XCTestCase {
         let item = NSStatusItem()
         let menu = StatusBarMenu(
             statusItem: item,
+            onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: MockNetworkProtectionStatusReporter(),
             appLauncher: TestAppLauncher(),
             iconProvider: MenuIconProvider())
@@ -49,6 +50,7 @@ final class StatusBarMenuTests: XCTestCase {
         let item = NSStatusItem()
         let menu = StatusBarMenu(
             statusItem: item,
+            onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: MockNetworkProtectionStatusReporter(),
             appLauncher: TestAppLauncher(),
             iconProvider: MenuIconProvider())
