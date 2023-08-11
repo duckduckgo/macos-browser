@@ -70,7 +70,7 @@ struct InvitedToWaitlistView: View {
             }
 
             Button("Get Started") {
-                model.perform(action: .joinQueue)
+                model.perform(action: .showTermsAndConditions)
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }

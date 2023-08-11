@@ -45,7 +45,7 @@ struct NetworkProtectionTermsAndConditionsView: View {
             }
 
             Button("Agree and Continue") {
-                model.perform(action: .joinQueue)
+                model.perform(action: .acceptTermsAndConditions)
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }

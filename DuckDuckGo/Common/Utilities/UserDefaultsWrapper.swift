@@ -143,6 +143,8 @@ public struct UserDefaultsWrapper<T> {
 
         case agentLaunchTime = "netp.agent.launch-time"
 
+        case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
+
         // Experiments
         case pixelExperimentInstalled = "pixel.experiment.installed"
         case pixelExperimentCohort = "pixel.experiment.cohort"

@@ -36,6 +36,8 @@ public final class WaitlistViewModel: ObservableObject {
     enum ViewAction: Equatable {
         case joinQueue
         case requestNotificationPermission
+        case showTermsAndConditions
+        case acceptTermsAndConditions
         case close
     }
 
@@ -45,7 +47,14 @@ public final class WaitlistViewModel: ObservableObject {
         case notificationsDisabled
     }
 
-    @Published var waitlistState: ViewState
+    @Published var waitlistState: ViewState {
+        didSet {
+            print("DEBUG: New view state: \(waitlistState)")
+        }
+    }
+
+    @UserDefaultsWrapper(key: .spellingCheckEnabledOnce, defaultValue: false)
+    private var acceptedNetworkProtectionTermsAndConditions: Bool
 
     weak var delegate: WaitlistViewModelDelegate?
 
@@ -57,7 +66,7 @@ public final class WaitlistViewModel: ObservableObject {
         self.waitlistStorage = waitlistStorage
 
         // TODO: Determine the real state
-        waitlistState = .readyToEnable
+        waitlistState = .invited
     }
 
     convenience init(waitlist: Waitlist) {
@@ -72,6 +81,8 @@ public final class WaitlistViewModel: ObservableObject {
         switch action {
         case .joinQueue: joinWaitlist()
         case .requestNotificationPermission: requestNotificationPermission()
+        case .showTermsAndConditions: showTermsAndConditions()
+        case .acceptTermsAndConditions: acceptTermsAndConditions()
         case .close: close()
         }
     }
@@ -89,6 +100,15 @@ public final class WaitlistViewModel: ObservableObject {
     private func requestNotificationPermission() {
         // TODO: Implement
         self.waitlistState = .joinedWaitlist(.notificationAllowed)
+    }
+
+    private func showTermsAndConditions() {
+        waitlistState = .termsAndConditions
+    }
+
+    private func acceptTermsAndConditions() {
+        acceptedNetworkProtectionTermsAndConditions = true
+        waitlistState = .readyToEnable
     }
 
 }
