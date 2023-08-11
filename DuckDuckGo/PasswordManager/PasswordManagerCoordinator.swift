@@ -25,6 +25,9 @@ protocol PasswordManagerCoordinating: BrowserServicesKit.PasswordManager {
 
     var displayName: String { get }
 
+    func reportPasswordAutofill()
+    func reportPasswordSave()
+
 }
 
 // Encapsulation of third party password managers
@@ -238,6 +241,22 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
                                  completion: @escaping (Error?) -> Void) {}
 
 #endif
+
+    func reportPasswordAutofill() {
+        guard isEnabled else {
+            return
+        }
+
+        Pixel.fire(.bitwardenPasswordAutofilled)
+    }
+
+    func reportPasswordSave() {
+        guard isEnabled else {
+            return
+        }
+
+        Pixel.fire(.bitwardenPasswordSaved)
+    }
 
     // MARK: - Cache
 

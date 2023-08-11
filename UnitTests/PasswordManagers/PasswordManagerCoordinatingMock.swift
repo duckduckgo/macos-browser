@@ -45,4 +45,8 @@ final class PasswordManagerCoordinatingMock: PasswordManagerCoordinating {
 
     func askToUnlock(completionHandler: @escaping () -> Void) {}
 
+    func reportPasswordAutofill() {}
+
+    func reportPasswordSave() {}
+
 }

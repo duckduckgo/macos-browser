@@ -762,6 +762,31 @@ CQ
                                                             <action selector="resetMakeDuckDuckGoYoursUserSettings:" target="Ady-hI-5gd" id="maa-qG-0Bx"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Change Activation Date" id="Emw-LJ-v7W">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Change Activation Date" id="0Qi-HZ-AJt">
+                                                            <items>
+                                                                <menuItem title="Today" keyEquivalent="N" id="0lm-tL-hli">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="changeInstallDateToToday:" target="Ady-hI-5gd" id="Lsi-xW-usu"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="Less Than a Week Ago" id="KhK-Zf-YHA">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="changeInstallDateToLessThanAWeekAgo:" target="Ady-hI-5gd" id="J0j-gf-bhG"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="More Than a Week Ago" id="mYW-2j-Ckg">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="changeInstallDateToMoreThanAWeekAgo:" target="Ady-hI-5gd" id="Ygn-GW-JkY"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                            </items>
+                                                        </menu>
+                                                    </menuItem>
                                                     <menuItem title="Reset Email Protection InContext Signup Prompt" id="cQF-Np-0vk">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
