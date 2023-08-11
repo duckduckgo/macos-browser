@@ -274,30 +274,20 @@ private struct ItemView: View {
 
                 switch item {
                 case .account:
-                    if let account = item.websiteAccount {                        
-                        LoginFaviconView(domain: account.domain, 
-                                         preferredFirstCharacter: model.firstLetterForAccount(account: account),
-                                         preferredColor: model.iconColorForAccount(account: account))
-                    }
-                    else {
-                        AutofillIconLetterView(letter: "#")
-                    }
-                case .card(let card):
-                    if let letter = card.title.first {
-                        AutofillIconLetterView(letter: String(letter))    
+                    if let account = item.websiteAccount {
+                        LoginFaviconView(domain: account.domain,
+                                         preferredFirstCharacter: model.firstLetterForAccount(account: account))
                     } else {
-                        Image("Card")
-                            .frame(width: 32)
-                            .padding(.leading, 6)    
+                        AutofillIconLetterView(title: "#")
                     }
-                case .identity(let identity):
-                    if let letter = identity.title.first {
-                        AutofillIconLetterView(letter: String(letter))
-                    } else {
-                        Image("Identity")
-                            .frame(width: 32)
-                            .padding(.leading, 6)
-                    }
+                case .card:
+                    Image("Card")
+                        .frame(width: 32)
+                        .padding(.leading, 6)
+                case .identity:
+                    Image("Identity")
+                        .frame(width: 32)
+                        .padding(.leading, 6)
                 case .note:
                     Image("Note")
                         .frame(width: 32)

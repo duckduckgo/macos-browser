@@ -195,7 +195,7 @@ struct PinnedTabInnerView: View {
         } else if let domain = model.content.url?.host, let firstLetter = domain.droppingWwwPrefix().capitalized.first.flatMap(String.init) {
             ZStack {
                 Rectangle()
-                    .foregroundColor(.forDomain(domain.droppingWwwPrefix()))
+                    .foregroundColor(.forString(domain.droppingWwwPrefix()))
                 Text(firstLetter)
                     .font(.caption)
                     .foregroundColor(.white)

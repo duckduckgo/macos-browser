@@ -20,30 +20,22 @@ import SwiftUI
 
 struct AutofillIconLetterView: View {
 
-    enum Constants {
-        static let randomColor = "RandomColor"
-        static let totalRandomColors = 15
-    }
-
     var title: String
     var size: CGFloat = 32
     var prefferedFirstCharacter: String?
 
-    var color: Color {                
-        Color("\(Constants.randomColor)\(abs(title.hashValue) % Constants.totalRandomColors)")
-    }
-    
     var letter: Character {
-        if let prefferedFirstCharacter {
+        if let prefferedFirstCharacter,
+           prefferedFirstCharacter != "" {
             return Character(prefferedFirstCharacter)
-        } 
+        }
         return title.first ?? "#"
     }
-    
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: size * 0.125)
-                .foregroundColor(color)
+                .foregroundColor(Color.forString(title))
                 .frame(width: size, height: size)
 
             Text(letter.uppercased())
