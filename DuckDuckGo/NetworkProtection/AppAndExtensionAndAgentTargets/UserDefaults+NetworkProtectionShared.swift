@@ -21,33 +21,6 @@
 import Combine
 import Foundation
 import NetworkProtectionUI
-/*
-extension UserDefaults {
-    // Convenience declaration
-    var networkProtectionOnboardingStatusRawValueKey: String {
-        UserDefaultsWrapper<Any>.Key.networkProtectionOnboardingStatusRawValue.rawValue
-    }
-
-    /// For KVO to work across processes (Menu App + Main App) we need to declare this dynamic var in a `UserDefaults`
-    /// extension, and the key for this property must match its name exactly.
-    ///
-    @objc
-    dynamic var networkProtectionOnboardingStatusRawValue: Int {
-        get {
-            value(forKey: networkProtectionOnboardingStatusRawValueKey) as? Int ?? OnboardingStatus.default.rawValue
-        }
-
-        set {
-            set(newValue, forKey: networkProtectionOnboardingStatusRawValueKey)
-        }
-    }
-
-    var networkProtectionOnboardingStatusPublisher: AnyPublisher<OnboardingStatus, Never> {
-        publisher(for: \.networkProtectionOnboardingStatusRawValue).map { value in
-            OnboardingStatus(rawValue: value) ?? .default
-        }.eraseToAnyPublisher()
-    }
-}*/
 
 extension NetworkProtectionUI.OnboardingStatus {
     /// The default onboarding status.
