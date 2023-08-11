@@ -19,15 +19,18 @@
 import Cocoa
 import Combine
 import Common
+import SwiftUI
 
 final class FeedbackViewController: NSViewController {
 
     enum Constants {
         static let defaultContentHeight: CGFloat = 160
-        static let feedbackContentHeight: CGFloat = 338
+        static let noWarningfeedbackContentHeight: CGFloat = 338
+        static let feedbackContentHeight: CGFloat = 458
         static let websiteBreakageContentHeight: CGFloat = 472
         static let thankYouContentHeight: CGFloat = 262
-
+        static let browserFeedbackViewTopConstraint: CGFloat = 53
+        static let browserFeedbackViewWebsiteBreakageTopConstraint: CGFloat = 153
     }
 
     enum FormOption {
@@ -53,9 +56,11 @@ final class FeedbackViewController: NSViewController {
     @IBOutlet weak var contentViewHeightContraint: NSLayoutConstraint!
 
     @IBOutlet weak var browserFeedbackView: NSView!
+    @IBOutlet weak var browserFeedbackViewTopConstraint: NSLayoutConstraint!
     @IBOutlet weak var browserFeedbackDescriptionLabel: NSTextField!
     @IBOutlet weak var browserFeedbackTextView: NSTextView!
     @IBOutlet weak var browserFeedbackDisclaimerTextView: NSTextField!
+    @IBOutlet weak var unsupportedOsView: NSView!
 
     @IBOutlet weak var websiteBreakageView: NSView!
     @IBOutlet weak var urlTextField: NSTextField!
@@ -65,9 +70,6 @@ final class FeedbackViewController: NSViewController {
 
     @IBOutlet weak var thankYouView: NSView!
     private var cancellables = Set<AnyCancellable>()
-
-    private var browserFeedbackConstraint: NSLayoutConstraint?
-    private var browserFeedbackBreakageConstraint: NSLayoutConstraint?
 
     var currentTab: Tab?
     var currentTabUrl: URL? {
@@ -86,11 +88,6 @@ final class FeedbackViewController: NSViewController {
         super.viewDidLoad()
         setContentViewHeight(Constants.defaultContentHeight, animated: false)
         setupTextViews()
-
-        browserFeedbackConstraint = browserFeedbackView.topAnchor.constraint(equalTo: optionPopUpButton.bottomAnchor, constant: 8)
-        browserFeedbackBreakageConstraint = browserFeedbackView.topAnchor.constraint(equalTo: websiteBreakageView.bottomAnchor)
-
-        browserFeedbackConstraint?.isActive = true
     }
 
     override func viewDidAppear() {
@@ -202,15 +199,13 @@ final class FeedbackViewController: NSViewController {
         case .feedback(let feedbackCategory):
             contentHeight = Constants.feedbackContentHeight
             updateBrowserFeedbackDescriptionLabel(for: feedbackCategory)
-            browserFeedbackBreakageConstraint?.isActive = false
-            browserFeedbackConstraint?.isActive = true
+            browserFeedbackViewTopConstraint.constant = Constants.browserFeedbackViewTopConstraint
             websiteBreakageView.isHidden = true
         case .websiteBreakage:
             contentHeight = Constants.websiteBreakageContentHeight
             urlTextField.stringValue = currentTabUrl?.absoluteString ?? ""
             updateBrowserFeedbackDescriptionLabel(for: .bug)
-            browserFeedbackConstraint?.isActive = false
-            browserFeedbackBreakageConstraint?.isActive = true
+            browserFeedbackViewTopConstraint.constant = Constants.browserFeedbackViewWebsiteBreakageTopConstraint
             websiteBreakageView.isHidden = false
         }
         updateBrowserFeedbackDisclaimerLabel(for: selectedFormOption)
