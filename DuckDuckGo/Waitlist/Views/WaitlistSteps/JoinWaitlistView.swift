@@ -73,7 +73,7 @@ struct JoinWaitlistView: View {
             Button("Join the Waitlist") {
                 model.perform(action: .joinQueue)
             }
-            .buttonStyle(DefaultActionButtonStyle(enabled: model.waitlistState == .notOnWaitlist))
+            .buttonStyle(DefaultActionButtonStyle(enabled: model.viewState == .notOnWaitlist))
         }
     }
 }

@@ -31,7 +31,7 @@ struct WaitlistRootView: View {
 
     var body: some View {
         Group {
-            switch model.waitlistState {
+            switch model.viewState {
             case .notOnWaitlist, .joiningWaitlist:
                 JoinWaitlistView()
             case .joinedWaitlist:

@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import UserNotifications
 
 protocol WaitlistViewModelDelegate: AnyObject {
     func dismissModal()
@@ -47,11 +48,7 @@ public final class WaitlistViewModel: ObservableObject {
         case notificationsDisabled
     }
 
-    @Published var waitlistState: ViewState {
-        didSet {
-            print("DEBUG: New view state: \(waitlistState)")
-        }
-    }
+    @Published var viewState: ViewState
 
     @UserDefaultsWrapper(key: .spellingCheckEnabledOnce, defaultValue: false)
     private var acceptedNetworkProtectionTermsAndConditions: Bool
@@ -60,30 +57,54 @@ public final class WaitlistViewModel: ObservableObject {
 
     private let waitlistRequest: WaitlistRequest
     private let waitlistStorage: WaitlistStorage
+    private let notificationService: NotificationService
 
-    init(waitlistRequest: WaitlistRequest, waitlistStorage: WaitlistStorage) {
+    init(waitlistRequest: WaitlistRequest, waitlistStorage: WaitlistStorage, notificationService: NotificationService) {
         self.waitlistRequest = waitlistRequest
         self.waitlistStorage = waitlistStorage
+        self.notificationService = notificationService
 
-        // TODO: Determine the real state
-        waitlistState = .invited
+        if waitlistStorage.getWaitlistTimestamp() != nil, waitlistStorage.getWaitlistInviteCode() == nil {
+             viewState = .joinedWaitlist(.notDetermined)
+
+             Task {
+                 await checkNotificationPermissions()
+             }
+         } else if let inviteCode = waitlistStorage.getWaitlistInviteCode() {
+             viewState = .invited
+         } else {
+             viewState = .notOnWaitlist
+         }
     }
 
     convenience init(waitlist: Waitlist) {
         let waitlistType = type(of: waitlist)
         self.init(
             waitlistRequest: ProductWaitlistRequest(productName: waitlistType.apiProductName),
-            waitlistStorage: WaitlistKeychainStore(waitlistIdentifier: waitlistType.identifier)
+            waitlistStorage: WaitlistKeychainStore(waitlistIdentifier: waitlistType.identifier),
+            notificationService: UNUserNotificationCenter.current()
         )
     }
 
     func perform(action: ViewAction) {
         switch action {
         case .joinQueue: joinWaitlist()
-        case .requestNotificationPermission: requestNotificationPermission()
+        case .requestNotificationPermission: Task { await requestNotificationPermission() }
         case .showTermsAndConditions: showTermsAndConditions()
         case .acceptTermsAndConditions: acceptTermsAndConditions()
         case .close: close()
+        }
+    }
+
+    @MainActor
+    private func checkNotificationPermissions() async {
+        switch await notificationService.authorizationStatus() {
+        case .notDetermined:
+            viewState = .joinedWaitlist(.notDetermined)
+        case .denied:
+            viewState = .joinedWaitlist(.notificationsDisabled)
+        default:
+            viewState = .joinedWaitlist(.notificationAllowed)
         }
     }
 
@@ -94,21 +115,46 @@ public final class WaitlistViewModel: ObservableObject {
     }
 
     private func joinWaitlist() {
-        waitlistState = .joinedWaitlist(.notDetermined)
+        self.viewState = .joiningWaitlist
+
+        Task {
+            let waitlistJoinResult = await waitlistRequest.joinWaitlist()
+
+            switch waitlistJoinResult {
+            case .success(let joinResponse):
+                print("DEBUG: Successfully joined waitlist")
+                waitlistStorage.store(waitlistToken: joinResponse.token)
+                waitlistStorage.store(waitlistTimestamp: joinResponse.timestamp)
+                await checkNotificationPermissions()
+            case .failure:
+                // TODO: Handle failure here
+                print("DEBUG: Failed to join waitlist")
+                self.viewState = .notOnWaitlist
+            }
+        }
     }
 
-    private func requestNotificationPermission() {
-        // TODO: Implement
-        self.waitlistState = .joinedWaitlist(.notificationAllowed)
+    private func requestNotificationPermission() async {
+        do {
+            let permissionGranted = try await notificationService.requestAuthorization(options: [.alert]) == true
+
+            if permissionGranted {
+                self.viewState = .joinedWaitlist(.notificationAllowed)
+            } else {
+                self.viewState = .joinedWaitlist(.notificationsDisabled)
+            }
+        } catch {
+            await checkNotificationPermissions()
+        }
     }
 
     private func showTermsAndConditions() {
-        waitlistState = .termsAndConditions
+        viewState = .termsAndConditions
     }
 
     private func acceptTermsAndConditions() {
         acceptedNetworkProtectionTermsAndConditions = true
-        waitlistState = .readyToEnable
+        viewState = .readyToEnable
     }
 
 }

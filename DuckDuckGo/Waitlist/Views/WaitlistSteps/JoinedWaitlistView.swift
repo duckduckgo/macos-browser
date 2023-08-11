@@ -30,14 +30,14 @@ struct JoinedWaitlistView: View {
                 Text("You're on the list!")
                     .font(.system(size: 17, weight: .bold))
 
-                if model.waitlistState == .joinedWaitlist(.notificationAllowed) {
+                if model.viewState == .joinedWaitlist(.notificationAllowed) {
                     Text("New invites are sent every few days, on a first come, first served basis.\n\nWe'll notify you know when your invite is ready.")
                 } else {
                     Text("Want to get a notification when your Network Protection invite is ready?")
                 }
             }
         } buttons: {
-            if model.waitlistState == .joinedWaitlist(.notificationAllowed) {
+            if model.viewState == .joinedWaitlist(.notificationAllowed) {
                 Button("Done") {
                     model.perform(action: .close)
                 }
