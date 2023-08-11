@@ -292,7 +292,7 @@ DQ
                                             <constraint firstItem="heN-iP-EsM" firstAttribute="top" secondItem="Obm-Wr-qrD" secondAttribute="bottom" constant="8" symbolic="YES" id="rDo-Qd-TbN"/>
                                         </constraints>
                                     </customView>
-                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="8xr-ho-IDj" userLabel="Unsupported OS View">
+                                    <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8xr-ho-IDj" userLabel="Unsupported OS View">
                                         <rect key="frame" x="0.0" y="527" width="360" height="120"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="120" id="3er-AK-Fjx"/>
@@ -403,6 +403,7 @@ Gw
                         <outlet property="urlTextField" destination="2gs-6z-agW" id="7CM-5N-ugt"/>
                         <outlet property="websiteBreakageCategoryPopUpButton" destination="hUd-Rb-6Ls" id="DqR-hE-Sm5"/>
                         <outlet property="websiteBreakageView" destination="8B9-wf-zcP" id="enA-tH-Z1l"/>
+                        <outlet property="websiteBreakageViewTopConstraint" destination="8Dh-xw-FXE" id="oNh-Yk-sHD"/>
                         <outlet property="websiteIsBrokenMenuItem" destination="uoX-qE-3kz" id="xnb-jy-aeZ"/>
                     </connections>
                 </viewController>

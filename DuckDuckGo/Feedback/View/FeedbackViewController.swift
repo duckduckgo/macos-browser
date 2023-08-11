@@ -25,12 +25,13 @@ final class FeedbackViewController: NSViewController {
 
     enum Constants {
         static let defaultContentHeight: CGFloat = 160
-        static let noWarningfeedbackContentHeight: CGFloat = 338
-        static let feedbackContentHeight: CGFloat = 458
+        static let feedbackContentHeight: CGFloat = 338
         static let websiteBreakageContentHeight: CGFloat = 472
         static let thankYouContentHeight: CGFloat = 262
         static let browserFeedbackViewTopConstraint: CGFloat = 53
         static let browserFeedbackViewWebsiteBreakageTopConstraint: CGFloat = 153
+        static let unsupportedOSWarningHeight: CGFloat = 120
+        static let websiteBreakageTopConstraint: CGFloat = 53
     }
 
     enum FormOption {
@@ -57,12 +58,14 @@ final class FeedbackViewController: NSViewController {
 
     @IBOutlet weak var browserFeedbackView: NSView!
     @IBOutlet weak var browserFeedbackViewTopConstraint: NSLayoutConstraint!
+
     @IBOutlet weak var browserFeedbackDescriptionLabel: NSTextField!
     @IBOutlet weak var browserFeedbackTextView: NSTextView!
     @IBOutlet weak var browserFeedbackDisclaimerTextView: NSTextField!
     @IBOutlet weak var unsupportedOsView: NSView!
 
     @IBOutlet weak var websiteBreakageView: NSView!
+    @IBOutlet weak var websiteBreakageViewTopConstraint: NSLayoutConstraint!
     @IBOutlet weak var urlTextField: NSTextField!
     @IBOutlet weak var websiteBreakageCategoryPopUpButton: NSPopUpButton!
 
@@ -194,18 +197,22 @@ final class FeedbackViewController: NSViewController {
 
         browserFeedbackView.isHidden = false
 
+        showUnsupportedOsViewIfNeeded()
+        let unsupportedOSWarningHeight = isOsUnsupported ? Constants.unsupportedOSWarningHeight : 0
+
         let contentHeight: CGFloat
         switch selectedFormOption {
         case .feedback(let feedbackCategory):
-            contentHeight = Constants.feedbackContentHeight
+            contentHeight = Constants.feedbackContentHeight + unsupportedOSWarningHeight
             updateBrowserFeedbackDescriptionLabel(for: feedbackCategory)
-            browserFeedbackViewTopConstraint.constant = Constants.browserFeedbackViewTopConstraint
+            browserFeedbackViewTopConstraint.constant = Constants.browserFeedbackViewTopConstraint + unsupportedOSWarningHeight
             websiteBreakageView.isHidden = true
         case .websiteBreakage:
-            contentHeight = Constants.websiteBreakageContentHeight
+            contentHeight = Constants.websiteBreakageContentHeight + unsupportedOSWarningHeight
+            websiteBreakageViewTopConstraint.constant = Constants.websiteBreakageTopConstraint + unsupportedOSWarningHeight
             urlTextField.stringValue = currentTabUrl?.absoluteString ?? ""
             updateBrowserFeedbackDescriptionLabel(for: .bug)
-            browserFeedbackViewTopConstraint.constant = Constants.browserFeedbackViewWebsiteBreakageTopConstraint
+            browserFeedbackViewTopConstraint.constant = Constants.browserFeedbackViewWebsiteBreakageTopConstraint + unsupportedOSWarningHeight
             websiteBreakageView.isHidden = false
         }
         updateBrowserFeedbackDisclaimerLabel(for: selectedFormOption)
@@ -320,6 +327,20 @@ final class FeedbackViewController: NSViewController {
         contentView.isHidden = true
         thankYouView.isHidden = false
     }
+
+    var isOsUnsupported: Bool {
+        //TODO
+        return true
+    }
+
+    private func showUnsupportedOsViewIfNeeded() {
+        if isOsUnsupported {
+            let demoView = NSHostingView(rootView: Preferences.UnsupportedDeviceInfoBox())
+            unsupportedOsView.addAndLayout(demoView)
+            unsupportedOsView.isHidden = false
+        }
+    }
+
 }
 
 fileprivate extension WebsiteBreakage.Category {
