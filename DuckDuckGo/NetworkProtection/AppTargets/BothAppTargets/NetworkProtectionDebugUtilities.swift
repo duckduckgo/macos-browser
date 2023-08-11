@@ -78,10 +78,15 @@ final class NetworkProtectionDebugUtilities {
                 try? await tunnel.removeFromPreferences()
             }
         }
-        onboardingStatusRawValue = OnboardingStatus.default.rawValue
+
+        // We reset the onboarding status incrementally to stay aligned with the actual
+        // status of things.
+        onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
+
         NetworkProtectionSelectedServerUserDefaultsStore().reset()
 
         try await removeSystemExtensionAndAgents()
+        onboardingStatusRawValue = OnboardingStatus.default.rawValue
     }
 
     func removeSystemExtensionAndAgents() async throws {

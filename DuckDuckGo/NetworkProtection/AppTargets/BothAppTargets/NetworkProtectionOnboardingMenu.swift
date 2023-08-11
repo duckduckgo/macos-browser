@@ -40,38 +40,28 @@ final class NetworkProtectionOnboardingMenu: NSMenu {
     @IBOutlet weak var setStatusCompletedMenuItem: NSMenuItem!
     @IBOutlet weak var setStatusAllowSystemExtensionMenuItem: NSMenuItem!
     @IBOutlet weak var setStatusAllowVPNConfigurationMenuItem: NSMenuItem!
-/*
-    @UserDefaultsWrapper(key: .networkProtectionOnboardingStatus, defaultValue: 1, defaults: .shared)
-    var onboardingStatus2: OnboardingStatus.RawValue
-*/
-    var onboardingStatus: OnboardingStatus {
-        get {
-            OnboardingStatus(rawValue: UserDefaults.shared!.networkProtectionOnboardingStatusRawValue) ?? .default
-        }
 
-        set {
-            UserDefaults.shared!.networkProtectionOnboardingStatusRawValue = newValue.rawValue
-        }
-    }
+    @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .shared)
+    var onboardingStatus: OnboardingStatus.RawValue
 
     @IBAction
     func reset(sender: NSMenuItem) {
-        onboardingStatus = .default
+        onboardingStatus = OnboardingStatus.default.rawValue
     }
 
     @IBAction
     func setStatusCompleted(sender: NSMenuItem) {
-        onboardingStatus = .completed
+        onboardingStatus = OnboardingStatus.completed.rawValue
     }
 
     @IBAction
     func setStatusAllowSystemExtension(sender: NSMenuItem) {
-        onboardingStatus = .isOnboarding(step: .userNeedsToAllowExtension)
+        onboardingStatus = OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue
     }
 
     @IBAction
     func setStatusAllowVPNConfiguration(sender: NSMenuItem) {
-        onboardingStatus = .isOnboarding(step: .userNeedsToAllowVPNConfiguration)
+        onboardingStatus = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
     }
 }
 
