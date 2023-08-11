@@ -22,6 +22,7 @@ struct WaitlistDialogView<Content, Buttons>: View where Content: View, Buttons: 
 
     let spacing: CGFloat
 
+    @EnvironmentObject var model: WaitlistViewModel
     @ViewBuilder let content: () -> Content
     @ViewBuilder let buttons: () -> Buttons
 
@@ -36,11 +37,18 @@ struct WaitlistDialogView<Content, Buttons>: View where Content: View, Buttons: 
             content()
                 .padding(.horizontal, 20.0)
                 .padding(.bottom, spacing)
+                .background(
+                    GeometryReader { proxy in
+                        Color.clear.onAppear {
+                            model.receivedNewViewHeight(proxy.size.height + 90.0)
+                        }
+                    }
+                )
 
-            Spacer()
+            // Spacer()
 
             Divider()
-                .padding(.bottom, 16.0)
+                .padding([.top, .bottom], 16.0)
 
             HStack {
                 Spacer()
@@ -50,6 +58,5 @@ struct WaitlistDialogView<Content, Buttons>: View where Content: View, Buttons: 
         }
         .padding(.top, spacing)
         .padding(.bottom, 16.0)
-        // .frame(minWidth: 360, minHeight: 300, idealHeight: 300)
     }
 }

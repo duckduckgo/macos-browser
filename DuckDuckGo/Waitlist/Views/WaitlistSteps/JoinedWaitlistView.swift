@@ -22,6 +22,8 @@ import SwiftUIExtensions
 struct JoinedWaitlistView: View {
     @EnvironmentObject var model: WaitlistViewModel
 
+    let notificationsAllowed: Bool
+
     var body: some View {
         WaitlistDialogView {
             VStack(spacing: 16.0) {
@@ -30,14 +32,21 @@ struct JoinedWaitlistView: View {
                 Text("You're on the list!")
                     .font(.system(size: 17, weight: .bold))
 
-                if model.viewState == .joinedWaitlist(.notificationAllowed) {
-                    Text("New invites are sent every few days, on a first come, first served basis.\n\nWe'll notify you know when your invite is ready.")
+                if notificationsAllowed {
+                    VStack(spacing: 16) {
+                        Text("New invites are sent every few days, on a first come, first served basis.")
+                            .multilineTextAlignment(.center)
+                        Text("We'll notify you know when your invite is ready.")
+                            .multilineTextAlignment(.center)
+                    }
+
                 } else {
                     Text("Want to get a notification when your Network Protection invite is ready?")
+                        .multilineTextAlignment(.center)
                 }
             }
         } buttons: {
-            if model.viewState == .joinedWaitlist(.notificationAllowed) {
+            if notificationsAllowed {
                 Button("Done") {
                     model.perform(action: .close)
                 }
@@ -52,5 +61,6 @@ struct JoinedWaitlistView: View {
                 .buttonStyle(DefaultActionButtonStyle(enabled: true))
             }
         }
+        .environmentObject(model)
     }
 }

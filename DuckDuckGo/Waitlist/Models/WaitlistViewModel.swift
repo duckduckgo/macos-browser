@@ -21,6 +21,7 @@ import UserNotifications
 
 protocol WaitlistViewModelDelegate: AnyObject {
     func dismissModal()
+    func viewHeightChanged(newHeight: CGFloat)
 }
 
 public final class WaitlistViewModel: ObservableObject {
@@ -65,7 +66,7 @@ public final class WaitlistViewModel: ObservableObject {
         self.notificationService = notificationService
 
         if waitlistStorage.getWaitlistTimestamp() != nil, waitlistStorage.getWaitlistInviteCode() == nil {
-             viewState = .joinedWaitlist(.notDetermined)
+             viewState = .joinedWaitlist(.notificationAllowed)
 
              Task {
                  await checkNotificationPermissions()
@@ -94,6 +95,10 @@ public final class WaitlistViewModel: ObservableObject {
         case .acceptTermsAndConditions: acceptTermsAndConditions()
         case .close: close()
         }
+    }
+
+    func receivedNewViewHeight(_ height: CGFloat) {
+        self.delegate?.viewHeightChanged(newHeight: height)
     }
 
     @MainActor

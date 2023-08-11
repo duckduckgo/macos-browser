@@ -49,5 +49,6 @@ struct NetworkProtectionTermsAndConditionsView: View {
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
+        .environmentObject(model)
     }
 }

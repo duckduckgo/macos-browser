@@ -75,6 +75,7 @@ struct JoinWaitlistView: View {
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: model.viewState == .notOnWaitlist))
         }
+        .environmentObject(model)
     }
 }
 

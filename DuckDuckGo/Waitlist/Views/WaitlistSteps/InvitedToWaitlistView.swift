@@ -74,5 +74,6 @@ struct InvitedToWaitlistView: View {
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
+        .environmentObject(model)
     }
 }

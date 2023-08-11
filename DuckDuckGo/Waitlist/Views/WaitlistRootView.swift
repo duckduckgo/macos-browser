@@ -25,6 +25,7 @@ struct WaitlistRootView: View {
 
     @State var viewHeight: CGFloat = 0.0 {
         didSet {
+            print("DEBUG: Got new view height in root view: \(viewHeight)")
             sizeChanged(viewHeight)
         }
     }
@@ -35,7 +36,7 @@ struct WaitlistRootView: View {
             case .notOnWaitlist, .joiningWaitlist:
                 JoinWaitlistView()
             case .joinedWaitlist:
-                JoinedWaitlistView()
+                JoinedWaitlistView(notificationsAllowed: model.viewState == .joinedWaitlist(.notificationAllowed))
             case .invited:
                 InvitedToWaitlistView()
             case .termsAndConditions:

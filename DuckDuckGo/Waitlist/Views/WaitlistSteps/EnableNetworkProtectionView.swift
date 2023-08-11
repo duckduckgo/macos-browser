@@ -44,5 +44,6 @@ struct EnableNetworkProtectionView: View {
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
+        .environmentObject(model)
     }
 }

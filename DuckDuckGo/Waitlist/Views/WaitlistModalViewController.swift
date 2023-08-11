@@ -36,7 +36,7 @@ final class WaitlistModalViewController: NSViewController {
         self.model.delegate = self
 
         let waitlistRootView = WaitlistRootView { newHeight in
-            self.updateViewHeight(height: newHeight)
+            // self.updateViewHeight(height: newHeight)
         }
 
         let hostingView = NSHostingView(rootView: waitlistRootView.environmentObject(self.model))
@@ -79,6 +79,10 @@ extension WaitlistModalViewController: WaitlistViewModelDelegate {
 
     func dismissModal() {
         self.dismiss()
+    }
+
+    func viewHeightChanged(newHeight: CGFloat) {
+        updateViewHeight(height: newHeight)
     }
 
 }
