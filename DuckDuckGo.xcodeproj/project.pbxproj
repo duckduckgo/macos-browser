@@ -1178,6 +1178,7 @@
 		4B8A071C2A85BA4000975D01 /* InvitedToWaitlistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A071B2A85BA4000975D01 /* InvitedToWaitlistView.swift */; };
 		4B8A071E2A85C25400975D01 /* NetworkProtectionTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A071D2A85C25400975D01 /* NetworkProtectionTermsAndConditionsView.swift */; };
 		4B8A07202A85C7C000975D01 /* EnableNetworkProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A071F2A85C7C000975D01 /* EnableNetworkProtectionView.swift */; };
+		4B8A07232A897F0F00975D01 /* NetworkProtectionFeatureVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A07222A897F0F00975D01 /* NetworkProtectionFeatureVisibility.swift */; };
 		4B8A4DFF27C83B29005F40E8 /* SaveIdentityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A4DFE27C83B29005F40E8 /* SaveIdentityViewController.swift */; };
 		4B8A4E0127C8447E005F40E8 /* SaveIdentityPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A4E0027C8447E005F40E8 /* SaveIdentityPopover.swift */; };
 		4B8AC93326B3B06300879451 /* EdgeDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8AC93226B3B06300879451 /* EdgeDataImporter.swift */; };
@@ -2468,6 +2469,8 @@
 		4B8A071B2A85BA4000975D01 /* InvitedToWaitlistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvitedToWaitlistView.swift; sourceTree = "<group>"; };
 		4B8A071D2A85C25400975D01 /* NetworkProtectionTermsAndConditionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionTermsAndConditionsView.swift; sourceTree = "<group>"; };
 		4B8A071F2A85C7C000975D01 /* EnableNetworkProtectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnableNetworkProtectionView.swift; sourceTree = "<group>"; };
+		4B8A07212A89776300975D01 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
+		4B8A07222A897F0F00975D01 /* NetworkProtectionFeatureVisibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionFeatureVisibility.swift; sourceTree = "<group>"; };
 		4B8A4DFE27C83B29005F40E8 /* SaveIdentityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveIdentityViewController.swift; sourceTree = "<group>"; };
 		4B8A4E0027C8447E005F40E8 /* SaveIdentityPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveIdentityPopover.swift; sourceTree = "<group>"; };
 		4B8AC93226B3B06300879451 /* EdgeDataImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeDataImporter.swift; sourceTree = "<group>"; };
@@ -3927,6 +3930,7 @@
 				4B33D8862A82E91C000DF070 /* Models */,
 				4B33D8812A82E7A7000DF070 /* Views */,
 				4B8A07192A85AA6500975D01 /* Waitlist.swift */,
+				4B8A07222A897F0F00975D01 /* NetworkProtectionFeatureVisibility.swift */,
 			);
 			path = Waitlist;
 			sourceTree = "<group>";
@@ -5092,6 +5096,7 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
+				4B8A07212A89776300975D01 /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -8875,6 +8880,7 @@
 				4B85A48028821CC500FC4C39 /* NSPasteboardItemExtension.swift in Sources */,
 				37CD54CA27F2FDD100F1F7B9 /* AutofillPreferencesModel.swift in Sources */,
 				7BBD45B12A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */,
+				4B8A07232A897F0F00975D01 /* NetworkProtectionFeatureVisibility.swift in Sources */,
 				B657841F25FA497600D8DB33 /* NSException+Catch.swift in Sources */,
 				4BE65481271FCD4D008D1D63 /* PasswordManagementNoteModel.swift in Sources */,
 				3184AC6F288F2A1100C35E4B /* CookieNotificationAnimationModel.swift in Sources */,

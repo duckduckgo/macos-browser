@@ -63,7 +63,7 @@ final class MoreOptionsMenu: NSMenu {
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
-         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore(),
+         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
          internalUserDecider: InternalUserDecider) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -125,7 +125,7 @@ final class MoreOptionsMenu: NSMenu {
             .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
 #if NETWORK_PROTECTION
-        if networkProtectionFeatureVisibility.isFeatureActivated || true { // TODO: Add waitlist flag check
+        if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
             addItem(withTitle: UserText.networkProtection, action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
                 .targetting(self)
                 .withImage(.image(for: .vpnIcon))

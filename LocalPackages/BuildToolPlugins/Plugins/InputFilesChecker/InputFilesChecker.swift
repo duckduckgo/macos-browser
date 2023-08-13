@@ -61,7 +61,8 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("Waitlist.swift", .source),
         .init("InvitedToWaitlistView.swift", .source),
         .init("NetworkProtectionTermsAndConditionsView.swift", .source),
-        .init("EnableNetworkProtectionView.swift", .source)
+        .init("EnableNetworkProtectionView.swift", .source),
+        .init("NetworkProtectionFeatureVisibility.swift", .source)
     ],
 
     "DuckDuckGo Privacy Browser App Store": [],

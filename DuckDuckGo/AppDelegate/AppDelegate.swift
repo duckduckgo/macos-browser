@@ -325,9 +325,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         guard #available(macOS 11.4, *) else { return }
 
         let loginItemsManager = NetworkProtectionLoginItemsManager()
-        let networkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
 
-        guard networkProtectionFeatureVisibility.isFeatureActivated else {
+        // Checks at startup whether to disable Network Protection. This logic may also be triggered when the Remote Configuration refreshes.
+        guard DefaultNetworkProtectionVisibility().isNetworkProtectionVisible() else {
             loginItemsManager.disableLoginItems()
             LocalPinningManager.shared.unpin(.networkProtection)
             return
