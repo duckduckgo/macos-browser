@@ -65,16 +65,17 @@ final class LocalBookmarkManager: BookmarkManager {
         self.faviconManagement = faviconManagement
     }
 
+    let bookmarkDatabaseCleaner = BookmarkDatabaseCleaner(
+        bookmarkDatabase: BookmarkDatabase.shared.db,
+        errorEvents: BookmarksCleanupErrorHandling(),
+        log: .bookmarks
+    )
+
     @Published private(set) var list: BookmarkList?
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
 
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared)
     private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
-    private lazy var bookmarkDatabaseCleaner = BookmarkDatabaseCleaner(
-        bookmarkDatabase: BookmarkDatabase.shared.db,
-        errorEvents: BookmarksCleanupErrorHandling(),
-        log: .bookmarks
-    )
 
     // MARK: - Bookmarks
 

@@ -306,7 +306,7 @@ final class LocalBookmarkStore: BookmarkStore {
     func remove(objectsWithUUIDs identifiers: [String], completion: @escaping (Bool, Error?) -> Void) {
 
         applyChangesAndSave(changes: { [weak self] context in
-            guard let self = self else {
+            guard self != nil else {
                 throw BookmarkStoreError.storeDeallocated
             }
 
@@ -488,7 +488,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
         let context = makeContext()
         context.performAndWait { [weak self] in
-            guard let self = self else {
+            guard self != nil else {
                 assertionFailure("Couldn't get strong self")
                 return
             }
