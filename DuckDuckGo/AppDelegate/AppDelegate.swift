@@ -218,6 +218,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     func applicationDidBecomeActive(_ notification: Notification) {
         syncService?.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
         syncService?.scheduler.notifyAppLifecycleEvent()
+
+        NetworkProtectionWaitlist.shared.fetchInviteCodeIfAvailable { error in
+            if error != nil {
+                print("DEBUG: Got error fetching invite code: \(String(describing: error))")
+            } else {
+                print("DEBUG: Got invite code!")
+            }
+        }
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {

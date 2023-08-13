@@ -41,6 +41,7 @@ public final class WaitlistViewModel: ObservableObject {
         case showTermsAndConditions
         case acceptTermsAndConditions
         case close
+        case closeAndPresentNetworkProtectionPopover
     }
 
     enum NotificationPermissionState {
@@ -51,8 +52,8 @@ public final class WaitlistViewModel: ObservableObject {
 
     @Published var viewState: ViewState
 
-    @UserDefaultsWrapper(key: .spellingCheckEnabledOnce, defaultValue: false)
-    private var acceptedNetworkProtectionTermsAndConditions: Bool
+    @UserDefaultsWrapper(key: .networkProtectionTermsAndConditionsAccepted, defaultValue: false)
+    var acceptedNetworkProtectionTermsAndConditions: Bool
 
     weak var delegate: WaitlistViewModelDelegate?
 
@@ -94,6 +95,12 @@ public final class WaitlistViewModel: ObservableObject {
         case .showTermsAndConditions: showTermsAndConditions()
         case .acceptTermsAndConditions: acceptTermsAndConditions()
         case .close: close()
+        case .closeAndPresentNetworkProtectionPopover:
+            close()
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                NotificationCenter.default.post(name: .networkProtectionWaitlistShowPopover, object: nil)
+            }
         }
     }
 

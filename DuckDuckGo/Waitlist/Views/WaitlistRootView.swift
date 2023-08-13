@@ -25,7 +25,6 @@ struct WaitlistRootView: View {
 
     @State var viewHeight: CGFloat = 0.0 {
         didSet {
-            print("DEBUG: Got new view height in root view: \(viewHeight)")
             sizeChanged(viewHeight)
         }
     }

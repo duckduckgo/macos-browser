@@ -137,6 +137,7 @@ final class NavigationBarViewController: NSViewController {
         listenToMessageNotifications()
         subscribeToDownloads()
         addContextMenu()
+        subscribeToActivateNotification()
 
         optionsButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.sendAction(on: .leftMouseDown)
@@ -269,9 +270,27 @@ final class NavigationBarViewController: NSViewController {
     }
 
 #if NETWORK_PROTECTION
+    private func subscribeToActivateNotification() {
+        NotificationCenter.default.addObserver(forName: .networkProtectionWaitlistShowPopover, object: nil, queue: .main) { _ in
+            if #available(macOS 11.4, *) {
+                self.showNetworkProtectionPopover()
+            }
+        }
+    }
+
     @available(macOS 11.4, *)
     @IBAction func networkProtectionButtonAction(_ sender: NSButton) {
-        popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
+        showNetworkProtectionPopover()
+    }
+
+    @available(macOS 11.4, *)
+    private func showNetworkProtectionPopover() {
+        let viewModel = WaitlistViewModel(waitlist: NetworkProtectionWaitlist.shared)
+        if NetworkProtectionWaitlist.shared.waitlistStorage.isInvited && !viewModel.acceptedNetworkProtectionTermsAndConditions {
+            WaitlistModalViewController.show()
+        } else {
+            popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
+        }
     }
 #endif
 
@@ -704,7 +723,7 @@ extension NavigationBarViewController: NSMenuDelegate {
 #if NETWORK_PROTECTION
         let isPopUpWindow = view.window?.isPopUpWindow ?? false
 
-        if !isPopUpWindow && networkProtectionFeatureVisibility.isFeatureActivated {
+        if !isPopUpWindow && (networkProtectionFeatureVisibility.isFeatureActivated || true) { // TODO: Check for waitlist flag
             let networkProtectionTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
         }
@@ -797,8 +816,14 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {
 #if NETWORK_PROTECTION
         print("SHOWING NETP")
-        WaitlistModalViewController.show()
-        // showNetworkProtectionStatus()
+        let viewModel = WaitlistViewModel(waitlist: NetworkProtectionWaitlist.shared)
+        if NetworkProtectionKeychainTokenStore().isFeatureActivated {
+            showNetworkProtectionStatus()
+        } else if NetworkProtectionWaitlist.shared.waitlistStorage.isInvited && viewModel.acceptedNetworkProtectionTermsAndConditions {
+            showNetworkProtectionStatus()
+        } else {
+            WaitlistModalViewController.show()
+        }
 #else
         fatalError("Tried to open Network Protection when it was disabled")
 #endif

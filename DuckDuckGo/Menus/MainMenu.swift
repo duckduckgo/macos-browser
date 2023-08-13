@@ -292,7 +292,7 @@ final class MainMenu: NSMenu {
 #if NETWORK_PROTECTION
         let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
         if #available(macOS 11.4, *),
-           networkProtectionFeatureVisibility.isFeatureActivated {
+           networkProtectionFeatureVisibility.isFeatureActivated || true { // TODO: Check for waitlist feature flag
             toggleNetworkProtectionShortcutMenuItem?.isHidden = false
             toggleNetworkProtectionShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
         } else {

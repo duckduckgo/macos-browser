@@ -125,7 +125,7 @@ final class MoreOptionsMenu: NSMenu {
             .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
 #if NETWORK_PROTECTION
-        if networkProtectionFeatureVisibility.isFeatureActivated {
+        if networkProtectionFeatureVisibility.isFeatureActivated || true { // TODO: Add waitlist flag check
             addItem(withTitle: UserText.networkProtection, action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
                 .targetting(self)
                 .withImage(.image(for: .vpnIcon))

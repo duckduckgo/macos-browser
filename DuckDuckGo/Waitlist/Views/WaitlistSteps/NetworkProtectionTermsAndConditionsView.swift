@@ -20,6 +20,31 @@ import SwiftUI
 import SwiftUIExtensions
 
 struct NetworkProtectionTermsAndConditionsView: View {
+
+    static func terms() -> String {
+        return """
+    Privacy Policy
+
+    • We don’t ask for any personal information from you in order to use this beta service.
+    • This Privacy Policy is for our limited waitlist beta VPN product.
+    • Our main Privacy Policy also applies here.
+
+    We don’t keep any logs of your online activity.
+
+    That means we have no way to tie what you do online to you as an individual and we don’t have any record of things like:
+    • Website visits
+    • DNS requests
+    • Connections made
+    • IP addresses used
+    • Session lengths
+
+    We only keep anonymous performance metrics that we cannot connect to your online activity.
+
+    • Our servers store generic usage (for example, CPU load) and diagnostic data (for example, errors), but none of that data is connected to any individual’s activity.
+    We use this non-identifying information to monitor and ensure the performance and quality of the service, for example to make sure servers aren’t overloaded.
+    """
+    }
+
     @EnvironmentObject var model: WaitlistViewModel
 
     var body: some View {
@@ -31,7 +56,7 @@ struct NetworkProtectionTermsAndConditionsView: View {
 
                 Group {
                     ScrollView {
-                        Text("TODO: actual terms and conditions go here")
+                        Text(Self.terms())
                     }
                     .padding(20.0)
                 }

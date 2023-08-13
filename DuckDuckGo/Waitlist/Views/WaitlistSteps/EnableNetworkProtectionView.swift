@@ -40,7 +40,7 @@ struct EnableNetworkProtectionView: View {
             }
         } buttons: {
             Button("Got It") {
-                model.perform(action: .close)
+                model.perform(action: .closeAndPresentNetworkProtectionPopover)
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }

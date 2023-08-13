@@ -101,11 +101,17 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         setupIconSubscription()
         setupStatusSubscription()
         setupInterruptionSubscription()
+        setupWaitlistAvailabilitySubscription()
     }
 
     private func setupIconSubscription() {
         iconPublisherCancellable = iconPublisher.$icon.sink { [weak self] icon in
-            self?.buttonImage = .image(for: icon)
+            let viewModel = WaitlistViewModel(waitlist: NetworkProtectionWaitlist.shared)
+            if NetworkProtectionWaitlist.shared.waitlistStorage.isInvited && !viewModel.acceptedNetworkProtectionTermsAndConditions {
+                self?.buttonImage = NSImage(named: "NetworkProtectionAvailableButton")! // .image(for: icon)
+            } else {
+                self?.buttonImage = .image(for: icon)
+            }
         }
     }
 
@@ -135,8 +141,23 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         }
     }
 
+    private func setupWaitlistAvailabilitySubscription() {
+        NotificationCenter.default.addObserver(forName: .networkProtectionWaitlistAccessChanged, object: nil, queue: .main) { _ in
+            self.buttonImage = NSImage(named: "NetworkProtectionAvailableButton")! 
+            self.updateVisibility()
+        }
+    }
+
     @MainActor
     private func updateVisibility() {
+        let waitlist = NetworkProtectionWaitlist.shared
+        let viewModel = WaitlistViewModel(waitlist: waitlist)
+
+        if waitlist.waitlistStorage.isInvited && !viewModel.acceptedNetworkProtectionTermsAndConditions {
+            showButton = true
+            return
+        }
+
         guard !isPinned,
               !popovers.isNetworkProtectionPopoverShown else {
             showButton = true
