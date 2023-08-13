@@ -267,6 +267,7 @@ extension Pixel {
             case syncBookmarksFailed
             case syncCredentialsProviderInitializationFailed
             case syncCredentialsFailed
+            case syncSettingsFailed
 
             case bookmarksCleanupFailed
             case bookmarksCleanupAttemptedWhileSyncWasEnabled
@@ -615,6 +616,7 @@ extension Pixel.Event.Debug {
         case .syncBookmarksFailed: return "sync_bookmarks_failed"
         case .syncCredentialsProviderInitializationFailed: return "sync_credentials_provider_initialization_failed"
         case .syncCredentialsFailed: return "sync_credentials_failed"
+        case .syncSettingsFailed: return "sync_settings_failed"
 
         case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
         case .bookmarksCleanupAttemptedWhileSyncWasEnabled: return "bookmarks_cleanup_attempted_while_sync_was_enabled"

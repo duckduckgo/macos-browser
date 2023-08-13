@@ -1,5 +1,5 @@
 //
-//  SyncBookmarksAdapter.swift
+//  SyncSettingsAdapter.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,45 +16,58 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Combine
 import Common
 import DDGSync
 import Persistence
 import SyncDataProviders
 
-final class SyncBookmarksAdapter {
+final class SyncSettingsAdapter {
 
-    private(set) var provider: BookmarksProvider?
+    private(set) var provider: SettingsProvider?
+    let syncDidCompletePublisher: AnyPublisher<Void, Never>
 
-    func setUpProviderIfNeeded(database: CoreDataDatabase, metadataStore: SyncMetadataStore) {
+    init() {
+        syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
+    }
+
+    func updateDatabaseCleanupSchedule(shouldEnable: Bool) {
+    }
+
+    func setUpProviderIfNeeded(metadataDatabase: CoreDataDatabase, metadataStore: SyncMetadataStore) {
         guard provider == nil else {
             return
         }
 
-        let provider = BookmarksProvider(
-            database: database,
+        let provider = SettingsProvider(
+            metadataDatabase: metadataDatabase,
             metadataStore: metadataStore,
-            syncDidUpdateData: LocalBookmarkManager.shared.loadBookmarks
+            emailManager: EmailManager(),
+            syncDidUpdateData: { [weak self] in
+                self?.syncDidCompleteSubject.send()
+            }
         )
 
         syncErrorCancellable = provider.syncErrorPublisher
             .sink { error in
                 switch error {
                 case let syncError as SyncError:
-                    Pixel.fire(.debug(event: .syncBookmarksFailed, error: syncError))
+                    Pixel.fire(.debug(event: .syncSettingsFailed, error: syncError))
                 default:
                     let nsError = error as NSError
                     if nsError.domain != NSURLErrorDomain {
                         let processedErrors = CoreDataErrorsParser.parse(error: error as NSError)
                         let params = processedErrors.errorPixelParameters
-                        Pixel.fire(.debug(event: .syncBookmarksFailed, error: error), withAdditionalParameters: params)
+                        Pixel.fire(.debug(event: .syncSettingsFailed, error: error), withAdditionalParameters: params)
                     }
                 }
-                os_log(.error, log: OSLog.sync, "Bookmarks Sync error: %{public}s", String(reflecting: error))
+                os_log(.error, log: OSLog.sync, "Credentials Sync error: %{public}s", String(reflecting: error))
             }
 
         self.provider = provider
     }
 
+    private var syncDidCompleteSubject = PassthroughSubject<Void, Never>()
     private var syncErrorCancellable: AnyCancellable?
 }
