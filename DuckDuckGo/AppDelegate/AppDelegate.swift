@@ -222,8 +222,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         NetworkProtectionWaitlist.shared.fetchInviteCodeIfAvailable { error in
             if error != nil {
                 print("DEBUG: Got error fetching invite code: \(String(describing: error))")
-            } else {
-                print("DEBUG: Got invite code!")
             }
         }
     }

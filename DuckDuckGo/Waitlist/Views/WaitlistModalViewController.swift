@@ -57,7 +57,6 @@ final class WaitlistModalViewController: NSViewController {
     }
 
     private func updateViewHeight(height: CGFloat) {
-        print("DEBUG: New height = \(height)")
         heightConstraint?.constant = height
     }
 

@@ -134,13 +134,11 @@ public final class WaitlistViewModel: ObservableObject {
 
             switch waitlistJoinResult {
             case .success(let joinResponse):
-                print("DEBUG: Successfully joined waitlist")
                 waitlistStorage.store(waitlistToken: joinResponse.token)
                 waitlistStorage.store(waitlistTimestamp: joinResponse.timestamp)
                 await checkNotificationPermissions()
             case .failure:
                 // TODO: Handle failure here
-                print("DEBUG: Failed to join waitlist")
                 self.viewState = .notOnWaitlist
             }
         }
