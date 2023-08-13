@@ -285,11 +285,16 @@ final class NavigationBarViewController: NSViewController {
 
     @available(macOS 11.4, *)
     private func showNetworkProtectionPopover() {
-        let viewModel = WaitlistViewModel(waitlist: NetworkProtectionWaitlist.shared)
-        if NetworkProtectionWaitlist.shared.waitlistStorage.isInvited && !viewModel.acceptedNetworkProtectionTermsAndConditions {
-            WaitlistModalViewController.show()
-        } else {
+        // If Network Protection is already activated with an auth token, show the popover. Otherwise, show the waitlist UI.
+        if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
+        } else {
+            let viewModel = WaitlistViewModel(waitlist: NetworkProtectionWaitlist.shared)
+            if NetworkProtectionWaitlist.shared.waitlistStorage.isInvited && !viewModel.acceptedNetworkProtectionTermsAndConditions {
+                WaitlistModalViewController.show()
+            } else {
+                popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
+            }
         }
     }
 #endif

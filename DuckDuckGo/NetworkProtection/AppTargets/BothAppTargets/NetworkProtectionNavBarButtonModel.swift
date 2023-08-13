@@ -108,13 +108,22 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private func setupIconSubscription() {
         iconPublisherCancellable = iconPublisher.$icon.sink { [weak self] icon in
-            let viewModel = WaitlistViewModel(waitlist: NetworkProtectionWaitlist.shared)
-            if NetworkProtectionWaitlist.shared.waitlistStorage.isInvited && !viewModel.acceptedNetworkProtectionTermsAndConditions {
-                self?.buttonImage = NSImage(named: "NetworkProtectionAvailableButton")! // .image(for: icon)
-            } else {
-                self?.buttonImage = .image(for: icon)
-            }
+            self?.buttonImage = self?.buttonImageFromWaitlistState()
         }
+    }
+
+    private func buttonImageFromWaitlistState() -> NSImage {
+        if NetworkProtectionKeychainTokenStore().isFeatureActivated {
+            return .image(for: iconPublisher.icon)!
+        }
+
+        let waitlist = NetworkProtectionWaitlist.shared
+        if waitlist.waitlistStorage.isInvited && !WaitlistViewModel(waitlist: waitlist).acceptedNetworkProtectionTermsAndConditions {
+            return NSImage(named: "NetworkProtectionAvailableButton")!
+        }
+
+        assertionFailure("Fell back to default icon publisher unexpectedly - the user should always have an auth token or invite code")
+        return .image(for: iconPublisher.icon)!
     }
 
     private func setupStatusSubscription() {
@@ -145,8 +154,10 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private func setupWaitlistAvailabilitySubscription() {
         NotificationCenter.default.addObserver(forName: .networkProtectionWaitlistAccessChanged, object: nil, queue: .main) { _ in
-            self.buttonImage = NSImage(named: "NetworkProtectionAvailableButton")! 
-            self.updateVisibility()
+            Task { @MainActor in
+                self.buttonImage = self.buttonImageFromWaitlistState()
+                self.updateVisibility()
+            }
         }
     }
 
@@ -155,7 +166,10 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         let waitlist = NetworkProtectionWaitlist.shared
         let viewModel = WaitlistViewModel(waitlist: waitlist)
 
-        if waitlist.waitlistStorage.isInvited && !viewModel.acceptedNetworkProtectionTermsAndConditions {
+        // The button is visible in the case where NetP has not been activated, but the user has been invited and they haven't accepted T&Cs.
+        let networkProtectionActivated = NetworkProtectionKeychainTokenStore().isFeatureActivated
+        let promptedToAcceptTermsAndConditions = waitlist.waitlistStorage.isInvited && !viewModel.acceptedNetworkProtectionTermsAndConditions
+        if !networkProtectionActivated && promptedToAcceptTermsAndConditions {
             showButton = true
             return
         }
