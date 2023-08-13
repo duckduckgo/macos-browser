@@ -45,7 +45,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         internalUserDecider = InternalUserDeciderMock()
 
 #if NETWORK_PROTECTION
-        networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(activated: false)
+        networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(visible: false)
 
         moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                          passwordManagerCoordinator: passwordManagerCoordinator,
@@ -72,7 +72,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 #if NETWORK_PROTECTION
         let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                              passwordManagerCoordinator: passwordManagerCoordinator,
-                                             networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(activated: true),
+                                             networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(visible: true),
                                              internalUserDecider: internalUserDecider)
 #else
         let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
@@ -108,7 +108,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 #if NETWORK_PROTECTION
         let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                              passwordManagerCoordinator: passwordManagerCoordinator,
-                                             networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(activated: false),
+                                             networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(visible: false),
                                              internalUserDecider: internalUserDecider)
 #else
         let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
@@ -160,14 +160,14 @@ final class MoreOptionsMenuTests: XCTestCase {
 #if NETWORK_PROTECTION
 final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility {
 
-    var activated: Bool
+    var visible: Bool
 
-    init(activated: Bool) {
-        self.activated = activated
+    init(visible: Bool) {
+        self.visible = visible
     }
 
-    var isFeatureActivated: Bool {
-        return activated
+    func isNetworkProtectionVisible() -> Bool {
+        return visible
     }
 
 }
