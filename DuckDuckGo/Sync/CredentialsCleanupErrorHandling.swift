@@ -1,5 +1,5 @@
 //
-//  BookmarksCleanupErrorHandling.swift
+//  CredentialsCleanupErrorHandling.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -17,26 +17,26 @@
 //
 
 import Foundation
-import Bookmarks
+import BrowserServicesKit
 import Common
 import Persistence
 
-public class BookmarksCleanupErrorHandling: EventMapping<BookmarksCleanupError> {
+public class CredentialsCleanupErrorHandling: EventMapping<CredentialsCleanupError> {
 
     public init() {
         super.init { event, _, _, _ in
-            if event.cleanupError is BookmarksCleanupCancelledError {
-                Pixel.fire(.debug(event: .bookmarksCleanupAttemptedWhileSyncWasEnabled))
+            if event.cleanupError is CredentialsCleanupErrorHandling {
+                Pixel.fire(.debug(event: .credentialsCleanupAttemptedWhileSyncWasEnabled))
             } else {
                 let processedErrors = CoreDataErrorsParser.parse(error: event.cleanupError as NSError)
                 let params = processedErrors.errorPixelParameters
 
-                Pixel.fire(.debug(event: .bookmarksCleanupFailed, error: event.cleanupError), withAdditionalParameters: params)
+                Pixel.fire(.debug(event: .credentialsDatabaseCleanupFailed, error: event.cleanupError), withAdditionalParameters: params)
             }
         }
     }
 
-    override init(mapping: @escaping EventMapping<BookmarksCleanupError>.Mapping) {
+    override init(mapping: @escaping EventMapping<CredentialsCleanupError>.Mapping) {
         fatalError("Use init()")
     }
 }

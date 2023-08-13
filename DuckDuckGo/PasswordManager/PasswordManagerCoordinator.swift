@@ -25,6 +25,9 @@ protocol PasswordManagerCoordinating: BrowserServicesKit.PasswordManager {
 
     var displayName: String { get }
 
+    func reportPasswordAutofill()
+    func reportPasswordSave()
+
 }
 
 // Encapsulation of third party password managers
@@ -210,13 +213,13 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
 
         if bitwardenCredential.credentialId == nil {
             bitwardenManagement.create(credential: bitwardenCredential) { [weak self] error in
-                self?.websiteCredentialsFor(domain: credentials.account.domain) { _, _ in
+                self?.websiteCredentialsFor(domain: credentials.account.domain ?? "") { _, _ in
                     completion(error)
                 }
             }
         } else {
             bitwardenManagement.update(credential: bitwardenCredential) { [weak self] error in
-                self?.websiteCredentialsFor(domain: credentials.account.domain) { _, _ in
+                self?.websiteCredentialsFor(domain: credentials.account.domain ?? "") { _, _ in
                     completion(error)
                 }
             }
@@ -238,6 +241,22 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
                                  completion: @escaping (Error?) -> Void) {}
 
 #endif
+
+    func reportPasswordAutofill() {
+        guard isEnabled else {
+            return
+        }
+
+        Pixel.fire(.bitwardenPasswordAutofilled)
+    }
+
+    func reportPasswordSave() {
+        guard isEnabled else {
+            return
+        }
+
+        Pixel.fire(.bitwardenPasswordSaved)
+    }
 
     // MARK: - Cache
 
@@ -296,12 +315,16 @@ extension BrowserServicesKit.SecureVaultModels.WebsiteCredentials {
 extension BWCredential {
 
     init?(from websiteCredentials: BrowserServicesKit.SecureVaultModels.WebsiteCredentials, vault: BWVault) {
+        guard let domain = websiteCredentials.account.domain else {
+            return nil
+        }
+
         self.init(userId: vault.id,
                   credentialId: websiteCredentials.account.id,
-                  credentialName: websiteCredentials.account.domain,
+                  credentialName: domain,
                   username: websiteCredentials.account.username,
-                  password: websiteCredentials.password.utf8String() ?? "",
-                  domain: websiteCredentials.account.domain)
+                  password: websiteCredentials.password?.utf8String() ?? "",
+                  domain: domain)
     }
 
 }
