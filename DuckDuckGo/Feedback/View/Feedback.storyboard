@@ -293,10 +293,15 @@ DQ
                                         </constraints>
                                     </customView>
                                     <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8xr-ho-IDj" userLabel="Unsupported OS View">
-                                        <rect key="frame" x="0.0" y="527" width="360" height="120"/>
+                                        <rect key="frame" x="0.0" y="507" width="360" height="140"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="120" id="3er-AK-Fjx"/>
+                                            <constraint firstAttribute="height" constant="140" id="3er-AK-Fjx"/>
                                         </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <integer key="value" value="8"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
                                     </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="RYb-WZ-bIo" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="360" height="69"/>

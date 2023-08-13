@@ -41,7 +41,7 @@ extension Preferences {
                     .font(Const.Fonts.preferencePaneTitle)
 
                 if !SupportedOSChecker.isCurrentOsSupported {
-                    UnsupportedDeviceInfoBox()
+                    UnsupportedDeviceInfoBox(wide: true)
                         .padding(.top, 10)
                         .padding(.leading, -20)
                 }
@@ -93,6 +93,16 @@ extension Preferences {
                 return "\(version.majorVersion).\(version.minorVersion).\(version.patchVersion)"
             }()
 
+        var wide: Bool
+
+        var width: CGFloat {
+            return wide ? 510 : 320
+        }
+
+        var height: CGFloat {
+            return wide ? 130 : 140
+        }
+
         var body: some View {
             HStack(alignment: .top) {
                 Image("Alert-Color-16")
@@ -101,34 +111,38 @@ extension Preferences {
                     .padding(.trailing, 4)
                 VStack(alignment: .leading, spacing: 12) {
                     Text(UserText.aboutUnsupportedDeviceInfo1(version: osVersion))
-                    VStack(alignment: .leading, spacing: 0) {
-                        HStack(alignment: .center, spacing: 0) {
-                            Text(UserText.aboutUnsupportedDeviceInfo2Part1)
-                            Button(action: {
-                                WindowControllersManager.shared.show(url: Self.appleSupportURL, newTab: true)
-                            }) {
-                                Text(UserText.aboutUnsupportedDeviceInfo2Part2)
-                                    .foregroundColor(Color.blue)
-                                    .underline()
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .onHover { hovering in
-                                if hovering {
-                                    NSCursor.pointingHand.set()
-                                } else {
-                                    NSCursor.arrow.set()
+                    if wide {
+                        VStack(alignment: .leading, spacing: 0) {
+                            HStack(alignment: .center, spacing: 0) {
+                                Text(UserText.aboutUnsupportedDeviceInfo2Part1)
+                                Button(action: {
+                                    WindowControllersManager.shared.show(url: Self.appleSupportURL, newTab: true)
+                                }) {
+                                    Text(UserText.aboutUnsupportedDeviceInfo2Part2)
+                                        .foregroundColor(Color.blue)
+                                        .underline()
                                 }
+                                .buttonStyle(PlainButtonStyle())
+                                .onHover { hovering in
+                                    if hovering {
+                                        NSCursor.pointingHand.set()
+                                    } else {
+                                        NSCursor.arrow.set()
+                                    }
+                                }
+                                Text(UserText.aboutUnsupportedDeviceInfo2Part3)
                             }
-                            Text(UserText.aboutUnsupportedDeviceInfo2Part3)
+                            Text(UserText.aboutUnsupportedDeviceInfo2Part4)
                         }
-                        Text(UserText.aboutUnsupportedDeviceInfo2Part4)
+                    } else {
+                        Text(UserText.aboutUnsupportedDeviceInfo2Part1 + UserText.aboutUnsupportedDeviceInfo2Part2 + UserText.aboutUnsupportedDeviceInfo2Part3 + UserText.aboutUnsupportedDeviceInfo2Part4)
                     }
                 }
             }
             .padding()
             .background(Color(red: 254/255, green: 240/255, blue: 199/255))
             .cornerRadius(8)
-            .frame(width: 510, height: 130)
+            .frame(width: width, height: height)
         }
     }
 

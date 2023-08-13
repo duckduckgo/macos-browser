@@ -30,7 +30,7 @@ final class FeedbackViewController: NSViewController {
         static let thankYouContentHeight: CGFloat = 262
         static let browserFeedbackViewTopConstraint: CGFloat = 53
         static let browserFeedbackViewWebsiteBreakageTopConstraint: CGFloat = 153
-        static let unsupportedOSWarningHeight: CGFloat = 120
+        static let unsupportedOSWarningHeight: CGFloat = 140
         static let websiteBreakageTopConstraint: CGFloat = 53
     }
 
@@ -329,13 +329,12 @@ final class FeedbackViewController: NSViewController {
     }
 
     var isOsUnsupported: Bool {
-        //TODO
-        return true
+        return !SupportedOSChecker.isCurrentOsSupported
     }
 
     private func showUnsupportedOsViewIfNeeded() {
         if isOsUnsupported {
-            let demoView = NSHostingView(rootView: Preferences.UnsupportedDeviceInfoBox())
+            let demoView = NSHostingView(rootView: Preferences.UnsupportedDeviceInfoBox(wide: false))
             unsupportedOsView.addAndLayout(demoView)
             unsupportedOsView.isHidden = false
         }
