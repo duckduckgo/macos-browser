@@ -35,8 +35,33 @@ let DataBrokerProtectionSecureVaultFactory: DataBrokerProtectionVaultFactory = S
 // swiftlint:enable identifier_name
 
 protocol DataBrokerProtectionSecureVault: SecureVault {
-    func saveProfile(profile: DataBrokerProtectionProfile) throws -> Int64
+    func save(profile: DataBrokerProtectionProfile) throws -> Int64
     func fetchProfile(with id: Int64) throws -> DataBrokerProtectionProfile?
+
+    func save(broker: DataBroker) throws -> Int64
+    func fetchBroker(with id: Int64) throws -> DataBroker
+    func fetchBroker(with name: String) throws -> DataBroker
+
+    func save(profileQuery: ProfileQuery) throws -> Int64
+    func fetchProfileQuery(with id: Int64) throws -> ProfileQuery
+
+    func save(brokerId: Int64, profileQueryId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws
+    func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanOperationData
+    func fetchAllScans() throws -> [ScanOperationData]
+
+    func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws
+    func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutOperationData
+    func fetchAllOptOuts() throws -> [OptOutOperationData]
+
+    func save(historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64) throws
+    func save(historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func fetchEvents(brokerId: Int64) throws -> [HistoryEvent]
+    func fetchEvents(profileQueryId: Int64) throws -> [HistoryEvent]
+
+    func save(extractedProfile: ExtractedProfile) throws -> Int64
+    func fetchExtractedProfile(with id: Int64) throws -> ExtractedProfile
+    func fetchExtractedProfiles(for brokerId: Int64, with profileId: Int64) throws -> [ExtractedProfile]
+    func updateRemovedDate(for extractedProfile: ExtractedProfile, with date: Date) throws
 }
 
 final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDatabaseProvider>: DataBrokerProtectionSecureVault {
@@ -49,7 +74,7 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         self.providers = providers
     }
 
-    func saveProfile(profile: DataBrokerProtectionProfile) throws -> Int64 {
+    func save(profile: DataBrokerProtectionProfile) throws -> Int64 {
         try executeThrowingDatabaseOperation {
             return try self.providers.database.saveProfile(profile: profile, mapperToDB: MapperToDB(mechanism: l2Encrypt(data:)))
         }
@@ -67,6 +92,84 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
             }
         }
     }
+
+    func save(broker: DataBroker) throws -> Int64 {
+        fatalError("Not implemented.")
+    }
+
+    func fetchBroker(with id: Int64) throws -> DataBroker {
+        fatalError("Not implemented.")
+    }
+
+    func fetchBroker(with name: String) throws -> DataBroker {
+        fatalError("Not implemented.")
+    }
+
+    func save(profileQuery: ProfileQuery) throws -> Int64 {
+        fatalError("Not implemented.")
+    }
+
+    func fetchProfileQuery(with id: Int64) throws -> ProfileQuery {
+        fatalError("Not implemented.")
+    }
+
+    func save(brokerId: Int64, profileQueryId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws {
+        fatalError("Not implemented.")
+    }
+
+    func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanOperationData {
+        fatalError("Not implemented.")
+    }
+
+    func fetchAllScans() throws -> [ScanOperationData] {
+        fatalError("Not implemented.")
+    }
+
+    func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws {
+        fatalError("Not implemented.")
+    }
+
+    func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutOperationData {
+        fatalError("Not implemented.")
+    }
+
+    func fetchAllOptOuts() throws -> [OptOutOperationData] {
+        fatalError("Not implemented.")
+    }
+
+    func save(historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64) throws {
+        fatalError("Not implemented.")
+    }
+
+    func save(historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        fatalError("Not implemented.")
+    }
+
+    func fetchEvents(brokerId: Int64) throws -> [HistoryEvent] {
+        fatalError("Not implemented.")
+    }
+
+    func fetchEvents(profileQueryId: Int64) throws -> [HistoryEvent] {
+        fatalError("Not implemented.")
+    }
+
+    func save(extractedProfile: ExtractedProfile) throws -> Int64 {
+        fatalError("Not implemented.")
+    }
+
+    func fetchExtractedProfile(with id: Int64) throws -> ExtractedProfile {
+        fatalError("Not implemented.")
+    }
+
+    func fetchExtractedProfiles(for brokerId: Int64, with profileId: Int64) throws -> [ExtractedProfile] {
+        fatalError("Not implemented.")
+    }
+
+    func updateRemovedDate(for extractedProfile: ExtractedProfile, with date: Date) throws {
+        fatalError("Not implemented.")
+    }
+
+    // MARK: - Private methods
 
     private func executeThrowingDatabaseOperation<DatabaseResult>(_ operation: () throws -> DatabaseResult) throws -> DatabaseResult {
         lock.lock()

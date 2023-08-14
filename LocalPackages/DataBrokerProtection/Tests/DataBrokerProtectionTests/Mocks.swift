@@ -54,7 +54,6 @@ final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
 }
 
 final class PrivacyConfigurationMock: PrivacyConfiguration {
-
     var identifier: String = "mock"
 
     var userUnprotectedDomains = [String]()
@@ -107,6 +106,9 @@ final class PrivacyConfigurationMock: PrivacyConfiguration {
 
     }
 
+    func isSubfeatureEnabled(_ subfeature: any BrowserServicesKit.PrivacySubfeature, versionProvider: BrowserServicesKit.AppVersionProvider, randomizer: (Range<Double>) -> Double) -> Bool {
+        false
+    }
 }
 
 extension ContentScopeProperties {
