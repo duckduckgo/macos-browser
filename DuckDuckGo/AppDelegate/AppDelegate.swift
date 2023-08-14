@@ -409,10 +409,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         if Pixel.isNewUser && repetition == .initial {
             Pixel.fire(.emailEnabledInitial)
         }
+
+        if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
+            syncService?.scheduler.notifyDataChanged()
+        }
     }
 
     @objc private func emailDidSignOutNotification(_ notification: Notification) {
         Pixel.fire(.emailDisabled)
+        if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
+            syncService?.scheduler.notifyDataChanged()
+        }
     }
 
     @objc private func dataImportCompleteNotification(_ notification: Notification) {

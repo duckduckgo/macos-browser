@@ -26,6 +26,7 @@ import SyncDataProviders
 final class SyncSettingsAdapter {
 
     private(set) var provider: SettingsProvider?
+    private(set) var emailManager: EmailManager?
     let syncDidCompletePublisher: AnyPublisher<Void, Never>
 
     init() {
@@ -39,11 +40,12 @@ final class SyncSettingsAdapter {
         guard provider == nil else {
             return
         }
+        let emailManager = EmailManager()
 
         let provider = SettingsProvider(
             metadataDatabase: metadataDatabase,
             metadataStore: metadataStore,
-            emailManager: EmailManager(),
+            emailManager: emailManager,
             syncDidUpdateData: { [weak self] in
                 self?.syncDidCompleteSubject.send()
             }
@@ -66,6 +68,7 @@ final class SyncSettingsAdapter {
             }
 
         self.provider = provider
+        self.emailManager = emailManager
     }
 
     private var syncDidCompleteSubject = PassthroughSubject<Void, Never>()
