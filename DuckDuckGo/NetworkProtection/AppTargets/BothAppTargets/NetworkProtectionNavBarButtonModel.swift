@@ -122,7 +122,6 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
             return NSImage(named: "NetworkProtectionAvailableButton")!
         }
 
-        assertionFailure("Fell back to default icon publisher unexpectedly - the user should always have an auth token or invite code")
         return .image(for: iconPublisher.icon)!
     }
 
