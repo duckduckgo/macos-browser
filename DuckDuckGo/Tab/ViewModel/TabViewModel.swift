@@ -187,7 +187,7 @@ final class TabViewModel {
     }
 
     private var tabURL: URL? {
-        return tab.content.url ?? tab.parentTab?.content.url
+        return tab.content.url
     }
 
     private var tabHostURL: URL? {

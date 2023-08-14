@@ -144,6 +144,19 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay7))
     }
 
+    @MainActor func testWhenInstallDateIsMoreThanAWeekAgoAndUserDismissedDay0SurveyDay7SurveyCardIsNotShown() {
+        let statisticStore = MockStatisticsStore()
+        vm.statisticsStore = statisticStore
+        vm.removeItem(for: .surveyDay0)
+        let aDayAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
+        userDefaults.set(aDayAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+        vm = HomePage.Models.ContinueSetUpModel.fixture()
+        vm.shouldShowAllFeatures = true
+
+        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay0))
+        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay7))
+    }
+
     @MainActor func testWhenInitializedNotForTheFirstTimeTheMatrixHasAllElementsInTheRightOrder() {
         var homePageIsFirstSession = UserDefaultsWrapper<Bool>(key: .homePageIsFirstSession, defaultValue: true)
         homePageIsFirstSession.wrappedValue = false

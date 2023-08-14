@@ -404,6 +404,7 @@ final class DataImportViewController: NSViewController {
                 } else {
                     self.bookmarkCount += summary.bookmarksResult?.successful ?? 0
                     self.viewState.interactionState = .completedImport(summary)
+                    self.requestSync()
                 }
 
                 NotificationCenter.default.post(name: .dataImportComplete, object: nil)
@@ -445,6 +446,14 @@ final class DataImportViewController: NSViewController {
             let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource, linkDelegate: self)
             alert.beginSheetModal(for: window, completionHandler: nil)
         }
+    }
+
+    private func requestSync() {
+        guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
+            return
+        }
+        os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+        syncService.scheduler.requestSyncImmediately()
     }
 
 }

@@ -277,7 +277,9 @@ final class NavigationBarPopovers {
             let statusReporter = DefaultNetworkProtectionStatusReporter(
                 statusObserver: statusObserver,
                 serverInfoObserver: statusInfoObserver,
-                connectionErrorObserver: connectionErrorObserver
+                connectionErrorObserver: connectionErrorObserver,
+                connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
+                controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
             )
 
             let menuItems = [

@@ -323,9 +323,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 button = popupsButton
                 popover = popupBlockedPopoverCreatingIfNeeded()
             case .externalScheme:
-                guard !query.wasShownOnce else { return }
                 button = externalSchemeButton
-                popover.behavior = .transient
                 query.shouldShowAlwaysAllowCheckbox = true
                 query.shouldShowCancelInsteadOfDeny = true
             default:
