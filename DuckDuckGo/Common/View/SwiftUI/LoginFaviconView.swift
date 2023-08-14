@@ -20,13 +20,11 @@ import SwiftUI
 
 struct LoginFaviconView: View {
 
-    let domain: String
+    let domain: String?
 
     let faviconManagement: FaviconManagement = FaviconManager.shared
 
     var body: some View {
-
-        let favicon = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image ?? NSImage(named: "Login")
 
         if let image = favicon {
             Image(nsImage: image)
@@ -36,6 +34,13 @@ struct LoginFaviconView: View {
                 .cornerRadius(4.0)
         }
 
+    }
+
+    var favicon: NSImage? {
+        guard let domain else {
+            return NSImage(named: "Login")
+        }
+        return faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image ?? NSImage(named: "Login")
     }
 
 }
