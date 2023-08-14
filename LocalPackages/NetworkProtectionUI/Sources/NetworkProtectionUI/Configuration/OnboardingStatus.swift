@@ -24,7 +24,7 @@ public typealias OnboardingStatusPublisher = AnyPublisher<OnboardingStatus, Neve
 /// Whether the user is onboarding.
 ///
 @frozen
-public enum OnboardingStatus: RawRepresentable {
+public enum OnboardingStatus: RawRepresentable, Equatable {
     /// The onboarding has been completed at least once
     ///
     case completed
@@ -58,7 +58,7 @@ public enum OnboardingStatus: RawRepresentable {
 /// A specific step in the onboarding process.
 ///
 @frozen
-public enum OnboardingStep: Int {
+public enum OnboardingStep: Int, Equatable {
     /// The user needs to allow the system extension in macOS
     ///
     case userNeedsToAllowExtension
