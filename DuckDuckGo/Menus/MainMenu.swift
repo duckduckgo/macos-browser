@@ -87,6 +87,11 @@ final class MainMenu: NSMenu {
 
     @IBOutlet weak var debugMenuItem: NSMenuItem?
 
+    @IBOutlet weak var debugNetworkProtectionWaitlistTokenItem: NSMenuItem?
+    @IBOutlet weak var debugNetworkProtectionWaitlistTimestampItem: NSMenuItem?
+    @IBOutlet weak var debugNetworkProtectionWaitlistInviteCodeItem: NSMenuItem?
+    @IBOutlet weak var debugNetworkProtectionWaitlistTermsAndConditionsAcceptedItem: NSMenuItem?
+
     private func setupDebugMenuItem(with featureFlagger: FeatureFlagger) {
         guard let debugMenuItem else {
             assertionFailure("debugMenuItem missing")
@@ -148,6 +153,7 @@ final class MainMenu: NSMenu {
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
         updateLoggingMenuItems()
+        updateNetworkProtectionItems()
     }
 
     @MainActor
@@ -343,6 +349,21 @@ final class MainMenu: NSMenu {
 
             item.state = enabledCategories.contains(category) ? .on : .off
         }
+    }
+
+    private func updateNetworkProtectionItems() {
+        let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: NetworkProtectionWaitlist.identifier)
+        debugNetworkProtectionWaitlistTokenItem?.title = "Waitlist Token: \(waitlistStorage.getWaitlistToken() ?? "N/A")"
+        debugNetworkProtectionWaitlistInviteCodeItem?.title = "Waitlist Invite Code: \(waitlistStorage.getWaitlistInviteCode() ?? "N/A")"
+
+        if let timestamp = waitlistStorage.getWaitlistTimestamp() {
+            debugNetworkProtectionWaitlistTimestampItem?.title = "Waitlist Timestamp: \(String(describing: timestamp))"
+        } else {
+            debugNetworkProtectionWaitlistTimestampItem?.title = "Waitlist Timestamp: N/A"
+        }
+
+        let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+        debugNetworkProtectionWaitlistTermsAndConditionsAcceptedItem?.title = "T&C Accepted: \(accepted ? "Yes" : "No")"
     }
 
     @objc private func loggingMenuItemAction(_ sender: NSMenuItem) {

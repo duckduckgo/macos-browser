@@ -735,6 +735,15 @@ extension MainViewController {
         ConfigurationManager.shared.forceRefresh()
     }
 
+    @IBAction func resetNetworkProtectionWaitlistState(_ sender: Any?) {
+        let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: NetworkProtectionWaitlist.identifier)
+        waitlistStorage.deleteWaitlistState()
+    }
+
+    @IBAction func resetNetworkProtectionTermsAndConditionsAcceptance(_ sender: Any?) {
+        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+    }
+
     // MARK: - Developer Tools
 
     @IBAction func toggleDeveloperTools(_ sender: Any?) {
@@ -870,7 +879,7 @@ extension AppDelegate: NSMenuItemValidation {
         case #selector(AppDelegate.reopenAllWindowsFromLastSession(_:)):
             return stateRestorationManager.canRestoreLastSessionState
 
-        // Enables and disables export bookmarks itemz
+        // Enables and disables export bookmarks items
         case #selector(AppDelegate.openExportBookmarks(_:)):
             return bookmarksManager.list?.totalBookmarks != 0
 

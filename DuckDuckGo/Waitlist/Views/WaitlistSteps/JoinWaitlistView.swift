@@ -24,47 +24,17 @@ struct JoinWaitlistView: View {
 
     var body: some View {
         WaitlistDialogView {
-            VStack(spacing: 16.0) {
-                Image("JoinWaitlistHeader")
-
-                Text("Network Protection Beta")
-                    .font(.system(size: 17, weight: .bold))
-
-                Text("Secure your network connection and keep your online activity private with Network Protection, a VPN from DuckDuckGo.")
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.black.opacity(0.88))
-
-                VStack(spacing: 16.0) {
-                    Text("How it works:")
-                        .font(.system(size: 13, weight: .bold))
-
-                    WaitlistListEntryView(
-                        imageName: "Join-16",
-                        title: "Join the waitlist",
-                        subtitle: "Beta access is limited for now."
-                    )
-
-                    WaitlistListEntryView(
-                        imageName: "Timer-16",
-                        title: "Wait your turn",
-                        subtitle: "We send new invites every few days."
-                    )
-
-                    WaitlistListEntryView(
-                        imageName: "Gift-16",
-                        title: "Get your invite",
-                        subtitle: "We can notify you when it's your turn."
-                    )
-                }
-                .padding(20.0)
-                .frame(maxWidth: .infinity)
-                .background(Color.black.opacity(0.01))
-                .border(Color.black.opacity(0.06))
-
-                Text("Network Protection is free to use during the beta.")
-                    .font(.system(size: 12))
-                    .foregroundColor(.black.opacity(0.60))
-            }
+            WaitlistInfoView(
+                headerImageName: "JoinWaitlistHeader",
+                title: "Network Protection Beta",
+                subtitle: "Secure your network connection and keep your online activity private with Network Protection, a VPN from DuckDuckGo.",
+                infoSectionTitle: "How it works:",
+                infoSections: [
+                    WaitlistInfoView.InfoSection(imageName: "Join-16", title: "Join the waitlist", subtitle: "Beta access is limited for now."),
+                    WaitlistInfoView.InfoSection(imageName: "Timer-16", title: "Wait your turn", subtitle: "We send new invites every few days."),
+                    WaitlistInfoView.InfoSection(imageName: "Gift-16", title: "Get your invite", subtitle: "We can notify you when it's your turn.")
+                ]
+            )
         } buttons: {
             Button("Close") {
                 model.perform(action: .close)
@@ -92,13 +62,13 @@ struct WaitlistListEntryView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(title)
                     .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(.black.opacity(0.88))
+                    .foregroundColor(Color("BlackWhite80"))
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 Text(subtitle)
                     .font(.system(size: 13))
-                    .foregroundColor(.black.opacity(0.60))
+                    .foregroundColor(Color("BlackWhite60"))
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }

@@ -958,6 +958,38 @@ CQ
                                                             </connections>
                                                         </menu>
                                                     </menuItem>
+                                                    <menuItem title="Waitlist" id="iSU-Wj-V9c">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Waitlist" id="FmX-fq-tGP">
+                                                            <items>
+                                                                <menuItem title="Reset Waitlist State" id="8FJ-Ns-JDn">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="resetNetworkProtectionWaitlistState:" target="Ady-hI-5gd" id="Adj-8o-hsb"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="Reset T&amp;C Acceptance" id="WmA-2m-7PX">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="resetNetworkProtectionTermsAndConditionsAcceptance:" target="Ady-hI-5gd" id="AIX-0X-WMH"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem isSeparatorItem="YES" id="ggg-Pf-MUh"/>
+                                                                <menuItem title="Waitlist Token:" enabled="NO" identifier="network-protection.waitlist.token" id="wU9-UN-SKZ">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                </menuItem>
+                                                                <menuItem title="Waitlist Timestamp:" enabled="NO" id="fJW-6O-O6J">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                </menuItem>
+                                                                <menuItem title="Waitlist Invite Code:" enabled="NO" id="R8L-HN-frT">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                </menuItem>
+                                                                <menuItem title="T&amp;C Accepted:" enabled="NO" id="LKh-12-jwj">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                </menuItem>
+                                                            </items>
+                                                        </menu>
+                                                    </menuItem>
                                                     <menuItem isSeparatorItem="YES" id="7LI-vT-hd9"/>
                                                     <menuItem title="Kill Switch (alternative approach)" id="Gdx-Ng-vit">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
@@ -1046,6 +1078,10 @@ CQ
                             <outlet property="closeTabMenuItem" destination="DVo-aG-piG" id="Hr0-hn-2p1"/>
                             <outlet property="closeWindowMenuItem" destination="CzI-4o-2re" id="32H-X4-8Ub"/>
                             <outlet property="debugMenuItem" destination="ilv-5f-YpZ" id="4F7-9b-Mve"/>
+                            <outlet property="debugNetworkProtectionWaitlistInviteCodeItem" destination="R8L-HN-frT" id="Hh6-eO-1pR"/>
+                            <outlet property="debugNetworkProtectionWaitlistTermsAndConditionsAcceptedItem" destination="LKh-12-jwj" id="GeC-Bi-JA8"/>
+                            <outlet property="debugNetworkProtectionWaitlistTimestampItem" destination="fJW-6O-O6J" id="86y-48-c5m"/>
+                            <outlet property="debugNetworkProtectionWaitlistTokenItem" destination="wU9-UN-SKZ" id="5F5-Ny-yoO"/>
                             <outlet property="exportBookmarksMenuItem" destination="3K6-pB-Kea" id="LbP-Ft-aAT"/>
                             <outlet property="favoriteThisPageMenuItem" destination="cHZ-Fb-aKU" id="uPM-LY-AmL"/>
                             <outlet property="favoritesMenuItem" destination="Y9I-ZC-gGg" id="zk1-XL-x3e"/>

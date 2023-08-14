@@ -1,0 +1,68 @@
+//
+//  WaitlistInfoView.swift
+//
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import SwiftUI
+import SwiftUIExtensions
+
+struct WaitlistInfoView: View {
+
+    struct InfoSection {
+        let imageName: String
+        let title: String
+        let subtitle: String
+    }
+
+    let headerImageName: String
+    let title: String
+    let subtitle: String
+    let infoSectionTitle: String?
+    let infoSections: [InfoSection]
+
+    var body: some View {
+        VStack(spacing: 16.0) {
+            Image(headerImageName)
+
+            Text(title)
+                .font(.system(size: 17, weight: .bold))
+
+            Text(subtitle)
+                .multilineTextAlignment(.center)
+                .foregroundColor(Color("BlackWhite80"))
+
+            VStack(spacing: 16.0) {
+                if let infoSectionTitle {
+                    Text(infoSectionTitle)
+                        .font(.system(size: 13, weight: .bold))
+                }
+
+                ForEach(infoSections, id: \.imageName) { section in
+                    WaitlistListEntryView(imageName: section.imageName, title: section.title, subtitle: section.subtitle)
+                }
+            }
+            .padding(20.0)
+            .frame(maxWidth: .infinity)
+            .background(Color("BlackWhite1"))
+            .border(Color("BlackWhite5"))
+
+            Text("Network Protection is free to use during the beta.")
+                .font(.system(size: 12))
+                .foregroundColor(Color("BlackWhite60"))
+        }
+    }
+
+}
