@@ -68,6 +68,17 @@ final class ProfileViewModel: ObservableObject {
     @Published var selectedName: Name?
     @Published var selectedAddress: Address?
 
+    static let defaultSuffixSelection = "No suffix"
+    static let defaultStateSelection = ""
+
+    let states = [ProfileViewModel.defaultStateSelection, "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
+
+    let suffixes =  [ProfileViewModel.defaultSuffixSelection, "Jr", "Sr", "I", "II", "III", "IV"]
+
+    let birthdayYearRange = (Date().year - 110)...ProfileViewModel.minimumBirthYear
+
+    static let minimumBirthYear = Date().year - 18
+
     var isBirthdayValid: Bool {
         birthYear != nil
     }
@@ -85,16 +96,18 @@ final class ProfileViewModel: ObservableObject {
     }
 
     func saveName(id: UUID?, firstName: String, middleName: String?, lastName: String, suffix: String?) {
+        let chosenSuffix = suffix == ProfileViewModel.defaultSuffixSelection ? nil : suffix
+
         if let id = id, let name = names.filter({ $0.id == id}).first {
             name.firstName = firstName
             name.middleName = middleName ?? ""
             name.lastName = lastName
-            name.suffix = suffix ?? ""
+            name.suffix = chosenSuffix ?? ""
         } else {
             let name = Name(firstName: firstName,
                             middleName: middleName ?? "",
                             lastName: lastName,
-                            suffix: suffix ?? "")
+                            suffix: chosenSuffix ?? "")
             names.append(name)
         }
     }
@@ -133,5 +146,12 @@ struct Trimmed {
 
     init(wrappedValue initialValue: String) {
         value = initialValue.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
+private extension Date {
+    var year: Int {
+        let calendar = Calendar.current
+        return calendar.component(.year, from: self)
     }
 }
