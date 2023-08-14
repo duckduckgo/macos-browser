@@ -510,7 +510,7 @@ private struct NotesView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .contextMenu(ContextMenu(menuItems: {
                     Button(UserText.copy, action: {
-                        NSPasteboard.general.copy(model.notes)
+                        model.copy(model.notes)
                     })
                 }))
         }
