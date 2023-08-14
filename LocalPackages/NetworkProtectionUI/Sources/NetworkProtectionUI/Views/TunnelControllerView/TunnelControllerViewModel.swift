@@ -109,10 +109,8 @@ public final class TunnelControllerViewModel: ObservableObject {
     private func subscribeToOnboardingStatusChanges() {
         onboardingStatusPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-            self?.onboardingStatus = status
-        }
-        .store(in: &cancellables)
+            .assign(to: \.onboardingStatus, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 
     private func subscribeToStatusChanges() {

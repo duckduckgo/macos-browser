@@ -32,9 +32,9 @@ extension UserDefaults {
     /// extension, and the key for this property must match its name exactly.
     ///
     @objc
-    dynamic var networkProtectionOnboardingStatusRawValue: Int {
+    dynamic var networkProtectionOnboardingStatusRawValue: String {
         get {
-            value(forKey: networkProtectionOnboardingStatusRawValueKey) as? Int ?? OnboardingStatus.default.rawValue
+            value(forKey: networkProtectionOnboardingStatusRawValueKey) as? String ?? OnboardingStatus.default.rawValue
         }
 
         set {
