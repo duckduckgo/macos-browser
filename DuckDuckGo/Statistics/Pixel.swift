@@ -114,3 +114,28 @@ public func pixelAssertionFailure(_ message: @autoclosure () -> String = String(
     Pixel.fire(.debug(event: Pixel.Event.Debug.assertionFailure(message: message(), file: file, line: line)))
     Swift.assertionFailure(message(), file: file, line: line)
 }
+
+extension Pixel {
+
+    static func fire(_ event: Pixel.Event,
+                     limitToOnceADay: Bool,
+                     withAdditionalParameters parameters: [String: String]? = nil,
+                     allowedQueryReservedCharacters: CharacterSet? = nil,
+                     includeAppVersionParameter: Bool = true,
+
+                     onComplete: @escaping (Error?) -> Void = {_ in }) {
+        if limitToOnceADay {
+            let repetition = Event.Repetition(key: event.name, update: false)
+            if repetition == .repetitive {
+                // Pixel alredy fired today
+                return
+            }
+        }
+
+        fire(event, withAdditionalParameters: parameters,
+             allowedQueryReservedCharacters: allowedQueryReservedCharacters,
+             includeAppVersionParameter: includeAppVersionParameter,
+             onComplete: onComplete)
+    }
+
+}
