@@ -24,6 +24,7 @@ import SwiftUI
 import Common
 import NetworkExtension
 import NetworkProtection
+import NetworkProtectionUI
 import SystemExtensions
 import Networking
 
@@ -95,6 +96,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     @MainActor
     @UserDefaultsWrapper(key: .networkProtectionConnectionTesterEnabled, defaultValue: NetworkProtectionUserDefaultsConstants.isConnectionTesterEnabled, defaults: .shared)
     private(set) var isConnectionTesterEnabled: Bool
+
+    @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .shared)
+    private(set) var onboardingStatusRawValue: OnboardingStatus.RawValue
 
     // MARK: - Connection Status
 
@@ -270,9 +274,12 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             guard try await ensureSystemExtensionIsActivated() else {
                 return
             }
+
+            onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
 #endif
 
             let tunnelManager = try await loadOrMakeTunnelManager()
+            onboardingStatusRawValue = OnboardingStatus.completed.rawValue
 
             switch tunnelManager.connection.status {
             case .invalid:
