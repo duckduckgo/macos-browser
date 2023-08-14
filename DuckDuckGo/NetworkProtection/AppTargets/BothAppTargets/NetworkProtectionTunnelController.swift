@@ -275,6 +275,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 return
             }
 
+            // We'll only update to completed if we were showing the onboarding step to
+            // allow the system extension.  Otherwise we may override the allow-VPN
+            // onboarding step.
             if onboardingStatusRawValue == OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue {
                 onboardingStatusRawValue = OnboardingStatus.completed.rawValue
             }
