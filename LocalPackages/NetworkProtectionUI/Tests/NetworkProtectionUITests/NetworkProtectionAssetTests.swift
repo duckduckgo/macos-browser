@@ -22,20 +22,32 @@ import XCTest
 
 final class NetworkProtectionAssetTests: XCTestCase {
     func testAssetEnumValuesAreUnchanged() {
-        XCTAssertEqual(NetworkProtectionAsset.ipAddressIcon.rawValue, "IP-16")
-        XCTAssertEqual(NetworkProtectionAsset.serverLocationIcon.rawValue, "Server-Location-16")
-        XCTAssertEqual(NetworkProtectionAsset.vpnDisabledImage.rawValue, "VPN-Disabled-128")
-        XCTAssertEqual(NetworkProtectionAsset.vpnEnabledImage.rawValue, "VPN-128")
-        XCTAssertEqual(NetworkProtectionAsset.vpnIcon.rawValue, "VPN-16")
-        XCTAssertEqual(NetworkProtectionAsset.appVPNOnIcon.rawValue, "app-vpn-on")
-        XCTAssertEqual(NetworkProtectionAsset.appVPNOffIcon.rawValue, "app-vpn-off")
-        XCTAssertEqual(NetworkProtectionAsset.appVPNIssueIcon.rawValue, "app-vpn-issue")
-        XCTAssertEqual(NetworkProtectionAsset.statusbarVPNOnIcon.rawValue, "statusbar-vpn-on")
-        XCTAssertEqual(NetworkProtectionAsset.statusbarVPNOffIcon.rawValue, "statusbar-vpn-off")
-        XCTAssertEqual(NetworkProtectionAsset.statusbarVPNIssueIcon.rawValue, "statusbar-vpn-issue")
-        XCTAssertEqual(NetworkProtectionAsset.statusbarReviewVPNOnIcon.rawValue, "statusbar-review-vpn-on")
-        XCTAssertEqual(NetworkProtectionAsset.statusbarDebugVPNOnIcon.rawValue, "statusbar-debug-vpn-on")
-        XCTAssertEqual(NetworkProtectionAsset.statusbarBrandedVPNOffIcon.rawValue, "statusbar-branded-vpn-off")
-        XCTAssertEqual(NetworkProtectionAsset.statusbarBrandedVPNIssueIcon.rawValue, "statusbar-branded-vpn-issue")
+        let assetsAndExpectedRawValues: [NetworkProtectionAsset: String] = [
+            .ipAddressIcon: "IP-16",
+            .serverLocationIcon: "Server-Location-16",
+            .vpnDisabledImage: "VPN-Disabled-128",
+            .vpnEnabledImage: "VPN-128",
+            .vpnIcon: "VPN-16",
+            .appleVaultIcon: "apple-vault-icon",
+            .appleVPNIcon: "apple-vpn-icon",
+            .appVPNOnIcon: "app-vpn-on",
+            .appVPNOffIcon: "app-vpn-off",
+            .appVPNIssueIcon: "app-vpn-issue",
+            .statusbarVPNOnIcon: "statusbar-vpn-on",
+            .statusbarVPNOffIcon: "statusbar-vpn-off",
+            .statusbarVPNIssueIcon: "statusbar-vpn-issue",
+            .statusbarReviewVPNOnIcon: "statusbar-review-vpn-on",
+            .statusbarDebugVPNOnIcon: "statusbar-debug-vpn-on",
+            .statusbarBrandedVPNOffIcon: "statusbar-branded-vpn-off",
+            .statusbarBrandedVPNIssueIcon: "statusbar-branded-vpn-issue",
+            .allowSysexScreenshot: "allow-sysex-screenshot",
+            .allowSysexScreenshotBigSur: "allow-sysex-screenshot-bigsur"
+        ]
+
+        XCTAssertEqual(assetsAndExpectedRawValues.count, NetworkProtectionAsset.allCases.count)
+
+        for (asset, rawValue) in assetsAndExpectedRawValues {
+            XCTAssertEqual(asset.rawValue, rawValue)
+        }
     }
 }

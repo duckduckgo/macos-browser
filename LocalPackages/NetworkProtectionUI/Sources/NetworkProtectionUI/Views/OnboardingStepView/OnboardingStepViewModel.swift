@@ -89,7 +89,11 @@ extension OnboardingStepView {
         var actionScreenshot: NetworkProtectionAsset? {
             switch step {
             case .userNeedsToAllowExtension:
-                return .allowSysexScreenshot
+                if #available(macOS 12, *) {
+                    return .allowSysexScreenshot
+                } else {
+                    return .allowSysexScreenshotBigSur
+                }
             case .userNeedsToAllowVPNConfiguration:
                 return nil
             }
