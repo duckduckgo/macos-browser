@@ -2936,7 +2936,7 @@
 		3171D6DA2889B64D0068632A /* CookieManagedNotificationContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieManagedNotificationContainerView.swift; sourceTree = "<group>"; };
 		3184AC6C288F29D800C35E4B /* BadgeNotificationAnimationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeNotificationAnimationModel.swift; sourceTree = "<group>"; };
 		3184AC6E288F2A1100C35E4B /* CookieNotificationAnimationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieNotificationAnimationModel.swift; sourceTree = "<group>"; };
-		3192A26E2A4C4CFF0084EA89 /* DuckDuckGo DBP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo DBP.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3192A26E2A4C4CFF0084EA89 /* DuckDuckGoDBP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGoDBP.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3192A2702A4C4E330084EA89 /* DataBrokerProtection */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = DataBrokerProtection; sourceTree = "<group>"; };
 		3192A2712A4CBD3A0084EA89 /* DuckDuckGoDBP.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoDBP.xcconfig; sourceTree = "<group>"; };
 		3192EC872A4DCF21001E97A5 /* DBPHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBPHomeViewController.swift; sourceTree = "<group>"; };
@@ -5823,7 +5823,7 @@
 				4B5F14CB2A14702C0060320F /* startVPN.app */,
 				4B5F14E12A1476BD0060320F /* stopVPN.app */,
 				7B736E5F2A4A22B700F9922A /* enableOnDemand.app */,
-				3192A26E2A4C4CFF0084EA89 /* DuckDuckGo DBP.app */,
+				3192A26E2A4C4CFF0084EA89 /* DuckDuckGoDBP.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -7380,7 +7380,7 @@
 				31A93F502A5D8AF0008BB88D /* DataBrokerProtection */,
 			);
 			productName = DuckDuckGo;
-			productReference = 3192A26E2A4C4CFF0084EA89 /* DuckDuckGo DBP.app */;
+			productReference = 3192A26E2A4C4CFF0084EA89 /* DuckDuckGoDBP.app */;
 			productType = "com.apple.product-type.application";
 		};
 		3706FA6A293F65D500E42796 /* DuckDuckGo Privacy Browser App Store */ = {
@@ -11163,7 +11163,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3192A2712A4CBD3A0084EA89 /* DuckDuckGoDBP.xcconfig */;
 			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
 		};
@@ -11171,7 +11170,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3192A2712A4CBD3A0084EA89 /* DuckDuckGoDBP.xcconfig */;
 			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = CI;
 		};
@@ -11179,7 +11177,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3192A2712A4CBD3A0084EA89 /* DuckDuckGoDBP.xcconfig */;
 			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -11187,7 +11184,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3192A2712A4CBD3A0084EA89 /* DuckDuckGoDBP.xcconfig */;
 			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Review;
 		};
