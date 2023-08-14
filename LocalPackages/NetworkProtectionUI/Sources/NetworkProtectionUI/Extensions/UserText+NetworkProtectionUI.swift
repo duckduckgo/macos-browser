@@ -30,10 +30,12 @@ final class UserText {
 
     // MARK: - Onboarding
 
+    static let networkProtectionOnboardingAllowExtensionTitle = NSLocalizedString("network.protection.onboarding.allow.extension.title", value: "Allow System Extension", comment: "Title for the onboarding allow-extension step")
     static let networkProtectionOnboardingAllowExtensionDescPrefix = NSLocalizedString("network.protection.onboarding.allow.extension.desc.prefix", value: "Open System Settings to Privacy & Security. Scroll and select ", comment: "Non-bold prefix for the onboarding allow-extension description")
     static let networkProtectionOnboardingAllowExtensionDescAllow = NSLocalizedString("network.protection.onboarding.allow.extension.desc.allow", value: "Allow", comment: "'Allow' word between the prefix and suffix for the onboarding allow-extension description")
     static let networkProtectionOnboardingAllowExtensionDescSuffix = NSLocalizedString("network.protection.onboarding.allow.extension.desc.suffix", value: " for DuckDuckGo software.", comment: "Non-bold suffix for the onboarding allow-extension description")
 
+    static let networkProtectionOnboardingAllowVPNTitle = NSLocalizedString("network.protection.onboarding.allow.vpn.title", value: "Add VPN Configuration", comment: "Title for the onboarding allow-VPN step")
     static let networkProtectionOnboardingAllowVPNDescPrefix = NSLocalizedString("network.protection.onboarding.allow.vpn.desc.prefix", value: "Select ", comment: "Non-bold prefix for the onboarding allow-VPN description")
     static let networkProtectionOnboardingAllowVPNDescAllow = NSLocalizedString("network.protection.onboarding.allow.vpn.desc.allow", value: "Allow", comment: "'Allow' word between the prefix and suffix for the onboarding allow-VPN description")
     static let networkProtectionOnboardingAllowVPNDescSuffix = NSLocalizedString("network.protection.onboarding.allow.vpn.desc.suffix", value: " when prompted to finish setting up Network Protection.", comment: "Non-bold suffix for the onboarding allow-VPN description")

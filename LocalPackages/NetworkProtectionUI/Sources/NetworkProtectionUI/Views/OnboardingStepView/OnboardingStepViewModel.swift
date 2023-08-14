@@ -54,9 +54,9 @@ extension OnboardingStepView {
         var title: String {
             switch step {
             case .userNeedsToAllowExtension:
-                return "Step 1 of 2: Allow System Extension"
+                return UserText.networkProtectionOnboardingAllowExtensionTitle
             case .userNeedsToAllowVPNConfiguration:
-                return "Step 2 of 2: Add VPN Configuration"
+                return UserText.networkProtectionOnboardingAllowVPNTitle
             }
         }
 
