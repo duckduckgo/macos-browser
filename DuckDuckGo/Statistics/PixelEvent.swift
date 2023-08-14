@@ -137,6 +137,9 @@ extension Pixel {
         case bookmarksBarOnboardingFirstInteraction(cohort: String)
         case bookmarksBarOnboardingInteraction2to8days(cohort: String)
 
+        // Pinned tabs
+        case userHasPinnedTab
+
         enum Debug {
 
             case assertionFailure(message: String, file: StaticString, line: UInt)
@@ -382,6 +385,11 @@ extension Pixel.Event {
             return "m_mac_bookmarksbarexperiment_firstinteraction"
         case .bookmarksBarOnboardingInteraction2to8days:
             return "m_mac_bookmarksbarexperiment_interaction2to8days"
+
+        // Pinned tabs
+        case .userHasPinnedTab:
+            return "m_mac_user_has_pinned_tab"
+
         }
     }
 }
