@@ -275,10 +275,22 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 return
             }
 
-            onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
+            if onboardingStatusRawValue == OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue {
+                onboardingStatusRawValue = OnboardingStatus.completed.rawValue
+            }
 #endif
 
-            let tunnelManager = try await loadOrMakeTunnelManager()
+            let tunnelManager: NETunnelProviderManager
+
+            do {
+                tunnelManager = try await loadOrMakeTunnelManager()
+            } catch {
+                if case NEVPNError.configurationReadWriteFailed = error {
+                    onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
+                }
+
+                throw error
+            }
             onboardingStatusRawValue = OnboardingStatus.completed.rawValue
 
             switch tunnelManager.connection.status {

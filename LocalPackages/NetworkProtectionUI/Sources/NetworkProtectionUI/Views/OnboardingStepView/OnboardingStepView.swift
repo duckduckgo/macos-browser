@@ -103,13 +103,13 @@ struct OnboardingStepView: View {
 
                         Button(model.actionTitle, action: model.action)
                             .applyStepButtonAttributes(colorScheme: colorScheme)
+                            .padding(.top, 3)
                     }
 
                     Spacer()
                 }
             }
-            .padding(.top, 16)
-            .padding(.bottom, model.actionScreenshot != nil ? 4 : 16)
+            .padding(.vertical, 16)
             .padding(.horizontal, 10)
 
             if let actionScreenshot = model.actionScreenshot {
