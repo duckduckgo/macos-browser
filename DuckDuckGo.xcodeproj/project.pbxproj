@@ -1317,6 +1317,8 @@
 		56D145F229E6F06D00E3488A /* MockBookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145F029E6F06D00E3488A /* MockBookmarkManager.swift */; };
 		56D6A3D629DB2BAB0055215A /* ContinueSetUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */; };
 		56D6A3D729DB2BAB0055215A /* ContinueSetUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */; };
+		7B05829E2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B05829D2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift */; };
+		7B05829F2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B05829D2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift */; };
 		7B1E819E27C8874900FF0E60 /* ContentOverlayPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */; };
 		7B1E819F27C8874900FF0E60 /* ContentOverlay.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */; };
 		7B1E81A027C8874900FF0E60 /* ContentOverlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */; };
@@ -1330,8 +1332,10 @@
 		7B934C3E2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C3D2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift */; };
 		7B934C3F2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C3D2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift */; };
 		7B934C412A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
-		7B934C422A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
+		7BAF9E4B2A8A3CC9002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
+		7BAF9E4C2A8A3CCA002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
+		7BAF9E4D2A8A3CCB002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
 		7BB108592A43375D000AB95F /* PFMoveApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BB108582A43375D000AB95F /* PFMoveApplication.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		7BBD45B12A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */; };
 		7BBD45B22A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */; };
@@ -2581,6 +2585,7 @@
 		56D145ED29E6DAD900E3488A /* DataImportProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportProviderTests.swift; sourceTree = "<group>"; };
 		56D145F029E6F06D00E3488A /* MockBookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBookmarkManager.swift; sourceTree = "<group>"; };
 		56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContinueSetUpView.swift; sourceTree = "<group>"; };
+		7B05829D2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionOnboardingMenu.swift; sourceTree = "<group>"; };
 		7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayPopover.swift; sourceTree = "<group>"; };
 		7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ContentOverlay.storyboard; sourceTree = "<group>"; };
 		7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayViewController.swift; sourceTree = "<group>"; };
@@ -3994,6 +3999,7 @@
 			children = (
 				4B4D60642A0B29FA00BCD287 /* LoginItem.swift */,
 				7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */,
+				7B05829D2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift */,
 				7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */,
 				7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */,
 				7B934C3D2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift */,
@@ -7658,6 +7664,7 @@
 				85774B042A71CDD000DE0561 /* BlockMenuItem.swift in Sources */,
 				3706FB19293F65D500E42796 /* FireViewController.swift in Sources */,
 				4B4D60D42A0C84F700BCD287 /* UserText+NetworkProtection.swift in Sources */,
+				7B05829F2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift in Sources */,
 				3707C71F294B5D2900682A9F /* WKUserContentControllerExtension.swift in Sources */,
 				3706FB1A293F65D500E42796 /* OutlineSeparatorViewCell.swift in Sources */,
 				3706FB1B293F65D500E42796 /* SafariDataImporter.swift in Sources */,
@@ -7775,6 +7782,7 @@
 				3706FB80293F65D500E42796 /* NSAlert+ActiveDownloadsTermination.swift in Sources */,
 				3707C717294B5D0F00682A9F /* FindInPageTabExtension.swift in Sources */,
 				3706FB81293F65D500E42796 /* IndexPathExtension.swift in Sources */,
+				7BAF9E4B2A8A3CC9002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */,
 				B6685E3D29A602D90043D2EE /* ExternalAppSchemeHandler.swift in Sources */,
 				B6E1491029A5C30500AAFBE8 /* ContentBlockingTabExtension.swift in Sources */,
 				3706FB82293F65D500E42796 /* PasswordManagementNoteItemView.swift in Sources */,
@@ -7888,7 +7896,6 @@
 				3706FBD9293F65D500E42796 /* NSAppearanceExtension.swift in Sources */,
 				3706FBDA293F65D500E42796 /* PermissionManager.swift in Sources */,
 				3706FBDB293F65D500E42796 /* DefaultBrowserPreferences.swift in Sources */,
-				7B934C422A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift in Sources */,
 				3706FBDC293F65D500E42796 /* Permissions.xcdatamodeld in Sources */,
 				3706FBDD293F65D500E42796 /* PaddedImageButton.swift in Sources */,
 				37CEFCAA2A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift in Sources */,
@@ -8436,6 +8443,7 @@
 			files = (
 				B6F92BA22A691580002ABA6B /* UserDefaultsWrapper.swift in Sources */,
 				4B2D065B2A11D1FF00DE1F49 /* Logging.swift in Sources */,
+				7BAF9E4C2A8A3CCA002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */,
 				4B2D06572A11D19B00DE1F49 /* DuckDuckGoAgentAppDelegate.swift in Sources */,
 				B6F92BAC2A6937B3002ABA6B /* OptionalExtension.swift in Sources */,
 				B6F92BAA2A691A44002ABA6B /* NetworkProtectionUserDefaultsConstants.swift in Sources */,
@@ -8456,6 +8464,7 @@
 				B6F92BAB2A691A44002ABA6B /* NetworkProtectionUserDefaultsConstants.swift in Sources */,
 				EEC589DC2A4F1CE800BCD60C /* AppLauncher.swift in Sources */,
 				B65DA5F02A77CC3C00CBEE8D /* Bundle+NetworkProtectionExtensions.swift in Sources */,
+				7BAF9E4D2A8A3CCB002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9153,6 +9162,7 @@
 				4B92928B26670D1700AD2C21 /* BookmarksOutlineView.swift in Sources */,
 				4BF01C00272AE74C00884A61 /* CountryList.swift in Sources */,
 				37CD54CC27F2FDD100F1F7B9 /* PreferencesSection.swift in Sources */,
+				7B05829E2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift in Sources */,
 				4B4D60B62A0C847D00BCD287 /* NetworkProtectionNavBarButtonModel.swift in Sources */,
 				FD23FD2D2886A81D007F6985 /* AutoconsentManagement.swift in Sources */,
 				4B4D60D32A0C84F700BCD287 /* UserText+NetworkProtection.swift in Sources */,

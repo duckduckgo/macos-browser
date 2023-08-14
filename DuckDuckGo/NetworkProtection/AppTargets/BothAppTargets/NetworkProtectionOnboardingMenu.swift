@@ -63,11 +63,6 @@ final class NetworkProtectionOnboardingMenu: NSMenu {
     func setStatusAllowVPNConfiguration(sender: NSMenuItem) {
         onboardingStatus = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
     }
-
-    @IBAction
-    func printOnboardingStatusToConsole(sender: NSMenuItem) {
-        print("Onboarding status is: \(String(describing: OnboardingStatus(rawValue: onboardingStatus)))")
-    }
 }
 
 #endif

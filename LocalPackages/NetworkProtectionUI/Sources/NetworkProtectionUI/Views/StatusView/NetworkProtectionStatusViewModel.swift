@@ -49,6 +49,19 @@ extension NetworkProtectionStatusView {
         @Published
         private var connectionStatus: NetworkProtection.ConnectionStatus = .disconnected
 
+        /// The type of extension that's being used for NetP
+        ///
+        @Published
+        private(set) var onboardingStatus: OnboardingStatus = .completed
+
+        var mainPanelDisabled: Bool {
+            onboardingStatus != .completed
+        }
+
+        /// The NetP onboarding status publisher
+        ///
+        private let onboardingStatusPublisher: OnboardingStatusPublisher
+
         /// The NetP status reporter
         ///
         private let statusReporter: NetworkProtectionStatusReporter
@@ -62,6 +75,7 @@ extension NetworkProtectionStatusView {
         /// The `RunLoop` for the timer.
         ///
         private let runLoopMode: RunLoop.Mode?
+
         private var cancellables = Set<AnyCancellable>()
 
         // MARK: - Dispatch Queues
@@ -75,16 +89,19 @@ extension NetworkProtectionStatusView {
         // MARK: - Initialization & Deinitialization
 
         public init(controller: TunnelController,
+                    onboardingStatusPublisher: OnboardingStatusPublisher,
                     statusReporter: NetworkProtectionStatusReporter,
                     menuItems: [MenuItem],
                     runLoopMode: RunLoop.Mode? = nil) {
 
             self.tunnelController = controller
+            self.onboardingStatusPublisher = onboardingStatusPublisher
             self.statusReporter = statusReporter
             self.menuItems = menuItems
             self.runLoopMode = runLoopMode
 
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
+                                                                  onboardingStatusPublisher: onboardingStatusPublisher,
                                                                   statusReporter: statusReporter)
 
             connectionStatus = statusReporter.statusObserver.recentValue
@@ -96,6 +113,13 @@ extension NetworkProtectionStatusView {
             subscribeToConnectivityIssues()
             subscribeToTunnelErrorMessages()
             subscribeToControllerErrorMessages()
+
+            onboardingStatusPublisher
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] status in
+                self?.onboardingStatus = status
+            }
+            .store(in: &cancellables)
         }
 
         private func subscribeToConnectivityIssues() {
@@ -110,7 +134,7 @@ extension NetworkProtectionStatusView {
                 Task { @MainActor in
                     self.isHavingConnectivityIssues = isHavingConnectivityIssues
                 }
-                }.store(in: &cancellables)
+            }.store(in: &cancellables)
         }
 
         private func subscribeToTunnelErrorMessages() {
@@ -201,5 +225,16 @@ extension NetworkProtectionStatusView {
         // MARK: - Child View Models
 
         let tunnelControllerViewModel: TunnelControllerViewModel
+
+        var onboardingStepViewModel: OnboardingStepView.Model? {
+            switch onboardingStatus {
+            case .completed:
+                return nil
+            case .isOnboarding(let step):
+                return OnboardingStepView.Model(step: step) { [weak self] in
+                    self?.tunnelControllerViewModel.startNetworkProtection()
+                }
+            }
+        }
     }
 }

@@ -50,8 +50,14 @@ public struct NetworkProtectionStatusView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            if let healthWarning = model.issueDescription {
-                connectionHealthWarningView(message: healthWarning)
+            if let onboardingStepViewModel = model.onboardingStepViewModel {
+                OnboardingStepView(model: onboardingStepViewModel)
+                    .padding(.horizontal, 5)
+                    .padding(.top, 5)
+            } else {
+                if let healthWarning = model.issueDescription {
+                    connectionHealthWarningView(message: healthWarning)
+                }
             }
 
             Spacer()

@@ -129,6 +129,7 @@ public struct UserDefaultsWrapper<T> {
         case firstLaunchDate = "first.app.launch.date"
 
         // Network Protection
+
         case networkProtectionOnDemandActivation = "netp.ondemand"
         case networkProtectionShouldEnforceRoutes = "netp.enforce-routes"
         case networkProtectionShouldIncludeAllNetworks = "netp.include-all-networks"

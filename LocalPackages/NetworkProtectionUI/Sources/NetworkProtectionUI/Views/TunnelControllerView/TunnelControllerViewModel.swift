@@ -28,6 +28,19 @@ public final class TunnelControllerViewModel: ObservableObject {
     ///
     private let tunnelController: TunnelController
 
+    /// The type of extension that's being used for NetP
+    ///
+    @Published
+    private(set) var onboardingStatus: OnboardingStatus = .completed
+
+    var viewDisabled: Bool {
+        onboardingStatus != .completed
+    }
+
+    /// The NetP onboarding status publisher
+    ///
+    private let onboardingStatusPublisher: OnboardingStatusPublisher
+
     /// The NetP status reporter
     ///
     private let statusReporter: NetworkProtectionStatusReporter
@@ -65,10 +78,12 @@ public final class TunnelControllerViewModel: ObservableObject {
     // MARK: - Initialization & Deinitialization
 
     public init(controller: TunnelController,
+                onboardingStatusPublisher: OnboardingStatusPublisher,
                 statusReporter: NetworkProtectionStatusReporter,
                 runLoopMode: RunLoop.Mode? = nil) {
 
         self.tunnelController = controller
+        self.onboardingStatusPublisher = onboardingStatusPublisher
         self.statusReporter = statusReporter
         self.runLoopMode = runLoopMode
 
@@ -79,6 +94,7 @@ public final class TunnelControllerViewModel: ObservableObject {
         // Particularly useful when unit testing with an initial status of our choosing.
         refreshInternalIsRunning()
 
+        subscribeToOnboardingStatusChanges()
         subscribeToStatusChanges()
         subscribeToServerInfoChanges()
     }
@@ -89,6 +105,13 @@ public final class TunnelControllerViewModel: ObservableObject {
     }
 
     // MARK: - Subscriptions
+
+    private func subscribeToOnboardingStatusChanges() {
+        onboardingStatusPublisher
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.onboardingStatus, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
 
     private func subscribeToStatusChanges() {
         statusReporter.statusObserver.publisher
@@ -413,13 +436,17 @@ public final class TunnelControllerViewModel: ObservableObject {
     /// Start network protection.
     ///
     func startNetworkProtection() {
-        toggleTransition = .switchingOn(locallyInitiated: true)
+        if !viewDisabled {
+            toggleTransition = .switchingOn(locallyInitiated: true)
+        }
 
         Task { @MainActor in
             await tunnelController.start()
 
-            toggleTransition = .idle
-            refreshInternalIsRunning()
+            if !viewDisabled {
+                toggleTransition = .idle
+                refreshInternalIsRunning()
+            }
         }
     }
 

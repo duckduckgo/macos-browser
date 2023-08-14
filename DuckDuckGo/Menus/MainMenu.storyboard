@@ -905,12 +905,6 @@ CQ
                                                                         <action selector="resetWithSender:" target="L82-We-Wwv" id="xOi-lx-E4W"/>
                                                                     </connections>
                                                                 </menuItem>
-                                                                <menuItem title="Print onboarding status to console" id="abt-dL-pSE">
-                                                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                                                    <connections>
-                                                                        <action selector="printOnboardingStatusToConsoleWithSender:" target="L82-We-Wwv" id="k2z-AC-UBV"/>
-                                                                    </connections>
-                                                                </menuItem>
                                                                 <menuItem isSeparatorItem="YES" id="3kV-PK-dO5"/>
                                                                 <menuItem title="Set Status" id="Mpv-Qy-bPV">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>

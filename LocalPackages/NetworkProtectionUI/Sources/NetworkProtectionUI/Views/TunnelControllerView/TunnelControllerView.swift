@@ -153,6 +153,7 @@ public struct TunnelControllerView: View {
                 connectionStatusView()
             }
         }
+        .disabled(on: model.viewDisabled)
     }
 
     // MARK: - Composite Views

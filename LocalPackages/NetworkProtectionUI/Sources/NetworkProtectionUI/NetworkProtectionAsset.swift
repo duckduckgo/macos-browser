@@ -25,6 +25,10 @@ public enum NetworkProtectionAsset: String {
     case vpnEnabledImage = "VPN-128"
     case vpnIcon = "VPN-16"
 
+    // Apple Icons
+    case appleVaultIcon = "apple-vault-icon"
+    case appleVPNIcon = "apple-vpn-icon"
+
     // App Specific
     case appVPNOnIcon = "app-vpn-on"
     case appVPNOffIcon = "app-vpn-off"
@@ -40,4 +44,7 @@ public enum NetworkProtectionAsset: String {
     case statusbarDebugVPNOnIcon = "statusbar-debug-vpn-on"
     case statusbarBrandedVPNOffIcon = "statusbar-branded-vpn-off"
     case statusbarBrandedVPNIssueIcon = "statusbar-branded-vpn-issue"
+
+    // Images:
+    case allowSysexScreenshot = "allow-sysex-screenshot"
 }
