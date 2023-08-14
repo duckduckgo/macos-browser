@@ -188,7 +188,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                      notificationCenter: NotificationCenter) async throws {
 
         guard let data = brokerProfileQueryData.optOutsData.filter({ $0.extractedProfile.id == extractedProfile.id }).first else {
-            // TODO: Fix error, send pixel
+            // Maybe send pixel?
             throw OperationsError.noOperationDataForExtractedProfile
         }
 

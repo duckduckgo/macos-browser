@@ -162,6 +162,7 @@ struct ModalView: View {
         }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private func labelForErrorEvent(_ error: DataBrokerProtectionError) -> String {
         switch error {
         case .malformedURL:
