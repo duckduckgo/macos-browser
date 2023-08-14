@@ -230,64 +230,49 @@ final class FutureExtensionTests: XCTestCase {
 
     // - main queue async -
 
-    func testUnfulfilledPromiseAsyncDoesNotHaveValue() {
-        let e = expectation(description: "async job done")
-        DispatchQueue.main.async {
-            let promise = Future<String, Never>.promise()
-            var value: String?
-            let c = promise.future.sink {
-                XCTFail("unexpected value")
-                value = $0
-            }
-
-            XCTAssertNil(value)
-            withExtendedLifetime(c, {})
-
-            e.fulfill()
+    @MainActor
+    func testUnfulfilledPromiseAsyncDoesNotHaveValue() async {
+        let promise = Future<String, Never>.promise()
+        var value: String?
+        let c = promise.future.sink {
+            XCTFail("unexpected value")
+            value = $0
         }
-        waitForExpectations(timeout: 1)
+
+        XCTAssertNil(value)
+        withExtendedLifetime(c, {})
     }
 
-    func testInstantlyFulfilledPromiseAsyncHasValue() {
-        let e = expectation(description: "async job done")
-        DispatchQueue.main.async {
-            let promise = Future<String, Never>.promise()
-            promise.fulfill("test")
-            var value: String?
-            let c = promise.future.sink {
-                XCTAssertEqual($0, "test")
-                value = $0
-            }
-
-            XCTAssertEqual(value, "test")
-            withExtendedLifetime(c, {})
-
-            e.fulfill()
+    @MainActor
+    func testInstantlyFulfilledPromiseAsyncHasValue() async {
+        let promise = Future<String, Never>.promise()
+        promise.fulfill("test")
+        var value: String?
+        let c = promise.future.sink {
+            XCTAssertEqual($0, "test")
+            value = $0
         }
-        waitForExpectations(timeout: 1)
+
+        XCTAssertEqual(value, "test")
+        withExtendedLifetime(c, {})
     }
 
-    func testFulfilledPromiseAsyncHasValue() {
-        let e = expectation(description: "async job done")
+    @MainActor
+    func testFulfilledPromiseAsyncHasValue() async {
         let eFulfilled = expectation(description: "fulfilled")
-        DispatchQueue.main.async {
-            let promise = Future<String, Never>.promise()
-            var value: String?
+        let promise = Future<String, Never>.promise()
+        var value: String?
 
-            let c = promise.future.sink {
-                XCTAssertEqual($0, "test")
-                value = $0
-                eFulfilled.fulfill()
-            }
-
-            promise.fulfill("test")
-            self.wait(for: [eFulfilled], timeout: 0)
-            XCTAssertEqual(value, "test")
-            withExtendedLifetime(c, {})
-
-            e.fulfill()
+        let c = promise.future.sink {
+            XCTAssertEqual($0, "test")
+            value = $0
+            eFulfilled.fulfill()
         }
-        wait(for: [e], timeout: 1)
+
+        promise.fulfill("test")
+        await fulfillment(of: [eFulfilled], timeout: 0)
+        XCTAssertEqual(value, "test")
+        withExtendedLifetime(c, {})
     }
 
     func testPromiseAsyncFulfilledAsyncHasValue() {
@@ -315,29 +300,24 @@ final class FutureExtensionTests: XCTestCase {
         wait(for: [e], timeout: 1)
     }
 
-    func testPromiseAsyncFulfilledInBackgroundHasValue() {
-        let e = expectation(description: "async job done")
+    @MainActor
+    func testPromiseAsyncFulfilledInBackgroundHasValue() async {
         let eFulfilled = expectation(description: "fulfilled")
-        DispatchQueue.main.async {
-            let promise = Future<String, Never>.promise()
-            var value: String?
+        let promise = Future<String, Never>.promise()
+        var value: String?
 
-            let c = promise.future.sink {
-                XCTAssertEqual($0, "test")
-                value = $0
-                eFulfilled.fulfill()
-            }
-
-            DispatchQueue.global().async {
-                promise.fulfill("test")
-            }
-            self.wait(for: [eFulfilled], timeout: 1)
-            XCTAssertEqual(value, "test")
-            withExtendedLifetime(c, {})
-
-            e.fulfill()
+        let c = promise.future.sink {
+            XCTAssertEqual($0, "test")
+            value = $0
+            eFulfilled.fulfill()
         }
-        wait(for: [e], timeout: 1)
+
+        DispatchQueue.global().async {
+            promise.fulfill("test")
+        }
+        await fulfillment(of: [eFulfilled], timeout: 1)
+        XCTAssertEqual(value, "test")
+        withExtendedLifetime(c, {})
     }
 
     // MARK: - Publishers.First.get()

@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1691186943127,
+    "version": 1691755115980,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1182,12 +1182,37 @@
         },
         "duckPlayer": {
             "exceptions": [],
-            "state": "enabled",
             "settings": {
                 "tryDuckPlayerLink": "https://www.youtube.com/watch?v=yKWIA-Pys4c",
                 "overlays": {
                     "youtube": {
-                        "state": "disabled"
+                        "state": "disabled",
+                        "selectors": {
+                            "thumbLink": "a[href^='/watch']",
+                            "excludedRegions": [
+                                "#playlist"
+                            ],
+                            "videoElement": "#player video",
+                            "videoElementContainer": "#player .html5-video-player",
+                            "hoverExcluded": [],
+                            "clickExcluded": [],
+                            "allowedEventTargets": [
+                                ".ytp-inline-preview-scrim",
+                                ".ytd-video-preview",
+                                "#thumbnail-container",
+                                "#video-title-link",
+                                "#video-title"
+                            ]
+                        },
+                        "thumbnailOverlays": {
+                            "state": "enabled"
+                        },
+                        "clickInterception": {
+                            "state": "enabled"
+                        },
+                        "videoOverlays": {
+                            "state": "enabled"
+                        }
                     },
                     "serpProxy": {
                         "state": "disabled"
@@ -1216,7 +1241,8 @@
                     }
                 ]
             },
-            "hash": "15e0c5b85f9b90b29c5af92eb9b9ad43"
+            "state": "enabled",
+            "hash": "117c4bb6ac25abdf57ffc4e975e73be9"
         },
         "elementHiding": {
             "exceptions": [
@@ -1985,6 +2011,15 @@
                         ]
                     },
                     {
+                        "domain": "gute-garne.de",
+                        "rules": [
+                            {
+                                "selector": ".ad",
+                                "type": "override"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "harpygee.com",
                         "rules": [
                             {
@@ -2308,7 +2343,7 @@
                                 "type": "hide"
                             },
                             {
-                                "selector": "[devicetype=\"desktop\"] [data*='\"isNsfw\":false'] ~ shreddit-experience-tree",
+                                "selector": "[devicetype=\"desktop\"] .grid:not([style='filter: blur(4px);']) ~ shreddit-experience-tree",
                                 "type": "hide"
                             }
                         ]
@@ -2700,7 +2735,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "214ef180c3de6b13185f015e63bbbb0a"
+            "hash": "5390746a877ef8f4dafdd830154ad76b"
         },
         "exceptionHandler": {
             "exceptions": [],
@@ -2974,6 +3009,10 @@
                 {
                     "domain": "web.whatsapp.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/620"
+                },
+                {
+                    "domain": "walmart.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1198"
                 }
             ],
             "settings": {
@@ -2985,7 +3024,7 @@
                     "privacy-test-pages.glitch.me"
                 ]
             },
-            "hash": "38034ac4789cd0aa516f7a6848227613"
+            "hash": "77d4f914f73a5d3fec51f38d32918a2c"
         },
         "harmfulApis": {
             "settings": {
@@ -3315,7 +3354,9 @@
                             {
                                 "rule": "adthrive.com",
                                 "domains": [
-                                    "gardeningknowhow.com"
+                                    "adamtheautomator.com",
+                                    "gardeningknowhow.com",
+                                    "packhacker.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1122"
                             }
@@ -3488,11 +3529,11 @@
                                 "reason": "See https://github.com/duckduckgo/privacy-configuration/issues/321.,These requests are associated with map/location functionality on websites."
                             },
                             {
-                                "rule": "th.bing.com/th",
+                                "rule": "bing.com/th",
                                 "domains": [
-                                    "drudgereport.com"
+                                    "<all>"
                                 ],
-                                "reason": "On the homepage (drudgereport.com), some images are fetched from bing.com.,When we block these requests, the images do not render, and the page appears to have blank boxes.,Note that requests can be of the form th.bing.com/th?id=... or th.bing.com/th/id/..., hence we unblock the common path here."
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/765"
                             },
                             {
                                 "rule": "www.bing.com/api/maps/mapcontrol",
@@ -4757,6 +4798,7 @@
                             {
                                 "rule": "klaviyo.com/",
                                 "domains": [
+                                    "footweartruth.com",
                                     "kmail-lists.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/362"
@@ -5667,6 +5709,17 @@
                             }
                         ]
                     },
+                    "viglink.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn.viglink.com/api/vglnk.js",
+                                "domains": [
+                                    "9to5mac.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1204"
+                            }
+                        ]
+                    },
                     "voxmedia.com": {
                         "rules": [
                             {
@@ -5848,7 +5901,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "7ab265aeb47cbefdf8f5e496c56cac4d"
+            "hash": "35923a372e0996a5dc55f012c76a6baa"
         },
         "trackingCookies1p": {
             "settings": {
