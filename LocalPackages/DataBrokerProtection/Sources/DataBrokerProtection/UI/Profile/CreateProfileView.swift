@@ -95,16 +95,10 @@ private struct BirthYearComponentView: View {
     }
 }
 
-private extension Date {
-    var year: Int {
-        let calendar = Calendar.current
-        return calendar.component(.year, from: self)
-    }
-}
-
 private struct BirthYearFormView: View {
     @ObservedObject var viewModel: ProfileViewModel
-    @State private var selectedYear = Date().year
+    @State private var selectedYear = ProfileViewModel.minimumBirthYear
+
     let completion: () -> Void
 
     var body: some View {
@@ -115,7 +109,7 @@ private struct BirthYearFormView: View {
                     .foregroundColor(.secondary)
 
                 Picker(selection: $selectedYear) {
-                    ForEach((Date().year - 110)...(Date().year), id: \.self) { year in
+                    ForEach(viewModel.birthdayYearRange, id: \.self) { year in
                         Text(String(year))
                             .tag(year)
                     }
@@ -197,7 +191,7 @@ private struct NameFormView: View {
     @State private var firstName = ""
     @State private var middleName = ""
     @State private var lastName = ""
-    @State private var suffix = ""
+    @State private var suffix = ProfileViewModel.defaultSuffixSelection
     @State private var shouldShowDeleteButton = false
 
     var body: some View {
@@ -205,7 +199,19 @@ private struct NameFormView: View {
             TextFieldWithLabel(label: "First Name*", text: $firstName)
             TextFieldWithLabel(label: "Middle Name", text: $middleName)
             TextFieldWithLabel(label: "Last Name*", text: $lastName)
-            TextFieldWithLabel(label: "Suffix", text: $suffix)
+
+            VStack(alignment: .leading) {
+                Text("Suffix")
+                    .foregroundColor(.secondary)
+
+                Picker(selection: $suffix) {
+                    ForEach(viewModel.suffixes, id: \.self) { suffix in
+                        Text(suffix)
+                            .tag(suffix)
+                    }
+                } label: { }
+            }
+            .padding(.bottom, 20)
 
             CTAFooterView(showDeleteButton: shouldShowDeleteButton,
                            saveButtonEnabled: areRequiredFormsFilled()) {
@@ -226,7 +232,7 @@ private struct NameFormView: View {
                 firstName = selectedName.firstName
                 middleName = selectedName.middleName
                 lastName = selectedName.lastName
-                suffix = selectedName.suffix
+                suffix = selectedName.suffix.isEmpty ? ProfileViewModel.defaultSuffixSelection : selectedName.suffix
             }
         }
     }
@@ -312,12 +318,8 @@ private struct AddressFormView: View {
 
     @State private var street = ""
     @State private var city = ""
-    @State private var state = AddressFormView.selectStateTag
+    @State private var state = ""
     @State private var shouldShowDeleteButton = false
-
-    private static let selectStateTag = "Select"
-
-    private let states = [AddressFormView.selectStateTag, "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
 
     var body: some View {
         VStack(spacing: 15) {
@@ -329,9 +331,11 @@ private struct AddressFormView: View {
                     .foregroundColor(.secondary)
 
                 Picker(selection: $state) {
-                    ForEach(states, id: \.self) { state in
-                        Text(state)
-                            .tag(state)
+                    ForEach(viewModel.states, id: \.self) { state in
+                        if state != ProfileViewModel.defaultStateSelection {
+                            Text(state)
+                                .tag(state)
+                        }
                     }
                 } label: { }
             }
@@ -379,7 +383,7 @@ private struct AddressFormView: View {
     }
 
     private func areRequiredFormsFilled() -> Bool {
-        if state == AddressFormView.selectStateTag {
+        if state == ProfileViewModel.defaultStateSelection {
             return false
         }
         return [city, state]
