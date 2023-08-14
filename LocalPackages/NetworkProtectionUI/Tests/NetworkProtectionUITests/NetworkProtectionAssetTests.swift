@@ -22,6 +22,10 @@ import XCTest
 @testable import NetworkProtectionUI
 
 final class NetworkProtectionAssetTests: XCTestCase {
+
+    /// This test validates that the asset names aren't changed by mistake, and that the assets
+    /// exist in the bundle.
+    ///
     func testAssetEnumValuesAreUnchanged() {
         let assetsAndExpectedRawValues: [NetworkProtectionAsset: String] = [
             .ipAddressIcon: "IP-16",
