@@ -97,6 +97,8 @@
 		3171D6B82889849F0068632A /* CookieManagedNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */; };
 		3171D6BA288984D00068632A /* BadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B9288984D00068632A /* BadgeAnimationView.swift */; };
 		3171D6DB2889B64D0068632A /* CookieManagedNotificationContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6DA2889B64D0068632A /* CookieManagedNotificationContainerView.swift */; };
+		318115E42A8A4F1C00129796 /* SyncCredentialsAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */; };
+		318115E52A8A4F3300129796 /* CredentialsCleanupErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CEFCA82A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift */; };
 		3184AC6D288F29D800C35E4B /* BadgeNotificationAnimationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3184AC6C288F29D800C35E4B /* BadgeNotificationAnimationModel.swift */; };
 		3184AC6F288F2A1100C35E4B /* CookieNotificationAnimationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3184AC6E288F2A1100C35E4B /* CookieNotificationAnimationModel.swift */; };
 		31929F992A4C4CFF0084EA89 /* FaviconUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA0CC562539EBC90079BC96 /* FaviconUserScript.swift */; };
@@ -8708,6 +8710,7 @@
 				3192A04E2A4C4CFF0084EA89 /* SafariDataImporter.swift in Sources */,
 				3192A04F2A4C4CFF0084EA89 /* LocalBookmarkStore.swift in Sources */,
 				3192A0502A4C4CFF0084EA89 /* BWEncryption.m in Sources */,
+				318115E42A8A4F1C00129796 /* SyncCredentialsAdapter.swift in Sources */,
 				3192A0512A4C4CFF0084EA89 /* StatisticsLoader.swift in Sources */,
 				3192A0522A4C4CFF0084EA89 /* WebsiteBreakageReporter.swift in Sources */,
 				3192A0532A4C4CFF0084EA89 /* PrivacyPreferencesModel.swift in Sources */,
@@ -8774,6 +8777,7 @@
 				3192A08F2A4C4CFF0084EA89 /* ContextMenuUserScript.swift in Sources */,
 				3192A0902A4C4CFF0084EA89 /* NSSavePanelExtension.swift in Sources */,
 				3192A0912A4C4CFF0084EA89 /* AppPrivacyConfigurationDataProvider.swift in Sources */,
+				318115E52A8A4F3300129796 /* CredentialsCleanupErrorHandling.swift in Sources */,
 				3192A0922A4C4CFF0084EA89 /* LinkButton.swift in Sources */,
 				3192A0932A4C4CFF0084EA89 /* TemporaryFileHandler.swift in Sources */,
 				3192A0942A4C4CFF0084EA89 /* URL+NetworkProtection.swift in Sources */,
