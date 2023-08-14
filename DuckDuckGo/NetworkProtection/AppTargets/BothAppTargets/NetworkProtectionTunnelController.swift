@@ -97,7 +97,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     @UserDefaultsWrapper(key: .networkProtectionConnectionTesterEnabled, defaultValue: NetworkProtectionUserDefaultsConstants.isConnectionTesterEnabled, defaults: .shared)
     private(set) var isConnectionTesterEnabled: Bool
 
-    @MainActor
     @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .shared)
     private(set) var onboardingStatusRawValue: OnboardingStatus.RawValue
 
@@ -259,12 +258,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     /// Starts the VPN connection used for Network Protection
     ///
-    @MainActor
     func start() async {
         await start(enableLoginItems: true)
     }
 
-    @MainActor
     func start(enableLoginItems: Bool) async {
         controllerErrorStore.lastErrorMessage = nil
 
