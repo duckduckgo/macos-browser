@@ -38,7 +38,7 @@ final class FireproofingReferenceTests: XCTestCase {
 
     private func sanitizedSite(_ site: String) -> String {
         let url = URL(string: site)!
-        return url.host!
+        return url.host ?? site
     }
 
     override func tearDownWithError() throws {
