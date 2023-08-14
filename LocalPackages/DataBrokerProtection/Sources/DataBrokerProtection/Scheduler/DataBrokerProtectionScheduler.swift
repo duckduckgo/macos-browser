@@ -22,7 +22,7 @@ import BrowserServicesKit
 
 public final class DataBrokerProtectionScheduler {
     private enum SchedulerCycle {
-        // TODO: Arbitrary numbers for now
+        // Arbitrary numbers for now
         // Scheduling an activity to fire between 15 and 45 minutes from now
 
         static let interval: TimeInterval = 5 * 60 // 5 minutes
