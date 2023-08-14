@@ -56,7 +56,7 @@ final class StatisticsLoader {
                 Pixel.fire(.serp)
                 PixelExperiment.fireSearchOnDay4to8Pixel()
                 Task {
-                    awaitst WindowControllersManager.shared.pinnedTabsManager.reportUsage()
+                    await WindowControllersManager.shared.pinnedTabsManager.reportUsage()
                 }
             } else if !self.statisticsStore.isAppRetentionFiredToday {
                 self.refreshAppRetentionAtb(completion: completion)

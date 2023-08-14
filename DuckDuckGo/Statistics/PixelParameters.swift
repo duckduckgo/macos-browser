@@ -131,7 +131,9 @@ extension Pixel.Event {
              .favoriteSectionHidden,
              .recentActivitySectionHidden,
              .continueSetUpSectionHidden,
-             .userHasPinnedTab:
+             .userHasPinnedTab,
+             .fireButtonFirstBurn,
+             .fireButton:
 
             return nil
         }

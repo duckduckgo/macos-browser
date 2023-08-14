@@ -125,7 +125,7 @@ extension Pixel {
 
                      onComplete: @escaping (Error?) -> Void = {_ in }) {
         if limitToOnceADay {
-            let repetition = Event.Repetition(key: event.name, update: false)
+            let repetition = Event.Repetition(key: event.name)
             if repetition == .repetitive {
                 // Pixel alredy fired today
                 return

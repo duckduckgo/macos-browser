@@ -140,6 +140,10 @@ extension Pixel {
         // Pinned tabs
         case userHasPinnedTab
 
+        // Fire Button
+        case fireButtonFirstBurn
+        case fireButton(option: FireButtonOption)
+
         enum Debug {
 
             case assertionFailure(message: String, file: StaticString, line: UInt)
@@ -390,7 +394,13 @@ extension Pixel.Event {
         case .userHasPinnedTab:
             return "m_mac_user_has_pinned_tab"
 
+        // Fire Button
+        case .fireButtonFirstBurn:
+            return "m_mac_fire_button_first_burn"
+        case .fireButton(option: let option):
+            return "m_mac_fire_button_\(option)"
         }
+
     }
 }
 
