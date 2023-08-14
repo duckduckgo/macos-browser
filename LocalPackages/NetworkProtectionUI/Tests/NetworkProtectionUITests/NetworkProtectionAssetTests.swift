@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import SwiftUI
 import XCTest
 @testable import NetworkProtectionUI
 
@@ -48,6 +49,7 @@ final class NetworkProtectionAssetTests: XCTestCase {
 
         for (asset, rawValue) in assetsAndExpectedRawValues {
             XCTAssertEqual(asset.rawValue, rawValue)
+            XCTAssertNotNil(Image(rawValue, bundle: .module))
         }
     }
 }
