@@ -31,26 +31,33 @@ public enum OnboardingStatus: RawRepresentable, Equatable {
 
     case isOnboarding(step: OnboardingStep)
 
-    public init?(rawValue: Int) {
-        if rawValue == 0 {
+    static let completedRawValue = "completed"
+    static let isOnboardingRawValue = "isOnboarding."
+
+    public init?(rawValue: String) {
+        if rawValue == Self.completedRawValue {
             self = .completed
+            return
+        } else if rawValue.hasPrefix(Self.isOnboardingRawValue) {
+            let stepRawValue = rawValue.dropping(prefix: Self.isOnboardingRawValue)
+
+            guard let step = OnboardingStep(rawValue: stepRawValue) else {
+                return nil
+            }
+
+            self = .isOnboarding(step: step)
             return
         }
 
-        let stepValue = rawValue - 1
-        guard let step = OnboardingStep(rawValue: stepValue) else {
-            return nil
-        }
-
-        self = .isOnboarding(step: step)
+        return nil
     }
 
-    public var rawValue: Int {
+    public var rawValue: String {
         switch self {
         case .completed:
-            return 0
+            return Self.completedRawValue
         case .isOnboarding(let step):
-            return 1 + step.rawValue
+            return Self.isOnboardingRawValue + step.rawValue
         }
     }
 }
@@ -58,7 +65,7 @@ public enum OnboardingStatus: RawRepresentable, Equatable {
 /// A specific step in the onboarding process.
 ///
 @frozen
-public enum OnboardingStep: Int, Equatable {
+public enum OnboardingStep: String, Equatable {
     /// The user needs to allow the system extension in macOS
     ///
     case userNeedsToAllowExtension
