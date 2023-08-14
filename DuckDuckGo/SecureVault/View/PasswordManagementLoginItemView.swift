@@ -490,11 +490,8 @@ private struct NotesView: View {
                         }
                     )
             } else {
-                EditableTextView(text: $model.notes)
+                EditableTextView(text: $model.notes, maxLength: characterLimit)
                     .frame(height: 197.0)
-                    .onReceive(Just(model.notes)) {
-                        model.notes = String($0.prefix(characterLimit))
-                    }
                     .clipShape(RoundedRectangle(cornerRadius: cornerRadius,
                                                 style: .continuous))
                     .overlay(
