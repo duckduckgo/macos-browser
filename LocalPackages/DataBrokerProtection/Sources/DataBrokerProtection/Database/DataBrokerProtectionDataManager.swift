@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Common
 
 public protocol DataBrokerProtectionDataManagerDelegate: AnyObject {
     func dataBrokerProtectionDataManagerDidUpdateData()
@@ -40,10 +41,11 @@ public class DataBrokerProtectionDataManager {
         // Save profile in the secure database
         do {
             let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-            let id = try vault.saveProfile(profile: profile)
-            print("Profile id: \(id)")
+            let id = try vault.save(profile: profile)
+            print()
+            os_log("Profile id: \(id)", log: .dataBrokerProtection)
         } catch {
-            print("ERROR: Secure storage \(error)")
+            os_log("ERROR: Secure storage \(error)", log: .error)
         }
     }
 
@@ -53,10 +55,10 @@ public class DataBrokerProtectionDataManager {
             if let profile = try vault.fetchProfile(with: 1) {
                 return profile
             } else {
-                print("No profile found")
+                os_log("No profile found", log: .dataBrokerProtection)
             }
         } catch {
-            print("ERROR: Secure storage \(error)")
+            os_log("ERROR: Secure storage \(error)", log: .error)
         }
 
         return nil
