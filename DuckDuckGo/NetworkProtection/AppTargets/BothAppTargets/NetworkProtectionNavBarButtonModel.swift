@@ -108,13 +108,16 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private func setupIconSubscription() {
         iconPublisherCancellable = iconPublisher.$icon.sink { [weak self] icon in
-            self?.buttonImage = self?.buttonImageFromWaitlistState()
+            self?.buttonImage = self?.buttonImageFromWaitlistState(icon: icon)
         }
     }
 
-    private func buttonImageFromWaitlistState() -> NSImage {
+    // TODO: Remove all this and make NetworkProtectionIconPublisher return the correct version instead
+    private func buttonImageFromWaitlistState(icon: NetworkProtectionAsset?) -> NSImage {
+        let icon = icon ?? iconPublisher.icon
+
         if NetworkProtectionKeychainTokenStore().isFeatureActivated {
-            return .image(for: iconPublisher.icon)!
+            return .image(for: icon)!
         }
 
         let waitlist = NetworkProtectionWaitlist.shared
@@ -122,7 +125,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
             return NSImage(named: "NetworkProtectionAvailableButton")!
         }
 
-        return .image(for: iconPublisher.icon)!
+        return .image(for: icon)!
     }
 
     private func setupStatusSubscription() {
@@ -154,7 +157,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     private func setupWaitlistAvailabilitySubscription() {
         NotificationCenter.default.addObserver(forName: .networkProtectionWaitlistAccessChanged, object: nil, queue: .main) { _ in
             Task { @MainActor in
-                self.buttonImage = self.buttonImageFromWaitlistState()
+                self.buttonImage = self.buttonImageFromWaitlistState(icon: nil)
                 self.updateVisibility()
             }
         }
