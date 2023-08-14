@@ -80,7 +80,7 @@ public struct DataBrokerProtectionContainerView: View {
                     Spacer()
                 }
 
-                // TODO: Remove, just for testing
+                // just for testing
                 VStack(alignment: .leading) {
                     HStack {
                         Picker(selection: $bodyViewType, label: Text("Body View Type")) {
