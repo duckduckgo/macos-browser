@@ -232,7 +232,7 @@ private struct NameFormView: View {
                 firstName = selectedName.firstName
                 middleName = selectedName.middleName
                 lastName = selectedName.lastName
-                suffix = selectedName.suffix
+                suffix = selectedName.suffix.isEmpty ? ProfileViewModel.defaultSuffixSelection : selectedName.suffix
             }
         }
     }
