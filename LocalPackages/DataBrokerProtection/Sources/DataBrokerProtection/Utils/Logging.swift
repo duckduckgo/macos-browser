@@ -31,6 +31,9 @@ struct Logging {
 
     fileprivate static let serviceLoggingEnabled = true
     fileprivate static let service: OSLog = OSLog(subsystem: subsystem, category: "Data Broker Protection Service")
+
+    fileprivate static let errorsLoggingEnabled = true
+    fileprivate static let error: OSLog = OSLog(subsystem: subsystem, category: "Data Broker Protection Errors")
 }
 
 extension OSLog {
@@ -45,5 +48,9 @@ extension OSLog {
 
     public static var service: OSLog {
         Logging.serviceLoggingEnabled ? Logging.service : .disabled
+    }
+
+    public static var error: OSLog {
+        Logging.errorsLoggingEnabled ? Logging.error : .disabled
     }
 }
