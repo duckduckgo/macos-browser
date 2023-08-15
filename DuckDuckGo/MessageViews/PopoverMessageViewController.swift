@@ -41,7 +41,7 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
     }
 
     deinit {
-        cancelAutoDismissTimer()        
+        cancelAutoDismissTimer()
     }
 
     override func viewDidAppear() {

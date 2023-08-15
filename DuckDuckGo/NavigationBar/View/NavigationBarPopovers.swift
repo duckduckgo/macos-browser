@@ -310,4 +310,3 @@ final class NavigationBarPopovers {
 extension Notification.Name {
     static let loginAutoSaved = Notification.Name(rawValue: "loginAutoSaved")
 }
-
