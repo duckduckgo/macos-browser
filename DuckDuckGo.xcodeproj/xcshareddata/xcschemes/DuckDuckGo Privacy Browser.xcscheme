@@ -98,9 +98,6 @@
                   Identifier = "AutoconsentMessageProtocolTests/testEval()">
                </Test>
                <Test
-                  Identifier = "BrokenSiteReportingReferenceTests/testBrokenSiteReporting()">
-               </Test>
-               <Test
                   Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">
                </Test>
                <Test
