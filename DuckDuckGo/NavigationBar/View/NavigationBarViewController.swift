@@ -378,11 +378,15 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
+        guard let domain = account.domain else {
+            return
+        }
+
         DispatchQueue.main.async {
             let action = {
                 self.showPasswordManagerPopover(selectedCategory: .logins)
             }
-            let viewController = PopoverMessageViewController(message: UserText.passwordManagerAutosavePopoverText(domain: account.domain),
+            let viewController = PopoverMessageViewController(message: UserText.passwordManagerAutosavePopoverText(domain: domain),
                                                               image: Self.Constants.autosavePopoverImageName,
                                                               buttonText: UserText.passwordManagerAutosaveButtonText,
                                                               buttonAction: action)
