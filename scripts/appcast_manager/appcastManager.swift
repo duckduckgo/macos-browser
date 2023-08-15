@@ -101,7 +101,7 @@ DESCRIPTION
 
 case .releaseToInternalChannel, .releaseHotfixToPublicChannel:
     guard let dmgPath = arguments.parameters["--dmg"], let releaseNotesPath = arguments.parameters["--release-notes"] else {
-        print("Missing required parameters for action '--add-to-internal-channel'")
+        print("Missing required parameters")
         exit(1)
     }
 
