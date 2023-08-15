@@ -150,7 +150,7 @@ case .releaseToPublicChannel:
     // Handle release notes if provided
     if let releaseNotesPath = arguments.parameters["--release-notes"] {
         print("Release Notes Path: \(releaseNotesPath)")
-        let dmgURLForPublic = specificDir.appendingPathComponent("duckduckgo-\(version).dmg")
+        let dmgURLForPublic = specificDir.appendingPathComponent(getDmgFilename(for: version))
         handleReleaseNotesFile(path: releaseNotesPath, updatesDirectoryURL: specificDir, dmgURL: dmgURLForPublic)
     } else {
         print("No new release notes provided. Keeping existing release notes.")
@@ -162,6 +162,10 @@ case .releaseToPublicChannel:
     }
 
     runGenerateAppcast(withVersions: version, rolloutInterval: "43200")
+}
+
+func getDmgFilename(for version: String) -> String {
+    return "duckduckgo-\(version).dmg"
 }
 
 // MARK: - Downloading of Appcast and Files
@@ -381,7 +385,7 @@ func handleDMGFile(dmgPath: String, updatesDirectoryURL: URL) -> URL? {
 }
 
 func verifyVersion(version: String, atDirectory dir: URL) -> Bool {
-    let expectedDMGFileName = "duckduckgo-\(version).dmg"
+    let expectedDMGFileName = getDmgFilename(for: version)
     let expectedDMGFilePath = dir.appendingPathComponent(expectedDMGFileName).path
     if FileManager.default.fileExists(atPath: expectedDMGFilePath) {
         print("Verified: Version \(version) exists in the downloaded appcast items.")
