@@ -31,6 +31,9 @@ final class NavigationBarViewController: NSViewController {
 
     enum Constants {
         static let downloadsButtonAutoHidingInterval: TimeInterval = 5 * 60
+        static let activeDownloadsImage = NSImage(named: "DownloadsActive")
+        static let inactiveDownloadsImage = NSImage(named: "Downloads")
+        static let autosavePopoverImageName = "PasswordManagement"
     }
 
     @IBOutlet weak var mouseOverView: MouseOverView!
@@ -63,8 +66,6 @@ final class NavigationBarViewController: NSViewController {
         downloadsButton.addSubview(progressView)
         return progressView
     }()
-    private static let activeDownloadsImage = NSImage(named: "DownloadsActive")
-    private static let inactiveDownloadsImage = NSImage(named: "Downloads")
 
     var addressBarViewController: AddressBarViewController?
 
@@ -335,12 +336,12 @@ final class NavigationBarViewController: NSViewController {
                                                selector: #selector(showPrivateEmailCopiedToClipboard(_:)),
                                                name: Notification.Name.privateEmailCopiedToClipboard,
                                                object: nil)
-        
+
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(showLoginAutosavedFeedback(_:)),
                                                name: .loginAutoSaved,
                                                object: nil)
-        
+
         if #available(macOS 11, *) {
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(showAutoconsentFeedback(_:)),
@@ -378,7 +379,13 @@ final class NavigationBarViewController: NSViewController {
         }
 
         DispatchQueue.main.async {
-            let viewController = PopoverMessageViewController(message: "Login saved")
+            let action = {
+                self.showPasswordManagerPopover(selectedCategory: .logins)
+            }
+            let viewController = PopoverMessageViewController(message: UserText.passwordManagerAutosavePopoverText(domain: account.domain),
+                                                              image: Self.Constants.autosavePopoverImageName,
+                                                              buttonText: UserText.passwordManagerAutosaveButtonText,
+                                                              buttonAction: action)
             viewController.show(onParent: self, relativeTo: self.passwordManagementButton)
         }
     }
@@ -567,7 +574,7 @@ final class NavigationBarViewController: NSViewController {
         }
 
         let hasActiveDownloads = DownloadListCoordinator.shared.hasActiveDownloads
-        downloadsButton.image = hasActiveDownloads ? Self.activeDownloadsImage : Self.inactiveDownloadsImage
+        downloadsButton.image = hasActiveDownloads ? Self.Constants.activeDownloadsImage : Self.Constants.inactiveDownloadsImage
         let isTimerActive = downloadsButtonHidingTimer != nil
 
         downloadsButton.isHidden = !(hasActiveDownloads || isTimerActive)

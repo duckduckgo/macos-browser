@@ -23,11 +23,23 @@ struct PopoverMessageView: View {
 
     var body: some View {
         HStack {
+            if let image = viewModel.image {
+                Image(image)
+            }
+
             Text(viewModel.message)
                 .font(.body)
                 .fontWeight(.bold)
-                .padding(.horizontal)
+                .padding(.leading, 4)
+                .padding(.trailing, 7)
+
+            if let text = viewModel.buttonText,
+               let action = viewModel.buttonAction {
+                Button(text, action: action)
+            }
+
         }
         .padding()
     }
+
 }

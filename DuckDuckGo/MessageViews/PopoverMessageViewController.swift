@@ -30,8 +30,8 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
     private var timer: Timer?
     let viewModel: PopoverMessageViewModel
 
-    init(message: String) {
-        self.viewModel = PopoverMessageViewModel(message: message)
+    init(message: String, image: String? = nil, buttonText: String? = nil, buttonAction: (() -> Void)? = nil) {
+        self.viewModel = PopoverMessageViewModel(message: message, image: image, buttonText: buttonText, buttonAction: buttonAction)
         let contentView = PopoverMessageView(viewModel: self.viewModel)
         super.init(rootView: contentView)
     }
@@ -41,7 +41,7 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
     }
 
     deinit {
-        cancelAutoDismissTimer()
+        cancelAutoDismissTimer()        
     }
 
     override func viewDidAppear() {

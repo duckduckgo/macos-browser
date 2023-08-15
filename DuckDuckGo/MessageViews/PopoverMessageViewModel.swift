@@ -19,8 +19,8 @@
 import Foundation
 
 final class PopoverMessageViewModel: ObservableObject {
-    @Published var message: String = ""
-    @Published var image: NSImage?
+    @Published var message: String
+    @Published var image: String?
     @Published var buttonText: String?
     @Published var buttonAction: (() -> Void)?
 
@@ -29,5 +29,8 @@ final class PopoverMessageViewModel: ObservableObject {
          buttonText: String? = nil,
          buttonAction: (() -> Void)? = nil) {
         self.message = message
+        self.image = image
+        self.buttonText = buttonText
+        self.buttonAction = buttonAction
     }
 }
