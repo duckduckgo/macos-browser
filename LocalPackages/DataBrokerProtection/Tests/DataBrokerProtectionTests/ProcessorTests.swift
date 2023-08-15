@@ -146,12 +146,14 @@ private struct MockDataBase: DataBase {
         let databroker1 = DataBroker(
             name: "1",
             steps: [Step](),
+            version: "1.0.0",
             schedulingConfig: commonScheduleConfig
         )
 
         let databroker2 = DataBroker(
             name: "2",
             steps: [Step](),
+            version: "1.0.0",
             schedulingConfig: commonScheduleConfig
         )
 
@@ -209,6 +211,7 @@ private struct MockDataBase: DataBase {
             dataBroker: DataBroker(
                 name: "onion",
                 steps: [Step](),
+                version: "1.0.0",
                 schedulingConfig: commonScheduleConfig
             )
         )
