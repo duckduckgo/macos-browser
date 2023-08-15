@@ -17,8 +17,9 @@
 //
 
 import AppKit
+import SwiftUI
 
-final class PopoverMessageViewController: NSViewController {
+final class PopoverMessageViewController: NSHostingController<PopoverMessageView> {
 
     enum Constants {
         static let storyboardName = "MessageViews"
@@ -26,39 +27,21 @@ final class PopoverMessageViewController: NSViewController {
         static let autoDismissDuration: TimeInterval = 2.5
     }
 
-    static func createWithMessage(_ message: String) -> PopoverMessageViewController {
-        let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
-
-        return storyboard.instantiateController(identifier: Constants.identifier) { coder in
-            return PopoverMessageViewController(coder: coder, message: message)
-        }
-    }
-
-    @IBOutlet weak var titleLabel: NSTextField!
-
     private var timer: Timer?
-    private var message: String
+    let viewModel: PopoverMessageViewModel
 
-    init?(coder: NSCoder, message: String) {
-        self.message = message
-        super.init(coder: coder)
+    init(message: String) {
+        self.viewModel = PopoverMessageViewModel(message: message)
+        let contentView = PopoverMessageView(viewModel: self.viewModel)
+        super.init(rootView: contentView)
     }
 
     required init?(coder: NSCoder) {
-        fatalError("You must create this view controller with a message.")
+        fatalError("init(coder:) has not been implemented")
     }
 
     deinit {
         cancelAutoDismissTimer()
-    }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        self.titleLabel.stringValue = message
-
-        if let mouseOverView = self.view as? MouseOverView {
-            mouseOverView.delegate = self
-        }
     }
 
     override func viewDidAppear() {
@@ -67,12 +50,16 @@ final class PopoverMessageViewController: NSViewController {
     }
 
     func show(onParent parent: NSViewController, relativeTo view: NSView) {
-        let rect = view.bounds.insetFromLineOfDeath()
+        let rect = view.bounds
+
+        // Set the content size to match the SwiftUI view's intrinsic size
+        self.preferredContentSize = self.view.fittingSize
+
         parent.present(self,
-                     asPopoverRelativeTo: rect,
-                     of: view,
-                     preferredEdge: .maxY,
-                     behavior: .applicationDefined)
+                       asPopoverRelativeTo: rect,
+                       of: view,
+                       preferredEdge: .maxY,
+                       behavior: .applicationDefined)
     }
 
     private func cancelAutoDismissTimer() {

@@ -194,8 +194,12 @@ final class NavigationBarPopovers {
     }
 
     func displaySaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, automaticallySaved: Bool, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        showSaveCredentialsPopover(usingView: view, withDelegate: delegate)
-        saveCredentialsPopover?.viewController.update(credentials: credentials, automaticallySaved: automaticallySaved)
+        if !automaticallySaved {
+            showSaveCredentialsPopover(usingView: view, withDelegate: delegate)
+            saveCredentialsPopover?.viewController.update(credentials: credentials, automaticallySaved: automaticallySaved)
+        } else {
+            NotificationCenter.default.post(name: .loginAutoSaved, object: credentials.account)
+        }
     }
 
     func displaySavePaymentMethod(_ card: SecureVaultModels.CreditCard, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
@@ -300,3 +304,8 @@ final class NavigationBarPopovers {
 #endif
 
 }
+
+extension Notification.Name {
+    static let loginAutoSaved = Notification.Name(rawValue: "loginAutoSaved")
+}
+

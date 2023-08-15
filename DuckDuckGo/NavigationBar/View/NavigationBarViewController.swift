@@ -335,6 +335,12 @@ final class NavigationBarViewController: NSViewController {
                                                selector: #selector(showPrivateEmailCopiedToClipboard(_:)),
                                                name: Notification.Name.privateEmailCopiedToClipboard,
                                                object: nil)
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(showLoginAutosavedFeedback(_:)),
+                                               name: .loginAutoSaved,
+                                               object: nil)
+        
         if #available(macOS 11, *) {
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(showAutoconsentFeedback(_:)),
@@ -347,7 +353,7 @@ final class NavigationBarViewController: NSViewController {
         guard view.window?.isKeyWindow == true else { return }
 
         DispatchQueue.main.async {
-            let viewController = PopoverMessageViewController.createWithMessage(UserText.privateEmailCopiedToClipboard)
+            let viewController = PopoverMessageViewController(message: UserText.privateEmailCopiedToClipboard)
             viewController.show(onParent: self, relativeTo: self.optionsButton)
         }
 
@@ -358,8 +364,22 @@ final class NavigationBarViewController: NSViewController {
               let domain = sender.userInfo?[FireproofDomains.Constants.newFireproofDomainKey] as? String else { return }
 
         DispatchQueue.main.async {
-            let viewController = PopoverMessageViewController.createWithMessage(UserText.domainIsFireproof(domain: domain))
+            let viewController = PopoverMessageViewController(message: UserText.domainIsFireproof(domain: domain))
             viewController.show(onParent: self, relativeTo: self.optionsButton)
+        }
+    }
+
+    @objc private func showLoginAutosavedFeedback(_ sender: Notification) {
+        guard view.window?.isKeyWindow == true,
+              let account = sender.object as? SecureVaultModels.WebsiteAccount else { return }
+
+        guard view.window?.isKeyWindow == true else {
+            return
+        }
+
+        DispatchQueue.main.async {
+            let viewController = PopoverMessageViewController(message: "Login saved")
+            viewController.show(onParent: self, relativeTo: self.passwordManagementButton)
         }
     }
 
