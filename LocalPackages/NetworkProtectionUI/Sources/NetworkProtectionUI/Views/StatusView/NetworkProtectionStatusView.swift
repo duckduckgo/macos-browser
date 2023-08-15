@@ -63,6 +63,7 @@ public struct NetworkProtectionStatusView: View {
             Spacer()
 
             TunnelControllerView(model: model.tunnelControllerViewModel)
+                .disabled(model.tunnelControllerViewDisabled)
 
             bottomMenuView()
         }
