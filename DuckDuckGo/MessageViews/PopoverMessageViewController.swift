@@ -29,6 +29,7 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
 
     private var timer: Timer?
     let viewModel: PopoverMessageViewModel
+    private var trackingArea: NSTrackingArea?
 
     init(message: String, image: String? = nil, buttonText: String? = nil, buttonAction: (() -> Void)? = nil) {
         self.viewModel = PopoverMessageViewModel(message: message, image: image, buttonText: buttonText, buttonAction: buttonAction)
@@ -42,10 +43,15 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
 
     deinit {
         cancelAutoDismissTimer()
+
+        if let trackingArea = trackingArea {
+            view.removeTrackingArea(trackingArea)
+        }
     }
 
     override func viewDidAppear() {
         super.viewDidAppear()
+        createTrackingArea()
         scheduleAutoDismissTimer()
     }
 
@@ -62,6 +68,7 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
                        behavior: .applicationDefined)
     }
 
+    // MARK: - Auto Dismissal
     private func cancelAutoDismissTimer() {
         timer?.invalidate()
         timer = nil
@@ -75,16 +82,21 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
         }
     }
 
-}
+    // MARK: - Mouse Tracking
+    private func createTrackingArea() {
+        trackingArea = NSTrackingArea(rect: view.bounds,
+                                      options: [.mouseEnteredAndExited, .activeInKeyWindow],
+                                      owner: self,
+                                    userInfo: nil)
+        view.addTrackingArea(trackingArea!)
+    }
 
-extension PopoverMessageViewController: MouseOverViewDelegate {
+    override func mouseEntered(with event: NSEvent) {
+        cancelAutoDismissTimer()
+    }
 
-    func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
-        if isMouseOver {
-            cancelAutoDismissTimer()
-        } else {
-            scheduleAutoDismissTimer()
-        }
+    override func mouseExited(with event: NSEvent) {
+        scheduleAutoDismissTimer()
     }
 
 }
