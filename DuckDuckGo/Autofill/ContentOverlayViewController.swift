@@ -51,6 +51,8 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         return model
     }()
 
+    lazy var passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
+
     public override func viewDidLoad() {
         initWebView()
         addTrackingArea()
@@ -250,6 +252,11 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
 
     public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
+
+        if type.formAutofillKind == .password &&
+            passwordManagerCoordinator.isEnabled {
+            passwordManagerCoordinator.reportPasswordAutofill()
+        }
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {

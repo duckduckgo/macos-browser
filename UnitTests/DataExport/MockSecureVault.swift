@@ -61,8 +61,8 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
         return storedAccounts.filter { $0.domain == domain }
     }
 
-    func accountsWithPartialMatchesFor(eTLDplus1: String) throws -> [BrowserServicesKit.SecureVaultModels.WebsiteAccount] {
-        return storedAccounts.filter { $0.domain.contains(eTLDplus1) }
+    func accountsWithPartialMatchesFor(eTLDplus1: String) throws -> [SecureVaultModels.WebsiteAccount] {
+        return storedAccounts.filter { $0.domain?.contains(eTLDplus1) ?? false }
     }
 
     func websiteCredentialsFor(accountId: Int64) throws -> SecureVaultModels.WebsiteCredentials? {
@@ -137,6 +137,63 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
 
     func existingCardForAutofill(matching proposedCard: SecureVaultModels.CreditCard) throws -> SecureVaultModels.CreditCard? {
         return nil
+    }
+
+    func inDatabaseTransaction(_ block: @escaping (Database) throws -> Void) throws {}
+
+    func modifiedSyncableCredentials() throws -> [SecureVaultModels.SyncableCredentials] {
+        []
+    }
+
+    func deleteSyncableCredentials(_ syncableCredentials: SecureVaultModels.SyncableCredentials, in database: Database) throws {
+        if let accountId = syncableCredentials.metadata.objectId {
+            try deleteWebsiteCredentialsFor(accountId: accountId)
+        }
+    }
+
+    func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, clearModifiedAt: Bool) throws -> Int64 {
+        try storeWebsiteCredentials(credentials)
+    }
+
+    func storeSyncableCredentials(_ syncableCredentials: SecureVaultModels.SyncableCredentials, in database: Database) throws {}
+
+    func syncableCredentialsForSyncIds(_ syncIds: any Sequence<String>, in database: Database) throws -> [SecureVaultModels.SyncableCredentials] {
+        []
+    }
+
+    func syncableCredentialsForAccountId(_ accountId: Int64, in database: Database) throws -> SecureVaultModels.SyncableCredentials? {
+        nil
+    }
+
+    func accountsForDomain(_ domain: String, in database: Database) throws -> [SecureVaultModels.WebsiteAccount] {
+        try accountsFor(domain: domain)
+    }
+
+    func getEncryptionKey() throws -> Data {
+        Data()
+    }
+
+    func encrypt(_ data: Data, using key: Data) throws -> Data {
+        data
+    }
+
+    func decrypt(_ data: Data, using key: Data) throws -> Data {
+        data
+    }
+
+    func hasAccountFor(username: String?, domain: String?) throws -> Bool {
+        storedAccounts.contains(where: { $0.username == username && $0.domain == domain })
+    }
+
+    func getHashingSalt() throws -> Data? {
+        nil
+    }
+
+    func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, in database: Database, encryptedUsing l2Key: Data, hashedUsing salt: Data?) throws -> Int64 {
+        1
+    }
+
+    func storeSyncableCredentials(_ syncableCredentials: SecureVaultModels.SyncableCredentials, in database: Database, encryptedUsing l2Key: Data, hashedUsing salt: Data?) throws {
     }
 
 }
@@ -253,6 +310,43 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
 
     func deleteCreditCardForCreditCardId(_ cardId: Int64) throws {
         _creditCards.removeValue(forKey: cardId)
+    }
+
+    func hasAccountFor(username: String?, domain: String?) throws -> Bool {
+        _accounts.contains(where: { $0.username == username && $0.domain == domain })
+    }
+
+    func inTransaction(_ block: @escaping (Database) throws -> Void) throws {
+        try db.write(block)
+    }
+
+    func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, in database: Database) throws -> Int64 {
+        1
+    }
+
+    func modifiedSyncableCredentials() throws -> [SecureVaultModels.SyncableCredentials] {
+        []
+    }
+
+    func syncableCredentialsForSyncIds(_ syncIds: any Sequence<String>, in database: Database) throws -> [SecureVaultModels.SyncableCredentials] {
+        []
+    }
+
+    func websiteCredentialsForAccountId(_ accountId: Int64, in database: Database) throws -> SecureVaultModels.WebsiteCredentials? {
+        nil
+    }
+
+    func syncableCredentialsForAccountId(_ accountId: Int64, in database: Database) throws -> SecureVaultModels.SyncableCredentials? {
+        nil
+    }
+
+    func storeSyncableCredentials(_ syncableCredentials: SecureVaultModels.SyncableCredentials, in database: Database) throws {
+    }
+
+    func deleteSyncableCredentials(_ syncableCredentials: SecureVaultModels.SyncableCredentials, in database: Database) throws {
+    }
+
+    func updateSyncTimestamp(in database: Database, tableName: String, objectId: Int64, timestamp: Date?) throws {
     }
 }
 
