@@ -26,11 +26,11 @@ extension OnboardingStepView {
     final class Model: ObservableObject {
         struct StyledTextFragment {
             let text: String
-            let isBold: Bool
+            let isEmphasized: Bool
 
-            init(text: String, isBold: Bool = false) {
+            init(text: String, isEmphasized: Bool = false) {
                 self.text = text
-                self.isBold = isBold
+                self.isEmphasized = isEmphasized
             }
         }
 
@@ -65,13 +65,13 @@ extension OnboardingStepView {
             case .userNeedsToAllowExtension:
                 return [
                     .init(text: UserText.networkProtectionOnboardingAllowExtensionDescPrefix),
-                    .init(text: UserText.networkProtectionOnboardingAllowExtensionDescAllow, isBold: true),
+                    .init(text: UserText.networkProtectionOnboardingAllowExtensionDescAllow, isEmphasized: true),
                     .init(text: UserText.networkProtectionOnboardingAllowExtensionDescSuffix),
                 ]
             case .userNeedsToAllowVPNConfiguration:
                 return [
                     .init(text: UserText.networkProtectionOnboardingAllowVPNDescPrefix),
-                    .init(text: UserText.networkProtectionOnboardingAllowVPNDescAllow, isBold: true),
+                    .init(text: UserText.networkProtectionOnboardingAllowVPNDescAllow, isEmphasized: true),
                     .init(text: UserText.networkProtectionOnboardingAllowVPNDescSuffix),
                 ]
             }
@@ -80,9 +80,9 @@ extension OnboardingStepView {
         var actionTitle: String {
             switch step {
             case .userNeedsToAllowExtension:
-                return "Open System Settings..."
+                return UserText.networkProtectionOnboardingAllowExtensionAction
             case .userNeedsToAllowVPNConfiguration:
-                return "Add VPN Configuration..."
+                return UserText.networkProtectionOnboardingAllowVPNAction
             }
         }
 

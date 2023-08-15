@@ -92,8 +92,8 @@ struct OnboardingStepView: View {
                         model.description.reduce(Text("")) { previous, fragment in
                             var newText = Text(fragment.text)
 
-                            if fragment.isBold {
-                                newText = newText.bold()
+                            if fragment.isEmphasized {
+                                newText = newText.fontWeight(.semibold)
                             }
 
                             return previous + newText
