@@ -36,6 +36,7 @@ struct PopoverMessageView: View {
             if let text = viewModel.buttonText,
                let action = viewModel.buttonAction {
                 Button(text, action: action)
+                    .padding(.top, 2)
             }
 
         }
