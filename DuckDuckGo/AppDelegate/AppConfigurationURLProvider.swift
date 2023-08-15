@@ -53,6 +53,6 @@ final class AppConfigurationURLProvider: ConfigurationURLProviding {
         .surrogates: URL(string: "https://duckduckgo.com/contentblocking.js?l=surrogates")!,
         .trackerDataSet: URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v5/current/macos-tds.json")!,
         // In archived repo, to be refactored shortly (https://staticcdn.duckduckgo.com/useragents/social_ctp_configuration.json)
-        .FBConfig: return URL(string: "https://staticcdn.duckduckgo.com/useragents/")!
+        .FBConfig: URL(string: "https://staticcdn.duckduckgo.com/useragents/")!
     ]
 }
