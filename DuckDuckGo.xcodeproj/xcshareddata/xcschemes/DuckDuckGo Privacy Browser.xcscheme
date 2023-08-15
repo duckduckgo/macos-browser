@@ -95,10 +95,10 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "CBRCompileTimeReporterTests">
+                  Identifier = "BrokenSiteReportingReferenceTests/testBrokenSiteReporting()">
                </Test>
                <Test
-                  Identifier = "FireproofingReferenceTests/testFireproofing()">
+                  Identifier = "CBRCompileTimeReporterTests">
                </Test>
                <Test
                   Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">

@@ -390,7 +390,7 @@ final class Fire {
               let accounts = try? vault.accounts() else {
             return []
         }
-        return Set(accounts.map { $0.domain })
+        return Set(accounts.compactMap { $0.domain })
     }
 
     private func burnFavicons(completion: @escaping () -> Void) {
@@ -519,7 +519,7 @@ final class Fire {
 
     private func burnDeletedBookmarks() {
         if syncService?.authState == .inactive {
-            LocalBookmarkManager.shared.cleanUpBookmarksDatabase()
+            bookmarkManager.cleanUpBookmarksDatabase()
         }
     }
 }
@@ -548,20 +548,6 @@ extension TabCollection {
             }
         }
         return domains
-    }
-
-}
-
-extension Set where Element == String {
-
-    func convertedToETLDPlus1(tld: TLD) -> Set<String> {
-        var transformedSet = Set<String>()
-        for domain in self {
-            if let eTLDPlus1Domain = tld.eTLDplus1(domain) {
-                transformedSet.insert(eTLDPlus1Domain)
-            }
-        }
-        return transformedSet
     }
 
 }

@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Common
 import DDGSync
 import Persistence
@@ -23,6 +24,7 @@ import SyncDataProviders
 
 final class SyncDataProviders: DataProvidersSource {
     public let bookmarksAdapter: SyncBookmarksAdapter
+    public let credentialsAdapter: SyncCredentialsAdapter
 
     func makeDataProviders() -> [DataProviding] {
         initializeMetadataDatabaseIfNeeded()
@@ -32,12 +34,21 @@ final class SyncDataProviders: DataProvidersSource {
         }
 
         bookmarksAdapter.setUpProviderIfNeeded(database: bookmarksDatabase, metadataStore: syncMetadata)
-        return [bookmarksAdapter.provider].compactMap { $0 }
+        credentialsAdapter.setUpProviderIfNeeded(secureVaultFactory: secureVaultFactory, metadataStore: syncMetadata)
+
+        let providers: [Any] = [
+            bookmarksAdapter.provider as Any,
+            credentialsAdapter.provider as Any
+        ]
+
+        return providers.compactMap { $0 as? DataProviding }
     }
 
-    init(bookmarksDatabase: CoreDataDatabase) {
+    init(bookmarksDatabase: CoreDataDatabase, secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory) {
         self.bookmarksDatabase = bookmarksDatabase
+        self.secureVaultFactory = secureVaultFactory
         bookmarksAdapter = SyncBookmarksAdapter()
+        credentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: secureVaultFactory)
     }
 
     private func initializeMetadataDatabaseIfNeeded() {
@@ -54,7 +65,7 @@ final class SyncDataProviders: DataProvidersSource {
                 }
 
                 Thread.sleep(forTimeInterval: 1)
-                fatalError("Could not create Bookmarks database stack: \(error?.localizedDescription ?? "err")")
+                fatalError("Could not create Sync Metadata database stack: \(error?.localizedDescription ?? "err")")
             }
         }
         syncMetadata = LocalSyncMetadataStore(database: syncMetadataDatabase.db)
@@ -66,4 +77,5 @@ final class SyncDataProviders: DataProvidersSource {
 
     private let syncMetadataDatabase: SyncMetadataDatabase = SyncMetadataDatabase()
     private let bookmarksDatabase: CoreDataDatabase
+    private let secureVaultFactory: AutofillVaultFactory
 }
