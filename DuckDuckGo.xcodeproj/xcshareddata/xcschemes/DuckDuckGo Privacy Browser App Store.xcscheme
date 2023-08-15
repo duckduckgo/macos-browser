@@ -94,9 +94,6 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "AutoconsentMessageProtocolTests/testEval()">
-               </Test>
-               <Test
                   Identifier = "CBRCompileTimeReporterTests">
                </Test>
                <Test
@@ -123,12 +120,6 @@
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
             <SkippedTests>
-               <Test
-                  Identifier = "AutoconsentIntegrationTests/testCosmeticRule_whenFakeCookieBannerIsDisplayedAndScriptsAreReloaded_bannerIsHidden()">
-               </Test>
-               <Test
-                  Identifier = "AutoconsentIntegrationTests/testCosmeticRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden()">
-               </Test>
                <Test
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
                </Test>
