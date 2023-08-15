@@ -113,14 +113,12 @@ case .releaseToInternalChannel, .releaseHotfixToPublicChannel:
     AppcastDownloader().download()
 
     // Handle dmg file
-    let updatesDirectoryPath = NSString(string: "~/Developer/sparkle-updates").expandingTildeInPath
-    let updatesDirectoryURL = URL(fileURLWithPath: updatesDirectoryPath)
-    guard let dmgURL = handleDMGFile(dmgPath: dmgPath, updatesDirectoryURL: updatesDirectoryURL) else {
+    guard let dmgURL = handleDMGFile(dmgPath: dmgPath, updatesDirectoryURL: specificDir) else {
         exit(1)
     }
 
     // Handle release notes file
-    handleReleaseNotesFile(path: releaseNotesPath, updatesDirectoryURL: updatesDirectoryURL, dmgURL: dmgURL)
+    handleReleaseNotesFile(path: releaseNotesPath, updatesDirectoryURL: specificDir, dmgURL: dmgURL)
 
     // Extract version number from DMG file name
     let versions = getVersionFromDMGFileName(dmgURL: dmgURL)
