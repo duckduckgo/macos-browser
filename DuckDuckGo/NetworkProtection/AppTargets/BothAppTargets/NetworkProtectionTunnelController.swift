@@ -222,7 +222,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         for try await event in SystemExtensionManager().activate() {
             switch event {
             case .waitingForUserApproval:
-                self.controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
+                onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue
             case .activated:
                 self.controllerErrorStore.lastErrorMessage = nil
                 activated = true
