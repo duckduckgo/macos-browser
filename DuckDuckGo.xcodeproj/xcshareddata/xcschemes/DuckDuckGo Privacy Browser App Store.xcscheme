@@ -97,6 +97,9 @@
                   Identifier = "AutoconsentMessageProtocolTests/testEval()">
                </Test>
                <Test
+                  Identifier = "BrokenSiteReportingReferenceTests/testBrokenSiteReporting()">
+               </Test>
+               <Test
                   Identifier = "CBRCompileTimeReporterTests">
                </Test>
                <Test
@@ -107,6 +110,9 @@
                </Test>
                <Test
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
+               </Test>
+               <Test
+                  Identifier = "WindowManagerStateRestorationTests/testWindowManagerStateRestoration()">
                </Test>
             </SkippedTests>
          </TestableReference>
