@@ -91,10 +91,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             Pixel.setUp()
 #endif
 
-
-
-
-            Databad se.shared.loadStore { _, error in
+            Database.shared.loadStore { _, error in
                 guard let error = error else { return }
 
                 switch error {
