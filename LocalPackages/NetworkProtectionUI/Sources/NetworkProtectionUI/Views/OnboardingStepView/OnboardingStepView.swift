@@ -114,7 +114,6 @@ struct OnboardingStepView: View {
 
             if let actionScreenshot = model.actionScreenshot {
                 Image(actionScreenshot)
-                    .shadow(color: .black.opacity(0.18), radius: 5, x: 0, y: 0)
             }
         }
         .cornerRadius(8)
