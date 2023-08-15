@@ -187,6 +187,8 @@ final class FirePopoverViewModel {
     // MARK: - Burning
 
     func burn() {
+        Pixel.fire(.fireButtonFirstBurn, limitToOnceADay: true)
+
         switch (clearingOption, areAllSelected) {
         case (.currentTab, _):
             guard let tabCollectionViewModel = tabCollectionViewModel,
@@ -194,6 +196,7 @@ final class FirePopoverViewModel {
                 assertionFailure("No tab selected")
                 return
             }
+            Pixel.fire(.fireButton(option: .tab))
             let burningEntity = Fire.BurningEntity.tab(tabViewModel: tabViewModel,
                                                        selectedDomains: selectedDomains,
                                                        parentTabCollectionViewModel: tabCollectionViewModel)
@@ -203,14 +206,17 @@ final class FirePopoverViewModel {
                 assertionFailure("FirePopoverViewModel: TabCollectionViewModel is not present")
                 return
             }
+            Pixel.fire(.fireButton(option: .window))
             let burningEntity = Fire.BurningEntity.window(tabCollectionViewModel: tabCollectionViewModel,
                                                           selectedDomains: selectedDomains)
             fireViewModel.fire.burnEntity(entity: burningEntity)
 
         case (.allData, true):
+            Pixel.fire(.fireButton(option: .allSites))
             fireViewModel.fire.burnAll()
 
         case (.allData, false):
+            Pixel.fire(.fireButton(option: .allSites))
             fireViewModel.fire.burnEntity(entity: .allWindows(mainWindowControllers: WindowControllersManager.shared.mainWindowControllers,
                                                               selectedDomains: selectedDomains))
         }
