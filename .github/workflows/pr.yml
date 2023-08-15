@@ -321,7 +321,7 @@ jobs:
     name: Create Asana Task
     needs: [swiftlint, tests, release-build, verify-autoconsent-bundle, private-api]
 
-    if: failure() && github.ref_name == 'develop'
+    if: failure()
     
     env:
       WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
