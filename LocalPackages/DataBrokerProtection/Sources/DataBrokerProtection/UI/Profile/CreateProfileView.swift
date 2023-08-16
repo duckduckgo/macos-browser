@@ -415,7 +415,7 @@ private struct FormFooterView: View {
     var body: some View {
         VStack(spacing: 16) {
             Button {
-               print("Scan")
+                viewModel.saveProfile()
             } label: {
                 Text("Scan")
                     .frame(maxWidth: .infinity)

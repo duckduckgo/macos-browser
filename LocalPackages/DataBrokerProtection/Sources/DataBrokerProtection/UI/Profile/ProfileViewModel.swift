@@ -133,6 +133,30 @@ final class ProfileViewModel: ObservableObject {
         addresses.removeAll(where: {$0.id == id})
     }
 
+    func saveProfile() {
+        let profile = mapUIProfileToDataBaseProfile()
+
+    }
+
+    private func mapUIProfileToDataBaseProfile() -> DataBrokerProtectionProfile {
+        let names = names.map {
+            DataBrokerProtectionProfile.Name(firstName: $0.firstName,
+                                             lastName: $0.lastName,
+                                             middleName: $0.middleName,
+                                             suffix: $0.suffix)
+        }
+
+        let addresses = addresses.map {
+            DataBrokerProtectionProfile.Address(city: $0.city,
+                                                state: $0.state,
+                                                street: $0.street)
+        }
+
+        return DataBrokerProtectionProfile(names: names,
+                                           addresses: addresses,
+                                           phones: [],
+                                           age: birthYear)
+    }
 }
 
 @propertyWrapper
