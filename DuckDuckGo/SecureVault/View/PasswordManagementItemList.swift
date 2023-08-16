@@ -274,8 +274,8 @@ private struct ItemView: View {
 
                 switch item {
                 case .account:
-                    if let account = item.websiteAccount {
-                        LoginFaviconView(domain: account.domain,
+                    if let account = item.websiteAccount, let domain = account.domain {
+                        LoginFaviconView(domain: domain,
                                          preferredFirstCharacter: model.firstLetterForAccount(account: account))
                     } else {
                         AutofillIconLetterView(title: "#")

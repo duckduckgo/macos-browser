@@ -41,9 +41,6 @@ struct LoginFaviconView: View {
     }
 
     var favicon: NSImage? {
-        guard let domain else {
-            return NSImage(named: "Login")
-        }
         return faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image ?? NSImage(named: "Login")
     }
 
