@@ -1029,7 +1029,7 @@ extension URL {
         "^fe80:.+"
     ]
 
-    private static var compiledRegexes: [NSRegularExpression] {
+    private static var compiledRegexes: [NSRegularExpression] = {
         var regexes: [NSRegularExpression] = []
         for pattern in localPatterns {
             if let newRegex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
@@ -1037,7 +1037,7 @@ extension URL {
             }
         }
         return regexes
-    }
+    }()
 
     var isLocalURL: Bool {
         if let host = self.host {
