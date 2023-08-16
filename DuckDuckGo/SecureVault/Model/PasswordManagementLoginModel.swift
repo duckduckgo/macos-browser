@@ -56,7 +56,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     @Published var firstLetter = ""
 
     var isDirty: Bool {
-        username != "" || password != "" || domain != ""
+        title != "" || username != "" || password != "" || domain != "" || notes != ""
     }
 
     var lastUpdatedDate: String = ""

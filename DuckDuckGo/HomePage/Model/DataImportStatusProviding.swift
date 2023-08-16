@@ -68,17 +68,17 @@ final class BookmarksAndPasswordsImportStatusProvider: DataImportStatusProviding
         }
 
         var dates: [Date] = []
-        if let accountsDates = try? secureVault.accounts().map({ $0.created }) {
+        do {
+            let accountsDates = try secureVault.accounts().map(\.created)
             dates.append(contentsOf: accountsDates)
-        }
-        if let noteDates = try? secureVault.notes().map({ $0.created }) {
+            let noteDates = try secureVault.notes().map(\.created)
             dates.append(contentsOf: noteDates)
-        }
-        if let cardDates = try? secureVault.creditCards().map({ $0.created }) {
+            let cardDates = try secureVault.creditCards().map(\.created)
             dates.append(contentsOf: cardDates)
-        }
-        if let identitiesDates = try? secureVault.identities().map({ $0.created }) {
+            let identitiesDates = try secureVault.identities().map(\.created)
             dates.append(contentsOf: identitiesDates)
+        } catch {
+            Pixel.fire(.debug(event: .secureVaultError, error: error))
         }
         guard dates.count >= 2 else {
             return false

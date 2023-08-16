@@ -18,6 +18,8 @@
 
 import Foundation
 import Combine
+import Common
+import DDGSync
 import SwiftUI
 import BrowserServicesKit
 import SecureStorage
@@ -101,6 +103,7 @@ final class PasswordManagementViewController: NSViewController {
     var emptyStateCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
     var appearanceCancellable: AnyCancellable?
+    var reloadDataAfterSyncCancellable: AnyCancellable?
 
     var domain: String?
     var isEditing = false
@@ -157,6 +160,7 @@ final class PasswordManagementViewController: NSViewController {
         createLoginItemView()
 
         appearanceCancellable = view.subscribeForAppApperanceUpdates()
+        reloadDataAfterSyncCancellable = bindSyncDidFinish()
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
@@ -178,9 +182,18 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
+    private func bindSyncDidFinish() -> AnyCancellable? {
+        (NSApp.delegate as? AppDelegate)?.syncDataProviders?.credentialsAdapter.syncDidCompletePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.refreshData()
+            }
+    }
+
     private func toggleLockScreen(hidden: Bool) {
         if hidden {
             hideLockScreen()
+            requestSync()
         } else {
             displayLockScreen()
         }
@@ -304,6 +317,8 @@ final class PasswordManagementViewController: NSViewController {
             } else if self?.isDirty == false {
                 if let selectItemMatchingDomain = selectItemMatchingDomain {
                     self?.listModel?.selectLoginWithDomainOrFirst(domain: selectItemMatchingDomain)
+                } else if let selectedItem = self?.listModel?.selected {
+                    self?.listModel?.select(item: selectedItem)
                 } else {
                     self?.listModel?.selectFirst()
                 }
@@ -456,7 +471,17 @@ final class PasswordManagementViewController: NSViewController {
     private func doSaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) {
         let isNew = credentials.account.id == nil
 
+        func showDuplicateAlert() {
+            if let window = view.window {
+                NSAlert.passwordManagerDuplicateLogin().beginSheetModal(for: window)
+            }
+        }
+
         do {
+            if try secureVault?.hasAccountFor(username: credentials.account.username, domain: credentials.account.domain) == true && isNew {
+                showDuplicateAlert()
+                return
+            }
             guard let id = try secureVault?.storeWebsiteCredentials(credentials),
                   let savedCredentials = try secureVault?.websiteCredentialsFor(accountId: id) else {
                 return
@@ -471,10 +496,13 @@ final class PasswordManagementViewController: NSViewController {
                 syncModelsOnCredentials(savedCredentials)
             }
             postChange()
+            requestSync()
 
         } catch {
-            if let window = view.window, case SecureStorageError.duplicateRecord = error {
-                NSAlert.passwordManagerDuplicateLogin().beginSheetModal(for: window)
+            if case SecureStorageError.duplicateRecord = error {
+                showDuplicateAlert()
+            } else {
+                Pixel.fire(.debug(event: .secureVaultError, error: error))
             }
         }
     }
@@ -497,7 +525,7 @@ final class PasswordManagementViewController: NSViewController {
             postChange()
 
         } catch {
-            // Which errors can occur when saving identities?
+            Pixel.fire(.debug(event: .secureVaultError, error: error))
         }
     }
 
@@ -541,7 +569,7 @@ final class PasswordManagementViewController: NSViewController {
             postChange()
 
         } catch {
-            // Which errors can occur when saving cards?
+            Pixel.fire(.debug(event: .secureVaultError, error: error))
         }
     }
 
@@ -555,8 +583,13 @@ final class PasswordManagementViewController: NSViewController {
 
             switch response {
             case .alertFirstButtonReturn:
-                try? self.secureVault?.deleteWebsiteCredentialsFor(accountId: id)
-                self.refreshData()
+                do {
+                    try self.secureVault?.deleteWebsiteCredentialsFor(accountId: id)
+                    self.requestSync()
+                    self.refreshData()
+                } catch {
+                    Pixel.fire(.debug(event: .secureVaultError, error: error))
+                }
 
             default:
                 break // cancel, do nothing
@@ -574,8 +607,12 @@ final class PasswordManagementViewController: NSViewController {
 
             switch response {
             case .alertFirstButtonReturn:
-                try? self.secureVault?.deleteIdentityFor(identityId: id)
-                self.refreshData()
+                do {
+                    try self.secureVault?.deleteIdentityFor(identityId: id)
+                    self.refreshData()
+                } catch {
+                    Pixel.fire(.debug(event: .secureVaultError, error: error))
+                }
 
             default:
                 break // cancel, do nothing
@@ -612,8 +649,12 @@ final class PasswordManagementViewController: NSViewController {
 
             switch response {
             case .alertFirstButtonReturn:
-                try? self.secureVault?.deleteCreditCardFor(cardId: id)
-                self.refreshData()
+                do {
+                    try self.secureVault?.deleteCreditCardFor(cardId: id)
+                    self.refreshData()
+                } catch {
+                    Pixel.fire(.debug(event: .secureVaultError, error: error))
+                }
 
             default:
                 break // cancel, do nothing
@@ -643,23 +684,27 @@ final class PasswordManagementViewController: NSViewController {
             }
 
             func loadNewItemWithID() {
-                switch newValue {
-                case .account:
-                    guard let credentials = try? self?.secureVault?.websiteCredentialsFor(accountId: id) else { return }
-                    self?.createLoginItemView()
-                    self?.syncModelsOnCredentials(credentials)
-                case .card:
-                    guard let card = try? self?.secureVault?.creditCardFor(id: id) else { return }
-                    self?.createCreditCardItemView()
-                    self?.syncModelsOnCreditCard(card)
-                case .identity:
-                    guard let identity = try? self?.secureVault?.identityFor(id: id) else { return }
-                    self?.createIdentityItemView()
-                    self?.syncModelsOnIdentity(identity)
-                case .note:
-                    guard let note = try? self?.secureVault?.noteFor(id: id) else { return }
-                    self?.createNoteItemView()
-                    self?.syncModelsOnNote(note)
+                do {
+                    switch newValue {
+                    case .account:
+                        guard let credentials = try self?.secureVault?.websiteCredentialsFor(accountId: id) else { return }
+                        self?.createLoginItemView()
+                        self?.syncModelsOnCredentials(credentials)
+                    case .card:
+                        guard let card = try self?.secureVault?.creditCardFor(id: id) else { return }
+                        self?.createCreditCardItemView()
+                        self?.syncModelsOnCreditCard(card)
+                    case .identity:
+                        guard let identity = try self?.secureVault?.identityFor(id: id) else { return }
+                        self?.createIdentityItemView()
+                        self?.syncModelsOnIdentity(identity)
+                    case .note:
+                        guard let note = try self?.secureVault?.noteFor(id: id) else { return }
+                        self?.createNoteItemView()
+                        self?.syncModelsOnNote(note)
+                    }
+                } catch {
+                    Pixel.fire(.debug(event: .secureVaultError, error: error))
                 }
             }
 
@@ -738,28 +783,32 @@ final class PasswordManagementViewController: NSViewController {
 
     private func fetchSecureVaultItems(category: SecureVaultSorting.Category = .allItems, completion: @escaping ([SecureVaultItem]) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
-            var items: [SecureVaultItem]
+            var items: [SecureVaultItem] = []
 
-            switch category {
-            case .allItems:
-                let accounts = (try? self.secureVault?.accounts()) ?? []
-                let cards = (try? self.secureVault?.creditCards()) ?? []
-                let notes = (try? self.secureVault?.notes()) ?? []
-                let identities = (try? self.secureVault?.identities()) ?? []
+            do {
+                switch category {
+                case .allItems:
+                    let accounts = try self.secureVault?.accounts() ?? []
+                    let cards = try self.secureVault?.creditCards() ?? []
+                    let notes = try self.secureVault?.notes() ?? []
+                    let identities = try self.secureVault?.identities() ?? []
 
-                items = accounts.map(SecureVaultItem.account) +
-                    cards.map(SecureVaultItem.card) +
-                    notes.map(SecureVaultItem.note) +
-                    identities.map(SecureVaultItem.identity)
-            case .logins:
-                let accounts = (try? self.secureVault?.accounts()) ?? []
-                items = accounts.map(SecureVaultItem.account)
-            case .identities:
-                let identities = (try? self.secureVault?.identities()) ?? []
-                items = identities.map(SecureVaultItem.identity)
-            case .cards:
-                let cards = (try? self.secureVault?.creditCards()) ?? []
-                items = cards.map(SecureVaultItem.card)
+                    items = accounts.map(SecureVaultItem.account) +
+                        cards.map(SecureVaultItem.card) +
+                        notes.map(SecureVaultItem.note) +
+                        identities.map(SecureVaultItem.identity)
+                case .logins:
+                    let accounts = try self.secureVault?.accounts() ?? []
+                    items = accounts.map(SecureVaultItem.account)
+                case .identities:
+                    let identities = try self.secureVault?.identities() ?? []
+                    items = identities.map(SecureVaultItem.identity)
+                case .cards:
+                    let cards = try self.secureVault?.creditCards() ?? []
+                    items = cards.map(SecureVaultItem.card)
+                }
+            } catch {
+                Pixel.fire(.debug(event: .secureVaultError, error: error))
             }
 
             DispatchQueue.main.async {
@@ -916,6 +965,14 @@ final class PasswordManagementViewController: NSViewController {
         emptyStateTitle.attributedStringValue = NSAttributedString.make(title, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.isHidden = true
         emptyStateButton.isHidden = true
+    }
+
+    private func requestSync() {
+        guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
+            return
+        }
+        os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+        syncService.scheduler.requestSyncImmediately()
     }
 
 }
