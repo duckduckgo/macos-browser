@@ -130,7 +130,10 @@ extension Pixel.Event {
              .networkProtectionSystemExtensionUnknownActivationResult,
              .favoriteSectionHidden,
              .recentActivitySectionHidden,
-             .continueSetUpSectionHidden:
+             .continueSetUpSectionHidden,
+             .userHasPinnedTab,
+             .fireButtonFirstBurn,
+             .fireButton:
 
             return nil
         }

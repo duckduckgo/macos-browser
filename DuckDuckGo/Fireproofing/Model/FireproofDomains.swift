@@ -64,7 +64,8 @@ internal class FireproofDomains {
 
                 var container = FireproofDomainsContainer()
                 do {
-                    let added = try store.add(Set(domains))
+                    let eTLDPlus1Domains = Set(domains).convertedToETLDPlus1(tld: tld)
+                    let added = try store.add(eTLDPlus1Domains)
                     for (domain, id) in added {
                         try container.add(domain: domain, withId: id)
                     }
