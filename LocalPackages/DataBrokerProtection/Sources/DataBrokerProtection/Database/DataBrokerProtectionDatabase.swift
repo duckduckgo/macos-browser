@@ -54,7 +54,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         // What about if brokers or profile queries are empty? Should we throw an error?
 
         for broker in brokers {
-            guard let brokerId = broker.id else { continue } // What happens if a broker has a nil id?
+            guard let brokerId = broker.id else { continue } // What happens if a broker has a nil id? Should throw send a pixel or something?
 
             for profileQuery in profileQueries {
                 let profileQueryId = try vault.save(profileQuery: profileQuery, profileId: profileId)

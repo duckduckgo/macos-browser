@@ -168,6 +168,7 @@ struct MapperToModel {
 
     func mapToModel(_ profileQueryDB: ProfileQueryDB) throws -> ProfileQuery {
         .init(
+            id: profileQueryDB.id,
             firstName: try mechanism(profileQueryDB.first).decoded,
             lastName: try mechanism(profileQueryDB.last).decoded,
             middleName: try profileQueryDB.middle.decode(mechanism),

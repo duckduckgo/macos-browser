@@ -24,6 +24,7 @@ struct Address: Encodable, Sendable {
 }
 
 struct ProfileQuery: Encodable, Sendable {
+    let id: Int64?
     let firstName: String
     let lastName: String
     let middleName: String?
@@ -42,7 +43,8 @@ struct ProfileQuery: Encodable, Sendable {
         return currentYear - birthYear
     }
 
-    public init(firstName: String,
+    public init(id: Int64? = nil,
+                firstName: String,
                 lastName: String,
                 middleName: String? = nil,
                 suffix: String? = nil,
@@ -52,6 +54,7 @@ struct ProfileQuery: Encodable, Sendable {
                 zipCode: String? = nil,
                 phone: String? = nil,
                 birthYear: Int) {
+        self.id = id
         self.firstName = firstName
         self.lastName = lastName
         self.city = city
