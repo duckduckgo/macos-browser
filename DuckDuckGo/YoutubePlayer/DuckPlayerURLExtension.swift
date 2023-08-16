@@ -136,7 +136,8 @@ extension URL {
     // MARK: - Private
 
     private var isYoutubeWatch: Bool {
-        host?.droppingWwwPrefix() == "youtube.com" && path == "/watch"
+        guard let host else { return false }
+        return host.contains("youtube.com") && path == "/watch"
     }
 
     private func addingTimestamp(_ timestamp: String?) -> URL {
