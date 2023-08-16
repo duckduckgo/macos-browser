@@ -28,7 +28,7 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
     var fakeBrokerSwitch: NSSwitch!
 
     private let fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()
-    private let reedemUseCase: DataBrokerProtectionRedeemUseCase
+    private let redeemUseCase: DataBrokerProtectionRedeemUseCase
 
     private var isSchedulerRunning = false
     private var scheduler: DataBrokerProtectionScheduler?
@@ -44,8 +44,8 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
         DataBrokerProfileQueryViewController(dataManager: dataManager)
     }()
 
-    init(reedemUseCase: DataBrokerProtectionRedeemUseCase) {
-        self.reedemUseCase = reedemUseCase
+    init(redeemUseCase: DataBrokerProtectionRedeemUseCase) {
+        self.redeemUseCase = redeemUseCase
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -180,7 +180,7 @@ final class DataBrokerProtectionDebugViewController: NSViewController {
                                                   dataManager: dataManager,
                                                   notificationCenter: NotificationCenter.default,
                                                   errorHandler: DataBrokerProtectionErrorHandling(),
-                                                  redeemUseCase: reedemUseCase
+                                                  redeemUseCase: redeemUseCase
         )
     }
 }
