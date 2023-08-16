@@ -19,12 +19,12 @@
 import SwiftUI
 import BrowserServicesKit
 
-struct LoginFaviconView: View {   
+struct LoginFaviconView: View {
     let domain: String
     let preferredFirstCharacter: String?
     let preferredColor: Int = 1
-    let faviconManagement: FaviconManagement = FaviconManager.shared    
-    
+    let faviconManagement: FaviconManagement = FaviconManager.shared
+
     var body: some View {
         if let image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image {
             Image(nsImage: image)

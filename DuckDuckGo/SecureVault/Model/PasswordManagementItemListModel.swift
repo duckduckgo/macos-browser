@@ -456,11 +456,11 @@ final class PasswordManagementItemListModel: ObservableObject {
         case .identities: emptyState = .identities
         }
     }
-    
+
     func firstLetterForAccount(account: SecureVaultModels.WebsiteAccount) -> String {
         account.firstTLDLetter(tld: tld, autofillDomainNameUrlSort: urlSort) ?? ""
     }
-    
+
     func iconColorForAccount(account: SecureVaultModels.WebsiteAccount) -> Int {
         ((Int(account.id ?? "") ?? 1) % Self.randomColorsCount) + 1
     }
