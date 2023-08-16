@@ -41,10 +41,9 @@ struct PasswordManagementItemListView: View {
     @available(macOS 11.0, *)
     private func selectItem(id: String, proxy: ScrollViewProxy) {
         // Selection/scroll wont work until list is fully rendered
-        // so give it a few milis based on element count before auto-selecting
+        // so give it a few milis before auto-selecting
         if !autoSelected {
-            let delay = TimeInterval(model.itemCount) * 0.0001
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 proxy.scrollTo(id, anchor: .center)
                 autoSelected = true
             }
