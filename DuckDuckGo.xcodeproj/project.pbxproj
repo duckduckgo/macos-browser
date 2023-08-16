@@ -2368,6 +2368,7 @@
 		4B4BEC332A11B509001D9AC5 /* DuckDuckGoNotifications.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoNotifications.entitlements; sourceTree = "<group>"; };
 		4B4BEC342A11B509001D9AC5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4B4BEC382A11B509001D9AC5 /* DuckDuckGoNotificationsAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckDuckGoNotificationsAppDelegate.swift; sourceTree = "<group>"; };
+		4B4C29FC2A8C13F700F12B04 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		4B4D603D2A0B290200BCD287 /* NetworkProtectionAppExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NetworkProtectionAppExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B4D603E2A0B290200BCD287 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionSystemExtension.xcconfig; sourceTree = "<group>"; };
@@ -4992,6 +4993,7 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
+				4B4C29FC2A8C13F700F12B04 /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,

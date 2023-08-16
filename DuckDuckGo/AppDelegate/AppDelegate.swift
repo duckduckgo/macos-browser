@@ -218,6 +218,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     func applicationDidBecomeActive(_ notification: Notification) {
         syncService?.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
         syncService?.scheduler.notifyAppLifecycleEvent()
+
+        if ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .incrementalRolloutTest) {
+            print("FEATURE ON!")
+        }
+
+        if ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(IncrementalRolloutTestSubfeature.rollout) {
+            print("SUBFEATURE ON!")
+        }
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
