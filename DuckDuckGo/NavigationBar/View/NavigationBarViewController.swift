@@ -384,7 +384,7 @@ final class NavigationBarViewController: NSViewController {
 
         DispatchQueue.main.async {
             let action = {
-                self.showPasswordManagerPopover(selectedCategory: .logins)
+                self.showPasswordManagerPopover(selectedWebsiteAccount: account)
             }
             let viewController = PopoverMessageViewController(message: UserText.passwordManagerAutosavePopoverText(domain: domain),
                                                               image: Self.Constants.autosavePopoverImageName,
@@ -425,6 +425,12 @@ final class NavigationBarViewController: NSViewController {
         popovers.showPasswordManagementPopover(selectedCategory: selectedCategory,
                                                usingView: passwordManagementButton,
                                                withDelegate: self)
+    }
+
+    func showPasswordManagerPopover(selectedWebsiteAccount: SecureVaultModels.WebsiteAccount) {
+        popovers.showPasswordManagerPopover(selectedWebsiteAccount: selectedWebsiteAccount,
+                                                     usingView: passwordManagementButton,
+                                                     withDelegate: self)
     }
 
     private func setupNavigationButtonMenus() {

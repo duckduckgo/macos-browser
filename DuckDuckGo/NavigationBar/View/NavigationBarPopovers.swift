@@ -189,6 +189,14 @@ final class NavigationBarPopovers {
         popover.select(category: selectedCategory)
     }
 
+    func showPasswordManagerPopover(selectedWebsiteAccount: SecureVaultModels.WebsiteAccount, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
+        let popover = passwordManagementPopover ?? PasswordManagementPopover()
+        passwordManagementPopover = popover
+        popover.delegate = delegate
+        show(popover: popover, usingView: view)
+        popover.select(websiteAccount: selectedWebsiteAccount)
+    }
+
     func hasAnySavePopoversVisible() -> Bool {
         return savePopovers.contains(where: { $0?.isShown ?? false })
     }

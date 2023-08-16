@@ -251,7 +251,11 @@ final class PasswordManagementItemListModel: ObservableObject {
             }
 
             updateFilteredData()
-            selectFirst()
+
+            // Select first item if no previous selection was provided
+            if selected == nil {
+                selectFirst()
+            }
         }
     }
 
