@@ -22,21 +22,18 @@ import XCTest
 final class BrokerJSONCodableTests: XCTestCase {
     let verecorJSONString = """
                {
-                 "name": "verecor",
-                "schedulingConfig" : {
-                    "retryError": 100,
-                    "confirmOptOutScan": 40,
-                    "maintenanceScan": 60,
-                    "emailConfirmation": 60,
-                              },
+                 "name": "verecor.com",
+                 "version": "0.1.0",
+                 "addedDatetime": 1677128400000,
                  "steps": [
                    {
                      "stepType": "scan",
+                     "scanType": "templatedUrl",
                      "actions": [
                        {
-                         "id": "fe235f94-1c33-11ee-be56-0242ac120002",
                          "actionType": "navigate",
-                         "url": "https://verecor.com/profile/search?fname=${firstName}&lname=${lastName}&state=${stateUpcase}&city=${cityCapitalize}&fage=${ageRange}",
+                         "id": "84aa05bc-1ca0-4f16-ae74-dfb352ce0eee",
+                         "url": "https://verecor.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${ageRange}",
                          "ageRange": [
                            "18-30",
                            "31-40",
@@ -48,30 +45,43 @@ final class BrokerJSONCodableTests: XCTestCase {
                          ]
                        },
                        {
-                         "id": "fe236548-1c33-11ee-be56-0242ac120002",
                          "actionType": "extract",
+                         "id": "92252eb5-ccaf-4b00-a3fe-019110ce0534",
                          "selector": ".search-item",
                          "profile": {
-                           "name": "//div[@class='col-sm-24 col-md-19 col-text']",
-                           "alternativeNamesList": ".name",
-                           "age": ".age",
-                           "addressCityStateList": ".location",
-                           "profileUrl": "a"
+                           "name": {
+                             "selector": "h4"
+                           },
+                           "alternativeNamesList": {
+                             "selector": ".//div[@class='col-sm-24 col-md-16 name']//li",
+                             "findElements": true
+                           },
+                           "age": {
+                             "selector": ".age"
+                           },
+                           "addressCityStateList": {
+                             "selector": ".//div[@class='col-sm-24 col-md-8 location']//li",
+                             "findElements": true
+                           },
+                           "profileUrl": {
+                             "selector": "a"
+                           }
                          }
                        }
                      ]
                    },
                    {
                      "stepType": "optOut",
+                     "optOutType": "formOptOut",
                      "actions": [
                        {
-                         "id": "fe23669c-1c33-11ee-be56-0242ac120002",
                          "actionType": "navigate",
+                         "id": "49f9aa73-4f97-47c0-b8bf-1729e9c169c0",
                          "url": "https://verecor.com/ng/control/privacy"
                        },
                        {
-                         "id": "fe2367be-1c33-11ee-be56-0242ac120002",
                          "actionType": "fillForm",
+                         "id": "55b1d0bb-d303-4b6f-bf9e-3fd96746f27e",
                          "selector": ".ahm",
                          "elements": [
                            {
@@ -89,18 +99,18 @@ final class BrokerJSONCodableTests: XCTestCase {
                          ]
                        },
                        {
-                         "id": "fe2369f8-1c33-11ee-be56-0242ac120002",
                          "actionType": "getCaptchaInfo",
+                         "id": "9efb1153-8f52-41e4-a8fb-3077a97a586d",
                          "selector": ".g-recaptcha"
                        },
                        {
-                         "id": "fe2368e0-1c33-11ee-be56-0242ac120002",
                          "actionType": "solveCaptcha",
+                         "id": "ed49e4c3-0cfa-4f1e-b3d1-06ad7b8b9ba4",
                          "selector": ".g-recaptcha"
                        },
                        {
-                         "id": "fe236b10-1c33-11ee-be56-0242ac120002",
                          "actionType": "click",
+                         "id": "6b986aa4-3d1b-44d5-8b2b-5463ee8916c9",
                          "elements": [
                            {
                              "type": "button",
@@ -109,8 +119,8 @@ final class BrokerJSONCodableTests: XCTestCase {
                          ]
                        },
                        {
-                         "id": "fe236c32-1c33-11ee-be56-0242ac120002",
                          "actionType": "expectation",
+                         "id": "d4c64d9b-1004-487e-ab06-ae74869bc9a7",
                          "expectations": [
                            {
                              "type": "text",
@@ -120,13 +130,13 @@ final class BrokerJSONCodableTests: XCTestCase {
                          ]
                        },
                        {
-                         "id": "fe236d4a-1c33-11ee-be56-0242ac120002",
                          "actionType": "emailConfirmation",
+                         "id": "3b4c611a-61ab-4792-810e-d5b3633ea203",
                          "pollingTime": 30
                        },
                        {
-                         "id": "fe2371be-1c33-11ee-be56-0242ac120002",
                          "actionType": "expectation",
+                         "id": "afe805a0-d422-473c-b47f-995a8672d476",
                          "expectations": [
                            {
                              "type": "text",
@@ -137,8 +147,14 @@ final class BrokerJSONCodableTests: XCTestCase {
                        }
                      ]
                    }
-                 ]
+                 ],
+                 "schedulingConfig": {
+                   "retryError": 48,
+                   "confirmOptOutScan": 72,
+                   "maintenanceScan": 240
+                 }
                }
+
                """
 
     func testVerecorJSON_isCorrectlyParsed() {
