@@ -77,13 +77,13 @@ public final class RedeemUseCase: DataBrokerProtectionRedeemUseCase {
     }
 
     public func getAuthHeader() async throws -> String {
-        guard let inviteCode = authenticationRepository.getInviteCode() else {
-            throw AuthenticationError.noInviteCode
-        }
-
         var accessToken = authenticationRepository.getAccessToken() ?? ""
 
         if accessToken.isEmpty {
+            guard let inviteCode = authenticationRepository.getInviteCode() else {
+                throw AuthenticationError.noInviteCode
+            }
+
             accessToken = try await authenticationService.redeem(inviteCode: inviteCode)
             authenticationRepository.save(accessToken: accessToken)
         }
