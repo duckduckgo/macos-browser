@@ -146,6 +146,11 @@ final class PasswordManagementViewController: NSViewController {
 
     private let passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
 
+    private let emailManager = EmailManager()
+    private let urlMatcher = AutofillDomainNameUrlMatcher()
+    private let tld = ContentBlocking.shared.tld
+    private let urlSort = AutofillDomainNameUrlSort()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         createListView()
@@ -370,7 +375,10 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCredentials(credentials)
         }, onDeleteRequested: { [weak self] credentials in
             self?.promptToDelete(credentials: credentials)
-        })
+        },
+                                                     urlMatcher: urlMatcher,
+                                                     emailManager: emailManager,
+                                                     urlSort: urlSort)
 
         self.itemModel = itemModel
 

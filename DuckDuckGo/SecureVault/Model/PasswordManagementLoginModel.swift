@@ -19,7 +19,6 @@
 import Combine
 import BrowserServicesKit
 import Common
-import AppKit
 
 final class PasswordManagementLoginModel: ObservableObject, PasswordManagementItemModel {
 
@@ -55,7 +54,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     @Published var isEditing = false
     @Published var isNew = false
     @Published var firstLetter = ""
-    
+
     var isDirty: Bool {
         username != "" || password != "" || domain != ""
     }
@@ -130,10 +129,10 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     init(onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
          onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
-         urlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher(),
-         emailManager: EmailManager = EmailManager(),
+         urlMatcher: AutofillUrlMatcher,
+         emailManager: EmailManager,
          tld: TLD = ContentBlocking.shared.tld,
-         urlSort: AutofillDomainNameUrlSort = AutofillDomainNameUrlSort()) {
+         urlSort: AutofillDomainNameUrlSort) {
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested
         self.urlMatcher = urlMatcher
@@ -211,7 +210,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         domain =  urlMatcher.normalizeUrlForWeb(credentials?.account.domain ?? "")
         notes = credentials?.account.notes ?? ""
         isNew = credentials?.account.id == nil
-        firstLetter = credentials?.account.firstTLDLetter(tld: tld, autofillDomainNameUrlSort: urlSort) ?? ""        
+        firstLetter = credentials?.account.firstTLDLetter(tld: tld, autofillDomainNameUrlSort: urlSort) ?? ""
 
         // Determine Private Email Status when required
         usernameIsPrivateEmail = emailManager.isPrivateEmail(email: username)
