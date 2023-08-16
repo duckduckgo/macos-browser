@@ -265,10 +265,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     func start(enableLoginItems: Bool) async {
         controllerErrorStore.lastErrorMessage = nil
 
-        if enableLoginItems {
-            loginItemsManager.enableLoginItems()
-        }
-
         do {
 #if NETP_SYSTEM_EXTENSION
             guard try await ensureSystemExtensionIsActivated() else {
@@ -295,6 +291,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 throw error
             }
             onboardingStatusRawValue = OnboardingStatus.completed.rawValue
+
+            if enableLoginItems {
+                loginItemsManager.enableLoginItems()
+            }
 
             switch tunnelManager.connection.status {
             case .invalid:
