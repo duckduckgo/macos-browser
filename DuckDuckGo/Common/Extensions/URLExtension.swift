@@ -79,6 +79,7 @@ extension URL {
     }
 
     static func makeURL(from addressBarString: String) -> URL? {
+
         let trimmed = addressBarString.trimmingWhitespace()
 
         if let addressBarUrl = URL(trimmedAddressBarString: trimmed), addressBarUrl.isValid {
@@ -206,9 +207,9 @@ extension URL {
     }
 
     private func toString(decodePunycode: Bool,
-                  dropScheme: Bool,
-                  needsWWW: Bool? = nil,
-                  dropTrailingSlash: Bool) -> String {
+                          dropScheme: Bool,
+                          needsWWW: Bool? = nil,
+                          dropTrailingSlash: Bool) -> String {
         guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
               var string = components.string
         else {
