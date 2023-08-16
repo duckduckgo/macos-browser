@@ -31,6 +31,7 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
 
     func save(_ broker: BrokerDB) throws -> Int64
     func fetchBroker(with id: Int64) throws -> BrokerDB?
+    func fetchAllBrokers() throws -> [BrokerDB]
 
     func save(_ profileQuery: ProfileQueryDB) throws -> Int64
     func fetchProfileQuery(with id: Int64) throws -> ProfileQueryDB?
@@ -129,7 +130,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 
             $0.column(BrokerDB.Columns.name.name, .text).unique().notNull()
             $0.column(BrokerDB.Columns.json.name, .text).notNull()
-            $0.column(BrokerDB.Columns.version.name, .numeric).notNull()
+            $0.column(BrokerDB.Columns.version.name, .text).notNull()
         }
 
         try database.create(table: ScanDB.databaseTableName) {
@@ -249,6 +250,12 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     func fetchBroker(with id: Int64) throws -> BrokerDB? {
         try db.read { db in
             return try BrokerDB.fetchOne(db, key: id)
+        }
+    }
+
+    func fetchAllBrokers() throws -> [BrokerDB] {
+        try db.read { db in
+            return try BrokerDB.fetchAll(db)
         }
     }
 

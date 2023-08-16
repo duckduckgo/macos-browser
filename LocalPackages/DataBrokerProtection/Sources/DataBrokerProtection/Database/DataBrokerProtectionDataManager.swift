@@ -35,7 +35,7 @@ public protocol DataBrokerProtectionDataManagerDelegate: AnyObject {
 public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
     public weak var delegate: DataBrokerProtectionDataManagerDelegate?
 
-    internal let database: DataBrokerProtectionDataBase
+    internal let database: DataBrokerProtectionDatabase
 
     required public init(fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()) {
         self.database = DataBrokerProtectionDataBase(fakeBrokerFlag: fakeBrokerFlag)

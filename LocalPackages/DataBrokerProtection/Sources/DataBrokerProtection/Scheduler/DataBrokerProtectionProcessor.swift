@@ -87,10 +87,10 @@ final class DataBrokerProtectionProcessor {
                                                       priorityDate: Date?) -> [DataBrokerOperationsCollection] {
 
         var collections: [DataBrokerOperationsCollection] = []
-        var visitedDataBrokerIDs: Set<UUID> = []
+        var visitedDataBrokerIDs: Set<Int64> = []
 
         for queryData in brokerProfileQueriesData {
-            let dataBrokerID = queryData.dataBroker.id
+            guard let dataBrokerID = queryData.dataBroker.id else { continue }
 
             if !visitedDataBrokerIDs.contains(dataBrokerID) {
                 let matchingQueriesData = brokerProfileQueriesData.filter { $0.dataBroker.id == dataBrokerID }

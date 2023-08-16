@@ -25,7 +25,7 @@ struct DataBrokerScheduleConfig: Codable {
 }
 
 struct DataBroker: Codable, Sendable {
-    let id = UUID()
+    let id: Int64?
     let name: String
     let steps: [Step]
     let version: String
@@ -42,7 +42,8 @@ struct DataBroker: Codable, Sendable {
         case schedulingConfig
     }
 
-    init(name: String, steps: [Step], version: String, schedulingConfig: DataBrokerScheduleConfig) {
+    init(id: Int64? = nil, name: String, steps: [Step], version: String, schedulingConfig: DataBrokerScheduleConfig) {
+        self.id = id
         self.name = name
         self.steps = steps
         self.version = version
@@ -55,6 +56,7 @@ struct DataBroker: Codable, Sendable {
         version = try container.decode(String.self, forKey: .version)
         steps = try container.decode([Step].self, forKey: .steps)
         schedulingConfig = try container.decode(DataBrokerScheduleConfig.self, forKey: .schedulingConfig)
+        id = nil
     }
 
     func scanStep() throws -> Step {

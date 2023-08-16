@@ -89,7 +89,7 @@ struct BrokerDB: Codable {
     let id: Int64?
     let name: String
     let json: Data
-    let version: Int
+    let version: String
 }
 
 extension BrokerDB: PersistableRecord, FetchableRecord {
