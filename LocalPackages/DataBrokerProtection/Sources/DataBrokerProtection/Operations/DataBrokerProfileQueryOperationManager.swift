@@ -26,7 +26,7 @@ enum OperationsError: Error {
 protocol OperationsManager {
     func runOperation(operationData: BrokerOperationData,
                       brokerProfileQueryData: BrokerProfileQueryData,
-                      database: DataBase,
+                      database: DataBrokerProtectionRepository,
                       notificationCenter: NotificationCenter,
                       runner: WebOperationRunner) async throws
 }
@@ -35,7 +35,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
     internal func runOperation(operationData: BrokerOperationData,
                                brokerProfileQueryData: BrokerProfileQueryData,
-                               database: DataBase,
+                               database: DataBrokerProtectionRepository,
                                notificationCenter: NotificationCenter = NotificationCenter.default,
                                runner: WebOperationRunner) async throws {
 
@@ -141,7 +141,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
     private func runScanOperation(on runner: WebOperationRunner,
                                   brokerProfileQueryData: BrokerProfileQueryData,
-                                  database: DataBase,
+                                  database: DataBrokerProtectionRepository,
                                   notificationCenter: NotificationCenter) async throws {
         defer {
             updateOperationDataDates(brokerProfileQueryData.scanData,
@@ -184,7 +184,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
     internal func runOptOutOperation(for extractedProfile: ExtractedProfile,
                                      on runner: WebOperationRunner,
                                      brokerProfileQueryData: BrokerProfileQueryData,
-                                     database: DataBase,
+                                     database: DataBrokerProtectionRepository,
                                      notificationCenter: NotificationCenter) async throws {
 
         guard let data = brokerProfileQueryData.optOutsData.filter({ $0.extractedProfile.id == extractedProfile.id }).first else {

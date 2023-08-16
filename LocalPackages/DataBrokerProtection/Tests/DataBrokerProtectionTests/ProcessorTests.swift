@@ -130,7 +130,7 @@ struct MockRunnerProvider: OperationRunnerProvider {
     }
 }
 
-private struct MockDataBase: DataBase {
+private struct MockDataBase: DataBrokerProtectionRepository {
     var brokerProfileQueryDataList: [BrokerProfileQueryData]
     var mockBrokerProfileQueryData: BrokerProfileQueryData?
     let commonScheduleConfig = DataBrokerScheduleConfig(

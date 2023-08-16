@@ -18,7 +18,7 @@
 
 import Foundation
 
-protocol DataBase {
+protocol DataBrokerProtectionRepository {
     func brokerProfileQueryData(for profileQuery: ProfileQuery, dataBroker: DataBroker) -> BrokerProfileQueryData?
     func saveOperationData(_ data: BrokerOperationData)
     func scanOperationData(for profileQueryID: UUID) -> ScanOperationData
@@ -27,7 +27,7 @@ protocol DataBase {
     func brokerProfileQueryData(for id: UUID) -> BrokerProfileQueryData?
 }
 
-final class DataBrokerProtectionDataBase: DataBase {
+final class DataBrokerProtectionDataBase: DataBrokerProtectionRepository {
     // Data in memory for tests
     public var dataBrokers = [DataBroker]()
     public var brokerProfileQueriesData = [BrokerProfileQueryData]()

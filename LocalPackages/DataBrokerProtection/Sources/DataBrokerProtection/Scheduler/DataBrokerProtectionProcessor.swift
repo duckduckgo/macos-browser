@@ -25,14 +25,14 @@ protocol OperationRunnerProvider {
 }
 
 final class DataBrokerProtectionProcessor {
-    private let database: DataBase
+    private let database: DataBrokerProtectionRepository
     private let config: SchedulerConfig
     private let operationRunnerProvider: OperationRunnerProvider
     private let notificationCenter: NotificationCenter
     private let operationQueue: OperationQueue
     private var errorHandler: EventMapping<DataBrokerProtectionOperationError>?
 
-    init(database: DataBase,
+    init(database: DataBrokerProtectionRepository,
          config: SchedulerConfig,
          operationRunnerProvider: OperationRunnerProvider,
          notificationCenter: NotificationCenter = NotificationCenter.default,

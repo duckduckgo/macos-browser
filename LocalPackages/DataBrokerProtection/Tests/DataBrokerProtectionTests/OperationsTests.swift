@@ -23,7 +23,7 @@ final class OperationsTests: XCTestCase {
 
     private func brokerProfileQueryData(for profileQuery: ProfileQuery,
                                         dataBroker: DataBroker,
-                                        database: DataBase) -> BrokerProfileQueryData {
+                                        database: DataBrokerProtectionRepository) -> BrokerProfileQueryData {
         if let queryData = database.brokerProfileQueryData(for: profileQuery,
                                                            dataBroker: dataBroker) {
             return queryData
@@ -450,7 +450,7 @@ final class OperationsTests: XCTestCase {
     }
 }
 
-private struct MockDataBase: DataBase {
+private struct MockDataBase: DataBrokerProtectionRepository {
     var mockBrokerProfileQueryData: BrokerProfileQueryData?
 
     func brokerProfileQueryData(for profileQuery: ProfileQuery, dataBroker: DataBroker) -> BrokerProfileQueryData? {
