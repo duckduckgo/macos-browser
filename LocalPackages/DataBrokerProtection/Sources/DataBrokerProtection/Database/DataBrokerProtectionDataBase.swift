@@ -19,14 +19,11 @@
 import Foundation
 
 protocol DataBrokerProtectionRepository {
-    func save(_ profile: DataBrokerProtectionProfile) throws // Is save a correct name?
+    func save(_ profile: DataBrokerProtectionProfile) throws // Is save the most representative name?
 
-    func brokerProfileQueryData(for profileQuery: ProfileQuery, dataBroker: DataBroker) -> BrokerProfileQueryData?
+    func brokerProfileQueryData(for brokerId: Int64, and profileQueryId: Int64) -> BrokerProfileQueryData?
     func saveOperationData(_ data: BrokerOperationData)
-    func scanOperationData(for profileQueryID: UUID) -> ScanOperationData
-    func optOutOperationData(for profileQueryID: UUID) -> [OptOutOperationData]
     func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData]
-    func brokerProfileQueryData(for id: UUID) -> BrokerProfileQueryData?
 }
 
 final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
@@ -63,35 +60,12 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         }
     }
 
-    func brokerProfileQueryData(for profileQuery: ProfileQuery, dataBroker: DataBroker) -> BrokerProfileQueryData? {
-        brokerProfileQueriesData.filter {
-            $0.profileQuery.fullName == profileQuery.fullName
-            && dataBroker.id == $0.dataBroker.id
-        }.first
-    }
-
-    func brokerProfileQueryData(for id: UUID) -> BrokerProfileQueryData? {
-        brokerProfileQueriesData.filter { $0.id == id }.first
+    func brokerProfileQueryData(for dataBrokerId: Int64, and profileQueryId: Int64) -> BrokerProfileQueryData? {
+        return nil // TODO: We should check the database and return the correct broker profile query data
     }
 
     func saveOperationData(_ data: BrokerOperationData) {
 
-    }
-
-    func scanOperationData(for profileQueryID: UUID) -> ScanOperationData {
-
-        return ScanOperationData(brokerProfileQueryID: profileQueryID,
-                                 preferredRunDate: Date(),
-                                 historyEvents: [HistoryEvent]())
-    }
-
-    func optOutOperationData(for profileQueryID: UUID) -> [OptOutOperationData] {
-        let extractedProfile = ExtractedProfile(name: "Duck")
-        let data = OptOutOperationData(brokerProfileQueryID: profileQueryID,
-                                       preferredRunDate: Date(),
-                                       historyEvents: [HistoryEvent](),
-                                       extractedProfile: extractedProfile)
-        return [data]
     }
 
     func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
@@ -111,7 +85,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         }
 
         let profileQuery = testProfileQuery!
-        let queryData = BrokerProfileQueryData(id: UUID(), profileQuery: profileQuery, dataBroker: dataBroker)
+        let queryData = BrokerProfileQueryData(dataBroker: dataBroker, profileQuery: profileQuery)
 
         self.dataBrokers.append(dataBroker)
         self.brokerProfileQueriesData.append(queryData)

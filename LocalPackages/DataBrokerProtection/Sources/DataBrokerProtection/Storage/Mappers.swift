@@ -185,9 +185,9 @@ struct MapperToModel {
     }
 
     func mapToModel(_ scanDB: ScanDB) -> ScanOperationData {
-        // This will be fixed to a correct model once we work on integrating the secure vault with the scheduler
         .init(
-            brokerProfileQueryID: UUID(),
+            brokerId: scanDB.brokerId,
+            profileQueryId: scanDB.profileQueryId,
             preferredRunDate: scanDB.preferredRunDate,
             historyEvents: [HistoryEvent](),
             lastRunDate: scanDB.lastRunDate
@@ -195,9 +195,9 @@ struct MapperToModel {
     }
 
     func mapToModel(_ optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB) throws -> OptOutOperationData {
-        // This will be fixed to a correct model once we work on integrating the secure vault with the scheduler
         .init(
-            brokerProfileQueryID: UUID(),
+            brokerId: optOutDB.brokerId,
+            profileQueryId: optOutDB.profileQueryId,
             preferredRunDate: optOutDB.preferredRunDate,
             historyEvents: [HistoryEvent](),
             lastRunDate: optOutDB.lastRunDate,

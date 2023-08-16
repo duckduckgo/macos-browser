@@ -19,8 +19,8 @@
 import Foundation
 
 protocol BrokerOperationData {
-    var id: UUID { get }
-    var brokerProfileQueryID: UUID { get }
+    var brokerId: Int64 { get }
+    var profileQueryId: Int64 { get }
     var preferredRunDate: Date? { get set }
     var historyEvents: [HistoryEvent] { get set }
     var lastRunDate: Date? { get set }
@@ -44,20 +44,19 @@ extension BrokerOperationData {
 }
 
 final class ScanOperationData: BrokerOperationData {
-    let id: UUID
-    let brokerProfileQueryID: UUID
+    let brokerId: Int64
+    let profileQueryId: Int64
     var preferredRunDate: Date?
     var historyEvents: [HistoryEvent]
     var lastRunDate: Date?
 
-    init(id: UUID = UUID(),
-         brokerProfileQueryID: UUID,
+    init(brokerId: Int64,
+         profileQueryId: Int64,
          preferredRunDate: Date? = nil,
          historyEvents: [HistoryEvent],
          lastRunDate: Date? = nil) {
-
-        self.id = id
-        self.brokerProfileQueryID = brokerProfileQueryID
+        self.brokerId = brokerId
+        self.profileQueryId = profileQueryId
         self.preferredRunDate = preferredRunDate
         self.historyEvents = historyEvents
         self.lastRunDate = lastRunDate
@@ -66,22 +65,21 @@ final class ScanOperationData: BrokerOperationData {
 }
 
 final class OptOutOperationData: BrokerOperationData {
-    let id: UUID
-    let brokerProfileQueryID: UUID
+    let brokerId: Int64
+    let profileQueryId: Int64
     var preferredRunDate: Date?
     var historyEvents: [HistoryEvent]
     var lastRunDate: Date?
     var extractedProfile: ExtractedProfile
 
-    init(id: UUID = UUID(),
-         brokerProfileQueryID: UUID,
+    init(brokerId: Int64,
+         profileQueryId: Int64,
          preferredRunDate: Date? = nil,
          historyEvents: [HistoryEvent],
          lastRunDate: Date? = nil,
          extractedProfile: ExtractedProfile) {
-
-        self.id = id
-        self.brokerProfileQueryID = brokerProfileQueryID
+        self.brokerId = brokerId
+        self.profileQueryId = profileQueryId
         self.preferredRunDate = preferredRunDate
         self.historyEvents = historyEvents
         self.lastRunDate = lastRunDate

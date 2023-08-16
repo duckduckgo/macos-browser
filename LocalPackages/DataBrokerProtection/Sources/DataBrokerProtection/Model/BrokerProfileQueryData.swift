@@ -20,10 +20,9 @@ import Foundation
 import Common
 
 final class BrokerProfileQueryData: Sendable {
-    let id: UUID
     let dataBroker: DataBroker
+    let profileQuery: ProfileQuery
 
-    var profileQuery: ProfileQuery
     var scanData: ScanOperationData
     var optOutsData: [OptOutOperationData] = [OptOutOperationData]()
     var operationsData: [BrokerOperationData] {
@@ -34,12 +33,10 @@ final class BrokerProfileQueryData: Sendable {
         optOutsData.map { $0.extractedProfile }
     }
 
-    init(id: UUID,
+    init(dataBroker: DataBroker,
          profileQuery: ProfileQuery,
-         dataBroker: DataBroker,
          scanOperationData: ScanOperationData? = nil,
          optOutOperationsData: [OptOutOperationData] = [OptOutOperationData]()) {
-        self.id = id
         self.profileQuery = profileQuery
         self.dataBroker = dataBroker
         self.optOutsData = optOutOperationsData
@@ -47,7 +44,8 @@ final class BrokerProfileQueryData: Sendable {
         if let scanData = scanOperationData {
             self.scanData = scanData
         } else {
-            self.scanData = ScanOperationData(brokerProfileQueryID: id,
+            self.scanData = ScanOperationData(brokerId: dataBroker.id ?? -1,
+                                              profileQueryId: profileQuery.id ?? -1,
                                               preferredRunDate: Date(),
                                               historyEvents: [HistoryEvent]())
         }
@@ -63,7 +61,8 @@ final class BrokerProfileQueryData: Sendable {
             if !isExistingProfile {
                 os_log("Creating new opt-out operation data for: %@ %@", log: .dataBrokerProtection, String(describing: extractedProfile.name), extractedProfile.id.uuidString)
 
-                let optOutOperationData = OptOutOperationData(brokerProfileQueryID: id,
+                let optOutOperationData = OptOutOperationData(brokerId: dataBroker.id ?? -1,
+                                                              profileQueryId: profileQuery.id ?? -1,
                                                               historyEvents: [HistoryEvent](),
                                                               extractedProfile: extractedProfile)
                 // If it's a new found profile, we'd like to opt-out ASAP

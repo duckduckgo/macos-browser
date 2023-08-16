@@ -125,7 +125,9 @@ final class DataBrokerOperationsCollection: Operation {
                 return
             }
 
-            let brokerProfileData = brokerProfileQueriesData.filter { $0.id == operationData.brokerProfileQueryID }.first
+            let brokerProfileData = brokerProfileQueriesData.filter {
+                $0.dataBroker.id == operationData.brokerId && $0.profileQuery.id == operationData.profileQueryId
+            }.first
 
             guard let brokerProfileData = brokerProfileData else {
                 continue
