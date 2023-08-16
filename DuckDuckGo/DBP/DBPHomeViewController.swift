@@ -104,7 +104,7 @@ final class DBPHomeViewController: NSViewController {
             debugWindow.title = "Debug Window"
             debugWindow.center()
             debugWindow.hidesOnDeactivate = true
-            let debugViewController = DataBrokerProtectionDebugViewController(reedemUseCase: redeemUseCase)
+            let debugViewController = DataBrokerProtectionDebugViewController(redeemUseCase: redeemUseCase)
             debugWindow.contentViewController = debugViewController
 
             debugWindowController = NSWindowController(window: debugWindow)
