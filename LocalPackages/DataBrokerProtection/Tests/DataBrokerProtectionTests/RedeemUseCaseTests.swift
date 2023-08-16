@@ -65,6 +65,8 @@ final class RedeemUseCaseTests: XCTestCase {
 
     func testWhenGetAuthHeaderHasNoInviteCode_thenThrowsNoInviteCodeError() async {
         repository.shouldSendNilInviteCode = true
+        repository.shouldSendNilAccessToken = true
+        
         let sut = RedeemUseCase(authenticationService: service, authenticationRepository: repository)
 
         let accessToken = try? await sut.getAuthHeader()
