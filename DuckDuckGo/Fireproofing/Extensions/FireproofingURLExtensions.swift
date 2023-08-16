@@ -51,28 +51,6 @@ extension URL {
         "duosecurity.com": [regex("oauth/v\\d.*/authorize"), regex("frame/prompt")]
     ]
 
-    var isLoginURL: Bool {
-        if isOAuthURL {
-            return true
-        }
-
-        let range = NSRange(location: 0, length: absoluteString.utf16.count)
-        let matches = Self.loginPattern.matches(in: self.absoluteString, options: [], range: range)
-        return matches.count > 0
-    }
-
-    var isTwoFactorURL: Bool {
-        matches(any: Self.twoFactorAuthPatterns)
-    }
-
-    var isSingleSignOnURL: Bool {
-        matches(any: Self.ssoPatterns)
-    }
-
-    var isOAuthURL: Bool {
-        matches(any: Self.oAuthUrlPatterns)
-    }
-
     var canFireproof: Bool {
         guard let host = self.host else { return false }
         return (host != Self.cookieDomain)
@@ -81,19 +59,6 @@ extension URL {
     var showFireproofStatus: Bool {
         guard let host = self.host else { return false }
         return canFireproof && FireproofDomains.shared.isFireproof(fireproofDomain: host)
-    }
-
-    private func matches(any patterns: URLPatterns) -> Bool {
-        guard let host = self.host?.droppingWwwPrefix(),
-              let matchingKey = patterns.keys.first(where: { host.contains($0) }),
-              let pattern = patterns[matchingKey] else { return false }
-
-        let range = NSRange(location: 0, length: absoluteString.utf16.count)
-
-        return pattern.contains { regex in
-            let matches = regex.matches(in: self.absoluteString, options: [], range: range)
-            return !matches.isEmpty
-        }
     }
 
 }

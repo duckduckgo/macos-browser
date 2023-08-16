@@ -314,4 +314,12 @@ extension Pixel.Event {
         case unknown = "unknown"
 
     }
+
+    enum FireButtonOption: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        case tab
+        case window
+        case allSites = "all-sites"
+    }
 }

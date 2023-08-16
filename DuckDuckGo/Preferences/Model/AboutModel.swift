@@ -35,7 +35,7 @@ final class AboutModel: ObservableObject {
 #endif
 
     let displayableAboutURL: String = URL.aboutDuckDuckGo
-        .toString(decodePunycode: false, dropScheme: true, needsWWW: false, dropTrailingSlash: false)
+        .toString(decodePunycode: false, dropScheme: true, dropTrailingSlash: false)
 
     @MainActor
     func openURL(_ url: URL) {
