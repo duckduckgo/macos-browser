@@ -60,13 +60,13 @@ public final class NetworkProtectionIconPublisher {
     // MARK: - Subscribing to NetP updates
 
     private func subscribeToConnectionStatusChanges() {
-        statusChangeCancellable = statusReporter.statusPublisher.sink { [weak self] _ in
+        statusChangeCancellable = statusReporter.statusObserver.publisher.sink { [weak self] _ in
             self?.updateMenuIcon()
         }
     }
 
     private func subscribeToConnectionIssues() {
-        connectivityIssuesCancellable = statusReporter.connectivityIssuesPublisher.sink { [weak self] _ in
+        connectivityIssuesCancellable = statusReporter.connectivityIssuesObserver.publisher.sink { [weak self] _ in
             self?.updateMenuIcon()
         }
     }
@@ -76,11 +76,11 @@ public final class NetworkProtectionIconPublisher {
     /// Resolves the correct icon to show, based on the current NetP status.
     ///
     private func menuIcon() -> NetworkProtectionAsset {
-        guard !statusReporter.connectivityIssuesPublisher.value else {
+        guard !statusReporter.connectivityIssuesObserver.recentValue else {
             return iconProvider.issueIcon
         }
 
-        switch statusReporter.statusPublisher.value {
+        switch statusReporter.statusObserver.recentValue {
         case .connected:
             return iconProvider.onIcon
         default:

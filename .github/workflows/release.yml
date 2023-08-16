@@ -39,6 +39,8 @@ jobs:
       ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       MM_HANDLES_BASE64: ${{ secrets.MM_HANDLES_BASE64 }}
       MM_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK_URL }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   appstore-release:
     name: Prepare AppStore Release

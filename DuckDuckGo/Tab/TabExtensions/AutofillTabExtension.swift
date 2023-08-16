@@ -53,6 +53,7 @@ final class AutofillTabExtension: TabExtension {
     }
     private var emailManager: AutofillEmailDelegate?
     private var vaultManager: AutofillSecureVaultDelegate?
+    private var passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
     private let isBurner: Bool
 
     @Published var autofillDataToSave: AutofillData?
@@ -106,6 +107,11 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
 
     func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
+
+        if type.formAutofillKind == .password &&
+            passwordManagerCoordinator.isEnabled {
+            passwordManagerCoordinator.reportPasswordAutofill()
+        }
     }
 
     func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
