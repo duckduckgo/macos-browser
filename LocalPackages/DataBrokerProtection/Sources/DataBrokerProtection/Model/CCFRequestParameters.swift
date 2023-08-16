@@ -54,7 +54,7 @@ struct ActionRequest: Encodable {
         case .extractedProfile(let extractedProfile):
             try container.encode(extractedProfile, forKey: .data)
         default:
-            assertionFailure("We sure have a profile data. Soon to be renamed just to data")
+            assertionFailure("Data not found. Please add the mission data to the encoding list.")
         }
 
         switch action {
