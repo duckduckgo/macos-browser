@@ -29,6 +29,7 @@ extension BrokerProfileQueryData {
             dataBroker: DataBroker(
                 name: "test",
                 steps: steps,
+                version: "1.0.0",
                 schedulingConfig: DataBrokerScheduleConfig.mock
             )
         )

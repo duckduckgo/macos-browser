@@ -1,6 +1,7 @@
 {
   "name": "peoplefinders.com",
-  "addedDatetime": 1677121200000,
+  "version": "0.1.0",
+  "addedDatetime": 1677128400000,
   "steps": [
     {
       "stepType": "scan",
@@ -8,19 +9,30 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "7d8d3e5e-86d5-4425-a79f-19d50f955a19",
+          "id": "ac90b3c5-36e5-4669-850c-3ad233d57b81",
           "url": "https://www.peoplefinders.com/people/${firstName}-${lastName}/${state}/${city}?landing=all&age=${age}"
         },
         {
           "actionType": "extract",
-          "id": "099fed62-c70c-47ff-b9b0-0a5f24b76661",
+          "id": "1d1a5dec-55e8-4bd8-a631-f00cab612d95",
           "selector": ".record",
           "profile": {
-            "name": ".record__title",
-            "alternativeNamesList": "ul.clean-list.mb-0.mt-2",
-            "age": ".col-lg-1",
-            "addressCityStateList": "ul.clean-list.mb-0",
-            "profileUrl": "a"
+            "name": {
+              "selector": ".//h4[@class='record__title']"
+            },
+            "alternativeNamesList": {
+              "selector": ".//ul[@class='clean-list mb-0 mt-2']"
+            },
+            "age": {
+              "selector": ".col-lg-1"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[@class='col-lg-2 col-xl-3']//li[@class='text-dark']",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": "a"
+            }
           }
         }
       ]
@@ -31,12 +43,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "9249e462-20a6-4739-ac97-f83dffffebe6",
+          "id": "5cd4836a-347f-4104-836c-2b5c2ab4c0f3",
           "url": "https://www.peoplefinders.com/opt-out"
         },
         {
           "actionType": "click",
-          "id": "dfc3f072-6b8e-4345-a407-a36e3c46db1a",
+          "id": "ed8e55df-38f6-4a0c-a1e1-184dba923255",
           "elements": [
             {
               "type": "button",
@@ -46,7 +58,7 @@
         },
         {
           "actionType": "fillForm",
-          "id": "1ab4ef56-7805-4424-8b7b-c2e6fe0023f3",
+          "id": "081632a5-93f4-4161-9787-272c1f24bf97",
           "selector": ".opt-out-form",
           "elements": [
             {
@@ -61,17 +73,17 @@
         },
         {
           "actionType": "getCaptchaInfo",
-          "id": "0c4db932-13c4-430f-a974-742aba25ea1f",
+          "id": "c285a2bb-0bc5-4019-8281-0fc49b141f09",
           "selector": ".g-recaptcha"
         },
         {
           "actionType": "solveCaptcha",
-          "id": "0193b63f-9a4f-4ca1-9518-58c7d6e0b2d0",
+          "id": "fddbb482-fb4d-4fb2-b9dd-ccf0637ab822",
           "selector": ".g-recaptcha"
         },
         {
           "actionType": "click",
-          "id": "99378094-cfae-48e0-a979-13d701e836ae",
+          "id": "9b5c23fd-4304-4aad-a3e6-c94c33f57d36",
           "elements": [
             {
               "type": "button",
@@ -81,22 +93,22 @@
         },
         {
           "actionType": "emailConfirmation",
-          "id": "e535f987-c25d-4252-9ab4-1466a092ad58",
+          "id": "f864fc4f-d2db-4941-8f7b-04c5156f84f4",
           "pollingTime": 30
         },
         {
           "actionType": "getCaptchaInfo",
-          "id": "266fead5-2369-41e0-bf35-02aa1551e40e",
+          "id": "c15dafe2-b9b0-4fa0-acc1-b8740198b0f5",
           "selector": ".g-recaptcha"
         },
         {
           "actionType": "solveCaptcha",
-          "id": "e9455e4a-543d-4aba-9d7a-ee80469ec63a",
+          "id": "4dc1239f-6fa3-4dcc-afa2-2c8823651570",
           "selector": ".g-recaptcha"
         },
         {
           "actionType": "click",
-          "id": "74feb25a-3f5c-4ae1-9453-3b67dc0d3434",
+          "id": "4d4b567c-ad9c-47be-8e63-6d6ebdf95f3c",
           "elements": [
             {
               "type": "button",
@@ -106,7 +118,7 @@
         },
         {
           "actionType": "expectation",
-          "id": "d0ed698f-5fb0-48c5-9328-cc30defacb59",
+          "id": "69c2fa29-0adf-4886-a190-b353ed793c5f",
           "expectations": [
             {
               "type": "url",
@@ -123,4 +135,3 @@
     "maintenanceScan": 240
   }
 }
-

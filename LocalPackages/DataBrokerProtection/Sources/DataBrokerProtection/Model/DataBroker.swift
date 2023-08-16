@@ -28,6 +28,7 @@ struct DataBroker: Codable, Sendable {
     let id = UUID()
     let name: String
     let steps: [Step]
+    let version: String
     let schedulingConfig: DataBrokerScheduleConfig
 
     var isFakeBroker: Bool {
@@ -37,18 +38,21 @@ struct DataBroker: Codable, Sendable {
     enum CodingKeys: CodingKey {
         case name
         case steps
+        case version
         case schedulingConfig
     }
 
-    init(name: String, steps: [Step], schedulingConfig: DataBrokerScheduleConfig) {
+    init(name: String, steps: [Step], version: String, schedulingConfig: DataBrokerScheduleConfig) {
         self.name = name
         self.steps = steps
+        self.version = version
         self.schedulingConfig = schedulingConfig
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = try container.decode(String.self, forKey: .name)
+        version = try container.decode(String.self, forKey: .version)
         steps = try container.decode([Step].self, forKey: .steps)
         schedulingConfig = try container.decode(DataBrokerScheduleConfig.self, forKey: .schedulingConfig)
     }
