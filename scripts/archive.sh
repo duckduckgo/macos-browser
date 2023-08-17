@@ -249,6 +249,19 @@ archive_and_export() {
 		-configuration "${configuration}" \
 		2>&1 \
 		| ${log_formatter}
+
+	local exported_at
+	exported_at=$(date +%Y-%m-%d-%H-%M-%S)
+	echo "${exported_at}" > "${app_path}/Contents/Resources/exported_at.txt"
+	
+	/usr/bin/codesign \
+		--force \
+		--sign D4D23EDB01DA0AA4FFEB63003869AD41EB0A278F \
+		-o runtime \
+		--entitlements "${derived_data}/Build/Intermediates.noindex/ArchiveIntermediates/${scheme}/IntermediateBuildFilesPath/DuckDuckGo.build/${configuration}/DuckDuckGo Privacy Browser.build/${app_name}.app.xcent" \
+		--generate-entitlement-der "${app_path}"
+		# --requirements \=designated\ \=\>\ anchor\ apple\ generic\ \ and\ identifier\ \"\$self.identifier\"\ and\ \(\(cert\ leaf\[field.1.2.840.113635.100.6.1.9\]\ exists\)\ or\ \(\ certificate\ 1\[field.1.2.840.113635.100.6.2.6\]\ exists\ and\ certificate\ leaf\[field.1.2.840.113635.100.6.1.13\]\ exists\ \ and\ certificate\ leaf\[subject.OU\]\ \=\ \"HKE973VLUW\"\ \)\) \
+		# --generate-entitlement-der "${app_path}"
 }
 
 notarize() {

@@ -64,6 +64,8 @@ extension Preferences {
                         model.openURL(.aboutDuckDuckGo)
                     }
 
+                    Text("Build variant: \(variant)")
+
                     TextButton(UserText.privacyPolicy) {
                         model.openURL(.privacyPolicy)
                     }
@@ -76,6 +78,13 @@ extension Preferences {
                     #endif
                 }
             }
+        }
+
+        var variant: String {
+            if let url = Bundle.main.url(forResource: "exported_at", withExtension: "txt"), let string = try? String(contentsOf: url) {
+                return string
+            }
+            return ""
         }
     }
 
