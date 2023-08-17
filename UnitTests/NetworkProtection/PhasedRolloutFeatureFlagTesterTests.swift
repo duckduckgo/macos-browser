@@ -51,7 +51,14 @@ final class PhasedRolloutFeatureFlagTesterTests: XCTestCase {
 
     private static let testSuiteName = "\(#file)"
 
-    override class func tearDown() {
+    override func setUp() {
+        super.setUp()
+
+        let defaults = UserDefaults(suiteName: Self.testSuiteName)!
+        defaults.removePersistentDomain(forName: Self.testSuiteName)
+    }
+
+    override func tearDown() {
         super.tearDown()
 
         let defaults = UserDefaults(suiteName: Self.testSuiteName)!
