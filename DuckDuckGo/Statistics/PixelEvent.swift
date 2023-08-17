@@ -137,6 +137,8 @@ extension Pixel {
         case bookmarksBarOnboardingFirstInteraction(cohort: String)
         case bookmarksBarOnboardingInteraction2to8days(cohort: String)
 
+        case incrementalRolloutTest
+
         enum Debug {
 
             case assertionFailure(message: String, file: StaticString, line: UInt)
@@ -382,6 +384,9 @@ extension Pixel.Event {
             return "m_mac_bookmarksbarexperiment_firstinteraction"
         case .bookmarksBarOnboardingInteraction2to8days:
             return "m_mac_bookmarksbarexperiment_interaction2to8days"
+
+        case .incrementalRolloutTest:
+            return "m_mac_netp_ev_incremental_rollout_test"
         }
     }
 }
