@@ -61,7 +61,7 @@ extension NSAlert {
         alert.alertStyle = .warning
         alert.icon = NSImage(named: "Fireproof")
         alert.addButton(withTitle: UserText.fireproof)
-        alert.addButton(withTitle: UserText.noThanks)
+        alert.addButton(withTitle: UserText.notNow)
         return alert
     }
 

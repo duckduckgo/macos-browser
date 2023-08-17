@@ -21,7 +21,7 @@ import Foundation
 enum UserText {
 
     static let ok = NSLocalizedString("ok", value: "OK", comment: "OK button")
-    static let noThanks = NSLocalizedString("nothanks", value: "No Thanks", comment: "No thanks button")
+    static let notNow = NSLocalizedString("notnow", value: "Not Now", comment: "Not Now button")
     static let cancel = NSLocalizedString("cancel", value: "Cancel", comment: "Cancel button")
     static let submit = NSLocalizedString("submit", value: "Submit", comment: "Submit button")
     static let next = NSLocalizedString("next", value: "Next", comment: "Next button")
