@@ -264,12 +264,10 @@ private struct ItemView: View {
     let action: () -> Void
 
     func getIconLetters(account: SecureVaultModels.WebsiteAccount) -> String {
-        var generatedIconLetters = model.tldForAccount(account)
-        if let title = account.title,
-            title != "" {
-            generatedIconLetters = title
+        if let title = account.title, !title.isEmpty {
+            return title
         }
-        return generatedIconLetters
+        return model.tldForAccount(account)
     }
 
     var body: some View {

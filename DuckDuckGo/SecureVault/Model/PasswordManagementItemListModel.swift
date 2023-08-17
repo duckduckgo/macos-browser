@@ -459,7 +459,8 @@ final class PasswordManagementItemListModel: ObservableObject {
 
     func tldForAccount(_ account: SecureVaultModels.WebsiteAccount) -> String {
         let name = account.name(tld: tld, autofillDomainNameUrlMatcher: urlMatcher)
-        return tld.eTLDplus1(name) ?? account.title ?? "#"
+        let title = (account.title?.isEmpty == false) ? account.title! : "#"
+        return tld.eTLDplus1(name) ?? title
     }
 
 }
