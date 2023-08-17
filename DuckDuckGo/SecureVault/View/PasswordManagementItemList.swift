@@ -271,7 +271,7 @@ private struct ItemView: View {
         }
         return generatedIconLetters
     }
-    
+
     var body: some View {
 
         let selected = model.selected == item
