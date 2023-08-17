@@ -20,6 +20,7 @@
 
 import SwiftUI
 import NetworkProtection
+import SwiftUIExtensions
 
 struct NetworkProtectionInviteDialog: View {
     @ObservedObject var model: NetworkProtectionInviteViewModel
@@ -27,9 +28,9 @@ struct NetworkProtectionInviteDialog: View {
     var body: some View {
         switch model.currentDialog {
         case .codeEntry:
-            NetworkProtectionInviteCodeView(model: model)
+            InviteCodeView(viewModel: model.inviteCodeViewModel)
         case .success:
-            NetworkProtectionInviteSuccessView(model: model)
+            InviteCodeSuccessView(viewModel: model.successCodeViewModel)
         case .none:
             EmptyView()
         }

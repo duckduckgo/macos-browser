@@ -107,6 +107,8 @@ extension Pixel.Event {
              .faviconImportFailed,
              .formAutofilled,
              .autofillItemSaved,
+             .bitwardenPasswordAutofilled,
+             .bitwardenPasswordSaved,
              .autoconsentOptOutFailed,
              .autoconsentSelfTestFailed,
              .ampBlockingRulesCompilationFailed,
@@ -128,7 +130,10 @@ extension Pixel.Event {
              .networkProtectionSystemExtensionUnknownActivationResult,
              .favoriteSectionHidden,
              .recentActivitySectionHidden,
-             .continueSetUpSectionHidden:
+             .continueSetUpSectionHidden,
+             .userHasPinnedTab,
+             .fireButtonFirstBurn,
+             .fireButton:
 
             return nil
         }
