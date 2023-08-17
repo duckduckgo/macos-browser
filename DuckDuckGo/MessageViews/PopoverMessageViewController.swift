@@ -19,10 +19,6 @@
 import AppKit
 import SwiftUI
 
-protocol PopoverMessageViewControllerDelegate {
-    func onDismiss()
-}
-
 final class PopoverMessageViewController: NSHostingController<PopoverMessageView> {
 
     enum Constants {
