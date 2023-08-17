@@ -15,7 +15,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "sam/phased-rollout-feature-flag-dry-run",
-        "revision" : "522e49b68002d62e86a5e7e63281fae622bf9c57"
+        "revision" : "a41cc984c32127aa57c6e28305d21672dddc5193"
       }
     },
     {
