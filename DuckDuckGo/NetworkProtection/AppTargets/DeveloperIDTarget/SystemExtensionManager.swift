@@ -44,10 +44,6 @@ struct SystemExtensionManager {
         self.workspace = workspace
     }
 
-    enum SomeError: Error {
-        case waitingForPreviousActivationRequest
-    }
-
     func activate() -> AsyncThrowingStream<ActivationRequestEvent, Error> {
         /// Documenting a workaround for the issue discussed in https://app.asana.com/0/0/1205275221447702/f
         ///     Background: For a lot of users, the system won't show the system-extension-blocked alert if there's a previous request
