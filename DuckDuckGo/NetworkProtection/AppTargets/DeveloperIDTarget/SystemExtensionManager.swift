@@ -29,33 +29,19 @@ struct SystemExtensionManager {
         case willActivateAfterReboot
     }
 
-    let bundleID: String
-    let manager: OSSystemExtensionManager
+    private static let systemSettingsSecurityURL = "x-apple.systempreferences:com.apple.preference.security?Security"
+
+    private let bundleID: String
+    private let manager: OSSystemExtensionManager
+    private let workspace: NSWorkspace
 
     init(bundleID: String = NetworkProtectionBundle.extensionBundle().bundleIdentifier!,
-         manager: OSSystemExtensionManager = .shared) {
+         manager: OSSystemExtensionManager = .shared,
+         workspace: NSWorkspace = .shared) {
+
         self.bundleID = bundleID
         self.manager = manager
-    }
-
-    func countExtensionMatches() -> Int {
-        let task = Process()
-        let pipe = Pipe()
-
-        let systemextensionsctlPath = "/usr/bin/systemextensionsctl"
-        let egrepPath = "/usr/bin/egrep"
-
-        task.standardOutput = pipe
-        task.launchPath = "/bin/bash" // Specify the shell to use
-        task.arguments = ["-c", "\(systemextensionsctlPath) list | \(egrepPath) -c '(?:\(bundleID)).+(?:activated waiting for user)+'"]
-
-        task.launch()
-        task.waitUntilExit()
-
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        return Int(output ?? "0") ?? 0
+        self.workspace = workspace
     }
 
     enum SomeError: Error {
@@ -63,13 +49,21 @@ struct SystemExtensionManager {
     }
 
     func activate() -> AsyncThrowingStream<ActivationRequestEvent, Error> {
-        guard countExtensionMatches() == 0 else {
-            let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Security")!
-            NSWorkspace.shared.open(url)
-
-            return AsyncThrowingStream<ActivationRequestEvent, Error> { continuation in
-                continuation.finish(throwing: SomeError.waitingForPreviousActivationRequest)
-            }
+        /// Documenting a workaround for the issue discussed in https://app.asana.com/0/0/1205275221447702/f
+        ///     Background: For a lot of users, the system won't show the system-extension-blocked alert if there's a previous request
+        ///         to activate the extension.  You can see active requests in your console using command `systemextensionsctl list`.
+        ///
+        ///     Proposed workaround: Just open system settings into the right section when we detect a previous activation request already exists.
+        ///
+        ///     Tradeoffs: Unfortunately we don't know if the previous request was sent out by the currently runing-instance of this App
+        ///         or if an activation request was made, and then the App was reopened.
+        ///         This means we don't know if we'll be notified when the previous activation request completes or fails.  Because we
+        ///         need to update our UI once the extension is allowed, we can't avoid sending a new activation request every time.
+        ///         For the users that don't see the alert come up more than once this should be invisible.  For users (like myself) that
+        ///         see the alert every single time, they'll see both the alert and system settings being opened automatically.
+        ///
+        if hasPendingActivationRequests() {
+            openSystemSettingsSecurity()
         }
 
         return SystemExtensionRequest.activationRequest(forExtensionWithIdentifier: bundleID, manager: manager).submit()
@@ -77,6 +71,37 @@ struct SystemExtensionManager {
 
     func deactivate() async throws {
         for try await _ in SystemExtensionRequest.deactivationRequest(forExtensionWithIdentifier: bundleID, manager: manager).submit() {}
+    }
+
+    // MARK: - Activation: Checking if there are pending requests
+
+    /// Checks if there are pending activation requests for the system extension.
+    ///
+    /// This implementation should work well for all macOS 11+ releases.  A better implementation for macOS 12+
+    /// would be to use a properties request, but that option requires bigger changes and some rethinking of these
+    /// classes which I'd rather avoid right now.  In short this solution was picked as a quick solution with the best
+    /// ROI to avoid getting blocked.
+    ///
+    private func hasPendingActivationRequests() -> Bool {
+        let task = Process()
+        let pipe = Pipe()
+
+        task.standardOutput = pipe
+        task.launchPath = "/bin/bash" // Specify the shell to use
+        task.arguments = ["-c", "$(which systemextensionsctl) list | $(which egrep) -c '(?:\(bundleID)).+(?:activated waiting for user)+'"]
+
+        task.launch()
+        task.waitUntilExit()
+
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        return (Int(output ?? "0") ?? 0) > 0
+    }
+
+    private func openSystemSettingsSecurity() {
+        let url = URL(string: Self.systemSettingsSecurityURL)!
+        NSWorkspace.shared.open(url)
     }
 }
 
@@ -101,6 +126,11 @@ final class SystemExtensionRequest: NSObject {
 
     static func deactivationRequest(forExtensionWithIdentifier bundleId: String, manager: OSSystemExtensionManager) -> Self {
         self.init(request: .deactivationRequest(forExtensionWithIdentifier: bundleId, queue: .global()), manager: manager)
+    }
+
+    @available(macOS 12.0, *)
+    static func propertiesRequest(forExtensionWithIdentifier bundleId: String, manager: OSSystemExtensionManager) -> Self {
+        self.init(request: .propertiesRequest(forExtensionWithIdentifier: bundleId, queue: .global()), manager: manager)
     }
 
     /// submitting the request returns an Async Iterator providing the OSSystemExtensionRequest state change events
