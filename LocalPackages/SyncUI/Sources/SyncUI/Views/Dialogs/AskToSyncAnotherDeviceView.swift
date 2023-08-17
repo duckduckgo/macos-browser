@@ -35,7 +35,7 @@ struct AskToSyncAnotherDeviceView<ViewModel>: View where ViewModel: ManagementDi
                     .multilineTextAlignment(.center)
             }
         } buttons: {
-            Button(UserText.notNow) {
+            Button(UserText.noThanks) {
                 model.delegate?.dontSyncAnotherDeviceNow()
                 model.endFlow()
             }

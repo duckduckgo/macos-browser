@@ -34,7 +34,7 @@ struct SaveRecoveryPDFView: View {
                     .multilineTextAlignment(.center)
             }
         } buttons: {
-            Button(UserText.notNow) {
+            Button(UserText.noThanks) {
                 model.endFlow()
             }
             Button(UserText.saveRecoveryPDF) {
