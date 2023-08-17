@@ -38,7 +38,40 @@ struct SystemExtensionManager {
         self.manager = manager
     }
 
+    func countExtensionMatches() -> Int {
+        let task = Process()
+        let pipe = Pipe()
+
+        let systemextensionsctlPath = "/usr/bin/systemextensionsctl"
+        let egrepPath = "/usr/bin/egrep"
+
+        task.standardOutput = pipe
+        task.launchPath = "/bin/bash" // Specify the shell to use
+        task.arguments = ["-c", "\(systemextensionsctlPath) list | \(egrepPath) -c '(?:\(bundleID)).+(?:activated waiting for user)+'"]
+
+        task.launch()
+        task.waitUntilExit()
+
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        return Int(output ?? "0") ?? 0
+    }
+
+    enum SomeError: Error {
+        case waitingForPreviousActivationRequest
+    }
+
     func activate() -> AsyncThrowingStream<ActivationRequestEvent, Error> {
+        guard countExtensionMatches() == 0 else {
+            let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Security")!
+            NSWorkspace.shared.open(url)
+
+            return AsyncThrowingStream<ActivationRequestEvent, Error> { continuation in
+                continuation.finish(throwing: SomeError.waitingForPreviousActivationRequest)
+            }
+        }
+
         return SystemExtensionRequest.activationRequest(forExtensionWithIdentifier: bundleID, manager: manager).submit()
     }
 
