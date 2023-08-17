@@ -128,11 +128,6 @@ final class SystemExtensionRequest: NSObject {
         self.init(request: .deactivationRequest(forExtensionWithIdentifier: bundleId, queue: .global()), manager: manager)
     }
 
-    @available(macOS 12.0, *)
-    static func propertiesRequest(forExtensionWithIdentifier bundleId: String, manager: OSSystemExtensionManager) -> Self {
-        self.init(request: .propertiesRequest(forExtensionWithIdentifier: bundleId, queue: .global()), manager: manager)
-    }
-
     /// submitting the request returns an Async Iterator providing the OSSystemExtensionRequest state change events
     /// until an Event is received.
     func submit() -> AsyncThrowingStream<Event, Error> {
