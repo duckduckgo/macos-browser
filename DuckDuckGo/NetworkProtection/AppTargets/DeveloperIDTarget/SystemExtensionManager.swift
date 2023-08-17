@@ -97,7 +97,7 @@ struct SystemExtensionManager {
 
     private func openSystemSettingsSecurity() {
         let url = URL(string: Self.systemSettingsSecurityURL)!
-        NSWorkspace.shared.open(url)
+        workspace.open(url)
     }
 }
 
