@@ -144,6 +144,9 @@ extension Pixel {
         case fireButtonFirstBurn
         case fireButton(option: FireButtonOption)
 
+        case incrementalRolloutTestAppStore
+        case incrementalRolloutTestDeveloperID
+
         enum Debug {
 
             case assertionFailure(message: String, file: StaticString, line: UInt)
@@ -399,6 +402,11 @@ extension Pixel.Event {
             return "m_mac_fire_button_first_burn"
         case .fireButton(option: let option):
             return "m_mac_fire_button_\(option)"
+
+        case .incrementalRolloutTestAppStore:
+            return "m_mac_netp_ev_incremental_rollout_test_app_store"
+        case .incrementalRolloutTestDeveloperID:
+            return "m_mac_netp_ev_incremental_rollout_test_developer_id"
         }
 
     }
