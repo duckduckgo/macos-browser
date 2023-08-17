@@ -390,7 +390,7 @@ final class NavigationBarViewController: NSViewController {
                                                               image: Self.Constants.autosavePopoverImageName,
                                                               buttonText: UserText.passwordManagerAutosaveButtonText,
                                                               buttonAction: action)
-            viewController.show(onParent: self, relativeTo: self.passwordManagementButton)
+            viewController.show(onParent: self, relativeTo: self.passwordManagementButton.isHidden ? self.optionsButton : self.passwordManagementButton)
         }
     }
 
