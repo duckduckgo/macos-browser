@@ -587,13 +587,13 @@ private struct DatesView: View {
 private struct HeaderView: View {
 
     @EnvironmentObject var model: PasswordManagementLoginModel
-    
+
     private func getIconLetters() -> String {
         return !model.title.isEmpty ? model.title :
                !model.domainTLD.isEmpty ? model.domainTLD :
                "#"
     }
-    
+
     var body: some View {
 
         HStack(alignment: .center, spacing: 0) {
