@@ -134,8 +134,7 @@ extension Pixel.Event {
              .userHasPinnedTab,
              .fireButtonFirstBurn,
              .fireButton,
-             .incrementalRolloutTestAppStore,
-             .incrementalRolloutTestDeveloperID:
+             .incrementalRolloutTest:
 
             return nil
         }

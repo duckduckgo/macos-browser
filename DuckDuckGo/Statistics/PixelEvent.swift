@@ -144,8 +144,7 @@ extension Pixel {
         case fireButtonFirstBurn
         case fireButton(option: FireButtonOption)
 
-        case incrementalRolloutTestAppStore
-        case incrementalRolloutTestDeveloperID
+        case incrementalRolloutTest
 
         enum Debug {
 
@@ -403,10 +402,8 @@ extension Pixel.Event {
         case .fireButton(option: let option):
             return "m_mac_fire_button_\(option)"
 
-        case .incrementalRolloutTestAppStore:
-            return "m_mac_netp_ev_incremental_rollout_test_app_store"
-        case .incrementalRolloutTestDeveloperID:
-            return "m_mac_netp_ev_incremental_rollout_test_developer_id"
+        case .incrementalRolloutTest:
+            return "m_mac_netp_ev_incremental_rollout_test"
         }
 
     }

@@ -25,15 +25,9 @@ protocol PhasedRolloutPixelSender: AnyObject {
 
 final class DefaultPhasedRolloutPixelSender: PhasedRolloutPixelSender {
     func sendPixel(completion: @escaping (Error?) -> Void) {
-#if APPSTORE
-        Pixel.fire(.incrementalRolloutTestAppStore) { error in
+        Pixel.fire(.incrementalRolloutTest) { error in
             completion(error)
         }
-#else
-        Pixel.fire(.incrementalRolloutTestDeveloperID) { error in
-            completion(error)
-        }
-#endif
     }
 }
 
