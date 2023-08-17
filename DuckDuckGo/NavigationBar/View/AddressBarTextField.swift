@@ -276,6 +276,21 @@ final class AddressBarTextField: NSTextField {
             }
         }
 
+#if APPSTORE
+        if url.isFileURL, let window = self.window {
+            let alert = NSAlert.cannotOpenFileAlert()
+            alert.beginSheetModal(for: window) { response in
+                switch response {
+                case .alertSecondButtonReturn:
+                    WindowControllersManager.shared.show(url: URL.ddgLearnMore, newTab: false)
+                default:
+                    window.makeFirstResponder(self)
+                    return
+                }
+
+            }
+        }
+#endif
         selectedTabViewModel.tab.setUrl(url, userEntered: userEnteredValue)
 
         self.window?.makeFirstResponder(nil)

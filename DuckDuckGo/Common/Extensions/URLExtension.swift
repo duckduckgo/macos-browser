@@ -320,6 +320,10 @@ extension URL {
         return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/")!
     }
 
+    static var ddgLearnMore: URL {
+        return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/get-duckduckgo/get-duckduckgo-browser-on-mac/")!
+    }
+
     static var theFireButton: URL {
         return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#the-fire-button")!
     }

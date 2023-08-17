@@ -177,6 +177,16 @@ extension NSAlert {
         return alert
     }
 
+    static func cannotOpenFileAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.cannotOpenFileAlertHeader
+        alert.informativeText = UserText.cannotOpenFileAlertInformative
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.ok)
+        alert.addButton(withTitle: UserText.learnMore)
+        return alert
+    }
+
     @discardableResult
     func runModal() async -> NSApplication.ModalResponse {
         await withCheckedContinuation { continuation in
