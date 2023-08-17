@@ -18,18 +18,19 @@
 
 import SwiftUI
 
-struct AutofillIconLetterView: View {
+struct LetterIconView: View {
 
     var title: String
     var size: CGFloat = 32
-    var prefferedFirstCharacter: String?
+    var prefferedFirstCharacters: String?
+    var characterCount = 2
 
-    var letter: Character {
-        if let prefferedFirstCharacter,
-           prefferedFirstCharacter != "" {
-            return Character(prefferedFirstCharacter)
+    var characters: String {
+        if let prefferedFirstCharacters = prefferedFirstCharacters,
+           prefferedFirstCharacters != "" {
+            return String(prefferedFirstCharacters.prefix(characterCount))
         }
-        return title.first ?? "#"
+        return String(title.prefix(characterCount))
     }
 
     var body: some View {
@@ -38,9 +39,11 @@ struct AutofillIconLetterView: View {
                 .foregroundColor(Color.forString(title))
                 .frame(width: size, height: size)
 
-            Text(letter.uppercased())
-                .font(.system(size: size * 0.76, weight: .bold, design: .default))
+            Text(characters.capitalized(with: .current))
+                .frame(width: size - 5, height: size - 5)
                 .foregroundColor(.white)
+                .minimumScaleFactor(0.01)
+                .font(.system(size: size, weight: .bold))
         }
         .padding(.leading, 8)
     }

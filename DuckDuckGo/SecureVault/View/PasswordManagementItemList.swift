@@ -263,6 +263,15 @@ private struct ItemView: View {
     let item: SecureVaultItem
     let action: () -> Void
 
+    func getIconLetters(account: SecureVaultModels.WebsiteAccount) -> String {
+        var generatedIconLetters = model.tldForAccount(account)
+        if let title = account.title,
+            title != "" {
+            generatedIconLetters = title
+        }
+        return generatedIconLetters
+    }
+    
     var body: some View {
 
         let selected = model.selected == item
@@ -275,10 +284,9 @@ private struct ItemView: View {
                 switch item {
                 case .account:
                     if let account = item.websiteAccount, let domain = account.domain {
-                        LoginFaviconView(domain: domain,
-                                         preferredFirstCharacter: model.firstLetterForAccount(account: account))
+                        LoginFaviconView(domain: domain, generatedIconLetters: getIconLetters(account: account))
                     } else {
-                        AutofillIconLetterView(title: "#")
+                        LetterIconView(title: "#")
                     }
                 case .card:
                     Image("Card")

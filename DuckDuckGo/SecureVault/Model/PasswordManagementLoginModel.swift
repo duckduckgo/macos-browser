@@ -33,7 +33,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     var onSaveRequested: (SecureVaultModels.WebsiteCredentials) -> Void
     var onDeleteRequested: (SecureVaultModels.WebsiteCredentials) -> Void
-    var urlMatcher: AutofillUrlMatcher
+    var urlMatcher: AutofillDomainNameUrlMatcher
     var emailManager: EmailManager
 
     var isEditingPublisher: Published<Bool>.Publisher {
@@ -53,7 +53,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     @Published var notes: String = ""
     @Published var isEditing = false
     @Published var isNew = false
-    @Published var firstLetter = ""
+    @Published var domainTLD = ""
 
     var isDirty: Bool {
         title != "" || username != "" || password != "" || domain != "" || notes != ""
@@ -129,7 +129,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     init(onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
          onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
-         urlMatcher: AutofillUrlMatcher,
+         urlMatcher: AutofillDomainNameUrlMatcher,
          emailManager: EmailManager,
          tld: TLD = ContentBlocking.shared.tld,
          urlSort: AutofillDomainNameUrlSort) {
@@ -210,7 +210,8 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         domain =  urlMatcher.normalizeUrlForWeb(credentials?.account.domain ?? "")
         notes = credentials?.account.notes ?? ""
         isNew = credentials?.account.id == nil
-        firstLetter = credentials?.account.firstTLDLetter(tld: tld, autofillDomainNameUrlSort: urlSort) ?? ""
+        let name = credentials?.account.name(tld: tld, autofillDomainNameUrlMatcher: urlMatcher)
+        domainTLD = tld.eTLDplus1(name) ?? credentials?.account.title ?? "#"
 
         // Determine Private Email Status when required
         usernameIsPrivateEmail = emailManager.isPrivateEmail(email: username)

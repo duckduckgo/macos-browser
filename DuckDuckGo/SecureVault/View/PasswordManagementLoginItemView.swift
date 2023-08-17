@@ -591,7 +591,8 @@ private struct HeaderView: View {
     var body: some View {
 
         HStack(alignment: .center, spacing: 0) {
-            LoginFaviconView(domain: model.domain, preferredFirstCharacter: model.firstLetter)
+            LoginFaviconView(domain: model.domain,
+                             generatedIconLetters: model.title != "" ? model.title : model.domainTLD)
                .padding(.trailing, 10)
 
             if model.isNew || model.isEditing {

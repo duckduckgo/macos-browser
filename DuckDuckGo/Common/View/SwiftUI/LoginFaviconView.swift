@@ -21,22 +21,21 @@ import BrowserServicesKit
 
 struct LoginFaviconView: View {
     let domain: String
-    let preferredFirstCharacter: String?
-    let preferredColor: Int = 1
+    let generatedIconLetters: String
     let faviconManagement: FaviconManagement = FaviconManager.shared
 
     var body: some View {
-        if let image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image {
-            Image(nsImage: image)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 32)
-                .cornerRadius(4.0)
-                .padding(.leading, 6)
-        } else {
-            let domainFirst = String(domain.first ?? "#")
-            let letter = preferredFirstCharacter ?? domainFirst
-            AutofillIconLetterView(title: domain, prefferedFirstCharacter: letter)
+        Group {
+            if let image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image {
+                Image(nsImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 32)
+                    .cornerRadius(4.0)
+                    .padding(.leading, 6)
+            } else {
+                LetterIconView(title: generatedIconLetters)
+            }
         }
     }
 
