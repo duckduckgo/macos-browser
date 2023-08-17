@@ -130,8 +130,8 @@ extension Pixel.Event {
              .networkProtectionSystemExtensionUnknownActivationResult,
              .favoriteSectionHidden,
              .recentActivitySectionHidden,
-             .continueSetUpSectionHidden:
-
+             .continueSetUpSectionHidden,
+             .incrementalRolloutTest:
             return nil
         }
     }
