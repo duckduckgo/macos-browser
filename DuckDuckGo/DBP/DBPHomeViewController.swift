@@ -33,8 +33,8 @@ final class DBPHomeViewController: NSViewController {
 
     private var presentedWindowController: NSWindowController?
 
-    lazy var dataBrokerContainerView: DataBrokerContainerViewController = {
-        DataBrokerContainerViewController()
+    lazy var dataBrokerProtectionViewController: DataBrokerProtectionViewController = {
+        DataBrokerProtectionViewController()
     }()
 
     init() {
@@ -59,8 +59,8 @@ final class DBPHomeViewController: NSViewController {
     }
 
     private func attachDataBrokerContainerView() {
-        addChild(dataBrokerContainerView)
-        view.addSubview(dataBrokerContainerView.view)
+        addChild(dataBrokerProtectionViewController)
+        view.addSubview(dataBrokerProtectionViewController.view)
     }
 
     override func viewDidAppear() {
@@ -75,7 +75,7 @@ final class DBPHomeViewController: NSViewController {
 
     override func viewDidLayout() {
         super.viewDidLayout()
-        dataBrokerContainerView.view.frame = view.bounds
+        dataBrokerProtectionViewController.view.frame = view.bounds
     }
 
     private func presentInviteCodeFlow() {

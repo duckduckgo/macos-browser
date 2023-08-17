@@ -18,48 +18,22 @@
 
 import SwiftUI
 
-private enum BodyViewType: CaseIterable {
-    case gettingStarted
-    case noResults
-    case scanStarted
-    case results
-    case createProfile
-
-    var description: String {
-        switch self {
-        case .gettingStarted:
-            return "Getting Started"
-        case .noResults:
-            return "No Results Found"
-        case .scanStarted:
-            return "Scan Started"
-        case .results:
-            return "Results"
-        case .createProfile:
-            return "Create Profile"
-        }
-    }
-}
-
 @available(macOS 11.0, *)
-public struct DataBrokerProtectionContainerView: View {
-    @State private var bodyViewType = BodyViewType.createProfile
+struct DataBrokerProtectionContainerView: View {
+    @ObservedObject var navigationViewModel: ContainerNavigationViewModel
+    @ObservedObject var profileViewModel: ProfileViewModel
 
-    private var shouldShowHeader: Bool {
-        bodyViewType != .createProfile
-    }
-
-    public init() { }
-
-    public var body: some View {
+    var body: some View {
         ScrollView {
             ZStack {
                 headerView()
 
                 VStack {
-                    switch bodyViewType {
+                    switch navigationViewModel.bodyViewType {
                     case .gettingStarted:
-                        GettingStartedView()
+                        GettingStartedView(buttonClicked: {
+                            navigationViewModel.updateNavigation(.createProfile)
+                        })
                             .padding(.top, 200)
                     case .noResults:
                         NoResultsFoundView()
@@ -73,29 +47,29 @@ public struct DataBrokerProtectionContainerView: View {
                             .padding(.top, 330)
                             .padding(.bottom, 100)
                     case .createProfile:
-                        CreateProfileView()
+                        CreateProfileView(viewModel: profileViewModel)
                             .frame(width: 670)
                             .padding(.top, 73)
                     }
                     Spacer()
                 }
 
-                // just for testing
-                VStack(alignment: .leading) {
-                    HStack {
-                        Picker(selection: $bodyViewType, label: Text("Body View Type")) {
-                            ForEach(BodyViewType.allCases, id: \.self) { viewType in
-                                Text(viewType.description).tag(viewType)
-                            }
-                        }
-                        .pickerStyle(MenuPickerStyle())
-                        .frame(width: 300)
+               // just for testing
+               VStack(alignment: .leading) {
+                   HStack {
+                       Picker(selection: $navigationViewModel.bodyViewType, label: Text("Body View Type")) {
+                           ForEach(ContainerNavigationViewModel.BodyViewType.allCases, id: \.self) { viewType in
+                               Text(viewType.description).tag(viewType)
+                           }
+                       }
+                       .pickerStyle(MenuPickerStyle())
+                       .frame(width: 300)
 
-                        Spacer()
-                    }
-                    Spacer()
-                }.padding()
-            }
+                       Spacer()
+                   }
+                   Spacer()
+               }.padding()
+         }
         }.background(
            backgroundView()
         )
@@ -103,7 +77,7 @@ public struct DataBrokerProtectionContainerView: View {
 
     @ViewBuilder
     func headerView() -> some View {
-        if shouldShowHeader {
+        if navigationViewModel.shouldShowHeader {
             VStack {
                 DashboardHeaderView(viewModel: DashboardHeaderViewModel(statusText: "Scanning...",
                                                                         faqButtonClicked: {},
@@ -116,7 +90,7 @@ public struct DataBrokerProtectionContainerView: View {
 
     @ViewBuilder
     func backgroundView() -> some View {
-        if shouldShowHeader {
+        if navigationViewModel.shouldShowHeader {
             Color("background-color", bundle: .module)
         } else {
             Image("background-pattern", bundle: .module)
@@ -128,7 +102,11 @@ public struct DataBrokerProtectionContainerView: View {
 @available(macOS 11.0, *)
 struct DataBrokerProtectionContainerView_Previews: PreviewProvider {
     static var previews: some View {
-        DataBrokerProtectionContainerView()
+        let dataManager = DataBrokerProtectionDataManager()
+        let navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
+        let profileViewModel = ProfileViewModel(dataManager: dataManager)
+
+        DataBrokerProtectionContainerView(navigationViewModel: navigationViewModel, profileViewModel: profileViewModel)
             .frame(width: 1024, height: 768)
     }
 }

@@ -19,16 +19,25 @@
 import Foundation
 import Common
 
+public protocol DataBrokerProtectionDataManaging {
+    var delegate: DataBrokerProtectionDataManagerDelegate? { get set }
+
+    init(fakeBrokerFlag: FakeBrokerFlag)
+    func saveProfile(_ profile: DataBrokerProtectionProfile)
+    func fetchProfile() -> DataBrokerProtectionProfile?
+    func fetchDataBrokerInfoData() -> [DataBrokerInfoData]
+}
+
 public protocol DataBrokerProtectionDataManagerDelegate: AnyObject {
     func dataBrokerProtectionDataManagerDidUpdateData()
 }
 
-public class DataBrokerProtectionDataManager {
+public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
     public weak var delegate: DataBrokerProtectionDataManagerDelegate?
 
     internal let database: DataBrokerProtectionDataBase
 
-    public init(fakeBrokerFlag: FakeBrokerFlag) {
+    required public init(fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()) {
         self.database = DataBrokerProtectionDataBase(fakeBrokerFlag: fakeBrokerFlag)
         setupNotifications()
     }
