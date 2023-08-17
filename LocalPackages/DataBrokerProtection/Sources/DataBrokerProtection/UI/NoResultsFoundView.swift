@@ -20,6 +20,8 @@ import SwiftUI
 
 @available(macOS 11.0, *)
 struct NoResultsFoundView: View {
+    let buttonClicked: () -> Void
+
     private let items: [RowItem] = [
         RowItem(imageName: "checkmark.circle", text: "Include your middle name"),
         RowItem(imageName: "checkmark.circle", text: "Add other names, such as maiden name or nicknames"),
@@ -33,13 +35,16 @@ struct NoResultsFoundView: View {
                        iconColor: .yellow)
                 .padding(.bottom, 30)
 
-            InfoView(rowItems: items)
+            InfoView(buttonClicked: buttonClicked,
+                     rowItems: items)
         }
     }
 }
 
 @available(macOS 11.0, *)
 private struct InfoView: View {
+    let buttonClicked: () -> Void
+
     let rowItems: [RowItem]
 
     var body: some View {
@@ -57,7 +62,8 @@ private struct InfoView: View {
                 }
             }.padding()
 
-            CTAButton(title: "Edit Profile")
+            CTAButton(title: "Edit Profile",
+                      buttonClicked: buttonClicked)
 
         }.padding(40)
             .frame(width: 600, alignment: .center)
@@ -73,9 +79,11 @@ private struct InfoView: View {
 
 private struct CTAButton: View {
     let title: String
+    let buttonClicked: () -> Void
+
     var body: some View {
         Button {
-            print("Edit Profile")
+            buttonClicked()
         } label: {
             Text(title)
                 .bold()
@@ -95,7 +103,7 @@ private struct RowItem: Identifiable {
 struct NoResultsFoundView_Previews: PreviewProvider {
     static var previews: some View {
 
-        NoResultsFoundView()
+        NoResultsFoundView(buttonClicked: {})
             .padding(40)
     }
 }
