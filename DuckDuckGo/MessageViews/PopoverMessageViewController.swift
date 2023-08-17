@@ -19,6 +19,10 @@
 import AppKit
 import SwiftUI
 
+protocol PopoverMessageViewControllerDelegate {
+    func onDismiss()
+}
+
 final class PopoverMessageViewController: NSHostingController<PopoverMessageView> {
 
     enum Constants {
@@ -27,12 +31,18 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
         static let autoDismissDuration: TimeInterval = 2.5
     }
 
-    private var timer: Timer?
     let viewModel: PopoverMessageViewModel
+    let onDismiss: (() -> Void)?
+    private var timer: Timer?
     private var trackingArea: NSTrackingArea?
 
-    init(message: String, image: String? = nil, buttonText: String? = nil, buttonAction: (() -> Void)? = nil) {
+    init(message: String,
+         image: String? = nil,
+         buttonText: String? = nil,
+         buttonAction: (() -> Void)? = nil,
+         onDismiss: (() -> Void)? = nil) {
         self.viewModel = PopoverMessageViewModel(message: message, image: image, buttonText: buttonText, buttonAction: buttonAction)
+        self.onDismiss = onDismiss
         let contentView = PopoverMessageView(viewModel: self.viewModel)
         super.init(rootView: contentView)
     }
@@ -47,6 +57,7 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
         if let trackingArea = trackingArea {
             view.removeTrackingArea(trackingArea)
         }
+        onDismiss?()
     }
 
     override func viewDidAppear() {

@@ -81,6 +81,7 @@ final class NavigationBarViewController: NSViewController {
     var isDownloadsPopoverShown: Bool {
         popovers.isDownloadsPopoverShown
     }
+    var isAutoFillAutosaveMessageVisible: Bool = false
 
     private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
@@ -383,14 +384,22 @@ final class NavigationBarViewController: NSViewController {
         }
 
         DispatchQueue.main.async {
+
             let action = {
                 self.showPasswordManagerPopover(selectedWebsiteAccount: account)
             }
-            let viewController = PopoverMessageViewController(message: UserText.passwordManagerAutosavePopoverText(domain: domain),
+            let popoverMessage = PopoverMessageViewController(message: UserText.passwordManagerAutosavePopoverText(domain: domain),
                                                               image: Self.Constants.autosavePopoverImageName,
                                                               buttonText: UserText.passwordManagerAutosaveButtonText,
-                                                              buttonAction: action)
-            viewController.show(onParent: self, relativeTo: self.passwordManagementButton.isHidden ? self.optionsButton : self.passwordManagementButton)
+                                                              buttonAction: action,
+                                                              onDismiss: {
+                                                                    self.isAutoFillAutosaveMessageVisible = false
+                                                                    self.passwordManagementButton.isHidden = !LocalPinningManager.shared.isPinned(.autofill)
+            }
+                                                              )
+            self.isAutoFillAutosaveMessageVisible = true
+            self.passwordManagementButton.isHidden = false
+            popoverMessage.show(onParent: self, relativeTo: self.passwordManagementButton)
         }
     }
 
@@ -560,7 +569,7 @@ final class NavigationBarViewController: NSViewController {
         if LocalPinningManager.shared.isPinned(.autofill) {
             passwordManagementButton.isHidden = false
         } else {
-            passwordManagementButton.isHidden = !popovers.isPasswordManagementPopoverShown
+            passwordManagementButton.isHidden = !popovers.isPasswordManagementPopoverShown && !isAutoFillAutosaveMessageVisible
         }
 
         popovers.passwordManagementDomain = nil
