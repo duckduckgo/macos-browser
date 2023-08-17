@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "sam/phased-rollout-feature-flag-dry-run",
-        "revision" : "a41cc984c32127aa57c6e28305d21672dddc5193"
+        "revision" : "0d81ad6e0b147257eb7e53e5f430ce74a1d5cae0",
+        "version" : "74.0.1-1"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "8def15fe8a4c2fb76730f640507e9fd1d6c1f8a7",
-        "version" : "4.32.0"
+        "revision" : "a4f35ad23ac4a0eb9b36b94f1f2aa0f0ebf2855d",
+        "version" : "4.30.0"
       }
     },
     {
