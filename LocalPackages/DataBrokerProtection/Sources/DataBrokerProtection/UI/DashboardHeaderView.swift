@@ -34,7 +34,9 @@ struct DashboardHeaderView: View {
             VStack(spacing: 0) {
                 HStack {
                     Spacer()
-                    CTAHeaderView()
+                    CTAHeaderView(viewModel: viewModel)
+                        .padding()
+
                 }
                 HeaderTitleView(viewModel: viewModel)
                 Spacer()
@@ -65,26 +67,30 @@ private struct HeaderTitleView: View {
 
 @available(macOS 11.0, *)
 private struct CTAHeaderView: View {
+    @ObservedObject var viewModel: DashboardHeaderViewModel
+
     var body: some View {
         HStack {
             Button {
-                print("FAQ")
+                viewModel.faqButtonClicked()
             } label: {
                 Text("FAQs")
             }
             .buttonStyle(.borderless)
             .foregroundColor(.primary)
 
-            Button {
-                print("Edit Profile")
-            } label: {
-                HStack {
-                    Image(systemName: "person")
-                    Text("Edit Profile")
+            if viewModel.isProfileButtonAvailable {
+                Button {
+                    viewModel.editProfileClicked()
+                } label: {
+                    HStack {
+                        Image(systemName: "person")
+                        Text("Edit Profile")
+                    }
+                    .frame(maxWidth: 110, maxHeight: 26)
                 }
-                .frame(maxWidth: 110, maxHeight: 26)
-            }.buttonStyle(CTAButtonStyle())
-                .padding()
+                .buttonStyle(CTAButtonStyle())
+            }
         }
     }
 }

@@ -36,7 +36,9 @@ struct DataBrokerProtectionContainerView: View {
                         })
                             .padding(.top, 200)
                     case .noResults:
-                        NoResultsFoundView()
+                        NoResultsFoundView(buttonClicked: {
+                            navigationViewModel.updateNavigation(.createProfile)
+                        })
                             .padding(.top, 330)
                     case .scanStarted:
                         ScanStartedView()
@@ -79,9 +81,10 @@ struct DataBrokerProtectionContainerView: View {
     func headerView() -> some View {
         if navigationViewModel.shouldShowHeader {
             VStack {
-                DashboardHeaderView(viewModel: DashboardHeaderViewModel(statusText: "Scanning...",
-                                                                        faqButtonClicked: {},
-                                                                        editProfileClicked: {}))
+                DashboardHeaderView(viewModel: DashboardHeaderViewModel(statusText: "",
+                                                                        isProfileButtonAvailable: navigationViewModel.bodyViewType != .gettingStarted,
+                                                                        faqButtonClicked: { },
+                                                                        editProfileClicked: { navigationViewModel.updateNavigation(.createProfile) }))
                 .frame(height: 300)
                 Spacer()
             }
