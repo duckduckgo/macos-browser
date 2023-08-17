@@ -19,6 +19,7 @@
 import Foundation
 
 final class ProfileViewModel: ObservableObject {
+    private let dataManager: DataBrokerProtectionDataManaging
 
     final class Name: Identifiable {
         let id = UUID()
@@ -95,6 +96,11 @@ final class ProfileViewModel: ObservableObject {
         [isBirthdayValid, isNameValid, isAddressValid].allSatisfy { $0 }
     }
 
+    init(dataManager: DataBrokerProtectionDataManaging) {
+        self.dataManager = dataManager
+        restoreSavedProfile()
+    }
+
     func saveName(id: UUID?, firstName: String, middleName: String?, lastName: String, suffix: String?) {
         let chosenSuffix = suffix == ProfileViewModel.defaultSuffixSelection ? nil : suffix
 
@@ -135,7 +141,29 @@ final class ProfileViewModel: ObservableObject {
 
     func saveProfile() {
         let profile = mapUIProfileToDataBaseProfile()
+        if let savedProfile = dataManager.fetchProfile() {
+            dataManager.fetchProfile()
+        }
+        dataManager.saveProfile(profile)
+    }
 
+    private func restoreSavedProfile() {
+        if let profile = dataManager.fetchProfile() {
+            names =  profile.names.map {
+                Name(firstName: $0.firstName,
+                     middleName: $0.middleName ?? "",
+                     lastName: $0.lastName,
+                     suffix: $0.suffix ?? "")
+            }
+
+            addresses = profile.addresses.map {
+                Address(street: $0.street ?? "",
+                        city: $0.city,
+                        state: $0.state)
+            }
+
+            birthYear = profile.age
+        }
     }
 
     private func mapUIProfileToDataBaseProfile() -> DataBrokerProtectionProfile {
@@ -155,7 +183,7 @@ final class ProfileViewModel: ObservableObject {
         return DataBrokerProtectionProfile(names: names,
                                            addresses: addresses,
                                            phones: [],
-                                           age: birthYear)
+                                           age: birthYear ?? 0)
     }
 }
 

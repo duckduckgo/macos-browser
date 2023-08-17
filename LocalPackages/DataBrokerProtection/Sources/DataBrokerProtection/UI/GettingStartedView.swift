@@ -20,6 +20,7 @@ import SwiftUI
 
 @available(macOS 11.0, *)
 struct GettingStartedView: View {
+    let buttonClicked: () -> Void
 
     var body: some View {
         VStack(alignment: .center, spacing: Constants.ContainerView.verticalSpacing) {
@@ -41,7 +42,7 @@ struct GettingStartedView: View {
                         subtitle: "Data brokers we cover target people with US addresses.")
             ])
 
-            CTAButton(title: "Get Started")
+            CTAButton(title: "Get Started", buttonClicked: buttonClicked)
         }
         .shadedBorderedPanel(backgroundColor: Color("modal-background-color", bundle: .module))
     }
@@ -49,9 +50,12 @@ struct GettingStartedView: View {
 
 private struct CTAButton: View {
     let title: String
+    let buttonClicked: () -> Void
+
     var body: some View {
-        Button(action: {
-        }) {
+        Button {
+            buttonClicked()
+        } label: {
             Text(title)
                 .bold()
                 .frame(width: Constants.CTA.width, height: Constants.CTA.height)
@@ -164,6 +168,6 @@ private enum Constants {
 @available(macOS 11.0, *)
 struct GettingStartedView_Previews: PreviewProvider {
     static var previews: some View {
-        GettingStartedView().frame(width: 600, height: 400)
+        GettingStartedView(buttonClicked: {}).frame(width: 600, height: 400)
     }
 }

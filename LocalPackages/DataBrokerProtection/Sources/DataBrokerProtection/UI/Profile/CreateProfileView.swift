@@ -20,7 +20,8 @@ import SwiftUI
 
 @available(macOS 11.0, *)
 struct CreateProfileView: View {
-    @StateObject var viewModel = ProfileViewModel()
+    @ObservedObject var viewModel: ProfileViewModel
+
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
@@ -639,7 +640,7 @@ private enum Consts {
 @available(macOS 11.0, *)
 struct CreateProfileView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateProfileView()
+        CreateProfileView(viewModel: ProfileViewModel(dataManager: DataBrokerProtectionDataManager()))
             .frame(width: 500, height: 1400)
             .padding(30)
     }
