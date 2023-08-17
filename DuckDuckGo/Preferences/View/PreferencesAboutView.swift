@@ -88,10 +88,6 @@ extension Preferences {
     struct UnsupportedDeviceInfoBox: View {
 
         static let appleSupportURL = URL(string: "https://support.apple.com/en-us/HT211238")!
-        let osVersion: String = {
-                let version = ProcessInfo.processInfo.operatingSystemVersion
-                return "\(version.majorVersion).\(version.minorVersion).\(version.patchVersion)"
-            }()
 
         var wide: Bool
 
@@ -110,7 +106,7 @@ extension Preferences {
                     .frame(width: 16, height: 16)
                     .padding(.trailing, 4)
                 VStack(alignment: .leading, spacing: 12) {
-                    Text(UserText.aboutUnsupportedDeviceInfo1(version: osVersion))
+                    Text(UserText.aboutUnsupportedDeviceInfo1(version: "\(ProcessInfo.processInfo.operatingSystemVersion)"))
                     if wide {
                         VStack(alignment: .leading, spacing: 0) {
                             HStack(alignment: .center, spacing: 0) {

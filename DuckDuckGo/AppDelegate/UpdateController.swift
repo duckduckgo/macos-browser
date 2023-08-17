@@ -38,6 +38,10 @@ final class UpdateController: NSObject {
     }
 
     func checkForUpdates(_ sender: Any!) {
+        if !SupportedOSChecker.isCurrentOsSupported {
+            showNotSupportedInfo()
+        }
+
         NSApp.windows.forEach {
             if let controller = $0.windowController, "\(type(of: controller))" == "SUUpdateAlert" {
                 $0.orderFrontRegardless()
@@ -63,6 +67,10 @@ final class UpdateController: NSObject {
         updater.updater.automaticallyChecksForUpdates = false
         updater.updater.updateCheckInterval = 0
 #endif
+    }
+
+    private func showNotSupportedInfo() {
+        NSAlert.osNotSupported().runModal()
     }
 
 }

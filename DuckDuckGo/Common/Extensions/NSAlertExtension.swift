@@ -177,6 +177,14 @@ extension NSAlert {
         return alert
     }
 
+    static func osNotSupported() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.unsupportedDeviceInfoAlertHeader
+        alert.informativeText = UserText.aboutUnsupportedDeviceInfo1(version: "\(ProcessInfo.processInfo.operatingSystemVersion)")
+        alert.alertStyle = .warning
+        return alert
+    }
+
     @discardableResult
     func runModal() async -> NSApplication.ModalResponse {
         await withCheckedContinuation { continuation in
