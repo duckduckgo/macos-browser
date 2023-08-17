@@ -133,8 +133,8 @@ extension Pixel.Event {
              .continueSetUpSectionHidden,
              .userHasPinnedTab,
              .fireButtonFirstBurn,
-             .fireButton:
-
+             .fireButton,
+             .incrementalRolloutTest:
             return nil
         }
     }
