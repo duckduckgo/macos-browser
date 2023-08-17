@@ -147,16 +147,16 @@ struct ModalView: View {
         switch event.type {
         case .noMatchFound:
             return "No match found"
-        case .matchFound(extractedProfileID: let extractedProfileID):
-            return "Match found \(extractedProfileID)"
+        case .matchesFound:
+            return "Matches found"
         case .error(error: let error):
             return labelForErrorEvent(error)
-        case .optOutStarted(extractedProfileID: let extractedProfileID):
-            return "Opt-out started \(extractedProfileID)"
-        case .optOutRequested(extractedProfileID: let extractedProfileID):
-            return "Opt-out requested \(extractedProfileID)"
-        case .optOutConfirmed(extractedProfileID: let extractedProfileID):
-            return "Opt-out confirmed \(extractedProfileID)"
+        case .optOutStarted:
+            return "Opt-out started for extracted profile with id: \(event.extractedProfileId!)"
+        case .optOutRequested:
+            return "Opt-out requested for extracted profile with id: \(event.extractedProfileId!)"
+        case .optOutConfirmed:
+            return "Opt-out confirmed for extracted profile with id: \(event.extractedProfileId!)"
         case .scanStarted:
             return "Scan Started"
         }

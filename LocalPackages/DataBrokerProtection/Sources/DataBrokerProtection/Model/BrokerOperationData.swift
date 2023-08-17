@@ -21,34 +21,17 @@ import Foundation
 protocol BrokerOperationData {
     var brokerId: Int64 { get }
     var profileQueryId: Int64 { get }
-    var preferredRunDate: Date? { get set }
-    var historyEvents: [HistoryEvent] { get set }
-    var lastRunDate: Date? { get set }
-
-    func lastEventWith(type: HistoryEvent.EventType) -> HistoryEvent?
-    mutating func addHistoryEvent(_ historyEvent: HistoryEvent)
+    var lastRunDate: Date? { get }
+    var preferredRunDate: Date? { get }
+    var historyEvents: [HistoryEvent] { get }
 }
 
-extension BrokerOperationData {
-    mutating func addHistoryEvent(_ historyEvent: HistoryEvent) {
-        self.historyEvents.append(historyEvent)
-    }
-
-    var lastRunDate: Date? {
-        historyEvents.last?.date
-    }
-
-    func lastEventWith(type: HistoryEvent.EventType) -> HistoryEvent? {
-        return historyEvents.last(where: { $0.type == type })
-    }
-}
-
-final class ScanOperationData: BrokerOperationData {
+final class ScanOperationData: BrokerOperationData, Sendable {
     let brokerId: Int64
     let profileQueryId: Int64
-    var preferredRunDate: Date?
-    var historyEvents: [HistoryEvent]
-    var lastRunDate: Date?
+    let preferredRunDate: Date?
+    let historyEvents: [HistoryEvent]
+    let lastRunDate: Date?
 
     init(brokerId: Int64,
          profileQueryId: Int64,
@@ -64,13 +47,13 @@ final class ScanOperationData: BrokerOperationData {
 
 }
 
-final class OptOutOperationData: BrokerOperationData {
+final class OptOutOperationData: BrokerOperationData, Sendable {
     let brokerId: Int64
     let profileQueryId: Int64
-    var preferredRunDate: Date?
-    var historyEvents: [HistoryEvent]
-    var lastRunDate: Date?
-    var extractedProfile: ExtractedProfile
+    let preferredRunDate: Date?
+    let historyEvents: [HistoryEvent]
+    let lastRunDate: Date?
+    let extractedProfile: ExtractedProfile
 
     init(brokerId: Int64,
          profileQueryId: Int64,

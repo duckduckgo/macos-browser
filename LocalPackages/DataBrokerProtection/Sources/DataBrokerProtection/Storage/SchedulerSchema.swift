@@ -120,8 +120,8 @@ extension BrokerDB: PersistableRecord, FetchableRecord {
 struct ScanDB: Codable {
     let brokerId: Int64
     let profileQueryId: Int64
-    let lastRunDate: Date?
-    let preferredRunDate: Date?
+    var lastRunDate: Date?
+    var preferredRunDate: Date?
 }
 
 extension ScanDB: PersistableRecord, FetchableRecord {
@@ -191,8 +191,8 @@ struct OptOutDB: Codable {
     let brokerId: Int64
     let profileQueryId: Int64
     let extractedProfileId: Int64
-    let lastRunDate: Date?
-    let preferredRunDate: Date?
+    var lastRunDate: Date?
+    var preferredRunDate: Date?
 }
 
 extension OptOutDB: PersistableRecord, FetchableRecord {

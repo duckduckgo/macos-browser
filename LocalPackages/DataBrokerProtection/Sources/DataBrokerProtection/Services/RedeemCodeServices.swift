@@ -101,7 +101,7 @@ public final class UserDefaultsAuthenticationData: AuthenticationRepository {
     }
 
     // Initialize this constant with the DBP API Dev Access Token on Bitwarden if you do not want to use the redeem endpoint.
-    private let developmentToken: String? = nil
+    private let developmentToken: String? = ""
 
     public init() {}
 

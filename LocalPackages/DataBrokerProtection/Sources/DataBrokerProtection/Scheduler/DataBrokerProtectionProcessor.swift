@@ -68,7 +68,7 @@ final class DataBrokerProtectionProcessor {
                                priorityDate: Date?,
                                completion: @escaping () -> Void) {
 
-        let brokersProfileData = database.fetchAllBrokerProfileQueryData()
+        let brokersProfileData = database.fetchAllBrokerProfileQueryData(for: 1) // We assume one profile for now
         let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
                                                                                   operationType: operationType,
                                                                                   priorityDate: priorityDate)

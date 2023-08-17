@@ -184,39 +184,58 @@ struct MapperToModel {
         )
     }
 
-    func mapToModel(_ scanDB: ScanDB) -> ScanOperationData {
+    func mapToModel(_ scanDB: ScanDB, events: [ScanHistoryEventDB]) throws -> ScanOperationData {
         .init(
             brokerId: scanDB.brokerId,
             profileQueryId: scanDB.profileQueryId,
             preferredRunDate: scanDB.preferredRunDate,
-            historyEvents: [HistoryEvent](),
+            historyEvents: try events.map(mapToModel(_:)),
             lastRunDate: scanDB.lastRunDate
         )
     }
 
-    func mapToModel(_ optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB) throws -> OptOutOperationData {
+    func mapToModel(_ optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB, events: [OptOutHistoryEventDB]) throws -> OptOutOperationData {
         .init(
             brokerId: optOutDB.brokerId,
             profileQueryId: optOutDB.profileQueryId,
             preferredRunDate: optOutDB.preferredRunDate,
-            historyEvents: [HistoryEvent](),
+            historyEvents: try events.map(mapToModel(_:)),
             lastRunDate: optOutDB.lastRunDate,
             extractedProfile: try mapToModel(extractedProfileDB)
         )
     }
 
     func mapToModel(_ extractedProfileDB: ExtractedProfileDB) throws -> ExtractedProfile {
-        return try jsonDecoder.decode(ExtractedProfile.self, from: try mechanism(extractedProfileDB.profile))
+        let extractedProfile = try jsonDecoder.decode(ExtractedProfile.self, from: try mechanism(extractedProfileDB.profile))
+        return .init(id: extractedProfileDB.id,
+                     name: extractedProfile.name,
+                     alternativeNamesList: extractedProfile.alternativeNamesList,
+                     addressFull: extractedProfile.addressFull,
+                     addressCityState: extractedProfile.addressCityState,
+                     addressCityStateList: extractedProfile.addressCityStateList,
+                     phone: extractedProfile.phone,
+                     relativesList: extractedProfile.relativesList,
+                     profileUrl: extractedProfile.profileUrl,
+                     reportId: extractedProfile.reportId,
+                     age: extractedProfile.age,
+                     email: extractedProfile.email,
+                     removedDate: extractedProfile.removedDate)
     }
 
     func mapToModel(_ scanEvent: ScanHistoryEventDB) throws -> HistoryEvent {
         let decodedEventType = try jsonDecoder.decode(HistoryEvent.EventType.self, from: scanEvent.event)
-        return .init(type: decodedEventType, date: scanEvent.timestamp)
+        return .init(brokerId: scanEvent.brokerId, profileQueryId: scanEvent.profileQueryId, type: decodedEventType, date: scanEvent.timestamp)
     }
 
     func mapToModel(_ optOutEvent: OptOutHistoryEventDB) throws -> HistoryEvent {
         let decodedEventType = try jsonDecoder.decode(HistoryEvent.EventType.self, from: optOutEvent.event)
-        return .init(type: decodedEventType, date: optOutEvent.timestamp)
+        return .init(
+            extractedProfileId: optOutEvent.extractedProfileId,
+            brokerId: optOutEvent.brokerId,
+            profileQueryId: optOutEvent.profileQueryId,
+            type: decodedEventType,
+            date: optOutEvent.timestamp
+        )
     }
 }
 

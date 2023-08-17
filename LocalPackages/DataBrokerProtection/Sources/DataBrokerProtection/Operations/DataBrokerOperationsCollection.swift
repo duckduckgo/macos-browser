@@ -104,9 +104,9 @@ final class DataBrokerOperationsCollection: Operation {
 
         switch operationType {
         case .optOut:
-            operationsData = brokerProfileQueriesData.flatMap { $0.optOutsData }
+            operationsData = brokerProfileQueriesData.flatMap { $0.optOutOperationsData }
         case .scan:
-            operationsData = brokerProfileQueriesData.compactMap { $0.scanData }
+            operationsData = brokerProfileQueriesData.compactMap { $0.scanOperationData }
         case .all:
             operationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
         }
