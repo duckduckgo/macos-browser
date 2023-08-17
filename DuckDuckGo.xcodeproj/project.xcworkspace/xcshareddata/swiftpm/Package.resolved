@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "sam/fix-macos-xcode-15-builds",
-        "revision" : "707b682860f0f9094b77493b3e0aa272ace6473c"
+        "revision" : "070cd5292161a2ca84efb7a583acecb55e777517",
+        "version" : "75.0.1"
       }
     },
     {
