@@ -46,12 +46,25 @@ struct Step: Codable, Sendable {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(type, forKey: .stepType)
         var actionsContainer = container.nestedUnkeyedContainer(forKey: .actions)
         for action in actions {
             if let navigateAction = action as? NavigateAction {
                 try actionsContainer.encode(navigateAction)
             } else if let extractAction = action as? ExtractAction {
                 try actionsContainer.encode(extractAction)
+            } else if let fillFormAction = action as? FillFormAction {
+                try actionsContainer.encode(fillFormAction)
+            } else if let getCaptchaInfoAction = action as? GetCaptchaInfoAction {
+                try actionsContainer.encode(getCaptchaInfoAction)
+            } else if let solveCaptchaInfoAction = action as? SolveCaptchaAction {
+                try actionsContainer.encode(solveCaptchaInfoAction)
+            } else if let emailConfirmationAction = action as? EmailConfirmationAction {
+                try actionsContainer.encode(emailConfirmationAction)
+            } else if let clickAction = action as? ClickAction {
+                try actionsContainer.encode(clickAction)
+            } else if let expectactionAction = action as? ExpectationAction {
+                try actionsContainer.encode(expectactionAction)
             }
         }
     }
