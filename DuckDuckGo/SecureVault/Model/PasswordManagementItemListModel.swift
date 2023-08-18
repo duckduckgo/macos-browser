@@ -238,11 +238,8 @@ final class PasswordManagementItemListModel: ObservableObject {
         didSet {
             updateFilteredData()
             calculateEmptyState()
-            itemCount = items.count
         }
     }
-
-    @Published private(set) var itemCount: Int = 0
 
     @Published var sortDescriptor = SecureVaultSorting.default {
         didSet {
@@ -251,7 +248,11 @@ final class PasswordManagementItemListModel: ObservableObject {
             }
 
             updateFilteredData()
-            selectFirst()
+
+            // Select first item if no previous selection was provided
+            if selected == nil {
+                selectFirst()
+            }
         }
     }
 
