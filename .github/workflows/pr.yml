@@ -333,7 +333,8 @@ jobs:
         uses: malmstein/github-asana-action@master
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}
+          asana-project: ${{ vars.APPLE_CI_FAILING_TESTS_PROJECT_ID }}
+          asana-section: ${{ vars.APPLE_CI_FAILING_TESTS_MACOS_POST_MERGE_SECTION_ID }}
           asana-task-name: 'PR Check is failing on develop'
           action: create-asana-task
           asana-task-description: PR Checks conducted after merging have failed.  See ${{ env.WORKFLOW_URL }}
