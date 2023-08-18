@@ -88,7 +88,7 @@ extension ProfileQueryDB: PersistableRecord, FetchableRecord {
 struct BrokerDB: Codable {
     let id: Int64?
     let name: String
-    let json: String
+    let json: Data
     let version: Int
 }
 
@@ -155,7 +155,7 @@ extension ScanDB: PersistableRecord, FetchableRecord {
 struct ScanHistoryEventDB: Codable {
     let brokerId: Int64
     let profileQueryId: Int64
-    let event: String
+    let event: Data
     let timestamp: Date
 }
 
@@ -202,6 +202,10 @@ extension OptOutDB: PersistableRecord, FetchableRecord {
     static let broker = belongsTo(BrokerDB.self)
     static let extractedProfile = belongsTo(ExtractedProfileDB.self)
 
+    var extractedProfile: QueryInterfaceRequest<ExtractedProfileDB> {
+        request(for: OptOutDB.extractedProfile)
+    }
+
     enum Columns: String, ColumnExpression {
         case brokerId
         case profileQueryId
@@ -231,7 +235,7 @@ struct OptOutHistoryEventDB: Codable {
     let brokerId: Int64
     let profileQueryId: Int64
     let extractedProfileId: Int64
-    let event: String
+    let event: Data
     let timestamp: Date
 }
 
@@ -272,7 +276,7 @@ struct ExtractedProfileDB: Codable {
     let brokerId: Int64
     let profileQueryId: Int64
     let profile: Data // Stored as Data JSON
-    let removedDate: String?
+    var removedDate: Date?
 }
 
 extension ExtractedProfileDB: PersistableRecord, FetchableRecord {
