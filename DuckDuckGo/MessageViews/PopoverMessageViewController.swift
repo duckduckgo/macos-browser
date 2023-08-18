@@ -18,6 +18,7 @@
 
 import AppKit
 import SwiftUI
+import SwiftUIExtensions
 
 final class PopoverMessageViewController: NSHostingController<PopoverMessageView> {
 

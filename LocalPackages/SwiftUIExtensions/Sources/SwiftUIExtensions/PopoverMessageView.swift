@@ -16,7 +16,26 @@
 //  limitations under the License.
 //
 
+import Foundation
 import SwiftUI
+
+final class PopoverMessageViewModel: ObservableObject {
+    @Published var message: String
+    @Published var image: String?
+    @Published var buttonText: String?
+    @Published var buttonAction: (() -> Void)?
+
+    init(message: String,
+         image: String? = nil,
+         buttonText: String? = nil,
+         buttonAction: (() -> Void)? = nil) {
+        self.message = message
+        self.image = image
+        self.buttonText = buttonText
+        self.buttonAction = buttonAction
+    }
+}
+
 
 struct PopoverMessageView: View {
     @ObservedObject var viewModel: PopoverMessageViewModel
