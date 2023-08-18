@@ -123,7 +123,8 @@ fileprivate extension View {
 
 public struct TunnelControllerView: View {
 
-    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.isEnabled) private var isEnabled
     @Environment(\.dismiss) private var dismiss
 
     // MARK: - Model
@@ -143,6 +144,7 @@ public struct TunnelControllerView: View {
     public var body: some View {
         Group {
             headerView()
+                .disabled(on: !isEnabled)
 
             featureToggleRow()
 
@@ -151,9 +153,9 @@ public struct TunnelControllerView: View {
 
             if model.showServerDetails {
                 connectionStatusView()
+                    .disabled(on: !isEnabled)
             }
         }
-        .disabled(on: model.viewDisabled)
     }
 
     // MARK: - Composite Views
@@ -215,18 +217,20 @@ public struct TunnelControllerView: View {
                     .applyLabelAttributes(colorScheme: colorScheme)
                     .frame(alignment: .leading)
                     .fixedSize()
+                    .disabled(on: !isEnabled)
 
                 Spacer(minLength: 8)
 
                 Text(model.connectionStatusDescription)
                     .applyTimerAttributes(colorScheme: colorScheme)
                     .fixedSize()
+                    .disabled(on: !isEnabled)
 
                 Spacer()
                     .frame(width: 8)
             }
         }
-        .disabled(model.isToggleDisabled)
+        .disabled(!isEnabled || model.isToggleDisabled)
         .toggleStyle(.switch)
         .padding(EdgeInsets(top: 3, leading: 9, bottom: 3, trailing: 9))
     }

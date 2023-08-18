@@ -222,7 +222,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         for try await event in SystemExtensionManager().activate() {
             switch event {
             case .waitingForUserApproval:
-                self.controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
+                onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue
             case .activated:
                 self.controllerErrorStore.lastErrorMessage = nil
                 activated = true
@@ -265,21 +265,36 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     func start(enableLoginItems: Bool) async {
         controllerErrorStore.lastErrorMessage = nil
 
-        if enableLoginItems {
-            loginItemsManager.enableLoginItems()
-        }
-
         do {
 #if NETP_SYSTEM_EXTENSION
             guard try await ensureSystemExtensionIsActivated() else {
                 return
             }
 
-            onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
+            // We'll only update to completed if we were showing the onboarding step to
+            // allow the system extension.  Otherwise we may override the allow-VPN
+            // onboarding step.
+            if onboardingStatusRawValue == OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue {
+                onboardingStatusRawValue = OnboardingStatus.completed.rawValue
+            }
 #endif
 
-            let tunnelManager = try await loadOrMakeTunnelManager()
+            let tunnelManager: NETunnelProviderManager
+
+            do {
+                tunnelManager = try await loadOrMakeTunnelManager()
+            } catch {
+                if case NEVPNError.configurationReadWriteFailed = error {
+                    onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
+                }
+
+                throw error
+            }
             onboardingStatusRawValue = OnboardingStatus.completed.rawValue
+
+            if enableLoginItems {
+                loginItemsManager.enableLoginItems()
+            }
 
             switch tunnelManager.connection.status {
             case .invalid:

@@ -1,8 +1,19 @@
 {
   "images" : [
     {
-      "filename" : "image 39.pdf",
-      "idiom" : "universal"
+      "filename" : "vpn-icon.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "vpn-icon@2x.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "vpn-icon@3x.png",
+      "idiom" : "universal",
+      "scale" : "3x"
     }
   ],
   "info" : {

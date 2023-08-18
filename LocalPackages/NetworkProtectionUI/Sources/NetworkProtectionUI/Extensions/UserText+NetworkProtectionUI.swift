@@ -28,6 +28,20 @@ final class UserText {
     static let networkProtectionStatusViewFeatureOn = NSLocalizedString("network.protection.status.view.feature.on", value: "Network Protection is ON", comment: "Text shown in NetworkProtection's status view when NetP is ON.")
     static let networkProtectionStatusViewTimerZero = "00:00:00"
 
+    // MARK: - Onboarding
+
+    static let networkProtectionOnboardingAllowExtensionTitle = NSLocalizedString("network.protection.onboarding.allow.extension.title", value: "Allow System Extension", comment: "Title for the onboarding allow-extension step")
+    static let networkProtectionOnboardingAllowExtensionDescPrefix = NSLocalizedString("network.protection.onboarding.allow.extension.desc.prefix", value: "Open System Settings to Privacy & Security. Scroll and select ", comment: "Non-bold prefix for the onboarding allow-extension description")
+    static let networkProtectionOnboardingAllowExtensionDescAllow = NSLocalizedString("network.protection.onboarding.allow.extension.desc.allow", value: "Allow", comment: "'Allow' word between the prefix and suffix for the onboarding allow-extension description")
+    static let networkProtectionOnboardingAllowExtensionDescSuffix = NSLocalizedString("network.protection.onboarding.allow.extension.desc.suffix", value: " for DuckDuckGo software.", comment: "Non-bold suffix for the onboarding allow-extension description")
+    static let networkProtectionOnboardingAllowExtensionAction = NSLocalizedString("network.protection.onboarding.allow.extension.action", value: "Open System Settings...", comment: "Action button title for the onboarding allow-extension view")
+
+    static let networkProtectionOnboardingAllowVPNTitle = NSLocalizedString("network.protection.onboarding.allow.vpn.title", value: "Add VPN Configuration", comment: "Title for the onboarding allow-VPN step")
+    static let networkProtectionOnboardingAllowVPNDescPrefix = NSLocalizedString("network.protection.onboarding.allow.vpn.desc.prefix", value: "Select ", comment: "Non-bold prefix for the onboarding allow-VPN description")
+    static let networkProtectionOnboardingAllowVPNDescAllow = NSLocalizedString("network.protection.onboarding.allow.vpn.desc.allow", value: "Allow", comment: "'Allow' word between the prefix and suffix for the onboarding allow-VPN description")
+    static let networkProtectionOnboardingAllowVPNDescSuffix = NSLocalizedString("network.protection.onboarding.allow.vpn.desc.suffix", value: " when prompted to finish setting up Network Protection.", comment: "Non-bold suffix for the onboarding allow-VPN description")
+    static let networkProtectionOnboardingAllowVPNAction = NSLocalizedString("network.protection.onboarding.allow.vpn.action", value: "Add VPN Configuration...", comment: "Action button title for the onboarding allow-VPN view")
+
     // MARK: - Connection Status
 
     static let networkProtectionStatusDisconnected = NSLocalizedString("network.protection.status.disconnected", value: "Not connected", comment: "The label for the NetP VPN when disconnected")

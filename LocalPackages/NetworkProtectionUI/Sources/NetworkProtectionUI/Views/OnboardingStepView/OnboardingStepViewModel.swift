@@ -26,11 +26,11 @@ extension OnboardingStepView {
     final class Model: ObservableObject {
         struct StyledTextFragment {
             let text: String
-            let isBold: Bool
+            let isEmphasized: Bool
 
-            init(text: String, isBold: Bool = false) {
+            init(text: String, isEmphasized: Bool = false) {
                 self.text = text
-                self.isBold = isBold
+                self.isEmphasized = isEmphasized
             }
         }
 
@@ -54,9 +54,9 @@ extension OnboardingStepView {
         var title: String {
             switch step {
             case .userNeedsToAllowExtension:
-                return "Step 1 of 2: Allow System Extension"
+                return UserText.networkProtectionOnboardingAllowExtensionTitle
             case .userNeedsToAllowVPNConfiguration:
-                return "Step 2 of 2: Add VPN Configuration"
+                return UserText.networkProtectionOnboardingAllowVPNTitle
             }
         }
 
@@ -64,19 +64,15 @@ extension OnboardingStepView {
             switch step {
             case .userNeedsToAllowExtension:
                 return [
-                    .init(text: "Open "),
-                    .init(text: "System Settings", isBold: true),
-                    .init(text: " to "),
-                    .init(text: "Privacy & Security", isBold: true),
-                    .init(text: ". Scroll and select "),
-                    .init(text: "Allow", isBold: true),
-                    .init(text: " for DuckDuckGo software.")
+                    .init(text: UserText.networkProtectionOnboardingAllowExtensionDescPrefix),
+                    .init(text: UserText.networkProtectionOnboardingAllowExtensionDescAllow, isEmphasized: true),
+                    .init(text: UserText.networkProtectionOnboardingAllowExtensionDescSuffix),
                 ]
             case .userNeedsToAllowVPNConfiguration:
                 return [
-                    .init(text: "Select "),
-                    .init(text: "Allow", isBold: true),
-                    .init(text: " when prompted to finish setting up Network Protection.")
+                    .init(text: UserText.networkProtectionOnboardingAllowVPNDescPrefix),
+                    .init(text: UserText.networkProtectionOnboardingAllowVPNDescAllow, isEmphasized: true),
+                    .init(text: UserText.networkProtectionOnboardingAllowVPNDescSuffix),
                 ]
             }
         }
@@ -84,16 +80,20 @@ extension OnboardingStepView {
         var actionTitle: String {
             switch step {
             case .userNeedsToAllowExtension:
-                return "Open System Settings..."
+                return UserText.networkProtectionOnboardingAllowExtensionAction
             case .userNeedsToAllowVPNConfiguration:
-                return "Add VPN Configuration..."
+                return UserText.networkProtectionOnboardingAllowVPNAction
             }
         }
 
         var actionScreenshot: NetworkProtectionAsset? {
             switch step {
             case .userNeedsToAllowExtension:
-                return .allowSysexScreenshot
+                if #available(macOS 12, *) {
+                    return .allowSysexScreenshot
+                } else {
+                    return .allowSysexScreenshotBigSur
+                }
             case .userNeedsToAllowVPNConfiguration:
                 return nil
             }

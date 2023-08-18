@@ -18,7 +18,7 @@
 
 import Foundation
 
-public enum NetworkProtectionAsset: String {
+public enum NetworkProtectionAsset: String, CaseIterable {
     case ipAddressIcon = "IP-16"
     case serverLocationIcon = "Server-Location-16"
     case vpnDisabledImage = "VPN-Disabled-128"
@@ -47,4 +47,5 @@ public enum NetworkProtectionAsset: String {
 
     // Images:
     case allowSysexScreenshot = "allow-sysex-screenshot"
+    case allowSysexScreenshotBigSur = "allow-sysex-screenshot-bigsur"
 }

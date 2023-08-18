@@ -92,8 +92,8 @@ struct OnboardingStepView: View {
                         model.description.reduce(Text("")) { previous, fragment in
                             var newText = Text(fragment.text)
 
-                            if fragment.isBold {
-                                newText = newText.bold()
+                            if fragment.isEmphasized {
+                                newText = newText.fontWeight(.semibold)
                             }
 
                             return previous + newText
@@ -103,26 +103,25 @@ struct OnboardingStepView: View {
 
                         Button(model.actionTitle, action: model.action)
                             .applyStepButtonAttributes(colorScheme: colorScheme)
+                            .padding(.top, 3)
                     }
 
                     Spacer()
                 }
             }
-            .padding(.top, 16)
-            .padding(.bottom, model.actionScreenshot != nil ? 4 : 16)
+            .padding(.vertical, 16)
             .padding(.horizontal, 10)
 
             if let actionScreenshot = model.actionScreenshot {
                 Image(actionScreenshot)
-                    .shadow(color: .black.opacity(0.18), radius: 5, x: 0, y: 0)
             }
         }
         .cornerRadius(8)
         .background(
-            RoundedRectangle(cornerRadius: 8, style: .circular)
+            RoundedRectangle(cornerRadius: 6, style: .circular)
                 .stroke(Color(.onboardingStepBorder))
                 .background(
-                    RoundedRectangle(cornerRadius: 8, style: .circular)
+                    RoundedRectangle(cornerRadius: 6, style: .circular)
                         .fill(Color(.onboardingStepBackground))
                 ))
     }
