@@ -142,10 +142,7 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
             try await ConfigurationManager.shared.forceRefresh(.privacyConfiguration)
             return generateResourceResponse()
         case let .debugTools(content):
-            let result = ContentBlocking.shared.privacyConfigurationManager.override(with: content.utf8data)
-            if result != .downloaded {
-                throw UpdateResourceError(message: "Failed to parse custom Privacy Config")
-            }
+            try ConfigurationManager.shared.override(.privacyConfiguration, with: content.utf8data)
             return generateResourceResponse()
         }
     }
@@ -184,10 +181,6 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
     func generateFeaturesResponse() -> FeaturesResponse {
         return FeaturesResponse(features: .init(remoteResources: .init(resources: [generateResourceResponse()])))
     }
-}
-
-struct UpdateResourceError: Error {
-    let message: String
 }
 
 // MARK: - GetTabsResponse

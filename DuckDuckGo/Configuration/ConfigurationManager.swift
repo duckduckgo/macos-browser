@@ -34,7 +34,9 @@ final class ConfigurationManager {
         case bloomFilterPersistenceFailed
         case bloomFilterExclusionsNotFound
         case bloomFilterExclusionsPersistenceFailed
-        case configurationNotSupportedForOnDemandRefreshing
+        case configurationDoesNotSupportOnDemandRefreshing
+        case configurationDoesNotSupportOverriding
+        case configurationOverrideFailed
     }
 
     enum Constants {
@@ -187,10 +189,23 @@ final class ConfigurationManager {
 
     public func forceRefresh(_ configuration: Configuration) async throws {
         guard [Configuration.privacyConfiguration, .trackerDataSet].contains(configuration) else {
-            throw Error.configurationNotSupportedForOnDemandRefreshing
+            throw Error.configurationDoesNotSupportOnDemandRefreshing
         }
         try await fetcher.fetch(configuration, honoringEtag: false)
         updateTrackerBlockingDependencies()
+    }
+
+    public func override(_ configuration: Configuration, with data: Data?) throws {
+        switch configuration {
+        case .privacyConfiguration:
+            let result = ContentBlocking.shared.privacyConfigurationManager.override(with: data)
+            if result != .downloaded {
+                throw Error.configurationOverrideFailed
+            }
+        default:
+            throw Error.configurationDoesNotSupportOverriding
+        }
+        ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
     }
 
     private func tryAgainLater() {
