@@ -142,7 +142,7 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
             try await ConfigurationManager.shared.forceRefresh(.privacyConfiguration)
             return generateResourceResponse()
         case let .debugTools(content):
-            try ConfigurationManager.shared.override(.privacyConfiguration, with: content.utf8data)
+            try await ConfigurationManager.shared.override(.privacyConfiguration, with: content.utf8data)
             return generateResourceResponse()
         }
     }

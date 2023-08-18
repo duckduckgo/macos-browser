@@ -192,10 +192,11 @@ final class ConfigurationManager {
             throw Error.configurationDoesNotSupportOnDemandRefreshing
         }
         try await fetcher.fetch(configuration, honoringEtag: false)
-        updateTrackerBlockingDependencies()
+        let token = updateTrackerBlockingDependencies()
+        await waitForCompilation(with: token)
     }
 
-    public func override(_ configuration: Configuration, with data: Data?) throws {
+    public func override(_ configuration: Configuration, with data: Data?) async throws {
         switch configuration {
         case .privacyConfiguration:
             let result = ContentBlocking.shared.privacyConfigurationManager.override(with: data)
@@ -205,7 +206,21 @@ final class ConfigurationManager {
         default:
             throw Error.configurationDoesNotSupportOverriding
         }
-        ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
+        let token = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
+        await waitForCompilation(with: token)
+    }
+
+    private func waitForCompilation(with token: ContentBlockerRulesManager.CompletionToken) async {
+        var cancellable: AnyCancellable?
+        await withCheckedContinuation { continuation in
+            cancellable = ContentBlocking.shared.contentBlockingManager.updatesPublisher
+                .filter { $0.completionTokens.contains(token) }
+                .prefix(1)
+                .sink { _ in
+                    continuation.resume()
+                }
+        }
+        cancellable?.cancel()
     }
 
     private func tryAgainLater() {
@@ -217,12 +232,12 @@ final class ConfigurationManager {
         lastUpdateTime = Date(timeIntervalSinceNow: Constants.refreshPeriodSeconds - Constants.retryDelaySeconds)
     }
 
-    private func updateTrackerBlockingDependencies() {
+    private func updateTrackerBlockingDependencies() -> ContentBlockerRulesManager.CompletionToken {
         ContentBlocking.shared.trackerDataManager.reload(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
                                                          data: ConfigurationStore.shared.loadData(for: .trackerDataSet))
         ContentBlocking.shared.privacyConfigurationManager.reload(etag: ConfigurationStore.shared.loadEtag(for: .privacyConfiguration),
                                                                   data: ConfigurationStore.shared.loadData(for: .privacyConfiguration))
-        ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
+        return ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
     }
 
     private func updateBloomFilter() async throws {
