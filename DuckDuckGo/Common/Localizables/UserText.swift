@@ -839,3 +839,37 @@ extension UserText {
     static let networkProtectionWaitlistButtonJoinWaitlist = NSLocalizedString("network-protection.waitlist.button.join-waitlist", value: "Join the Waitlist", comment: "Join Waitlist button for Network Protection join waitlist screen")
 
 }
+
+// MARK: - Network Protection Terms of Service
+
+extension UserText {
+
+    static let networkProtectionPrivacyPolicyTitle = NSLocalizedString("network-protection.privacy-policy.title", value: "Privacy Policy", comment: "Privacy Policy title for Network Protection")
+
+    static let networkProtectionPrivacyPolicySection1Title = NSLocalizedString("network-protection.privacy-policy.section.1.title", value: "We don’t ask for any personal information from you in order to use this beta service.", comment: "Privacy Policy title for Network Protection")
+    static let networkProtectionPrivacyPolicySection1List = NSLocalizedString("network-protection.privacy-policy.section.1.list", value: "• This Privacy Policy is for our limited waitlist beta VPN product.\n• Our main Privacy Policy also applies here.", comment: "Privacy Policy list for Network Protection")
+
+    static let networkProtectionPrivacyPolicySection2Title = NSLocalizedString("network-protection.privacy-policy.section.2.title", value: "We don’t keep any logs of your online activity.", comment: "Privacy Policy title for Network Protection")
+    static let networkProtectionPrivacyPolicySection2List = NSLocalizedString("network-protection.privacy-policy.section.2.list", value: "• That means we have no way to tie what you do online to you as an individual and we don’t have any record of things like:\n    • Website visits\n    • DNS requests\n    • Connections made\n    • IP addresses used\n    • Session lengths\n    • Session lengths", comment: "Privacy Policy list for Network Protection")
+
+    static let networkProtectionPrivacyPolicySection3Title = NSLocalizedString("network-protection.privacy-policy.section.3.title", value: "We only keep anonymous performance metrics that we cannot connect to your online activity.", comment: "Privacy Policy title for Network Protection")
+    static let networkProtectionPrivacyPolicySection3List = NSLocalizedString("network-protection.privacy-policy.section.3.title", value: "• Our servers store generic usage (for example, CPU load) and diagnostic data (for example, errors), but none of that data is connected to any individual’s activity.\n• We use this non-identifying information to monitor and ensure the performance and quality of the service, for example to make sure servers aren’t overloaded.", comment: "Privacy Policy list for Network Protection")
+
+    static let networkProtectionPrivacyPolicySection4Title = NSLocalizedString("network-protection.privacy-policy.section.4.title", value: ">We use dedicated servers for all VPN traffic.", comment: "Privacy Policy title for Network Protection")
+    static let networkProtectionPrivacyPolicySection4List = NSLocalizedString("network-protection.privacy-policy.section.4.title", value: "• Dedicated servers means they are not shared with anyone else.\n• We rent our servers from providers we carefully selected because they meet our privacy requirements.\n• We have strict access controls in place so that only limited DuckDuckGo team members have access to our servers.", comment: "Privacy Policy list for Network Protection")
+
+    static let networkProtectionPrivacyPolicySection5Title = NSLocalizedString("network-protection.privacy-policy.section.5.title", value: "We protect and limit use of your data when you communicate directly with DuckDuckGo.", comment: "Privacy Policy title for Network Protection")
+    static let networkProtectionPrivacyPolicySection5List = NSLocalizedString("network-protection.privacy-policy.section.5.title", value: "• If you reach out to us for support by submitting a bug report or through email and agree to be contacted to troubleshoot the issue, we’ll contact you using the information you provide.\n• If you participate in a voluntary product survey or questionnaire and agree to provide further feedback, we may contact you using the information you provide.\n• We will permanently delete all personal information you provided to us (email, contact information), within 30 days after closing a support case or, in the case of follow up feedback, within 60 days after ending this beta service.", comment: "Privacy Policy list for Network Protection")
+
+    static let networkProtectionTermsOfServiceTitle = NSLocalizedString("network-protection.terms-of-service.title", value: "Terms of Service", comment: "Terms of Service title for Network Protection")
+
+    static let networkProtectionTermsOfServiceSection1Title = NSLocalizedString("network-protection.terms-of-service.section.1.title", value: "The service is for limited and personal use only.", comment: "Terms of Service title for Network Protection")
+    static let networkProtectionTermsOfServiceSection1List = NSLocalizedString("network-protection.terms-of-service.section.1.list", value: "• This service is provided for your personal use only.\n• You are responsible for all activity in the service that occurs on or through your device.\n• This service may only be used through the DuckDuckGo app on the device on which you are given access. If you delete the DuckDuckGo app, you will lose access to the service.\n• You may not use this service through a third-party client.", comment: "Terms of Service list for Network Protection")
+
+    static let networkProtectionTermsOfServiceSection2Title = NSLocalizedString("network-protection.terms-of-service.section.2.title", value: "You agree to comply with all applicable laws, rules, and regulations.", comment: "Terms of Service title for Network Protection")
+    static let networkProtectionTermsOfServiceSection2List = NSLocalizedString("network-protection.terms-of-service.section.2.list", value: "• You agree that you will not use the service for any unlawful, illicit, criminal, or fraudulent purpose, or in any manner that could give rise to civil or criminal liability under applicable law.\n• You agree to comply with our DuckDuckGo Terms of Service, which are incorporated by reference.", comment: "Terms of Service list for Network Protection")
+
+    static let networkProtectionTermsOfServiceSection3Title = NSLocalizedString("network-protection.terms-of-service.section.3.title", value: "You must be eligible to use this service.", comment: "Terms of Service title for Network Protection")
+    static let networkProtectionTermsOfServiceSection3List = NSLocalizedString("network-protection.terms-of-service.section.3.list", value: "• Access to this beta is randomly awarded. You are responsible for ensuring eligibility.\n• You must be at least 18 years old and live in a location where use of a VPN is legal in order to be eligible to use this service.", comment: "Terms of Service list for Network Protection")
+
+}

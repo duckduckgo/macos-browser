@@ -3,6 +3,16 @@
     {
       "filename" : "Toolbar Button.pdf",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "toolbarbuttondark.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

@@ -21,30 +21,6 @@ import SwiftUIExtensions
 
 struct NetworkProtectionTermsAndConditionsView: View {
 
-    static func terms() -> String {
-        return """
-    Privacy Policy
-
-    • We don’t ask for any personal information from you in order to use this beta service.
-    • This Privacy Policy is for our limited waitlist beta VPN product.
-    • Our main Privacy Policy also applies here.
-
-    We don’t keep any logs of your online activity.
-
-    That means we have no way to tie what you do online to you as an individual and we don’t have any record of things like:
-    • Website visits
-    • DNS requests
-    • Connections made
-    • IP addresses used
-    • Session lengths
-
-    We only keep anonymous performance metrics that we cannot connect to your online activity.
-
-    • Our servers store generic usage (for example, CPU load) and diagnostic data (for example, errors), but none of that data is connected to any individual’s activity.
-    We use this non-identifying information to monitor and ensure the performance and quality of the service, for example to make sure servers aren’t overloaded.
-    """
-    }
-
     @EnvironmentObject var model: WaitlistViewModel
 
     var body: some View {
@@ -54,15 +30,82 @@ struct NetworkProtectionTermsAndConditionsView: View {
                     .font(.system(size: 17, weight: .bold))
                     .multilineTextAlignment(.center)
 
-                Group {
-                    ScrollView {
-                        Text(Self.terms())
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 8.0) {
+                        Text(UserText.networkProtectionPrivacyPolicyTitle)
+                            .font(.system(size: 17, weight: .bold))
+                            .multilineTextAlignment(.leading)
+                            .padding(.bottom, 16)
+
+                        Group {
+                            Text(UserText.networkProtectionPrivacyPolicySection1Title)
+                                .font(.system(size: 15, weight: .bold))
+                                .multilineTextAlignment(.leading)
+
+                            Text(UserText.networkProtectionPrivacyPolicySection1List)
+
+                            Text(UserText.networkProtectionPrivacyPolicySection2Title)
+                                .font(.system(size: 15, weight: .bold))
+                                .multilineTextAlignment(.leading)
+                                .padding(.top, 10)
+
+                            Text(UserText.networkProtectionPrivacyPolicySection2List)
+
+                            Text(UserText.networkProtectionPrivacyPolicySection3Title)
+                                .font(.system(size: 15, weight: .bold))
+                                .multilineTextAlignment(.leading)
+                                .padding(.top, 10)
+
+                            Text(UserText.networkProtectionPrivacyPolicySection3List)
+
+                            Text(UserText.networkProtectionPrivacyPolicySection4Title)
+                                .font(.system(size: 15, weight: .bold))
+                                .multilineTextAlignment(.leading)
+                                .padding(.top, 10)
+
+                            Text(UserText.networkProtectionPrivacyPolicySection4List)
+
+                            Text(UserText.networkProtectionPrivacyPolicySection5Title)
+                                .font(.system(size: 15, weight: .bold))
+                                .multilineTextAlignment(.leading)
+                                .padding(.top, 10)
+
+                            Text(UserText.networkProtectionPrivacyPolicySection5List)
+                        }
+
+                        Text(UserText.networkProtectionTermsOfServiceTitle)
+                            .font(.system(size: 17, weight: .bold))
+                            .multilineTextAlignment(.leading)
+                            .padding(.bottom, 16)
+                            .padding(.top, 10)
+
+                        Group {
+                            Text(UserText.networkProtectionTermsOfServiceSection1Title)
+                                .font(.system(size: 15, weight: .bold))
+                                .multilineTextAlignment(.leading)
+
+                            Text(UserText.networkProtectionTermsOfServiceSection1List)
+
+                            Text(UserText.networkProtectionTermsOfServiceSection2Title)
+                                .font(.system(size: 15, weight: .bold))
+                                .multilineTextAlignment(.leading)
+                                .padding(.top, 10)
+
+                            Text(UserText.networkProtectionTermsOfServiceSection2List)
+
+                            Text(UserText.networkProtectionTermsOfServiceSection3Title)
+                                .font(.system(size: 15, weight: .bold))
+                                .multilineTextAlignment(.leading)
+                                .padding(.top, 10)
+
+                            Text(UserText.networkProtectionTermsOfServiceSection3List)
+                        }
                     }
                     .padding(20.0)
                 }
                 .frame(maxWidth: .infinity)
-                .background(Color.black.opacity(0.01))
-                .border(Color.black.opacity(0.06))
+                .background(Color("BlackWhite1"))
+                .border(Color("BlackWhite5"))
             }
         } buttons: {
             Button("Cancel") {

@@ -67,7 +67,7 @@ public final class WaitlistViewModel: ObservableObject {
         self.notificationService = notificationService
 
         if waitlistStorage.getWaitlistTimestamp() != nil, waitlistStorage.getWaitlistInviteCode() == nil {
-             viewState = .joinedWaitlist(.notificationAllowed)
+             viewState = .joinedWaitlist(.notificationsDisabled)
 
              Task {
                  await checkNotificationPermissions()
@@ -98,7 +98,7 @@ public final class WaitlistViewModel: ObservableObject {
         case .closeAndPresentNetworkProtectionPopover:
             close()
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            DispatchQueue.main.async {
                 NotificationCenter.default.post(name: .networkProtectionWaitlistShowPopover, object: nil)
             }
         }
@@ -138,7 +138,7 @@ public final class WaitlistViewModel: ObservableObject {
                 waitlistStorage.store(waitlistTimestamp: joinResponse.timestamp)
                 await checkNotificationPermissions()
             case .failure:
-                // TODO: Handle failure here
+                // TODO: Handle failure here - just reset back to the Join state?
                 self.viewState = .notOnWaitlist
             }
         }
