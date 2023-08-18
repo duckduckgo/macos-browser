@@ -19,16 +19,16 @@
 import Foundation
 import SwiftUI
 
-final class PopoverMessageViewModel: ObservableObject {
+public final class PopoverMessageViewModel: ObservableObject {
     @Published var message: String
     @Published var image: String?
     @Published var buttonText: String?
     @Published var buttonAction: (() -> Void)?
 
-    init(message: String,
-         image: String? = nil,
-         buttonText: String? = nil,
-         buttonAction: (() -> Void)? = nil) {
+    public init(message: String,
+                image: String? = nil,
+                buttonText: String? = nil,
+                buttonAction: (() -> Void)? = nil) {
         self.message = message
         self.image = image
         self.buttonText = buttonText
@@ -36,11 +36,14 @@ final class PopoverMessageViewModel: ObservableObject {
     }
 }
 
+public struct PopoverMessageView: View {
+    @ObservedObject public var viewModel: PopoverMessageViewModel
 
-struct PopoverMessageView: View {
-    @ObservedObject var viewModel: PopoverMessageViewModel
+    public init(viewModel: PopoverMessageViewModel) {
+        self.viewModel = viewModel
+    }
 
-    var body: some View {
+    public var body: some View {
         HStack {
             if let image = viewModel.image {
                 Image(image)
@@ -57,9 +60,7 @@ struct PopoverMessageView: View {
                 Button(text, action: action)
                     .padding(.top, 2)
             }
-
         }
         .padding()
     }
-
 }

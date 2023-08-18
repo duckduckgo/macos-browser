@@ -375,10 +375,6 @@ final class NavigationBarViewController: NSViewController {
         guard view.window?.isKeyWindow == true,
               let account = sender.object as? SecureVaultModels.WebsiteAccount else { return }
 
-        guard view.window?.isKeyWindow == true else {
-            return
-        }
-
         guard let domain = account.domain else {
             return
         }
