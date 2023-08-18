@@ -92,4 +92,20 @@ extension String {
         return hasPrefix(other) || other.hasPrefix(self)
     }
 
+    // MARK: - Search with bang
+
+    private static let searchWithBangPattern = "^.+\\?q=%21[a-zA-Z]+(?:%20[a-zA-Z]+)*$"
+
+    private static var compiledSearchWithBangRegex: NSRegularExpression? = {
+        if let newRegex = try? NSRegularExpression(pattern: searchWithBangPattern, options: .caseInsensitive) {
+            return newRegex
+        }
+        return nil
+    }()
+
+    var isSearchWithBang: Bool {
+        guard let regex = Self.compiledSearchWithBangRegex else { return false }
+        return self.url?.isDuckDuckGoSearch ?? false && regex.firstMatch(in: self, options: [], range: NSRange(location: 0, length: self.utf16.count)) != nil
+    }
+
 }

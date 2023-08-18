@@ -670,7 +670,8 @@ protocol NewWindowPolicyDecisionMaker {
             return
         }
 
-        let canGoBack = webView.canGoBack || self.error != nil
+        let isJustOneRidirectGoingBack = webView.backForwardList.backList.count == 1 && webView.backForwardList.backItem?.url.absoluteString.contains("%21") ?? false
+        let canGoBack = (webView.canGoBack && !isJustOneRidirectGoingBack) || self.error != nil
         let canGoForward = webView.canGoForward && self.error == nil
         let canReload = (self.content.urlForWebView?.scheme ?? URL.NavigationalScheme.about.rawValue) != URL.NavigationalScheme.about.rawValue
 
@@ -700,6 +701,14 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         userInteractionDialog = nil
+
+        // If search with bang go back of 2 spaces (to avoid redirect)
+        if let urlString = webView.backForwardList.backItem?.url.absoluteString, urlString.isSearchWithBang {
+            if let item =  webView.backForwardList.item(at: -2) {
+                return webView.navigator()?.go(to: item)
+            }
+        }
+
         return webView.navigator()?.goBack(withExpectedNavigationType: .backForward(distance: -1))
     }
 
@@ -707,6 +716,14 @@ protocol NewWindowPolicyDecisionMaker {
     @discardableResult
     func goForward() -> ExpectedNavigation? {
         guard canGoForward else { return nil }
+
+        // If search with bang go forward of 2 spaces (to avoid redirect)
+        if let urlString = webView.backForwardList.forwardItem?.url.absoluteString, urlString.isSearchWithBang {
+            if let item =  webView.backForwardList.item(at: +2) {
+                return webView.navigator()?.go(to: item)
+            }
+        }
+
         return webView.navigator()?.goForward(withExpectedNavigationType: .backForward(distance: 1))
     }
 

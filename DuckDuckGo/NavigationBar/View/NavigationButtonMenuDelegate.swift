@@ -134,6 +134,13 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
             }
         }
 
+        // Remove duckduckgo search with bang
+        for (index, item) in list.enumerated().reversed() {
+            if let url = item.url, url.absoluteString.isSearchWithBang {
+                list.remove(at: index)
+            }
+        }
+
         return (list, currentIndex)
     }
 
