@@ -40,7 +40,7 @@ struct LetterIconView: View {
                 .frame(width: size, height: size)
 
             Text(characters.capitalized(with: .current))
-                .frame(width: size - 5, height: size - 5)
+                .frame(width: size - 10, height: size - 10)
                 .foregroundColor(.white)
                 .minimumScaleFactor(0.01)
                 .font(.system(size: size, weight: .bold))
