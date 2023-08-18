@@ -21,6 +21,7 @@ import SwiftUI
 @available(macOS 11.0, *)
 struct CreateProfileView: View {
     @ObservedObject var viewModel: ProfileViewModel
+    let scanButtonClicked: () -> Void
 
     @Environment(\.colorScheme) var colorScheme
 
@@ -33,9 +34,12 @@ struct CreateProfileView: View {
                 ComponentsContainerView(viewModel: viewModel)
                     .padding()
 
-                FormFooterView(viewModel: viewModel)
-                    .padding()
-                    .padding(.horizontal, Consts.OuterForm.horizontalPadding)
+                FormFooterView(viewModel: viewModel, buttonClicked: {
+                    viewModel.saveProfile()
+                    scanButtonClicked()
+                })
+                .padding()
+                .padding(.horizontal, Consts.OuterForm.horizontalPadding)
             }
             .shadedBorderedPanel(backgroundColor: Color("profile-background-color", bundle: .module))
 
@@ -412,11 +416,11 @@ private struct FormHeaderView: View {
 
 private struct FormFooterView: View {
     @ObservedObject var viewModel: ProfileViewModel
-
+    let buttonClicked: () -> Void
     var body: some View {
         VStack(spacing: 16) {
             Button {
-                viewModel.saveProfile()
+                buttonClicked()
             } label: {
                 Text("Scan")
                     .frame(maxWidth: .infinity)
@@ -640,7 +644,7 @@ private enum Consts {
 @available(macOS 11.0, *)
 struct CreateProfileView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateProfileView(viewModel: ProfileViewModel(dataManager: DataBrokerProtectionDataManager()))
+        CreateProfileView(viewModel: ProfileViewModel(dataManager: DataBrokerProtectionDataManager()), scanButtonClicked: {})
             .frame(width: 500, height: 1400)
             .padding(30)
     }

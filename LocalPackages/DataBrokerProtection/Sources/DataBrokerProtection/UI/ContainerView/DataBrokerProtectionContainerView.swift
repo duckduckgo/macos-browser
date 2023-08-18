@@ -34,12 +34,12 @@ struct DataBrokerProtectionContainerView: View {
                         GettingStartedView(buttonClicked: {
                             navigationViewModel.updateNavigation(.createProfile)
                         })
-                            .padding(.top, 200)
+                        .padding(.top, 200)
                     case .noResults:
                         NoResultsFoundView(buttonClicked: {
                             navigationViewModel.updateNavigation(.createProfile)
                         })
-                            .padding(.top, 330)
+                        .padding(.top, 330)
                     case .scanStarted:
                         ScanStartedView()
                             .padding(.top, 330)
@@ -49,9 +49,11 @@ struct DataBrokerProtectionContainerView: View {
                             .padding(.top, 330)
                             .padding(.bottom, 100)
                     case .createProfile:
-                        CreateProfileView(viewModel: profileViewModel)
-                            .frame(width: 670)
-                            .padding(.top, 73)
+                        CreateProfileView(viewModel: profileViewModel, scanButtonClicked: {
+                            navigationViewModel.updateNavigation(.scanStarted)
+                        })
+                        .frame(width: 670)
+                        .padding(.top, 73)
                     }
                     Spacer()
                 }
