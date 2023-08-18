@@ -39,8 +39,10 @@ extension WKWebViewConfiguration {
         preferences.javaScriptCanOpenWindowsAutomatically = true
         preferences.isFraudulentWebsiteWarningEnabled = false
 
-        if urlSchemeHandler(forURLScheme: DuckPlayer.duckPlayerScheme) == nil {
-            setURLSchemeHandler(DuckPlayerSchemeHandler(), forURLScheme: DuckPlayer.duckPlayerScheme)
+        if SupportedOSChecker.isCurrentOsSupported {
+            if urlSchemeHandler(forURLScheme: DuckPlayer.duckPlayerScheme) == nil {
+                setURLSchemeHandler(DuckPlayerSchemeHandler(), forURLScheme: DuckPlayer.duckPlayerScheme)
+            }
         }
 
         let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,
