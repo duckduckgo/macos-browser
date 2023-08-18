@@ -24,23 +24,30 @@ struct JoinWaitlistView: View {
 
     var body: some View {
         WaitlistDialogView {
-            WaitlistInfoView(
-                headerImageName: "JoinWaitlistHeader",
-                title: "Network Protection Beta",
-                subtitle: "Secure your network connection and keep your online activity private with Network Protection, a VPN from DuckDuckGo.",
-                infoSectionTitle: "How it works:",
-                infoSections: [
-                    WaitlistInfoView.InfoSection(imageName: "Join-16", title: "Join the waitlist", subtitle: "Beta access is limited for now."),
-                    WaitlistInfoView.InfoSection(imageName: "Timer-16", title: "Wait your turn", subtitle: "We send new invites every few days."),
-                    WaitlistInfoView.InfoSection(imageName: "Gift-16", title: "Get your invite", subtitle: "We can notify you when it's your turn.")
-                ]
-            )
+            VStack(spacing: 16.0) {
+                Image("JoinWaitlistHeader")
+
+                Text(UserText.networkProtectionWaitlistJoinTitle)
+                    .font(.system(size: 17, weight: .bold))
+
+                Text(UserText.networkProtectionWaitlistJoinSubtitle1)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(Color("BlackWhite80"))
+
+                Text(UserText.networkProtectionWaitlistJoinSubtitle2)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(Color("BlackWhite80"))
+
+                Text(UserText.networkProtectionWaitlistAvailabilityDisclaimer)
+                    .font(.system(size: 12))
+                    .foregroundColor(Color("BlackWhite60"))
+            }
         } buttons: {
-            Button("Close") {
+            Button(UserText.networkProtectionWaitlistButtonClose) {
                 model.perform(action: .close)
             }
 
-            Button("Join the Waitlist") {
+            Button(UserText.networkProtectionWaitlistButtonJoinWaitlist) {
                 model.perform(action: .joinQueue)
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: model.viewState == .notOnWaitlist))
