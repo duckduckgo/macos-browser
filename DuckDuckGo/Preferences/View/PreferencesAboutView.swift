@@ -110,11 +110,11 @@ extension Preferences {
                     if wide {
                         VStack(alignment: .leading, spacing: 0) {
                             HStack(alignment: .center, spacing: 0) {
-                                Text(UserText.aboutUnsupportedDeviceInfo2Part1)
+                                Text(UserText.aboutUnsupportedDeviceInfo2Part1 + " ")
                                 Button(action: {
                                     WindowControllersManager.shared.show(url: Self.appleSupportURL, newTab: true)
                                 }) {
-                                    Text(UserText.aboutUnsupportedDeviceInfo2Part2)
+                                    Text(UserText.aboutUnsupportedDeviceInfo2Part2 + " ")
                                         .foregroundColor(Color.blue)
                                         .underline()
                                 }
@@ -131,7 +131,7 @@ extension Preferences {
                             Text(UserText.aboutUnsupportedDeviceInfo2Part4)
                         }
                     } else {
-                        Text(UserText.aboutUnsupportedDeviceInfo2Part1 + UserText.aboutUnsupportedDeviceInfo2Part2 + UserText.aboutUnsupportedDeviceInfo2Part3 + UserText.aboutUnsupportedDeviceInfo2Part4)
+                        Text(UserText.aboutUnsupportedDeviceInfo2Part1 + " " + UserText.aboutUnsupportedDeviceInfo2Part2 + " " + UserText.aboutUnsupportedDeviceInfo2Part3 + " " + UserText.aboutUnsupportedDeviceInfo2Part4)
                     }
                 }
             }
