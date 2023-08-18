@@ -21,6 +21,7 @@ import Foundation
 struct MapperToDB {
 
     private let mechanism: (Data) throws -> Data
+    private let jsonEncoder = JSONEncoder()
 
     init(mechanism: @escaping (Data) throws -> Data) {
         self.mechanism = mechanism
@@ -53,11 +54,68 @@ struct MapperToDB {
     func mapToDB(_ phone: String, relatedTo profileId: Int64) throws -> PhoneDB {
         .init(phoneNumber: try mechanism(phone.encoded), profileId: profileId)
     }
+
+    func mapToDB(_ broker: DataBroker) throws -> BrokerDB {
+        let encodedBroker = try jsonEncoder.encode(broker)
+        return .init(id: nil, name: broker.name, json: encodedBroker, version: 1)
+    }
+
+    func mapToDB(_ profileQuery: ProfileQuery, relatedTo profileId: Int64) throws -> ProfileQueryDB {
+        .init(
+            id: nil,
+            profileId: profileId,
+            first: try mechanism(profileQuery.firstName.encoded),
+            last: try mechanism(profileQuery.lastName.encoded),
+            middle: try profileQuery.middleName.encoded(mechanism),
+            suffix: try profileQuery.suffix.encoded(mechanism),
+            city: try mechanism(profileQuery.city.encoded),
+            state: try mechanism(profileQuery.state.encoded),
+            street: try profileQuery.street.encoded(mechanism),
+            zipCode: try profileQuery.zipCode.encoded(mechanism),
+            phone: try profileQuery.phone.encoded(mechanism),
+            age: try withUnsafeBytes(of: profileQuery.age) { try mechanism(Data($0)) }
+        )
+    }
+
+    func mapToDB(_ extractedProfile: ExtractedProfile, brokerId: Int64, profileQueryId: Int64) throws -> ExtractedProfileDB {
+        let encodedProfile = try jsonEncoder.encode(extractedProfile)
+
+        return .init(
+            id: nil,
+            brokerId: brokerId,
+            profileQueryId: profileQueryId,
+            profile: try mechanism(encodedProfile),
+            removedDate: nil // Removed data is initialized as empty when created.
+        )
+    }
+
+    func mapToDB(_ historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64) throws -> ScanHistoryEventDB {
+        let encodedEventType = try jsonEncoder.encode(historyEvent.type)
+
+        return .init(
+            brokerId: brokerId,
+            profileQueryId: profileQueryId,
+            event: encodedEventType,
+            timestamp: historyEvent.date
+        )
+    }
+
+    func mapToDB(_ historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutHistoryEventDB {
+        let encodedEventType = try jsonEncoder.encode(historyEvent.type)
+        return .init(
+            brokerId: brokerId,
+            profileQueryId: profileQueryId,
+            extractedProfileId: extractedProfileId,
+            event: encodedEventType,
+            timestamp: historyEvent.date
+        )
+    }
 }
 
 struct MapperToModel {
 
     private let mechanism: (Data) throws -> Data
+    private let jsonDecoder = JSONDecoder()
 
     init(mechanism: @escaping (Data) throws -> Data) {
         self.mechanism = mechanism
@@ -94,6 +152,62 @@ struct MapperToModel {
 
     private func mapToModel(_ phoneDB: PhoneDB) throws -> String {
         try mechanism(phoneDB.phoneNumber).decoded
+    }
+
+    func mapToModel(_ brokerDB: BrokerDB) throws -> DataBroker {
+        return try jsonDecoder.decode(DataBroker.self, from: brokerDB.json)
+    }
+
+    func mapToModel(_ profileQueryDB: ProfileQueryDB) throws -> ProfileQuery {
+        .init(
+            firstName: try mechanism(profileQueryDB.first).decoded,
+            lastName: try mechanism(profileQueryDB.last).decoded,
+            middleName: try profileQueryDB.middle.decode(mechanism),
+            suffix: try profileQueryDB.suffix.decode(mechanism),
+            city: try mechanism(profileQueryDB.city).decoded,
+            state: try mechanism(profileQueryDB.state).decoded,
+            street: try profileQueryDB.street.decode(mechanism),
+            zipCode: try profileQueryDB.zipCode.decode(mechanism),
+            phone: try profileQueryDB.phone.decode(mechanism),
+            age: try mechanism(profileQueryDB.age).withUnsafeBytes {
+                $0.load(as: Int.self)
+            }
+        )
+    }
+
+    func mapToModel(_ scanDB: ScanDB) -> ScanOperationData {
+        // This will be fixed to a correct model once we work on integrating the secure vault with the scheduler
+        .init(
+            brokerProfileQueryID: UUID(),
+            preferredRunDate: scanDB.preferredRunDate,
+            historyEvents: [HistoryEvent](),
+            lastRunDate: scanDB.lastRunDate
+        )
+    }
+
+    func mapToModel(_ optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB) throws -> OptOutOperationData {
+        // This will be fixed to a correct model once we work on integrating the secure vault with the scheduler
+        .init(
+            brokerProfileQueryID: UUID(),
+            preferredRunDate: optOutDB.preferredRunDate,
+            historyEvents: [HistoryEvent](),
+            lastRunDate: optOutDB.lastRunDate,
+            extractedProfile: try mapToModel(extractedProfileDB)
+        )
+    }
+
+    func mapToModel(_ extractedProfileDB: ExtractedProfileDB) throws -> ExtractedProfile {
+        return try jsonDecoder.decode(ExtractedProfile.self, from: try mechanism(extractedProfileDB.profile))
+    }
+
+    func mapToModel(_ scanEvent: ScanHistoryEventDB) throws -> HistoryEvent {
+        let decodedEventType = try jsonDecoder.decode(HistoryEvent.EventType.self, from: scanEvent.event)
+        return .init(type: decodedEventType, date: scanEvent.timestamp)
+    }
+
+    func mapToModel(_ optOutEvent: OptOutHistoryEventDB) throws -> HistoryEvent {
+        let decodedEventType = try jsonDecoder.decode(HistoryEvent.EventType.self, from: optOutEvent.event)
+        return .init(type: decodedEventType, date: optOutEvent.timestamp)
     }
 }
 

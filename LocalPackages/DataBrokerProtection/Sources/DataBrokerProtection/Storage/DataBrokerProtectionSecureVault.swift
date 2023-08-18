@@ -39,29 +39,27 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
     func fetchProfile(with id: Int64) throws -> DataBrokerProtectionProfile?
 
     func save(broker: DataBroker) throws -> Int64
-    func fetchBroker(with id: Int64) throws -> DataBroker
-    func fetchBroker(with name: String) throws -> DataBroker
+    func fetchBroker(with id: Int64) throws -> DataBroker?
 
-    func save(profileQuery: ProfileQuery) throws -> Int64
-    func fetchProfileQuery(with id: Int64) throws -> ProfileQuery
+    func save(profileQuery: ProfileQuery, profileId: Int64) throws -> Int64
+    func fetchProfileQuery(with id: Int64) throws -> ProfileQuery?
 
     func save(brokerId: Int64, profileQueryId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws
-    func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanOperationData
+    func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanOperationData?
     func fetchAllScans() throws -> [ScanOperationData]
 
     func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws
-    func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutOperationData
+    func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutOperationData?
     func fetchAllOptOuts() throws -> [OptOutOperationData]
 
     func save(historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64) throws
     func save(historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
-    func fetchEvents(brokerId: Int64) throws -> [HistoryEvent]
-    func fetchEvents(profileQueryId: Int64) throws -> [HistoryEvent]
+    func fetchEvents(brokerId: Int64, profileQueryId: Int64) throws -> [HistoryEvent]
 
-    func save(extractedProfile: ExtractedProfile) throws -> Int64
-    func fetchExtractedProfile(with id: Int64) throws -> ExtractedProfile
-    func fetchExtractedProfiles(for brokerId: Int64, with profileId: Int64) throws -> [ExtractedProfile]
-    func updateRemovedDate(for extractedProfile: ExtractedProfile, with date: Date) throws
+    func save(extractedProfile: ExtractedProfile, brokerId: Int64, profileQueryId: Int64) throws -> Int64
+    func fetchExtractedProfile(with id: Int64) throws -> ExtractedProfile?
+    func fetchExtractedProfiles(for brokerId: Int64, with profileQueryId: Int64) throws -> [ExtractedProfile]
+    func updateRemovedDate(for extractedProfileId: Int64, with date: Date) throws
 }
 
 final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDatabaseProvider>: DataBrokerProtectionSecureVault {
@@ -82,10 +80,10 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
 
     func fetchProfile(with id: Int64) throws -> DataBrokerProtectionProfile? {
         try executeThrowingDatabaseOperation {
-            let mapper = MapperToModel(mechanism: l2Decrypt(data:))
             let profile = try self.providers.database.fetchProfile(with: id)
 
             if let profile = profile {
+                let mapper = MapperToModel(mechanism: l2Decrypt(data:))
                 return try mapper.mapToModel(profile)
             } else {
                 return nil // Profile not found
@@ -94,79 +92,164 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
     }
 
     func save(broker: DataBroker) throws -> Int64 {
-        fatalError("Not implemented.")
+        try executeThrowingDatabaseOperation {
+            let mapper = MapperToDB(mechanism: l2Encrypt(data:))
+            return try self.providers.database.save(mapper.mapToDB(broker))
+        }
     }
 
-    func fetchBroker(with id: Int64) throws -> DataBroker {
-        fatalError("Not implemented.")
+    func fetchBroker(with id: Int64) throws -> DataBroker? {
+        try executeThrowingDatabaseOperation {
+            if let broker = try self.providers.database.fetchBroker(with: 1) {
+                let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+                return try mapper.mapToModel(broker)
+            }
+
+            return nil
+        }
     }
 
-    func fetchBroker(with name: String) throws -> DataBroker {
-        fatalError("Not implemented.")
+    func save(profileQuery: ProfileQuery, profileId: Int64) throws -> Int64 {
+        try executeThrowingDatabaseOperation {
+            let mapper = MapperToDB(mechanism: l2Encrypt(data:))
+            return try self.providers.database.save(mapper.mapToDB(profileQuery, relatedTo: profileId))
+        }
     }
 
-    func save(profileQuery: ProfileQuery) throws -> Int64 {
-        fatalError("Not implemented.")
-    }
+    func fetchProfileQuery(with id: Int64) throws -> ProfileQuery? {
+        try executeThrowingDatabaseOperation {
+            let profileQuery = try self.providers.database.fetchProfileQuery(with: id)
 
-    func fetchProfileQuery(with id: Int64) throws -> ProfileQuery {
-        fatalError("Not implemented.")
+            if let profileQuery = profileQuery {
+                let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+                return try mapper.mapToModel(profileQuery)
+            } else {
+                return nil // ProfileQuery not found
+            }
+        }
     }
 
     func save(brokerId: Int64, profileQueryId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws {
-        fatalError("Not implemented.")
+        try executeThrowingDatabaseOperation {
+            try self.providers.database.save(
+                brokerId: brokerId,
+                profileQueryId: profileQueryId,
+                lastRunDate: lastRunDate,
+                preferredRunDate: preferredRunDate
+            )
+        }
     }
 
-    func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanOperationData {
-        fatalError("Not implemented.")
+    func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanOperationData? {
+        try executeThrowingDatabaseOperation {
+            if let scanDB = try self.providers.database.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) {
+                let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+                return mapper.mapToModel(scanDB)
+            } else {
+                return nil // Scan not found
+            }
+        }
     }
 
     func fetchAllScans() throws -> [ScanOperationData] {
-        fatalError("Not implemented.")
+        try executeThrowingDatabaseOperation {
+            let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+
+            return try self.providers.database.fetchAllScans().map(mapper.mapToModel(_:))
+        }
     }
 
     func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws {
-        fatalError("Not implemented.")
+        try executeThrowingDatabaseOperation {
+            try self.providers.database.save(
+                brokerId: brokerId,
+                profileQueryId: profileQueryId,
+                extractedProfileId: extractedProfileId,
+                lastRunDate: lastRunDate,
+                preferredRunDate: preferredRunDate
+            )
+        }
     }
 
-    func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutOperationData {
-        fatalError("Not implemented.")
+    func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutOperationData? {
+        try executeThrowingDatabaseOperation {
+            let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+            if let optOutResult = try self.providers.database.fetchOptOut(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId) {
+                return try mapper.mapToModel(optOutResult.optOutDB, extractedProfileDB: optOutResult.extractedProfileDB)
+            } else {
+                return nil // OptOut not found
+            }
+        }
     }
 
     func fetchAllOptOuts() throws -> [OptOutOperationData] {
-        fatalError("Not implemented.")
+        try executeThrowingDatabaseOperation {
+            let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+
+            return try self.providers.database.fetchAllOptOuts().map {
+                try mapper.mapToModel($0.optOutDB, extractedProfileDB: $0.extractedProfileDB)
+            }
+        }
     }
 
     func save(historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64) throws {
-        fatalError("Not implemented.")
+        try executeThrowingDatabaseOperation {
+            let mapper = MapperToDB(mechanism: l2Encrypt(data:))
+
+            try self.providers.database.save(mapper.mapToDB(historyEvent, brokerId: brokerId, profileQueryId: profileQueryId))
+        }
     }
 
     func save(historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
-        fatalError("Not implemented.")
+        try executeThrowingDatabaseOperation {
+            let mapper = MapperToDB(mechanism: l2Encrypt(data:))
+
+            try self.providers.database.save(mapper.mapToDB(historyEvent, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId))
+        }
     }
 
-    func fetchEvents(brokerId: Int64) throws -> [HistoryEvent] {
-        fatalError("Not implemented.")
+    func fetchEvents(brokerId: Int64, profileQueryId: Int64) throws -> [HistoryEvent] {
+        try executeThrowingDatabaseOperation {
+            let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+            let scanEvents = try self.providers.database.fetchScanEvents(brokerId: brokerId, profileQueryId: profileQueryId).map(mapper.mapToModel(_:))
+            let optOutEvents = try self.providers.database.fetchOptOutEvents(brokerId: brokerId, profileQueryId: profileQueryId).map(mapper.mapToModel(_:))
+
+            return scanEvents + optOutEvents
+        }
     }
 
-    func fetchEvents(profileQueryId: Int64) throws -> [HistoryEvent] {
-        fatalError("Not implemented.")
+    func save(extractedProfile: ExtractedProfile, brokerId: Int64, profileQueryId: Int64) throws -> Int64 {
+        try executeThrowingDatabaseOperation {
+            let mapper = MapperToDB(mechanism: l2Encrypt(data:))
+
+            return try self.providers.database.save(mapper.mapToDB(extractedProfile, brokerId: brokerId, profileQueryId: profileQueryId))
+        }
     }
 
-    func save(extractedProfile: ExtractedProfile) throws -> Int64 {
-        fatalError("Not implemented.")
+    func fetchExtractedProfile(with id: Int64) throws -> ExtractedProfile? {
+        try executeThrowingDatabaseOperation {
+            if let extractedProfile = try self.providers.database.fetchExtractedProfile(with: id) {
+                let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+                return try mapper.mapToModel(extractedProfile)
+            } else {
+                return nil // No extracted profile found
+            }
+        }
     }
 
-    func fetchExtractedProfile(with id: Int64) throws -> ExtractedProfile {
-        fatalError("Not implemented.")
+    func fetchExtractedProfiles(for brokerId: Int64, with profileQueryId: Int64) throws -> [ExtractedProfile] {
+        try executeThrowingDatabaseOperation {
+            let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+            let extractedProfiles = try self.providers.database.fetchExtractedProfiles(for: brokerId, with: profileQueryId)
+
+            return try extractedProfiles.map(mapper.mapToModel(_:))
+        }
     }
 
-    func fetchExtractedProfiles(for brokerId: Int64, with profileId: Int64) throws -> [ExtractedProfile] {
-        fatalError("Not implemented.")
-    }
-
-    func updateRemovedDate(for extractedProfile: ExtractedProfile, with date: Date) throws {
-        fatalError("Not implemented.")
+    func updateRemovedDate(for extractedProfileId: Int64, with date: Date) throws {
+        try executeThrowingDatabaseOperation {
+            try self.providers.database.updateRemovedDate(for: extractedProfileId, with: date)
+        }
     }
 
     // MARK: - Private methods
