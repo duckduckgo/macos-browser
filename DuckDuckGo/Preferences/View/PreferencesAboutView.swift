@@ -99,39 +99,55 @@ extension Preferences {
             return wide ? 130 : 140
         }
 
+        var osVersion: String {
+            return "\(ProcessInfo.processInfo.operatingSystemVersion)"
+        }
+
+        var combinedText: String {
+            return UserText.aboutUnsupportedDeviceInfo2Part1 + " " + UserText.aboutUnsupportedDeviceInfo2Part2 + " " + UserText.aboutUnsupportedDeviceInfo2Part3 + " " + UserText.aboutUnsupportedDeviceInfo2Part4
+        }
+
         var body: some View {
-            HStack(alignment: .top) {
-                Image("Alert-Color-16")
-                    .resizable()
-                    .frame(width: 16, height: 16)
-                    .padding(.trailing, 4)
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(UserText.aboutUnsupportedDeviceInfo1(version: "\(ProcessInfo.processInfo.operatingSystemVersion)"))
-                    if wide {
-                        VStack(alignment: .leading, spacing: 0) {
-                            HStack(alignment: .center, spacing: 0) {
-                                Text(UserText.aboutUnsupportedDeviceInfo2Part1 + " ")
-                                Button(action: {
-                                    WindowControllersManager.shared.show(url: Self.appleSupportURL, newTab: true)
-                                }) {
-                                    Text(UserText.aboutUnsupportedDeviceInfo2Part2 + " ")
-                                        .foregroundColor(Color.blue)
-                                        .underline()
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                                .onHover { hovering in
-                                    if hovering {
-                                        NSCursor.pointingHand.set()
-                                    } else {
-                                        NSCursor.arrow.set()
-                                    }
-                                }
-                                Text(UserText.aboutUnsupportedDeviceInfo2Part3)
-                            }
-                            Text(UserText.aboutUnsupportedDeviceInfo2Part4)
+            let image = Image("Alert-Color-16")
+                .resizable()
+                .frame(width: 16, height: 16)
+                .padding(.trailing, 4)
+
+            let versionText = Text(UserText.aboutUnsupportedDeviceInfo1(version: osVersion))
+
+            let narrowContentView = Text(combinedText)
+
+            let wideContentView: some View = VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .center, spacing: 0) {
+                    Text(UserText.aboutUnsupportedDeviceInfo2Part1 + " ")
+                    Button(action: {
+                        WindowControllersManager.shared.show(url: Self.appleSupportURL, newTab: true)
+                    }) {
+                        Text(UserText.aboutUnsupportedDeviceInfo2Part2 + " ")
+                            .foregroundColor(Color.blue)
+                            .underline()
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .onHover { hovering in
+                        if hovering {
+                            NSCursor.pointingHand.set()
+                        } else {
+                            NSCursor.arrow.set()
                         }
+                    }
+                    Text(UserText.aboutUnsupportedDeviceInfo2Part3)
+                }
+                Text(UserText.aboutUnsupportedDeviceInfo2Part4)
+            }
+
+            return HStack(alignment: .top) {
+                image
+                VStack(alignment: .leading, spacing: 12) {
+                    versionText
+                    if wide {
+                        wideContentView
                     } else {
-                        Text(UserText.aboutUnsupportedDeviceInfo2Part1 + " " + UserText.aboutUnsupportedDeviceInfo2Part2 + " " + UserText.aboutUnsupportedDeviceInfo2Part3 + " " + UserText.aboutUnsupportedDeviceInfo2Part4)
+                        narrowContentView
                     }
                 }
             }
