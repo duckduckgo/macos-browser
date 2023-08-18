@@ -219,10 +219,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         syncService?.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
         syncService?.scheduler.notifyAppLifecycleEvent()
 
-        NetworkProtectionWaitlist.shared.fetchInviteCodeIfAvailable { error in
-            if error != nil {
-                print("DEBUG: Got error fetching invite code: \(String(describing: error))")
-            }
+        NetworkProtectionWaitlist.shared.fetchInviteCodeIfAvailable { _ in
+            // Do nothing when code fetching fails, as the app will try again later
         }
     }
 

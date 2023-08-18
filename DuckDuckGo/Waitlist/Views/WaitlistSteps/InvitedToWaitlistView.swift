@@ -28,11 +28,11 @@ struct InvitedToWaitlistView: View {
             VStack(spacing: 16.0) {
                 Image("Gift-96")
 
-                Text("You're invited to try\nNetwork Protection beta!")
+                Text(UserText.networkProtectionWaitlistInvitedTitle)
                     .font(.system(size: 17, weight: .bold))
                     .multilineTextAlignment(.center)
 
-                Text("Network Protection is a VPN. Enable to secure your network connection and keep your online activity private.")
+                Text(UserText.networkProtectionWaitlistInvitedSubtitle)
                     .multilineTextAlignment(.center)
                     .foregroundColor(.black.opacity(0.88))
 
@@ -60,16 +60,16 @@ struct InvitedToWaitlistView: View {
                 .background(Color.black.opacity(0.01))
                 .border(Color.black.opacity(0.06))
 
-                Text("Network Protection is free to use during the beta.")
+                Text(UserText.networkProtectionWaitlistAvailabilityDisclaimer)
                     .font(.system(size: 12))
                     .foregroundColor(.black.opacity(0.60))
             }
         } buttons: {
-            Button("Dismiss") {
+            Button(UserText.networkProtectionWaitlistButtonDismiss) {
                 model.perform(action: .close)
             }
 
-            Button("Get Started") {
+            Button(UserText.networkProtectionWaitlistButtonGetStarted) {
                 model.perform(action: .showTermsAndConditions)
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
