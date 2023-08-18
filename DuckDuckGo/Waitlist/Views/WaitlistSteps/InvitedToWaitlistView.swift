@@ -34,35 +34,35 @@ struct InvitedToWaitlistView: View {
 
                 Text(UserText.networkProtectionWaitlistInvitedSubtitle)
                     .multilineTextAlignment(.center)
-                    .foregroundColor(.black.opacity(0.88))
+                    .foregroundColor(Color("BlackWhite80"))
 
                 VStack(spacing: 16.0) {
                     WaitlistListEntryView(
                         imageName: "Shield-16",
-                        title: "Secure all traffic to and from your device",
-                        subtitle: "We use the WireGuard protocol to encrypt online traffic across your browsers and apps."
+                        title: UserText.networkProtectionWaitlistInvitedSection1Title,
+                        subtitle: UserText.networkProtectionWaitlistInvitedSection1Subtitle
                     )
 
                     WaitlistListEntryView(
                         imageName: "Rocket-16",
-                        title: "Fast, reliable, and easy to use",
-                        subtitle: "Connect with one click to route your browsing and app activity through the nearest VPN server."
+                        title: UserText.networkProtectionWaitlistInvitedSection2Title,
+                        subtitle: UserText.networkProtectionWaitlistInvitedSection2Subtitle
                     )
 
                     WaitlistListEntryView(
                         imageName: "Card-16",
-                        title: "A VPN you can trust",
-                        subtitle: "Unlike some VPNs, we do not log or save any data that can connect you to your online activity."
+                        title: UserText.networkProtectionWaitlistInvitedSection3Title,
+                        subtitle: UserText.networkProtectionWaitlistInvitedSection3Subtitle
                     )
                 }
                 .padding(20.0)
                 .frame(maxWidth: .infinity)
-                .background(Color.black.opacity(0.01))
-                .border(Color.black.opacity(0.06))
+                .background(Color("BlackWhite1"))
+                .border(Color("BlackWhite5"))
 
                 Text(UserText.networkProtectionWaitlistAvailabilityDisclaimer)
                     .font(.system(size: 12))
-                    .foregroundColor(.black.opacity(0.60))
+                    .foregroundColor(Color("BlackWhite60"))
             }
         } buttons: {
             Button(UserText.networkProtectionWaitlistButtonDismiss) {
