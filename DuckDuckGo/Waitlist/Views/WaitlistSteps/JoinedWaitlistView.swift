@@ -29,33 +29,33 @@ struct JoinedWaitlistView: View {
             VStack(spacing: 16.0) {
                 Image("JoinedWaitlistHeader")
 
-                Text("You're on the list!")
+                Text(UserText.networkProtectionWaitlistJoinedTitle)
                     .font(.system(size: 17, weight: .bold))
 
                 if notificationsAllowed {
                     VStack(spacing: 16) {
-                        Text("New invites are sent every few days, on a first come, first served basis.")
+                        Text(UserText.networkProtectionWaitlistJoinedWithNotificationsSubtitle1)
                             .multilineTextAlignment(.center)
-                        Text("We'll notify you know when your invite is ready.")
+                        Text(UserText.networkProtectionWaitlistJoinedWithNotificationsSubtitle2)
                             .multilineTextAlignment(.center)
                     }
 
                 } else {
-                    Text("Want to get a notification when your Network Protection invite is ready?")
+                    Text(UserText.networkProtectionWaitlistEnableNotifications)
                         .multilineTextAlignment(.center)
                 }
             }
         } buttons: {
             if notificationsAllowed {
-                Button("Done") {
+                Button(UserText.networkProtectionWaitlistButtonDone) {
                     model.perform(action: .close)
                 }
             } else {
-                Button("No Thanks") {
+                Button(UserText.networkProtectionWaitlistButtonNoThanks) {
                     model.perform(action: .close)
                 }
 
-                Button("Enable Notifications") {
+                Button(UserText.networkProtectionWaitlistButtonEnableNotifications) {
                     model.perform(action: .requestNotificationPermission)
                 }
                 .buttonStyle(DefaultActionButtonStyle(enabled: true))

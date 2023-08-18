@@ -813,7 +813,15 @@ extension UserText {
 
     static let networkProtectionWaitlistAvailabilityDisclaimer = NSLocalizedString("network-protection.waitlist.availability-disclaimer", value: "Network Protection is free to use during the beta.", comment: "Availability disclaimer for Network Protection join waitlist screen")
 
+    static let networkProtectionWaitlistJoinedTitle = NSLocalizedString("network-protection.waitlist.joined.title", value: "You’re on the list!", comment: "Title for Network Protection joined waitlist screen")
+    static let networkProtectionWaitlistJoinedWithNotificationsSubtitle1 = NSLocalizedString("network-protection.waitlist.joined.with-notifications.subtitle.1", value: "New invites are sent every few days, on a first come, first served basis.", comment: "Subtitle 1 for Network Protection joined waitlist screen when notifications are enabled")
+    static let networkProtectionWaitlistJoinedWithNotificationsSubtitle2 = NSLocalizedString("network-protection.waitlist.joined.with-notifications.subtitle.2", value: "We’ll notify you know when your invite is ready.", comment: "Subtitle 2 for Network Protection joined waitlist screen when notifications are enabled")
+    static let networkProtectionWaitlistEnableNotifications = NSLocalizedString("network-protection.waitlist.enable-notifications", value: "Want to get a notification when your Network Protection invite is ready?", comment: "Enable notifications prompt for Network Protection joined waitlist screen")
+
     static let networkProtectionWaitlistButtonClose = NSLocalizedString("network-protection.waitlist.button.close", value: "Close", comment: "Close button for Network Protection join waitlist screen")
+    static let networkProtectionWaitlistButtonDone = NSLocalizedString("network-protection.waitlist.button.done", value: "Done", comment: "Close button for Network Protection joined waitlist screen")
+    static let networkProtectionWaitlistButtonNoThanks = NSLocalizedString("network-protection.waitlist.button.no-thanks", value: "No Thanks", comment: "No Thanks button for Network Protection joined waitlist screen")
+    static let networkProtectionWaitlistButtonEnableNotifications = NSLocalizedString("network-protection.waitlist.button.enable-notifications", value: "Enable Notifications", comment: "Enable Notifications button for Network Protection joined waitlist screen")
     static let networkProtectionWaitlistButtonJoinWaitlist = NSLocalizedString("network-protection.waitlist.button.join-waitlist", value: "Join the Waitlist", comment: "Join Waitlist button for Network Protection join waitlist screen")
 
 }
