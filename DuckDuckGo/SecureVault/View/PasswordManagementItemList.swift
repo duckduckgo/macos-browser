@@ -38,6 +38,18 @@ struct PasswordManagementItemListView: View {
     @EnvironmentObject var model: PasswordManagementItemListModel
     @State var autoSelected = false
 
+    @available(macOS 11.0, *)
+    private func selectItem(id: String, proxy: ScrollViewProxy) {
+        // Selection/scroll wont work until list is fully rendered
+        // so give it a few milis before auto-selecting
+        if !autoSelected {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                proxy.scrollTo(id, anchor: .center)
+                autoSelected = true
+            }
+        }
+    }
+
     var body: some View {
 
         VStack(spacing: 0) {
@@ -54,17 +66,9 @@ struct PasswordManagementItemListView: View {
                 ScrollView {
                     ScrollViewReader { proxy in
                         PasswordManagementItemListStackView()
-                            // Selection/scroll wont work until list is fully rendered
-                            // so give it a few milis based on element count before auto-selecting
                             .onChange(of: model.selected?.id) { itemId in
-                                if !autoSelected {
-                                    let delay = TimeInterval(model.itemCount) * 0.0001
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                                        if let selectionID = itemId {
-                                            proxy.scrollTo(selectionID, anchor: .center)
-                                            autoSelected = true
-                                        }
-                                    }
+                                if let id = itemId {
+                                    selectItem(id: id, proxy: proxy)
                                 }
                             }
                     }
