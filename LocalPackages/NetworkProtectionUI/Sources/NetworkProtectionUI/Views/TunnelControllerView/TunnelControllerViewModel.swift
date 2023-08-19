@@ -33,8 +33,10 @@ public final class TunnelControllerViewModel: ObservableObject {
     @Published
     private(set) var onboardingStatus: OnboardingStatus = .completed
 
-    var viewDisabled: Bool {
-        onboardingStatus != .completed
+    var shouldFlipToggle: Bool {
+        // The toggle is not flipped when we're asking to allow a system extension
+        // because that step does not result in the tunnel being started.
+        onboardingStatus != .isOnboarding(step: .userNeedsToAllowExtension)
     }
 
     /// The NetP onboarding status publisher
@@ -436,17 +438,15 @@ public final class TunnelControllerViewModel: ObservableObject {
     /// Start network protection.
     ///
     func startNetworkProtection() {
-        if !viewDisabled {
+        if shouldFlipToggle {
             toggleTransition = .switchingOn(locallyInitiated: true)
         }
 
         Task { @MainActor in
             await tunnelController.start()
 
-            if !viewDisabled {
-                toggleTransition = .idle
-                refreshInternalIsRunning()
-            }
+            toggleTransition = .idle
+            refreshInternalIsRunning()
         }
     }
 
