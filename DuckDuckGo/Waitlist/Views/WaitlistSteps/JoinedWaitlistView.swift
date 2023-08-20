@@ -36,6 +36,8 @@ struct JoinedWaitlistView: View {
                     VStack(spacing: 16) {
                         Text(UserText.networkProtectionWaitlistJoinedWithNotificationsSubtitle1)
                             .multilineTextAlignment(.center)
+                            .frame(minHeight: 28) // Hack to force height calculation to work correctly
+
                         Text(UserText.networkProtectionWaitlistJoinedWithNotificationsSubtitle2)
                             .multilineTextAlignment(.center)
                     }

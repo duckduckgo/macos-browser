@@ -23,6 +23,7 @@ public protocol NotificationService {
 
     func requestAuthorization(options: UNAuthorizationOptions) async throws -> Bool
     func authorizationStatus() async -> UNAuthorizationStatus
+
 }
 
 extension UNUserNotificationCenter: NotificationService {
@@ -30,4 +31,5 @@ extension UNUserNotificationCenter: NotificationService {
     public func authorizationStatus() async -> UNAuthorizationStatus {
         await notificationSettings().authorizationStatus
     }
+
 }

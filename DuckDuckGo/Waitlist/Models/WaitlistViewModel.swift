@@ -67,16 +67,16 @@ public final class WaitlistViewModel: ObservableObject {
         self.notificationService = notificationService
 
         if waitlistStorage.getWaitlistTimestamp() != nil, waitlistStorage.getWaitlistInviteCode() == nil {
-             viewState = .joinedWaitlist(.notificationsDisabled)
+            viewState = .joinedWaitlist(.notDetermined)
 
-             Task {
-                 await checkNotificationPermissions()
-             }
-         } else if let inviteCode = waitlistStorage.getWaitlistInviteCode() {
-             viewState = .invited
-         } else {
-             viewState = .notOnWaitlist
-         }
+            Task {
+                await checkNotificationPermissions()
+            }
+        } else if waitlistStorage.getWaitlistInviteCode() != nil {
+            viewState = .invited
+        } else {
+            viewState = .notOnWaitlist
+        }
     }
 
     convenience init(waitlist: Waitlist) {
@@ -91,7 +91,10 @@ public final class WaitlistViewModel: ObservableObject {
     func perform(action: ViewAction) {
         switch action {
         case .joinQueue: joinWaitlist()
-        case .requestNotificationPermission: Task { await requestNotificationPermission() }
+        case .requestNotificationPermission:
+            Task {
+                await requestNotificationPermission()
+            }
         case .showTermsAndConditions: showTermsAndConditions()
         case .acceptTermsAndConditions: acceptTermsAndConditions()
         case .close: close()
@@ -105,6 +108,7 @@ public final class WaitlistViewModel: ObservableObject {
     }
 
     func receivedNewViewHeight(_ height: CGFloat) {
+        print("DEBUG: Got new height \(height)")
         self.delegate?.viewHeightChanged(newHeight: height)
     }
 
@@ -138,7 +142,6 @@ public final class WaitlistViewModel: ObservableObject {
                 waitlistStorage.store(waitlistTimestamp: joinResponse.timestamp)
                 await checkNotificationPermissions()
             case .failure:
-                // TODO: Handle failure here - just reset back to the Join state?
                 self.viewState = .notOnWaitlist
             }
         }

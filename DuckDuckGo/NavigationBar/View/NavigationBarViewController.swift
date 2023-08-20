@@ -289,12 +289,7 @@ final class NavigationBarViewController: NSViewController {
         if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
         } else {
-            let viewModel = WaitlistViewModel(waitlist: NetworkProtectionWaitlist.shared)
-            if NetworkProtectionWaitlist.shared.waitlistStorage.isInvited && !viewModel.acceptedNetworkProtectionTermsAndConditions {
-                WaitlistModalViewController.show()
-            } else {
-                popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
-            }
+            WaitlistModalViewController.show()
         }
     }
 #endif
@@ -336,6 +331,7 @@ final class NavigationBarViewController: NSViewController {
                     self.updateDownloadsButton(updatingFromPinnedViewsNotification: true)
                 case .networkProtection:
 #if NETWORK_PROTECTION
+                    // TODO: Make sure that NetP can't be pinned unless there is a valid auth token
                     networkProtectionButtonModel.isPinned = LocalPinningManager.shared.isPinned(.networkProtection)
 #else
                     assertionFailure("Tried to toggle NetP when the feature was disabled")

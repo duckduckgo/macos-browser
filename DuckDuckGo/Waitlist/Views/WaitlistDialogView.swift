@@ -39,13 +39,22 @@ struct WaitlistDialogView<Content, Buttons>: View where Content: View, Buttons: 
                 .padding(.bottom, spacing)
                 .background(
                     GeometryReader { proxy in
-                        Color.clear.onAppear {
-                            model.receivedNewViewHeight(proxy.size.height + 90.0)
+                        if #available(macOS 11.0, *) {
+                            Color.clear
+                                .onAppear {
+                                    model.receivedNewViewHeight(proxy.size.height + 90.0)
+                                }
+                                .onChange(of: proxy.size) { _ in
+                                    model.receivedNewViewHeight(proxy.size.height + 90.0)
+                                }
+                        } else {
+                            Color.clear
+                                .onAppear {
+                                    model.receivedNewViewHeight(proxy.size.height + 90.0)
+                                }
                         }
                     }
                 )
-
-            // Spacer()
 
             Divider()
                 .padding([.top, .bottom], 16.0)

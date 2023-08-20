@@ -34,8 +34,12 @@ struct WaitlistRootView: View {
             switch model.viewState {
             case .notOnWaitlist, .joiningWaitlist:
                 JoinWaitlistView()
-            case .joinedWaitlist:
-                JoinedWaitlistView(notificationsAllowed: model.viewState == .joinedWaitlist(.notificationAllowed))
+            case .joinedWaitlist(let state):
+                if state == .notificationAllowed {
+                    JoinedWaitlistView(notificationsAllowed: true)
+                } else {
+                    JoinedWaitlistView(notificationsAllowed: false)
+                }
             case .invited:
                 InvitedToWaitlistView()
             case .termsAndConditions:
