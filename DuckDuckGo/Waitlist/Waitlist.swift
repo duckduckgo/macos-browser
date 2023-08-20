@@ -165,13 +165,13 @@ extension ProductWaitlistRequest {
 struct NetworkProtectionWaitlist: Waitlist {
 
     static let identifier: String = "networkprotection"
-    static let apiProductName: String = "networkprotection"
+    static let apiProductName: String = "networkprotection" // TODO: Change to `networkprotection_mac` once available
 
     static let shared: NetworkProtectionWaitlist = .init()
 
-    static let notificationIdentifier = "com.duckduckgo.ios.network-protection.invite-code-available"
-    static let inviteAvailableNotificationTitle = "Title"
-    static let inviteAvailableNotificationBody = "Body"
+    static let notificationIdentifier = "com.duckduckgo.macos.browser.network-protection.invite-code-available"
+    static let inviteAvailableNotificationTitle = "Network Protection beta is ready!"
+    static let inviteAvailableNotificationBody = "Open your invite"
 
     let waitlistStorage: WaitlistStorage
     let waitlistRequest: WaitlistRequest
