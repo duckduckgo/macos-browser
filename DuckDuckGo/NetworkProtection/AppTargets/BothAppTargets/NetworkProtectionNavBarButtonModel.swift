@@ -112,7 +112,8 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         }
     }
 
-    // TODO: Remove all this and make NetworkProtectionIconPublisher return the correct version instead
+    /// Temporary override used for the NetP waitlist beta, as a different asset is used for users who are invited to join the beta but haven't yet accepted.
+    /// This will be removed once the waitlist beta has ended.
     private func buttonImageFromWaitlistState(icon: NetworkProtectionAsset?) -> NSImage {
         let icon = icon ?? iconPublisher.icon
 

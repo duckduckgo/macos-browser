@@ -108,7 +108,6 @@ public final class WaitlistViewModel: ObservableObject {
     }
 
     func receivedNewViewHeight(_ height: CGFloat) {
-        print("DEBUG: Got new height \(height)")
         self.delegate?.viewHeightChanged(newHeight: height)
     }
 
