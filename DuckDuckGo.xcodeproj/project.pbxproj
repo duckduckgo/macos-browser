@@ -1195,8 +1195,6 @@
 		4B8A071E2A85C25400975D01 /* NetworkProtectionTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A071D2A85C25400975D01 /* NetworkProtectionTermsAndConditionsView.swift */; };
 		4B8A07202A85C7C000975D01 /* EnableNetworkProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A071F2A85C7C000975D01 /* EnableNetworkProtectionView.swift */; };
 		4B8A07232A897F0F00975D01 /* NetworkProtectionFeatureVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A07222A897F0F00975D01 /* NetworkProtectionFeatureVisibility.swift */; };
-		4B8A07252A89C49E00975D01 /* WaitlistInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A07242A89C49E00975D01 /* WaitlistInfoView.swift */; };
-		4B8A07262A89C7D700975D01 /* WaitlistInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A07242A89C49E00975D01 /* WaitlistInfoView.swift */; };
 		4B8A4DFF27C83B29005F40E8 /* SaveIdentityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A4DFE27C83B29005F40E8 /* SaveIdentityViewController.swift */; };
 		4B8A4E0127C8447E005F40E8 /* SaveIdentityPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A4E0027C8447E005F40E8 /* SaveIdentityPopover.swift */; };
 		4B8AC93326B3B06300879451 /* EdgeDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8AC93226B3B06300879451 /* EdgeDataImporter.swift */; };
@@ -2488,7 +2486,6 @@
 		4B8A071D2A85C25400975D01 /* NetworkProtectionTermsAndConditionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionTermsAndConditionsView.swift; sourceTree = "<group>"; };
 		4B8A071F2A85C7C000975D01 /* EnableNetworkProtectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnableNetworkProtectionView.swift; sourceTree = "<group>"; };
 		4B8A07222A897F0F00975D01 /* NetworkProtectionFeatureVisibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionFeatureVisibility.swift; sourceTree = "<group>"; };
-		4B8A07242A89C49E00975D01 /* WaitlistInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitlistInfoView.swift; sourceTree = "<group>"; };
 		4B8A4DFE27C83B29005F40E8 /* SaveIdentityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveIdentityViewController.swift; sourceTree = "<group>"; };
 		4B8A4E0027C8447E005F40E8 /* SaveIdentityPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveIdentityPopover.swift; sourceTree = "<group>"; };
 		4B8AC93226B3B06300879451 /* EdgeDataImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeDataImporter.swift; sourceTree = "<group>"; };
@@ -3958,7 +3955,6 @@
 			children = (
 				4BF43BD82A84742B000111F4 /* WaitlistRootView.swift */,
 				4B33D8822A82E7BB000DF070 /* WaitlistDialogView.swift */,
-				4B8A07242A89C49E00975D01 /* WaitlistInfoView.swift */,
 				4B33D8892A82F1BB000DF070 /* WaitlistModalViewController.swift */,
 				4BF43BDA2A847432000111F4 /* WaitlistSteps */,
 			);
@@ -8229,7 +8225,6 @@
 				3706FC97293F65D500E42796 /* BookmarksOutlineView.swift in Sources */,
 				3706FC98293F65D500E42796 /* CountryList.swift in Sources */,
 				3706FC99293F65D500E42796 /* PreferencesSection.swift in Sources */,
-				4B8A07262A89C7D700975D01 /* WaitlistInfoView.swift in Sources */,
 				B655124929A79465009BFE1C /* NavigationActionExtension.swift in Sources */,
 				3706FC9A293F65D500E42796 /* AutoconsentManagement.swift in Sources */,
 				3706FC9C293F65D500E42796 /* BookmarkStore.swift in Sources */,
@@ -9103,7 +9098,6 @@
 				AABEE6A924AB4B910043105B /* SuggestionTableCellView.swift in Sources */,
 				AA6820F125503DA9005ED0D5 /* FireViewModel.swift in Sources */,
 				372BC2A12A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift in Sources */,
-				4B8A07252A89C49E00975D01 /* WaitlistInfoView.swift in Sources */,
 				AAA0CC6A253CC43C0079BC96 /* WKUserContentControllerExtension.swift in Sources */,
 				4BE65479271FCD41008D1D63 /* EditableTextView.swift in Sources */,
 				AA9FF95D24A1FA1C0039E328 /* TabCollection.swift in Sources */,
