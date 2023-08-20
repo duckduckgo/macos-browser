@@ -109,11 +109,11 @@ struct NetworkProtectionTermsAndConditionsView: View {
             }
         } buttons: {
             Button(UserText.networkProtectionWaitlistButtonCancel) {
-                model.perform(action: .close)
+                Task { await model.perform(action: .close) }
             }
 
             Button(UserText.networkProtectionWaitlistButtonAgreeAndContinue) {
-                model.perform(action: .acceptTermsAndConditions)
+                Task { await model.perform(action: .acceptTermsAndConditions) }
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }

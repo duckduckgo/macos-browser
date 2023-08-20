@@ -44,11 +44,11 @@ struct JoinWaitlistView: View {
             }
         } buttons: {
             Button(UserText.networkProtectionWaitlistButtonClose) {
-                model.perform(action: .close)
+                Task { await model.perform(action: .close) }
             }
 
             Button(UserText.networkProtectionWaitlistButtonJoinWaitlist) {
-                model.perform(action: .joinQueue)
+                Task { await model.perform(action: .joinQueue) }
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: model.viewState == .notOnWaitlist))
         }

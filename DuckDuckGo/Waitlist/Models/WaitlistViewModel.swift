@@ -32,6 +32,7 @@ public final class WaitlistViewModel: ObservableObject {
         case joinedWaitlist(NotificationPermissionState)
         case invited
         case termsAndConditions
+        case acceptingTermsAndConditions
         case readyToEnable
     }
 
@@ -88,9 +89,10 @@ public final class WaitlistViewModel: ObservableObject {
         )
     }
 
-    func perform(action: ViewAction) {
+    @MainActor
+    func perform(action: ViewAction) async {
         switch action {
-        case .joinQueue: joinWaitlist()
+        case .joinQueue: await joinWaitlist()
         case .requestNotificationPermission:
             Task {
                 await requestNotificationPermission()
@@ -104,6 +106,16 @@ public final class WaitlistViewModel: ObservableObject {
             DispatchQueue.main.async {
                 NotificationCenter.default.post(name: .networkProtectionWaitlistShowPopover, object: nil)
             }
+        }
+    }
+
+    public func updateViewState() async {
+        if waitlistStorage.getWaitlistTimestamp() != nil, waitlistStorage.getWaitlistInviteCode() == nil {
+            await checkNotificationPermissions()
+        } else if waitlistStorage.getWaitlistInviteCode() != nil {
+            self.viewState = .invited
+        } else {
+            self.viewState = .notOnWaitlist
         }
     }
 
@@ -129,20 +141,18 @@ public final class WaitlistViewModel: ObservableObject {
         delegate?.dismissModal()
     }
 
-    private func joinWaitlist() {
+    private func joinWaitlist() async {
         self.viewState = .joiningWaitlist
 
-        Task {
-            let waitlistJoinResult = await waitlistRequest.joinWaitlist()
+        let waitlistJoinResult = await waitlistRequest.joinWaitlist()
 
-            switch waitlistJoinResult {
-            case .success(let joinResponse):
-                waitlistStorage.store(waitlistToken: joinResponse.token)
-                waitlistStorage.store(waitlistTimestamp: joinResponse.timestamp)
-                await checkNotificationPermissions()
-            case .failure:
-                self.viewState = .notOnWaitlist
-            }
+        switch waitlistJoinResult {
+        case .success(let joinResponse):
+            waitlistStorage.store(waitlistToken: joinResponse.token)
+            waitlistStorage.store(waitlistTimestamp: joinResponse.timestamp)
+            await checkNotificationPermissions()
+        case .failure:
+            self.viewState = .notOnWaitlist
         }
     }
 

@@ -66,11 +66,15 @@ struct InvitedToWaitlistView: View {
             }
         } buttons: {
             Button(UserText.networkProtectionWaitlistButtonDismiss) {
-                model.perform(action: .close)
+                Task {
+                    await model.perform(action: .close)
+                }
             }
 
             Button(UserText.networkProtectionWaitlistButtonGetStarted) {
-                model.perform(action: .showTermsAndConditions)
+                Task {
+                    await model.perform(action: .showTermsAndConditions)
+                }
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }

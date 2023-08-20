@@ -50,15 +50,21 @@ struct JoinedWaitlistView: View {
         } buttons: {
             if notificationsAllowed {
                 Button(UserText.networkProtectionWaitlistButtonDone) {
-                    model.perform(action: .close)
+                    Task {
+                        await model.perform(action: .close)
+                    }
                 }
             } else {
                 Button(UserText.networkProtectionWaitlistButtonNoThanks) {
-                    model.perform(action: .close)
+                    Task {
+                        await model.perform(action: .close)
+                    }
                 }
 
                 Button(UserText.networkProtectionWaitlistButtonEnableNotifications) {
-                    model.perform(action: .requestNotificationPermission)
+                    Task {
+                        await model.perform(action: .requestNotificationPermission)
+                    }
                 }
                 .buttonStyle(DefaultActionButtonStyle(enabled: true))
             }
