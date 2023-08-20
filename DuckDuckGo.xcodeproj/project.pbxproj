@@ -1144,6 +1144,22 @@
 		4B677433255DBEB800025BD8 /* httpsMobileV2Bloom.bin in Resources */ = {isa = PBXBuildFile; fileRef = 4B677428255DBEB800025BD8 /* httpsMobileV2Bloom.bin */; };
 		4B677435255DBEB800025BD8 /* httpsMobileV2FalsePositives.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B67742A255DBEB800025BD8 /* httpsMobileV2FalsePositives.json */; };
 		4B677442255DBEEA00025BD8 /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B677440255DBEEA00025BD8 /* Database.swift */; };
+		4B6EE24E2A92AF38009B5E5B /* WaitlistRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A07152A85A2B700975D01 /* WaitlistRequest.swift */; };
+		4B6EE24F2A92AF3A009B5E5B /* ProductWaitlistRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A07172A85A2C000975D01 /* ProductWaitlistRequest.swift */; };
+		4B6EE2502A92AF3D009B5E5B /* WaitlistStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A07122A85A26600975D01 /* WaitlistStorage.swift */; };
+		4B6EE2512A92AF3F009B5E5B /* WaitlistKeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A07102A85A1CA00975D01 /* WaitlistKeychainStorage.swift */; };
+		4B6EE2522A92AF43009B5E5B /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A070D2A858F2800975D01 /* NotificationService.swift */; };
+		4B6EE2532A92AF46009B5E5B /* WaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B33D8872A82E94D000DF070 /* WaitlistViewModel.swift */; };
+		4B6EE2542A92AF4D009B5E5B /* JoinWaitlistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B33D8842A82E8F6000DF070 /* JoinWaitlistView.swift */; };
+		4B6EE2552A92AF4D009B5E5B /* InvitedToWaitlistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A071B2A85BA4000975D01 /* InvitedToWaitlistView.swift */; };
+		4B6EE2562A92AF4D009B5E5B /* JoinedWaitlistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF43BDB2A84782B000111F4 /* JoinedWaitlistView.swift */; };
+		4B6EE2572A92AF4D009B5E5B /* WaitlistDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B33D8822A82E7BB000DF070 /* WaitlistDialogView.swift */; };
+		4B6EE2582A92AF4D009B5E5B /* WaitlistRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF43BD82A84742B000111F4 /* WaitlistRootView.swift */; };
+		4B6EE2592A92AF4D009B5E5B /* WaitlistModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B33D8892A82F1BB000DF070 /* WaitlistModalViewController.swift */; };
+		4B6EE25A2A92AF4D009B5E5B /* EnableNetworkProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A071F2A85C7C000975D01 /* EnableNetworkProtectionView.swift */; };
+		4B6EE25B2A92AF4D009B5E5B /* NetworkProtectionTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A071D2A85C25400975D01 /* NetworkProtectionTermsAndConditionsView.swift */; };
+		4B6EE25C2A92AF51009B5E5B /* Waitlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A07192A85AA6500975D01 /* Waitlist.swift */; };
+		4B6EE25D2A92AF51009B5E5B /* NetworkProtectionFeatureVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A07222A897F0F00975D01 /* NetworkProtectionFeatureVisibility.swift */; };
 		4B70C00127B0793D000386ED /* DuckDuckGo-ExampleCrash.ips in Resources */ = {isa = PBXBuildFile; fileRef = 4B70BFFF27B0793D000386ED /* DuckDuckGo-ExampleCrash.ips */; };
 		4B70C00227B0793D000386ED /* CrashReportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B70C00027B0793D000386ED /* CrashReportTests.swift */; };
 		4B723E0526B0003E00E14D75 /* DataImportMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DFF26B0003E00E14D75 /* DataImportMocks.swift */; };
@@ -7635,6 +7651,8 @@
 				3706FAA4293F65D500E42796 /* ContextMenuManager.swift in Sources */,
 				3706FAA5293F65D500E42796 /* GradientView.swift in Sources */,
 				3706FAA6293F65D500E42796 /* PreferencesSidebar.swift in Sources */,
+				4B6EE25A2A92AF4D009B5E5B /* EnableNetworkProtectionView.swift in Sources */,
+				4B6EE2572A92AF4D009B5E5B /* WaitlistDialogView.swift in Sources */,
 				3706FAA7293F65D500E42796 /* NSPointExtension.swift in Sources */,
 				3706FAA8293F65D500E42796 /* WindowsManager.swift in Sources */,
 				3706FAAB293F65D500E42796 /* HomePageDefaultBrowserModel.swift in Sources */,
@@ -7650,6 +7668,7 @@
 				3706FAB4293F65D500E42796 /* NSPopUpButtonExtension.swift in Sources */,
 				3706FAB5293F65D500E42796 /* ConfigurationManager.swift in Sources */,
 				3706FAB6293F65D500E42796 /* YoutubePlayerUserScript.swift in Sources */,
+				4B6EE2562A92AF4D009B5E5B /* JoinedWaitlistView.swift in Sources */,
 				373D9B4929EEAC1B00381FDD /* SyncMetadataDatabase.swift in Sources */,
 				3706FAB7293F65D500E42796 /* PixelParameters.swift in Sources */,
 				3706FAB8293F65D500E42796 /* FaviconImageCache.swift in Sources */,
@@ -7675,6 +7694,7 @@
 				3706FACA293F65D500E42796 /* TabLazyLoader.swift in Sources */,
 				3706FACB293F65D500E42796 /* FileImportViewController.swift in Sources */,
 				3706FACC293F65D500E42796 /* SaveCredentialsViewController.swift in Sources */,
+				4B6EE2592A92AF4D009B5E5B /* WaitlistModalViewController.swift in Sources */,
 				3706FACD293F65D500E42796 /* PopUpButton.swift in Sources */,
 				3706FACE293F65D500E42796 /* SuggestionViewController.swift in Sources */,
 				3706FACF293F65D500E42796 /* AddEditFavoriteWindow.swift in Sources */,
@@ -7748,6 +7768,7 @@
 				3706FB0D293F65D500E42796 /* BrowserImportSummaryViewController.swift in Sources */,
 				3706FB0E293F65D500E42796 /* FaviconManager.swift in Sources */,
 				4B8F52422A18326600BE7131 /* NetworkProtectionTunnelController.swift in Sources */,
+				4B6EE25C2A92AF51009B5E5B /* Waitlist.swift in Sources */,
 				3706FB0F293F65D500E42796 /* ChromiumFaviconsReader.swift in Sources */,
 				3706FB10293F65D500E42796 /* SuggestionTableRowView.swift in Sources */,
 				3706FB11293F65D500E42796 /* DownloadsPreferences.swift in Sources */,
@@ -7782,6 +7803,7 @@
 				3706FB2A293F65D500E42796 /* PasswordManagerCoordinator.swift in Sources */,
 				3706FB2B293F65D500E42796 /* PasswordManagementIdentityModel.swift in Sources */,
 				3706FB2C293F65D500E42796 /* UserDefaultsWrapper.swift in Sources */,
+				4B6EE2552A92AF4D009B5E5B /* InvitedToWaitlistView.swift in Sources */,
 				3706FB2D293F65D500E42796 /* PasswordManagementPopover.swift in Sources */,
 				3706FB2F293F65D500E42796 /* HomePageRecentlyVisitedModel.swift in Sources */,
 				3707C718294B5D0F00682A9F /* AdClickAttributionTabExtension.swift in Sources */,
@@ -7908,6 +7930,7 @@
 				3706FB95293F65D500E42796 /* PermissionType.swift in Sources */,
 				3706FB96293F65D500E42796 /* RecentlyClosedWindow.swift in Sources */,
 				1D36F4252A3B85C50052B527 /* TabCleanupPreparer.swift in Sources */,
+				4B6EE2512A92AF3F009B5E5B /* WaitlistKeychainStorage.swift in Sources */,
 				3706FB97293F65D500E42796 /* ActionSpeech.swift in Sources */,
 				3706FB99293F65D500E42796 /* PrivacySecurityPreferences.swift in Sources */,
 				B6AFE6BD29A5D621002FF962 /* HTTPSUpgradeTabExtension.swift in Sources */,
@@ -7920,6 +7943,7 @@
 				3707C71A294B5D0F00682A9F /* TabExtensions.swift in Sources */,
 				B6D6A5DE2982A5A7001F5F11 /* WebKitDownloadDelegate.swift in Sources */,
 				B66260DE29AC5D4300E9E3EE /* NavigationProtectionTabExtension.swift in Sources */,
+				4B6EE2582A92AF4D009B5E5B /* WaitlistRootView.swift in Sources */,
 				98779A0129999B64005D8EB6 /* Bookmark.xcdatamodeld in Sources */,
 				3706FB9E293F65D500E42796 /* AboutModel.swift in Sources */,
 				3706FB9F293F65D500E42796 /* PasswordManagementCreditCardItemView.swift in Sources */,
@@ -7942,6 +7966,7 @@
 				B626A7552991413000053070 /* SerpHeadersNavigationResponder.swift in Sources */,
 				3706FBB1293F65D500E42796 /* HomePageView.swift in Sources */,
 				3706FBB2293F65D500E42796 /* WebKitDownloadTask.swift in Sources */,
+				4B6EE2542A92AF4D009B5E5B /* JoinWaitlistView.swift in Sources */,
 				3706FBB3293F65D500E42796 /* ChromiumLoginReader.swift in Sources */,
 				3706FBB4293F65D500E42796 /* NSAlert+PasswordManager.swift in Sources */,
 				1D6A492129CF7A490011DF74 /* NSPopoverExtension.swift in Sources */,
@@ -7952,6 +7977,7 @@
 				3706FBB8293F65D500E42796 /* SavePaymentMethodPopover.swift in Sources */,
 				3706FBB9293F65D500E42796 /* FindInPageViewController.swift in Sources */,
 				3706FBBA293F65D500E42796 /* Cryptography.swift in Sources */,
+				4B6EE24E2A92AF38009B5E5B /* WaitlistRequest.swift in Sources */,
 				3706FBBC293F65D500E42796 /* NSViewExtension.swift in Sources */,
 				3706FBBD293F65D500E42796 /* Preferences.swift in Sources */,
 				3706FBBE293F65D500E42796 /* DownloadListViewModel.swift in Sources */,
@@ -7972,8 +7998,11 @@
 				3706FBCB293F65D500E42796 /* BookmarkHTMLImporter.swift in Sources */,
 				987799F72999996B005D8EB6 /* BookmarkDatabase.swift in Sources */,
 				3706FBCC293F65D500E42796 /* CustomRoundedCornersShape.swift in Sources */,
+				4B6EE25D2A92AF51009B5E5B /* NetworkProtectionFeatureVisibility.swift in Sources */,
 				3706FBCD293F65D500E42796 /* LocaleExtension.swift in Sources */,
+				4B6EE24F2A92AF3A009B5E5B /* ProductWaitlistRequest.swift in Sources */,
 				3706FBCE293F65D500E42796 /* SavePaymentMethodViewController.swift in Sources */,
+				4B6EE2502A92AF3D009B5E5B /* WaitlistStorage.swift in Sources */,
 				3706FBD0293F65D500E42796 /* WebKitVersionProvider.swift in Sources */,
 				3706FBD1293F65D500E42796 /* NSCoderExtensions.swift in Sources */,
 				B6D6A5DD2982A4CE001F5F11 /* Tab+Navigation.swift in Sources */,
@@ -8083,6 +8112,7 @@
 				3706FC2B293F65D500E42796 /* DownloadViewModel.swift in Sources */,
 				987799F22999993C005D8EB6 /* LegacyBookmarkStore.swift in Sources */,
 				3706FC2C293F65D500E42796 /* BookmarkHTMLReader.swift in Sources */,
+				4B6EE2532A92AF46009B5E5B /* WaitlistViewModel.swift in Sources */,
 				3706FC2D293F65D500E42796 /* Tab+NSSecureCoding.swift in Sources */,
 				3706FC2E293F65D500E42796 /* NSNotificationName+EmailManager.swift in Sources */,
 				37445F9D2A1569F00029F789 /* SyncBookmarksAdapter.swift in Sources */,
@@ -8104,6 +8134,7 @@
 				3706FC3F293F65D500E42796 /* ApplicationDockMenu.swift in Sources */,
 				3706FC40293F65D500E42796 /* SaveIdentityViewController.swift in Sources */,
 				3706FC41293F65D500E42796 /* FileStore.swift in Sources */,
+				4B6EE25B2A92AF4D009B5E5B /* NetworkProtectionTermsAndConditionsView.swift in Sources */,
 				3706FC42293F65D500E42796 /* PixelArguments.swift in Sources */,
 				3706FC43293F65D500E42796 /* PinnedTabsViewModel.swift in Sources */,
 				B6685E4329A61C470043D2EE /* DownloadsTabExtension.swift in Sources */,
@@ -8133,6 +8164,7 @@
 				3706FC59293F65D500E42796 /* Fire.swift in Sources */,
 				3706FC5A293F65D500E42796 /* RandomAccessCollectionExtension.swift in Sources */,
 				3706FC5B293F65D500E42796 /* NSOutlineViewExtensions.swift in Sources */,
+				4B6EE2522A92AF43009B5E5B /* NotificationService.swift in Sources */,
 				3706FC5C293F65D500E42796 /* AppDelegate.swift in Sources */,
 				3706FC5D293F65D500E42796 /* ContentOverlayViewController.swift in Sources */,
 				3706FC5E293F65D500E42796 /* OnboardingViewController.swift in Sources */,
