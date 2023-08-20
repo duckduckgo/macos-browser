@@ -28,6 +28,7 @@ struct EditableTextView: NSViewRepresentable {
     var onEditingChanged: () -> Void       = {}
     var onCommit: () -> Void = {}
     var onTextChange: (String) -> Void = { _ in }
+    var maxLength: Int?
 
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -73,6 +74,10 @@ extension EditableTextView {
         func textDidChange(_ notification: Notification) {
             guard let textView = notification.object as? NSTextView else {
                 return
+            }
+
+            if let maxLength = parent.maxLength, textView.string.count > maxLength {
+                textView.string = String(textView.string.prefix(maxLength))
             }
 
             self.parent.text = textView.string

@@ -486,7 +486,7 @@ final class AddressBarTextField: NSTextField {
                    !title.isEmpty,
                    suggestionViewModel.autocompletionString != title {
                     self = .title(title)
-                } else if let host = url.root?.toString(decodePunycode: true, dropScheme: true, needsWWW: false, dropTrailingSlash: true) {
+                } else if let host = url.root?.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true) {
                     self = .visit(host: host)
                 } else {
                     self = .url(url)
@@ -524,7 +524,6 @@ final class AddressBarTextField: NSTextField {
                 } else {
                     return " – " + url.toString(decodePunycode: false,
                                                 dropScheme: true,
-                                                needsWWW: false,
                                                 dropTrailingSlash: false)
                 }
             case .title(let title):
