@@ -55,33 +55,3 @@ struct JoinWaitlistView: View {
         .environmentObject(model)
     }
 }
-
-struct WaitlistListEntryView: View {
-    let imageName: String
-    let title: String
-    let subtitle: String
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 8) {
-            Image(imageName)
-                .frame(maxWidth: 16, maxHeight: 16)
-
-            VStack(alignment: .leading, spacing: 6) {
-                Text(title)
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(Color("BlackWhite80"))
-                    .multilineTextAlignment(.leading)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                Text(subtitle)
-                    .font(.system(size: 13))
-                    .foregroundColor(Color("BlackWhite60"))
-                    .multilineTextAlignment(.leading)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .frame(maxWidth: .infinity)
-
-            Spacer()
-        }
-    }
-}
