@@ -108,11 +108,11 @@ struct NetworkProtectionTermsAndConditionsView: View {
                 .border(Color("BlackWhite5"))
             }
         } buttons: {
-            Button("Cancel") {
+            Button(UserText.networkProtectionWaitlistButtonCancel) {
                 model.perform(action: .close)
             }
 
-            Button("Agree and Continue") {
+            Button(UserText.networkProtectionWaitlistButtonAgreeAndContinue) {
                 model.perform(action: .acceptTermsAndConditions)
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))

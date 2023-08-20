@@ -27,19 +27,19 @@ struct EnableNetworkProtectionView: View {
             VStack(spacing: 16.0) {
                 Image("Network-Protection-256")
 
-                Text("Ready to enable Network Protection?")
+                Text(UserText.networkProtectionWaitlistEnableTitle)
                     .font(.system(size: 17, weight: .bold))
 
-                Text("Look for the globe icon in the browser toolbar or in the Mac menu bar.\n\nYou'll be asked to Allow a VPN connection once when setting up Network Protection the first time.")
+                Text(UserText.networkProtectionWaitlistEnableSubtitle)
                     .multilineTextAlignment(.center)
                     .foregroundColor(.black.opacity(0.88))
 
-                Text("Network Protection is free to use during the beta.")
+                Text(UserText.networkProtectionWaitlistAvailabilityDisclaimer)
                     .font(.system(size: 12))
                     .foregroundColor(.black.opacity(0.60))
             }
         } buttons: {
-            Button("Got It") {
+            Button(UserText.networkProtectionWaitlistButtonGotIt) {
                 model.perform(action: .closeAndPresentNetworkProtectionPopover)
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
