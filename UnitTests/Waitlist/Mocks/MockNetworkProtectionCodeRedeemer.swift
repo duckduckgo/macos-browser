@@ -1,5 +1,5 @@
 //
-//  MockNotificationService.swift
+//  MockNetworkProtectionCodeRedeemer.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -17,24 +17,23 @@
 //
 
 import Foundation
-import UserNotifications
-@testable import DuckDuckGo_Privacy_Browser
+import NetworkProtection
 
-struct MockNotificationService: NotificationService {
+final class MockNetworkProtectionCodeRedeemer: NetworkProtectionCodeRedeeming {
 
-    init(isAuthorized: Bool = true, authorizationStatus: UNAuthorizationStatus = .authorized) {
-        self.isAuthorized = isAuthorized
-        self.authorizationStatus = authorizationStatus
+    enum MockNetworkProtectionCodeRedeemerError: Error {
+        case error
     }
 
-    var isAuthorized: Bool
-    var authorizationStatus: UNAuthorizationStatus
+    var redeemedCode: String?
+    var throwError: Bool = false
 
-    func requestAuthorization(options: UNAuthorizationOptions) async throws -> Bool {
-        isAuthorized
+    func redeem(_ code: String) async throws {
+        if throwError {
+            throw MockNetworkProtectionCodeRedeemerError.error
+        } else {
+            redeemedCode = code
+        }
     }
 
-    func authorizationStatus() async -> UNAuthorizationStatus {
-        authorizationStatus
-    }
 }

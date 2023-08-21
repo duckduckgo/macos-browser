@@ -19,21 +19,21 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-public struct MockWaitlistRequest: WaitlistRequest {
+struct MockWaitlistRequest: WaitlistRequest {
 
-    public static func failure() -> MockWaitlistRequest {
+    static func failure() -> MockWaitlistRequest {
         return MockWaitlistRequest(joinResult: .failure(.noData),
                                    statusResult: .failure(.noData),
                                    inviteCodeResult: .failure(.noData))
     }
 
-    public static func returning(_ joinResult: WaitlistJoinResult) -> MockWaitlistRequest {
+    static func returning(_ joinResult: WaitlistJoinResult) -> MockWaitlistRequest {
         return MockWaitlistRequest(joinResult: joinResult,
                                    statusResult: .success(.init(timestamp: 0)),
                                    inviteCodeResult: .failure(.noData))
     }
 
-    public init(
+    init(
         joinResult: WaitlistJoinResult,
         statusResult: Result<WaitlistResponse.Status, WaitlistResponse.StatusError>,
         inviteCodeResult: Result<WaitlistResponse.InviteCode, WaitlistResponse.InviteCodeError>
@@ -43,23 +43,23 @@ public struct MockWaitlistRequest: WaitlistRequest {
         self.inviteCodeResult = inviteCodeResult
     }
 
-    public let joinResult: WaitlistJoinResult
-    public let statusResult: Result<WaitlistResponse.Status, WaitlistResponse.StatusError>
-    public let inviteCodeResult: Result<WaitlistResponse.InviteCode, WaitlistResponse.InviteCodeError>
+    let joinResult: WaitlistJoinResult
+    let statusResult: Result<WaitlistResponse.Status, WaitlistResponse.StatusError>
+    let inviteCodeResult: Result<WaitlistResponse.InviteCode, WaitlistResponse.InviteCodeError>
 
-    public func joinWaitlist(completionHandler: @escaping WaitlistJoinCompletion) {
+    func joinWaitlist(completionHandler: @escaping WaitlistJoinCompletion) {
         completionHandler(joinResult)
     }
 
-    public func joinWaitlist() async -> WaitlistJoinResult {
+    func joinWaitlist() async -> WaitlistJoinResult {
         return joinResult
     }
 
-    public func getWaitlistStatus(completionHandler: @escaping (Result<WaitlistResponse.Status, WaitlistResponse.StatusError>) -> Void) {
+    func getWaitlistStatus(completionHandler: @escaping (Result<WaitlistResponse.Status, WaitlistResponse.StatusError>) -> Void) {
         completionHandler(statusResult)
     }
 
-    public func getInviteCode(token: String, completionHandler: @escaping (Result<WaitlistResponse.InviteCode, WaitlistResponse.InviteCodeError>) -> Void) {
+    func getInviteCode(token: String, completionHandler: @escaping (Result<WaitlistResponse.InviteCode, WaitlistResponse.InviteCodeError>) -> Void) {
         completionHandler(inviteCodeResult)
     }
 

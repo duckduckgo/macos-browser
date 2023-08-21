@@ -19,39 +19,39 @@
 import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
-public class MockWaitlistStorage: WaitlistStorage {
+class MockWaitlistStorage: WaitlistStorage {
 
-    public init() {}
+    init() {}
 
     private var token: String?
     private var timestamp: Int?
     private var code: String?
 
-    public func getWaitlistToken() -> String? {
+    func getWaitlistToken() -> String? {
         return token
     }
 
-    public func getWaitlistTimestamp() -> Int? {
+    func getWaitlistTimestamp() -> Int? {
         return timestamp
     }
 
-    public func getWaitlistInviteCode() -> String? {
+    func getWaitlistInviteCode() -> String? {
         return code
     }
 
-    public func store(waitlistToken: String) {
+    func store(waitlistToken: String) {
         token = waitlistToken
     }
 
-    public func store(waitlistTimestamp: Int) {
+    func store(waitlistTimestamp: Int) {
         timestamp = waitlistTimestamp
     }
 
-    public func store(inviteCode: String) {
+    func store(inviteCode: String) {
         code = inviteCode
     }
 
-    public func deleteWaitlistState() {
+    func deleteWaitlistState() {
         token = nil
         timestamp = nil
         code = nil

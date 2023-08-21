@@ -1158,6 +1158,8 @@
 		4B51C0982A92CB82002F0D55 /* MockWaitlistRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B51C0962A92CB82002F0D55 /* MockWaitlistRequest.swift */; };
 		4B51C09A2A92CBAD002F0D55 /* MockWaitlistStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B51C0992A92CBAD002F0D55 /* MockWaitlistStorage.swift */; };
 		4B51C09B2A92CBAD002F0D55 /* MockWaitlistStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B51C0992A92CBAD002F0D55 /* MockWaitlistStorage.swift */; };
+		4B51C09D2A92DC22002F0D55 /* MockNetworkProtectionCodeRedeemer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B51C09C2A92DC22002F0D55 /* MockNetworkProtectionCodeRedeemer.swift */; };
+		4B51C09E2A92DC22002F0D55 /* MockNetworkProtectionCodeRedeemer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B51C09C2A92DC22002F0D55 /* MockNetworkProtectionCodeRedeemer.swift */; };
 		4B59023D26B35F3600489384 /* ChromeDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023826B35F3600489384 /* ChromeDataImporter.swift */; };
 		4B59023E26B35F3600489384 /* ChromiumLoginReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023926B35F3600489384 /* ChromiumLoginReader.swift */; };
 		4B59024026B35F3600489384 /* ChromiumDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023B26B35F3600489384 /* ChromiumDataImporter.swift */; };
@@ -2456,6 +2458,7 @@
 		4B51C0932A92CAD1002F0D55 /* MockNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNotificationService.swift; sourceTree = "<group>"; };
 		4B51C0962A92CB82002F0D55 /* MockWaitlistRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockWaitlistRequest.swift; sourceTree = "<group>"; };
 		4B51C0992A92CBAD002F0D55 /* MockWaitlistStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockWaitlistStorage.swift; sourceTree = "<group>"; };
+		4B51C09C2A92DC22002F0D55 /* MockNetworkProtectionCodeRedeemer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNetworkProtectionCodeRedeemer.swift; sourceTree = "<group>"; };
 		4B59023826B35F3600489384 /* ChromeDataImporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromeDataImporter.swift; sourceTree = "<group>"; };
 		4B59023926B35F3600489384 /* ChromiumLoginReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromiumLoginReader.swift; sourceTree = "<group>"; };
 		4B59023B26B35F3600489384 /* ChromiumDataImporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromiumDataImporter.swift; sourceTree = "<group>"; };
@@ -4206,6 +4209,7 @@
 				4B51C0932A92CAD1002F0D55 /* MockNotificationService.swift */,
 				4B51C0962A92CB82002F0D55 /* MockWaitlistRequest.swift */,
 				4B51C0992A92CBAD002F0D55 /* MockWaitlistStorage.swift */,
+				4B51C09C2A92DC22002F0D55 /* MockNetworkProtectionCodeRedeemer.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -8381,6 +8385,7 @@
 				3706FE25293F661700E42796 /* CoreDataTestUtilities.swift in Sources */,
 				3706FE26293F661700E42796 /* TemporaryFileCreator.swift in Sources */,
 				3706FE27293F661700E42796 /* AppPrivacyConfigurationTests.swift in Sources */,
+				4B51C09E2A92DC22002F0D55 /* MockNetworkProtectionCodeRedeemer.swift in Sources */,
 				B626A7652992506A00053070 /* SerpHeadersNavigationResponderTests.swift in Sources */,
 				3706FE28293F661700E42796 /* BookmarkTests.swift in Sources */,
 				3706FE29293F661700E42796 /* SuggestionContainerViewModelTests.swift in Sources */,
@@ -9469,6 +9474,7 @@
 				B6106BAF26A7C6180013B453 /* PermissionStoreMock.swift in Sources */,
 				4B98D27A28D95F1A003C2B6F /* ChromiumFaviconsReaderTests.swift in Sources */,
 				986189E62A7CFB3E001B4519 /* LocalBookmarkStoreSavingTests.swift in Sources */,
+				4B51C09D2A92DC22002F0D55 /* MockNetworkProtectionCodeRedeemer.swift in Sources */,
 				AA652CD325DDA6E9009059CC /* LocalBookmarkManagerTests.swift in Sources */,
 				CBDD5DE329A67F2700832877 /* MockConfigurationStore.swift in Sources */,
 				B63ED0DC26AE7B1E00A9DAD1 /* WebViewMock.swift in Sources */,

@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import NetworkProtection
 import UserNotifications
 
 protocol WaitlistViewModelDelegate: AnyObject {
@@ -61,11 +62,16 @@ public final class WaitlistViewModel: ObservableObject {
     private let waitlistRequest: WaitlistRequest
     private let waitlistStorage: WaitlistStorage
     private let notificationService: NotificationService
+    private let networkProtectionCodeRedemption: NetworkProtectionCodeRedeeming
 
-    init(waitlistRequest: WaitlistRequest, waitlistStorage: WaitlistStorage, notificationService: NotificationService) {
+    init(waitlistRequest: WaitlistRequest,
+         waitlistStorage: WaitlistStorage,
+         notificationService: NotificationService,
+         networkProtectionCodeRedemption: NetworkProtectionCodeRedeeming) {
         self.waitlistRequest = waitlistRequest
         self.waitlistStorage = waitlistStorage
         self.notificationService = notificationService
+        self.networkProtectionCodeRedemption = networkProtectionCodeRedemption
 
         if waitlistStorage.getWaitlistTimestamp() != nil, waitlistStorage.getWaitlistInviteCode() == nil {
             viewState = .joinedWaitlist(.notDetermined)
@@ -85,7 +91,8 @@ public final class WaitlistViewModel: ObservableObject {
         self.init(
             waitlistRequest: ProductWaitlistRequest(productName: waitlistType.apiProductName),
             waitlistStorage: WaitlistKeychainStore(waitlistIdentifier: waitlistType.identifier),
-            notificationService: UNUserNotificationCenter.current()
+            notificationService: UNUserNotificationCenter.current(),
+            networkProtectionCodeRedemption: NetworkProtectionCodeRedemptionCoordinator()
         )
     }
 
@@ -98,7 +105,7 @@ public final class WaitlistViewModel: ObservableObject {
                 await requestNotificationPermission()
             }
         case .showTermsAndConditions: showTermsAndConditions()
-        case .acceptTermsAndConditions: acceptTermsAndConditions()
+        case .acceptTermsAndConditions: await acceptTermsAndConditions()
         case .close: close()
         case .closeAndPresentNetworkProtectionPopover:
             close()
@@ -174,9 +181,20 @@ public final class WaitlistViewModel: ObservableObject {
         viewState = .termsAndConditions
     }
 
-    private func acceptTermsAndConditions() {
-        acceptedNetworkProtectionTermsAndConditions = true
-        viewState = .readyToEnable
+    private func acceptTermsAndConditions() async {
+        guard let inviteCode = waitlistStorage.getWaitlistInviteCode() else {
+            assertionFailure("Got into terms & conditions state without having an invite code")
+            return
+        }
+
+        do {
+            try await networkProtectionCodeRedemption.redeem(inviteCode)
+
+            acceptedNetworkProtectionTermsAndConditions = true
+            viewState = .readyToEnable
+        } catch {
+            viewState = .termsAndConditions
+        }
     }
 
 }
