@@ -71,7 +71,7 @@ struct MapperToDB {
             city: try mechanism(profileQuery.city.encoded),
             state: try mechanism(profileQuery.state.encoded),
             street: try profileQuery.street.encoded(mechanism),
-            zipCode: try profileQuery.zipCode.encoded(mechanism),
+            zipCode: try profileQuery.zip.encoded(mechanism),
             phone: try profileQuery.phone.encoded(mechanism),
             age: try withUnsafeBytes(of: profileQuery.age) { try mechanism(Data($0)) }
         )
