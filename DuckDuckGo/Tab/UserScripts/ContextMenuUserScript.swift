@@ -38,25 +38,26 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
         guard let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any] else { return }
         let selectedText = json["selectedText"] as? String
         let linkUrl = json["linkUrl"] as? String
-        guard let selectedText = message.body as? String else { return }
         delegate?.willShowContextMenu(withSelectedText: selectedText, linkURL: linkUrl)
     }
 
     static let source = """
     (function() {
         document.addEventListener("contextmenu", function(e) {
-            // Check if the right-clicked element is a link (anchor).
-            if (e.target.tagName.toLowerCase() === 'a') {
-                var linkUrl = e.target.href;
+                var linkUrl = '';
                 var selectedText = window.getSelection().toString();
+
+                if (e.target.tagName.toLowerCase() === 'a') {
+                    linkUrl = e.target.href;
+                }
+
                 var contextData = {
                     selectedText: selectedText,
                     linkUrl: linkUrl
                 };
-                webkit.messageHandlers.contextMenu.postMessage(JSON.stringify(contextData));
-            }
-        }, true);
-    })();
-    """
 
+                webkit.messageHandlers.contextMenu.postMessage(JSON.stringify(contextData));
+            }, true);
+        })();
+    """
 }
