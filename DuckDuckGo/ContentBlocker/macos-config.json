@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1692289879322,
+    "version": 1692395382212,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -3249,10 +3249,50 @@
                 {
                     "domain": "hyatt.com",
                     "reason": "Site loads blank and does not proceed."
+                },
+                {
+                    "domain": "airbnb.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.fr",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.cn",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.co.uk",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.es",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.it",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.ca",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.com.au",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.de",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
+                },
+                {
+                    "domain": "airbnb.com.br",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1224"
                 }
             ],
             "state": "enabled",
-            "hash": "45a44987e7de21ef45971d284364e229"
+            "hash": "e835ac0edefe276f0df2602da7df97ed"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -3473,6 +3513,16 @@
             "exceptions": [],
             "state": "enabled",
             "hash": "52857469413a66e8b0c7b00de5589162"
+        },
+        "incrementalRolloutTest": {
+            "state": "disabled",
+            "features": {
+                "rollout": {
+                    "state": "disabled"
+                }
+            },
+            "exceptions": [],
+            "hash": "c1293c7b2687c8a2f7c5433a4d7a330d"
         },
         "navigatorInterface": {
             "exceptions": [],
@@ -3900,6 +3950,17 @@
                                     "<all>"
                                 ],
                                 "reason": "See https://github.com/duckduckgo/privacy-configuration/issues/321.,These requests are associated with map/location functionality on websites."
+                            }
+                        ]
+                    },
+                    "boldapps.net": {
+                        "rules": [
+                            {
+                                "rule": "option.boldapps.net/js/options.js",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1222"
                             }
                         ]
                     },
@@ -6254,7 +6315,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "74b4ffada4f4e15c38b30702ad65dcab"
+            "hash": "8da977185d316800299b1f019ae71e2d"
         },
         "trackingCookies1p": {
             "settings": {
