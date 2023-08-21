@@ -331,7 +331,6 @@ private struct AddressFormView: View {
         VStack(spacing: 15) {
             TextFieldWithLabel(label: "Street", text: $street)
             TextFieldWithLabel(label: "City*", text: $city)
-            TextFieldWithLabel(label: "Zip Code", text: $zip)
 
             VStack(alignment: .leading) {
                 Text("State*")
@@ -346,6 +345,8 @@ private struct AddressFormView: View {
                     }
                 } label: { }
             }
+            
+            TextFieldWithLabel(label: "Zip Code", text: $zip)
             .padding(.bottom, 20)
 
             CTAFooterView(
