@@ -329,7 +329,7 @@ final class FeedbackViewController: NSViewController {
     }
 
     var isOsUnsupported: Bool {
-        return !SupportedOSChecker.isCurrentOsSupported
+        return !SupportedOSChecker.isCurrentOSReceivingUpdates
     }
 
     private func showUnsupportedOsViewIfNeeded() {

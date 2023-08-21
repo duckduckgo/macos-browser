@@ -39,7 +39,7 @@ extension WKWebViewConfiguration {
         preferences.javaScriptCanOpenWindowsAutomatically = true
         preferences.isFraudulentWebsiteWarningEnabled = false
 
-        if SupportedOSChecker.isCurrentOsSupported {
+        if SupportedOSChecker.isCurrentOSReceivingUpdates {
             if urlSchemeHandler(forURLScheme: DuckPlayer.duckPlayerScheme) == nil {
                 setURLSchemeHandler(DuckPlayerSchemeHandler(), forURLScheme: DuckPlayer.duckPlayerScheme)
             }

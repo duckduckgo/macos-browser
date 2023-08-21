@@ -40,7 +40,7 @@ extension Preferences {
                 Text(UserText.aboutDuckDuckGo)
                     .font(Const.Fonts.preferencePaneTitle)
 
-                if !SupportedOSChecker.isCurrentOsSupported {
+                if !SupportedOSChecker.isCurrentOSReceivingUpdates {
                     UnsupportedDeviceInfoBox(wide: true)
                         .padding(.top, 10)
                         .padding(.leading, -20)

@@ -29,7 +29,7 @@ final class SupportedOSChecker {
     private static let currentOSVersion = ProcessInfo.processInfo.operatingSystemVersion
 
     // Check if the current macOS version is at least the supported version
-    static var isCurrentOsSupported: Bool {
+    static var isCurrentOSReceivingUpdates: Bool {
         if currentOSVersion.majorVersion > SupportedVersion.major {
             return true
         }

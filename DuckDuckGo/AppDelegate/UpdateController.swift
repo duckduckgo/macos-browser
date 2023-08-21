@@ -38,7 +38,7 @@ final class UpdateController: NSObject {
     }
 
     func checkForUpdates(_ sender: Any!) {
-        if !SupportedOSChecker.isCurrentOsSupported {
+        if !SupportedOSChecker.isCurrentOSReceivingUpdates {
             showNotSupportedInfo()
         }
 
