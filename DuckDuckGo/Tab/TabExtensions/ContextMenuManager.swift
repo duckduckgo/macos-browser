@@ -33,6 +33,9 @@ final class ContextMenuManager: NSObject {
     private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
     private var originalItems: [WKMenuItemIdentifier: NSMenuItem]?
     private var selectedText: String?
+    private var isMailToLink: Bool {
+        return selectedText == "Send Email"
+    }
     fileprivate weak var webView: WKWebView?
 
     @MainActor
@@ -85,12 +88,16 @@ extension ContextMenuManager {
             return
         }
 
-        menu.replaceItem(at: index, with: self.openLinkInNewTabMenuItem(from: openLinkInNewWindowItem,
+        if isMailToLink {
+            menu.removeItem(at: index)
+        } else {
+            menu.replaceItem(at: index, with: self.openLinkInNewTabMenuItem(from: openLinkInNewWindowItem,
                                                                             makeBurner: isCurrentWindowBurner))
+        }
     }
 
     private func handleOpenLinkInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        if isCurrentWindowBurner {
+        if isCurrentWindowBurner || isMailToLink {
             menu.removeItem(at: index)
         } else {
             menu.replaceItem(at: index, with: self.openLinkInNewWindowMenuItem(from: item))
@@ -98,7 +105,7 @@ extension ContextMenuManager {
     }
 
     private func handleOpenFrameInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        if isCurrentWindowBurner {
+        if isCurrentWindowBurner || isMailToLink {
             menu.removeItem(at: index)
         } else {
             menu.replaceItem(at: index, with: self.openFrameInNewWindowMenuItem(from: item))
@@ -106,7 +113,11 @@ extension ContextMenuManager {
     }
 
     private func handleDownloadLinkedFileItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        menu.replaceItem(at: index, with: self.downloadMenuItem(from: item))
+        if isMailToLink {
+            menu.removeItem(at: index)
+        } else {
+            menu.replaceItem(at: index, with: self.downloadMenuItem(from: item))
+        }
     }
 
     private func handleCopyLinkItem(_ copyLinkItem: NSMenuItem, at index: Int, in menu: NSMenu) {
@@ -115,11 +126,13 @@ extension ContextMenuManager {
             return
         }
         // insert Add Link to Bookmarks
-        menu.insertItem(self.addLinkToBookmarksMenuItem(from: openLinkInNewWindowItem), at: index)
-        menu.replaceItem(at: index + 1, with: self.copyLinkMenuItem(withTitle: copyLinkItem.title, from: openLinkInNewWindowItem))
+        if !isMailToLink {
+            menu.insertItem(self.addLinkToBookmarksMenuItem(from: openLinkInNewWindowItem), at: index)
+            menu.replaceItem(at: index + 1, with: self.copyLinkMenuItem(withTitle: copyLinkItem.title, from: openLinkInNewWindowItem))
+        }
 
         // insert Separator and Copy (selection) items
-        if selectedText?.isEmpty == false {
+        if selectedText?.isEmpty == false && !isMailToLink {
             menu.insertItem(.separator(), at: index + 2)
             menu.insertItem(self.copySelectionMenuItem(), at: index + 3)
         }
@@ -161,6 +174,7 @@ extension ContextMenuManager {
 extension ContextMenuManager: WebViewContextMenuDelegate {
 
     func webView(_ webView: WebView, willOpenContextMenu menu: NSMenu, with event: NSEvent) {
+
         originalItems = menu.items.reduce(into: [WKMenuItemIdentifier: NSMenuItem]()) { partialResult, item in
             if let identifier = item.identifier.flatMap(WKMenuItemIdentifier.init) {
                 partialResult[identifier] = item
