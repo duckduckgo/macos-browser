@@ -33,8 +33,9 @@ final class ContextMenuManager: NSObject {
     private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
     private var originalItems: [WKMenuItemIdentifier: NSMenuItem]?
     private var selectedText: String?
+    private var linkURL: String?
     private var isMailToLink: Bool {
-        return selectedText == "Send Email"
+        return linkURL?.contains("mailto:") ?? false
     }
     fileprivate weak var webView: WKWebView?
 
@@ -512,10 +513,10 @@ private extension ContextMenuManager {
 
 // MARK: - ContextMenuUserScriptDelegate
 extension ContextMenuManager: ContextMenuUserScriptDelegate {
-    func willShowContextMenu(withSelectedText selectedText: String) {
+    func willShowContextMenu(withSelectedText selectedText: String?, linkURL: String?) {
         self.selectedText = selectedText
+        self.linkURL = linkURL
     }
-
 }
 
 // MARK: - TabExtensions
