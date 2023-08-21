@@ -31,7 +31,7 @@ struct ProfileQuery: Encodable, Sendable {
     let city: String
     let state: String
     let street: String?
-    let zipCode: String?
+    let zip: String?
     let addresses: [Address]
     let age: Int
     let phone: String?
@@ -55,7 +55,7 @@ struct ProfileQuery: Encodable, Sendable {
         self.middleName = middleName
         self.suffix = suffix
         self.street = street
-        self.zipCode = zipCode
+        self.zip = zipCode
         self.phone = phone
         self.addresses = [Address(city: city, state: state)]
         self.fullName = "\(firstName) \(lastName)"
