@@ -32,11 +32,11 @@ struct EnableNetworkProtectionView: View {
 
                 Text(UserText.networkProtectionWaitlistEnableSubtitle)
                     .multilineTextAlignment(.center)
-                    .foregroundColor(.black.opacity(0.88))
+                    .foregroundColor(Color("BlackWhite80"))
 
                 Text(UserText.networkProtectionWaitlistAvailabilityDisclaimer)
                     .font(.system(size: 12))
-                    .foregroundColor(.black.opacity(0.60))
+                    .foregroundColor(Color("BlackWhite60"))
             }
         } buttons: {
             Button(UserText.networkProtectionWaitlistButtonGotIt) {

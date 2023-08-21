@@ -110,7 +110,7 @@ public final class WaitlistViewModel: ObservableObject {
         case .closeAndPresentNetworkProtectionPopover:
             close()
 
-            DispatchQueue.main.async {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 NotificationCenter.default.post(name: .networkProtectionWaitlistShowPopover, object: nil)
             }
         }
@@ -148,6 +148,7 @@ public final class WaitlistViewModel: ObservableObject {
         delegate?.dismissModal()
     }
 
+    @MainActor
     private func joinWaitlist() async {
         self.viewState = .joiningWaitlist
 
@@ -181,11 +182,14 @@ public final class WaitlistViewModel: ObservableObject {
         viewState = .termsAndConditions
     }
 
+    @MainActor
     private func acceptTermsAndConditions() async {
         guard let inviteCode = waitlistStorage.getWaitlistInviteCode() else {
             assertionFailure("Got into terms & conditions state without having an invite code")
             return
         }
+
+        self.viewState = .acceptingTermsAndConditions
 
         do {
             try await networkProtectionCodeRedemption.redeem(inviteCode)

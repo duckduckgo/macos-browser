@@ -974,6 +974,12 @@ CQ
                                                                         <action selector="resetNetworkProtectionTermsAndConditionsAcceptance:" target="Ady-hI-5gd" id="AIX-0X-WMH"/>
                                                                     </connections>
                                                                 </menuItem>
+                                                                <menuItem title="Enter Waitlist Invite Code" id="Fkp-YK-NDy">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="showNetworkProtectionInviteCodePrompt:" target="Ady-hI-5gd" id="CO5-ar-NTA"/>
+                                                                    </connections>
+                                                                </menuItem>
                                                                 <menuItem isSeparatorItem="YES" id="ggg-Pf-MUh"/>
                                                                 <menuItem title="Waitlist Token:" enabled="NO" identifier="network-protection.waitlist.token" id="wU9-UN-SKZ">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -1078,6 +1084,7 @@ CQ
                             <outlet property="closeTabMenuItem" destination="DVo-aG-piG" id="Hr0-hn-2p1"/>
                             <outlet property="closeWindowMenuItem" destination="CzI-4o-2re" id="32H-X4-8Ub"/>
                             <outlet property="debugMenuItem" destination="ilv-5f-YpZ" id="4F7-9b-Mve"/>
+                            <outlet property="debugNetworkProtectionWaitlistEnterInviteCodeItem" destination="Fkp-YK-NDy" id="eii-tb-KsQ"/>
                             <outlet property="debugNetworkProtectionWaitlistInviteCodeItem" destination="R8L-HN-frT" id="Hh6-eO-1pR"/>
                             <outlet property="debugNetworkProtectionWaitlistTermsAndConditionsAcceptedItem" destination="LKh-12-jwj" id="GeC-Bi-JA8"/>
                             <outlet property="debugNetworkProtectionWaitlistTimestampItem" destination="fJW-6O-O6J" id="86y-48-c5m"/>

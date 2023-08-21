@@ -91,6 +91,7 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var debugNetworkProtectionWaitlistTimestampItem: NSMenuItem?
     @IBOutlet weak var debugNetworkProtectionWaitlistInviteCodeItem: NSMenuItem?
     @IBOutlet weak var debugNetworkProtectionWaitlistTermsAndConditionsAcceptedItem: NSMenuItem?
+    @IBOutlet weak var debugNetworkProtectionWaitlistEnterInviteCodeItem: NSMenuItem?
 
     private func setupDebugMenuItem(with featureFlagger: FeatureFlagger) {
         guard let debugMenuItem else {

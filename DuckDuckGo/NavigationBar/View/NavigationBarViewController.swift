@@ -861,8 +861,6 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         let viewModel = WaitlistViewModel(waitlist: NetworkProtectionWaitlist.shared)
         if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             showNetworkProtectionStatus()
-        } else if NetworkProtectionWaitlist.shared.waitlistStorage.isInvited && viewModel.acceptedNetworkProtectionTermsAndConditions {
-            showNetworkProtectionStatus()
         } else {
             WaitlistModalViewController.show()
         }

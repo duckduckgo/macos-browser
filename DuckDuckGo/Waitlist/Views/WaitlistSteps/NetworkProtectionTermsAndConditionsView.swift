@@ -23,6 +23,8 @@ struct NetworkProtectionTermsAndConditionsView: View {
 
     @EnvironmentObject var model: WaitlistViewModel
 
+    let acceptingTermsAndConditions: Bool
+
     var body: some View {
         WaitlistDialogView {
             VStack(spacing: 16.0) {
@@ -106,6 +108,7 @@ struct NetworkProtectionTermsAndConditionsView: View {
                 .frame(maxWidth: .infinity)
                 .background(Color("BlackWhite1"))
                 .border(Color("BlackWhite5"))
+                .frame(maxHeight: 500)
             }
         } buttons: {
             Button(UserText.networkProtectionWaitlistButtonCancel) {
@@ -115,7 +118,7 @@ struct NetworkProtectionTermsAndConditionsView: View {
             Button(UserText.networkProtectionWaitlistButtonAgreeAndContinue) {
                 Task { await model.perform(action: .acceptTermsAndConditions) }
             }
-            .buttonStyle(DefaultActionButtonStyle(enabled: true))
+            .buttonStyle(DefaultActionButtonStyle(enabled: !acceptingTermsAndConditions))
         }
         .environmentObject(model)
     }

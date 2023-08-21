@@ -736,12 +736,18 @@ extension MainViewController {
     }
 
     @IBAction func resetNetworkProtectionWaitlistState(_ sender: Any?) {
-        let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: NetworkProtectionWaitlist.identifier)
-        waitlistStorage.deleteWaitlistState()
+        NetworkProtectionWaitlist.shared.waitlistStorage.deleteWaitlistState()
+        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
     }
 
     @IBAction func resetNetworkProtectionTermsAndConditionsAcceptance(_ sender: Any?) {
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+    }
+
+    @IBAction func showNetworkProtectionInviteCodePrompt(_ sender: Any?) {
+        let code = getInviteCode()
+        NetworkProtectionWaitlist.shared.waitlistStorage.store(inviteCode: code)
+        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
     }
 
     // MARK: - Developer Tools
@@ -856,10 +862,34 @@ extension MainViewController: NSMenuItemValidation {
 
             return true
 
+        // Network Protection Debugging
+        case #selector(MainViewController.showNetworkProtectionInviteCodePrompt(_:)):
+            // Only allow testers to enter a custom code if they're on the waitlist, to simulate the correct path through the flow
+            return NetworkProtectionWaitlist.shared.waitlistStorage.isOnWaitlist || NetworkProtectionWaitlist.shared.waitlistStorage.isInvited
         default:
             return true
         }
     }
+
+    func getInviteCode() -> String {
+        let alert = NSAlert()
+        alert.addButton(withTitle: "Use Invite Code")
+        alert.addButton(withTitle: "Cancel")
+        alert.messageText = "Enter Invite Code"
+        alert.informativeText = "Please grab a Network Protection invite code from Asana and enter it here."
+
+        let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
+        alert.accessoryView = textField
+
+        let response = alert.runModal()
+
+        if response == .alertFirstButtonReturn {
+            return textField.stringValue
+        } else {
+            return ""
+        }
+    }
+
     // swiftlint:enable function_body_length
     // swiftlint:enable cyclomatic_complexity
 }
