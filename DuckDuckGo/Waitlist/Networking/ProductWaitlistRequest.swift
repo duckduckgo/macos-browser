@@ -133,7 +133,8 @@ public class ProductWaitlistRequest: WaitlistRequest {
 #if DEBUG
         return URL(string: "https://quackdev.duckduckgo.com/api/auth/waitlist/")!
 #else
-        return URL(string: "https://quack.duckduckgo.com/api/auth/waitlist/")!
+        // TODO: Replace with `quack.duckduckgo.com` once the `networkprotection_mac` type exists
+        return URL(string: "https://quackdev.duckduckgo.com/api/auth/waitlist/")!
 #endif
     }
 
