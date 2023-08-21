@@ -324,12 +324,14 @@ private struct AddressFormView: View {
     @State private var street = ""
     @State private var city = ""
     @State private var state = ""
+    @State private var zip = ""
     @State private var shouldShowDeleteButton = false
 
     var body: some View {
         VStack(spacing: 15) {
             TextFieldWithLabel(label: "Street", text: $street)
             TextFieldWithLabel(label: "City*", text: $city)
+            TextFieldWithLabel(label: "Zip Code", text: $zip)
 
             VStack(alignment: .leading) {
                 Text("State*")
@@ -366,6 +368,7 @@ private struct AddressFormView: View {
                 street = selectedAddress.street
                 city = selectedAddress.city
                 state = selectedAddress.state
+                zip = selectedAddress.zip
             }
         }
     }
@@ -375,7 +378,8 @@ private struct AddressFormView: View {
             viewModel.saveAddress(id: viewModel.selectedAddress?.id,
                                   street: street,
                                   city: city,
-                                  state: state)
+                                  state: state,
+                                  zip: zip)
         }
     }
 
