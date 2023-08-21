@@ -86,9 +86,10 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
         guard let dict = params as? [String: Any],
               let href = dict["href"] as? String,
               let url = href.url,
+              url.isDuckPlayerScheme,
               let webView = message.messageWebView
         else {
-            assertionFailure("YoutubeOverlayUserScript: expected URL")
+            assertionFailure("YoutubeOverlayUserScript: expected duck:// URL")
             return nil
         }
         self.delegate?.youtubeOverlayUserScriptDidRequestDuckPlayer(with: url, in: webView)
