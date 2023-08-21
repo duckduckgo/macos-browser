@@ -146,6 +146,17 @@ extension Pixel {
 
         case incrementalRolloutTest
 
+        // Duck Player
+        case duckPlayerDailyUniqueView
+        case duckPlayerViewFromYouTubeViaMainOverlay
+        case duckPlayerViewFromYouTubeViaHoverButton
+        case duckPlayerViewFromYoutubeAutomatic
+        case duckPlayerViewFromSERP
+        case duckPlayerViewFromOther
+        case duckPlayerSettingAlways
+        case duckPlayerSettingNever
+        case duckPlayerSettingBackToDefault
+
         enum Debug {
 
             case assertionFailure(message: String, file: StaticString, line: UInt)
@@ -404,6 +415,26 @@ extension Pixel.Event {
 
         case .incrementalRolloutTest:
             return "m_mac_netp_ev_incremental_rollout_test"
+
+        case .duckPlayerDailyUniqueView:
+            return "m_mac_duck-player_daily-unique-view"
+        case .duckPlayerViewFromYouTubeViaMainOverlay:
+            return "m_mac_duck-player_view-from_main-overlay"
+        case .duckPlayerViewFromYouTubeViaHoverButton:
+            return "m_mac_duck-player_view-from_hover-button"
+        case .duckPlayerViewFromYoutubeAutomatic:
+            return "m_mac_duck-player_view-from_automatic"
+        case .duckPlayerViewFromSERP:
+            return "m_mac_duck-player_view-from_serp"
+        case .duckPlayerViewFromOther:
+            return "m_mac_duck-player_view-from_other"
+        case .duckPlayerSettingAlways:
+            return "m_mac_duck-player_setting_always"
+        case .duckPlayerSettingNever:
+            return "m_mac_duck-player_setting_never"
+        case .duckPlayerSettingBackToDefault:
+            return "m_mac_duck-player_setting_back-to-default"
+
         }
 
     }
