@@ -18,22 +18,27 @@
 
 import SwiftUI
 
-struct LetterIconView: View {
+public struct LetterIconView: View {
 
-    var title: String
-    var size: CGFloat = 32
-    var prefferedFirstCharacters: String?
-    var characterCount = 2
+    public var title: String
+    public var size: CGFloat
+    public var prefferedFirstCharacters: String?
+    public var characterCount: Int
 
-    var characters: String {
+    private var characters: String {
         if let prefferedFirstCharacters = prefferedFirstCharacters,
            prefferedFirstCharacters != "" {
             return String(prefferedFirstCharacters.prefix(characterCount))
         }
         return String(title.prefix(characterCount))
     }
-    
-    
+
+    public init(title: String, size: CGFloat = 32, prefferedFirstCharacters: String? = nil, characterCount: Int = 2) {
+        self.title = title
+        self.size = size
+        self.prefferedFirstCharacters = prefferedFirstCharacters
+        self.characterCount = characterCount
+    }
 
     public var body: some View {
         ZStack {

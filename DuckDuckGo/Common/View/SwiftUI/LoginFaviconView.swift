@@ -24,7 +24,7 @@ struct LoginFaviconView: View {
     let domain: String
     let generatedIconLetters: String
     let faviconManagement: FaviconManagement = FaviconManager.shared
-
+    
     var body: some View {
         Group {
             if let image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image {
