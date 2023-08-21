@@ -18,6 +18,7 @@
 
 import SwiftUI
 import BrowserServicesKit
+import SwiftUIExtensions
 
 struct LoginFaviconView: View {
     let domain: String
