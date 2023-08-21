@@ -196,6 +196,7 @@ extension ContextMenuManager: WebViewContextMenuDelegate {
     func webView(_ webView: WebView, didCloseContextMenu menu: NSMenu, with event: NSEvent?) {
         DispatchQueue.main.async { [weak self] in
             self?.selectedText = nil
+            self?.linkURL = nil
             self?.originalItems = nil
         }
     }
