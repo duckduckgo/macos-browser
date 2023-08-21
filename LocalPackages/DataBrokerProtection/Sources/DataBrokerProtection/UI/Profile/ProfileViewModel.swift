@@ -49,15 +49,17 @@ final class ProfileViewModel: ObservableObject {
         @Trimmed var street = ""
         @Trimmed var city = ""
         @Trimmed var state =  ""
+        @Trimmed var zip =  ""
 
-        internal init(street: String = "", city: String, state: String) {
+        internal init(street: String = "", city: String, state: String, zip: String = "") {
             self.street = street
             self.city = city
             self.state = state
+            self.zip = zip
         }
 
         var fullAddress: String {
-            let components = [street, city, state].filter { !$0.isEmpty }
+            let components = [street, zip, city, state].filter { !$0.isEmpty }
             return components.joined(separator: ", ")
         }
     }
@@ -122,15 +124,17 @@ final class ProfileViewModel: ObservableObject {
         names.removeAll(where: {$0.id == id})
     }
 
-    func saveAddress(id: UUID?, street: String? = nil, city: String, state: String) {
+    func saveAddress(id: UUID?, street: String? = nil, city: String, state: String, zip: String? = nil) {
         if let id = id, let address = addresses.filter({ $0.id == id}).first {
             address.street = street ?? ""
             address.city = city
             address.state = state
+            address.zip = zip ?? ""
         } else {
             let address = Address(street: street ?? "",
                                   city: city,
-                                  state: state)
+                                  state: state,
+                                  zip: zip ?? "")
             addresses.append(address)
         }
     }
@@ -159,7 +163,8 @@ final class ProfileViewModel: ObservableObject {
             addresses = profile.addresses.map {
                 Address(street: $0.street ?? "",
                         city: $0.city,
-                        state: $0.state)
+                        state: $0.state,
+                        zip: $0.zipCode ?? "")
             }
 
             birthYear = profile.age
