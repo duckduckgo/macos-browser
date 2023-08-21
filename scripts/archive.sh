@@ -249,6 +249,12 @@ archive_and_export() {
 		-configuration "${configuration}" \
 		2>&1 \
 		| ${log_formatter}
+
+	echo "Storing entitlements file ..."
+
+	local xcent_path="${workdir}/entitlements.xcent"
+	rm -f "${xcent_path}"
+	cp -f "${derived_data}/Build/Intermediates.noindex/ArchiveIntermediates/${scheme}/IntermediateBuildFilesPath/DuckDuckGo.build/${configuration}/DuckDuckGo Privacy Browser.build/${app_name}.app.xcent" "${workdir}/entitlements.xcent"
 }
 
 notarize() {
