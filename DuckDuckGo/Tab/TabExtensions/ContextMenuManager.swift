@@ -20,6 +20,8 @@ import AppKit
 import Combine
 import Foundation
 import WebKit
+import BrowserServicesKit
+import Common
 
 enum NavigationDecision {
     case allow(NewWindowPolicy)
@@ -34,8 +36,9 @@ final class ContextMenuManager: NSObject {
     private var originalItems: [WKMenuItemIdentifier: NSMenuItem]?
     private var selectedText: String?
     private var linkURL: String?
-    private var isMailToLink: Bool {
-        return linkURL?.contains("mailto:") ?? false
+    private var isNonSupportedScheme: Bool {
+        guard let linkURL else { return false }
+        return !WKWebView.handlesURLScheme(linkURL)
     }
     fileprivate weak var webView: WKWebView?
 
@@ -89,7 +92,7 @@ extension ContextMenuManager {
             return
         }
 
-        if isMailToLink {
+        if isNonSupportedScheme {
             menu.removeItem(at: index)
         } else {
             menu.replaceItem(at: index, with: self.openLinkInNewTabMenuItem(from: openLinkInNewWindowItem,
@@ -98,7 +101,7 @@ extension ContextMenuManager {
     }
 
     private func handleOpenLinkInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        if isCurrentWindowBurner || isMailToLink {
+        if isCurrentWindowBurner || isNonSupportedScheme {
             menu.removeItem(at: index)
         } else {
             menu.replaceItem(at: index, with: self.openLinkInNewWindowMenuItem(from: item))
@@ -106,7 +109,7 @@ extension ContextMenuManager {
     }
 
     private func handleOpenFrameInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        if isCurrentWindowBurner || isMailToLink {
+        if isCurrentWindowBurner || isNonSupportedScheme {
             menu.removeItem(at: index)
         } else {
             menu.replaceItem(at: index, with: self.openFrameInNewWindowMenuItem(from: item))
@@ -114,7 +117,7 @@ extension ContextMenuManager {
     }
 
     private func handleDownloadLinkedFileItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        if isMailToLink {
+        if isNonSupportedScheme {
             menu.removeItem(at: index)
         } else {
             menu.replaceItem(at: index, with: self.downloadMenuItem(from: item))
@@ -127,13 +130,13 @@ extension ContextMenuManager {
             return
         }
         // insert Add Link to Bookmarks
-        if !isMailToLink {
+        if !isNonSupportedScheme {
             menu.insertItem(self.addLinkToBookmarksMenuItem(from: openLinkInNewWindowItem), at: index)
             menu.replaceItem(at: index + 1, with: self.copyLinkMenuItem(withTitle: copyLinkItem.title, from: openLinkInNewWindowItem))
         }
 
         // insert Separator and Copy (selection) items
-        if selectedText?.isEmpty == false && !isMailToLink {
+        if selectedText?.isEmpty == false && !isNonSupportedScheme {
             menu.insertItem(.separator(), at: index + 2)
             menu.insertItem(self.copySelectionMenuItem(), at: index + 3)
         }
