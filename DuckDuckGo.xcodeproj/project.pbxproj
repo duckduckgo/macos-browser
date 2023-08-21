@@ -1832,6 +1832,9 @@
 		4B4D60E22A0C883A00BCD287 /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60E12A0C883A00BCD287 /* Main.swift */; };
 		4B4D60E32A0C883A00BCD287 /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60E12A0C883A00BCD287 /* Main.swift */; };
 		4B4F72EC266B2ED300814C60 /* CollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4F72EB266B2ED300814C60 /* CollectionExtension.swift */; };
+		4B51C09F2A93C683002F0D55 /* NetworkProtectionSimulateFailureMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */; };
+		4B51C0A02A93C683002F0D55 /* NetworkProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */; };
+		4B51C0A12A93C6A1002F0D55 /* BookmarksBarPromptAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 859F30662A72B38500C20372 /* BookmarksBarPromptAssets.xcassets */; };
 		4B59023D26B35F3600489384 /* ChromeDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023826B35F3600489384 /* ChromeDataImporter.swift */; };
 		4B59023E26B35F3600489384 /* ChromiumLoginReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023926B35F3600489384 /* ChromiumLoginReader.swift */; };
 		4B59024026B35F3600489384 /* ChromiumDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023B26B35F3600489384 /* ChromiumDataImporter.swift */; };
@@ -7947,6 +7950,7 @@
 				3192A2362A4C4CFF0084EA89 /* CookieConsent.storyboard in Resources */,
 				3192A2382A4C4CFF0084EA89 /* Bookmarks.storyboard in Resources */,
 				3192A2392A4C4CFF0084EA89 /* BookmarksBarCollectionViewItem.xib in Resources */,
+				4B51C0A12A93C6A1002F0D55 /* BookmarksBarPromptAssets.xcassets in Resources */,
 				3192A23A2A4C4CFF0084EA89 /* PrivacyDashboard.storyboard in Resources */,
 				3192A23B2A4C4CFF0084EA89 /* shield.json in Resources */,
 				3192A23C2A4C4CFF0084EA89 /* TabBarViewItem.xib in Resources */,
@@ -8788,6 +8792,7 @@
 				3192A0732A4C4CFF0084EA89 /* PrivacyDashboardPopover.swift in Sources */,
 				3192A0742A4C4CFF0084EA89 /* TestsClosureNavigationResponder.swift in Sources */,
 				3192A0752A4C4CFF0084EA89 /* RootView.swift in Sources */,
+				4B51C09F2A93C683002F0D55 /* NetworkProtectionSimulateFailureMenu.swift in Sources */,
 				3192A0762A4C4CFF0084EA89 /* AddressBarTextField.swift in Sources */,
 				3192A0772A4C4CFF0084EA89 /* FocusRingView.swift in Sources */,
 				3192A0782A4C4CFF0084EA89 /* BookmarksBarViewModel.swift in Sources */,
@@ -9051,6 +9056,7 @@
 				3192A1742A4C4CFF0084EA89 /* StatisticsStore.swift in Sources */,
 				3192A1752A4C4CFF0084EA89 /* BWInstallationService.swift in Sources */,
 				3192A1762A4C4CFF0084EA89 /* NetworkProtectionInvitePresenter.swift in Sources */,
+				4B51C0A02A93C683002F0D55 /* NetworkProtectionDebugMenu.swift in Sources */,
 				3192A1772A4C4CFF0084EA89 /* ColorView.swift in Sources */,
 				3192A1782A4C4CFF0084EA89 /* RecentlyClosedCacheItem.swift in Sources */,
 				3192A1792A4C4CFF0084EA89 /* PopupBlockedPopover.swift in Sources */,
