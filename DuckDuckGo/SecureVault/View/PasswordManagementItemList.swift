@@ -20,6 +20,7 @@ import Foundation
 import SwiftUI
 import BrowserServicesKit
 import Combine
+import SwiftUIExtensions
 
 struct ScrollOffsetKey: PreferenceKey {
     typealias Value = CGFloat

@@ -32,8 +32,10 @@ struct LetterIconView: View {
         }
         return String(title.prefix(characterCount))
     }
+    
+    
 
-    var body: some View {
+    public var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: size * 0.125)
                 .foregroundColor(Color.forString(title))
