@@ -748,6 +748,7 @@ final class AddressBarButtonsViewController: NSViewController {
         let isDuckDuckGoUrl = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
         let isEditingMode = controllerMode?.isEditing ?? false
         let isTextFieldValueText = textFieldValue?.isText ?? false
+        let isLocalUrl = selectedTabViewModel.tab.content.url?.isLocalURL ?? false
 
         // Privacy entry point button
         privacyEntryPointButton.isHidden = isEditingMode ||
@@ -755,7 +756,8 @@ final class AddressBarButtonsViewController: NSViewController {
             isDuckDuckGoUrl ||
             !isHypertextUrl ||
             selectedTabViewModel.errorViewState.isVisible ||
-            isTextFieldValueText
+            isTextFieldValueText ||
+            isLocalUrl
         imageButtonWrapper.isHidden = view.window?.isPopUpWindow == true
             || !privacyEntryPointButton.isHidden
             || isAnyTrackerAnimationPlaying
@@ -1010,4 +1012,40 @@ final class TrackerAnimationImageProvider: AnimationImageProvider {
         }
     }
 
+}
+
+extension URL {
+    private static let localPatterns = [
+        "^localhost$",
+        "^::1$",
+        "^.+\\.local$",
+        "^localhost\\.localhost$",
+        "^127\\.0\\.0\\.1$",
+        "^10\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)$",
+        "^172\\.(1[6-9]|2[0-9]|3[0-1])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)$",
+        "^192\\.168\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)$",
+        "^169\\.254\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)$",
+        "^fc[0-9a-fA-F]{2}:.+",
+        "^fe80:.+"
+    ]
+
+    private static var compiledRegexes: [NSRegularExpression] = {
+        var regexes: [NSRegularExpression] = []
+        for pattern in localPatterns {
+            if let newRegex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+                regexes.append(newRegex)
+            }
+        }
+        return regexes
+    }()
+
+    var isLocalURL: Bool {
+        if let host = self.host {
+            for regex in Self.compiledRegexes
+            where regex.firstMatch(in: host, options: [], range: NSRange(location: 0, length: host.utf16.count)) != nil {
+                return true
+            }
+        }
+        return false
+    }
 }

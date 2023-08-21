@@ -137,6 +137,15 @@ extension Pixel {
         case bookmarksBarOnboardingFirstInteraction(cohort: String)
         case bookmarksBarOnboardingInteraction2to8days(cohort: String)
 
+        // Pinned tabs
+        case userHasPinnedTab
+
+        // Fire Button
+        case fireButtonFirstBurn
+        case fireButton(option: FireButtonOption)
+
+        case incrementalRolloutTest
+
         enum Debug {
 
             case assertionFailure(message: String, file: StaticString, line: UInt)
@@ -242,10 +251,10 @@ extension Pixel {
             case networkProtectionNoAuthTokenFoundError
             case networkProtectionUnhandledError(function: String, line: Int, error: Error)
 
-            case faviconDecryptionFailed
-            case downloadListItemDecryptionFailed
-            case historyEntryDecryptionFailed
-            case permissionDecryptionFailed
+            case faviconDecryptionFailedUnique
+            case downloadListItemDecryptionFailedUnique
+            case historyEntryDecryptionFailedUnique
+            case permissionDecryptionFailedUnique
 
             // Errors from Bookmarks Module
             case missingParent
@@ -382,7 +391,21 @@ extension Pixel.Event {
             return "m_mac_bookmarksbarexperiment_firstinteraction"
         case .bookmarksBarOnboardingInteraction2to8days:
             return "m_mac_bookmarksbarexperiment_interaction2to8days"
+
+        // Pinned tabs
+        case .userHasPinnedTab:
+            return "m_mac_user_has_pinned_tab"
+
+        // Fire Button
+        case .fireButtonFirstBurn:
+            return "m_mac_fire_button_first_burn"
+        case .fireButton(option: let option):
+            return "m_mac_fire_button_\(option)"
+
+        case .incrementalRolloutTest:
+            return "m_mac_netp_ev_incremental_rollout_test"
         }
+
     }
 }
 
@@ -586,14 +609,14 @@ extension Pixel.Event.Debug {
         case .networkProtectionUnhandledError:
             return "netp_unhandled_error"
 
-        case .faviconDecryptionFailed:
-            return "favicon_decryption_failed"
-        case .downloadListItemDecryptionFailed:
-            return "download_list_item_decryption_failed"
-        case .historyEntryDecryptionFailed:
-            return "history_entry_decryption_failed"
-        case .permissionDecryptionFailed:
-            return "permission_decryption_failed"
+        case .faviconDecryptionFailedUnique:
+            return "favicon_decryption_failed_unique"
+        case .downloadListItemDecryptionFailedUnique:
+            return "download_list_item_decryption_failed_unique"
+        case .historyEntryDecryptionFailedUnique:
+            return "history_entry_decryption_failed_unique"
+        case .permissionDecryptionFailedUnique:
+            return "permission_decryption_failed_unique"
 
         case .missingParent: return "bookmark_missing_parent"
         case .bookmarksSaveFailed: return "bookmarks_save_failed"
