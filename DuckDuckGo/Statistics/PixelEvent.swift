@@ -148,8 +148,8 @@ extension Pixel {
 
         // Duck Player
         case duckPlayerDailyUniqueView
-        case duckPlayerViewFromYouTubeViaMainOverlay
-        case duckPlayerViewFromYouTubeViaHoverButton
+        case duckPlayerViewFromYoutubeViaMainOverlay
+        case duckPlayerViewFromYoutubeViaHoverButton
         case duckPlayerViewFromYoutubeAutomatic
         case duckPlayerViewFromSERP
         case duckPlayerViewFromOther
@@ -418,12 +418,12 @@ extension Pixel.Event {
 
         case .duckPlayerDailyUniqueView:
             return "m_mac_duck-player_daily-unique-view"
-        case .duckPlayerViewFromYouTubeViaMainOverlay:
-            return "m_mac_duck-player_view-from_main-overlay"
-        case .duckPlayerViewFromYouTubeViaHoverButton:
-            return "m_mac_duck-player_view-from_hover-button"
+        case .duckPlayerViewFromYoutubeViaMainOverlay:
+            return "m_mac_duck-player_view-from_youtube_main-overlay"
+        case .duckPlayerViewFromYoutubeViaHoverButton:
+            return "m_mac_duck-player_view-from_youtube_hover-button"
         case .duckPlayerViewFromYoutubeAutomatic:
-            return "m_mac_duck-player_view-from_automatic"
+            return "m_mac_duck-player_view-from_youtube_automatic"
         case .duckPlayerViewFromSERP:
             return "m_mac_duck-player_view-from_serp"
         case .duckPlayerViewFromOther:
