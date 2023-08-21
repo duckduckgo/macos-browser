@@ -17,10 +17,12 @@
 //
 
 import Cocoa
+import Combine
 import Common
 import NetworkExtension
 import NetworkProtection
 import NetworkProtectionUI
+import ServiceManagement
 
 @objc(Application)
 final class DuckDuckGoAgentApplication: NSApplication {
@@ -56,17 +58,11 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
     private var agentLaunchTime: Date
     private static let recentThreshold: TimeInterval = 5.0
 
-    private lazy var appLauncher: AppLauncher = {
-        let appBundleURL: URL
-        let parentBundlePath = "../../../../"
+    private let appLauncher = AppLauncher()
+    private let bouncer = NetworkProtectionBouncer()
 
-        if #available(macOS 13, *) {
-            appBundleURL = URL(filePath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
-        } else {
-            appBundleURL = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
-        }
-
-        return AppLauncher(appBundleURL: appBundleURL)
+    private lazy var tunnelController: FeatureProtectingTunnelController = {
+        FeatureProtectingTunnelController(appLauncher: appLauncher, bouncer: bouncer)
     }()
 
     /// The status bar NetworkProtection menu
@@ -82,12 +78,23 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
         let iconProvider = MenuIconProvider()
         #endif
 
-        return StatusBarMenu(appLauncher: appLauncher, iconProvider: iconProvider)
+        let menuItems = [
+            StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
+                await self?.appLauncher.launchApp(withCommand: .shareFeedback)
+            }),
+            StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: { [weak self] in
+                await self?.appLauncher.launchApp(withCommand: .justOpen)
+            })
+        ]
+
+        return StatusBarMenu(controller: tunnelController, iconProvider: iconProvider, menuItems: menuItems)
     }()
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         os_log("DuckDuckGoAgent started", log: .networkProtectionLoginItemLog, type: .info)
         networkProtectionMenu.show()
+
+        bouncer.requireAuthTokenOrKillApp()
 
         // Connect on Log In
         if shouldAutoConnect,
