@@ -37,20 +37,20 @@ final class PhasedRolloutFeatureFlagTester {
         static let hasSentPixelKey = "network-protection.incremental-feature-flag-test.has-sent-pixel"
     }
 
-    private let privacyConfiguration: PrivacyConfiguration
+    private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let pixelSender: PhasedRolloutPixelSender
     private let userDefaults: UserDefaults
 
-    init(privacyConfiguration: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig,
+    init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          pixelSender: PhasedRolloutPixelSender = DefaultPhasedRolloutPixelSender(),
          userDefaults: UserDefaults = .standard) {
-        self.privacyConfiguration = privacyConfiguration
+        self.privacyConfigurationManager = privacyConfigurationManager
         self.pixelSender = pixelSender
         self.userDefaults = userDefaults
     }
 
     func sendFeatureFlagEnabledPixelIfNecessary(completion: (() -> Void)? = nil) {
-        guard !hasSentPixelBefore(), privacyConfiguration.isSubfeatureEnabled(IncrementalRolloutTestSubfeature.rollout) else {
+        guard !hasSentPixelBefore(), privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(IncrementalRolloutTestSubfeature.rollout) else {
             completion?()
             return
         }
