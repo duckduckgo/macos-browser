@@ -38,8 +38,8 @@ final class ContextMenuManager: NSObject {
     private var linkURL: String?
     private var isNonSupportedScheme: Bool {
         guard let linkURL else { return false }
-        if URL(string: linkURL)?.scheme != nil {
-            return !WKWebView.handlesURLScheme(linkURL)
+        if let scheme = URL(string: linkURL)?.scheme {
+            return !WKWebView.handlesURLScheme(scheme)
         }
         return false
     }
