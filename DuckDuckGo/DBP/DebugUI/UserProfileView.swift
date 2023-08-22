@@ -79,7 +79,7 @@ struct UserProfileView: View {
             validateTextField(label: "Middle Name",
                               text: $middleName,
                               value: middleName,
-                              validationFunction: validateLastName,
+                              validationFunction: validateMiddleName,
                               error: middleNameError)
 
             validateTextField(label: "Last Name",
@@ -155,6 +155,10 @@ struct UserProfileView: View {
             cityError = ""
         }
         validateSaveButton()
+    }
+
+    private func validateMiddleName(_ value: String) {
+        // middleName is optional
     }
 
     private func validateState(_ value: String) {
