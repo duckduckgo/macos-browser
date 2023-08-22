@@ -25,29 +25,32 @@ final class CSVLoginExporter {
         case failedToEncodeLogins
     }
 
-    private let secureVault: SecureVault
+    private let secureVault: any AutofillSecureVault
     private let fileStore: FileStore
 
-    init(secureVault: SecureVault, fileStore: FileStore = FileManager.default) {
+    init(secureVault: any AutofillSecureVault, fileStore: FileStore = FileManager.default) {
         self.secureVault = secureVault
         self.fileStore = fileStore
     }
 
     func exportVaultLogins(to url: URL) throws {
-        guard let accounts = try? secureVault.accounts() else {
-            return
-        }
-
         var credentialsToExport: [SecureVaultModels.WebsiteCredentials] = []
 
-        for account in accounts {
-            guard let accountID = account.id, let accountIDInt = Int64(accountID) else {
-                continue
-            }
+        do {
+            let accounts = try secureVault.accounts()
 
-            if let credentials = try? secureVault.websiteCredentialsFor(accountId: accountIDInt) {
-                credentialsToExport.append(credentials)
+            for account in accounts {
+                guard let accountID = account.id, let accountIDInt = Int64(accountID) else {
+                    continue
+                }
+
+                if let credentials = try secureVault.websiteCredentialsFor(accountId: accountIDInt) {
+                    credentialsToExport.append(credentials)
+                }
             }
+        } catch {
+            Pixel.fire(.debug(event: .secureVaultError, error: error))
+            throw error
         }
 
         try save(credentials: credentialsToExport, to: url)
@@ -56,9 +59,9 @@ final class CSVLoginExporter {
     private func save(credentials: [SecureVaultModels.WebsiteCredentials], to url: URL) throws {
         let credentialsAsCSVRows: [String] = credentials.compactMap { credential in
             let title = credential.account.title ?? ""
-            let domain = credential.account.domain
-            let username = credential.account.username
-            let password = credential.password.utf8String() ?? ""
+            let domain = credential.account.domain ?? ""
+            let username = credential.account.username ?? ""
+            let password = credential.password?.utf8String() ?? ""
 
             // Ensure that exported passwords escape any quotes they contain
             let escapedPassword = password.replacingOccurrences(of: "\"", with: "\\\"")

@@ -155,6 +155,18 @@ final class DuckPlayer {
         if isFeatureEnabled {
             modeCancellable = preferences.$duckPlayerMode
                 .removeDuplicates()
+                .dropFirst(1)
+                .handleEvents(receiveOutput: { mode in
+                    switch mode {
+                    case .enabled:
+                        Pixel.fire(.duckPlayerSettingAlways)
+                    case .alwaysAsk:
+                        Pixel.fire(.duckPlayerSettingBackToDefault)
+                    case .disabled:
+                        Pixel.fire(.duckPlayerSettingNever)
+                    }
+                })
+                .prepend(preferences.duckPlayerMode)
                 .assign(to: \.mode, onWeaklyHeld: self)
         } else {
             modeCancellable = nil
@@ -167,7 +179,7 @@ final class DuckPlayer {
 extension DuckPlayer {
 
     func image(for faviconView: FaviconView) -> NSImage? {
-        guard isAvailable, mode != .disabled, faviconView.domain == Self.commonName else {
+        guard isAvailable, mode != .disabled, faviconView.url?.isDuckPlayer == true else {
             return nil
         }
         return .duckPlayer

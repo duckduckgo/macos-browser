@@ -98,16 +98,19 @@
                   Identifier = "AutoconsentMessageProtocolTests/testEval()">
                </Test>
                <Test
-                  Identifier = "CBRCompileTimeReporterTests">
+                  Identifier = "BrokenSiteReportingReferenceTests/testBrokenSiteReporting()">
                </Test>
                <Test
-                  Identifier = "FireproofingReferenceTests/testFireproofing()">
+                  Identifier = "CBRCompileTimeReporterTests">
                </Test>
                <Test
                   Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">
                </Test>
                <Test
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
+               </Test>
+               <Test
+                  Identifier = "WindowManagerStateRestorationTests/testWindowManagerStateRestoration()">
                </Test>
             </SkippedTests>
          </TestableReference>
@@ -149,6 +152,16 @@
                BuildableName = "SyncUITests"
                BlueprintName = "SyncUITests"
                ReferencedContainer = "container:LocalPackages/SyncUI">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "NetworkProtectionUITests"
+               BuildableName = "NetworkProtectionUITests"
+               BlueprintName = "NetworkProtectionUITests"
+               ReferencedContainer = "container:LocalPackages/NetworkProtectionUI">
             </BuildableReference>
          </TestableReference>
       </Testables>

@@ -17,15 +17,28 @@
 //
 
 import Foundation
-import XCTest
+import Combine
 import SwiftUI
+import NetworkProtection
+import XCTest
 @testable import NetworkProtectionUI
+import NetworkProtectionTestUtils
 
 final class StatusBarMenuTests: XCTestCase {
 
+    private final class TestAppLauncher: AppLaunching {
+        func launchApp(withCommand command: NetworkProtection.AppLaunchCommand) async {
+            // no-op
+        }
+    }
+
     func testShowStatusBarMenu() {
         let item = NSStatusItem()
-        let menu = StatusBarMenu(statusItem: item)
+        let menu = StatusBarMenu(
+            statusItem: item,
+            statusReporter: MockNetworkProtectionStatusReporter(),
+            appLauncher: TestAppLauncher(),
+            iconProvider: MenuIconProvider())
 
         menu.show()
 
@@ -34,7 +47,11 @@ final class StatusBarMenuTests: XCTestCase {
 
     func testHideStatusBarMenu() {
         let item = NSStatusItem()
-        let menu = StatusBarMenu(statusItem: item)
+        let menu = StatusBarMenu(
+            statusItem: item,
+            statusReporter: MockNetworkProtectionStatusReporter(),
+            appLauncher: TestAppLauncher(),
+            iconProvider: MenuIconProvider())
 
         menu.hide()
 

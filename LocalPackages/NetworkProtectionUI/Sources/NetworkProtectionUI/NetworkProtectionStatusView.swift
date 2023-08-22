@@ -21,35 +21,6 @@ import SwiftUIExtensions
 import Combine
 import NetworkProtection
 
-/// This view helps us fix the height of a view that's meant to be shown inside a `NSHostingView`.
-///
-/// It seems the `NSHostingView` uses the max height of the SwiftUI View for its own height, which for multi-line
-/// `Text` views is the maximum number of lines that it could show (which makes the hosting view become huge).
-/// This view updates it's max height to it's actual height after layout, meaning the hosting view will be sized correctly.
-///
-/// If the view supports multiple heights, you'll probably need to adapt it with a solution that's similar to the collapsed/expanded
-/// solution that's included.
-///
-struct PopoverHeightFixer<Content: View>: View {
-    @Binding var popoverHeight: CGFloat
-    @ViewBuilder var content: () -> Content
-
-    var body: some View {
-        VStack(spacing: 0, content: content)
-            .frame(maxHeight: popoverHeight)
-            .fixedSize(horizontal: false, vertical: true)
-            .background(GeometryReader { geometry in
-                /// Since .onAppear is only called once, we'll use a different view for the collapsed and expanded states.
-                /// so that the proper height is calculated for both.
-                Color.clear.onReceive(Just(popoverHeight)) { _ in
-                    if popoverHeight == .infinity {
-                        popoverHeight = geometry.size.height
-                    }
-                }
-            })
-    }
-}
-
 private let defaultTextColor = Color("TextColor", bundle: .module)
 
 fileprivate extension Font {
@@ -180,8 +151,6 @@ public struct NetworkProtectionStatusView: View {
     ///
     @ObservedObject var model: Model
 
-    @State private var popoverHeight = CGFloat.infinity
-
     // MARK: - Initializers
 
     public init(model: Model) {
@@ -191,36 +160,24 @@ public struct NetworkProtectionStatusView: View {
     // MARK: - View Contents
 
     public var body: some View {
-        PopoverHeightFixer(popoverHeight: $popoverHeight) {
-            VStack(spacing: 0) {
-                if let healthWarning = model.issueDescription {
-                    connectionHealthWarningView(message: healthWarning).onAppear {
-                        popoverHeight = .infinity
-                    }
-                    .onDisappear {
-                        popoverHeight = .infinity
-                    }
-                }
-
-                headerView()
-                featureToggleRow()
-
-                Divider()
-                    .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
-
-                if model.showServerDetails {
-                    connectionStatusView().onAppear {
-                        popoverHeight = .infinity
-                    }
-                    .onDisappear {
-                        popoverHeight = .infinity
-                    }
-                }
-
-                bottomMenuView()
+        VStack(spacing: 0) {
+            if let healthWarning = model.issueDescription {
+                connectionHealthWarningView(message: healthWarning)
             }
-            .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
+
+            headerView()
+            featureToggleRow()
+
+            Divider()
+                .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
+
+            if model.showServerDetails {
+                connectionStatusView()
+            }
+
+            bottomMenuView()
         }
+        .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
         .frame(maxWidth: 350)
     }
 
@@ -236,6 +193,7 @@ public struct NetworkProtectionStatusView: View {
                 HStack(spacing: 0) {
                     Text(message)
                         .makeSelectable()
+                        .multilineText()
                         .foregroundColor(defaultTextColor)
 
                     Spacer()
@@ -262,8 +220,9 @@ public struct NetworkProtectionStatusView: View {
                 .padding([.top], 8)
 
             Text(UserText.networkProtectionStatusViewFeatureDesc)
-                .applyDescriptionAttributes(colorScheme: colorScheme)
+                .multilineText()
                 .multilineTextAlignment(.center)
+                .applyDescriptionAttributes(colorScheme: colorScheme)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(EdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 16))
         }
@@ -346,48 +305,5 @@ public struct NetworkProtectionStatusView: View {
                 .fixedSize()
         }
         .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 9))
-    }
-}
-
-struct NetworkProtectionStatusView_Previews: PreviewProvider {
-
-    private class PreviewController: NetworkProtection.TunnelController {
-        func isConnected() async -> Bool {
-            false
-        }
-
-        func start() async {
-            print("Preview controller started")
-        }
-
-        func stop() async {
-            print("Preview controller stopped")
-        }
-    }
-
-    /// Convenience reporter for SwiftUI preview
-    ///
-    private final class PreviewNetworkProtectionStatusReporter: NetworkProtectionStatusReporter {
-        let statusPublisher = CurrentValueSubject<ConnectionStatus, Never>(.connected(connectedDate: Date()))
-        let connectivityIssuesPublisher = CurrentValueSubject<Bool, Never>(false)
-        let serverInfoPublisher = CurrentValueSubject<NetworkProtectionStatusServerInfo, Never>(NetworkProtectionStatusServerInfo(serverLocation: "Los Angeles, USA", serverAddress: "127.0.0.1"))
-        let connectionErrorPublisher = CurrentValueSubject<String?, Never>(nil)
-        let controllerErrorMessagePublisher = CurrentValueSubject<String?, Never>(nil)
-
-        func forceRefresh() {
-            // No-op
-        }
-    }
-
-    static var previews: some View {
-        let statusReporter = PreviewNetworkProtectionStatusReporter()
-        let menuItems = [
-            NetworkProtectionStatusView.Model.MenuItem(name: "Share Feedback...", action: {})
-        ]
-        let model = NetworkProtectionStatusView.Model(controller: PreviewController(),
-                                                      statusReporter: statusReporter,
-                                                      menuItems: menuItems)
-
-        NetworkProtectionStatusView(model: model)
     }
 }

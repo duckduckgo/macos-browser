@@ -68,7 +68,8 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     init(popovers: NavigationBarPopovers,
          pinningManager: PinningManager = LocalPinningManager.shared,
-         statusReporter: NetworkProtectionStatusReporter? = nil) {
+         statusReporter: NetworkProtectionStatusReporter? = nil,
+         iconProvider: IconProvider = NavigationBarIconProvider()) {
 
         let statusObserver = ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
                                                                     platformDidWakeNotification: NSWorkspace.didWakeNotification)
@@ -79,14 +80,16 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         self.networkProtectionStatusReporter = statusReporter ?? DefaultNetworkProtectionStatusReporter(
             statusObserver: statusObserver,
             serverInfoObserver: statusInfoObserver,
-            connectionErrorObserver: connectionErrorObserver
+            connectionErrorObserver: connectionErrorObserver,
+            connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
+            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
         )
-        self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, isForStatusBar: false)
+        self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, iconProvider: iconProvider)
         self.popovers = popovers
         self.pinningManager = pinningManager
         isPinned = pinningManager.isPinned(.networkProtection)
 
-        isHavingConnectivityIssues = networkProtectionStatusReporter.connectivityIssuesPublisher.value
+        isHavingConnectivityIssues = networkProtectionStatusReporter.connectivityIssuesObserver.recentValue
         buttonImage = .image(for: iconPublisher.icon)
 
         super.init()
@@ -109,7 +112,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     }
 
     private func setupStatusSubscription() {
-        statusChangeCancellable = networkProtectionStatusReporter.statusPublisher.sink { [weak self] status in
+        statusChangeCancellable = networkProtectionStatusReporter.statusObserver.publisher.sink { [weak self] status in
             guard let self = self else {
                 return
             }
@@ -122,7 +125,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     }
 
     private func setupInterruptionSubscription() {
-        interruptionCancellable = networkProtectionStatusReporter.connectivityIssuesPublisher.sink { [weak self] isHavingConnectivityIssues in
+        interruptionCancellable = networkProtectionStatusReporter.connectivityIssuesObserver.publisher.sink { [weak self] isHavingConnectivityIssues in
             guard let self = self else {
                 return
             }

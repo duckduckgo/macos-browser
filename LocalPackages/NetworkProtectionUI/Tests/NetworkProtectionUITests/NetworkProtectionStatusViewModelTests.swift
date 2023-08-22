@@ -22,6 +22,7 @@ import SwiftUI
 import XCTest
 import NetworkProtection
 @testable import NetworkProtectionUI
+import NetworkProtectionTestUtils
 
 final class NetworkProtectionStatusViewModelTests: XCTestCase {
 
@@ -30,11 +31,11 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
             serverLocation: "New York, USA",
             serverAddress: "127.0.0.1")
 
-        var statusPublisher: CurrentValueSubject<ConnectionStatus, Never>
-        var connectivityIssuesPublisher: CurrentValueSubject<Bool, Never>
-        var serverInfoPublisher: CurrentValueSubject<NetworkProtectionStatusServerInfo, Never>
-        var connectionErrorPublisher: CurrentValueSubject<String?, Never>
-        var controllerErrorMessagePublisher: CurrentValueSubject<String?, Never>
+        let statusObserver: ConnectionStatusObserver
+        let serverInfoObserver: ConnectionServerInfoObserver
+        let connectionErrorObserver: ConnectionErrorObserver
+        let connectivityIssuesObserver: ConnectivityIssueObserver
+        let controllerErrorMessageObserver: ControllerErrorMesssageObserver
 
         init(status: ConnectionStatus,
              isHavingConnectivityIssues: Bool = false,
@@ -42,11 +43,25 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
              tunnelErrorMessage: String? = nil,
              controllerErrorMessage: String? = nil) {
 
-            statusPublisher = CurrentValueSubject<ConnectionStatus, Never>(status)
-            connectivityIssuesPublisher = CurrentValueSubject<Bool, Never>(isHavingConnectivityIssues)
-            serverInfoPublisher = CurrentValueSubject<NetworkProtectionStatusServerInfo, Never>(serverInfo)
-            connectionErrorPublisher = CurrentValueSubject<String?, Never>(tunnelErrorMessage)
-            controllerErrorMessagePublisher = CurrentValueSubject<String?, Never>(controllerErrorMessage)
+            let mockStatusObserver = MockConnectionStatusObserver()
+            mockStatusObserver.subject.send(status)
+            statusObserver = mockStatusObserver
+
+            let mockServerInfoObserver = MockConnectionServerInfoObserver()
+            mockServerInfoObserver.subject.send(serverInfo)
+            serverInfoObserver = mockServerInfoObserver
+
+            let mockConnectivityIssueObserver = MockConnectivityIssueObserver()
+            mockConnectivityIssueObserver.subject.send(isHavingConnectivityIssues)
+            connectivityIssuesObserver = mockConnectivityIssueObserver
+
+            let mockConnectionErrorObserver = MockConnectionErrorObserver()
+            mockConnectionErrorObserver.subject.send(tunnelErrorMessage)
+            connectionErrorObserver = mockConnectionErrorObserver
+
+            let mockControllerErrorMessageObserver = MockControllerErrorMesssageObserver()
+            mockControllerErrorMessageObserver.subject.send(controllerErrorMessage)
+            controllerErrorMessageObserver = mockControllerErrorMessageObserver
         }
 
         func forceRefresh() {
@@ -78,25 +93,6 @@ final class NetworkProtectionStatusViewModelTests: XCTestCase {
     }
 
     // MARK: - Tests
-
-    /// We expect that the model will be initialized correctly (with status .uknown by default).
-    ///
-    @MainActor
-    func testProperInitialization() async throws {
-        let controller = MockTunnelController()
-        let statusReporter = MockStatusReporter(status: .unknown)
-        let model = NetworkProtectionStatusView.Model(
-            controller: controller,
-            statusReporter: statusReporter,
-            menuItems: [])
-
-        let isToggleOn = model.isToggleOn.wrappedValue
-        XCTAssertFalse(isToggleOn)
-        XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusDisconnected)
-        XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
-        XCTAssertEqual(model.featureStatusDescription, UserText.networkProtectionStatusViewFeatureOff)
-        XCTAssertFalse(model.showServerDetails)
-    }
 
     /// We expect the model to properly reflect the disconnected status.
     ///

@@ -18,42 +18,48 @@
 
 import Foundation
 import BrowserServicesKit
+import SecureStorage
 
 final class SecureVaultLoginImporter: LoginImporter {
 
-    private let secureVault: SecureVault
+    private let secureVault: any AutofillSecureVault
 
-    init(secureVault: SecureVault) {
+    init(secureVault: any AutofillSecureVault) {
         self.secureVault = secureVault
     }
 
     func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.CompletedLoginsResult {
-        let vault = try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        let vault = try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
 
         var successful: [String] = []
         var duplicates: [String] = []
         var failed: [String] = []
 
-        for login in logins {
-            let title = login.title
-            let account = SecureVaultModels.WebsiteAccount(title: title, username: login.username, domain: login.url)
-            let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: login.password.data(using: .utf8)!)
-            let importSummaryValue: String
+        let encryptionKey = try vault.getEncryptionKey()
+        let hashingSalt = try vault.getHashingSalt()
 
-            if let title = account.title {
-                importSummaryValue = "\(title): \(credentials.account.domain) (\(credentials.account.username))"
-            } else {
-                importSummaryValue = "\(credentials.account.domain) (\(credentials.account.username))"
-            }
+        try vault.inDatabaseTransaction { database in
+            for login in logins {
+                let title = login.title
+                let account = SecureVaultModels.WebsiteAccount(title: title, username: login.username, domain: login.url)
+                let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: login.password.data(using: .utf8)!)
+                let importSummaryValue: String
 
-            do {
-                try vault.storeWebsiteCredentials(credentials)
-                successful.append(importSummaryValue)
-            } catch {
-                if case .duplicateRecord = error as? SecureVaultError {
-                    duplicates.append(importSummaryValue)
+                if let title = account.title {
+                    importSummaryValue = "\(title): \(credentials.account.domain ?? "") (\(credentials.account.username ?? ""))"
                 } else {
-                    failed.append(importSummaryValue)
+                    importSummaryValue = "\(credentials.account.domain ?? "") (\(credentials.account.username ?? ""))"
+                }
+
+                do {
+                    _ = try vault.storeWebsiteCredentials(credentials, in: database, encryptedUsing: encryptionKey, hashedUsing: hashingSalt)
+                    successful.append(importSummaryValue)
+                } catch {
+                    if case .duplicateRecord = error as? SecureStorageError {
+                        duplicates.append(importSummaryValue)
+                    } else {
+                        failed.append(importSummaryValue)
+                    }
                 }
             }
         }

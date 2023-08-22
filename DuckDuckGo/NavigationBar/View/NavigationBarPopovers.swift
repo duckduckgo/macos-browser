@@ -93,6 +93,7 @@ final class NavigationBarPopovers {
         }
     }
 
+    @available(macOS 11.4, *)
     func toggleNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
 #if NETWORK_PROTECTION
         if let networkProtectionPopover = networkProtectionPopover,
@@ -188,13 +189,25 @@ final class NavigationBarPopovers {
         popover.select(category: selectedCategory)
     }
 
+    func showPasswordManagerPopover(selectedWebsiteAccount: SecureVaultModels.WebsiteAccount, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
+        let popover = passwordManagementPopover ?? PasswordManagementPopover()
+        passwordManagementPopover = popover
+        popover.delegate = delegate
+        show(popover: popover, usingView: view)
+        popover.select(websiteAccount: selectedWebsiteAccount)
+    }
+
     func hasAnySavePopoversVisible() -> Bool {
         return savePopovers.contains(where: { $0?.isShown ?? false })
     }
 
     func displaySaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, automaticallySaved: Bool, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        showSaveCredentialsPopover(usingView: view, withDelegate: delegate)
-        saveCredentialsPopover?.viewController.update(credentials: credentials, automaticallySaved: automaticallySaved)
+        if !automaticallySaved {
+            showSaveCredentialsPopover(usingView: view, withDelegate: delegate)
+            saveCredentialsPopover?.viewController.update(credentials: credentials, automaticallySaved: automaticallySaved)
+        } else {
+            NotificationCenter.default.post(name: .loginAutoSaved, object: credentials.account)
+        }
     }
 
     func displaySavePaymentMethod(_ card: SecureVaultModels.CreditCard, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
@@ -263,6 +276,7 @@ final class NavigationBarPopovers {
     // MARK: - Network Protection
 
 #if NETWORK_PROTECTION
+    @available(macOS 11.4, *)
     func showNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         let popover = networkProtectionPopover ?? {
             let controller = NetworkProtectionTunnelController()
@@ -275,7 +289,9 @@ final class NavigationBarPopovers {
             let statusReporter = DefaultNetworkProtectionStatusReporter(
                 statusObserver: statusObserver,
                 serverInfoObserver: statusInfoObserver,
-                connectionErrorObserver: connectionErrorObserver
+                connectionErrorObserver: connectionErrorObserver,
+                connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
+                controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
             )
 
             let menuItems = [
@@ -297,4 +313,8 @@ final class NavigationBarPopovers {
     }
 #endif
 
+}
+
+extension Notification.Name {
+    static let loginAutoSaved = Notification.Name(rawValue: "loginAutoSaved")
 }

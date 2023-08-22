@@ -90,11 +90,19 @@ extension ContextMenuManager {
     }
 
     private func handleOpenLinkInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        menu.replaceItem(at: index, with: self.openLinkInNewWindowMenuItem(from: item, makeBurner: isCurrentWindowBurner))
+        if isCurrentWindowBurner {
+            menu.removeItem(at: index)
+        } else {
+            menu.replaceItem(at: index, with: self.openLinkInNewWindowMenuItem(from: item))
+        }
     }
 
     private func handleOpenFrameInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        menu.replaceItem(at: index, with: self.openFrameInNewWindowMenuItem(from: item, makeBurner: isCurrentWindowBurner))
+        if isCurrentWindowBurner {
+            menu.removeItem(at: index)
+        } else {
+            menu.replaceItem(at: index, with: self.openFrameInNewWindowMenuItem(from: item))
+        }
     }
 
     private func handleDownloadLinkedFileItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
@@ -129,7 +137,11 @@ extension ContextMenuManager {
 
     private func handleOpenImageInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
         menu.insertItem(self.openImageInNewTabMenuItem(from: item, makeBurner: isCurrentWindowBurner), at: index)
-        menu.replaceItem(at: index + 1, with: self.openImageInNewWindowMenuItem(from: item, makeBurner: isCurrentWindowBurner))
+        if isCurrentWindowBurner {
+            menu.removeItem(at: index + 1)
+        } else {
+            menu.replaceItem(at: index + 1, with: self.openImageInNewWindowMenuItem(from: item))
+        }
     }
 
     private func handleDownloadImageItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
@@ -188,16 +200,12 @@ private extension ContextMenuManager {
         NSMenuItem(title: UserText.bookmarkPage, action: #selector(MainViewController.bookmarkThisPage), target: nil, keyEquivalent: "")
     }
 
-    func openLinkInNewWindowMenuItem(from item: NSMenuItem, makeBurner: Bool) -> NSMenuItem {
-        let title = makeBurner ? UserText.openLinkInNewBurnerWindow : item.title
-        let action = makeBurner ? #selector(openLinkInNewBurnerWindow) : #selector(openLinkInNewWindow)
-        return makeMenuItem(withTitle: title, action: action, from: item, with: .openLinkInNewWindow)
+    func openLinkInNewWindowMenuItem(from item: NSMenuItem) -> NSMenuItem {
+        makeMenuItem(withTitle: item.title, action: #selector(openLinkInNewWindow), from: item, with: .openLinkInNewWindow)
     }
 
-    func openFrameInNewWindowMenuItem(from item: NSMenuItem, makeBurner: Bool) -> NSMenuItem {
-        let title = makeBurner ? UserText.openFrameInNewBurnerWindow : item.title
-        let action = makeBurner ? #selector(openFrameInNewBurnerWindow) : #selector(openFrameInNewWindow)
-        return makeMenuItem(withTitle: title, action: action, from: item, with: .openFrameInNewWindow)
+    func openFrameInNewWindowMenuItem(from item: NSMenuItem) -> NSMenuItem {
+        makeMenuItem(withTitle: item.title, action: #selector(openFrameInNewWindow), from: item, with: .openFrameInNewWindow)
     }
 
     private func downloadMenuItemTitle(for item: NSMenuItem) -> String {
@@ -233,10 +241,8 @@ private extension ContextMenuManager {
         return makeMenuItem(withTitle: title, action: action, from: item, with: .openImageInNewWindow, keyEquivalent: "")
     }
 
-    func openImageInNewWindowMenuItem(from item: NSMenuItem, makeBurner: Bool) -> NSMenuItem {
-        let title = makeBurner ? UserText.openImageInNewBurnerWindow : item.title
-        let action = makeBurner ? #selector(openImageInNewBurnerWindow) : #selector(openImageInNewWindow)
-        return makeMenuItem(withTitle: title, action: action, from: item, with: .openImageInNewWindow)
+    func openImageInNewWindowMenuItem(from item: NSMenuItem) -> NSMenuItem {
+        makeMenuItem(withTitle: item.title, action: #selector(openImageInNewWindow), from: item, with: .openImageInNewWindow)
     }
 
     func downloadImageMenuItem(from item: NSMenuItem) -> NSMenuItem {
@@ -322,14 +328,6 @@ private extension ContextMenuManager {
     }
 
     func openLinkInNewWindow(_ sender: NSMenuItem) {
-        openLinkInNewWindowCommon(sender, burner: false)
-    }
-
-    func openLinkInNewBurnerWindow(_ sender: NSMenuItem) {
-        openLinkInNewWindowCommon(sender, burner: true)
-    }
-
-    private func openLinkInNewWindowCommon(_ sender: NSMenuItem, burner: Bool) {
         guard let originalItem = sender.representedObject as? NSMenuItem,
               let identifier = originalItem.identifier.map(WKMenuItemIdentifier.init),
               identifier == .openLinkInNewWindow,
@@ -339,7 +337,7 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.window(active: true, burner: burner)) }
+        onNewWindow = { _ in .allow(.window(active: true, burner: false)) }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 

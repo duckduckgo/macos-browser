@@ -79,6 +79,7 @@ extension URL {
     }
 
     static func makeURL(from addressBarString: String) -> URL? {
+
         let trimmed = addressBarString.trimmingWhitespace()
 
         if let addressBarUrl = URL(trimmedAddressBarString: trimmed), addressBarUrl.isValid {
@@ -201,8 +202,14 @@ extension URL {
 
     func toString(decodePunycode: Bool,
                   dropScheme: Bool,
-                  needsWWW: Bool? = nil,
                   dropTrailingSlash: Bool) -> String {
+        toString(decodePunycode: decodePunycode, dropScheme: dropScheme, needsWWW: nil, dropTrailingSlash: dropTrailingSlash)
+    }
+
+    private func toString(decodePunycode: Bool,
+                          dropScheme: Bool,
+                          needsWWW: Bool? = nil,
+                          dropTrailingSlash: Bool) -> String {
         guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
               var string = components.string
         else {
@@ -255,8 +262,7 @@ extension URL {
         return self.toString(decodePunycode: decodePunycode,
                              dropScheme: input.isEmpty || !(hasInputScheme && !hasInputHost),
                              needsWWW: !input.dropping(prefix: self.separatedScheme ?? "").isEmpty
-                                && hasInputWww
-                                && !hasInputHost,
+                                && hasInputWww,
                              dropTrailingSlash: !input.hasSuffix("/"))
     }
 
@@ -323,6 +329,7 @@ extension URL {
     }
 
     static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email-protection")!
+    static var duckDuckGoEmailLogin = URL(string: "https://duckduckgo.com/email")!
 
     static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 

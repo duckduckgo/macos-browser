@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import AppKit
 
 protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
@@ -26,6 +27,8 @@ protocol AppearancePreferencesPersistor {
     var isFavoriteVisible: Bool { get set }
     var isContinueSetUpVisible: Bool { get set }
     var isRecentActivityVisible: Bool { get set }
+    var showBookmarksBar: Bool { get set }
+    var bookmarksBarAppearance: BookmarksBarAppearance { get set }
 }
 
 struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
@@ -49,6 +52,21 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .homePageIsRecentActivityVisible, defaultValue: true)
     var isRecentActivityVisible: Bool
+
+    @UserDefaultsWrapper(key: .showBookmarksBar, defaultValue: false)
+    var showBookmarksBar: Bool
+
+    @UserDefaultsWrapper(key: .bookmarksBarAppearance, defaultValue: BookmarksBarAppearance.alwaysOn.rawValue)
+    private var bookmarksBarValue: String
+    var bookmarksBarAppearance: BookmarksBarAppearance {
+        get {
+            return BookmarksBarAppearance(rawValue: bookmarksBarValue) ?? .alwaysOn
+        }
+
+        set {
+            bookmarksBarValue = newValue.rawValue
+        }
+    }
 }
 
 enum DefaultZoomValue: CGFloat, CaseIterable {
@@ -113,6 +131,10 @@ enum ThemeName: String, Equatable, CaseIterable {
 
 final class AppearancePreferences: ObservableObject {
 
+    struct Notifications {
+        static let showBookmarksBarSettingChanged = NSNotification.Name("ShowBookmarksBarSettingChanged")
+    }
+
     static let shared = AppearancePreferences()
 
     @Published var currentThemeName: ThemeName {
@@ -170,6 +192,23 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    @Published var showBookmarksBar: Bool {
+        didSet {
+            persistor.showBookmarksBar = showBookmarksBar
+            NotificationCenter.default.post(name: Notifications.showBookmarksBarSettingChanged, object: nil)
+        }
+    }
+    @Published var bookmarksBarAppearance: BookmarksBarAppearance {
+        didSet {
+            persistor.bookmarksBarAppearance = bookmarksBarAppearance
+        }
+    }
+
+    var isContinueSetUpAvailable: Bool {
+        let privacyConfig = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
+        return privacyConfig.isEnabled(featureKey: .newTabContinueSetUp)
+    }
+
     func updateUserInterfaceStyle() {
         NSApp.appearance = currentThemeName.appearance
     }
@@ -183,6 +222,8 @@ final class AppearancePreferences: ObservableObject {
         isRecentActivityVisible = persistor.isRecentActivityVisible
         isContinueSetUpVisible = persistor.isContinueSetUpVisible
         defaultPageZoom =  .init(rawValue: persistor.defaultPageZoom) ?? .percent100
+        showBookmarksBar = persistor.showBookmarksBar
+        bookmarksBarAppearance = persistor.bookmarksBarAppearance
     }
 
     private var persistor: AppearancePreferencesPersistor

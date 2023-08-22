@@ -62,7 +62,7 @@ final class HistoryEntry {
         visits.insert(visit)
 
         numberOfTotalVisits += 1
-        lastVisit = Date.startOfMinuteNow
+        lastVisit = Date()
 
         return visit
     }

@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "687d881b82eb293bf30a2aed0ee62fa005a22b8d",
-        "version" : "68.1.0"
+        "revision" : "8d4c3d884762d954183a9496961b87d254b43539",
+        "version" : "75.0.2"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "0cfcedb9c8aefa52c7f3a36a2b3793a2c44de764",
-        "version" : "4.22.5"
+        "revision" : "8def15fe8a4c2fb76730f640507e9fd1d6c1f8a7",
+        "version" : "4.32.0"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "44cd844b6bb5d8ccfefbd6e025817d800c26ad76",
-        "version" : "7.2.0"
+        "revision" : "40bcd0d347b51d14e8114f191df2817d8dcb4284",
+        "version" : "8.1.2"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sparkle-project/Sparkle.git",
       "state" : {
-        "revision" : "9d85a02fe7916caa7531847452c4933d331503a5",
-        "version" : "2.3.1"
+        "revision" : "87e4fcbac39912f9cdb9a9acf205cad60e1ca3bc",
+        "version" : "2.4.2"
       }
     },
     {
@@ -129,7 +129,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
       "state" : {
         "revision" : "4684440d03304e7638a2c8086895367e90987463",
         "version" : "1.2.1"
@@ -140,8 +140,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/wireguard-apple",
       "state" : {
-        "revision" : "cf3c0f5132dbb8de08c46155a1bbd5e5bb6a47c1",
-        "version" : "1.1.0"
+        "revision" : "2d8172c11478ab11b0f5ad49bdb4f93f4b3d5e0d",
+        "version" : "1.1.1"
       }
     }
   ],

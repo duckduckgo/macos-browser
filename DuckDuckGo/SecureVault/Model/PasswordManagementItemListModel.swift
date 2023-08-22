@@ -99,10 +99,9 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
     func item(matches filter: String) -> Bool {
         switch self {
         case .account(let account):
-            return account.domain.lowercased().contains(filter) ||
-                account.username.lowercased().contains(filter) ||
-                account.title?.lowercased().contains(filter) ?? false ||
-                account.notes?.lowercased().contains(filter) ?? false
+            return account.domain?.lowercased().contains(filter) == true ||
+                account.username?.lowercased().contains(filter) == true ||
+                account.title?.lowercased().contains(filter) == true
         case .card(let card):
             return card.title.localizedCaseInsensitiveContains(filter)
         case .identity(let identity):
@@ -110,7 +109,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
         case .note(let note):
             return note.title.localizedCaseInsensitiveContains(filter) ||
                 note.text.localizedCaseInsensitiveContains(filter) ||
-                (note.associatedDomain?.localizedCaseInsensitiveContains(filter) ?? false)
+                (note.associatedDomain?.localizedCaseInsensitiveContains(filter) == true)
         }
     }
 
@@ -131,7 +130,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
     var displaySubtitle: String {
         switch self {
         case .account(let account):
-            return account.username
+            return account.username ?? ""
         case .card(let creditCard):
             return creditCard.displayName
         case .identity(let identity):
@@ -239,11 +238,8 @@ final class PasswordManagementItemListModel: ObservableObject {
         didSet {
             updateFilteredData()
             calculateEmptyState()
-            itemCount = items.count
         }
     }
-
-    @Published private(set) var itemCount: Int = 0
 
     @Published var sortDescriptor = SecureVaultSorting.default {
         didSet {
@@ -252,7 +248,11 @@ final class PasswordManagementItemListModel: ObservableObject {
             }
 
             updateFilteredData()
-            selectFirst()
+
+            // Select first item if no previous selection was provided
+            if selected == nil {
+                selectFirst()
+            }
         }
     }
 
@@ -307,8 +307,10 @@ final class PasswordManagementItemListModel: ObservableObject {
         for section in displayedItems {
             if let first = section.items.first(where: { $0 == item }) {
                 selected(item: first, notify: notify)
+                return
             }
         }
+        selectFirst()
     }
 
     func selectLoginWithDomainOrFirst(domain: String, notify: Bool = true) {

@@ -237,7 +237,7 @@ platform :mac do
   private_lane :validate_new_version do |options|
     current_version = macos_current_version
     user_version = format_user_version(options[:version])
-    new_version = user_version.nil? ? macos_bump_patch_version(current_version) : user_version
+    new_version = user_version.nil? ? macos_bump_minor_version(current_version) : user_version
     unless UI.confirm(
       "Current version is #{current_version}.\nNew version is #{new_version}.\nDo you want to continue?"
     )
@@ -352,15 +352,15 @@ platform :mac do
     current_version
   end
 
-  # Updates version in the config file by bumping the patch (third) number
+  # Updates version in the config file by bumping the minor (second) number
   #
   # @param [String] current version
   # @return [String] updated version
   #
-  def macos_bump_patch_version(current_version)
+  def macos_bump_minor_version(current_version)
     current_version_array = current_version.split('.')
-    new_patch_number = current_version_array[2].to_i + 1
-    "#{current_version_array[0]}.#{current_version_array[1]}.#{new_patch_number}"
+    new_minor_number = current_version_array[1].to_i + 1
+    "#{current_version_array[0]}.#{new_minor_number}.0"
   end
 
   # Formats the version provided by the user to be Major.Minor.Patch

@@ -20,6 +20,7 @@ import Cocoa
 import WebKit
 import Combine
 import BrowserServicesKit
+import SecureStorage
 import Autofill
 
 @MainActor
@@ -49,6 +50,8 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         let model = AutofillPreferencesModel()
         return model
     }()
+
+    lazy var passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
 
     public override func viewDidLoad() {
         initWebView()
@@ -223,7 +226,13 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         return true
     }
 
-    public func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData, hasGeneratedPassword generatedPassword: Bool, withTrigger trigger: AutofillUserScript.GetTriggerType?) {
+    public func secureVaultManagerShouldSaveData(_: SecureVaultManager) -> Bool {
+        return true
+    }
+
+    public func secureVaultManager(_: SecureVaultManager,
+                                   promptUserToStoreAutofillData data: AutofillData,
+                                   withTrigger trigger: AutofillUserScript.GetTriggerType?) {
         // No-op, the content overlay view controller should not be prompting the user to store data
     }
 
@@ -243,14 +252,11 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
 
     public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
-    }
 
-    public func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager, shouldSilentlySave: Bool) -> Bool {
-        return true
-    }
-
-    public func secureVaultManagerShouldSilentlySaveGeneratedPassword(_: SecureVaultManager) -> Bool {
-        return false
+        if type.formAutofillKind == .password &&
+            passwordManagerCoordinator.isEnabled {
+            passwordManagerCoordinator.reportPasswordAutofill()
+        }
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
@@ -259,7 +265,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         }
     }
 
-    public func secureVaultInitFailed(_ error: SecureVaultError) {
+    public func secureVaultInitFailed(_ error: SecureStorageError) {
         SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
     }
 

@@ -22,21 +22,23 @@ import CoreData
 import DDGSync
 import Bookmarks
 import Cocoa
+import Persistence
 
 // swiftlint:disable:next type_body_length
 final class LocalBookmarkStore: BookmarkStore {
 
-    init(bookmarkDatabase: BookmarkDatabase) {
-        self.context = bookmarkDatabase.db.makeContext(concurrencyType: .privateQueueConcurrencyType)
-        sharedInitialization()
+    convenience init(bookmarkDatabase: BookmarkDatabase) {
+        self.init(contextProvider: {
+            let context = bookmarkDatabase.db.makeContext(concurrencyType: .privateQueueConcurrencyType)
+            context.stalenessInterval = 0
+            return context
+        })
     }
 
-    init(context: NSManagedObjectContext) {
-        self.context = context
-        sharedInitialization()
-    }
+    // Directly used in tests
+    init(contextProvider: @escaping () -> NSManagedObjectContext) {
+        self.contextProvider = contextProvider
 
-    private func sharedInitialization() {
         removeInvalidBookmarkEntities()
         cacheReadOnlyTopLevelBookmarksFolders()
     }
@@ -47,24 +49,161 @@ final class LocalBookmarkStore: BookmarkStore {
         case badObjectId
         case asyncFetchFailed
         case missingParent
+        case missingEntity
+        case missingRoot
+        case missingFavoritesRoot
+        case saveLoopError(Error?)
     }
 
-    private let context: NSManagedObjectContext
+    private let contextProvider: () -> NSManagedObjectContext
 
     /// All entities within the bookmarks store must exist under this root level folder. Because this value is used so frequently, it is cached here.
-    private var rootLevelFolder: BookmarkEntity?
+    private var rootLevelFolderObjectID: NSManagedObjectID?
 
     /// All favorites must additionally be children of this special folder. Because this value is used so frequently, it is cached here.
-    private var favoritesFolder: BookmarkEntity?
+    private var favoritesFolderObjectID: NSManagedObjectID?
+
+    private func makeContext() -> NSManagedObjectContext {
+        return contextProvider()
+    }
+
+    private func bookmarksRoot(in context: NSManagedObjectContext) -> BookmarkEntity? {
+        guard let objectID = self.rootLevelFolderObjectID else {
+            return nil
+        }
+        return try? (context.existingObject(with: objectID) as? BookmarkEntity)
+    }
+
+    private func favoritesRoot(in context: NSManagedObjectContext) -> BookmarkEntity? {
+        guard let objectID = self.favoritesFolderObjectID else {
+            return nil
+        }
+        return try? (context.existingObject(with: objectID) as? BookmarkEntity)
+    }
+
+    /*
+     Utility function to help with saving changes to the database.
+
+     If there is a timing issue (e.g. another context making changes), we may encounter merge error on save, in such case:
+       - reset context
+       - reapply changes
+       - retry save
+
+     You can expect either `onError` or `onDidSave` to be called once.
+     Error thrown from within `changes` block triggers `onError` call and prevents saving.
+     */
+    func applyChangesAndSave(changes: @escaping (NSManagedObjectContext) throws -> Void,
+                             onError: @escaping (Error) -> Void,
+                             onDidSave: @escaping () -> Void) {
+        let context = makeContext()
+
+        let maxRetries = 4
+        var iteration = 0
+
+        context.perform {
+            var lastError: Error?
+            while iteration < maxRetries {
+                do {
+                    try changes(context)
+
+                    try context.save()
+                    onDidSave()
+                    return
+                } catch {
+                    let nsError = error as NSError
+                    if nsError.code == NSManagedObjectMergeError || nsError.code == NSManagedObjectConstraintMergeError {
+                        iteration += 1
+                        lastError = error
+                        context.reset()
+                    } else {
+                        onError(error)
+                        return
+                    }
+                }
+            }
+
+            onError(BookmarkStoreError.saveLoopError(lastError))
+        }
+    }
+
+    /*
+     Utility function to help with saving changes to the database.
+
+     If there is a timing issue (e.g. another context making changes), we may encounter merge error on save, in such case:
+       - reset context
+       - reapply changes
+       - retry save
+
+     Error thrown from within `changes` block prevent saving and is rethrown.
+     */
+    func applyChangesAndSave(changes: (NSManagedObjectContext) throws -> Void) throws {
+        let context = makeContext()
+
+        let maxRetries = 4
+        var iteration = 0
+
+        var errorToThrow: Error?
+        context.performAndWait {
+            var lastMergeError: NSError?
+            while iteration < maxRetries {
+                do {
+                    try changes(context)
+                    try context.save()
+                    return
+                } catch {
+
+                    let nsError = error as NSError
+                    if nsError.code == NSManagedObjectMergeError || nsError.code == NSManagedObjectConstraintMergeError {
+                        lastMergeError = nsError
+                        iteration += 1
+                        context.reset()
+                    } else {
+                        errorToThrow = error
+                        return
+                    }
+                }
+            }
+
+            errorToThrow = BookmarkStoreError.saveLoopError(lastMergeError)
+        }
+
+        if let errorToThrow {
+            throw errorToThrow
+        }
+    }
+
+    private func commonOnSaveErrorHandler(_ error: Error) {
+        guard !NSApp.isRunningUnitTests else { return }
+
+        assertionFailure("LocalBookmarkStore: Saving of context failed")
+
+        if let localError = error as? BookmarkStoreError {
+            if case BookmarkStoreError.saveLoopError(let innerError) = localError, let innerError {
+                let processedErrors = CoreDataErrorsParser.parse(error: innerError as NSError)
+
+                Pixel.fire(.debug(event: .bookmarksSaveFailed, error: error),
+                               withAdditionalParameters: processedErrors.errorPixelParameters)
+            } else {
+                Pixel.fire(.debug(event: .bookmarksSaveFailed, error: localError))
+            }
+        } else {
+            let error = error as NSError
+            let processedErrors = CoreDataErrorsParser.parse(error: error)
+
+            Pixel.fire(.debug(event: .bookmarksSaveFailed, error: error),
+                           withAdditionalParameters: processedErrors.errorPixelParameters)
+        }
+    }
 
     private func cacheReadOnlyTopLevelBookmarksFolders() {
+        let context = makeContext()
         context.performAndWait {
             guard let folder = BookmarkUtils.fetchRootFolder(context) else {
                 fatalError("Top level folder missing")
             }
 
-            self.rootLevelFolder = folder
-            self.favoritesFolder = BookmarkUtils.fetchFavoritesFolder(context)
+            self.rootLevelFolderObjectID = folder.objectID
+            self.favoritesFolderObjectID = BookmarkUtils.fetchFavoritesFolder(context)?.objectID
         }
     }
 
@@ -77,27 +216,27 @@ final class LocalBookmarkStore: BookmarkStore {
             }
         }
 
+        let context = makeContext()
         context.perform {
             do {
-                self.context.refreshAllObjects()
                 let results: [BookmarkEntity]
 
                 switch type {
                 case .bookmarks:
                     let fetchRequest = Bookmark.bookmarksFetchRequest()
                     fetchRequest.returnsObjectsAsFaults = false
-                    results = try self.context.fetch(fetchRequest)
+                    results = try context.fetch(fetchRequest)
                 case .topLevelEntities:
                     // When fetching the top level entities, the root folder will be returned. To make things simpler for the caller, this function
                     // will return the children of the root folder, as the root folder is an implementation detail of the bookmarks store.
-                    let rootFolder = BookmarkUtils.fetchRootFolder(self.context)
-                    let orphanedEntities = BookmarkUtils.fetchOrphanedEntities(self.context)
+                    let rootFolder = self.bookmarksRoot(in: context)
+                    let orphanedEntities = BookmarkUtils.fetchOrphanedEntities(context)
                     if !orphanedEntities.isEmpty {
                         self.reportOrphanedBookmarksIfNeeded()
                     }
                     results = (rootFolder?.childrenArray ?? []) + orphanedEntities
                 case .favorites:
-                    results = self.favoritesFolder?.favoritesArray ?? []
+                    results = self.favoritesRoot(in: context)?.favoritesArray ?? []
                 }
 
                 let entities: [BaseBookmarkEntity] = results.compactMap { entity in
@@ -122,65 +261,57 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?, completion: @escaping (Bool, Error?) -> Void) {
-        context.perform { [weak self] in
+        applyChangesAndSave(changes: { [weak self] context in
             guard let self = self else {
-                DispatchQueue.main.async { completion(false, BookmarkStoreError.storeDeallocated) }
-                return
+                throw BookmarkStoreError.storeDeallocated
             }
 
             let parentEntity: BookmarkEntity
             if let parent = parent,
-               let parentFetchRequestResult = try? self.context.fetch(BaseBookmarkEntity.singleEntity(with: parent.id)).first {
+               let parentFetchRequestResult = try? context.fetch(BaseBookmarkEntity.singleEntity(with: parent.id)).first {
                 parentEntity = parentFetchRequestResult
-            } else if let root = BookmarkUtils.fetchRootFolder(self.context) {
+            } else if let root = bookmarksRoot(in: context) {
                 parentEntity = root
             } else {
                 Pixel.fire(.debug(event: .missingParent))
-                DispatchQueue.main.async { completion(false, BookmarkStoreError.missingParent) }
-                return
+                throw BookmarkStoreError.missingParent
             }
 
             let bookmarkMO: BookmarkEntity
             if bookmark.isFolder {
                 bookmarkMO = BookmarkEntity.makeFolder(title: bookmark.title,
                                                        parent: parentEntity,
-                                                       context: self.context)
+                                                       context: context)
             } else {
                 bookmarkMO = BookmarkEntity.makeBookmark(title: bookmark.title,
                                                          url: bookmark.url,
                                                          parent: parentEntity,
-                                                         context: self.context)
+                                                         context: context)
 
                 if bookmark.isFavorite,
-                   let favoritesFolder = self.favoritesFolder {
+                   let favoritesFolder = self.favoritesRoot(in: context) {
                     bookmarkMO.addToFavorites(favoritesRoot: favoritesFolder)
                 }
             }
 
             bookmarkMO.uuid = bookmark.id
-
-            do {
-                try self.context.save(onErrorFire: .bookmarksSaveFailed)
-            } catch {
-                self.context.rollback()
-                assertionFailure("LocalBookmarkStore: Saving of context failed")
-                DispatchQueue.main.async { completion(false, error) }
-                return
-            }
-
+        }, onError: { [weak self] error in
+            self?.commonOnSaveErrorHandler(error)
+            DispatchQueue.main.async { completion(false, error) }
+        }, onDidSave: {
             DispatchQueue.main.async { completion(true, nil) }
-        }
+        })
     }
 
     func remove(objectsWithUUIDs identifiers: [String], completion: @escaping (Bool, Error?) -> Void) {
-        context.perform { [weak self] in
-            guard let self = self else {
-                DispatchQueue.main.async { completion(false, BookmarkStoreError.storeDeallocated) }
-                return
+
+        applyChangesAndSave(changes: { [weak self] context in
+            guard self != nil else {
+                throw BookmarkStoreError.storeDeallocated
             }
 
             let fetchRequest = BaseBookmarkEntity.entities(with: identifiers)
-            let fetchResults = (try? self.context.fetch(fetchRequest)) ?? []
+            let fetchResults = (try? context.fetch(fetchRequest)) ?? []
 
             if fetchResults.count != identifiers.count {
                 assertionFailure("\(#file): Fetched bookmark entities didn't match the number of provided UUIDs")
@@ -189,195 +320,161 @@ final class LocalBookmarkStore: BookmarkStore {
             for object in fetchResults {
                 object.markPendingDeletion()
             }
-
-            do {
-                try self.context.save(onErrorFire: .bookmarksSaveFailed)
-            } catch {
-                self.context.rollback()
-                assertionFailure("LocalBookmarkStore: Saving of context failed")
-                DispatchQueue.main.async { completion(false, error) }
-            }
-
+        }, onError: { [weak self] error in
+            self?.commonOnSaveErrorHandler(error)
+            DispatchQueue.main.async { completion(false, error) }
+        }, onDidSave: {
             DispatchQueue.main.async { completion(true, nil) }
-        }
+        })
     }
 
     func update(bookmark: Bookmark) {
-        context.performAndWait { [weak self] in
-            guard let self = self else {
-                return
-            }
 
-            let bookmarkFetchRequest = BaseBookmarkEntity.singleEntity(with: bookmark.id)
-            let bookmarkFetchRequestResults = try? self.context.fetch(bookmarkFetchRequest)
+        do {
+            try applyChangesAndSave(changes: { [weak self] context in
+                guard let self = self else {
+                    throw BookmarkStoreError.storeDeallocated
+                }
 
-            guard let bookmarkMO = bookmarkFetchRequestResults?.first else {
-                assertionFailure("LocalBookmarkStore: Failed to get BookmarkEntity from the context")
-                return
-            }
+                let bookmarkFetchRequest = BaseBookmarkEntity.singleEntity(with: bookmark.id)
+                let bookmarkFetchRequestResults = try? context.fetch(bookmarkFetchRequest)
 
-            bookmarkMO.update(with: bookmark, favoritesFolder: self.favoritesFolder)
+                guard let bookmarkMO = bookmarkFetchRequestResults?.first else {
+                    assertionFailure("LocalBookmarkStore: Failed to get BookmarkEntity from the context")
+                    throw BookmarkStoreError.missingEntity
+                }
 
-            do {
-                try self.context.save(onErrorFire: .bookmarksSaveFailed)
-            } catch {
-                self.context.rollback()
-                assertionFailure("LocalBookmarkStore: Saving of context failed")
-            }
+                bookmarkMO.update(with: bookmark, favoritesFolder: self.favoritesRoot(in: context))
+            })
+
+        } catch {
+            let error = error as NSError
+            commonOnSaveErrorHandler(error)
         }
     }
 
     func update(folder: BookmarkFolder) {
-        context.performAndWait { [weak self] in
-            guard let self = self else {
-                return
-            }
 
-            let folderFetchRequest = BaseBookmarkEntity.singleEntity(with: folder.id)
-            let folderFetchRequestResults = try? self.context.fetch(folderFetchRequest)
+        do {
+            _ = try applyChangesAndSave(changes: { context in
+                let folderFetchRequest = BaseBookmarkEntity.singleEntity(with: folder.id)
+                let folderFetchRequestResults = try? context.fetch(folderFetchRequest)
 
-            guard let bookmarkFolderMO = folderFetchRequestResults?.first else {
-                assertionFailure("LocalBookmarkStore: Failed to get BookmarkEntity from the context")
-                return
-            }
+                guard let bookmarkFolderMO = folderFetchRequestResults?.first else {
+                    assertionFailure("LocalBookmarkStore: Failed to get BookmarkEntity from the context")
+                    throw BookmarkStoreError.missingEntity
+                }
 
-            bookmarkFolderMO.update(with: folder)
-
-            do {
-                try self.context.save(onErrorFire: .bookmarksSaveFailed)
-            } catch {
-                self.context.rollback()
-                assertionFailure("LocalBookmarkStore: Saving of context failed")
-            }
+                bookmarkFolderMO.update(with: folder)
+            })
+        } catch {
+            let error = error as NSError
+            commonOnSaveErrorHandler(error)
         }
     }
 
     func add(objectsWithUUIDs uuids: [String], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
-        context.perform { [weak self] in
+
+        applyChangesAndSave(changes: { [weak self] context in
             guard let self = self else {
-                completion(nil)
-                return
+                throw BookmarkStoreError.storeDeallocated
             }
 
             let bookmarksFetchRequest = BaseBookmarkEntity.entities(with: uuids)
             bookmarksFetchRequest.returnsObjectsAsFaults = false
-            let bookmarksResults = try? self.context.fetch(bookmarksFetchRequest)
+            let bookmarksResults = try? context.fetch(bookmarksFetchRequest)
 
             guard let bookmarkManagedObjects = bookmarksResults else {
                 assertionFailure("\(#file): Failed to get BookmarkEntity from the context")
-                completion(nil)
-                return
+                throw BookmarkStoreError.missingEntity
             }
 
             if let parentUUID = parent?.id {
                 let parentFetchRequest = BaseBookmarkEntity.singleEntity(with: parentUUID)
-                let parentFetchRequestResults = try? self.context.fetch(parentFetchRequest)
+                let parentFetchRequestResults = try? context.fetch(parentFetchRequest)
 
                 guard let parentManagedObject = parentFetchRequestResults?.first, parentManagedObject.isFolder else {
                     assertionFailure("\(#file): Failed to get BookmarkEntity from the context")
-                    completion(nil)
-                    return
+                    throw BookmarkStoreError.missingEntity
                 }
 
                 parentManagedObject.addToChildren(NSOrderedSet(array: bookmarkManagedObjects))
             } else {
+                let root = self.bookmarksRoot(in: context)
                 for bookmarkManagedObject in bookmarkManagedObjects {
-                    bookmarkManagedObject.parent = self.rootLevelFolder
+                    bookmarkManagedObject.parent = root
                 }
             }
-
-            do {
-                try self.context.save(onErrorFire: .bookmarksSaveFailed)
-            } catch {
-                self.context.rollback()
-                assertionFailure("\(#file): Saving of context failed: \(error)")
-                DispatchQueue.main.async { completion(error) }
-                return
-            }
-
+        }, onError: { [weak self] error in
+            self?.commonOnSaveErrorHandler(error)
+            DispatchQueue.main.async { completion(error) }
+        }, onDidSave: {
             DispatchQueue.main.async { completion(nil) }
-        }
+        })
     }
 
     func update(objectsWithUUIDs uuids: [String], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void) {
-        context.perform { [weak self] in
+
+        applyChangesAndSave(changes: { [weak self] context in
             guard let self = self else {
-                completion(nil)
-                return
+                throw BookmarkStoreError.storeDeallocated
             }
 
             let bookmarksFetchRequest = BaseBookmarkEntity.entities(with: uuids)
             bookmarksFetchRequest.returnsObjectsAsFaults = false
-            let bookmarksResults = try? self.context.fetch(bookmarksFetchRequest)
+            let bookmarksResults = try? context.fetch(bookmarksFetchRequest)
 
             guard let bookmarkManagedObjects = bookmarksResults else {
                 assertionFailure("\(#file): Failed to get BookmarkEntity from the context")
-                completion(nil)
-                return
+                throw BookmarkStoreError.missingEntity
             }
 
+            let favoritesRoot = self.favoritesRoot(in: context)
             bookmarkManagedObjects.forEach { managedObject in
                 if let entity = BaseBookmarkEntity.from(managedObject: managedObject, parentFolderUUID: nil) {
                     update(entity)
-                    managedObject.update(with: entity, favoritesFolder: self.favoritesFolder)
+                    managedObject.update(with: entity, favoritesFolder: favoritesRoot)
                 }
             }
-
-            do {
-                try self.context.save(onErrorFire: .bookmarksSaveFailed)
-            } catch {
-                self.context.rollback()
-                assertionFailure("\(#file): Saving of context failed")
-                DispatchQueue.main.async { completion(error) }
-                return
-            }
-
+        }, onError: { [weak self] error in
+            self?.commonOnSaveErrorHandler(error)
+            DispatchQueue.main.async { completion(error) }
+        }, onDidSave: {
             DispatchQueue.main.async { completion(nil) }
-        }
+        })
     }
 
     // MARK: - Folders
 
     func save(folder: BookmarkFolder, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void) {
-        context.perform { [weak self] in
+
+        applyChangesAndSave(changes: { [weak self] context in
             guard let self = self else {
-                DispatchQueue.main.async { completion(false, BookmarkStoreError.storeDeallocated) }
-                return
+                throw BookmarkStoreError.storeDeallocated
             }
 
             let parentEntity: BookmarkEntity
             if let parent = parent,
-               let parentFetchRequestResult = try? self.context.fetch(BaseBookmarkEntity.singleEntity(with: parent.id)).first {
+               let parentFetchRequestResult = try? context.fetch(BaseBookmarkEntity.singleEntity(with: parent.id)).first {
                 parentEntity = parentFetchRequestResult
-            } else if let root = BookmarkUtils.fetchRootFolder(self.context) {
+            } else if let root = self.bookmarksRoot(in: context) {
                 parentEntity = root
             } else {
                 Pixel.fire(.debug(event: .missingParent))
-                DispatchQueue.main.async { completion(false, BookmarkStoreError.missingParent) }
-                return
+                throw BookmarkStoreError.missingParent
             }
 
             let bookmarkMO = BookmarkEntity.makeFolder(title: folder.title,
                                                        parent: parentEntity,
-                                                       context: self.context)
+                                                       context: context)
 
             bookmarkMO.uuid = folder.id
-
-            do {
-                try self.context.save(onErrorFire: .bookmarksSaveFailed)
-            } catch {
-                self.context.rollback()
-                // Only throw this assertion when running in debug and when unit tests are not running.
-                if !NSApp.isRunningUnitTests {
-                    assertionFailure("LocalBookmarkStore: Saving of context failed")
-                }
-
-                DispatchQueue.main.async { completion(false, error) }
-                return
-            }
-
+        }, onError: { [weak self] error in
+            self?.commonOnSaveErrorHandler(error)
+            DispatchQueue.main.async { completion(false, error) }
+        }, onDidSave: {
             DispatchQueue.main.async { completion(true, nil) }
-        }
+        })
     }
 
     func canMoveObjectWithUUID(objectUUID uuid: String, to parent: BookmarkFolder) -> Bool {
@@ -389,17 +486,18 @@ final class LocalBookmarkStore: BookmarkStore {
         // Assume true by default – the database validations will serve as a final check before any invalid state makes it into the database.
         var canMoveObject = true
 
+        let context = makeContext()
         context.performAndWait { [weak self] in
-            guard let self = self else {
+            guard self != nil else {
                 assertionFailure("Couldn't get strong self")
                 return
             }
 
             let folderToMoveFetchRequest = BaseBookmarkEntity.singleEntity(with: uuid)
-            let folderToMoveFetchRequestResults = try? self.context.fetch(folderToMoveFetchRequest)
+            let folderToMoveFetchRequestResults = try? context.fetch(folderToMoveFetchRequest)
 
             let parentFolderFetchRequest = BaseBookmarkEntity.singleEntity(with: parent.id)
-            let parentFolderFetchRequestResults = try? self.context.fetch(parentFolderFetchRequest)
+            let parentFolderFetchRequestResults = try? context.fetch(parentFolderFetchRequest)
 
             guard let folderToMove = folderToMoveFetchRequestResults?.first,
                   let parentFolder = parentFolderFetchRequestResults?.first,
@@ -425,24 +523,21 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     func move(objectUUIDs: [String], toIndex index: Int?, withinParentFolder type: ParentFolderType, completion: @escaping (Error?) -> Void) {
-        context.perform { [weak self] in
+
+        applyChangesAndSave(changes: { [weak self] context in
             guard let self = self else {
-                assertionFailure("Couldn't get strong self")
-                completion(nil)
-                return
+                throw BookmarkStoreError.storeDeallocated
             }
 
-            guard let rootFolder = self.rootLevelFolder else {
-                assertionFailure("\(#file): Failed to get root level folder")
-                completion(nil)
-                return
+            guard let rootFolder = self.bookmarksRoot(in: context) else {
+                throw BookmarkStoreError.missingRoot
             }
 
             // Guarantee that bookmarks are fetched in the same order as the UUIDs. In the future, this should fetch all objects at once with a
             // batch fetch request and have them sorted in the correct order.
             let bookmarkManagedObjects: [BookmarkEntity] = objectUUIDs.compactMap { uuid in
                 let entityFetchRequest = BaseBookmarkEntity.singleEntity(with: uuid)
-                return (try? self.context.fetch(entityFetchRequest))?.first
+                return (try? context.fetch(entityFetchRequest))?.first
             }
 
             let newParentFolder: BookmarkEntity
@@ -452,16 +547,10 @@ final class LocalBookmarkStore: BookmarkStore {
             case .parent(let newParentUUID):
                 let bookmarksFetchRequest = BaseBookmarkEntity.singleEntity(with: newParentUUID)
 
-                do {
-                    if let fetchedParent = try self.context.fetch(bookmarksFetchRequest).first, fetchedParent.isFolder {
-                        newParentFolder = fetchedParent
-                    } else {
-                        completion(nil)
-                        return
-                    }
-                } catch {
-                    completion(error)
-                    return
+                if let fetchedParent = try context.fetch(bookmarksFetchRequest).first, fetchedParent.isFolder {
+                    newParentFolder = fetchedParent
+                } else {
+                    throw BookmarkStoreError.missingEntity
                 }
             }
 
@@ -473,18 +562,12 @@ final class LocalBookmarkStore: BookmarkStore {
                     newParentFolder.addToChildren(bookmarkManagedObject)
                 }
             }
-
-            do {
-                try self.context.save(onErrorFire: .bookmarksSaveFailed)
-            } catch {
-                self.context.rollback()
-                assertionFailure("\(#file): Saving of context failed")
-                DispatchQueue.main.async { completion(error) }
-                return
-            }
-
+        }, onError: { [weak self] error in
+            self?.commonOnSaveErrorHandler(error)
+            DispatchQueue.main.async { completion(error) }
+        }, onDidSave: {
             DispatchQueue.main.async { completion(nil) }
-        }
+        })
     }
 
     private func move(entities bookmarkManagedObjects: [BookmarkEntity], to index: Int, within newParentFolder: BookmarkEntity) {
@@ -516,24 +599,21 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     func moveFavorites(with objectUUIDs: [String], toIndex index: Int?, completion: @escaping (Error?) -> Void) {
-        context.perform { [weak self] in
+
+        applyChangesAndSave(changes: { [weak self] context in
             guard let self = self else {
-                assertionFailure("Couldn't get strong self")
-                completion(nil)
-                return
+                throw BookmarkStoreError.storeDeallocated
             }
 
-            guard let favoritesFolder = self.favoritesFolder else {
-                assertionFailure("\(#file): Failed to get favorites folder")
-                completion(nil)
-                return
+            guard let favoritesFolder = self.favoritesRoot(in: context) else {
+                throw BookmarkStoreError.missingFavoritesRoot
             }
 
             // Guarantee that bookmarks are fetched in the same order as the UUIDs. In the future, this should fetch all objects at once with a
             // batch fetch request and have them sorted in the correct order.
             let bookmarkManagedObjects: [BookmarkEntity] = objectUUIDs.compactMap { uuid in
                 let entityFetchRequest = BaseBookmarkEntity.favorite(with: uuid)
-                return (try? self.context.fetch(entityFetchRequest))?.first
+                return (try? context.fetch(entityFetchRequest))?.first
             }
 
             if let index = index, index < (favoritesFolder.favorites?.count ?? 0) {
@@ -563,18 +643,13 @@ final class LocalBookmarkStore: BookmarkStore {
                     bookmarkManagedObject.addToFavorites(favoritesRoot: favoritesFolder)
                 }
             }
-
-            do {
-                try self.context.save(onErrorFire: .bookmarksSaveFailed)
-            } catch {
-                self.context.rollback()
-                assertionFailure("\(#file): Saving of context failed")
-                DispatchQueue.main.async { completion(error) }
-                return
-            }
-
+        }, onError: { [weak self] error in
+            self?.commonOnSaveErrorHandler(error)
+            DispatchQueue.main.async { completion(error) }
+        }, onDidSave: {
             DispatchQueue.main.async { completion(nil) }
-        }
+        })
+
     }
 
     // MARK: - Import
@@ -591,53 +666,48 @@ final class LocalBookmarkStore: BookmarkStore {
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult {
         var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
 
-        context.performAndWait {
-            do {
-                let bookmarkCountBeforeImport = try context.count(for: Bookmark.bookmarksFetchRequest())
+        do {
+            let context = makeContext()
+            var bookmarkCountBeforeImport = 0
+            context.performAndWait {
+                bookmarkCountBeforeImport = (try? context.count(for: Bookmark.bookmarksFetchRequest())) ?? 0
+            }
+
+            try applyChangesAndSave { context in
                 let allFolders = try context.fetch(BookmarkFolder.bookmarkFoldersFetchRequest())
+                total += createEntitiesFromBookmarks(allFolders: allFolders,
+                                                     bookmarks: bookmarks,
+                                                     importSourceName: source.importSourceName,
+                                                     in: context)
+            }
 
-                total += createEntitiesFromBookmarks(allFolders: allFolders, bookmarks: bookmarks, importSourceName: source.importSourceName)
-
-                try self.context.save(onErrorFire: .bookmarksSaveFailedOnImport)
-                let bookmarkCountAfterImport = try context.count(for: Bookmark.bookmarksFetchRequest())
-
+            context.performAndWait {
+                let bookmarkCountAfterImport = (try? context.count(for: Bookmark.bookmarksFetchRequest())) ?? 0
                 total.successful = bookmarkCountAfterImport - bookmarkCountBeforeImport
-            } catch {
-                self.context.rollback()
-                os_log("Failed to import bookmarks, with error: %s", log: .dataImportExport, type: .error, error.localizedDescription)
+            }
 
-                // Only throw this assertion when running in debug and when unit tests are not running.
-                if !NSApp.isRunningUnitTests {
-                    assertionFailure("LocalBookmarkStore: Saving of context failed, error: \(error.localizedDescription)")
-                }
+        } catch {
+            os_log("Failed to import bookmarks, with error: %s", log: .dataImportExport, type: .error, error.localizedDescription)
+
+            let error = error as NSError
+            let processedErrors = CoreDataErrorsParser.parse(error: error)
+
+            if !NSApp.isRunningUnitTests {
+                Pixel.fire(.debug(event: .bookmarksSaveFailedOnImport, error: error),
+                           withAdditionalParameters: processedErrors.errorPixelParameters)
+                assertionFailure("LocalBookmarkStore: Saving of context failed, error: \(error.localizedDescription)")
             }
         }
 
         return total
     }
 
-    private func createEntitiesFromDDGWebKitBookmarks(allFolders: [BookmarkEntity], bookmarks: ImportedBookmarks) -> BookmarkImportResult {
-
-        var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
-
-        if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children,
-           let rootFolder = rootLevelFolder {
-            let result = recursivelyCreateEntities(from: otherBookmarks,
-                                                   parent: rootFolder,
-                                                   in: self.context)
-
-            total += result
-        }
-
-        return total
-
-    }
-
     private func createEntitiesFromBookmarks(allFolders: [BookmarkEntity],
                                              bookmarks: ImportedBookmarks,
-                                             importSourceName: String) -> BookmarkImportResult {
+                                             importSourceName: String,
+                                             in context: NSManagedObjectContext) -> BookmarkImportResult {
 
-        guard let root = rootLevelFolder else {
+        guard let root = bookmarksRoot(in: context) else {
             return .init(successful: 0,
                          duplicates: 0,
                          failed: bookmarks.numberOfBookmarks)
@@ -658,7 +728,7 @@ final class LocalBookmarkStore: BookmarkStore {
             let result = recursivelyCreateEntities(from: bookmarksBar,
                                                    parent: parent,
                                                    markBookmarksAsFavorite: makeFavorties,
-                                                   in: self.context)
+                                                   in: context)
 
             total += result
         }
@@ -667,7 +737,7 @@ final class LocalBookmarkStore: BookmarkStore {
             let result = recursivelyCreateEntities(from: otherBookmarks,
                                                    parent: parent,
                                                    markBookmarksAsFavorite: false,
-                                                   in: self.context)
+                                                   in: context)
 
             total += result
         }
@@ -701,7 +771,7 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             // Bookmarks from the bookmarks bar are imported as favorites
-            if let favoritesRoot = favoritesFolder,
+            if let favoritesRoot = favoritesRoot(in: context),
                bookmarkOrFolder.isDDGFavorite || (!bookmarkOrFolder.isFolder && markBookmarksAsFavorite == true) {
                 bookmarkManagedObject.addToFavorites(favoritesRoot: favoritesRoot)
             }
@@ -735,32 +805,31 @@ final class LocalBookmarkStore: BookmarkStore {
     /// There is a rare issue where bookmark managed objects can end up in the database with an invalid state, that is that they are missing their title value despite being non-optional.
     /// They appear to be disjoint from a user's actual bookmarks data, so this function removes them.
     private func removeInvalidBookmarkEntities() {
-        context.performAndWait {
+
+        applyChangesAndSave { context in
             let entitiesFetchRequest = BookmarkEntity.fetchRequest()
 
-            do {
-                let entities = try self.context.fetch(entitiesFetchRequest)
+            let entities = try context.fetch(entitiesFetchRequest)
+            var deletedEntityCount = 0
 
-                var deletedEntityCount = 0
-
-                for entity in entities where entity.isInvalid {
-                    self.context.delete(entity)
-                    deletedEntityCount += 1
-                }
-
-                if deletedEntityCount > 0 {
-                    Pixel.fire(.debug(event: .removedInvalidBookmarkManagedObjects))
-                }
-
-                try self.context.save(onErrorFire: .bookmarksSaveFailed)
-            } catch {
-                self.context.rollback()
-                os_log("Failed to remove invalid bookmark entities", type: .error)
+            for entity in entities where entity.isInvalid {
+                context.delete(entity)
+                deletedEntityCount += 1
             }
-        }
+
+            if deletedEntityCount > 0 {
+                Pixel.fire(.debug(event: .removedInvalidBookmarkManagedObjects))
+            }
+        } onError: { [weak self] error in
+            self?.commonOnSaveErrorHandler(error)
+
+            os_log("Failed to remove invalid bookmark entities", type: .error)
+        } onDidSave: {}
+
     }
 
     func resetBookmarks() {
+        let context = makeContext()
         context.performAndWait {
             let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: BookmarkEntity.className())
             let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
@@ -772,7 +841,7 @@ final class LocalBookmarkStore: BookmarkStore {
             }
         }
 
-        sharedInitialization()
+        cacheReadOnlyTopLevelBookmarksFolders()
     }
 
     // MARK: - Concurrency
@@ -846,6 +915,31 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
+}
+
+extension LocalBookmarkStore.BookmarkStoreError: CustomNSError {
+
+    var errorCode: Int {
+        switch self {
+        case .storeDeallocated: return 1
+        case .noObjectId: return 2
+        case .badObjectId: return 3
+        case .asyncFetchFailed: return 4
+        case .missingParent: return 5
+        case .missingEntity: return 6
+        case .missingRoot: return 7
+        case .missingFavoritesRoot: return 8
+        case .saveLoopError: return 9
+        }
+    }
+
+    var errorUserInfo: [String: Any] {
+        guard case .saveLoopError(let error) = self, let error else {
+            return [:]
+        }
+
+        return [NSUnderlyingErrorKey: error as NSError]
+    }
 }
 
 fileprivate extension BookmarkEntity {

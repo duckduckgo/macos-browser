@@ -94,6 +94,9 @@ extension Pixel {
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
 
+        case bitwardenPasswordAutofilled
+        case bitwardenPasswordSaved
+
         case autoconsentOptOutFailed
         case autoconsentSelfTestFailed
 
@@ -101,6 +104,7 @@ extension Pixel {
 
         case adClickAttributionDetected
         case adClickAttributionActive
+        case adClickAttributionPageLoads
 
         case emailEnabled
         case emailDisabled
@@ -126,6 +130,32 @@ extension Pixel {
         case favoriteSectionHidden
         case recentActivitySectionHidden
         case continueSetUpSectionHidden
+
+        // Bookmarks bar onboarding
+        case bookmarksBarOnboardingEnrollment(cohort: String)
+        case bookmarksBarOnboardingSearched4to8days(cohort: String)
+        case bookmarksBarOnboardingFirstInteraction(cohort: String)
+        case bookmarksBarOnboardingInteraction2to8days(cohort: String)
+
+        // Pinned tabs
+        case userHasPinnedTab
+
+        // Fire Button
+        case fireButtonFirstBurn
+        case fireButton(option: FireButtonOption)
+
+        case incrementalRolloutTest
+
+        // Duck Player
+        case duckPlayerDailyUniqueView
+        case duckPlayerViewFromYoutubeViaMainOverlay
+        case duckPlayerViewFromYoutubeViaHoverButton
+        case duckPlayerViewFromYoutubeAutomatic
+        case duckPlayerViewFromSERP
+        case duckPlayerViewFromOther
+        case duckPlayerSettingAlways
+        case duckPlayerSettingNever
+        case duckPlayerSettingBackToDefault
 
         enum Debug {
 
@@ -232,16 +262,15 @@ extension Pixel {
             case networkProtectionNoAuthTokenFoundError
             case networkProtectionUnhandledError(function: String, line: Int, error: Error)
 
-            case faviconDecryptionFailed
-            case downloadListItemDecryptionFailed
-            case historyEntryDecryptionFailed
-            case permissionDecryptionFailed
+            case faviconDecryptionFailedUnique
+            case downloadListItemDecryptionFailedUnique
+            case historyEntryDecryptionFailedUnique
+            case permissionDecryptionFailedUnique
 
             // Errors from Bookmarks Module
             case missingParent
             case bookmarksSaveFailed
             case bookmarksSaveFailedOnImport
-            case bookmarksCleanupFailed
             case orphanedBookmarksPresent
 
             case bookmarksCouldNotLoadDatabase
@@ -256,6 +285,14 @@ extension Pixel {
             case syncMetadataCouldNotLoadDatabase
             case syncBookmarksProviderInitializationFailed
             case syncBookmarksFailed
+            case syncCredentialsProviderInitializationFailed
+            case syncCredentialsFailed
+
+            case bookmarksCleanupFailed
+            case bookmarksCleanupAttemptedWhileSyncWasEnabled
+
+            case credentialsDatabaseCleanupFailed
+            case credentialsCleanupAttemptedWhileSyncWasEnabled
 
             case invalidPayload(Configuration)
 
@@ -294,6 +331,12 @@ extension Pixel.Event {
         case .autofillItemSaved(kind: let kind):
             return "m_mac_save_\(kind)"
 
+        case .bitwardenPasswordAutofilled:
+            return "m_mac_bitwarden_autofill_password"
+
+        case .bitwardenPasswordSaved:
+            return "m_mac_bitwarden_save_password"
+
         case .debug(event: let event, error: _):
             return "m_mac_debug_\(event.name)"
 
@@ -311,6 +354,9 @@ extension Pixel.Event {
 
         case .adClickAttributionActive:
             return "m_mac_ad_click_active"
+
+        case .adClickAttributionPageLoads:
+            return "m_mac_ad_click_page_loads"
 
         // Deliberately omit the `m_mac_` prefix in order to format these pixels the same way as other platforms
         case .emailEnabled: return "email_enabled_macos_desktop"
@@ -346,7 +392,51 @@ extension Pixel.Event {
             return "m_mac.recent-activity-section-hidden"
         case .continueSetUpSectionHidden:
             return "m_mac.continue-setup-section-hidden"
+
+        // Bookmarks bar experiement
+        case .bookmarksBarOnboardingEnrollment:
+            return "m_mac_bookmarksbarexperiment_enrollment"
+        case .bookmarksBarOnboardingSearched4to8days:
+            return "m_mac_bookmarksbarexperiment_searched4to8days"
+        case .bookmarksBarOnboardingFirstInteraction:
+            return "m_mac_bookmarksbarexperiment_firstinteraction"
+        case .bookmarksBarOnboardingInteraction2to8days:
+            return "m_mac_bookmarksbarexperiment_interaction2to8days"
+
+        // Pinned tabs
+        case .userHasPinnedTab:
+            return "m_mac_user_has_pinned_tab"
+
+        // Fire Button
+        case .fireButtonFirstBurn:
+            return "m_mac_fire_button_first_burn"
+        case .fireButton(option: let option):
+            return "m_mac_fire_button_\(option)"
+
+        case .incrementalRolloutTest:
+            return "m_mac_netp_ev_incremental_rollout_test"
+
+        case .duckPlayerDailyUniqueView:
+            return "m_mac_duck-player_daily-unique-view"
+        case .duckPlayerViewFromYoutubeViaMainOverlay:
+            return "m_mac_duck-player_view-from_youtube_main-overlay"
+        case .duckPlayerViewFromYoutubeViaHoverButton:
+            return "m_mac_duck-player_view-from_youtube_hover-button"
+        case .duckPlayerViewFromYoutubeAutomatic:
+            return "m_mac_duck-player_view-from_youtube_automatic"
+        case .duckPlayerViewFromSERP:
+            return "m_mac_duck-player_view-from_serp"
+        case .duckPlayerViewFromOther:
+            return "m_mac_duck-player_view-from_other"
+        case .duckPlayerSettingAlways:
+            return "m_mac_duck-player_setting_always"
+        case .duckPlayerSettingNever:
+            return "m_mac_duck-player_setting_never"
+        case .duckPlayerSettingBackToDefault:
+            return "m_mac_duck-player_setting_back-to-default"
+
         }
+
     }
 }
 
@@ -550,19 +640,18 @@ extension Pixel.Event.Debug {
         case .networkProtectionUnhandledError:
             return "netp_unhandled_error"
 
-        case .faviconDecryptionFailed:
-            return "favicon_decryption_failed"
-        case .downloadListItemDecryptionFailed:
-            return "download_list_item_decryption_failed"
-        case .historyEntryDecryptionFailed:
-            return "history_entry_decryption_failed"
-        case .permissionDecryptionFailed:
-            return "permission_decryption_failed"
+        case .faviconDecryptionFailedUnique:
+            return "favicon_decryption_failed_unique"
+        case .downloadListItemDecryptionFailedUnique:
+            return "download_list_item_decryption_failed_unique"
+        case .historyEntryDecryptionFailedUnique:
+            return "history_entry_decryption_failed_unique"
+        case .permissionDecryptionFailedUnique:
+            return "permission_decryption_failed_unique"
 
         case .missingParent: return "bookmark_missing_parent"
         case .bookmarksSaveFailed: return "bookmarks_save_failed"
         case .bookmarksSaveFailedOnImport: return "bookmarks_save_failed_on_import"
-        case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
         case .orphanedBookmarksPresent: return "bookmarks_orphans_present"
 
         case .bookmarksCouldNotLoadDatabase: return "bookmarks_could_not_load_database"
@@ -578,6 +667,14 @@ extension Pixel.Event.Debug {
         case .syncMetadataCouldNotLoadDatabase: return "sync_metadata_could_not_load_database"
         case .syncBookmarksProviderInitializationFailed: return "sync_bookmarks_provider_initialization_failed"
         case .syncBookmarksFailed: return "sync_bookmarks_failed"
+        case .syncCredentialsProviderInitializationFailed: return "sync_credentials_provider_initialization_failed"
+        case .syncCredentialsFailed: return "sync_credentials_failed"
+
+        case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
+        case .bookmarksCleanupAttemptedWhileSyncWasEnabled: return "bookmarks_cleanup_attempted_while_sync_was_enabled"
+
+        case .credentialsDatabaseCleanupFailed: return "credentials_database_cleanup_failed"
+        case .credentialsCleanupAttemptedWhileSyncWasEnabled: return "credentials_cleanup_attempted_while_sync_was_enabled"
 
         case .invalidPayload(let configuration): return "m_d_\(configuration.rawValue)_invalid_payload".lowercased()
 

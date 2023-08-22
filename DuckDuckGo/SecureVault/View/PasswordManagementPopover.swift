@@ -47,6 +47,10 @@ final class PasswordManagementPopover: NSPopover {
         viewController.select(category: category)
     }
 
+    func select(websiteAccount: SecureVaultModels.WebsiteAccount) {
+        viewController.select(websiteAccount: websiteAccount)
+    }
+
     private func setupContentController() {
         let controller = PasswordManagementViewController.create()
         contentViewController = controller
@@ -75,7 +79,7 @@ extension PasswordManagementPopover: NSPopoverDelegate {
     func popoverDidClose(_ notification: Notification) {
         if let window = viewController.view.window {
             for sheet in window.sheets {
-                window.endSheet(sheet, returnCode: .cancel)
+                sheet.endSheet(window)
             }
         }
         viewController.postChange()

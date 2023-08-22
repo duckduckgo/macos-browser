@@ -89,13 +89,13 @@ extension NSApplication {
     // NSApp.runType - returns .unitTests or .integrationTests when running tests
 
     static var swizzleRunTypeOnce: Void = {
-        let runTypeMethod = class_getInstanceMethod(NSApplication.self, #selector(getter: NSApplication.runType))!
-        let swizzledRunTypeMethod = class_getInstanceMethod(NSApplication.self, #selector(NSApplication.swizzled_runType))!
+        let runTypeMethod = class_getClassMethod(NSApplication.self, #selector(getter: NSApplication.runType))!
+        let swizzledRunTypeMethod = class_getClassMethod(NSApplication.self, #selector(NSApplication.swizzled_runType))!
 
         method_exchangeImplementations(runTypeMethod, swizzledRunTypeMethod)
     }()
 
-    @objc dynamic func swizzled_runType() -> NSApplication.RunType {
+    @objc dynamic class func swizzled_runType() -> NSApplication.RunType {
         RunType(bundle: Bundle(for: TestRunHelper.self))
     }
 

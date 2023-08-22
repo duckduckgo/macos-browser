@@ -294,11 +294,6 @@ extension ProgressView {
         var progress: Double
         var interval: CFTimeInterval
 
-        init(progress: Double, interval: CFTimeInterval) {
-            self.progress = progress
-            self.interval = interval
-        }
-
         static func nextStep(for currentProgress: Double,
                              lastProgressEvent: ProgressEvent?,
                              milestones: [ProgressEvent] = Constants.milestones) -> Self? {

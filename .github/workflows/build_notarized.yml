@@ -81,6 +81,11 @@ on:
         required: true
       MM_WEBHOOK_URL:
         required: true
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+
 
 jobs:
   export-notarized-app:
@@ -179,25 +184,8 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Set cache key hash
-      run: |
-        has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
-        if [[ "$has_only_tags" == "true" ]]; then
-          echo "cache_key_hash=${{ hashFiles('DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}" >> $GITHUB_ENV
-        else
-          echo "Package.resolved contains dependencies specified by branch or commit, skipping cache."
-        fi
-
-    - name: Cache SPM
-      if: env.cache_key_hash
-      uses: actions/cache@v3
-      with:
-        path: DerivedData/SourcePackages
-        key: ${{ runner.os }}-spm-${{ env.cache_key_hash }}
-        restore-keys: |
-          ${{ runner.os }}-spm-
-
     - name: Install xcbeautify
+      if: runner.debug != '1'
       continue-on-error: true
       run: brew install xcbeautify
 
@@ -216,7 +204,11 @@ jobs:
         export APPLE_API_KEY_PATH="$RUNNER_TEMP/apple_api_key.pem"
         echo -n "$APPLE_API_KEY_BASE64" | base64 --decode -o $APPLE_API_KEY_PATH
 
-        ./scripts/archive.sh ${{ env.release-type }}
+        if [[ "${{ runner.debug }}" == "1" ]]; then
+          ./scripts/archive.sh ${{ env.release-type }} -r
+        else
+          ./scripts/archive.sh ${{ env.release-type }}
+        fi
 
     - name: Set app name and version
       id: set-outputs
@@ -243,6 +235,19 @@ jobs:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         file-name: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip
         task-url: ${{ env.asana-task-url }}
+
+    - name: Upload dSYMs to S3
+      if: ${{ env.release-type == 'release' && (startsWith(github.ref_name, 'release') || startsWith(github.ref_name, 'hotfix')) }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+        DSYM_BUCKET_NAME: ${{ vars.DSYM_BUCKET_NAME }}
+        DSYM_BUCKET_PREFIX: ${{ vars.DSYM_BUCKET_PREFIX }}
+      run: |
+        aws s3 cp \
+          ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip \
+          s3://${{ env.DSYM_BUCKET_NAME }}/${{ env.DSYM_BUCKET_PREFIX }}/
 
   create-dmg:
 

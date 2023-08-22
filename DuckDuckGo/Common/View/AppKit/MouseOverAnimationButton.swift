@@ -33,14 +33,18 @@ final class MouseOverAnimationButton: AddressBarButton {
 
     private var isMouseOverCancellable: AnyCancellable?
 
+    var isAnimationEnabled: Bool = true
+
     private func subscribeToIsMouseOver() {
         isMouseOverCancellable = $isMouseOver
             .dropFirst()
             .sink { [weak self] isMouseOver in
+                guard let self, self.isAnimationEnabled else { return }
+
                 if isMouseOver {
-                    self?.animate()
+                    self.animate()
                 } else {
-                    self?.stopAnimation()
+                    self.stopAnimation()
                 }
             }
     }

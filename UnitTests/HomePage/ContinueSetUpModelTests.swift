@@ -31,9 +31,13 @@ final class ContinueSetUpModelTests: XCTestCase {
     var privacyPreferences: PrivacySecurityPreferences!
     var duckPlayerPreferences: DuckPlayerPreferencesPersistor!
     var delegate: CapturingSetUpVewModelDelegate!
+    var privacyConfig: MockPrivacyConfiguration!
+    let userDefaults = UserDefaults(suiteName: Bundle.main.bundleIdentifier! + "." + NSApp.runType.description)!
 
     @MainActor override func setUp() {
         UserDefaultsWrapper<Any>.clearAll()
+        userDefaults.set(Date(), forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+        userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
         capturingDefaultBrowserProvider = CapturingDefaultBrowserProvider()
         capturingDataImportProvider = CapturingDataImportProvider()
         tabCollectionVM = TabCollectionViewModel()
@@ -41,8 +45,14 @@ final class ContinueSetUpModelTests: XCTestCase {
         emailManager = EmailManager(storage: emailStorage)
         privacyPreferences = PrivacySecurityPreferences.shared
         duckPlayerPreferences = DuckPlayerPreferencesPersistorMock()
+        privacyConfig = MockPrivacyConfiguration()
+        privacyConfig.featureSettings = [
+            "surveyCardDay0": "enabled",
+            "surveyCardDay7": "enabled"
+        ] as! [String: String]
         delegate = CapturingSetUpVewModelDelegate()
-        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences)
+
+        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences, privacyConfig: privacyConfig)
         vm.delegate = delegate
     }
 
@@ -79,7 +89,6 @@ final class ContinueSetUpModelTests: XCTestCase {
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
         privacyPreferences.autoconsentEnabled = true
         vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences)
-        print(vm.visibleFeaturesMatrix)
         XCTAssertFalse(vm.isMoreOrLessButtonNeeded)
     }
 
@@ -90,9 +99,62 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm.shouldShowAllFeatures = true
 
-        expectedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: vm.itemsPerRow)
+        expectedMatrix = expectedFeatureMatrixWithout(types: [.surveyDay7])
 
         XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
+    }
+
+    @MainActor func testWhenInstallDateIsMoreThanADayAgoButLessThanAWeekAgoNoSurveyCardIsShown() {
+        let aDayAgo = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        userDefaults.set(aDayAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+        vm = HomePage.Models.ContinueSetUpModel.fixture()
+        vm.shouldShowAllFeatures = true
+
+        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay0))
+        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay7))
+
+        let sixDayAgo = Calendar.current.date(byAdding: .day, value: -6, to: Date())!
+        userDefaults.set(aDayAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+        vm = HomePage.Models.ContinueSetUpModel.fixture()
+
+        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay0))
+        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay7))
+    }
+
+    @MainActor func testWhenInstallDateIsMoreThanAWeekAgoDay7SurveyCardIsShown() {
+        let aDayAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
+        userDefaults.set(aDayAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+        vm = HomePage.Models.ContinueSetUpModel.fixture()
+        vm.shouldShowAllFeatures = true
+
+        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay0))
+        XCTAssertTrue(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay7))
+    }
+
+    @MainActor func testWhenInstallDateIsMoreThanAWeekAgoAndUserInteractedWithDay0SurveyDay7SurveyCardIsNotShown() {
+        let statisticStore = MockStatisticsStore()
+        vm.statisticsStore = statisticStore
+        vm.performAction(for: .surveyDay0)
+        let aDayAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
+        userDefaults.set(aDayAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+        vm = HomePage.Models.ContinueSetUpModel.fixture()
+        vm.shouldShowAllFeatures = true
+
+        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay0))
+        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay7))
+    }
+
+    @MainActor func testWhenInstallDateIsMoreThanAWeekAgoAndUserDismissedDay0SurveyDay7SurveyCardIsNotShown() {
+        let statisticStore = MockStatisticsStore()
+        vm.statisticsStore = statisticStore
+        vm.removeItem(for: .surveyDay0)
+        let aDayAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
+        userDefaults.set(aDayAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+        vm = HomePage.Models.ContinueSetUpModel.fixture()
+        vm.shouldShowAllFeatures = true
+
+        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay0))
+        XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay7))
     }
 
     @MainActor func testWhenInitializedNotForTheFirstTimeTheMatrixHasAllElementsInTheRightOrder() {
@@ -102,11 +164,12 @@ final class ContinueSetUpModelTests: XCTestCase {
         vm.shouldShowAllFeatures = true
 
         XCTAssertEqual(vm.visibleFeaturesMatrix[0][0], HomePage.Models.FeatureType.defaultBrowser)
-        XCTAssertEqual(vm.visibleFeaturesMatrix.reduce([], +).count, HomePage.Models.FeatureType.allCases.count)
+        // All cases minus one since it will show only one of the surveys
+        XCTAssertEqual(vm.visibleFeaturesMatrix.reduce([], +).count, HomePage.Models.FeatureType.allCases.count - 1)
     }
 
     func testWhenTogglingShowAllFeatureThenCorrectElementsAreVisible() {
-        let expectedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: vm.itemsPerRow)
+        var expectedMatrix = expectedFeatureMatrixWithout(types: [.surveyDay7])
 
         vm.shouldShowAllFeatures = true
 
@@ -134,7 +197,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenIsDefaultBrowserAndTogglingShowAllFeatureThenCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(type: .defaultBrowser)
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [.defaultBrowser, .surveyDay7])
 
         capturingDefaultBrowserProvider.isDefault = true
         vm = HomePage.Models.ContinueSetUpModel.fixture(defaultBrowserProvider: capturingDefaultBrowserProvider)
@@ -150,7 +213,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenAskedToPerformActionForImportPromptThrowsThenItOpensImportWindow() {
-        let numberOfFeatures = HomePage.Models.FeatureType.allCases.count
+        let numberOfFeatures = HomePage.Models.FeatureType.allCases.count - 1
         vm.shouldShowAllFeatures = true
         XCTAssertEqual(vm.visibleFeaturesMatrix.flatMap { $0 }.count, numberOfFeatures)
 
@@ -162,7 +225,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenUserHasUsedImportAndTogglingShowAllFeatureThenCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(type: .importBookmarksAndPasswords)
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [.surveyDay7, .importBookmarksAndPasswords])
 
         capturingDataImportProvider.didImport = true
         vm = HomePage.Models.ContinueSetUpModel.fixture(dataImportProvider: capturingDataImportProvider)
@@ -184,7 +247,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenUserHasEmailProtectionEnabledThenCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(type: .emailProtection)
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [.surveyDay7, .emailProtection])
 
         emailStorage.isEmailProtectionEnabled = true
         vm = HomePage.Models.ContinueSetUpModel.fixture(emailManager: emailManager)
@@ -200,7 +263,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenAskedToPerformActionForCookieConsentThenShowsCookiePopUp() {
-        let numberOfFeatures = HomePage.Models.FeatureType.allCases.count
+        let numberOfFeatures = HomePage.Models.FeatureType.allCases.count - 1
         vm.shouldShowAllFeatures = true
         XCTAssertEqual(vm.visibleFeaturesMatrix.flatMap { $0 }.count, numberOfFeatures)
 
@@ -211,7 +274,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenUserHasCookieConsentEnabledThenCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(type: .cookiePopUp)
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [.surveyDay7, .cookiePopUp])
 
         privacyPreferences.autoconsentEnabled = true
         vm = HomePage.Models.ContinueSetUpModel.fixture(privacyPreferences: privacyPreferences)
@@ -233,7 +296,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenUserHasDuckPlayerEnabledAndOverlayButtonNotPressedThenCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(type: .duckplayer)
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [.surveyDay7, .duckplayer])
 
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = false
         duckPlayerPreferences.duckPlayerModeBool = true
@@ -250,7 +313,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenUserHasDuckPlayerDisabledAndOverlayButtonNotPressedThenCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(type: .duckplayer)
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [.surveyDay7, .duckplayer])
 
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = false
         duckPlayerPreferences.duckPlayerModeBool = false
@@ -267,7 +330,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenUserHasDuckPlayerOnAlwaysAskAndOverlayButtonNotPressedThenCorrectElementsAreVisible() {
-        let expectedMatrix = HomePage.Models.FeatureType.allCases.chunked(into: HomePage.featuresPerRow)
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [.surveyDay7])
 
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = false
         duckPlayerPreferences.duckPlayerModeBool = nil
@@ -284,7 +347,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     @MainActor func testWhenUserHasDuckPlayerOnAlwaysAskAndOverlayButtonIsPressedThenCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(type: .duckplayer)
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [.surveyDay7, .duckplayer])
 
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
         duckPlayerPreferences.duckPlayerModeBool = nil
@@ -300,12 +363,34 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= HomePage.featuresPerRow)
     }
 
-    func testThatWhenIfAllFeatureActiveThenVisibleMatrixIsEmpty() {
+    @MainActor func testWhenAskedToPerformActionForSurveyDay1ShowsTheSurveySite() {
+        let atb = "someAtb"
+        let statisticStore = MockStatisticsStore()
+        statisticStore.atb = atb
+        vm.statisticsStore = statisticStore
+
+        vm.performAction(for: .surveyDay0)
+        XCTAssertEqual(tabCollectionVM.tabs[1].url, URL(string: vm.day0SurveyURL + "&atb=" + atb))
+    }
+
+    @MainActor func testWhenAskedToPerformActionForSurveyDay7ShowsTheSurveySite() {
+        let atb = "someAtb"
+        let statisticStore = MockStatisticsStore()
+        statisticStore.atb = atb
+        vm.statisticsStore = statisticStore
+
+        vm.performAction(for: .surveyDay7)
+        XCTAssertEqual(tabCollectionVM.tabs[1].url, URL(string: vm.day7SurveyURL + "&atb=" + atb))
+    }
+
+    @MainActor func testThatWhenIfAllFeatureActiveThenVisibleMatrixIsEmpty() {
         capturingDefaultBrowserProvider.isDefault = true
         emailStorage.isEmailProtectionEnabled = true
         privacyPreferences.autoconsentEnabled = true
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
         capturingDataImportProvider.didImport = true
+        userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.homePageShowSurveyDay0.rawValue)
+        userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.homePageShowSurveyDay7.rawValue)
 
         vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences)
 
@@ -314,7 +399,17 @@ final class ContinueSetUpModelTests: XCTestCase {
 
     @MainActor func testDismissedItemsAreRemovedFromVisibleMatrixAndChoicesArePersisted() {
         vm.shouldShowAllFeatures = true
-        XCTAssertEqual(HomePage.Models.FeatureType.allCases.chunked(into: vm.itemsPerRow), vm.visibleFeaturesMatrix)
+        var expectedMatrix = expectedFeatureMatrixWithout(types: [.surveyDay7])
+        XCTAssertEqual(expectedMatrix, vm.visibleFeaturesMatrix)
+
+        vm.removeItem(for: .surveyDay0)
+        XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.surveyDay0))
+
+        userDefaults.set(Calendar.current.date(byAdding: .month, value: -1, to: Date())!, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+        vm = HomePage.Models.ContinueSetUpModel.fixture()
+
+        vm.removeItem(for: .surveyDay7)
+        XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.surveyDay7))
 
         vm.removeItem(for: .defaultBrowser)
         XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.defaultBrowser))
@@ -346,11 +441,23 @@ final class ContinueSetUpModelTests: XCTestCase {
     private func doTheyContainTheSameElements(matrix1: [[HomePage.Models.FeatureType]], matrix2: [[HomePage.Models.FeatureType]]) -> Bool {
         Set(matrix1.flatMap { $0 }) == Set(matrix2.flatMap { $0 })
     }
-    private func expectedFeatureMatrixWithout(type: HomePage.Models.FeatureType) -> [[HomePage.Models.FeatureType]] {
+    private func expectedFeatureMatrixWithout(types: [HomePage.Models.FeatureType]) -> [[HomePage.Models.FeatureType]] {
         var features = HomePage.Models.FeatureType.allCases
-        let indexToRemove = features.firstIndex(of: type)!
-        features.remove(at: indexToRemove)
+        var indexesToRemove: [Int] = []
+        for type in types {
+            indexesToRemove.append(features.firstIndex(of: type)!)
+        }
+        indexesToRemove.sort()
+        indexesToRemove.reverse()
+        for index in indexesToRemove {
+            features.remove(at: index)
+        }
         return features.chunked(into: HomePage.featuresPerRow)
+    }
+
+    enum SurveyDay {
+        case day0
+        case day7
     }
 }
 
@@ -360,14 +467,20 @@ extension HomePage.Models.ContinueSetUpModel {
         dataImportProvider: DataImportStatusProviding = CapturingDataImportProvider(),
         emailManager: EmailManager = EmailManager(storage: MockEmailStorage()),
         privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
-        duckPlayerPreferences: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesPersistorMock()
+        duckPlayerPreferences: DuckPlayerPreferencesPersistor = DuckPlayerPreferencesPersistorMock(),
+        privacyConfig: MockPrivacyConfiguration = MockPrivacyConfiguration()
     ) -> HomePage.Models.ContinueSetUpModel {
-        HomePage.Models.ContinueSetUpModel(
+        privacyConfig.featureSettings = [
+            "surveyCardDay0": "enabled",
+            "surveyCardDay7": "enabled"
+        ] as! [String: String]
+        return HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: defaultBrowserProvider,
             dataImportProvider: dataImportProvider,
             tabCollectionViewModel: TabCollectionViewModel(),
             emailManager: emailManager,
             privacyPreferences: privacyPreferences,
-            duckPlayerPreferences: duckPlayerPreferences)
+            duckPlayerPreferences: duckPlayerPreferences,
+            privacyConfig: privacyConfig)
     }
 }

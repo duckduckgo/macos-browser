@@ -34,7 +34,7 @@ extension LoginItem {
 
 /// Takes care of enabling and disabling a login item.
 ///
-struct LoginItem {
+struct LoginItem: Equatable {
 
     let agentBundleID: String
     let url: URL
@@ -107,13 +107,13 @@ struct LoginItem {
         stop()
     }
 
-    /// Resets a login item.
+    /// Restarts a login item.
     ///
     /// This call will only enable the login item if it was enabled to begin with.
     ///
-    func reset() throws {
+    func restart() throws {
         guard [.enabled, .requiresApproval].contains(status) else {
-            os_log("🟢 reset not needed for login item %{public}@", log: .networkProtection, self.debugDescription)
+            os_log("🟢 restart not needed for login item %{public}@", log: .networkProtection, self.debugDescription)
             return
         }
         try? disable()
@@ -122,7 +122,7 @@ struct LoginItem {
 
     func launch() async throws {
         os_log("🟢 launching login item %{public}@", log: .networkProtection, self.debugDescription)
-        _=try await NSWorkspace.shared.openApplication(at: url, configuration: .init())
+        _ = try await NSWorkspace.shared.openApplication(at: url, configuration: .init())
     }
 
     private func stop() {
