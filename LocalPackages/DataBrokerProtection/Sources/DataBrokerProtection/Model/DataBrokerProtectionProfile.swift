@@ -76,6 +76,7 @@ internal extension DataBrokerProtectionProfile {
                 ProfileQuery(
                     firstName: name.firstName,
                     lastName: name.lastName,
+                    middleName: name.middleName,
                     city: address.city,
                     state: address.state,
                     age: age)

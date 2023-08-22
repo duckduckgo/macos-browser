@@ -23,11 +23,13 @@ import DataBrokerProtection
 struct UserProfileView: View {
     @State private var firstName: String = ""
     @State private var lastName: String = ""
+    @State private var middleName: String = ""
     @State private var city: String = ""
     @State private var state: String = ""
     @State private var age: String = ""
 
     @State private var firstNameError: String = ""
+    @State private var middleNameError: String = ""
     @State private var lastNameError: String = ""
     @State private var cityError: String = ""
     @State private var stateError: String = ""
@@ -73,6 +75,12 @@ struct UserProfileView: View {
                               value: firstName,
                               validationFunction: validateFirstName,
                               error: firstNameError)
+
+            validateTextField(label: "Middle Name",
+                              text: $middleName,
+                              value: middleName,
+                              validationFunction: validateMiddleName,
+                              error: middleNameError)
 
             validateTextField(label: "Last Name",
                               text: $lastName,
@@ -149,6 +157,10 @@ struct UserProfileView: View {
         validateSaveButton()
     }
 
+    private func validateMiddleName(_ value: String) {
+        // middleName is optional
+    }
+
     private func validateState(_ value: String) {
         if value.isEmpty {
             stateError = "State must not be empty."
@@ -172,7 +184,7 @@ struct UserProfileView: View {
     }
 
     private func saveData() {
-        let name = DataBrokerProtectionProfile.Name(firstName: firstName, lastName: lastName)
+        let name = DataBrokerProtectionProfile.Name(firstName: firstName, lastName: lastName, middleName: middleName)
         let address = DataBrokerProtectionProfile.Address(city: city, state: state)
 
         let profile = DataBrokerProtectionProfile(names: [name],
