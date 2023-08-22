@@ -111,6 +111,9 @@ extension YoutubeOverlayUserScript {
         let pixelName = parameters["pixelName"] as? String
         if pixelName == "play.use" || pixelName == "play.do_not_use" {
             duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
+            if pixelName == "play.use" {
+                Pixel.fire(.duckPlayerViewFromYoutubeViaMainOverlay)
+            }
         }
 
         // Temporary pixel for first time user uses Duck Player

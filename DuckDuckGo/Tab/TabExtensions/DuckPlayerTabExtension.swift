@@ -131,6 +131,11 @@ final class DuckPlayerTabExtension {
 extension DuckPlayerTabExtension: YoutubeOverlayUserScriptDelegate {
 
     func youtubeOverlayUserScriptDidRequestDuckPlayer(with url: URL, in webView: WKWebView) {
+        if duckPlayer.mode == .enabled {
+            Pixel.fire(.duckPlayerViewFromYoutubeAutomatic)
+        } else {
+            Pixel.fire(.duckPlayerViewFromYoutubeViaHoverButton)
+        }
         // to be standardised across the app
         let isRequestingNewTab = NSApp.isCommandPressed
         if isRequestingNewTab {
@@ -206,6 +211,9 @@ extension DuckPlayerTabExtension: NavigationResponder {
 
         // Always allow loading Private Player URLs (local HTML)
         if navigationAction.url.isDuckPlayerScheme || navigationAction.url.isDuckPlayer {
+            if navigationAction.request.allHTTPHeaderFields?["Referer"] == URL.duckDuckGo.absoluteString {
+                Pixel.fire(.duckPlayerViewFromSERP)
+            }
             return .allow
         }
 
@@ -276,12 +284,32 @@ extension DuckPlayerTabExtension: NavigationResponder {
                 || (navigationAction.sourceFrame.url.isDuckPlayer && navigationAction.url.isYoutubeVideoRecommendation),
               let mainFrame = navigationAction.mainFrameTarget {
 
+            switch navigationAction.navigationType {
+            case .custom, .redirect(.server):
+                Pixel.fire(.duckPlayerViewFromOther)
+            case .other:
+                if navigationAction.request.allHTTPHeaderFields?["Referer"] == URL.duckDuckGo.absoluteString {
+                    Pixel.fire(.duckPlayerViewFromSERP)
+                }
+            default:
+                break
+            }
+
             return .redirect(mainFrame) { navigator in
                 navigator.load(URLRequest(url: .duckPlayer(videoID, timestamp: timestamp)))
             }
         }
 
         return .next
+    }
+
+    func didCommit(_ navigation: Navigation) {
+        guard duckPlayer.isAvailable, duckPlayer.mode != .disabled else {
+            return
+        }
+        if navigation.url.isDuckPlayer {
+            Pixel.fire(.duckPlayerDailyUniqueView, limitToOnceADay: true)
+        }
     }
 
     @MainActor
