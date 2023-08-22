@@ -22,11 +22,10 @@ on:
         description: "Asana release task URL"
         required: false
         type: string
-      create-atb-variants:
-        description: "Create ATB variants"
-        required: true
-        default: false
-        type: boolean
+      atb-variants:
+        description: "ATB variants (comma-separated)"
+        required: false
+        type: string
   workflow_call:
     inputs:
       release-type:
@@ -43,11 +42,10 @@ on:
         description: "Asana release task URL"
         required: true
         type: string
-      create-atb-variants:
-        description: "Create ATB variants"
-        required: true
-        default: false
-        type: boolean
+      atb-variants:
+        description: "ATB variants (comma-separated)"
+        required: false
+        type: string
     secrets:
       BUILD_CERTIFICATE_BASE64:
         required: true
@@ -111,6 +109,7 @@ jobs:
     env:
       release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
       asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+      atb-variants: ${{ github.event.inputs.atb-variants || inputs.atb-variants }}
 
     steps:
 
@@ -170,17 +169,10 @@ jobs:
 
     - name: Setup ATB variants
       id: atb-variants
-      if: ${{ github.event.inputs.create-atb-variants == true || inputs.create-atb-variants == true }}
+      if: ${{ env.atb-variants }}
       run: |
-        echo "matrix={\"variant\": [\"00\"]}" >> $GITHUB_OUTPUT
-
-        # echo "matrix={\"variant\": [\
-        #     \"ab\", \"cd\", \"ef\", \"gh\", \"ij\", \"kl\", \"mn\", \"op\", \"qr\", \"st\", \"uw\", \"vx\", \"yz\", \
-        #     \"01\", \"02\", \"03\", \"04\", \"05\", \"06\", \"07\", \"08\", \"09\", \"10\", \"11\", \"12\", \
-        #     \"13\", \"14\", \"15\", \"16\", \"17\", \"18\", \"19\", \"20\", \"21\", \"22\", \"23\", \"24\", \
-        #     \"25\", \"26\", \"27\", \"28\", \"29\", \"30\", \"31\", \"32\", \"33\", \"34\", \"35\", \"36\", \
-        #     \"37\", \"38\", \"39\", \"40\", \"41\", \"42\", \"43\", \"44\", \"45\", \"46\", \"47\", \"48\" \
-        #     ]}" >> $GITHUB_OUTPUT
+        variant_matrix="$(echo "${{ env.atb-variants }}" | sed 's/,/\",\"/g')"
+        echo "matrix={\"variant\": [\"${variant_matrix}\"]}" >> $GITHUB_OUTPUT
 
     - name: Set app name and version
       id: set-outputs
@@ -301,7 +293,7 @@ jobs:
 
     name: Create ATB variant
     needs: export-notarized-app
-    if: ${{ github.event.inputs.create-atb-variants == true || inputs.create-atb-variants == true }}
+    if: ${{ github.event.inputs.atb-variants || inputs.atb-variants }}
 
     strategy:
       matrix: ${{ fromJSON(needs.export-notarized-app.outputs.atb-variants) }}
