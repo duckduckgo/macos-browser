@@ -85,6 +85,7 @@ final class MainViewController: NSViewController {
         view.registerForDraggedTypes([.URL, .fileURL])
 
         registerForBookmarkBarPromptNotifications()
+        registerForDidBecomeActiveNotifications()
     }
 
     var bookmarkBarPromptObserver: Any?
@@ -122,6 +123,23 @@ final class MainViewController: NSViewController {
         }
 
         updateDividerColor()
+    }
+
+    // Temporary feature flag tester, to validate that phased rollouts are working as intended.
+    // This is to be removed before the end of August 2023.
+    lazy var featureFlagTester: PhasedRolloutFeatureFlagTester = {
+        return PhasedRolloutFeatureFlagTester()
+    }()
+
+    func registerForDidBecomeActiveNotifications() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(applicationDidBecomeActive),
+                                               name: NSApplication.didBecomeActiveNotification,
+                                               object: nil)
+    }
+
+    @objc func applicationDidBecomeActive() {
+        featureFlagTester.sendFeatureFlagEnabledPixelIfNecessary()
     }
 
     override func viewDidLayout() {
