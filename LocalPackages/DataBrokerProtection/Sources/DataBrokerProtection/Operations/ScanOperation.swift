@@ -30,7 +30,7 @@ final class ScanOperation: DataBrokerOperation {
     let prefs: ContentScopeProperties
     let query: BrokerProfileQueryData
     let emailService: EmailServiceProtocol
-    let captchaService: CaptchaServiceProtocol
+    let captchaService: CaptchaService
     var webViewHandler: WebViewHandler?
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<[ExtractedProfile], Error>?
@@ -41,7 +41,7 @@ final class ScanOperation: DataBrokerOperation {
          prefs: ContentScopeProperties,
          query: BrokerProfileQueryData,
          emailService: EmailServiceProtocol = EmailService(),
-         captchaService: CaptchaServiceProtocol = CaptchaService(),
+         captchaService: CaptchaService = DefaultCaptchaService(),
          operationAwaitTime: TimeInterval = 1
     ) {
         self.privacyConfig = privacyConfig

@@ -31,12 +31,12 @@ final class DataBrokerOperationRunner: WebOperationRunner {
     let privacyConfigManager: PrivacyConfigurationManaging
     let contentScopeProperties: ContentScopeProperties
     let emailService: EmailServiceProtocol
-    let captchaService: CaptchaServiceProtocol
+    let captchaService: CaptchaService
 
     internal init(privacyConfigManager: PrivacyConfigurationManaging,
                   contentScopeProperties: ContentScopeProperties,
                   emailService: EmailServiceProtocol,
-                  captchaService: CaptchaServiceProtocol) {
+                  captchaService: CaptchaService) {
         self.privacyConfigManager = privacyConfigManager
         self.contentScopeProperties = contentScopeProperties
         self.emailService = emailService

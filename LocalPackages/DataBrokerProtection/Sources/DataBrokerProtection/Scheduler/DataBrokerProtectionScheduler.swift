@@ -37,7 +37,7 @@ public final class DataBrokerProtectionScheduler {
     private let schedulerIdentifier = "com.duckduckgo.macos.browser.databroker-protection-scheduler"
     private let notificationCenter: NotificationCenter
     private let emailService: EmailServiceProtocol
-    private let captchaService: CaptchaServiceProtocol
+    private let captchaService: CaptchaService
 
     lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
@@ -74,7 +74,7 @@ public final class DataBrokerProtectionScheduler {
         self.notificationCenter = notificationCenter
 
         self.emailService = EmailService(redeemUseCase: redeemUseCase)
-        self.captchaService = CaptchaService(redeemUseCase: redeemUseCase)
+        self.captchaService = DefaultCaptchaService(redeemUseCase: redeemUseCase)
     }
 
     public func start(debug: Bool = true) {

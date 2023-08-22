@@ -1,5 +1,5 @@
 //
-//  CaptchaService.swift
+//  DefaultCaptchaService.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -74,7 +74,7 @@ struct CaptchaResult: Codable {
     let meta: Meta
 }
 
-protocol CaptchaServiceProtocol {
+protocol CaptchaService {
 
     /// Submits captcha information to the backend to start solving it,
     ///
@@ -96,7 +96,7 @@ protocol CaptchaServiceProtocol {
                                    pollingInterval: Int) async throws -> CaptchaResolveData
 }
 
-extension CaptchaServiceProtocol {
+extension CaptchaService {
     func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse) async throws -> CaptchaTransactionId {
         try await submitCaptchaInformation(captchaInfo, retries: 5)
     }
@@ -106,7 +106,7 @@ extension CaptchaServiceProtocol {
     }
 }
 
-struct CaptchaService: CaptchaServiceProtocol {
+struct DefaultCaptchaService: CaptchaService {
 
     private struct Constants {
         struct URL {

@@ -217,7 +217,7 @@ final class EmailServiceMock: EmailServiceProtocol {
     }
 }
 
-final class CaptchaServiceMock: CaptchaServiceProtocol {
+final class CaptchaServiceMock: CaptchaService {
 
     var wasSubmitCaptchaInformationCalled = false
     var wasSubmitCaptchaToBeResolvedCalled = false

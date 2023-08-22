@@ -23,7 +23,7 @@ struct DataBrokerOperationRunnerProvider: OperationRunnerProvider {
     var privacyConfigManager: PrivacyConfigurationManaging
     var contentScopeProperties: ContentScopeProperties
     var emailService: EmailServiceProtocol
-    var captchaService: CaptchaServiceProtocol
+    var captchaService: CaptchaService
 
     @MainActor
     func getOperationRunner() -> WebOperationRunner {

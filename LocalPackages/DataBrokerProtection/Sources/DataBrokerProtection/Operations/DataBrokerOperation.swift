@@ -30,7 +30,7 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     var prefs: ContentScopeProperties { get }
     var query: BrokerProfileQueryData { get }
     var emailService: EmailServiceProtocol { get }
-    var captchaService: CaptchaServiceProtocol { get }
+    var captchaService: CaptchaService { get }
 
     var webViewHandler: WebViewHandler? { get set }
     var actionsHandler: ActionsHandler? { get }
