@@ -145,6 +145,7 @@ final class ProfileViewModel: ObservableObject {
 
     func saveProfile() {
         // It should edit or delete the profile before saving if there was a previous profile saved
+        let profile = mapUIProfileToDataBaseProfile()
         dataManager.saveProfile(profile)
     }
 
