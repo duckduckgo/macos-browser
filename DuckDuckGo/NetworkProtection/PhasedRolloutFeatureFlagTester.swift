@@ -43,8 +43,6 @@ final class PhasedRolloutFeatureFlagTester {
     private let pixelSender: PhasedRolloutPixelSender
     private let userDefaults: UserDefaults
 
-    private let lock = NSLock()
-
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          pixelSender: PhasedRolloutPixelSender = DefaultPhasedRolloutPixelSender(),
          userDefaults: UserDefaults = .standard) {
@@ -54,16 +52,12 @@ final class PhasedRolloutFeatureFlagTester {
     }
 
     func sendFeatureFlagEnabledPixelIfNecessary(completion: (() -> Void)? = nil) {
-        lock.lock()
-
         guard !hasSentPixelBefore(), privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(IncrementalRolloutTestSubfeature.rollout) else {
-            lock.unlock()
             completion?()
             return
         }
 
         markPixelAsSent()
-        lock.unlock() // Unlock here because it's now safe to do so, the guard statement at the top will prevent duplicate pixels from being sent
 
         pixelSender.sendPixel { [weak self] error in
             if error != nil {
