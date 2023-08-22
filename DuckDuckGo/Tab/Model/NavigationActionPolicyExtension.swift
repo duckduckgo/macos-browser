@@ -34,14 +34,21 @@ extension NavigationActionPolicy {
         return .redirect(mainFrame) { navigator in
             // Cancelled & Upgraded Client Redirect URL leaves wrong backForwardList record
 
-            if case .redirect(.client(delay: 0)) = navigationAction.navigationType,
-               // initial NavigationAction BackForwardListItem is not the Current Item (new item was pushed during navigation)
-               let fromHistoryItemIdentity = navigationAction.redirectHistory?.last?.fromHistoryItemIdentity,
-               fromHistoryItemIdentity != webView.backForwardList.currentItem?.identity {
+            if case .redirect(.client(delay: 0)) = navigationAction.navigationType {
+                // initial NavigationAction BackForwardListItem is not the Current Item (new item was pushed during navigation)
+                if let fromHistoryItemIdentity = navigationAction.redirectHistory?.last?.fromHistoryItemIdentity,
+                   fromHistoryItemIdentity != webView.backForwardList.currentItem?.identity {
 
-                navigator.goBack()?.overrideResponders { _, _ in
-                    // don‘t perform actual navigation, just pop the back item
-                    .cancel
+                    navigator.goBack()?.overrideResponders { _, _ in
+                        // don‘t perform actual navigation, just pop the back item
+                        .cancel
+                    }
+
+                // we can‘t go back when navigating from an empty state
+                } else if !webView.canGoBack {
+                    // use the private call to clear navigation history
+                    webView.backForwardList.removeAllItems()
+
                 }
             }
 
