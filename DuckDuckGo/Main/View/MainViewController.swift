@@ -125,12 +125,6 @@ final class MainViewController: NSViewController {
         updateDividerColor()
     }
 
-    // Temporary feature flag tester, to validate that phased rollouts are working as intended.
-    // This is to be removed before the end of August 2023.
-    lazy var featureFlagTester: PhasedRolloutFeatureFlagTester = {
-        return PhasedRolloutFeatureFlagTester()
-    }()
-
     func registerForDidBecomeActiveNotifications() {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(applicationDidBecomeActive),
@@ -139,7 +133,9 @@ final class MainViewController: NSViewController {
     }
 
     @objc func applicationDidBecomeActive() {
-        featureFlagTester.sendFeatureFlagEnabledPixelIfNecessary()
+        // Temporary feature flag tester, to validate that phased rollouts are working as intended.
+        // This is to be removed before the end of August 2023.
+        PhasedRolloutFeatureFlagTester.shared.sendFeatureFlagEnabledPixelIfNecessary()
     }
 
     override func viewDidLayout() {
