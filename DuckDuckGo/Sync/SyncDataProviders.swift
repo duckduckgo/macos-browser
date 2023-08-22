@@ -47,7 +47,7 @@ final class SyncDataProviders: DataProvidersSource {
     init(bookmarksDatabase: CoreDataDatabase, secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory) {
         self.bookmarksDatabase = bookmarksDatabase
         self.secureVaultFactory = secureVaultFactory
-        bookmarksAdapter = SyncBookmarksAdapter()
+        bookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase)
         credentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: secureVaultFactory)
     }
 
