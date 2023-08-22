@@ -28,7 +28,7 @@ struct MapperToDB {
     }
 
     func mapToDB(profile: DataBrokerProtectionProfile) throws -> ProfileDB {
-        .init(id: nil, age: try withUnsafeBytes(of: profile.age) { try mechanism(Data($0)) })
+        .init(id: nil, birthYear: try withUnsafeBytes(of: profile.birthYear) { try mechanism(Data($0)) })
     }
 
     func mapToDB(_ name: DataBrokerProtectionProfile.Name, relatedTo profileId: Int64) throws -> NameDB {
@@ -73,7 +73,7 @@ struct MapperToDB {
             street: try profileQuery.street.encoded(mechanism),
             zipCode: try profileQuery.zip.encoded(mechanism),
             phone: try profileQuery.phone.encoded(mechanism),
-            age: try withUnsafeBytes(of: profileQuery.age) { try mechanism(Data($0)) }
+            birthYear: try withUnsafeBytes(of: profileQuery.birthYear) { try mechanism(Data($0)) }
         )
     }
 
@@ -126,7 +126,7 @@ struct MapperToModel {
             names: try profile.names.map(mapToModel(_:)),
             addresses: try profile.addresses.map(mapToModel(_:)),
             phones: try profile.phones.map(mapToModel(_:)),
-            age: try mechanism(profile.profile.age).withUnsafeBytes {
+            birthYear: try mechanism(profile.profile.birthYear).withUnsafeBytes {
                 $0.load(as: Int.self)
             }
         )
@@ -169,7 +169,7 @@ struct MapperToModel {
             street: try profileQueryDB.street.decode(mechanism),
             zipCode: try profileQueryDB.zipCode.decode(mechanism),
             phone: try profileQueryDB.phone.decode(mechanism),
-            age: try mechanism(profileQueryDB.age).withUnsafeBytes {
+            birthYear: try mechanism(profileQueryDB.birthYear).withUnsafeBytes {
                 $0.load(as: Int.self)
             }
         )

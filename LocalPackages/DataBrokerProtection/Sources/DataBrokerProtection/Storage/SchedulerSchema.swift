@@ -33,7 +33,7 @@ struct ProfileQueryDB: Codable {
     let street: Data?
     let zipCode: Data?
     let phone: Data?
-    let age: Data
+    let birthYear: Data
 }
 
 extension ProfileQueryDB: PersistableRecord, FetchableRecord {
@@ -51,7 +51,7 @@ extension ProfileQueryDB: PersistableRecord, FetchableRecord {
         case street
         case zipCode
         case phone
-        case age
+        case birthYear
     }
 
     init(row: Row) throws {
@@ -66,7 +66,7 @@ extension ProfileQueryDB: PersistableRecord, FetchableRecord {
         street = row[Columns.street]
         zipCode = row[Columns.zipCode]
         phone = row[Columns.phone]
-        age = row[Columns.age]
+        birthYear = row[Columns.birthYear]
     }
 
     func encode(to container: inout PersistenceContainer) throws {
@@ -81,7 +81,7 @@ extension ProfileQueryDB: PersistableRecord, FetchableRecord {
         container[Columns.street] = street
         container[Columns.zipCode] = zipCode
         container[Columns.phone] = phone
-        container[Columns.age] = age
+        container[Columns.birthYear] = birthYear
     }
 }
 

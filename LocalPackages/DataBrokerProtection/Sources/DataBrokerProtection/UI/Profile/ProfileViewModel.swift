@@ -165,7 +165,7 @@ final class ProfileViewModel: ObservableObject {
                         zip: $0.zipCode ?? "")
             }
 
-            birthYear = profile.age
+            birthYear = profile.birthYear
         }
     }
 
@@ -186,7 +186,7 @@ final class ProfileViewModel: ObservableObject {
         return DataBrokerProtectionProfile(names: names,
                                            addresses: addresses,
                                            phones: [],
-                                           age: birthYear ?? 0)
+                                           birthYear: birthYear ?? 0)
     }
 }
 
