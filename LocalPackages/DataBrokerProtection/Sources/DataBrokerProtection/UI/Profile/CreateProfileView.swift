@@ -345,7 +345,7 @@ private struct AddressFormView: View {
                     }
                 } label: { }
             }
-            
+
             TextFieldWithLabel(label: "Zip Code", text: $zip)
             .padding(.bottom, 20)
 
