@@ -105,7 +105,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         os_log("Extracted profile already exists in database: %@", log: .dataBrokerProtection, id.description)
                     } else {
                         // If profile does not exist we insert the new profile and we create the opt-out operation
-                        // TODO: Should we do everything in one step here? If inserting the optOutOperationData fails should we remove the extracted profile, too? Or should we consider another way?
+                        // Should we do everything in one step here? If inserting the optOutOperationData fails should we remove the extracted profile, too? Or should we consider another way?
                         let extractedProfileId = try database.save(extractedProfile, brokerId: brokerId, profileQueryId: profileQueryId)
                         os_log("Creating new opt-out operation data for: %@", log: .dataBrokerProtection, String(describing: extractedProfile.name))
                         let optOutOperationData = OptOutOperationData(brokerId: brokerId,
