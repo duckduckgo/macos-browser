@@ -61,7 +61,6 @@ final class MainWindow: NSWindow {
         titlebarAppearsTransparent = true
         // the window will be draggable using custom drag areas defined by WindowDraggingView
         isMovable = false
-//        setFrameAutosaveName("MainWindow")
     }
 
     // MARK: - First Responder Notification
