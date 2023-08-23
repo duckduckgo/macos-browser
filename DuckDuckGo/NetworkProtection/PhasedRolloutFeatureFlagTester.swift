@@ -37,6 +37,8 @@ final class PhasedRolloutFeatureFlagTester {
         static let hasSentPixelKey = "network-protection.incremental-feature-flag-test.has-sent-pixel"
     }
 
+    static let shared = PhasedRolloutFeatureFlagTester()
+
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let pixelSender: PhasedRolloutPixelSender
     private let userDefaults: UserDefaults
@@ -56,6 +58,7 @@ final class PhasedRolloutFeatureFlagTester {
         }
 
         markPixelAsSent()
+
         pixelSender.sendPixel { [weak self] error in
             if error != nil {
                 self?.markPixelAsUnsent()
