@@ -38,8 +38,7 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
     internal let database: DataBrokerProtectionRepository
 
     required public init(fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()) {
-        self.database = DataBrokerProtectionDataBase(fakeBrokerFlag: fakeBrokerFlag)
-        setupNotifications()
+        self.database = DataBrokerProtectionDatabase(fakeBrokerFlag: fakeBrokerFlag)
     }
 
     public func saveProfile(_ profile: DataBrokerProtectionProfile) {
@@ -75,15 +74,6 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         }
 
         return result
-    }
-
-    @objc private func setupFakeData() {
-        delegate?.dataBrokerProtectionDataManagerDidUpdateData()
-    }
-
-    private func setupNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(setupFakeData), name: DataBrokerProtectionNotifications.didFinishOptOut, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(setupFakeData), name: DataBrokerProtectionNotifications.didFinishScan, object: nil)
     }
 }
 

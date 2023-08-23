@@ -24,18 +24,13 @@ import BrowserServicesKit
 extension BrokerProfileQueryData {
     static func mock(with steps: [Step] = [Step]()) -> BrokerProfileQueryData {
         BrokerProfileQueryData(
-<<<<<<< HEAD
-            id: UUID(),
-            profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50),
-=======
->>>>>>> c698ed36 (Core scheduler and secure storage integration work)
             dataBroker: DataBroker(
                 name: "test",
                 steps: steps,
                 version: "1.0.0",
                 schedulingConfig: DataBrokerScheduleConfig.mock
             ),
-            profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 50),
+            profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50),
             scanOperationData: ScanOperationData(brokerId: 1, profileQueryId: 1, historyEvents: [HistoryEvent]())
         )
     }

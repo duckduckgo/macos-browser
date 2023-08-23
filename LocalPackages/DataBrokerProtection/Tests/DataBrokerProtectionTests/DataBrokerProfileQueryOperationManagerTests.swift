@@ -693,11 +693,11 @@ extension DataBroker {
 extension ProfileQuery {
 
     static var mock: ProfileQuery {
-        .init(id: 1, firstName: "First", lastName: "Last", city: "City", state: "State", age: 1980)
+        .init(id: 1, firstName: "First", lastName: "Last", city: "City", state: "State", birthYear: 1980)
     }
 
     static var mockWithoutId: ProfileQuery {
-        .init(firstName: "First", lastName: "Last", city: "City", state: "State", age: 1980)
+        .init(firstName: "First", lastName: "Last", city: "City", state: "State", birthYear: 1980)
     }
 }
 
