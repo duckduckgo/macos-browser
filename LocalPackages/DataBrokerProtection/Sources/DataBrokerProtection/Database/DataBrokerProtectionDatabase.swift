@@ -33,7 +33,7 @@ protocol DataBrokerProtectionRepository {
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64)
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64)
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64)
-    func updateRemoveDate(_ date: Date?, on extractedProfileId: Int64)
+    func updateRemovedDate(_ date: Date?, on extractedProfileId: Int64)
 
     func add(_ historyEvent: HistoryEvent)
     func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) -> HistoryEvent?
@@ -171,7 +171,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         }
     }
 
-    func updateRemoveDate(_ date: Date?, on extractedProfileId: Int64) {
+    func updateRemovedDate(_ date: Date?, on extractedProfileId: Int64) {
         do {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
 

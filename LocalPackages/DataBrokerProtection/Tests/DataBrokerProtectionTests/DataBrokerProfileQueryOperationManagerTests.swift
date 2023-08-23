@@ -572,7 +572,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
         wasUpdateLastRunDateForOptOutCalled = true
     }
 
-    func updateRemoveDate(_ date: Date?, on extractedProfileId: Int64) {
+    func updateRemovedDate(_ date: Date?, on extractedProfileId: Int64) {
         wasUpdateRemoveDateCalled = true
     }
 

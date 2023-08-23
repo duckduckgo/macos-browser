@@ -99,7 +99,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                     if doesProfileExistsInDatabase, let alreadyInDatabaseProfile = brokerProfileQueryData.extractedProfiles.first(where: { $0.profileUrl == extractedProfile.profileUrl }), let id = alreadyInDatabaseProfile.id {
                         // If it was removed in the past but was found again when scanning, it means it appearead again, so we reset the remove date.
                         if alreadyInDatabaseProfile.removedDate != nil {
-                            database.updateRemoveDate(nil, on: id)
+                            database.updateRemovedDate(nil, on: id)
                         }
 
                         os_log("Extracted profile already exists in database: %@", log: .dataBrokerProtection, id.description)
@@ -128,7 +128,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                     if let extractedProfileId = removedProfile.id {
                         let event = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutConfirmed)
                         database.add(event)
-                        database.updateRemoveDate(Date(), on: extractedProfileId)
+                        database.updateRemovedDate(Date(), on: extractedProfileId)
                         database.updatePreferredRunDate(nil, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
                         os_log("Profile removed from optOutsData: %@", log: .dataBrokerProtection, String(describing: removedProfile))
                     }
