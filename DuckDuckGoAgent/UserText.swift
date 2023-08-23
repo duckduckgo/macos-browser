@@ -24,4 +24,3 @@ final class UserText {
     static let networkProtectionStatusMenuShareFeedback = NSLocalizedString("network.protection.status.menu.share.feedback", value: "Share Feedback...", comment: "The status menu 'Share Feedback' menu item")
     static let networkProtectionStatusMenuOpenDuckDuckGo = NSLocalizedString("network.protection.status.menu.open.duckduckgo", value: "Open DuckDuckGo...", comment: "The status menu 'Open DuckDuckGo' menu item")
 }
-
