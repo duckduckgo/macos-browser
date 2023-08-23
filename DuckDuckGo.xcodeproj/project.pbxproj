@@ -1381,8 +1381,6 @@
 		7B736E582A4A22B700F9922A /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5F14C52A145D6A0060320F /* Main.swift */; };
 		7B736E6A2A4A22FC00F9922A /* enableOnDemand.app in Embed NetP Controller Apps */ = {isa = PBXBuildFile; fileRef = 7B736E5F2A4A22B700F9922A /* enableOnDemand.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7B838C382A1DD8DD00E05A13 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B2D06522A11D19B00DE1F49 /* Assets.xcassets */; };
-		7B934C3E2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C3D2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift */; };
-		7B934C3F2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C3D2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift */; };
 		7B934C412A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
 		7BAF9E4B2A8A3CC9002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
@@ -7780,7 +7778,6 @@
 				3706FAD2293F65D500E42796 /* Atb.swift in Sources */,
 				3706FAD3293F65D500E42796 /* DownloadsViewController.swift in Sources */,
 				3706FAD4293F65D500E42796 /* DataExtension.swift in Sources */,
-				7B2DDD0D2A93EB630039D884 /* NetworkProtectionAppEvents.swift in Sources */,
 				3706FAD6293F65D500E42796 /* ConfigurationStore.swift in Sources */,
 				3706FAD7293F65D500E42796 /* Feedback.swift in Sources */,
 				3707C722294B5D2900682A9F /* WKWebViewExtension.swift in Sources */,
@@ -8074,7 +8071,6 @@
 				85774B002A713D3B00DE0561 /* BookmarksBarMenuFactory.swift in Sources */,
 				B602E81E2A1E25B1006D261F /* NEOnDemandRuleExtension.swift in Sources */,
 				3706FBC7293F65D500E42796 /* HistoryStore.swift in Sources */,
-				7B934C3F2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift in Sources */,
 				3706FBC8293F65D500E42796 /* FirePopoverCollectionViewItem.swift in Sources */,
 				3706FBC9293F65D500E42796 /* ArrayExtension.swift in Sources */,
 				3706FBCA293F65D500E42796 /* CrashReportSender.swift in Sources */,
@@ -8828,7 +8824,6 @@
 				4B9292A426670D2A00AD2C21 /* PasteboardWriting.swift in Sources */,
 				4B92928D26670D1700AD2C21 /* BookmarkOutlineViewCell.swift in Sources */,
 				B604085C274B8FBA00680351 /* UnprotectedDomains.xcdatamodeld in Sources */,
-				7B2DDD0B2A93EA570039D884 /* NetworkProtectionAppEvents.swift in Sources */,
 				4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */,
 				4B59024326B35F7C00489384 /* BrowserImportViewController.swift in Sources */,
 				4B9292D72667124000AD2C21 /* NSPopUpButtonExtension.swift in Sources */,
@@ -9285,7 +9280,6 @@
 				B64C84E32692DC9F0048FEBE /* PermissionAuthorizationViewController.swift in Sources */,
 				4B92929D26670D2A00AD2C21 /* BookmarkNode.swift in Sources */,
 				B693955226F04BEB0015B914 /* LongPressButton.swift in Sources */,
-				7B934C3E2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift in Sources */,
 				B6085D062743905F00A9C456 /* CoreDataStore.swift in Sources */,
 				B6DB3AF6278EA0130024C5C4 /* BundleExtension.swift in Sources */,
 				4B0511E1262CAA8600F6079C /* NSOpenPanelExtensions.swift in Sources */,
