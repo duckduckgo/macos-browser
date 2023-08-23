@@ -154,7 +154,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         super.init(notificationsPresenter: Self.makeNotificationsPresenter(),
                    tunnelHealthStore: tunnelHealthStore,
                    controllerErrorStore: controllerErrorStore,
-                   useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
+                   keychainType: NetworkProtectionBundle.keychainType,
                    debugEvents: Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore),
                    providerEvents: Self.packetTunnelProviderEvents)
 

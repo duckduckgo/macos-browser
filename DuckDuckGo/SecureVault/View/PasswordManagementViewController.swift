@@ -149,6 +149,11 @@ final class PasswordManagementViewController: NSViewController {
 
     private let passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
 
+    private let emailManager = EmailManager()
+    private let urlMatcher = AutofillDomainNameUrlMatcher()
+    private let tld = ContentBlocking.shared.tld
+    private let urlSort = AutofillDomainNameUrlSort()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         createListView()
@@ -344,6 +349,16 @@ final class PasswordManagementViewController: NSViewController {
         }
     }
 
+    func select(websiteAccount: SecureVaultModels.WebsiteAccount) {
+        listModel?.selected(item: SecureVaultItem.account(websiteAccount))
+        if let descriptor = self.listModel?.sortDescriptor {
+            self.listModel?.sortDescriptor = .init(category: .logins, parameter: descriptor.parameter, order: descriptor.order)
+        } else {
+            self.listModel?.sortDescriptor = .init(category: .logins, parameter: .title, order: .ascending)
+        }
+
+    }
+
     private func syncModelsOnCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, select: Bool = false) {
         self.itemModel?.setSecureVaultModel(credentials)
         self.listModel?.update(item: SecureVaultItem.account(credentials.account))
@@ -385,7 +400,10 @@ final class PasswordManagementViewController: NSViewController {
             self?.doSaveCredentials(credentials)
         }, onDeleteRequested: { [weak self] credentials in
             self?.promptToDelete(credentials: credentials)
-        })
+        },
+                                                     urlMatcher: urlMatcher,
+                                                     emailManager: emailManager,
+                                                     urlSort: urlSort)
 
         self.itemModel = itemModel
 

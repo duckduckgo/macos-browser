@@ -25,7 +25,7 @@ import NetworkProtection
 /// Abstraction of the the Network Protection status bar menu with a simple interface.
 ///
 public final class StatusBarMenu {
-    typealias MenuItem = NetworkProtectionStatusView.Model.MenuItem
+    public typealias MenuItem = NetworkProtectionStatusView.Model.MenuItem
 
     private let statusItem: NSStatusItem
     private let popover: NetworkProtectionPopover
@@ -45,8 +45,9 @@ public final class StatusBarMenu {
     public init(statusItem: NSStatusItem? = nil,
                 onboardingStatusPublisher: OnboardingStatusPublisher,
                 statusReporter: NetworkProtectionStatusReporter? = nil,
-                appLauncher: AppLaunching,
-                iconProvider: IconProvider) {
+                controller: TunnelController,
+                iconProvider: IconProvider,
+                menuItems: [MenuItem]) {
 
         let statusReporter = statusReporter ?? DefaultNetworkProtectionStatusReporter(
             statusObserver: ConnectionStatusObserverThroughDistributedNotifications(),
@@ -58,17 +59,6 @@ public final class StatusBarMenu {
 
         self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter, iconProvider: iconProvider)
-
-        let controller = AppLaunchingController(appLauncher: appLauncher)
-
-        let menuItems = [
-            MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: {
-                await appLauncher.launchApp(withCommand: .shareFeedback)
-            }),
-            MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: {
-                await appLauncher.launchApp(withCommand: .justOpen)
-            })
-        ]
 
         popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, menuItems: menuItems)
         popover.behavior = .transient

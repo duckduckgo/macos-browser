@@ -54,36 +54,6 @@ struct BookmarkViewModel {
         }
     }
 
-    // MARK: - Representing Color and Character
-
-    static var representingColors = [
-        NSColor.bookmarkRepresentingColor1,
-        NSColor.bookmarkRepresentingColor2,
-        NSColor.bookmarkRepresentingColor3,
-        NSColor.bookmarkRepresentingColor4,
-        NSColor.bookmarkRepresentingColor5
-    ]
-
-    // Representing color is a color shown as a background of home page item when
-    // the bookmark has no favicon
-    var representingColor: NSColor {
-        guard let bookmark = entity as? Bookmark else {
-            preconditionFailure("\(#file): Attempted to provide representing color for non-Bookmark")
-        }
-
-        let index = bookmark.url.count % Self.representingColors.count
-        return Self.representingColors[index]
-    }
-
-    // Representing character is on top of representing color
-    var representingCharacter: String {
-        guard let bookmark = entity as? Bookmark else {
-            preconditionFailure("\(#file): Attempted to provide representing character for non-Bookmark")
-        }
-
-        return bookmark.urlObject?.host?.droppingWwwPrefix().first?.uppercased() ?? "-"
-    }
-
 }
 
 fileprivate extension NSImage {
