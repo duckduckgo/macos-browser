@@ -96,7 +96,12 @@ final class ConfigurationStore: ConfigurationStoring {
         } catch {
             guard !NSApp.isRunningUnitTests else { return nil }
 
-            Pixel.fire(.debug(event: .trackerDataCouldNotBeLoaded, error: error))
+            let nserror = error as NSError
+
+            if nserror.domain != NSCocoaErrorDomain || nserror.code != NSFileReadNoSuchFileError {
+                Pixel.fire(.debug(event: .trackerDataCouldNotBeLoaded, error: error))
+            }
+
             return nil
         }
     }
