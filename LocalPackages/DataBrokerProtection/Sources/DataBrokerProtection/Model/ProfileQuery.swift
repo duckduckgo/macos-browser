@@ -24,6 +24,8 @@ struct Address: Encodable, Sendable {
 }
 
 struct ProfileQuery: Encodable, Sendable {
+    static let currentYear = Calendar.current.component(.year, from: Date())
+
     let id: Int64?
     let firstName: String
     let lastName: String
@@ -37,11 +39,7 @@ struct ProfileQuery: Encodable, Sendable {
     let birthYear: Int
     let phone: String?
     let fullName: String
-
-    var age: Int {
-        let currentYear = Calendar.current.component(.year, from: Date())
-        return currentYear - birthYear
-    }
+    let age: Int
 
     public init(id: Int64? = nil,
                 firstName: String,
@@ -67,5 +65,6 @@ struct ProfileQuery: Encodable, Sendable {
         self.phone = phone
         self.addresses = [Address(city: city, state: state)]
         self.fullName = "\(firstName) \(lastName)"
+        self.age = Self.currentYear - birthYear
     }
 }
