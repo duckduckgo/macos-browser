@@ -290,18 +290,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
         let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync)
         syncService.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
-
-        syncStateCancellable = syncService.authStatePublisher
-            .dropFirst()
-            .map { $0 == .inactive }
-            .removeDuplicates()
-            .sink { isSyncDisabled in
-                syncDataProviders.bookmarksAdapter.updateDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
-                syncDataProviders.credentialsAdapter.updateDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
-            }
-
-        syncDataProviders.bookmarksAdapter.setDatabaseCleanupSchedule(isEnabled: syncService.authState == .inactive)
-        syncDataProviders.credentialsAdapter.setDatabaseCleanupSchedule(isEnabled: syncService.authState == .inactive)
+        syncDataProviders.setUpDatabaseCleaners(syncService: syncService)
 
         // This is also called in applicationDidBecomeActive, but we're also calling it here, since
         // syncService can be nil when applicationDidBecomeActive is called during startup, if a modal
@@ -312,14 +301,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         self.syncDataProviders = syncDataProviders
         self.syncService = syncService
-
-        syncDataProviders.bookmarksAdapter.databaseCleaner.isSyncActive = { [weak self] in
-            self?.syncService?.authState == .active
-        }
-
-        syncDataProviders.credentialsAdapter.databaseCleaner.isSyncActive = { [weak self] in
-            self?.syncService?.authState == .active
-        }
     }
 
     // MARK: - Network Protection

@@ -36,13 +36,9 @@ final class SyncBookmarksAdapter {
         )
     }
 
-    func updateDatabaseCleanupSchedule(shouldEnable: Bool) {
+    func cleanUpDatabaseAndUpdateSchedule(shouldEnable: Bool) {
         databaseCleaner.cleanUpDatabaseNow()
-        setDatabaseCleanupSchedule(isEnabled: shouldEnable)
-    }
-
-    func setDatabaseCleanupSchedule(isEnabled: Bool) {
-        if isEnabled {
+        if shouldEnable {
             databaseCleaner.scheduleRegularCleaning()
         } else {
             databaseCleaner.cancelCleaningSchedule()
