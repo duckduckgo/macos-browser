@@ -2709,6 +2709,7 @@
 		BB5CB0A12A7AD59D00B312D1 /* NetworkProtectionDebugUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */; };
 		BB79F4F42A8FDDD400EDD78C /* PhasedRolloutFeatureFlagTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD1FE982A8D965200596EE4 /* PhasedRolloutFeatureFlagTester.swift */; };
 		BB79F4F52A8FDDE200EDD78C /* SetExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DFAB51C2A8982A600A0F7F6 /* SetExtension.swift */; };
+		BB8705162A96324B003359A2 /* WKBackForwardListExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B602E7CE2A93A5FF00F12201 /* WKBackForwardListExtension.swift */; };
 		CB24F70C29A3D9CB006DCC58 /* AppConfigurationURLProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB24F70B29A3D9CB006DCC58 /* AppConfigurationURLProvider.swift */; };
 		CB24F70D29A3D9CB006DCC58 /* AppConfigurationURLProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB24F70B29A3D9CB006DCC58 /* AppConfigurationURLProvider.swift */; };
 		CB6BCDF927C6BEFF00CC76DC /* PrivacyFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB6BCDF827C6BEFF00CC76DC /* PrivacyFeatures.swift */; };
@@ -8787,6 +8788,7 @@
 				3192A08F2A4C4CFF0084EA89 /* ContextMenuUserScript.swift in Sources */,
 				3192A0902A4C4CFF0084EA89 /* NSSavePanelExtension.swift in Sources */,
 				3192A0912A4C4CFF0084EA89 /* AppPrivacyConfigurationDataProvider.swift in Sources */,
+				BB8705162A96324B003359A2 /* WKBackForwardListExtension.swift in Sources */,
 				318115E52A8A4F3300129796 /* CredentialsCleanupErrorHandling.swift in Sources */,
 				3192A0922A4C4CFF0084EA89 /* LinkButton.swift in Sources */,
 				3192A0932A4C4CFF0084EA89 /* TemporaryFileHandler.swift in Sources */,
