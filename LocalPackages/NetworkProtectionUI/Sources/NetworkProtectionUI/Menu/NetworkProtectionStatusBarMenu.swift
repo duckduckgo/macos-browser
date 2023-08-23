@@ -43,6 +43,7 @@ public final class StatusBarMenu {
     ///     - statusItem: (meant for testing) this allows us to inject our own status `NSStatusItem` to make automated testing easier..
     ///
     public init(statusItem: NSStatusItem? = nil,
+                onboardingStatusPublisher: OnboardingStatusPublisher,
                 statusReporter: NetworkProtectionStatusReporter? = nil,
                 controller: TunnelController,
                 iconProvider: IconProvider,
@@ -59,7 +60,7 @@ public final class StatusBarMenu {
         self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter, iconProvider: iconProvider)
 
-        popover = NetworkProtectionPopover(controller: controller, statusReporter: statusReporter, menuItems: menuItems)
+        popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, menuItems: menuItems)
         popover.behavior = .transient
 
         self.statusItem.button?.image = .image(for: iconPublisher.icon)
