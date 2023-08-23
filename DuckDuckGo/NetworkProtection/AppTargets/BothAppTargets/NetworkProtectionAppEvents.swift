@@ -18,6 +18,8 @@
 
 import Common
 import Foundation
+
+#if NETWORK_PROTECTION
 import NetworkProtection
 
 /// Implements the sequence of steps that Network Protection needs to execute when the App starts up.
@@ -125,5 +127,6 @@ final class NetworkProtectionAppEvents {
             os_log("Successfully updated Network Protection servers; total server count = %{public}d", log: .networkProtection, serverCount)
         }
     }
-
 }
+
+#endif
