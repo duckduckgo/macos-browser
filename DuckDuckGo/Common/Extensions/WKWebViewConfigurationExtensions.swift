@@ -43,10 +43,6 @@ extension WKWebViewConfiguration {
             setURLSchemeHandler(DuckPlayerSchemeHandler(), forURLScheme: DuckPlayer.duckPlayerScheme)
         }
 
-        if urlSchemeHandler(forURLScheme: PrivacyDebugTools.urlScheme) == nil {
-            setURLSchemeHandler(PrivacyDebugToolsSchemeHandler(), forURLScheme: PrivacyDebugTools.urlScheme)
-        }
-
         let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,
                                                           privacyConfigurationManager: contentBlocking.privacyConfigurationManager)
 

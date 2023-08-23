@@ -905,8 +905,6 @@
 		37158E3A2A5569CA00874A9E /* PrivacyDebugToolsTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37158E382A5569CA00874A9E /* PrivacyDebugToolsTabExtension.swift */; };
 		37158E3D2A556EF900874A9E /* PrivacyDebugTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37158E3C2A556EF900874A9E /* PrivacyDebugTools.swift */; };
 		37158E3E2A556EF900874A9E /* PrivacyDebugTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37158E3C2A556EF900874A9E /* PrivacyDebugTools.swift */; };
-		37158E402A55712500874A9E /* PrivacyDebugToolsSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37158E3F2A55712500874A9E /* PrivacyDebugToolsSchemeHandler.swift */; };
-		37158E412A55712500874A9E /* PrivacyDebugToolsSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37158E3F2A55712500874A9E /* PrivacyDebugToolsSchemeHandler.swift */; };
 		37158E442A55B5E200874A9E /* PrivacyConfigurationEditUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37158E432A55B5E200874A9E /* PrivacyConfigurationEditUserScript.swift */; };
 		37158E452A55B5E200874A9E /* PrivacyConfigurationEditUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37158E432A55B5E200874A9E /* PrivacyConfigurationEditUserScript.swift */; };
 		37197EA12942441700394917 /* Tab+UIDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBDE293C8F7F00C3C99E /* Tab+UIDelegate.swift */; };
@@ -2223,7 +2221,6 @@
 		3714B1E828EDBAAB0056C57A /* DuckPlayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerTests.swift; sourceTree = "<group>"; };
 		37158E382A5569CA00874A9E /* PrivacyDebugToolsTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDebugToolsTabExtension.swift; sourceTree = "<group>"; };
 		37158E3C2A556EF900874A9E /* PrivacyDebugTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDebugTools.swift; sourceTree = "<group>"; };
-		37158E3F2A55712500874A9E /* PrivacyDebugToolsSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDebugToolsSchemeHandler.swift; sourceTree = "<group>"; };
 		37158E432A55B5E200874A9E /* PrivacyConfigurationEditUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyConfigurationEditUserScript.swift; sourceTree = "<group>"; };
 		371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackPresenter.swift; sourceTree = "<group>"; };
 		372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCredentialsAdapter.swift; sourceTree = "<group>"; };
@@ -3566,7 +3563,6 @@
 			isa = PBXGroup;
 			children = (
 				37158E3C2A556EF900874A9E /* PrivacyDebugTools.swift */,
-				37158E3F2A55712500874A9E /* PrivacyDebugToolsSchemeHandler.swift */,
 				37158E432A55B5E200874A9E /* PrivacyConfigurationEditUserScript.swift */,
 			);
 			path = PrivacyDebugTools;
@@ -8071,7 +8067,6 @@
 				3706FC6C293F65D500E42796 /* BookmarkViewModel.swift in Sources */,
 				3706FC6D293F65D500E42796 /* DaxSpeech.swift in Sources */,
 				3706FC6E293F65D500E42796 /* DuckPlayerSchemeHandler.swift in Sources */,
-				37158E412A55712500874A9E /* PrivacyDebugToolsSchemeHandler.swift in Sources */,
 				37445F9A2A1566420029F789 /* SyncDataProviders.swift in Sources */,
 				3706FC6F293F65D500E42796 /* FirePopoverViewModel.swift in Sources */,
 				3706FC71293F65D500E42796 /* NSColorExtension.swift in Sources */,
@@ -8621,7 +8616,6 @@
 				85D33F1225C82EB3002B91A6 /* ConfigurationManager.swift in Sources */,
 				31F28C4F28C8EEC500119F70 /* YoutubePlayerUserScript.swift in Sources */,
 				B6A9E48426146AAB0067D1B9 /* PixelParameters.swift in Sources */,
-				37158E402A55712500874A9E /* PrivacyDebugToolsSchemeHandler.swift in Sources */,
 				4B7A94B429C16294000C7D4C /* ErrorWithParameters.swift in Sources */,
 				AA5FA697275F90C400DCE9C9 /* FaviconImageCache.swift in Sources */,
 				1430DFF524D0580F00B8978C /* TabBarViewController.swift in Sources */,

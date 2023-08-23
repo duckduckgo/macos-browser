@@ -25,7 +25,11 @@ import UserScript
 
 final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
 
-    let messageOriginPolicy: MessageOriginPolicy = .all
+    let messageOriginPolicy: MessageOriginPolicy = .only(
+        rules: [
+            .exact(hostname: "duckduckgo.github.io")
+        ]
+    )
     let featureName: String = "debugToolsPage"
     weak var broker: UserScriptMessageBroker?
     weak var webView: WKWebView?

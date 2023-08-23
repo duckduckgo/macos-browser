@@ -736,7 +736,7 @@ extension MainViewController {
     }
 
     @IBAction func editRemoteConfiguration(_ sender: Any?) {
-        browserTabViewController.openNewTab(with: .url("ddg-debug://remote-config".url!))
+        browserTabViewController.openNewTab(with: .url("https://duckduckgo.github.io/content-scope-utils/debugger/v1".url!))
     }
 
     // MARK: - Developer Tools
