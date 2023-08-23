@@ -43,6 +43,7 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanDB?
     func fetchAllScans() throws -> [ScanDB]
 
+    func save(brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfileDB, lastRunDate: Date?, preferredRunDate: Date?) throws
     func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
@@ -329,6 +330,20 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     func fetchAllScans() throws -> [ScanDB] {
         try db.read { db in
             return try ScanDB.fetchAll(db)
+        }
+    }
+
+    func save(brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfileDB, lastRunDate: Date?, preferredRunDate: Date?) throws {
+        try db.write { db in
+            try extractedProfile.insert(db)
+            let extractedProfileId = db.lastInsertedRowID
+            try OptOutDB(
+                brokerId: brokerId,
+                profileQueryId: profileQueryId,
+                extractedProfileId: extractedProfileId,
+                lastRunDate: lastRunDate,
+                preferredRunDate: preferredRunDate
+            ).insert(db)
         }
     }
 

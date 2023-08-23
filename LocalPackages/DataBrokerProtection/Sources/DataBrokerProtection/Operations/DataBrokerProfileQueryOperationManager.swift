@@ -105,15 +105,17 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         os_log("Extracted profile already exists in database: %@", log: .dataBrokerProtection, id.description)
                     } else {
                         // If profile does not exist we insert the new profile and we create the opt-out operation
-                        // Should we do everything in one step here? If inserting the optOutOperationData fails should we remove the extracted profile, too? Or should we consider another way?
-                        let extractedProfileId = try database.save(extractedProfile, brokerId: brokerId, profileQueryId: profileQueryId)
-                        os_log("Creating new opt-out operation data for: %@", log: .dataBrokerProtection, String(describing: extractedProfile.name))
+                        //
+                        // This is done inside a transaction on the database side. We insert the extracted profile and then
+                        // we insert the opt-out operation, we do not want to do things separately in case creating an opt-out fails
+                        // causing the extracted profile to be orphan.
                         let optOutOperationData = OptOutOperationData(brokerId: brokerId,
                                                                       profileQueryId: profileQueryId,
                                                                       preferredRunDate: Date(), // If it's a new found profile, we'd like to opt-out ASAP
                                                                       historyEvents: [HistoryEvent](),
                                                                       extractedProfile: extractedProfile)
-                        database.saveOptOutOperation(optOut: optOutOperationData, extractedProfileId: extractedProfileId)
+                        os_log("Creating new opt-out operation data for: %@", log: .dataBrokerProtection, String(describing: extractedProfile.name))
+                        try database.saveOptOutOperation(optOut: optOutOperationData, extractedProfile: extractedProfile)
                     }
                 }
 

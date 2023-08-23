@@ -23,8 +23,7 @@ protocol DataBrokerProtectionRepository {
     func save(_ profile: DataBrokerProtectionProfile)
     func fetchProfile() -> DataBrokerProtectionProfile?
 
-    func save(_ extractedProfile: ExtractedProfile, brokerId: Int64, profileQueryId: Int64) throws -> Int64
-    func saveOptOutOperation(optOut: OptOutOperationData, extractedProfileId: Int64)
+    func saveOptOutOperation(optOut: OptOutOperationData, extractedProfile: ExtractedProfile) throws
 
     func brokerProfileQueryData(for brokerId: Int64, and profileQueryId: Int64) -> BrokerProfileQueryData?
     func fetchAllBrokerProfileQueryData(for profileId: Int64) -> [BrokerProfileQueryData]
@@ -220,18 +219,14 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         }
     }
 
-    func saveOptOutOperation(optOut: OptOutOperationData, extractedProfileId: Int64) {
-        do {
-            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+    func saveOptOutOperation(optOut: OptOutOperationData, extractedProfile: ExtractedProfile) throws {
+        let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
 
-            try vault.save(brokerId: optOut.brokerId,
-                           profileQueryId: optOut.profileQueryId,
-                           extractedProfileId: extractedProfileId,
-                           lastRunDate: optOut.lastRunDate,
-                           preferredRunDate: optOut.preferredRunDate)
-        } catch {
-            os_log("Database error: saveOptOutOperation, error: %{public}@", log: .error, error.localizedDescription)
-        }
+        try vault.save(brokerId: optOut.brokerId,
+                       profileQueryId: optOut.profileQueryId,
+                       extractedProfile: extractedProfile,
+                       lastRunDate: optOut.lastRunDate,
+                       preferredRunDate: optOut.preferredRunDate)
     }
 
     func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) -> HistoryEvent? {

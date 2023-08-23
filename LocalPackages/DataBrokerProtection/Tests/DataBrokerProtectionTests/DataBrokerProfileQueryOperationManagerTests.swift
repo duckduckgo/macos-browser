@@ -158,7 +158,6 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default
             )
-            XCTAssertTrue(mockDatabase.wasSaveExtractedProfileCalled)
             XCTAssertTrue(mockDatabase.wasSaveOptOutOperationCalled)
         } catch {
             XCTFail("Should not throw")
@@ -229,7 +228,6 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .error(error: .unknown("Test error")) }))
             XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .matchesFound }))
             XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .noMatchFound }))
-            XCTAssertFalse(mockDatabase.wasSaveExtractedProfileCalled)
             XCTAssertFalse(mockDatabase.wasSaveOptOutOperationCalled)
         }
     }
@@ -483,7 +481,6 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
 final class MockDatabase: DataBrokerProtectionRepository {
     var wasSaveProfileCalled = false
     var wasFetchProfileCalled = false
-    var wasSaveExtractedProfileCalled = false
     var wasSaveOptOutOperationCalled = false
     var wasBrokerProfileQueryDataCalled = false
     var wasFetchAllBrokerProfileQueryDataCalled = false
@@ -503,7 +500,6 @@ final class MockDatabase: DataBrokerProtectionRepository {
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
         wasFetchProfileCalled,
-        wasSaveExtractedProfileCalled,
         wasSaveOptOutOperationCalled,
         wasBrokerProfileQueryDataCalled,
         wasFetchAllBrokerProfileQueryDataCalled,
@@ -528,12 +524,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
         return nil
     }
 
-    func save(_ extractedProfile: ExtractedProfile, brokerId: Int64, profileQueryId: Int64) throws -> Int64 {
-        wasSaveExtractedProfileCalled = true
-        return 1
-    }
-
-    func saveOptOutOperation(optOut: OptOutOperationData, extractedProfileId: Int64) {
+    func saveOptOutOperation(optOut: OptOutOperationData, extractedProfile: ExtractedProfile) throws {
         wasSaveOptOutOperationCalled = true
     }
 
@@ -590,7 +581,6 @@ final class MockDatabase: DataBrokerProtectionRepository {
     func clear() {
         wasSaveProfileCalled = false
         wasFetchProfileCalled = false
-        wasSaveExtractedProfileCalled = false
         wasSaveOptOutOperationCalled = false
         wasBrokerProfileQueryDataCalled = false
         wasFetchAllBrokerProfileQueryDataCalled = false
