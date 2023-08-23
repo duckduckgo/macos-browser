@@ -43,7 +43,7 @@ public final class WaitlistViewModel: ObservableObject {
         case showTermsAndConditions
         case acceptTermsAndConditions
         case close
-        case closeAndPresentNetworkProtectionPopover
+        case closeAndPinNetworkProtection
     }
 
     enum NotificationPermissionState {
@@ -107,12 +107,11 @@ public final class WaitlistViewModel: ObservableObject {
         case .showTermsAndConditions: showTermsAndConditions()
         case .acceptTermsAndConditions: await acceptTermsAndConditions()
         case .close: close()
-        case .closeAndPresentNetworkProtectionPopover:
+        case .closeAndPinNetworkProtection:
             close()
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                NotificationCenter.default.post(name: .networkProtectionWaitlistShowPopover, object: nil)
-            }
+            LocalPinningManager.shared.togglePinning(for: .networkProtection)
+            NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
         }
     }
 

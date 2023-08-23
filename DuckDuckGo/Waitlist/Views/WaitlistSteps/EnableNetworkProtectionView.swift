@@ -41,7 +41,7 @@ struct EnableNetworkProtectionView: View {
         } buttons: {
             Button(UserText.networkProtectionWaitlistButtonGotIt) {
                 Task {
-                    await model.perform(action: .closeAndPresentNetworkProtectionPopover)
+                    await model.perform(action: .closeAndPinNetworkProtection)
                 }
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))

@@ -63,7 +63,6 @@ public enum WaitlistInviteCodeFetchError: Error, Equatable {
 extension Notification.Name {
 
     static let networkProtectionWaitlistAccessChanged = Notification.Name(rawValue: "networkProtectionWaitlistAccessChanged")
-    static let networkProtectionWaitlistShowPopover = Notification.Name(rawValue: "networkProtectionWaitlistShowPopover")
 
 }
 

@@ -139,7 +139,6 @@ final class NavigationBarViewController: NSViewController {
         listenToMessageNotifications()
         subscribeToDownloads()
         addContextMenu()
-        subscribeToActivateNotification()
 
         optionsButton.sendAction(on: .leftMouseDown)
         bookmarkListButton.sendAction(on: .leftMouseDown)
@@ -272,14 +271,6 @@ final class NavigationBarViewController: NSViewController {
     }
 
 #if NETWORK_PROTECTION
-    private func subscribeToActivateNotification() {
-        NotificationCenter.default.addObserver(forName: .networkProtectionWaitlistShowPopover, object: nil, queue: .main) { _ in
-            if #available(macOS 11.4, *) {
-                self.showNetworkProtectionPopover()
-            }
-        }
-    }
-
     @available(macOS 11.4, *)
     @IBAction func networkProtectionButtonAction(_ sender: NSButton) {
         showNetworkProtectionPopover()
