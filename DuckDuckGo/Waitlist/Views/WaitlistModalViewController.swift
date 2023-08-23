@@ -37,9 +37,7 @@ final class WaitlistModalViewController: NSViewController {
 
         self.model.delegate = self
 
-        let waitlistRootView = WaitlistRootView { newHeight in
-            // self.updateViewHeight(height: newHeight)
-        }
+        let waitlistRootView = WaitlistRootView()
 
         let hostingView = NSHostingView(rootView: waitlistRootView.environmentObject(self.model))
         hostingView.translatesAutoresizingMaskIntoConstraints = false

@@ -23,14 +23,6 @@ import SwiftUI
 struct WaitlistRootView: View {
     @EnvironmentObject var model: WaitlistViewModel
 
-    let sizeChanged: (CGFloat) -> Void
-
-    @State var viewHeight: CGFloat = 0.0 {
-        didSet {
-            sizeChanged(viewHeight)
-        }
-    }
-
     var body: some View {
         Group {
             switch model.viewState {
@@ -52,13 +44,6 @@ struct WaitlistRootView: View {
                 EnableNetworkProtectionView()
             }
         }
-        .background(
-            GeometryReader { proxy in
-                Color.clear.onAppear {
-                    viewHeight = proxy.size.height
-                }
-            }
-        )
         .environmentObject(model)
     }
 }
