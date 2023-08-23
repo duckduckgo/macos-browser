@@ -68,11 +68,11 @@ struct PinnedTabsView: View {
 }
 
 extension PinnedTabsView {
-    func itemIndex(for point: CGPoint) -> Int? {
-        guard (0..<PinnedTabView.Const.dimension).contains(point.y) else {
-            return nil
-        }
-        let possibleItemIndex = Int(point.x / PinnedTabView.Const.dimension)
+    func index(forItemAt point: CGPoint) -> Int? {
+        guard !model.items.isEmpty,
+              (0..<PinnedTabView.Const.dimension).contains(point.y) else { return nil }
+
+        let possibleItemIndex = min(model.items.count - 1, Int(point.x / PinnedTabView.Const.dimension))
         return model.items.index(model.items.startIndex, offsetBy: possibleItemIndex, limitedBy: model.items.endIndex)
     }
 }
