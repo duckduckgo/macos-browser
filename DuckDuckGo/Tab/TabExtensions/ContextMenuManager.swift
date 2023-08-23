@@ -20,8 +20,6 @@ import AppKit
 import Combine
 import Foundation
 import WebKit
-import BrowserServicesKit
-import Common
 
 enum NavigationDecision {
     case allow(NewWindowPolicy)
@@ -313,7 +311,7 @@ private extension ContextMenuManager {
         }
 
         self.onNewWindow = { _ in
-                .allow(.tab(selected: true, burner: burner))
+            .allow(.tab(selected: true, burner: burner))
         }
         webView.loadInNewWindow(url)
     }
@@ -345,7 +343,9 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.tab(selected: false, burner: burner)) }
+        onNewWindow = { _ in
+            .allow(.tab(selected: false, burner: burner))
+        }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -359,7 +359,9 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.window(active: true, burner: false)) }
+        onNewWindow = { _ in
+            .allow(.window(active: true, burner: false))
+        }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -457,7 +459,9 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.tab(selected: true, burner: burner)) }
+        onNewWindow = { _ in
+            .allow(.tab(selected: true, burner: burner))
+        }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -479,7 +483,9 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.window(active: true, burner: burner)) }
+        onNewWindow = { _ in
+            .allow(.window(active: true, burner: burner))
+        }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
