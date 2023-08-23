@@ -66,11 +66,12 @@ final class PhasedRolloutFeatureFlagTesterTests: XCTestCase {
     }
 
     func testWhenAttemptingToSendPixel_AndRolloutSubfeatureIsDisabled_ThenPixelDoesNotSend() {
-        let mockPrivacyConfiguration = mockConfiguration(subfeatureEnabled: false)
+        let mockManager = MockPrivacyConfigurationManager()
+        mockManager.privacyConfig = mockConfiguration(subfeatureEnabled: false)
         let pixelSender = MockPixelSender(returnError: false)
         let userDefaults = UserDefaults(suiteName: Self.testSuiteName)!
 
-        let tester = PhasedRolloutFeatureFlagTester(privacyConfiguration: mockPrivacyConfiguration,
+        let tester = PhasedRolloutFeatureFlagTester(privacyConfigurationManager: mockManager,
                                                     pixelSender: pixelSender,
                                                     userDefaults: userDefaults)
 
@@ -85,11 +86,12 @@ final class PhasedRolloutFeatureFlagTesterTests: XCTestCase {
     }
 
     func testWhenAttemptingToSendPixel_AndRolloutSubfeatureIsEnabled_AndPixelHasNotBeenSentBefore_ThenPixelSends() {
-        let mockPrivacyConfiguration = mockConfiguration(subfeatureEnabled: true)
+        let mockManager = MockPrivacyConfigurationManager()
+        mockManager.privacyConfig = mockConfiguration(subfeatureEnabled: true)
         let pixelSender = MockPixelSender(returnError: false)
         let userDefaults = UserDefaults(suiteName: Self.testSuiteName)!
 
-        let tester = PhasedRolloutFeatureFlagTester(privacyConfiguration: mockPrivacyConfiguration,
+        let tester = PhasedRolloutFeatureFlagTester(privacyConfigurationManager: mockManager,
                                                     pixelSender: pixelSender,
                                                     userDefaults: userDefaults)
 
@@ -104,11 +106,12 @@ final class PhasedRolloutFeatureFlagTesterTests: XCTestCase {
     }
 
     func testWhenAttemptingToSendPixel_AndRolloutSubfeatureIsEnabled_AndPixelHasBeenSentBefore_ThenPixelDoesNotSend() {
-        let mockPrivacyConfiguration = mockConfiguration(subfeatureEnabled: true)
+        let mockManager = MockPrivacyConfigurationManager()
+        mockManager.privacyConfig = mockConfiguration(subfeatureEnabled: true)
         let pixelSender = MockPixelSender(returnError: false)
         let userDefaults = UserDefaults(suiteName: Self.testSuiteName)!
 
-        let tester = PhasedRolloutFeatureFlagTester(privacyConfiguration: mockPrivacyConfiguration,
+        let tester = PhasedRolloutFeatureFlagTester(privacyConfigurationManager: mockManager,
                                                     pixelSender: pixelSender,
                                                     userDefaults: userDefaults)
 

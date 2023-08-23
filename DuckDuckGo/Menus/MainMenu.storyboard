@@ -895,6 +895,51 @@ CQ
                                                             <action selector="sendTestNotification:" target="Rah-lS-gno" id="Hea-8E-9VU"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Onboarding" id="xu6-z0-age">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Onboarding" id="L82-We-Wwv" customClass="NetworkProtectionOnboardingMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                            <items>
+                                                                <menuItem title="Reset Onboarding Status" id="gfc-0G-Ujy">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="resetWithSender:" target="L82-We-Wwv" id="xOi-lx-E4W"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem isSeparatorItem="YES" id="3kV-PK-dO5"/>
+                                                                <menuItem title="Set Status" id="Mpv-Qy-bPV">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <menu key="submenu" id="NiU-Vj-2iO">
+                                                                        <items>
+                                                                            <menuItem title="Onboarding Completed" id="3dg-2K-mfF">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                                <connections>
+                                                                                    <action selector="setStatusCompletedWithSender:" target="L82-We-Wwv" id="yxX-Y8-mhf"/>
+                                                                                </connections>
+                                                                            </menuItem>
+                                                                            <menuItem title="Allow System Extension" id="fBd-P9-lzz">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                                <connections>
+                                                                                    <action selector="setStatusAllowSystemExtensionWithSender:" target="L82-We-Wwv" id="Bdv-pa-CnK"/>
+                                                                                </connections>
+                                                                            </menuItem>
+                                                                            <menuItem title="Allow VPN Configuration" id="FDy-9D-IWu">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                                <connections>
+                                                                                    <action selector="setStatusAllowVPNConfigurationWithSender:" target="L82-We-Wwv" id="pTb-5l-0eT"/>
+                                                                                </connections>
+                                                                            </menuItem>
+                                                                        </items>
+                                                                    </menu>
+                                                                </menuItem>
+                                                            </items>
+                                                            <connections>
+                                                                <outlet property="resetMenuItem" destination="gfc-0G-Ujy" id="IQi-c6-FGQ"/>
+                                                                <outlet property="setStatusAllowSystemExtensionMenuItem" destination="fBd-P9-lzz" id="vAR-4f-npu"/>
+                                                                <outlet property="setStatusAllowVPNConfigurationMenuItem" destination="FDy-9D-IWu" id="eCX-M8-KNR"/>
+                                                                <outlet property="setStatusCompletedMenuItem" destination="3dg-2K-mfF" id="D7v-lV-bMJ"/>
+                                                            </connections>
+                                                        </menu>
+                                                    </menuItem>
                                                     <menuItem title="Preferred Server" id="Zh6-DO-H1c">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <menu key="submenu" title="Preferred Server" autoenablesItems="NO" id="jbT-17-qgW">
@@ -1099,7 +1144,6 @@ CQ
                             <outlet property="importBookmarksMenuItem" destination="tNX-Bv-yM3" id="NI1-on-lCU"/>
                             <outlet property="importBrowserDataMenuItem" destination="gTV-od-6G5" id="2R0-Pa-qG4"/>
                             <outlet property="manageBookmarksMenuItem" destination="BaO-sP-wbQ" id="rn7-HX-04s"/>
-                            <outlet property="networkProtectionMenuItem" destination="Dt6-sj-4hn" id="rwK-fl-TRh"/>
                             <outlet property="newBurnerWindowMenuItem" destination="fx4-EK-KRg" id="52V-eM-hzi"/>
                             <outlet property="newTabMenuItem" destination="9qI-62-tsd" id="6SI-rG-P34"/>
                             <outlet property="newWindowMenuItem" destination="Was-JA-tGl" id="uyQ-qR-DFk"/>

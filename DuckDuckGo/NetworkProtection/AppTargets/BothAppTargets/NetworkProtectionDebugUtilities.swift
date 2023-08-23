@@ -21,6 +21,7 @@ import Foundation
 
 #if NETWORK_PROTECTION
 import NetworkProtection
+import NetworkProtectionUI
 import NetworkExtension
 import SystemExtensions
 
@@ -38,6 +39,9 @@ final class NetworkProtectionDebugUtilities {
             }
         }
     }
+
+    @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .shared)
+    private(set) var onboardingStatusRawValue: OnboardingStatus.RawValue
 
     // MARK: - Login Items Management
 
@@ -75,9 +79,14 @@ final class NetworkProtectionDebugUtilities {
             }
         }
 
+        // We reset the onboarding status incrementally to stay aligned with the actual
+        // status of things.
+        onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
+
         NetworkProtectionSelectedServerUserDefaultsStore().reset()
 
         try await removeSystemExtensionAndAgents()
+        onboardingStatusRawValue = OnboardingStatus.default.rawValue
     }
 
     func removeSystemExtensionAndAgents() async throws {
