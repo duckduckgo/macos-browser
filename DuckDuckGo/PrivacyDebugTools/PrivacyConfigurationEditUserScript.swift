@@ -27,7 +27,7 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
 
     let messageOriginPolicy: MessageOriginPolicy = .only(
         rules: [
-            .exact(hostname: "duckduckgo.github.io")
+            .exact(hostname: PrivacyDebugTools.urlHost)
         ]
     )
     let featureName: String = "debugToolsPage"

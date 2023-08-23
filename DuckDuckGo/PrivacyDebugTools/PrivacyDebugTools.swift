@@ -20,7 +20,7 @@ import BrowserServicesKit
 import Foundation
 
 final class PrivacyDebugTools {
-    static let urlScheme = "ddg-debug"
+    static let urlHost = "duckduckgo.github.io"
 
     var isEnabled: Bool {
 #if DEBUG
@@ -39,7 +39,7 @@ final class PrivacyDebugTools {
 
 extension URL {
 
-    var isPrivacyDebugToolsScheme: Bool {
-        scheme == PrivacyDebugTools.urlScheme
+    var isPrivacyDebugTools: Bool {
+        host == "duckduckgo.github.io"
     }
 }
