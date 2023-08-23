@@ -29,7 +29,7 @@ final class NetworkProtectionAppEvents {
 
     /// Call this method when the app finishes launching, to run the startup logic for NetP.
     ///
-    func appLaunchComplete() {
+    func applicationDidFinishLaunching() {
         let loginItemsManager = NetworkProtectionLoginItemsManager()
         let keychainStore = NetworkProtectionKeychainTokenStore()
 
