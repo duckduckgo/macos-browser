@@ -170,6 +170,11 @@ final class ProfileViewModel: ObservableObject {
     }
 
     private func mapProfileUIToModel() -> DataBrokerProtectionProfile {
+
+        guard let birthYear = birthYear else {
+            fatalError("Birth year shouldn't be nil")
+        }
+
         let names = names.map {
             DataBrokerProtectionProfile.Name(firstName: $0.firstName,
                                              lastName: $0.lastName,
@@ -187,7 +192,7 @@ final class ProfileViewModel: ObservableObject {
         return DataBrokerProtectionProfile(names: names,
                                            addresses: addresses,
                                            phones: [],
-                                           birthYear: birthYear ?? 0)
+                                           birthYear: birthYear)
     }
 }
 
