@@ -17,30 +17,29 @@
 //
 
 import SwiftUI
-import BrowserServicesKit
-import SwiftUIExtensions
 
 struct LoginFaviconView: View {
-    let domain: String
-    let generatedIconLetters: String
+
+    let domain: String?
+
     let faviconManagement: FaviconManagement = FaviconManager.shared
 
     var body: some View {
-        Group {
-            if let image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image {
-                Image(nsImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 32)
-                    .cornerRadius(4.0)
-                    .padding(.leading, 6)
-            } else {
-                LetterIconView(title: generatedIconLetters)
-            }
+
+        if let image = favicon {
+            Image(nsImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 32)
+                .cornerRadius(4.0)
         }
+
     }
 
     var favicon: NSImage? {
+        guard let domain else {
+            return NSImage(named: "Login")
+        }
         return faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image ?? NSImage(named: "Login")
     }
 

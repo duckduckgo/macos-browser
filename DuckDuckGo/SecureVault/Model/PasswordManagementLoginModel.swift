@@ -18,7 +18,6 @@
 
 import Combine
 import BrowserServicesKit
-import Common
 
 final class PasswordManagementLoginModel: ObservableObject, PasswordManagementItemModel {
 
@@ -33,7 +32,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     var onSaveRequested: (SecureVaultModels.WebsiteCredentials) -> Void
     var onDeleteRequested: (SecureVaultModels.WebsiteCredentials) -> Void
-    var urlMatcher: AutofillDomainNameUrlMatcher
+    var urlMatcher: AutofillUrlMatcher
     var emailManager: EmailManager
 
     var isEditingPublisher: Published<Bool>.Publisher {
@@ -53,7 +52,6 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
     @Published var notes: String = ""
     @Published var isEditing = false
     @Published var isNew = false
-    @Published var domainTLD = ""
 
     var isDirty: Bool {
         title != "" || username != "" || password != "" || domain != "" || notes != ""
@@ -123,23 +121,16 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         usernameIsPrivateEmail && privateEmailMessage != ""
     }
 
-    private let tld: TLD
-    private let urlSort: AutofillDomainNameUrlSort
-    private static let randomColorsCount = 15
-
     init(onSaveRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
          onDeleteRequested: @escaping (SecureVaultModels.WebsiteCredentials) -> Void,
-         urlMatcher: AutofillDomainNameUrlMatcher,
-         emailManager: EmailManager,
-         tld: TLD = ContentBlocking.shared.tld,
-         urlSort: AutofillDomainNameUrlSort) {
+         urlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher(),
+         emailManager: EmailManager = EmailManager()) {
         self.onSaveRequested = onSaveRequested
         self.onDeleteRequested = onDeleteRequested
         self.urlMatcher = urlMatcher
         self.emailManager = emailManager
-        self.tld = tld
-        self.urlSort = urlSort
         self.emailManager.requestDelegate = self
+
     }
 
     func setSecureVaultModel<Model>(_ modelObject: Model) {
@@ -210,8 +201,6 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
         domain =  urlMatcher.normalizeUrlForWeb(credentials?.account.domain ?? "")
         notes = credentials?.account.notes ?? ""
         isNew = credentials?.account.id == nil
-        let name = credentials?.account.name(tld: tld, autofillDomainNameUrlMatcher: urlMatcher)
-        domainTLD = tld.eTLDplus1(name) ?? credentials?.account.title ?? "#"
 
         // Determine Private Email Status when required
         usernameIsPrivateEmail = emailManager.isPrivateEmail(email: username)
