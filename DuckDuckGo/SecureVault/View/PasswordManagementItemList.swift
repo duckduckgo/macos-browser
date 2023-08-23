@@ -20,6 +20,7 @@ import Foundation
 import SwiftUI
 import BrowserServicesKit
 import Combine
+import SwiftUIExtensions
 
 struct ScrollOffsetKey: PreferenceKey {
     typealias Value = CGFloat
@@ -267,6 +268,13 @@ private struct ItemView: View {
     let item: SecureVaultItem
     let action: () -> Void
 
+    func getIconLetters(account: SecureVaultModels.WebsiteAccount) -> String {
+        if let title = account.title, !title.isEmpty {
+            return title
+        }
+        return model.tldForAccount(account)
+    }
+
     var body: some View {
 
         let selected = model.selected == item
@@ -277,9 +285,12 @@ private struct ItemView: View {
             HStack(spacing: 2) {
 
                 switch item {
-                case .account(let account):
-                    LoginFaviconView(domain: account.domain)
-                        .padding(.leading, 6)
+                case .account:
+                    if let account = item.websiteAccount, let domain = account.domain {
+                        LoginFaviconView(domain: domain, generatedIconLetters: getIconLetters(account: account))
+                    } else {
+                        LetterIconView(title: "#")
+                    }
                 case .card:
                     Image("Card")
                         .frame(width: 32)
