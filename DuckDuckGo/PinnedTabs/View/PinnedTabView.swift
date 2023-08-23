@@ -195,7 +195,7 @@ struct PinnedTabInnerView: View {
         } else if let domain = model.content.url?.host, let eTLDplus1 = ContentBlocking.shared.tld.eTLDplus1(domain), let firstLetter = eTLDplus1.capitalized.first.flatMap(String.init) {
             ZStack {
                 Rectangle()
-                    .foregroundColor(.forDomain(eTLDplus1))
+                    .foregroundColor(.forString(eTLDplus1))
                 Text(firstLetter)
                     .font(.caption)
                     .foregroundColor(.white)

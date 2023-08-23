@@ -274,11 +274,18 @@ final class PasswordManagementItemListModel: ObservableObject {
     @Published var canChangeCategory: Bool = true
 
     private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void
+    private let tld: TLD
+    private let urlMatcher: AutofillDomainNameUrlMatcher
+    private static let randomColorsCount = 15
 
     init(passwordManagerCoordinator: PasswordManagerCoordinating,
-         onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void) {
+         onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void,
+         urlMatcher: AutofillDomainNameUrlMatcher = AutofillDomainNameUrlMatcher(),
+         tld: TLD = ContentBlocking.shared.tld) {
         self.onItemSelected = onItemSelected
         self.passwordManagerCoordinator = passwordManagerCoordinator
+        self.urlMatcher = urlMatcher
+        self.tld = tld
     }
 
     func update(items: [SecureVaultItem]) {
@@ -449,6 +456,12 @@ final class PasswordManagementItemListModel: ObservableObject {
         case .logins: emptyState = .logins
         case .identities: emptyState = .identities
         }
+    }
+
+    func tldForAccount(_ account: SecureVaultModels.WebsiteAccount) -> String {
+        let name = account.name(tld: tld, autofillDomainNameUrlMatcher: urlMatcher)
+        let title = (account.title?.isEmpty == false) ? account.title! : "#"
+        return tld.eTLDplus1(name) ?? title
     }
 
 }
