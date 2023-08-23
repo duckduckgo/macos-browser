@@ -35,7 +35,7 @@ final class OperationsTests: XCTestCase {
     }
 
     func testCleanScanOperationNoResults() async throws {
-        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
+        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 1980)
         let dataBroker = DataBroker(name: "Test Broker",
                                     steps: [Step](),
                                     version: "1.0.0",
@@ -75,7 +75,7 @@ final class OperationsTests: XCTestCase {
     }
 
     func testCleanScanOperationWithResults() async throws {
-        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
+        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 1980)
         let dataBroker = DataBroker(name: "Test Broker",
                                     steps: [Step](),
                                     version: "1.0.0",
@@ -124,7 +124,7 @@ final class OperationsTests: XCTestCase {
     }
 
     func testCleanScanOperationWithError() async throws {
-        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
+        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 1980)
         let dataBroker = DataBroker(name: "Test Broker",
                                     steps: [Step](),
                                     version: "1.0.0",
@@ -164,7 +164,7 @@ final class OperationsTests: XCTestCase {
     }
 
     func testOptOutOperationWithSuccess() async throws {
-        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
+        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 1980)
         let dataBroker = DataBroker(name: "Test Broker",
                                     steps: [Step](),
                                     version: "1.0.0",
@@ -217,7 +217,7 @@ final class OperationsTests: XCTestCase {
     }
 
     func testOptOutOperationWithRunnerError() async throws {
-        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
+        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 1980)
         let dataBroker = DataBroker(name: "Test Broker",
                                     steps: [Step](),
                                     version: "1.0.0",
@@ -268,7 +268,7 @@ final class OperationsTests: XCTestCase {
     }
 
     func testOptOutConfirmationSuccess() async throws {
-        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
+        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 1980)
         let dataBroker = DataBroker(name: "Test Broker",
                                     steps: [Step](),
                                     version: "1.0.0",
@@ -331,7 +331,7 @@ final class OperationsTests: XCTestCase {
     }
 
     func testOptOutConfirmationNotRemoved() async throws {
-        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
+        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 1980)
         let dataBroker = DataBroker(name: "Test Broker",
                                     steps: [Step](),
                                     version: "1.0.0",
@@ -386,7 +386,7 @@ final class OperationsTests: XCTestCase {
     }
 
     func testOptOutConfirmationRemovedOnSomeProfiles() async throws {
-        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46)
+        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 1980)
         let dataBroker = DataBroker(name: "Test Broker",
                                     steps: [Step](),
                                     version: "1.0.0",
@@ -462,7 +462,7 @@ private struct MockDataBase: DataBase {
 
     func brokerProfileQueryData(for id: UUID) -> BrokerProfileQueryData? {
         BrokerProfileQueryData(id: UUID(),
-                               profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46),
+                               profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 1980),
                                dataBroker: DataBroker(name: "batata",
                                                       steps: [Step](),
                                                       version: "1.0.0",
@@ -495,7 +495,7 @@ private struct MockDataBase: DataBase {
 
     func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
         let data = BrokerProfileQueryData(id: UUID(),
-                                          profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46),
+                                          profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 1980),
                                           dataBroker: DataBroker(name: "batata",
                                                                  steps: [Step](),
                                                                  version: "1.0.0",

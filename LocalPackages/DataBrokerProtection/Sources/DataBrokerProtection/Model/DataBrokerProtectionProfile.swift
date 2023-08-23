@@ -56,16 +56,16 @@ public struct DataBrokerProtectionProfile: Codable {
     public let names: [Name]
     public let addresses: [Address]
     public let phones: [String]
-    public let age: Int
+    public let birthYear: Int
 
     public init(names: [DataBrokerProtectionProfile.Name],
                 addresses: [DataBrokerProtectionProfile.Address],
                 phones: [String],
-                age: Int) {
+                birthYear: Int) {
         self.names = names
         self.addresses = addresses
         self.phones = phones
-        self.age = age
+        self.birthYear = birthYear
     }
 }
 
@@ -79,7 +79,7 @@ internal extension DataBrokerProtectionProfile {
                     middleName: name.middleName,
                     city: address.city,
                     state: address.state,
-                    age: age)
+                    birthYear: birthYear)
             }
         }
     }

@@ -19,6 +19,7 @@
 import Foundation
 
 final class ProfileViewModel: ObservableObject {
+    private let dataManager: DataBrokerProtectionDataManaging
 
     final class Name: Identifiable {
         let id = UUID()
@@ -48,15 +49,17 @@ final class ProfileViewModel: ObservableObject {
         @Trimmed var street = ""
         @Trimmed var city = ""
         @Trimmed var state =  ""
+        @Trimmed var zip =  ""
 
-        internal init(street: String = "", city: String, state: String) {
+        internal init(street: String = "", city: String, state: String, zip: String = "") {
             self.street = street
             self.city = city
             self.state = state
+            self.zip = zip
         }
 
         var fullAddress: String {
-            let components = [street, city, state].filter { !$0.isEmpty }
+            let components = [street, zip, city, state].filter { !$0.isEmpty }
             return components.joined(separator: ", ")
         }
     }
@@ -95,6 +98,11 @@ final class ProfileViewModel: ObservableObject {
         [isBirthdayValid, isNameValid, isAddressValid].allSatisfy { $0 }
     }
 
+    init(dataManager: DataBrokerProtectionDataManaging) {
+        self.dataManager = dataManager
+        restoreSavedProfile()
+    }
+
     func saveName(id: UUID?, firstName: String, middleName: String?, lastName: String, suffix: String?) {
         let chosenSuffix = suffix == ProfileViewModel.defaultSuffixSelection ? nil : suffix
 
@@ -116,15 +124,17 @@ final class ProfileViewModel: ObservableObject {
         names.removeAll(where: {$0.id == id})
     }
 
-    func saveAddress(id: UUID?, street: String? = nil, city: String, state: String) {
+    func saveAddress(id: UUID?, street: String? = nil, city: String, state: String, zip: String? = nil) {
         if let id = id, let address = addresses.filter({ $0.id == id}).first {
             address.street = street ?? ""
             address.city = city
             address.state = state
+            address.zip = zip ?? ""
         } else {
             let address = Address(street: street ?? "",
                                   city: city,
-                                  state: state)
+                                  state: state,
+                                  zip: zip ?? "")
             addresses.append(address)
         }
     }
@@ -133,6 +143,57 @@ final class ProfileViewModel: ObservableObject {
         addresses.removeAll(where: {$0.id == id})
     }
 
+    func saveProfile() {
+        // It should edit or delete the profile before saving if there was a previous profile saved
+        let profile = mapProfileUIToModel()
+        dataManager.saveProfile(profile)
+    }
+
+    private func restoreSavedProfile() {
+        if let profile = dataManager.fetchProfile() {
+            names =  profile.names.map {
+                Name(firstName: $0.firstName,
+                     middleName: $0.middleName ?? "",
+                     lastName: $0.lastName,
+                     suffix: $0.suffix ?? "")
+            }
+
+            addresses = profile.addresses.map {
+                Address(street: $0.street ?? "",
+                        city: $0.city,
+                        state: $0.state,
+                        zip: $0.zipCode ?? "")
+            }
+
+            birthYear = profile.birthYear
+        }
+    }
+
+    private func mapProfileUIToModel() -> DataBrokerProtectionProfile {
+
+        guard let birthYear = birthYear else {
+            fatalError("Birth year shouldn't be nil")
+        }
+
+        let names = names.map {
+            DataBrokerProtectionProfile.Name(firstName: $0.firstName,
+                                             lastName: $0.lastName,
+                                             middleName: $0.middleName,
+                                             suffix: $0.suffix)
+        }
+
+        let addresses = addresses.map {
+            DataBrokerProtectionProfile.Address(city: $0.city,
+                                                state: $0.state,
+                                                street: $0.street,
+                                                zipCode: $0.zip)
+        }
+
+        return DataBrokerProtectionProfile(names: names,
+                                           addresses: addresses,
+                                           phones: [],
+                                           birthYear: birthYear)
+    }
 }
 
 @propertyWrapper

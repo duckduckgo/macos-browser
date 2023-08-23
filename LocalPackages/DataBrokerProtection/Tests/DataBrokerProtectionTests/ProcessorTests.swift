@@ -181,33 +181,33 @@ private struct MockDataBase: DataBase {
 
         let data1 = BrokerProfileQueryData(
             id: brokerProfileQueryID1,
-            profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 46),
+            profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 1980),
             dataBroker: databroker1,
             optOutOperationsData: [optOutToRemoveSecond]
         )
 
         let data2 = BrokerProfileQueryData(
             id: brokerProfileQueryID2,
-            profileQuery: ProfileQuery(firstName: "Jane", lastName: "Smith", city: "New York", state: "NY", age: 32),
+            profileQuery: ProfileQuery(firstName: "Jane", lastName: "Smith", city: "New York", state: "NY", birthYear: 1980),
             dataBroker: databroker1,
             optOutOperationsData: [removedOptOutOperationData, optOutToRemoveFirst]
         )
 
         let data3 = BrokerProfileQueryData(
             id: UUID(),
-            profileQuery: ProfileQuery(firstName: "Michael", lastName: "Johnson", city: "Los Angeles", state: "CA", age: 50),
+            profileQuery: ProfileQuery(firstName: "Michael", lastName: "Johnson", city: "Los Angeles", state: "CA", birthYear: 1980),
             dataBroker: databroker2
         )
 
         let data4 = BrokerProfileQueryData(
             id: UUID(),
-            profileQuery: ProfileQuery(firstName: "Emily", lastName: "Brown", city: "Chicago", state: "IL", age: 27),
+            profileQuery: ProfileQuery(firstName: "Emily", lastName: "Brown", city: "Chicago", state: "IL", birthYear: 1980),
             dataBroker: databroker2
         )
 
         let data5 = BrokerProfileQueryData(
             id: UUID(),
-            profileQuery: ProfileQuery(firstName: "David", lastName: "Anderson", city: "Houston", state: "TX", age: 38),
+            profileQuery: ProfileQuery(firstName: "David", lastName: "Anderson", city: "Houston", state: "TX", birthYear: 1980),
             dataBroker: DataBroker(
                 name: "onion",
                 steps: [Step](),

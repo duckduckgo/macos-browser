@@ -30,7 +30,7 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
                 DataBrokerProtectionProfile.Address(city: "New York", state: "NY")
             ],
             phones: [String](),
-            age: 30
+            birthYear: 1980
         )
 
         let queries = profile.profileQueries
@@ -43,13 +43,13 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
                 lastName: "Doe",
                 city: "New York",
                 state: "NY",
-                age: 30),
+                birthYear: 1980),
             ProfileQuery(
                 firstName: "Jane",
                 lastName: "Smith",
                 city: "New York",
                 state: "NY",
-                age: 30)
+                birthYear: 1980)
         ]
 
         XCTAssertTrue(queries.contains { query in
@@ -67,7 +67,7 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
                 DataBrokerProtectionProfile.Address(city: "Los Angeles", state: "CA")
             ],
             phones: [String](),
-            age: 30
+            birthYear: 1980
         )
 
         let queries = profile.profileQueries
@@ -80,14 +80,14 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
                 lastName: "Doe",
                 city: "New York",
                 state: "NY",
-                age: 30
+                birthYear: 1980
             ),
             ProfileQuery(
                 firstName: "John",
                 lastName: "Doe",
                 city: "Los Angeles",
                 state: "CA",
-                age: 30
+                birthYear: 1980
             )
         ]
 
@@ -106,7 +106,7 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
                 DataBrokerProtectionProfile.Address(city: "Los Angeles", state: "CA")
             ],
             phones: [String](),
-            age: 30
+            birthYear: 1980
         )
 
         let queries = profile.profileQueries
@@ -119,35 +119,35 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
                 lastName: "Doe",
                 city: "New York",
                 state: "NY",
-                age: 30
+                birthYear: 1980
             ),
             ProfileQuery(
                 firstName: "John",
                 lastName: "Doe",
                 city: "Los Angeles",
                 state: "CA",
-                age: 30
+                birthYear: 1980
             ),
             ProfileQuery(
                 firstName: "Jane",
                 lastName: "Smith",
                 city: "New York",
                 state: "NY",
-                age: 30
+                birthYear: 1980
             ),
             ProfileQuery(
                 firstName: "Jane",
                 lastName: "Smith",
                 city: "Los Angeles",
                 state: "CA",
-                age: 30
+                birthYear: 1980
             )
         ]
         XCTAssertEqual(queries.sorted(), expectedQueries.sorted())
     }
 
     func testProfileQueriesWithNoNamesAndAddresses() {
-        let profile = DataBrokerProtectionProfile(names: [], addresses: [], phones: [String](), age: 30)
+        let profile = DataBrokerProtectionProfile(names: [], addresses: [], phones: [String](), birthYear: 1980)
 
         let queries = profile.profileQueries
 

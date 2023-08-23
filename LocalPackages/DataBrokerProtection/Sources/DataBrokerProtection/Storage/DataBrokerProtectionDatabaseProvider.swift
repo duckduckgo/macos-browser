@@ -71,7 +71,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         // User profile
         try database.create(table: ProfileDB.databaseTableName) {
             $0.autoIncrementedPrimaryKey(ProfileDB.Columns.id.name)
-            $0.column(ProfileDB.Columns.age.name, .integer).notNull()
+            $0.column(ProfileDB.Columns.birthYear.name, .integer).notNull()
         }
 
         try database.create(table: NameDB.databaseTableName) {
@@ -121,7 +121,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             $0.column(ProfileQueryDB.Columns.zipCode.name, .text)
 
             $0.column(ProfileQueryDB.Columns.phone.name, .text)
-            $0.column(ProfileQueryDB.Columns.age.name, .integer)
+            $0.column(ProfileQueryDB.Columns.birthYear.name, .integer)
         }
 
         try database.create(table: BrokerDB.databaseTableName) {
