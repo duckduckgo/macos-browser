@@ -68,7 +68,7 @@ extension PrivacyDebugToolsTabExtension: NavigationResponder {
             return .next
         }
         // Always allow loading Privacy Debug Tools URLs (from CCF)
-        privacyConfigurationEditUserScript?.isActive = navigationAction.url.isPrivacyDebugToolsScheme
+        privacyConfigurationEditUserScript?.isActive = navigationAction.url.isPrivacyDebugTools
         if privacyConfigurationEditUserScript?.isActive == true {
             return .allow
         }
