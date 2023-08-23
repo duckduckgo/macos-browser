@@ -212,7 +212,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 #if NETWORK_PROTECTION
         if #available(macOS 11.4, *) {
-            NetworkProtectionAppEvents().appLaunchComplete()
+            NetworkProtectionAppEvents().applicationDidFinishLaunching()
         }
 #endif
     }
