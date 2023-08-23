@@ -31,9 +31,9 @@ public extension Color {
         )
     }
 
-    static func forString(_ string: String) -> Color {
+    static func forDomain(_ domain: String) -> Color {
         var consistentHash: Int {
-            return string.utf8
+            return domain.utf8
                 .map { return $0 }
                 .reduce(5381) { ($0 << 5) &+ $0 &+ Int($1) }
         }
