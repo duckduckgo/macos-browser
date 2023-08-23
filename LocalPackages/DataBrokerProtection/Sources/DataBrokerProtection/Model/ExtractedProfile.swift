@@ -57,7 +57,7 @@ struct AddressCityState: Codable {
 }
 
 struct ExtractedProfile: Codable, Sendable {
-    let id: UUID = UUID()
+    let id: Int64?
     let name: String?
     let alternativeNamesList: [String]?
     let addressFull: String?
@@ -74,6 +74,7 @@ struct ExtractedProfile: Codable, Sendable {
     let fullName: String?
 
     enum CodingKeys: CodingKey {
+        case id
         case name
         case alternativeNamesList
         case addressFull
@@ -90,7 +91,8 @@ struct ExtractedProfile: Codable, Sendable {
         case fullName
     }
 
-    init(name: String? = nil,
+    init(id: Int64? = nil,
+         name: String? = nil,
          alternativeNamesList: [String]? = nil,
          addressFull: String? = nil,
          addressCityState: String? = nil,
@@ -103,6 +105,7 @@ struct ExtractedProfile: Codable, Sendable {
          age: String? = nil,
          email: String? = nil,
          removedDate: Date? = nil) {
+        self.id = id
         self.name = name
         self.alternativeNamesList = alternativeNamesList
         self.addressFull = addressFull
@@ -121,6 +124,7 @@ struct ExtractedProfile: Codable, Sendable {
 
     func merge(with profile: ProfileQuery) -> ExtractedProfile {
         ExtractedProfile(
+            id: self.id,
             name: self.name ?? profile.fullName,
             alternativeNamesList: self.alternativeNamesList,
             addressFull: self.addressFull,

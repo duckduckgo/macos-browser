@@ -25,14 +25,14 @@ protocol OperationRunnerProvider {
 }
 
 final class DataBrokerProtectionProcessor {
-    private let database: DataBase
+    private let database: DataBrokerProtectionRepository
     private let config: SchedulerConfig
     private let operationRunnerProvider: OperationRunnerProvider
     private let notificationCenter: NotificationCenter
     private let operationQueue: OperationQueue
     private var errorHandler: EventMapping<DataBrokerProtectionOperationError>?
 
-    init(database: DataBase,
+    init(database: DataBrokerProtectionRepository,
          config: SchedulerConfig,
          operationRunnerProvider: OperationRunnerProvider,
          notificationCenter: NotificationCenter = NotificationCenter.default,
@@ -68,7 +68,7 @@ final class DataBrokerProtectionProcessor {
                                priorityDate: Date?,
                                completion: @escaping () -> Void) {
 
-        let brokersProfileData = database.fetchAllBrokerProfileQueryData()
+        let brokersProfileData = database.fetchAllBrokerProfileQueryData(for: 1) // We assume one profile for now
         let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
                                                                                   operationType: operationType,
                                                                                   priorityDate: priorityDate)
@@ -87,10 +87,10 @@ final class DataBrokerProtectionProcessor {
                                                       priorityDate: Date?) -> [DataBrokerOperationsCollection] {
 
         var collections: [DataBrokerOperationsCollection] = []
-        var visitedDataBrokerIDs: Set<UUID> = []
+        var visitedDataBrokerIDs: Set<Int64> = []
 
         for queryData in brokerProfileQueriesData {
-            let dataBrokerID = queryData.dataBroker.id
+            guard let dataBrokerID = queryData.dataBroker.id else { continue }
 
             if !visitedDataBrokerIDs.contains(dataBrokerID) {
                 let matchingQueriesData = brokerProfileQueriesData.filter { $0.dataBroker.id == dataBrokerID }

@@ -57,7 +57,7 @@ struct MapperToDB {
 
     func mapToDB(_ broker: DataBroker) throws -> BrokerDB {
         let encodedBroker = try jsonEncoder.encode(broker)
-        return .init(id: nil, name: broker.name, json: encodedBroker, version: 1)
+        return .init(id: nil, name: broker.name, json: encodedBroker, version: broker.version)
     }
 
     func mapToDB(_ profileQuery: ProfileQuery, relatedTo profileId: Int64) throws -> ProfileQueryDB {
@@ -155,11 +155,20 @@ struct MapperToModel {
     }
 
     func mapToModel(_ brokerDB: BrokerDB) throws -> DataBroker {
-        return try jsonDecoder.decode(DataBroker.self, from: brokerDB.json)
+        let decodedBroker = try jsonDecoder.decode(DataBroker.self, from: brokerDB.json)
+
+        return DataBroker(
+            id: brokerDB.id,
+            name: decodedBroker.name,
+            steps: decodedBroker.steps,
+            version: decodedBroker.version,
+            schedulingConfig: decodedBroker.schedulingConfig
+        )
     }
 
     func mapToModel(_ profileQueryDB: ProfileQueryDB) throws -> ProfileQuery {
         .init(
+            id: profileQueryDB.id,
             firstName: try mechanism(profileQueryDB.first).decoded,
             lastName: try mechanism(profileQueryDB.last).decoded,
             middleName: try profileQueryDB.middle.decode(mechanism),
@@ -175,39 +184,58 @@ struct MapperToModel {
         )
     }
 
-    func mapToModel(_ scanDB: ScanDB) -> ScanOperationData {
-        // This will be fixed to a correct model once we work on integrating the secure vault with the scheduler
+    func mapToModel(_ scanDB: ScanDB, events: [ScanHistoryEventDB]) throws -> ScanOperationData {
         .init(
-            brokerProfileQueryID: UUID(),
+            brokerId: scanDB.brokerId,
+            profileQueryId: scanDB.profileQueryId,
             preferredRunDate: scanDB.preferredRunDate,
-            historyEvents: [HistoryEvent](),
+            historyEvents: try events.map(mapToModel(_:)),
             lastRunDate: scanDB.lastRunDate
         )
     }
 
-    func mapToModel(_ optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB) throws -> OptOutOperationData {
-        // This will be fixed to a correct model once we work on integrating the secure vault with the scheduler
+    func mapToModel(_ optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB, events: [OptOutHistoryEventDB]) throws -> OptOutOperationData {
         .init(
-            brokerProfileQueryID: UUID(),
+            brokerId: optOutDB.brokerId,
+            profileQueryId: optOutDB.profileQueryId,
             preferredRunDate: optOutDB.preferredRunDate,
-            historyEvents: [HistoryEvent](),
+            historyEvents: try events.map(mapToModel(_:)),
             lastRunDate: optOutDB.lastRunDate,
             extractedProfile: try mapToModel(extractedProfileDB)
         )
     }
 
     func mapToModel(_ extractedProfileDB: ExtractedProfileDB) throws -> ExtractedProfile {
-        return try jsonDecoder.decode(ExtractedProfile.self, from: try mechanism(extractedProfileDB.profile))
+        let extractedProfile = try jsonDecoder.decode(ExtractedProfile.self, from: try mechanism(extractedProfileDB.profile))
+        return .init(id: extractedProfileDB.id,
+                     name: extractedProfile.name,
+                     alternativeNamesList: extractedProfile.alternativeNamesList,
+                     addressFull: extractedProfile.addressFull,
+                     addressCityState: extractedProfile.addressCityState,
+                     addressCityStateList: extractedProfile.addressCityStateList,
+                     phone: extractedProfile.phone,
+                     relativesList: extractedProfile.relativesList,
+                     profileUrl: extractedProfile.profileUrl,
+                     reportId: extractedProfile.reportId,
+                     age: extractedProfile.age,
+                     email: extractedProfile.email,
+                     removedDate: extractedProfile.removedDate)
     }
 
     func mapToModel(_ scanEvent: ScanHistoryEventDB) throws -> HistoryEvent {
         let decodedEventType = try jsonDecoder.decode(HistoryEvent.EventType.self, from: scanEvent.event)
-        return .init(type: decodedEventType, date: scanEvent.timestamp)
+        return .init(brokerId: scanEvent.brokerId, profileQueryId: scanEvent.profileQueryId, type: decodedEventType, date: scanEvent.timestamp)
     }
 
     func mapToModel(_ optOutEvent: OptOutHistoryEventDB) throws -> HistoryEvent {
         let decodedEventType = try jsonDecoder.decode(HistoryEvent.EventType.self, from: optOutEvent.event)
-        return .init(type: decodedEventType, date: optOutEvent.timestamp)
+        return .init(
+            extractedProfileId: optOutEvent.extractedProfileId,
+            brokerId: optOutEvent.brokerId,
+            profileQueryId: optOutEvent.profileQueryId,
+            type: decodedEventType,
+            date: optOutEvent.timestamp
+        )
     }
 }
 

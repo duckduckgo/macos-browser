@@ -19,45 +19,27 @@
 import Foundation
 
 protocol BrokerOperationData {
-    var id: UUID { get }
-    var brokerProfileQueryID: UUID { get }
-    var preferredRunDate: Date? { get set }
-    var historyEvents: [HistoryEvent] { get set }
-    var lastRunDate: Date? { get set }
-
-    func lastEventWith(type: HistoryEvent.EventType) -> HistoryEvent?
-    mutating func addHistoryEvent(_ historyEvent: HistoryEvent)
+    var brokerId: Int64 { get }
+    var profileQueryId: Int64 { get }
+    var lastRunDate: Date? { get }
+    var preferredRunDate: Date? { get }
+    var historyEvents: [HistoryEvent] { get }
 }
 
-extension BrokerOperationData {
-    mutating func addHistoryEvent(_ historyEvent: HistoryEvent) {
-        self.historyEvents.append(historyEvent)
-    }
+final class ScanOperationData: BrokerOperationData, Sendable {
+    let brokerId: Int64
+    let profileQueryId: Int64
+    let preferredRunDate: Date?
+    let historyEvents: [HistoryEvent]
+    let lastRunDate: Date?
 
-    var lastRunDate: Date? {
-        historyEvents.last?.date
-    }
-
-    func lastEventWith(type: HistoryEvent.EventType) -> HistoryEvent? {
-        return historyEvents.last(where: { $0.type == type })
-    }
-}
-
-final class ScanOperationData: BrokerOperationData {
-    let id: UUID
-    let brokerProfileQueryID: UUID
-    var preferredRunDate: Date?
-    var historyEvents: [HistoryEvent]
-    var lastRunDate: Date?
-
-    init(id: UUID = UUID(),
-         brokerProfileQueryID: UUID,
+    init(brokerId: Int64,
+         profileQueryId: Int64,
          preferredRunDate: Date? = nil,
          historyEvents: [HistoryEvent],
          lastRunDate: Date? = nil) {
-
-        self.id = id
-        self.brokerProfileQueryID = brokerProfileQueryID
+        self.brokerId = brokerId
+        self.profileQueryId = profileQueryId
         self.preferredRunDate = preferredRunDate
         self.historyEvents = historyEvents
         self.lastRunDate = lastRunDate
@@ -65,23 +47,22 @@ final class ScanOperationData: BrokerOperationData {
 
 }
 
-final class OptOutOperationData: BrokerOperationData {
-    let id: UUID
-    let brokerProfileQueryID: UUID
-    var preferredRunDate: Date?
-    var historyEvents: [HistoryEvent]
-    var lastRunDate: Date?
-    var extractedProfile: ExtractedProfile
+final class OptOutOperationData: BrokerOperationData, Sendable {
+    let brokerId: Int64
+    let profileQueryId: Int64
+    let preferredRunDate: Date?
+    let historyEvents: [HistoryEvent]
+    let lastRunDate: Date?
+    let extractedProfile: ExtractedProfile
 
-    init(id: UUID = UUID(),
-         brokerProfileQueryID: UUID,
+    init(brokerId: Int64,
+         profileQueryId: Int64,
          preferredRunDate: Date? = nil,
          historyEvents: [HistoryEvent],
          lastRunDate: Date? = nil,
          extractedProfile: ExtractedProfile) {
-
-        self.id = id
-        self.brokerProfileQueryID = brokerProfileQueryID
+        self.brokerId = brokerId
+        self.profileQueryId = profileQueryId
         self.preferredRunDate = preferredRunDate
         self.historyEvents = historyEvents
         self.lastRunDate = lastRunDate

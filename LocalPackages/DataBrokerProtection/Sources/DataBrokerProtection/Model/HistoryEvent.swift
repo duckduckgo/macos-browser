@@ -19,41 +19,35 @@
 import Foundation
 
 public struct HistoryEvent: Sendable, Identifiable {
-    public enum EventType: Codable {
+    public enum EventType: Codable, Sendable, Equatable {
         case noMatchFound
-        case matchFound(extractedProfileID: UUID) // We will change this in follow-up changes to just log that we found scans.
+        case matchesFound
         case error(error: DataBrokerProtectionError)
-        case optOutStarted(extractedProfileID: UUID)
-        case optOutRequested(extractedProfileID: UUID)
-        case optOutConfirmed(extractedProfileID: UUID)
+        case optOutStarted
+        case optOutRequested
+        case optOutConfirmed
         case scanStarted
     }
 
-    public let id: UUID
+    public let extractedProfileId: Int64?
+    public let brokerId: Int64
+    public let profileQueryId: Int64
     public let type: EventType
     public let date: Date
 
-    init(type: EventType, date: Date = Date()) {
-        self.id = UUID()
+    public var id: String {
+        return "\(extractedProfileId ?? 0)-\(brokerId)-\(profileQueryId)-\(date)"
+    }
+
+    init(extractedProfileId: Int64? = nil,
+         brokerId: Int64,
+         profileQueryId: Int64,
+         type: EventType,
+         date: Date = Date()) {
+        self.extractedProfileId = extractedProfileId
+        self.brokerId = brokerId
+        self.profileQueryId = profileQueryId
         self.date = date
         self.type = type
-    }
-}
-
-extension HistoryEvent.EventType: Equatable {
-    public static func == (lhs: HistoryEvent.EventType, rhs: HistoryEvent.EventType) -> Bool {
-        switch (lhs, rhs) {
-        case (.noMatchFound, .noMatchFound),
-             (.error, .error),
-             (.scanStarted, .scanStarted):
-            return true
-        case let (.matchFound(extractedProfileID: lhsProfileID), .matchFound(extractedProfileID: rhsProfileID)),
-             let (.optOutStarted(extractedProfileID: lhsProfileID), .optOutStarted(extractedProfileID: rhsProfileID)),
-             let (.optOutRequested(extractedProfileID: lhsProfileID), .optOutRequested(extractedProfileID: rhsProfileID)),
-             let (.optOutConfirmed(extractedProfileID: lhsProfileID), .optOutConfirmed(extractedProfileID: rhsProfileID)):
-            return lhsProfileID == rhsProfileID
-        default:
-            return false
-        }
     }
 }

@@ -28,7 +28,7 @@ final class DataBrokerOperationsCollection: Operation {
     }
 
     private let brokerProfileQueriesData: [BrokerProfileQueryData]
-    private let database: DataBase
+    private let database: DataBrokerProtectionRepository
     private let id = UUID()
     private var _isExecuting = false
     private var _isFinished = false
@@ -44,7 +44,7 @@ final class DataBrokerOperationsCollection: Operation {
     }
 
     init(brokerProfileQueriesData: [BrokerProfileQueryData],
-         database: DataBase,
+         database: DataBrokerProtectionRepository,
          operationType: OperationType,
          intervalBetweenOperations: TimeInterval? = nil,
          priorityDate: Date? = nil,
@@ -104,9 +104,9 @@ final class DataBrokerOperationsCollection: Operation {
 
         switch operationType {
         case .optOut:
-            operationsData = brokerProfileQueriesData.flatMap { $0.optOutsData }
+            operationsData = brokerProfileQueriesData.flatMap { $0.optOutOperationsData }
         case .scan:
-            operationsData = brokerProfileQueriesData.compactMap { $0.scanData }
+            operationsData = brokerProfileQueriesData.compactMap { $0.scanOperationData }
         case .all:
             operationsData = brokerProfileQueriesData.flatMap { $0.operationsData }
         }
@@ -125,7 +125,9 @@ final class DataBrokerOperationsCollection: Operation {
                 return
             }
 
-            let brokerProfileData = brokerProfileQueriesData.filter { $0.id == operationData.brokerProfileQueryID }.first
+            let brokerProfileData = brokerProfileQueriesData.filter {
+                $0.dataBroker.id == operationData.brokerId && $0.profileQuery.id == operationData.profileQueryId
+            }.first
 
             guard let brokerProfileData = brokerProfileData else {
                 continue

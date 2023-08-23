@@ -31,27 +31,36 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
 
     func save(_ broker: BrokerDB) throws -> Int64
     func fetchBroker(with id: Int64) throws -> BrokerDB?
+    func fetchAllBrokers() throws -> [BrokerDB]
 
     func save(_ profileQuery: ProfileQueryDB) throws -> Int64
     func fetchProfileQuery(with id: Int64) throws -> ProfileQueryDB?
+    func fetchAllProfileQueries(for profileId: Int64) throws -> [ProfileQueryDB]
 
     func save(brokerId: Int64, profileQueryId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws
+    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws
+    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws
     func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanDB?
     func fetchAllScans() throws -> [ScanDB]
 
+    func save(brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfileDB, lastRunDate: Date?, preferredRunDate: Date?) throws
     func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws
+    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
+    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws
     func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> (optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)?
+    func fetchOptOuts(brokerId: Int64, profileQueryId: Int64) throws -> [(optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)]
     func fetchAllOptOuts() throws -> [(optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)]
 
     func save(_ scanEvent: ScanHistoryEventDB) throws
     func save(_ optOutEvent: OptOutHistoryEventDB) throws
     func fetchScanEvents(brokerId: Int64, profileQueryId: Int64) throws -> [ScanHistoryEventDB]
     func fetchOptOutEvents(brokerId: Int64, profileQueryId: Int64) throws -> [OptOutHistoryEventDB]
+    func fetchOptOutEvents(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> [OptOutHistoryEventDB]
 
     func save(_ extractedProfile: ExtractedProfileDB) throws -> Int64
     func fetchExtractedProfile(with id: Int64) throws -> ExtractedProfileDB?
     func fetchExtractedProfiles(for brokerId: Int64, with profileQueryId: Int64) throws -> [ExtractedProfileDB]
-    func updateRemovedDate(for extractedProfileId: Int64, with date: Date) throws
+    func updateRemovedDate(for extractedProfileId: Int64, with date: Date?) throws
  }
 
 final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDatabaseProvider, DataBrokerProtectionDatabaseProvider {
@@ -61,7 +70,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     }
 
     public init(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(), key: Data) throws {
-        try super.init(file: file, key: Data(), writerType: .queue) { migrator in
+        try super.init(file: file, key: key, writerType: .queue) { migrator in
             migrator.registerMigration("v1", migrate: Self.migrateV1(database:))
         }
     }
@@ -129,7 +138,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 
             $0.column(BrokerDB.Columns.name.name, .text).unique().notNull()
             $0.column(BrokerDB.Columns.json.name, .text).notNull()
-            $0.column(BrokerDB.Columns.version.name, .numeric).notNull()
+            $0.column(BrokerDB.Columns.version.name, .text).notNull()
         }
 
         try database.create(table: ScanDB.databaseTableName) {
@@ -252,6 +261,12 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
+    func fetchAllBrokers() throws -> [BrokerDB] {
+        try db.read { db in
+            return try BrokerDB.fetchAll(db)
+        }
+    }
+
     func save(_ profileQuery: ProfileQueryDB) throws -> Int64 {
         try db.write { db in
             try profileQuery.insert(db)
@@ -262,6 +277,14 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     func fetchProfileQuery(with id: Int64) throws -> ProfileQueryDB? {
         try db.read { db in
             return try ProfileQueryDB.fetchOne(db, key: id)
+        }
+    }
+
+    func fetchAllProfileQueries(for profileId: Int64) throws -> [ProfileQueryDB] {
+        try db.read { db in
+            return try ProfileQueryDB
+                .filter(Column(ProfileQueryDB.Columns.profileId.name) == profileId)
+                .fetchAll(db)
         }
     }
 
@@ -276,15 +299,51 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
+    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws {
+        try db.write { db in
+            if var scan = try ScanDB.fetchOne(db, key: [ScanDB.Columns.brokerId.name: brokerId, ScanDB.Columns.profileQueryId.name: profileQueryId]) {
+                scan.preferredRunDate = date
+                try scan.update(db)
+            } else {
+                throw DataBrokerProtectionDatabaseErrors.elementNotFound
+            }
+        }
+    }
+
+    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws {
+        try db.write { db in
+            if var scan = try ScanDB.fetchOne(db, key: [ScanDB.Columns.brokerId.name: brokerId, ScanDB.Columns.profileQueryId.name: profileQueryId]) {
+                scan.lastRunDate = date
+                try scan.update(db)
+            } else {
+                throw DataBrokerProtectionDatabaseErrors.elementNotFound
+            }
+        }
+    }
+
     func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanDB? {
         try db.read { db in
-            return try ScanDB.fetchOne(db, key: ["brokerId": brokerId, "profileQueryId": profileQueryId])
+            return try ScanDB.fetchOne(db, key: [ScanDB.Columns.brokerId.name: brokerId, ScanDB.Columns.profileQueryId.name: profileQueryId])
         }
     }
 
     func fetchAllScans() throws -> [ScanDB] {
         try db.read { db in
             return try ScanDB.fetchAll(db)
+        }
+    }
+
+    func save(brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfileDB, lastRunDate: Date?, preferredRunDate: Date?) throws {
+        try db.write { db in
+            try extractedProfile.insert(db)
+            let extractedProfileId = db.lastInsertedRowID
+            try OptOutDB(
+                brokerId: brokerId,
+                profileQueryId: profileQueryId,
+                extractedProfileId: extractedProfileId,
+                lastRunDate: lastRunDate,
+                preferredRunDate: preferredRunDate
+            ).insert(db)
         }
     }
 
@@ -300,17 +359,62 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
+    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        try db.write { db in
+            if var optOut = try OptOutDB.fetchOne(db, key: [
+                OptOutDB.Columns.brokerId.name: brokerId,
+                OptOutDB.Columns.profileQueryId.name: profileQueryId,
+                OptOutDB.Columns.extractedProfileId.name: extractedProfileId]) {
+                optOut.preferredRunDate = date
+                try optOut.update(db)
+            } else {
+                throw DataBrokerProtectionDatabaseErrors.elementNotFound
+            }
+        }
+    }
+
+    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+        try db.write { db in
+            if var optOut = try OptOutDB.fetchOne(db, key: [
+                OptOutDB.Columns.brokerId.name: brokerId,
+                OptOutDB.Columns.profileQueryId.name: profileQueryId,
+                OptOutDB.Columns.extractedProfileId.name: extractedProfileId]) {
+                optOut.lastRunDate = date
+                try optOut.update(db)
+            } else {
+                throw DataBrokerProtectionDatabaseErrors.elementNotFound
+            }
+        }
+    }
+
     func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> (optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)? {
         try db.read { db in
             if let optOut = try OptOutDB.fetchOne(db, key: [
-                "brokerId": brokerId,
-                "profileQueryId": profileQueryId,
-                "extractdProfileId": extractedProfileId]
+                OptOutDB.Columns.brokerId.name: brokerId,
+                OptOutDB.Columns.profileQueryId.name: profileQueryId,
+                OptOutDB.Columns.extractedProfileId.name: extractedProfileId]
             ), let extractedProfile = try optOut.extractedProfile.fetchOne(db) {
                 return (optOut, extractedProfile)
             }
 
             return nil
+        }
+    }
+
+    func fetchOptOuts(brokerId: Int64, profileQueryId: Int64) throws -> [(optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)] {
+        try db.read { db in
+            var optOutsWithExtractedProfiles = [(optOutDB: OptOutDB, extractedProfileDB: ExtractedProfileDB)]()
+            let optOuts = try OptOutDB
+                .filter(Column(OptOutDB.Columns.brokerId.name) == brokerId && Column(OptOutDB.Columns.profileQueryId.name) == profileQueryId)
+                .fetchAll(db)
+
+            for optOut in optOuts {
+                if let extractedProfile = try optOut.extractedProfile.fetchOne(db) {
+                    optOutsWithExtractedProfiles.append((optOutDB: optOut, extractedProfileDB: extractedProfile))
+                }
+            }
+
+            return optOutsWithExtractedProfiles
         }
     }
 
@@ -344,7 +448,8 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     func fetchScanEvents(brokerId: Int64, profileQueryId: Int64) throws -> [ScanHistoryEventDB] {
         try db.read { db in
             return try ScanHistoryEventDB
-                .filter(Column("brokerId") == brokerId && Column("profileQueryId") == profileQueryId)
+                .filter(Column(ScanHistoryEventDB.Columns.brokerId.name) == brokerId &&
+                        Column(ScanHistoryEventDB.Columns.profileQueryId.name) == profileQueryId)
                 .fetchAll(db)
         }
     }
@@ -352,7 +457,18 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     func fetchOptOutEvents(brokerId: Int64, profileQueryId: Int64) throws -> [OptOutHistoryEventDB] {
         try db.read { db in
             return try OptOutHistoryEventDB
-                .filter(Column("brokerId") == brokerId && Column("profileQueryId") == profileQueryId)
+                .filter(Column(OptOutHistoryEventDB.Columns.brokerId.name) == brokerId &&
+                        Column(OptOutHistoryEventDB.Columns.profileQueryId.name) == profileQueryId)
+                .fetchAll(db)
+        }
+    }
+
+    func fetchOptOutEvents(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> [OptOutHistoryEventDB] {
+        try db.read { db in
+            return try OptOutHistoryEventDB
+                .filter(Column(OptOutHistoryEventDB.Columns.brokerId.name) == brokerId &&
+                        Column(OptOutHistoryEventDB.Columns.profileQueryId.name) == profileQueryId &&
+                        Column(OptOutHistoryEventDB.Columns.extractedProfileId.name) == extractedProfileId)
                 .fetchAll(db)
         }
     }
@@ -373,12 +489,13 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     func fetchExtractedProfiles(for brokerId: Int64, with profileQueryId: Int64) throws -> [ExtractedProfileDB] {
         try db.read { db in
             return try ExtractedProfileDB
-                .filter(Column("brokerId") == brokerId && Column("profileQueryId") == profileQueryId)
+                .filter(Column(ExtractedProfileDB.Columns.brokerId.name) == brokerId &&
+                        Column(ExtractedProfileDB.Columns.profileQueryId.name) == profileQueryId)
                 .fetchAll(db)
         }
     }
 
-    func updateRemovedDate(for extractedProfileId: Int64, with date: Date) throws {
+    func updateRemovedDate(for extractedProfileId: Int64, with date: Date?) throws {
         try db.write { db in
             if var extractedProfile = try ExtractedProfileDB.fetchOne(db, key: extractedProfileId) {
                 extractedProfile.removedDate = date
