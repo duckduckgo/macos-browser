@@ -73,7 +73,7 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
                     partialResult.combineLatest(publisher, { $0 + [$1] }).eraseToAnyPublisher()
                 }
             }
-            .map { $0.compactMap(\.url).removingDuplicates(byKey: \.absoluteString).filter { $0.scheme != PrivacyDebugTools.urlScheme } }
+            .map { $0.compactMap(\.url).removingDuplicates(byKey: \.absoluteString).filter { $0.scheme != PrivacyDebugTools.urlHost } }
             .removeDuplicates()
             .sink { [weak self] urls in
                 guard let self, let webView else {
@@ -97,6 +97,11 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
         case getTabs
         case getFeatures
         case updateResource
+        case getRemoteResource
+    }
+
+    enum SupportedRemoteResources: String, CaseIterable {
+        case privacyConfiguration = "privacy-configuration"
     }
 
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
@@ -105,6 +110,8 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
             return handleGetTabs
         case .getFeatures:
             return handleGetFeatures
+        case .getRemoteResource:
+            return handleGetRemoteResource
         case .updateResource:
             return handleUpdateResource
         default:
@@ -125,12 +132,26 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
             .flatMap { $0 }
             .compactMap(\.content.url)
 
-        return GetTabsResponse.init(urls: urls.removingDuplicates(byKey: \.absoluteString).filter { $0.scheme != PrivacyDebugTools.urlScheme })
+        return GetTabsResponse.init(urls: urls.removingDuplicates(byKey: \.absoluteString).filter { $0.scheme != PrivacyDebugTools.urlHost })
     }
 
     @MainActor
     func handleGetFeatures(params: Any, message: UserScriptMessage) -> Encodable? {
         generateFeaturesResponse()
+    }
+
+    struct GetRemoteResourceParams: Decodable {
+        let id: String;
+    }
+
+    @MainActor
+    func handleGetRemoteResource(params: Any, message: UserScriptMessage) -> Encodable? {
+        guard let params: GetRemoteResourceParams = DecodableHelper.decode(from: params),
+              let supported = SupportedRemoteResources(rawValue: params.id) else {
+            assertionFailure("PrivacyConfigurationEditUserScript: cannot provide resource")
+            return nil
+        }
+        return generateResourceResponseFor(resource: supported)
     }
 
     @MainActor
@@ -144,17 +165,32 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
         case let .remote(url):
             configurationURLProvider.setURL(url.url, for: .privacyConfiguration)
             try await ConfigurationManager.shared.forceRefresh(.privacyConfiguration)
-            return generateResourceResponse()
+            return generateResourceResponseFor(resource: .privacyConfiguration)
         case let .debugTools(content):
             try await ConfigurationManager.shared.override(.privacyConfiguration, with: content.utf8data)
-            return generateResourceResponse()
+            return generateResourceResponseFor(resource: .privacyConfiguration)
         }
     }
 
     private let dateFormatter = ISO8601DateFormatter()
 
     @MainActor
-    func generateResourceResponse() -> RemoteResource {
+    func generateResourceRefsResponse() -> [RemoteResourceRef] {
+        // swiftlint:disable:next force_cast
+        let urlProvider = (NSApp.delegate as! AppDelegate).configurationURLProvider
+
+        return [
+            RemoteResourceRef(
+                id: SupportedRemoteResources.privacyConfiguration.rawValue,
+                url: urlProvider.url(for: .privacyConfiguration, allowOverrides: false).absoluteString,
+                name: "Privacy Config"
+            )
+        ]
+    }
+
+    @MainActor
+    func generateResourceResponseFor(resource: SupportedRemoteResources) -> RemoteResource {
+        // unused `id`
         let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
         // swiftlint:disable:next force_cast
         let urlProvider = (NSApp.delegate as! AppDelegate).configurationURLProvider
@@ -170,7 +206,7 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
         }()
 
         return RemoteResource(
-            id: "privacy-configuration",
+            id: SupportedRemoteResources.privacyConfiguration.rawValue,
             url: urlProvider.url(for: .privacyConfiguration, allowOverrides: false).absoluteString,
             name: "Privacy Config",
             current: .init(
@@ -183,7 +219,7 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
 
     @MainActor
     func generateFeaturesResponse() -> FeaturesResponse {
-        return FeaturesResponse(features: .init(remoteResources: .init(resources: [generateResourceResponse()])))
+        return FeaturesResponse(features: .init(remoteResources: .init(resources: generateResourceRefsResponse())))
     }
 }
 
@@ -224,7 +260,13 @@ struct Features: Codable {
 }
 
 struct RemoteResources: Codable {
-    let resources: [RemoteResource]
+    let resources: [RemoteResourceRef]
+}
+
+struct RemoteResourceRef: Codable {
+    let id: String
+    let url: String
+    let name: String
 }
 
 struct RemoteResource: Codable {
