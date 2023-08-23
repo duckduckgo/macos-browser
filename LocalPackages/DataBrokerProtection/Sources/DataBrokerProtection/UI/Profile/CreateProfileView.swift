@@ -20,7 +20,9 @@ import SwiftUI
 
 @available(macOS 11.0, *)
 struct CreateProfileView: View {
-    @StateObject var viewModel = ProfileViewModel()
+    @ObservedObject var viewModel: ProfileViewModel
+    let scanButtonClicked: () -> Void
+
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
@@ -32,9 +34,12 @@ struct CreateProfileView: View {
                 ComponentsContainerView(viewModel: viewModel)
                     .padding()
 
-                FormFooterView(viewModel: viewModel)
-                    .padding()
-                    .padding(.horizontal, Consts.OuterForm.horizontalPadding)
+                FormFooterView(viewModel: viewModel, buttonClicked: {
+                    viewModel.saveProfile()
+                    scanButtonClicked()
+                })
+                .padding()
+                .padding(.horizontal, Consts.OuterForm.horizontalPadding)
             }
             .shadedBorderedPanel(backgroundColor: Color("profile-background-color", bundle: .module))
 
@@ -319,6 +324,7 @@ private struct AddressFormView: View {
     @State private var street = ""
     @State private var city = ""
     @State private var state = ""
+    @State private var zip = ""
     @State private var shouldShowDeleteButton = false
 
     var body: some View {
@@ -339,6 +345,8 @@ private struct AddressFormView: View {
                     }
                 } label: { }
             }
+
+            TextFieldWithLabel(label: "Zip Code", text: $zip)
             .padding(.bottom, 20)
 
             CTAFooterView(
@@ -361,6 +369,7 @@ private struct AddressFormView: View {
                 street = selectedAddress.street
                 city = selectedAddress.city
                 state = selectedAddress.state
+                zip = selectedAddress.zip
             }
         }
     }
@@ -370,7 +379,8 @@ private struct AddressFormView: View {
             viewModel.saveAddress(id: viewModel.selectedAddress?.id,
                                   street: street,
                                   city: city,
-                                  state: state)
+                                  state: state,
+                                  zip: zip)
         }
     }
 
@@ -411,11 +421,11 @@ private struct FormHeaderView: View {
 
 private struct FormFooterView: View {
     @ObservedObject var viewModel: ProfileViewModel
-
+    let buttonClicked: () -> Void
     var body: some View {
         VStack(spacing: 16) {
             Button {
-               print("Scan")
+                buttonClicked()
             } label: {
                 Text("Scan")
                     .frame(maxWidth: .infinity)
@@ -639,7 +649,7 @@ private enum Consts {
 @available(macOS 11.0, *)
 struct CreateProfileView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateProfileView()
+        CreateProfileView(viewModel: ProfileViewModel(dataManager: DataBrokerProtectionDataManager()), scanButtonClicked: {})
             .frame(width: 500, height: 1400)
             .padding(30)
     }

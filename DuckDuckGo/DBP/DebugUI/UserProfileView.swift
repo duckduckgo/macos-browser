@@ -26,7 +26,7 @@ struct UserProfileView: View {
     @State private var middleName: String = ""
     @State private var city: String = ""
     @State private var state: String = ""
-    @State private var age: String = ""
+    @State private var birthYear: String = ""
 
     @State private var firstNameError: String = ""
     @State private var middleNameError: String = ""
@@ -101,8 +101,8 @@ struct UserProfileView: View {
                               error: stateError)
 
             validateTextField(label: "Age",
-                              text: $age,
-                              value: age,
+                              text: $birthYear,
+                              value: birthYear,
                               validationFunction: validateAge,
                               error: ageError)
         }
@@ -180,7 +180,7 @@ struct UserProfileView: View {
     }
 
     private func validateSaveButton() {
-        isSaveDisabled = firstName.isEmpty || lastName.isEmpty || city.isEmpty || state.isEmpty || age.isEmpty || !ageError.isEmpty
+        isSaveDisabled = firstName.isEmpty || lastName.isEmpty || city.isEmpty || state.isEmpty || birthYear.isEmpty || !ageError.isEmpty
     }
 
     private func saveData() {
@@ -190,7 +190,7 @@ struct UserProfileView: View {
         let profile = DataBrokerProtectionProfile(names: [name],
                                                   addresses: [address],
                                                   phones: [String](),
-                                                  age: Int(age)!)
+                                                  birthYear: Int(birthYear)!)
 
         dataManager.saveProfile(profile)
         isSaveAlertOn = true
@@ -203,10 +203,10 @@ struct UserProfileView: View {
             city = profile?.addresses.first?.city ?? ""
             state = profile?.addresses.first?.state ?? ""
 
-        if let profileAge = profile?.age {
-            age = String("\(profileAge)")
+        if let profileBirthYear = profile?.birthYear {
+            birthYear = String("\(profileBirthYear)")
         } else {
-            age = ""
+            birthYear = ""
         }
     }
 }

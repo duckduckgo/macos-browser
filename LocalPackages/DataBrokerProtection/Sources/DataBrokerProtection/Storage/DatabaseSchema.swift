@@ -23,7 +23,7 @@ import GRDB
 
 struct ProfileDB: Codable {
     let id: Int64?
-    let age: Data
+    let birthYear: Data
 }
 
 struct NameDB: Codable {
@@ -140,16 +140,16 @@ extension ProfileDB: PersistableRecord, FetchableRecord {
 
     enum Columns: String, ColumnExpression {
         case id
-        case age
+        case birthYear
     }
 
     public init(row: Row) throws {
         id = row[Columns.id]
-        age = row[Columns.age]
+        birthYear = row[Columns.birthYear]
     }
 
     public func encode(to container: inout PersistenceContainer) throws {
         container[Columns.id] = id
-        container[Columns.age] = age
+        container[Columns.birthYear] = birthYear
     }
 }
