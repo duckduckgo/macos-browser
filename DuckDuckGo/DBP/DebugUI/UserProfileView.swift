@@ -203,8 +203,8 @@ struct UserProfileView: View {
             city = profile?.addresses.first?.city ?? ""
             state = profile?.addresses.first?.state ?? ""
 
-        if let profileAge = profile?.birthYear {
-            birthYear = String("\(profileAge)")
+        if let profileBirthYear = profile?.birthYear {
+            birthYear = String("\(profileBirthYear)")
         } else {
             birthYear = ""
         }
