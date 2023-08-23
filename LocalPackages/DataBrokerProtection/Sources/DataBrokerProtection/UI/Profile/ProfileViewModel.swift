@@ -180,7 +180,8 @@ final class ProfileViewModel: ObservableObject {
         let addresses = addresses.map {
             DataBrokerProtectionProfile.Address(city: $0.city,
                                                 state: $0.state,
-                                                street: $0.street)
+                                                street: $0.street,
+                                                zipCode: $0.zip)
         }
 
         return DataBrokerProtectionProfile(names: names,
