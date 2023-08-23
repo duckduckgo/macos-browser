@@ -24,6 +24,7 @@ public struct LetterIconView: View {
     public var size: CGFloat
     public var prefferedFirstCharacters: String?
     public var characterCount: Int
+    private var padding: CGFloat = 0.33
 
     private var characters: String {
         if let prefferedFirstCharacters = prefferedFirstCharacters,
@@ -47,10 +48,10 @@ public struct LetterIconView: View {
                 .frame(width: size, height: size)
 
             Text(characters.capitalized(with: .current))
-                .frame(width: size - 10, height: size - 10)
+                .frame(width: size - (size * padding), height: size - (size * padding))
                 .foregroundColor(.white)
                 .minimumScaleFactor(0.01)
-                .font(.system(size: size, weight: .bold))
+                .font(.system(size: size, weight: .semibold))
         }
         .padding(.leading, 8)
     }
