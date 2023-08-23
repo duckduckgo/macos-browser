@@ -849,7 +849,6 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
     func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {
 #if NETWORK_PROTECTION
-        let viewModel = WaitlistViewModel(waitlist: NetworkProtectionWaitlist.shared)
         if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             showNetworkProtectionStatus()
         } else {
