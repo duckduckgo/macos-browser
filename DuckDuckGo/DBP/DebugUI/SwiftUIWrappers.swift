@@ -19,6 +19,7 @@
 import Foundation
 import SwiftUI
 import DataBrokerProtection
+import BrowserServicesKit
 
 final class DataBrokerProfileQueryViewController: NSViewController {
    private let dataManager: DataBrokerProtectionDataManager
@@ -55,5 +56,32 @@ final class DataBrokerUserProfileViewController: NSViewController {
     override func loadView() {
         let hostingController = NSHostingController(rootView: UserProfileView(dataManager: dataManager))
         view = hostingController.view
+    }
+}
+
+final class DataBrokerContainerViewController: NSViewController {
+
+    override func loadView() {
+        if #available(macOS 11.0, *) {
+            let privacyConfigurationManager = PrivacyFeatures.contentBlocking.privacyConfigurationManager
+            let features = ContentScopeFeatureToggles(emailProtection: false,
+                                                      emailProtectionIncontextSignup: false,
+                                                      credentialsAutofill: false,
+                                                      identitiesAutofill: false,
+                                                      creditCardsAutofill: false,
+                                                      credentialsSaving: false,
+                                                      passwordGeneration: false,
+                                                      inlineIconCredentials: false,
+                                                      thirdPartyCredentialsProvider: false)
+
+            let privacySettings = PrivacySecurityPreferences.shared
+            let sessionKey = UUID().uuidString
+            let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled,
+                                                    sessionKey: sessionKey,
+                                                    featureToggles: features)
+
+            let hostingController = NSHostingController(rootView: DataBrokerProtectionContainerView(privacyConfig: privacyConfigurationManager, prefs: prefs))
+            view = hostingController.view
+        }
     }
 }
