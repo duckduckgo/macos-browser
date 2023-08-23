@@ -145,7 +145,7 @@ final class ProfileViewModel: ObservableObject {
 
     func saveProfile() {
         // It should edit or delete the profile before saving if there was a previous profile saved
-        let profile = mapUIProfileToDataBaseProfile()
+        let profile = mapProfileUIToModel()
         dataManager.saveProfile(profile)
     }
 
@@ -169,7 +169,7 @@ final class ProfileViewModel: ObservableObject {
         }
     }
 
-    private func mapUIProfileToDataBaseProfile() -> DataBrokerProtectionProfile {
+    private func mapProfileUIToModel() -> DataBrokerProtectionProfile {
         let names = names.map {
             DataBrokerProtectionProfile.Name(firstName: $0.firstName,
                                              lastName: $0.lastName,
