@@ -96,7 +96,7 @@ extension ContextMenuManager {
         }
 
         if isNonSupportedScheme {
-            menu.removeItem(at: index)
+            // leave "open link" item for non-supported scheme
         } else {
             menu.replaceItem(at: index, with: self.openLinkInNewTabMenuItem(from: openLinkInNewWindowItem,
                                                                             makeBurner: isCurrentWindowBurner))
@@ -139,7 +139,7 @@ extension ContextMenuManager {
         }
 
         // insert Separator and Copy (selection) items
-        if selectedText?.isEmpty == false && !isNonSupportedScheme {
+        if selectedText?.isEmpty == false {
             menu.insertItem(.separator(), at: index + 2)
             menu.insertItem(self.copySelectionMenuItem(), at: index + 3)
         }

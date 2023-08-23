@@ -33,31 +33,24 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
     weak var delegate: ContextMenuUserScriptDelegate?
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard let jsonDataString = message.body as? String else { return }
-        guard let jsonData = jsonDataString.data(using: .utf8) else { return }
-        guard let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any] else { return }
-        let selectedText = json["selectedText"] as? String
-        let linkUrl = json["linkUrl"] as? String
+        guard let dict = message.body as? [String: Any] else { return }
+        let selectedText = dict["selectedText"] as? String
+        let linkUrl = dict["linkUrl"] as? String
         delegate?.willShowContextMenu(withSelectedText: selectedText, linkURL: linkUrl)
     }
 
     static let source = """
     (function() {
         document.addEventListener("contextmenu", function(e) {
-                var linkUrl = '';
-                var selectedText = window.getSelection().toString();
+            let anchor = event.target.closest('a');
+            let linkUrl = anchor ? anchor.href : null;
+            let selectedText = window.getSelection().toString();
 
-                if (e.target.tagName.toLowerCase() === 'a') {
-                    linkUrl = e.target.href;
-                }
-
-                var contextData = {
-                    selectedText: selectedText,
-                    linkUrl: linkUrl
-                };
-
-                webkit.messageHandlers.contextMenu.postMessage(JSON.stringify(contextData));
-            }, true);
-        })();
+            webkit.messageHandlers.contextMenu.postMessage({
+                selectedText: selectedText,
+                linkUrl: linkUrl
+            });
+        }, true);
+    })();
     """
 }
