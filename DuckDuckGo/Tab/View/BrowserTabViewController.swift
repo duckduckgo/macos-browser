@@ -124,13 +124,19 @@ final class BrowserTabViewController: NSViewController {
 
     @objc
     private func onDuckDuckGoEmailIncontextSignup(_ notification: Notification) {
+        guard tabCollectionViewModel.selectedTab == WindowControllersManager.shared.selectedTab else {
+            return
+        }
         self.previouslySelectedTab = tabCollectionViewModel.selectedTab
-        let tab = Tab(content: .url(EmailUrls().emailProtectionInContextSignupLink), shouldLoadInBackground: true)
+        let tab = Tab(content: .url(EmailUrls().emailProtectionInContextSignupLink), shouldLoadInBackground: false)
         tabCollectionViewModel.append(tab: tab)
     }
 
     @objc
     private func onCloseDuckDuckGoEmailProtection(_ notification: Notification) {
+        guard tabCollectionViewModel.selectedTab == WindowControllersManager.shared.selectedTab else {
+            return
+        }
         guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab else { return }
         if activeTab.url != nil && EmailUrls().isDuckDuckGoEmailProtection(url: activeTab.url!) {
             self.closeTab(activeTab)
@@ -138,6 +144,7 @@ final class BrowserTabViewController: NSViewController {
         if let previouslySelectedTab = self.previouslySelectedTab {
             tabCollectionViewModel.select(tab: previouslySelectedTab)
             if #available(macOS 11.0, *) {
+                os_log(.debug, "Tab  %{private}s calling openAutofillAfterClosingEmailProtectionTab()", previouslySelectedTab.webView.url?.absoluteString ?? "with no url")
                 previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
             }
             self.previouslySelectedTab = nil
