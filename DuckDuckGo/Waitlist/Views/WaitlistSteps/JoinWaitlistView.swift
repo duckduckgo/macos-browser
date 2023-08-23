@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import SwiftUI
 import SwiftUIExtensions
 
@@ -55,3 +57,5 @@ struct JoinWaitlistView: View {
         .environmentObject(model)
     }
 }
+
+#endif

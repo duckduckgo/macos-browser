@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import SwiftUI
 
 struct WaitlistDialogView<Content, Buttons>: View where Content: View, Buttons: View {
@@ -69,3 +71,5 @@ struct WaitlistDialogView<Content, Buttons>: View where Content: View, Buttons: 
         .padding(.bottom, 16.0)
     }
 }
+
+#endif

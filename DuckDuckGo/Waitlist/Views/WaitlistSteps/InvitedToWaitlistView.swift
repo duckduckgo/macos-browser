@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import Foundation
 import SwiftUI
 import SwiftUIExtensions
@@ -111,3 +113,5 @@ private struct WaitlistListEntryView: View {
         }
     }
 }
+
+#endif

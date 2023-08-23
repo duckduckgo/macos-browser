@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import Foundation
 import BrowserServicesKit
 import NetworkProtection
@@ -55,3 +57,5 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     }
 
 }
+
+#endif

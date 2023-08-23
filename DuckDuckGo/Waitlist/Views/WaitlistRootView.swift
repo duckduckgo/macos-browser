@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import SwiftUI
 
 struct WaitlistRootView: View {
@@ -60,3 +62,5 @@ struct WaitlistRootView: View {
         .environmentObject(model)
     }
 }
+
+#endif

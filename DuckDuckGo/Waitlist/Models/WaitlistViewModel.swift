@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import Foundation
 import NetworkProtection
 import UserNotifications
@@ -201,3 +203,5 @@ public final class WaitlistViewModel: ObservableObject {
     }
 
 }
+
+#endif

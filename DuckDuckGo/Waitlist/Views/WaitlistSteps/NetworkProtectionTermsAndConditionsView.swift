@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import SwiftUI
 import SwiftUIExtensions
 
@@ -37,38 +39,38 @@ struct NetworkProtectionTermsAndConditionsView: View {
                         Text(UserText.networkProtectionPrivacyPolicyTitle)
                             .font(.system(size: 17, weight: .bold))
                             .multilineTextAlignment(.leading)
-                            .padding(.bottom, 16)
+                            .padding(.bottom, 10)
 
                         Group {
                             Text(UserText.networkProtectionPrivacyPolicySection1Title)
-                                .font(.system(size: 15, weight: .bold))
+                                .font(.system(size: 13, weight: .bold))
                                 .multilineTextAlignment(.leading)
 
                             Text(UserText.networkProtectionPrivacyPolicySection1List)
 
                             Text(UserText.networkProtectionPrivacyPolicySection2Title)
-                                .font(.system(size: 15, weight: .bold))
+                                .font(.system(size: 13, weight: .bold))
                                 .multilineTextAlignment(.leading)
                                 .padding(.top, 10)
 
                             Text(UserText.networkProtectionPrivacyPolicySection2List)
 
                             Text(UserText.networkProtectionPrivacyPolicySection3Title)
-                                .font(.system(size: 15, weight: .bold))
+                                .font(.system(size: 13, weight: .bold))
                                 .multilineTextAlignment(.leading)
                                 .padding(.top, 10)
 
                             Text(UserText.networkProtectionPrivacyPolicySection3List)
 
                             Text(UserText.networkProtectionPrivacyPolicySection4Title)
-                                .font(.system(size: 15, weight: .bold))
+                                .font(.system(size: 13, weight: .bold))
                                 .multilineTextAlignment(.leading)
                                 .padding(.top, 10)
 
                             Text(UserText.networkProtectionPrivacyPolicySection4List)
 
                             Text(UserText.networkProtectionPrivacyPolicySection5Title)
-                                .font(.system(size: 15, weight: .bold))
+                                .font(.system(size: 13, weight: .bold))
                                 .multilineTextAlignment(.leading)
                                 .padding(.top, 10)
 
@@ -78,25 +80,25 @@ struct NetworkProtectionTermsAndConditionsView: View {
                         Text(UserText.networkProtectionTermsOfServiceTitle)
                             .font(.system(size: 17, weight: .bold))
                             .multilineTextAlignment(.leading)
-                            .padding(.bottom, 16)
-                            .padding(.top, 10)
+                            .padding(.bottom, 10)
+                            .padding(.top, 20)
 
                         Group {
                             Text(UserText.networkProtectionTermsOfServiceSection1Title)
-                                .font(.system(size: 15, weight: .bold))
+                                .font(.system(size: 13, weight: .bold))
                                 .multilineTextAlignment(.leading)
 
                             Text(UserText.networkProtectionTermsOfServiceSection1List)
 
                             Text(UserText.networkProtectionTermsOfServiceSection2Title)
-                                .font(.system(size: 15, weight: .bold))
+                                .font(.system(size: 13, weight: .bold))
                                 .multilineTextAlignment(.leading)
                                 .padding(.top, 10)
 
                             Text(UserText.networkProtectionTermsOfServiceSection2List)
 
                             Text(UserText.networkProtectionTermsOfServiceSection3Title)
-                                .font(.system(size: 15, weight: .bold))
+                                .font(.system(size: 13, weight: .bold))
                                 .multilineTextAlignment(.leading)
                                 .padding(.top, 10)
 
@@ -123,3 +125,5 @@ struct NetworkProtectionTermsAndConditionsView: View {
         .environmentObject(model)
     }
 }
+
+#endif

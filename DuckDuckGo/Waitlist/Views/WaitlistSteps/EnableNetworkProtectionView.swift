@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import SwiftUI
 import SwiftUIExtensions
 
@@ -49,3 +51,5 @@ struct EnableNetworkProtectionView: View {
         .environmentObject(model)
     }
 }
+
+#endif
