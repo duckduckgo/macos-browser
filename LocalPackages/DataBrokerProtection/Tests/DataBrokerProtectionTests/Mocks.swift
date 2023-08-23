@@ -25,7 +25,7 @@ extension BrokerProfileQueryData {
     static func mock(with steps: [Step] = [Step]()) -> BrokerProfileQueryData {
         BrokerProfileQueryData(
             id: UUID(),
-            profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", age: 50),
+            profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50),
             dataBroker: DataBroker(
                 name: "test",
                 steps: steps,

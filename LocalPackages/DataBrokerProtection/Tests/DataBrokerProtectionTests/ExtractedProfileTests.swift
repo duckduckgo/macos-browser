@@ -23,7 +23,7 @@ import Foundation
 final class ExtractedProfileTests: XCTestCase {
 
     func testWhenExtractedProfileDoesNotHaveAName_thenMergeAddsProfileQueryNameToIt() {
-        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Los Angeles", state: "CA", age: 45)
+        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Los Angeles", state: "CA", birthYear: 1980)
         let extractedProfile = ExtractedProfile()
 
         let sut = extractedProfile.merge(with: profileQuery)
@@ -32,7 +32,7 @@ final class ExtractedProfileTests: XCTestCase {
     }
 
     func testWhenExtractedProfileHasAName_thenMergeLeavesExtractedProfileName() {
-        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Los Angeles", state: "CA", age: 45)
+        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Los Angeles", state: "CA", birthYear: 1980)
         let extractedProfile = ExtractedProfile(name: "Ben Smith")
 
         let sut = extractedProfile.merge(with: profileQuery)
@@ -41,16 +41,20 @@ final class ExtractedProfileTests: XCTestCase {
     }
 
     func testWhenExtractedProfileDoesNotHaveAge_thenMergeAddsProfileQueryAgeToIt() {
-        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Los Angeles", state: "CA", age: 45)
+        let birthYear = 1980
+        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Los Angeles", state: "CA", birthYear: birthYear)
         let extractedProfile = ExtractedProfile()
+
+        let currentYear = Calendar.current.component(.year, from: Date())
+        let age = currentYear - birthYear
 
         let sut = extractedProfile.merge(with: profileQuery)
 
-        XCTAssertEqual(sut.age, "45")
+        XCTAssertEqual(sut.age, "\(age)")
     }
 
     func testWhenExtractedProfileHasAge_thenMergeLeavesExtractedProfileAge() {
-        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Los Angeles", state: "CA", age: 45)
+        let profileQuery = ProfileQuery(firstName: "John", lastName: "Doe", city: "Los Angeles", state: "CA", birthYear: 1980)
         let extractedProfile = ExtractedProfile(age: "52")
 
         let sut = extractedProfile.merge(with: profileQuery)
