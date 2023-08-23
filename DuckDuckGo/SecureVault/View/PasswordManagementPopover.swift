@@ -47,6 +47,10 @@ final class PasswordManagementPopover: NSPopover {
         viewController.select(category: category)
     }
 
+    func select(websiteAccount: SecureVaultModels.WebsiteAccount) {
+        viewController.select(websiteAccount: websiteAccount)
+    }
+
     private func setupContentController() {
         let controller = PasswordManagementViewController.create()
         contentViewController = controller

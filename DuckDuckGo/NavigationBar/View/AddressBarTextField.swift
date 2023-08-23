@@ -260,23 +260,7 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        var url = providedUrl
-
-        // keep current search mode
-        if url.isDuckDuckGoSearch,
-           let oldURL = selectedTabViewModel.tab.content.url,
-            oldURL.isDuckDuckGoSearch {
-            if let ia = oldURL.getParameter(named: URL.DuckDuckGoParameters.ia.rawValue) {
-                url = url.removingParameters(named: [URL.DuckDuckGoParameters.ia.rawValue])
-                    .appendingParameter(name: URL.DuckDuckGoParameters.ia.rawValue, value: ia)
-            }
-            if let iax = oldURL.getParameter(named: URL.DuckDuckGoParameters.iax.rawValue) {
-                url = url.removingParameters(named: [URL.DuckDuckGoParameters.iax.rawValue])
-                    .appendingParameter(name: URL.DuckDuckGoParameters.iax.rawValue, value: iax)
-            }
-        }
-
-        selectedTabViewModel.tab.setUrl(url, userEntered: userEnteredValue)
+        selectedTabViewModel.tab.setUrl(providedUrl, userEntered: userEnteredValue)
 
         self.window?.makeFirstResponder(nil)
     }
@@ -486,7 +470,7 @@ final class AddressBarTextField: NSTextField {
                    !title.isEmpty,
                    suggestionViewModel.autocompletionString != title {
                     self = .title(title)
-                } else if let host = url.root?.toString(decodePunycode: true, dropScheme: true, needsWWW: false, dropTrailingSlash: true) {
+                } else if let host = url.root?.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true) {
                     self = .visit(host: host)
                 } else {
                     self = .url(url)
@@ -524,7 +508,6 @@ final class AddressBarTextField: NSTextField {
                 } else {
                     return " – " + url.toString(decodePunycode: false,
                                                 dropScheme: true,
-                                                needsWWW: false,
                                                 dropTrailingSlash: false)
                 }
             case .title(let title):

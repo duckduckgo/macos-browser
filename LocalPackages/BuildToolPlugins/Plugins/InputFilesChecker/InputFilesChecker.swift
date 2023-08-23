@@ -45,7 +45,10 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("startVPN.app", .unknown),
         .init("stopVPN.app", .unknown),
         .init("enableOnDemand.app", .unknown),
-        .init("PFMoveApplication.m", .source)
+        .init("PFMoveApplication.m", .source),
+        .init("NetworkProtectionBundle.swift", .source),
+        .init("NetworkProtectionAppEvents.swift", .source),
+        .init("KeychainType+ClientDefault.swift", .source)
     ],
 
     "DuckDuckGo Privacy Browser App Store": [],
