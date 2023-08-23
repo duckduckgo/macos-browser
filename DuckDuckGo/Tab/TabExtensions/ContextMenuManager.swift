@@ -33,6 +33,14 @@ final class ContextMenuManager: NSObject {
     private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
     private var originalItems: [WKMenuItemIdentifier: NSMenuItem]?
     private var selectedText: String?
+    private var linkURL: String?
+    private var isNonSupportedScheme: Bool {
+        guard let linkURL else { return false }
+        if let scheme = URL(string: linkURL)?.scheme {
+            return !WKWebView.handlesURLScheme(scheme)
+        }
+        return false
+    }
     fileprivate weak var webView: WKWebView?
 
     @MainActor
@@ -85,12 +93,16 @@ extension ContextMenuManager {
             return
         }
 
-        menu.replaceItem(at: index, with: self.openLinkInNewTabMenuItem(from: openLinkInNewWindowItem,
+        if isNonSupportedScheme {
+            // leave "open link" item for non-supported scheme
+        } else {
+            menu.replaceItem(at: index, with: self.openLinkInNewTabMenuItem(from: openLinkInNewWindowItem,
                                                                             makeBurner: isCurrentWindowBurner))
+        }
     }
 
     private func handleOpenLinkInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        if isCurrentWindowBurner {
+        if isCurrentWindowBurner || isNonSupportedScheme {
             menu.removeItem(at: index)
         } else {
             menu.replaceItem(at: index, with: self.openLinkInNewWindowMenuItem(from: item))
@@ -98,7 +110,7 @@ extension ContextMenuManager {
     }
 
     private func handleOpenFrameInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        if isCurrentWindowBurner {
+        if isCurrentWindowBurner || isNonSupportedScheme {
             menu.removeItem(at: index)
         } else {
             menu.replaceItem(at: index, with: self.openFrameInNewWindowMenuItem(from: item))
@@ -106,7 +118,11 @@ extension ContextMenuManager {
     }
 
     private func handleDownloadLinkedFileItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        menu.replaceItem(at: index, with: self.downloadMenuItem(from: item))
+        if isNonSupportedScheme {
+            menu.removeItem(at: index)
+        } else {
+            menu.replaceItem(at: index, with: self.downloadMenuItem(from: item))
+        }
     }
 
     private func handleCopyLinkItem(_ copyLinkItem: NSMenuItem, at index: Int, in menu: NSMenu) {
@@ -115,8 +131,10 @@ extension ContextMenuManager {
             return
         }
         // insert Add Link to Bookmarks
-        menu.insertItem(self.addLinkToBookmarksMenuItem(from: openLinkInNewWindowItem), at: index)
-        menu.replaceItem(at: index + 1, with: self.copyLinkMenuItem(withTitle: copyLinkItem.title, from: openLinkInNewWindowItem))
+        if !isNonSupportedScheme {
+            menu.insertItem(self.addLinkToBookmarksMenuItem(from: openLinkInNewWindowItem), at: index)
+            menu.replaceItem(at: index + 1, with: self.copyLinkMenuItem(withTitle: copyLinkItem.title, from: openLinkInNewWindowItem))
+        }
 
         // insert Separator and Copy (selection) items
         if selectedText?.isEmpty == false {
@@ -161,6 +179,7 @@ extension ContextMenuManager {
 extension ContextMenuManager: WebViewContextMenuDelegate {
 
     func webView(_ webView: WebView, willOpenContextMenu menu: NSMenu, with event: NSEvent) {
+
         originalItems = menu.items.reduce(into: [WKMenuItemIdentifier: NSMenuItem]()) { partialResult, item in
             if let identifier = item.identifier.flatMap(WKMenuItemIdentifier.init) {
                 partialResult[identifier] = item
@@ -178,6 +197,7 @@ extension ContextMenuManager: WebViewContextMenuDelegate {
     func webView(_ webView: WebView, didCloseContextMenu menu: NSMenu, with event: NSEvent?) {
         DispatchQueue.main.async { [weak self] in
             self?.selectedText = nil
+            self?.linkURL = nil
             self?.originalItems = nil
         }
     }
@@ -291,7 +311,7 @@ private extension ContextMenuManager {
         }
 
         self.onNewWindow = { _ in
-                .allow(.tab(selected: true, burner: burner))
+            .allow(.tab(selected: true, burner: burner))
         }
         webView.loadInNewWindow(url)
     }
@@ -323,7 +343,9 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.tab(selected: false, burner: burner)) }
+        onNewWindow = { _ in
+            .allow(.tab(selected: false, burner: burner))
+        }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -337,7 +359,9 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.window(active: true, burner: false)) }
+        onNewWindow = { _ in
+            .allow(.window(active: true, burner: false))
+        }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -435,7 +459,9 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.tab(selected: true, burner: burner)) }
+        onNewWindow = { _ in
+            .allow(.tab(selected: true, burner: burner))
+        }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -457,7 +483,9 @@ private extension ContextMenuManager {
             return
         }
 
-        onNewWindow = { _ in .allow(.window(active: true, burner: burner)) }
+        onNewWindow = { _ in
+            .allow(.window(active: true, burner: burner))
+        }
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
@@ -498,10 +526,10 @@ private extension ContextMenuManager {
 
 // MARK: - ContextMenuUserScriptDelegate
 extension ContextMenuManager: ContextMenuUserScriptDelegate {
-    func willShowContextMenu(withSelectedText selectedText: String) {
+    func willShowContextMenu(withSelectedText selectedText: String?, linkURL: String?) {
         self.selectedText = selectedText
+        self.linkURL = linkURL
     }
-
 }
 
 // MARK: - TabExtensions

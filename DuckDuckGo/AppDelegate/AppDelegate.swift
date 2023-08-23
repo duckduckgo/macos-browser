@@ -217,17 +217,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
     }
 
-    // Temporary feature flag tester, to validate that phased rollouts are working as intended.
-    // This is to be removed before the end of August 2023.
-    lazy var featureFlagTester: PhasedRolloutFeatureFlagTester = {
-        return PhasedRolloutFeatureFlagTester()
-    }()
-
     func applicationDidBecomeActive(_ notification: Notification) {
         syncService?.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
         syncService?.scheduler.notifyAppLifecycleEvent()
-
-        featureFlagTester.sendFeatureFlagEnabledPixelIfNecessary()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
