@@ -44,7 +44,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
         } catch {
-            XCTAssertEqual(error as! OperationsError, OperationsError.idsMissingForBrokerOrProfileQuery)
+            XCTAssertEqual(error as? OperationsError, OperationsError.idsMissingForBrokerOrProfileQuery)
             XCTAssertFalse(mockWebOperationRunner.wasScanCalled)
         }
     }
@@ -63,7 +63,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id for broker")
         } catch {
-            XCTAssertEqual(error as! OperationsError, OperationsError.idsMissingForBrokerOrProfileQuery)
+            XCTAssertEqual(error as? OperationsError, OperationsError.idsMissingForBrokerOrProfileQuery)
         }
     }
 
@@ -79,7 +79,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default
             )
-            XCTAssertEqual(mockDatabase.eventsAdded.first!.type, .scanStarted)
+            XCTAssertEqual(mockDatabase.eventsAdded.first?.type, .scanStarted)
         } catch {
             XCTFail("Should not throw")
         }
@@ -97,7 +97,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default
             )
-            XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .noMatchFound } ))
+            XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .noMatchFound }))
         } catch {
             XCTFail("Should not throw")
         }
@@ -179,7 +179,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default
             )
-            XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutConfirmed } ))
+            XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutConfirmed }))
             XCTAssertTrue(mockDatabase.wasUpdateRemoveDateCalled)
             XCTAssertTrue(mockDatabase.wasUpdatedPreferredRunDateForOptOutCalled)
         } catch {
@@ -201,7 +201,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default
             )
-            XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutConfirmed } ))
+            XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutConfirmed }))
             XCTAssertFalse(mockDatabase.wasUpdateRemoveDateCalled)
             XCTAssertFalse(mockDatabase.wasUpdatedPreferredRunDateForOptOutCalled)
         } catch {
@@ -226,9 +226,9 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             XCTFail("Should throw!")
         } catch {
             XCTAssertTrue(mockDatabase.wasAddHistoryEventCalled)
-            XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .error(error: .unknown("Test error")) } ))
-            XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .matchesFound } ))
-            XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .noMatchFound } ))
+            XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .error(error: .unknown("Test error")) }))
+            XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .matchesFound }))
+            XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .noMatchFound }))
             XCTAssertFalse(mockDatabase.wasSaveExtractedProfileCalled)
             XCTAssertFalse(mockDatabase.wasSaveOptOutOperationCalled)
         }
@@ -252,7 +252,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
         } catch {
-            XCTAssertEqual(error as! OperationsError, OperationsError.idsMissingForBrokerOrProfileQuery)
+            XCTAssertEqual(error as? OperationsError, OperationsError.idsMissingForBrokerOrProfileQuery)
             XCTAssertFalse(mockWebOperationRunner.wasOptOutCalled)
         }
     }
@@ -273,7 +273,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
         } catch {
-            XCTAssertEqual(error as! OperationsError, OperationsError.idsMissingForBrokerOrProfileQuery)
+            XCTAssertEqual(error as? OperationsError, OperationsError.idsMissingForBrokerOrProfileQuery)
             XCTAssertFalse(mockWebOperationRunner.wasOptOutCalled)
         }
     }
@@ -294,7 +294,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
         } catch {
-            XCTAssertEqual(error as! OperationsError, OperationsError.idsMissingForBrokerOrProfileQuery)
+            XCTAssertEqual(error as? OperationsError, OperationsError.idsMissingForBrokerOrProfileQuery)
             XCTAssertFalse(mockWebOperationRunner.wasOptOutCalled)
         }
     }
@@ -334,7 +334,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default
             )
-            XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutStarted } ))
+            XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutStarted }))
         } catch {
             XCTFail("Should not throw")
         }
@@ -354,7 +354,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default
             )
-            XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutRequested } ))
+            XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutRequested }))
         } catch {
             XCTFail("Should not throw")
         }
@@ -377,9 +377,9 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             )
             XCTFail("Should throw!")
         } catch {
-            XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutStarted } ))
-            XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutRequested } ))
-            XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .error(error: DataBrokerProtectionError.unknown("Test error")) } ))
+            XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutStarted }))
+            XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutRequested }))
+            XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .error(error: DataBrokerProtectionError.unknown("Test error")) }))
         }
     }
 
@@ -480,7 +480,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
     }
 }
 
-class MockDatabase: DataBrokerProtectionRepository {
+final class MockDatabase: DataBrokerProtectionRepository {
     var wasSaveProfileCalled = false
     var wasFetchProfileCalled = false
     var wasSaveExtractedProfileCalled = false
@@ -496,9 +496,9 @@ class MockDatabase: DataBrokerProtectionRepository {
     var wasFetchLastHistoryEventCalled = false
 
     var eventsAdded = [HistoryEvent]()
-    var lastHistoryEventToReturn: HistoryEvent? = nil
-    var lastPreferredRunDateOnScan: Date? = nil
-    var lastPreferredRunDateOnOptOut: Date? = nil
+    var lastHistoryEventToReturn: HistoryEvent?
+    var lastPreferredRunDateOnScan: Date?
+    var lastPreferredRunDateOnOptOut: Date?
 
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
@@ -608,7 +608,7 @@ class MockDatabase: DataBrokerProtectionRepository {
     }
 }
 
-class MockWebOperationRunner: WebOperationRunner {
+final class MockWebOperationRunner: WebOperationRunner {
     var shouldScanThrow = false
     var shouldOptOutThrow = false
     var scanResults = [ExtractedProfile]()

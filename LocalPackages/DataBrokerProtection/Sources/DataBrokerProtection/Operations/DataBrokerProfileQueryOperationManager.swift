@@ -56,9 +56,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
     // swiftlint:disable:next function_body_length
     internal func runScanOperation(on runner: WebOperationRunner,
-                                  brokerProfileQueryData: BrokerProfileQueryData,
-                                  database: DataBrokerProtectionRepository,
-                                  notificationCenter: NotificationCenter) async throws {
+                                   brokerProfileQueryData: BrokerProfileQueryData,
+                                   database: DataBrokerProtectionRepository,
+                                   notificationCenter: NotificationCenter) async throws {
         os_log("Running scan operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 
         guard let brokerId = brokerProfileQueryData.dataBroker.id, let profileQueryId = brokerProfileQueryData.profileQuery.id else {
@@ -197,7 +197,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
     }
 
     // https://app.asana.com/0/0/1204834439855281/f
-    // swiftlint:disable:next cyclomatic_complexity
+    // swiftlint:disable:next function_body_length
     internal func updateOperationDataDates(
         brokerId: Int64,
         profileQueryId: Int64,
@@ -208,7 +208,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         let maintenanceScanDate = Date().addingTimeInterval(schedulingConfig.maintenanceScan)
 
         if let brokerProfileQuery = database.brokerProfileQueryData(for: brokerId, and: profileQueryId),
-            let lastHistoryEvent = brokerProfileQuery.events.last {
+           let lastHistoryEvent = brokerProfileQuery.events.last {
             switch lastHistoryEvent.type {
             case .error:
                 let retryOperationDate = Date().addingTimeInterval(schedulingConfig.retryError)
@@ -248,11 +248,11 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                 )
 
                 if let extractedProfileId = extractedProfileId,
-                    shouldScheduleNewOptOut(
-                        events: brokerProfileQuery.events,
-                        extractedProfileId: extractedProfileId,
-                        schedulingConfig: schedulingConfig
-                    ) {
+                   shouldScheduleNewOptOut(
+                    events: brokerProfileQuery.events,
+                    extractedProfileId: extractedProfileId,
+                    schedulingConfig: schedulingConfig
+                   ) {
                     updatePreferredRunDate(
                         Date(),
                         brokerId: brokerId,
