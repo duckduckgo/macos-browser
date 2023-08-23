@@ -21,7 +21,7 @@ import Foundation
 
 extension UserDefaults {
     /// The app group's shared UserDefaults
-    static let shared = UserDefaults(suiteName: Bundle.main.appGroupName)
+    static let shared = UserDefaults(suiteName: Bundle.main.appGroupName)!
 }
 
 @propertyWrapper

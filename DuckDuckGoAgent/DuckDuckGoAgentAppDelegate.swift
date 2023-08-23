@@ -84,7 +84,7 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
         let iconProvider = MenuIconProvider()
         #endif
 
-        let onboardingStatusPublisher = UserDefaults.shared!.publisher(for: \.networkProtectionOnboardingStatusRawValue).map { rawValue in
+        let onboardingStatusPublisher = UserDefaults.shared.publisher(for: \.networkProtectionOnboardingStatusRawValue).map { rawValue in
             OnboardingStatus(rawValue: rawValue) ?? .default
         }.eraseToAnyPublisher()
 
