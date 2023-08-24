@@ -30,11 +30,10 @@ struct AccountsService {
         var description: String { return String(reflecting: self) }
     }
 
-//    private static let baseURL = URL(string: "https://quackdev.duckduckgo.com/api/auth")!
-    private static let baseURL = URL(string: "https://use-tstorey1.duckduckgo.com/api/auth")!
+    private static let baseURL = URL(string: "https://quackdev.duckduckgo.com/api/auth")!
+    
     private static let session = {
         let configuration = URLSessionConfiguration.ephemeral
-
         return URLSession(configuration: configuration)
     }()
 
