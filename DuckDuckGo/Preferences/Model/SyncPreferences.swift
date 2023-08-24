@@ -56,11 +56,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     }
 
     @MainActor
-    func presentEnableSyncDialog() {
-        presentDialog(for: .enableSync)
-    }
-
-    @MainActor
     func presentRecoverSyncAccountDialog() {
         presentDialog(for: .recoverAccount)
     }
@@ -251,12 +246,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         presentDialog(for: .deviceSynced(syncedDevices))
     }
 
-    @MainActor
     func turnOnSync() {
-        presentDialog(for: .askToSyncAnotherDevice)
-    }
-
-    func dontSyncAnotherDeviceNow() {
         Task { @MainActor in
             isCreatingAccount = true
             defer {

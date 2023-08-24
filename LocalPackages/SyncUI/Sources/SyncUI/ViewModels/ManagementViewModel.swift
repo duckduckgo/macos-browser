@@ -28,7 +28,7 @@ public protocol ManagementViewModel: ObservableObject {
     var recoveryCode: String? { get }
     var devices: [SyncDevice] { get }
 
-    func presentEnableSyncDialog()
+    func presentSyncAnotherDeviceDialog()
     func presentRecoverSyncAccountDialog()
     func presentTurnOffSyncConfirmDialog()
     func presentDeleteAccount()
@@ -36,6 +36,7 @@ public protocol ManagementViewModel: ObservableObject {
     func presentDeviceDetails(_ device: SyncDevice)
     func presentRemoveDevice(_ device: SyncDevice)
 
+    func turnOnSync()
     func saveRecoveryPDF()
     func refreshDevices()
 }

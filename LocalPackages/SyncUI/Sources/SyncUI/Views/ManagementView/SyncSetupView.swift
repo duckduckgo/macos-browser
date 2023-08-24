@@ -24,7 +24,7 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
 
     var body: some View {
         PreferencePaneSection {
-            HStack(alignment: .top, spacing: 12) {
+            VStack(alignment: .leading, spacing: 12) {
                 Text(UserText.syncSetupExplanation)
                     .fixMultilineScrollableText()
                 Spacer()
@@ -36,8 +36,13 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                             EmptyView()
                         }
                     } else {
-                        Button(UserText.turnOnSyncWithEllipsis) {
-                            model.presentEnableSyncDialog()
+                        HStack {
+                            Button(UserText.syncAnotherDeviceButton) {
+                                model.presentSyncAnotherDeviceDialog()
+                            }
+                            Button(UserText.turnOnSync) {
+                                model.turnOnSync()
+                            }
                         }
                     }
                 }.frame(minWidth: 100)

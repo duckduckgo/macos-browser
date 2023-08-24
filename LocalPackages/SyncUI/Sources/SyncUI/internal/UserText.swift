@@ -30,8 +30,9 @@ enum UserText {
 
     static let sync = NSLocalizedString("preferences.sync", value: "Sync", comment: "Show sync preferences")
 
-    static let syncSetupExplanation = NSLocalizedString("preferences.sync.setup-explanation", value: "Sync your bookmarks and Autofill logins across your devices and save an encrypted backup on DuckDuckGo’s servers.", comment: "Sync setup explanation")
-    static let turnOnSync = NSLocalizedString("preferences.sync.turn-on", value: "Turn on Sync", comment: "Enable sync button caption")
+    static let syncSetupExplanation = NSLocalizedString("preferences.sync.setup-explanation", value: "Automatically back up your bookmarks, logins and Email Protection settings and sync them with your other devices.", comment: "Sync setup explanation")
+    static let turnOnSync = NSLocalizedString("preferences.sync.turn-on", value: "Sync & Backup for the First Time", comment: "Enable sync button caption")
+    static let syncAnotherDeviceButton = NSLocalizedString("preferences.sync.turn-on", value: "Enter an Existing Code", comment: "Sync another device button caption")
     static let turnOnSyncWithEllipsis = NSLocalizedString("preferences.sync.turn-on-ellipsis", value: "Turn on Sync...", comment: "Enable sync button caption")
     static let turnOff = NSLocalizedString("preferences.sync.turn-off", value: "Turn Off", comment: "Turn off sync confirmation dialog button title")
     static let turnOffSync = NSLocalizedString("preferences.sync.turn-off.ellipsis", value: "Turn off Sync...", comment: "Disable sync button caption")
