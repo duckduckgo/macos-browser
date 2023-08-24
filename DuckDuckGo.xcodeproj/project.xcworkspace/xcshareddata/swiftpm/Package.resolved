@@ -14,7 +14,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "daniel/daniel/autofill-settings-consistency",
+        "branch" : "daniel/autofill-settings-consistency",
         "revision" : "563c0935d6325f1ef802fa40240ec90ec260c55a"
       }
     },

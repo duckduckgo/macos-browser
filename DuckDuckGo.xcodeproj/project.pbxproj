@@ -10262,7 +10262,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "daniel/daniel/autofill-settings-consistency";
+				branch = "daniel/autofill-settings-consistency";
 				kind = branch;
 			};
 		};
