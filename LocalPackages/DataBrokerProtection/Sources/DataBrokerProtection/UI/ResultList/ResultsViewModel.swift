@@ -25,13 +25,17 @@ final class ResultsViewModel: ObservableObject {
     struct RemovedProfile: Identifiable {
         let id = UUID()
         let dataBroker: String
-        let scheduledDate: Date
+        let scheduledDate: Date?
 
         var formattedDate: String {
-            let formatter = DateFormatter()
-            formatter.timeStyle = .none
-            formatter.dateStyle = .short
-            return formatter.string(from: scheduledDate)
+            if let date = scheduledDate {
+                let formatter = DateFormatter()
+                formatter.timeStyle = .none
+                formatter.dateStyle = .short
+                return formatter.string(from: date)
+            } else {
+                return "No date set"
+            }
         }
     }
 
@@ -58,38 +62,40 @@ final class ResultsViewModel: ObservableObject {
 
     private func updateUI() {
         let brokersInfoData = dataManager.fetchBrokerProfileQueryData()
-        let optOutOperationsData = brokersInfoData
-            .flatMap { $0.optOutOperationsData }
+        var removedProfiles = [RemovedProfile]()
+        var pendingProfiles = [PendingProfile]()
 
-        let brokerList = brokersInfoData.reduce(into: [Int64: DataBroker]()) { dictionary, profileQueryData in
-            let dataBroker = profileQueryData.dataBroker
-            if let dataBrokerID = dataBroker.id {
-                dictionary[dataBrokerID] = dataBroker
+        for brokerProfileQueryData in brokersInfoData {
+            for optOutOperationData in brokerProfileQueryData.optOutOperationsData {
+
+                if optOutOperationData.extractedProfile.removedDate == nil {
+                    var errorName: String?
+                    var errorDescription: String?
+
+                    if let lastEvent = optOutOperationData.historyEvents.last {
+                        if case .error(let error) = lastEvent.type {
+                            errorName = error.name
+                            errorDescription = error.localizedDescription
+                        }
+                    }
+
+                    let profile = PendingProfile(
+                        dataBroker: brokerProfileQueryData.dataBroker.name,
+                        profile: optOutOperationData.extractedProfile.fullName ?? "",
+                        address: optOutOperationData.extractedProfile.addressCityStateList?.first?.fullAddress ?? "",
+                        error: errorName,
+                        errorDescription: errorDescription)
+
+                    pendingProfiles.append(profile)
+                } else {
+                    let profile = RemovedProfile(dataBroker: brokerProfileQueryData.dataBroker.name,
+                                                 scheduledDate: brokerProfileQueryData.scanOperationData.preferredRunDate)
+                    removedProfiles.append(profile)
+                }
             }
         }
-
-        let result = optOutOperationsData.reduce(into: (removed: [Int64: RemovedProfile](),
-                                                        pending: [Int64: PendingProfile]())) { result, optOutOperationData in
-
-            if let removedDate = optOutOperationData.extractedProfile.removedDate {
-
-                result.removed[optOutOperationData.brokerId] = RemovedProfile(
-                    dataBroker: brokerList[optOutOperationData.brokerId]?.name ?? "",
-                    scheduledDate: Date())
-
-            } else {
-                let pendingProfile = PendingProfile(
-                    dataBroker: brokerList[optOutOperationData.brokerId]?.name ?? "",
-                    profile: optOutOperationData.extractedProfile.fullName ?? "",
-                    address: optOutOperationData.extractedProfile.addressCityStateList?.first?.fullAddress ?? "",
-                    error: nil,
-                    errorDescription: nil)
-                result.pending[optOutOperationData.brokerId] = pendingProfile
-            }
-        }
-
-        removedProfiles = result.removed.map { $0.value }
-        pendingProfiles = result.pending.map { $0.value }
+        self.removedProfiles = removedProfiles
+        self.pendingProfiles = pendingProfiles
     }
 
     // MARK: - Test Data
