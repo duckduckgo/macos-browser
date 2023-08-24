@@ -142,6 +142,9 @@
                <Test
                   Identifier = "NavigationProtectionIntegrationTests/testAMPLinks()">
                </Test>
+               <Test
+                  Identifier = "SearchNonexistentDomainTests/testWhenNonexistentDomainRequested_redirectedToSERP()">
+               </Test>
             </SkippedTests>
          </TestableReference>
          <TestableReference
