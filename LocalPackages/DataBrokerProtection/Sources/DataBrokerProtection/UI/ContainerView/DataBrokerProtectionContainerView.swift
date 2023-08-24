@@ -22,6 +22,7 @@ import SwiftUI
 struct DataBrokerProtectionContainerView: View {
     @ObservedObject var navigationViewModel: ContainerNavigationViewModel
     @ObservedObject var profileViewModel: ProfileViewModel
+    @ObservedObject var resultsViewModel: ResultsViewModel
 
     var body: some View {
         ScrollView {
@@ -44,7 +45,7 @@ struct DataBrokerProtectionContainerView: View {
                         ScanStartedView()
                             .padding(.top, 330)
                     case .results:
-                        ResultsView(viewModel: ResultsViewModel())
+                        ResultsView(viewModel: resultsViewModel)
                             .frame(width: 800)
                             .padding(.top, 330)
                             .padding(.bottom, 100)
@@ -110,8 +111,10 @@ struct DataBrokerProtectionContainerView_Previews: PreviewProvider {
         let dataManager = DataBrokerProtectionDataManager()
         let navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
         let profileViewModel = ProfileViewModel(dataManager: dataManager)
-
-        DataBrokerProtectionContainerView(navigationViewModel: navigationViewModel, profileViewModel: profileViewModel)
+        let resultsViewModel = ResultsViewModel(dataManager: dataManager)
+        DataBrokerProtectionContainerView(navigationViewModel: navigationViewModel,
+                                          profileViewModel: profileViewModel,
+                                          resultsViewModel: resultsViewModel)
             .frame(width: 1024, height: 768)
     }
 }

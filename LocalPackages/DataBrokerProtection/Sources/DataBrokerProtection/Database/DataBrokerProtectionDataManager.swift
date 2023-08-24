@@ -26,6 +26,8 @@ public protocol DataBrokerProtectionDataManaging {
     func saveProfile(_ profile: DataBrokerProtectionProfile)
     func fetchProfile() -> DataBrokerProtectionProfile?
     func fetchDataBrokerInfoData() -> [DataBrokerInfoData]
+    func fetchBrokerProfileQueryData() -> [BrokerProfileQueryData]
+
 }
 
 public protocol DataBrokerProtectionDataManagerDelegate: AnyObject {
@@ -52,6 +54,10 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
             os_log("No profile found", log: .dataBrokerProtection)
             return nil
         }
+    }
+
+    public func fetchBrokerProfileQueryData() -> [BrokerProfileQueryData] {
+        return database.fetchAllBrokerProfileQueryData(for: 1) // We assume one profile for now
     }
 
     public func fetchDataBrokerInfoData() -> [DataBrokerInfoData] {

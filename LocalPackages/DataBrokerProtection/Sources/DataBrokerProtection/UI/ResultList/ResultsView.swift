@@ -177,7 +177,11 @@ private extension View {
 @available(macOS 11.0, *)
 struct ResultsView_Previews: PreviewProvider {
     static var previews: some View {
-        ResultsView(viewModel: ResultsViewModel()).frame(height: 700)
+        let dataManager = DataBrokerProtectionDataManager()
+        let resultsViewModel = ResultsViewModel(dataManager: dataManager)
+
+        ResultsView(viewModel: resultsViewModel)
+            .frame(height: 700)
             .padding()
     }
 }

@@ -54,6 +54,10 @@ struct ExtractProfileSelectors: Codable, Sendable {
 struct AddressCityState: Codable {
     let city: String
     let state: String
+
+    var fullAddress: String {
+        "\(city), \(state)"
+    }
 }
 
 struct ExtractedProfile: Codable, Sendable {

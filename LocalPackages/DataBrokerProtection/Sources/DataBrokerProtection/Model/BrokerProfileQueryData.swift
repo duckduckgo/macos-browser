@@ -19,7 +19,7 @@
 import Foundation
 import Common
 
-final class BrokerProfileQueryData: Sendable {
+final public class BrokerProfileQueryData: Sendable {
     let dataBroker: DataBroker
     let profileQuery: ProfileQuery
     let scanOperationData: ScanOperationData

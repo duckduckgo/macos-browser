@@ -82,7 +82,7 @@ public final class DataBrokerProtectionScheduler {
             self.dataBrokerProcessor.runQueuedOperations()
         } else {
             activity.schedule { completion in
-                os_log("Scheduler runnning...", log: .dataBrokerProtection)
+                os_log("Scheduler running...", log: .dataBrokerProtection)
                 self.dataBrokerProcessor.runQueuedOperations {
                     completion(.finished)
                 }

@@ -20,6 +20,7 @@ import Foundation
 import SwiftUI
 
 final class ResultsViewModel: ObservableObject {
+    private let dataManager: DataBrokerProtectionDataManaging
 
     struct RemovedProfile: Identifiable {
         let id = UUID()
@@ -50,8 +51,45 @@ final class ResultsViewModel: ObservableObject {
     @Published var removedProfiles =  [RemovedProfile]()
     @Published var pendingProfiles = [PendingProfile]()
 
-    init() {
-        addFakeData()
+    init(dataManager: DataBrokerProtectionDataManaging) {
+        self.dataManager = dataManager
+        updateUI()
+    }
+
+    private func updateUI() {
+        let brokersInfoData = dataManager.fetchBrokerProfileQueryData()
+        let optOutOperationsData = brokersInfoData
+            .flatMap { $0.optOutOperationsData }
+
+        let brokerList = brokersInfoData.reduce(into: [Int64: DataBroker]()) { dictionary, profileQueryData in
+            let dataBroker = profileQueryData.dataBroker
+            if let dataBrokerID = dataBroker.id {
+                dictionary[dataBrokerID] = dataBroker
+            }
+        }
+
+        let result = optOutOperationsData.reduce(into: (removed: [Int64: RemovedProfile](),
+                                                        pending: [Int64: PendingProfile]())) { result, optOutOperationData in
+
+            if let removedDate = optOutOperationData.extractedProfile.removedDate {
+
+                result.removed[optOutOperationData.brokerId] = RemovedProfile(
+                    dataBroker: brokerList[optOutOperationData.brokerId]?.name ?? "",
+                    scheduledDate: Date())
+
+            } else {
+                let pendingProfile = PendingProfile(
+                    dataBroker: brokerList[optOutOperationData.brokerId]?.name ?? "",
+                    profile: optOutOperationData.extractedProfile.fullName ?? "",
+                    address: optOutOperationData.extractedProfile.addressCityStateList?.first?.fullAddress ?? "",
+                    error: nil,
+                    errorDescription: nil)
+                result.pending[optOutOperationData.brokerId] = pendingProfile
+            }
+        }
+
+        removedProfiles = result.removed.map { $0.value }
+        pendingProfiles = result.pending.map { $0.value }
     }
 
     // MARK: - Test Data
