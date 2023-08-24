@@ -45,7 +45,10 @@ public final class NetworkProtectionPopover: NSPopover {
 
     private let statusReporter: NetworkProtectionStatusReporter
 
-    public required init(controller: TunnelController, statusReporter: NetworkProtectionStatusReporter, menuItems: [MenuItem]) {
+    public required init(controller: TunnelController,
+                         onboardingStatusPublisher: OnboardingStatusPublisher,
+                         statusReporter: NetworkProtectionStatusReporter,
+                         menuItems: [MenuItem]) {
 
         self.statusReporter = statusReporter
 
@@ -54,16 +57,20 @@ public final class NetworkProtectionPopover: NSPopover {
         self.animates = false
         self.behavior = .semitransient
 
-        setupContentController(controller: controller, statusReporter: statusReporter, menuItems: menuItems)
+        setupContentController(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, menuItems: menuItems)
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func setupContentController(controller: TunnelController, statusReporter: NetworkProtectionStatusReporter, menuItems: [MenuItem]) {
+    private func setupContentController(controller: TunnelController,
+                                        onboardingStatusPublisher: OnboardingStatusPublisher,
+                                        statusReporter: NetworkProtectionStatusReporter,
+                                        menuItems: [MenuItem]) {
 
         let model = NetworkProtectionStatusView.Model(controller: controller,
+                                                      onboardingStatusPublisher: onboardingStatusPublisher,
                                                       statusReporter: statusReporter,
                                                       menuItems: menuItems)
 
@@ -73,6 +80,10 @@ public final class NetworkProtectionPopover: NSPopover {
 
         let controller = NSHostingController(rootView: view)
         contentViewController = controller
+
+        // It's important to set the frame at least once here.  If we don't the popover
+        // fails to get the right width and the popover can exceed the screen's limits.
+        controller.view.frame = CGRect(origin: .zero, size: controller.view.intrinsicContentSize)
     }
 
     // MARK: - Forcing Status Refresh

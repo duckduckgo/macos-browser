@@ -671,6 +671,7 @@ struct UserText {
     // MARK: - Tooltips
 
     static let autofillShortcutTooltip = NSLocalizedString("tooltip.autofill.shortcut", value: "Autofill", comment: "Tooltip for the autofill shortcut")
+    
     static let bookmarksShortcutTooltip = NSLocalizedString("tooltip.bookmarks.shortcut", value: "Bookmarks", comment: "Tooltip for the bookmarks shortcut")
     static let downloadsShortcutTooltip = NSLocalizedString("tooltip.downloads.shortcut", value: "Downloads", comment: "Tooltip for the downloads shortcut")
 
@@ -720,6 +721,16 @@ struct UserText {
         let localized = NSLocalizedString("autofill.popover.password-manager-connected-to-user", value: "Connected to user %@", comment: "Label describing what user is connected to the password manager")
         return String(format: localized, user)
     }
+    
+    static func passwordManagerAutosavePopoverText(domain: String) -> String {
+        let localized = NSLocalizedString("autofill.popover.autosave.text", value: "Login saved for %@", comment: "Text confirming a password has been saved for the %@ domain")
+        return String(format: localized, domain)
+    }
+    
+    static let passwordManagerAutosaveButtonText = NSLocalizedString("autofill.popover.autosave.button.text",
+                                                                      value: "View",
+                                                                      comment: "Button to view the recently autosaved password")
+
 
     static func openPasswordManagerButton(managerName: String) -> String {
         let localized = NSLocalizedString("autofill.popover.open-password-manager", value: "Open %@", comment: "Open password manager button")
@@ -800,9 +811,4 @@ struct UserText {
     static let disableEmailProtectionTitle = NSLocalizedString("disable.email.protection.title", value: "Disable Email Protection Autofill?", comment: "Title for alert shown when user disables email protection")
     static let disableEmailProtectionMessage = NSLocalizedString("disable.email.protection.mesage", value: "This will only disable Autofill for Duck Addresses in this browser. \n\n You can still manually enter Duck Addresses and continue to receive forwarded email.", comment: "Message for alert shown when user disables email protection")
     static let disable = NSLocalizedString("disable", value: "Disable", comment: "Email protection Disable button text")
-
-
-
-
 }
-

@@ -724,7 +724,9 @@ protocol NewWindowPolicyDecisionMaker {
 
     func reload() {
         userInteractionDialog = nil
-        if let error = error, let failingUrl = error.failingUrl {
+
+        // In the case of an error only reload web URLs to prevent uxss attacks via redirecting to javascript://
+        if let error = error, let failingUrl = error.failingUrl, (failingUrl.isHttp || failingUrl.isHttps) {
             webView.load(URLRequest(url: failingUrl, cachePolicy: .reloadIgnoringLocalCacheData))
             return
         }

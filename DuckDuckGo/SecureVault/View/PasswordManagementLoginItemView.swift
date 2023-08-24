@@ -490,11 +490,8 @@ private struct NotesView: View {
                         }
                     )
             } else {
-                EditableTextView(text: $model.notes)
+                EditableTextView(text: $model.notes, maxLength: characterLimit)
                     .frame(height: 197.0)
-                    .onReceive(Just(model.notes)) {
-                        model.notes = String($0.prefix(characterLimit))
-                    }
                     .clipShape(RoundedRectangle(cornerRadius: cornerRadius,
                                                 style: .continuous))
                     .overlay(
@@ -513,7 +510,7 @@ private struct NotesView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .contextMenu(ContextMenu(menuItems: {
                     Button(UserText.copy, action: {
-                        NSPasteboard.general.copy(model.notes)
+                        model.copy(model.notes)
                     })
                 }))
         }
@@ -591,12 +588,18 @@ private struct HeaderView: View {
 
     @EnvironmentObject var model: PasswordManagementLoginModel
 
+    private func getIconLetters() -> String {
+        return !model.title.isEmpty ? model.title :
+               !model.domainTLD.isEmpty ? model.domainTLD :
+               "#"
+    }
+
     var body: some View {
 
         HStack(alignment: .center, spacing: 0) {
-
-            LoginFaviconView(domain: model.domain)
-                .padding(.trailing, 10)
+            LoginFaviconView(domain: model.domain,
+                             generatedIconLetters: getIconLetters())
+               .padding(.trailing, 10)
 
             if model.isNew || model.isEditing {
 

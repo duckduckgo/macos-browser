@@ -71,9 +71,10 @@ struct FaviconView: View {
             } else {
 
                 ZStack {
+                    let eTLDplus1 = ContentBlocking.shared.tld.eTLDplus1(domain) ?? domain
                     Rectangle()
-                        .foregroundColor(Color.forDomain(domain.droppingWwwPrefix()))
-                    Text(String(domain.droppingWwwPrefix().capitalized.first ?? "?"))
+                        .foregroundColor(Color.forString(eTLDplus1))
+                    Text(String(eTLDplus1.capitalized.first ?? "?"))
                         .font(.title)
                         .foregroundColor(Color.white)
                 }

@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Bookmarks
 import Combine
 import Common
 import DDGSync
@@ -25,6 +26,24 @@ import SyncDataProviders
 final class SyncBookmarksAdapter {
 
     private(set) var provider: BookmarksProvider?
+    let databaseCleaner: BookmarkDatabaseCleaner
+
+    init(database: CoreDataDatabase) {
+        databaseCleaner = BookmarkDatabaseCleaner(
+            bookmarkDatabase: database,
+            errorEvents: BookmarksCleanupErrorHandling(),
+            log: .bookmarks
+        )
+    }
+
+    func cleanUpDatabaseAndUpdateSchedule(shouldEnable: Bool) {
+        databaseCleaner.cleanUpDatabaseNow()
+        if shouldEnable {
+            databaseCleaner.scheduleRegularCleaning()
+        } else {
+            databaseCleaner.cancelCleaningSchedule()
+        }
+    }
 
     func setUpProviderIfNeeded(database: CoreDataDatabase, metadataStore: SyncMetadataStore) {
         guard provider == nil else {
