@@ -83,6 +83,10 @@
 		3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */; };
 		310E79BF294A19A8007C49E8 /* FireproofingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */; };
 		311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B262628E73E0A00FD181A /* TabShadowConfig.swift */; };
+		312015BF2A974BDA00EA6B76 /* NetworkProtectionOnboardingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B05829D2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift */; };
+		312015C02A974BE300EA6B76 /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
+		31278FCE2A974B59003153EC /* NetworkProtectionAppEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B2DDCF72A93A8BB0039D884 /* NetworkProtectionAppEvents.swift */; };
+		31278FCF2A974B5D003153EC /* KeychainType+ClientDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */; };
 		313AEDA1287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */; };
 		313B6A4F2A6EB19C00601B75 /* TabCleanupPreparer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D36F4232A3B85C50052B527 /* TabCleanupPreparer.swift */; };
 		313B6A502A6EB1B900601B75 /* HTTPCookie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA6D0FC2A1FF9A100540406 /* HTTPCookie.swift */; };
@@ -8822,6 +8826,7 @@
 				3192A08F2A4C4CFF0084EA89 /* ContextMenuUserScript.swift in Sources */,
 				3192A0902A4C4CFF0084EA89 /* NSSavePanelExtension.swift in Sources */,
 				3192A0912A4C4CFF0084EA89 /* AppPrivacyConfigurationDataProvider.swift in Sources */,
+				312015BF2A974BDA00EA6B76 /* NetworkProtectionOnboardingMenu.swift in Sources */,
 				BB8705162A96324B003359A2 /* WKBackForwardListExtension.swift in Sources */,
 				318115E52A8A4F3300129796 /* CredentialsCleanupErrorHandling.swift in Sources */,
 				3192A0922A4C4CFF0084EA89 /* LinkButton.swift in Sources */,
@@ -8876,6 +8881,7 @@
 				3192A0C32A4C4CFF0084EA89 /* NSWindowExtension.swift in Sources */,
 				3192A0C42A4C4CFF0084EA89 /* BookmarkPopover.swift in Sources */,
 				3192A0C52A4C4CFF0084EA89 /* PreferencesDownloadsView.swift in Sources */,
+				312015C02A974BE300EA6B76 /* UserDefaults+NetworkProtectionShared.swift in Sources */,
 				3192A0C62A4C4CFF0084EA89 /* QRSharingService.swift in Sources */,
 				3192A0C72A4C4CFF0084EA89 /* ProcessExtension.swift in Sources */,
 				3192A0C82A4C4CFF0084EA89 /* PermissionAuthorizationQuery.swift in Sources */,
@@ -8906,6 +8912,7 @@
 				3192A0E12A4C4CFF0084EA89 /* BookmarkManager.swift in Sources */,
 				3192A0E22A4C4CFF0084EA89 /* AboutModel.swift in Sources */,
 				3192A0E32A4C4CFF0084EA89 /* PasswordManagementCreditCardItemView.swift in Sources */,
+				31278FCF2A974B5D003153EC /* KeychainType+ClientDefault.swift in Sources */,
 				3192A0E42A4C4CFF0084EA89 /* NSTextFieldExtension.swift in Sources */,
 				3192A0E52A4C4CFF0084EA89 /* BWManagement.swift in Sources */,
 				3192A0E62A4C4CFF0084EA89 /* FireproofDomainsContainer.swift in Sources */,
@@ -8935,6 +8942,7 @@
 				3192A0FE2A4C4CFF0084EA89 /* UserContentUpdating.swift in Sources */,
 				3192A0FF2A4C4CFF0084EA89 /* ChromePreferences.swift in Sources */,
 				3192A1002A4C4CFF0084EA89 /* FirePopoverViewController.swift in Sources */,
+				31278FCE2A974B59003153EC /* NetworkProtectionAppEvents.swift in Sources */,
 				3192A1012A4C4CFF0084EA89 /* SavePaymentMethodPopover.swift in Sources */,
 				3192A1022A4C4CFF0084EA89 /* FindInPageViewController.swift in Sources */,
 				3192A1032A4C4CFF0084EA89 /* Cryptography.swift in Sources */,
@@ -9298,7 +9306,6 @@
 				3706FAD2293F65D500E42796 /* Atb.swift in Sources */,
 				3706FAD3293F65D500E42796 /* DownloadsViewController.swift in Sources */,
 				3706FAD4293F65D500E42796 /* DataExtension.swift in Sources */,
-				7B2DDD0D2A93EB630039D884 /* NetworkProtectionAppEvents.swift in Sources */,
 				3706FAD6293F65D500E42796 /* ConfigurationStore.swift in Sources */,
 				3706FAD7293F65D500E42796 /* Feedback.swift in Sources */,
 				3707C722294B5D2900682A9F /* WKWebViewExtension.swift in Sources */,
@@ -10329,7 +10336,6 @@
 				4B9292A426670D2A00AD2C21 /* PasteboardWriting.swift in Sources */,
 				4B92928D26670D1700AD2C21 /* BookmarkOutlineViewCell.swift in Sources */,
 				B604085C274B8FBA00680351 /* UnprotectedDomains.xcdatamodeld in Sources */,
-				7B2DDD0B2A93EA570039D884 /* NetworkProtectionAppEvents.swift in Sources */,
 				4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */,
 				4B59024326B35F7C00489384 /* BrowserImportViewController.swift in Sources */,
 				4B9292D72667124000AD2C21 /* NSPopUpButtonExtension.swift in Sources */,
