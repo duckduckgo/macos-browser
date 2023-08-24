@@ -130,8 +130,20 @@ extension Pixel.Event {
              .networkProtectionSystemExtensionUnknownActivationResult,
              .favoriteSectionHidden,
              .recentActivitySectionHidden,
-             .continueSetUpSectionHidden:
-
+             .continueSetUpSectionHidden,
+             .userHasPinnedTab,
+             .fireButtonFirstBurn,
+             .fireButton,
+             .incrementalRolloutTest,
+             .duckPlayerDailyUniqueView,
+             .duckPlayerViewFromYoutubeViaMainOverlay,
+             .duckPlayerViewFromYoutubeViaHoverButton,
+             .duckPlayerViewFromYoutubeAutomatic,
+             .duckPlayerViewFromSERP,
+             .duckPlayerViewFromOther,
+             .duckPlayerSettingAlways,
+             .duckPlayerSettingNever,
+             .duckPlayerSettingBackToDefault:
             return nil
         }
     }

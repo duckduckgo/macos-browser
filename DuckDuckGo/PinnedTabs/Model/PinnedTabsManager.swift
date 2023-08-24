@@ -68,7 +68,7 @@ final class PinnedTabsManager {
     }
 
     var pinnedDomains: Set<String> {
-        Set(tabCollection.tabs.compactMap { $0.url?.host?.droppingWwwPrefix() })
+        Set(tabCollection.tabs.compactMap { $0.url?.host })
     }
 
     func setUp(with collection: TabCollection) {
@@ -95,6 +95,12 @@ final class PinnedTabsManager {
                     self?.tabCollection.tabs.forEach { $0.stopAllMediaAndLoading() }
                 }
             }
+    }
+
+    func reportUsage() {
+        if !tabCollection.tabs.isEmpty {
+            Pixel.fire(.userHasPinnedTab)
+        }
     }
 
     // MARK: - Private

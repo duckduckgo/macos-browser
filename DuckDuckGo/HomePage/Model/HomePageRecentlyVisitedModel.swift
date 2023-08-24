@@ -74,7 +74,7 @@ final class RecentlyVisitedModel: ObservableObject {
             .forEach {
 
             numberOfTrackersBlocked += $0.numberOfTrackersBlocked
-            guard let host = $0.url.host?.droppingWwwPrefix() else { return }
+            guard let host = $0.url.host else { return }
 
             var site = sitesByDomain[host]
             if site == nil, let newSite = RecentlyVisitedSiteModel(originalURL: $0.url) {
@@ -111,7 +111,7 @@ final class RecentlyVisitedModel: ObservableObject {
             bookmarkManager.update(bookmark: bookmark)
             site.isFavorite = bookmark.isFavorite
         } else {
-            bookmarkManager.makeBookmark(for: url, title: site.domain.droppingWwwPrefix(), isFavorite: true)
+            bookmarkManager.makeBookmark(for: url, title: site.domain, isFavorite: true)
             site.isFavorite = true
         }
     }

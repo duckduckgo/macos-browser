@@ -17,6 +17,7 @@
 //
 
 import BrowserServicesKit
+import Combine
 import Common
 import DDGSync
 import Persistence
@@ -44,10 +45,36 @@ final class SyncDataProviders: DataProvidersSource {
         return providers.compactMap { $0 as? DataProviding }
     }
 
+    func setUpDatabaseCleaners(syncService: DDGSync) {
+        bookmarksAdapter.databaseCleaner.isSyncActive = { [weak syncService] in
+            syncService?.authState == .active
+        }
+
+        credentialsAdapter.databaseCleaner.isSyncActive = { [weak syncService] in
+            syncService?.authState == .active
+        }
+
+        let syncAuthStateDidChangePublisher = syncService.authStatePublisher
+            .dropFirst()
+            .map { $0 == .inactive }
+            .removeDuplicates()
+
+        syncAuthStateDidChangeCancellable = syncAuthStateDidChangePublisher
+            .sink { [weak self] isSyncDisabled in
+                self?.bookmarksAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: isSyncDisabled)
+                self?.credentialsAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: isSyncDisabled)
+            }
+
+        if syncService.authState == .inactive {
+            bookmarksAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: true)
+            credentialsAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: true)
+        }
+    }
+
     init(bookmarksDatabase: CoreDataDatabase, secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory) {
         self.bookmarksDatabase = bookmarksDatabase
         self.secureVaultFactory = secureVaultFactory
-        bookmarksAdapter = SyncBookmarksAdapter()
+        bookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase)
         credentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: secureVaultFactory)
     }
 
@@ -74,6 +101,7 @@ final class SyncDataProviders: DataProvidersSource {
 
     private var isSyncMetadaDatabaseLoaded: Bool = false
     private var syncMetadata: SyncMetadataStore?
+    private var syncAuthStateDidChangeCancellable: AnyCancellable?
 
     private let syncMetadataDatabase: SyncMetadataDatabase = SyncMetadataDatabase()
     private let bookmarksDatabase: CoreDataDatabase

@@ -21,6 +21,7 @@ import BrowserServicesKit
 import AppKit
 
 #if NETWORK_PROTECTION
+import Combine
 import NetworkProtection
 import NetworkProtectionUI
 #endif
@@ -189,13 +190,25 @@ final class NavigationBarPopovers {
         popover.select(category: selectedCategory)
     }
 
+    func showPasswordManagerPopover(selectedWebsiteAccount: SecureVaultModels.WebsiteAccount, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
+        let popover = passwordManagementPopover ?? PasswordManagementPopover()
+        passwordManagementPopover = popover
+        popover.delegate = delegate
+        show(popover: popover, usingView: view)
+        popover.select(websiteAccount: selectedWebsiteAccount)
+    }
+
     func hasAnySavePopoversVisible() -> Bool {
         return savePopovers.contains(where: { $0?.isShown ?? false })
     }
 
     func displaySaveCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, automaticallySaved: Bool, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        showSaveCredentialsPopover(usingView: view, withDelegate: delegate)
-        saveCredentialsPopover?.viewController.update(credentials: credentials, automaticallySaved: automaticallySaved)
+        if !automaticallySaved {
+            showSaveCredentialsPopover(usingView: view, withDelegate: delegate)
+            saveCredentialsPopover?.viewController.update(credentials: credentials, automaticallySaved: automaticallySaved)
+        } else {
+            NotificationCenter.default.post(name: .loginAutoSaved, object: credentials.account)
+        }
     }
 
     func displaySavePaymentMethod(_ card: SecureVaultModels.CreditCard, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
@@ -291,7 +304,9 @@ final class NavigationBarPopovers {
                 })
             ]
 
-            let popover = NetworkProtectionPopover(controller: controller, statusReporter: statusReporter, menuItems: menuItems)
+            let onboardingStatusPublisher = UserDefaults.shared.networkProtectionOnboardingStatusPublisher
+
+            let popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, menuItems: menuItems)
             popover.delegate = delegate
 
             networkProtectionPopover = popover
@@ -300,5 +315,8 @@ final class NavigationBarPopovers {
         show(popover: popover, usingView: view, preferredEdge: .maxY)
     }
 #endif
+}
 
+extension Notification.Name {
+    static let loginAutoSaved = Notification.Name(rawValue: "loginAutoSaved")
 }

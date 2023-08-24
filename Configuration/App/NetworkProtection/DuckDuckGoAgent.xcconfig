@@ -33,9 +33,8 @@ INFOPLIST_KEY_NSPrincipalClass = Application
 //CODE_SIGN_STYLE[config=Debug][sdk=*] = Manual
 //CODE_SIGN_STYLE[config=Release][sdk=*] = Manual
 
-// Left empty intentionally as we currently only support debug and release builds
-CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] =
-CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
+CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = DuckDuckGoAgent/DuckDuckGoAgent.entitlements
+CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] = DuckDuckGoAgent/DuckDuckGoAgent.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = DuckDuckGoAgent/DuckDuckGoAgent.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = DuckDuckGoAgent/DuckDuckGoAgent.entitlements
 
