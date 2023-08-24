@@ -25,17 +25,21 @@ import Combine
 ///
 public final class CurrentValuePublisher<Output, Failure>: Publisher where Failure: Error {
 
-    public private(set) var value: Output
+    var value: Output {
+        currentValueCallback()
+    }
+
+    private let currentValueCallback: () -> Output
     private let underlyingPublisher: AnyPublisher<Output, Failure>
 
-    public init(initialValue: Output, underlyingPublisher: AnyPublisher<Output, Failure>) {
-        value = initialValue
+    public init(underlyingPublisher: AnyPublisher<Output, Failure>, currentValueCallback: @escaping () -> Output) {
+        self.currentValueCallback = currentValueCallback
         self.underlyingPublisher = underlyingPublisher
     }
 
     // MARK: - Publisher
 
-    public func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
+    public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
         underlyingPublisher.receive(subscriber: subscriber)
     }
 }
