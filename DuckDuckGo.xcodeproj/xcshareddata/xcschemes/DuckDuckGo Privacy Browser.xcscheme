@@ -131,6 +131,9 @@
                   Identifier = "AutoconsentIntegrationTests/testCosmeticRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden()">
                </Test>
                <Test
+                  Identifier = "AutoconsentIntegrationTests/testWhenAutoconsentDisabled_promptIsDisplayed()">
+               </Test>
+               <Test
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
                </Test>
                <Test
