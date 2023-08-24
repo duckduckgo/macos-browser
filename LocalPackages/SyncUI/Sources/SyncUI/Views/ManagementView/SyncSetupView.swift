@@ -56,11 +56,5 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                 Spacer()
             }
         }
-
-        PreferencePaneSection {
-            TextButton(UserText.recoverSyncedData) {
-                model.presentRecoverSyncAccountDialog()
-            }
-        }
     }
 }
