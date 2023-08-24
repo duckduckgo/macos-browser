@@ -59,8 +59,6 @@ final class MainWindow: NSWindow {
         hasShadow = true
         titleVisibility = .hidden
         titlebarAppearsTransparent = true
-        // the window will be draggable using custom drag areas defined by WindowDraggingView
-        isMovable = false
     }
 
     // MARK: - First Responder Notification
