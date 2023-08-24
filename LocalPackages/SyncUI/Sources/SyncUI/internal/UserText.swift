@@ -28,7 +28,7 @@ enum UserText {
     static let copy = NSLocalizedString("copy", value: "Copy", comment: "Copy button")
     static let pasteFromClipboard = NSLocalizedString("paste-from-clipboard", value: "Paste from Clipboard", comment: "Paste button")
 
-    static let sync = NSLocalizedString("preferences.sync", value: "Sync", comment: "Show sync preferences")
+    static let sync = NSLocalizedString("preferences.sync", value: "Sync & Backup", comment: "Show sync preferences")
 
     static let syncSetupExplanation = NSLocalizedString("preferences.sync.setup-explanation", value: "Automatically back up your bookmarks, logins and Email Protection settings and sync them with your other devices.", comment: "Sync setup explanation")
     static let turnOnSync = NSLocalizedString("preferences.sync.turn-on", value: "Sync & Backup for the First Time", comment: "Enable sync button caption")
