@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import Foundation
 import NetworkProtection
 
@@ -37,3 +39,5 @@ final class MockNetworkProtectionCodeRedeemer: NetworkProtectionCodeRedeeming {
     }
 
 }
+
+#endif

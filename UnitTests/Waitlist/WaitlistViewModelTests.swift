@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -120,3 +122,5 @@ final class WaitlistViewModelTests: XCTestCase {
     }
 
 }
+
+#endif
