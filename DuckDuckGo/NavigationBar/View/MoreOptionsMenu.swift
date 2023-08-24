@@ -388,7 +388,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
         let alert = NSAlert.disableEmailProtection()
         let response = alert.runModal()
         if response == .alertFirstButtonReturn {
-            emailManager.signOut()
+            try? emailManager.signOut()
         }
     }
 
