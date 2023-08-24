@@ -107,6 +107,9 @@
                   Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">
                </Test>
                <Test
+                  Identifier = "PixelStoreTests/testWhenValuesAreRemovedThenTheyAreNotInCache()">
+               </Test>
+               <Test
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
                </Test>
                <Test
@@ -132,6 +135,9 @@
                </Test>
                <Test
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
+               </Test>
+               <Test
+                  Identifier = "DownloadsIntegrationTests/testWhenNavigationActionIsData_downloadStarts()">
                </Test>
                <Test
                   Identifier = "EncryptionKeyStoreTests">
