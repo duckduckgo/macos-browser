@@ -107,11 +107,16 @@ final class DefaultVariantManager: VariantManager {
             return
         }
 
-        storage.variant = variant.name
+        storage.variant = variant
         newInstallCompletion(self)
     }
 
-    private func selectVariant() -> Variant? {
+    private func selectVariant() -> String? {
+        // Prioritise campaign variants
+        if let variant = CampaignVariant().getAndEnableVariant() {
+            return variant
+        }
+
         let totalWeight = variants.reduce(0, { $0 + $1.weight })
         let randomPercent = rng.nextInt(upperBound: totalWeight)
 
@@ -119,7 +124,7 @@ final class DefaultVariantManager: VariantManager {
         for variant in variants {
             runningTotal += variant.weight
             if randomPercent < runningTotal {
-                return variant.isIncluded() ? variant : nil
+                return variant.isIncluded() ? variant.name : nil
             }
         }
 
@@ -135,6 +140,44 @@ final class Arc4RandomUniformVariantRNG: VariantRNG {
     func nextInt(upperBound: Int) -> Int {
         // swiftlint:disable:next legacy_random
         return Int(arc4random_uniform(UInt32(upperBound)))
+    }
+
+}
+
+final class CampaignVariant {
+
+    @UserDefaultsWrapper(key: .agentLaunchTime, defaultValue: false)
+    private var isCampaignVariant: Bool
+
+    private let statisticsStore: StatisticsStore
+
+    init(statisticsStore: StatisticsStore = LocalStatisticsStore()) {
+        self.statisticsStore = statisticsStore
+    }
+
+    // Should only be called during the first installation
+    func getAndEnableVariant() -> String? {
+        assert(statisticsStore.variant == nil)
+        if let url = Bundle.main.url(forResource: "variant", withExtension: "txt"), let string = try? String(contentsOf: url) {
+            isCampaignVariant = true
+            return string.trimmingWhitespace()
+        }
+        return nil
+    }
+
+    private var daysSinceInstall: Int {
+        guard let installDate = statisticsStore.installDate,
+              let days = Calendar.current.numberOfDaysBetween(installDate, and: Date()) else { return -1 }
+        return days
+    }
+
+    var isActive: Bool {
+        // 93 days is used for our campaign specific retention calculations
+        return isCampaignVariant && (0...93).contains(daysSinceInstall)
+    }
+
+    func cleanUp() {
+        isCampaignVariant = false
     }
 
 }
