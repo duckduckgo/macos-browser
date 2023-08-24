@@ -20,7 +20,7 @@ import WebKit
 import UserScript
 
 protocol ContextMenuUserScriptDelegate: AnyObject {
-    func willShowContextMenu(withSelectedText: String)
+    func willShowContextMenu(withSelectedText selectedText: String?, linkURL: String?)
 }
 
 final class ContextMenuUserScript: NSObject, StaticUserScript {
@@ -33,16 +33,24 @@ final class ContextMenuUserScript: NSObject, StaticUserScript {
     weak var delegate: ContextMenuUserScriptDelegate?
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard let selectedText = message.body as? String else { return }
-        delegate?.willShowContextMenu(withSelectedText: selectedText)
+        guard let dict = message.body as? [String: Any] else { return }
+        let selectedText = dict["selectedText"] as? String
+        let linkUrl = dict["linkUrl"] as? String
+        delegate?.willShowContextMenu(withSelectedText: selectedText, linkURL: linkUrl)
     }
 
     static let source = """
     (function() {
         document.addEventListener("contextmenu", function(e) {
-            webkit.messageHandlers.contextMenu.postMessage(window.getSelection().toString());
-        }, true);
-    }) ();
-    """
+            let anchor = event.target.closest('a');
+            let linkUrl = anchor ? anchor.href : null;
+            let selectedText = window.getSelection().toString();
 
+            webkit.messageHandlers.contextMenu.postMessage({
+                selectedText: selectedText,
+                linkUrl: linkUrl
+            });
+        }, true);
+    })();
+    """
 }

@@ -211,21 +211,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
 #if NETWORK_PROTECTION
-        startupNetworkProtection()
+        if #available(macOS 11.4, *) {
+            NetworkProtectionAppEvents().applicationDidFinishLaunching()
+        }
 #endif
     }
-
-    // Temporary feature flag tester, to validate that phased rollouts are working as intended.
-    // This is to be removed before the end of August 2023.
-    lazy var featureFlagTester: PhasedRolloutFeatureFlagTester = {
-        return PhasedRolloutFeatureFlagTester()
-    }()
 
     func applicationDidBecomeActive(_ notification: Notification) {
         syncService?.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
         syncService?.scheduler.notifyAppLifecycleEvent()
-
-        featureFlagTester.sendFeatureFlagEnabledPixelIfNecessary()
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -290,15 +284,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
         let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync)
         syncService.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
-
-        syncStateCancellable = syncService.authStatePublisher
-            .prepend(syncService.authState)
-            .map { $0 == .inactive }
-            .removeDuplicates()
-            .sink { isSyncDisabled in
-                LocalBookmarkManager.shared.updateBookmarkDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
-                syncDataProviders.credentialsAdapter.updateDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
-            }
+        syncDataProviders.setUpDatabaseCleaners(syncService: syncService)
 
         // This is also called in applicationDidBecomeActive, but we're also calling it here, since
         // syncService can be nil when applicationDidBecomeActive is called during startup, if a modal
@@ -309,91 +295,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         self.syncDataProviders = syncDataProviders
         self.syncService = syncService
-
-        bookmarksManager.bookmarkDatabaseCleaner.isSyncActive = { [weak self] in
-            self?.syncService?.authState == .active
-        }
-
-        syncDataProviders.credentialsAdapter.databaseCleaner.isSyncActive = { [weak self] in
-            self?.syncService?.authState == .active
-        }
     }
-
-    // MARK: - Network Protection
-
-#if NETWORK_PROTECTION
-
-    private func startupNetworkProtection() {
-        guard #available(macOS 11.4, *) else { return }
-
-        let loginItemsManager = NetworkProtectionLoginItemsManager()
-        let networkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
-
-        guard networkProtectionFeatureVisibility.isFeatureActivated else {
-            loginItemsManager.disableLoginItems()
-            LocalPinningManager.shared.unpin(.networkProtection)
-            return
-        }
-
-        restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
-        refreshNetworkProtectionServers()
-    }
-
-    @available(macOS 11.4, *)
-    private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: NetworkProtectionLoginItemsManager) {
-        let currentVersion = AppVersion.shared.versionNumber
-        let versionStore = NetworkProtectionLastVersionRunStore()
-        defer {
-            versionStore.lastVersionRun = currentVersion
-        }
-
-        // should‘ve been run at least once with NetP enabled
-        guard let lastVersionRun = versionStore.lastVersionRun else {
-            os_log(.info, log: .networkProtection, "No last version found for the NetP login items, skipping update")
-            return
-        }
-
-        if lastVersionRun != currentVersion {
-            os_log(.info, log: .networkProtection, "App updated from %{public}s to %{public}s: updating login items", lastVersionRun, currentVersion)
-            restartNetworkProtectionTunnelAndMenu(using: loginItemsManager)
-        } else {
-            // If login items failed to launch (e.g. because of the App bundle rename), launch using NSWorkspace
-            loginItemsManager.ensureLoginItemsAreRunning(.ifLoginItemsAreEnabled, after: 1)
-        }
-    }
-
-    @available(macOS 11.4, *)
-    private func restartNetworkProtectionTunnelAndMenu(using loginItemsManager: NetworkProtectionLoginItemsManager) {
-        loginItemsManager.restartLoginItems()
-
-        Task {
-            let provider = NetworkProtectionTunnelController()
-
-            // Restart NetP SysEx on app update
-            if await provider.isConnected {
-                await provider.stop()
-                await provider.start()
-            }
-        }
-    }
-
-    /// Fetches a new list of Network Protection servers, and updates the existing set.
-    @available(macOS 11.4, *)
-    private func refreshNetworkProtectionServers() {
-        Task {
-            let serverCount: Int
-            do {
-                serverCount = try await NetworkProtectionDeviceManager.create().refreshServerList().count
-            } catch {
-                os_log("Failed to update Network Protection servers", log: .networkProtection, type: .error)
-                return
-            }
-
-            os_log("Successfully updated Network Protection servers; total server count = %{public}d", log: .networkProtection, serverCount)
-        }
-    }
-
-#endif
 
     private func subscribeToEmailProtectionStatusNotifications() {
         NotificationCenter.default.addObserver(self,

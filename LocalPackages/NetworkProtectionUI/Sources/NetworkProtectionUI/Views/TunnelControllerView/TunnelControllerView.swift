@@ -21,8 +21,6 @@ import SwiftUIExtensions
 import Combine
 import NetworkProtection
 
-private let defaultTextColor = Color("TextColor", bundle: .module)
-
 fileprivate extension Font {
     enum NetworkProtection {
         static var connectionStatusDetail: Font {
@@ -34,10 +32,6 @@ fileprivate extension Font {
         }
 
         static var description: Font {
-            .system(size: 13, weight: .regular, design: .default)
-        }
-
-        static var menu: Font {
             .system(size: 13, weight: .regular, design: .default)
         }
 
@@ -68,7 +62,6 @@ private enum Opacity {
     static let content = Double(0.58)
     static let label = Double(0.9)
     static let description = Double(0.9)
-    static let menu = Double(0.9)
     static let link = Double(1)
 
     static func sectionHeader(colorScheme: ColorScheme) -> Double {
@@ -88,84 +81,71 @@ fileprivate extension View {
     func applyConnectionStatusDetailAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.connectionStatusDetail(colorScheme: colorScheme))
             .font(.NetworkProtection.connectionStatusDetail)
-            .foregroundColor(defaultTextColor)
+            .foregroundColor(Color(.defaultText))
     }
 
     func applyContentAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.content)
             .font(.NetworkProtection.content)
-            .foregroundColor(defaultTextColor)
+            .foregroundColor(Color(.defaultText))
     }
 
     func applyDescriptionAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.description)
             .font(.NetworkProtection.description)
-            .foregroundColor(defaultTextColor)
-    }
-
-    func applyMenuAttributes() -> some View {
-        opacity(Opacity.menu)
-            .font(.NetworkProtection.menu)
-            .foregroundColor(defaultTextColor)
-    }
-
-    func applyLinkAttributes(colorScheme: ColorScheme) -> some View {
-        opacity(Opacity.link)
-            .font(.NetworkProtection.content)
-            .foregroundColor(defaultTextColor)
+            .foregroundColor(Color(.defaultText))
     }
 
     func applyLabelAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.label)
             .font(.NetworkProtection.label)
-            .foregroundColor(defaultTextColor)
+            .foregroundColor(Color(.defaultText))
     }
 
     func applySectionHeaderAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.sectionHeader(colorScheme: colorScheme))
             .font(.NetworkProtection.sectionHeader)
-            .foregroundColor(defaultTextColor)
+            .foregroundColor(Color(.defaultText))
     }
 
     func applyTimerAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.timer(colorScheme: colorScheme))
             .font(.NetworkProtection.timer)
-            .foregroundColor(defaultTextColor)
+            .foregroundColor(Color(.defaultText))
     }
 
     func applyTitleAttributes(colorScheme: ColorScheme) -> some View {
         opacity(Opacity.title(colorScheme: colorScheme))
             .font(.NetworkProtection.title)
-            .foregroundColor(defaultTextColor)
+            .foregroundColor(Color(.defaultText))
     }
 }
 
-public struct NetworkProtectionStatusView: View {
+public struct TunnelControllerView: View {
 
-    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.isEnabled) private var isEnabled
     @Environment(\.dismiss) private var dismiss
 
     // MARK: - Model
 
     /// The view model that this instance will use.
     ///
-    @ObservedObject var model: Model
+    @ObservedObject var model: TunnelControllerViewModel
 
     // MARK: - Initializers
 
-    public init(model: Model) {
+    public init(model: TunnelControllerViewModel) {
         self.model = model
     }
 
     // MARK: - View Contents
 
     public var body: some View {
-        VStack(spacing: 0) {
-            if let healthWarning = model.issueDescription {
-                connectionHealthWarningView(message: healthWarning)
-            }
-
+        Group {
             headerView()
+                .disabled(on: !isEnabled)
+
             featureToggleRow()
 
             Divider()
@@ -173,37 +153,12 @@ public struct NetworkProtectionStatusView: View {
 
             if model.showServerDetails {
                 connectionStatusView()
+                    .disabled(on: !isEnabled)
             }
-
-            bottomMenuView()
         }
-        .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
-        .frame(maxWidth: 350)
     }
 
     // MARK: - Composite Views
-
-    private func connectionHealthWarningView(message: String) -> some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .top, spacing: 12) {
-                Image("WarningColored", bundle: Bundle.module)
-
-                /// Text elements in SwiftUI don't expand horizontally more than needed, so we're adding an "optional" spacer at the end so that
-                /// the alert bubble won't shrink if there's not enough text.
-                HStack(spacing: 0) {
-                    Text(message)
-                        .makeSelectable()
-                        .multilineText()
-                        .foregroundColor(defaultTextColor)
-
-                    Spacer()
-                }
-            }
-            .padding(16)
-            .background(RoundedRectangle(cornerRadius: 8).fill(Color("AlertBubbleBackground", bundle: Bundle.module)))
-        }
-        .padding(EdgeInsets(top: 8, leading: 8, bottom: 4, trailing: 8))
-    }
 
     /// Main image, feature ON/OFF and feature description
     ///
@@ -218,6 +173,7 @@ public struct NetworkProtectionStatusView: View {
             Text(model.featureStatusDescription)
                 .applyTitleAttributes(colorScheme: colorScheme)
                 .padding([.top], 8)
+                .multilineText()
 
             Text(UserText.networkProtectionStatusViewFeatureDesc)
                 .multilineText()
@@ -247,17 +203,6 @@ public struct NetworkProtectionStatusView: View {
         }
     }
 
-    private func bottomMenuView() -> some View {
-        VStack(spacing: 0) {
-            ForEach(model.menuItems, id: \.name) { menuItem in
-                MenuItemButton(menuItem.name, textColor: defaultTextColor) {
-                    await menuItem.action()
-                    dismiss()
-                }
-            }
-        }
-    }
-
     // MARK: - Rows
 
     private func dividerRow() -> some View {
@@ -272,18 +217,20 @@ public struct NetworkProtectionStatusView: View {
                     .applyLabelAttributes(colorScheme: colorScheme)
                     .frame(alignment: .leading)
                     .fixedSize()
+                    .disabled(on: !isEnabled)
 
                 Spacer(minLength: 8)
 
                 Text(model.connectionStatusDescription)
                     .applyTimerAttributes(colorScheme: colorScheme)
                     .fixedSize()
+                    .disabled(on: !isEnabled)
 
                 Spacer()
                     .frame(width: 8)
             }
         }
-        .disabled(model.isToggleDisabled)
+        .disabled(!isEnabled || model.isToggleDisabled)
         .toggleStyle(.switch)
         .padding(EdgeInsets(top: 3, leading: 9, bottom: 3, trailing: 9))
     }

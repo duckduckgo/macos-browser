@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1692395382212,
+    "version": 1692864247771,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -3515,14 +3515,14 @@
             "hash": "52857469413a66e8b0c7b00de5589162"
         },
         "incrementalRolloutTest": {
-            "state": "disabled",
+            "state": "enabled",
             "features": {
                 "rollout": {
                     "state": "disabled"
                 }
             },
             "exceptions": [],
-            "hash": "c1293c7b2687c8a2f7c5433a4d7a330d"
+            "hash": "54776d4aa010391dc14a53ad69cd1777"
         },
         "navigatorInterface": {
             "exceptions": [],
@@ -5165,6 +5165,17 @@
                             }
                         ]
                     },
+                    "ipify.org": {
+                        "rules": [
+                            {
+                                "rule": "api.ipify.org/",
+                                "domains": [
+                                    "mass.gov"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1239"
+                            }
+                        ]
+                    },
                     "jimstatic.com": {
                         "rules": [
                             {
@@ -6315,7 +6326,7 @@
                 }
             },
             "exceptions": [],
-            "hash": "8da977185d316800299b1f019ae71e2d"
+            "hash": "3384e886b783a215f87ccf7e42f7211d"
         },
         "trackingCookies1p": {
             "settings": {
@@ -6378,6 +6389,11 @@
             "exceptions": [],
             "state": "disabled",
             "hash": "5d33a7d6a3f780d2e07076e209a5bccb"
+        },
+        "voiceSearch": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
         "webCompat": {
             "exceptions": [
@@ -6703,10 +6719,20 @@
                                 "value": "enabled"
                             }
                         ]
+                    },
+                    {
+                        "domain": "kia.com",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/safariObject",
+                                "value": "disabled"
+                            }
+                        ]
                     }
                 ]
             },
-            "hash": "c974f70390be61f9ca4c183311231ac9"
+            "hash": "028bcb02a623aeba1b45a72e69b63a80"
         },
         "windowsPermissionUsage": {
             "exceptions": [],

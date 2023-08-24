@@ -588,12 +588,18 @@ private struct HeaderView: View {
 
     @EnvironmentObject var model: PasswordManagementLoginModel
 
+    private func getIconLetters() -> String {
+        return !model.title.isEmpty ? model.title :
+               !model.domainTLD.isEmpty ? model.domainTLD :
+               "#"
+    }
+
     var body: some View {
 
         HStack(alignment: .center, spacing: 0) {
-
-            LoginFaviconView(domain: model.domain)
-                .padding(.trailing, 10)
+            LoginFaviconView(domain: model.domain,
+                             generatedIconLetters: getIconLetters())
+               .padding(.trailing, 10)
 
             if model.isNew || model.isEditing {
 

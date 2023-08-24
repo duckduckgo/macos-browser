@@ -26,8 +26,12 @@ import NetworkProtectionTestUtils
 
 final class StatusBarMenuTests: XCTestCase {
 
-    private final class TestAppLauncher: AppLaunching {
-        func launchApp(withCommand command: NetworkProtection.AppLaunchCommand) async {
+    private final class TestTunnelController: TunnelController {
+        func start() async {
+            // no-op
+        }
+
+        func stop() async {
             // no-op
         }
     }
@@ -36,9 +40,11 @@ final class StatusBarMenuTests: XCTestCase {
         let item = NSStatusItem()
         let menu = StatusBarMenu(
             statusItem: item,
+            onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: MockNetworkProtectionStatusReporter(),
-            appLauncher: TestAppLauncher(),
-            iconProvider: MenuIconProvider())
+            controller: TestTunnelController(),
+            iconProvider: MenuIconProvider(),
+            menuItems: [])
 
         menu.show()
 
@@ -49,9 +55,11 @@ final class StatusBarMenuTests: XCTestCase {
         let item = NSStatusItem()
         let menu = StatusBarMenu(
             statusItem: item,
+            onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: MockNetworkProtectionStatusReporter(),
-            appLauncher: TestAppLauncher(),
-            iconProvider: MenuIconProvider())
+            controller: TestTunnelController(),
+            iconProvider: MenuIconProvider(),
+            menuItems: [])
 
         menu.hide()
 
