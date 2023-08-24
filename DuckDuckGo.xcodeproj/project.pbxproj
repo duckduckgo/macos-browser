@@ -7619,7 +7619,6 @@
 				3706FAD2293F65D500E42796 /* Atb.swift in Sources */,
 				3706FAD3293F65D500E42796 /* DownloadsViewController.swift in Sources */,
 				3706FAD4293F65D500E42796 /* DataExtension.swift in Sources */,
-				7B2DDD0D2A93EB630039D884 /* NetworkProtectionAppEvents.swift in Sources */,
 				3706FAD6293F65D500E42796 /* ConfigurationStore.swift in Sources */,
 				3706FAD7293F65D500E42796 /* Feedback.swift in Sources */,
 				3707C722294B5D2900682A9F /* WKWebViewExtension.swift in Sources */,
@@ -8650,7 +8649,6 @@
 				4B9292A426670D2A00AD2C21 /* PasteboardWriting.swift in Sources */,
 				4B92928D26670D1700AD2C21 /* BookmarkOutlineViewCell.swift in Sources */,
 				B604085C274B8FBA00680351 /* UnprotectedDomains.xcdatamodeld in Sources */,
-				7B2DDD0B2A93EA570039D884 /* NetworkProtectionAppEvents.swift in Sources */,
 				4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */,
 				4B59024326B35F7C00489384 /* BrowserImportViewController.swift in Sources */,
 				4B9292D72667124000AD2C21 /* NSPopUpButtonExtension.swift in Sources */,
@@ -10286,8 +10284,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 75.0.4;
+				kind = revision;
+				revision = 4c547c334f493232e3858445bf67c1fe9cabadc1;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
