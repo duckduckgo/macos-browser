@@ -108,18 +108,13 @@ extension NetworkProtectionStatusView {
             isHavingConnectivityIssues = statusReporter.connectivityIssuesObserver.recentValue
             lastTunnelErrorMessage = statusReporter.connectionErrorObserver.recentValue
             lastControllerErrorMessage = statusReporter.controllerErrorMessageObserver.recentValue
+            onboardingStatus = onboardingStatusPublisher.value
 
             // Particularly useful when unit testing with an initial status of our choosing.
             subscribeToConnectivityIssues()
             subscribeToTunnelErrorMessages()
             subscribeToControllerErrorMessages()
-
-            onboardingStatusPublisher
-                .receive(on: DispatchQueue.main)
-                .sink { [weak self] status in
-                self?.onboardingStatus = status
-            }
-            .store(in: &cancellables)
+            subscribeToOnboardingStatusChanges()
         }
 
         private func subscribeToConnectivityIssues() {
@@ -165,6 +160,15 @@ extension NetworkProtectionStatusView {
                     self.lastControllerErrorMessage = errorMessage
                 }
             }.store(in: &cancellables)
+        }
+
+        private func subscribeToOnboardingStatusChanges() {
+            onboardingStatusPublisher
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] status in
+                self?.onboardingStatus = status
+            }
+            .store(in: &cancellables)
         }
 
         // MARK: - Connection Status: Errors

@@ -42,10 +42,13 @@ extension UserDefaults {
         }
     }
 
-    var networkProtectionOnboardingStatusPublisher: AnyPublisher<OnboardingStatus, Never> {
-        publisher(for: \.networkProtectionOnboardingStatusRawValue).map { value in
+    var networkProtectionOnboardingStatusPublisher: CurrentValuePublisher<OnboardingStatus, Never> {
+        let value = OnboardingStatus(rawValue: networkProtectionOnboardingStatusRawValue) ?? .default
+        let publisher = publisher(for: \.networkProtectionOnboardingStatusRawValue).map { value in
             OnboardingStatus(rawValue: value) ?? .default
         }.eraseToAnyPublisher()
+
+        return CurrentValuePublisher(initialValue: value, underlyingPublisher: publisher)
     }
 }
 

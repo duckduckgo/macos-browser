@@ -19,7 +19,7 @@
 import Combine
 import Foundation
 
-public typealias OnboardingStatusPublisher = AnyPublisher<OnboardingStatus, Never>
+public typealias OnboardingStatusPublisher = CurrentValuePublisher<OnboardingStatus, Never>
 
 /// Whether the user is onboarding.
 ///
