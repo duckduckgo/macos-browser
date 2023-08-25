@@ -28,6 +28,7 @@ extension UserDefaults {
 public struct UserDefaultsWrapper<T> {
 
     public enum Key: String, CaseIterable {
+        /// system setting defining window title double-click action
         case appleActionOnDoubleClick = "AppleActionOnDoubleClick"
 
         case configLastUpdated = "config.last.updated"
