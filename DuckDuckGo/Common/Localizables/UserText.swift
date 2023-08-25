@@ -812,6 +812,11 @@ struct UserText {
     static let disableEmailProtectionMessage = NSLocalizedString("disable.email.protection.mesage", value: "This will only disable Autofill for Duck Addresses in this browser. \n\n You can still manually enter Duck Addresses and continue to receive forwarded email.", comment: "Message for alert shown when user disables email protection")
     static let disable = NSLocalizedString("disable", value: "Disable", comment: "Email protection Disable button text")
 
+#if DBP
+    static let dataBrokerProtectionOptionsMenuItem = NSLocalizedString("data-broker-protection.optionsMenu", value: "Data Broker Protection", comment: "Menu item data broker protection feature")
+    static let tabDataBrokerProtectionTitle = NSLocalizedString("tab.dbp.title", value: "Data Broker Protection", comment: "Tab data broker protection title")
+#endif //DBP
+
 }
 
 // MARK: - Network Protection Waitlist
