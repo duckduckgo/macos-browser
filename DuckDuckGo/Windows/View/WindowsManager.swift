@@ -32,6 +32,13 @@ final class WindowsManager {
         }
     }
 
+    private class func parentWindow(for tab: Tab?) -> NSWindow? {
+        guard let parentTab = tab?.parentTab else { return nil }
+        return (WindowControllersManager.shared.mainWindowControllers.first(where: {
+            $0.mainViewController.tabCollectionViewModel.tabs.contains(parentTab)
+        }) ?? WindowControllersManager.shared.lastKeyMainWindowController)?.window
+    }
+
     @discardableResult
     class func openNewWindow(with tabCollectionViewModel: TabCollectionViewModel? = nil,
                              burnerMode: BurnerMode = .regular,
@@ -44,14 +51,17 @@ final class WindowsManager {
                                                  popUp: popUp,
                                                  burnerMode: burnerMode)
 
-        if let droppingPoint = droppingPoint {
+        if let contentSize {
+            mainWindowController.window?.setContentSize(contentSize)
+        }
+
+        if let droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
+
+        } else if let parentWindow = self.parentWindow(for: tabCollectionViewModel?.tabs.first) {
+            mainWindowController.window?.setFrameOrigin(cascadedFrom: parentWindow)
         }
-        if let contentSize = contentSize {
-            let frame = NSRect(origin: droppingPoint ?? CGPoint.zero,
-                               size: contentSize)
-            mainWindowController.window?.setFrame(frame, display: true)
-        }
+
         if showWindow {
             mainWindowController.showWindow(self)
             if !NSApp.isActive {
@@ -103,13 +113,37 @@ final class WindowsManager {
         tabCollectionViewModel.setUpLazyLoadingIfNeeded()
     }
 
-    class func openPopUpWindow(with tab: Tab, contentSize: NSSize?) {
+    private static let defaultPopUpWidth: CGFloat = 1024
+    private static let defaultPopUpHeight: CGFloat = 752
+
+    class func openPopUpWindow(with tab: Tab, origin: NSPoint?, contentSize: NSSize?) {
         if let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController,
            mainWindowController.window?.styleMask.contains(.fullScreen) == true,
            mainWindowController.window?.isPopUpWindow == false {
+
             mainWindowController.mainViewController.tabCollectionViewModel.insert(tab, selected: true)
+
         } else {
-            self.openNewWindow(with: tab, contentSize: contentSize, popUp: true)
+            let screenFrame = (self.parentWindow(for: tab)?.screen ?? .main)?.visibleFrame ?? NSRect(x: 0, y: 100, width: 1280, height: 900)
+
+            // limit popUp content size to screen visible frame
+            // fallback to default if nil or zero
+            let contentSize = contentSize.map { size in
+                NSSize(width: size.width > 0 ? min(screenFrame.width, size.width) : Self.defaultPopUpWidth,
+                       height: size.height > 0 ? min(screenFrame.height, size.height) : Self.defaultPopUpHeight)
+            } ?? NSSize(width: Self.defaultPopUpWidth, height: Self.defaultPopUpHeight)
+
+            // if origin provided, popup should be fully positioned on screen
+            let origin = origin.map { origin in
+                NSPoint(x: max(screenFrame.minX, min(screenFrame.maxX - contentSize.width, screenFrame.minX + origin.x)),
+                        y: min(screenFrame.maxY, max(screenFrame.minY + contentSize.height, screenFrame.maxY - origin.y)))
+            }
+
+            let droppingPoint = origin.map { origin in
+                NSPoint(x: origin.x + contentSize.width / 2, y: origin.y)
+            }
+
+            self.openNewWindow(with: tab, droppingPoint: droppingPoint, contentSize: contentSize, popUp: true)
         }
     }
 
