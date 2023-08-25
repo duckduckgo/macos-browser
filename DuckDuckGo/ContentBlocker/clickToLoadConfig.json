@@ -19,8 +19,11 @@
             {
                 "domain": "apps.facebook.com",
                 "reason": "FB breakage"
+            },
+            {
+                "domain": "www.standard.co.uk",
+                "reason": "https://app.asana.com/0/1200277586140538/1205326380537958/f"
             }
-
         ],
         "surrogates": [
             {
