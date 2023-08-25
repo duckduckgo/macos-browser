@@ -27,8 +27,8 @@ struct MapperToDB {
         self.mechanism = mechanism
     }
 
-    func mapToDB(profile: DataBrokerProtectionProfile) throws -> ProfileDB {
-        .init(id: nil, birthYear: try withUnsafeBytes(of: profile.birthYear) { try mechanism(Data($0)) })
+    func mapToDB(id: Int64? = nil, profile: DataBrokerProtectionProfile) throws -> ProfileDB {
+        .init(id: id, birthYear: try withUnsafeBytes(of: profile.birthYear) { try mechanism(Data($0)) })
     }
 
     func mapToDB(_ name: DataBrokerProtectionProfile.Name, relatedTo profileId: Int64) throws -> NameDB {

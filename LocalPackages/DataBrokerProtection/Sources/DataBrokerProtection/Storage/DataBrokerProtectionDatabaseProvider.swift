@@ -220,17 +220,26 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 
     func saveProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {
         try db.write { db in
-            try mapperToDB.mapToDB(profile: profile).insert(db)
-            let profileId = db.lastInsertedRowID
+            // The schema currently supports multiple profiles, but we are going to start with one
+            // We need to keep only one row in the profile screen, so an update of a profile
+            // is an upsert, and for the multi-attributed columns we just delete everything and
+            // insert the new data.
+            let profileId: Int64 = 1
+            try mapperToDB.mapToDB(id: profileId, profile: profile).upsert(db)
 
+            try ScanDB.deleteAll(db) // We need to delete all scans related to a possible old user
+
+            try NameDB.deleteAll(db)
             for name in profile.names {
                 try mapperToDB.mapToDB(name, relatedTo: profileId).insert(db)
             }
 
+            try AddressDB.deleteAll(db)
             for address in profile.addresses {
                 try mapperToDB.mapToDB(address, relatedTo: profileId).insert(db)
             }
 
+            try PhoneDB.deleteAll(db)
             for phone in profile.phones {
                 try mapperToDB.mapToDB(phone, relatedTo: profileId).insert(db)
             }
