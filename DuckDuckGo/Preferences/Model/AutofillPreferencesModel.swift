@@ -50,6 +50,12 @@ final class AutofillPreferencesModel: ObservableObject {
         }
     }
 
+    @Published var autolockLocksFormFilling: Bool {
+        didSet {
+            persistor.autolockLocksFormFilling = autolockLocksFormFilling
+        }
+    }
+
     @MainActor
     @Published private(set) var passwordManager: PasswordManager {
         didSet {
@@ -128,6 +134,7 @@ final class AutofillPreferencesModel: ObservableObject {
         askToSaveUsernamesAndPasswords = persistor.askToSaveUsernamesAndPasswords
         askToSaveAddresses = persistor.askToSaveAddresses
         askToSavePaymentMethods = persistor.askToSavePaymentMethods
+        autolockLocksFormFilling = persistor.autolockLocksFormFilling
         passwordManager = persistor.passwordManager
     }
 

@@ -122,19 +122,24 @@ extension Preferences {
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.autofillAutoLock)
                     Picker(selection: isAutoLockEnabledBinding, content: {
-                        HStack {
-                            Text(UserText.autofillLockWhenIdle)
-                            NSPopUpButtonView(selection: autoLockThresholdBinding) {
-                                let button = NSPopUpButton()
-                                button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text(UserText.autofillLockWhenIdle)
+                                NSPopUpButtonView(selection: autoLockThresholdBinding) {
+                                    let button = NSPopUpButton()
+                                    button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
-                                for threshold in AutofillAutoLockThreshold.allCases {
-                                    let item = button.menu?.addItem(withTitle: threshold.title, action: nil, keyEquivalent: "")
-                                    item?.representedObject = threshold
+                                    for threshold in AutofillAutoLockThreshold.allCases {
+                                        let item = button.menu?.addItem(withTitle: threshold.title, action: nil, keyEquivalent: "")
+                                        item?.representedObject = threshold
+                                    }
+                                    return button
                                 }
-                                return button
+                                .disabled(!model.isAutoLockEnabled)
                             }
-                            .disabled(!model.isAutoLockEnabled)
+                            ToggleMenuItem(title: UserText.autolockLocksFormFill, isOn: $model.autolockLocksFormFilling)
+                                .disabled(!model.isAutoLockEnabled)
+                                .padding()
                         }.tag(true)
                         Text(UserText.autofillNeverLock).tag(false)
                     }, label: {})

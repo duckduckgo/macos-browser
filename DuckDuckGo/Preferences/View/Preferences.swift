@@ -110,6 +110,7 @@ enum Preferences {
         var body: some View {
             Toggle(title, isOn: isOn)
                 .fixMultilineScrollableText()
+                .toggleStyle(.checkbox)
         }
     }
 }
