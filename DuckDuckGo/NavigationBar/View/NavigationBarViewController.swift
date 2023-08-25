@@ -278,8 +278,13 @@ final class NavigationBarViewController: NSViewController {
 
     @available(macOS 11.4, *)
     private func showNetworkProtectionPopover() {
-        // If Network Protection is already activated with an auth token, show the popover. Otherwise, show the waitlist UI.
-        if NetworkProtectionKeychainTokenStore().isFeatureActivated {
+        // 1. If the user is on the waitlist but hasn't been invited or accepted terms and conditions, show the waitlist screen.
+        // 2. If the user has no waitlist state but has an auth token, show the NetP popover.
+        // 3. If the user has no state of any kind, show the waitlist screen.
+
+        if NetworkProtectionWaitlist.shared.isOnWaitlist || NetworkProtectionWaitlist.shared.readyToAcceptTermsAndConditions {
+            WaitlistModalViewController.show()
+        } else if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
         } else {
             WaitlistModalViewController.show()
@@ -856,10 +861,8 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
     func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {
 #if NETWORK_PROTECTION
-        if NetworkProtectionKeychainTokenStore().isFeatureActivated {
-            showNetworkProtectionStatus()
-        } else {
-            WaitlistModalViewController.show()
+        if #available(macOS 11.4, *) {
+            showNetworkProtectionPopover()
         }
 #else
         fatalError("Tried to open Network Protection when it was disabled")

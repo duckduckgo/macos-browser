@@ -19,6 +19,7 @@
 import Foundation
 import Networking
 import UserNotifications
+import NetworkProtection
 
 public protocol WaitlistConstants {
     static var identifier: String { get }
@@ -35,8 +36,6 @@ public protocol Waitlist: WaitlistConstants {
 
     var waitlistStorage: WaitlistStorage { get }
     var waitlistRequest: WaitlistRequest { get }
-
-    init(store: WaitlistStorage, request: WaitlistRequest)
 
     func fetchInviteCodeIfAvailable() async -> WaitlistInviteCodeFetchError?
     func fetchInviteCodeIfAvailable(completion: @escaping (WaitlistInviteCodeFetchError?) -> Void)
@@ -66,7 +65,7 @@ extension Notification.Name {
 
 }
 
-public extension Waitlist {
+extension Waitlist {
 
     func fetchInviteCodeIfAvailable() async -> WaitlistInviteCodeFetchError? {
         await withCheckedContinuation { continuation in
@@ -95,7 +94,6 @@ public extension Waitlist {
                         switch inviteCodeResult {
                         case .success(let inviteCode):
                             waitlistStorage.store(inviteCode: inviteCode.code)
-                            NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
                             completion(nil)
                         case .failure(let inviteCodeError):
                             completion(.failure(inviteCodeError))
@@ -127,17 +125,6 @@ public extension Waitlist {
 }
 
 // MARK: - Extensions
-
-extension Waitlist {
-
-    init() {
-        self.init(
-            store: WaitlistKeychainStore(waitlistIdentifier: Self.identifier),
-            request: ProductWaitlistRequest(productName: Self.apiProductName)
-        )
-    }
-
-}
 
 extension ProductWaitlistRequest {
 
@@ -174,10 +161,50 @@ struct NetworkProtectionWaitlist: Waitlist {
 
     let waitlistStorage: WaitlistStorage
     let waitlistRequest: WaitlistRequest
+    private let networkProtectionCodeRedemption: NetworkProtectionCodeRedeeming
 
-    init(store: WaitlistStorage, request: WaitlistRequest) {
+    var isOnWaitlist: Bool {
+        return waitlistStorage.isOnWaitlist
+    }
+
+    var isInvited: Bool {
+        return waitlistStorage.isInvited
+    }
+
+    var readyToAcceptTermsAndConditions: Bool {
+        let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+        return waitlistStorage.isInvited && !accepted
+    }
+
+    init() {
+        self.init(
+            store: WaitlistKeychainStore(waitlistIdentifier: Self.identifier),
+            request: ProductWaitlistRequest(productName: Self.apiProductName),
+            networkProtectionCodeRedemption: NetworkProtectionCodeRedemptionCoordinator()
+        )
+    }
+
+    init(store: WaitlistStorage, request: WaitlistRequest, networkProtectionCodeRedemption: NetworkProtectionCodeRedeeming) {
         self.waitlistStorage = store
         self.waitlistRequest = request
+        self.networkProtectionCodeRedemption = networkProtectionCodeRedemption
+    }
+
+    func fetchNetworkProtectionInviteCodeIfAvailable(completion: @escaping (WaitlistInviteCodeFetchError?) -> Void) {
+        self.fetchInviteCodeIfAvailable { error in
+            if let error {
+                completion(error)
+            } else if let inviteCode = waitlistStorage.getWaitlistInviteCode() {
+                Task { @MainActor in
+                    do {
+                        try await networkProtectionCodeRedemption.redeem(inviteCode)
+                        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+                    } catch {
+                        // TODO: Handle storage errors
+                    }
+                }
+            }
+        }
     }
 
 }

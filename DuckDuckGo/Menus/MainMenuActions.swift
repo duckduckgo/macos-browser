@@ -21,6 +21,10 @@ import Cocoa
 import Common
 import WebKit
 
+#if NETWORK_PROTECTION
+import NetworkProtection
+#endif
+
 // Actions are sent to objects of responder chain
 
 // MARK: - Main Menu Actions
@@ -746,8 +750,17 @@ extension MainViewController {
 
     @IBAction func showNetworkProtectionInviteCodePrompt(_ sender: Any?) {
         let code = getInviteCode()
-        NetworkProtectionWaitlist.shared.waitlistStorage.store(inviteCode: code)
-        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+
+        Task {
+            do {
+                let redeemer = NetworkProtectionCodeRedemptionCoordinator()
+                try await redeemer.redeem(code)
+                NetworkProtectionWaitlist.shared.waitlistStorage.store(inviteCode: code)
+                NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+            } catch {
+                // Do nothing here, this is just a debug menu
+            }
+        }
     }
 
     // MARK: - Developer Tools

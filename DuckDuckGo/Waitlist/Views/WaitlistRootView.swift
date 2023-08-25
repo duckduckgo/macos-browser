@@ -37,9 +37,7 @@ struct WaitlistRootView: View {
             case .invited:
                 InvitedToWaitlistView()
             case .termsAndConditions:
-                NetworkProtectionTermsAndConditionsView(acceptingTermsAndConditions: false)
-            case .acceptingTermsAndConditions:
-                NetworkProtectionTermsAndConditionsView(acceptingTermsAndConditions: true)
+                NetworkProtectionTermsAndConditionsView()
             case .readyToEnable:
                 EnableNetworkProtectionView()
             }

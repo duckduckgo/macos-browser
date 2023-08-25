@@ -25,8 +25,6 @@ struct NetworkProtectionTermsAndConditionsView: View {
 
     @EnvironmentObject var model: WaitlistViewModel
 
-    let acceptingTermsAndConditions: Bool
-
     var body: some View {
         WaitlistDialogView {
             VStack(spacing: 16.0) {
@@ -120,7 +118,7 @@ struct NetworkProtectionTermsAndConditionsView: View {
             Button(UserText.networkProtectionWaitlistButtonAgreeAndContinue) {
                 Task { await model.perform(action: .acceptTermsAndConditions) }
             }
-            .buttonStyle(DefaultActionButtonStyle(enabled: !acceptingTermsAndConditions))
+            .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
         .environmentObject(model)
     }
