@@ -24,12 +24,17 @@ final public class DataBrokerProtectionViewController: NSViewController {
     private let profileViewModel: ProfileViewModel
     private let dataManager: DataBrokerProtectionDataManaging
     private let resultsViewModel: ResultsViewModel
+    private let containerViewModel: ContainerViewModel
+    private let scheduler: DataBrokerProtectionScheduler
 
-    public init() {
-        dataManager = DataBrokerProtectionDataManager()
+    public init(scheduler: DataBrokerProtectionScheduler, dataManager: DataBrokerProtectionDataManaging) {
+        self.scheduler = scheduler
+        self.dataManager = dataManager
+
         navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
         profileViewModel = ProfileViewModel(dataManager: dataManager)
         resultsViewModel = ResultsViewModel(dataManager: dataManager)
+        containerViewModel = ContainerViewModel(scheduler: scheduler, dataManager: dataManager)
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -40,9 +45,12 @@ final public class DataBrokerProtectionViewController: NSViewController {
 
     override public func loadView() {
         if #available(macOS 11.0, *) {
-            let containerView = DataBrokerProtectionContainerView(navigationViewModel: navigationViewModel,
-                                                                  profileViewModel: profileViewModel,
-                                                                  resultsViewModel: resultsViewModel)
+
+            let containerView = DataBrokerProtectionContainerView(
+                containerViewModel: containerViewModel,
+                navigationViewModel: navigationViewModel,
+                profileViewModel: profileViewModel,
+                resultsViewModel: resultsViewModel)
 
             let hostingController = NSHostingController(rootView: containerView)
             view = hostingController.view

@@ -18,8 +18,40 @@
 
 import SwiftUI
 
+final class ContainerViewModel: ObservableObject {
+    enum ScanResult {
+        case noResults
+        case results
+    }
+
+    let scheduler: DataBrokerProtectionScheduler
+    let dataManager: DataBrokerProtectionDataManaging
+
+    internal init(scheduler: DataBrokerProtectionScheduler,
+                  dataManager: DataBrokerProtectionDataManaging) {
+        self.scheduler = scheduler
+        self.dataManager = dataManager
+    }
+
+    func scan(completion: @escaping (ScanResult) -> Void) {
+        scheduler.scanAllBrokers { [weak self] in
+            guard let self = self else { return
+
+            }
+            let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
+            let data = brokerProfileData.filter { !$0.optOutOperationsData.isEmpty }
+            if data.isEmpty {
+                completion(.noResults)
+            } else {
+                completion(.results)
+            }
+        }
+    }
+}
+
 @available(macOS 11.0, *)
 struct DataBrokerProtectionContainerView: View {
+    @ObservedObject var containerViewModel: ContainerViewModel
     @ObservedObject var navigationViewModel: ContainerNavigationViewModel
     @ObservedObject var profileViewModel: ProfileViewModel
     @ObservedObject var resultsViewModel: ResultsViewModel
@@ -52,6 +84,14 @@ struct DataBrokerProtectionContainerView: View {
                     case .createProfile:
                         CreateProfileView(viewModel: profileViewModel, scanButtonClicked: {
                             navigationViewModel.updateNavigation(.scanStarted)
+                            containerViewModel.scan { scanResult in
+                                switch scanResult {
+                                case .noResults:
+                                    navigationViewModel.updateNavigation(.noResults)
+                                case .results:
+                                    navigationViewModel.updateNavigation(.results)
+                                }
+                            }
                         })
                         .frame(width: 670)
                         .padding(.top, 73)
@@ -105,16 +145,17 @@ struct DataBrokerProtectionContainerView: View {
     }
 }
 
-@available(macOS 11.0, *)
-struct DataBrokerProtectionContainerView_Previews: PreviewProvider {
-    static var previews: some View {
-        let dataManager = DataBrokerProtectionDataManager()
-        let navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
-        let profileViewModel = ProfileViewModel(dataManager: dataManager)
-        let resultsViewModel = ResultsViewModel(dataManager: dataManager)
-        DataBrokerProtectionContainerView(navigationViewModel: navigationViewModel,
-                                          profileViewModel: profileViewModel,
-                                          resultsViewModel: resultsViewModel)
-            .frame(width: 1024, height: 768)
-    }
-}
+//TODO create scheduler protocol
+//@available(macOS 11.0, *)
+//struct DataBrokerProtectionContainerView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        let dataManager = DataBrokerProtectionDataManager()
+//        let navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
+//        let profileViewModel = ProfileViewModel(dataManager: dataManager)
+//        let resultsViewModel = ResultsViewModel(dataManager: dataManager)
+//        DataBrokerProtectionContainerView(navigationViewModel: navigationViewModel,
+//                                          profileViewModel: profileViewModel,
+//                                          resultsViewModel: resultsViewModel)
+//            .frame(width: 1024, height: 768)
+//    }
+//}

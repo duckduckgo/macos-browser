@@ -95,9 +95,9 @@ public final class DataBrokerProtectionScheduler {
         activity.invalidate()
     }
 
-    public func scanAllBrokers() {
+    public func scanAllBrokers(completion: (() -> Void)? = nil) {
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
-        self.dataBrokerProcessor.runScanOnAllDataBrokers()
+        self.dataBrokerProcessor.runScanOnAllDataBrokers(completion: completion)
     }
 
 }
