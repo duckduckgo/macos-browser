@@ -749,8 +749,8 @@ struct UserText {
 
     static let noAccessToSelectedFolderHeader = NSLocalizedString("no.access.to.selected.folder.header", value: "DuckDuckGo needs permission to access selected folder", comment: "Header of the alert dialog informing user about failed download")
     static let noAccessToSelectedFolder = NSLocalizedString("no.access.to.selected.folder", value: "Grant access to the location of download.", comment: "Alert presented to user if the app doesn't have rights to access selected folder")
-    static let cannotOpenFileAlertHeader = NSLocalizedString("cannot.open.file.alert.header", value: "Cannot open the file", comment: "Header of the alert dialog informing user it is not possible to open the file")
-    static let cannotOpenFileAlertInformative = NSLocalizedString("cannot.open.file.alert.informative", value: "DuckDuckGo downloaded from the Mac App Store does not have access to files on your computer", comment: "Informative of the alert dialog informing user it is not possible to open the file")
+    static let cannotOpenFileAlertHeader = NSLocalizedString("cannot.open.file.alert.header", value: "Cannot Open File", comment: "Header of the alert dialog informing user it is not possible to open the file")
+    static let cannotOpenFileAlertInformative = NSLocalizedString("cannot.open.file.alert.informative", value: "DuckDuckGo for Mac App Store does not have access to files on your computer", comment: "Informative of the alert dialog informing user it is not possible to open the file")
 
     // MARK: New Tab
     // Context Menu
