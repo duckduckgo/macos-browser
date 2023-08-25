@@ -615,7 +615,9 @@ extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
                                                                                   containsSensitiveData: containsSensitiveData)
         }
 
-        if DeviceAuthenticator.shared.requiresAuthentication && containsSensitiveData {
+        if DeviceAuthenticator.shared.requiresAuthentication &&
+            containsSensitiveData &&
+            AutofillPreferences().autolockLocksFormFilling {
             DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { result in
                 if case .success = result {
                     displayOverlay()

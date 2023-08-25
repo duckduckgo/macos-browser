@@ -113,4 +113,5 @@ enum Preferences {
                 .toggleStyle(.checkbox)
         }
     }
+
 }

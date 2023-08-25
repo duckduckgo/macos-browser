@@ -134,12 +134,13 @@ extension Preferences {
                                         item?.representedObject = threshold
                                     }
                                     return button
-                                }
-                                .disabled(!model.isAutoLockEnabled)
+                                }.disabled(!model.isAutoLockEnabled)
                             }
-                            ToggleMenuItem(title: UserText.autolockLocksFormFill, isOn: $model.autolockLocksFormFilling)
+                            // We have to use a custom toggle here, as with a SwiftUI Toggle on macOS 10.x to 12.x, the checkbox gets rendered
+                            // to the right when inside a picker 🤷
+                            NativeCheckboxToggle(isOn: $model.autolockLocksFormFilling, label: UserText.autolockLocksFormFill)
                                 .disabled(!model.isAutoLockEnabled)
-                                .padding()
+                                .padding(.bottom, 6)
                         }.tag(true)
                         Text(UserText.autofillNeverLock).tag(false)
                     }, label: {})
