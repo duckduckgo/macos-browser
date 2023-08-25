@@ -26,8 +26,8 @@ final class DBPUIUserContentController: WKUserContentController {
 
     let dbpUIUserScripts: DBPUIUserScript
 
-    init(with privacyConfigurationManager: PrivacyConfigurationManaging, prefs: ContentScopeProperties) {
-        dbpUIUserScripts = DBPUIUserScript(privacyConfig: privacyConfigurationManager, prefs: prefs)
+    init(with privacyConfigurationManager: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: DBPUICommunicationDelegate) {
+        dbpUIUserScripts = DBPUIUserScript(privacyConfig: privacyConfigurationManager, prefs: prefs, delegate: delegate)
 
         super.init()
 
@@ -54,10 +54,11 @@ final class DBPUIUserScript: UserScriptsProvider {
     let contentScopeUserScriptIsolated: ContentScopeUserScript
     var dbpUICommunicationLayer: DBPUICommunicationLayer
 
-    init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties) {
+    init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: DBPUICommunicationDelegate) {
         contentScopeUserScriptIsolated = ContentScopeUserScript(privacyConfig, properties: prefs, isIsolated: false)
         contentScopeUserScriptIsolated.messageNames = ["dbpui"]
         dbpUICommunicationLayer = DBPUICommunicationLayer()
+        dbpUICommunicationLayer.delegate = delegate
         dbpUICommunicationLayer.broker = contentScopeUserScriptIsolated.broker
         contentScopeUserScriptIsolated.registerSubfeature(delegate: dbpUICommunicationLayer)
     }
@@ -83,9 +84,9 @@ final class DBPUIUserScript: UserScriptsProvider {
 extension WKWebViewConfiguration {
 
     @MainActor
-    func applyDBPUIConfiguration(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties) {
+    func applyDBPUIConfiguration(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: DBPUICommunicationDelegate) {
         preferences.isFraudulentWebsiteWarningEnabled = false
-        let userContentController = DBPUIUserContentController(with: privacyConfig, prefs: prefs)
+        let userContentController = DBPUIUserContentController(with: privacyConfig, prefs: prefs, delegate: delegate)
         self.userContentController = userContentController
      }
 }

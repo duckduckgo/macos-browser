@@ -22,7 +22,21 @@ import BrowserServicesKit
 import UserScript
 import Common
 
+protocol DBPUICommunicationDelegate: AnyObject {
+    func setState()
+    func getUserProfile() -> UserProfile
+    func addNameToCurrentUserProfile(_ name: UserProfileName) -> Bool
+    func removeNameFromUserProfile(_ name: UserProfileName) -> Bool
+    func removeNameAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool
+    func setBirthYearForCurrentUserProfile(_ year: DBPUIBirthYear)
+    func addAddressToCurrentUserProfile(_ address: UserProfileAddress) -> Bool
+    func removeAddressFromCurrentUserProfile(_ address: UserProfileAddress) -> Bool
+    func removeAddressAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool
+    func startScanAndOptOut() -> Bool
+}
+
 enum DBPUIReceivedMethodName: String {
+    case handshake
     case setState
     case getCurrentUserProfile
     case addNameToCurrentUserProfile
@@ -35,10 +49,21 @@ enum DBPUIReceivedMethodName: String {
     case startScanAndOptOut
 }
 
+enum DBPUISendableMethodName: String {
+    case setState
+    case scanAndOptOutStatusChanged
+}
+
 struct DBPUICommunicationLayer: Subfeature {
     var messageOriginPolicy: MessageOriginPolicy = .all
     var featureName: String = "dbpuiCommunication"
     var broker: UserScriptMessageBroker?
+
+    weak var delegate: DBPUICommunicationDelegate?
+
+    private enum Constants {
+        static let version = 1
+    }
 
     // swiftlint:disable:next cyclomatic_complexity
     func handler(forMethodNamed methodName: String) -> Handler? {
@@ -48,6 +73,7 @@ struct DBPUICommunicationLayer: Subfeature {
         }
 
         switch actionResult {
+        case .handshake: return handshake
         case .setState: return setState
         case .getCurrentUserProfile: return getCurrentUserProfile
         case .addNameToCurrentUserProfile: return addNameToCurrentUserProfile
@@ -62,6 +88,20 @@ struct DBPUICommunicationLayer: Subfeature {
 
     }
 
+    func handshake(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let data = try? JSONSerialization.data(withJSONObject: params),
+                let result = try? JSONDecoder().decode(DBPUIHandshake.self, from: data) else {
+            os_log("Failed to parse setState message", log: .dataBrokerProtection)
+            return DBPUIHandshakeResponse(version: Constants.version, success: false)
+        }
+
+        if result.version != Constants.version {
+            return DBPUIHandshakeResponse(version: Constants.version, success: false)
+        }
+
+        return DBPUIHandshakeResponse(version: Constants.version, success: true)
+    }
+
     func setState(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(DBPUISetState.self, from: data) else {
@@ -69,25 +109,29 @@ struct DBPUICommunicationLayer: Subfeature {
             return nil
         }
 
-        print(result.state)
+        os_log("Web UI requested new state: \(result.state.rawValue)", log: .dataBrokerProtection)
+
+        delegate?.setState()
 
         return nil
     }
 
     func getCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        // TODO: get user profile
-        return nil
+        return delegate?.getUserProfile()
     }
 
     func addNameToCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(UserProfileName.self, from: data) else {
             os_log("Failed to parse addNameToCurrentUserProfile message", log: .dataBrokerProtection)
-            return nil
+            return DBPUIHandshakeResponse(version: Constants.version, success: false)
         }
 
-        // TODO: add result to user profile
-        return nil
+        if delegate?.addNameToCurrentUserProfile(result) == true {
+            return DBPUIHandshakeResponse(version: Constants.version, success: true)
+        }
+
+        return DBPUIHandshakeResponse(version: Constants.version, success: false)
     }
 
     func removeNameFromCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -97,8 +141,11 @@ struct DBPUICommunicationLayer: Subfeature {
             return nil
         }
 
-        // TODO: remove result from user profile
-        return nil
+        if delegate?.removeNameFromUserProfile(result) == true {
+            return DBPUIHandshakeResponse(version: Constants.version, success: true)
+        }
+
+        return DBPUIHandshakeResponse(version: Constants.version, success: false)
     }
 
     func removeNameAtIndexFromCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -108,10 +155,13 @@ struct DBPUICommunicationLayer: Subfeature {
             return nil
         }
 
-        // TODO: remove result from user profile
-        return nil
+        if delegate?.removeNameAtIndexFromUserProfile(result) == true {
+            return DBPUIHandshakeResponse(version: Constants.version, success: true)
+        }
+
+        return DBPUIHandshakeResponse(version: Constants.version, success: false)
     }
-    
+
     func setBirthYearForCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(DBPUIBirthYear.self, from: data) else {
@@ -119,10 +169,11 @@ struct DBPUICommunicationLayer: Subfeature {
             return nil
         }
 
-        // TODO: set result on user profile
+        delegate?.setBirthYearForCurrentUserProfile(result)
+
         return nil
     }
-    
+
     func addAddressToCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(UserProfileAddress.self, from: data) else {
@@ -130,8 +181,11 @@ struct DBPUICommunicationLayer: Subfeature {
             return nil
         }
 
-        // TODO: add result to user profile
-        return nil
+        if delegate?.addAddressToCurrentUserProfile(result) == true {
+            return DBPUIHandshakeResponse(version: Constants.version, success: true)
+        }
+
+        return DBPUIHandshakeResponse(version: Constants.version, success: false)
     }
 
     func removeAddressFromCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -141,8 +195,11 @@ struct DBPUICommunicationLayer: Subfeature {
             return nil
         }
 
-        // TODO: remove result from user profile
-        return nil
+        if delegate?.removeAddressFromCurrentUserProfile(result) == true {
+            return DBPUIHandshakeResponse(version: Constants.version, success: true)
+        }
+
+        return DBPUIHandshakeResponse(version: Constants.version, success: false)
     }
 
     func removeAddressAtIndexFromCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -152,12 +209,22 @@ struct DBPUICommunicationLayer: Subfeature {
             return nil
         }
 
-        // TODO: remove address at result from user profile
-        return nil
+        if delegate?.removeAddressAtIndexFromUserProfile(result) == true {
+            return DBPUIHandshakeResponse(version: Constants.version, success: true)
+        }
+
+        return DBPUIHandshakeResponse(version: Constants.version, success: false)
     }
 
     func startScanAndOptOut(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        // TODO: Return opt out state
-        return nil
+        if delegate?.startScanAndOptOut() == true {
+            return DBPUIHandshakeResponse(version: Constants.version, success: true)
+        }
+
+        return DBPUIHandshakeResponse(version: Constants.version, success: false)
+    }
+
+    func sendMessageToUI(method: DBPUISendableMethodName, params: DBPUISendableMessage, into webView: WKWebView) {
+        broker?.push(method: method.rawValue, params: params, for: self, into: webView)
     }
 }

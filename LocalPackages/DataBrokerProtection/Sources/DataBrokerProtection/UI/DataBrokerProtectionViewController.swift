@@ -18,16 +18,68 @@
 
 import Cocoa
 import SwiftUI
+import BrowserServicesKit
+import WebKit
 
 final public class DataBrokerProtectionViewController: NSViewController {
     private let navigationViewModel: ContainerNavigationViewModel
     private let profileViewModel: ProfileViewModel
     private let dataManager: DataBrokerProtectionDataManaging
 
-    public init() {
+    private let privacyConfig: PrivacyConfigurationManaging?
+    private let prefs: ContentScopeProperties?
+
+    private var communicationLayer: DBPUICommunicationLayer?
+    private var webView: WKWebView?
+
+    private let debugPage: String = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form>
+        <input type="button" value="setState" onclick="setState()">
+        <input type="button" value="handshake" onclick="handshake()">
+    </form>
+
+    <script type="text/javascript">
+        function setState() {
+            window.webkit.messageHandlers.dbpui.postMessage({
+                "context": "dbpui",
+                "featureName": "dbpuiCommunication",
+                "method": "setState",
+                "params": {
+                    "state": "Onboarding"
+                }
+            })
+        }
+
+        function handshake() {
+            window.webkit.messageHandlers.dbpui.postMessage({
+                "context": "dbpui",
+                "featureName": "dbpuiCommunication",
+                "method": "handshake",
+                "params": {
+                    "version": 1
+                }
+            })
+        }
+    </script>
+</body>
+</html>
+"""
+
+    public init(privacyConfig: PrivacyConfigurationManaging? = nil, prefs: ContentScopeProperties? = nil) {
         dataManager = DataBrokerProtectionDataManager()
         navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
         profileViewModel = ProfileViewModel(dataManager: dataManager)
+
+        self.privacyConfig = privacyConfig
+        self.prefs = prefs
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -38,12 +90,83 @@ final public class DataBrokerProtectionViewController: NSViewController {
 
     override public func loadView() {
         if #available(macOS 11.0, *) {
-            let containerView = DataBrokerProtectionContainerView(navigationViewModel: navigationViewModel,
-                                                                  profileViewModel: profileViewModel)
+//            let containerView = DataBrokerProtectionContainerView(navigationViewModel: navigationViewModel,
+//                                                                  profileViewModel: profileViewModel)
+//
+//            let hostingController = NSHostingController(rootView: containerView)
+//            view = hostingController.view
 
-            let hostingController = NSHostingController(rootView: containerView)
-            view = hostingController.view
+            guard let privacyConfig = privacyConfig else { return }
+            guard let prefs = prefs else { return }
+
+            let configuration = WKWebViewConfiguration()
+            configuration.applyDBPUIConfiguration(privacyConfig: privacyConfig, prefs: prefs, delegate: self)
+            configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
+
+            if let dbpUIContentController = configuration.userContentController as? DBPUIUserContentController {
+                communicationLayer = dbpUIContentController.dbpUIUserScripts.dbpUICommunicationLayer
+            }
+
+            webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1024, height: 768), configuration: configuration)
+            view = webView!
+
+            webView?.loadHTMLString(debugPage, baseURL: nil)
+
+            let button = NSButton(title: "Set State", target: self, action: #selector(setUIState))
+            button.contentTintColor = .black
+            button.frame = CGRect(x: 10, y: 100, width: 100, height: 50)
+            view.addSubview(button)
         }
+    }
+
+    @objc func setUIState() {
+        guard let webView = webView else { return }
+        communicationLayer?.sendMessageToUI(method: .setState,
+                                            params: DBPUIWebSetState(state: .onboarding),
+                                            into: webView)
+    }
+
+}
+
+extension DataBrokerProtectionViewController: DBPUICommunicationDelegate {
+    func setState() {
+
+    }
+
+    func getUserProfile() -> UserProfile {
+        return UserProfile(names: [], birthYear: 1990, addresses: [])
+    }
+
+    func addNameToCurrentUserProfile(_ name: UserProfileName) -> Bool {
+        return false
+    }
+
+    func removeNameFromUserProfile(_ name: UserProfileName) -> Bool {
+        return false
+    }
+
+    func removeNameAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool {
+        return false
+    }
+
+    func setBirthYearForCurrentUserProfile(_ year: DBPUIBirthYear) {
+
+    }
+
+    func addAddressToCurrentUserProfile(_ address: UserProfileAddress) -> Bool {
+        return false
+    }
+
+    func removeAddressFromCurrentUserProfile(_ address: UserProfileAddress) -> Bool {
+        return false
+    }
+
+    func removeAddressAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool {
+        return false
+    }
+
+    func startScanAndOptOut() -> Bool {
+        return false
     }
 
 }

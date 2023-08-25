@@ -18,20 +18,19 @@
 
 import Foundation
 
-protocol DBPUIMessageContent {
-    func toJSONString() -> String
-}
-
-struct DBPUIMessage {
-    let version: Int
-    let name: String
-    let content: DBPUIMessageContent
-}
-
 public enum DBPUIState: String, Codable {
     case onboarding = "Onboarding"
     case profileReview = "ProfileReview"
     case dashboard = "Dashboard"
+}
+
+struct DBPUIHandshake: Codable {
+    let version: Int
+}
+
+struct DBPUIHandshakeResponse: Codable {
+    let version: Int
+    let success: Bool
 }
 
 struct DBPUISetState: Codable {
@@ -58,14 +57,10 @@ struct UserProfileAddress: Codable {
     let state: String
 }
 
-struct UserProfile: DBPUIMessageContent, Codable {
+struct UserProfile: Codable {
     let names: [UserProfileName]
     let birthYear: Int
     let addresses: [UserProfileAddress]
-    
-    func toJSONString() -> String {
-        return ""
-    }
 }
 
 struct DBPUIIndex: Codable {
@@ -86,12 +81,14 @@ struct DataBrokerProfileMatch: Codable {
     let addresses: [UserProfileAddress]
 }
 
-struct ScanAndOptOutState: DBPUIMessageContent, Codable {
+protocol DBPUISendableMessage: Codable {}
+
+struct DBPUIWebSetState: DBPUISendableMessage {
+    let state: DBPUIState
+}
+
+struct ScanAndOptOutState: DBPUISendableMessage {
     let status: DBPUIScanAndOptOutStatus
     let inProgressOptOuts: [DataBrokerProfileMatch]
     let completedOptOuts: [DataBrokerProfileMatch]
-    
-    func toJSONString() -> String {
-        return ""
-    }
 }

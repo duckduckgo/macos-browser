@@ -58,30 +58,3 @@ final class DataBrokerUserProfileViewController: NSViewController {
         view = hostingController.view
     }
 }
-
-final class DataBrokerContainerViewController: NSViewController {
-
-    override func loadView() {
-        if #available(macOS 11.0, *) {
-            let privacyConfigurationManager = PrivacyFeatures.contentBlocking.privacyConfigurationManager
-            let features = ContentScopeFeatureToggles(emailProtection: false,
-                                                      emailProtectionIncontextSignup: false,
-                                                      credentialsAutofill: false,
-                                                      identitiesAutofill: false,
-                                                      creditCardsAutofill: false,
-                                                      credentialsSaving: false,
-                                                      passwordGeneration: false,
-                                                      inlineIconCredentials: false,
-                                                      thirdPartyCredentialsProvider: false)
-
-            let privacySettings = PrivacySecurityPreferences.shared
-            let sessionKey = UUID().uuidString
-            let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled,
-                                                    sessionKey: sessionKey,
-                                                    featureToggles: features)
-
-            let hostingController = NSHostingController(rootView: DataBrokerProtectionContainerView(privacyConfig: privacyConfigurationManager, prefs: prefs))
-            view = hostingController.view
-        }
-    }
-}

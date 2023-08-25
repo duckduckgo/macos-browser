@@ -20,6 +20,7 @@ import Foundation
 import DataBrokerProtection
 import AppKit
 import SwiftUI
+import BrowserServicesKit
 
 public extension Notification.Name {
     static let dbpDidClose = Notification.Name("com.duckduckgo.DBP.DBPDidClose")
@@ -34,7 +35,24 @@ final class DBPHomeViewController: NSViewController {
     private var presentedWindowController: NSWindowController?
 
     lazy var dataBrokerProtectionViewController: DataBrokerProtectionViewController = {
-        DataBrokerProtectionViewController()
+        let privacyConfigurationManager = PrivacyFeatures.contentBlocking.privacyConfigurationManager
+        let features = ContentScopeFeatureToggles(emailProtection: false,
+                                                  emailProtectionIncontextSignup: false,
+                                                  credentialsAutofill: false,
+                                                  identitiesAutofill: false,
+                                                  creditCardsAutofill: false,
+                                                  credentialsSaving: false,
+                                                  passwordGeneration: false,
+                                                  inlineIconCredentials: false,
+                                                  thirdPartyCredentialsProvider: false)
+
+        let privacySettings = PrivacySecurityPreferences.shared
+        let sessionKey = UUID().uuidString
+        let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled,
+                                                sessionKey: sessionKey,
+                                                featureToggles: features)
+
+        return DataBrokerProtectionViewController(privacyConfig: privacyConfigurationManager, prefs: prefs)
     }()
 
     init() {
