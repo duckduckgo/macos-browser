@@ -28,6 +28,7 @@ extension UserDefaults {
 public struct UserDefaultsWrapper<T> {
 
     public enum Key: String, CaseIterable {
+        case appleActionOnDoubleClick = "AppleActionOnDoubleClick"
 
         case configLastUpdated = "config.last.updated"
         case configStorageTrackerRadarEtag = "config.storage.trackerradar.etag"

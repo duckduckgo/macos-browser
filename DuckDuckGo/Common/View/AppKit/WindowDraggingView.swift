@@ -16,11 +16,24 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import AppKit
 import Combine
 
 final class WindowDraggingView: NSView {
-    let mouseDownPublisher: AnyPublisher<NSEvent, Never>
+
+    private let mouseDownSubject = PassthroughSubject<NSEvent, Never>()
+
+    var mouseDownPublisher: AnyPublisher<NSEvent, Never> {
+        mouseDownSubject.eraseToAnyPublisher()
+    }
+
+    private enum DoubleClickAction: String {
+        case none = "None"
+        case miniaturize = "Minimize"
+        case zoom = "Maximize"
+    }
+    @UserDefaultsWrapper(key: .appleActionOnDoubleClick, defaultValue: .zoom)
+    private var actionOnDoubleClick: DoubleClickAction
 
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
         return true
@@ -39,29 +52,33 @@ final class WindowDraggingView: NSView {
         mouseDownSubject.send(event)
 
         if event.clickCount == 2 {
-            zoom()
+            performDoubleClickAction()
         } else {
             drag(with: event)
         }
     }
 
-    override init(frame frameRect: NSRect) {
-        mouseDownPublisher = mouseDownSubject.eraseToAnyPublisher()
-        super.init(frame: frameRect)
-    }
-
-    required init?(coder: NSCoder) {
-        mouseDownPublisher = mouseDownSubject.eraseToAnyPublisher()
-        super.init(coder: coder)
+    private func performDoubleClickAction() {
+        switch actionOnDoubleClick {
+        case .zoom:
+            zoom()
+        case .miniaturize:
+            miniaturize()
+        case .none:
+            break
+        }
     }
 
     private func zoom() {
         window?.zoom(self)
     }
 
+    private func miniaturize() {
+        window?.miniaturize(self)
+    }
+
     private func drag(with event: NSEvent) {
         window?.performDrag(with: event)
     }
 
-    private let mouseDownSubject = PassthroughSubject<NSEvent, Never>()
 }
