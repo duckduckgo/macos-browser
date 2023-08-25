@@ -615,9 +615,12 @@ extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
                                                                                   containsSensitiveData: containsSensitiveData)
         }
 
+        // Require bio authentication for filling sensitive data via DDG password manager
+        let autofillPrefs = AutofillPreferences()
         if DeviceAuthenticator.shared.requiresAuthentication &&
             containsSensitiveData &&
-            AutofillPreferences().autolockLocksFormFilling {
+            autofillPrefs.autolockLocksFormFilling &&
+            autofillPrefs.passwordManager == .duckduckgo {
             DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { result in
                 if case .success = result {
                     displayOverlay()
