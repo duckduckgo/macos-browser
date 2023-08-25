@@ -113,7 +113,7 @@ extension UserText {
     static let pmAutoLockPromptUnlockLogins = NSLocalizedString("pm.lock-screen.prompt.unlock-logins", value: "unlock access to your Autofill info", comment: "Label presented when unlocking Autofill")
     static let pmAutoLockPromptExportLogins = NSLocalizedString("pm.lock-screen.prompt.export-logins", value: "export your usernames and passwords", comment: "Label presented when exporting logins")
     static let pmAutoLockPromptChangeLoginsSettings = NSLocalizedString("pm.lock-screen.prompt.change-settings", value: "change your Autofill info access settings", comment: "Label presented when changing Auto-Lock settings")
-    static let pmAutoLockPromptAutofill = NSLocalizedString("pm.lock-screen.prompt.autofill", value: "autofill credit card information", comment: "Label presented when autofilling credit card information")
+    static let pmAutoLockPromptAutofill = NSLocalizedString("pm.lock-screen.prompt.autofill", value: "unlock access to your Autofill info", comment: "Label presented when autofilling credit card information")
 
     static let autoLockThreshold1Minute = NSLocalizedString("pm.lock-screen.threshold.1-minute", value: "1 minute", comment: "Label used when selecting the Auto-Lock threshold")
     static let autoLockThreshold5Minutes = NSLocalizedString("pm.lock-screen.threshold.5-minutes", value: "5 minutes", comment: "Label used when selecting the Auto-Lock threshold")

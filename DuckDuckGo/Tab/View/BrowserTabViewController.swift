@@ -604,12 +604,28 @@ extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
     public func websiteAutofillUserScript(_ websiteAutofillUserScript: WebsiteAutofillUserScript,
                                           willDisplayOverlayAtClick: NSPoint?,
                                           serializedInputContext: String,
-                                          inputPosition: CGRect) {
-        contentOverlayPopoverCreatingIfNeeded().websiteAutofillUserScript(websiteAutofillUserScript,
-                                                                          willDisplayOverlayAtClick: willDisplayOverlayAtClick,
-                                                                          serializedInputContext: serializedInputContext,
-                                                                          inputPosition: inputPosition)
+                                          inputPosition: CGRect,
+                                          containsSensitiveData: Bool) {
+
+        let displayOverlay: () -> Void = { [weak self] in
+            self?.contentOverlayPopoverCreatingIfNeeded().websiteAutofillUserScript(websiteAutofillUserScript,
+                                                                                  willDisplayOverlayAtClick: willDisplayOverlayAtClick,
+                                                                                  serializedInputContext: serializedInputContext,
+                                                                                  inputPosition: inputPosition,
+                                                                                  containsSensitiveData: containsSensitiveData)
+        }
+
+        if DeviceAuthenticator.shared.requiresAuthentication && containsSensitiveData {
+            DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { result in
+                if case .success = result {
+                    displayOverlay()
+                }
+            }
+        } else {
+            displayOverlay()
+        }
     }
+
 }
 
 extension BrowserTabViewController: TabDelegate {
