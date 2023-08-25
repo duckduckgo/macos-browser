@@ -61,9 +61,12 @@ final class NetworkProtectionAppEvents {
             return
         }
 
-        let anyDataProtectionKeychainStore = NetworkProtectionKeychainTokenStore(keychainType: .dataProtection(.unspecified), errorEvents: nil)
+        let legacyServiceName = "\(Bundle.main.bundleIdentifier!).authToken"
+        let legacyKeychainStore = NetworkProtectionKeychainTokenStore(keychainType: .dataProtection(.unspecified),
+                                                                      serviceName: legacyServiceName,
+                                                                      errorEvents: nil)
 
-        guard let token = try? anyDataProtectionKeychainStore.fetchToken() else {
+        guard let token = try? legacyKeychainStore.fetchToken() else {
             // If fetching the token fails, we just assume we can't migrate anything and the user
             // will need to re-enable NetP.
             return
