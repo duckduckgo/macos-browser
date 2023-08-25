@@ -34,6 +34,8 @@ protocol PinningManager {
     func togglePinning(for view: PinnableView)
     func isPinned(_ view: PinnableView) -> Bool
     func wasManuallyToggled(_ view: PinnableView) -> Bool
+    func pin(_ view: PinnableView)
+    func unpin(_ view: PinnableView)
 }
 
 final class LocalPinningManager: PinningManager {
@@ -68,6 +70,21 @@ final class LocalPinningManager: PinningManager {
         } else {
             pinnedViewStrings.append(view.rawValue)
         }
+
+        NotificationCenter.default.post(name: .PinnedViewsChanged, object: nil, userInfo: [
+            Self.pinnedViewChangedNotificationViewTypeKey: view.rawValue
+        ])
+    }
+
+    /// Do not call this for user-initiated toggling.  This is only meant to be used for scenarios in which certain conditions
+    /// may require a view to be pinned.
+    ///
+    func pin(_ view: PinnableView) {
+        guard !isPinned(view) else {
+            return
+        }
+
+        pinnedViewStrings.append(view.rawValue)
 
         NotificationCenter.default.post(name: .PinnedViewsChanged, object: nil, userInfo: [
             Self.pinnedViewChangedNotificationViewTypeKey: view.rawValue

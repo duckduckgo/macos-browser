@@ -166,7 +166,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     @MainActor
     private func updateVisibility() {
         // The button is visible in the case where NetP has not been activated, but the user has been invited and they haven't accepted T&Cs.
-        if NetworkProtectionWaitlist.shared.isInvited || NetworkProtectionWaitlist.shared.readyToAcceptTermsAndConditions {
+        if NetworkProtectionWaitlist.shared.readyToAcceptTermsAndConditions {
             showButton = true
             return
         }
@@ -205,7 +205,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
             return
         }
 
-        pinningManager.togglePinning(for: .networkProtection)
+        pinningManager.pin(.networkProtection)
     }
 }
 
