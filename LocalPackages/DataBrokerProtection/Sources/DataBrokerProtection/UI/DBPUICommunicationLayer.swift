@@ -24,7 +24,7 @@ import Common
 
 protocol DBPUICommunicationDelegate: AnyObject {
     func setState()
-    func getUserProfile() -> UserProfile
+    func getUserProfile() -> UserProfile?
     func addNameToCurrentUserProfile(_ name: UserProfileName) -> Bool
     func removeNameFromUserProfile(_ name: UserProfileName) -> Bool
     func removeNameAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool

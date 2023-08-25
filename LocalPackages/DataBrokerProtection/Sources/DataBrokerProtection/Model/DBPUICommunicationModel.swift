@@ -45,19 +45,19 @@ public enum DBPUIScanAndOptOutStatus: String, Codable {
     case complete
 }
 
-struct UserProfileName: Codable {
+public struct UserProfileName: Codable {
     let first: String
     let middle: String
     let last: String
 }
 
-struct UserProfileAddress: Codable {
+public struct UserProfileAddress: Codable {
     let street: String
     let city: String
     let state: String
 }
 
-struct UserProfile: Codable {
+public struct UserProfile: Codable {
     let names: [UserProfileName]
     let birthYear: Int
     let addresses: [UserProfileAddress]

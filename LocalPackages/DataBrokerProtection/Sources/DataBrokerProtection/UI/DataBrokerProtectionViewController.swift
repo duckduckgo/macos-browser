@@ -133,8 +133,8 @@ extension DataBrokerProtectionViewController: DBPUICommunicationDelegate {
 
     }
 
-    func getUserProfile() -> UserProfile {
-        return UserProfile(names: [], birthYear: 1990, addresses: [])
+    func getUserProfile() -> UserProfile? {
+        return dataManager.fetchProfileForUI()
     }
 
     func addNameToCurrentUserProfile(_ name: UserProfileName) -> Bool {
