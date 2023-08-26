@@ -35,15 +35,16 @@ final class ContainerViewModel: ObservableObject {
 
     func scan(completion: @escaping (ScanResult) -> Void) {
         scheduler.scanAllBrokers { [weak self] in
-            guard let self = self else { return
+            guard let self = self else { return }
 
-            }
-            let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
-            let data = brokerProfileData.filter { !$0.optOutOperationsData.isEmpty }
-            if data.isEmpty {
-                completion(.noResults)
-            } else {
-                completion(.results)
+            DispatchQueue.main.async {
+                let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
+                let data = brokerProfileData.filter { !$0.optOutOperationsData.isEmpty }
+                if data.isEmpty {
+                    completion(.noResults)
+                } else {
+                    completion(.results)
+                }
             }
         }
     }
@@ -89,6 +90,7 @@ struct DataBrokerProtectionContainerView: View {
                                 case .noResults:
                                     navigationViewModel.updateNavigation(.noResults)
                                 case .results:
+                                    resultsViewModel.reloadData()
                                     navigationViewModel.updateNavigation(.results)
                                 }
                             }

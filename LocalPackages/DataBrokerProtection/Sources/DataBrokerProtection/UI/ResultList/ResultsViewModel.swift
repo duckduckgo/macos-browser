@@ -98,6 +98,10 @@ final class ResultsViewModel: ObservableObject {
         self.pendingProfiles = pendingProfiles
     }
 
+    public func reloadData() {
+        updateUI()
+    }
+    
     // MARK: - Test Data
     private func addFakeData() {
         removedProfiles = [
