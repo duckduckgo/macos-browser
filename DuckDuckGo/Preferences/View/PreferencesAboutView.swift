@@ -152,7 +152,7 @@ extension Preferences {
                 }
             }
             .padding()
-            .background(Color(red: 254/255, green: 240/255, blue: 199/255))
+            .background(Color("UnsupportedOSWarningColor"))
             .cornerRadius(8)
             .frame(width: width, height: height)
         }
