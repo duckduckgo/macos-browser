@@ -87,7 +87,7 @@ extension Preferences {
 
     struct UnsupportedDeviceInfoBox: View {
 
-        static let appleSupportURL = URL(string: "https://support.apple.com/en-us/HT211238")!
+        static let softwareUpdateURL = URL(string: "x-apple.systempreferences:com.apple.preferences.softwareupdate")!
 
         var wide: Bool
 
@@ -128,7 +128,7 @@ extension Preferences {
                 HStack(alignment: .center, spacing: 0) {
                     Text(UserText.aboutUnsupportedDeviceInfo2Part1 + " ")
                     Button(action: {
-                        WindowControllersManager.shared.show(url: Self.appleSupportURL, newTab: true)
+                        NSWorkspace.shared.open(Self.softwareUpdateURL)
                     }) {
                         Text(UserText.aboutUnsupportedDeviceInfo2Part2(version: versionString) + " ")
                             .foregroundColor(Color.blue)
