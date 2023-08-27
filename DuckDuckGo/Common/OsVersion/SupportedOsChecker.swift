@@ -20,7 +20,7 @@ import Foundation
 
 final class SupportedOSChecker {
 
-    private struct SupportedVersion {
+    struct SupportedVersion {
         static let major = 11
         static let minor = 4
         static let patch = 0

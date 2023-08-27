@@ -293,9 +293,9 @@ DQ
                                         </constraints>
                                     </customView>
                                     <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8xr-ho-IDj" userLabel="Unsupported OS View">
-                                        <rect key="frame" x="0.0" y="507" width="360" height="140"/>
+                                        <rect key="frame" x="0.0" y="447" width="360" height="200"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="140" id="3er-AK-Fjx"/>
+                                            <constraint firstAttribute="height" constant="200" id="3er-AK-Fjx"/>
                                         </constraints>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">

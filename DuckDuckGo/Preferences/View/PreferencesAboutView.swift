@@ -96,7 +96,7 @@ extension Preferences {
         }
 
         var height: CGFloat {
-            return wide ? 130 : 140
+            return wide ? 130 : 200
         }
 
         var osVersion: String {
@@ -104,7 +104,14 @@ extension Preferences {
         }
 
         var combinedText: String {
-            return UserText.aboutUnsupportedDeviceInfo2Part1 + " " + UserText.aboutUnsupportedDeviceInfo2Part2 + " " + UserText.aboutUnsupportedDeviceInfo2Part3 + " " + UserText.aboutUnsupportedDeviceInfo2Part4
+            return UserText.aboutUnsupportedDeviceInfo2Part1 + " " +
+            UserText.aboutUnsupportedDeviceInfo2Part2(version: versionString) + " " +
+            UserText.aboutUnsupportedDeviceInfo2Part3 + " " +
+            UserText.aboutUnsupportedDeviceInfo2Part4
+        }
+
+        var versionString: String {
+            return "\(SupportedOSChecker.SupportedVersion.major).\(SupportedOSChecker.SupportedVersion.minor)"
         }
 
         var body: some View {
@@ -113,7 +120,7 @@ extension Preferences {
                 .frame(width: 16, height: 16)
                 .padding(.trailing, 4)
 
-            let versionText = Text(UserText.aboutUnsupportedDeviceInfo1(version: osVersion))
+            let versionText = Text(UserText.aboutUnsupportedDeviceInfo1)
 
             let narrowContentView = Text(combinedText)
 
@@ -123,7 +130,7 @@ extension Preferences {
                     Button(action: {
                         WindowControllersManager.shared.show(url: Self.appleSupportURL, newTab: true)
                     }) {
-                        Text(UserText.aboutUnsupportedDeviceInfo2Part2 + " ")
+                        Text(UserText.aboutUnsupportedDeviceInfo2Part2(version: versionString) + " ")
                             .foregroundColor(Color.blue)
                             .underline()
                     }

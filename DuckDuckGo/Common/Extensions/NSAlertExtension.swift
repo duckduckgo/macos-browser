@@ -179,8 +179,11 @@ extension NSAlert {
 
     static func osNotSupported() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = UserText.unsupportedDeviceInfoAlertHeader
-        alert.informativeText = UserText.aboutUnsupportedDeviceInfo1(version: "\(ProcessInfo.processInfo.operatingSystemVersion)")
+        alert.messageText = UserText.aboutUnsupportedDeviceInfo1
+        alert.informativeText = UserText.aboutUnsupportedDeviceInfo2Part1 + " " +
+        UserText.aboutUnsupportedDeviceInfo2Part2(version: "\(SupportedOSChecker.SupportedVersion.major).\(SupportedOSChecker.SupportedVersion.minor)") + " " +
+        UserText.aboutUnsupportedDeviceInfo2Part3 + " " +
+        UserText.aboutUnsupportedDeviceInfo2Part4
         alert.alertStyle = .warning
         return alert
     }
