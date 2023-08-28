@@ -31,8 +31,7 @@ final class WaitlistViewModelTests: XCTestCase {
         let storage = MockWaitlistStorage.init()
         let viewModel = WaitlistViewModel(waitlistRequest: request,
                                           waitlistStorage: storage,
-                                          notificationService: MockNotificationService(),
-                                          networkProtectionCodeRedemption: MockNetworkProtectionCodeRedeemer())
+                                          notificationService: MockNotificationService())
 
         await viewModel.updateViewState()
 
@@ -48,8 +47,7 @@ final class WaitlistViewModelTests: XCTestCase {
 
         let viewModel = WaitlistViewModel(waitlistRequest: request,
                                           waitlistStorage: storage,
-                                          notificationService: notificationService,
-                                          networkProtectionCodeRedemption: MockNetworkProtectionCodeRedeemer())
+                                          notificationService: notificationService)
 
         await viewModel.updateViewState()
 
@@ -67,8 +65,7 @@ final class WaitlistViewModelTests: XCTestCase {
 
         let viewModel = WaitlistViewModel(waitlistRequest: request,
                                           waitlistStorage: storage,
-                                          notificationService: notificationService,
-                                          networkProtectionCodeRedemption: MockNetworkProtectionCodeRedeemer())
+                                          notificationService: notificationService)
 
         await viewModel.updateViewState()
 
@@ -85,8 +82,7 @@ final class WaitlistViewModelTests: XCTestCase {
         notificationService.authorizationStatus = .notDetermined
         let viewModel = WaitlistViewModel(waitlistRequest: request,
                                           waitlistStorage: storage,
-                                          notificationService: notificationService,
-                                          networkProtectionCodeRedemption: MockNetworkProtectionCodeRedeemer())
+                                          notificationService: notificationService)
 
         var stateUpdates: [WaitlistViewModel.ViewState] = []
         let cancellable = viewModel.$viewState.sink { stateUpdates.append($0) }
@@ -101,7 +97,6 @@ final class WaitlistViewModelTests: XCTestCase {
     func testWhenAcceptingTermsAndConditions_ThenAuthTokenIsFetched_AndTermsAndConditionsAreMarkedAsAccepted() async {
         let request = MockWaitlistRequest.failure()
         let storage = MockWaitlistStorage.init()
-        let redeemer = MockNetworkProtectionCodeRedeemer()
         storage.store(waitlistTimestamp: 12345)
         storage.store(waitlistToken: "token")
         storage.store(inviteCode: "ABCD1234")
@@ -109,15 +104,12 @@ final class WaitlistViewModelTests: XCTestCase {
 
         let viewModel = WaitlistViewModel(waitlistRequest: request,
                                           waitlistStorage: storage,
-                                          notificationService: notificationService,
-                                          networkProtectionCodeRedemption: redeemer)
+                                          notificationService: notificationService)
 
         await viewModel.updateViewState()
         XCTAssertEqual(viewModel.viewState, .invited)
 
         await viewModel.perform(action: .acceptTermsAndConditions)
-
-        XCTAssertEqual(redeemer.redeemedCode, "ABCD1234")
         XCTAssertEqual(viewModel.viewState, .readyToEnable)
     }
 
