@@ -33,9 +33,6 @@ final class SyncSettingsAdapter {
         syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
     }
 
-    func updateDatabaseCleanupSchedule(shouldEnable: Bool) {
-    }
-
     func setUpProviderIfNeeded(metadataDatabase: CoreDataDatabase, metadataStore: SyncMetadataStore) {
         guard provider == nil else {
             return
@@ -56,6 +53,11 @@ final class SyncSettingsAdapter {
                 switch error {
                 case let syncError as SyncError:
                     Pixel.fire(.debug(event: .syncSettingsFailed, error: syncError))
+                case let settingsMetadataError as SettingsSyncMetadataSaveError:
+                    let underlyingError = settingsMetadataError.underlyingError
+                    let processedErrors = CoreDataErrorsParser.parse(error: underlyingError as NSError)
+                    let params = processedErrors.errorPixelParameters
+                    Pixel.fire(.debug(event: .syncSettingsMetadataUpdateFailed, error: underlyingError), withAdditionalParameters: params)
                 default:
                     let nsError = error as NSError
                     if nsError.domain != NSURLErrorDomain {
@@ -64,7 +66,7 @@ final class SyncSettingsAdapter {
                         Pixel.fire(.debug(event: .syncSettingsFailed, error: error), withAdditionalParameters: params)
                     }
                 }
-                os_log(.error, log: OSLog.sync, "Credentials Sync error: %{public}s", String(reflecting: error))
+                os_log(.error, log: OSLog.sync, "Settings Sync error: %{public}s", String(reflecting: error))
             }
 
         self.provider = provider
