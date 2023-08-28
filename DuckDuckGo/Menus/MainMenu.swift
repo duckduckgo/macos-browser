@@ -297,7 +297,7 @@ final class MainMenu: NSMenu {
         toggleDownloadsShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
 
 #if NETWORK_PROTECTION
-        if #available(macOS 11.4, *), DefaultNetworkProtectionVisibility().isNetworkProtectionVisible() {
+        if #available(macOS 11.4, *), NetworkProtectionKeychainTokenStore().isFeatureActivated {
             toggleNetworkProtectionShortcutMenuItem?.isHidden = false
             toggleNetworkProtectionShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
         } else {

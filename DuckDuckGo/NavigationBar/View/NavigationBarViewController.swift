@@ -329,7 +329,12 @@ final class NavigationBarViewController: NSViewController {
                     self.updateDownloadsButton(updatingFromPinnedViewsNotification: true)
                 case .networkProtection:
 #if NETWORK_PROTECTION
-                    // TODO: Make sure that NetP can't be pinned unless there is a valid auth token
+                    guard NetworkProtectionKeychainTokenStore().isFeatureActivated else {
+                        LocalPinningManager.shared.unpin(.networkProtection)
+                        networkProtectionButtonModel.isPinned = false
+                        return
+                    }
+
                     networkProtectionButtonModel.isPinned = LocalPinningManager.shared.isPinned(.networkProtection)
 #else
                     assertionFailure("Tried to toggle NetP when the feature was disabled")
@@ -762,7 +767,7 @@ extension NavigationBarViewController: NSMenuDelegate {
 #if NETWORK_PROTECTION
         let isPopUpWindow = view.window?.isPopUpWindow ?? false
 
-        if !isPopUpWindow && DefaultNetworkProtectionVisibility().isNetworkProtectionVisible() {
+        if !isPopUpWindow && NetworkProtectionKeychainTokenStore().isFeatureActivated {
             let networkProtectionTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
         }
