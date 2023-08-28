@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 
 extension NSEvent {
     static func isContextClick(_ event: NSEvent) -> Bool {

@@ -119,7 +119,7 @@ struct OnboardingStepView: View {
         .cornerRadius(8)
         .background(
             RoundedRectangle(cornerRadius: 6, style: .circular)
-                .stroke(Color(.onboardingStepBorder))
+                .stroke(Color(.onboardingStepBorder), lineWidth: 1)
                 .background(
                     RoundedRectangle(cornerRadius: 6, style: .circular)
                         .fill(Color(.onboardingStepBackground))
