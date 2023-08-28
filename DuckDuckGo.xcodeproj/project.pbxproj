@@ -52,6 +52,7 @@
 		1D69C553291302F200B75945 /* BWVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D69C552291302F200B75945 /* BWVault.swift */; };
 		1D6A492029CF7A490011DF74 /* NSPopoverExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6A491F29CF7A490011DF74 /* NSPopoverExtension.swift */; };
 		1D6A492129CF7A490011DF74 /* NSPopoverExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6A491F29CF7A490011DF74 /* NSPopoverExtension.swift */; };
+		1D76760E2A9CE4F000DA0BD7 /* SupportedOsChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8057C72A83CAEE00F4FED6 /* SupportedOsChecker.swift */; };
 		1D77921828FDC54C00BE0210 /* FaviconReferenceCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D77921728FDC54C00BE0210 /* FaviconReferenceCacheTests.swift */; };
 		1D77921A28FDC79800BE0210 /* FaviconStoringMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D77921928FDC79800BE0210 /* FaviconStoringMock.swift */; };
 		1D8057C82A83CAEE00F4FED6 /* SupportedOsChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8057C72A83CAEE00F4FED6 /* SupportedOsChecker.swift */; };
@@ -8707,6 +8708,7 @@
 				3192A00D2A4C4CFF0084EA89 /* ChromiumDataImporter.swift in Sources */,
 				3192A00E2A4C4CFF0084EA89 /* LegacyWebKitDownloadDelegate.swift in Sources */,
 				3192A00F2A4C4CFF0084EA89 /* WKBackForwardListItemViewModel.swift in Sources */,
+				1D76760E2A9CE4F000DA0BD7 /* SupportedOsChecker.swift in Sources */,
 				3192A0102A4C4CFF0084EA89 /* BWNotRespondingAlert.swift in Sources */,
 				3192A0112A4C4CFF0084EA89 /* DebugUserScript.swift in Sources */,
 				3192A0122A4C4CFF0084EA89 /* RecentlyClosedTab.swift in Sources */,
