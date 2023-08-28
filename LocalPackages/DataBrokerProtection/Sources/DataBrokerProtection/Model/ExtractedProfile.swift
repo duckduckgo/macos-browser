@@ -21,6 +21,9 @@ import Foundation
 struct ProfileSelector: Codable {
     let selector: String
     let findElements: Bool?
+    let afterText: String?
+    let beforeText: String?
+    let separator: String?
 }
 
 struct ExtractProfileSelectors: Codable, Sendable {
