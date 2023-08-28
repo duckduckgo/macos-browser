@@ -27,10 +27,37 @@ final class ContainerViewModel: ObservableObject {
     let scheduler: DataBrokerProtectionScheduler
     let dataManager: DataBrokerProtectionDataManaging
 
+    var headerStatusText: String {
+        let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
+        let scanHistoryEvents = brokerProfileData.flatMap { $0.scanOperationData.historyEvents }
+        if scanHistoryEvents.isEmpty {
+            return ""
+        } else {
+            if let date = getLastEventDate(events: scanHistoryEvents) {
+                return "Last Scan \(date)"
+            } else {
+                return ""
+            }
+        }
+    }
+
     internal init(scheduler: DataBrokerProtectionScheduler,
                   dataManager: DataBrokerProtectionDataManaging) {
         self.scheduler = scheduler
         self.dataManager = dataManager
+    }
+
+    private func getLastEventDate(events: [HistoryEvent]) -> String? {
+        let sortedEvents = events.sorted(by: { $0.date < $1.date })
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .short
+
+        if let lastEvent = sortedEvents.last {
+            return dateFormatter.string(from: lastEvent.date)
+        } else {
+            return nil
+        }
     }
 
     func scan(completion: @escaping (ScanResult) -> Void) {
@@ -108,7 +135,8 @@ struct DataBrokerProtectionContainerView: View {
                // just for testing
                VStack(alignment: .leading) {
                    HStack {
-                       Picker(selection: $navigationViewModel.bodyViewType, label: Text("Body View Type")) {
+                       Picker(selection: $navigationViewModel.bodyViewType,
+                              label: Text("Body View Type")) {
                            ForEach(ContainerNavigationViewModel.BodyViewType.allCases, id: \.self) { viewType in
                                Text(viewType.description).tag(viewType)
                            }
@@ -131,7 +159,7 @@ struct DataBrokerProtectionContainerView: View {
         if navigationViewModel.shouldShowHeader {
             VStack {
 
-                DashboardHeaderView(statusText: "",
+                DashboardHeaderView(statusText: containerViewModel.headerStatusText,
                                     displayProfileButton: navigationViewModel.bodyViewType != .gettingStarted,
                                     faqButtonClicked: {
                     print("FAQ")
