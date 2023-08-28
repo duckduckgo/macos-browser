@@ -83,18 +83,22 @@ struct DataBrokerProtectionContainerView: View {
                             .padding(.top, 330)
                             .padding(.bottom, 100)
                     case .createProfile:
-                        CreateProfileView(viewModel: profileViewModel, scanButtonClicked: {
-                            navigationViewModel.updateNavigation(.scanStarted)
-                            containerViewModel.scan { scanResult in
-                                switch scanResult {
-                                case .noResults:
-                                    navigationViewModel.updateNavigation(.noResults)
-                                case .results:
-                                    resultsViewModel.reloadData()
-                                    navigationViewModel.updateNavigation(.results)
+                        CreateProfileView(
+                            viewModel: profileViewModel,
+                            scanButtonClicked: {
+                                navigationViewModel.updateNavigation(.scanStarted)
+                                containerViewModel.scan { scanResult in
+                                    switch scanResult {
+                                    case .noResults:
+                                        navigationViewModel.updateNavigation(.noResults)
+                                    case .results:
+                                        resultsViewModel.reloadData()
+                                        navigationViewModel.updateNavigation(.results)
+                                    }
                                 }
-                            }
-                        })
+                            }, backToDashboardClicked: {
+                                navigationViewModel.updateNavigation(.results)
+                            })
                         .frame(width: 670)
                         .padding(.top, 73)
                     }

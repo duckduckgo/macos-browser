@@ -94,6 +94,12 @@ final class ProfileViewModel: ObservableObject {
         addresses.count > 0
     }
 
+    var hasOperationContent: Bool {
+        let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
+        let data = brokerProfileData.filter { !$0.optOutOperationsData.isEmpty }
+        return !data.isEmpty
+    }
+
     var isProfileValid: Bool {
         [isBirthdayValid, isNameValid, isAddressValid].allSatisfy { $0 }
     }
