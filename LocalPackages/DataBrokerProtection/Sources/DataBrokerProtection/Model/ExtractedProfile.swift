@@ -30,10 +30,8 @@ struct ExtractProfileSelectors: Codable, Sendable {
     let name: ProfileSelector?
     let alternativeNamesList: ProfileSelector?
     let addressFull: ProfileSelector?
-    let addressCityState: ProfileSelector?
-    let addressCityStateList: ProfileSelector?
-    let phone: ProfileSelector?
-    let phoneList: ProfileSelector?
+    let addresses: ProfileSelector?
+    let phoneNumbers: ProfileSelector?
     let relativesList: ProfileSelector?
     let profileUrl: ProfileSelector?
     let reportId: String?
@@ -43,10 +41,8 @@ struct ExtractProfileSelectors: Codable, Sendable {
         case name
         case alternativeNamesList
         case addressFull
-        case addressCityState
-        case addressCityStateList
-        case phone
-        case phoneList
+        case addresses
+        case phoneNumbers
         case relativesList
         case profileUrl
         case reportId
@@ -68,10 +64,8 @@ struct ExtractedProfile: Codable, Sendable {
     let name: String?
     let alternativeNamesList: [String]?
     let addressFull: String?
-    let addressCityState: String?
-    let addressCityStateList: [AddressCityState]?
-    let phone: String?
-    let phoneList: String?
+    let addresses: [AddressCityState]?
+    let phoneNumbers: [String]?
     let relativesList: [String]?
     let profileUrl: String?
     let reportId: String?
@@ -85,10 +79,8 @@ struct ExtractedProfile: Codable, Sendable {
         case name
         case alternativeNamesList
         case addressFull
-        case addressCityState
-        case addressCityStateList
-        case phone
-        case phoneList
+        case addresses
+        case phoneNumbers
         case relativesList
         case profileUrl
         case reportId
@@ -102,10 +94,8 @@ struct ExtractedProfile: Codable, Sendable {
          name: String? = nil,
          alternativeNamesList: [String]? = nil,
          addressFull: String? = nil,
-         addressCityState: String? = nil,
-         addressCityStateList: [AddressCityState]? = nil,
-         phone: String? = nil,
-         phoneList: String? = nil,
+         addresses: [AddressCityState]? = nil,
+         phoneNumbers: [String]? = nil,
          relativesList: [String]? = nil,
          profileUrl: String? = nil,
          reportId: String? = nil,
@@ -116,10 +106,8 @@ struct ExtractedProfile: Codable, Sendable {
         self.name = name
         self.alternativeNamesList = alternativeNamesList
         self.addressFull = addressFull
-        self.addressCityState = addressCityState
-        self.addressCityStateList = addressCityStateList
-        self.phone = phone
-        self.phoneList = phoneList
+        self.addresses = addresses
+        self.phoneNumbers = phoneNumbers
         self.relativesList = relativesList
         self.profileUrl = profileUrl
         self.reportId = reportId
@@ -135,9 +123,8 @@ struct ExtractedProfile: Codable, Sendable {
             name: self.name ?? profile.fullName,
             alternativeNamesList: self.alternativeNamesList,
             addressFull: self.addressFull,
-            addressCityState: self.addressCityState,
-            addressCityStateList: self.addressCityStateList,
-            phone: self.phone,
+            addresses: self.addresses,
+            phoneNumbers: self.phoneNumbers,
             relativesList: self.relativesList,
             profileUrl: self.profileUrl,
             reportId: self.reportId,
