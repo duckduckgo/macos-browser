@@ -185,6 +185,9 @@ extension NSAlert {
         UserText.aboutUnsupportedDeviceInfo2Part3 + " " +
         UserText.aboutUnsupportedDeviceInfo2Part4
         alert.alertStyle = .warning
+
+        alert.addButton(withTitle: UserText.checkForUpdate)
+        alert.addButton(withTitle: UserText.ok)
         return alert
     }
 

@@ -70,7 +70,10 @@ final class UpdateController: NSObject {
     }
 
     private func showNotSupportedInfo() {
-        NSAlert.osNotSupported().runModal()
+        if NSAlert.osNotSupported().runModal() != .cancel {
+            let url = Preferences.UnsupportedDeviceInfoBox.softwareUpdateURL
+            NSWorkspace.shared.open(url)
+        }
     }
 
 }
