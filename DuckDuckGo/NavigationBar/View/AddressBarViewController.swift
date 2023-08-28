@@ -22,8 +22,8 @@ import Lottie
 
 final class AddressBarViewController: NSViewController {
 
-    @IBOutlet weak var addressBarTextField: AddressBarTextField!
-    @IBOutlet weak var passiveTextField: NSTextField!
+    @IBOutlet var addressBarTextField: AddressBarTextField!
+    @IBOutlet var passiveTextField: NSTextField!
     @IBOutlet var inactiveBackgroundView: NSView!
     @IBOutlet var activeBackgroundView: NSView!
     @IBOutlet var activeOuterBorderView: NSView!
@@ -100,6 +100,8 @@ final class AddressBarViewController: NSViewController {
         view.layer?.masksToBounds = false
 
         updateView()
+        // only activate active text field leading constraint on its appearance to avoid constraint conflicts
+        activeTextFieldMinXConstraint.isActive = false
         addressBarTextField.addressBarTextFieldDelegate = self
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
         subscribeToSelectedTabViewModel()
@@ -379,6 +381,7 @@ extension AddressBarViewController {
     @objc func textFieldFirstReponderNotification(_ notification: Notification) {
         if view.window?.firstResponder == addressBarTextField.currentEditor() {
             isFirstResponder = true
+            activeTextFieldMinXConstraint.isActive = true
         } else {
             isFirstResponder = false
         }

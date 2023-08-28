@@ -108,6 +108,12 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
 
 extension WindowControllersManager {
 
+#if DBP
+    func showDataBrokerProtectionTab() {
+        showTab(with: .dataBrokerProtection)
+    }
+#endif
+
     func showBookmarksTab() {
         showTab(with: .bookmarks)
     }
@@ -124,6 +130,8 @@ extension WindowControllersManager {
             WindowsManager.openNewWindow(with: url, isBurner: false)
         } else if mainWindowController?.mainViewController.view.window?.isPopUpWindow ?? false {
             show(url: url, newTab: true)
+        } else if NSApplication.shared.isCommandPressed && !NSApplication.shared.isOptionPressed {
+            mainWindowController?.mainViewController.tabCollectionViewModel.appendNewTab(with: .url(url), selected: false)
         } else if selectedTab?.isPinned ?? false { // When selecting a bookmark with a pinned tab active, always open the URL in a new tab
             show(url: url, newTab: true)
         } else {

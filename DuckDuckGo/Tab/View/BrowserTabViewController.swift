@@ -115,6 +115,13 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onCloseDuckDuckGoEmailProtection),
                                                name: .emailDidCloseEmailProtection,
                                                object: nil)
+
+#if DBP
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onCloseDataBrokerProtection),
+                                               name: .dbpDidClose,
+                                               object: nil)
+#endif
     }
 
     @objc
@@ -140,6 +147,17 @@ final class BrowserTabViewController: NSViewController {
             if #available(macOS 11.0, *) {
                 previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
             }
+            self.previouslySelectedTab = nil
+        }
+    }
+
+    @objc
+    private func onCloseDataBrokerProtection(_ notification: Notification) {
+        guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab else { return }
+        self.closeTab(activeTab)
+
+        if let previouslySelectedTab = self.previouslySelectedTab {
+            tabCollectionViewModel.select(tab: previouslySelectedTab)
             self.previouslySelectedTab = nil
         }
     }
@@ -401,6 +419,9 @@ final class BrowserTabViewController: NSViewController {
         transientTabContentViewController?.removeCompletely()
         preferencesViewController?.removeCompletely()
         bookmarksViewController?.removeCompletely()
+#if DBP
+        dataBrokerProtectionHomeViewController?.removeCompletely()
+#endif
         if includingWebView {
             self.removeWebViewFromHierarchy()
         }
@@ -416,6 +437,7 @@ final class BrowserTabViewController: NSViewController {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: true)
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private func showTabContent(of tabViewModel: TabViewModel?) {
         guard tabCollectionViewModel.allTabsCount > 0 else {
             view.window?.performClose(self)
@@ -453,6 +475,13 @@ final class BrowserTabViewController: NSViewController {
             removeAllTabContent()
             view.addAndLayout(homePageView)
 
+#if DBP
+        case .dataBrokerProtection:
+            removeAllTabContent()
+            let dataBrokerProtectionViewController = dataBrokerProtectionHomeViewControllerCreatingIfNeeded()
+            self.previouslySelectedTab = tabCollectionViewModel.selectedTab
+            addAndLayoutChild(dataBrokerProtectionViewController)
+#endif
         default:
             removeAllTabContent()
         }
@@ -471,6 +500,19 @@ final class BrowserTabViewController: NSViewController {
 
         return isDifferentTabDisplayed || tabIsNotOnScreen || (isPinnedTab && isKeyWindow)
     }
+
+#if DBP
+    // MARK: - DataBrokerProtection
+
+    var dataBrokerProtectionHomeViewController: DBPHomeViewController?
+    private func dataBrokerProtectionHomeViewControllerCreatingIfNeeded() -> DBPHomeViewController {
+        return dataBrokerProtectionHomeViewController ?? {
+            let dataBrokerProtectionHomeViewController = DBPHomeViewController()
+            self.dataBrokerProtectionHomeViewController = dataBrokerProtectionHomeViewController
+            return dataBrokerProtectionHomeViewController
+        }()
+    }
+#endif
 
     // MARK: - Preferences
 

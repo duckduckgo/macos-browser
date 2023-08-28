@@ -25,7 +25,7 @@ public class CredentialsCleanupErrorHandling: EventMapping<CredentialsCleanupErr
 
     public init() {
         super.init { event, _, _, _ in
-            if event.cleanupError is CredentialsCleanupErrorHandling {
+            if event.cleanupError is CredentialsCleanupCancelledError {
                 Pixel.fire(.debug(event: .credentialsCleanupAttemptedWhileSyncWasEnabled))
             } else {
                 let processedErrors = CoreDataErrorsParser.parse(error: event.cleanupError as NSError)
