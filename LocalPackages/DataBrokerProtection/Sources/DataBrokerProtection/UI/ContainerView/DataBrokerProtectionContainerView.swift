@@ -130,10 +130,15 @@ struct DataBrokerProtectionContainerView: View {
     func headerView() -> some View {
         if navigationViewModel.shouldShowHeader {
             VStack {
-                DashboardHeaderView(viewModel: DashboardHeaderViewModel(statusText: "",
-                                                                        isProfileButtonAvailable: navigationViewModel.bodyViewType != .gettingStarted,
-                                                                        faqButtonClicked: { },
-                                                                        editProfileClicked: { navigationViewModel.updateNavigation(.createProfile) }))
+
+                DashboardHeaderView(statusText: "",
+                                    displayProfileButton: navigationViewModel.bodyViewType != .gettingStarted,
+                                    faqButtonClicked: {
+                    print("FAQ")
+                },
+                                    editProfileClicked: {
+                    navigationViewModel.updateNavigation(.createProfile)
+                })
                 .frame(height: 300)
                 Spacer()
             }
