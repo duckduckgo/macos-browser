@@ -30,8 +30,10 @@ struct ExtractProfileSelectors: Codable, Sendable {
     let name: ProfileSelector?
     let alternativeNamesList: ProfileSelector?
     let addressFull: ProfileSelector?
-    let addresses: ProfileSelector?
-    let phoneNumbers: ProfileSelector?
+    let addressCityStateList: ProfileSelector?
+    let addressCityState: ProfileSelector?
+    let phone: ProfileSelector?
+    let phoneList: ProfileSelector?
     let relativesList: ProfileSelector?
     let profileUrl: ProfileSelector?
     let reportId: String?
@@ -41,8 +43,10 @@ struct ExtractProfileSelectors: Codable, Sendable {
         case name
         case alternativeNamesList
         case addressFull
-        case addresses
-        case phoneNumbers
+        case addressCityStateList
+        case addressCityState
+        case phone
+        case phoneList
         case relativesList
         case profileUrl
         case reportId
