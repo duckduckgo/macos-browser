@@ -38,6 +38,7 @@ final class Fire {
     let pinnedTabsManager: PinnedTabsManager
     let bookmarkManager: BookmarkManager
     let syncService: DDGSyncing?
+    let syncDataProviders: SyncDataProviders?
     let tabCleanupPreparer = TabCleanupPreparer()
     let secureVaultFactory: AutofillVaultFactory
     let tld: TLD
@@ -96,6 +97,7 @@ final class Fire {
          tld: TLD,
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
          syncService: DDGSyncing? = nil,
+         syncDataProviders: SyncDataProviders? = nil,
          secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory
     ) {
         self.webCacheManager = cacheManager
@@ -108,6 +110,7 @@ final class Fire {
         self.pinnedTabsManager = pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager
         self.bookmarkManager = bookmarkManager
         self.syncService = syncService ?? (NSApp.delegate as? AppDelegate)?.syncService
+        self.syncDataProviders = syncDataProviders ?? (NSApp.delegate as? AppDelegate)?.syncDataProviders
         self.secureVaultFactory = secureVaultFactory
         self.tld = tld
 
@@ -519,7 +522,7 @@ final class Fire {
 
     private func burnDeletedBookmarks() {
         if syncService?.authState == .inactive {
-            bookmarkManager.cleanUpBookmarksDatabase()
+            syncDataProviders?.bookmarksAdapter.databaseCleaner.cleanUpDatabaseNow()
         }
     }
 }

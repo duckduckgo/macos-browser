@@ -155,12 +155,15 @@ struct ScriptSourceProvider: ScriptSourceProviding {
     private func buildClickToLoadSource() -> String {
         // For now bundle FB SDK and associated config, as they diverged from the extension
         let fbSDK = loadTextFile("fb-sdk", "js")
-        let config = loadTextFile("clickToLoadConfig", "json")
+        var config = loadTextFile("clickToLoadConfig", "json")!
+        if #unavailable(OSX 11) {  // disable CTL for Catalina and earlier
+            config = "{}"
+        }
         let proximaRegFont = loadFont("ProximaNova-Reg-webfont", "woff2")
         let proximaBoldFont = loadFont("ProximaNova-Bold-webfont", "woff2")
         return ContentBlockerRulesUserScript.loadJS("clickToLoad", from: .main, withReplacements: [
             "${fb-sdk.js}": fbSDK!,
-            "${clickToLoadConfig.json}": config!,
+            "${clickToLoadConfig.json}": config,
             "${proximaRegFont}": proximaRegFont!,
             "${proximaBoldFont}": proximaBoldFont!
         ])

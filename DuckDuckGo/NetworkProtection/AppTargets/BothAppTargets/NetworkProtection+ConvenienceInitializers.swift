@@ -40,14 +40,14 @@ extension NetworkProtectionCodeRedemptionCoordinator {
 
 extension NetworkProtectionKeychainTokenStore {
     convenience init() {
-        self.init(useSystemKeychain: false,
+        self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents)
     }
 }
 
 extension NetworkProtectionKeychainKeyStore {
     convenience init() {
-        self.init(useSystemKeychain: false,
+        self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents)
     }
 }
