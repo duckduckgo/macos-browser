@@ -26,15 +26,24 @@ final public class DataBrokerProtectionViewController: NSViewController {
     private let resultsViewModel: ResultsViewModel
     private let containerViewModel: ContainerViewModel
     private let scheduler: DataBrokerProtectionScheduler
+    private let notificationCenter: NotificationCenter
 
-    public init(scheduler: DataBrokerProtectionScheduler, dataManager: DataBrokerProtectionDataManaging) {
+    public init(scheduler: DataBrokerProtectionScheduler,
+                dataManager: DataBrokerProtectionDataManaging,
+                notificationCenter: NotificationCenter = .default) {
         self.scheduler = scheduler
         self.dataManager = dataManager
+        self.notificationCenter = notificationCenter
 
         navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
         profileViewModel = ProfileViewModel(dataManager: dataManager)
-        resultsViewModel = ResultsViewModel(dataManager: dataManager)
-        containerViewModel = ContainerViewModel(scheduler: scheduler, dataManager: dataManager)
+
+        resultsViewModel = ResultsViewModel(dataManager: dataManager,
+                                            notificationCenter: notificationCenter)
+
+        containerViewModel = ContainerViewModel(scheduler: scheduler,
+                                                dataManager: dataManager,
+                                                notificationCenter: notificationCenter)
 
         super.init(nibName: nil, bundle: nil)
     }

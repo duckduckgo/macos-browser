@@ -21,6 +21,7 @@ import SwiftUI
 
 final class ResultsViewModel: ObservableObject {
     private let dataManager: DataBrokerProtectionDataManaging
+    private let notificationCenter: NotificationCenter
 
     struct RemovedProfile: Identifiable {
         let id = UUID()
@@ -55,9 +56,25 @@ final class ResultsViewModel: ObservableObject {
     @Published var removedProfiles =  [RemovedProfile]()
     @Published var pendingProfiles = [PendingProfile]()
 
-    init(dataManager: DataBrokerProtectionDataManaging) {
+    init(dataManager: DataBrokerProtectionDataManaging,
+         notificationCenter: NotificationCenter = .default) {
         self.dataManager = dataManager
+        self.notificationCenter = notificationCenter
+
         updateUI()
+        setupNotifications()
+    }
+
+    private func setupNotifications() {
+        notificationCenter.addObserver(self,
+                                       selector: #selector(reloadData),
+                                       name: DataBrokerProtectionNotifications.didFinishScan,
+                                       object: nil)
+
+        notificationCenter.addObserver(self,
+                                       selector: #selector(reloadData),
+                                       name: DataBrokerProtectionNotifications.didFinishOptOut,
+                                       object: nil)
     }
 
     private func updateUI() {
@@ -94,14 +111,17 @@ final class ResultsViewModel: ObservableObject {
                 }
             }
         }
+
         self.removedProfiles = removedProfiles
         self.pendingProfiles = pendingProfiles
     }
 
-    public func reloadData() {
-        updateUI()
+    @objc public func reloadData() {
+        DispatchQueue.main.async {
+            self.updateUI()
+        }
     }
-    
+
     // MARK: - Test Data
     private func addFakeData() {
         removedProfiles = [

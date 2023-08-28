@@ -24,27 +24,33 @@ final class ContainerViewModel: ObservableObject {
         case results
     }
 
-    let scheduler: DataBrokerProtectionScheduler
-    let dataManager: DataBrokerProtectionDataManaging
+    private let scheduler: DataBrokerProtectionScheduler
+    private let dataManager: DataBrokerProtectionDataManaging
+    private let notificationCenter: NotificationCenter
 
-    var headerStatusText: String {
-        let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
-        let scanHistoryEvents = brokerProfileData.flatMap { $0.scanOperationData.historyEvents }
-        if scanHistoryEvents.isEmpty {
-            return ""
-        } else {
-            if let date = getLastEventDate(events: scanHistoryEvents) {
-                return "Last Scan \(date)"
-            } else {
-                return ""
-            }
-        }
-    }
+    @Published var headerStatusText = ""
 
     internal init(scheduler: DataBrokerProtectionScheduler,
-                  dataManager: DataBrokerProtectionDataManaging) {
+                  dataManager: DataBrokerProtectionDataManaging,
+                  notificationCenter: NotificationCenter = .default) {
         self.scheduler = scheduler
         self.dataManager = dataManager
+        self.notificationCenter = notificationCenter
+
+        updateHeaderStatus()
+        setupNotifications()
+    }
+
+    private func setupNotifications() {
+        notificationCenter.addObserver(self,
+                                       selector: #selector(handleReloadNotification),
+                                       name: DataBrokerProtectionNotifications.didFinishScan,
+                                       object: nil)
+
+        notificationCenter.addObserver(self,
+                                       selector: #selector(handleReloadNotification),
+                                       name: DataBrokerProtectionNotifications.didFinishOptOut,
+                                       object: nil)
     }
 
     private func getLastEventDate(events: [HistoryEvent]) -> String? {
@@ -60,6 +66,25 @@ final class ContainerViewModel: ObservableObject {
         }
     }
 
+    @objc private func handleReloadNotification() {
+        DispatchQueue.main.async {
+            self.updateHeaderStatus()
+        }
+    }
+
+    private func updateHeaderStatus() {
+        let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
+        let scanHistoryEvents = brokerProfileData.flatMap { $0.scanOperationData.historyEvents }
+        var status = ""
+
+        if !scanHistoryEvents.isEmpty {
+            if let date = getLastEventDate(events: scanHistoryEvents) {
+                status = "Last Scan \(date)"
+            }
+        }
+        self.headerStatusText = status
+    }
+
     func scan(completion: @escaping (ScanResult) -> Void) {
         scheduler.scanAllBrokers { [weak self] in
             guard let self = self else { return }
@@ -67,6 +92,7 @@ final class ContainerViewModel: ObservableObject {
             DispatchQueue.main.async {
                 let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
                 let data = brokerProfileData.filter { !$0.optOutOperationsData.isEmpty }
+
                 if data.isEmpty {
                     completion(.noResults)
                 } else {
