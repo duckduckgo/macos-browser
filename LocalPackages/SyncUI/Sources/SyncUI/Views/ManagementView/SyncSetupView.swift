@@ -36,12 +36,22 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                             EmptyView()
                         }
                     } else {
-                        HStack {
-                            Button(UserText.syncAnotherDeviceButton) {
-                                model.presentSyncAnotherDeviceDialog()
+                        HStack(spacing: 24.0) {
+                            let iconFrameSize = 24.0
+                            let iconSize = NSSize(width: 64, height: 48)
+                            let saveIcon = {
+                                Image(nsImage: NSImage(named: "Default-App-128")!.resized(to: iconSize)!)
+                                    .frame(width: iconFrameSize, height: iconFrameSize)
                             }
-                            Button(UserText.turnOnSync) {
+                            let syncIcon = {
+                                Image(nsImage: NSImage(named: "Default-App-128")!.resized(to: iconSize)!)
+                                    .frame(width: iconFrameSize, height: iconFrameSize)
+                            }
+                            CardTemplate(title: UserText.startNewBackupCardTitle, summary: UserText.startNewBackupCardDesctiption, actionText: UserText.startNewBackupCardAction, icon: saveIcon, width: 240, height: 160) {
                                 model.turnOnSync()
+                            }
+                            CardTemplate(title: UserText.syncAnotherDeviceCardTitle, summary: UserText.syncAnotherDeviceCardDesctiption, actionText: UserText.syncAnotherDeviceCardAction, icon: syncIcon, width: 240, height: 160) {
+                                model.presentSyncAnotherDeviceDialog()
                             }
                         }
                     }
@@ -49,12 +59,29 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
             }
         }
 
-        PreferencePaneSection {
-            HStack {
-                Spacer()
-                Image("SyncSetup")
-                Spacer()
-            }
-        }
+//        PreferencePaneSection {
+//            HStack {
+//                Spacer()
+//                Image("SyncSetup")
+//                Spacer()
+//            }
+//        }
+    }
+}
+
+extension NSImage {
+
+    func resized(to size: NSSize) -> NSImage? {
+        let image = NSImage(size: size)
+        let targetRect = NSRect(x: 0, y: 0, width: size.width, height: size.height)
+        let currentRect = NSRect(x: 0, y: 0, width: self.size.width, height: self.size.height)
+
+        image.lockFocus()
+        let graphicsContext = NSGraphicsContext.current
+        graphicsContext?.imageInterpolation = .high
+        self.draw(in: targetRect, from: currentRect, operation: .copy, fraction: 1)
+        image.unlockFocus()
+
+        return image
     }
 }

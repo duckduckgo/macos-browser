@@ -298,7 +298,7 @@ struct UserText {
     static let settings = NSLocalizedString("settings", value: "Settings", comment: "Menu item for opening settings")
 
     static let general = NSLocalizedString("preferences.general", value: "General", comment: "Show general preferences")
-    static let sync = NSLocalizedString("preferences.sync", value: "Sync", comment: "Show sync preferences")
+    static let sync = NSLocalizedString("preferences.sync", value: "Sync & Backup", comment: "Show sync preferences")
     static let defaultBrowser = NSLocalizedString("preferences.default-browser", value: "Default Browser", comment: "Show default browser preferences")
     static let appearance = NSLocalizedString("preferences.appearance", value: "Appearance", comment: "Show appearance preferences")
     static let privacy = NSLocalizedString("preferences.privacy", value: "Privacy", comment: "Show privacy browser preferences")

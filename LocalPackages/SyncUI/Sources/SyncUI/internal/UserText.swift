@@ -30,9 +30,14 @@ enum UserText {
 
     static let sync = NSLocalizedString("preferences.sync", value: "Sync & Backup", comment: "Show sync preferences")
 
-    static let syncSetupExplanation = NSLocalizedString("preferences.sync.setup-explanation", value: "Automatically back up your bookmarks, logins and Email Protection settings and sync them with your other devices.", comment: "Sync setup explanation")
+    static let syncSetupExplanation = NSLocalizedString("preferences.sync.setup-explanation", value: "Manage your bookmarks and logins effortlessly. Safeguard your current browser data, restore viously saved information, or keep everything in sync across devices. All backups are securely stores on DuckDuckGo's servers", comment: "Sync setup explanation")
     static let turnOnSync = NSLocalizedString("preferences.sync.turn-on", value: "Sync & Backup for the First Time", comment: "Enable sync button caption")
-    static let syncAnotherDeviceButton = NSLocalizedString("preferences.sync.turn-on", value: "Enter an Existing Code", comment: "Sync another device button caption")
+    static let syncAnotherDeviceCardTitle = NSLocalizedString("preferences.sync.new.device.title", value: "Connect to Existing Data", comment: "Sync another device card title caption")
+    static let syncAnotherDeviceCardDesctiption = NSLocalizedString("preferences.sync.new.device.description", value: "Access and sync previously saved bookmarks and logins.", comment: "Sync another device card description caption")
+    static let syncAnotherDeviceCardAction = NSLocalizedString("preferences.sync.new.device.action", value: "Connect Now", comment: "Sync another device card action caption")
+    static let startNewBackupCardTitle = NSLocalizedString("preferences.sync.turn-on.title", value: "Save Current Data", comment: "Save current data card title caption")
+    static let startNewBackupCardDesctiption = NSLocalizedString("preferences.sync.turn-on.description", value: "Save a new copy of your current bookmarks and logins.", comment: "Save current data card description caption")
+    static let startNewBackupCardAction = NSLocalizedString("preferences.sync.turn-on.action", value: "Start Sync & Backup", comment: "Save current data card description action")
     static let turnOnSyncWithEllipsis = NSLocalizedString("preferences.sync.turn-on-ellipsis", value: "Turn on Sync...", comment: "Enable sync button caption")
     static let turnOff = NSLocalizedString("preferences.sync.turn-off", value: "Turn Off", comment: "Turn off sync confirmation dialog button title")
     static let turnOffSync = NSLocalizedString("preferences.sync.turn-off.ellipsis", value: "Turn off Sync...", comment: "Disable sync button caption")
