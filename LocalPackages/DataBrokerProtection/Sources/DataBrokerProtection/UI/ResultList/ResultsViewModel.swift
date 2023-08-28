@@ -82,7 +82,7 @@ final class ResultsViewModel: ObservableObject {
                     let profile = PendingProfile(
                         dataBroker: brokerProfileQueryData.dataBroker.name,
                         profile: optOutOperationData.extractedProfile.fullName ?? "",
-                        address: optOutOperationData.extractedProfile.addressCityStateList?.first?.fullAddress ?? "",
+                        address: optOutOperationData.extractedProfile.addresses?.first?.fullAddress ?? "",
                         error: errorName,
                         errorDescription: errorDescription)
 
