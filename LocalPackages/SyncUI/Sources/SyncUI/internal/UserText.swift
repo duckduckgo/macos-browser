@@ -30,7 +30,7 @@ enum UserText {
 
     static let sync = NSLocalizedString("preferences.sync", value: "Sync & Backup", comment: "Show sync preferences")
 
-    static let syncSetupExplanation = NSLocalizedString("preferences.sync.setup-explanation", value: "Automatically back up your bookmarks, logins and Email Protection settings and sync them with your other devices.", comment: "Sync setup explanation")
+    static let syncSetupExplanation = NSLocalizedString("preferences.sync.setup-explanation", value: "Securely store and synchronize your bookmarks and login details. Choose to begin a fresh sync or reconnect to a previous one.", comment: "Sync setup explanation")
     static let turnOnSync = NSLocalizedString("preferences.sync.turn-on", value: "Sync & Backup for the First Time", comment: "Enable sync button caption")
     static let syncAnotherDeviceButton = NSLocalizedString("preferences.sync.turn-on", value: "Enter an Existing Code", comment: "Sync another device button caption")
     static let turnOnSyncWithEllipsis = NSLocalizedString("preferences.sync.turn-on-ellipsis", value: "Turn on Sync...", comment: "Enable sync button caption")

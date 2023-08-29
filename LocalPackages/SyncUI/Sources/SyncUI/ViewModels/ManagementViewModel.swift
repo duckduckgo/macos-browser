@@ -39,4 +39,5 @@ public protocol ManagementViewModel: ObservableObject {
     func turnOnSync()
     func saveRecoveryPDF()
     func refreshDevices()
+    
 }
