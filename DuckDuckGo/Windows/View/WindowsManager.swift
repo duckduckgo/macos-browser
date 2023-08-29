@@ -32,11 +32,18 @@ final class WindowsManager {
         }
     }
 
-    private class func parentWindow(for tab: Tab?) -> NSWindow? {
-        guard let parentTab = tab?.parentTab else { return nil }
-        return (WindowControllersManager.shared.mainWindowControllers.first(where: {
-            $0.mainViewController.tabCollectionViewModel.tabs.contains(parentTab)
-        }) ?? WindowControllersManager.shared.lastKeyMainWindowController)?.window
+    /// finds window to position newly opened (or popup) windows against
+    private class func findPositioningSourceWindow(for tab: Tab?) -> NSWindow? {
+        if let parentTab = tab?.parentTab,
+           let sourceWindowController = WindowControllersManager.shared.mainWindowControllers.first(where: {
+               $0.mainViewController.tabCollectionViewModel.tabs.contains(parentTab)
+           }) {
+            // window that initiated the new window opening
+            return sourceWindowController.window
+        }
+
+        // fallback to last known main window
+        return WindowControllersManager.shared.lastKeyMainWindowController?.window
     }
 
     @discardableResult
@@ -58,8 +65,8 @@ final class WindowsManager {
         if let droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
 
-        } else if let parentWindow = self.parentWindow(for: tabCollectionViewModel?.tabs.first) {
-            mainWindowController.window?.setFrameOrigin(cascadedFrom: parentWindow)
+        } else if let sourceWindow = self.findPositioningSourceWindow(for: tabCollectionViewModel?.tabs.first) {
+            mainWindowController.window?.setFrameOrigin(cascadedFrom: sourceWindow)
         }
 
         if showWindow {
@@ -124,7 +131,9 @@ final class WindowsManager {
             mainWindowController.mainViewController.tabCollectionViewModel.insert(tab, selected: true)
 
         } else {
-            let screenFrame = (self.parentWindow(for: tab)?.screen ?? .main)?.visibleFrame ?? NSRect(x: 0, y: 100, width: 1280, height: 900)
+            let screenFrame = (self.findPositioningSourceWindow(for: tab)?.screen ?? .main)?.visibleFrame
+                // fallback for headless state
+                ?? NSRect(x: 0, y: 100, width: 1280, height: 900)
 
             // limit popUp content size to screen visible frame
             // fallback to default if nil or zero
