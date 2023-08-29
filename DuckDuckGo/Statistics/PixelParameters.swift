@@ -133,8 +133,17 @@ extension Pixel.Event {
              .continueSetUpSectionHidden,
              .userHasPinnedTab,
              .fireButtonFirstBurn,
-             .fireButton:
-
+             .fireButton,
+             .incrementalRolloutTest,
+             .duckPlayerDailyUniqueView,
+             .duckPlayerViewFromYoutubeViaMainOverlay,
+             .duckPlayerViewFromYoutubeViaHoverButton,
+             .duckPlayerViewFromYoutubeAutomatic,
+             .duckPlayerViewFromSERP,
+             .duckPlayerViewFromOther,
+             .duckPlayerSettingAlways,
+             .duckPlayerSettingNever,
+             .duckPlayerSettingBackToDefault:
             return nil
         }
     }

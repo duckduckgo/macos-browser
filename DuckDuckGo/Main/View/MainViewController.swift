@@ -85,6 +85,7 @@ final class MainViewController: NSViewController {
         view.registerForDraggedTypes([.URL, .fileURL])
 
         registerForBookmarkBarPromptNotifications()
+        registerForDidBecomeActiveNotifications()
     }
 
     var bookmarkBarPromptObserver: Any?
@@ -122,6 +123,19 @@ final class MainViewController: NSViewController {
         }
 
         updateDividerColor()
+    }
+
+    func registerForDidBecomeActiveNotifications() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(applicationDidBecomeActive),
+                                               name: NSApplication.didBecomeActiveNotification,
+                                               object: nil)
+    }
+
+    @objc func applicationDidBecomeActive() {
+        // Temporary feature flag tester, to validate that phased rollouts are working as intended.
+        // This is to be removed before the end of August 2023.
+        PhasedRolloutFeatureFlagTester.shared.sendFeatureFlagEnabledPixelIfNecessary()
     }
 
     override func viewDidLayout() {
@@ -231,7 +245,7 @@ final class MainViewController: NSViewController {
     private func updateBookmarksBarViewVisibility(visible: Bool) {
         let showBookmarksBar = isInPopUpWindow ? false : visible
 
-        if visible {
+        if showBookmarksBar {
             if bookmarksBarViewController.parent == nil {
                 addChild(bookmarksBarViewController)
 
@@ -436,6 +450,10 @@ final class MainViewController: NSViewController {
             browserTabViewController.bookmarksViewController?.view.makeMeFirstResponder()
         case .none:
             shouldAdjustFirstResponderOnContentChange = true
+#if DBP
+        case .dataBrokerProtection:
+            browserTabViewController.preferencesViewController?.view.makeMeFirstResponder()
+#endif
         }
     }
 

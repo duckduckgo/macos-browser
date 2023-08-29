@@ -31,6 +31,9 @@ final class NavigationBarViewController: NSViewController {
 
     enum Constants {
         static let downloadsButtonAutoHidingInterval: TimeInterval = 5 * 60
+        static let activeDownloadsImage = NSImage(named: "DownloadsActive")
+        static let inactiveDownloadsImage = NSImage(named: "Downloads")
+        static let autosavePopoverImageName = "PasswordManagement"
     }
 
     @IBOutlet weak var mouseOverView: MouseOverView!
@@ -63,8 +66,6 @@ final class NavigationBarViewController: NSViewController {
         downloadsButton.addSubview(progressView)
         return progressView
     }()
-    private static let activeDownloadsImage = NSImage(named: "DownloadsActive")
-    private static let inactiveDownloadsImage = NSImage(named: "Downloads")
 
     var addressBarViewController: AddressBarViewController?
 
@@ -80,6 +81,7 @@ final class NavigationBarViewController: NSViewController {
     var isDownloadsPopoverShown: Bool {
         popovers.isDownloadsPopoverShown
     }
+    var isAutoFillAutosaveMessageVisible: Bool = false
 
     private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
@@ -335,6 +337,12 @@ final class NavigationBarViewController: NSViewController {
                                                selector: #selector(showPrivateEmailCopiedToClipboard(_:)),
                                                name: Notification.Name.privateEmailCopiedToClipboard,
                                                object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(showLoginAutosavedFeedback(_:)),
+                                               name: .loginAutoSaved,
+                                               object: nil)
+
         if #available(macOS 11, *) {
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(showAutoconsentFeedback(_:)),
@@ -347,7 +355,7 @@ final class NavigationBarViewController: NSViewController {
         guard view.window?.isKeyWindow == true else { return }
 
         DispatchQueue.main.async {
-            let viewController = PopoverMessageViewController.createWithMessage(UserText.privateEmailCopiedToClipboard)
+            let viewController = PopoverMessageViewController(message: UserText.privateEmailCopiedToClipboard)
             viewController.show(onParent: self, relativeTo: self.optionsButton)
         }
 
@@ -358,8 +366,36 @@ final class NavigationBarViewController: NSViewController {
               let domain = sender.userInfo?[FireproofDomains.Constants.newFireproofDomainKey] as? String else { return }
 
         DispatchQueue.main.async {
-            let viewController = PopoverMessageViewController.createWithMessage(UserText.domainIsFireproof(domain: domain))
+            let viewController = PopoverMessageViewController(message: UserText.domainIsFireproof(domain: domain))
             viewController.show(onParent: self, relativeTo: self.optionsButton)
+        }
+    }
+
+    @objc private func showLoginAutosavedFeedback(_ sender: Notification) {
+        guard view.window?.isKeyWindow == true,
+              let account = sender.object as? SecureVaultModels.WebsiteAccount else { return }
+
+        guard let domain = account.domain else {
+            return
+        }
+
+        DispatchQueue.main.async {
+
+            let action = {
+                self.showPasswordManagerPopover(selectedWebsiteAccount: account)
+            }
+            let popoverMessage = PopoverMessageViewController(message: UserText.passwordManagerAutosavePopoverText(domain: domain),
+                                                              image: Self.Constants.autosavePopoverImageName,
+                                                              buttonText: UserText.passwordManagerAutosaveButtonText,
+                                                              buttonAction: action,
+                                                              onDismiss: {
+                                                                    self.isAutoFillAutosaveMessageVisible = false
+                                                                    self.passwordManagementButton.isHidden = !LocalPinningManager.shared.isPinned(.autofill)
+            }
+                                                              )
+            self.isAutoFillAutosaveMessageVisible = true
+            self.passwordManagementButton.isHidden = false
+            popoverMessage.show(onParent: self, relativeTo: self.passwordManagementButton)
         }
     }
 
@@ -394,6 +430,12 @@ final class NavigationBarViewController: NSViewController {
         popovers.showPasswordManagementPopover(selectedCategory: selectedCategory,
                                                usingView: passwordManagementButton,
                                                withDelegate: self)
+    }
+
+    func showPasswordManagerPopover(selectedWebsiteAccount: SecureVaultModels.WebsiteAccount) {
+        popovers.showPasswordManagerPopover(selectedWebsiteAccount: selectedWebsiteAccount,
+                                                     usingView: passwordManagementButton,
+                                                     withDelegate: self)
     }
 
     private func setupNavigationButtonMenus() {
@@ -523,7 +565,7 @@ final class NavigationBarViewController: NSViewController {
         if LocalPinningManager.shared.isPinned(.autofill) {
             passwordManagementButton.isHidden = false
         } else {
-            passwordManagementButton.isHidden = !popovers.isPasswordManagementPopoverShown
+            passwordManagementButton.isHidden = !popovers.isPasswordManagementPopoverShown && !isAutoFillAutosaveMessageVisible
         }
 
         popovers.passwordManagementDomain = nil
@@ -547,7 +589,7 @@ final class NavigationBarViewController: NSViewController {
         }
 
         let hasActiveDownloads = DownloadListCoordinator.shared.hasActiveDownloads
-        downloadsButton.image = hasActiveDownloads ? Self.activeDownloadsImage : Self.inactiveDownloadsImage
+        downloadsButton.image = hasActiveDownloads ? Self.Constants.activeDownloadsImage : Self.Constants.inactiveDownloadsImage
         let isTimerActive = downloadsButtonHidingTimer != nil
 
         downloadsButton.isHidden = !(hasActiveDownloads || isTimerActive)
@@ -760,6 +802,13 @@ extension NavigationBarViewController: NSMenuDelegate {
 }
 
 extension NavigationBarViewController: OptionsButtonMenuDelegate {
+
+#if DBP
+    func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu) {
+        WindowControllersManager.shared.showDataBrokerProtectionTab()
+    }
+#endif
+
     func optionsButtonMenuRequestedOpenExternalPasswordManager(_ menu: NSMenu) {
         BWManager.shared.openBitwarden()
     }
