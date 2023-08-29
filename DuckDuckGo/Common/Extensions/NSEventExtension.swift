@@ -17,11 +17,28 @@
 //
 
 import AppKit
+import Combine
 
 extension NSEvent {
-    static func isContextClick(_ event: NSEvent) -> Bool {
+
+    class func isContextClick(_ event: NSEvent) -> Bool {
         let isControlClick = event.type == .leftMouseDown && (event.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue != 0)
         let isRightClick = event.type == .rightMouseDown
         return isControlClick || isRightClick
     }
+
+    class func addGlobalCancellableMonitor(forEventsMatching mask: NSEvent.EventTypeMask, handler: @escaping (NSEvent) -> Void) -> AnyCancellable {
+        let monitor = addGlobalMonitorForEvents(matching: mask, handler: handler)
+        return AnyCancellable {
+            monitor.map(NSEvent.removeMonitor)
+        }
+    }
+
+    class func addLocalCancellableMonitor(forEventsMatching mask: NSEvent.EventTypeMask, handler: @escaping (NSEvent) -> NSEvent?) -> AnyCancellable {
+        let monitor = addLocalMonitorForEvents(matching: mask, handler: handler)
+        return AnyCancellable {
+            monitor.map(NSEvent.removeMonitor)
+        }
+    }
+
 }

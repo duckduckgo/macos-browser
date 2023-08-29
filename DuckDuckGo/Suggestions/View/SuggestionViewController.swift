@@ -53,8 +53,7 @@ final class SuggestionViewController: NSViewController {
     var suggestionResultCancellable: AnyCancellable?
     var selectionIndexCancellable: AnyCancellable?
 
-    private var mouseUpEventsMonitor: Any?
-    private var mouseDownEventsMonitor: Any?
+    private var eventMonitorCancellables = Set<AnyCancellable>()
     private var appObserver: Any?
 
     override func viewDidLoad() {
@@ -75,14 +74,14 @@ final class SuggestionViewController: NSViewController {
         self.view.window!.isOpaque = false
         self.view.window!.backgroundColor = .clear
 
-        addMonitors()
+        addEventMonitors()
         tableView.rowHeight = suggestionContainerViewModel.isHomePage ? 34 : 28
     }
 
     override func viewWillDisappear() {
         super.viewWillDisappear()
 
-        removeMouseEventsMonitor()
+        eventMonitorCancellables.removeAll()
         clearSelection()
     }
 
@@ -102,34 +101,20 @@ final class SuggestionViewController: NSViewController {
         tableView.addTrackingArea(trackingArea)
     }
 
-    private func addMonitors() {
-        let upEventTypes: NSEvent.EventTypeMask = [.leftMouseUp, .rightMouseUp]
-        mouseUpEventsMonitor = NSEvent.addLocalMonitorForEvents(matching: upEventTypes) { [weak self] event in
-            self?.mouseUp(with: event)
-        }
+    private func addEventMonitors() {
+        NSEvent.addLocalCancellableMonitor(forEventsMatching: [.leftMouseUp, .rightMouseUp]) { [weak self] event in
+            guard let self else { return event }
+            return self.mouseUp(with: event)
+        }.store(in: &eventMonitorCancellables)
 
-        let downEventTypes: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown]
-        mouseDownEventsMonitor = NSEvent.addLocalMonitorForEvents(matching: downEventTypes) { [weak self] event in
-            self?.mouseDown(with: event)
-        }
+        NSEvent.addLocalCancellableMonitor(forEventsMatching: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
+            guard let self else { return event }
+            return self.mouseDown(with: event)
+        }.store(in: &eventMonitorCancellables)
 
-        appObserver = NotificationCenter.default.addObserver(forName: NSApplication.didResignActiveNotification,
-                                                             object: nil,
-                                                             queue: nil) { [weak self] _ in
+        NotificationCenter.default.publisher(for: NSApplication.didResignActiveNotification).sink { [weak self] _ in
             self?.closeWindow()
-        }
-    }
-
-    private func removeMouseEventsMonitor() {
-        if let upEventMonitor = mouseUpEventsMonitor {
-            NSEvent.removeMonitor(upEventMonitor)
-            mouseUpEventsMonitor = nil
-        }
-
-        if let downEventMonitor = mouseDownEventsMonitor {
-            NSEvent.removeMonitor(downEventMonitor)
-            mouseDownEventsMonitor = nil
-        }
+        }.store(in: &eventMonitorCancellables)
     }
 
     private func subscribeToSuggestionResult() {
