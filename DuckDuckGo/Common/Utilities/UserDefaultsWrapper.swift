@@ -28,6 +28,8 @@ extension UserDefaults {
 public struct UserDefaultsWrapper<T> {
 
     public enum Key: String, CaseIterable {
+        /// system setting defining window title double-click action
+        case appleActionOnDoubleClick = "AppleActionOnDoubleClick"
 
         case configLastUpdated = "config.last.updated"
         case configStorageTrackerRadarEtag = "config.storage.trackerradar.etag"
@@ -194,24 +196,49 @@ public struct UserDefaultsWrapper<T> {
 
     public var wrappedValue: T {
         get {
-            if let storedValue = defaults.object(forKey: key.rawValue),
-               let typedValue = storedValue as? T {
+            guard let storedValue = defaults.object(forKey: key.rawValue) else {
+                if setIfEmpty {
+                    setValue(defaultValue)
+                }
+
+                return defaultValue
+            }
+
+            if let typedValue = storedValue as? T {
                 return typedValue
             }
 
-            if setIfEmpty {
-                defaults.set(defaultValue, forKey: key.rawValue)
+            guard let rawRepresentableType = T.self as? any RawRepresentable.Type,
+                  let value = rawRepresentableType.init(anyRawValue: storedValue) as? T else {
+                return defaultValue
             }
 
-            return defaultValue
+            return value
         }
         set {
-            if (newValue as? AnyOptional)?.isNil == true {
-                defaults.removeObject(forKey: key.rawValue)
-            } else {
-                defaults.set(newValue, forKey: key.rawValue)
-            }
+            setValue(newValue)
         }
+    }
+
+    private func setValue(_ value: T) {
+        guard (value as? AnyOptional)?.isNil != true else {
+            defaults.removeObject(forKey: key.rawValue)
+            return
+        }
+
+        if PropertyListSerialization.propertyList(value, isValidFor: .binary) {
+            defaults.set(value, forKey: key.rawValue)
+            return
+        }
+
+        guard let rawRepresentable = value as? any RawRepresentable,
+              PropertyListSerialization.propertyList(rawRepresentable.rawValue, isValidFor: .binary) else {
+            assertionFailure("\(value) cannot be stored in UserDefaults")
+            return
+        }
+
+        defaults.set(rawRepresentable.rawValue, forKey: key.rawValue)
+
     }
 
     static func clearAll() {
@@ -242,6 +269,18 @@ extension UserDefaultsWrapper where T: OptionalProtocol {
 
     init(key: Key, defaults: UserDefaults? = nil) {
         self.init(key: key, defaultValue: .none, defaults: defaults)
+    }
+
+}
+
+private extension RawRepresentable {
+
+    init?(anyRawValue: Any) {
+        guard let rawValue = anyRawValue as? RawValue else {
+            assertionFailure("\(anyRawValue) is not \(RawValue.self)")
+            return nil
+        }
+        self.init(rawValue: rawValue)
     }
 
 }

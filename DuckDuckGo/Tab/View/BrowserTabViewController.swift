@@ -664,8 +664,8 @@ extension BrowserTabViewController: TabDelegate {
 
     func tab(_ parentTab: Tab, createdChild childTab: Tab, of kind: NewWindowPolicy) {
         switch kind {
-        case .popup(size: let windowContentSize):
-            WindowsManager.openPopUpWindow(with: childTab, contentSize: windowContentSize)
+        case .popup(origin: let origin, size: let contentSize):
+            WindowsManager.openPopUpWindow(with: childTab, origin: origin, contentSize: contentSize)
         case .window(active: let active, let isBurner):
             assert(isBurner == childTab.burnerMode.isBurner)
             WindowsManager.openNewWindow(with: childTab, showWindow: active)

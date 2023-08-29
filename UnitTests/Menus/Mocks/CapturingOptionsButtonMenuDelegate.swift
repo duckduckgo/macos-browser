@@ -26,7 +26,7 @@ class CapturingOptionsButtonMenuDelegate: OptionsButtonMenuDelegate {
 
 #if DBP
     func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu) {
-        
+
     }
 #endif
 
