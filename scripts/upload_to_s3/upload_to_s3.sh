@@ -11,21 +11,31 @@ OVERWRITE_DMG_VERSION=""
 
 # Print the usage
 function print_usage() {
-    echo "Usage: $0 [OPTIONS]"
-    echo ""
-    echo "This script is a tool for uploading files to AWS S3. It's designed to assist in deploying app updates."
-    echo "Ensure the specified directory contains appcast2.xml, .dmg, and .delta files."
-    echo ""
-    echo "Options:"
-    echo "  --directory <directory_path>    Path to the directory containing the files for upload. Default is '$DIRECTORY'."
-    echo ""
-    echo "  --overwrite-duckduckgo-dmg <version>    Specifies the version of the .dmg that should be used to overwrite duckduckgo.dmg in S3. Typically used for public releases."
-    echo ""
-    echo "  --debug    If set, no 'aws cp' commands will be executed. They will be printed to stdout instead."
-    echo ""
-    echo "Example:"
-    echo "  $0 --overwrite-duckduckgo-dmg 2.0.1"
-    exit 1
+    echo "
+NAME
+    upload_to_s3.sh – automation tool for uploading files to AWS S3 for macOS Desktop Browser
+
+SYNOPSIS
+    $0 [--directory directory_path] [--overwrite-duckduckgo-dmg version] [--debug]
+    $0 --help
+
+DESCRIPTION
+    This script is a tool for uploading macOS Desktop Browser files, specifically appcast2.xml, .dmg, and .delta files, to AWS S3.
+
+    --directory directory_path
+        Specifies the directory that contains the appcast2.xml, .dmg, and .delta files. If not provided, the default value is: $DIRECTORY.
+
+    --overwrite-duckduckgo-dmg version
+        Overwrites the primary duckduckgo.dmg in S3 with the dmg version specified. This option is usually used for public releases.
+        Example:
+        $0 --overwrite-duckduckgo-dmg 2.0.1
+
+    --debug
+        In debug mode, no 'aws cp' commands will be executed; they will only be printed to stdout.
+
+    --help
+        Displays this help message.
+"
 }
 
 # Execute AWS command, but just echo it if in debug mode
@@ -43,13 +53,14 @@ while [[ "$#" -gt 0 ]]; do
         --directory) DIRECTORY="$2"; shift ;;
         --overwrite-duckduckgo-dmg) OVERWRITE_DMG_VERSION="$2"; shift ;;
         --debug) DEBUG=1 ;;
-        *) echo "Unknown parameter passed: $1"; print_usage ;;
+        --help) print_usage; exit 0 ;; # Display the help and exit immediately.
+        *) echo "Unknown parameter passed: $1"; print_usage; exit 1 ;; # Display the help and exit with error.
     esac
     shift
 done
 
 # Perform AWS login
-execute_aws "aws sso login --profile $PROFILE"
+aws sso login --profile $PROFILE
 
 # Ensure appcast2.xml exists
 if [[ ! -f "$DIRECTORY/appcast2.xml" ]]; then
@@ -72,7 +83,7 @@ for FILENAME in $FILES_TO_UPLOAD; do
 
     # Check if the file exists on S3
     AWS_CMD="aws --profile $PROFILE s3 ls ${S3_PATH}${FILENAME}"
-    echo "Checking S3 for $FILENAME..."
+    echo "Checking S3 for ${S3_PATH}${FILENAME}..."
     if ! $(aws --profile $PROFILE s3 ls ${S3_PATH}${FILENAME} > /dev/null 2>&1); then
         echo "$FILENAME not found on S3. Marking for upload."
         MISSING_FILES+=("$FILENAME")
@@ -85,11 +96,17 @@ done
 MISSING_FILES+=("appcast2.xml")
 
 # Notify the user about files to be uploaded
-if [[ ${#MISSING_FILES[@]} -gt 0 ]]; then
-    echo "The following files will be uploaded:"
-    for FILE in "${MISSING_FILES[@]}"; do
-        echo "$FILE"
-    done
+if [[ ${#MISSING_FILES[@]} -gt 0 ]] || [[ ! -z "$OVERWRITE_DMG_VERSION" ]]; then
+    if [[ ${#MISSING_FILES[@]} -gt 0 ]]; then
+        echo "The following files will be uploaded:"
+        for FILE in "${MISSING_FILES[@]}"; do
+            echo "$FILE"
+        done
+    fi
+
+    if [[ ! -z "$OVERWRITE_DMG_VERSION" ]]; then
+        echo "The file duckduckgo-$OVERWRITE_DMG_VERSION.dmg will be used to overwrite duckduckgo.dmg on S3."
+    fi
 
     read -p "Do you wish to continue? (y/n) " -n 1 -r
     echo
