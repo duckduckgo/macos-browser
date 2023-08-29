@@ -108,7 +108,7 @@ final class AutofillPreferences: AutofillPreferencesPersistor {
     @UserDefaultsWrapper(key: .askToSavePaymentMethods, defaultValue: true)
     var askToSavePaymentMethods: Bool
 
-    @UserDefaultsWrapper(key: .autolockLocksFormFilling, defaultValue: true)
+    @UserDefaultsWrapper(key: .autolockLocksFormFilling, defaultValue: false)
     var autolockLocksFormFilling: Bool
 
 #if APPSTORE
