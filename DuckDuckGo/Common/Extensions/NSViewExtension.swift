@@ -90,7 +90,7 @@ extension NSView {
             NSLayoutConstraintToAttribute(attribute: .width, multiplier: multiplier, constant: const)
         }
         static func height(multiplier: CGFloat = 1.0, const: CGFloat = 0.0) -> NSLayoutConstraintToAttribute {
-            NSLayoutConstraintToAttribute(attribute: .width, multiplier: multiplier, constant: const)
+            NSLayoutConstraintToAttribute(attribute: .height, multiplier: multiplier, constant: const)
         }
 
         static func const(multiplier: CGFloat = 1.0, _ const: CGFloat) -> NSLayoutConstraintToAttribute {

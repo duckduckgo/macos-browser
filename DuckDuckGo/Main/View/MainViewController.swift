@@ -245,7 +245,7 @@ final class MainViewController: NSViewController {
     private func updateBookmarksBarViewVisibility(visible: Bool) {
         let showBookmarksBar = isInPopUpWindow ? false : visible
 
-        if visible {
+        if showBookmarksBar {
             if bookmarksBarViewController.parent == nil {
                 addChild(bookmarksBarViewController)
 
@@ -450,6 +450,10 @@ final class MainViewController: NSViewController {
             browserTabViewController.bookmarksViewController?.view.makeMeFirstResponder()
         case .none:
             shouldAdjustFirstResponderOnContentChange = true
+#if DBP
+        case .dataBrokerProtection:
+            browserTabViewController.preferencesViewController?.view.makeMeFirstResponder()
+#endif
         }
     }
 

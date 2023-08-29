@@ -20,8 +20,20 @@ import Foundation
 
 extension NSRect {
 
-    var center: CGPoint {
-        CGPoint(x: midX, y: midY)
+    var topLeft: NSPoint {
+        NSPoint(x: minX, y: maxY)
+    }
+
+    var center: NSPoint {
+        NSPoint(x: midX, y: midY)
+    }
+
+    var droppingPoint: NSPoint {
+        NSPoint(x: self.midX, y: maxY)
+    }
+
+    func frameOrigin(fromDroppingPoint droppingPoint: NSPoint) -> NSPoint {
+        NSPoint(x: droppingPoint.x - self.width / 2, y: droppingPoint.y - self.height)
     }
 
     // Apply an offset so that we don't get caught by the "Line of Death" https://textslashplain.com/2017/01/14/the-line-of-death/

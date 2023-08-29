@@ -39,7 +39,9 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu)
     func optionsButtonMenuRequestedPreferences(_ menu: NSMenu)
     func optionsButtonMenuRequestedAppearancePreferences(_ menu: NSMenu)
-
+#if DBP
+    func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu)
+#endif
 }
 
 @MainActor
@@ -131,7 +133,16 @@ final class MoreOptionsMenu: NSMenu {
                 .targetting(self)
                 .withImage(.image(for: .vpnIcon))
         }
-#endif
+#endif // NETWORK_PROTECTION
+
+#if DBP
+        let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
+                                                  action: #selector(openDataBrokerProtection),
+                                                  keyEquivalent: "")
+            .targetting(self)
+            .withImage(NSImage(named: "BurnerWindowIcon2")) // PLACEHOLDER: Change it once we have the final icon
+        addItem(dataBrokerProtectionItem)
+#endif // DBP
 
         addItem(NSMenuItem.separator())
 
@@ -142,6 +153,12 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "Preferences"))
         addItem(preferencesItem)
     }
+
+#if DBP
+    @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
+    }
+#endif // DBP
 
     @objc func showNetworkProtectionStatus(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedNetworkProtectionPopover(self)
