@@ -207,13 +207,13 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         schedulingConfig: DataBrokerScheduleConfig,
         database: DataBrokerProtectionRepository
     ) {
-        let maintenanceScanDate = Date().addingTimeInterval(schedulingConfig.maintenanceScan)
+        let maintenanceScanDate = Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
 
         if let brokerProfileQuery = database.brokerProfileQueryData(for: brokerId, and: profileQueryId),
            let lastHistoryEvent = brokerProfileQuery.events.last {
             switch lastHistoryEvent.type {
             case .error:
-                let retryOperationDate = Date().addingTimeInterval(schedulingConfig.retryError)
+                let retryOperationDate = Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
                 updatePreferredRunDate(
                     retryOperationDate,
                     brokerId: brokerId,
@@ -222,7 +222,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                     database: database
                 )
             case .optOutRequested:
-                let confirmOptOutDate = Date().addingTimeInterval(schedulingConfig.confirmOptOutScan)
+                let confirmOptOutDate = Date().addingTimeInterval(schedulingConfig.confirmOptOutScan.hoursToSeconds)
 
                 // We set extractedProfileId to nil because we want to update the scan operation
                 updatePreferredRunDate(
@@ -345,6 +345,6 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             return false
         }
 
-        return lastRemovalEvent.date.addingTimeInterval(schedulingConfig.maintenanceScan) < Date()
+        return lastRemovalEvent.date.addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds) < Date()
     }
 }

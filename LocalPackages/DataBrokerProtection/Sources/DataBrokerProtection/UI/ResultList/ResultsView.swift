@@ -178,13 +178,22 @@ private struct DebugModalView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            ForEach(sortedEvents) { event in
-                VStack {
-                    Text("Event \(labelForEvent(event))")
-                    Text("Date: \(formatDate(event.date))")
-                    Divider()
+            ScrollView {
+                ForEach(sortedEvents) { event in
+                    VStack {
+                        Text("Event \(labelForEvent(event))")
+                        Text("Date: \(formatDate(event.date))")
+                        Divider()
+                    }
                 }
+            }.frame(width: 400, height: 600)
+
+            if let date = optOutOperationData.preferredRunDate {
+                Text("Preferred Run Date \(formatDate(date))")
+            } else {
+                Text("Preferred Run Date not set")
             }
+
             Button {
                 showingModal = false
             } label: {
