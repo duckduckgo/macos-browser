@@ -18,97 +18,13 @@
 
 import SwiftUI
 
-final class ContainerViewModel: ObservableObject {
-    enum ScanResult {
-        case noResults
-        case results
-    }
-
-    private let scheduler: DataBrokerProtectionScheduler
-    private let dataManager: DataBrokerProtectionDataManaging
-    private let notificationCenter: NotificationCenter
-
-    @Published var headerStatusText = ""
-
-    internal init(scheduler: DataBrokerProtectionScheduler,
-                  dataManager: DataBrokerProtectionDataManaging,
-                  notificationCenter: NotificationCenter = .default) {
-        self.scheduler = scheduler
-        self.dataManager = dataManager
-        self.notificationCenter = notificationCenter
-
-        updateHeaderStatus()
-        setupNotifications()
-    }
-
-    private func setupNotifications() {
-        notificationCenter.addObserver(self,
-                                       selector: #selector(handleReloadNotification),
-                                       name: DataBrokerProtectionNotifications.didFinishScan,
-                                       object: nil)
-
-        notificationCenter.addObserver(self,
-                                       selector: #selector(handleReloadNotification),
-                                       name: DataBrokerProtectionNotifications.didFinishOptOut,
-                                       object: nil)
-    }
-
-    private func getLastEventDate(events: [HistoryEvent]) -> String? {
-        let sortedEvents = events.sorted(by: { $0.date < $1.date })
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .short
-        dateFormatter.timeStyle = .short
-
-        if let lastEvent = sortedEvents.last {
-            return dateFormatter.string(from: lastEvent.date)
-        } else {
-            return nil
-        }
-    }
-
-    @objc private func handleReloadNotification() {
-        DispatchQueue.main.async {
-            self.updateHeaderStatus()
-        }
-    }
-
-    private func updateHeaderStatus() {
-        let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
-        let scanHistoryEvents = brokerProfileData.flatMap { $0.scanOperationData.historyEvents }
-        var status = ""
-
-        if !scanHistoryEvents.isEmpty {
-            if let date = getLastEventDate(events: scanHistoryEvents) {
-                status = "Last Scan \(date)"
-            }
-        }
-        self.headerStatusText = status
-    }
-
-    func scan(completion: @escaping (ScanResult) -> Void) {
-        scheduler.scanAllBrokers { [weak self] in
-            guard let self = self else { return }
-
-            DispatchQueue.main.async {
-                let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
-                let data = brokerProfileData.filter { !$0.optOutOperationsData.isEmpty }
-
-                if data.isEmpty {
-                    completion(.noResults)
-                } else {
-                    completion(.results)
-                }
-            }
-        }
-    }
-}
-
 @available(macOS 11.0, *)
 struct DataBrokerProtectionContainerView: View {
     @ObservedObject var containerViewModel: ContainerViewModel
     @ObservedObject var navigationViewModel: ContainerNavigationViewModel
     @ObservedObject var profileViewModel: ProfileViewModel
     @ObservedObject var resultsViewModel: ResultsViewModel
+    @State var shouldShowDebugUI = false
 
     var body: some View {
         ScrollView {
@@ -147,6 +63,7 @@ struct DataBrokerProtectionContainerView: View {
                                     case .results:
                                         resultsViewModel.reloadData()
                                         navigationViewModel.updateNavigation(.results)
+                                        containerViewModel.startScheduler()
                                     }
                                 }
                             }, backToDashboardClicked: {
@@ -158,37 +75,43 @@ struct DataBrokerProtectionContainerView: View {
                     Spacer()
                 }
 
-               // just for testing
-               VStack(alignment: .leading) {
-                   HStack {
-                       Picker(selection: $navigationViewModel.bodyViewType,
-                              label: Text("Body View Type")) {
-                           ForEach(ContainerNavigationViewModel.BodyViewType.allCases, id: \.self) { viewType in
-                               Text(viewType.description).tag(viewType)
-                           }
-                       }
-                       .pickerStyle(MenuPickerStyle())
-                       .frame(width: 300)
+                if shouldShowDebugUI {
+                    // just for testing
+                    VStack(alignment: .leading) {
+                        Text("Scheduler status: \(containerViewModel.schedulerStatus)")
 
-                       Spacer()
-                   }
-                   Spacer()
-               }.padding()
-         }
+                        HStack {
+                            Picker(selection: $navigationViewModel.bodyViewType,
+                                   label: Text("Body View Type")) {
+                                ForEach(ContainerNavigationViewModel.BodyViewType.allCases, id: \.self) { viewType in
+                                    Text(viewType.description).tag(viewType)
+                                }
+                            }
+                                   .pickerStyle(MenuPickerStyle())
+                                   .frame(width: 300)
+
+                            Spacer()
+                        }
+                        Spacer()
+                    }.padding()
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }.background(
-           backgroundView()
+            backgroundView()
         )
     }
 
     @ViewBuilder
     func headerView() -> some View {
-        if navigationViewModel.shouldShowHeader {
+        if navigationViewModel.bodyViewType != .createProfile {
             VStack {
 
                 DashboardHeaderView(statusText: containerViewModel.headerStatusText,
                                     displayProfileButton: navigationViewModel.bodyViewType != .gettingStarted,
                                     faqButtonClicked: {
                     print("FAQ")
+                    shouldShowDebugUI.toggle()
                 },
                                     editProfileClicked: {
                     navigationViewModel.updateNavigation(.createProfile)
@@ -201,7 +124,7 @@ struct DataBrokerProtectionContainerView: View {
 
     @ViewBuilder
     func backgroundView() -> some View {
-        if navigationViewModel.shouldShowHeader {
+        if  navigationViewModel.bodyViewType != .createProfile {
             Color("background-color", bundle: .module)
         } else {
             Image("background-pattern", bundle: .module)

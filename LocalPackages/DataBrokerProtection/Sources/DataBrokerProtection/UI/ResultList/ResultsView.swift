@@ -118,13 +118,18 @@ private struct PendingProfileRow: View {
             HStack {
                 Label {
                     Text(pendingProfile.dataBroker)
+                        .frame(width: 220, alignment: .leading)
+
                 } icon: {
                     Image(systemName: pendingProfile.hasError ? "exclamationmark.triangle.fill" : "clock.fill")
                         .foregroundColor(.yellow)
                 }
                 Spacer()
                 Label {
-                    Text("John Smith")
+                    Text(pendingProfile.profile)
+                        .lineLimit(1)
+                        .frame(width: 180, alignment: .leading)
+
                 } icon: {
                     Image(systemName: "person")
                 }

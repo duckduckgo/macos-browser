@@ -21,6 +21,12 @@ import Common
 import BrowserServicesKit
 
 public final class DataBrokerProtectionScheduler {
+    enum Status {
+        case stopped
+        case idle
+        case running
+    }
+
     private enum SchedulerCycle {
         // Arbitrary numbers for now
 
@@ -37,6 +43,7 @@ public final class DataBrokerProtectionScheduler {
     private let notificationCenter: NotificationCenter
     private let emailService: EmailServiceProtocol
     private let captchaService: CaptchaServiceProtocol
+    @Published var status: Status = .stopped
 
     lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
@@ -79,11 +86,16 @@ public final class DataBrokerProtectionScheduler {
     public func start(debug: Bool = true) {
         os_log("Starting scheduler...", log: .dataBrokerProtection)
         if debug {
-            self.dataBrokerProcessor.runQueuedOperations()
+            self.status = .running
+            self.dataBrokerProcessor.runQueuedOperations {  [weak self] in
+                self?.status = .idle
+            }
         } else {
             activity.schedule { completion in
+                self.status = .running
                 os_log("Scheduler running...", log: .dataBrokerProtection)
-                self.dataBrokerProcessor.runQueuedOperations {
+                self.dataBrokerProcessor.runQueuedOperations { [weak self] in
+                    self?.status = .idle
                     completion(.finished)
                 }
             }
@@ -93,6 +105,7 @@ public final class DataBrokerProtectionScheduler {
     public func stop() {
         os_log("Stopping scheduler...", log: .dataBrokerProtection)
         activity.invalidate()
+        status = .stopped
     }
 
     public func scanAllBrokers(completion: (() -> Void)? = nil) {
