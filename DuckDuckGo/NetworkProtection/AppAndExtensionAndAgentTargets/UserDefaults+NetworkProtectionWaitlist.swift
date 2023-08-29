@@ -26,6 +26,16 @@ enum WaitlistBetaActive: Int {
     static let `default`: WaitlistBetaActive = .on
 }
 
+protocol WaitlistBetaOverriding {
+    var betaActive: WaitlistBetaActive { get }
+}
+
+class DefaultWaitlistBetaOverrides: WaitlistBetaOverriding {
+    var betaActive: WaitlistBetaActive {
+        .init(rawValue: UserDefaults.shared.networkProtectionWaitlistBetaActiveOverrideRawValue) ?? .default
+    }
+}
+
 extension UserDefaults {
     // Convenience declaration
     var networkProtectionWaitlistBetaActiveOverrideRawValueKey: String {
@@ -36,9 +46,9 @@ extension UserDefaults {
     /// extension, and the key for this property must match its name exactly.
     ///
     @objc
-    dynamic var networkProtectionWaitlistBetaActiveOverrideRawValue: Bool {
+    dynamic var networkProtectionWaitlistBetaActiveOverrideRawValue: Int {
         get {
-            value(forKey: networkProtectionWaitlistBetaActiveOverrideRawValueKey) as? Bool ?? false
+            value(forKey: networkProtectionWaitlistBetaActiveOverrideRawValueKey) as? Int ?? WaitlistBetaActive.default.rawValue
         }
 
         set {
