@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import CoreGraphics
 
 extension NSWorkspace {
 
@@ -26,6 +27,35 @@ extension NSWorkspace {
         else { return nil }
 
         return bundle.displayName
+    }
+
+    static func isMissionControlActive() -> Bool {
+        guard let visibleWindows = CGWindowListCopyWindowInfo(.optionOnScreenOnly, CGWindowID(0)) as? [[CFString: Any]] else {
+            assertionFailure("CGWindowListCopyWindowInfo doesn‘t work anymore")
+            return false
+        }
+
+        let allScreenSizes = NSScreen.screens.map(\.frame.size)
+
+        // here‘s the trick: normally the Dock App only displays full-screen overlay windows drawing the Dock
+        // when the Mission Control is activated, the Dock presents multiple window tiles for each visible window
+        // so here we filter out all the screen-sized windows and if the resulting list is not empty it may
+        // mean that Mission Control is active
+        let missionControlWindows = visibleWindows.filter { window in
+            windowName(window) == "Dock" && !allScreenSizes.contains(windowSize(window))
+        }
+
+        func windowName(_ dict: [CFString: Any]) -> String? {
+            dict[kCGWindowOwnerName] as? String
+        }
+        func windowSize(_ dict: [CFString: Any]) -> NSSize {
+            guard let bounds = dict[kCGWindowBounds] as? [String: NSNumber],
+                  let width = bounds["Width"]?.intValue,
+                  let height = bounds["Height"]?.intValue else { return .zero }
+            return NSSize(width: width, height: height)
+        }
+
+        return missionControlWindows.count > allScreenSizes.count
     }
 
 }

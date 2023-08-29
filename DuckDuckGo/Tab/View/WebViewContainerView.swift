@@ -87,7 +87,9 @@ final class WebViewContainerView: NSView {
                       !(fullScreenWindowController is MainWindowController) else { return }
 
                 fullScreenWindowController.associatedTab = tab
+
                 self.observeTabMainWindow(fullScreenWindowController)
+                self.observeFullScreenWindowWillExitFullScreen(fullScreenWindow)
             }
             .store(in: &cancellables)
     }
@@ -108,6 +110,31 @@ final class WebViewContainerView: NSView {
                 // when the Full Screen Window Controller receives Main Menu events
                 // they should be redirected to the Tab‘s MainViewController
                 fullScreenWindowController.nextResponder = mainViewController
+            }
+            .store(in: &cancellables)
+    }
+
+    // fix a glitch scaling down Full Screen layer on next Full Screen activation
+    // after exiting Full Screen by dragging the window out in Mission Control
+    // (three-fingers-up swipe)
+    // see https://app.asana.com/0/1177771139624306/1204370242122745/f
+    private func observeFullScreenWindowWillExitFullScreen(_ fullScreenWindow: NSWindow) {
+        NotificationCenter.default.publisher(for: NSWindow.willExitFullScreenNotification, object: fullScreenWindow)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.cancellables.removeAll()
+
+                if NSWorkspace.isMissionControlActive() {
+                    // closeAllMediaPresentations causes all Full Screen windows to be closed and removed from their WebViews
+                    // (and reinstantiated the next time Full Screen is requested)
+                    // this would slightly break UX in case multiple Full Screen windows are open but it fixes the bug
+                    if #available(macOS 12.0, *) {
+                        webView.closeAllMediaPresentations {}
+                    } else if #available(macOS 11.4, *) {
+                        webView.closeAllMediaPresentations()
+                    }
+
+                }
             }
             .store(in: &cancellables)
     }
