@@ -59,6 +59,14 @@ final class NetworkProtectionWaitlistMenu: NSMenu {
                          defaults: .shared)
     private var waitlistEnabledOverrideValue: Int
 
+    // MARK: - Misc IBActions
+
+    @IBAction
+    func waitlistResetFeatureOverrides(sender: NSMenuItem) {
+        waitlistActiveOverrideValue = WaitlistOverride.default.rawValue
+        waitlistEnabledOverrideValue = WaitlistOverride.default.rawValue
+    }
+
     // MARK: - Waitlist Active IBActions
 
     @IBAction
