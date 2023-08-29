@@ -37,47 +37,91 @@ import NetworkProtectionUI
 @MainActor
 final class NetworkProtectionWaitlistMenu: NSMenu {
 
-    @IBOutlet weak var useRemoteValueMenuItem: NSMenuItem!
-    @IBOutlet weak var overrideONMenuItem: NSMenuItem!
-    @IBOutlet weak var overrideOFFMenuItem: NSMenuItem!
+    // MARK: - Waitlist Active Properties
 
-    @UserDefaultsWrapper(key: .networkProtectionWaitlistBetaActiveOverrideRawValue,
-                         defaultValue: WaitlistBetaActive.default.rawValue,
+    @IBOutlet weak var waitlistActiveUseRemoteValueMenuItem: NSMenuItem!
+    @IBOutlet weak var waitlistActiveOverrideONMenuItem: NSMenuItem!
+    @IBOutlet weak var waitlistActiveOverrideOFFMenuItem: NSMenuItem!
+
+    @UserDefaultsWrapper(key: .networkProtectionWaitlistActiveOverrideRawValue,
+                         defaultValue: WaitlistOverride.default.rawValue,
                          defaults: .shared)
-    private var overrideValue: Int
+    private var waitlistActiveOverrideValue: Int
+
+    // MARK: - Waitlist Enabled Properties
+
+    @IBOutlet weak var waitlistEnabledUseRemoteValueMenuItem: NSMenuItem!
+    @IBOutlet weak var waitlistEnabledOverrideONMenuItem: NSMenuItem!
+    @IBOutlet weak var waitlistEnabledOverrideOFFMenuItem: NSMenuItem!
+
+    @UserDefaultsWrapper(key: .networkProtectionWaitlistEnabledOverrideRawValue,
+                         defaultValue: WaitlistOverride.default.rawValue,
+                         defaults: .shared)
+    private var waitlistEnabledOverrideValue: Int
+
+    // MARK: - Waitlist Active IBActions
 
     @IBAction
-    func waitlistBetaActiveUseRemoteValue(sender: NSMenuItem) {
-        overrideValue = WaitlistBetaActive.useRemoteValue.rawValue
+    func waitlistActiveUseRemoteValue(sender: NSMenuItem) {
+        waitlistActiveOverrideValue = WaitlistOverride.useRemoteValue.rawValue
     }
 
     @IBAction
-    func waitlistBetaActiveOverrideON(sender: NSMenuItem) {
-        overrideValue = WaitlistBetaActive.on.rawValue
+    func waitlistActiveOverrideON(sender: NSMenuItem) {
+        waitlistActiveOverrideValue = WaitlistOverride.on.rawValue
     }
 
     @IBAction
-    func waitlistBetaActiveOverrideOFF(sender: NSMenuItem) {
+    func waitlistActiveOverrideOFF(sender: NSMenuItem) {
         Task { @MainActor in
-            guard case .alertFirstButtonReturn = await betaActiveOFFAlert().runModal() else {
+            guard case .alertFirstButtonReturn = await waitlistOFFAlert().runModal() else {
                 return
             }
 
-            overrideValue = WaitlistBetaActive.off.rawValue
+            waitlistActiveOverrideValue = WaitlistOverride.off.rawValue
         }
     }
 
+    // MARK: - Waitlist Enabled IBActions
+
+    @IBAction
+    func waitlistEnabledUseRemoteValue(sender: NSMenuItem) {
+        waitlistEnabledOverrideValue = WaitlistOverride.useRemoteValue.rawValue
+    }
+
+    @IBAction
+    func waitlistEnabledOverrideON(sender: NSMenuItem) {
+        waitlistEnabledOverrideValue = WaitlistOverride.on.rawValue
+    }
+
+    @IBAction
+    func waitlistEnabledOverrideOFF(sender: NSMenuItem) {
+        Task { @MainActor in
+            guard case .alertFirstButtonReturn = await waitlistOFFAlert().runModal() else {
+                return
+            }
+
+            waitlistEnabledOverrideValue = WaitlistOverride.off.rawValue
+        }
+    }
+
+    // MARK: - Updating the menu state
+
     override func update() {
-        useRemoteValueMenuItem.state = overrideValue == WaitlistBetaActive.useRemoteValue.rawValue ? .on : .off
-        overrideONMenuItem.state = overrideValue == WaitlistBetaActive.on.rawValue ? .on : .off
-        overrideOFFMenuItem.state = overrideValue == WaitlistBetaActive.off.rawValue ? .on : .off
+        waitlistActiveUseRemoteValueMenuItem.state = waitlistActiveOverrideValue == WaitlistOverride.useRemoteValue.rawValue ? .on : .off
+        waitlistActiveOverrideONMenuItem.state = waitlistActiveOverrideValue == WaitlistOverride.on.rawValue ? .on : .off
+        waitlistActiveOverrideOFFMenuItem.state = waitlistActiveOverrideValue == WaitlistOverride.off.rawValue ? .on : .off
+
+        waitlistEnabledUseRemoteValueMenuItem.state = waitlistEnabledOverrideValue == WaitlistOverride.useRemoteValue.rawValue ? .on : .off
+        waitlistEnabledOverrideONMenuItem.state = waitlistEnabledOverrideValue == WaitlistOverride.on.rawValue ? .on : .off
+        waitlistEnabledOverrideOFFMenuItem.state = waitlistEnabledOverrideValue == WaitlistOverride.off.rawValue ? .on : .off
     }
 
     // MARK: - UI Additions
 
-    private func betaActiveOFFAlert() -> NSAlert {
+    private func waitlistOFFAlert() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Override waitlistBetaActive to OFF value?"
+        alert.messageText = "Override to OFF value?"
         alert.informativeText = """
         This will potentially disable Network Protection and erase your invitation.
 

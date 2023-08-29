@@ -67,12 +67,8 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         isWaitlistEnabled && isWaitlistBetaActive
     }
 
-    private var isWaitlistEnabled: Bool {
-        true // Will be replaced with privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlist)
-    }
-
     private var isWaitlistBetaActive: Bool {
-        switch featureOverrides.betaActive {
+        switch featureOverrides.waitlistActive {
         case .useRemoteValue:
             guard privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlistBetaActive) else {
 
@@ -81,6 +77,17 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
             }
 
             return true
+        case .on:
+            return true
+        case .off:
+            return false
+        }
+    }
+
+    private var isWaitlistEnabled: Bool {
+        switch featureOverrides.waitlistEnabled {
+        case .useRemoteValue:
+            return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlist)
         case .on:
             return true
         case .off:

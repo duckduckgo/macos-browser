@@ -18,28 +18,35 @@
 
 import Foundation
 
-enum WaitlistBetaActive: Int {
+enum WaitlistOverride: Int {
     case useRemoteValue = 0
     case on
     case off
 
-    static let `default`: WaitlistBetaActive = .on
+    static let `default`: WaitlistOverride = .on
 }
 
 protocol WaitlistBetaOverriding {
-    var betaActive: WaitlistBetaActive { get }
+    var waitlistActive: WaitlistOverride { get }
+    var waitlistEnabled: WaitlistOverride { get }
 }
 
-class DefaultWaitlistBetaOverrides: WaitlistBetaOverriding {
-    var betaActive: WaitlistBetaActive {
-        .init(rawValue: UserDefaults.shared.networkProtectionWaitlistBetaActiveOverrideRawValue) ?? .default
+final class DefaultWaitlistBetaOverrides: WaitlistBetaOverriding {
+    private let userDefaults: UserDefaults = .shared
+
+    var waitlistActive: WaitlistOverride {
+        .init(rawValue: userDefaults.networkProtectionWaitlistBetaActiveOverrideRawValue) ?? .default
+    }
+
+    var waitlistEnabled: WaitlistOverride {
+        .init(rawValue: userDefaults.networkProtectionWaitlistBetaActiveOverrideRawValue) ?? .default
     }
 }
 
 extension UserDefaults {
     // Convenience declaration
-    var networkProtectionWaitlistBetaActiveOverrideRawValueKey: String {
-        UserDefaultsWrapper<Any>.Key.networkProtectionWaitlistBetaActiveOverrideRawValue.rawValue
+    var networkProtectionWaitlistActiveOverrideRawValueKey: String {
+        UserDefaultsWrapper<Any>.Key.networkProtectionWaitlistActiveOverrideRawValue.rawValue
     }
 
     /// For KVO to work across processes (Menu App + Main App) we need to declare this dynamic var in a `UserDefaults`
@@ -48,11 +55,30 @@ extension UserDefaults {
     @objc
     dynamic var networkProtectionWaitlistBetaActiveOverrideRawValue: Int {
         get {
-            value(forKey: networkProtectionWaitlistBetaActiveOverrideRawValueKey) as? Int ?? WaitlistBetaActive.default.rawValue
+            value(forKey: networkProtectionWaitlistActiveOverrideRawValueKey) as? Int ?? WaitlistOverride.default.rawValue
         }
 
         set {
-            set(newValue, forKey: networkProtectionWaitlistBetaActiveOverrideRawValueKey)
+            set(newValue, forKey: networkProtectionWaitlistActiveOverrideRawValueKey)
+        }
+    }
+
+    // Convenience declaration
+    var networkProtectionWaitlistEnabledOverrideRawValueKey: String {
+        UserDefaultsWrapper<Any>.Key.networkProtectionWaitlistEnabledOverrideRawValue.rawValue
+    }
+
+    /// For KVO to work across processes (Menu App + Main App) we need to declare this dynamic var in a `UserDefaults`
+    /// extension, and the key for this property must match its name exactly.
+    ///
+    @objc
+    dynamic var networkProtectionWaitlistEnabledOverrideRawValue: Int {
+        get {
+            value(forKey: networkProtectionWaitlistEnabledOverrideRawValueKey) as? Int ?? WaitlistOverride.default.rawValue
+        }
+
+        set {
+            set(newValue, forKey: networkProtectionWaitlistEnabledOverrideRawValueKey)
         }
     }
 }
