@@ -1033,14 +1033,26 @@ CQ
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <menu key="submenu" title="Waitlist" id="M1G-na-mOc" customClass="NetworkProtectionWaitlistMenu" customModule="DuckDuckGo_Privacy_Browser">
                                                             <items>
-                                                                <menuItem title="Overrides" id="iYI-Zc-Jum">
+                                                                <menuItem title="Waitlist Beta Active" id="iYI-Zc-Jum">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
-                                                                    <menu key="submenu" title="Overrides" id="6jM-ds-gYu">
+                                                                    <menu key="submenu" title="Waitlist Beta Active" id="6jM-ds-gYu">
                                                                         <items>
-                                                                            <menuItem title="Waitlist Ended" id="E15-lj-ZHB">
+                                                                            <menuItem title="Remote (default)" id="3Kd-XZ-Odx">
                                                                                 <modifierMask key="keyEquivalentModifierMask"/>
                                                                                 <connections>
-                                                                                    <action selector="toggleWaitlistEndedWithSender:" target="M1G-na-mOc" id="dhW-nS-EVr"/>
+                                                                                    <action selector="waitlistBetaActiveUseRemoteValueWithSender:" target="M1G-na-mOc" id="TQQ-Fo-WyI"/>
+                                                                                </connections>
+                                                                            </menuItem>
+                                                                            <menuItem title="ON" id="E15-lj-ZHB">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                                <connections>
+                                                                                    <action selector="waitlistBetaActiveOverrideONSender:" target="M1G-na-mOc" id="VY6-zn-dQc"/>
+                                                                                </connections>
+                                                                            </menuItem>
+                                                                            <menuItem title="OFF" id="8Bg-oD-OJI">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                                <connections>
+                                                                                    <action selector="waitlistBetaActiveOverrideOFFWithSender:" target="M1G-na-mOc" id="7ym-Tc-Ca2"/>
                                                                                 </connections>
                                                                             </menuItem>
                                                                         </items>
@@ -1048,7 +1060,9 @@ CQ
                                                                 </menuItem>
                                                             </items>
                                                             <connections>
-                                                                <outlet property="waitlistEndedOverrideMenuItem" destination="E15-lj-ZHB" id="NqW-Ch-qzH"/>
+                                                                <outlet property="overrideOFFMenuItem" destination="8Bg-oD-OJI" id="X6S-i8-oVT"/>
+                                                                <outlet property="overrideONMenuItem" destination="E15-lj-ZHB" id="paY-id-xuc"/>
+                                                                <outlet property="useRemoteValueMenuItem" destination="3Kd-XZ-Odx" id="GYU-vt-dpp"/>
                                                             </connections>
                                                         </menu>
                                                     </menuItem>
