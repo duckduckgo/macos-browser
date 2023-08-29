@@ -2084,6 +2084,9 @@
 		7BFE95592A9DF2AF0081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE95532A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift */; };
 		7BFE955A2A9DF4550081ABE9 /* NetworkProtectionWaitlistMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE95512A9DF1CE0081ABE9 /* NetworkProtectionWaitlistMenu.swift */; };
 		7BFE955B2A9DF5210081ABE9 /* NetworkProtectionWaitlistMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE95512A9DF1CE0081ABE9 /* NetworkProtectionWaitlistMenu.swift */; };
+		7BFE955E2A9E71F30081ABE9 /* NetworkProtectionFeatureVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE955D2A9E71F30081ABE9 /* NetworkProtectionFeatureVisibility.swift */; };
+		7BFE955F2A9E71F30081ABE9 /* NetworkProtectionFeatureVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE955D2A9E71F30081ABE9 /* NetworkProtectionFeatureVisibility.swift */; };
+		7BFE95602A9E71F30081ABE9 /* NetworkProtectionFeatureVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE955D2A9E71F30081ABE9 /* NetworkProtectionFeatureVisibility.swift */; };
 		85012B0229133F9F003D0DCC /* NavigationBarPopovers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */; };
 		850E8DFB2A6FEC5E00691187 /* BookmarksBarAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */; };
 		8511E18425F82B34002F516B /* 01_Fire_really_small.json in Resources */ = {isa = PBXBuildFile; fileRef = 8511E18325F82B34002F516B /* 01_Fire_really_small.json */; };
@@ -3403,6 +3406,8 @@
 		7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionDebugMenu.swift; sourceTree = "<group>"; };
 		7BFE95512A9DF1CE0081ABE9 /* NetworkProtectionWaitlistMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionWaitlistMenu.swift; sourceTree = "<group>"; };
 		7BFE95532A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaults+NetworkProtectionWaitlist.swift"; sourceTree = "<group>"; };
+		7BFE955D2A9E71F30081ABE9 /* NetworkProtectionFeatureVisibility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NetworkProtectionFeatureVisibility.swift; path = ../../../../../Downloads/NetworkProtectionFeatureVisibility.swift; sourceTree = "<group>"; };
+		7BFE95612A9E74100081ABE9 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../../BrowserServicesKit; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
 		850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarAppearance.swift; sourceTree = "<group>"; };
 		8511E18325F82B34002F516B /* 01_Fire_really_small.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 01_Fire_really_small.json; sourceTree = "<group>"; };
@@ -4514,6 +4519,7 @@
 		378E279C2970217400FCADA2 /* LocalPackages */ = {
 			isa = PBXGroup;
 			children = (
+				7BFE95612A9E74100081ABE9 /* BrowserServicesKit */,
 				3192A2702A4C4E330084EA89 /* DataBrokerProtection */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
 				4BE15DB32A0B0DD500898243 /* NetworkProtectionUI */,
@@ -5413,6 +5419,14 @@
 			path = LetsMove1.25;
 			sourceTree = "<group>";
 		};
+		7BFE955C2A9E71E50081ABE9 /* Waitlist */ = {
+			isa = PBXGroup;
+			children = (
+				7BFE955D2A9E71F30081ABE9 /* NetworkProtectionFeatureVisibility.swift */,
+			);
+			path = Waitlist;
+			sourceTree = "<group>";
+		};
 		853014D425E6709500FB8205 /* Support */ = {
 			isa = PBXGroup;
 			children = (
@@ -5952,6 +5966,7 @@
 				AAE8B0FD258A416F00E81239 /* TabPreview */,
 				B6040859274B8C5200680351 /* UnprotectedDomains */,
 				AACF6FD426BC35C200CF09F9 /* UserAgent */,
+				7BFE955C2A9E71E50081ABE9 /* Waitlist */,
 				AA6EF9AE25066F99004754E6 /* Windows */,
 				31F28C4B28C8EE9000119F70 /* YoutubePlayer */,
 				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
@@ -8860,6 +8875,7 @@
 				3192A0A12A4C4CFF0084EA89 /* PrivacyDashboardWebView.swift in Sources */,
 				3192A0A22A4C4CFF0084EA89 /* AppearancePreferences.swift in Sources */,
 				3192A0A32A4C4CFF0084EA89 /* DownloadListCoordinator.swift in Sources */,
+				7BFE95602A9E71F30081ABE9 /* NetworkProtectionFeatureVisibility.swift in Sources */,
 				3192A0A52A4C4CFF0084EA89 /* AdClickAttributionTabExtension.swift in Sources */,
 				3192A0A62A4C4CFF0084EA89 /* NSNotificationName+Debug.swift in Sources */,
 				3192A0A72A4C4CFF0084EA89 /* NavigationBarBadgeAnimationView.swift in Sources */,
@@ -9506,6 +9522,7 @@
 				3707C72A294B5D2900682A9F /* URLExtension.swift in Sources */,
 				3706FB76293F65D500E42796 /* ASN1Parser.swift in Sources */,
 				37FD78122A29EBD100B36DB1 /* SyncErrorHandler.swift in Sources */,
+				7BFE955F2A9E71F30081ABE9 /* NetworkProtectionFeatureVisibility.swift in Sources */,
 				987799F42999993C005D8EB6 /* LegacyBookmarksStoreMigration.swift in Sources */,
 				3706FB7A293F65D500E42796 /* FileDownloadManager.swift in Sources */,
 				3706FB7B293F65D500E42796 /* BookmarkImport.swift in Sources */,
@@ -10640,6 +10657,7 @@
 				3154FD1428E6011A00909769 /* TabShadowView.swift in Sources */,
 				1D43EB3C292B664A0065E5D6 /* BWMessageIdGenerator.swift in Sources */,
 				4BA1A6A5258B07DF00F6F690 /* EncryptedValueTransformer.swift in Sources */,
+				7BFE955E2A9E71F30081ABE9 /* NetworkProtectionFeatureVisibility.swift in Sources */,
 				B634DBE1293C8FD500C3C99E /* Tab+Dialogs.swift in Sources */,
 				4B92929F26670D2A00AD2C21 /* PasteboardBookmark.swift in Sources */,
 				37BF3F14286D8A6500BD9014 /* PinnedTabsManager.swift in Sources */,
