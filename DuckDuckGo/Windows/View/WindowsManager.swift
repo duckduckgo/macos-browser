@@ -122,6 +122,7 @@ final class WindowsManager {
 
     private static let defaultPopUpWidth: CGFloat = 1024
     private static let defaultPopUpHeight: CGFloat = 752
+    private static let fallbackHeadlessScreenFrame = NSRect(x: 0, y: 100, width: 1280, height: 900)
 
     class func openPopUpWindow(with tab: Tab, origin: NSPoint?, contentSize: NSSize?) {
         if let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController,
@@ -131,16 +132,13 @@ final class WindowsManager {
             mainWindowController.mainViewController.tabCollectionViewModel.insert(tab, selected: true)
 
         } else {
-            let screenFrame = (self.findPositioningSourceWindow(for: tab)?.screen ?? .main)?.visibleFrame
-                // fallback for headless state
-                ?? NSRect(x: 0, y: 100, width: 1280, height: 900)
+            let screenFrame = (self.findPositioningSourceWindow(for: tab)?.screen ?? .main)?.visibleFrame ?? Self.fallbackHeadlessScreenFrame
 
             // limit popUp content size to screen visible frame
             // fallback to default if nil or zero
-            let contentSize = contentSize.map { size in
-                NSSize(width: size.width > 0 ? min(screenFrame.width, size.width) : Self.defaultPopUpWidth,
-                       height: size.height > 0 ? min(screenFrame.height, size.height) : Self.defaultPopUpHeight)
-            } ?? NSSize(width: Self.defaultPopUpWidth, height: Self.defaultPopUpHeight)
+            var contentSize = contentSize ?? .zero
+            contentSize = NSSize(width: min(screenFrame.width, contentSize.width > 0 ? contentSize.width : Self.defaultPopUpWidth),
+                                 height: min(screenFrame.height, contentSize.height > 0 ? contentSize.height : Self.defaultPopUpHeight))
 
             // if origin provided, popup should be fully positioned on screen
             let origin = origin.map { origin in
