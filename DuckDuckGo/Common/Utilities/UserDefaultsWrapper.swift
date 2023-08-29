@@ -152,7 +152,7 @@ public struct UserDefaultsWrapper<T> {
         // or else KVO will just not work as of 2023-08-07
 
         case networkProtectionOnboardingStatusRawValue = "networkProtectionOnboardingStatusRawValue"
-        case networkProtectionWaitlistEndedOverride = "networkProtectionWaitlistEndedOverride"
+        case networkProtectionWaitlistBetaActiveOverrideRawValue = "networkProtectionWaitlistBetaActiveOverrideRawValue"
 
         // Experiments
         case pixelExperimentInstalled = "pixel.experiment.installed"
