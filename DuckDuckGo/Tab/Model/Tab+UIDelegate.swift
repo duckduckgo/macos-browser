@@ -113,7 +113,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                 completionHandler(nil)
                 return
             }
-            let webView = self.createWebView(from: webView, with: configuration, for: navigationAction, of: .popup(size: windowFeatures.windowContentSize))
+            let webView = self.createWebView(from: webView, with: configuration, for: navigationAction, of: .popup(origin: windowFeatures.origin, size: windowFeatures.size))
 
             completionHandler(webView)
         }
