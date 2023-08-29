@@ -183,8 +183,7 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
 
         let attributedTempListName = AdClickAttributionRulesProvider.Constants.attributedTempRuleListName
 
-        guard dependencies.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking)
-        else {
+        guard dependencies.privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .contentBlocking) else {
             userContentController.removeLocalContentRuleList(withIdentifier: attributedTempListName)
             contentBlockerRulesScript?.currentAdClickAttributionVendor = nil
             contentBlockerRulesScript?.supplementaryTrackerData = []
@@ -215,17 +214,21 @@ extension AdClickAttributionTabExtension: AdClickAttributionLogicDelegate {
 
 extension AdClickAttributionTabExtension: NavigationResponder {
 
+    @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         if navigationAction.isForMainFrame, navigationAction.navigationType.isBackForward {
+
             logic.onBackForwardNavigation(mainFrameURL: navigationAction.url)
         }
         return .next
     }
 
+    @MainActor
     func didStart(_ navigation: Navigation) {
         detection.onStartNavigation(url: navigation.url)
     }
 
+    @MainActor
     func decidePolicy(for navigationResponse: NavigationResponse) async -> NavigationResponsePolicy? {
         if navigationResponse.isForMainFrame,
            let currentNavigation = navigationResponse.mainFrameNavigation,
@@ -238,12 +241,14 @@ extension AdClickAttributionTabExtension: NavigationResponder {
         return .next
     }
 
+    @MainActor
     func navigationDidFinish(_ navigation: Navigation) {
         guard navigation.isCurrent else { return }
         detection.onDidFinishNavigation(url: navigation.url)
         logic.onDidFinishNavigation(host: navigation.url.host, currentTime: dateTimeProvider())
     }
 
+    @MainActor
     func navigation(_ navigation: Navigation, didFailWith error: WKError) {
         guard navigation.isCurrent else { return }
         detection.onDidFailNavigation()
