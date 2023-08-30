@@ -64,7 +64,8 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// Waitlist users are users that have the waitlist enabled and active
     ///
     private var isWaitlistUser: Bool {
-        isWaitlistEnabled && isWaitlistBetaActive
+        false
+        // Once we are able to support the waitlist, this will be changed to: isWaitlistEnabled && isWaitlistBetaActive
     }
 
     private var isWaitlistBetaActive: Bool {

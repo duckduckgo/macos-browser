@@ -23,7 +23,7 @@ enum WaitlistOverride: Int {
     case on
     case off
 
-    static let `default`: WaitlistOverride = .off
+    static let `default`: WaitlistOverride = .on
 }
 
 protocol WaitlistBetaOverriding {
