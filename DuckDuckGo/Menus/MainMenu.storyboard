@@ -1035,13 +1035,6 @@ CQ
                                                             <items>
                                                                 <menuItem title="Reset Waitlist Overrides" id="soP-sz-xwK">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
-                                                                    <menu key="submenu" title="Reset Waitlist Overrides" id="PXn-zq-heS">
-                                                                        <items>
-                                                                            <menuItem title="Item" id="gcW-v9-DIa">
-                                                                                <modifierMask key="keyEquivalentModifierMask"/>
-                                                                            </menuItem>
-                                                                        </items>
-                                                                    </menu>
                                                                     <connections>
                                                                         <action selector="waitlistResetFeatureOverridesWithSender:" target="M1G-na-mOc" id="UyM-sh-9EK"/>
                                                                     </connections>
