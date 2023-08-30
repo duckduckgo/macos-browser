@@ -151,7 +151,7 @@ extension ProductWaitlistRequest {
 struct NetworkProtectionWaitlist: Waitlist {
 
     static let identifier: String = "networkprotection"
-    static let apiProductName: String = "networkprotection" // TODO: Change to `networkprotection_mac` once available
+    static let apiProductName: String = "networkprotection_macos"
 
     static let shared: NetworkProtectionWaitlist = .init()
 
@@ -200,7 +200,7 @@ struct NetworkProtectionWaitlist: Waitlist {
                         try await networkProtectionCodeRedemption.redeem(inviteCode)
                         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
                     } catch {
-                        // TODO: Handle storage errors
+                        assertionFailure("Failed to redeem invite code")
                     }
                 }
             }
