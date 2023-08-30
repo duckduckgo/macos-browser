@@ -5,7 +5,7 @@ on:
     inputs:
       atb-variants:
         description: "ATB variants (comma-separated)"
-        required: false
+        required: true
         type: string
 
 jobs:
