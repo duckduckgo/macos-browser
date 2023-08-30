@@ -599,7 +599,6 @@ extension MainViewController {
 
 }
 
-
 extension Notification.Name {
     static let displayCannotOpenFileAlert = Notification.Name("displayCannotOpenFileAlert")
 }
