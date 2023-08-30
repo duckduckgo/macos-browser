@@ -96,9 +96,11 @@ struct DBPUICommunicationLayer: Subfeature {
         }
 
         if result.version != Constants.version {
+            os_log("Incorrect protocol version presented by UI", log: .dataBrokerProtection)
             return DBPUIStandardResponse(version: Constants.version, success: false)
         }
 
+        os_log("Successful handshake made by UI", log: .dataBrokerProtection)
         return DBPUIStandardResponse(version: Constants.version, success: true)
     }
 
