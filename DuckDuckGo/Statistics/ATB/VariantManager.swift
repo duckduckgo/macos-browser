@@ -165,15 +165,15 @@ final class CampaignVariant {
         return nil
     }
 
-    private var daysSinceInstall: Int {
+    func daysSinceInstall(_ today: Date = Date()) -> Int {
         guard let installDate = statisticsStore.installDate,
-              let days = Calendar.current.numberOfDaysBetween(installDate, and: Date()) else { return -1 }
+              let days = Calendar.current.numberOfDaysBetween(installDate, and: today) else { return -1 }
         return days
     }
 
     var isActive: Bool {
         // 93 days is used for our campaign specific retention calculations
-        return isCampaignVariant && (0...93).contains(daysSinceInstall)
+        return isCampaignVariant && (0...93).contains(daysSinceInstall())
     }
 
     func cleanUp() {
