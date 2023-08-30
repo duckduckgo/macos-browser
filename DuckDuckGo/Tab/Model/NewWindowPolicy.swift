@@ -58,18 +58,4 @@ extension WKWindowFeatures {
         return NSSize(width: self.width?.intValue ?? 0, height: self.height?.intValue ?? 0)
     }
 
-    var descr: String {
-        ["menuBarVisibility": menuBarVisibility,
-         "statusBarVisibility": statusBarVisibility,
-         "toolbarsVisibility": toolbarsVisibility,
-         "allowsResizing": allowsResizing,
-         "x": x,
-         "y": y,
-         "width": width,
-         "height": height,
-         "_locationBarVisibility": value(forKey: "_locationBarVisibility"),
-         "_scrollbarsVisibility": value(forKey: "_scrollbarsVisibility"),
-         "_fullscreenDisplay": value(forKey: "_fullscreenDisplay"),
-         "_dialogDisplay": value(forKey: "_dialogDisplay")].description
-    }
 }
