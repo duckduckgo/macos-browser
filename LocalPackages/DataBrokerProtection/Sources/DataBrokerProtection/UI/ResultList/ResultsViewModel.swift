@@ -61,7 +61,7 @@ final class ResultsViewModel: ObservableObject {
         self.dataManager = dataManager
         self.notificationCenter = notificationCenter
 
-        updateUI()
+        updateUI(ignoresCache: false)
         setupNotifications()
     }
 
@@ -77,8 +77,8 @@ final class ResultsViewModel: ObservableObject {
                                        object: nil)
     }
 
-    private func updateUI() {
-        let brokersInfoData = dataManager.fetchBrokerProfileQueryData()
+    private func updateUI(ignoresCache: Bool) {
+        let brokersInfoData = dataManager.fetchBrokerProfileQueryData(ignoresCache: ignoresCache)
         var removedProfiles = [RemovedProfile]()
         var pendingProfiles = [PendingProfile]()
 
@@ -119,7 +119,8 @@ final class ResultsViewModel: ObservableObject {
 
     @objc public func reloadData() {
         DispatchQueue.main.async {
-            self.updateUI()
+
+            self.updateUI(ignoresCache: true)
         }
     }
 }
