@@ -21,13 +21,13 @@ import DataBrokerProtection
 import AppKit
 import SwiftUI
 import BrowserServicesKit
+import Common
 
 public extension Notification.Name {
     static let dbpDidClose = Notification.Name("com.duckduckgo.DBP.DBPDidClose")
 }
 
 final class DBPHomeViewController: NSViewController {
-    private var debugWindowController: NSWindowController?
     private let authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData()
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
@@ -100,9 +100,7 @@ final class DBPHomeViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
 
-        if !redeemUseCase.shouldAskForInviteCode() {
-            openDebugUI()
-        } else {
+        if redeemUseCase.shouldAskForInviteCode() {
             presentInviteCodeFlow()
         }
     }
@@ -127,25 +125,6 @@ final class DBPHomeViewController: NSViewController {
         }
         parentWindowController.window?.beginSheet(newWindow)
     }
-
-    private func openDebugUI() {
-        if debugWindowController == nil {
-            let windowRect = NSRect(x: 0, y: 0, width: 1024, height: 768)
-            let debugWindow = NSWindow(contentRect: windowRect,
-                                  styleMask: [.titled, .closable, .resizable],
-                                  backing: .buffered,
-                                  defer: false)
-            debugWindow.title = "Debug Window"
-            debugWindow.center()
-            debugWindow.hidesOnDeactivate = true
-            let debugViewController = DataBrokerProtectionDebugViewController(redeemUseCase: redeemUseCase)
-            debugWindow.contentViewController = debugViewController
-
-            debugWindowController = NSWindowController(window: debugWindow)
-        }
-
-        debugWindowController?.showWindow(self)
-    }
 }
 
 extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDelegate {
@@ -153,12 +132,24 @@ extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDeleg
         presentedWindowController?.window?.close()
         presentedWindowController = nil
         attachDataBrokerContainerView()
-        openDebugUI()
     }
 
     func dataBrokerProtectionInviteDialogsViewModelDidCancel(_ viewModel: DataBrokerProtectionInviteDialogsViewModel) {
         presentedWindowController?.window?.close()
         presentedWindowController = nil
         NotificationCenter.default.post(name: .dbpDidClose, object: nil)
+    }
+}
+
+public class DataBrokerProtectionErrorHandling: EventMapping<DataBrokerProtectionOperationError> {
+
+    public init() {
+        super.init { event, _, _, _ in
+            Pixel.fire(.debug(event: .dataBrokerProtectionError, error: event.error), withAdditionalParameters: event.params)
+        }
+    }
+
+    override init(mapping: @escaping EventMapping<DataBrokerProtectionOperationError>.Mapping) {
+        fatalError("Use init()")
     }
 }
