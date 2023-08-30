@@ -35,13 +35,9 @@ final class PreviewScheduler: DataBrokerProtectionScheduler {
 final class PreviewDataManager: DataBrokerProtectionDataManaging {
     var delegate: DataBrokerProtectionDataManagerDelegate?
 
-    init(fakeBrokerFlag: FakeBrokerFlag) {
-        
-    }
+    init(fakeBrokerFlag: FakeBrokerFlag) { }
 
-    init() {
-        
-    }
+    init() { }
 
     func saveProfile(_ profile: DataBrokerProtectionProfile) { }
 
@@ -56,5 +52,4 @@ final class PreviewDataManager: DataBrokerProtectionDataManaging {
     func fetchBrokerProfileQueryData(ignoresCache: Bool) -> [BrokerProfileQueryData] {
         [BrokerProfileQueryData]()
     }
-
 }
