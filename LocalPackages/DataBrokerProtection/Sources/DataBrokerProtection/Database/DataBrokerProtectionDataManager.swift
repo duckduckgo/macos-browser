@@ -25,7 +25,7 @@ public protocol DataBrokerProtectionDataManaging {
     init(fakeBrokerFlag: FakeBrokerFlag)
     func saveProfile(_ profile: DataBrokerProtectionProfile)
     func fetchProfile() -> DataBrokerProtectionProfile?
-    func fetchProfileForUI() -> UserProfile?
+    func fetchProfileForUI() -> DBPUIUserProfile?
     func fetchDataBrokerInfoData() -> [DataBrokerInfoData]
 }
 
@@ -55,13 +55,13 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         }
     }
 
-    public func fetchProfileForUI() -> UserProfile? {
+    public func fetchProfileForUI() -> DBPUIUserProfile? {
         guard let profile = fetchProfile() else { return nil }
 
-        let names = profile.names.map { UserProfileName(first: $0.firstName, middle: $0.middleName ?? "", last: $0.lastName) }
-        let addresses = profile.addresses.map { UserProfileAddress(street: $0.street ?? "", city: $0.city, state: $0.state) }
+        let names = profile.names.map { DBPUIUserProfileName(first: $0.firstName, middle: $0.middleName ?? "", last: $0.lastName) }
+        let addresses = profile.addresses.map { DBPUIUserProfileAddress(street: $0.street ?? "", city: $0.city, state: $0.state) }
 
-        return UserProfile(names: names, birthYear: profile.birthYear, addresses: addresses)
+        return DBPUIUserProfile(names: names, birthYear: profile.birthYear, addresses: addresses)
     }
 
     public func fetchDataBrokerInfoData() -> [DataBrokerInfoData] {

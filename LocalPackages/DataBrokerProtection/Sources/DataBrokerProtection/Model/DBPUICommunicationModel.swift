@@ -18,25 +18,32 @@
 
 import Foundation
 
+/// Enum to represent the requested UI State
 public enum DBPUIState: String, Codable {
     case onboarding = "Onboarding"
     case profileReview = "ProfileReview"
     case dashboard = "Dashboard"
 }
 
+/// Handshake request from the UI
 struct DBPUIHandshake: Codable {
     let version: Int
 }
 
-struct DBPUIHandshakeResponse: Codable {
+/// Standard response from the host to the UI. The response contains the
+/// current version of the host's communication protocol and a bool value
+/// indicating if the requested operation was successful.
+struct DBPUIStandardResponse: Codable {
     let version: Int
     let success: Bool
 }
 
+/// Message to set the UI state. Sent from the UI to the host
 struct DBPUISetState: Codable {
     let state: DBPUIState
 }
 
+/// Enum representing possible scan and opt out states
 public enum DBPUIScanAndOptOutStatus: String, Codable {
     case notRunning
     case quickScan
@@ -45,50 +52,64 @@ public enum DBPUIScanAndOptOutStatus: String, Codable {
     case complete
 }
 
-public struct UserProfileName: Codable {
+/// Message Object representing a user profile name
+public struct DBPUIUserProfileName: Codable {
     let first: String
     let middle: String
     let last: String
 }
 
-public struct UserProfileAddress: Codable {
+/// Message Object representing a user profile address
+public struct DBPUIUserProfileAddress: Codable {
     let street: String
     let city: String
     let state: String
 }
 
-public struct UserProfile: Codable {
-    let names: [UserProfileName]
+/// Message Object representing a user profile containing one or more names and addresses
+/// also contains the user profile's birth year
+public struct DBPUIUserProfile: Codable {
+    let names: [DBPUIUserProfileName]
     let birthYear: Int
-    let addresses: [UserProfileAddress]
+    let addresses: [DBPUIUserProfileAddress]
 }
 
+/// Message Object representing an index. This is used to determine a particular name or
+/// address that should be removed from a user profile
 struct DBPUIIndex: Codable {
     let index: Int
 }
 
+/// Message Object representing a data broker
 struct DBPUIDataBroker: Codable {
     let name: String
 }
 
+/// Message Object representing a requested change to the user profile's brith year
 struct DBPUIBirthYear: Codable {
     let year: Int
 }
 
-struct DataBrokerProfileMatch: Codable {
+/// Message object containing information related to a profile match on a data broker
+/// The message contains the data broker on which the profile was found and the names
+/// and addresses that were matched
+struct DBPUIDataBrokerProfileMatch: Codable {
     let dataBroker: DBPUIDataBroker
-    let names: [UserProfileName]
-    let addresses: [UserProfileAddress]
+    let names: [DBPUIUserProfileName]
+    let addresses: [DBPUIUserProfileAddress]
 }
 
+/// Protocol to represent a message that can be passed from the host to the UI
 protocol DBPUISendableMessage: Codable {}
 
+/// Message to set the UI state. Sent from the host to the UI
 struct DBPUIWebSetState: DBPUISendableMessage {
     let state: DBPUIState
 }
 
+/// Message representing the state of any scans and opt outs
 struct ScanAndOptOutState: DBPUISendableMessage {
     let status: DBPUIScanAndOptOutStatus
-    let inProgressOptOuts: [DataBrokerProfileMatch]
-    let completedOptOuts: [DataBrokerProfileMatch]
+    let inProgressOptOuts: [DBPUIDataBrokerProfileMatch]
+    let completedOptOuts: [DBPUIDataBrokerProfileMatch]
 }

@@ -24,13 +24,13 @@ import Common
 
 protocol DBPUICommunicationDelegate: AnyObject {
     func setState()
-    func getUserProfile() -> UserProfile?
-    func addNameToCurrentUserProfile(_ name: UserProfileName) -> Bool
-    func removeNameFromUserProfile(_ name: UserProfileName) -> Bool
+    func getUserProfile() -> DBPUIUserProfile?
+    func addNameToCurrentUserProfile(_ name: DBPUIUserProfileName) -> Bool
+    func removeNameFromUserProfile(_ name: DBPUIUserProfileName) -> Bool
     func removeNameAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool
     func setBirthYearForCurrentUserProfile(_ year: DBPUIBirthYear)
-    func addAddressToCurrentUserProfile(_ address: UserProfileAddress) -> Bool
-    func removeAddressFromCurrentUserProfile(_ address: UserProfileAddress) -> Bool
+    func addAddressToCurrentUserProfile(_ address: DBPUIUserProfileAddress) -> Bool
+    func removeAddressFromCurrentUserProfile(_ address: DBPUIUserProfileAddress) -> Bool
     func removeAddressAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool
     func startScanAndOptOut() -> Bool
 }
@@ -92,14 +92,14 @@ struct DBPUICommunicationLayer: Subfeature {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(DBPUIHandshake.self, from: data) else {
             os_log("Failed to parse setState message", log: .dataBrokerProtection)
-            return DBPUIHandshakeResponse(version: Constants.version, success: false)
+            return DBPUIStandardResponse(version: Constants.version, success: false)
         }
 
         if result.version != Constants.version {
-            return DBPUIHandshakeResponse(version: Constants.version, success: false)
+            return DBPUIStandardResponse(version: Constants.version, success: false)
         }
 
-        return DBPUIHandshakeResponse(version: Constants.version, success: true)
+        return DBPUIStandardResponse(version: Constants.version, success: true)
     }
 
     func setState(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -122,30 +122,30 @@ struct DBPUICommunicationLayer: Subfeature {
 
     func addNameToCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
-                let result = try? JSONDecoder().decode(UserProfileName.self, from: data) else {
+                let result = try? JSONDecoder().decode(DBPUIUserProfileName.self, from: data) else {
             os_log("Failed to parse addNameToCurrentUserProfile message", log: .dataBrokerProtection)
-            return DBPUIHandshakeResponse(version: Constants.version, success: false)
+            return DBPUIStandardResponse(version: Constants.version, success: false)
         }
 
         if delegate?.addNameToCurrentUserProfile(result) == true {
-            return DBPUIHandshakeResponse(version: Constants.version, success: true)
+            return DBPUIStandardResponse(version: Constants.version, success: true)
         }
 
-        return DBPUIHandshakeResponse(version: Constants.version, success: false)
+        return DBPUIStandardResponse(version: Constants.version, success: false)
     }
 
     func removeNameFromCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
-                let result = try? JSONDecoder().decode(UserProfileName.self, from: data) else {
+                let result = try? JSONDecoder().decode(DBPUIUserProfileName.self, from: data) else {
             os_log("Failed to parse removeNameFromCurrentUserProfile message", log: .dataBrokerProtection)
             return nil
         }
 
         if delegate?.removeNameFromUserProfile(result) == true {
-            return DBPUIHandshakeResponse(version: Constants.version, success: true)
+            return DBPUIStandardResponse(version: Constants.version, success: true)
         }
 
-        return DBPUIHandshakeResponse(version: Constants.version, success: false)
+        return DBPUIStandardResponse(version: Constants.version, success: false)
     }
 
     func removeNameAtIndexFromCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -156,10 +156,10 @@ struct DBPUICommunicationLayer: Subfeature {
         }
 
         if delegate?.removeNameAtIndexFromUserProfile(result) == true {
-            return DBPUIHandshakeResponse(version: Constants.version, success: true)
+            return DBPUIStandardResponse(version: Constants.version, success: true)
         }
 
-        return DBPUIHandshakeResponse(version: Constants.version, success: false)
+        return DBPUIStandardResponse(version: Constants.version, success: false)
     }
 
     func setBirthYearForCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -176,30 +176,30 @@ struct DBPUICommunicationLayer: Subfeature {
 
     func addAddressToCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
-                let result = try? JSONDecoder().decode(UserProfileAddress.self, from: data) else {
+                let result = try? JSONDecoder().decode(DBPUIUserProfileAddress.self, from: data) else {
             os_log("Failed to parse removeNameAtIndexFromCurrentUserProfile message", log: .dataBrokerProtection)
             return nil
         }
 
         if delegate?.addAddressToCurrentUserProfile(result) == true {
-            return DBPUIHandshakeResponse(version: Constants.version, success: true)
+            return DBPUIStandardResponse(version: Constants.version, success: true)
         }
 
-        return DBPUIHandshakeResponse(version: Constants.version, success: false)
+        return DBPUIStandardResponse(version: Constants.version, success: false)
     }
 
     func removeAddressFromCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
-                let result = try? JSONDecoder().decode(UserProfileAddress.self, from: data) else {
+                let result = try? JSONDecoder().decode(DBPUIUserProfileAddress.self, from: data) else {
             os_log("Failed to parse removeNameAtIndexFromCurrentUserProfile message", log: .dataBrokerProtection)
             return nil
         }
 
         if delegate?.removeAddressFromCurrentUserProfile(result) == true {
-            return DBPUIHandshakeResponse(version: Constants.version, success: true)
+            return DBPUIStandardResponse(version: Constants.version, success: true)
         }
 
-        return DBPUIHandshakeResponse(version: Constants.version, success: false)
+        return DBPUIStandardResponse(version: Constants.version, success: false)
     }
 
     func removeAddressAtIndexFromCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -210,18 +210,18 @@ struct DBPUICommunicationLayer: Subfeature {
         }
 
         if delegate?.removeAddressAtIndexFromUserProfile(result) == true {
-            return DBPUIHandshakeResponse(version: Constants.version, success: true)
+            return DBPUIStandardResponse(version: Constants.version, success: true)
         }
 
-        return DBPUIHandshakeResponse(version: Constants.version, success: false)
+        return DBPUIStandardResponse(version: Constants.version, success: false)
     }
 
     func startScanAndOptOut(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         if delegate?.startScanAndOptOut() == true {
-            return DBPUIHandshakeResponse(version: Constants.version, success: true)
+            return DBPUIStandardResponse(version: Constants.version, success: true)
         }
 
-        return DBPUIHandshakeResponse(version: Constants.version, success: false)
+        return DBPUIStandardResponse(version: Constants.version, success: false)
     }
 
     func sendMessageToUI(method: DBPUISendableMethodName, params: DBPUISendableMessage, into webView: WKWebView) {

@@ -113,6 +113,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
             webView?.loadHTMLString(debugPage, baseURL: nil)
 
             let button = NSButton(title: "Set State", target: self, action: #selector(setUIState))
+            button.setButtonType(.momentaryLight)
             button.contentTintColor = .black
             button.frame = CGRect(x: 10, y: 100, width: 100, height: 50)
             view.addSubview(button)
@@ -133,15 +134,15 @@ extension DataBrokerProtectionViewController: DBPUICommunicationDelegate {
 
     }
 
-    func getUserProfile() -> UserProfile? {
+    func getUserProfile() -> DBPUIUserProfile? {
         return dataManager.fetchProfileForUI()
     }
 
-    func addNameToCurrentUserProfile(_ name: UserProfileName) -> Bool {
+    func addNameToCurrentUserProfile(_ name: DBPUIUserProfileName) -> Bool {
         return false
     }
 
-    func removeNameFromUserProfile(_ name: UserProfileName) -> Bool {
+    func removeNameFromUserProfile(_ name: DBPUIUserProfileName) -> Bool {
         return false
     }
 
@@ -153,11 +154,11 @@ extension DataBrokerProtectionViewController: DBPUICommunicationDelegate {
 
     }
 
-    func addAddressToCurrentUserProfile(_ address: UserProfileAddress) -> Bool {
+    func addAddressToCurrentUserProfile(_ address: DBPUIUserProfileAddress) -> Bool {
         return false
     }
 
-    func removeAddressFromCurrentUserProfile(_ address: UserProfileAddress) -> Bool {
+    func removeAddressFromCurrentUserProfile(_ address: DBPUIUserProfileAddress) -> Bool {
         return false
     }
 
