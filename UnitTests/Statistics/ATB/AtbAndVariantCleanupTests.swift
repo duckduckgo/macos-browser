@@ -37,7 +37,7 @@ class AtbAndVariantCleanupTests: XCTestCase {
         mockStorage.atb = "\(Constants.atb)\(Constants.variant)"
         mockStorage.variant = Constants.variant
 
-        AtbAndVariantCleanup.cleanup(statisticsStorage: mockStorage, variantManager: mockVariantManager)
+        AtbAndVariantCleanup.cleanup(statisticsStorage: mockStorage, variantManager: mockVariantManager, campaignVariant: CampaignVariant(statisticsStore: mockStorage))
 
         XCTAssertEqual(Constants.atb, mockStorage.atb)
 
@@ -48,7 +48,7 @@ class AtbAndVariantCleanupTests: XCTestCase {
         mockStorage.atb = "\(Constants.atb)\(Constants.variant)"
         mockStorage.variant = Constants.variant
 
-        AtbAndVariantCleanup.cleanup(statisticsStorage: mockStorage, variantManager: mockVariantManager)
+        AtbAndVariantCleanup.cleanup(statisticsStorage: mockStorage, variantManager: mockVariantManager, campaignVariant: CampaignVariant(statisticsStore: mockStorage))
 
         XCTAssertNil(mockStorage.variant)
 
@@ -62,7 +62,7 @@ class AtbAndVariantCleanupTests: XCTestCase {
         mockStorage.atb = "\(Constants.atb)\(Constants.variant)"
         mockStorage.variant = Constants.variant
 
-        AtbAndVariantCleanup.cleanup(statisticsStorage: mockStorage, variantManager: mockVariantManager)
+        AtbAndVariantCleanup.cleanup(statisticsStorage: mockStorage, variantManager: mockVariantManager, campaignVariant: CampaignVariant(statisticsStore: mockStorage))
 
         XCTAssertEqual(Constants.variant, mockStorage.variant)
 
