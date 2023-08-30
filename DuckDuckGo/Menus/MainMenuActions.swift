@@ -724,7 +724,7 @@ extension MainViewController {
                       canBeClosedWithBack: false,
                       webViewSize: .zero)
 
-        WindowsManager.openPopUpWindow(with: tab, contentSize: nil)
+        WindowsManager.openPopUpWindow(with: tab, origin: nil, contentSize: nil)
     }
 
     @IBAction func resetEmailProtectionInContextPrompt(_ sender: Any?) {
