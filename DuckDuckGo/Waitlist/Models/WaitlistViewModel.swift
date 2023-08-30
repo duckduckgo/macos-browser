@@ -178,13 +178,7 @@ public final class WaitlistViewModel: ObservableObject {
         viewState = .termsAndConditions
     }
 
-    @MainActor
     private func acceptTermsAndConditions() {
-        guard let inviteCode = waitlistStorage.getWaitlistInviteCode() else {
-            assertionFailure("Got into terms & conditions state without having an invite code")
-            return
-        }
-
         acceptedNetworkProtectionTermsAndConditions = true
         viewState = .readyToEnable
     }
