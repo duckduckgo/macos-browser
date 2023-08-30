@@ -133,17 +133,21 @@ struct DataBrokerProtectionContainerView: View {
     }
 }
 
-//TODO create scheduler protocol
-//@available(macOS 11.0, *)
-//struct DataBrokerProtectionContainerView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        let dataManager = DataBrokerProtectionDataManager()
-//        let navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
-//        let profileViewModel = ProfileViewModel(dataManager: dataManager)
-//        let resultsViewModel = ResultsViewModel(dataManager: dataManager)
-//        DataBrokerProtectionContainerView(navigationViewModel: navigationViewModel,
-//                                          profileViewModel: profileViewModel,
-//                                          resultsViewModel: resultsViewModel)
-//            .frame(width: 1024, height: 768)
-//    }
-//}
+@available(macOS 11.0, *)
+struct DataBrokerProtectionContainerView_Previews: PreviewProvider {
+    static var previews: some View {
+        let dataManager = PreviewDataManager()
+        let navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
+        let profileViewModel = ProfileViewModel(dataManager: dataManager)
+        let resultsViewModel = ResultsViewModel(dataManager: dataManager)
+        let containerViewModel = ContainerViewModel(scheduler: PreviewScheduler(), dataManager: dataManager)
+
+        DataBrokerProtectionContainerView(containerViewModel: containerViewModel,
+                                          navigationViewModel: navigationViewModel,
+                                          profileViewModel: profileViewModel,
+                                          resultsViewModel: resultsViewModel)
+        .frame(width: 1024, height: 768)
+    }
+
+
+}

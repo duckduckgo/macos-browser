@@ -47,7 +47,7 @@ final class ContainerViewModel: ObservableObject {
     }
 
     private func setupCancellable() {
-        statusCancellable = scheduler.$status
+        statusCancellable = scheduler.statusPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
 

@@ -19,13 +19,29 @@
 import Foundation
 import Common
 import BrowserServicesKit
+import Combine
 
-public final class DataBrokerProtectionScheduler {
-    enum Status {
-        case stopped
-        case idle
-        case running
+public enum DataBrokerProtectionSchedulerStatus {
+    case stopped
+    case idle
+    case running
+}
+
+public protocol DataBrokerProtectionScheduler {
+    func start(debug: Bool)
+    func stop()
+    func scanAllBrokers(completion: (() -> Void)?)
+    var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { get }
+    var status: DataBrokerProtectionSchedulerStatus { get }
+}
+
+extension DataBrokerProtectionScheduler {
+    public func start() {
+        start(debug: false)
     }
+}
+
+public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionScheduler {
 
     private enum SchedulerCycle {
         // Arbitrary numbers for now
@@ -43,9 +59,11 @@ public final class DataBrokerProtectionScheduler {
     private let notificationCenter: NotificationCenter
     private let emailService: EmailServiceProtocol
     private let captchaService: CaptchaServiceProtocol
-    @Published var status: Status = .stopped
+    
+    @Published public var status: DataBrokerProtectionSchedulerStatus = .stopped
+    public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { $status}
 
-    lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
+    private lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
         let runnerProvider = DataBrokerOperationRunnerProvider(privacyConfigManager: privacyConfigManager,
                                                                contentScopeProperties: contentScopeProperties,
@@ -83,7 +101,7 @@ public final class DataBrokerProtectionScheduler {
         self.captchaService = CaptchaService(redeemUseCase: redeemUseCase)
     }
 
-    public func start(debug: Bool = true) {
+    public func start(debug: Bool = false) {
         os_log("Starting scheduler...", log: .dataBrokerProtection)
         if debug {
             self.status = .running
@@ -112,5 +130,5 @@ public final class DataBrokerProtectionScheduler {
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
         self.dataBrokerProcessor.runScanOnAllDataBrokers(completion: completion)
     }
-
 }
+
