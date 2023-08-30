@@ -330,14 +330,10 @@ final class MainViewController: NSViewController {
     }
 
     private func subscribeToShouldDisplayCannotOpenFileAlert() {
-        tabCollectionViewModel.selectedTabViewModel?.tab.$shouldShowCannotOpenFileAlert.receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] shouldShowAlert in
-            if shouldShowAlert {
-                self?.displayCannotOpenFileAlert()
-            }
-        }).store(in: &self.navigationalCancellables)
+        NotificationCenter.default.addObserver(self, selector: #selector(displayCannotOpenFileAlert(_:)), name: .displayCannotOpenFileAlert, object: nil)
     }
 
-    private func displayCannotOpenFileAlert() {
+    @objc private func displayCannotOpenFileAlert(_ notification: Notification) {
         guard let window = self.view.window else { return }
         let alert = NSAlert.cannotOpenFileAlert()
         alert.beginSheetModal(for: window) { response in
@@ -602,4 +598,9 @@ extension MainViewController {
 
     }
 
+}
+
+
+extension Notification.Name {
+    static let displayCannotOpenFileAlert = Notification.Name("displayCannotOpenFileAlert")
 }
