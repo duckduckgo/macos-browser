@@ -48,6 +48,7 @@ jobs:
         mkdir -p dmg
         cp -R vanilla/DuckDuckGo.app dmg/DuckDuckGo.app
         hdiutil detach vanilla
+        rm -rf duckduckgo.dmg
 
     - name: Install create-dmg
       run: brew install create-dmg
