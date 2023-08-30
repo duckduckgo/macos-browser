@@ -59,7 +59,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     private let notificationCenter: NotificationCenter
     private let emailService: EmailServiceProtocol
     private let captchaService: CaptchaServiceProtocol
-    
+
     @Published public var status: DataBrokerProtectionSchedulerStatus = .stopped
     public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { $status}
 
@@ -132,4 +132,3 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         self.dataBrokerProcessor.runScanOnAllDataBrokers(completion: completion)
     }
 }
-

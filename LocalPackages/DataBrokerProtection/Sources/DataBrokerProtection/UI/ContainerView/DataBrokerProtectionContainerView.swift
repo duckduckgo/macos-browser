@@ -148,6 +148,4 @@ struct DataBrokerProtectionContainerView_Previews: PreviewProvider {
                                           resultsViewModel: resultsViewModel)
         .frame(width: 1024, height: 768)
     }
-
-
 }
