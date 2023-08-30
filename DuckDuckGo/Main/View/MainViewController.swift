@@ -245,7 +245,7 @@ final class MainViewController: NSViewController {
     private func updateBookmarksBarViewVisibility(visible: Bool) {
         let showBookmarksBar = isInPopUpWindow ? false : visible
 
-        if visible {
+        if showBookmarksBar {
             if bookmarksBarViewController.parent == nil {
                 addChild(bookmarksBarViewController)
 
