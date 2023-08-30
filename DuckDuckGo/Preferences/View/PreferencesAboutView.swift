@@ -40,6 +40,12 @@ extension Preferences {
                 Text(UserText.aboutDuckDuckGo)
                     .font(Const.Fonts.preferencePaneTitle)
 
+                if !SupportedOSChecker.isCurrentOSReceivingUpdates {
+                    UnsupportedDeviceInfoBox(wide: true)
+                        .padding(.top, 10)
+                        .padding(.leading, -20)
+                }
+
                 PreferencePaneSection {
                     HStack {
                         Image("AboutPageLogo")
@@ -76,6 +82,86 @@ extension Preferences {
                     #endif
                 }
             }
+        }
+    }
+
+    struct UnsupportedDeviceInfoBox: View {
+
+        static let softwareUpdateURL = URL(string: "x-apple.systempreferences:com.apple.preferences.softwareupdate")!
+
+        var wide: Bool
+
+        var width: CGFloat {
+            return wide ? 510 : 320
+        }
+
+        var height: CGFloat {
+            return wide ? 130 : 200
+        }
+
+        var osVersion: String {
+            return "\(ProcessInfo.processInfo.operatingSystemVersion)"
+        }
+
+        var combinedText: String {
+            return UserText.aboutUnsupportedDeviceInfo2Part1 + " " +
+            UserText.aboutUnsupportedDeviceInfo2Part2(version: versionString) + " " +
+            UserText.aboutUnsupportedDeviceInfo2Part3 + " " +
+            UserText.aboutUnsupportedDeviceInfo2Part4
+        }
+
+        var versionString: String {
+            return "\(SupportedOSChecker.SupportedVersion.major).\(SupportedOSChecker.SupportedVersion.minor)"
+        }
+
+        var body: some View {
+            let image = Image("Alert-Color-16")
+                .resizable()
+                .frame(width: 16, height: 16)
+                .padding(.trailing, 4)
+
+            let versionText = Text(UserText.aboutUnsupportedDeviceInfo1)
+
+            let narrowContentView = Text(combinedText)
+
+            let wideContentView: some View = VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .center, spacing: 0) {
+                    Text(UserText.aboutUnsupportedDeviceInfo2Part1 + " ")
+                    Button(action: {
+                        NSWorkspace.shared.open(Self.softwareUpdateURL)
+                    }) {
+                        Text(UserText.aboutUnsupportedDeviceInfo2Part2(version: versionString) + " ")
+                            .foregroundColor(Color.blue)
+                            .underline()
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .onHover { hovering in
+                        if hovering {
+                            NSCursor.pointingHand.set()
+                        } else {
+                            NSCursor.arrow.set()
+                        }
+                    }
+                    Text(UserText.aboutUnsupportedDeviceInfo2Part3)
+                }
+                Text(UserText.aboutUnsupportedDeviceInfo2Part4)
+            }
+
+            return HStack(alignment: .top) {
+                image
+                VStack(alignment: .leading, spacing: 12) {
+                    versionText
+                    if wide {
+                        wideContentView
+                    } else {
+                        narrowContentView
+                    }
+                }
+            }
+            .padding()
+            .background(Color("UnsupportedOSWarningColor"))
+            .cornerRadius(8)
+            .frame(width: width, height: height)
         }
     }
 
