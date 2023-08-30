@@ -15,7 +15,7 @@ let package = Package(
             targets: ["NetworkProtectionUI"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "75.2.2"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "75.2.3"),
         .package(path: "../SwiftUIExtensions")
     ],
     targets: [
