@@ -64,7 +64,7 @@ final class ContainerViewModel: ObservableObject {
 
     private func startSchedulerIfProfileAvailable() {
         if dataManager.fetchProfile() != nil {
-            scheduler.start()
+            startScheduler()
         }
     }
 

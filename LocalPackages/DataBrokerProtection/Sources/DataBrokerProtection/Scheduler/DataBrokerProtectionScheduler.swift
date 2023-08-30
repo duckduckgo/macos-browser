@@ -109,6 +109,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                 self?.status = .idle
             }
         } else {
+            self.status = .idle
             activity.schedule { completion in
                 self.status = .running
                 os_log("Scheduler running...", log: .dataBrokerProtection)
