@@ -343,7 +343,6 @@ final class MainViewController: NSViewController {
             default:
                 guard let addressBar = self.navigationBarViewController.addressBarViewController?.addressBarTextField else { return }
                 window.makeFirstResponder(addressBar)
-                return
             }
         }
     }
