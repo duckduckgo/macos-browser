@@ -144,7 +144,6 @@ jobs:
   mattermost:
 
     name: Send Mattermost message
-    if: always()
 
     needs: create-atb-variants
 
