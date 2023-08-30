@@ -278,6 +278,7 @@ final class MainViewController: NSViewController {
             self?.subscribeToTabContent()
             self?.adjustFirstResponder()
             self?.subscribeToTitleChange()
+            self?.subscribeToShouldDisplayCannotOpenFileAlert()
         }
     }
 
@@ -326,6 +327,29 @@ final class MainViewController: NSViewController {
             self.lastTabContent = content
             self.adjustFirstResponderOnContentChange(content: content)
         }).store(in: &self.navigationalCancellables)
+    }
+
+    private func subscribeToShouldDisplayCannotOpenFileAlert() {
+        tabCollectionViewModel.selectedTabViewModel?.tab.$shouldShowCannotOpenFileAlert.receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] shouldShowAlert in
+            if shouldShowAlert {
+                self?.displayCannotOpenFileAlert()
+            }
+        }).store(in: &self.navigationalCancellables)
+    }
+
+    private func displayCannotOpenFileAlert() {
+        guard let window = self.view.window else { return }
+        let alert = NSAlert.cannotOpenFileAlert()
+        alert.beginSheetModal(for: window) { response in
+            switch response {
+            case .alertSecondButtonReturn:
+                WindowControllersManager.shared.show(url: URL.ddgLearnMore, newTab: false)
+            default:
+                guard let addressBar = self.navigationBarViewController.addressBarViewController?.addressBarTextField else { return }
+                window.makeFirstResponder(addressBar)
+                return
+            }
+        }
     }
 
     private func updateBookmarksBar(_ content: Tab.TabContent, _ prefs: AppearancePreferences = AppearancePreferences.shared) {

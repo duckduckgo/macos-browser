@@ -517,6 +517,8 @@ protocol NewWindowPolicyDecisionMaker {
         }
     }
 
+    @Published private (set) var shouldShowCannotOpenFileAlert: Bool = false
+
     @discardableResult
     func setContent(_ newContent: TabContent) -> Task<ExpectedNavigation?, Never>? {
         guard contentChangeEnabled else { return nil }
@@ -783,6 +785,10 @@ protocol NewWindowPolicyDecisionMaker {
             }
 
             if url.isFileURL {
+#if APPSTORE
+                shouldShowCannotOpenFileAlert = true
+                shouldShowCannotOpenFileAlert = false
+#endif
                 return webView.navigator(distributedNavigationDelegate: navigationDelegate)
                     .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: navigationType)
             }

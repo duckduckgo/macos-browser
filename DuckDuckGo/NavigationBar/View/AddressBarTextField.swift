@@ -259,22 +259,6 @@ final class AddressBarTextField: NSTextField {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
-
-#if APPSTORE
-        if url.isFileURL, let window = self.window {
-            let alert = NSAlert.cannotOpenFileAlert()
-            alert.beginSheetModal(for: window) { response in
-                switch response {
-                case .alertSecondButtonReturn:
-                    WindowControllersManager.shared.show(url: URL.ddgLearnMore, newTab: false)
-                default:
-                    window.makeFirstResponder(self)
-                    return
-                }
-
-            }
-        }
-#endif
         selectedTabViewModel.tab.setUrl(providedUrl, userEntered: userEnteredValue)
 
         self.window?.makeFirstResponder(nil)
