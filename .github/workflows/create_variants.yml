@@ -137,8 +137,7 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
       run: |
-        aws s3 cp \
-          dmg/duckduckgo.dmg \
+        aws s3 cp duckduckgo.dmg \
           s3://${{ vars.RELEASE_BUCKET_NAME }}/${{ vars.RELEASE_BUCKET_PREFIX }}/${{ matrix.variant }}/duckduckgo.dmg \
           --acl public-read
 
