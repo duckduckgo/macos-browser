@@ -1,9 +1,6 @@
 name: Create DMG Variants
 
 on:
-  push:
-    branches:
-      - dominik/atb-variants
   workflow_dispatch:
     inputs:
       atb-variants:
