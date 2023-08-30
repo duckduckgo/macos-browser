@@ -75,13 +75,16 @@ final class DefaultVariantManager: VariantManager {
     private let variants: [Variant]
     private let storage: StatisticsStore
     private let rng: VariantRNG
+    private let campaignVariant: CampaignVariant
 
     init(variants: [Variant] = Variant.defaultVariants,
          storage: StatisticsStore = LocalStatisticsStore(),
-         rng: VariantRNG = Arc4RandomUniformVariantRNG()) {
+         rng: VariantRNG = Arc4RandomUniformVariantRNG(),
+         campaignVariant: CampaignVariant = CampaignVariant()) {
         self.variants = variants
         self.storage = storage
         self.rng = rng
+        self.campaignVariant = campaignVariant
     }
 
     func isSupported(feature: FeatureName) -> Bool {
@@ -113,7 +116,7 @@ final class DefaultVariantManager: VariantManager {
 
     private func selectVariant() -> String? {
         // Prioritise campaign variants
-        if let variant = CampaignVariant().getAndEnableVariant() {
+        if let variant = campaignVariant.getAndEnableVariant() {
             return variant
         }
 
@@ -146,19 +149,26 @@ final class Arc4RandomUniformVariantRNG: VariantRNG {
 
 final class CampaignVariant {
 
-    @UserDefaultsWrapper(key: .agentLaunchTime, defaultValue: false)
+    @UserDefaultsWrapper(key: .campaignVariant, defaultValue: false)
     private var isCampaignVariant: Bool
 
     private let statisticsStore: StatisticsStore
+    private let loadFromFile: () -> String?
 
-    init(statisticsStore: StatisticsStore = LocalStatisticsStore()) {
+    init(statisticsStore: StatisticsStore = LocalStatisticsStore(), loadFromFile: @escaping () -> String? = {
+        if let url = Bundle.main.url(forResource: "variant", withExtension: "txt") {
+            return try? String(contentsOf: url)
+        }
+        return nil
+    }) {
         self.statisticsStore = statisticsStore
+        self.loadFromFile = loadFromFile
     }
 
     // Should only be called during the first installation
     func getAndEnableVariant() -> String? {
         assert(statisticsStore.variant == nil)
-        if let url = Bundle.main.url(forResource: "variant", withExtension: "txt"), let string = try? String(contentsOf: url) {
+        if let string = loadFromFile() {
             isCampaignVariant = true
             return string.trimmingWhitespace()
         }
