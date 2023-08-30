@@ -126,24 +126,9 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "OptionsButtonMenuEmail"))
             .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
-#if NETWORK_PROTECTION
-        if networkProtectionFeatureVisibility.isFeatureActivated {
-            addItem(withTitle: UserText.networkProtection, action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
-                .targetting(self)
-                .withImage(.image(for: .vpnIcon))
-        }
-#endif // NETWORK_PROTECTION
-
-#if DBP
-        let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
-                                                  action: #selector(openDataBrokerProtection),
-                                                  keyEquivalent: "")
-            .targetting(self)
-            .withImage(NSImage(named: "BurnerWindowIcon2")) // PLACEHOLDER: Change it once we have the final icon
-        addItem(dataBrokerProtectionItem)
-#endif // DBP
-
         addItem(NSMenuItem.separator())
+
+        addSubscriptionItems()
 
         addPageItems()
 
@@ -288,6 +273,55 @@ final class MoreOptionsMenu: NSMenu {
             .withSubmenu(loginsSubMenu)
 
         addItem(NSMenuItem.separator())
+    }
+
+    private func addSubscriptionItems() {
+        var items: [NSMenuItem] = []
+
+#if NETWORK_PROTECTION
+        if networkProtectionFeatureVisibility.isFeatureActivated {
+            let networkProtectionItem  = NSMenuItem(title: UserText.networkProtection,
+                                                    action: #selector(showNetworkProtectionStatus(_:)),
+                                                    keyEquivalent: "")
+                .targetting(self)
+                .withImage(.image(for: .vpnIcon))
+
+        items.append(networkProtectionItem)
+        }
+#endif // NETWORK_PROTECTION
+
+#if DBP
+        let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
+                                                  action: #selector(openDataBrokerProtection),
+                                                  keyEquivalent: "")
+            .targetting(self)
+            .withImage(NSImage(named: "BurnerWindowIcon2")) // PLACEHOLDER: Change it once we have the final icon
+        items.append(dataBrokerProtectionItem)
+#endif // DBP
+
+        let privacyProItem = NSMenuItem(title: "",
+                                        action: #selector(openPreferences(_:)),
+                                        keyEquivalent: "")
+            .targetting(self)
+            .withImage(NSImage(named: "BurnerWindowIcon2"))
+
+        let imageAttachment = NSTextAttachment()
+        let image = NSImage(named: "BetaLabel")
+        imageAttachment.image = image
+        imageAttachment.bounds = CGRect(x: 0, y: -4, width: image!.size.width, height: image!.size.height)
+        let attributedText = NSMutableAttributedString(string: "Privacy Pro")
+        attributedText.append (NSAttributedString(string: "     "))
+        attributedText.append(NSAttributedString(attachment: imageAttachment))
+
+        privacyProItem.attributedTitle = attributedText
+
+        items.append(privacyProItem)
+
+        if !items.isEmpty {
+            items.forEach { addItem($0) }
+
+            addItem(NSMenuItem.separator())
+        }
     }
 
     private func addPageItems() {
