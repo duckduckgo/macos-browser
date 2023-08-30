@@ -63,7 +63,7 @@ final class DBPHomeViewController: NSViewController {
                                                 sessionKey: sessionKey,
                                                 featureToggles: features)
 
-        return DataBrokerProtectionScheduler(privacyConfigManager: privacyConfigurationManager,
+        return DefaultDataBrokerProtectionScheduler(privacyConfigManager: privacyConfigurationManager,
                                                   contentScopeProperties: prefs,
                                                   dataManager: dataManager,
                                                   notificationCenter: NotificationCenter.default,
