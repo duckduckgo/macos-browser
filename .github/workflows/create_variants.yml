@@ -48,7 +48,7 @@ jobs:
         mkdir -p dmg
         cp -R vanilla/DuckDuckGo.app dmg/DuckDuckGo.app
         hdiutil detach vanilla
-        rm -rf duckduckgo.dmg
+        rm -f duckduckgo.dmg
 
     - name: Install create-dmg
       run: brew install create-dmg
@@ -93,7 +93,7 @@ jobs:
             --options runtime \
             --entitlements entitlements.plist \
             --generate-entitlement-der "DuckDuckGo.app"
-        rm -rf entitlements.plist
+        rm -f entitlements.plist
 
     - name: Notarize the app
       env:
