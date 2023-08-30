@@ -136,7 +136,7 @@ extension Preferences {
                                     return button
                                 }.disabled(!model.isAutoLockEnabled)
                             }
-                            // We have to use a custom toggle here, as with a SwiftUI Toggle on macOS 10.x to 12.x, the checkbox gets rendered
+                            // We have to use a custom toggle here, as with a SwiftUI Toggle on macOS 10.x to 13.x, the checkbox gets rendered
                             // to the right when inside a picker 🤷
                             NativeCheckboxToggle(isOn: $model.autolockLocksFormFilling, label: UserText.autolockLocksFormFill)
                                 .disabled(!model.isAutoLockEnabled)

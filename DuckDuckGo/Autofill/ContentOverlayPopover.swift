@@ -72,8 +72,7 @@ extension ContentOverlayPopover: ContentOverlayUserScriptDelegate {
     public func websiteAutofillUserScript(_ websiteAutofillUserScript: WebsiteAutofillUserScript,
                                           willDisplayOverlayAtClick: NSPoint?,
                                           serializedInputContext: String,
-                                          inputPosition: CGRect,
-                                          containsSensitiveData: Bool) {
+                                          inputPosition: CGRect) {
         guard let overlayWindow = windowController.window,
               let currentTabView = currentTabView,
               let currentTabViewWindow = currentTabView.window else {

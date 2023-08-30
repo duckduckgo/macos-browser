@@ -604,31 +604,13 @@ extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
     public func websiteAutofillUserScript(_ websiteAutofillUserScript: WebsiteAutofillUserScript,
                                           willDisplayOverlayAtClick: NSPoint?,
                                           serializedInputContext: String,
-                                          inputPosition: CGRect,
-                                          containsSensitiveData: Bool) {
+                                          inputPosition: CGRect) {
 
-        let displayOverlay: () -> Void = { [weak self] in
-            self?.contentOverlayPopoverCreatingIfNeeded().websiteAutofillUserScript(websiteAutofillUserScript,
-                                                                                  willDisplayOverlayAtClick: willDisplayOverlayAtClick,
-                                                                                  serializedInputContext: serializedInputContext,
-                                                                                  inputPosition: inputPosition,
-                                                                                  containsSensitiveData: containsSensitiveData)
-        }
+        self.contentOverlayPopoverCreatingIfNeeded().websiteAutofillUserScript(websiteAutofillUserScript,
+                                                                              willDisplayOverlayAtClick: willDisplayOverlayAtClick,
+                                                                              serializedInputContext: serializedInputContext,
+                                                                              inputPosition: inputPosition)
 
-        // Require bio authentication for filling sensitive data via DDG password manager
-        let autofillPrefs = AutofillPreferences()
-        if DeviceAuthenticator.shared.requiresAuthentication &&
-            containsSensitiveData &&
-            autofillPrefs.autolockLocksFormFilling &&
-            autofillPrefs.passwordManager == .duckduckgo {
-            DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { result in
-                if case .success = result {
-                    displayOverlay()
-                }
-            }
-        } else {
-            displayOverlay()
-        }
     }
 
 }
