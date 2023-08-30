@@ -1746,6 +1746,9 @@
 		4B0A63E8289DB58E00378EF7 /* FirefoxFaviconsReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0A63E7289DB58E00378EF7 /* FirefoxFaviconsReader.swift */; };
 		4B0AACAC28BC63ED001038AC /* ChromiumFaviconsReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0AACAB28BC63ED001038AC /* ChromiumFaviconsReader.swift */; };
 		4B0AACAE28BC6FD0001038AC /* SafariFaviconsReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0AACAD28BC6FD0001038AC /* SafariFaviconsReader.swift */; };
+		4B0BD7B72A9FE6E500EF609D /* NetworkProtectionOnboardingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B05829D2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift */; };
+		4B0BD7B82A9FE6E600EF609D /* NetworkProtectionOnboardingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B05829D2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift */; };
+		4B0BD7B92A9FE6E900EF609D /* NetworkProtectionOnboardingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B05829D2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift */; };
 		4B0DB5E528BD9D08007DD239 /* PinningManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0DB5E428BD9D08007DD239 /* PinningManager.swift */; };
 		4B11060525903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060325903E570039B979 /* CoreDataEncryptionTesting.xcdatamodeld */; };
 		4B11060A25903EAC0039B979 /* CoreDataEncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B11060925903EAC0039B979 /* CoreDataEncryptionTests.swift */; };
@@ -2014,7 +2017,6 @@
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
 		4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */; };
 		4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B5A25B7BA50006F6B06 /* Instruments.swift */; };
-		4BB9269D2A9EDF720012E989 /* NetworkProtectionOnboardingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B05829D2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift */; };
 		4BB99CFE26FE191E001E4761 /* FirefoxBookmarksReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99CF526FE191E001E4761 /* FirefoxBookmarksReader.swift */; };
 		4BB99CFF26FE191E001E4761 /* BookmarkImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99CF626FE191E001E4761 /* BookmarkImport.swift */; };
 		4BB99D0026FE191E001E4761 /* CoreDataBookmarkImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99CF726FE191E001E4761 /* CoreDataBookmarkImporter.swift */; };
@@ -8802,7 +8804,6 @@
 				31929FC32A4C4CFF0084EA89 /* CrashReportPromptViewController.swift in Sources */,
 				31929FC42A4C4CFF0084EA89 /* BookmarksCleanupErrorHandling.swift in Sources */,
 				31929FC52A4C4CFF0084EA89 /* ContextMenuManager.swift in Sources */,
-				4BB9269D2A9EDF720012E989 /* NetworkProtectionOnboardingMenu.swift in Sources */,
 				31929FC62A4C4CFF0084EA89 /* GradientView.swift in Sources */,
 				31929FC72A4C4CFF0084EA89 /* PreferencesSidebar.swift in Sources */,
 				31929FC82A4C4CFF0084EA89 /* HoveredLinkTabExtension.swift in Sources */,
@@ -8956,6 +8957,7 @@
 				3192A0572A4C4CFF0084EA89 /* NavigationBarBadgeAnimator.swift in Sources */,
 				3192A0582A4C4CFF0084EA89 /* NSTextViewExtension.swift in Sources */,
 				3192A0592A4C4CFF0084EA89 /* FutureExtension.swift in Sources */,
+				4B0BD7B92A9FE6E900EF609D /* NetworkProtectionOnboardingMenu.swift in Sources */,
 				3192A05A2A4C4CFF0084EA89 /* UserDialogRequest.swift in Sources */,
 				3192A05B2A4C4CFF0084EA89 /* DownloadsCellView.swift in Sources */,
 				3192A05C2A4C4CFF0084EA89 /* FileImportSummaryViewController.swift in Sources */,
@@ -9576,6 +9578,7 @@
 				3706FB0E293F65D500E42796 /* FaviconManager.swift in Sources */,
 				4B8F52422A18326600BE7131 /* NetworkProtectionTunnelController.swift in Sources */,
 				3706FB0F293F65D500E42796 /* ChromiumFaviconsReader.swift in Sources */,
+				4B0BD7B82A9FE6E600EF609D /* NetworkProtectionOnboardingMenu.swift in Sources */,
 				3706FB10293F65D500E42796 /* SuggestionTableRowView.swift in Sources */,
 				3706FB11293F65D500E42796 /* DownloadsPreferences.swift in Sources */,
 				3706FB12293F65D500E42796 /* PasswordManagementItemList.swift in Sources */,
@@ -11019,6 +11022,7 @@
 				4B0511E1262CAA8600F6079C /* NSOpenPanelExtensions.swift in Sources */,
 				AAE99B8927088A19008B6BD9 /* FirePopover.swift in Sources */,
 				AAE75280263B0A4D00B973F8 /* HistoryCoordinator.swift in Sources */,
+				4B0BD7B72A9FE6E500EF609D /* NetworkProtectionOnboardingMenu.swift in Sources */,
 				B69B503D2726A12500758A2B /* VariantManager.swift in Sources */,
 				AA97BF4625135DD30014931A /* ApplicationDockMenu.swift in Sources */,
 				4B8A4DFF27C83B29005F40E8 /* SaveIdentityViewController.swift in Sources */,
