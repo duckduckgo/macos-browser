@@ -138,10 +138,8 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
         AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
       run: |
-        aws sts get-caller-identity
         aws s3 cp duckduckgo.dmg \
-          s3://${{ vars.RELEASE_BUCKET_NAME }}/${{ vars.RELEASE_BUCKET_PREFIX }}/${{ matrix.variant }}/duckduckgo.dmg \
-          --acl public-read
+          s3://${{ vars.RELEASE_BUCKET_NAME }}/${{ vars.RELEASE_BUCKET_PREFIX }}/${{ matrix.variant }}/duckduckgo.dmg
 
   mattermost:
 
