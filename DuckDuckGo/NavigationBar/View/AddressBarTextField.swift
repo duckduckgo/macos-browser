@@ -259,7 +259,7 @@ final class AddressBarTextField: NSTextField {
             os_log("%s: Selected tab view model is nil", type: .error, className)
             return
         }
-        
+
         selectedTabViewModel.tab.setUrl(providedUrl, userEntered: userEnteredValue)
 
         self.window?.makeFirstResponder(nil)
