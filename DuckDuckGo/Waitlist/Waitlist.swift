@@ -203,6 +203,8 @@ struct NetworkProtectionWaitlist: Waitlist {
                         assertionFailure("Failed to redeem invite code")
                     }
                 }
+            } else {
+                assertionFailure("Didn't get error or invite code")
             }
         }
     }

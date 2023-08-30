@@ -742,10 +742,12 @@ extension MainViewController {
     @IBAction func resetNetworkProtectionWaitlistState(_ sender: Any?) {
         NetworkProtectionWaitlist.shared.waitlistStorage.deleteWaitlistState()
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
     }
 
     @IBAction func resetNetworkProtectionTermsAndConditionsAcceptance(_ sender: Any?) {
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
     }
 
     @IBAction func showNetworkProtectionInviteCodePrompt(_ sender: Any?) {
