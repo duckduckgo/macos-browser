@@ -218,19 +218,17 @@ final class BrowserTabViewController: NSViewController {
             self.webView = nil
         }
 
-        if webView.window === view.window {
-            if webView.isInspectorShown {
-                removeWebInspectorFromHierarchy(container: container)
-            }
-            container.removeFromSuperview()
+        if webView.window === view.window, webView.isInspectorShown {
+            removeWebInspectorFromHierarchy(container: container)
         }
+        container.removeFromSuperview()
         if self.webViewContainer === container {
             self.webViewContainer = nil
         }
     }
 
-    private func addWebViewToViewHierarchy(_ webView: WebView) {
-        let container = WebViewContainerView(webView: webView, frame: view.bounds)
+    private func addWebViewToViewHierarchy(_ webView: WebView, tab: Tab) {
+        let container = WebViewContainerView(tab: tab, webView: webView, frame: view.bounds)
         self.webViewContainer = container
         view.addSubview(container)
 
@@ -251,7 +249,7 @@ final class BrowserTabViewController: NSViewController {
             cleanUpRemoteWebViewIfNeeded(newWebView)
             webView = newWebView
 
-            addWebViewToViewHierarchy(newWebView)
+            addWebViewToViewHierarchy(newWebView, tab: tabViewModel.tab)
         }
 
         guard let tabViewModel = tabViewModel else {
