@@ -32,8 +32,6 @@ public protocol WaitlistConstants {
 
 public protocol Waitlist: WaitlistConstants {
 
-    static var shared: Self { get }
-
     var waitlistStorage: WaitlistStorage { get }
     var waitlistRequest: WaitlistRequest { get }
 
@@ -152,8 +150,6 @@ struct NetworkProtectionWaitlist: Waitlist {
 
     static let identifier: String = "networkprotection"
     static let apiProductName: String = "networkprotection_macos"
-
-    static let shared: NetworkProtectionWaitlist = .init()
 
     static let notificationIdentifier = "com.duckduckgo.macos.browser.network-protection.invite-code-available"
     static let inviteAvailableNotificationTitle = "Network Protection beta is ready!"

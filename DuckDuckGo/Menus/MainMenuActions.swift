@@ -740,7 +740,7 @@ extension MainViewController {
     }
 
     @IBAction func resetNetworkProtectionWaitlistState(_ sender: Any?) {
-        NetworkProtectionWaitlist.shared.waitlistStorage.deleteWaitlistState()
+        NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
     }
@@ -757,7 +757,7 @@ extension MainViewController {
             do {
                 let redeemer = NetworkProtectionCodeRedemptionCoordinator()
                 try await redeemer.redeem(code)
-                NetworkProtectionWaitlist.shared.waitlistStorage.store(inviteCode: code)
+                NetworkProtectionWaitlist().waitlistStorage.store(inviteCode: code)
                 NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
             } catch {
                 // Do nothing here, this is just a debug menu
@@ -880,7 +880,8 @@ extension MainViewController: NSMenuItemValidation {
         // Network Protection Debugging
         case #selector(MainViewController.showNetworkProtectionInviteCodePrompt(_:)):
             // Only allow testers to enter a custom code if they're on the waitlist, to simulate the correct path through the flow
-            return NetworkProtectionWaitlist.shared.waitlistStorage.isOnWaitlist || NetworkProtectionWaitlist.shared.waitlistStorage.isInvited
+            let waitlist = NetworkProtectionWaitlist()
+            return waitlist.waitlistStorage.isOnWaitlist || waitlist.waitlistStorage.isInvited
         default:
             return true
         }

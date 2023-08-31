@@ -282,7 +282,8 @@ final class NavigationBarViewController: NSViewController {
         // 2. If the user has no waitlist state but has an auth token, show the NetP popover.
         // 3. If the user has no state of any kind, show the waitlist screen.
 
-        if NetworkProtectionWaitlist.shared.isOnWaitlist || NetworkProtectionWaitlist.shared.readyToAcceptTermsAndConditions {
+        let waitlist = NetworkProtectionWaitlist()
+        if waitlist.isOnWaitlist || waitlist.readyToAcceptTermsAndConditions {
             WaitlistModalViewController.show()
         } else if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)

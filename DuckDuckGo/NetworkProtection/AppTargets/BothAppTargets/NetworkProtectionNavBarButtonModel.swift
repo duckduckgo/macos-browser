@@ -117,7 +117,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     private func buttonImageFromWaitlistState(icon: NetworkProtectionAsset?) -> NSImage {
         let icon = icon ?? iconPublisher.icon
 
-        if NetworkProtectionWaitlist.shared.readyToAcceptTermsAndConditions {
+        if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
             return NSImage(named: "NetworkProtectionAvailableButton")!
         }
 
@@ -166,7 +166,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     @MainActor
     private func updateVisibility() {
         // The button is visible in the case where NetP has not been activated, but the user has been invited and they haven't accepted T&Cs.
-        if NetworkProtectionWaitlist.shared.readyToAcceptTermsAndConditions {
+        if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
             showButton = true
             return
         }
