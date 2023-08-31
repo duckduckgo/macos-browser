@@ -1,5 +1,5 @@
 name: Instal Certs and Profiles
-description: Installs signing certificates and provisioning profiles 
+description: Installs signing certificates and provisioning profiles
 inputs:
   BUILD_CERTIFICATE_BASE64:
     required: true
