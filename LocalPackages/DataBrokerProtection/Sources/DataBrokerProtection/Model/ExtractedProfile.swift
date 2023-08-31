@@ -66,11 +66,11 @@ struct AddressCityState: Codable {
 struct ExtractedProfile: Codable, Sendable {
     let id: Int64?
     let name: String?
-    let alternativeNamesList: [String]?
+    let alternativeNames: [String]?
     let addressFull: String?
     let addresses: [AddressCityState]?
     let phoneNumbers: [String]?
-    let relativesList: [String]?
+    let relatives: [String]?
     let profileUrl: String?
     let reportId: String?
     let age: String?
@@ -81,11 +81,11 @@ struct ExtractedProfile: Codable, Sendable {
     enum CodingKeys: CodingKey {
         case id
         case name
-        case alternativeNamesList
+        case alternativeNames
         case addressFull
         case addresses
         case phoneNumbers
-        case relativesList
+        case relatives
         case profileUrl
         case reportId
         case age
@@ -96,11 +96,11 @@ struct ExtractedProfile: Codable, Sendable {
 
     init(id: Int64? = nil,
          name: String? = nil,
-         alternativeNamesList: [String]? = nil,
+         alternativeNames: [String]? = nil,
          addressFull: String? = nil,
          addresses: [AddressCityState]? = nil,
          phoneNumbers: [String]? = nil,
-         relativesList: [String]? = nil,
+         relatives: [String]? = nil,
          profileUrl: String? = nil,
          reportId: String? = nil,
          age: String? = nil,
@@ -108,11 +108,11 @@ struct ExtractedProfile: Codable, Sendable {
          removedDate: Date? = nil) {
         self.id = id
         self.name = name
-        self.alternativeNamesList = alternativeNamesList
+        self.alternativeNames = alternativeNames
         self.addressFull = addressFull
         self.addresses = addresses
         self.phoneNumbers = phoneNumbers
-        self.relativesList = relativesList
+        self.relatives = relatives
         self.profileUrl = profileUrl
         self.reportId = reportId
         self.age = age
@@ -125,11 +125,11 @@ struct ExtractedProfile: Codable, Sendable {
         ExtractedProfile(
             id: self.id,
             name: self.name ?? profile.fullName,
-            alternativeNamesList: self.alternativeNamesList,
+            alternativeNames: self.alternativeNames,
             addressFull: self.addressFull,
             addresses: self.addresses,
             phoneNumbers: self.phoneNumbers,
-            relativesList: self.relativesList,
+            relatives: self.relatives,
             profileUrl: self.profileUrl,
             reportId: self.reportId,
             age: self.age ?? String(profile.age),

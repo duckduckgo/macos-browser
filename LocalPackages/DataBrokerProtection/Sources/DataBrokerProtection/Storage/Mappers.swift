@@ -209,11 +209,11 @@ struct MapperToModel {
         let extractedProfile = try jsonDecoder.decode(ExtractedProfile.self, from: try mechanism(extractedProfileDB.profile))
         return .init(id: extractedProfileDB.id,
                      name: extractedProfile.name,
-                     alternativeNamesList: extractedProfile.alternativeNamesList,
+                     alternativeNames: extractedProfile.alternativeNames,
                      addressFull: extractedProfile.addressFull,
                      addresses: extractedProfile.addresses,
                      phoneNumbers: extractedProfile.phoneNumbers,
-                     relativesList: extractedProfile.relativesList,
+                     relatives: extractedProfile.relatives,
                      profileUrl: extractedProfile.profileUrl,
                      reportId: extractedProfile.reportId,
                      age: extractedProfile.age,
