@@ -23,6 +23,17 @@ enum DBPUIError: Error {
     case malformedRequest(String)
 }
 
+extension DBPUIError: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case .notFoundError(let message):
+            return message
+        case .malformedRequest(let message):
+            return message
+        }
+    }
+}
+
 /// Enum to represent the requested UI State
 public enum DBPUIState: String, Codable {
     case onboarding = "Onboarding"
