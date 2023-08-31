@@ -30,7 +30,9 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func fetchProfile(with id: Int64) throws -> FullProfileDB?
 
     func save(_ broker: BrokerDB) throws -> Int64
+    func update(_ broker: BrokerDB) throws
     func fetchBroker(with id: Int64) throws -> BrokerDB?
+    func fetchBroker(with name: String) throws -> BrokerDB?
     func fetchAllBrokers() throws -> [BrokerDB]
 
     func save(_ profileQuery: ProfileQueryDB) throws -> Int64
@@ -264,9 +266,23 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
+    func update(_ broker: BrokerDB) throws {
+        try db.write { db in
+            try broker.update(db)
+        }
+    }
+
     func fetchBroker(with id: Int64) throws -> BrokerDB? {
         try db.read { db in
             return try BrokerDB.fetchOne(db, key: id)
+        }
+    }
+
+    func fetchBroker(with name: String) throws -> BrokerDB? {
+        try db.read { db in
+            return try BrokerDB
+                .filter(Column(BrokerDB.Columns.name.name) == name)
+                .fetchOne(db)
         }
     }
 

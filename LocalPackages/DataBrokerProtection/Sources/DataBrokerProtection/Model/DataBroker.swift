@@ -82,10 +82,9 @@ struct DataBroker: Codable, Sendable {
         return optOutStep
     }
 
-    static func initFromResource(_ brokerName: String) -> DataBroker {
-        let jsonUrl = Bundle.module.url(forResource: brokerName, withExtension: "json")!
+    static func initFromResource(_ url: URL) -> DataBroker {
         // swiftlint:disable:next force_try
-        let data = try! Data(contentsOf: jsonUrl)
+        let data = try! Data(contentsOf: url)
         // swiftlint:disable:next force_try
         return try! JSONDecoder().decode(DataBroker.self, from: data)
     }

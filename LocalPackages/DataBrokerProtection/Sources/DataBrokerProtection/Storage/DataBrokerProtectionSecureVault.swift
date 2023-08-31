@@ -39,7 +39,9 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
     func fetchProfile(with id: Int64) throws -> DataBrokerProtectionProfile?
 
     func save(broker: DataBroker) throws -> Int64
+    func update(_ broker: DataBroker, with id: Int64) throws
     func fetchBroker(with id: Int64) throws -> DataBroker?
+    func fetchBroker(with name: String) throws -> DataBroker?
     func fetchAllBrokers() throws -> [DataBroker]
 
     func save(profileQuery: ProfileQuery, profileId: Int64) throws -> Int64
@@ -106,9 +108,27 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         }
     }
 
+    func update(_ broker: DataBroker, with id: Int64) throws {
+        try executeThrowingDatabaseOperation {
+            let mapper = MapperToDB(mechanism: l2Encrypt(data:))
+            return try self.providers.database.update(mapper.mapToDB(broker, id: id))
+        }
+    }
+
     func fetchBroker(with id: Int64) throws -> DataBroker? {
         try executeThrowingDatabaseOperation {
-            if let broker = try self.providers.database.fetchBroker(with: 1) {
+            if let broker = try self.providers.database.fetchBroker(with: id) {
+                let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+                return try mapper.mapToModel(broker)
+            }
+
+            return nil
+        }
+    }
+
+    func fetchBroker(with name: String) throws -> DataBroker? {
+        try executeThrowingDatabaseOperation {
+            if let broker = try self.providers.database.fetchBroker(with: name) {
                 let mapper = MapperToModel(mechanism: l2Decrypt(data:))
                 return try mapper.mapToModel(broker)
             }
