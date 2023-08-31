@@ -162,9 +162,13 @@ final class MainViewController: NSViewController {
     func showBookmarkPromptIfNeeded() {
         guard #available(macOS 11, *) else { return }
 
-        guard !bookmarksBarIsVisible,
-                !bookmarksBarViewController.bookmarksBarPromptShown else { return }
-        
+        guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
+        if bookmarksBarIsVisible {
+            // Don't show this to users who obviously know about the bookmarks bar already
+            bookmarksBarViewController.bookmarksBarPromptShown = true
+            return
+        }
+
         updateBookmarksBarViewVisibility(visible: true)
         // This won't work until the bookmarks bar is actually visible which it isn't until the next ui cycle
         DispatchQueue.main.async {
