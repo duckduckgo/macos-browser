@@ -21,6 +21,7 @@ import BrowserServicesKit
 import AppKit
 
 #if NETWORK_PROTECTION
+import Combine
 import NetworkProtection
 import NetworkProtectionUI
 #endif
@@ -303,7 +304,9 @@ final class NavigationBarPopovers {
                 })
             ]
 
-            let popover = NetworkProtectionPopover(controller: controller, statusReporter: statusReporter, menuItems: menuItems)
+            let onboardingStatusPublisher = UserDefaults.shared.networkProtectionOnboardingStatusPublisher
+
+            let popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, menuItems: menuItems)
             popover.delegate = delegate
 
             networkProtectionPopover = popover
@@ -312,7 +315,6 @@ final class NavigationBarPopovers {
         show(popover: popover, usingView: view, preferredEdge: .maxY)
     }
 #endif
-
 }
 
 extension Notification.Name {

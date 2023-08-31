@@ -143,6 +143,14 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
     }
 
+    static var tokenServiceName: String {
+#if NETP_SYSTEM_EXTENSION
+        "\(Bundle.main.bundleIdentifier!).authToken"
+#else
+        NetworkProtectionKeychainTokenStore.Defaults.tokenStoreService
+#endif
+    }
+
     // MARK: - Initialization
 
     @objc public init() {
@@ -150,12 +158,17 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
+        let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
+        let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: NetworkProtectionBundle.keychainType,
+                                                             serviceName: Self.tokenServiceName,
+                                                             errorEvents: debugEvents)
 
         super.init(notificationsPresenter: Self.makeNotificationsPresenter(),
                    tunnelHealthStore: tunnelHealthStore,
                    controllerErrorStore: controllerErrorStore,
-                   useSystemKeychain: NetworkProtectionBundle.usesSystemKeychain(),
-                   debugEvents: Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore),
+                   keychainType: NetworkProtectionBundle.keychainType,
+                   tokenStore: tokenStore,
+                   debugEvents: debugEvents,
                    providerEvents: Self.packetTunnelProviderEvents)
 
         observeConnectionStatusChanges()
@@ -285,14 +298,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             }
 
             completionHandler(nil)
-            if !isOnDemand {
-                Task { [self] in
-                    // We're handling a successful connection started by request.
-                    // We want to call the completion handler before turning on-demand
-                    // ON so that on-demand won't start the connection on its own.
-                    await self.appLauncher?.launchApp(withCommand: .enableOnDemand)
-                }
-            }
         }
     }
 

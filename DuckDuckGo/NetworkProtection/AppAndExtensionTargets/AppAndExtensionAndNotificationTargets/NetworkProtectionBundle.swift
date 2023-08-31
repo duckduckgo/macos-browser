@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import NetworkProtection
 
 enum NetworkProtectionBundle {
 
@@ -67,11 +68,11 @@ enum NetworkProtectionBundle {
         return extensionBundle
     }
 
-    static func usesSystemKeychain() -> Bool {
+    static let keychainType: KeychainType = {
 #if NETP_SYSTEM_EXTENSION
-        true
+        .system
 #else
-        false
+        .dataProtection(.named(Bundle.main.appGroupName))
 #endif
-    }
+    }()
 }

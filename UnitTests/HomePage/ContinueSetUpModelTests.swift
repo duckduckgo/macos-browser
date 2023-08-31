@@ -113,7 +113,6 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay0))
         XCTAssertFalse(vm.visibleFeaturesMatrix.reduce([], +).contains(HomePage.Models.FeatureType.surveyDay7))
 
-        let sixDayAgo = Calendar.current.date(byAdding: .day, value: -6, to: Date())!
         userDefaults.set(aDayAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
         vm = HomePage.Models.ContinueSetUpModel.fixture()
 
@@ -169,7 +168,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     func testWhenTogglingShowAllFeatureThenCorrectElementsAreVisible() {
-        var expectedMatrix = expectedFeatureMatrixWithout(types: [.surveyDay7])
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [.surveyDay7])
 
         vm.shouldShowAllFeatures = true
 
@@ -399,7 +398,7 @@ final class ContinueSetUpModelTests: XCTestCase {
 
     @MainActor func testDismissedItemsAreRemovedFromVisibleMatrixAndChoicesArePersisted() {
         vm.shouldShowAllFeatures = true
-        var expectedMatrix = expectedFeatureMatrixWithout(types: [.surveyDay7])
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [.surveyDay7])
         XCTAssertEqual(expectedMatrix, vm.visibleFeaturesMatrix)
 
         vm.removeItem(for: .surveyDay0)

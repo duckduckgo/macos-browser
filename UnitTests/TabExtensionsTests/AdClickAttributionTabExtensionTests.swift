@@ -74,7 +74,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
     var extensionsBuilder: TestTabExtensionsBuilder!
 
     override func setUp() {
-        contentBlockingMock = ContentBlockingMock()
+        contentBlockingMock = ContentBlockingMock(adClickAttributionEnabled: true)
         privacyFeaturesMock = AppPrivacyFeatures(contentBlocking: contentBlockingMock, httpsUpgradeStore: HTTPSUpgradeStoreMock())
 
         extensionsBuilder = TestTabExtensionsBuilder(load: [AdClickAttributionTabExtension.self]) { [unowned self] builder in { args, dependencies in

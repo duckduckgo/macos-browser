@@ -24,6 +24,7 @@ import SwiftUI
 import Common
 import NetworkExtension
 import NetworkProtection
+import NetworkProtectionUI
 import SystemExtensions
 import Networking
 
@@ -62,11 +63,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     private let debugUtilities = NetworkProtectionDebugUtilities()
 
-    /// Enable On-Demand VPN activation rule
-    @MainActor
-    @UserDefaultsWrapper(key: .networkProtectionOnDemandActivation, defaultValue: NetworkProtectionUserDefaultsConstants.onDemandActivation)
-    private(set) var isOnDemandEnabled: Bool
-
     /// Kill Switch: Enable enforceRoutes flag
     ///
     /// Applies enforceRoutes setting, sets up excludedRoutes in MacPacketTunnelProvider and disables disconnect on failure
@@ -96,6 +92,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     @UserDefaultsWrapper(key: .networkProtectionConnectionTesterEnabled, defaultValue: NetworkProtectionUserDefaultsConstants.isConnectionTesterEnabled, defaults: .shared)
     private(set) var isConnectionTesterEnabled: Bool
 
+    @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .shared)
+    private(set) var onboardingStatusRawValue: OnboardingStatus.RawValue
+
     // MARK: - Connection Status
 
     private let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusObserver: ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter, platformDidWakeNotification: NSWorkspace.didWakeNotification), transitionTimeout: .seconds(4))
@@ -117,8 +116,8 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         return tunnelManager
     }
 
-    private func setupAndSave(_ tunnelManager: NETunnelProviderManager, isOnDemandEnabled: Bool? = nil) async throws {
-        await setup(tunnelManager, isOnDemandEnabled: isOnDemandEnabled)
+    private func setupAndSave(_ tunnelManager: NETunnelProviderManager) async throws {
+        await setup(tunnelManager)
         try await tunnelManager.saveToPreferences()
         try await tunnelManager.loadFromPreferences()
     }
@@ -144,7 +143,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// Setups the tunnel manager if it's not set up already.
     ///
     @MainActor
-    private func setup(_ tunnelManager: NETunnelProviderManager, isOnDemandEnabled: Bool?) {
+    private func setup(_ tunnelManager: NETunnelProviderManager) {
         if tunnelManager.localizedDescription == nil {
             tunnelManager.localizedDescription = UserText.networkProtectionTunnelName
         }
@@ -176,14 +175,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
             return protocolConfiguration
         }()
-
-        // auto-connect on any network request
-        if isOnDemandEnabled ?? (self.isOnDemandEnabled || self.shouldEnforceRoutes) {
-            tunnelManager.onDemandRules = [NEOnDemandRuleConnect(interfaceType: .any)]
-            tunnelManager.isOnDemandEnabled = true
-        } else {
-            tunnelManager.isOnDemandEnabled = false
-        }
     }
 
     // MARK: - Connection Status Querying
@@ -218,7 +209,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         for try await event in SystemExtensionManager().activate() {
             switch event {
             case .waitingForUserApproval:
-                self.controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
+                onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue
             case .activated:
                 self.controllerErrorStore.lastErrorMessage = nil
                 activated = true
@@ -261,18 +252,41 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     func start(enableLoginItems: Bool) async {
         controllerErrorStore.lastErrorMessage = nil
 
-        if enableLoginItems {
-            loginItemsManager.enableLoginItems()
-        }
-
         do {
 #if NETP_SYSTEM_EXTENSION
             guard try await ensureSystemExtensionIsActivated() else {
                 return
             }
+
+            // We'll only update to completed if we were showing the onboarding step to
+            // allow the system extension.  Otherwise we may override the allow-VPN
+            // onboarding step.
+            //
+            // Additionally if the onboarding step was allowing the system extension, we won't
+            // start the tunnel at once, and instead require that the user enables the toggle.
+            //
+            if onboardingStatusRawValue == OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue {
+                onboardingStatusRawValue = OnboardingStatus.completed.rawValue
+                return
+            }
 #endif
 
-            let tunnelManager = try await loadOrMakeTunnelManager()
+            let tunnelManager: NETunnelProviderManager
+
+            do {
+                tunnelManager = try await loadOrMakeTunnelManager()
+            } catch {
+                if case NEVPNError.configurationReadWriteFailed = error {
+                    onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
+                }
+
+                throw error
+            }
+            onboardingStatusRawValue = OnboardingStatus.completed.rawValue
+
+            if enableLoginItems {
+                loginItemsManager.enableLoginItems()
+            }
 
             switch tunnelManager.connection.status {
             case .invalid:
@@ -314,6 +328,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
         try tunnelManager.connection.startVPNTunnel(options: options)
         try await statusTransitionAwaiter.waitUntilConnectionStarted()
+        try await enableOnDemand(tunnelManager: tunnelManager)
     }
 
     /// Stops the VPN connection used for Network Protection
@@ -346,35 +361,22 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     // MARK: - On Demand & Kill Switch
 
     @MainActor
-    func enableOnDemandRequestedByExtension() async throws {
-        guard isOnDemandEnabled || shouldEnforceRoutes else {
-            os_log("On-demand requested by Extension: declining, disabled", log: .networkProtection)
-            return
-        }
+    func enableOnDemand(tunnelManager: NETunnelProviderManager) async throws {
+        tunnelManager.onDemandRules = [NEOnDemandRuleConnect(interfaceType: .any)]
+        tunnelManager.isOnDemandEnabled = true
 
-        try await self.enableOnDemand()
+        try await tunnelManager.saveToPreferences()
     }
 
     @MainActor
-    func enableOnDemand() async throws {
-        isOnDemandEnabled = true
+    func disableOnDemand(tunnelManager: NETunnelProviderManager) async throws {
+        tunnelManager.isOnDemandEnabled = false
 
-        // calls setupAndSave where configuration is done
-        _=try await loadOrMakeTunnelManager()
-    }
-
-    @MainActor
-    func disableOnDemand(tunnelManager: NETunnelProviderManager? = nil) async throws {
-        // disable on-demand flag on disconnect to prevent respawn but keep the defaults value
-        guard let tunnelManager = await loadTunnelManager(),
-              tunnelManager.isOnDemandEnabled else { return }
-
-        try await setupAndSave(tunnelManager, isOnDemandEnabled: false)
+        try await tunnelManager.saveToPreferences()
     }
 
     @MainActor
     func enableEnforceRoutes() async throws {
-        isOnDemandEnabled = true
         shouldEnforceRoutes = true
 
         // calls setupAndSave where configuration is done
@@ -393,7 +395,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     @MainActor
     func enableIncludeAllNetworks() async throws {
-        isOnDemandEnabled = true
         shouldIncludeAllNetworks = true
 
         // calls setupAndSave where configuration is done
@@ -408,25 +409,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
               tunnelManager.protocolConfiguration?.includeAllNetworks == true else { return }
 
         try await setupAndSave(tunnelManager)
-    }
-
-    @MainActor
-    func toggleOnDemandEnabled() {
-        isOnDemandEnabled.toggle()
-        if !isOnDemandEnabled {
-            shouldEnforceRoutes = false
-        }
-
-        // update configuration if connected
-        Task { [isOnDemandEnabled] in
-            guard await isConnected else { return }
-
-            if isOnDemandEnabled {
-                try await enableOnDemand()
-            } else {
-                try await disableOnDemand()
-            }
-        }
     }
 
     @MainActor

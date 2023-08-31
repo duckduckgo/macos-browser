@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -30,18 +29,18 @@
                 </windowController>
                 <customObject id="Nmr-Vd-3ch" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-299" y="567"/>
+            <point key="canvasLocation" x="-299" y="415"/>
         </scene>
         <!--Feedback View Controller-->
         <scene sceneID="NVa-uK-UhP">
             <objects>
                 <viewController id="TOa-sP-KHa" customClass="FeedbackViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="Ie8-lu-6dX">
-                        <rect key="frame" x="0.0" y="0.0" width="360" height="569"/>
+                        <rect key="frame" x="0.0" y="0.0" width="360" height="769"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="B4Q-yT-nKT" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="500" width="360" height="69"/>
+                                <rect key="frame" x="0.0" y="700" width="360" height="69"/>
                                 <subviews>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7KM-rJ-r28">
                                         <rect key="frame" x="43" y="25" width="274" height="19"/>
@@ -80,13 +79,74 @@
                                 </userDefinedRuntimeAttributes>
                             </customView>
                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="iPz-Dg-VNs">
-                                <rect key="frame" x="0.0" y="498" width="360" height="5"/>
+                                <rect key="frame" x="0.0" y="698" width="360" height="5"/>
                             </box>
+                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C8j-UX-ywh">
+                                <rect key="frame" x="0.0" y="0.0" width="360" height="700"/>
+                                <subviews>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3nf-Bg-7k2">
+                                        <rect key="frame" x="14" y="14" width="332" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="1gW-Wq-I7c"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="H3H-xG-326">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="okButtonAction:" target="TOa-sP-KHa" id="C2a-ct-tif"/>
+                                        </connections>
+                                    </button>
+                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="nOJ-4u-waA">
+                                        <rect key="frame" x="132" y="584" width="96" height="96"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="96" id="OdO-XF-nm1"/>
+                                            <constraint firstAttribute="height" constant="96" id="eyV-Eu-vmp"/>
+                                        </constraints>
+                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="ThankYou" id="Ykf-at-KNR"/>
+                                    </imageView>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Pad-Pc-j6d">
+                                        <rect key="frame" x="137" y="557" width="87" height="19"/>
+                                        <textFieldCell key="cell" alignment="center" title="Thank you!" id="NFA-fu-2EM">
+                                            <font key="font" metaFont="systemSemibold" size="15"/>
+                                            <color key="textColor" name="GreyTextColor"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="syf-sE-uUM">
+                                        <rect key="frame" x="18" y="521" width="324" height="28"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="NhF-KV-8Fz"/>
+                                            <constraint firstAttribute="width" constant="320" id="OKh-5g-IKI"/>
+                                        </constraints>
+                                        <textFieldCell key="cell" alignment="center" title="Your feedback will help us improve the DuckDuckGo app." id="cij-aI-J9r">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="3nf-Bg-7k2" secondAttribute="trailing" constant="20" symbolic="YES" id="0ih-HM-vLb"/>
+                                    <constraint firstAttribute="bottom" secondItem="3nf-Bg-7k2" secondAttribute="bottom" constant="20" symbolic="YES" id="G6K-eI-7Wb"/>
+                                    <constraint firstItem="3nf-Bg-7k2" firstAttribute="leading" secondItem="C8j-UX-ywh" secondAttribute="leading" constant="20" symbolic="YES" id="IAg-ez-Kww"/>
+                                    <constraint firstAttribute="trailing" secondItem="syf-sE-uUM" secondAttribute="trailing" constant="20" symbolic="YES" id="Qih-Y8-L1A"/>
+                                    <constraint firstItem="nOJ-4u-waA" firstAttribute="centerX" secondItem="C8j-UX-ywh" secondAttribute="centerX" id="jIn-5G-ItS"/>
+                                    <constraint firstItem="Pad-Pc-j6d" firstAttribute="top" secondItem="nOJ-4u-waA" secondAttribute="bottom" constant="8" id="jqU-sX-T0P"/>
+                                    <constraint firstItem="Pad-Pc-j6d" firstAttribute="centerX" secondItem="C8j-UX-ywh" secondAttribute="centerX" id="kxj-pU-r3k"/>
+                                    <constraint firstItem="nOJ-4u-waA" firstAttribute="top" secondItem="C8j-UX-ywh" secondAttribute="top" constant="20" id="maw-do-guj"/>
+                                    <constraint firstItem="syf-sE-uUM" firstAttribute="leading" secondItem="C8j-UX-ywh" secondAttribute="leading" constant="20" symbolic="YES" id="psO-TK-tGb"/>
+                                    <constraint firstItem="syf-sE-uUM" firstAttribute="top" secondItem="Pad-Pc-j6d" secondAttribute="bottom" constant="8" id="uoM-1L-Ohi"/>
+                                </constraints>
+                            </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="wYB-07-s0m" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="360" height="500"/>
+                                <rect key="frame" x="0.0" y="0.0" width="360" height="700"/>
                                 <subviews>
                                     <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="7Z6-Ji-PH7">
-                                        <rect key="frame" x="17" y="446" width="326" height="37"/>
+                                        <rect key="frame" x="17" y="658" width="326" height="37"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="30" id="Fw3-Y4-XV0"/>
                                         </constraints>
@@ -108,79 +168,8 @@
                                             <action selector="optionPopUpButtonAction:" target="TOa-sP-KHa" id="UAa-qp-Arp"/>
                                         </connections>
                                     </popUpButton>
-                                    <customView hidden="YES" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8Xi-CY-jyt" userLabel="Browser Feedback View">
-                                        <rect key="frame" x="0.0" y="227" width="360" height="215"/>
-                                        <subviews>
-                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Obm-Wr-qrD">
-                                                <rect key="frame" x="18" y="213" width="324" height="15"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" constant="320" id="Y8O-Rh-baf"/>
-                                                </constraints>
-                                                <textFieldCell key="cell" title="Please give us your feedback:" id="B04-A6-cRC">
-                                                    <font key="font" metaFont="cellTitle"/>
-                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                </textFieldCell>
-                                            </textField>
-                                            <scrollView focusRingType="exterior" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="heN-iP-EsM">
-                                                <rect key="frame" x="20" y="108" width="320" height="97"/>
-                                                <clipView key="contentView" drawsBackground="NO" id="PTf-L1-DK2">
-                                                    <rect key="frame" x="0.0" y="0.0" width="305" height="97"/>
-                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                    <subviews>
-                                                        <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" smartInsertDelete="YES" id="F3N-ft-DgV">
-                                                            <rect key="frame" x="0.0" y="0.0" width="305" height="97"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                            <size key="minSize" width="305" height="97"/>
-                                                            <size key="maxSize" width="320" height="10000000"/>
-                                                            <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                        </textView>
-                                                    </subviews>
-                                                </clipView>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" constant="320" id="7uA-ap-LX7"/>
-                                                    <constraint firstAttribute="height" constant="97" id="XGh-UV-33u"/>
-                                                </constraints>
-                                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="xjV-Ft-rEz">
-                                                    <rect key="frame" x="-100" y="-100" width="240" height="16"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
-                                                </scroller>
-                                                <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="MIn-YA-XiI">
-                                                    <rect key="frame" x="305" y="0.0" width="15" height="97"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
-                                                </scroller>
-                                            </scrollView>
-                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nm3-pj-w2B">
-                                                <rect key="frame" x="18" y="13" width="324" height="75"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" constant="320" id="46H-7M-bu2"/>
-                                                    <constraint firstAttribute="height" constant="75" id="R9C-cp-9Jj"/>
-                                                </constraints>
-                                                <textFieldCell key="cell" id="7PA-BW-gkt">
-                                                    <font key="font" metaFont="cellTitle"/>
-                                                    <string key="title">Reports sent to DuckDuckGo are 100% anonymous and only include your selection above, your optional message, the URL, a list of trackers we found on the site, the DuckDuckGo app version, and your macOS version.</string>
-                                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                </textFieldCell>
-                                            </textField>
-                                        </subviews>
-                                        <constraints>
-                                            <constraint firstAttribute="trailing" secondItem="nm3-pj-w2B" secondAttribute="trailing" constant="20" symbolic="YES" id="9nz-EV-snH"/>
-                                            <constraint firstAttribute="trailing" secondItem="Obm-Wr-qrD" secondAttribute="trailing" constant="20" id="Ex6-sU-DUY"/>
-                                            <constraint firstItem="nm3-pj-w2B" firstAttribute="leading" secondItem="8Xi-CY-jyt" secondAttribute="leading" constant="20" symbolic="YES" id="JfJ-gI-4XY"/>
-                                            <constraint firstItem="nm3-pj-w2B" firstAttribute="top" secondItem="heN-iP-EsM" secondAttribute="bottom" constant="20" id="K3s-7i-8OO"/>
-                                            <constraint firstItem="Obm-Wr-qrD" firstAttribute="top" secondItem="8Xi-CY-jyt" secondAttribute="top" constant="12" id="S8X-ph-cIv"/>
-                                            <constraint firstItem="heN-iP-EsM" firstAttribute="leading" secondItem="8Xi-CY-jyt" secondAttribute="leading" constant="20" symbolic="YES" id="SmD-G6-K0m"/>
-                                            <constraint firstAttribute="height" constant="240" id="UQa-QI-LjA"/>
-                                            <constraint firstAttribute="trailing" secondItem="heN-iP-EsM" secondAttribute="trailing" constant="20" symbolic="YES" id="hGl-iA-cWw"/>
-                                            <constraint firstItem="Obm-Wr-qrD" firstAttribute="leading" secondItem="8Xi-CY-jyt" secondAttribute="leading" constant="20" id="mEl-bd-Itj"/>
-                                            <constraint firstItem="heN-iP-EsM" firstAttribute="top" secondItem="Obm-Wr-qrD" secondAttribute="bottom" constant="8" symbolic="YES" id="rDo-Qd-TbN"/>
-                                        </constraints>
-                                    </customView>
                                     <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8B9-wf-zcP" userLabel="Website Breakage View">
-                                        <rect key="frame" x="0.0" y="342" width="360" height="100"/>
+                                        <rect key="frame" x="0.0" y="547" width="360" height="100"/>
                                         <subviews>
                                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2gs-6z-agW">
                                                 <rect key="frame" x="20" y="61" width="320" height="27"/>
@@ -232,6 +221,88 @@
                                             <constraint firstAttribute="trailing" secondItem="2gs-6z-agW" secondAttribute="trailing" constant="20" id="qTG-tx-tnf"/>
                                         </constraints>
                                     </customView>
+                                    <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8Xi-CY-jyt" userLabel="Browser Feedback View">
+                                        <rect key="frame" x="0.0" y="357" width="360" height="290"/>
+                                        <subviews>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Obm-Wr-qrD">
+                                                <rect key="frame" x="18" y="263" width="324" height="15"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="320" id="Y8O-Rh-baf"/>
+                                                </constraints>
+                                                <textFieldCell key="cell" title="Please give us your feedback:" id="B04-A6-cRC">
+                                                    <font key="font" metaFont="cellTitle"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <scrollView focusRingType="exterior" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="heN-iP-EsM">
+                                                <rect key="frame" x="20" y="158" width="320" height="97"/>
+                                                <clipView key="contentView" drawsBackground="NO" id="PTf-L1-DK2">
+                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="97"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    <subviews>
+                                                        <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" smartInsertDelete="YES" id="F3N-ft-DgV">
+                                                            <rect key="frame" x="0.0" y="0.0" width="320" height="97"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            <size key="minSize" width="320" height="97"/>
+                                                            <size key="maxSize" width="320" height="10000000"/>
+                                                            <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                        </textView>
+                                                    </subviews>
+                                                </clipView>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="320" id="7uA-ap-LX7"/>
+                                                    <constraint firstAttribute="height" constant="97" id="XGh-UV-33u"/>
+                                                </constraints>
+                                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="xjV-Ft-rEz">
+                                                    <rect key="frame" x="-100" y="-100" width="240" height="16"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                </scroller>
+                                                <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="MIn-YA-XiI">
+                                                    <rect key="frame" x="304" y="0.0" width="16" height="97"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                </scroller>
+                                            </scrollView>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nm3-pj-w2B">
+                                                <rect key="frame" x="18" y="63" width="324" height="75"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="320" id="46H-7M-bu2"/>
+                                                    <constraint firstAttribute="height" constant="75" id="R9C-cp-9Jj"/>
+                                                </constraints>
+                                                <textFieldCell key="cell" id="7PA-BW-gkt">
+                                                    <font key="font" metaFont="cellTitle"/>
+                                                    <string key="title">Reports sent to DuckDuckGo are 100% anonymous and only include your selection above, your optional message, the URL, a list of trackers we found on the site, the DuckDuckGo app version, and your macOS version.</string>
+                                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="trailing" secondItem="nm3-pj-w2B" secondAttribute="trailing" constant="20" symbolic="YES" id="9nz-EV-snH"/>
+                                            <constraint firstAttribute="trailing" secondItem="Obm-Wr-qrD" secondAttribute="trailing" constant="20" id="Ex6-sU-DUY"/>
+                                            <constraint firstItem="nm3-pj-w2B" firstAttribute="leading" secondItem="8Xi-CY-jyt" secondAttribute="leading" constant="20" symbolic="YES" id="JfJ-gI-4XY"/>
+                                            <constraint firstItem="nm3-pj-w2B" firstAttribute="top" secondItem="heN-iP-EsM" secondAttribute="bottom" constant="20" id="K3s-7i-8OO"/>
+                                            <constraint firstItem="Obm-Wr-qrD" firstAttribute="top" secondItem="8Xi-CY-jyt" secondAttribute="top" constant="12" id="S8X-ph-cIv"/>
+                                            <constraint firstItem="heN-iP-EsM" firstAttribute="leading" secondItem="8Xi-CY-jyt" secondAttribute="leading" constant="20" symbolic="YES" id="SmD-G6-K0m"/>
+                                            <constraint firstAttribute="height" constant="290" id="UQa-QI-LjA"/>
+                                            <constraint firstAttribute="trailing" secondItem="heN-iP-EsM" secondAttribute="trailing" constant="20" symbolic="YES" id="hGl-iA-cWw"/>
+                                            <constraint firstItem="Obm-Wr-qrD" firstAttribute="leading" secondItem="8Xi-CY-jyt" secondAttribute="leading" constant="20" id="mEl-bd-Itj"/>
+                                            <constraint firstItem="heN-iP-EsM" firstAttribute="top" secondItem="Obm-Wr-qrD" secondAttribute="bottom" constant="8" symbolic="YES" id="rDo-Qd-TbN"/>
+                                        </constraints>
+                                    </customView>
+                                    <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8xr-ho-IDj" userLabel="Unsupported OS View">
+                                        <rect key="frame" x="0.0" y="447" width="360" height="200"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="200" id="3er-AK-Fjx"/>
+                                        </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <integer key="value" value="8"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </customView>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="RYb-WZ-bIo" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="360" height="69"/>
                                         <constraints>
@@ -274,22 +345,26 @@ Gw
                                     </button>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="500" id="0W2-HI-Vs8"/>
+                                    <constraint firstAttribute="height" constant="700" id="0W2-HI-Vs8"/>
                                     <constraint firstItem="Gy6-KF-A15" firstAttribute="leading" secondItem="G99-8X-64H" secondAttribute="trailing" constant="12" symbolic="YES" id="0eZ-Ps-KCz"/>
-                                    <constraint firstItem="8B9-wf-zcP" firstAttribute="top" secondItem="7Z6-Ji-PH7" secondAttribute="bottom" constant="8" id="8Zk-eQ-vBn"/>
+                                    <constraint firstItem="8B9-wf-zcP" firstAttribute="top" secondItem="wYB-07-s0m" secondAttribute="top" constant="53" id="8Dh-xw-FXE"/>
+                                    <constraint firstItem="8xr-ho-IDj" firstAttribute="top" secondItem="wYB-07-s0m" secondAttribute="top" constant="53" id="AKl-Ll-Pv6"/>
+                                    <constraint firstItem="8xr-ho-IDj" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" id="BQd-LB-MKt"/>
                                     <constraint firstItem="RYb-WZ-bIo" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" id="Igx-KW-WiD"/>
                                     <constraint firstAttribute="trailing" secondItem="Gy6-KF-A15" secondAttribute="trailing" constant="20" symbolic="YES" id="J4k-PJ-uFO"/>
                                     <constraint firstAttribute="bottom" secondItem="Gy6-KF-A15" secondAttribute="bottom" constant="20" symbolic="YES" id="KOD-v1-Y2g"/>
                                     <constraint firstAttribute="trailing" secondItem="RYb-WZ-bIo" secondAttribute="trailing" id="Mah-G4-3ac"/>
+                                    <constraint firstAttribute="bottom" secondItem="RYb-WZ-bIo" secondAttribute="bottom" id="O8G-li-YJD"/>
                                     <constraint firstItem="G99-8X-64H" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" constant="20" id="VJ3-WB-B1n"/>
                                     <constraint firstAttribute="bottom" secondItem="G99-8X-64H" secondAttribute="bottom" constant="20" symbolic="YES" id="Vlb-cF-IG9"/>
+                                    <constraint firstAttribute="trailing" secondItem="8xr-ho-IDj" secondAttribute="trailing" id="Vmw-fD-Pho"/>
                                     <constraint firstItem="Gy6-KF-A15" firstAttribute="width" secondItem="G99-8X-64H" secondAttribute="width" id="XTc-rW-crW"/>
-                                    <constraint firstItem="7Z6-Ji-PH7" firstAttribute="top" secondItem="wYB-07-s0m" secondAttribute="top" constant="20" symbolic="YES" id="ZL6-G9-svI"/>
+                                    <constraint firstItem="7Z6-Ji-PH7" firstAttribute="top" secondItem="wYB-07-s0m" secondAttribute="top" constant="8" id="ZL6-G9-svI"/>
                                     <constraint firstAttribute="trailing" secondItem="8Xi-CY-jyt" secondAttribute="trailing" id="b9w-wm-81Z"/>
                                     <constraint firstAttribute="trailing" secondItem="8B9-wf-zcP" secondAttribute="trailing" id="nRt-k0-4pb"/>
                                     <constraint firstItem="8B9-wf-zcP" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" id="opY-Un-GIS"/>
-                                    <constraint firstAttribute="bottom" secondItem="RYb-WZ-bIo" secondAttribute="bottom" id="owJ-rI-cNo"/>
                                     <constraint firstItem="8Xi-CY-jyt" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" id="qvK-Km-IZH"/>
+                                    <constraint firstItem="8Xi-CY-jyt" firstAttribute="top" secondItem="wYB-07-s0m" secondAttribute="top" constant="53" id="rcx-DQ-kn9"/>
                                     <constraint firstItem="7Z6-Ji-PH7" firstAttribute="leading" secondItem="wYB-07-s0m" secondAttribute="leading" constant="20" symbolic="YES" id="sQp-ga-TtJ"/>
                                     <constraint firstAttribute="trailing" secondItem="7Z6-Ji-PH7" secondAttribute="trailing" constant="20" symbolic="YES" id="zCp-C1-Fcy"/>
                                 </constraints>
@@ -298,67 +373,6 @@ Gw
                                         <color key="value" name="InterfaceBackgroundColor"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
-                            </customView>
-                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C8j-UX-ywh">
-                                <rect key="frame" x="0.0" y="0.0" width="360" height="500"/>
-                                <subviews>
-                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3nf-Bg-7k2">
-                                        <rect key="frame" x="14" y="14" width="332" height="40"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="28" id="1gW-Wq-I7c"/>
-                                        </constraints>
-                                        <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="H3H-xG-326">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <string key="keyEquivalent" base64-UTF8="YES">
-DQ
-</string>
-                                        </buttonCell>
-                                        <connections>
-                                            <action selector="okButtonAction:" target="TOa-sP-KHa" id="C2a-ct-tif"/>
-                                        </connections>
-                                    </button>
-                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="nOJ-4u-waA">
-                                        <rect key="frame" x="132" y="384" width="96" height="96"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="96" id="OdO-XF-nm1"/>
-                                            <constraint firstAttribute="height" constant="96" id="eyV-Eu-vmp"/>
-                                        </constraints>
-                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="ThankYou" id="Ykf-at-KNR"/>
-                                    </imageView>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Pad-Pc-j6d">
-                                        <rect key="frame" x="137" y="357" width="87" height="19"/>
-                                        <textFieldCell key="cell" alignment="center" title="Thank you!" id="NFA-fu-2EM">
-                                            <font key="font" metaFont="systemSemibold" size="15"/>
-                                            <color key="textColor" name="GreyTextColor"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="syf-sE-uUM">
-                                        <rect key="frame" x="18" y="321" width="324" height="28"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="28" id="NhF-KV-8Fz"/>
-                                            <constraint firstAttribute="width" constant="320" id="OKh-5g-IKI"/>
-                                        </constraints>
-                                        <textFieldCell key="cell" alignment="center" title="Your feedback will help us improve the DuckDuckGo app." id="cij-aI-J9r">
-                                            <font key="font" metaFont="smallSystem"/>
-                                            <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                </subviews>
-                                <constraints>
-                                    <constraint firstAttribute="trailing" secondItem="3nf-Bg-7k2" secondAttribute="trailing" constant="20" symbolic="YES" id="0ih-HM-vLb"/>
-                                    <constraint firstAttribute="bottom" secondItem="3nf-Bg-7k2" secondAttribute="bottom" constant="20" symbolic="YES" id="G6K-eI-7Wb"/>
-                                    <constraint firstItem="3nf-Bg-7k2" firstAttribute="leading" secondItem="C8j-UX-ywh" secondAttribute="leading" constant="20" symbolic="YES" id="IAg-ez-Kww"/>
-                                    <constraint firstAttribute="trailing" secondItem="syf-sE-uUM" secondAttribute="trailing" constant="20" symbolic="YES" id="Qih-Y8-L1A"/>
-                                    <constraint firstItem="nOJ-4u-waA" firstAttribute="centerX" secondItem="C8j-UX-ywh" secondAttribute="centerX" id="jIn-5G-ItS"/>
-                                    <constraint firstItem="Pad-Pc-j6d" firstAttribute="top" secondItem="nOJ-4u-waA" secondAttribute="bottom" constant="8" id="jqU-sX-T0P"/>
-                                    <constraint firstItem="Pad-Pc-j6d" firstAttribute="centerX" secondItem="C8j-UX-ywh" secondAttribute="centerX" id="kxj-pU-r3k"/>
-                                    <constraint firstItem="nOJ-4u-waA" firstAttribute="top" secondItem="C8j-UX-ywh" secondAttribute="top" constant="20" id="maw-do-guj"/>
-                                    <constraint firstItem="syf-sE-uUM" firstAttribute="leading" secondItem="C8j-UX-ywh" secondAttribute="leading" constant="20" symbolic="YES" id="psO-TK-tGb"/>
-                                    <constraint firstItem="syf-sE-uUM" firstAttribute="top" secondItem="Pad-Pc-j6d" secondAttribute="bottom" constant="8" id="uoM-1L-Ohi"/>
-                                </constraints>
                             </customView>
                         </subviews>
                         <constraints>
@@ -369,11 +383,11 @@ DQ
                             <constraint firstItem="B4Q-yT-nKT" firstAttribute="leading" secondItem="Ie8-lu-6dX" secondAttribute="leading" id="ADl-PW-sIG"/>
                             <constraint firstAttribute="trailing" secondItem="B4Q-yT-nKT" secondAttribute="trailing" id="Qvt-j3-DaC"/>
                             <constraint firstAttribute="trailing" secondItem="iPz-Dg-VNs" secondAttribute="trailing" id="Xte-41-dmx"/>
+                            <constraint firstItem="wYB-07-s0m" firstAttribute="top" secondItem="Ie8-lu-6dX" secondAttribute="top" constant="69" id="azR-RT-PzC"/>
                             <constraint firstItem="C8j-UX-ywh" firstAttribute="top" secondItem="B4Q-yT-nKT" secondAttribute="bottom" id="bdh-tz-GgB"/>
                             <constraint firstItem="C8j-UX-ywh" firstAttribute="leading" secondItem="Ie8-lu-6dX" secondAttribute="leading" id="cb2-bQ-LAr"/>
                             <constraint firstAttribute="bottom" secondItem="wYB-07-s0m" secondAttribute="bottom" id="iNT-d7-7lc"/>
                             <constraint firstItem="iPz-Dg-VNs" firstAttribute="bottom" secondItem="B4Q-yT-nKT" secondAttribute="bottom" id="k6G-bc-JFm"/>
-                            <constraint firstItem="wYB-07-s0m" firstAttribute="top" secondItem="B4Q-yT-nKT" secondAttribute="bottom" id="lQH-dg-3tL"/>
                             <constraint firstItem="iPz-Dg-VNs" firstAttribute="leading" secondItem="Ie8-lu-6dX" secondAttribute="leading" id="qPT-VT-BJu"/>
                             <constraint firstAttribute="bottom" secondItem="C8j-UX-ywh" secondAttribute="bottom" id="taz-Ft-0Yy"/>
                         </constraints>
@@ -383,21 +397,24 @@ DQ
                         <outlet property="browserFeedbackDisclaimerTextView" destination="nm3-pj-w2B" id="gil-t1-jv0"/>
                         <outlet property="browserFeedbackTextView" destination="F3N-ft-DgV" id="amf-uR-AYI"/>
                         <outlet property="browserFeedbackView" destination="8Xi-CY-jyt" id="5IL-yu-IWc"/>
+                        <outlet property="browserFeedbackViewTopConstraint" destination="rcx-DQ-kn9" id="vZz-Yt-Lko"/>
                         <outlet property="contentView" destination="wYB-07-s0m" id="XXQ-Fh-tQF"/>
                         <outlet property="contentViewHeightContraint" destination="0W2-HI-Vs8" id="vY1-me-1T6"/>
                         <outlet property="optionPopUpButton" destination="7Z6-Ji-PH7" id="4aZ-ZE-ym6"/>
                         <outlet property="pickOptionMenuItem" destination="z2T-3Y-jPK" id="6dO-Or-fk2"/>
                         <outlet property="submitButton" destination="Gy6-KF-A15" id="aBn-VX-sGY"/>
                         <outlet property="thankYouView" destination="C8j-UX-ywh" id="EQo-2a-mhp"/>
+                        <outlet property="unsupportedOsView" destination="8xr-ho-IDj" id="3HW-mc-78M"/>
                         <outlet property="urlTextField" destination="2gs-6z-agW" id="7CM-5N-ugt"/>
                         <outlet property="websiteBreakageCategoryPopUpButton" destination="hUd-Rb-6Ls" id="DqR-hE-Sm5"/>
                         <outlet property="websiteBreakageView" destination="8B9-wf-zcP" id="enA-tH-Z1l"/>
+                        <outlet property="websiteBreakageViewTopConstraint" destination="8Dh-xw-FXE" id="oNh-Yk-sHD"/>
                         <outlet property="websiteIsBrokenMenuItem" destination="uoX-qE-3kz" id="xnb-jy-aeZ"/>
                     </connections>
                 </viewController>
                 <customObject id="FaH-Lu-sfn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-299" y="1173"/>
+            <point key="canvasLocation" x="-299" y="1172.5"/>
         </scene>
     </scenes>
     <resources>

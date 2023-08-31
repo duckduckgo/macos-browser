@@ -47,12 +47,8 @@ final class MainViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var bookmarksBarVisibilityChangedCancellable: AnyCancellable?
     private var navigationalCancellables = Set<AnyCancellable>()
-    private var canBookmarkCancellable: AnyCancellable?
-    private var canInsertLastRemovedTabCancellable: AnyCancellable?
-    private var findInPageCancellable: AnyCancellable?
-    private var keyDownMonitor: Any?
-    private var mouseNavButtonsMonitor: Any?
     private var windowTitleCancellable: AnyCancellable?
+    private var eventMonitorCancellables = Set<AnyCancellable>()
 
     private var bookmarksBarIsVisible: Bool {
         return bookmarksBarViewController.parent != nil
@@ -85,6 +81,7 @@ final class MainViewController: NSViewController {
         view.registerForDraggedTypes([.URL, .fileURL])
 
         registerForBookmarkBarPromptNotifications()
+        registerForDidBecomeActiveNotifications()
     }
 
     var bookmarkBarPromptObserver: Any?
@@ -124,6 +121,19 @@ final class MainViewController: NSViewController {
         updateDividerColor()
     }
 
+    func registerForDidBecomeActiveNotifications() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(applicationDidBecomeActive),
+                                               name: NSApplication.didBecomeActiveNotification,
+                                               object: nil)
+    }
+
+    @objc func applicationDidBecomeActive() {
+        // Temporary feature flag tester, to validate that phased rollouts are working as intended.
+        // This is to be removed before the end of August 2023.
+        PhasedRolloutFeatureFlagTester.shared.sendFeatureFlagEnabledPixelIfNecessary()
+    }
+
     override func viewDidLayout() {
         findInPageContainerView.applyDropShadow()
     }
@@ -156,15 +166,7 @@ final class MainViewController: NSViewController {
     }
 
     func windowWillClose() {
-        if let monitor = keyDownMonitor {
-            NSEvent.removeMonitor(monitor)
-            keyDownMonitor = nil
-        }
-        if let monitor = mouseNavButtonsMonitor {
-            NSEvent.removeMonitor(monitor)
-            mouseNavButtonsMonitor = nil
-        }
-
+        eventMonitorCancellables.removeAll()
         tabBarViewController?.hideTabPreview()
     }
 
@@ -231,7 +233,7 @@ final class MainViewController: NSViewController {
     private func updateBookmarksBarViewVisibility(visible: Bool) {
         let showBookmarksBar = isInPopUpWindow ? false : visible
 
-        if visible {
+        if showBookmarksBar {
             if bookmarksBarViewController.parent == nil {
                 addChild(bookmarksBarViewController)
 
@@ -436,6 +438,10 @@ final class MainViewController: NSViewController {
             browserTabViewController.bookmarksViewController?.view.makeMeFirstResponder()
         case .none:
             shouldAdjustFirstResponderOnContentChange = true
+#if DBP
+        case .dataBrokerProtection:
+            browserTabViewController.preferencesViewController?.view.makeMeFirstResponder()
+#endif
         }
     }
 
@@ -481,18 +487,14 @@ extension MainViewController: NSDraggingDestination {
 extension MainViewController {
 
     func listenToKeyDownEvents() {
-        if let monitor = keyDownMonitor {
-            NSEvent.removeMonitor(monitor)
-            keyDownMonitor = nil
-        }
-
-        self.keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            guard let self = self else { return nil }
+        NSEvent.addLocalCancellableMonitor(forEventsMatching: .keyDown) { [weak self] event in
+            guard let self else { return event }
             return self.customKeyDown(with: event) ? nil : event
-        }
-        self.mouseNavButtonsMonitor = NSEvent.addLocalMonitorForEvents(matching: .otherMouseUp) { [weak self] event in
-            return self?.otherMouseUp(with: event)
-        }
+        }.store(in: &eventMonitorCancellables)
+        NSEvent.addLocalCancellableMonitor(forEventsMatching: .otherMouseUp) { [weak self] event in
+            guard let self else { return event }
+            return self.otherMouseUp(with: event)
+        }.store(in: &eventMonitorCancellables)
     }
 
     func customKeyDown(with event: NSEvent) -> Bool {

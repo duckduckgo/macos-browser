@@ -47,12 +47,18 @@ final class ContentBlockingMock: NSObject, ContentBlockingProtocol, AdClickAttri
     let contentBlockerRulesManager = ContentBlockerRulesManagerMock()
     let privacyConfigurationManager: PrivacyConfigurationManaging = MockPrivacyConfigurationManager()
 
-    var adClickAttribution: AdClickAttributing = MockAttributing()
+    var adClickAttribution: AdClickAttributing
     var adClickAttributionRulesProvider: AdClickAttributionRulesProviding = MockAttributionRulesProvider()
 
     var attributionEvents: EventMapping<AdClickAttributionEvents>?
     var attributionDebugEvents: EventMapping<BrowserServicesKit.AdClickAttributionDebugEvents>?
 
+    init(adClickAttributionEnabled: Bool) {
+        self.adClickAttribution = MockAttributing(isEnabled: adClickAttributionEnabled)
+    }
+    override convenience init() {
+        self.init(adClickAttributionEnabled: false)
+    }
 }
 
 @objc(HTTPSUpgradeStoreMock)
@@ -83,13 +89,15 @@ final class HTTPSUpgradeStoreMock: NSObject, HTTPSUpgradeStore {
 
 final class MockAttributing: AdClickAttributing {
 
-    init(onFormatMatching: @escaping (URL) -> Bool = { _ in return true },
+    init(isEnabled: Bool = true,
+         onFormatMatching: @escaping (URL) -> Bool = { _ in return true },
          onParameterNameQuery: @escaping (URL) -> String? = { _ in return nil }) {
+        self.isEnabled = isEnabled
         self.onFormatMatching = onFormatMatching
         self.onParameterNameQuery = onParameterNameQuery
     }
 
-    var isEnabled = true
+    var isEnabled: Bool
 
     var allowlist = [AdClickAttributionFeature.AllowlistEntry]()
 
