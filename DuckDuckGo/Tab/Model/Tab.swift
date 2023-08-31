@@ -784,7 +784,7 @@ protocol NewWindowPolicyDecisionMaker {
 
             if url.isFileURL {
 #if APPSTORE
-                NotificationCenter.default.post(name: .displayCannotOpenFileAlert, object: nil, userInfo: nil)
+                NotificationCenter.default.post(name: .displayCannotOpenFileAlert, object: self, userInfo: nil)
                 return nil
 #else
                 return webView.navigator(distributedNavigationDelegate: navigationDelegate)

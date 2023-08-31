@@ -330,7 +330,7 @@ final class MainViewController: NSViewController {
     }
 
     private func subscribeToShouldDisplayCannotOpenFileAlert() {
-        NotificationCenter.default.addObserver(self, selector: #selector(displayCannotOpenFileAlert(_:)), name: .displayCannotOpenFileAlert, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(displayCannotOpenFileAlert(_:)), name: .displayCannotOpenFileAlert, object: tabCollectionViewModel.selectedTabViewModel?.tab)
     }
 
     @objc private func displayCannotOpenFileAlert(_ notification: Notification) {
