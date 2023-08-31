@@ -91,8 +91,8 @@ struct DBPUICommunicationLayer: Subfeature {
     func handshake(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(DBPUIHandshake.self, from: data) else {
-            os_log("Failed to parse setState message", log: .dataBrokerProtection)
-            return DBPUIStandardResponse(version: Constants.version, success: false)
+            os_log("Failed to parse handshake message", log: .dataBrokerProtection)
+            throw DBPUIError.malformedRequest("Unable to parse handshake message")
         }
 
         if result.version != Constants.version {
@@ -108,7 +108,7 @@ struct DBPUICommunicationLayer: Subfeature {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(DBPUISetState.self, from: data) else {
             os_log("Failed to parse setState message", log: .dataBrokerProtection)
-            return nil
+            throw DBPUIError.malformedRequest("Unable to parse setState message")
         }
 
         os_log("Web UI requested new state: \(result.state.rawValue)", log: .dataBrokerProtection)
@@ -119,14 +119,18 @@ struct DBPUICommunicationLayer: Subfeature {
     }
 
     func getCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        return delegate?.getUserProfile()
+        guard let profile = delegate?.getUserProfile() else {
+            throw DBPUIError.notFoundError("No user profile found")
+        }
+
+        return profile
     }
 
     func addNameToCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(DBPUIUserProfileName.self, from: data) else {
             os_log("Failed to parse addNameToCurrentUserProfile message", log: .dataBrokerProtection)
-            return DBPUIStandardResponse(version: Constants.version, success: false)
+            throw DBPUIError.malformedRequest("Unable to parse addNameToCurrentUserProfile message")
         }
 
         if delegate?.addNameToCurrentUserProfile(result) == true {
@@ -140,7 +144,7 @@ struct DBPUICommunicationLayer: Subfeature {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(DBPUIUserProfileName.self, from: data) else {
             os_log("Failed to parse removeNameFromCurrentUserProfile message", log: .dataBrokerProtection)
-            return nil
+            throw DBPUIError.malformedRequest("Unable to parse removeNameFromCurrentUserProfile message")
         }
 
         if delegate?.removeNameFromUserProfile(result) == true {
@@ -154,7 +158,7 @@ struct DBPUICommunicationLayer: Subfeature {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(DBPUIIndex.self, from: data) else {
             os_log("Failed to parse removeNameAtIndexFromCurrentUserProfile message", log: .dataBrokerProtection)
-            return nil
+            throw DBPUIError.malformedRequest("Unable to parse removeNameAtIndexFromCurrentUserProfile message")
         }
 
         if delegate?.removeNameAtIndexFromUserProfile(result) == true {
@@ -167,8 +171,8 @@ struct DBPUICommunicationLayer: Subfeature {
     func setBirthYearForCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(DBPUIBirthYear.self, from: data) else {
-            os_log("Failed to parse removeNameAtIndexFromCurrentUserProfile message", log: .dataBrokerProtection)
-            return nil
+            os_log("Failed to parse setBirthYearForCurrentUserProfile message", log: .dataBrokerProtection)
+            throw DBPUIError.malformedRequest("Unable to parse setBirthYearForCurrentUserProfile message")
         }
 
         delegate?.setBirthYearForCurrentUserProfile(result)
@@ -179,8 +183,8 @@ struct DBPUICommunicationLayer: Subfeature {
     func addAddressToCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(DBPUIUserProfileAddress.self, from: data) else {
-            os_log("Failed to parse removeNameAtIndexFromCurrentUserProfile message", log: .dataBrokerProtection)
-            return nil
+            os_log("Failed to parse addAddressToCurrentUserProfile message", log: .dataBrokerProtection)
+            throw DBPUIError.malformedRequest("Unable to parse addAddressToCurrentUserProfile message")
         }
 
         if delegate?.addAddressToCurrentUserProfile(result) == true {
@@ -193,8 +197,8 @@ struct DBPUICommunicationLayer: Subfeature {
     func removeAddressFromCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(DBPUIUserProfileAddress.self, from: data) else {
-            os_log("Failed to parse removeNameAtIndexFromCurrentUserProfile message", log: .dataBrokerProtection)
-            return nil
+            os_log("Failed to parse removeAddressFromCurrentUserProfile message", log: .dataBrokerProtection)
+            throw DBPUIError.malformedRequest("Unable to parse removeAddressFromCurrentUserProfile message")
         }
 
         if delegate?.removeAddressFromCurrentUserProfile(result) == true {
@@ -208,7 +212,7 @@ struct DBPUICommunicationLayer: Subfeature {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(DBPUIIndex.self, from: data) else {
             os_log("Failed to parse removeNameAtIndexFromCurrentUserProfile message", log: .dataBrokerProtection)
-            return nil
+            throw DBPUIError.malformedRequest("Unable to parse removeNameAtIndexFromCurrentUserProfile message")
         }
 
         if delegate?.removeAddressAtIndexFromUserProfile(result) == true {

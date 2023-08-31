@@ -18,6 +18,11 @@
 
 import Foundation
 
+enum DBPUIError: Error {
+    case notFoundError(String)
+    case malformedRequest(String)
+}
+
 /// Enum to represent the requested UI State
 public enum DBPUIState: String, Codable {
     case onboarding = "Onboarding"
