@@ -22,10 +22,6 @@ on:
         description: "Asana release task URL"
         required: false
         type: string
-      atb-variants:
-        description: "ATB variants (comma-separated)"
-        required: false
-        type: string
   workflow_call:
     inputs:
       release-type:
@@ -41,10 +37,6 @@ on:
       asana-task-url:
         description: "Asana release task URL"
         required: true
-        type: string
-      atb-variants:
-        description: "ATB variants (comma-separated)"
-        required: false
         type: string
     secrets:
       BUILD_CERTIFICATE_BASE64:
@@ -104,12 +96,10 @@ jobs:
     outputs:
       app-version: ${{ steps.set-outputs.outputs.app-version }}
       app-name: ${{ steps.set-outputs.outputs.app-name }}
-      atb-variants: ${{ steps.atb-variants.outputs.matrix }}
 
     env:
       release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
       asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
-      atb-variants: ${{ github.event.inputs.atb-variants || inputs.atb-variants }}
 
     steps:
 
@@ -167,13 +157,6 @@ jobs:
           ./scripts/archive.sh ${{ env.release-type }}
         fi
 
-    - name: Setup ATB variants
-      id: atb-variants
-      if: ${{ env.atb-variants }}
-      run: |
-        variant_matrix="$(echo "${{ env.atb-variants }}" | sed 's/,/\",\"/g')"
-        echo "matrix={\"variant\": [\"${variant_matrix}\"]}" >> $GITHUB_OUTPUT
-
     - name: Set app name and version
       id: set-outputs
       run: |
@@ -191,13 +174,6 @@ jobs:
       with:
         name: DuckDuckGo-${{ env.release-type }}-dSYM-${{ env.app-version }}
         path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip
-
-    - name: Upload entitlements artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: DuckDuckGo-${{ env.release-type }}-entitlements
-        path: ${{ github.workspace }}/release/entitlements.xcent
-        retention-days: 1
 
     - name: Upload dSYMs to Asana
       if: env.asana-task-url
@@ -289,136 +265,11 @@ jobs:
         file-name: ${{ github.workspace }}/duckduckgo-${{ env.app-version }}.dmg
         task-url: ${{ env.asana-task-url }}
 
-  create-atb-variants:
-
-    name: Create ATB variant
-    needs: export-notarized-app
-    if: ${{ github.event.inputs.atb-variants || inputs.atb-variants }}
-
-    strategy:
-      matrix: ${{ fromJSON(needs.export-notarized-app.outputs.atb-variants) }}
-
-    runs-on: macos-12
-    timeout-minutes: 15
-
-    env:
-      app-version: ${{ needs.export-notarized-app.outputs.app-version }}
-      app-name: ${{ needs.export-notarized-app.outputs.app-name }}
-      asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
-      release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
-
-    steps:
-
-    - name: Fetch app bundle
-      uses: actions/download-artifact@v3
-      with:
-        name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.app
-        path: ${{ github.workspace }}/dmg
-
-    - name: Extract app bundle
-      working-directory: ${{ github.workspace }}/dmg
-      run: |
-        ditto -xk DuckDuckGo-${{ env.app-version }}.zip .
-        rm -f DuckDuckGo-${{ env.app-version }}.zip
-
-    - name: Fetch entitlements
-      uses: actions/download-artifact@v3
-      with:
-        name: DuckDuckGo-${{ env.release-type }}-entitlements
-        path: ${{ github.workspace }}/dmg
-
-    - name: Install create-dmg
-      run: brew install create-dmg
-
-    - name: Fetch install-certs-and-profiles action
-      env:
-        GH_TOKEN: ${{ github.token }}
-        DEST_DIR: ".github/actions/install-certs-and-profiles"
-      run: |
-        mkdir -p "${{ env.DEST_DIR }}"
-        curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/${{ env.DEST_DIR }}/action.yml?ref=${{ github.ref }} --jq .download_url) \
-            --output ${{ env.DEST_DIR }}/action.yml
-
-    - name: Install Apple Developer ID Application certificate
-      uses: ./.github/actions/install-certs-and-profiles
-      with:
-        BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
-        P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
-        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-        REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.REVIEW_PROVISION_PROFILE_BASE64 }}
-        RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.RELEASE_PROVISION_PROFILE_BASE64 }}
-        NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64 }}
-        NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64 }}
-        NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64 }}
-        NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64 }}
-        NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64 }}
-        NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64 }}
-        NETP_START_VPN_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_START_VPN_PROVISION_PROFILE_BASE64 }}
-        NETP_STOP_VPN_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_STOP_VPN_PROVISION_PROFILE_BASE64 }}
-        NETP_ENABLE_ON_DEMAND_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_ENABLE_ON_DEMAND_PROVISION_PROFILE_BASE64 }}
-
-    - name: Set up variant
-      working-directory: ${{ github.workspace }}/dmg
-      run: |
-        echo "${{ matrix.variant }}" > "${{ env.app-name }}.app/Contents/Resources/variant.txt"
-        sign_identity="$(security find-certificate -a -c "Developer ID Application" -Z | grep ^SHA-1 | cut -d " " -f3 | uniq)"
-
-        /usr/bin/codesign \
-            --force \
-            --sign ${sign_identity} \
-            -o runtime \
-            --entitlements "entitlements.xcent" \
-            --generate-entitlement-der "${{ env.app-name }}.app"
-        rm -rf entitlements.xcent
-
-    - name: Notarize the app
-      env:
-        APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
-        APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
-        APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
-      working-directory: ${{ github.workspace }}/dmg
-      run: |
-        # import API Key from secrets
-        export APPLE_API_KEY_PATH="$RUNNER_TEMP/apple_api_key.pem"
-        echo -n "$APPLE_API_KEY_BASE64" | base64 --decode -o $APPLE_API_KEY_PATH
-
-        notarization_zip_path="DuckDuckGo-for-notarization.zip"
-
-        ditto -c -k --keepParent "${{ env.app-name }}.app" "${notarization_zip_path}"
-        xcrun notarytool submit \
-          --key "${APPLE_API_KEY_PATH}" \
-          --key-id "${{ env.APPLE_API_KEY_ID }}" \
-          --issuer "${{ env.APPLE_API_KEY_ISSUER }}" \
-          --wait \
-          "${notarization_zip_path}"
-        xcrun stapler staple "${{ env.app-name }}.app"
-        rm -rf "${notarization_zip_path}"
-
-    - name: Create DMG
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/scripts/assets/dmg-background.png?ref=${{ github.ref }} --jq .download_url) \
-            --output dmg-background.png
-        create-dmg --volname "${{ env.app-name }}" \
-            --icon "${{ env.app-name }}.app" 140 160 \
-            --background "dmg-background.png" \
-            --window-size 600 400 \
-            --icon-size 120 \
-            --app-drop-link 430 160 "duckduckgo-${{ env.app-version }}.dmg" \
-            "dmg"
-
-    - name: Upload DMG artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: DuckDuckGo-${{ env.release-type }}-${{ matrix.variant }}-${{ env.app-version }}.dmg
-        path: ${{ github.workspace }}/duckduckgo*-${{ env.app-version }}.dmg
-
   mattermost:
 
     name: Send Mattermost message
 
-    needs: [export-notarized-app, create-dmg, create-atb-variants]
+    needs: [export-notarized-app, create-dmg]
     if: ${{ always() && (needs.export-notarized-app.result == 'success') && (needs.create-dmg.result == 'success' || needs.create-dmg.result == 'skipped') }}
 
     runs-on: ubuntu-latest
