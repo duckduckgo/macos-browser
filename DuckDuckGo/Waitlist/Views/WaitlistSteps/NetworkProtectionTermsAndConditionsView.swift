@@ -26,16 +26,19 @@ struct NetworkProtectionTermsAndConditionsView: View {
     @EnvironmentObject var model: WaitlistViewModel
 
     var body: some View {
-        WaitlistDialogView {
-            VStack(spacing: 16.0) {
+        WaitlistDialogView(innerPadding: 0) {
+            VStack(spacing: 0) {
                 Text("Network Protection Beta\nService Terms and Privacy Policy")
                     .font(.system(size: 17, weight: .bold))
                     .multilineTextAlignment(.center)
+                    .padding(.bottom, 16.0)
+
+                Divider()
 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 8.0) {
+                    VStack(alignment: .leading, spacing: 0) {
                         Text(UserText.networkProtectionPrivacyPolicyTitle)
-                            .font(.system(size: 13, weight: .bold))
+                            .font(.system(size: 15, weight: .bold))
                             .multilineTextAlignment(.leading)
 
                         Group {
@@ -52,12 +55,13 @@ struct NetworkProtectionTermsAndConditionsView: View {
                         }
 
                         Text(UserText.networkProtectionTermsOfServiceTitle)
-                            .font(.system(size: 13, weight: .bold))
+                            .font(.system(size: 15, weight: .bold))
                             .multilineTextAlignment(.leading)
-                            .padding(.top, 20)
+                            .padding(.top, 28)
+                            .padding(.bottom, 14)
 
                         Group {
-                            Text(UserText.networkProtectionTermsOfServiceSection1Title).titleStyle()
+                            Text(UserText.networkProtectionTermsOfServiceSection1Title).titleStyle(topPadding: 0)
                             Text(UserText.networkProtectionTermsOfServiceSection1List).bodyStyle()
                             Text(UserText.networkProtectionTermsOfServiceSection2Title).titleStyle()
                             Text(UserText.networkProtectionTermsOfServiceSection2List).bodyStyle()
@@ -65,12 +69,12 @@ struct NetworkProtectionTermsAndConditionsView: View {
                             Text(UserText.networkProtectionTermsOfServiceSection3List).bodyStyle()
                         }
                     }
-                    .padding(20.0)
+                    .padding(.all, 20)
                 }
                 .frame(maxWidth: .infinity)
-                .background(Color("BlackWhite1"))
-                .border(Color("BlackWhite5"))
                 .frame(maxHeight: 500)
+                // .background(Color("BlackWhite1"))
+                // .border(Color("BlackWhite5"))
             }
         } buttons: {
             Button(UserText.networkProtectionWaitlistButtonCancel) {
@@ -88,12 +92,12 @@ struct NetworkProtectionTermsAndConditionsView: View {
 
 private extension Text {
 
-    func titleStyle() -> some View {
+    func titleStyle(topPadding: CGFloat = 24, bottomPadding: CGFloat = 14) -> some View {
         self
             .font(.system(size: 11, weight: .bold))
             .multilineTextAlignment(.leading)
-            .padding(.top, 18)
-            .padding(.bottom, 5)
+            .padding(.top, topPadding)
+            .padding(.bottom, bottomPadding)
     }
 
     func bodyStyle() -> some View {

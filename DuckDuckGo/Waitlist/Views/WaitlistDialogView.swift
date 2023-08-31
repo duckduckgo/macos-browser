@@ -22,14 +22,14 @@ import SwiftUI
 
 struct WaitlistDialogView<Content, Buttons>: View where Content: View, Buttons: View {
 
-    let spacing: CGFloat
+    let innerPadding: CGFloat
 
     @EnvironmentObject var model: WaitlistViewModel
     @ViewBuilder let content: () -> Content
     @ViewBuilder let buttons: () -> Buttons
 
-    init(spacing: CGFloat = 16.0, @ViewBuilder content: @escaping () -> Content, @ViewBuilder buttons: @escaping () -> Buttons) {
-        self.spacing = spacing
+    init(innerPadding: CGFloat = 16.0, @ViewBuilder content: @escaping () -> Content, @ViewBuilder buttons: @escaping () -> Buttons) {
+        self.innerPadding = innerPadding
         self.content = content
         self.buttons = buttons
     }
@@ -37,29 +37,29 @@ struct WaitlistDialogView<Content, Buttons>: View where Content: View, Buttons: 
     var body: some View {
         VStack(spacing: 0) {
             content()
-                .padding(.horizontal, 20.0)
-                .padding(.bottom, spacing)
+                .padding(.all, innerPadding)
                 .background(
                     GeometryReader { proxy in
                         if #available(macOS 11.0, *) {
                             Color.clear
                                 .onAppear {
-                                    model.receivedNewViewHeight(proxy.size.height + 90.0)
+                                    model.receivedNewViewHeight(proxy.size.height + 74.0 + innerPadding)
                                 }
                                 .onChange(of: proxy.size) { _ in
-                                    model.receivedNewViewHeight(proxy.size.height + 90.0)
+                                    model.receivedNewViewHeight(proxy.size.height + 74.0 + innerPadding)
                                 }
                         } else {
                             Color.clear
                                 .onAppear {
-                                    model.receivedNewViewHeight(proxy.size.height + 90.0)
+                                    model.receivedNewViewHeight(proxy.size.height + 74.0 + innerPadding)
                                 }
                         }
                     }
                 )
 
             Divider()
-                .padding([.top, .bottom], 16.0)
+                .padding(.bottom, 16.0)
+                .padding(.top, innerPadding)
 
             HStack {
                 Spacer()
@@ -67,8 +67,8 @@ struct WaitlistDialogView<Content, Buttons>: View where Content: View, Buttons: 
             }
             .padding(.horizontal, 20.0)
         }
-        .padding(.top, spacing)
-        .padding(.bottom, 16.0)
+        // .padding(.top, innerPadding)
+        // .padding(.bottom, 16.0)
     }
 }
 
