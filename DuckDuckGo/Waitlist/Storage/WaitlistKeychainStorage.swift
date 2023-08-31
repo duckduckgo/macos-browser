@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import NetworkProtection
 
 public class WaitlistKeychainStore: WaitlistStorage {
 
@@ -29,14 +28,9 @@ public class WaitlistKeychainStore: WaitlistStorage {
         case inviteCode = "invite-code"
     }
 
-    let keychainType: KeychainType
-
-    init(waitlistIdentifier: String,
-                keychainPrefix: String? = Bundle.main.bundleIdentifier,
-                keychainType: KeychainType = .default) {
+    init(waitlistIdentifier: String, keychainPrefix: String? = Bundle.main.bundleIdentifier) {
         self.waitlistIdentifier = waitlistIdentifier
         self.keychainPrefix = keychainPrefix ?? "com.duckduckgo"
-        self.keychainType = keychainType
     }
 
     func getWaitlistToken() -> String? {
@@ -87,12 +81,9 @@ public class WaitlistKeychainStore: WaitlistStorage {
     }
 
     private func retrieveData(forField field: WaitlistKeychainField) -> Data? {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecMatchLimit as String: kSecMatchLimitOne,
-            kSecAttrService as String: keychainServiceName(for: field),
-            kSecAttrAccessGroup as String: Bundle.main.appGroupName,
-            kSecReturnData as String: true]
+        var query = defaultAttributes(serviceName: keychainServiceName(for: field))
+        query[kSecMatchLimit as String] = kSecMatchLimitOne
+        query[kSecReturnData as String] = true
 
         var item: CFTypeRef?
         let status = SecItemCopyMatching(query as CFDictionary, &item)
@@ -115,27 +106,26 @@ public class WaitlistKeychainStore: WaitlistStorage {
     }
 
     private func add(data: Data, forField field: WaitlistKeychainField) {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrSynchronizable as String: false,
-            kSecAttrService as String: keychainServiceName(for: field),
-            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
-            kSecValueData as String: data]
-
+        var query = defaultAttributes(serviceName: keychainServiceName(for: field))
+        query[kSecValueData as String] = data
         SecItemAdd(query as CFDictionary, nil)
     }
 
     private func deleteItem(forField field: WaitlistKeychainField) {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: keychainServiceName(for: field)]
+        let query = defaultAttributes(serviceName: keychainServiceName(for: field))
         SecItemDelete(query as CFDictionary)
     }
 
     // MARK: -
 
-    private func defaultAttributes() -> [CFString: Any] {
-        return [:] // TODO
+    private func defaultAttributes(serviceName: String) -> [String: Any] {
+        return [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrSynchronizable as String: false,
+            kSecAttrAccessGroup as String: Bundle.main.appGroupName,
+            kSecAttrService as String: serviceName,
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
+        ]
     }
 
     internal func keychainServiceName(for field: WaitlistKeychainField) -> String {

@@ -117,7 +117,7 @@ public final class WaitlistViewModel: ObservableObject {
         case .closeAndPinNetworkProtection:
             close()
 
-            LocalPinningManager.shared.togglePinning(for: .networkProtection)
+            LocalPinningManager.shared.pin(.networkProtection)
             NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
         }
     }
