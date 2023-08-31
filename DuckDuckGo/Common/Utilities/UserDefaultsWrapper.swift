@@ -132,7 +132,6 @@ public struct UserDefaultsWrapper<T> {
 
         // Network Protection
 
-        case networkProtectionOnDemandActivation = "netp.ondemand"
         case networkProtectionShouldEnforceRoutes = "netp.enforce-routes"
         case networkProtectionShouldIncludeAllNetworks = "netp.include-all-networks"
 
