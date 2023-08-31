@@ -63,8 +63,6 @@ jobs:
             flavor: Non-Sandbox
           - cache-key: sandbox-
             flavor: Sandbox
-          - scheme: DataBrokerProtectionTests
-            flavor: Non-Sandbox
 
     runs-on: macos-13
     timeout-minutes: 30
