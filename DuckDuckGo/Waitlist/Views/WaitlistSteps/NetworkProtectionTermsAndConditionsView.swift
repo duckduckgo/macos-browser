@@ -37,70 +37,32 @@ struct NetworkProtectionTermsAndConditionsView: View {
                         Text(UserText.networkProtectionPrivacyPolicyTitle)
                             .font(.system(size: 13, weight: .bold))
                             .multilineTextAlignment(.leading)
-                            .padding(.bottom, 10)
 
                         Group {
-                            Text(UserText.networkProtectionPrivacyPolicySection1Title)
-                                .titleStyle()
-
-                            Text(UserText.networkProtectionPrivacyPolicySection1List)
-                                .bodyStyle()
-
-                            Text(UserText.networkProtectionPrivacyPolicySection2Title)
-                                .titleStyle()
-                                .padding(.top, 10)
-
-                            Text(UserText.networkProtectionPrivacyPolicySection2List)
-                                .bodyStyle()
-
-                            Text(UserText.networkProtectionPrivacyPolicySection3Title)
-                                .titleStyle()
-                                .padding(.top, 10)
-
-                            Text(UserText.networkProtectionPrivacyPolicySection3List)
-                                .bodyStyle()
-
-                            Text(UserText.networkProtectionPrivacyPolicySection4Title)
-                                .titleStyle()
-                                .padding(.top, 10)
-
-                            Text(UserText.networkProtectionPrivacyPolicySection4List)
-                                .bodyStyle()
-
-                            Text(UserText.networkProtectionPrivacyPolicySection5Title)
-                                .titleStyle()
-                                .padding(.top, 10)
-
-                            Text(UserText.networkProtectionPrivacyPolicySection5List)
-                                .bodyStyle()
+                            Text(UserText.networkProtectionPrivacyPolicySection1Title).titleStyle()
+                            Text(UserText.networkProtectionPrivacyPolicySection1List).bodyStyle()
+                            Text(UserText.networkProtectionPrivacyPolicySection2Title).titleStyle()
+                            Text(UserText.networkProtectionPrivacyPolicySection2List).bodyStyle()
+                            Text(UserText.networkProtectionPrivacyPolicySection3Title).titleStyle()
+                            Text(UserText.networkProtectionPrivacyPolicySection3List).bodyStyle()
+                            Text(UserText.networkProtectionPrivacyPolicySection4Title).titleStyle()
+                            Text(UserText.networkProtectionPrivacyPolicySection4List).bodyStyle()
+                            Text(UserText.networkProtectionPrivacyPolicySection5Title).titleStyle()
+                            Text(UserText.networkProtectionPrivacyPolicySection5List).bodyStyle()
                         }
 
                         Text(UserText.networkProtectionTermsOfServiceTitle)
                             .font(.system(size: 13, weight: .bold))
                             .multilineTextAlignment(.leading)
-                            .padding(.bottom, 10)
                             .padding(.top, 20)
 
                         Group {
-                            Text(UserText.networkProtectionTermsOfServiceSection1Title)
-                                .titleStyle()
-
-                            Text(UserText.networkProtectionTermsOfServiceSection1List)
-                                .bodyStyle()
-
-                            Text(UserText.networkProtectionTermsOfServiceSection2Title)
-                                .titleStyle()
-                                .padding(.top, 10)
-
-                            Text(UserText.networkProtectionTermsOfServiceSection2List)
-                                .bodyStyle()
-
-                            Text(UserText.networkProtectionTermsOfServiceSection3Title)
-                                .titleStyle()
-                                .padding(.top, 10)
-
-                            Text(UserText.networkProtectionTermsOfServiceSection3List)
-                                .bodyStyle()
+                            Text(UserText.networkProtectionTermsOfServiceSection1Title).titleStyle()
+                            Text(UserText.networkProtectionTermsOfServiceSection1List).bodyStyle()
+                            Text(UserText.networkProtectionTermsOfServiceSection2Title).titleStyle()
+                            Text(UserText.networkProtectionTermsOfServiceSection2List).bodyStyle()
+                            Text(UserText.networkProtectionTermsOfServiceSection3Title).titleStyle()
+                            Text(UserText.networkProtectionTermsOfServiceSection3List).bodyStyle()
                         }
                     }
                     .padding(20.0)
@@ -130,6 +92,8 @@ private extension Text {
         self
             .font(.system(size: 11, weight: .bold))
             .multilineTextAlignment(.leading)
+            .padding(.top, 18)
+            .padding(.bottom, 5)
     }
 
     func bodyStyle() -> some View {
