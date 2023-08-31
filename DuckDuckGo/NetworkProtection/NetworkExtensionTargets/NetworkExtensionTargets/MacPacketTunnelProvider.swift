@@ -298,14 +298,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             }
 
             completionHandler(nil)
-            if !isOnDemand {
-                Task { [self] in
-                    // We're handling a successful connection started by request.
-                    // We want to call the completion handler before turning on-demand
-                    // ON so that on-demand won't start the connection on its own.
-                    await self.appLauncher?.launchApp(withCommand: .enableOnDemand)
-                }
-            }
         }
     }
 
