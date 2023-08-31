@@ -51,6 +51,14 @@ public final class WaitlistViewModel: ObservableObject {
         case notDetermined
         case notificationAllowed
         case notificationsDisabled
+
+        static func from(_ status: UNAuthorizationStatus) -> NotificationPermissionState {
+            switch status {
+            case .notDetermined: return .notDetermined
+            case .denied: return .notificationsDisabled
+            default: return .notificationAllowed
+            }
+        }
     }
 
     @Published var viewState: ViewState
@@ -66,15 +74,16 @@ public final class WaitlistViewModel: ObservableObject {
 
     init(waitlistRequest: WaitlistRequest,
          waitlistStorage: WaitlistStorage,
-         notificationService: NotificationService) {
+         notificationService: NotificationService,
+         notificationPermissionState: NotificationPermissionState = .notDetermined) {
         self.waitlistRequest = waitlistRequest
         self.waitlistStorage = waitlistStorage
         self.notificationService = notificationService
 
         if waitlistStorage.getWaitlistTimestamp() != nil, waitlistStorage.getWaitlistInviteCode() == nil {
-            viewState = .joinedWaitlist(.notDetermined)
+            viewState = .joinedWaitlist(notificationPermissionState)
 
-            Task {
+            Task { @MainActor in
                 await checkNotificationPermissions()
             }
         } else if waitlistStorage.getWaitlistInviteCode() != nil {
@@ -84,12 +93,13 @@ public final class WaitlistViewModel: ObservableObject {
         }
     }
 
-    convenience init(waitlist: Waitlist) {
+    convenience init(waitlist: Waitlist, notificationPermissionState: NotificationPermissionState = .notDetermined) {
         let waitlistType = type(of: waitlist)
         self.init(
             waitlistRequest: ProductWaitlistRequest(productName: waitlistType.apiProductName),
             waitlistStorage: WaitlistKeychainStore(waitlistIdentifier: waitlistType.identifier),
-            notificationService: UNUserNotificationCenter.current()
+            notificationService: UNUserNotificationCenter.current(),
+            notificationPermissionState: notificationPermissionState
         )
     }
 
@@ -128,14 +138,8 @@ public final class WaitlistViewModel: ObservableObject {
 
     @MainActor
     private func checkNotificationPermissions() async {
-        switch await notificationService.authorizationStatus() {
-        case .notDetermined:
-            viewState = .joinedWaitlist(.notDetermined)
-        case .denied:
-            viewState = .joinedWaitlist(.notificationsDisabled)
-        default:
-            viewState = .joinedWaitlist(.notificationAllowed)
-        }
+        let status = await notificationService.authorizationStatus()
+        viewState = .joinedWaitlist(NotificationPermissionState.from(status))
     }
 
     // MARK: - Action
@@ -160,9 +164,10 @@ public final class WaitlistViewModel: ObservableObject {
         }
     }
 
+    @MainActor
     private func requestNotificationPermission() async {
         do {
-            let permissionGranted = try await notificationService.requestAuthorization(options: [.alert]) == true
+            let permissionGranted = try await notificationService.requestAuthorization(options: [.alert])
 
             if permissionGranted {
                 self.viewState = .joinedWaitlist(.notificationAllowed)

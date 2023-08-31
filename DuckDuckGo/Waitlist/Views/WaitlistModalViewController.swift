@@ -20,13 +20,23 @@
 
 import AppKit
 import SwiftUI
+import UserNotifications
 
 final class WaitlistModalViewController: NSViewController {
 
     private let defaultSize = CGSize(width: 360, height: 650)
-    private let model = WaitlistViewModel(waitlist: NetworkProtectionWaitlist())
+    private let model: WaitlistViewModel
 
     private var heightConstraint: NSLayoutConstraint?
+
+    init(notificationPermissionState: WaitlistViewModel.NotificationPermissionState) {
+        self.model = WaitlistViewModel(waitlist: NetworkProtectionWaitlist(), notificationPermissionState: notificationPermissionState)
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     public override func loadView() {
         view = NSView(frame: NSRect(origin: CGPoint.zero, size: defaultSize))
@@ -66,9 +76,19 @@ final class WaitlistModalViewController: NSViewController {
             return
         }
 
-        let viewController = WaitlistModalViewController(nibName: nil, bundle: nil)
-        windowController.mainViewController.beginSheet(viewController) { _ in
-            completion?()
+        // This is a hack to get around an issue with the waitlist notification screen showing the wrong state while it animates in, and then
+        // jumping to the correct state as soon as the animation is complete. This works around that problem by providing the correct state up front,
+        // preventing any state changing from occurring.
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            let status = settings.authorizationStatus
+            let state = WaitlistViewModel.NotificationPermissionState.from(status)
+
+            DispatchQueue.main.async {
+                let viewController = WaitlistModalViewController(notificationPermissionState: state)
+                windowController.mainViewController.beginSheet(viewController) { _ in
+                    completion?()
+                }
+            }
         }
     }
 
