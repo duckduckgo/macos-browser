@@ -2180,6 +2180,8 @@
 		85774B032A71CDD000DE0561 /* BlockMenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85774B022A71CDD000DE0561 /* BlockMenuItem.swift */; };
 		85774B042A71CDD000DE0561 /* BlockMenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85774B022A71CDD000DE0561 /* BlockMenuItem.swift */; };
 		85799C1825DEBB3F0007EC87 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85799C1725DEBB3F0007EC87 /* Logging.swift */; };
+		857E44642A9F70F200ED77A7 /* CampaignVariantTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857E44612A9F6F3500ED77A7 /* CampaignVariantTests.swift */; };
+		857E44652A9F70F300ED77A7 /* CampaignVariantTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857E44612A9F6F3500ED77A7 /* CampaignVariantTests.swift */; };
 		857E5AF52A79045800FC0FB4 /* PixelExperiment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857E5AF42A79045800FC0FB4 /* PixelExperiment.swift */; };
 		857E5AF62A790B7000FC0FB4 /* PixelExperiment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857E5AF42A79045800FC0FB4 /* PixelExperiment.swift */; };
 		857E5AFA2A7961FF00FC0FB4 /* PixelExperimentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857E5AF82A79618100FC0FB4 /* PixelExperimentTests.swift */; };
@@ -3517,6 +3519,7 @@
 		85774AFE2A713D3B00DE0561 /* BookmarksBarMenuFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarMenuFactory.swift; sourceTree = "<group>"; };
 		85774B022A71CDD000DE0561 /* BlockMenuItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockMenuItem.swift; sourceTree = "<group>"; };
 		85799C1725DEBB3F0007EC87 /* Logging.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
+		857E44612A9F6F3500ED77A7 /* CampaignVariantTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CampaignVariantTests.swift; sourceTree = "<group>"; };
 		857E5AF42A79045800FC0FB4 /* PixelExperiment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelExperiment.swift; sourceTree = "<group>"; };
 		857E5AF82A79618100FC0FB4 /* PixelExperimentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelExperimentTests.swift; sourceTree = "<group>"; };
 		857FFEBF27D239DC00415E7A /* HyperLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperLink.swift; sourceTree = "<group>"; };
@@ -7341,6 +7344,7 @@
 				B69B50412726C5C100758A2B /* AtbParserTests.swift */,
 				B69B50442726C5C200758A2B /* StatisticsLoaderTests.swift */,
 				B69B50432726C5C100758A2B /* VariantManagerTests.swift */,
+				857E44612A9F6F3500ED77A7 /* CampaignVariantTests.swift */,
 			);
 			path = ATB;
 			sourceTree = "<group>";
@@ -10144,6 +10148,7 @@
 				3706FE1C293F661700E42796 /* ConnectBitwardenViewModelTests.swift in Sources */,
 				4B9DB0552A983B55000927DB /* MockWaitlistStorage.swift in Sources */,
 				3706FE1D293F661700E42796 /* PixelStoreTests.swift in Sources */,
+				857E44642A9F70F200ED77A7 /* CampaignVariantTests.swift in Sources */,
 				3706FE1E293F661700E42796 /* GeolocationProviderTests.swift in Sources */,
 				3706FE1F293F661700E42796 /* AppStateChangePublisherTests.swift in Sources */,
 				3706FE20293F661700E42796 /* CLLocationManagerMock.swift in Sources */,
@@ -11354,6 +11359,7 @@
 				B63ED0DA26AE7AF400A9DAD1 /* PermissionManagerMock.swift in Sources */,
 				374EF08329B751FC003D2E87 /* RecentlyClosedCoordinatorTests.swift in Sources */,
 				AA9C362825518C44004B1BA3 /* WebsiteDataStoreMock.swift in Sources */,
+				857E44652A9F70F300ED77A7 /* CampaignVariantTests.swift in Sources */,
 				3776582D27F71652009A6B35 /* WebsiteBreakageReportTests.swift in Sources */,
 				31E163BA293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift in Sources */,
 				4B723E0826B0003E00E14D75 /* MockSecureVault.swift in Sources */,
