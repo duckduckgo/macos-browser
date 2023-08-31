@@ -550,6 +550,12 @@ protocol NewWindowPolicyDecisionMaker {
 
     @discardableResult
     func setUrl(_ url: URL?, userEntered: String?) -> Task<ExpectedNavigation?, Never>? {
+#if APPSTORE
+        if url?.isFileURL ?? false {
+            NotificationCenter.default.post(name: .displayCannotOpenFileAlert, object: self, userInfo: nil)
+            return nil
+        }
+#endif
         if url == .welcome {
             OnboardingViewModel().restart()
         }
@@ -783,13 +789,8 @@ protocol NewWindowPolicyDecisionMaker {
             }
 
             if url.isFileURL {
-#if APPSTORE
-                NotificationCenter.default.post(name: .displayCannotOpenFileAlert, object: self, userInfo: nil)
-                return nil
-#else
                 return webView.navigator(distributedNavigationDelegate: navigationDelegate)
                     .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: navigationType)
-#endif
             }
 
             var request = URLRequest(url: url, cachePolicy: interactionState.shouldLoadFromCache ? .returnCacheDataElseLoad : .useProtocolCachePolicy)
