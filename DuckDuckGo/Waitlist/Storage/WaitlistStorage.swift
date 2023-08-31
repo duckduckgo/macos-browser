@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-public protocol WaitlistStorage {
+protocol WaitlistStorage {
 
     func getWaitlistToken() -> String?
     func getWaitlistTimestamp() -> Int?
@@ -30,7 +30,7 @@ public protocol WaitlistStorage {
 
 }
 
-public extension WaitlistStorage {
+extension WaitlistStorage {
 
     var isOnWaitlist: Bool {
         return getWaitlistToken() != nil && getWaitlistTimestamp() != nil && !isInvited

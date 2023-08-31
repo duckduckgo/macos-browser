@@ -17,56 +17,62 @@
 //
 
 import Foundation
+import NetworkProtection
 
 public class WaitlistKeychainStore: WaitlistStorage {
 
-    public static let inviteCodeDidChangeNotification = Notification.Name("com.duckduckgo.app.waitlist.invite-code-changed")
+    static let inviteCodeDidChangeNotification = Notification.Name("com.duckduckgo.app.waitlist.invite-code-changed")
 
-    public enum WaitlistKeychainField: String {
+    enum WaitlistKeychainField: String {
         case waitlistToken = "token"
         case waitlistTimestamp = "timestamp"
         case inviteCode = "invite-code"
     }
 
-    public init(waitlistIdentifier: String, keychainPrefix: String? = Bundle.main.bundleIdentifier) {
+    let keychainType: KeychainType
+
+    init(waitlistIdentifier: String,
+                keychainPrefix: String? = Bundle.main.bundleIdentifier,
+                keychainType: KeychainType = .default) {
         self.waitlistIdentifier = waitlistIdentifier
         self.keychainPrefix = keychainPrefix ?? "com.duckduckgo"
+        self.keychainType = keychainType
     }
 
-    public func getWaitlistToken() -> String? {
+    func getWaitlistToken() -> String? {
         return getString(forField: .waitlistToken)
     }
 
-    public func getWaitlistTimestamp() -> Int? {
+    func getWaitlistTimestamp() -> Int? {
         guard let timestampString = getString(forField: .waitlistTimestamp) else { return nil }
         return Int(timestampString)
     }
 
-    public func getWaitlistInviteCode() -> String? {
+    func getWaitlistInviteCode() -> String? {
         return getString(forField: .inviteCode)
     }
 
-    public func store(waitlistToken: String) {
+    func store(waitlistToken: String) {
         add(string: waitlistToken, forField: .waitlistToken)
     }
 
-    public func store(waitlistTimestamp: Int) {
+    func store(waitlistTimestamp: Int) {
         let timestampString = String(waitlistTimestamp)
         add(string: timestampString, forField: .waitlistTimestamp)
     }
 
-    public func store(inviteCode: String) {
+    func store(inviteCode: String) {
         add(string: inviteCode, forField: .inviteCode)
         NotificationCenter.default.post(name: Self.inviteCodeDidChangeNotification, object: waitlistIdentifier)
     }
 
-    public func deleteWaitlistState() {
+    func deleteWaitlistState() {
         deleteItem(forField: .waitlistToken)
         deleteItem(forField: .waitlistTimestamp)
         deleteItem(forField: .inviteCode)
     }
 
-    public func delete(field: WaitlistKeychainField) {
+    func delete(field: WaitlistKeychainField) {
         deleteItem(forField: field)
     }
 
@@ -85,6 +91,7 @@ public class WaitlistKeychainStore: WaitlistStorage {
             kSecClass as String: kSecClassGenericPassword,
             kSecMatchLimit as String: kSecMatchLimitOne,
             kSecAttrService as String: keychainServiceName(for: field),
+            kSecAttrAccessGroup as String: Bundle.main.appGroupName,
             kSecReturnData as String: true]
 
         var item: CFTypeRef?
@@ -126,6 +133,10 @@ public class WaitlistKeychainStore: WaitlistStorage {
     }
 
     // MARK: -
+
+    private func defaultAttributes() -> [CFString: Any] {
+        return [:] // TODO
+    }
 
     internal func keychainServiceName(for field: WaitlistKeychainField) -> String {
         [keychainPrefix, "waitlist", waitlistIdentifier, field.rawValue].joined(separator: ".")

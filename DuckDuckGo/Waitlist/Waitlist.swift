@@ -21,7 +21,7 @@ import Networking
 import UserNotifications
 import NetworkProtection
 
-public protocol WaitlistConstants {
+protocol WaitlistConstants {
     static var identifier: String { get }
     static var apiProductName: String { get }
 
@@ -30,7 +30,7 @@ public protocol WaitlistConstants {
     static var inviteAvailableNotificationBody: String { get }
 }
 
-public protocol Waitlist: WaitlistConstants {
+protocol Waitlist: WaitlistConstants {
 
     var waitlistStorage: WaitlistStorage { get }
     var waitlistRequest: WaitlistRequest { get }
@@ -40,7 +40,7 @@ public protocol Waitlist: WaitlistConstants {
     func sendInviteCodeAvailableNotification()
 }
 
-public enum WaitlistInviteCodeFetchError: Error, Equatable {
+enum WaitlistInviteCodeFetchError: Error, Equatable {
     case waitlistInactive
     case alreadyHasInviteCode
     case notOnWaitlist
