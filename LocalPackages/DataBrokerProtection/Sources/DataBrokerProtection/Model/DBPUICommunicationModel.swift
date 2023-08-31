@@ -19,17 +19,14 @@
 import Foundation
 
 enum DBPUIError: Error {
-    case notFoundError(String)
-    case malformedRequest(String)
+    case malformedRequest
 }
 
 extension DBPUIError: LocalizedError {
     var errorDescription: String? {
         switch self {
-        case .notFoundError(let message):
-            return message
-        case .malformedRequest(let message):
-            return message
+        case .malformedRequest:
+            return "MALFORMED_REQUEST"
         }
     }
 }
@@ -52,6 +49,15 @@ struct DBPUIHandshake: Codable {
 struct DBPUIStandardResponse: Codable {
     let version: Int
     let success: Bool
+    let id: String?
+    let message: String?
+
+    init(version: Int, success: Bool, id: String? = nil, message: String? = nil) {
+        self.version = version
+        self.success = success
+        self.id = id
+        self.message = message
+    }
 }
 
 /// Message to set the UI state. Sent from the UI to the host
