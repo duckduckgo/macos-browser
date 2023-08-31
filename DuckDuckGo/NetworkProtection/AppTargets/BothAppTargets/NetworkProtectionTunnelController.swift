@@ -370,8 +370,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     @MainActor
     func disableOnDemand(tunnelManager: NETunnelProviderManager) async throws {
-        tunnelManager.onDemandRules = [NEOnDemandRuleConnect(interfaceType: .any)]
-        tunnelManager.isOnDemandEnabled = true
+        tunnelManager.isOnDemandEnabled = false
 
         try await tunnelManager.saveToPreferences()
     }
