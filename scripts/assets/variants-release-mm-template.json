@@ -1,1 +1,1 @@
-{"channel":"${MM_USER_HANDLE}","username":"GitHub Actions","text":"**macOS app variants successfully published** :goose_honk_tada: | [:github: Workflow run summary](${WORKFLOW_URL})","icon_url":"https://duckduckgo.com/assets/logo_header.v108.svg"}
+{"channel":"${MM_USER_HANDLE}","username":"GitHub Actions","text":"**macOS app variants have been published successfully** :goose_honk_tada: | [:github: Workflow run summary](${WORKFLOW_URL})","icon_url":"https://duckduckgo.com/assets/logo_header.v108.svg"}
