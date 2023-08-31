@@ -87,6 +87,10 @@ final class NetworkProtectionDebugUtilities {
 
         try await removeSystemExtensionAndAgents()
         onboardingStatusRawValue = OnboardingStatus.default.rawValue
+
+        NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
+        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
     }
 
     func removeSystemExtensionAndAgents() async throws {
