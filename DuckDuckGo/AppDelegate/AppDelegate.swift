@@ -177,7 +177,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         if LocalStatisticsStore().atb == nil {
             Pixel.firstLaunchDate = Date()
-            PixelExperiment.install()
+            // MARK: Enable pixel experiments here
         }
         PixelExperiment.cleanup()
         AtbAndVariantCleanup.cleanup()
