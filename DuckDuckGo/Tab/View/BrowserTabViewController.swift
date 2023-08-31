@@ -36,6 +36,7 @@ final class BrowserTabViewController: NSViewController {
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
+
     private var tabContentCancellable: AnyCancellable?
     private var userDialogsCancellable: AnyCancellable?
     private var cookieConsentCancellable: AnyCancellable?
@@ -44,15 +45,14 @@ final class BrowserTabViewController: NSViewController {
     private var hoverLinkCancellable: AnyCancellable?
     private var pinnedTabsDelegatesCancellable: AnyCancellable?
     private var keyWindowSelectedTabCancellable: AnyCancellable?
-    private var alertCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
+    private var mouseDownCancellable: AnyCancellable?
+
     private var previouslySelectedTab: Tab?
 
     private var hoverLabelWorkItem: DispatchWorkItem?
 
     private var transientTabContentViewController: NSViewController?
-
-    private var mouseDownMonitor: Any?
 
     private var cookieConsentPopoverManager = CookieConsentPopoverManager()
 
@@ -95,7 +95,7 @@ final class BrowserTabViewController: NSViewController {
     override func viewWillDisappear() {
         super.viewWillDisappear()
 
-        removeMouseMonitors()
+        mouseDownCancellable = nil
     }
 
     override func viewDidAppear() {
@@ -275,11 +275,8 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToTabContent(of tabViewModel: TabViewModel?) {
-        tabContentCancellable?.cancel()
-
-        guard let tabViewModel = tabViewModel else {
-            return
-        }
+        tabContentCancellable = nil
+        guard let tabViewModel else { return }
 
         let tabContentPublisher = tabViewModel.tab.$content
             .dropFirst()
@@ -316,10 +313,8 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToUserDialogs(of tabViewModel: TabViewModel?) {
-        guard let tabViewModel = tabViewModel else {
-            userDialogsCancellable = nil
-            return
-        }
+        userDialogsCancellable = nil
+        guard let tabViewModel else { return }
 
         userDialogsCancellable = Publishers.CombineLatest(
             tabViewModel.tab.$userInteractionDialog,
@@ -928,18 +923,10 @@ extension BrowserTabViewController: OnboardingDelegate {
 extension BrowserTabViewController {
 
     func addMouseMonitors() {
-        guard mouseDownMonitor == nil else { return }
-
-        self.mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
-            self?.mouseDown(with: event)
+        mouseDownCancellable = NSEvent.addLocalCancellableMonitor(forEventsMatching: .leftMouseDown) { [weak self] event in
+            guard let self else { return event }
+            return self.mouseDown(with: event)
         }
-    }
-
-    func removeMouseMonitors() {
-        if let monitor = mouseDownMonitor {
-            NSEvent.removeMonitor(monitor)
-        }
-        self.mouseDownMonitor = nil
     }
 
     func mouseDown(with event: NSEvent) -> NSEvent? {
@@ -947,6 +934,7 @@ extension BrowserTabViewController {
         tabViewModel?.tab.autofill?.didClick(at: event.locationInWindow)
         return event
     }
+
 }
 
 // MARK: - Web View snapshot for Pinned Tab selected in more than 1 window
