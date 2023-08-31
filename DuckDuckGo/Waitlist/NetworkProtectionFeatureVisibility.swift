@@ -49,7 +49,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
             return true
         }
 
-        if ContentBlocking.shared.privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlist) {
+        if privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlist) {
             return true
         }
 
