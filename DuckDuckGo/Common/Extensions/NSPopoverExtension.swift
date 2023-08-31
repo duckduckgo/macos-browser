@@ -21,8 +21,19 @@ import AppKit
 extension NSPopover {
 
     static let defaultMainWindowMargin = 6.0
+
+    /// maximum margin from window edge
     @objc var mainWindowMargin: CGFloat {
         Self.defaultMainWindowMargin
+    }
+
+    /// prefferred bounding box for the popover positioning
+    @objc var boundingFrame: NSRect {
+        guard let mainWindow = self.contentViewController?.view.window?.parent else {
+            return .infinite
+        }
+
+        return mainWindow.frame.insetBy(dx: mainWindowMargin, dy: 0)
     }
 
     /// Shows the popover below the specified rect inside the view bounds with the popover's pin positioned in the middle of the rect
@@ -60,10 +71,10 @@ extension NSPopover {
     @objc(swizzled_currentFrameOnScreenWithContentSize:outAnchorEdge:)
     private dynamic func currentFrameOnScreenWithContentSize(size: NSSize, outAnchorEdge: UnsafeRawPointer?) -> NSRect {
         var frame = self.currentFrameOnScreenWithContentSize(size: size, outAnchorEdge: outAnchorEdge)
-        if let mainWindow = self.contentViewController?.view.window?.parent,
-           mainWindow.frame.width >= (frame.width + mainWindowMargin * 2) {
 
-            frame.origin.x = min(max(frame.minX, mainWindow.frame.minX + mainWindowMargin), mainWindow.frame.maxX - frame.width - mainWindowMargin)
+        let boundingFrame = self.boundingFrame
+        if !boundingFrame.isInfinite, boundingFrame.width > frame.width {
+            frame.origin.x = min(max(frame.minX, boundingFrame.minX), boundingFrame.maxX - frame.width)
         }
 
         return frame

@@ -292,7 +292,7 @@ final class AddressBarButtonsViewController: NSViewController {
             bookmarkButton.isHidden = false
             bookmarkPopover.isNew = result.isNew
             bookmarkPopover.viewController.bookmark = bookmark
-            bookmarkPopover.show(relativeTo: bookmarkButton.bounds, of: bookmarkButton, preferredEdge: .maxY)
+            bookmarkPopover.show(positionedBelow: bookmarkButton)
         } else {
             updateBookmarkButtonVisibility()
             bookmarkPopover.close()
