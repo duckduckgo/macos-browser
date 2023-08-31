@@ -78,7 +78,7 @@ final class WebViewContainerView: NSView {
         cancellables.removeAll()
 
         // associate the Tab with the WebView when it gets moved to Full Screen Window Controller
-        // this will help to identify an active Tab when we receive Main Menu events in Full Screen
+        // this will help to identify an active Tab when we receive the Main Menu events in Full Screen mode
         webView.publisher(for: \.window)
             .sink { [weak self, weak tab] fullScreenWindow in
                 guard let self, let fullScreenWindow,
@@ -94,7 +94,7 @@ final class WebViewContainerView: NSView {
             .store(in: &cancellables)
     }
 
-    // fix handling keyboard shortcuts in Full Screen mode
+    /// fix handling keyboard shortcuts in Full Screen mode
     private func observeTabMainWindow(_ fullScreenWindowController: NSWindowController) {
         guard webView !== webView.tabContentView else {
             assertionFailure("WebView Replacement view should be present")
@@ -108,7 +108,7 @@ final class WebViewContainerView: NSView {
                 assert(mainViewController is MainViewController)
 
                 // when the Full Screen Window Controller receives Main Menu events
-                // they should be redirected to the Tab‘s MainViewController
+                // they should be redirected to the Tab owning MainViewController
                 fullScreenWindowController.nextResponder = mainViewController
             }
             .store(in: &cancellables)
@@ -161,12 +161,14 @@ final class WebViewContainerView: NSView {
 }
 
 extension WebView {
+    /// a parent (container) view displaying the WebView in the MainWindow hierarchy
     var containerView: WebViewContainerView? {
+        // WebView is re-added to another Window hierarchy when in Full Screen media presentation mode
+        // it creates a placeholder view added to the MainWindow hierarchy instead of it – `fullScreenPlaceholderView`
         superview as? WebViewContainerView ?? tabContentView.superview as? WebViewContainerView
     }
 }
 
-// Associates a Tab object for a Web Content Full Screen Window Controller
 private extension NSWindowController {
 
     private static let associatedTabKey = UnsafeRawPointer(bitPattern: "associatedTabKey".hashValue)!
@@ -176,6 +178,10 @@ private extension NSWindowController {
             self.tab = tab
         }
     }
+    /// Associates a Tab object with a Web Content Full Screen Window Controller.
+    /// Set when WebViewContainerView detects entering Full Screen mode.
+    /// Used to determine a currently active Tab performing Full Screen media presentation while a Last known Key MainWindow may have another tab selected
+    /// (see MainMenuActions.swift)
     var associatedTab: Tab? {
         get {
             (objc_getAssociatedObject(self, Self.associatedTabKey) as? WeakTabRef)?.tab
@@ -184,10 +190,12 @@ private extension NSWindowController {
             objc_setAssociatedObject(self, Self.associatedTabKey, newValue.map(WeakTabRef.init(tab:)), .OBJC_ASSOCIATION_RETAIN)
         }
     }
+
 }
 
 extension NSWindowController {
 
+    /// Currently active (key) Tab: either a Key MainWindow‘s `selectedTab` or `associatedTab` of a Full Screen mediia presentation Window Controller (see above)
     var activeTab: Tab? {
         (self as? MainWindowController)?.mainViewController.tabCollectionViewModel.selectedTab
             ?? self.associatedTab

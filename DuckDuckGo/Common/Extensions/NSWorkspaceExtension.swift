@@ -37,10 +37,10 @@ extension NSWorkspace {
 
         let allScreenSizes = NSScreen.screens.map(\.frame.size)
 
-        // here‘s the trick: normally the Dock App only displays full-screen overlay windows drawing the Dock
-        // when the Mission Control is activated, the Dock presents multiple window tiles for each visible window
+        // Here‘s the trick: normally the Dock App only displays full-screen overlay windows drawing the Dock.
+        // When the Mission Control is activated, the Dock presents multiple window tiles for each visible window
         // so here we filter out all the screen-sized windows and if the resulting list is not empty it may
-        // mean that Mission Control is active
+        // mean that Mission Control is active.
         let missionControlWindows = visibleWindows.filter { window in
             windowName(window) == "Dock" && !allScreenSizes.contains(windowSize(window))
         }

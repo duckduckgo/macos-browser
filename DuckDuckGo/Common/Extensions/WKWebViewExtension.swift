@@ -239,10 +239,10 @@ extension WKWebView {
     }
 
     var canPrint: Bool {
-        Self.canPrint && !self.isInFullScreenMode
+        Self.supportsPrinting && !self.isInFullScreenMode
     }
 
-    static var canPrint: Bool {
+    static var supportsPrinting: Bool {
         if #available(macOS 11.0, *) {
             return true
         } else {
