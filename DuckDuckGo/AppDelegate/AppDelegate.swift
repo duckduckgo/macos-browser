@@ -179,6 +179,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             Pixel.firstLaunchDate = Date()
             PixelExperiment.install()
         }
+        PixelExperiment.cleanup()
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
             // MARK: perform first time launch logic here

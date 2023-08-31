@@ -84,12 +84,17 @@ final class MainViewController: NSViewController {
 
         view.registerForDraggedTypes([.URL, .fileURL])
 
-        registerForBookmarkBarPromptNotifications()
         registerForDidBecomeActiveNotifications()
+    }
+
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        registerForBookmarkBarPromptNotifications()
     }
 
     var bookmarkBarPromptObserver: Any?
     func registerForBookmarkBarPromptNotifications() {
+        guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
         bookmarkBarPromptObserver = NotificationCenter.default.addObserver(
             forName: .bookmarkPromptShouldShow,
             object: nil,
@@ -156,8 +161,10 @@ final class MainViewController: NSViewController {
 
     func showBookmarkPromptIfNeeded() {
         guard #available(macOS 11, *) else { return }
-        guard PixelExperiment.cohort == .showBookmarksBarPrompt else { return }
-        guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
+
+        guard !bookmarksBarIsVisible,
+                !bookmarksBarViewController.bookmarksBarPromptShown else { return }
+        
         updateBookmarksBarViewVisibility(visible: true)
         // This won't work until the bookmarks bar is actually visible which it isn't until the next ui cycle
         DispatchQueue.main.async {
