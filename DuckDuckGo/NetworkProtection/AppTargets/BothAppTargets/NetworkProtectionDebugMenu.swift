@@ -179,11 +179,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     @IBAction
-    func toggleConnectOnDemandAction(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleOnDemandEnabled()
-    }
-
-    @IBAction
     func toggleEnforceRoutesAction(_ sender: Any?) {
         NetworkProtectionTunnelController().toggleShouldEnforceRoutes()
     }
@@ -384,10 +379,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     private func updateNetworkProtectionMenuItemsState() {
         let controller = NetworkProtectionTunnelController()
-
-        enableConnectOnDemandMenuItem.state = controller.isOnDemandEnabled ? .on : .off
-        // On-Demand should always be enabled for the Kill Switch to work
-        enableConnectOnDemandMenuItem.isEnabled = !controller.shouldEnforceRoutes
 
         shouldEnforceRoutesMenuItem.state = controller.shouldEnforceRoutes ? .on : .off
         shouldIncludeAllNetworksMenuItem.state = controller.shouldIncludeAllNetworks ? .on : .off

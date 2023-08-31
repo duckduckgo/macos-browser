@@ -21,13 +21,12 @@ import SwiftUI
 
 fileprivate extension View {
     func applyStepTitleAttributes() -> some View {
-        self.font(.custom("SF Pro Text", size: 13)
-            .weight(.bold))
+        self.font(.system(size: 13).weight(.bold))
             .foregroundColor(Color(.defaultText))
     }
 
     func applyStepDescriptionAttributes() -> some View {
-        self.font(.custom("SF Pro Text", size: 13))
+        self.font(.system(size: 13))
             .foregroundColor(Color(.defaultText))
     }
 
