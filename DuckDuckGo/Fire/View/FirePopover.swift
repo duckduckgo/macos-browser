@@ -27,7 +27,8 @@ final class FirePopover: NSPopover {
     init(fireViewModel: FireViewModel, tabCollectionViewModel: TabCollectionViewModel) {
         super.init()
 
-        self.behavior = .transient
+        self.animates = false
+        self.behavior = .semitransient
 
         setupContentController(fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
     }

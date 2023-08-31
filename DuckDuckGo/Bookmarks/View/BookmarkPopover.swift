@@ -25,7 +25,8 @@ final class BookmarkPopover: NSPopover {
     override init() {
         super.init()
 
-        behavior = .transient
+        self.animates = false
+        self.behavior = .transient
         setupContentController()
     }
 
