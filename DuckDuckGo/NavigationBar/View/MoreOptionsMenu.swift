@@ -19,6 +19,7 @@
 import Cocoa
 import Common
 import BrowserServicesKit
+import Accounts
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -103,16 +104,16 @@ final class MoreOptionsMenu: NSMenu {
 
     private func setupMenuItems() {
 
-        #if FEEDBACK
+#if FEEDBACK
 
         addItem(withTitle: "Send Feedback", action: #selector(AppDelegate.openFeedback(_:)), keyEquivalent: "")
-        #if !APPSTORE
+#if !APPSTORE
             .withImage(NSImage(named: "BetaLabel"))
-        #endif // !APPSTORE
+#endif // !APPSTORE
 
         addItem(NSMenuItem.separator())
 
-        #endif // FEEDBACK
+#endif // FEEDBACK
 
         addWindowItems()
 
@@ -278,6 +279,17 @@ final class MoreOptionsMenu: NSMenu {
     private func addSubscriptionItems() {
         var items: [NSMenuItem] = []
 
+        items.append(contentsOf: AccountManager().isSignedIn ? makeActiveSubscriptionItems() : makeInactiveSubscriptionItems())
+
+        if !items.isEmpty {
+            items.forEach { addItem($0) }
+            addItem(NSMenuItem.separator())
+        }
+    }
+
+    private func makeActiveSubscriptionItems() -> [NSMenuItem] {
+        var items: [NSMenuItem] = []
+
 #if NETWORK_PROTECTION
         if networkProtectionFeatureVisibility.isFeatureActivated {
             let networkProtectionItem  = NSMenuItem(title: UserText.networkProtection,
@@ -286,7 +298,7 @@ final class MoreOptionsMenu: NSMenu {
                 .targetting(self)
                 .withImage(.image(for: .vpnIcon))
 
-        items.append(networkProtectionItem)
+            items.append(networkProtectionItem)
         }
 #endif // NETWORK_PROTECTION
 
@@ -299,6 +311,21 @@ final class MoreOptionsMenu: NSMenu {
         items.append(dataBrokerProtectionItem)
 #endif // DBP
 
+        // TODO: Placeholders
+        let item1  = NSMenuItem(title: "Placeholder A", action: #selector(openPreferences(_:)), keyEquivalent: "")
+            .targetting(self)
+            .withImage(.image(for: .vpnIcon))
+        items.append(item1)
+
+        let item2  = NSMenuItem(title: "Placeholder B", action: #selector(openPreferences(_:)), keyEquivalent: "")
+            .targetting(self)
+            .withImage(.image(for: .vpnIcon))
+        items.append(item2)
+
+        return items
+    }
+
+    private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
         let privacyProItem = NSMenuItem(title: "",
                                         action: #selector(openPreferences(_:)),
                                         keyEquivalent: "")
@@ -315,13 +342,7 @@ final class MoreOptionsMenu: NSMenu {
 
         privacyProItem.attributedTitle = attributedText
 
-        items.append(privacyProItem)
-
-        if !items.isEmpty {
-            items.forEach { addItem($0) }
-
-            addItem(NSMenuItem.separator())
-        }
+        return [privacyProItem]
     }
 
     private func addPageItems() {
