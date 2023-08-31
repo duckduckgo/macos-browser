@@ -102,6 +102,8 @@ final class SuggestionViewController: NSViewController {
     }
 
     private func addEventMonitors() {
+        eventMonitorCancellables.removeAll()
+
         NSEvent.addLocalCancellableMonitor(forEventsMatching: [.leftMouseUp, .rightMouseUp]) { [weak self] event in
             guard let self else { return event }
             return self.mouseUp(with: event)

@@ -424,6 +424,7 @@ extension AddressBarViewController {
     }
 
     func addMouseMonitors() {
+        eventMonitorCancellables.removeAll()
         NSEvent.addLocalCancellableMonitor(forEventsMatching: .leftMouseDown) { [weak self] event in
             guard let self else { return event }
             return self.mouseDown(with: event)

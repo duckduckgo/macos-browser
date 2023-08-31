@@ -21,23 +21,32 @@ import Combine
 
 extension NSEvent {
 
-    class func isContextClick(_ event: NSEvent) -> Bool {
+    /// is NSEvent representing right mouse down event or cntrl+mouse down event
+    static func isContextClick(_ event: NSEvent) -> Bool {
         let isControlClick = event.type == .leftMouseDown && (event.modifierFlags.rawValue & NSEvent.ModifierFlags.control.rawValue != 0)
         let isRightClick = event.type == .rightMouseDown
         return isControlClick || isRightClick
     }
 
-    class func addGlobalCancellableMonitor(forEventsMatching mask: NSEvent.EventTypeMask, handler: @escaping (NSEvent) -> Void) -> AnyCancellable {
+    /// `addGlobalMonitorForEventsMatchingMask:handler:` with automatic unsubscribe
+    /// - Returns: AnyCancellable removing the monitor on `.cancel()` or `deinit`
+    static func addGlobalCancellableMonitor(forEventsMatching mask: NSEvent.EventTypeMask, handler: @escaping (NSEvent) -> Void) -> AnyCancellable {
         let monitor = addGlobalMonitorForEvents(matching: mask, handler: handler)
         return AnyCancellable {
-            monitor.map(NSEvent.removeMonitor)
+            if let monitor {
+                NSEvent.removeMonitor(monitor)
+            }
         }
     }
 
-    class func addLocalCancellableMonitor(forEventsMatching mask: NSEvent.EventTypeMask, handler: @escaping (NSEvent) -> NSEvent?) -> AnyCancellable {
+    /// `addLocalMonitorForEventsMatchingMask:handler:` with automatic unsubscribe
+    /// - Returns: AnyCancellable removing the monitor on `.cancel()` or `deinit`
+    static func addLocalCancellableMonitor(forEventsMatching mask: NSEvent.EventTypeMask, handler: @escaping (NSEvent) -> NSEvent?) -> AnyCancellable {
         let monitor = addLocalMonitorForEvents(matching: mask, handler: handler)
         return AnyCancellable {
-            monitor.map(NSEvent.removeMonitor)
+            if let monitor {
+                NSEvent.removeMonitor(monitor)
+            }
         }
     }
 
