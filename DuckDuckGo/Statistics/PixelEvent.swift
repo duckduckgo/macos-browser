@@ -388,7 +388,7 @@ extension Pixel.Event {
             return "m_mac.recent-activity-section-hidden"
         case .continueSetUpSectionHidden:
             return "m_mac.continue-setup-section-hidden"
-            
+
         // Pinned tabs
         case .userHasPinnedTab:
             return "m_mac_user_has_pinned_tab"
