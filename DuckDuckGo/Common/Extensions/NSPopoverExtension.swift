@@ -20,22 +20,53 @@ import AppKit
 
 extension NSPopover {
 
-    /// Shows the popover below the specified button with the popover's pin positioned in the middle of the button, and a specified y-offset for the pin.
-    ///
-    /// - Parameters:
-    ///   - view: The button below which the popover should appear.
-    ///   - yOffset: The y-offset for the popover's pin position relative to the bottom of the button. Default is 5.0 points.
-    func showBelow(_ view: NSView) {
-        // Set the preferred edge to be the bottom edge of the button
-        let preferredEdge: NSRectEdge = .maxY
+    static let defaultMainWindowMargin = 6.0
+    @objc var mainWindowMargin: CGFloat {
+        Self.defaultMainWindowMargin
+    }
 
-        // Calculate the positioning rect
-        let viewFrame = view.bounds
-        let pinPositionX = viewFrame.midX
-        let positioningRect = NSRect(x: pinPositionX, y: 0, width: 0, height: 0)
+    /// Shows the popover below the specified rect inside the view bounds with the popover's pin positioned in the middle of the rect
+    public func show(positionedBelow positioningRect: NSRect, in positioningView: NSView) {
+        assert(!positioningView.isHidden && positioningView.alphaValue > 0)
 
-        // Show the popover
-        self.show(relativeTo: positioningRect, of: view, preferredEdge: preferredEdge)
+        // We tap into `_currentFrameOnScreenWithContentSize:outAnchorEdge:` to adjust popover position
+        // inside bounds of its owner Main Window.
+        // https://app.asana.com/0/1177771139624306/1202217488822824/f
+        _=Self.swizzleCurrentFrameOnScreenOnce
+
+        // position popover at the middle of the positioningView
+        let positioningRect = NSRect(x: positioningRect.midX - 1, y: positioningRect.origin.y, width: 2, height: positioningRect.height)
+        let preferredEdge: NSRectEdge = positioningView.isFlipped ? .maxY : .minY
+
+        self.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
+    }
+
+    /// Shows the popover below the specified view with the popover's pin positioned in the middle of the view
+    func show(positionedBelow view: NSView) {
+        self.show(positionedBelow: view.bounds, in: view)
+    }
+
+    private static let swizzleCurrentFrameOnScreenOnce: () = {
+        guard let originalMethod = class_getInstanceMethod(NSPopover.self, NSSelectorFromString("_currentFrameOnScreenWithContentSize:outAnchorEdge:")),
+              let swizzledMethod = class_getInstanceMethod(NSPopover.self, #selector(currentFrameOnScreenWithContentSize)) else {
+            assertionFailure("Methods not available")
+            return
+        }
+
+        method_exchangeImplementations(originalMethod, swizzledMethod)
+    }()
+
+    // place popover inside bounds of its owner Main Window
+    @objc(swizzled_currentFrameOnScreenWithContentSize:outAnchorEdge:)
+    private dynamic func currentFrameOnScreenWithContentSize(size: NSSize, outAnchorEdge: UnsafeRawPointer?) -> NSRect {
+        var frame = self.currentFrameOnScreenWithContentSize(size: size, outAnchorEdge: outAnchorEdge)
+        if let mainWindow = self.contentViewController?.view.window?.parent,
+           mainWindow.frame.width >= (frame.width + mainWindowMargin * 2) {
+
+            frame.origin.x = min(max(frame.minX, mainWindow.frame.minX + mainWindowMargin), mainWindow.frame.maxX - frame.width - mainWindowMargin)
+        }
+
+        return frame
     }
 
 }

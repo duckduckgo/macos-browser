@@ -20,6 +20,10 @@ import AppKit
 
 final class FirePopover: NSPopover {
 
+    override var mainWindowMargin: CGFloat {
+        -14
+    }
+
     init(fireViewModel: FireViewModel, tabCollectionViewModel: TabCollectionViewModel) {
         super.init()
 
@@ -38,10 +42,9 @@ final class FirePopover: NSPopover {
 
     private func setupContentController(fireViewModel: FireViewModel, tabCollectionViewModel: TabCollectionViewModel) {
         let storyboard = NSStoryboard(name: "Fire", bundle: nil)
-        let controller = storyboard.instantiateController(
-            identifier: "FirePopoverWrapperViewController") { coder -> FirePopoverWrapperViewController? in
-                return FirePopoverWrapperViewController(coder: coder, fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
-            }
+        let controller = storyboard.instantiateController(identifier: "FirePopoverWrapperViewController") { coder -> FirePopoverWrapperViewController? in
+            return FirePopoverWrapperViewController(coder: coder, fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
+        }
         contentViewController = controller
     }
 
