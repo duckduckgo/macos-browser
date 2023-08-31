@@ -131,12 +131,6 @@ extension Pixel {
         case recentActivitySectionHidden
         case continueSetUpSectionHidden
 
-        // Bookmarks bar onboarding
-        case bookmarksBarOnboardingEnrollment(cohort: String)
-        case bookmarksBarOnboardingSearched4to8days(cohort: String)
-        case bookmarksBarOnboardingFirstInteraction(cohort: String)
-        case bookmarksBarOnboardingInteraction2to8days(cohort: String)
-
         // Pinned tabs
         case userHasPinnedTab
 
@@ -394,17 +388,7 @@ extension Pixel.Event {
             return "m_mac.recent-activity-section-hidden"
         case .continueSetUpSectionHidden:
             return "m_mac.continue-setup-section-hidden"
-
-        // Bookmarks bar experiement
-        case .bookmarksBarOnboardingEnrollment:
-            return "m_mac_bookmarksbarexperiment_enrollment"
-        case .bookmarksBarOnboardingSearched4to8days:
-            return "m_mac_bookmarksbarexperiment_searched4to8days"
-        case .bookmarksBarOnboardingFirstInteraction:
-            return "m_mac_bookmarksbarexperiment_firstinteraction"
-        case .bookmarksBarOnboardingInteraction2to8days:
-            return "m_mac_bookmarksbarexperiment_interaction2to8days"
-
+            
         // Pinned tabs
         case .userHasPinnedTab:
             return "m_mac_user_has_pinned_tab"
