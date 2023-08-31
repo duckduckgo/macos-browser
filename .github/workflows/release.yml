@@ -7,10 +7,6 @@ on:
         description: "Asana release task URL"
         required: true
         type: string
-      atb-variants:
-        description: "ATB variants (comma-separated)"
-        required: false
-        type: string
 
 jobs:
 
@@ -21,7 +17,6 @@ jobs:
       release-type: release
       create-dmg: true
       asana-task-url: ${{ github.event.inputs.asana-task-url }}
-      atb-variants: ${{ github.event.inputs.atb-variants }}
     secrets:
       BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
       P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
