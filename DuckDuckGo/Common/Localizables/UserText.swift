@@ -828,9 +828,9 @@ struct UserText {
 #endif //DBP
 
     // Bookmarks bar prompt
-    static let bookmarksBarPromptTitle = "Show Bookmarks Bar?"
-    static let bookmarksBarPromptMessage = "Show the Bookmarks Bar for quick access to your new bookmarks."
-    static let bookmarksBarPromptDismiss = "Hide"
-    static let bookmarksBarPromptAccept = "Show"
+    static let bookmarksBarPromptTitle = NSLocalizedString("bookmarks.bar.prompt.title", value: "Show Bookmarks Bar?", comment: "Title for bookmarks bar prompt")
+    static let bookmarksBarPromptMessage = NSLocalizedString("bookmarks.bar.prompt.message", value: "Show the Bookmarks Bar for quick access to your new bookmarks.", comment: "Message show for bookmarks bar prompt")
+    static let bookmarksBarPromptDismiss = NSLocalizedString("bookmarks.bar.prompt.dismiss", value: "Hide", comment: "Dismiss button label on bookmarks bar prompt")
+    static let bookmarksBarPromptAccept = NSLocalizedString("bookmarks.bar.prompt.accept", value: "Show", comment: "Accept button label on bookmarks bar prompt")
 
 }
