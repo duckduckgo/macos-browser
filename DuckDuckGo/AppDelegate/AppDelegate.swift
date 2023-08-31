@@ -184,6 +184,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             // MARK: perform first time launch logic here
         }
 
+        print(DefaultVariantManager().currentVariant)
+
         startupSync()
 
         stateRestorationManager.applicationDidFinishLaunching()

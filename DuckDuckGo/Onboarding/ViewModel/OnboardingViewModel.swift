@@ -29,6 +29,9 @@ protocol OnboardingDelegate: NSObjectProtocol {
     /// Has finished, but still showing a screen.  This is when to re-enable the UI.
     func onboardingHasFinished()
 
+    /// Loads new tab page.
+    func goToNewTabPage()
+
 }
 
 final class OnboardingViewModel: ObservableObject {
@@ -63,6 +66,9 @@ final class OnboardingViewModel: ObservableObject {
         self.delegate = delegate
         self.statisticsLoader = statisticsLoader
         self.state = onboardingFinished ? .startBrowsing : .startFlow
+
+        NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(addressBarMouseDown(_:)), name: .addressBarMouseDown, object: nil)
     }
 
     func onSplashFinished() {
@@ -71,7 +77,11 @@ final class OnboardingViewModel: ObservableObject {
 
     func onStartPressed() {
         statisticsLoader?.load()
-        state = .importData
+        if DefaultVariantManager().isSupported(feature: .newOnboarding) {
+            delegate?.goToNewTabPage()
+        } else {
+            state = .importData
+        }
     }
 
     func onImportPressed() {
@@ -114,6 +124,15 @@ final class OnboardingViewModel: ObservableObject {
     func restart() {
         onboardingFinished = false
         state = .startFlow
+    }
+
+    @objc private func newTabOpenNotification(_ notification: Notification) {
+        onboardingFinished = true
+    }
+
+    @objc private func addressBarMouseDown(_ notification: Notification) {
+        onboardingFinished = true
+        delegate?.goToNewTabPage()
     }
 
 }

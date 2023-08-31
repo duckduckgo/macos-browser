@@ -43,8 +43,8 @@ struct OnboardingFlow: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
 
                 ZStack {
-
-                    CallToAction(text: UserText.onboardingWelcomeText,
+                    var welcomeText = DefaultVariantManager().isSupported(feature: .newOnboarding) ? UserText.onboardingWelcomeTextV2 : UserText.onboardingWelcomeText
+                    CallToAction(text: welcomeText,
                                  cta: UserText.onboardingStartButton) {
                         model.onStartPressed()
                     }.visibility(model.state == .welcome ? .visible : .gone)

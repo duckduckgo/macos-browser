@@ -453,7 +453,7 @@ final class BrowserTabViewController: NSViewController {
 
         case .onboarding:
             removeAllTabContent()
-            if !OnboardingViewModel().onboardingFinished {
+            if !OnboardingViewModel().onboardingFinished && !DefaultVariantManager().isSupported(feature: .newOnboarding) {
                 requestDisableUI()
             }
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
@@ -914,6 +914,12 @@ extension BrowserTabViewController: OnboardingDelegate {
 
     func onboardingHasFinished() {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: false)
+    }
+
+    func goToNewTabPage() {
+        tabViewModel?.tab.setContent(.homePage)
+        guard let mainVC = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else { return }
+        mainVC.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
     }
 
 }
