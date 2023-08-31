@@ -826,4 +826,11 @@ struct UserText {
     static let dataBrokerProtectionOptionsMenuItem = NSLocalizedString("data-broker-protection.optionsMenu", value: "Data Broker Protection", comment: "Menu item data broker protection feature")
     static let tabDataBrokerProtectionTitle = NSLocalizedString("tab.dbp.title", value: "Data Broker Protection", comment: "Tab data broker protection title")
 #endif //DBP
+
+    // Bookmarks bar prompt
+    static let bookmarksBarPromptTitle = "Show Bookmarks Bar?"
+    static let bookmarksBarPromptMessage = "Show the Bookmarks Bar for quick access to your new bookmarks."
+    static let bookmarksBarPromptDismiss = "Hide"
+    static let bookmarksBarPromptAccept = "Show"
+
 }
