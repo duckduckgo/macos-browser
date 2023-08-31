@@ -20,6 +20,7 @@ import BrowserServicesKit
 import Cocoa
 import Common
 import WebKit
+import Accounts
 
 // Actions are sent to objects of responder chain
 
@@ -733,6 +734,14 @@ extension MainViewController {
 
     @IBAction func fetchConfigurationNow(_ sender: Any?) {
         ConfigurationManager.shared.forceRefresh()
+    }
+
+    @IBAction func simulateAccountSignIn(_ sender: Any?) {
+        AccountManager().storeToken("aaa")
+    }
+
+    @IBAction func simulateAccountSignOut(_ sender: Any?) {
+        AccountManager().signOut()
     }
 
     // MARK: - Developer Tools
