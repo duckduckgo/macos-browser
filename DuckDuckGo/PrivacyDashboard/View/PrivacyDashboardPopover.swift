@@ -20,6 +20,19 @@ import Cocoa
 
 final class PrivacyDashboardPopover: NSPopover {
 
+    private weak var addressBar: NSView?
+
+    /// prefferred bounding box for the popover positioning
+    override var boundingFrame: NSRect {
+        guard let addressBar,
+              let window = addressBar.window else { return .infinite }
+        var frame = window.convertToScreen(addressBar.convert(addressBar.bounds, to: nil))
+
+        frame = frame.insetBy(dx: -36, dy: -window.frame.size.height)
+
+        return frame
+    }
+
     override init() {
         super.init()
 
@@ -52,6 +65,11 @@ final class PrivacyDashboardPopover: NSPopover {
 
     func setPreferredMaxHeight(_ height: CGFloat) {
         viewController.setPreferredMaxHeight(height - 40) // Account for popover arrow height
+    }
+
+    override func show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
+        self.addressBar = positioningView.superview
+        super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
     }
 
 }
