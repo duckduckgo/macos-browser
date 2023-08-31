@@ -330,14 +330,15 @@ final class MoreOptionsMenu: NSMenu {
                                         action: #selector(openPreferences(_:)),
                                         keyEquivalent: "")
             .targetting(self)
-            .withImage(NSImage(named: "BurnerWindowIcon2"))
+            .withImage(NSImage(named: "SubscriptionIcon"))
+
+        let attributedText = NSMutableAttributedString(string: UserText.privacyProOptionsMenuItem)
+        attributedText.append (NSAttributedString(string: "  "))
 
         let imageAttachment = NSTextAttachment()
-        let image = NSImage(named: "BetaLabel")
-        imageAttachment.image = image
-        imageAttachment.bounds = CGRect(x: 0, y: -4, width: image!.size.width, height: image!.size.height)
-        let attributedText = NSMutableAttributedString(string: "Privacy Pro")
-        attributedText.append (NSAttributedString(string: "     "))
+        imageAttachment.image = NSImage(named: "NewLabel")
+        imageAttachment.setImageHeight(height: 16, offset: .init(x: 0, y: -4))
+
         attributedText.append(NSAttributedString(attachment: imageAttachment))
 
         privacyProItem.attributedTitle = attributedText

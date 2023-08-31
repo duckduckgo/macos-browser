@@ -816,4 +816,8 @@ struct UserText {
     static let dataBrokerProtectionOptionsMenuItem = NSLocalizedString("data-broker-protection.optionsMenu", value: "Data Broker Protection", comment: "Menu item data broker protection feature")
     static let tabDataBrokerProtectionTitle = NSLocalizedString("tab.dbp.title", value: "Data Broker Protection", comment: "Tab data broker protection title")
 #endif //DBP
+
+#if SUBSCRIPTION
+    static let privacyProOptionsMenuItem = NSLocalizedString("subscription.optionsMenu", value: "Privacy Pro", comment: "Privacy Pro options menu item title")
+#endif
 }
