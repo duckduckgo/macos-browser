@@ -49,13 +49,24 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     ///
     /// Once the waitlist beta has ended, we can trigger a remote change that removes the user's auth token and turn off the waitlist flag, hiding Network Protection from the user.
     func isNetworkProtectionVisible() -> Bool {
-        isEasterEggUser || (isWaitlistUser && waitlistIsOngoing)
+        let isFeatureVisible = isEasterEggUser || isEnabledWaitlistUser
+
+        if !isFeatureVisible {
+            disableNetworkProtectionForWaitlistUsers()
+        }
+
+        return isFeatureVisible
     }
 
     /// Easter egg users can be identified by them being internal users and having an auth token (NetP being activated).
     ///
     private var isEasterEggUser: Bool {
         !isWaitlistUser && networkProtectionFeatureActivation.isFeatureActivated
+    }
+
+    /// Whether it's a user with feature access
+    private var isEnabledWaitlistUser: Bool {
+        isWaitlistUser && waitlistIsOngoing
     }
 
     /// Waitlist users are users that have the waitlist enabled and active
@@ -74,7 +85,6 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         switch featureOverrides.waitlistActive {
         case .useRemoteValue:
             guard privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlistBetaActive) else {
-                disableNetworkProtectionForWaitlistUsers()
                 return false
             }
 
@@ -82,7 +92,6 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         case .on:
             return true
         case .off:
-            disableNetworkProtectionForWaitlistUsers()
             return false
         }
     }
@@ -100,11 +109,11 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
 
     private func disableNetworkProtectionForWaitlistUsers() {
 #if DEBUG
-        if isWaitlistUser {
-            print("NetP Debug: Internal user detected. Network Protection is still enabled.")
-        } else {
-            print("NetP Debug: Network Protection was disabled.")
+        guard isWaitlistUser else {
+            return
         }
+
+        print("NetP Debug: waitlist user - disabling NetP")
 #endif
     }
 }
