@@ -122,9 +122,9 @@ final class ContainerViewModel: ObservableObject {
 
             DispatchQueue.main.async {
                 let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
-                let data = brokerProfileData.filter { !$0.optOutOperationsData.isEmpty }
+                let hasResults = brokerProfileData.contains { $0.hasMatches }
 
-                if data.isEmpty {
+                if hasResults {
                     completion(.noResults)
                 } else {
                     completion(.results)

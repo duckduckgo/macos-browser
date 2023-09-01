@@ -37,6 +37,10 @@ final public class BrokerProfileQueryData: Sendable {
         operationsData.flatMap { $0.historyEvents }.sorted { $0.date < $1.date }
     }
 
+    var hasMatches: Bool {
+        !optOutOperationsData.isEmpty
+    }
+
     init(dataBroker: DataBroker,
          profileQuery: ProfileQuery,
          scanOperationData: ScanOperationData,

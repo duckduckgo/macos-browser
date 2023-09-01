@@ -96,8 +96,8 @@ final class ProfileViewModel: ObservableObject {
 
     var hasOperationContent: Bool {
         let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
-        let data = brokerProfileData.filter { !$0.optOutOperationsData.isEmpty }
-        return !data.isEmpty
+        let hasResults = brokerProfileData.contains { $0.hasMatches }
+        return hasResults
     }
 
     var isProfileValid: Bool {
