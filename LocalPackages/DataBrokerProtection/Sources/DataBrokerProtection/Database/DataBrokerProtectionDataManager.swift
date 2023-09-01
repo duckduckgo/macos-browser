@@ -60,7 +60,7 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
 
     public func saveProfile(_ profile: DataBrokerProtectionProfile) {
         database.save(profile)
-        cache.reset()
+        cache.invalidate()
         cache.profile = profile
     }
 
@@ -145,7 +145,7 @@ private final class InMemoryDataCache {
     var brokerProfileQueryData = [BrokerProfileQueryData]()
     var dataBrokerInfoData = [DataBrokerInfoData]()
 
-    public func reset() {
+    public func invalidate() {
         profile = nil
         brokerProfileQueryData.removeAll()
         dataBrokerInfoData.removeAll()
