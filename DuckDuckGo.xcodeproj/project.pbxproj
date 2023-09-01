@@ -12077,7 +12077,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "daniel/bitwarden-protection-fix";
+				branch = "daniel/bitwarden-save-fix";
 				kind = branch;
 			};
 		};
