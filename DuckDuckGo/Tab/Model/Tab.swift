@@ -550,12 +550,6 @@ protocol NewWindowPolicyDecisionMaker {
 
     @discardableResult
     func setUrl(_ url: URL?, userEntered: String?) -> Task<ExpectedNavigation?, Never>? {
-#if APPSTORE
-        if url?.isFileURL ?? false {
-            NotificationCenter.default.post(name: .displayCannotOpenFileAlert, object: self, userInfo: nil)
-            return nil
-        }
-#endif
         if url == .welcome {
             OnboardingViewModel().restart()
         }
