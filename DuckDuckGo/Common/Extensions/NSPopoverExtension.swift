@@ -27,11 +27,17 @@ extension NSPopover {
         Self.defaultMainWindowMargin
     }
 
+    /// temporary value used to get popover‘s owner window while it‘s not yet set
+    @TaskLocal
+    private static var mainWindow: NSWindow?
+
+    var mainWindow: NSWindow? {
+        self.contentViewController?.view.window?.parent ?? Self.mainWindow
+    }
+
     /// prefferred bounding box for the popover positioning
     @objc var boundingFrame: NSRect {
-        guard let mainWindow = self.contentViewController?.view.window?.parent else {
-            return .infinite
-        }
+        guard let mainWindow else { return .infinite }
 
         return mainWindow.frame.insetBy(dx: mainWindowMargin, dy: 0)
             .intersection(mainWindow.screen?.visibleFrame ?? .infinite)
@@ -59,7 +65,9 @@ extension NSPopover {
         let positioningRect = NSRect(x: positioningRect.midX - 1, y: positioningRect.origin.y, width: 2, height: positioningRect.height)
         let preferredEdge: NSRectEdge = positioningView.isFlipped ? .maxY : .minY
 
-        self.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
+        Self.$mainWindow.withValue(positioningView.window) {
+            self.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
+        }
     }
 
     /// Shows the popover below the specified view with the popover's pin positioned in the middle of the view
