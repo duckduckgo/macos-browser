@@ -48,7 +48,7 @@ final class DataBrokerProtectionProcessor {
     }
 
     // MARK: - Public functions
-    func runScanOnAllDataBrokers(completion: (() -> Void)? = nil ) {
+    func runScanOnAllDataBrokers(completion: (() -> Void)? = nil) {
         operationQueue.cancelAllOperations()
         runOperations(operationType: .scan, priorityDate: nil) {
             os_log("Scans done", log: .dataBrokerProtection)

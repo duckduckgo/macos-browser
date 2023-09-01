@@ -20,8 +20,11 @@ import SwiftUI
 
 @available(macOS 11.0, *)
 struct DataBrokerProtectionContainerView: View {
+    @ObservedObject var containerViewModel: ContainerViewModel
     @ObservedObject var navigationViewModel: ContainerNavigationViewModel
     @ObservedObject var profileViewModel: ProfileViewModel
+    @ObservedObject var resultsViewModel: ResultsViewModel
+    @State var shouldShowDebugUI = false
 
     var body: some View {
         ScrollView {
@@ -44,49 +47,75 @@ struct DataBrokerProtectionContainerView: View {
                         ScanStartedView()
                             .padding(.top, 330)
                     case .results:
-                        ResultsView(viewModel: ResultsViewModel())
+                        ResultsView(viewModel: resultsViewModel)
                             .frame(width: 800)
                             .padding(.top, 330)
                             .padding(.bottom, 100)
                     case .createProfile:
-                        CreateProfileView(viewModel: profileViewModel, scanButtonClicked: {
-                            navigationViewModel.updateNavigation(.scanStarted)
-                        })
+                        CreateProfileView(
+                            viewModel: profileViewModel,
+                            scanButtonClicked: {
+                                navigationViewModel.updateNavigation(.scanStarted)
+                                containerViewModel.scan { scanResult in
+                                    switch scanResult {
+                                    case .noResults:
+                                        navigationViewModel.updateNavigation(.noResults)
+                                    case .results:
+                                        resultsViewModel.reloadData()
+                                        navigationViewModel.updateNavigation(.results)
+                                        containerViewModel.startScheduler()
+                                    }
+                                }
+                            }, backToDashboardClicked: {
+                                navigationViewModel.updateNavigation(.results)
+                            })
                         .frame(width: 670)
                         .padding(.top, 73)
                     }
                     Spacer()
                 }
 
-               // just for testing
-               VStack(alignment: .leading) {
-                   HStack {
-                       Picker(selection: $navigationViewModel.bodyViewType, label: Text("Body View Type")) {
-                           ForEach(ContainerNavigationViewModel.BodyViewType.allCases, id: \.self) { viewType in
-                               Text(viewType.description).tag(viewType)
-                           }
-                       }
-                       .pickerStyle(MenuPickerStyle())
-                       .frame(width: 300)
+                if shouldShowDebugUI {
+                    // just for testing
+                    VStack(alignment: .leading) {
+                        Text("Scheduler status: \(containerViewModel.schedulerStatus)")
 
-                       Spacer()
-                   }
-                   Spacer()
-               }.padding()
-         }
+                        HStack {
+                            Picker(selection: $navigationViewModel.bodyViewType,
+                                   label: Text("Body View Type")) {
+                                ForEach(ContainerNavigationViewModel.BodyViewType.allCases, id: \.self) { viewType in
+                                    Text(viewType.description).tag(viewType)
+                                }
+                            }
+                                   .pickerStyle(MenuPickerStyle())
+                                   .frame(width: 300)
+
+                            Spacer()
+                        }
+                        Spacer()
+                    }.padding()
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }.background(
-           backgroundView()
+            backgroundView()
         )
     }
 
     @ViewBuilder
     func headerView() -> some View {
-        if navigationViewModel.shouldShowHeader {
+        if navigationViewModel.bodyViewType != .createProfile {
             VStack {
-                DashboardHeaderView(viewModel: DashboardHeaderViewModel(statusText: "",
-                                                                        isProfileButtonAvailable: navigationViewModel.bodyViewType != .gettingStarted,
-                                                                        faqButtonClicked: { },
-                                                                        editProfileClicked: { navigationViewModel.updateNavigation(.createProfile) }))
+
+                DashboardHeaderView(statusText: containerViewModel.headerStatusText,
+                                    displayProfileButton: navigationViewModel.bodyViewType != .gettingStarted,
+                                    faqButtonClicked: {
+                    print("FAQ")
+                    shouldShowDebugUI.toggle()
+                },
+                                    editProfileClicked: {
+                    navigationViewModel.updateNavigation(.createProfile)
+                })
                 .frame(height: 300)
                 Spacer()
             }
@@ -95,7 +124,7 @@ struct DataBrokerProtectionContainerView: View {
 
     @ViewBuilder
     func backgroundView() -> some View {
-        if navigationViewModel.shouldShowHeader {
+        if  navigationViewModel.bodyViewType != .createProfile {
             Color("background-color", bundle: .module)
         } else {
             Image("background-pattern", bundle: .module)
@@ -107,11 +136,16 @@ struct DataBrokerProtectionContainerView: View {
 @available(macOS 11.0, *)
 struct DataBrokerProtectionContainerView_Previews: PreviewProvider {
     static var previews: some View {
-        let dataManager = DataBrokerProtectionDataManager()
+        let dataManager = PreviewDataManager()
         let navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
         let profileViewModel = ProfileViewModel(dataManager: dataManager)
+        let resultsViewModel = ResultsViewModel(dataManager: dataManager)
+        let containerViewModel = ContainerViewModel(scheduler: PreviewScheduler(), dataManager: dataManager)
 
-        DataBrokerProtectionContainerView(navigationViewModel: navigationViewModel, profileViewModel: profileViewModel)
-            .frame(width: 1024, height: 768)
+        DataBrokerProtectionContainerView(containerViewModel: containerViewModel,
+                                          navigationViewModel: navigationViewModel,
+                                          profileViewModel: profileViewModel,
+                                          resultsViewModel: resultsViewModel)
+        .frame(width: 1024, height: 768)
     }
 }
