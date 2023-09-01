@@ -177,8 +177,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         if LocalStatisticsStore().atb == nil {
             Pixel.firstLaunchDate = Date()
-            PixelExperiment.install()
+            // MARK: Enable pixel experiments here
         }
+        PixelExperiment.cleanup()
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
             // MARK: perform first time launch logic here
@@ -284,15 +285,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
         let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync)
         syncService.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
-
-        syncStateCancellable = syncService.authStatePublisher
-            .prepend(syncService.authState)
-            .map { $0 == .inactive }
-            .removeDuplicates()
-            .sink { isSyncDisabled in
-                LocalBookmarkManager.shared.updateBookmarkDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
-                syncDataProviders.credentialsAdapter.updateDatabaseCleanupSchedule(shouldEnable: isSyncDisabled)
-            }
+        syncDataProviders.setUpDatabaseCleaners(syncService: syncService)
 
         // This is also called in applicationDidBecomeActive, but we're also calling it here, since
         // syncService can be nil when applicationDidBecomeActive is called during startup, if a modal
@@ -303,14 +296,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         self.syncDataProviders = syncDataProviders
         self.syncService = syncService
-
-        bookmarksManager.bookmarkDatabaseCleaner.isSyncActive = { [weak self] in
-            self?.syncService?.authState == .active
-        }
-
-        syncDataProviders.credentialsAdapter.databaseCleaner.isSyncActive = { [weak self] in
-            self?.syncService?.authState == .active
-        }
     }
 
     private func subscribeToEmailProtectionStatusNotifications() {

@@ -56,6 +56,7 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
     /// Agent launch time saved by the main app to distinguish between Log In launch and Main App launch to prevent connection when started by the Main App
     @UserDefaultsWrapper(key: .agentLaunchTime, defaultValue: .distantPast, defaults: .shared)
     private var agentLaunchTime: Date
+
     private static let recentThreshold: TimeInterval = 5.0
 
     private let appLauncher = AppLauncher()
@@ -87,7 +88,11 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
             })
         ]
 
-        return StatusBarMenu(controller: tunnelController, iconProvider: iconProvider, menuItems: menuItems)
+        let onboardingStatusPublisher = UserDefaults.shared.publisher(for: \.networkProtectionOnboardingStatusRawValue).map { rawValue in
+            OnboardingStatus(rawValue: rawValue) ?? .default
+        }.eraseToAnyPublisher()
+
+        return StatusBarMenu(onboardingStatusPublisher: onboardingStatusPublisher, controller: tunnelController, iconProvider: iconProvider, menuItems: menuItems)
     }()
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {

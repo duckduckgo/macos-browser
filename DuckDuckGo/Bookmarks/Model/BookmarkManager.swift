@@ -45,9 +45,6 @@ protocol BookmarkManager: AnyObject {
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
-    func cleanUpBookmarksDatabase()
-    func updateBookmarkDatabaseCleanupSchedule(shouldEnable: Bool)
-
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
     var list: BookmarkList? { get }
@@ -65,12 +62,6 @@ final class LocalBookmarkManager: BookmarkManager {
         self.faviconManagement = faviconManagement
     }
 
-    let bookmarkDatabaseCleaner = BookmarkDatabaseCleaner(
-        bookmarkDatabase: BookmarkDatabase.shared.db,
-        errorEvents: BookmarksCleanupErrorHandling(),
-        log: .bookmarks
-    )
-
     @Published private(set) var list: BookmarkList?
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
 
@@ -78,19 +69,6 @@ final class LocalBookmarkManager: BookmarkManager {
     private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
 
     // MARK: - Bookmarks
-
-    func updateBookmarkDatabaseCleanupSchedule(shouldEnable: Bool) {
-        bookmarkDatabaseCleaner.cleanUpDatabaseNow()
-        if shouldEnable {
-            bookmarkDatabaseCleaner.scheduleRegularCleaning()
-        } else {
-            bookmarkDatabaseCleaner.cancelCleaningSchedule()
-        }
-    }
-
-    func cleanUpBookmarksDatabase() {
-        bookmarkDatabaseCleaner.cleanUpDatabaseNow()
-    }
 
     func loadBookmarks() {
         bookmarkStore.loadAll(type: .topLevelEntities) { [weak self] (topLevelEntities, error) in

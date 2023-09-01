@@ -35,10 +35,13 @@ enum PixelExperiment: String, CaseIterable {
         logic.install()
     }
 
+    static func cleanup() {
+        logic.cleanup()
+    }
+
     // These are the variants. Rename or add/remove them as needed.  If you change the string value
     //  remember to keep it clear for privacy triage.
     case control
-    case showBookmarksBarPrompt = "variant1"
 
 }
 
@@ -47,14 +50,6 @@ extension PixelExperiment {
 
     static func fireEnrollmentPixel() {
         logic.fireEnrollmentPixel()
-    }
-
-    static func fireSearchOnDay4to8Pixel() {
-        logic.fireSearchOnDay4to8Pixel()
-    }
-
-    static func fireBookmarksBarInteractionPixel() {
-        logic.fireBookmarksBarInteractionPixel()
     }
 
 }
@@ -117,31 +112,12 @@ final internal class PixelExperimentLogic {
         installed = true
     }
 
+    // You'll need additional pixels for your experiment.  Pass the cohort as a paramter.
     func fireEnrollmentPixel() {
-        guard allocatedCohort != nil, let cohort else { return }
-        if firedPixels.insert(Pixel.Event.bookmarksBarOnboardingEnrollment(cohort: "").name).inserted {
-            fire(.bookmarksBarOnboardingEnrollment(cohort: cohort.rawValue))
-        }
+        // You'll probably need this at least.
     }
 
-    func fireSearchOnDay4to8Pixel() {
-        guard allocatedCohort != nil, let cohort else { return }
-        guard 4...8 ~= daysSinceEnrollment else { return }
-        if firedPixels.insert(Pixel.Event.bookmarksBarOnboardingSearched4to8days(cohort: "").name).inserted {
-            fire(.bookmarksBarOnboardingSearched4to8days(cohort: cohort.rawValue))
-        }
-    }
-
-    func fireBookmarksBarInteractionPixel() {
-        guard allocatedCohort != nil, let cohort else { return }
-        if firedPixels.insert(Pixel.Event.bookmarksBarOnboardingFirstInteraction(cohort: "").name).inserted {
-            fire(.bookmarksBarOnboardingFirstInteraction(cohort: cohort.rawValue))
-        } else if 2...8 ~= daysSinceEnrollment && firedPixels.insert(Pixel.Event.bookmarksBarOnboardingInteraction2to8days(cohort: "").name).inserted {
-            fire(.bookmarksBarOnboardingInteraction2to8days(cohort: cohort.rawValue))
-        }
-    }
-
-    func reset() {
+    func cleanup() {
         installed = false
         allocatedCohort = nil
         enrollmentDate = nil

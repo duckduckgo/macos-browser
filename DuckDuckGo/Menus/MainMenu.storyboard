@@ -71,7 +71,7 @@
                             </menuItem>
                             <menuItem title="File" id="dMs-cI-mzQ">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="File" autoenablesItems="NO" id="bib-Uj-vzu">
+                                <menu key="submenu" title="File" id="bib-Uj-vzu">
                                     <items>
                                         <menuItem title="New Window" keyEquivalent="n" id="Was-JA-tGl">
                                             <connections>
@@ -857,12 +857,6 @@ CQ
                                                             <action selector="toggleConnectOnLogInAction:" target="Rah-lS-gno" id="ZCH-Qd-oYZ"/>
                                                         </connections>
                                                     </menuItem>
-                                                    <menuItem title="Enable On-Demand (required for Kill Switch)" id="u0h-YJ-J4H" userLabel="Connect On Demand">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="toggleConnectOnDemandAction:" target="Rah-lS-gno" id="beL-Aq-2Xu"/>
-                                                        </connections>
-                                                    </menuItem>
                                                     <menuItem title="Kill Switch (enforceRoutes)" id="9HJ-tK-AOs" userLabel="Enforce Routes">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
@@ -894,6 +888,51 @@ CQ
                                                         <connections>
                                                             <action selector="sendTestNotification:" target="Rah-lS-gno" id="Hea-8E-9VU"/>
                                                         </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Onboarding" id="xu6-z0-age">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Onboarding" id="L82-We-Wwv" customClass="NetworkProtectionOnboardingMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                            <items>
+                                                                <menuItem title="Reset Onboarding Status" id="gfc-0G-Ujy">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="resetWithSender:" target="L82-We-Wwv" id="xOi-lx-E4W"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem isSeparatorItem="YES" id="3kV-PK-dO5"/>
+                                                                <menuItem title="Set Status" id="Mpv-Qy-bPV">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <menu key="submenu" id="NiU-Vj-2iO">
+                                                                        <items>
+                                                                            <menuItem title="Onboarding Completed" id="3dg-2K-mfF">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                                <connections>
+                                                                                    <action selector="setStatusCompletedWithSender:" target="L82-We-Wwv" id="yxX-Y8-mhf"/>
+                                                                                </connections>
+                                                                            </menuItem>
+                                                                            <menuItem title="Allow System Extension" id="fBd-P9-lzz">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                                <connections>
+                                                                                    <action selector="setStatusAllowSystemExtensionWithSender:" target="L82-We-Wwv" id="Bdv-pa-CnK"/>
+                                                                                </connections>
+                                                                            </menuItem>
+                                                                            <menuItem title="Allow VPN Configuration" id="FDy-9D-IWu">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                                <connections>
+                                                                                    <action selector="setStatusAllowVPNConfigurationWithSender:" target="L82-We-Wwv" id="pTb-5l-0eT"/>
+                                                                                </connections>
+                                                                            </menuItem>
+                                                                        </items>
+                                                                    </menu>
+                                                                </menuItem>
+                                                            </items>
+                                                            <connections>
+                                                                <outlet property="resetMenuItem" destination="gfc-0G-Ujy" id="IQi-c6-FGQ"/>
+                                                                <outlet property="setStatusAllowSystemExtensionMenuItem" destination="fBd-P9-lzz" id="vAR-4f-npu"/>
+                                                                <outlet property="setStatusAllowVPNConfigurationMenuItem" destination="FDy-9D-IWu" id="eCX-M8-KNR"/>
+                                                                <outlet property="setStatusCompletedMenuItem" destination="3dg-2K-mfF" id="D7v-lV-bMJ"/>
+                                                            </connections>
+                                                        </menu>
                                                     </menuItem>
                                                     <menuItem title="Preferred Server" id="Zh6-DO-H1c">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
@@ -988,7 +1027,6 @@ CQ
                                                 <connections>
                                                     <outlet property="connectOnLogInMenuItem" destination="fSA-hH-Vum" id="HSf-v8-MYh"/>
                                                     <outlet property="connectionTesterEnabledMenuItem" destination="L06-y6-zv3" id="uhM-4n-eOm"/>
-                                                    <outlet property="enableConnectOnDemandMenuItem" destination="u0h-YJ-J4H" id="Ufg-Pq-PYy"/>
                                                     <outlet property="excludeLocalNetworksMenuItem" destination="Zak-JJ-7hc" id="vYu-wC-dTl"/>
                                                     <outlet property="exclusionsMenu" destination="j7y-fb-xa6" id="igE-bU-qW4"/>
                                                     <outlet property="mainMenuItem" destination="Dt6-sj-4hn" id="vwa-T8-0ak"/>

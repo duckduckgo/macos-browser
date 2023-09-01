@@ -134,7 +134,7 @@ final class MainMenu: NSMenu {
             NSApplication.shared.helpMenu = helpMenuItem?.submenu
         }
 
-        if !WKWebView.canPrint {
+        if !WKWebView.supportsPrinting {
             printMenuItem?.removeFromParent()
             printSeparatorItem?.removeFromParent()
         }
