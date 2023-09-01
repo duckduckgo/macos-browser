@@ -61,6 +61,7 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
     public func saveProfile(_ profile: DataBrokerProtectionProfile) {
         database.save(profile)
         cache.reset()
+        cache.profile = profile
     }
 
     public func fetchProfile(ignoresCache: Bool = false) -> DataBrokerProtectionProfile? {
