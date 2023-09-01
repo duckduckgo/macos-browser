@@ -133,7 +133,6 @@ public struct UserDefaultsWrapper<T> {
 
         // Network Protection
 
-        case networkProtectionOnDemandActivation = "netp.ondemand"
         case networkProtectionShouldEnforceRoutes = "netp.enforce-routes"
         case networkProtectionShouldIncludeAllNetworks = "netp.include-all-networks"
 
@@ -159,6 +158,7 @@ public struct UserDefaultsWrapper<T> {
         case pixelExperimentCohort = "pixel.experiment.cohort"
         case pixelExperimentEnrollmentDate = "pixel.experiment.enrollment.date"
         case pixelExperimentFiredPixels = "pixel.experiment.pixels.fired"
+        case campaignVariant = "campaign.variant"
     }
 
     enum RemovedKeys: String, CaseIterable {

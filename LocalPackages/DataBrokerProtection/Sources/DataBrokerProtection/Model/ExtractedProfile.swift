@@ -30,8 +30,8 @@ struct ExtractProfileSelectors: Codable, Sendable {
     let name: ProfileSelector?
     let alternativeNamesList: ProfileSelector?
     let addressFull: ProfileSelector?
-    let addressCityState: ProfileSelector?
     let addressCityStateList: ProfileSelector?
+    let addressCityState: ProfileSelector?
     let phone: ProfileSelector?
     let phoneList: ProfileSelector?
     let relativesList: ProfileSelector?
@@ -43,8 +43,8 @@ struct ExtractProfileSelectors: Codable, Sendable {
         case name
         case alternativeNamesList
         case addressFull
-        case addressCityState
         case addressCityStateList
+        case addressCityState
         case phone
         case phoneList
         case relativesList
@@ -57,18 +57,20 @@ struct ExtractProfileSelectors: Codable, Sendable {
 struct AddressCityState: Codable {
     let city: String
     let state: String
+
+    var fullAddress: String {
+        "\(city), \(state)"
+    }
 }
 
 struct ExtractedProfile: Codable, Sendable {
     let id: Int64?
     let name: String?
-    let alternativeNamesList: [String]?
+    let alternativeNames: [String]?
     let addressFull: String?
-    let addressCityState: String?
-    let addressCityStateList: [AddressCityState]?
-    let phone: String?
-    let phoneList: String?
-    let relativesList: [String]?
+    let addresses: [AddressCityState]?
+    let phoneNumbers: [String]?
+    let relatives: [String]?
     let profileUrl: String?
     let reportId: String?
     let age: String?
@@ -79,13 +81,11 @@ struct ExtractedProfile: Codable, Sendable {
     enum CodingKeys: CodingKey {
         case id
         case name
-        case alternativeNamesList
+        case alternativeNames
         case addressFull
-        case addressCityState
-        case addressCityStateList
-        case phone
-        case phoneList
-        case relativesList
+        case addresses
+        case phoneNumbers
+        case relatives
         case profileUrl
         case reportId
         case age
@@ -96,13 +96,11 @@ struct ExtractedProfile: Codable, Sendable {
 
     init(id: Int64? = nil,
          name: String? = nil,
-         alternativeNamesList: [String]? = nil,
+         alternativeNames: [String]? = nil,
          addressFull: String? = nil,
-         addressCityState: String? = nil,
-         addressCityStateList: [AddressCityState]? = nil,
-         phone: String? = nil,
-         phoneList: String? = nil,
-         relativesList: [String]? = nil,
+         addresses: [AddressCityState]? = nil,
+         phoneNumbers: [String]? = nil,
+         relatives: [String]? = nil,
          profileUrl: String? = nil,
          reportId: String? = nil,
          age: String? = nil,
@@ -110,13 +108,11 @@ struct ExtractedProfile: Codable, Sendable {
          removedDate: Date? = nil) {
         self.id = id
         self.name = name
-        self.alternativeNamesList = alternativeNamesList
+        self.alternativeNames = alternativeNames
         self.addressFull = addressFull
-        self.addressCityState = addressCityState
-        self.addressCityStateList = addressCityStateList
-        self.phone = phone
-        self.phoneList = phoneList
-        self.relativesList = relativesList
+        self.addresses = addresses
+        self.phoneNumbers = phoneNumbers
+        self.relatives = relatives
         self.profileUrl = profileUrl
         self.reportId = reportId
         self.age = age
@@ -129,12 +125,11 @@ struct ExtractedProfile: Codable, Sendable {
         ExtractedProfile(
             id: self.id,
             name: self.name ?? profile.fullName,
-            alternativeNamesList: self.alternativeNamesList,
+            alternativeNames: self.alternativeNames,
             addressFull: self.addressFull,
-            addressCityState: self.addressCityState,
-            addressCityStateList: self.addressCityStateList,
-            phone: self.phone,
-            relativesList: self.relativesList,
+            addresses: self.addresses,
+            phoneNumbers: self.phoneNumbers,
+            relatives: self.relatives,
             profileUrl: self.profileUrl,
             reportId: self.reportId,
             age: self.age ?? String(profile.age),

@@ -772,6 +772,8 @@ struct UserText {
 
     static let noAccessToSelectedFolderHeader = NSLocalizedString("no.access.to.selected.folder.header", value: "DuckDuckGo needs permission to access selected folder", comment: "Header of the alert dialog informing user about failed download")
     static let noAccessToSelectedFolder = NSLocalizedString("no.access.to.selected.folder", value: "Grant access to the location of download.", comment: "Alert presented to user if the app doesn't have rights to access selected folder")
+    static let cannotOpenFileAlertHeader = NSLocalizedString("cannot.open.file.alert.header", value: "Cannot Open File", comment: "Header of the alert dialog informing user it is not possible to open the file")
+    static let cannotOpenFileAlertInformative = NSLocalizedString("cannot.open.file.alert.informative", value: "The App Store version of DuckDuckGo can only access local files if you drag-and-drop them into a browser window.\n\n To navigate local files using the address bar, please download DuckDuckGo directly from https://duckduckgo.com/mac.", comment: "Informative of the alert dialog informing user it is not possible to open the file")
 
     // MARK: New Tab
     // Context Menu
@@ -828,4 +830,11 @@ struct UserText {
     static let dataBrokerProtectionOptionsMenuItem = NSLocalizedString("data-broker-protection.optionsMenu", value: "Data Broker Protection", comment: "Menu item data broker protection feature")
     static let tabDataBrokerProtectionTitle = NSLocalizedString("tab.dbp.title", value: "Data Broker Protection", comment: "Tab data broker protection title")
 #endif //DBP
+
+    // Bookmarks bar prompt
+    static let bookmarksBarPromptTitle = NSLocalizedString("bookmarks.bar.prompt.title", value: "Show Bookmarks Bar?", comment: "Title for bookmarks bar prompt")
+    static let bookmarksBarPromptMessage = NSLocalizedString("bookmarks.bar.prompt.message", value: "Show the Bookmarks Bar for quick access to your new bookmarks.", comment: "Message show for bookmarks bar prompt")
+    static let bookmarksBarPromptDismiss = NSLocalizedString("bookmarks.bar.prompt.dismiss", value: "Hide", comment: "Dismiss button label on bookmarks bar prompt")
+    static let bookmarksBarPromptAccept = NSLocalizedString("bookmarks.bar.prompt.accept", value: "Show", comment: "Accept button label on bookmarks bar prompt")
+
 }

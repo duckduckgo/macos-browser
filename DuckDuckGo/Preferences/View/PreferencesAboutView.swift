@@ -70,6 +70,8 @@ extension Preferences {
                         model.openURL(.aboutDuckDuckGo)
                     }
 
+                    Text("Build variant: \(variant)")
+
                     TextButton(UserText.privacyPolicy) {
                         model.openURL(.privacyPolicy)
                     }
@@ -83,6 +85,14 @@ extension Preferences {
                 }
             }
         }
+
+        var variant: String {
+            if let url = Bundle.main.url(forResource: "variant", withExtension: "txt"), let string = try? String(contentsOf: url) {
+                return string
+            }
+            return "default"
+        }
+
     }
 
     struct UnsupportedDeviceInfoBox: View {
