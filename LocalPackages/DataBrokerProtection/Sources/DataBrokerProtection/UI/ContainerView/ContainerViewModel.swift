@@ -104,10 +104,8 @@ final class ContainerViewModel: ObservableObject {
         let scanHistoryEvents = brokerProfileData.flatMap { $0.scanOperationData.historyEvents }
         var status = ""
 
-        if !scanHistoryEvents.isEmpty {
-            if let date = getLastEventDate(events: scanHistoryEvents) {
-                status = "Last Scan \(date)"
-            }
+        if let date = getLastEventDate(events: scanHistoryEvents) {
+            status = "Last Scan \(date)"
         }
         self.headerStatusText = status
     }
