@@ -135,7 +135,12 @@ extension DataBrokerProtectionViewController: DBPUICommunicationDelegate {
     }
 
     func getUserProfile() -> DBPUIUserProfile? {
-        return dataManager.fetchProfileForUI()
+        guard let profile = dataManager.fetchProfile() else { return nil }
+
+        let names = profile.names.map { DBPUIUserProfileName(first: $0.firstName, middle: $0.middleName ?? "", last: $0.lastName) }
+        let addresses = profile.addresses.map { DBPUIUserProfileAddress(street: $0.street ?? "", city: $0.city, state: $0.state) }
+
+        return DBPUIUserProfile(names: names, birthYear: profile.birthYear, addresses: addresses)
     }
 
     func addNameToCurrentUserProfile(_ name: DBPUIUserProfileName) -> Bool {

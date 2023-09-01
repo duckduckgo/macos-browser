@@ -19,7 +19,6 @@
 import Foundation
 import SwiftUI
 import DataBrokerProtection
-import BrowserServicesKit
 
 final class DataBrokerProfileQueryViewController: NSViewController {
    private let dataManager: DataBrokerProtectionDataManager

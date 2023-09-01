@@ -32,7 +32,7 @@ extension DBPUIError: LocalizedError {
 }
 
 /// Enum to represent the requested UI State
-public enum DBPUIState: String, Codable {
+enum DBPUIState: String, Codable {
     case onboarding = "Onboarding"
     case profileReview = "ProfileReview"
     case dashboard = "Dashboard"
@@ -66,7 +66,7 @@ struct DBPUISetState: Codable {
 }
 
 /// Enum representing possible scan and opt out states
-public enum DBPUIScanAndOptOutStatus: String, Codable {
+enum DBPUIScanAndOptOutStatus: String, Codable {
     case notRunning
     case quickScan
     case noProfileMatch
@@ -75,14 +75,14 @@ public enum DBPUIScanAndOptOutStatus: String, Codable {
 }
 
 /// Message Object representing a user profile name
-public struct DBPUIUserProfileName: Codable {
+struct DBPUIUserProfileName: Codable {
     let first: String
     let middle: String
     let last: String
 }
 
 /// Message Object representing a user profile address
-public struct DBPUIUserProfileAddress: Codable {
+struct DBPUIUserProfileAddress: Codable {
     let street: String
     let city: String
     let state: String
@@ -90,7 +90,7 @@ public struct DBPUIUserProfileAddress: Codable {
 
 /// Message Object representing a user profile containing one or more names and addresses
 /// also contains the user profile's birth year
-public struct DBPUIUserProfile: Codable {
+struct DBPUIUserProfile: Codable {
     let names: [DBPUIUserProfileName]
     let birthYear: Int
     let addresses: [DBPUIUserProfileAddress]
