@@ -1022,8 +1022,6 @@ final class AddressBarTextEditor: NSTextView {
             let adjustedSelection = delegate.filterSuffix(fromSelectionRange: currentSelection, for: string)
             setSelectedRange(adjustedSelection)
         }
-
-        NotificationCenter.default.post(name: .addressBarMouseDown, object: nil, userInfo: nil)
     }
 
     override func paste(_ sender: Any?) {
@@ -1110,8 +1108,3 @@ final class AddressBarTextFieldCell: NSTextFieldCell {
 fileprivate extension NSStoryboard {
     static let suggestion = NSStoryboard(name: "Suggestion", bundle: .main)
 }
-
-
-extension Notification.Name {
-     static let addressBarMouseDown = Notification.Name("addressBarMouseDownAlert")
- }

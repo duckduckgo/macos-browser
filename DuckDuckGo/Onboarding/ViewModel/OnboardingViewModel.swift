@@ -55,16 +55,25 @@ final class OnboardingViewModel: ObservableObject {
         }
     }
 
+    var isNewOnboarding: Bool {
+        variantManager?.isSupported(feature: .newOnboarding) ?? false
+    }
+
     @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
     private(set) var onboardingFinished: Bool
 
     private let statisticsLoader: StatisticsLoader?
+    private let variantManager: VariantManager?
 
     weak var delegate: OnboardingDelegate?
 
-    init(delegate: OnboardingDelegate? = nil, statisticsLoader: StatisticsLoader? = (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)) {
+    init(
+        delegate: OnboardingDelegate? = nil,
+        statisticsLoader: StatisticsLoader? = (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared),
+        variantManager: VariantManager? = (NSApp.isRunningUnitTests ? nil : DefaultVariantManager())) {
         self.delegate = delegate
         self.statisticsLoader = statisticsLoader
+        self.variantManager = variantManager
         self.state = onboardingFinished ? .startBrowsing : .startFlow
 
         NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
@@ -76,10 +85,11 @@ final class OnboardingViewModel: ObservableObject {
     }
 
     func onStartPressed() {
-        statisticsLoader?.load()
-        if DefaultVariantManager().isSupported(feature: .newOnboarding) {
+        if variantManager?.isSupported(feature: .newOnboarding) ?? false {
+            finishOnboarding()
             delegate?.goToNewTabPage()
         } else {
+            statisticsLoader?.load()
             state = .importData
         }
     }
@@ -127,12 +137,17 @@ final class OnboardingViewModel: ObservableObject {
     }
 
     @objc private func newTabOpenNotification(_ notification: Notification) {
-        onboardingFinished = true
+        finishOnboarding()
     }
 
     @objc private func addressBarMouseDown(_ notification: Notification) {
-        onboardingFinished = true
+        finishOnboarding()
         delegate?.goToNewTabPage()
+    }
+
+    private func finishOnboarding() {
+        onboardingFinished = true
+        statisticsLoader?.load()
     }
 
 }

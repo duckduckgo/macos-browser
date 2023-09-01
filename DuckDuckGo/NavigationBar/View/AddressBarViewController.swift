@@ -502,3 +502,7 @@ fileprivate extension NSView {
     }
 
 }
+
+extension Notification.Name {
+     static let addressBarMouseDown = Notification.Name("addressBarMouseDownAlert")
+ }
