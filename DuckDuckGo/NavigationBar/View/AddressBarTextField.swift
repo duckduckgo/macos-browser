@@ -272,7 +272,6 @@ final class AddressBarTextField: NSTextField {
                     window.makeFirstResponder(self)
                     return
                 }
-
             }
         }
 #endif
