@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-//#if NETWORK_PROTECTION || DBP
-
 import AppKit
 import Common
 import Foundation
@@ -158,5 +156,3 @@ private struct SM: ServiceManagementProtocol {
 }
 
 private var ServiceManagement: ServiceManagementProtocol { SM() } // swiftlint:disable:this identifier_name
-
-//#endif
