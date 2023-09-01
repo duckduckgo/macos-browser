@@ -20,8 +20,30 @@ import AppKit
 
 final class FirePopover: NSPopover {
 
-    override var mainWindowMargin: CGFloat {
-        -14
+    override var mainWindowMargin: CGFloat { -14 }
+
+    private static let minScreenEdgeMargin = 10.0
+    private static let defaultScreenEdgeCorrection = 12.0
+
+    // always position the Fire popover by the right edge
+    override func adjustFrame(_ frame: NSRect) -> NSRect {
+        let boundingFrame = self.boundingFrame
+        guard !boundingFrame.isInfinite else { return frame }
+        guard let popoverWindow = self.contentViewController?.view.window else {
+            assertionFailure("no popover window")
+            return frame
+        }
+
+        var frame = frame
+        frame.origin.x = boundingFrame.maxX - popoverWindow.frame.width
+        if let mainWindow = popoverWindow.parent,
+           let screen = mainWindow.screen,
+           mainWindow.frame.maxX > screen.visibleFrame.maxX - Self.defaultScreenEdgeCorrection {
+            print(screen.visibleFrame.maxX - mainWindow.frame.maxX)
+            // close to the edge of the screen Popover start appearing shifted to the left
+            frame.origin.x += Self.defaultScreenEdgeCorrection - (screen.visibleFrame.maxX - mainWindow.frame.maxX)
+        }
+        return frame
     }
 
     init(fireViewModel: FireViewModel, tabCollectionViewModel: TabCollectionViewModel) {

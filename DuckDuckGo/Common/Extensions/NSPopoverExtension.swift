@@ -34,6 +34,16 @@ extension NSPopover {
         }
 
         return mainWindow.frame.insetBy(dx: mainWindowMargin, dy: 0)
+            .intersection(mainWindow.screen?.visibleFrame ?? .infinite)
+    }
+
+    @objc func adjustFrame(_ frame: NSRect) -> NSRect {
+        var frame = frame
+        let boundingFrame = self.boundingFrame
+        if !boundingFrame.isInfinite, boundingFrame.width > frame.width {
+            frame.origin.x = min(max(frame.minX, boundingFrame.minX), boundingFrame.maxX - frame.width)
+        }
+        return frame
     }
 
     /// Shows the popover below the specified rect inside the view bounds with the popover's pin positioned in the middle of the rect
@@ -57,8 +67,10 @@ extension NSPopover {
         self.show(positionedBelow: view.bounds, in: view)
     }
 
+    static let currentFrameOnScreenWithContentSizeSelector = NSSelectorFromString("_currentFrameOnScreenWithContentSize:outAnchorEdge:")
+
     private static let swizzleCurrentFrameOnScreenOnce: () = {
-        guard let originalMethod = class_getInstanceMethod(NSPopover.self, NSSelectorFromString("_currentFrameOnScreenWithContentSize:outAnchorEdge:")),
+        guard let originalMethod = class_getInstanceMethod(NSPopover.self, currentFrameOnScreenWithContentSizeSelector),
               let swizzledMethod = class_getInstanceMethod(NSPopover.self, #selector(currentFrameOnScreenWithContentSize)) else {
             assertionFailure("Methods not available")
             return
@@ -70,14 +82,7 @@ extension NSPopover {
     // place popover inside bounds of its owner Main Window
     @objc(swizzled_currentFrameOnScreenWithContentSize:outAnchorEdge:)
     private dynamic func currentFrameOnScreenWithContentSize(size: NSSize, outAnchorEdge: UnsafeRawPointer?) -> NSRect {
-        var frame = self.currentFrameOnScreenWithContentSize(size: size, outAnchorEdge: outAnchorEdge)
-
-        let boundingFrame = self.boundingFrame
-        if !boundingFrame.isInfinite, boundingFrame.width > frame.width {
-            frame.origin.x = min(max(frame.minX, boundingFrame.minX), boundingFrame.maxX - frame.width)
-        }
-
-        return frame
+        self.adjustFrame(currentFrameOnScreenWithContentSize(size: size, outAnchorEdge: outAnchorEdge))
     }
 
 }
