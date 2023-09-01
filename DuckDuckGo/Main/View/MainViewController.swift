@@ -47,12 +47,8 @@ final class MainViewController: NSViewController {
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var bookmarksBarVisibilityChangedCancellable: AnyCancellable?
     private var navigationalCancellables = Set<AnyCancellable>()
-    private var canBookmarkCancellable: AnyCancellable?
-    private var canInsertLastRemovedTabCancellable: AnyCancellable?
-    private var findInPageCancellable: AnyCancellable?
-    private var keyDownMonitor: Any?
-    private var mouseNavButtonsMonitor: Any?
     private var windowTitleCancellable: AnyCancellable?
+    private var eventMonitorCancellables = Set<AnyCancellable>()
 
     private var bookmarksBarIsVisible: Bool {
         return bookmarksBarViewController.parent != nil
@@ -84,12 +80,17 @@ final class MainViewController: NSViewController {
 
         view.registerForDraggedTypes([.URL, .fileURL])
 
-        registerForBookmarkBarPromptNotifications()
         registerForDidBecomeActiveNotifications()
+    }
+
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        registerForBookmarkBarPromptNotifications()
     }
 
     var bookmarkBarPromptObserver: Any?
     func registerForBookmarkBarPromptNotifications() {
+        guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
         bookmarkBarPromptObserver = NotificationCenter.default.addObserver(
             forName: .bookmarkPromptShouldShow,
             object: nil,
@@ -156,8 +157,14 @@ final class MainViewController: NSViewController {
 
     func showBookmarkPromptIfNeeded() {
         guard #available(macOS 11, *) else { return }
-        guard PixelExperiment.cohort == .showBookmarksBarPrompt else { return }
+
         guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
+        if bookmarksBarIsVisible {
+            // Don't show this to users who obviously know about the bookmarks bar already
+            bookmarksBarViewController.bookmarksBarPromptShown = true
+            return
+        }
+
         updateBookmarksBarViewVisibility(visible: true)
         // This won't work until the bookmarks bar is actually visible which it isn't until the next ui cycle
         DispatchQueue.main.async {
@@ -170,15 +177,7 @@ final class MainViewController: NSViewController {
     }
 
     func windowWillClose() {
-        if let monitor = keyDownMonitor {
-            NSEvent.removeMonitor(monitor)
-            keyDownMonitor = nil
-        }
-        if let monitor = mouseNavButtonsMonitor {
-            NSEvent.removeMonitor(monitor)
-            mouseNavButtonsMonitor = nil
-        }
-
+        eventMonitorCancellables.removeAll()
         tabBarViewController?.hideTabPreview()
     }
 
@@ -245,7 +244,7 @@ final class MainViewController: NSViewController {
     private func updateBookmarksBarViewVisibility(visible: Bool) {
         let showBookmarksBar = isInPopUpWindow ? false : visible
 
-        if visible {
+        if showBookmarksBar {
             if bookmarksBarViewController.parent == nil {
                 addChild(bookmarksBarViewController)
 
@@ -499,18 +498,14 @@ extension MainViewController: NSDraggingDestination {
 extension MainViewController {
 
     func listenToKeyDownEvents() {
-        if let monitor = keyDownMonitor {
-            NSEvent.removeMonitor(monitor)
-            keyDownMonitor = nil
-        }
-
-        self.keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            guard let self = self else { return nil }
+        NSEvent.addLocalCancellableMonitor(forEventsMatching: .keyDown) { [weak self] event in
+            guard let self else { return event }
             return self.customKeyDown(with: event) ? nil : event
-        }
-        self.mouseNavButtonsMonitor = NSEvent.addLocalMonitorForEvents(matching: .otherMouseUp) { [weak self] event in
-            return self?.otherMouseUp(with: event)
-        }
+        }.store(in: &eventMonitorCancellables)
+        NSEvent.addLocalCancellableMonitor(forEventsMatching: .otherMouseUp) { [weak self] event in
+            guard let self else { return event }
+            return self.otherMouseUp(with: event)
+        }.store(in: &eventMonitorCancellables)
     }
 
     func customKeyDown(with event: NSEvent) -> Bool {

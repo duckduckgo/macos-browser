@@ -27,8 +27,8 @@ struct MapperToDB {
         self.mechanism = mechanism
     }
 
-    func mapToDB(profile: DataBrokerProtectionProfile) throws -> ProfileDB {
-        .init(id: nil, birthYear: try withUnsafeBytes(of: profile.birthYear) { try mechanism(Data($0)) })
+    func mapToDB(id: Int64? = nil, profile: DataBrokerProtectionProfile) throws -> ProfileDB {
+        .init(id: id, birthYear: try withUnsafeBytes(of: profile.birthYear) { try mechanism(Data($0)) })
     }
 
     func mapToDB(_ name: DataBrokerProtectionProfile.Name, relatedTo profileId: Int64) throws -> NameDB {
@@ -209,12 +209,11 @@ struct MapperToModel {
         let extractedProfile = try jsonDecoder.decode(ExtractedProfile.self, from: try mechanism(extractedProfileDB.profile))
         return .init(id: extractedProfileDB.id,
                      name: extractedProfile.name,
-                     alternativeNamesList: extractedProfile.alternativeNamesList,
+                     alternativeNames: extractedProfile.alternativeNames,
                      addressFull: extractedProfile.addressFull,
-                     addressCityState: extractedProfile.addressCityState,
-                     addressCityStateList: extractedProfile.addressCityStateList,
-                     phone: extractedProfile.phone,
-                     relativesList: extractedProfile.relativesList,
+                     addresses: extractedProfile.addresses,
+                     phoneNumbers: extractedProfile.phoneNumbers,
+                     relatives: extractedProfile.relatives,
                      profileUrl: extractedProfile.profileUrl,
                      reportId: extractedProfile.reportId,
                      age: extractedProfile.age,

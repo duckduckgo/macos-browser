@@ -21,8 +21,11 @@ import Cocoa
 extension NSWindow {
 
     func setFrameOrigin(droppingPoint: NSPoint) {
-        let frameOrigin = NSPoint(x: droppingPoint.x - frame.size.width/2, y: droppingPoint.y - frame.size.height)
-        setFrameOrigin(frameOrigin)
+        setFrameOrigin(frame.frameOrigin(fromDroppingPoint: droppingPoint))
+    }
+
+    func setFrameOrigin(cascadedFrom window: NSWindow) {
+        setFrameTopLeftPoint(cascadeTopLeft(from: window.frame.topLeft))
     }
 
     private static let lastLeftHitKey = "_lastLeftHit"
