@@ -65,13 +65,13 @@ final class MoreOptionsMenu: NSMenu {
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
-         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility? = nil,
+         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
          internalUserDecider: InternalUserDecider) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
-        self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility ?? DefaultNetworkProtectionVisibility(internalUserDecider: internalUserDecider)
+        self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility
         self.internalUserDecider = internalUserDecider
 
         super.init(title: "")
