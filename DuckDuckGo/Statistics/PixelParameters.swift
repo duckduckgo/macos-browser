@@ -125,7 +125,6 @@ extension Pixel.Event {
              .userHasPinnedTab,
              .fireButtonFirstBurn,
              .fireButton,
-             .incrementalRolloutTest,
              .duckPlayerDailyUniqueView,
              .duckPlayerViewFromYoutubeViaMainOverlay,
              .duckPlayerViewFromYoutubeViaHoverButton,
