@@ -17,7 +17,7 @@
 //
 
 import AppKit
-import Common
+import os.log // swiftlint:disable:this enforce_os_log_wrapper
 import Foundation
 import ServiceManagement
 
