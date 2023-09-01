@@ -36,6 +36,7 @@ final class BrowserTabViewController: NSViewController {
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
+
     private var tabContentCancellable: AnyCancellable?
     private var userDialogsCancellable: AnyCancellable?
     private var cookieConsentCancellable: AnyCancellable?
@@ -44,15 +45,14 @@ final class BrowserTabViewController: NSViewController {
     private var hoverLinkCancellable: AnyCancellable?
     private var pinnedTabsDelegatesCancellable: AnyCancellable?
     private var keyWindowSelectedTabCancellable: AnyCancellable?
-    private var alertCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
+    private var mouseDownCancellable: AnyCancellable?
+
     private var previouslySelectedTab: Tab?
 
     private var hoverLabelWorkItem: DispatchWorkItem?
 
     private var transientTabContentViewController: NSViewController?
-
-    private var mouseDownMonitor: Any?
 
     private var cookieConsentPopoverManager = CookieConsentPopoverManager()
 
@@ -95,7 +95,7 @@ final class BrowserTabViewController: NSViewController {
     override func viewWillDisappear() {
         super.viewWillDisappear()
 
-        removeMouseMonitors()
+        mouseDownCancellable = nil
     }
 
     override func viewDidAppear() {
@@ -218,19 +218,17 @@ final class BrowserTabViewController: NSViewController {
             self.webView = nil
         }
 
-        if webView.window === view.window {
-            if webView.isInspectorShown {
-                removeWebInspectorFromHierarchy(container: container)
-            }
-            container.removeFromSuperview()
+        if webView.window === view.window, webView.isInspectorShown {
+            removeWebInspectorFromHierarchy(container: container)
         }
+        container.removeFromSuperview()
         if self.webViewContainer === container {
             self.webViewContainer = nil
         }
     }
 
-    private func addWebViewToViewHierarchy(_ webView: WebView) {
-        let container = WebViewContainerView(webView: webView, frame: view.bounds)
+    private func addWebViewToViewHierarchy(_ webView: WebView, tab: Tab) {
+        let container = WebViewContainerView(tab: tab, webView: webView, frame: view.bounds)
         self.webViewContainer = container
         view.addSubview(container)
 
@@ -251,7 +249,7 @@ final class BrowserTabViewController: NSViewController {
             cleanUpRemoteWebViewIfNeeded(newWebView)
             webView = newWebView
 
-            addWebViewToViewHierarchy(newWebView)
+            addWebViewToViewHierarchy(newWebView, tab: tabViewModel.tab)
         }
 
         guard let tabViewModel = tabViewModel else {
@@ -275,11 +273,8 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToTabContent(of tabViewModel: TabViewModel?) {
-        tabContentCancellable?.cancel()
-
-        guard let tabViewModel = tabViewModel else {
-            return
-        }
+        tabContentCancellable = nil
+        guard let tabViewModel else { return }
 
         let tabContentPublisher = tabViewModel.tab.$content
             .dropFirst()
@@ -316,10 +311,8 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToUserDialogs(of tabViewModel: TabViewModel?) {
-        guard let tabViewModel = tabViewModel else {
-            userDialogsCancellable = nil
-            return
-        }
+        userDialogsCancellable = nil
+        guard let tabViewModel else { return }
 
         userDialogsCancellable = Publishers.CombineLatest(
             tabViewModel.tab.$userInteractionDialog,
@@ -605,11 +598,14 @@ extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
                                           willDisplayOverlayAtClick: NSPoint?,
                                           serializedInputContext: String,
                                           inputPosition: CGRect) {
-        contentOverlayPopoverCreatingIfNeeded().websiteAutofillUserScript(websiteAutofillUserScript,
-                                                                          willDisplayOverlayAtClick: willDisplayOverlayAtClick,
-                                                                          serializedInputContext: serializedInputContext,
-                                                                          inputPosition: inputPosition)
+
+        self.contentOverlayPopoverCreatingIfNeeded().websiteAutofillUserScript(websiteAutofillUserScript,
+                                                                              willDisplayOverlayAtClick: willDisplayOverlayAtClick,
+                                                                              serializedInputContext: serializedInputContext,
+                                                                              inputPosition: inputPosition)
+
     }
+
 }
 
 extension BrowserTabViewController: TabDelegate {
@@ -643,8 +639,8 @@ extension BrowserTabViewController: TabDelegate {
 
     func tab(_ parentTab: Tab, createdChild childTab: Tab, of kind: NewWindowPolicy) {
         switch kind {
-        case .popup(size: let windowContentSize):
-            WindowsManager.openPopUpWindow(with: childTab, contentSize: windowContentSize)
+        case .popup(origin: let origin, size: let contentSize):
+            WindowsManager.openPopUpWindow(with: childTab, origin: origin, contentSize: contentSize)
         case .window(active: let active, let isBurner):
             assert(isBurner == childTab.burnerMode.isBurner)
             WindowsManager.openNewWindow(with: childTab, showWindow: active)
@@ -928,18 +924,10 @@ extension BrowserTabViewController: OnboardingDelegate {
 extension BrowserTabViewController {
 
     func addMouseMonitors() {
-        guard mouseDownMonitor == nil else { return }
-
-        self.mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
-            self?.mouseDown(with: event)
+        mouseDownCancellable = NSEvent.addLocalCancellableMonitor(forEventsMatching: .leftMouseDown) { [weak self] event in
+            guard let self else { return event }
+            return self.mouseDown(with: event)
         }
-    }
-
-    func removeMouseMonitors() {
-        if let monitor = mouseDownMonitor {
-            NSEvent.removeMonitor(monitor)
-        }
-        self.mouseDownMonitor = nil
     }
 
     func mouseDown(with event: NSEvent) -> NSEvent? {
@@ -947,6 +935,7 @@ extension BrowserTabViewController {
         tabViewModel?.tab.autofill?.didClick(at: event.locationInWindow)
         return event
     }
+
 }
 
 // MARK: - Web View snapshot for Pinned Tab selected in more than 1 window

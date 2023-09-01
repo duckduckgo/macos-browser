@@ -177,6 +177,30 @@ extension NSAlert {
         return alert
     }
 
+    static func cannotOpenFileAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.cannotOpenFileAlertHeader
+        alert.informativeText = UserText.cannotOpenFileAlertInformative
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.ok)
+        alert.addButton(withTitle: UserText.learnMore)
+        return alert
+    }
+
+    static func osNotSupported() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.aboutUnsupportedDeviceInfo1
+        alert.informativeText = UserText.aboutUnsupportedDeviceInfo2Part1 + " " +
+        UserText.aboutUnsupportedDeviceInfo2Part2(version: "\(SupportedOSChecker.SupportedVersion.major).\(SupportedOSChecker.SupportedVersion.minor)") + " " +
+        UserText.aboutUnsupportedDeviceInfo2Part3 + " " +
+        UserText.aboutUnsupportedDeviceInfo2Part4
+        alert.alertStyle = .warning
+
+        alert.addButton(withTitle: UserText.checkForUpdate)
+        alert.addButton(withTitle: UserText.ok)
+        return alert
+    }
+
     @discardableResult
     func runModal() async -> NSApplication.ModalResponse {
         await withCheckedContinuation { continuation in
