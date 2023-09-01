@@ -58,14 +58,15 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// Easter egg users can be identified by them being internal users and having an auth token (NetP being activated).
     ///
     private var isEasterEggUser: Bool {
-        internalUserDecider.isInternalUser && networkProtectionFeatureActivation.isFeatureActivated
+        !isWaitlistUser && networkProtectionFeatureActivation.isFeatureActivated
     }
 
     /// Waitlist users are users that have the waitlist enabled and active
     ///
     private var isWaitlistUser: Bool {
         false
-        // Once we are able to support the waitlist, this will be changed to: isWaitlistEnabled && isWaitlistBetaActive
+        // Once we are able to support the waitlist, this will be changed to something similar to:
+        // isWaitlistUser && isWaitlistEnabled && isWaitlistBetaActive
     }
 
     private var isWaitlistBetaActive: Bool {
