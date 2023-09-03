@@ -65,13 +65,13 @@ final class MoreOptionsMenu: NSMenu {
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
-         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore(),
+         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
          internalUserDecider: InternalUserDecider) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
-        self.networkProtectionFeatureVisibility =  networkProtectionFeatureVisibility
+        self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility
         self.internalUserDecider = internalUserDecider
 
         super.init(title: "")
@@ -127,7 +127,7 @@ final class MoreOptionsMenu: NSMenu {
             .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
 #if NETWORK_PROTECTION
-        if networkProtectionFeatureVisibility.isFeatureActivated {
+        if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
             addItem(withTitle: UserText.networkProtection, action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
                 .targetting(self)
                 .withImage(.image(for: .vpnIcon))
