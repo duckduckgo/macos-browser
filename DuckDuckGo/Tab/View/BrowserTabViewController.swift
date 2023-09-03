@@ -500,7 +500,7 @@ final class BrowserTabViewController: NSViewController {
     var dataBrokerProtectionHomeViewController: DBPHomeViewController?
     private func dataBrokerProtectionHomeViewControllerCreatingIfNeeded() -> DBPHomeViewController {
         return dataBrokerProtectionHomeViewController ?? {
-            let dataBrokerProtectionHomeViewController = DBPHomeViewController()
+            let dataBrokerProtectionHomeViewController = DBPHomeViewController(dataBrokerProtectionManager: DataBrokerProtectionManager.shared)
             self.dataBrokerProtectionHomeViewController = dataBrokerProtectionHomeViewController
             return dataBrokerProtectionHomeViewController
         }()

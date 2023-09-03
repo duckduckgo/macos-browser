@@ -216,6 +216,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             NetworkProtectionAppEvents().applicationDidFinishLaunching()
         }
 #endif
+
+#if DBP
+        DataBrokerProtectionManager.shared.startSchedulerIfNecessary()
+#endif
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
