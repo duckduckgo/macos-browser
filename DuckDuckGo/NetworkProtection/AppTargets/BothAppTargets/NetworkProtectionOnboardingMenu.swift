@@ -30,7 +30,7 @@ final class NetworkProtectionOnboardingMenu: NSMenu {
 import NetworkProtection
 import NetworkProtectionUI
 
-/// Implements the logic for Network Protection's simulate failures menu.
+/// Implements the logic for Network Protection's onboarding menu.
 ///
 @available(macOS 11.4, *)
 @objc

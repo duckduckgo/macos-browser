@@ -318,7 +318,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
         if Self.simulationOptions.isEnabled(.tunnelFailure) {
             Self.simulationOptions.setEnabled(false, option: .tunnelFailure)
-            options[NetworkProtectionOptionKey.tunnelFailureSimulation] = NetworkProtectionOptionValue.true
+            options[NetworkProtectionOptionKey.tunnelFailureSimulation] = NSNumber(value: true)
         }
 
         if Self.simulationOptions.isEnabled(.controllerFailure) {
