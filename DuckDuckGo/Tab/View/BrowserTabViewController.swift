@@ -598,11 +598,14 @@ extension BrowserTabViewController: ContentOverlayUserScriptDelegate {
                                           willDisplayOverlayAtClick: NSPoint?,
                                           serializedInputContext: String,
                                           inputPosition: CGRect) {
-        contentOverlayPopoverCreatingIfNeeded().websiteAutofillUserScript(websiteAutofillUserScript,
-                                                                          willDisplayOverlayAtClick: willDisplayOverlayAtClick,
-                                                                          serializedInputContext: serializedInputContext,
-                                                                          inputPosition: inputPosition)
+
+        self.contentOverlayPopoverCreatingIfNeeded().websiteAutofillUserScript(websiteAutofillUserScript,
+                                                                              willDisplayOverlayAtClick: willDisplayOverlayAtClick,
+                                                                              serializedInputContext: serializedInputContext,
+                                                                              inputPosition: inputPosition)
+
     }
+
 }
 
 extension BrowserTabViewController: TabDelegate {
