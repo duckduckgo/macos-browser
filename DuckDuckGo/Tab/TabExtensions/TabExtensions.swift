@@ -184,7 +184,8 @@ extension TabExtensionsBuilder {
             PrivacyDebugToolsTabExtension(
                 privacyDebugTools: dependencies.privacyDebugTools,
                 scriptsPublisher: userScripts.compactMap { $0 },
-                webViewPublisher: args.webViewFuture
+                webViewPublisher: args.webViewFuture,
+                trackersPublisher: contentBlocking.trackersPublisher
             )
         }
     }

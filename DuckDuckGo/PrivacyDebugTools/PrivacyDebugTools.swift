@@ -18,9 +18,59 @@
 
 import BrowserServicesKit
 import Foundation
+import Combine
 
 final class PrivacyDebugTools {
     static let urlHost = "duckduckgo.github.io"
+
+    var current: String? = nil;
+    var seen = Set<String>();
+    var trackers: [DetectedTracker] = [] {
+        didSet {
+            trackersSubject.send(trackers)
+        }
+    }
+
+    private let trackersSubject = CurrentValueSubject<[DetectedTracker], Never>([])
+
+    public var itemsPublisher: AnyPublisher<[DetectedTracker], Never> {
+        trackersSubject.eraseToAnyPublisher()
+    }
+
+    public func setCurrent(domain: String) {
+        trackers = []
+        current = domain;
+        seen = Set<String>();
+    }
+
+    public func tracker(tracker: DetectedTracker) -> ()? {
+        guard let url = URL(string: tracker.request.pageUrl),
+              let host = url.host
+        else {
+            print("ignoring, host couldn't be read for incoming pageUrl")
+            return nil
+        }
+
+        if case .thirdPartyRequest = tracker.type {
+            print("ignoring, third party trackers")
+            return nil
+        }
+
+        guard current != nil, current == host else {
+            print("ignoring, didn't match current, host: \(host), current: \(String(describing: current)) ")
+            return nil
+        }
+
+        print("current: \(String(describing: current))")
+        print("trackers: \(String(describing: trackers))")
+
+        if seen.contains(tracker.request.url) {
+            return nil;
+        }
+        seen.insert(tracker.request.url);
+        trackers.append(tracker);
+        return nil
+    }
 
     var isEnabled: Bool {
 #if DEBUG
@@ -40,6 +90,6 @@ final class PrivacyDebugTools {
 extension URL {
 
     var isPrivacyDebugTools: Bool {
-        host == "duckduckgo.github.io"
+        return host == "duckduckgo.github.io" || host == "localhost"
     }
 }

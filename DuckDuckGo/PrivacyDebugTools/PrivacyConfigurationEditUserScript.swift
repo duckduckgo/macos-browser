@@ -22,19 +22,33 @@ import WebKit
 import Combine
 import Common
 import UserScript
+import ContentBlocking
 
 final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
-
     let messageOriginPolicy: MessageOriginPolicy = .only(
         rules: [
-            .exact(hostname: PrivacyDebugTools.urlHost)
+            .exact(hostname: PrivacyDebugTools.urlHost),
+            .exact(hostname: "localhost:3000"),
+            .exact(hostname: "localhost:3210"),
         ]
     )
     let featureName: String = "debugToolsPage"
     weak var broker: UserScriptMessageBroker?
     weak var webView: WKWebView?
 
+    weak var debugTools: PrivacyDebugTools? = nil {
+        didSet {
+            guard let debugTools = debugTools else { return }
+
+            debugTools.itemsPublisher.sink { (trackers: [DetectedTracker]) in
+                guard let current = debugTools.current else { return }
+                self.publishTrackers(domain: current, trackers: trackers)
+            }.store(in: &cancellables)
+        }
+    }
+
     let configurationURLProvider: ConfigurationURLProviding
+    private var cancellables = Set<AnyCancellable>()
 
     @MainActor
     var isActive: Bool = false {
@@ -85,6 +99,33 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
             }
     }
 
+    struct SubscribeToTrackers: Decodable {
+        let domain: String;
+    }
+
+    struct SubscribeToTrackersResponse: Encodable {
+        let requests: [DetectedRequest];
+    }
+
+    @MainActor
+    func handleSubscribeToTrackers(params: Any, message: UserScriptMessage) -> Encodable? {
+        guard let params: SubscribeToTrackers = DecodableHelper.decode(from: params),
+              let tools = self.debugTools else {
+            return nil
+        }
+        tools.setCurrent(domain: params.domain)
+        return nil
+    }
+
+    func publishTrackers(domain: String, trackers: [DetectedTracker]) {
+        guard let webView = webView else {
+            print("webview was absent");
+            return
+        }
+        let response = SubscribeToTrackersResponse.init(requests: trackers.map { $0.request })
+        self.broker?.push(method: "onTrackersUpdated", params: response, for: self, into: webView)
+    }
+
     // MARK: - Subfeature
 
     public func with(broker: UserScriptMessageBroker) {
@@ -98,6 +139,7 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
         case getFeatures
         case updateResource
         case getRemoteResource
+        case subscribeToTrackers
     }
 
     enum SupportedRemoteResources: String, CaseIterable {
@@ -114,6 +156,8 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
             return handleGetRemoteResource
         case .updateResource:
             return handleUpdateResource
+        case .subscribeToTrackers:
+            return handleSubscribeToTrackers
         default:
             assertionFailure("PrivacyConfigurationEditUserScript: Failed to parse User Script message: \(methodName)")
             return nil

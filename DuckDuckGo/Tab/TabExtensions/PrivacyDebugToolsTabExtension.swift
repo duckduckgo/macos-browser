@@ -29,6 +29,7 @@ extension UserScripts: PrivacyDebugToolsScriptsProvider {}
 final class PrivacyDebugToolsTabExtension {
 
     let privacyDebugTools: PrivacyDebugTools
+    let trackersPublisher: AnyPublisher<DetectedTracker, Never>
     private var cancellables = Set<AnyCancellable>()
     private weak var privacyConfigurationEditUserScript: PrivacyConfigurationEditUserScript?
 
@@ -41,13 +42,16 @@ final class PrivacyDebugToolsTabExtension {
     init(
         privacyDebugTools: PrivacyDebugTools,
         scriptsPublisher: some Publisher<some PrivacyDebugToolsScriptsProvider, Never>,
-        webViewPublisher: some Publisher<WKWebView, Never>
+        webViewPublisher: some Publisher<WKWebView, Never>,
+        trackersPublisher: some Publisher<DetectedTracker, Never>
     ) {
         self.privacyDebugTools = privacyDebugTools
+        self.trackersPublisher = trackersPublisher as! AnyPublisher<DetectedTracker, Never>
 
         scriptsPublisher
             .sink { [weak self] scripts in
                 self?.privacyConfigurationEditUserScript = scripts.privacyConfigurationEditUserScript
+                self?.privacyConfigurationEditUserScript?.debugTools = self?.privacyDebugTools
                 self?.privacyConfigurationEditUserScript?.webView = self?.webView
             }
             .store(in: &cancellables)
@@ -55,6 +59,13 @@ final class PrivacyDebugToolsTabExtension {
         webViewPublisher
             .sink { [weak self] webView in
                 self?.webView = webView
+            }
+            .store(in: &cancellables)
+
+        self.trackersPublisher
+            .sink { [weak self] tracker in
+                guard let self else { return }
+                self.privacyDebugTools.tracker(tracker: tracker)
             }
             .store(in: &cancellables)
     }
