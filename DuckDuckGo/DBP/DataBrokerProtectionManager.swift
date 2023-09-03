@@ -71,6 +71,7 @@ public final class DataBrokerProtectionManager {
 
     public func startSchedulerIfNecessary() {
         // If there's no saved profileQueryData we don't need to start the scheduler
+        // We should probably use a faster query for this, i.e: instead of returning data just check the count in the db
         if !dataManager.fetchBrokerProfileQueryData().isEmpty {
             scheduler.start()
         }
