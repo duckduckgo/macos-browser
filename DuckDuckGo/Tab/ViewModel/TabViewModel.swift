@@ -27,6 +27,9 @@ final class TabViewModel {
         static let burnerHome = NSImage(named: "BurnerTabFavicon")!
         static let preferences = NSImage(named: "Preferences")!
         static let bookmarks = NSImage(named: "Bookmarks")!
+#if DBP
+        static let dataBrokerProtection = NSImage(named: "BurnerWindowIcon2")! // PLACEHOLDER: Change it once we have the final icon
+#endif
     }
 
     private(set) var tab: Tab
@@ -74,6 +77,14 @@ final class TabViewModel {
 
     @Published private(set) var usedPermissions = Permissions()
     @Published private(set) var permissionAuthorizationQuery: PermissionAuthorizationQuery?
+
+    var canPrint: Bool {
+        self.canReload && tab.webView.canPrint
+    }
+
+    var canSaveContent: Bool {
+        self.canReload && !tab.webView.isInFullScreenMode
+    }
 
     init(tab: Tab, appearancePreferences: AppearancePreferences = .shared) {
         self.tab = tab
@@ -247,6 +258,10 @@ final class TabViewModel {
         }
 
         switch tab.content {
+#if DBP
+        case .dataBrokerProtection:
+            title = UserText.tabDataBrokerProtectionTitle
+#endif
         case .preferences:
             title = UserText.tabPreferencesTitle
         case .bookmarks:
@@ -278,6 +293,11 @@ final class TabViewModel {
         }
 
         switch tab.content {
+#if DBP
+        case .dataBrokerProtection:
+            favicon = Favicon.dataBrokerProtection
+            return
+#endif
         case .homePage:
             if tab.burnerMode.isBurner {
                 favicon = Favicon.burnerHome

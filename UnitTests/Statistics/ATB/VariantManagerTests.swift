@@ -31,7 +31,7 @@ class VariantManagerTests: XCTestCase {
 
     func testWhenVariantIsExcludedThenItIsNotInVariantList() {
 
-        let subject = DefaultVariantManager(variants: testVariants, storage: MockStatisticsStore(), rng: MockVariantRNG(returnValue: 500))
+        let subject = DefaultVariantManager(variants: testVariants, storage: MockStatisticsStore(), rng: MockVariantRNG(returnValue: 500), campaignVariant: CampaignVariant(statisticsStore: MockStatisticsStore()))
         XCTAssertTrue(!subject.isSupported(feature: .dummy))
 
     }
@@ -44,7 +44,7 @@ class VariantManagerTests: XCTestCase {
 
         let mockStore = MockStatisticsStore()
         mockStore.variant = "test"
-        let subject = DefaultVariantManager(variants: testVariants, storage: mockStore, rng: MockVariantRNG(returnValue: 0))
+        let subject = DefaultVariantManager(variants: testVariants, storage: mockStore, rng: MockVariantRNG(returnValue: 0), campaignVariant: CampaignVariant(statisticsStore: mockStore))
 
         // temporarily use this feature name
         XCTAssertTrue(subject.isSupported(feature: .dummy))
@@ -60,7 +60,7 @@ class VariantManagerTests: XCTestCase {
 
         for i in 0 ..< 100 {
 
-            let subject = DefaultVariantManager(variants: testVariants, storage: mockStore, rng: MockVariantRNG(returnValue: i))
+            let subject = DefaultVariantManager(variants: testVariants, storage: mockStore, rng: MockVariantRNG(returnValue: i), campaignVariant: CampaignVariant(statisticsStore: mockStore))
             subject.assignVariantIfNeeded { _ in  }
             XCTAssertNotEqual("mt", subject.currentVariant?.name)
 
@@ -73,7 +73,7 @@ class VariantManagerTests: XCTestCase {
         let mockStore = MockStatisticsStore()
         mockStore.atb = "atb"
 
-        let subject = DefaultVariantManager(variants: testVariants, storage: mockStore, rng: MockVariantRNG(returnValue: 0))
+        let subject = DefaultVariantManager(variants: testVariants, storage: mockStore, rng: MockVariantRNG(returnValue: 0), campaignVariant: CampaignVariant(statisticsStore: mockStore))
         subject.assignVariantIfNeeded {  _ in  }
         XCTAssertNil(subject.currentVariant)
 
@@ -82,7 +82,7 @@ class VariantManagerTests: XCTestCase {
     func testWhenVariantAssignedAndUsingDefaultRNGThenReturnsValidVariant() {
 
         let variant = Variant(name: "anything", weight: 100, isIncluded: Variant.When.always, features: [])
-        let subject = DefaultVariantManager(variants: [variant], storage: MockStatisticsStore())
+        let subject = DefaultVariantManager(variants: [variant], storage: MockStatisticsStore(), campaignVariant: CampaignVariant(statisticsStore: MockStatisticsStore()))
         subject.assignVariantIfNeeded {  _ in }
         XCTAssertEqual(variant.name, subject.currentVariant?.name)
 
@@ -92,7 +92,7 @@ class VariantManagerTests: XCTestCase {
 
         let mockStore = MockStatisticsStore()
         mockStore.variant = "mb"
-        let subject = DefaultVariantManager(variants: testVariants, storage: mockStore)
+        let subject = DefaultVariantManager(variants: testVariants, storage: mockStore, campaignVariant: CampaignVariant(statisticsStore: mockStore))
         XCTAssertEqual("mb", subject.currentVariant?.name)
         XCTAssertEqual("mb", mockStore.variant)
 
@@ -110,7 +110,7 @@ class VariantManagerTests: XCTestCase {
     func testWhenVariantAssignedThenReturnsRandomVariantAndSavesIt() {
 
         let mockStore = MockStatisticsStore()
-        let subject = DefaultVariantManager(variants: testVariants, storage: mockStore, rng: MockVariantRNG(returnValue: 0))
+        let subject = DefaultVariantManager(variants: testVariants, storage: mockStore, rng: MockVariantRNG(returnValue: 0), campaignVariant: CampaignVariant(statisticsStore: mockStore))
         subject.assignVariantIfNeeded { _ in }
         XCTAssertEqual("mb", subject.currentVariant?.name)
         XCTAssertEqual("mb", mockStore.variant)
@@ -120,18 +120,18 @@ class VariantManagerTests: XCTestCase {
     func testWhenNewThenCurrentVariantIsNil() {
 
         let mockStore = MockStatisticsStore()
-        let subject = DefaultVariantManager(variants: testVariants, storage: mockStore, rng: MockVariantRNG(returnValue: 0))
+        let subject = DefaultVariantManager(variants: testVariants, storage: mockStore, rng: MockVariantRNG(returnValue: 0), campaignVariant: CampaignVariant(statisticsStore: mockStore))
         XCTAssertNil(subject.currentVariant)
 
     }
 
     func testWhenNoVariantsThenAssignsNothing() {
-        let subject = DefaultVariantManager(variants: [], storage: MockStatisticsStore())
+        let subject = DefaultVariantManager(variants: [], storage: MockStatisticsStore(), campaignVariant: CampaignVariant(statisticsStore: MockStatisticsStore()))
         XCTAssertNil(subject.currentVariant)
     }
 
     private func assignedVariantManager(withRNG rng: VariantRNG) -> VariantManager {
-        let variantManager = DefaultVariantManager(variants: testVariants, storage: MockStatisticsStore(), rng: rng)
+        let variantManager = DefaultVariantManager(variants: testVariants, storage: MockStatisticsStore(), rng: rng, campaignVariant: CampaignVariant(statisticsStore: MockStatisticsStore()))
         variantManager.assignVariantIfNeeded { _ in }
         return variantManager
     }

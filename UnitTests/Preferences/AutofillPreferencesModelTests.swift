@@ -27,6 +27,7 @@ final class AutofillPreferencesPersistorMock: AutofillPreferencesPersistor {
     var askToSaveAddresses: Bool = true
     var askToSavePaymentMethods: Bool = true
     var passwordManager: PasswordManager = .duckduckgo
+    var autolockLocksFormFilling: Bool = false
 }
 
 final class UserAuthenticatorMock: UserAuthenticating {

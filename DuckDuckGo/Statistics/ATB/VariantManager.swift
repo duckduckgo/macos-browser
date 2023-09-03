@@ -75,13 +75,16 @@ final class DefaultVariantManager: VariantManager {
     private let variants: [Variant]
     private let storage: StatisticsStore
     private let rng: VariantRNG
+    private let campaignVariant: CampaignVariant
 
     init(variants: [Variant] = Variant.defaultVariants,
          storage: StatisticsStore = LocalStatisticsStore(),
-         rng: VariantRNG = Arc4RandomUniformVariantRNG()) {
+         rng: VariantRNG = Arc4RandomUniformVariantRNG(),
+         campaignVariant: CampaignVariant = CampaignVariant()) {
         self.variants = variants
         self.storage = storage
         self.rng = rng
+        self.campaignVariant = campaignVariant
     }
 
     func isSupported(feature: FeatureName) -> Bool {
@@ -107,11 +110,16 @@ final class DefaultVariantManager: VariantManager {
             return
         }
 
-        storage.variant = variant.name
+        storage.variant = variant
         newInstallCompletion(self)
     }
 
-    private func selectVariant() -> Variant? {
+    private func selectVariant() -> String? {
+        // Prioritise campaign variants
+        if let variant = campaignVariant.getAndEnableVariant() {
+            return variant
+        }
+
         let totalWeight = variants.reduce(0, { $0 + $1.weight })
         let randomPercent = rng.nextInt(upperBound: totalWeight)
 
@@ -119,7 +127,7 @@ final class DefaultVariantManager: VariantManager {
         for variant in variants {
             runningTotal += variant.weight
             if randomPercent < runningTotal {
-                return variant.isIncluded() ? variant : nil
+                return variant.isIncluded() ? variant.name : nil
             }
         }
 
@@ -135,6 +143,51 @@ final class Arc4RandomUniformVariantRNG: VariantRNG {
     func nextInt(upperBound: Int) -> Int {
         // swiftlint:disable:next legacy_random
         return Int(arc4random_uniform(UInt32(upperBound)))
+    }
+
+}
+
+final class CampaignVariant {
+
+    @UserDefaultsWrapper(key: .campaignVariant, defaultValue: false)
+    private var isCampaignVariant: Bool
+
+    private let statisticsStore: StatisticsStore
+    private let loadFromFile: () -> String?
+
+    init(statisticsStore: StatisticsStore = LocalStatisticsStore(), loadFromFile: @escaping () -> String? = {
+        if let url = Bundle.main.url(forResource: "variant", withExtension: "txt") {
+            return try? String(contentsOf: url)
+        }
+        return nil
+    }) {
+        self.statisticsStore = statisticsStore
+        self.loadFromFile = loadFromFile
+    }
+
+    // Should only be called during the first installation
+    func getAndEnableVariant() -> String? {
+        assert(statisticsStore.variant == nil)
+        if let string = loadFromFile() {
+            isCampaignVariant = true
+            return string.trimmingWhitespace()
+        }
+        return nil
+    }
+
+    func daysSinceInstall(_ today: Date = Date()) -> Int {
+        guard let installDate = statisticsStore.installDate,
+              let days = Calendar.current.numberOfDaysBetween(installDate, and: today) else { return -1 }
+        return days
+    }
+
+    var isActive: Bool {
+        // 93 days is used for our campaign specific retention calculations
+        return isCampaignVariant && (0...93).contains(daysSinceInstall())
+    }
+
+    func cleanUp() {
+        isCampaignVariant = false
     }
 
 }
