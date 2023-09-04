@@ -115,7 +115,7 @@ final class DefaultVariantManager: VariantManager {
         }
 
         storage.variant = variant
-        Pixel.fire(.launchInitial, limitToInitial: true, withAdditionalParameters: Pixel.Event.launchInitial.parameters)
+        Pixel.fire(.launchInitial, limitToInitial: true)
         newInstallCompletion(self)
     }
 

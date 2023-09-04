@@ -90,12 +90,14 @@ extension Pixel.Event {
             return params
 
         case .launchInitial:
-            if let cohort = DefaultVariantManager().currentVariant?.name {
+            if let variantManager = (NSApp.isRunningUnitTests ? nil : DefaultVariantManager()),
+               let cohort = variantManager.currentVariant?.name {
                 return [Pixel.Parameters.experimentCohort: cohort]
             }
             return nil
         case .serpInitial:
-            if let cohort = DefaultVariantManager().currentVariant?.name {
+            if let variantManager = (NSApp.isRunningUnitTests ? nil : DefaultVariantManager()),
+               let cohort = variantManager.currentVariant?.name {
                 return [Pixel.Parameters.experimentCohort: cohort]
             }
             return nil
