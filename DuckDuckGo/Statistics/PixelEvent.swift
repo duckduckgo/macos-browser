@@ -138,8 +138,6 @@ extension Pixel {
         case fireButtonFirstBurn
         case fireButton(option: FireButtonOption)
 
-        case incrementalRolloutTest
-
         // Duck Player
         case duckPlayerDailyUniqueView
         case duckPlayerViewFromYoutubeViaMainOverlay
@@ -398,9 +396,6 @@ extension Pixel.Event {
             return "m_mac_fire_button_first_burn"
         case .fireButton(option: let option):
             return "m_mac_fire_button_\(option)"
-
-        case .incrementalRolloutTest:
-            return "m_mac_netp_ev_incremental_rollout_test"
 
         case .duckPlayerDailyUniqueView:
             return "m_mac_duck-player_daily-unique-view"

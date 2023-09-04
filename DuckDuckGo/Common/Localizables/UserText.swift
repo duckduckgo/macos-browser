@@ -201,7 +201,9 @@ struct UserText {
     static let autofillLockWhenIdle = NSLocalizedString("autofill.lock-when-idle", value: "Lock Autofill after computer is idle for", comment: "Autofill auto-lock setting")
     static let autofillNeverLock = NSLocalizedString("autofill.never-lock", value: "Never lock Autofill", comment: "Autofill auto-lock setting")
     static let autofillNeverLockWarning = NSLocalizedString("autofill.never-lock-warning", value: "Anyone with access to your device will be able to use and modify your Autofill data if not locked.", comment: "Autofill disabled auto-lock warning")
+    static let autolockLocksFormFill = NSLocalizedString("autofill.autolock-locks-form-filling", value: "Also lock access to Login and Credit Card form fill.", comment: "Lock form filling when auto-lock is active text")
 
+    
     static let downloadsLocation = NSLocalizedString("downloads.location", value: "Location", comment: "Downloads directory location")
     static let downloadsAlwaysAsk = NSLocalizedString("downloads.always-ask", value: "Always ask where to save files", comment: "Downloads preferences checkbox")
     static let downloadsChangeDirectory = NSLocalizedString("downloads.change", value: "Change...", comment: "Change downloads directory button")
@@ -770,6 +772,8 @@ struct UserText {
 
     static let noAccessToSelectedFolderHeader = NSLocalizedString("no.access.to.selected.folder.header", value: "DuckDuckGo needs permission to access selected folder", comment: "Header of the alert dialog informing user about failed download")
     static let noAccessToSelectedFolder = NSLocalizedString("no.access.to.selected.folder", value: "Grant access to the location of download.", comment: "Alert presented to user if the app doesn't have rights to access selected folder")
+    static let cannotOpenFileAlertHeader = NSLocalizedString("cannot.open.file.alert.header", value: "Cannot Open File", comment: "Header of the alert dialog informing user it is not possible to open the file")
+    static let cannotOpenFileAlertInformative = NSLocalizedString("cannot.open.file.alert.informative", value: "The App Store version of DuckDuckGo can only access local files if you drag-and-drop them into a browser window.\n\n To navigate local files using the address bar, please download DuckDuckGo directly from https://duckduckgo.com/mac.", comment: "Informative of the alert dialog informing user it is not possible to open the file")
 
     // MARK: New Tab
     // Context Menu

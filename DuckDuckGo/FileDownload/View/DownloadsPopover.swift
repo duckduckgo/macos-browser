@@ -23,6 +23,7 @@ final class DownloadsPopover: NSPopover {
     override init() {
         super.init()
 
+        self.animates = false
         self.behavior = .semitransient
 
         setupContentController()

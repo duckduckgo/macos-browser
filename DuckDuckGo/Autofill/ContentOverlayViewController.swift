@@ -260,6 +260,35 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         // no-op on macOS
     }
 
+    public func secureVaultManager(_: SecureVaultManager,
+                                   isAuthenticatedFor type: AutofillType,
+                                   completionHandler: @escaping (Bool) -> Void) {
+
+        switch type {
+
+        // Require bio authentication for filling sensitive data via DDG password manager
+        case .card, .password:
+            let autofillPrefs = AutofillPreferences()
+            if DeviceAuthenticator.shared.requiresAuthentication &&
+                autofillPrefs.autolockLocksFormFilling &&
+                autofillPrefs.passwordManager == .duckduckgo {
+                DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { result in
+                    if case .success = result {
+                        completionHandler(true)
+                    } else {
+                        completionHandler(false)
+                    }
+                }
+            } else {
+                completionHandler(true)
+            }
+
+        default:
+            completionHandler(true)
+        }
+
+    }
+
     public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
 
