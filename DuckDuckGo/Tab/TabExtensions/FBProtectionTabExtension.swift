@@ -58,6 +58,9 @@ extension FBProtectionTabExtension {
 
     @discardableResult
     private func setFBProtection(enabled: Bool) -> Bool {
+        if #unavailable(OSX 11) {  // disable CTL for Catalina and earlier
+            return false
+        }
         guard self.fbBlockingEnabled != enabled else { return false }
         guard let userContentController else {
             assertionFailure("Missing UserContentController")
