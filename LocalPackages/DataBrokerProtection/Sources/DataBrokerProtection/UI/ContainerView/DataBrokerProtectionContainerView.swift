@@ -24,7 +24,8 @@ struct DataBrokerProtectionContainerView: View {
     @ObservedObject var navigationViewModel: ContainerNavigationViewModel
     @ObservedObject var profileViewModel: ProfileViewModel
     @ObservedObject var resultsViewModel: ResultsViewModel
-    @State var shouldShowDebugUI = false
+    @State var shouldShowDebugUI = true
+    @State var useFakeBroker = true
 
     var body: some View {
         ScrollView {
@@ -76,24 +77,14 @@ struct DataBrokerProtectionContainerView: View {
                 }
 
                 if shouldShowDebugUI {
-                    // just for testing
-                    VStack(alignment: .leading) {
-                        Text("Scheduler status: \(containerViewModel.schedulerStatus)")
-
+                    VStack {
                         HStack {
-                            Picker(selection: $navigationViewModel.bodyViewType,
-                                   label: Text("Body View Type")) {
-                                ForEach(ContainerNavigationViewModel.BodyViewType.allCases, id: \.self) { viewType in
-                                    Text(viewType.description).tag(viewType)
-                                }
-                            }
-                                   .pickerStyle(MenuPickerStyle())
-                                   .frame(width: 300)
-
+                            debugUI()
+                                .padding()
                             Spacer()
                         }
                         Spacer()
-                    }.padding()
+                    }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -103,7 +94,38 @@ struct DataBrokerProtectionContainerView: View {
     }
 
     @ViewBuilder
-    func headerView() -> some View {
+    private func debugUI() -> some View {
+        VStack(alignment: .leading) {
+            Text("Scheduler status: \(containerViewModel.schedulerStatus)")
+
+            Toggle("Use Fake Broker", isOn: $useFakeBroker)
+
+            Toggle("Display WebViews", isOn: $containerViewModel.showWebView)
+
+            Button {
+                print("Force")
+            } label: {
+                Text("Force operations run")
+            }
+
+            HStack {
+                Picker(selection: $navigationViewModel.bodyViewType,
+                       label: Text("Body View Type")) {
+                    ForEach(ContainerNavigationViewModel.BodyViewType.allCases, id: \.self) { viewType in
+                        Text(viewType.description).tag(viewType)
+                    }
+                }
+                       .pickerStyle(MenuPickerStyle())
+                       .frame(width: 300)
+
+            }
+        }
+        .padding()
+        .borderedRoundedCorner()
+    }
+
+    @ViewBuilder
+    private func headerView() -> some View {
         if navigationViewModel.bodyViewType != .createProfile {
             VStack {
 

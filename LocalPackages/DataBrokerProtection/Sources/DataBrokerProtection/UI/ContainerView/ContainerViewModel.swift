@@ -28,10 +28,11 @@ final class ContainerViewModel: ObservableObject {
     private let scheduler: DataBrokerProtectionScheduler
     private let dataManager: DataBrokerProtectionDataManaging
     private let notificationCenter: NotificationCenter
-    private var statusCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
     @Published var headerStatusText = ""
     @Published var schedulerStatus = ""
+    @Published var showWebView = false
 
     internal init(scheduler: DataBrokerProtectionScheduler,
                   dataManager: DataBrokerProtectionDataManaging,
@@ -47,7 +48,7 @@ final class ContainerViewModel: ObservableObject {
     }
 
     private func setupCancellable() {
-        statusCancellable = scheduler.statusPublisher
+        scheduler.statusPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
 
@@ -59,7 +60,8 @@ final class ContainerViewModel: ObservableObject {
                 case .stopped:
                     self?.schedulerStatus = "🔴 Stopped"
                 }
-            }
+            }.store(in: &cancellables)
+
     }
 
     private func startSchedulerIfProfileAvailable() {
@@ -112,12 +114,12 @@ final class ContainerViewModel: ObservableObject {
 
     func startScheduler() {
         if scheduler.status == .stopped {
-            scheduler.start()
+            scheduler.start(showWebView: showWebView)
         }
     }
 
     func scan(completion: @escaping (ScanResult) -> Void) {
-        scheduler.scanAllBrokers { [weak self] in
+        scheduler.scanAllBrokers(showWebView: showWebView) { [weak self] in
             guard let self = self else { return }
 
             DispatchQueue.main.async {

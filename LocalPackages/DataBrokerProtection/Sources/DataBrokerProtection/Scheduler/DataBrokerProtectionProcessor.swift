@@ -48,16 +48,20 @@ final class DataBrokerProtectionProcessor {
     }
 
     // MARK: - Public functions
-    func runScanOnAllDataBrokers(completion: (() -> Void)? = nil) {
+    func runScanOnAllDataBrokers(showWebView: Bool = false, completion: (() -> Void)? = nil) {
         operationQueue.cancelAllOperations()
-        runOperations(operationType: .scan, priorityDate: nil) {
+        runOperations(operationType: .scan,
+                      priorityDate: nil,
+                      showWebView: showWebView) {
             os_log("Scans done", log: .dataBrokerProtection)
             completion?()
         }
     }
 
-    func runQueuedOperations(completion: (() -> Void)? = nil ) {
-        runOperations(operationType: .all, priorityDate: Date()) {
+    func runQueuedOperations(showWebView: Bool = false, completion: (() -> Void)? = nil ) {
+        runOperations(operationType: .all,
+                      priorityDate: Date(),
+                      showWebView: showWebView) {
             os_log("Queued operations done", log: .dataBrokerProtection)
             completion?()
         }
@@ -66,6 +70,7 @@ final class DataBrokerProtectionProcessor {
     // MARK: - Private functions
     private func runOperations(operationType: DataBrokerOperationsCollection.OperationType,
                                priorityDate: Date?,
+                               showWebView: Bool,
                                completion: @escaping () -> Void) {
 
         let brokersProfileData = database.fetchAllBrokerProfileQueryData(for: 1) // We assume one profile for now
@@ -74,6 +79,7 @@ final class DataBrokerProtectionProcessor {
                                                                                   priorityDate: priorityDate)
 
         for collection in dataBrokerOperationCollections {
+            collection.showWebView = showWebView
             operationQueue.addOperation(collection)
         }
 

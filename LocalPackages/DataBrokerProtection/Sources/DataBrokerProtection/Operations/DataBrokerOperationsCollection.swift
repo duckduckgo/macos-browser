@@ -39,6 +39,8 @@ final class DataBrokerOperationsCollection: Operation {
     private let runner: WebOperationRunner
     private let errorHandler: EventMapping<DataBrokerProtectionOperationError>?
 
+    var showWebView: Bool = false
+
     deinit {
         os_log("Deinit operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
     }
@@ -137,7 +139,8 @@ final class DataBrokerOperationsCollection: Operation {
                                                                                 brokerProfileQueryData: brokerProfileData,
                                                                                 database: database,
                                                                                 notificationCenter: notificationCenter,
-                                                                                runner: runner)
+                                                                                runner: runner,
+                                                                                showWebView: showWebView)
                 if let sleepInterval = intervalBetweenOperations {
                     os_log("Waiting...: %{public}f", log: .dataBrokerProtection, sleepInterval)
                     try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
