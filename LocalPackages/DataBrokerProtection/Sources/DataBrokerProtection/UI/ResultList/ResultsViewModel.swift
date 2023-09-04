@@ -138,7 +138,7 @@ extension DataBrokerProtectionError {
         case .actionFailed(actionID: let actionID, message: let message):
             return (title: "Action \(actionID)", subtitle: message)
         case .parsingErrorObjectFailed:
-            return (title: genericTitle, subtitle: "Parsin error")
+            return (title: genericTitle, subtitle: "Parsing error")
         case .unknownMethodName:
             return (title: genericTitle, subtitle: "Unkonwn method name")
         case .userScriptMessageBrokerNotSet:
