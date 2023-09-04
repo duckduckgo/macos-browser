@@ -102,7 +102,7 @@ struct DataBrokerProtectionContainerView: View {
             Toggle("Display WebViews", isOn: $containerViewModel.showWebView)
 
             Button {
-                print("Force")
+                containerViewModel.forceSchedulerRun()
             } label: {
                 Text("Force operations run")
             }

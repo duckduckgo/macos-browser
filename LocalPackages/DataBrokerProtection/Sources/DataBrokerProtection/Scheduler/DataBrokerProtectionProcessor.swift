@@ -67,6 +67,15 @@ final class DataBrokerProtectionProcessor {
         }
     }
 
+    func forceRunOperations(showWebView: Bool = false, completion: (() -> Void)? = nil ) {
+        runOperations(operationType: .all,
+                      priorityDate: nil,
+                      showWebView: showWebView) {
+            os_log("Queued operations done", log: .dataBrokerProtection)
+            completion?()
+        }
+    }
+
     // MARK: - Private functions
     private func runOperations(operationType: DataBrokerOperationsCollection.OperationType,
                                priorityDate: Date?,

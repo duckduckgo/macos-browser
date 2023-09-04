@@ -113,7 +113,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
     public func forceStart(showWebView: Bool = false) {
         self.status = .running
-        self.dataBrokerProcessor.runQueuedOperations(showWebView: showWebView) {  [weak self] in
+        self.dataBrokerProcessor.forceRunOperations(showWebView: showWebView) {  [weak self] in
             self?.status = .idle
         }
     }

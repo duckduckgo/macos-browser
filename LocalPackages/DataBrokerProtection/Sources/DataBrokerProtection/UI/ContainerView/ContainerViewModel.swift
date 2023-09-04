@@ -130,6 +130,10 @@ final class ContainerViewModel: ObservableObject {
         }
     }
 
+    func forceSchedulerRun() {
+        scheduler.forceStart(showWebView: showWebView)
+    }
+
     func scan(completion: @escaping (ScanResult) -> Void) {
         scheduler.scanAllBrokers(showWebView: showWebView) { [weak self] in
             guard let self = self else { return }
