@@ -997,9 +997,9 @@ CQ
                                                             </connections>
                                                         </menu>
                                                     </menuItem>
-                                                    <menuItem title="Waitlist" id="iSU-Wj-V9c">
+                                                    <menuItem title="NetP Waitlist" id="iSU-Wj-V9c">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Waitlist" id="FmX-fq-tGP">
+                                                        <menu key="submenu" title="NetP Waitlist" id="FmX-fq-tGP">
                                                             <items>
                                                                 <menuItem title="Reset Waitlist State" id="8FJ-Ns-JDn">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -1035,35 +1035,9 @@ CQ
                                                             </items>
                                                         </menu>
                                                     </menuItem>
-                                                    <menuItem isSeparatorItem="YES" id="7LI-vT-hd9"/>
-                                                    <menuItem title="Kill Switch (alternative approach)" id="Gdx-Ng-vit">
+                                                    <menuItem title="NetP Waitlist Feature Flag Overrides" id="xot-uM-W8R">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Kill Switch (alternative approach)" id="wo0-bZ-WF3">
-                                                            <items>
-                                                                <menuItem title="includeAllNetworks" id="mSZ-AV-Dee" userLabel="Include All Networks">
-                                                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                                                    <connections>
-                                                                        <action selector="toggleIncludeAllNetworks:" target="Rah-lS-gno" id="c1r-Fw-0ca"/>
-                                                                    </connections>
-                                                                </menuItem>
-                                                                <menuItem title="excludeLocalNetworks" id="Zak-JJ-7hc" userLabel="Exclude Local Networks">
-                                                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                                                    <connections>
-                                                                        <action selector="toggleShouldExcludeLocalRoutes:" target="Rah-lS-gno" id="Wdd-D6-yWy"/>
-                                                                    </connections>
-                                                                </menuItem>
-                                                                <menuItem title="enable Connection Tester" id="L06-y6-zv3">
-                                                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                                                    <connections>
-                                                                        <action selector="toggleConnectionTesterEnabled:" target="Rah-lS-gno" id="iei-t7-7pG"/>
-                                                                    </connections>
-                                                                </menuItem>
-                                                            </items>
-                                                        </menu>
-                                                    </menuItem>
-                                                    <menuItem title="Waitlist" id="xot-uM-W8R">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Waitlist" id="M1G-na-mOc" customClass="NetworkProtectionWaitlistMenu" customModule="DuckDuckGo_Privacy_Browser">
+                                                        <menu key="submenu" title="NetP Waitlist Feature Flag Overrides" id="M1G-na-mOc" customClass="NetworkProtectionWaitlistMenu" customModule="DuckDuckGo_Privacy_Browser">
                                                             <items>
                                                                 <menuItem title="Reset Waitlist Overrides" id="soP-sz-xwK">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -1131,6 +1105,32 @@ CQ
                                                                 <outlet property="waitlistEnabledOverrideONMenuItem" destination="hwX-Fv-poo" id="aSf-jk-uEq"/>
                                                                 <outlet property="waitlistEnabledUseRemoteValueMenuItem" destination="HEJ-pc-b2x" id="TRT-Tv-eU8"/>
                                                             </connections>
+                                                        </menu>
+                                                    </menuItem>
+                                                    <menuItem isSeparatorItem="YES" id="7LI-vT-hd9"/>
+                                                    <menuItem title="Kill Switch (alternative approach)" id="Gdx-Ng-vit">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Kill Switch (alternative approach)" id="wo0-bZ-WF3">
+                                                            <items>
+                                                                <menuItem title="includeAllNetworks" id="mSZ-AV-Dee" userLabel="Include All Networks">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="toggleIncludeAllNetworks:" target="Rah-lS-gno" id="c1r-Fw-0ca"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="excludeLocalNetworks" id="Zak-JJ-7hc" userLabel="Exclude Local Networks">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="toggleShouldExcludeLocalRoutes:" target="Rah-lS-gno" id="Wdd-D6-yWy"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="enable Connection Tester" id="L06-y6-zv3">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="toggleConnectionTesterEnabled:" target="Rah-lS-gno" id="iei-t7-7pG"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                            </items>
                                                         </menu>
                                                     </menuItem>
                                                 </items>
