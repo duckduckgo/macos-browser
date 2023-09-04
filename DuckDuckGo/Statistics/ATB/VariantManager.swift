@@ -115,7 +115,9 @@ final class DefaultVariantManager: VariantManager {
         }
 
         storage.variant = variant
-        Pixel.fire(.launchInitial, limitToInitial: true, includeAppVersionParameter: false)
+        if !NSApp.isRunningUnitTests {
+            Pixel.fire(.launchInitial, limitToInitial: true, includeAppVersionParameter: false)
+        }
         newInstallCompletion(self)
     }
 
