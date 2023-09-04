@@ -76,7 +76,7 @@ final class OnboardingViewModel: ObservableObject {
         self.variantManager = variantManager
         self.state = onboardingFinished ? .startBrowsing : .startFlow
 
-        NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
+            NotificationCenter.default.addObserver(self, selector: #selector(onboardingPageLeft(_:)), name: .onboardingPageLeft, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(addressEnterPressed(_:)), name: .addressBarEnterPressed, object: nil)
     }
 
@@ -136,7 +136,7 @@ final class OnboardingViewModel: ObservableObject {
         state = .startFlow
     }
 
-    @objc private func newTabOpenNotification(_ notification: Notification) {
+    @objc private func onboardingPageLeft(_ notification: Notification) {
         finishOnboarding()
     }
 
