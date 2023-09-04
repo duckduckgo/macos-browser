@@ -29,7 +29,7 @@ public enum DataBrokerProtectionSchedulerStatus {
 
 public protocol DataBrokerProtectionScheduler {
     func start(showWebView: Bool)
-    func forceStart(showWebView: Bool)
+    func forceRunOperations(showWebView: Bool)
     func stop()
     func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?)
     var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { get }
@@ -42,7 +42,7 @@ extension DataBrokerProtectionScheduler {
     }
 
     func forceStart() {
-        forceStart(showWebView: false)
+        forceRunOperations(showWebView: false)
     }
 
     func scanAllBrokers() {
@@ -111,10 +111,12 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         self.captchaService = CaptchaService(redeemUseCase: redeemUseCase)
     }
 
-    public func forceStart(showWebView: Bool = false) {
+    public func forceRunOperations(showWebView: Bool = false) {
+        stop()
+
         self.status = .running
         self.dataBrokerProcessor.forceRunOperations(showWebView: showWebView) {  [weak self] in
-            self?.status = .idle
+            self?.status = .stopped
         }
     }
 

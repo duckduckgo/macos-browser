@@ -131,7 +131,7 @@ final class ContainerViewModel: ObservableObject {
     }
 
     func forceSchedulerRun() {
-        scheduler.forceStart(showWebView: showWebView)
+        scheduler.forceRunOperations(showWebView: showWebView)
     }
 
     func scan(completion: @escaping (ScanResult) -> Void) {

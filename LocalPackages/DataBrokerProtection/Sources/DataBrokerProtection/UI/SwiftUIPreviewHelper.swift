@@ -27,7 +27,7 @@ final class PreviewScheduler: DataBrokerProtectionScheduler {
     }
 
     func start(showWebView: Bool) { }
-    func forceStart(showWebView: Bool) { }
+    func forceRunOperations(showWebView: Bool) { }
     func stop() { }
     func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) { }
 
