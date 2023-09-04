@@ -43,6 +43,9 @@ let package = Package(
         ),
         .testTarget(
             name: "DataBrokerProtectionTests",
-            dependencies: ["DataBrokerProtection"])
+            dependencies: [
+                "DataBrokerProtection",
+                "BrowserServicesKit"
+            ])
     ]
 )
