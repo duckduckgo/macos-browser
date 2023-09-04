@@ -39,7 +39,6 @@ final class FirePopover: NSPopover {
         if let mainWindow = popoverWindow.parent,
            let screen = mainWindow.screen,
            mainWindow.frame.maxX > screen.visibleFrame.maxX - Self.defaultScreenEdgeCorrection {
-            print(screen.visibleFrame.maxX - mainWindow.frame.maxX)
             // close to the edge of the screen Popover start appearing shifted to the left
             frame.origin.x += Self.defaultScreenEdgeCorrection - (screen.visibleFrame.maxX - mainWindow.frame.maxX)
         }
