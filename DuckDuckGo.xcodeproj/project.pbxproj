@@ -314,7 +314,6 @@
 		3192A06C2A4C4CFF0084EA89 /* PinnedTabsHostingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D23783287F4D6A00BCE03B /* PinnedTabsHostingView.swift */; };
 		3192A06D2A4C4CFF0084EA89 /* FirefoxBookmarksReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99CF526FE191E001E4761 /* FirefoxBookmarksReader.swift */; };
 		3192A06E2A4C4CFF0084EA89 /* DeviceIdleStateDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBC16A127C485BC00E00A38 /* DeviceIdleStateDetector.swift */; };
-		3192A06F2A4C4CFF0084EA89 /* AppUsageActivityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E4A2261475C70067D1B9 /* AppUsageActivityMonitor.swift */; };
 		3192A0702A4C4CFF0084EA89 /* FlatButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C2327BDE1B0008A968E /* FlatButton.swift */; };
 		3192A0712A4C4CFF0084EA89 /* PinnedTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37054FC82873301700033B6F /* PinnedTabView.swift */; };
 		3192A0722A4C4CFF0084EA89 /* DataEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69F258B079600F6F690 /* DataEncryption.swift */; };
@@ -993,7 +992,6 @@
 		3706FB31293F65D500E42796 /* PinnedTabsHostingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D23783287F4D6A00BCE03B /* PinnedTabsHostingView.swift */; };
 		3706FB32293F65D500E42796 /* FirefoxBookmarksReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99CF526FE191E001E4761 /* FirefoxBookmarksReader.swift */; };
 		3706FB33293F65D500E42796 /* DeviceIdleStateDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBC16A127C485BC00E00A38 /* DeviceIdleStateDetector.swift */; };
-		3706FB34293F65D500E42796 /* AppUsageActivityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E4A2261475C70067D1B9 /* AppUsageActivityMonitor.swift */; };
 		3706FB35293F65D500E42796 /* FlatButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B379C2327BDE1B0008A968E /* FlatButton.swift */; };
 		3706FB36293F65D500E42796 /* PinnedTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37054FC82873301700033B6F /* PinnedTabView.swift */; };
 		3706FB37293F65D500E42796 /* DataEncryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A69F258B079600F6F690 /* DataEncryption.swift */; };
@@ -1421,7 +1419,6 @@
 		3706FDEF293F661700E42796 /* PinnedTabsManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D2377F287EFEE200BCE03B /* PinnedTabsManagerTests.swift */; };
 		3706FDF0293F661700E42796 /* WebKitVersionProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0877B926D5161D00B05660 /* WebKitVersionProviderTests.swift */; };
 		3706FDF1293F661700E42796 /* AtbAndVariantCleanupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B50422726C5C100758A2B /* AtbAndVariantCleanupTests.swift */; };
-		3706FDF2293F661700E42796 /* AppUsageActivityMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44272616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift */; };
 		3706FDF3293F661700E42796 /* ChromiumLoginReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59024B26B38BB800489384 /* ChromiumLoginReaderTests.swift */; };
 		3706FDF4293F661700E42796 /* TabCollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC9C01624CAFBDC00AD1325 /* TabCollectionTests.swift */; };
 		3706FDF5293F661700E42796 /* StartupPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378205F7283BC6A600D1D4AA /* StartupPreferencesTests.swift */; };
@@ -2617,7 +2614,6 @@
 		B6A9E47F26146A800067D1B9 /* PixelArguments.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E47E26146A800067D1B9 /* PixelArguments.swift */; };
 		B6A9E48426146AAB0067D1B9 /* PixelParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E48326146AAB0067D1B9 /* PixelParameters.swift */; };
 		B6A9E499261474120067D1B9 /* TimedPixel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E498261474120067D1B9 /* TimedPixel.swift */; };
-		B6A9E4A3261475C70067D1B9 /* AppUsageActivityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A9E4A2261475C70067D1B9 /* AppUsageActivityMonitor.swift */; };
 		B6AA64732994B43300D99CD6 /* FutureExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AA64722994B43300D99CD6 /* FutureExtensionTests.swift */; };
 		B6AA64742994B43300D99CD6 /* FutureExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AA64722994B43300D99CD6 /* FutureExtensionTests.swift */; };
 		B6AA64752995164700D99CD6 /* MockPrivacyConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CA482F298D04690067ECCE /* MockPrivacyConfiguration.swift */; };
@@ -2689,7 +2685,6 @@
 		B6DA44192616C13800DD1EC2 /* OHHTTPStubsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B6DA44182616C13800DD1EC2 /* OHHTTPStubsSwift */; };
 		B6DA441E2616C84600DD1EC2 /* PixelStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA441D2616C84600DD1EC2 /* PixelStoreMock.swift */; };
 		B6DA44232616CABC00DD1EC2 /* PixelArgumentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44222616CABC00DD1EC2 /* PixelArgumentsTests.swift */; };
-		B6DA44282616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA44272616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift */; };
 		B6DB3AEF278D5C370024C5C4 /* URLSessionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DB3AEE278D5C370024C5C4 /* URLSessionExtension.swift */; };
 		B6DB3AF6278EA0130024C5C4 /* BundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106B9D26A565DA0013B453 /* BundleExtension.swift */; };
 		B6DB3CF926A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DB3CF826A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift */; };
@@ -3867,7 +3862,6 @@
 		B6A9E47E26146A800067D1B9 /* PixelArguments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelArguments.swift; sourceTree = "<group>"; };
 		B6A9E48326146AAB0067D1B9 /* PixelParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelParameters.swift; sourceTree = "<group>"; };
 		B6A9E498261474120067D1B9 /* TimedPixel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimedPixel.swift; sourceTree = "<group>"; };
-		B6A9E4A2261475C70067D1B9 /* AppUsageActivityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUsageActivityMonitor.swift; sourceTree = "<group>"; };
 		B6AA64722994B43300D99CD6 /* FutureExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureExtensionTests.swift; sourceTree = "<group>"; };
 		B6AAAC2C260330580029438D /* PublishedAfter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublishedAfter.swift; sourceTree = "<group>"; };
 		B6AAAC3D26048F690029438D /* RandomAccessCollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomAccessCollectionExtension.swift; sourceTree = "<group>"; };
@@ -3923,7 +3917,6 @@
 		B6DA44102616C0FC00DD1EC2 /* PixelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PixelTests.swift; sourceTree = "<group>"; };
 		B6DA441D2616C84600DD1EC2 /* PixelStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelStoreMock.swift; sourceTree = "<group>"; };
 		B6DA44222616CABC00DD1EC2 /* PixelArgumentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelArgumentsTests.swift; sourceTree = "<group>"; };
-		B6DA44272616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUsageActivityMonitorTests.swift; sourceTree = "<group>"; };
 		B6DB3AEE278D5C370024C5C4 /* URLSessionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionExtension.swift; sourceTree = "<group>"; };
 		B6DB3CF826A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVCaptureDevice+SwizzledAuthState.swift"; sourceTree = "<group>"; };
 		B6DB3CFA26A17CB800D459B7 /* PermissionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionModel.swift; sourceTree = "<group>"; };
@@ -7208,7 +7201,6 @@
 				B6A9E47626146A570067D1B9 /* PixelEvent.swift */,
 				B6A9E47E26146A800067D1B9 /* PixelArguments.swift */,
 				B6A9E48326146AAB0067D1B9 /* PixelParameters.swift */,
-				B6A9E4A2261475C70067D1B9 /* AppUsageActivityMonitor.swift */,
 				B610F2BA27A145C500FCEBE9 /* RulesCompilationMonitor.swift */,
 				B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */,
 				B68C92C32750EF76002AC6B0 /* PixelDataRecord.swift */,
@@ -7288,7 +7280,6 @@
 				4BC2621C293996410087A482 /* PixelEventTests.swift */,
 				B662D3D82755D7AD0035D4D6 /* PixelStoreTests.swift */,
 				B6DA44222616CABC00DD1EC2 /* PixelArgumentsTests.swift */,
-				B6DA44272616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift */,
 				B6DA441D2616C84600DD1EC2 /* PixelStoreMock.swift */,
 				4B117F7C276C0CB5002F3D8C /* LocalStatisticsStoreTests.swift */,
 				B610F2E327A8F37A00FCEBE9 /* CBRCompileTimeReporterTests.swift */,
@@ -8790,7 +8781,6 @@
 				3192A06C2A4C4CFF0084EA89 /* PinnedTabsHostingView.swift in Sources */,
 				3192A06D2A4C4CFF0084EA89 /* FirefoxBookmarksReader.swift in Sources */,
 				3192A06E2A4C4CFF0084EA89 /* DeviceIdleStateDetector.swift in Sources */,
-				3192A06F2A4C4CFF0084EA89 /* AppUsageActivityMonitor.swift in Sources */,
 				3192A0702A4C4CFF0084EA89 /* FlatButton.swift in Sources */,
 				3192EC882A4DCF21001E97A5 /* DBPHomeViewController.swift in Sources */,
 				3192A0712A4C4CFF0084EA89 /* PinnedTabView.swift in Sources */,
@@ -9421,7 +9411,6 @@
 				B6AFE6BC29A5D3F8002FF962 /* PrivacyDashboardTabExtension.swift in Sources */,
 				3706FB32293F65D500E42796 /* FirefoxBookmarksReader.swift in Sources */,
 				3706FB33293F65D500E42796 /* DeviceIdleStateDetector.swift in Sources */,
-				3706FB34293F65D500E42796 /* AppUsageActivityMonitor.swift in Sources */,
 				3706FB35293F65D500E42796 /* FlatButton.swift in Sources */,
 				3706FB36293F65D500E42796 /* PinnedTabView.swift in Sources */,
 				3706FB37293F65D500E42796 /* DataEncryption.swift in Sources */,
@@ -9878,7 +9867,6 @@
 				3706FDF0293F661700E42796 /* WebKitVersionProviderTests.swift in Sources */,
 				3706FDF1293F661700E42796 /* AtbAndVariantCleanupTests.swift in Sources */,
 				1D1C36E729FB019C001FA40C /* HistoryTabExtensionTests.swift in Sources */,
-				3706FDF2293F661700E42796 /* AppUsageActivityMonitorTests.swift in Sources */,
 				3706FDF3293F661700E42796 /* ChromiumLoginReaderTests.swift in Sources */,
 				3706FDF4293F661700E42796 /* TabCollectionTests.swift in Sources */,
 				3706FDF5293F661700E42796 /* StartupPreferencesTests.swift in Sources */,
@@ -10497,7 +10485,6 @@
 				37D23785287F4E6500BCE03B /* PinnedTabsHostingView.swift in Sources */,
 				4BB99CFE26FE191E001E4761 /* FirefoxBookmarksReader.swift in Sources */,
 				4BBC16A227C485BC00E00A38 /* DeviceIdleStateDetector.swift in Sources */,
-				B6A9E4A3261475C70067D1B9 /* AppUsageActivityMonitor.swift in Sources */,
 				4B379C2427BDE1B0008A968E /* FlatButton.swift in Sources */,
 				37054FC92873301700033B6F /* PinnedTabView.swift in Sources */,
 				4BA1A6A0258B079600F6F690 /* DataEncryption.swift in Sources */,
@@ -10954,7 +10941,6 @@
 				37D23780287EFEE200BCE03B /* PinnedTabsManagerTests.swift in Sources */,
 				AA0877BA26D5161D00B05660 /* WebKitVersionProviderTests.swift in Sources */,
 				B69B50462726C5C200758A2B /* AtbAndVariantCleanupTests.swift in Sources */,
-				B6DA44282616CAE000DD1EC2 /* AppUsageActivityMonitorTests.swift in Sources */,
 				567DA94529E95C3F008AC5EE /* YoutubeOverlayUserScriptTests.swift in Sources */,
 				4B59024C26B38BB800489384 /* ChromiumLoginReaderTests.swift in Sources */,
 				AAC9C01724CAFBDC00AD1325 /* TabCollectionTests.swift in Sources */,
