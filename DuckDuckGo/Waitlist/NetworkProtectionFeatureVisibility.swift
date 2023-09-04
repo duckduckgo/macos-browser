@@ -18,26 +18,32 @@
 
 #if NETWORK_PROTECTION
 
-import Foundation
 import BrowserServicesKit
+import Common
+import NetworkExtension
 import NetworkProtection
+import NetworkProtectionUI
 
 protocol NetworkProtectionFeatureVisibility {
     func isNetworkProtectionVisible() -> Bool
+    func disableForWaitlistUsers()
 }
 
 struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
-
-    private let privacyConfigurationManager: PrivacyConfigurationManaging
-    private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
+    private let featureDisabler: NetworkProtectionFeatureDisabling
     private let featureOverrides: WaitlistBetaOverriding
+    private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
+    private let privacyConfigurationManager: PrivacyConfigurationManaging
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
-         featureOverrides: WaitlistBetaOverriding = DefaultWaitlistBetaOverrides()) {
+         featureOverrides: WaitlistBetaOverriding = DefaultWaitlistBetaOverrides(),
+         featureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
+         log: OSLog = .networkProtection) {
 
         self.privacyConfigurationManager = privacyConfigurationManager
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
+        self.featureDisabler = featureDisabler
         self.featureOverrides = featureOverrides
     }
 
@@ -49,13 +55,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     ///
     /// Once the waitlist beta has ended, we can trigger a remote change that removes the user's auth token and turn off the waitlist flag, hiding Network Protection from the user.
     func isNetworkProtectionVisible() -> Bool {
-        let isFeatureVisible = isEasterEggUser || isEnabledWaitlistUser
-
-        if !isFeatureVisible {
-            disableNetworkProtectionForWaitlistUsers()
-        }
-
-        return isFeatureVisible
+        isEasterEggUser || isEnabledWaitlistUser
     }
 
     /// Easter egg users can be identified by them being internal users and having an auth token (NetP being activated).
@@ -107,14 +107,12 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         }
     }
 
-    private func disableNetworkProtectionForWaitlistUsers() {
-#if DEBUG
+    func disableForWaitlistUsers() {
         guard isWaitlistUser else {
             return
         }
 
-        print("NetP Debug: waitlist user - disabling NetP")
-#endif
+        featureDisabler.disable(uninstallSystemExtension: false)
     }
 }
 
