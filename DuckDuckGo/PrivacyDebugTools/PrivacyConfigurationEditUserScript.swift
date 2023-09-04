@@ -117,6 +117,15 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
         return nil
     }
 
+    @MainActor
+    func handleUnsubscribeToTrackers(params: Any, message: UserScriptMessage) -> Encodable? {
+        guard let tools = self.debugTools else {
+            return nil
+        }
+        tools.setCurrent(domain: nil)
+        return nil
+    }
+
     func publishTrackers(domain: String, trackers: [DetectedTracker]) {
         guard let webView = webView else {
             print("webview was absent");
@@ -140,6 +149,7 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
         case updateResource
         case getRemoteResource
         case subscribeToTrackers
+        case unsubscribeToTrackers
     }
 
     enum SupportedRemoteResources: String, CaseIterable {
@@ -158,6 +168,8 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
             return handleUpdateResource
         case .subscribeToTrackers:
             return handleSubscribeToTrackers
+        case .unsubscribeToTrackers:
+            return handleUnsubscribeToTrackers;
         default:
             assertionFailure("PrivacyConfigurationEditUserScript: Failed to parse User Script message: \(methodName)")
             return nil

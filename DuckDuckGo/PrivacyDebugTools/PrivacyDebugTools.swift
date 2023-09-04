@@ -37,32 +37,37 @@ final class PrivacyDebugTools {
         trackersSubject.eraseToAnyPublisher()
     }
 
-    public func setCurrent(domain: String) {
+    public func setCurrent(domain: String?) {
         trackers = []
         current = domain;
         seen = Set<String>();
     }
 
     public func tracker(tracker: DetectedTracker) -> ()? {
+        guard current != nil else {
+//            print("ignoring, current not set")
+            return nil
+        }
+
         guard let url = URL(string: tracker.request.pageUrl),
               let host = url.host
         else {
-            print("ignoring, host couldn't be read for incoming pageUrl")
+//            print("ignoring, host couldn't be read for incoming pageUrl")
             return nil
         }
 
         if case .thirdPartyRequest = tracker.type {
-            print("ignoring, third party trackers")
+//            print("ignoring, third party trackers")
             return nil
         }
 
-        guard current != nil, current == host else {
-            print("ignoring, didn't match current, host: \(host), current: \(String(describing: current)) ")
+        guard current == host else {
+//            print("ignoring, didn't match current, host: \(host), current: \(String(describing: current)) ")
             return nil
         }
 
-        print("current: \(String(describing: current))")
-        print("trackers: \(String(describing: trackers))")
+//        print("current: \(String(describing: current))")
+//        print("trackers: \(String(describing: trackers))")
 
         if seen.contains(tracker.request.url) {
             return nil;
