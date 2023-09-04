@@ -28,6 +28,14 @@ final class WebView: WKWebView {
 
     weak var contextMenuDelegate: WebViewContextMenuDelegate?
 
+    override var isInFullScreenMode: Bool {
+        if #available(macOS 13.0, *) {
+            return self.fullscreenState != .notInFullscreen
+        } else {
+            return self.tabContentView !== self
+        }
+    }
+
     func stopAllMediaAndLoading() {
         stopLoading()
         stopMediaCapture()
@@ -63,15 +71,15 @@ final class WebView: WKWebView {
     }
 
     var canZoomToActualSize: Bool {
-        window != nil && zoomLevel != defaultZoomValue
+        window != nil && zoomLevel != defaultZoomValue && !self.isInFullScreenMode
     }
 
     var canZoomIn: Bool {
-        window != nil && zoomLevel.index < DefaultZoomValue.allCases.count - 1
+        window != nil && zoomLevel.index < DefaultZoomValue.allCases.count - 1 && !self.isInFullScreenMode
     }
 
     var canZoomOut: Bool {
-        window != nil && zoomLevel.index > 0
+        window != nil && zoomLevel.index > 0 && !self.isInFullScreenMode
     }
 
     func resetZoomLevel() {

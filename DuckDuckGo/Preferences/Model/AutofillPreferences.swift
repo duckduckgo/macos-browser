@@ -24,6 +24,7 @@ protocol AutofillPreferencesPersistor {
     var askToSaveUsernamesAndPasswords: Bool { get set }
     var askToSaveAddresses: Bool { get set }
     var askToSavePaymentMethods: Bool { get set }
+    var autolockLocksFormFilling: Bool { get set }
     var passwordManager: PasswordManager { get set }
 }
 
@@ -38,6 +39,7 @@ enum AutofillAutoLockThreshold: String, CaseIterable {
     case fifteenMinutes
     case thirtyMinutes
     case oneHour
+    case twelveHours
 
     var title: String {
         switch self {
@@ -46,6 +48,7 @@ enum AutofillAutoLockThreshold: String, CaseIterable {
         case .fifteenMinutes: return UserText.autoLockThreshold15Minutes
         case .thirtyMinutes: return UserText.autoLockThreshold30Minutes
         case .oneHour: return UserText.autoLockThreshold1Hour
+        case .twelveHours: return UserText.autoLockThreshold12Hours
         }
     }
 
@@ -56,6 +59,7 @@ enum AutofillAutoLockThreshold: String, CaseIterable {
         case .fifteenMinutes: return 60 * 15
         case .thirtyMinutes: return 60 * 30
         case .oneHour: return 60 * 60
+        case .twelveHours: return 60 * 60 * 12
         }
     }
 }
@@ -103,6 +107,9 @@ final class AutofillPreferences: AutofillPreferencesPersistor {
 
     @UserDefaultsWrapper(key: .askToSavePaymentMethods, defaultValue: true)
     var askToSavePaymentMethods: Bool
+
+    @UserDefaultsWrapper(key: .autolockLocksFormFilling, defaultValue: false)
+    var autolockLocksFormFilling: Bool
 
 #if APPSTORE
     var passwordManager: PasswordManager {

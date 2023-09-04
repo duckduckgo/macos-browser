@@ -25,7 +25,10 @@ private enum Constants {
 
 @available(macOS 11.0, *)
 struct DashboardHeaderView: View {
-    @ObservedObject var viewModel: DashboardHeaderViewModel
+    let statusText: String
+    let displayProfileButton: Bool
+    let faqButtonClicked: () -> Void
+    let editProfileClicked: () -> Void
 
     var body: some View {
         ZStack {
@@ -34,11 +37,13 @@ struct DashboardHeaderView: View {
             VStack(spacing: 0) {
                 HStack {
                     Spacer()
-                    CTAHeaderView(viewModel: viewModel)
+                    CTAHeaderView(displayProfileButton: displayProfileButton,
+                                  faqButtonClicked: faqButtonClicked,
+                                  editProfileClicked: editProfileClicked)
                         .padding()
 
                 }
-                HeaderTitleView(viewModel: viewModel)
+                HeaderTitleView(statusText: statusText)
                 Spacer()
             }
         }
@@ -47,7 +52,7 @@ struct DashboardHeaderView: View {
 
 @available(macOS 11.0, *)
 private struct HeaderTitleView: View {
-    @ObservedObject var viewModel: DashboardHeaderViewModel
+    let statusText: String
 
     var body: some View {
         VStack(spacing: 0) {
@@ -58,7 +63,7 @@ private struct HeaderTitleView: View {
                     .font(.title)
                     .bold()
 
-                Text(viewModel.statusText)
+                Text(statusText)
                     .font(.body)
             }
         }
@@ -67,21 +72,23 @@ private struct HeaderTitleView: View {
 
 @available(macOS 11.0, *)
 private struct CTAHeaderView: View {
-    @ObservedObject var viewModel: DashboardHeaderViewModel
+    let displayProfileButton: Bool
+    let faqButtonClicked: () -> Void
+    let editProfileClicked: () -> Void
 
     var body: some View {
         HStack {
             Button {
-                viewModel.faqButtonClicked()
+                faqButtonClicked()
             } label: {
                 Text("FAQs")
             }
             .buttonStyle(.borderless)
             .foregroundColor(.primary)
 
-            if viewModel.isProfileButtonAvailable {
+            if displayProfileButton {
                 Button {
-                    viewModel.editProfileClicked()
+                    editProfileClicked()
                 } label: {
                     HStack {
                         Image(systemName: "person")
@@ -98,11 +105,11 @@ private struct CTAHeaderView: View {
 @available(macOS 11.0, *)
 struct DashboardHeaderView_Previews: PreviewProvider {
     static var previews: some View {
-        let viewModel = DashboardHeaderViewModel(statusText: "Scanning...",
-                                                 faqButtonClicked: {},
-                                                 editProfileClicked: {})
 
-        DashboardHeaderView(viewModel: viewModel)
+        DashboardHeaderView(statusText: "Scanning...",
+                            displayProfileButton: true,
+                            faqButtonClicked: {},
+                            editProfileClicked: {})
             .frame(width: 1000, height: 300)
     }
 }

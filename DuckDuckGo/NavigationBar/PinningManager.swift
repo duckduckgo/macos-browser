@@ -39,7 +39,7 @@ protocol PinningManager {
 final class LocalPinningManager: PinningManager {
 
 #if NETWORK_PROTECTION
-    static let shared = LocalPinningManager(networkProtectionFeatureVisibility: NetworkProtectionKeychainTokenStore())
+    static let shared = LocalPinningManager(networkProtectionFeatureActivation: NetworkProtectionKeychainTokenStore())
 #else
     static let shared = LocalPinningManager()
 #endif
@@ -53,10 +53,10 @@ final class LocalPinningManager: PinningManager {
     private var manuallyToggledPinnedViewsStrings: [String]
 
 #if NETWORK_PROTECTION
-    private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
+    private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
 
-    init(networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility) {
-        self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility
+    init(networkProtectionFeatureActivation: NetworkProtectionFeatureActivation) {
+        self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
     }
 #endif
 
@@ -100,7 +100,7 @@ final class LocalPinningManager: PinningManager {
         case .downloads: return isPinned(.downloads) ? UserText.hideDownloadsShortcut : UserText.showDownloadsShortcut
         case .networkProtection:
 #if NETWORK_PROTECTION
-            if !networkProtectionFeatureVisibility.isFeatureActivated {
+            if !networkProtectionFeatureActivation.isFeatureActivated {
                 assertionFailure("Tried to toggle Network Protection when it was not activated")
             }
 

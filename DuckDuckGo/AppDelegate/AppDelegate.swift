@@ -73,8 +73,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     var updateController: UpdateController!
 #endif
 
-    var appUsageActivityMonitor: AppUsageActivityMonitor?
-
     // swiftlint:disable:next function_body_length
     func applicationWillFinishLaunching(_ notification: Notification) {
 #if !APPSTORE && !DEBUG
@@ -177,8 +175,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         if LocalStatisticsStore().atb == nil {
             Pixel.firstLaunchDate = Date()
-            PixelExperiment.install()
+            // MARK: Enable pixel experiments here
         }
+        PixelExperiment.cleanup()
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
             // MARK: perform first time launch logic here
@@ -198,8 +197,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         grammarFeaturesManager.manage()
 
         applyPreferredTheme()
-
-        appUsageActivityMonitor = AppUsageActivityMonitor(delegate: self)
 
         crashReporter.checkForNewReports()
 
@@ -331,19 +328,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         if Pixel.isNewUser && repetition == .initial {
             Pixel.fire(.importDataInitial)
         }
-    }
-
-}
-
-extension AppDelegate: AppUsageActivityMonitorDelegate {
-
-    func countOpenWindowsAndTabs() -> [Int] {
-        return WindowControllersManager.shared.mainWindowControllers
-            .map { $0.mainViewController.tabCollectionViewModel.tabCollection.tabs.count }
-    }
-
-    func activeUsageTimeHasReachedThreshold(avgTabCount: Double) {
-        // This is temporarily unused while we determine whether it required to determine an active user count.
     }
 
 }

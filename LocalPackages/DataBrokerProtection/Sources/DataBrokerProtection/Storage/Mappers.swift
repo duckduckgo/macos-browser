@@ -55,9 +55,9 @@ struct MapperToDB {
         .init(phoneNumber: try mechanism(phone.encoded), profileId: profileId)
     }
 
-    func mapToDB(_ broker: DataBroker) throws -> BrokerDB {
+    func mapToDB(_ broker: DataBroker, id: Int64? = nil) throws -> BrokerDB {
         let encodedBroker = try jsonEncoder.encode(broker)
-        return .init(id: nil, name: broker.name, json: encodedBroker, version: broker.version)
+        return .init(id: id, name: broker.name, json: encodedBroker, version: broker.version)
     }
 
     func mapToDB(_ profileQuery: ProfileQuery, relatedTo profileId: Int64) throws -> ProfileQueryDB {
@@ -209,12 +209,11 @@ struct MapperToModel {
         let extractedProfile = try jsonDecoder.decode(ExtractedProfile.self, from: try mechanism(extractedProfileDB.profile))
         return .init(id: extractedProfileDB.id,
                      name: extractedProfile.name,
-                     alternativeNamesList: extractedProfile.alternativeNamesList,
+                     alternativeNames: extractedProfile.alternativeNames,
                      addressFull: extractedProfile.addressFull,
-                     addressCityState: extractedProfile.addressCityState,
-                     addressCityStateList: extractedProfile.addressCityStateList,
-                     phone: extractedProfile.phone,
-                     relativesList: extractedProfile.relativesList,
+                     addresses: extractedProfile.addresses,
+                     phoneNumbers: extractedProfile.phoneNumbers,
+                     relatives: extractedProfile.relatives,
                      profileUrl: extractedProfile.profileUrl,
                      reportId: extractedProfile.reportId,
                      age: extractedProfile.age,
