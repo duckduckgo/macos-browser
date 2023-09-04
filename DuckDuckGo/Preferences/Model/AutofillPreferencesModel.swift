@@ -23,6 +23,7 @@ final class AutofillPreferencesModel: ObservableObject {
     @Published var askToSaveUsernamesAndPasswords: Bool {
         didSet {
             persistor.askToSaveUsernamesAndPasswords = askToSaveUsernamesAndPasswords
+            NotificationCenter.default.post(name: .autofillUserSettingsDidChange, object: askToSaveUsernamesAndPasswords)
         }
     }
 
@@ -35,6 +36,7 @@ final class AutofillPreferencesModel: ObservableObject {
     @Published var askToSavePaymentMethods: Bool {
         didSet {
             persistor.askToSavePaymentMethods = askToSavePaymentMethods
+            NotificationCenter.default.post(name: .autofillUserSettingsDidChange, object: nil)
         }
     }
 
