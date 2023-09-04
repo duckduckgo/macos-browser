@@ -25,7 +25,6 @@ struct DataBrokerProtectionContainerView: View {
     @ObservedObject var profileViewModel: ProfileViewModel
     @ObservedObject var resultsViewModel: ResultsViewModel
     @State var shouldShowDebugUI = true
-    @State var useFakeBroker = true
 
     var body: some View {
         ScrollView {
@@ -98,7 +97,7 @@ struct DataBrokerProtectionContainerView: View {
         VStack(alignment: .leading) {
             Text("Scheduler status: \(containerViewModel.schedulerStatus)")
 
-            Toggle("Use Fake Broker", isOn: $useFakeBroker)
+            Toggle("Use Fake Broker", isOn: $containerViewModel.useFakeBroker)
 
             Toggle("Display WebViews", isOn: $containerViewModel.showWebView)
 

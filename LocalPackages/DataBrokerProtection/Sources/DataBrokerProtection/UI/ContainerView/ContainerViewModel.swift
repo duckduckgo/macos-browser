@@ -33,6 +33,7 @@ final class ContainerViewModel: ObservableObject {
     @Published var headerStatusText = ""
     @Published var schedulerStatus = ""
     @Published var showWebView = false
+    @Published var useFakeBroker = false
 
     internal init(scheduler: DataBrokerProtectionScheduler,
                   dataManager: DataBrokerProtectionDataManaging,
@@ -41,6 +42,7 @@ final class ContainerViewModel: ObservableObject {
         self.dataManager = dataManager
         self.notificationCenter = notificationCenter
 
+        restoreFakeBrokerStatus()
         updateHeaderStatus()
         setupNotifications()
         setupCancellable()
@@ -62,6 +64,16 @@ final class ContainerViewModel: ObservableObject {
                 }
             }.store(in: &cancellables)
 
+        $useFakeBroker
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] value in
+                FakeBrokerUserDefaults().setFakeBrokerFlag(value)
+            }.store(in: &cancellables)
+
+    }
+
+    private func restoreFakeBrokerStatus() {
+        useFakeBroker = FakeBrokerUserDefaults().isFakeBrokerFlagOn()
     }
 
     private func startSchedulerIfProfileAvailable() {
