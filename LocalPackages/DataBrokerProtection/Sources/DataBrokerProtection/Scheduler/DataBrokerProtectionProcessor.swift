@@ -93,10 +93,10 @@ final class DataBrokerProtectionProcessor {
         let brokersProfileData = database.fetchAllBrokerProfileQueryData(for: profileId)
         let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
                                                                                   operationType: operationType,
-                                                                                  priorityDate: priorityDate)
+                                                                                  priorityDate: priorityDate,
+                                                                                  showWebView: showWebView)
 
         for collection in dataBrokerOperationCollections {
-            collection.showWebView = showWebView
             operationQueue.addOperation(collection)
         }
 
@@ -107,7 +107,8 @@ final class DataBrokerProtectionProcessor {
 
     private func createDataBrokerOperationCollections(from brokerProfileQueriesData: [BrokerProfileQueryData],
                                                       operationType: DataBrokerOperationsCollection.OperationType,
-                                                      priorityDate: Date?) -> [DataBrokerOperationsCollection] {
+                                                      priorityDate: Date?,
+                                                      showWebView: Bool) -> [DataBrokerOperationsCollection] {
 
         var collections: [DataBrokerOperationsCollection] = []
         var visitedDataBrokerIDs: Set<Int64> = []
@@ -124,7 +125,8 @@ final class DataBrokerProtectionProcessor {
                                                                 priorityDate: priorityDate,
                                                                 notificationCenter: notificationCenter,
                                                                 runner: operationRunnerProvider.getOperationRunner(),
-                                                                errorHandler: errorHandler)
+                                                                errorHandler: errorHandler,
+                                                                showWebView: showWebView)
                 collections.append(collection)
 
                 visitedDataBrokerIDs.insert(dataBrokerID)

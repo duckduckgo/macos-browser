@@ -38,8 +38,7 @@ final class DataBrokerOperationsCollection: Operation {
     private let notificationCenter: NotificationCenter
     private let runner: WebOperationRunner
     private let errorHandler: EventMapping<DataBrokerProtectionOperationError>?
-
-    var showWebView: Bool = false
+    private let showWebView: Bool
 
     deinit {
         os_log("Deinit operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
@@ -52,7 +51,8 @@ final class DataBrokerOperationsCollection: Operation {
          priorityDate: Date? = nil,
          notificationCenter: NotificationCenter = NotificationCenter.default,
          runner: WebOperationRunner,
-         errorHandler: EventMapping<DataBrokerProtectionOperationError>? = nil) {
+         errorHandler: EventMapping<DataBrokerProtectionOperationError>? = nil,
+         showWebView: Bool) {
 
         self.brokerProfileQueriesData = brokerProfileQueriesData
         self.database = database
@@ -62,7 +62,7 @@ final class DataBrokerOperationsCollection: Operation {
         self.notificationCenter = notificationCenter
         self.runner = runner
         self.errorHandler = errorHandler
-
+        self.showWebView = showWebView
         super.init()
     }
 
