@@ -53,7 +53,7 @@ final class StatisticsLoader {
                         completion()
                     }
                 }
-                Pixel.fire(.serpInitial, limitToInitial: true)
+                Pixel.fire(.serpInitial, limitToInitial: true, includeAppVersionParameter: false)
                 Pixel.fire(.serp)
                 Task {
                     await WindowControllersManager.shared.pinnedTabsManager.reportUsage()
