@@ -244,7 +244,7 @@ extension AppDelegate {
             assertionFailure("No reference to main window controller")
             return
         }
-    windowController.mainViewController.browserTabViewController.openNewTab(with: .url(URL.duckDuckGoEmailLogin))
+        windowController.mainViewController.browserTabViewController.openNewTab(with: .url(URL.duckDuckGoEmailLogin))
     }
 
 }

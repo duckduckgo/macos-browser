@@ -71,7 +71,7 @@ final class MoreOptionsMenu: NSMenu {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
-        self.networkProtectionFeatureVisibility =  networkProtectionFeatureVisibility
+        self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility
         self.internalUserDecider = internalUserDecider
 
         super.init(title: "")

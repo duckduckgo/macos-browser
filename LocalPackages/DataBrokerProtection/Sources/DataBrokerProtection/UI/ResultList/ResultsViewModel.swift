@@ -20,17 +20,23 @@ import Foundation
 import SwiftUI
 
 final class ResultsViewModel: ObservableObject {
+    private let dataManager: DataBrokerProtectionDataManaging
+    private let notificationCenter: NotificationCenter
 
     struct RemovedProfile: Identifiable {
         let id = UUID()
         let dataBroker: String
-        let scheduledDate: Date
+        let scheduledDate: Date?
 
         var formattedDate: String {
-            let formatter = DateFormatter()
-            formatter.timeStyle = .none
-            formatter.dateStyle = .short
-            return formatter.string(from: scheduledDate)
+            if let date = scheduledDate {
+                let formatter = DateFormatter()
+                formatter.timeStyle = .none
+                formatter.dateStyle = .short
+                return formatter.string(from: date)
+            } else {
+                return "No date set"
+            }
         }
     }
 
@@ -41,7 +47,7 @@ final class ResultsViewModel: ObservableObject {
         let address: String
         let error: String?
         let errorDescription: String?
-
+        let operationData: OptOutOperationData
         var hasError: Bool {
             error != nil
         }
@@ -50,52 +56,71 @@ final class ResultsViewModel: ObservableObject {
     @Published var removedProfiles =  [RemovedProfile]()
     @Published var pendingProfiles = [PendingProfile]()
 
-    init() {
-        addFakeData()
+    init(dataManager: DataBrokerProtectionDataManaging,
+         notificationCenter: NotificationCenter = .default) {
+        self.dataManager = dataManager
+        self.notificationCenter = notificationCenter
+
+        updateUI(ignoresCache: false)
+        setupNotifications()
     }
 
-    // MARK: - Test Data
-    private func addFakeData() {
-        removedProfiles = [
-            RemovedProfile(dataBroker: "ABC Data Broker", scheduledDate: Date()),
-            RemovedProfile(dataBroker: "XYZ Data Broker", scheduledDate: Date().addingTimeInterval(86400)),
-            RemovedProfile(dataBroker: "DEF Data Broker", scheduledDate: Date().addingTimeInterval(86400 * 2)),
-            RemovedProfile(dataBroker: "GHI Data Broker", scheduledDate: Date().addingTimeInterval(86400 * 3)),
-            RemovedProfile(dataBroker: "JKL Data Broker", scheduledDate: Date().addingTimeInterval(86400 * 4))
-        ]
+    private func setupNotifications() {
+        notificationCenter.addObserver(self,
+                                       selector: #selector(reloadData),
+                                       name: DataBrokerProtectionNotifications.didFinishScan,
+                                       object: nil)
 
-        pendingProfiles = [
-            PendingProfile(dataBroker: "ABC Data Broker", profile: "John Doe", address: "123 Apple Street", error: nil, errorDescription: nil),
-            PendingProfile(dataBroker: "XYZ Data Broker", profile: "Jane Smith", address: "456 Cherry Avenue", error: "Error", errorDescription: "Error Description"),
-            PendingProfile(dataBroker: "DEF Data Broker", profile: "Michael Johnson", address: "789 Orange Road", error: nil, errorDescription: nil),
-            PendingProfile(dataBroker: "GHI Data Broker", profile: "Emily Davis", address: "321 Banana Boulevard", error: "Error", errorDescription: "Error Description"),
-            PendingProfile(dataBroker: "JKL Data Broker", profile: "Matthew Wilson", address: "654 Grape Lane", error: nil, errorDescription: nil),
-            PendingProfile(dataBroker: "MNO Data Broker", profile: "Olivia Taylor", address: "987 Lemon Drive", error: "Error", errorDescription: "Error Description")
-        ]
-
-        startMovingProfiles()
+        notificationCenter.addObserver(self,
+                                       selector: #selector(reloadData),
+                                       name: DataBrokerProtectionNotifications.didFinishOptOut,
+                                       object: nil)
     }
 
-    private var timer: Timer?
-    private var secondsElapsed: Int = 0
+    private func updateUI(ignoresCache: Bool) {
+        let brokersInfoData = dataManager.fetchBrokerProfileQueryData(ignoresCache: ignoresCache)
+        var removedProfiles = [RemovedProfile]()
+        var pendingProfiles = [PendingProfile]()
 
-    func startMovingProfiles() {
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in
-            self?.moveProfileToRemoved()
-            self?.secondsElapsed += 1
+        for brokerProfileQueryData in brokersInfoData {
+            for optOutOperationData in brokerProfileQueryData.optOutOperationsData {
 
-            if self?.secondsElapsed == 10 {
-                timer.invalidate()
+                if optOutOperationData.extractedProfile.removedDate == nil {
+                    var errorName: String?
+                    var errorDescription: String?
+
+                    if let lastEvent = optOutOperationData.historyEvents.last {
+                        if case .error(let error) = lastEvent.type {
+                            errorName = error.name
+                            errorDescription = error.localizedDescription
+                        }
+                    }
+
+                    let profile = PendingProfile(
+                        dataBroker: brokerProfileQueryData.dataBroker.name,
+                        profile: optOutOperationData.extractedProfile.fullName ?? "",
+                        address: optOutOperationData.extractedProfile.addresses?.first?.fullAddress ?? "",
+                        error: errorName,
+                        errorDescription: errorDescription,
+                        operationData: optOutOperationData)
+
+                    pendingProfiles.append(profile)
+                } else {
+                    let profile = RemovedProfile(dataBroker: brokerProfileQueryData.dataBroker.name,
+                                                 scheduledDate: brokerProfileQueryData.scanOperationData.preferredRunDate)
+                    removedProfiles.append(profile)
+                }
             }
         }
+
+        self.removedProfiles = removedProfiles
+        self.pendingProfiles = pendingProfiles
     }
 
-    private func moveProfileToRemoved() {
-        if let profile = pendingProfiles.first {
-            withAnimation {
-                pendingProfiles.removeFirst()
-                removedProfiles.append(RemovedProfile(dataBroker: profile.dataBroker, scheduledDate: Date()))
-            }
+    @objc public func reloadData() {
+        DispatchQueue.main.async {
+
+            self.updateUI(ignoresCache: true)
         }
     }
 }

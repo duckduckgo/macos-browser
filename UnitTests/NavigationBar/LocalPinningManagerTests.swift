@@ -32,7 +32,6 @@ private struct NetworkProtectionFeatureActivationMock: NetworkProtectionFeatureA
     var isFeatureActivated: Bool {
         activated
     }
-
 }
 #endif
 

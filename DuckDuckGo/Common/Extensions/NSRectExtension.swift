@@ -37,8 +37,10 @@ extension NSRect {
     }
 
     // Apply an offset so that we don't get caught by the "Line of Death" https://textslashplain.com/2017/01/14/the-line-of-death/
-    func insetFromLineOfDeath() -> NSRect {
-        return insetBy(dx: 0, dy: -15)
+    func insetFromLineOfDeath(flipped: Bool) -> NSRect {
+        let offset = 3.0
+        assert(height > offset * 2)
+        return insetBy(dx: 0, dy: offset)
     }
 
 }

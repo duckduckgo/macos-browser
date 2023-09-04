@@ -54,13 +54,16 @@ final class OptOutOperation: DataBrokerOperation {
 
     func run(inputValue: ExtractedProfile,
              webViewHandler: WebViewHandler? = nil,
-             actionsHandler: ActionsHandler? = nil) async throws {
+             actionsHandler: ActionsHandler? = nil,
+             showWebView: Bool = false) async throws {
         try await withCheckedThrowingContinuation { continuation in
             self.extractedProfile = inputValue.merge(with: query.profileQuery)
             self.continuation = continuation
 
             Task {
-                await initialize(handler: webViewHandler, isFakeBroker: query.dataBroker.isFakeBroker)
+                await initialize(handler: webViewHandler,
+                                 isFakeBroker: query.dataBroker.isFakeBroker,
+                                 showWebView: showWebView)
 
                 do {
                     if let optOutStep = try query.dataBroker.optOutStep() {

@@ -50,31 +50,72 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
     func save(_ profile: DataBrokerProtectionProfile) {
         do {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-            let brokers = try vault.fetchAllBrokers()
-            let profileId = try vault.save(profile: profile)
             let profileQueries = profile.profileQueries
+            let profileId: Int64 = 1 // At the moment, we only support one profile for DBP.
 
-            // On the error handling task we should handle the work when the list of brokers or profile queries are empty.
+            if try vault.fetchProfile(with: profileId) != nil {
+                // There is a profile created.
+                // 1. We update the profile in the database
+                // 2. The database layer takes care of deleting the scans related to the old profile.
+                // 3. We fetch the list of brokers
+                // 4. We save each profile query into the database
+                // 5. We initialize the scan operations (related to a profile query and a broker)
+                _ = try vault.save(profile: profile)
+                let brokerIDs = try vault.fetchAllBrokers().compactMap({ $0.id })
 
-            if brokers.isEmpty {
-                let brokerId = try vault.save(broker: DataBroker.initFromResource("verecor.com"))
-
-                for profileQuery in profileQueries {
-                    let profileQueryId = try vault.save(profileQuery: profileQuery, profileId: profileId)
-                    try vault.save(brokerId: brokerId, profileQueryId: profileQueryId, lastRunDate: nil, preferredRunDate: nil)
-                }
+                try intializeDatabaseForProfile(
+                    profileId: profileId,
+                    vault: vault,
+                    brokerIDs: brokerIDs,
+                    profileQueries: profileQueries
+                )
             } else {
-                for broker in brokers {
-                    guard let brokerId = broker.id else { continue } // What happens if a broker has a nil id? Should throw send a pixel or something?
+                // There is no profile in the database. We need to insert it.
+                // Here we do the following:
+                // 1. We save the profile into the database
+                // 2. We fetch all the broker JSON files from Resources
+                // 3. We convert those JSON files into DataBroker objects
+                // 4. We save the brokers into the database
+                // 5. We save each profile query into the database
+                // 6. We initialize the scan operations (related to a profile query and a broker)
+                _ = try vault.save(profile: profile)
 
-                    for profileQuery in profileQueries {
-                        let profileQueryId = try vault.save(profileQuery: profileQuery, profileId: profileId)
-                        try vault.save(brokerId: brokerId, profileQueryId: profileQueryId, lastRunDate: nil, preferredRunDate: nil)
+                if let brokers = FileResources().fetchBrokerFromResourceFiles() {
+                    var brokerIDs = [Int64]()
+
+                    for broker in brokers {
+                        let brokerId = try vault.save(broker: broker)
+                        brokerIDs.append(brokerId)
                     }
+
+                    try intializeDatabaseForProfile(
+                        profileId: profileId,
+                        vault: vault,
+                        brokerIDs: brokerIDs,
+                        profileQueries: profileQueries
+                    )
                 }
             }
         } catch {
             os_log("Database error: saveProfile, error: %{public}@", log: .error, error.localizedDescription)
+        }
+    }
+
+    private func intializeDatabaseForProfile(profileId: Int64,
+                                             vault: any (DataBrokerProtectionSecureVault),
+                                             brokerIDs: [Int64],
+                                             profileQueries: [ProfileQuery]) throws {
+        var profileQueryIDs = [Int64]()
+
+        for profileQuery in profileQueries {
+            let profileQueryId = try vault.save(profileQuery: profileQuery, profileId: profileId)
+            profileQueryIDs.append(profileQueryId)
+        }
+
+        for brokerId in brokerIDs {
+            for profileQueryId in profileQueryIDs {
+                try vault.save(brokerId: brokerId, profileQueryId: profileQueryId, lastRunDate: nil, preferredRunDate: nil)
+            }
         }
     }
 

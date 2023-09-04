@@ -292,7 +292,7 @@ final class AddressBarButtonsViewController: NSViewController {
             bookmarkButton.isHidden = false
             bookmarkPopover.isNew = result.isNew
             bookmarkPopover.viewController.bookmark = bookmark
-            bookmarkPopover.show(relativeTo: bookmarkButton.bounds, of: bookmarkButton, preferredEdge: .maxY)
+            bookmarkPopover.show(positionedBelow: bookmarkButton)
         } else {
             updateBookmarkButtonVisibility()
             bookmarkPopover.close()
@@ -356,7 +356,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
         let positioningViewInWindow = privacyDashboardPositioningView.convert(privacyDashboardPositioningView.bounds, to: view.window?.contentView)
         privacyDashboardPopover.setPreferredMaxHeight(positioningViewInWindow.origin.y)
-        privacyDashboardPopover.show(relativeTo: privacyDashboardPositioningView.bounds, of: privacyDashboardPositioningView, preferredEdge: .maxY)
+        privacyDashboardPopover.show(positionedBelow: privacyDashboardPositioningView)
 
         privacyEntryPointButton.state = .on
 

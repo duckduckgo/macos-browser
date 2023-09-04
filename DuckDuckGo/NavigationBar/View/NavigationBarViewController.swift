@@ -256,7 +256,8 @@ final class NavigationBarViewController: NSViewController {
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
                                    internalUserDecider: internalUserDecider)
         menu.actionDelegate = self
-        menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height + 4), in: sender)
+        let location = NSPoint(x: -menu.size.width + sender.bounds.width, y: sender.bounds.height + 4)
+        menu.popUp(positioning: nil, at: location, in: sender)
     }
     // swiftlint:enable force_cast
 
@@ -768,7 +769,7 @@ extension NavigationBarViewController: NSMenuDelegate {
 #if NETWORK_PROTECTION
         let isPopUpWindow = view.window?.isPopUpWindow ?? false
 
-        if !isPopUpWindow && NetworkProtectionKeychainTokenStore().isFeatureActivated {
+        if !isPopUpWindow && networkProtectionFeatureActivation.isFeatureActivated {
             let networkProtectionTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
         }

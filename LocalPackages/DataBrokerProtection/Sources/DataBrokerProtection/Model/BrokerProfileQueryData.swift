@@ -19,7 +19,7 @@
 import Foundation
 import Common
 
-final class BrokerProfileQueryData: Sendable {
+final public class BrokerProfileQueryData: Sendable {
     let dataBroker: DataBroker
     let profileQuery: ProfileQuery
     let scanOperationData: ScanOperationData
@@ -35,6 +35,10 @@ final class BrokerProfileQueryData: Sendable {
 
     var events: [HistoryEvent] {
         operationsData.flatMap { $0.historyEvents }.sorted { $0.date < $1.date }
+    }
+
+    var hasMatches: Bool {
+        !optOutOperationsData.isEmpty
     }
 
     init(dataBroker: DataBroker,

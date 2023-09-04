@@ -22,6 +22,7 @@ import SwiftUI
 struct CreateProfileView: View {
     @ObservedObject var viewModel: ProfileViewModel
     let scanButtonClicked: () -> Void
+    let backToDashboardClicked: () -> Void
 
     @Environment(\.colorScheme) var colorScheme
 
@@ -30,6 +31,18 @@ struct CreateProfileView: View {
             VStack {
                 FormHeaderView()
                     .padding(.horizontal, Consts.OuterForm.horizontalPadding)
+
+                if viewModel.hasOperationContent {
+                    Button {
+                        backToDashboardClicked()
+                    } label: {
+                        Text("􀰌 Back to Dashboard")
+                            .padding(.horizontal, Consts.Button.horizontalPadding)
+                            .padding(.vertical, Consts.Button.verticalPadding)
+                    }
+                    .buttonStyle(CTAButtonStyle(style: .outlined))
+                    .padding(.top, 12)
+                }
 
                 ComponentsContainerView(viewModel: viewModel)
                     .padding()
@@ -649,7 +662,9 @@ private enum Consts {
 @available(macOS 11.0, *)
 struct CreateProfileView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateProfileView(viewModel: ProfileViewModel(dataManager: DataBrokerProtectionDataManager()), scanButtonClicked: {})
+        CreateProfileView(viewModel: ProfileViewModel(dataManager: DataBrokerProtectionDataManager()),
+                          scanButtonClicked: {},
+                          backToDashboardClicked: {})
             .frame(width: 500, height: 1400)
             .padding(30)
     }

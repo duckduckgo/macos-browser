@@ -30,11 +30,15 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
 
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
+    private let featureOverrides: WaitlistBetaOverriding
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
-         networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore()) {
+         networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
+         featureOverrides: WaitlistBetaOverriding = DefaultWaitlistBetaOverrides()) {
+
         self.privacyConfigurationManager = privacyConfigurationManager
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
+        self.featureOverrides = featureOverrides
     }
 
     /// Calculates whether Network Protection is visible.
@@ -45,17 +49,73 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     ///
     /// Once the waitlist beta has ended, we can trigger a remote change that removes the user's auth token and turn off the waitlist flag, hiding Network Protection from the user.
     func isNetworkProtectionVisible() -> Bool {
-        if networkProtectionFeatureActivation.isFeatureActivated {
-            return true
+        let isFeatureVisible = isEasterEggUser || isEnabledWaitlistUser
+
+        if !isFeatureVisible {
+            disableNetworkProtectionForWaitlistUsers()
         }
 
-        if privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlist) {
-            return true
-        }
-
-        return false
+        return isFeatureVisible
     }
 
+    /// Easter egg users can be identified by them being internal users and having an auth token (NetP being activated).
+    ///
+    private var isEasterEggUser: Bool {
+        !isWaitlistUser && networkProtectionFeatureActivation.isFeatureActivated
+    }
+
+    /// Whether it's a user with feature access
+    private var isEnabledWaitlistUser: Bool {
+        isWaitlistUser && waitlistIsOngoing
+    }
+
+    /// Waitlist users are users that have the waitlist enabled and active
+    ///
+    private var isWaitlistUser: Bool {
+        // In this PR we don't know this, so we're defaulting to false.  This will be
+        // addressed when this is merged back onto the main waitlist PR
+        false
+    }
+
+    private var waitlistIsOngoing: Bool {
+        isWaitlistEnabled && isWaitlistBetaActive
+    }
+
+    private var isWaitlistBetaActive: Bool {
+        switch featureOverrides.waitlistActive {
+        case .useRemoteValue:
+            guard privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlistBetaActive) else {
+                return false
+            }
+
+            return true
+        case .on:
+            return true
+        case .off:
+            return false
+        }
+    }
+
+    private var isWaitlistEnabled: Bool {
+        switch featureOverrides.waitlistEnabled {
+        case .useRemoteValue:
+            return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlist)
+        case .on:
+            return true
+        case .off:
+            return false
+        }
+    }
+
+    private func disableNetworkProtectionForWaitlistUsers() {
+#if DEBUG
+        guard isWaitlistUser else {
+            return
+        }
+
+        print("NetP Debug: waitlist user - disabling NetP")
+#endif
+    }
 }
 
 #endif

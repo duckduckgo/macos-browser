@@ -117,6 +117,10 @@ final class LocalPinningManager: PinningManager {
         case .downloads: return isPinned(.downloads) ? UserText.hideDownloadsShortcut : UserText.showDownloadsShortcut
         case .networkProtection:
 #if NETWORK_PROTECTION
+            if !networkProtectionFeatureActivation.isFeatureActivated {
+                assertionFailure("Tried to toggle Network Protection when it was not activated")
+            }
+
             return isPinned(.networkProtection) ? UserText.hideNetworkProtectionShortcut : UserText.showNetworkProtectionShortcut
 #else
             fatalError("Tried to get Network Protection interface title when NetP was disabled")
