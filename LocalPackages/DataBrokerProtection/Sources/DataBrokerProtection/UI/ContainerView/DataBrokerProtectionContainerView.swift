@@ -116,11 +116,11 @@ struct DataBrokerProtectionContainerView: View {
                 }
                        .pickerStyle(MenuPickerStyle())
                        .frame(width: 300)
-
             }
         }
         .padding()
-        .borderedRoundedCorner()
+        .blurredBackground()
+
     }
 
     @ViewBuilder
@@ -168,5 +168,17 @@ struct DataBrokerProtectionContainerView_Previews: PreviewProvider {
                                           profileViewModel: profileViewModel,
                                           resultsViewModel: resultsViewModel)
         .frame(width: 1024, height: 768)
+    }
+}
+
+extension View {
+    @ViewBuilder
+    func blurredBackground() -> some View {
+        if #available(macOS 12.0, *) {
+            self
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+        } else {
+            self
+        }
     }
 }

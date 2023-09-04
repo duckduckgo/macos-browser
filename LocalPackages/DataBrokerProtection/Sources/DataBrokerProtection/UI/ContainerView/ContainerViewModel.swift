@@ -66,7 +66,7 @@ final class ContainerViewModel: ObservableObject {
 
         $useFakeBroker
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] value in
+            .sink { value in
                 FakeBrokerUserDefaults().setFakeBrokerFlag(value)
             }.store(in: &cancellables)
 
