@@ -46,8 +46,8 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     private enum SchedulerCycle {
         // Arbitrary numbers for now
 
-        static let interval: TimeInterval = 5 * 60 // 5 minutes
-        static let tolerance: TimeInterval = 60 // 1 minute
+        static let interval: TimeInterval = 40 * 60 // 40 minutes
+        static let tolerance: TimeInterval = 20 * 60 // 20 minutes
     }
 
     private let privacyConfigManager: PrivacyConfigurationManaging
