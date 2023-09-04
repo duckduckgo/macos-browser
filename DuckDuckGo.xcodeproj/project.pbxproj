@@ -5240,6 +5240,7 @@
 		4B9DB0062A983B23000927DB /* Waitlist */ = {
 			isa = PBXGroup;
 			children = (
+				7BD8679A2A9E9E000063B9F7 /* NetworkProtectionFeatureVisibility.swift */,
 				4B9DB0072A983B23000927DB /* Waitlist.swift */,
 				4B9DB0082A983B23000927DB /* Networking */,
 				4B9DB00B2A983B24000927DB /* Models */,
@@ -5569,14 +5570,6 @@
 				7BB108582A43375D000AB95F /* PFMoveApplication.m */,
 			);
 			path = LetsMove1.25;
-			sourceTree = "<group>";
-		};
-		7BFE955C2A9E71E50081ABE9 /* Waitlist */ = {
-			isa = PBXGroup;
-			children = (
-				7BD8679A2A9E9E000063B9F7 /* NetworkProtectionFeatureVisibility.swift */,
-			);
-			path = Waitlist;
 			sourceTree = "<group>";
 		};
 		853014D425E6709500FB8205 /* Support */ = {
@@ -6118,7 +6111,6 @@
 				AAE8B0FD258A416F00E81239 /* TabPreview */,
 				B6040859274B8C5200680351 /* UnprotectedDomains */,
 				AACF6FD426BC35C200CF09F9 /* UserAgent */,
-				7BFE955C2A9E71E50081ABE9 /* Waitlist */,
 				4B9DB0062A983B23000927DB /* Waitlist */,
 				AA6EF9AE25066F99004754E6 /* Windows */,
 				31F28C4B28C8EE9000119F70 /* YoutubePlayer */,
