@@ -127,9 +127,9 @@ final class ContainerViewModel: ObservableObject {
                 let hasResults = brokerProfileData.contains { $0.hasMatches }
 
                 if hasResults {
-                    completion(.noResults)
-                } else {
                     completion(.results)
+                } else {
+                    completion(.noResults)
                 }
             }
         }

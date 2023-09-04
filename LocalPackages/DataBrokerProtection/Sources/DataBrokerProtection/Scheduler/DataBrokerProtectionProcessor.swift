@@ -73,7 +73,15 @@ final class DataBrokerProtectionProcessor {
                                showWebView: Bool,
                                completion: @escaping () -> Void) {
 
-        let brokersProfileData = database.fetchAllBrokerProfileQueryData(for: 1) // We assume one profile for now
+        // Before running new operatiosn we check if there is any updates to the broker files.
+        // This runs only once per 24 hours.
+        if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil) {
+            let brokerUpdater = DataBrokerProtectionBrokerUpdater(vault: vault)
+            brokerUpdater.checkForUpdatesInBrokerJSONFiles()
+        }
+
+        let profileId: Int64 = 1 // We assume one profile for now
+        let brokersProfileData = database.fetchAllBrokerProfileQueryData(for: profileId)
         let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
                                                                                   operationType: operationType,
                                                                                   priorityDate: priorityDate)
