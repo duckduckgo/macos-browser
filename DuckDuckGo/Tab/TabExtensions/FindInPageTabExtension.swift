@@ -56,7 +56,11 @@ final class FindInPageTabExtension: TabExtension {
 
     @MainActor
     private func showFindInPage() async {
-        guard !model.isVisible else {
+        let alreadyVisible = model.isVisible
+        // makes Find In Page a first responder if re-requested
+        model.show()
+
+        guard !alreadyVisible else {
             // Find In Page is already active
             guard !model.text.isEmpty,
                   // would just find next for PDF
@@ -66,8 +70,6 @@ final class FindInPageTabExtension: TabExtension {
             await find(model.text, with: [.noIndexChange, .determineMatchIndex, .showOverlay])
             return
         }
-
-        model.show()
 
         await reset()
         guard !model.text.isEmpty else { return }

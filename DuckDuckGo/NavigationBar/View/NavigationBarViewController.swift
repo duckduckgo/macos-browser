@@ -95,7 +95,7 @@ final class NavigationBarViewController: NSViewController {
 
 #if NETWORK_PROTECTION
     private let networkProtectionButtonModel: NetworkProtectionNavBarButtonModel
-    private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
+    private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
 #endif
 
     required init?(coder: NSCoder) {
@@ -103,11 +103,11 @@ final class NavigationBarViewController: NSViewController {
     }
 
 #if NETWORK_PROTECTION
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore()) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popovers: popovers)
         self.isBurner = isBurner
-        self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility
+        self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
         goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
         super.init(coder: coder)
@@ -256,7 +256,8 @@ final class NavigationBarViewController: NSViewController {
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
                                    internalUserDecider: internalUserDecider)
         menu.actionDelegate = self
-        menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height + 4), in: sender)
+        let location = NSPoint(x: -menu.size.width + sender.bounds.width, y: sender.bounds.height + 4)
+        menu.popUp(positioning: nil, at: location, in: sender)
     }
     // swiftlint:enable force_cast
 
@@ -746,7 +747,7 @@ extension NavigationBarViewController: NSMenuDelegate {
 #if NETWORK_PROTECTION
         let isPopUpWindow = view.window?.isPopUpWindow ?? false
 
-        if !isPopUpWindow && networkProtectionFeatureVisibility.isFeatureActivated {
+        if !isPopUpWindow && networkProtectionFeatureActivation.isFeatureActivated {
             let networkProtectionTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
         }

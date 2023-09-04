@@ -19,9 +19,15 @@
 import Foundation
 
 struct DataBrokerScheduleConfig: Codable {
-    let retryError: TimeInterval
-    let confirmOptOutScan: TimeInterval
-    let maintenanceScan: TimeInterval
+    let retryError: Int
+    let confirmOptOutScan: Int
+    let maintenanceScan: Int
+}
+
+extension Int {
+    var hoursToSeconds: TimeInterval {
+        return TimeInterval(self * 3600)
+    }
 }
 
 struct DataBroker: Codable, Sendable {

@@ -89,15 +89,6 @@ extension Pixel.Event {
 
             return params
 
-        case .bookmarksBarOnboardingEnrollment(let cohort):
-            return [Pixel.Parameters.experimentCohort: cohort]
-        case .bookmarksBarOnboardingSearched4to8days(let cohort):
-            return [Pixel.Parameters.experimentCohort: cohort]
-        case .bookmarksBarOnboardingFirstInteraction(let cohort):
-            return [Pixel.Parameters.experimentCohort: cohort]
-        case .bookmarksBarOnboardingInteraction2to8days(let cohort):
-            return [Pixel.Parameters.experimentCohort: cohort]
-
         case .launchInitial:
             if let cohort = DefaultVariantManager().currentVariant?.name {
                 return [Pixel.Parameters.experimentCohort: cohort]
@@ -145,7 +136,6 @@ extension Pixel.Event {
              .userHasPinnedTab,
              .fireButtonFirstBurn,
              .fireButton,
-             .incrementalRolloutTest,
              .duckPlayerDailyUniqueView,
              .duckPlayerViewFromYoutubeViaMainOverlay,
              .duckPlayerViewFromYoutubeViaHoverButton,
