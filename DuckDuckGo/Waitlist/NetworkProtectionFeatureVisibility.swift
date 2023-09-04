@@ -112,7 +112,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
             return
         }
 
-        featureDisabler.disable(uninstallSystemExtension: false)
+        featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
     }
 }
 

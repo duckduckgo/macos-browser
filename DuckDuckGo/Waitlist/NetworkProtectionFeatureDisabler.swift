@@ -26,7 +26,7 @@ import NetworkProtectionUI
 import SystemExtensions
 
 protocol NetworkProtectionFeatureDisabling {
-    func disable(uninstallSystemExtension: Bool)
+    func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool)
 }
 
 final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling {
@@ -52,9 +52,10 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     /// This method disables Network Protection and clear all of its state.
     ///
     /// - Parameters:
+    ///     - keepAuthToken: If `true`, the auth token will not be removed.
     ///     - includeSystemExtension: Whether this method should uninstall the system extension.
     ///
-    func disable(uninstallSystemExtension: Bool) {
+    func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) {
         Task {
             unpinNetworkProtection()
             disableLoginItems()
@@ -67,7 +68,10 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
 
             await stopTunnel()
             resetUserDefaults()
-            try? removeAppAuthToken()
+
+            if !keepAuthToken {
+                try? removeAppAuthToken()
+            }
 
             if uninstallSystemExtension {
                 try? await disableSystemExtension()
