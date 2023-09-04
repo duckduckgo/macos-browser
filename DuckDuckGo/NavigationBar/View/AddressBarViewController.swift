@@ -75,8 +75,7 @@ final class AddressBarViewController: NSViewController {
     private var loadingCancellable: AnyCancellable?
 
     private var clickPoint: NSPoint?
-    private var mouseDownMonitor: Any?
-    private var mouseUpMonitor: Any?
+    private var eventMonitorCancellables = Set<AnyCancellable>()
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarViewController: Bad initializer")
@@ -149,7 +148,7 @@ final class AddressBarViewController: NSViewController {
     // swiftlint:disable notification_center_detachment
     override func viewWillDisappear() {
         NotificationCenter.default.removeObserver(self)
-        removeMouseMonitors()
+        eventMonitorCancellables.removeAll()
     }
     // swiftlint:enable notification_center_detachment
 
@@ -199,8 +198,6 @@ final class AddressBarViewController: NSViewController {
     }
 
     private func subscribeToTabContent() {
-        tabContentCancellable?.cancel()
-
         tabContentCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$content
             .receive(on: DispatchQueue.main)
             .map { $0 == .homePage }
@@ -208,7 +205,7 @@ final class AddressBarViewController: NSViewController {
     }
 
     private func subscribeToPassiveAddressBarString() {
-        passiveAddressBarStringCancellable?.cancel()
+        passiveAddressBarStringCancellable = nil
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             passiveTextField.stringValue = ""
@@ -427,25 +424,15 @@ extension AddressBarViewController {
     }
 
     func addMouseMonitors() {
-        guard mouseDownMonitor == nil, mouseUpMonitor == nil else { return }
-
-        self.mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
-            self?.mouseDown(with: event)
-        }
-        self.mouseUpMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseUp) { [weak self] event in
-            self?.mouseUp(with: event)
-        }
-    }
-
-    func removeMouseMonitors() {
-        if let monitor = mouseDownMonitor {
-            NSEvent.removeMonitor(monitor)
-        }
-        if let monitor = mouseUpMonitor {
-            NSEvent.removeMonitor(monitor)
-        }
-        self.mouseUpMonitor = nil
-        self.mouseDownMonitor = nil
+        eventMonitorCancellables.removeAll()
+        NSEvent.addLocalCancellableMonitor(forEventsMatching: .leftMouseDown) { [weak self] event in
+            guard let self else { return event }
+            return self.mouseDown(with: event)
+        }.store(in: &eventMonitorCancellables)
+        NSEvent.addLocalCancellableMonitor(forEventsMatching: .leftMouseUp) { [weak self] event in
+            guard let self else { return event }
+            return self.mouseUp(with: event)
+        }.store(in: &eventMonitorCancellables)
     }
 
     func mouseDown(with event: NSEvent) -> NSEvent? {

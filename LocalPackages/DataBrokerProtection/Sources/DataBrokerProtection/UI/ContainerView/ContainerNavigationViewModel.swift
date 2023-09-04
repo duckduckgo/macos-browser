@@ -51,19 +51,20 @@ final class ContainerNavigationViewModel: ObservableObject {
 
     init(dataManager: DataBrokerProtectionDataManaging) {
         self.dataManager = dataManager
-        restoreInitialState()
+        restoreState()
     }
 
-    private func restoreInitialState() {
-        if dataManager.fetchProfile() != nil {
+    private func restoreState() {
+        let brokerProfileData = dataManager.fetchBrokerProfileQueryData()
+        let data = brokerProfileData.filter { !$0.optOutOperationsData.isEmpty }
+
+        if !data.isEmpty {
+            bodyViewType = .results
+        } else if dataManager.fetchProfile() != nil {
             bodyViewType = .createProfile
         } else {
             bodyViewType = .gettingStarted
         }
-    }
-
-    var shouldShowHeader: Bool {
-        bodyViewType != .createProfile
     }
 
     func updateNavigation(_ bodyType: BodyViewType) {

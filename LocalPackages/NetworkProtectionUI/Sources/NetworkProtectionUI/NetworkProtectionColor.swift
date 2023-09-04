@@ -30,12 +30,14 @@ extension Color {
 /// NetworkProtectionUI bundled color definitions
 ///
 enum NetworkProtectionColor: String {
-    case alertBubbleBackground = "AlertBubbleBackground"
     case defaultText = "TextColor"
     case linkColor = "LinkBlueColor"
     case onboardingButtonBackgroundColor = "OnboardingButtonBackgroundColor"
+#if swift(<5.9)
+    case alertBubbleBackground = "AlertBubbleBackground"
     case onboardingStepBorder = "OnboardingStepBorderColor"
     case onboardingStepBackground = "OnboardingStepBackgroundColor"
+#endif
 
     var asColor: Color {
         Color(rawValue, bundle: .module)

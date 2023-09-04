@@ -60,7 +60,6 @@ public final class AppLauncher: AppLaunching {
             os_log("🔵 Open Application failed: %{public}@", type: .error, error.localizedDescription)
         }
     }
-
 }
 
 extension AppLaunchCommand {

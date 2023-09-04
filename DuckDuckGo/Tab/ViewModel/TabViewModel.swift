@@ -78,6 +78,14 @@ final class TabViewModel {
     @Published private(set) var usedPermissions = Permissions()
     @Published private(set) var permissionAuthorizationQuery: PermissionAuthorizationQuery?
 
+    var canPrint: Bool {
+        self.canReload && tab.webView.canPrint
+    }
+
+    var canSaveContent: Bool {
+        self.canReload && !tab.webView.isInFullScreenMode
+    }
+
     init(tab: Tab, appearancePreferences: AppearancePreferences = .shared) {
         self.tab = tab
         self.appearancePreferences = appearancePreferences

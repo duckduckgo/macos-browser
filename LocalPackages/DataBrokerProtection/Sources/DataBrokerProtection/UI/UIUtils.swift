@@ -23,6 +23,7 @@ struct CTAButtonStyle: ButtonStyle {
         case primary
         case secondary
         case destructive
+        case outlined
     }
 
     @Environment(\.colorScheme) var colorScheme
@@ -39,10 +40,12 @@ struct CTAButtonStyle: ButtonStyle {
             .foregroundColor(foregroundColor(configuration))
             .background(backgroundColor(configuration))
             .cornerRadius(6.0)
+            .if(style == .outlined) { view in
+                view.borderedRoundedCorner()
+            }
     }
 
     func foregroundColor(_ configuration: Self.Configuration) -> Color {
-
         if !isEnabled {
             return Color.secondary
         }
@@ -60,6 +63,9 @@ struct CTAButtonStyle: ButtonStyle {
 
         case .destructive:
             return configuration.isPressed ? .black : .red
+
+        case .outlined:
+            return configuration.isPressed ? Color.secondary : Color.primary
         }
     }
 
@@ -78,6 +84,9 @@ struct CTAButtonStyle: ButtonStyle {
             return configuration.isPressed ? Color.secondary : opacitySecondaryColor
 
         case .destructive:
+            return .clear
+
+        case .outlined:
             return .clear
         }
     }
@@ -129,5 +138,15 @@ extension View {
 
     func shadedBorderedPanel(backgroundColor: Color) -> some View {
         modifier(ShadedBorderedPanel(backgroundColor: backgroundColor))
+    }
+}
+
+extension View {
+    @ViewBuilder func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
+        }
     }
 }
