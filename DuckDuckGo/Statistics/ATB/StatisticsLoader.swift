@@ -54,7 +54,6 @@ final class StatisticsLoader {
                     }
                 }
                 Pixel.fire(.serp)
-                PixelExperiment.fireSearchOnDay4to8Pixel()
                 Task {
                     await WindowControllersManager.shared.pinnedTabsManager.reportUsage()
                 }

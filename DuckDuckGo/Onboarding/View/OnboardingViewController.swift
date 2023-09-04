@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
-import Carbon.HIToolbox
 import AppKit
+import Carbon.HIToolbox
+import Combine
 import SwiftUI
 
 final class OnboardingViewController: NSViewController {
@@ -40,11 +41,11 @@ final class OnboardingViewController: NSViewController {
         }
     }
 
-    weak var delegate: OnboardingDelegate?
+    private weak var delegate: OnboardingDelegate?
 
-    let model = OnboardingViewModel()
+    private let model = OnboardingViewModel()
 
-    var mouseDownMonitor: Any?
+    private var mouseDownMonitor: AnyCancellable?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,7 +53,7 @@ final class OnboardingViewController: NSViewController {
         let host = NSHostingView(rootView: Onboarding.RootView().environmentObject(model))
         view.addAndLayout(host)
 
-        mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .otherMouseDown, .keyDown]) { [weak self] event in
+        mouseDownMonitor = NSEvent.addLocalCancellableMonitor(forEventsMatching: [.leftMouseDown, .otherMouseDown, .keyDown]) { [weak self] event in
             dispatchPrecondition(condition: .onQueue(.main))
             if event.type == .keyDown && event.keyCode != kVK_Escape {
                 return event
@@ -60,10 +61,6 @@ final class OnboardingViewController: NSViewController {
             self?.model.skipTyping()
             return event
         }
-    }
-
-    deinit {
-        NSEvent.removeMonitor(mouseDownMonitor as Any)
     }
 
 }

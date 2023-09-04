@@ -64,7 +64,7 @@ final class AppUsageActivityMonitor: NSObject {
 
     private weak var delegate: AppUsageActivityMonitorDelegate?
 
-    private var monitor: Any?
+    private var monitor: AnyCancellable?
     private var timer: Timer?
 
     init(delegate: AppUsageActivityMonitorDelegate,
@@ -89,19 +89,19 @@ final class AppUsageActivityMonitor: NSObject {
 
         let kinds: NSEvent.EventTypeMask = [.keyDown, .mouseMoved, .scrollWheel]
 
-        self.monitor = NSEvent.addLocalMonitorForEvents(matching: kinds) { [weak self] event in
-            if let self = self, NSApp.isActive {
+        self.monitor = NSEvent.addLocalCancellableMonitor(forEventsMatching: kinds) { [weak self] event in
+            guard let self, NSApp.isActive else { return event }
 
-                if self.timer == nil, throttle > 0 {
-                    self.timer = .scheduledTimer(withTimeInterval: throttle, repeats: false) { [weak self] _ in
-                        self?.timer = nil
-                        self?.monitorDidReceiveEvent()
-                    }
-
-                } else if throttle == 0 {
-                    self.monitorDidReceiveEvent()
+            if self.timer == nil, throttle > 0 {
+                self.timer = .scheduledTimer(withTimeInterval: throttle, repeats: false) { [weak self] _ in
+                    self?.timer = nil
+                    self?.monitorDidReceiveEvent()
                 }
+
+            } else if throttle == 0 {
+                self.monitorDidReceiveEvent()
             }
+
             return event
         }
     }
@@ -140,10 +140,6 @@ final class AppUsageActivityMonitor: NSObject {
         if self.usageTime >= self.threshold {
             delegate?.activeUsageTimeHasReachedThreshold(avgTabCount: self.avgTabCount)
         }
-    }
-
-    deinit {
-        NSEvent.removeMonitor(monitor!)
     }
 
 }

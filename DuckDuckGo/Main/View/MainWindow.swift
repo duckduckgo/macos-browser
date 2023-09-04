@@ -59,6 +59,7 @@ final class MainWindow: NSWindow {
         hasShadow = true
         titleVisibility = .hidden
         titlebarAppearsTransparent = true
+        collectionBehavior = .fullScreenPrimary
     }
 
     // MARK: - First Responder Notification

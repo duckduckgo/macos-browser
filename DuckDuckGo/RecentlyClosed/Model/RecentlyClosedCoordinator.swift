@@ -119,7 +119,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         let tabCacheItems = tabCollection.tabs.enumerated().map {
             RecentlyClosedTab(tab: $0.element, originalTabCollection: tabCollection, tabIndex: .unpinned($0.offset))
         }
-        let droppingPoint = mainWindowController.window?.frame.origin
+        let droppingPoint = mainWindowController.window?.frame.droppingPoint
         let contentSize = mainWindowController.window?.frame.size
         let cacheItem = RecentlyClosedWindow(tabs: tabCacheItems, droppingPoint: droppingPoint, contentSize: contentSize)
         cache.append(cacheItem)

@@ -72,7 +72,7 @@ enum NetworkProtectionBundle {
 #if NETP_SYSTEM_EXTENSION
         .system
 #else
-        .accessGroup(.named(Bundle.main.appGroupName))
+        .dataProtection(.named(Bundle.main.appGroupName))
 #endif
     }()
 }
