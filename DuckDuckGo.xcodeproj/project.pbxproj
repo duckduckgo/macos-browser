@@ -1958,9 +1958,6 @@
 		4B9DB02C2A983B24000927DB /* WaitlistKeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00F2A983B24000927DB /* WaitlistKeychainStorage.swift */; };
 		4B9DB02D2A983B24000927DB /* WaitlistKeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00F2A983B24000927DB /* WaitlistKeychainStorage.swift */; };
 		4B9DB02E2A983B24000927DB /* WaitlistKeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00F2A983B24000927DB /* WaitlistKeychainStorage.swift */; };
-		4B9DB02F2A983B24000927DB /* NetworkProtectionFeatureVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0102A983B24000927DB /* NetworkProtectionFeatureVisibility.swift */; };
-		4B9DB0302A983B24000927DB /* NetworkProtectionFeatureVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0102A983B24000927DB /* NetworkProtectionFeatureVisibility.swift */; };
-		4B9DB0312A983B24000927DB /* NetworkProtectionFeatureVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0102A983B24000927DB /* NetworkProtectionFeatureVisibility.swift */; };
 		4B9DB0322A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */; };
 		4B9DB0332A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */; };
 		4B9DB0342A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */; };
@@ -9326,7 +9323,6 @@
 				3192A1C72A4C4CFF0084EA89 /* DuckPlayerSchemeHandler.swift in Sources */,
 				3192A1C82A4C4CFF0084EA89 /* FirePopoverViewModel.swift in Sources */,
 				3192A1C92A4C4CFF0084EA89 /* BWCommand.swift in Sources */,
-				4B9DB0312A983B24000927DB /* NetworkProtectionFeatureVisibility.swift in Sources */,
 				3192A1CA2A4C4CFF0084EA89 /* NSColorExtension.swift in Sources */,
 				3192A1CB2A4C4CFF0084EA89 /* Stored.swift in Sources */,
 				3192A1CC2A4C4CFF0084EA89 /* AddressBarButtonsViewController.swift in Sources */,
@@ -9669,7 +9665,6 @@
 				3706FB71293F65D500E42796 /* AddBookmarkModalViewController.swift in Sources */,
 				3706FB72293F65D500E42796 /* RecentlyClosedCoordinator.swift in Sources */,
 				3706FB74293F65D500E42796 /* FaviconHostReference.swift in Sources */,
-				4B9DB0302A983B24000927DB /* NetworkProtectionFeatureVisibility.swift in Sources */,
 				3706FB75293F65D500E42796 /* WebsiteBreakageSender.swift in Sources */,
 				3707C72A294B5D2900682A9F /* URLExtension.swift in Sources */,
 				3706FB76293F65D500E42796 /* ASN1Parser.swift in Sources */,
@@ -10754,7 +10749,6 @@
 				B63BDF7E27FDAA640072D75B /* PrivacyDashboardWebView.swift in Sources */,
 				37CD54CF27F2FDD100F1F7B9 /* AppearancePreferences.swift in Sources */,
 				B6B1E87B26D381710062C350 /* DownloadListCoordinator.swift in Sources */,
-				4B9DB02F2A983B24000927DB /* NetworkProtectionFeatureVisibility.swift in Sources */,
 				B647EFBB2922584B00BA628D /* AdClickAttributionTabExtension.swift in Sources */,
 				4B980E212817604000282EE1 /* NSNotificationName+Debug.swift in Sources */,
 				31F7F2A6288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift in Sources */,

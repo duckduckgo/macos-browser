@@ -159,6 +159,10 @@ struct NetworkProtectionWaitlist: Waitlist {
     let waitlistRequest: WaitlistRequest
     private let networkProtectionCodeRedemption: NetworkProtectionCodeRedeeming
 
+    var shouldShowWaitlistViewController: Bool {
+        return isOnWaitlist || readyToAcceptTermsAndConditions
+    }
+
     var isOnWaitlist: Bool {
         return waitlistStorage.isOnWaitlist
     }
