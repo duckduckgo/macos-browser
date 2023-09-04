@@ -28,16 +28,25 @@ public enum DataBrokerProtectionSchedulerStatus {
 }
 
 public protocol DataBrokerProtectionScheduler {
-    func start(debug: Bool)
+    func start(showWebView: Bool)
+    func forceRunOperations(showWebView: Bool)
     func stop()
-    func scanAllBrokers(completion: (() -> Void)?)
+    func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?)
     var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { get }
     var status: DataBrokerProtectionSchedulerStatus { get }
 }
 
 extension DataBrokerProtectionScheduler {
-    public func start() {
-        start(debug: false)
+    func start() {
+        start(showWebView: false)
+    }
+
+    func forceStart() {
+        forceRunOperations(showWebView: false)
+    }
+
+    func scanAllBrokers() {
+        scanAllBrokers(showWebView: false, completion: nil)
     }
 }
 
@@ -61,6 +70,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     private let captchaService: CaptchaServiceProtocol
 
     @Published public var status: DataBrokerProtectionSchedulerStatus = .stopped
+
     public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { $status}
 
     private lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
@@ -101,22 +111,23 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         self.captchaService = CaptchaService(redeemUseCase: redeemUseCase)
     }
 
-    public func start(debug: Bool = false) {
-        os_log("Starting scheduler...", log: .dataBrokerProtection)
-        if debug {
+    public func forceRunOperations(showWebView: Bool = false) {
+        stop()
+
+        self.status = .running
+        self.dataBrokerProcessor.forceRunOperations(showWebView: showWebView) {  [weak self] in
+            self?.status = .stopped
+        }
+    }
+
+    public func start(showWebView: Bool = false) {
+        self.status = .idle
+        activity.schedule { completion in
             self.status = .running
-            self.dataBrokerProcessor.runQueuedOperations {  [weak self] in
+            os_log("Scheduler running...", log: .dataBrokerProtection)
+            self.dataBrokerProcessor.runQueuedOperations(showWebView: showWebView) { [weak self] in
                 self?.status = .idle
-            }
-        } else {
-            self.status = .idle
-            activity.schedule { completion in
-                self.status = .running
-                os_log("Scheduler running...", log: .dataBrokerProtection)
-                self.dataBrokerProcessor.runQueuedOperations { [weak self] in
-                    self?.status = .idle
-                    completion(.finished)
-                }
+                completion(.finished)
             }
         }
     }
@@ -127,8 +138,9 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         status = .stopped
     }
 
-    public func scanAllBrokers(completion: (() -> Void)? = nil) {
+    public func scanAllBrokers(showWebView: Bool = false, completion: (() -> Void)? = nil) {
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
-        self.dataBrokerProcessor.runScanOnAllDataBrokers(completion: completion)
+        self.dataBrokerProcessor.runScanOnAllDataBrokers(showWebView: showWebView,
+                                                         completion: completion)
     }
 }

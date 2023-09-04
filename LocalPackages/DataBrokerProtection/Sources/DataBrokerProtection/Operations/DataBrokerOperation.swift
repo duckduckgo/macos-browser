@@ -37,8 +37,14 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     var continuation: CheckedContinuation<ReturnValue, Error>? { get set }
     var extractedProfile: ExtractedProfile? { get set }
 
-    func run(inputValue: InputValue, webViewHandler: WebViewHandler?, actionsHandler: ActionsHandler?) async throws -> ReturnValue
+    func run(inputValue: InputValue, webViewHandler: WebViewHandler?, actionsHandler: ActionsHandler?, showWebView: Bool) async throws -> ReturnValue
     func executeNextStep() async
+}
+
+extension DataBrokerOperation {
+    func run(inputValue: InputValue, webViewHandler: WebViewHandler?, actionsHandler: ActionsHandler?) async throws -> ReturnValue {
+        try await run(inputValue: inputValue, webViewHandler: webViewHandler, actionsHandler: actionsHandler, showWebView: false)
+    }
 }
 
 extension DataBrokerOperation {
@@ -107,14 +113,16 @@ extension DataBrokerOperation {
         self.continuation = nil
     }
 
-    func initialize(handler: WebViewHandler?, isFakeBroker: Bool = false) async {
+    func initialize(handler: WebViewHandler?,
+                    isFakeBroker: Bool = false,
+                    showWebView: Bool) async {
         if let handler = handler { // This help us swapping up the WebViewHandler on tests
             self.webViewHandler = handler
         } else {
             self.webViewHandler = await DataBrokerProtectionWebViewHandler(privacyConfig: privacyConfig, prefs: prefs, delegate: self, isFakeBroker: isFakeBroker)
         }
 
-        await webViewHandler?.initializeWebView(debug: true)
+        await webViewHandler?.initializeWebView(showWebView: showWebView)
     }
 
     // MARK: - CSSCommunicationDelegate

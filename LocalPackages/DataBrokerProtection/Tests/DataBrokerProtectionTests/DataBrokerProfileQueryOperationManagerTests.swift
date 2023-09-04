@@ -599,13 +599,14 @@ final class MockDatabase: DataBrokerProtectionRepository {
 }
 
 final class MockWebOperationRunner: WebOperationRunner {
+
     var shouldScanThrow = false
     var shouldOptOutThrow = false
     var scanResults = [ExtractedProfile]()
     var wasScanCalled = false
     var wasOptOutCalled = false
 
-    func scan(_ profileQuery: BrokerProfileQueryData) async throws -> [ExtractedProfile] {
+    func scan(_ profileQuery: DataBrokerProtection.BrokerProfileQueryData, showWebView: Bool) async throws -> [ExtractedProfile] {
         wasScanCalled = true
 
         if shouldScanThrow {
@@ -615,7 +616,7 @@ final class MockWebOperationRunner: WebOperationRunner {
         }
     }
 
-    func optOut(profileQuery: DataBrokerProtection.BrokerProfileQueryData, extractedProfile: DataBrokerProtection.ExtractedProfile) async throws {
+    func optOut(profileQuery: DataBrokerProtection.BrokerProfileQueryData, extractedProfile: DataBrokerProtection.ExtractedProfile, showWebView: Bool) async throws {
         wasOptOutCalled = true
 
         if shouldOptOutThrow {
