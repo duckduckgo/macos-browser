@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "daniel/bitwarden-fix",
-        "revision" : "cd4f62261a45a04f14eb1d53b845f2c540a8a09a"
+        "revision" : "fd65ad9ec0427df218b40caaa4404c31a1cee3e5",
+        "version" : "76.1.0"
       }
     },
     {
