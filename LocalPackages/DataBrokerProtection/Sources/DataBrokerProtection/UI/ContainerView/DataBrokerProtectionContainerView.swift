@@ -24,7 +24,7 @@ struct DataBrokerProtectionContainerView: View {
     @ObservedObject var navigationViewModel: ContainerNavigationViewModel
     @ObservedObject var profileViewModel: ProfileViewModel
     @ObservedObject var resultsViewModel: ResultsViewModel
-    @State var shouldShowDebugUI = true
+    @State var shouldShowDebugUI = false
 
     var body: some View {
         ScrollView {
