@@ -86,7 +86,10 @@ extension Pixel {
                                      result: result)
         }
 
+        case launchInitial
+
         case serp
+        case serpInitial
 
         case dataImportFailed(action: DataImportAction, source: DataImportSource)
         case faviconImportFailed(source: DataImportSource)
@@ -437,6 +440,10 @@ extension Pixel.Event {
         case .duckPlayerSettingBackToDefault:
             return "m_mac_duck-player_setting_back-to-default"
 
+        case .launchInitial:
+            return "m.mac.first-launch"
+        case .serpInitial:
+            return "m.mac.navigation.first-search"
         }
 
     }

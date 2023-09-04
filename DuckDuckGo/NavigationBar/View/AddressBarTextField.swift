@@ -235,6 +235,7 @@ final class AddressBarTextField: NSTextField {
     }
 
     private func addressBarEnterPressed() {
+        NotificationCenter.default.post(name: .addressBarEnterPressed, object: self, userInfo: nil)
         suggestionContainerViewModel?.clearUserStringValue()
 
         let suggestion = suggestionContainerViewModel?.selectedSuggestionViewModel?.suggestion
@@ -1108,3 +1109,7 @@ final class AddressBarTextFieldCell: NSTextFieldCell {
 fileprivate extension NSStoryboard {
     static let suggestion = NSStoryboard(name: "Suggestion", bundle: .main)
 }
+
+extension Notification.Name {
+     static let addressBarEnterPressed = Notification.Name("addressBarEnterPressed")
+ }

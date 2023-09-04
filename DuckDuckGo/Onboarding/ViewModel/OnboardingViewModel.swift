@@ -77,7 +77,7 @@ final class OnboardingViewModel: ObservableObject {
         self.state = onboardingFinished ? .startBrowsing : .startFlow
 
         NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(addressBarMouseDown(_:)), name: .addressBarMouseDown, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(addressEnterPressed(_:)), name: .addressBarEnterPressed, object: nil)
     }
 
     func onSplashFinished() {
@@ -140,7 +140,7 @@ final class OnboardingViewModel: ObservableObject {
         finishOnboarding()
     }
 
-    @objc private func addressBarMouseDown(_ notification: Notification) {
+    @objc private func addressEnterPressed(_ notification: Notification) {
         finishOnboarding()
         delegate?.goToNewTabPage()
     }

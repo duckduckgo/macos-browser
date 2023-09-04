@@ -446,7 +446,6 @@ extension AddressBarViewController {
 
             // bookmark button visibility is usually determined by hover state, but we def need to hide it right now
             self.addressBarButtonsViewController?.bookmarkButton.isHidden = true
-            NotificationCenter.default.post(name: .addressBarMouseDown, object: self, userInfo: nil)
             // first activate app and window if needed, then make it first responder
             if self.view.window?.isMainWindow == true {
                 self.addressBarTextField.makeMeFirstResponder()
@@ -502,7 +501,3 @@ fileprivate extension NSView {
     }
 
 }
-
-extension Notification.Name {
-     static let addressBarMouseDown = Notification.Name("addressBarMouseDownAlert")
- }

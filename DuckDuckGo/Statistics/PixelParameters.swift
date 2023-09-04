@@ -98,6 +98,17 @@ extension Pixel.Event {
         case .bookmarksBarOnboardingInteraction2to8days(let cohort):
             return [Pixel.Parameters.experimentCohort: cohort]
 
+        case .launchInitial:
+            if let cohort = DefaultVariantManager().currentVariant?.name {
+                return [Pixel.Parameters.experimentCohort: cohort]
+            }
+            return nil
+        case .serpInitial:
+            if let cohort = DefaultVariantManager().currentVariant?.name {
+                return [Pixel.Parameters.experimentCohort: cohort]
+            }
+            return nil
+
         // Don't use default to force new items to be thought about
         case .crash,
              .brokenSiteReport,

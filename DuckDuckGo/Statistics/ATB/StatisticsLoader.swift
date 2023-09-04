@@ -53,6 +53,8 @@ final class StatisticsLoader {
                         completion()
                     }
                 }
+                
+                Pixel.fire(.serpInitial, limitToInitial: true, withAdditionalParameters: Pixel.Event.serpInitial.parameters)
                 Pixel.fire(.serp)
                 PixelExperiment.fireSearchOnDay4to8Pixel()
                 Task {

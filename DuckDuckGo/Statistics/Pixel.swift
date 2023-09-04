@@ -138,4 +138,22 @@ extension Pixel {
              onComplete: onComplete)
     }
 
+    static func fire(_ event: Pixel.Event,
+                     limitToInitial: Bool,
+                     withAdditionalParameters parameters: [String: String]? = nil,
+                     allowedQueryReservedCharacters: CharacterSet? = nil,
+                     includeAppVersionParameter: Bool = true,
+
+                     onComplete: @escaping (Error?) -> Void = {_ in }) {
+        if limitToInitial {
+            let repetition = Event.Repetition(key: event.name)
+            if repetition == .initial {
+                fire(event, withAdditionalParameters: parameters,
+                     allowedQueryReservedCharacters: allowedQueryReservedCharacters,
+                     includeAppVersionParameter: includeAppVersionParameter,
+                     onComplete: onComplete)
+            }
+        }
+    }
+
 }

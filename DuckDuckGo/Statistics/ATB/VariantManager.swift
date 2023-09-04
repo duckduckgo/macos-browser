@@ -39,10 +39,13 @@ struct Variant {
 
     static let doNotAllocate = 0
 
+    static let controlVariantName = "a"
+    static let onboardingExperiment1Name = "b"
+
     // Note: Variants with `doNotAllocate` weight, should always be included so that previous installations are unaffected
     static let defaultVariants: [Variant] = [
-        Variant(name: "onboardingExperiment", weight: 50, isIncluded: Variant.When.always, features: [.newOnboarding]),
-        Variant(name: "control", weight: 50, isIncluded: Variant.When.always, features: [])
+        Variant(name: onboardingExperiment1Name, weight: 50, isIncluded: Variant.When.always, features: [.newOnboarding]),
+        Variant(name: controlVariantName, weight: 50, isIncluded: Variant.When.always, features: [])
     ]
 
     let name: String
@@ -109,6 +112,7 @@ final class DefaultVariantManager: VariantManager {
         }
 
         storage.variant = variant.name
+        Pixel.fire(.launchInitial, limitToInitial: true, withAdditionalParameters: Pixel.Event.launchInitial.parameters)
         newInstallCompletion(self)
     }
 
