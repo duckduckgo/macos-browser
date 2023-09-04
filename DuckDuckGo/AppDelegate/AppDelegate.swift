@@ -218,7 +218,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
 #if DBP
-        DataBrokerProtectionManager.shared.startSchedulerIfNecessary()
+        DataBrokerProtectionManager.shared.startSchedulerIfPossible()
 #endif
     }
 
