@@ -121,7 +121,7 @@ final class FireproofingReferenceTests: XCTestCase {
 
             for domain in domains {
                 guard let eTLDPlusOne = tld.eTLDplus1(domain) else {
-                    XCTFail("Can't create eTLD+1 domain")
+                    XCTFail("Can't create eTLD+1 domain for \(domain). TLDs: \(Mirror(reflecting: tld).children.first(where: { $0.label == "tlds" }).map { String(describing: $0.value) } ?? "<nil>")")
                     return
                 }
                 super.add(domain: eTLDPlusOne)

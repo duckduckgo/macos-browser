@@ -55,9 +55,9 @@ final class DataImportViewController: NSViewController {
     }
 
     static func show(completion: (() -> Void)? = nil) {
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
-              windowController.window?.isKeyWindow == true else {
-            return
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
+        if windowController.window?.isKeyWindow != true {
+            windowController.window?.makeKeyAndOrderFront(nil)
         }
 
         let viewController = DataImportViewController.create()

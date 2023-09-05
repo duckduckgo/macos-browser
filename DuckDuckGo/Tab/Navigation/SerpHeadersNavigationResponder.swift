@@ -26,7 +26,7 @@ struct SerpHeadersNavigationResponder: NavigationResponder {
     ]
 
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        guard let mainFrame = navigationAction.mainFrameTarget,
+        guard navigationAction.isForMainFrame,
               navigationAction.url.isDuckDuckGo,
               Self.headers.contains(where: { navigationAction.request.value(forHTTPHeaderField: $0.key) == nil }),
               !navigationAction.navigationType.isBackForward
@@ -39,7 +39,7 @@ struct SerpHeadersNavigationResponder: NavigationResponder {
             request.setValue(value, forHTTPHeaderField: key)
         }
 
-        return .redirect(mainFrame) { navigator in
+        return .redirectInvalidatingBackItemIfNeeded(navigationAction) { navigator in
             navigator.load(request)
         }
     }

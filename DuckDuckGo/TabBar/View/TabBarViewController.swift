@@ -54,8 +54,8 @@ final class TabBarViewController: NSViewController {
     private let pinnedTabsView: PinnedTabsView?
     private let pinnedTabsHostingView: PinnedTabsHostingView?
 
-    private var tabsCancellable: AnyCancellable?
     private var selectionIndexCancellable: AnyCancellable?
+    private var mouseDownCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
     @IBOutlet weak var shadowView: TabShadowView!
@@ -117,7 +117,8 @@ final class TabBarViewController: NSViewController {
 
     override func viewWillDisappear() {
         super.viewWillDisappear()
-        removeMouseMonitors()
+
+        mouseDownCancellable = nil
     }
 
     override func viewDidLayout() {
@@ -154,6 +155,7 @@ final class TabBarViewController: NSViewController {
     private func setupFireButton() {
         fireButton.toolTip = UserText.clearBrowsingHistoryTooltip
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
+        fireButton.sendAction(on: .leftMouseDown)
     }
 
     private func setupAsBurnerWindowIfNeeded() {
@@ -254,7 +256,7 @@ final class TabBarViewController: NSViewController {
 
     private func subscribeToPinnedTabsHostingView() {
         pinnedTabsHostingView?.middleClickPublisher
-            .compactMap { [weak self] in self?.pinnedTabsView?.itemIndex(for: $0) }
+            .compactMap { [weak self] in self?.pinnedTabsView?.index(forItemAt: $0) }
             .sink { [weak self] index in
                 self?.tabCollectionViewModel.remove(at: .pinned(index))
             }
@@ -335,18 +337,17 @@ final class TabBarViewController: NSViewController {
         }
     }
 
-    private func selectTabWithPoint(_ point: NSPoint) {
-        guard let pointLocationOnPinnedTabsView = pinnedTabsHostingView?.convert(point, from: view) else {
-            return
-        }
+    private func selectTab(with event: NSEvent) {
+        let locationInWindow = event.locationInWindow
 
-        if let index = pinnedTabsView?.itemIndex(for: pointLocationOnPinnedTabsView) {
+        if let point = pinnedTabsHostingView?.mouseLocationInsideBounds(locationInWindow),
+           let index = pinnedTabsView?.index(forItemAt: point) {
+
             tabCollectionViewModel.select(at: .pinned(index))
-        } else {
-            let pointLocationOnCollectionView = collectionView.convert(point, from: view)
-            if let indexPath = collectionView.indexPathForItem(at: pointLocationOnCollectionView) {
-                tabCollectionViewModel.select(at: .unpinned(indexPath.item))
-            }
+
+        } else if let point = collectionView.mouseLocationInsideBounds(locationInWindow),
+                  let indexPath = collectionView.indexPathForItem(at: point) {
+            tabCollectionViewModel.select(at: .unpinned(indexPath.item))
         }
     }
 
@@ -393,29 +394,18 @@ final class TabBarViewController: NSViewController {
 
     // MARK: - Mouse Monitor
 
-    private var mouseDownMonitor: Any?
-
     private func addMouseMonitors() {
-        guard mouseDownMonitor == nil else { return }
-
-        mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
-            self?.mouseDown(with: event)
+        mouseDownCancellable = NSEvent.addLocalCancellableMonitor(forEventsMatching: .leftMouseDown) { [weak self] event in
+            guard let self else { return event }
+            return self.mouseDown(with: event)
         }
-    }
-
-    private func removeMouseMonitors() {
-        if let monitor = mouseDownMonitor {
-            NSEvent.removeMonitor(monitor)
-        }
-
-        mouseDownMonitor = nil
     }
 
     func mouseDown(with event: NSEvent) -> NSEvent? {
         if event.window === view.window,
-           view.window?.isMainWindow == false,
-           let point = view.mouseLocationInsideBounds(event.locationInWindow) {
-            selectTabWithPoint(point)
+           view.window?.isMainWindow == false {
+
+            selectTab(with: event)
         }
 
         return event

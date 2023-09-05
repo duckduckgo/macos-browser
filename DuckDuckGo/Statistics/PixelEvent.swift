@@ -131,12 +131,6 @@ extension Pixel {
         case recentActivitySectionHidden
         case continueSetUpSectionHidden
 
-        // Bookmarks bar onboarding
-        case bookmarksBarOnboardingEnrollment(cohort: String)
-        case bookmarksBarOnboardingSearched4to8days(cohort: String)
-        case bookmarksBarOnboardingFirstInteraction(cohort: String)
-        case bookmarksBarOnboardingInteraction2to8days(cohort: String)
-
         // Pinned tabs
         case userHasPinnedTab
 
@@ -144,7 +138,16 @@ extension Pixel {
         case fireButtonFirstBurn
         case fireButton(option: FireButtonOption)
 
-        case incrementalRolloutTest
+        // Duck Player
+        case duckPlayerDailyUniqueView
+        case duckPlayerViewFromYoutubeViaMainOverlay
+        case duckPlayerViewFromYoutubeViaHoverButton
+        case duckPlayerViewFromYoutubeAutomatic
+        case duckPlayerViewFromSERP
+        case duckPlayerViewFromOther
+        case duckPlayerSettingAlways
+        case duckPlayerSettingNever
+        case duckPlayerSettingBackToDefault
 
         enum Debug {
 
@@ -286,7 +289,9 @@ extension Pixel {
             case invalidPayload(Configuration)
 
             case burnerTabMisplaced
-
+#if DBP
+            case dataBrokerProtectionError
+#endif
         }
 
     }
@@ -382,16 +387,6 @@ extension Pixel.Event {
         case .continueSetUpSectionHidden:
             return "m_mac.continue-setup-section-hidden"
 
-        // Bookmarks bar experiement
-        case .bookmarksBarOnboardingEnrollment:
-            return "m_mac_bookmarksbarexperiment_enrollment"
-        case .bookmarksBarOnboardingSearched4to8days:
-            return "m_mac_bookmarksbarexperiment_searched4to8days"
-        case .bookmarksBarOnboardingFirstInteraction:
-            return "m_mac_bookmarksbarexperiment_firstinteraction"
-        case .bookmarksBarOnboardingInteraction2to8days:
-            return "m_mac_bookmarksbarexperiment_interaction2to8days"
-
         // Pinned tabs
         case .userHasPinnedTab:
             return "m_mac_user_has_pinned_tab"
@@ -402,8 +397,25 @@ extension Pixel.Event {
         case .fireButton(option: let option):
             return "m_mac_fire_button_\(option)"
 
-        case .incrementalRolloutTest:
-            return "m_mac_netp_ev_incremental_rollout_test"
+        case .duckPlayerDailyUniqueView:
+            return "m_mac_duck-player_daily-unique-view"
+        case .duckPlayerViewFromYoutubeViaMainOverlay:
+            return "m_mac_duck-player_view-from_youtube_main-overlay"
+        case .duckPlayerViewFromYoutubeViaHoverButton:
+            return "m_mac_duck-player_view-from_youtube_hover-button"
+        case .duckPlayerViewFromYoutubeAutomatic:
+            return "m_mac_duck-player_view-from_youtube_automatic"
+        case .duckPlayerViewFromSERP:
+            return "m_mac_duck-player_view-from_serp"
+        case .duckPlayerViewFromOther:
+            return "m_mac_duck-player_view-from_other"
+        case .duckPlayerSettingAlways:
+            return "m_mac_duck-player_setting_always"
+        case .duckPlayerSettingNever:
+            return "m_mac_duck-player_setting_never"
+        case .duckPlayerSettingBackToDefault:
+            return "m_mac_duck-player_setting_back-to-default"
+
         }
 
     }
@@ -649,6 +661,9 @@ extension Pixel.Event.Debug {
 
         case .burnerTabMisplaced: return "burner_tab_misplaced"
 
+#if DBP
+        case .dataBrokerProtectionError: return "data_broker_error"
+#endif
         }
     }
 }

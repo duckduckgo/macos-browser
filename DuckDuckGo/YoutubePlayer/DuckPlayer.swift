@@ -87,7 +87,11 @@ final class DuckPlayer {
     static let shared = DuckPlayer()
 
     var isAvailable: Bool {
-        isFeatureEnabled
+        if SupportedOSChecker.isCurrentOSReceivingUpdates {
+            return isFeatureEnabled
+        } else {
+            return false
+        }
     }
 
     @Published var mode: DuckPlayerMode
@@ -155,6 +159,18 @@ final class DuckPlayer {
         if isFeatureEnabled {
             modeCancellable = preferences.$duckPlayerMode
                 .removeDuplicates()
+                .dropFirst(1)
+                .handleEvents(receiveOutput: { mode in
+                    switch mode {
+                    case .enabled:
+                        Pixel.fire(.duckPlayerSettingAlways)
+                    case .alwaysAsk:
+                        Pixel.fire(.duckPlayerSettingBackToDefault)
+                    case .disabled:
+                        Pixel.fire(.duckPlayerSettingNever)
+                    }
+                })
+                .prepend(preferences.duckPlayerMode)
                 .assign(to: \.mode, onWeaklyHeld: self)
         } else {
             modeCancellable = nil

@@ -21,11 +21,15 @@ import Foundation
 public class AtbAndVariantCleanup {
 
     static func cleanup(statisticsStorage: StatisticsStore = LocalStatisticsStore(),
-                        variantManager: VariantManager = DefaultVariantManager()) {
+                        variantManager: VariantManager = DefaultVariantManager(),
+                        campaignVariant: CampaignVariant = CampaignVariant()) {
 
         guard let variant = statisticsStorage.variant else { return }
 
+        guard !campaignVariant.isActive else { return }
+
         // clean up ATB
+        campaignVariant.cleanUp()
         if let atb = statisticsStorage.atb, atb.hasSuffix(variant) {
             statisticsStorage.atb = String(atb.dropLast(variant.count))
         }

@@ -292,7 +292,7 @@ final class AddressBarButtonsViewController: NSViewController {
             bookmarkButton.isHidden = false
             bookmarkPopover.isNew = result.isNew
             bookmarkPopover.viewController.bookmark = bookmark
-            bookmarkPopover.show(relativeTo: bookmarkButton.bounds, of: bookmarkButton, preferredEdge: .maxY)
+            bookmarkPopover.show(positionedBelow: bookmarkButton)
         } else {
             updateBookmarkButtonVisibility()
             bookmarkPopover.close()
@@ -356,7 +356,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
         let positioningViewInWindow = privacyDashboardPositioningView.convert(privacyDashboardPositioningView.bounds, to: view.window?.contentView)
         privacyDashboardPopover.setPreferredMaxHeight(positioningViewInWindow.origin.y)
-        privacyDashboardPopover.show(relativeTo: privacyDashboardPositioningView.bounds, of: privacyDashboardPositioningView, preferredEdge: .maxY)
+        privacyDashboardPopover.show(positionedBelow: privacyDashboardPositioningView)
 
         privacyEntryPointButton.state = .on
 
@@ -745,7 +745,6 @@ final class AddressBarButtonsViewController: NSViewController {
 
         let urlScheme = selectedTabViewModel.tab.content.url?.scheme
         let isHypertextUrl = urlScheme == "http" || urlScheme == "https"
-        let isDuckDuckGoUrl = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
         let isEditingMode = controllerMode?.isEditing ?? false
         let isTextFieldValueText = textFieldValue?.isText ?? false
         let isLocalUrl = selectedTabViewModel.tab.content.url?.isLocalURL ?? false
@@ -753,7 +752,6 @@ final class AddressBarButtonsViewController: NSViewController {
         // Privacy entry point button
         privacyEntryPointButton.isHidden = isEditingMode ||
             isTextFieldEditorFirstResponder ||
-            isDuckDuckGoUrl ||
             !isHypertextUrl ||
             selectedTabViewModel.errorViewState.isVisible ||
             isTextFieldValueText ||

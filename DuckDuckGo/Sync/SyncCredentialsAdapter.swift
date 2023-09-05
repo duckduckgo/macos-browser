@@ -39,7 +39,7 @@ final class SyncCredentialsAdapter {
         )
     }
 
-    func updateDatabaseCleanupSchedule(shouldEnable: Bool) {
+    func cleanUpDatabaseAndUpdateSchedule(shouldEnable: Bool) {
         databaseCleaner.cleanUpDatabaseNow()
         if shouldEnable {
             databaseCleaner.scheduleRegularCleaning()

@@ -59,19 +59,6 @@ final class AppMain {
                 }
 
                 dispatchMain()
-            case "enableOnDemand":
-                swizzleMainBundle()
-
-                Task {
-                    do {
-                        try await NetworkProtectionTunnelController().enableOnDemandRequestedByExtension()
-                        exit(0)
-                    } catch {
-                        fatalError("Could not enable on demand due to error: \(String(describing: error))")
-                    }
-                }
-
-                dispatchMain()
             default:
                 break
             }

@@ -89,15 +89,6 @@ extension Pixel.Event {
 
             return params
 
-        case .bookmarksBarOnboardingEnrollment(let cohort):
-            return [Pixel.Parameters.experimentCohort: cohort]
-        case .bookmarksBarOnboardingSearched4to8days(let cohort):
-            return [Pixel.Parameters.experimentCohort: cohort]
-        case .bookmarksBarOnboardingFirstInteraction(let cohort):
-            return [Pixel.Parameters.experimentCohort: cohort]
-        case .bookmarksBarOnboardingInteraction2to8days(let cohort):
-            return [Pixel.Parameters.experimentCohort: cohort]
-
         // Don't use default to force new items to be thought about
         case .crash,
              .brokenSiteReport,
@@ -134,7 +125,15 @@ extension Pixel.Event {
              .userHasPinnedTab,
              .fireButtonFirstBurn,
              .fireButton,
-             .incrementalRolloutTest:
+             .duckPlayerDailyUniqueView,
+             .duckPlayerViewFromYoutubeViaMainOverlay,
+             .duckPlayerViewFromYoutubeViaHoverButton,
+             .duckPlayerViewFromYoutubeAutomatic,
+             .duckPlayerViewFromSERP,
+             .duckPlayerViewFromOther,
+             .duckPlayerSettingAlways,
+             .duckPlayerSettingNever,
+             .duckPlayerSettingBackToDefault:
             return nil
         }
     }

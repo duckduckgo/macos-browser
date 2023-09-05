@@ -28,6 +28,14 @@ final class MainWindow: NSWindow {
         return true
     }
 
+    override var frameAutosaveName: NSWindow.FrameAutosaveName {
+        return "MainWindow"
+    }
+
+    override func setFrameAutosaveName(_ name: NSWindow.FrameAutosaveName) -> Bool {
+        return super.setFrameAutosaveName(self.frameAutosaveName)
+    }
+
     init(frame: NSRect) {
         super.init(contentRect: frame,
                    styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
@@ -51,8 +59,7 @@ final class MainWindow: NSWindow {
         hasShadow = true
         titleVisibility = .hidden
         titlebarAppearsTransparent = true
-        // the window will be draggable using custom drag areas defined by WindowDraggingView
-        isMovable = false
+        collectionBehavior = .fullScreenPrimary
     }
 
     // MARK: - First Responder Notification

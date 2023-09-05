@@ -21,15 +21,17 @@ import WebKit
 
 enum NewWindowPolicy {
     case tab(selected: Bool, burner: Bool)
-    case popup(size: CGSize)
+    case popup(origin: NSPoint?, size: NSSize?)
     case window(active: Bool, burner: Bool)
 
     init(_ windowFeatures: WKWindowFeatures, shouldSelectNewTab: Bool = false, isBurner: Bool) {
         if windowFeatures.toolbarsVisibility?.boolValue == true {
             self = .tab(selected: shouldSelectNewTab,
                         burner: isBurner)
+        } else if windowFeatures.width != nil {
+            self = .popup(origin: windowFeatures.origin, size: windowFeatures.size)
         } else {
-            self = .popup(size: windowFeatures.windowContentSize)
+            self = .window(active: true, burner: isBurner)
         }
     }
 
@@ -46,9 +48,14 @@ enum NewWindowPolicy {
 
 extension WKWindowFeatures {
 
-    var windowContentSize: NSSize {
-        NSSize(width: self.width?.intValue ?? 1024,
-               height: self.height?.intValue ?? 752)
+    var origin: NSPoint? {
+        guard x != nil || y != nil else { return nil }
+        return NSPoint(x: x?.intValue ?? 0, y: y?.intValue ?? 0)
+    }
+
+    var size: NSSize? {
+        guard width != nil || height != nil else { return nil }
+        return NSSize(width: self.width?.intValue ?? 0, height: self.height?.intValue ?? 0)
     }
 
 }
