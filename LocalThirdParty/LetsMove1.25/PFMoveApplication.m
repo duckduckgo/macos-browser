@@ -220,14 +220,6 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 	}
 
 	MoveInProgress = NO;
-
-    // Only return when the modal has been removed from the list of windows
-    // as this prevented the browser window from being shown after this alert
-    // was presented to the user.
-    while ([NSApp modalWindow] != nil) {
-        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
-    }
-
 	return;
 
 fail:
