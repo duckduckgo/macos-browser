@@ -41,15 +41,15 @@ public protocol DataBrokerProtectionScheduler {
 }
 
 extension DataBrokerProtectionScheduler {
-    func startScheduler() {
+    public func startScheduler() {
         startScheduler(showWebView: false)
     }
 
-    func runAllOperations() {
+    public func runAllOperations() {
         runAllOperations(showWebView: false)
     }
 
-    func scanAllBrokers() {
+    public func scanAllBrokers() {
         scanAllBrokers(showWebView: false, completion: nil)
     }
 }
@@ -103,7 +103,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         activity.repeats = true
         activity.interval = SchedulerCycle.interval
         activity.tolerance = SchedulerCycle.tolerance
-        activity.qualityOfService = QualityOfService.utility
+        activity.qualityOfService = QualityOfService.default
 
         self.dataManager = dataManager
         self.privacyConfigManager = privacyConfigManager
@@ -116,8 +116,18 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     }
 
     public func startScheduler(showWebView: Bool = false) {
-        self.status = .idle
+        guard status == .stopped else {
+            os_log("Trying to start scheduler when it's already running, returning...", log: .dataBrokerProtection)
+            return
+        }
+
+        status = .idle
         activity.schedule { completion in
+            guard self.status != .stopped else {
+                os_log("Activity started when scheduler was already running, returning...", log: .dataBrokerProtection)
+                completion(.finished)
+                return
+            }
             self.status = .running
             os_log("Scheduler running...", log: .dataBrokerProtection)
             self.dataBrokerProcessor.runQueuedOperations(showWebView: showWebView) { [weak self] in
@@ -135,13 +145,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
     public func runAllOperations(showWebView: Bool = false) {
         os_log("Running all operations...", log: .dataBrokerProtection)
-
-        stopScheduler()
-
-        self.status = .running
-        self.dataBrokerProcessor.runAllOperations(showWebView: showWebView) {  [weak self] in
-            self?.status = .stopped
-        }
+        self.dataBrokerProcessor.runAllOperations(showWebView: showWebView)
     }
 
     public func runQueuedOperations(showWebView: Bool = false, completion: (() -> Void)? = nil) {

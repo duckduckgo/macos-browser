@@ -46,7 +46,6 @@ final class ContainerViewModel: ObservableObject {
         updateHeaderStatus()
         setupNotifications()
         setupCancellable()
-        startSchedulerIfProfileAvailable()
     }
 
     private func setupCancellable() {
@@ -74,12 +73,6 @@ final class ContainerViewModel: ObservableObject {
 
     private func restoreFakeBrokerStatus() {
         useFakeBroker = FakeBrokerUserDefaults().isFakeBrokerFlagOn()
-    }
-
-    private func startSchedulerIfProfileAvailable() {
-        if dataManager.fetchProfile() != nil {
-            startScheduler()
-        }
     }
 
     private func setupNotifications() {
@@ -124,17 +117,20 @@ final class ContainerViewModel: ObservableObject {
         self.headerStatusText = status
     }
 
-    func startScheduler() {
-        if scheduler.status == .stopped {
-            scheduler.start(showWebView: showWebView)
+    func runQueuedOperationsAndStartScheduler() {
+        scheduler.runQueuedOperations(showWebView: showWebView) { [weak self] in
+            guard let self = self else { return }
+            self.scheduler.startScheduler(showWebView: self.showWebView)
         }
     }
 
     func forceSchedulerRun() {
-        scheduler.forceRunOperations(showWebView: showWebView)
+        scheduler.runAllOperations(showWebView: showWebView)
     }
 
-    func scan(completion: @escaping (ScanResult) -> Void) {
+    func scanAfterProfileCreation(completion: @escaping (ScanResult) -> Void) {
+        scheduler.stopScheduler()
+        
         scheduler.scanAllBrokers(showWebView: showWebView) { [weak self] in
             guard let self = self else { return }
 
