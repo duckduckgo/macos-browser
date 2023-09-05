@@ -292,6 +292,13 @@ create_dmg() {
 	local dmg_background="${cwd}/assets/dmg-background.png"
 	dmg_output_path="${workdir}/duckduckgo-${app_version}.dmg"
 
+	# Workaround for hdiutil failing with "Resource busy"
+	# https://github.com/actions/runner-images/issues/7522#issuecomment-1566746364
+	if [[ -n $CI ]]; then
+		echo "Killing XProtectBehaviorService to avoid 'Resource busy' error"
+		sudo pkill -9 XProtectBehaviorService >/dev/null 2>&1
+	fi
+
 	rm -rf "${dmg_dir}" "${dmg_output_path}"
 	mkdir -p "${dmg_dir}"
 	cp -R "${app_path}" "${dmg_dir}"
