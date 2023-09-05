@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import Combine
 import Common
 import BrowserServicesKit
 
@@ -329,6 +330,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
+    private var emailProtectionDidChangeCancellable: AnyCancellable?
 
     init(tabCollectionViewModel: TabCollectionViewModel, emailManager: EmailManager) {
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -337,14 +339,15 @@ final class EmailOptionsButtonSubMenu: NSMenu {
 
         updateMenuItems()
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(emailDidSignInNotification(_:)),
-                                               name: .emailDidSignIn,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(emailDidSignOutNotification(_:)),
-                                               name: .emailDidSignOut,
-                                               object: nil)
+        emailProtectionDidChangeCancellable = Publishers
+            .Merge(
+                NotificationCenter.default.publisher(for: .emailDidSignIn),
+                NotificationCenter.default.publisher(for: .emailDidSignOut)
+            )
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateMenuItems()
+            }
     }
 
     required init(coder: NSCoder) {
@@ -405,21 +408,13 @@ final class EmailOptionsButtonSubMenu: NSMenu {
         let alert = NSAlert.disableEmailProtection()
         let response = alert.runModal()
         if response == .alertFirstButtonReturn {
-            emailManager.signOut()
+            try? emailManager.signOut()
         }
     }
 
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
         let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab)
-    }
-
-    @objc func emailDidSignInNotification(_ notification: Notification) {
-        updateMenuItems()
-    }
-
-    @objc func emailDidSignOutNotification(_ notification: Notification) {
-        updateMenuItems()
     }
 }
 
