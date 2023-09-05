@@ -36,6 +36,7 @@ protocol DataBrokerProtectionRepository {
 
     func add(_ historyEvent: HistoryEvent)
     func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) -> HistoryEvent?
+    func wereThereAnyMatches() -> Bool
 }
 
 final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
@@ -287,6 +288,16 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         } catch {
             os_log("Database error: fetchLastEvent, error: %{public}@", log: .error, error.localizedDescription)
             return nil
+        }
+    }
+
+    func wereThereAnyMatches() -> Bool {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            return try vault.wereThereAnyMatches()
+        } catch {
+            os_log("Database error: wereThereAnyMatches, error: %{public}@", log: .error, error.localizedDescription)
+            return false
         }
     }
 }

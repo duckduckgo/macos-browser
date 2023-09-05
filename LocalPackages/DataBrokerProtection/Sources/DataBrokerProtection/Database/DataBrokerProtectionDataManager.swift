@@ -26,6 +26,7 @@ public protocol DataBrokerProtectionDataManaging {
     func saveProfile(_ profile: DataBrokerProtectionProfile) async
     func fetchProfile(ignoresCache: Bool) -> DataBrokerProtectionProfile?
     func fetchBrokerProfileQueryData(ignoresCache: Bool) -> [BrokerProfileQueryData]
+    func wereThereAnyMatches() -> Bool
 }
 
 extension DataBrokerProtectionDataManaging {
@@ -83,6 +84,10 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         let queryData = database.fetchAllBrokerProfileQueryData(for: 1) // We assume one profile for now
         cache.brokerProfileQueryData = queryData
         return queryData
+    }
+
+    public func wereThereAnyMatches() -> Bool {
+        return database.wereThereAnyMatches()
     }
 }
 

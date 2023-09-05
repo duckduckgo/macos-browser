@@ -55,13 +55,12 @@ final class ContainerNavigationViewModel: ObservableObject {
     }
 
     private func restoreState() {
-        let brokerProfileData = dataManager.fetchBrokerProfileQueryData()
-        let data = brokerProfileData.filter { !$0.optOutOperationsData.isEmpty }
+        let hasMatches = dataManager.wereThereAnyMatches()
 
-        if !data.isEmpty {
+        if hasMatches {
             bodyViewType = .results
         } else if dataManager.fetchProfile() != nil {
-            bodyViewType = .createProfile
+            bodyViewType = .noResults
         } else {
             bodyViewType = .gettingStarted
         }

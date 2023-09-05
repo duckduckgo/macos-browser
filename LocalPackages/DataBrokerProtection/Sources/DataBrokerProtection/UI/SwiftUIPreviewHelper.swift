@@ -49,4 +49,8 @@ final class PreviewDataManager: DataBrokerProtectionDataManaging {
     func fetchBrokerProfileQueryData(ignoresCache: Bool) -> [BrokerProfileQueryData] {
         [BrokerProfileQueryData]()
     }
+
+    func wereThereAnyMatches() -> Bool {
+        return false
+    }
 }
