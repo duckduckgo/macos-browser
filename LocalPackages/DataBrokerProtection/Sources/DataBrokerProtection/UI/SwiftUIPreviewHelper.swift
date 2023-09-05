@@ -46,10 +46,6 @@ final class PreviewDataManager: DataBrokerProtectionDataManaging {
         return nil
     }
 
-    func fetchDataBrokerInfoData(ignoresCache: Bool) -> [DataBrokerInfoData] {
-        [DataBrokerInfoData]()
-    }
-
     func fetchBrokerProfileQueryData(ignoresCache: Bool) -> [BrokerProfileQueryData] {
         [BrokerProfileQueryData]()
     }
