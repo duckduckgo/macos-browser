@@ -19,13 +19,44 @@
 import Foundation
 import Common
 import BrowserServicesKit
+import Combine
 
-public final class DataBrokerProtectionScheduler {
+public enum DataBrokerProtectionSchedulerStatus {
+    case stopped
+    case idle
+    case running
+}
+
+public protocol DataBrokerProtectionScheduler {
+    func start(showWebView: Bool)
+    func forceRunOperations(showWebView: Bool)
+    func stop()
+    func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?)
+    var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { get }
+    var status: DataBrokerProtectionSchedulerStatus { get }
+}
+
+extension DataBrokerProtectionScheduler {
+    func start() {
+        start(showWebView: false)
+    }
+
+    func forceStart() {
+        forceRunOperations(showWebView: false)
+    }
+
+    func scanAllBrokers() {
+        scanAllBrokers(showWebView: false, completion: nil)
+    }
+}
+
+public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionScheduler {
+
     private enum SchedulerCycle {
         // Arbitrary numbers for now
 
-        static let interval: TimeInterval = 5 * 60 // 5 minutes
-        static let tolerance: TimeInterval = 60 // 1 minute
+        static let interval: TimeInterval = 40 * 60 // 40 minutes
+        static let tolerance: TimeInterval = 20 * 60 // 20 minutes
     }
 
     private let privacyConfigManager: PrivacyConfigurationManaging
@@ -38,7 +69,11 @@ public final class DataBrokerProtectionScheduler {
     private let emailService: EmailServiceProtocol
     private let captchaService: CaptchaServiceProtocol
 
-    lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
+    @Published public var status: DataBrokerProtectionSchedulerStatus = .stopped
+
+    public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { $status}
+
+    private lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
         let runnerProvider = DataBrokerOperationRunnerProvider(privacyConfigManager: privacyConfigManager,
                                                                contentScopeProperties: contentScopeProperties,
@@ -76,16 +111,23 @@ public final class DataBrokerProtectionScheduler {
         self.captchaService = CaptchaService(redeemUseCase: redeemUseCase)
     }
 
-    public func start(debug: Bool = true) {
-        os_log("Starting scheduler...", log: .dataBrokerProtection)
-        if debug {
-            self.dataBrokerProcessor.runQueuedOperations()
-        } else {
-            activity.schedule { completion in
-                os_log("Scheduler runnning...", log: .dataBrokerProtection)
-                self.dataBrokerProcessor.runQueuedOperations {
-                    completion(.finished)
-                }
+    public func forceRunOperations(showWebView: Bool = false) {
+        stop()
+
+        self.status = .running
+        self.dataBrokerProcessor.forceRunOperations(showWebView: showWebView) {  [weak self] in
+            self?.status = .stopped
+        }
+    }
+
+    public func start(showWebView: Bool = false) {
+        self.status = .idle
+        activity.schedule { completion in
+            self.status = .running
+            os_log("Scheduler running...", log: .dataBrokerProtection)
+            self.dataBrokerProcessor.runQueuedOperations(showWebView: showWebView) { [weak self] in
+                self?.status = .idle
+                completion(.finished)
             }
         }
     }
@@ -93,11 +135,12 @@ public final class DataBrokerProtectionScheduler {
     public func stop() {
         os_log("Stopping scheduler...", log: .dataBrokerProtection)
         activity.invalidate()
+        status = .stopped
     }
 
-    public func scanAllBrokers() {
+    public func scanAllBrokers(showWebView: Bool = false, completion: (() -> Void)? = nil) {
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
-        self.dataBrokerProcessor.runScanOnAllDataBrokers()
+        self.dataBrokerProcessor.runScanOnAllDataBrokers(showWebView: showWebView,
+                                                         completion: completion)
     }
-
 }

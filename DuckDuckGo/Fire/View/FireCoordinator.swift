@@ -56,10 +56,12 @@ final class FireCoordinator {
     }
 
     static func showFirePopover(relativeTo positioningView: NSView, tabCollectionViewModel: TabCollectionViewModel) {
-        if !(firePopover?.isShown ?? false) {
-            firePopover = FirePopover(fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
-            firePopover?.showBelow(positioningView)
+        guard !(firePopover?.isShown ?? false) else {
+            firePopover?.close()
+            return
         }
+        firePopover = FirePopover(fireViewModel: fireViewModel, tabCollectionViewModel: tabCollectionViewModel)
+        firePopover?.show(positionedBelow: positioningView.bounds.insetBy(dx: 0, dy: 3), in: positioningView)
     }
 
 }

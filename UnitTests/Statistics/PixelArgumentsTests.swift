@@ -111,48 +111,6 @@ class PixelArgumentsTests: XCTestCase {
         XCTAssertEqual(ap, .tabMenu)
     }
 
-    // MARK: IsBookmarkFireproofed
-
-    func testWhenInitWithFireproofDomainThenIsBookmarkFireproofedIsFireproofed() {
-        fireproofDomains.add(domain: "duckduckgo.com")
-        let url = URL(string: "https://duckduckgo.com/?q=search")!
-        let fp = Pixel.Event.IsBookmarkFireproofed(url: url, fireproofDomains: fireproofDomains)
-        XCTAssertEqual(fp, .fireproofed)
-    }
-
-    func testWhenInitWithNonFireproofDomainThenIsBookmarkFireproofedIsNotFireproofed() {
-        let url = URL(string: "https://duckduckgo.com/?q=search")!
-        let fp = Pixel.Event.IsBookmarkFireproofed(url: url, fireproofDomains: fireproofDomains)
-        XCTAssertEqual(fp, .nonFireproofed)
-    }
-
-    // MARK: FireproofKind
-
-    func testWhenInitWithURLThenFireproofKindIsURL() {
-        let url = URL(string: "https://duckduckgo.com")!
-
-        let kind = Pixel.Event.FireproofKind(url: url, bookmarkManager: bookmarkManager)
-        XCTAssertEqual(kind, .website)
-    }
-
-    func testWhenInitWithBookmarkedURLThenFireproofKindIsBookmark() {
-        let url = URL(string: "https://duckduckgo.com")!
-
-        bookmarkManager.makeBookmark(for: url, title: "DDG", isFavorite: false)
-
-        let kind = Pixel.Event.FireproofKind(url: url, bookmarkManager: bookmarkManager)
-        XCTAssertEqual(kind, .bookmarked)
-    }
-
-    func testWhenInitWithFavoriteURLThenFireproofKindIsBookmark() {
-        let url = URL(string: "https://duckduckgo.com")!
-
-        bookmarkManager.makeBookmark(for: url, title: "DDG", isFavorite: true)
-
-        let kind = Pixel.Event.FireproofKind(url: url, bookmarkManager: bookmarkManager)
-        XCTAssertEqual(kind, .favorite)
-    }
-
     // MARK: Repetition
 
     func testWhenInitFirstTimeThenRepetitionIsInitial() {
@@ -184,67 +142,6 @@ class PixelArgumentsTests: XCTestCase {
         XCTAssertEqual(rep1, .dailyFirst)
         XCTAssertEqual(rep2, .repetitive)
         XCTAssertEqual(rep3, .dailyFirst)
-    }
-
-    // MARK: AppLaunch
-
-    func testWhenInitFirstTimeThenAppLaunchIsInitial() {
-        let launch = Pixel.Event.AppLaunch.autoInitialOrRegular(store: pixelDataStore)
-        XCTAssertEqual(launch, .initial)
-    }
-
-    func testWhenInitNextDayThenAppLaunchIsRegular() {
-        let now = Date()
-        let tomorrow = now.addingTimeInterval(3600 * 24)
-        let tomorrow2 = now.addingTimeInterval(3600 * 24 + 1)
-        let afterTomorrow = tomorrow.addingTimeInterval(3600 * 24)
-
-        _=Pixel.Event.AppLaunch.autoInitialOrRegular(store: pixelDataStore, now: now)
-        Pixel.Event.AppLaunch.repetition(store: pixelDataStore, now: now).update()
-        let rep1 = Pixel.Event.AppLaunch.autoInitialOrRegular(store: pixelDataStore, now: tomorrow)
-        Pixel.Event.AppLaunch.repetition(store: pixelDataStore, now: tomorrow).update()
-        let rep2 = Pixel.Event.AppLaunch.autoInitialOrRegular(store: pixelDataStore, now: tomorrow2)
-        Pixel.Event.AppLaunch.repetition(store: pixelDataStore, now: tomorrow2).update()
-        let rep3 = Pixel.Event.AppLaunch.autoInitialOrRegular(store: pixelDataStore, now: afterTomorrow)
-
-        XCTAssertEqual(rep1, .dailyFirst)
-        XCTAssertEqual(rep2, .regular)
-        XCTAssertEqual(rep3, .dailyFirst)
-    }
-
-    // MARK: Others
-
-    func testIsDefaultBrowser() {
-        XCTAssertEqual(Pixel.Event.IsDefaultBrowser(isDefault: true), .default)
-        XCTAssertEqual(Pixel.Event.IsDefaultBrowser(isDefault: false), .nonDefault)
-    }
-
-    func testAverageTabsCount() {
-        XCTAssertEqual(Pixel.Event.AverageTabsCount(avgTabs: -1), .lessThan6)
-        XCTAssertEqual(Pixel.Event.AverageTabsCount(avgTabs: 0), .lessThan6)
-        XCTAssertEqual(Pixel.Event.AverageTabsCount(avgTabs: 2), .lessThan6)
-        XCTAssertEqual(Pixel.Event.AverageTabsCount(avgTabs: 5), .lessThan6)
-        XCTAssertEqual(Pixel.Event.AverageTabsCount(avgTabs: 6.1), .moreThan6)
-        XCTAssertEqual(Pixel.Event.AverageTabsCount(avgTabs: 20), .moreThan6)
-    }
-
-    func testBurnedTabs() {
-        XCTAssertEqual(Pixel.Event.BurnedTabs(-1), .lessThan6)
-        XCTAssertEqual(Pixel.Event.BurnedTabs(0), .lessThan6)
-        XCTAssertEqual(Pixel.Event.BurnedTabs(2), .lessThan6)
-        XCTAssertEqual(Pixel.Event.BurnedTabs(5), .lessThan6)
-        XCTAssertEqual(Pixel.Event.BurnedTabs(6), .moreThan6)
-        XCTAssertEqual(Pixel.Event.BurnedTabs(20), .moreThan6)
-    }
-
-    func testBurnedWindows() {
-        XCTAssertEqual(Pixel.Event.BurnedWindows(-1), .one)
-        XCTAssertEqual(Pixel.Event.BurnedWindows(0), .one)
-        XCTAssertEqual(Pixel.Event.BurnedWindows(1), .one)
-        XCTAssertEqual(Pixel.Event.BurnedWindows(2), .moreThan1)
-        XCTAssertEqual(Pixel.Event.BurnedWindows(5), .moreThan1)
-        XCTAssertEqual(Pixel.Event.BurnedWindows(6), .moreThan1)
-        XCTAssertEqual(Pixel.Event.BurnedWindows(20), .moreThan1)
     }
 
 }

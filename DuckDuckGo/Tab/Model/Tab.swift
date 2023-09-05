@@ -514,6 +514,9 @@ protocol NewWindowPolicyDecisionMaker {
             }
             handleFavicon(oldValue: oldValue)
             invalidateInteractionStateData()
+            if navigationDelegate.currentNavigation == nil {
+                updateCanGoBackForward(withCurrentNavigation: nil)
+            }
             error = nil
         }
     }
