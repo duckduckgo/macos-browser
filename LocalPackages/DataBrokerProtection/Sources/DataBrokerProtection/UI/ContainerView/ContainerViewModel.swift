@@ -28,10 +28,12 @@ final class ContainerViewModel: ObservableObject {
     private let scheduler: DataBrokerProtectionScheduler
     private let dataManager: DataBrokerProtectionDataManaging
     private let notificationCenter: NotificationCenter
-    private var statusCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
     @Published var headerStatusText = ""
     @Published var schedulerStatus = ""
+    @Published var showWebView = false
+    @Published var useFakeBroker = false
 
     internal init(scheduler: DataBrokerProtectionScheduler,
                   dataManager: DataBrokerProtectionDataManaging,
@@ -40,6 +42,7 @@ final class ContainerViewModel: ObservableObject {
         self.dataManager = dataManager
         self.notificationCenter = notificationCenter
 
+        restoreFakeBrokerStatus()
         updateHeaderStatus()
         setupNotifications()
         setupCancellable()
@@ -47,7 +50,7 @@ final class ContainerViewModel: ObservableObject {
     }
 
     private func setupCancellable() {
-        statusCancellable = scheduler.statusPublisher
+        scheduler.statusPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
 
@@ -59,7 +62,18 @@ final class ContainerViewModel: ObservableObject {
                 case .stopped:
                     self?.schedulerStatus = "🔴 Stopped"
                 }
-            }
+            }.store(in: &cancellables)
+
+        $useFakeBroker
+            .receive(on: DispatchQueue.main)
+            .sink { value in
+                FakeBrokerUserDefaults().setFakeBrokerFlag(value)
+            }.store(in: &cancellables)
+
+    }
+
+    private func restoreFakeBrokerStatus() {
+        useFakeBroker = FakeBrokerUserDefaults().isFakeBrokerFlagOn()
     }
 
     private func startSchedulerIfProfileAvailable() {
@@ -112,12 +126,16 @@ final class ContainerViewModel: ObservableObject {
 
     func startScheduler() {
         if scheduler.status == .stopped {
-            scheduler.start()
+            scheduler.start(showWebView: showWebView)
         }
     }
 
+    func forceSchedulerRun() {
+        scheduler.forceRunOperations(showWebView: showWebView)
+    }
+
     func scan(completion: @escaping (ScanResult) -> Void) {
-        scheduler.scanAllBrokers { [weak self] in
+        scheduler.scanAllBrokers(showWebView: showWebView) { [weak self] in
             guard let self = self else { return }
 
             DispatchQueue.main.async {

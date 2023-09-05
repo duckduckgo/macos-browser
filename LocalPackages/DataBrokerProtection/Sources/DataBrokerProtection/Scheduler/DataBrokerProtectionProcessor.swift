@@ -48,16 +48,29 @@ final class DataBrokerProtectionProcessor {
     }
 
     // MARK: - Public functions
-    func runScanOnAllDataBrokers(completion: (() -> Void)? = nil) {
+    func runScanOnAllDataBrokers(showWebView: Bool = false, completion: (() -> Void)? = nil) {
         operationQueue.cancelAllOperations()
-        runOperations(operationType: .scan, priorityDate: nil) {
+        runOperations(operationType: .scan,
+                      priorityDate: nil,
+                      showWebView: showWebView) {
             os_log("Scans done", log: .dataBrokerProtection)
             completion?()
         }
     }
 
-    func runQueuedOperations(completion: (() -> Void)? = nil ) {
-        runOperations(operationType: .all, priorityDate: Date()) {
+    func runQueuedOperations(showWebView: Bool = false, completion: (() -> Void)? = nil ) {
+        runOperations(operationType: .all,
+                      priorityDate: Date(),
+                      showWebView: showWebView) {
+            os_log("Queued operations done", log: .dataBrokerProtection)
+            completion?()
+        }
+    }
+
+    func forceRunOperations(showWebView: Bool = false, completion: (() -> Void)? = nil ) {
+        runOperations(operationType: .all,
+                      priorityDate: nil,
+                      showWebView: showWebView) {
             os_log("Queued operations done", log: .dataBrokerProtection)
             completion?()
         }
@@ -66,6 +79,7 @@ final class DataBrokerProtectionProcessor {
     // MARK: - Private functions
     private func runOperations(operationType: DataBrokerOperationsCollection.OperationType,
                                priorityDate: Date?,
+                               showWebView: Bool,
                                completion: @escaping () -> Void) {
 
         // Before running new operatiosn we check if there is any updates to the broker files.
@@ -79,7 +93,8 @@ final class DataBrokerProtectionProcessor {
         let brokersProfileData = database.fetchAllBrokerProfileQueryData(for: profileId)
         let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
                                                                                   operationType: operationType,
-                                                                                  priorityDate: priorityDate)
+                                                                                  priorityDate: priorityDate,
+                                                                                  showWebView: showWebView)
 
         for collection in dataBrokerOperationCollections {
             operationQueue.addOperation(collection)
@@ -92,7 +107,8 @@ final class DataBrokerProtectionProcessor {
 
     private func createDataBrokerOperationCollections(from brokerProfileQueriesData: [BrokerProfileQueryData],
                                                       operationType: DataBrokerOperationsCollection.OperationType,
-                                                      priorityDate: Date?) -> [DataBrokerOperationsCollection] {
+                                                      priorityDate: Date?,
+                                                      showWebView: Bool) -> [DataBrokerOperationsCollection] {
 
         var collections: [DataBrokerOperationsCollection] = []
         var visitedDataBrokerIDs: Set<Int64> = []
@@ -109,7 +125,8 @@ final class DataBrokerProtectionProcessor {
                                                                 priorityDate: priorityDate,
                                                                 notificationCenter: notificationCenter,
                                                                 runner: operationRunnerProvider.getOperationRunner(),
-                                                                errorHandler: errorHandler)
+                                                                errorHandler: errorHandler,
+                                                                showWebView: showWebView)
                 collections.append(collection)
 
                 visitedDataBrokerIDs.insert(dataBrokerID)

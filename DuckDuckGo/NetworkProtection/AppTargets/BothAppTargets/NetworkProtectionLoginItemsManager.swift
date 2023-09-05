@@ -18,6 +18,7 @@
 
 import Common
 import Foundation
+import LoginItems
 
 #if NETWORK_PROTECTION
 

@@ -22,8 +22,19 @@ import Common
 
 protocol WebOperationRunner {
 
-    func scan(_ profileQuery: BrokerProfileQueryData) async throws -> [ExtractedProfile]
-    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile) async throws
+    func scan(_ profileQuery: BrokerProfileQueryData, showWebView: Bool) async throws -> [ExtractedProfile]
+    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile, showWebView: Bool) async throws
+}
+
+extension WebOperationRunner {
+
+    func scan(_ profileQuery: BrokerProfileQueryData) async throws -> [ExtractedProfile] {
+        try await scan(profileQuery, showWebView: false)
+    }
+
+    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile) async throws {
+        try await optOut(profileQuery: profileQuery, extractedProfile: extractedProfile, showWebView: false)
+    }
 }
 
 @MainActor
@@ -43,7 +54,7 @@ final class DataBrokerOperationRunner: WebOperationRunner {
         self.captchaService = captchaService
     }
 
-    func scan(_ profileQuery: BrokerProfileQueryData) async throws -> [ExtractedProfile] {
+    func scan(_ profileQuery: BrokerProfileQueryData, showWebView: Bool) async throws -> [ExtractedProfile] {
         let scan = ScanOperation(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
@@ -51,10 +62,10 @@ final class DataBrokerOperationRunner: WebOperationRunner {
             emailService: emailService,
             captchaService: captchaService
         )
-        return try await scan.run(inputValue: ())
+        return try await scan.run(inputValue: (), showWebView: showWebView)
     }
 
-    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile) async throws {
+    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile, showWebView: Bool) async throws {
         let optOut = OptOutOperation(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
@@ -62,7 +73,7 @@ final class DataBrokerOperationRunner: WebOperationRunner {
             emailService: emailService,
             captchaService: captchaService
         )
-        try await optOut.run(inputValue: extractedProfile)
+        try await optOut.run(inputValue: extractedProfile, showWebView: showWebView)
     }
 
     deinit {

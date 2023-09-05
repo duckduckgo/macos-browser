@@ -151,7 +151,7 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
     var wasExecuteCalledForProfileData = false
     var wasExecuteCalledForSolveCaptcha = false
 
-    func initializeWebView(debug: Bool) async {
+    func initializeWebView(showWebView: Bool) async {
         wasInitializeWebViewCalled = true
     }
 

@@ -76,24 +76,14 @@ struct DataBrokerProtectionContainerView: View {
                 }
 
                 if shouldShowDebugUI {
-                    // just for testing
-                    VStack(alignment: .leading) {
-                        Text("Scheduler status: \(containerViewModel.schedulerStatus)")
-
+                    VStack {
                         HStack {
-                            Picker(selection: $navigationViewModel.bodyViewType,
-                                   label: Text("Body View Type")) {
-                                ForEach(ContainerNavigationViewModel.BodyViewType.allCases, id: \.self) { viewType in
-                                    Text(viewType.description).tag(viewType)
-                                }
-                            }
-                                   .pickerStyle(MenuPickerStyle())
-                                   .frame(width: 300)
-
+                            debugUI()
+                                .padding()
                             Spacer()
                         }
                         Spacer()
-                    }.padding()
+                    }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -103,7 +93,38 @@ struct DataBrokerProtectionContainerView: View {
     }
 
     @ViewBuilder
-    func headerView() -> some View {
+    private func debugUI() -> some View {
+        VStack(alignment: .leading) {
+            Text("Scheduler status: \(containerViewModel.schedulerStatus)")
+
+            Toggle("Use Fake Broker", isOn: $containerViewModel.useFakeBroker)
+
+            Toggle("Display WebViews", isOn: $containerViewModel.showWebView)
+
+            Button {
+                containerViewModel.forceSchedulerRun()
+            } label: {
+                Text("Force operations run")
+            }
+
+            HStack {
+                Picker(selection: $navigationViewModel.bodyViewType,
+                       label: Text("Body View Type")) {
+                    ForEach(ContainerNavigationViewModel.BodyViewType.allCases, id: \.self) { viewType in
+                        Text(viewType.description).tag(viewType)
+                    }
+                }
+                       .pickerStyle(MenuPickerStyle())
+                       .frame(width: 300)
+            }
+        }
+        .padding()
+        .blurredBackground()
+
+    }
+
+    @ViewBuilder
+    private func headerView() -> some View {
         if navigationViewModel.bodyViewType != .createProfile {
             VStack {
 
@@ -147,5 +168,17 @@ struct DataBrokerProtectionContainerView_Previews: PreviewProvider {
                                           profileViewModel: profileViewModel,
                                           resultsViewModel: resultsViewModel)
         .frame(width: 1024, height: 768)
+    }
+}
+
+extension View {
+    @ViewBuilder
+    func blurredBackground() -> some View {
+        if #available(macOS 12.0, *) {
+            self
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+        } else {
+            self
+        }
     }
 }
