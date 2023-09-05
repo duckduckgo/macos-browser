@@ -132,6 +132,8 @@ final class MoreOptionsMenu: NSMenu {
             addItem(withTitle: UserText.networkProtection, action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
                 .targetting(self)
                 .withImage(.image(for: .vpnIcon))
+        } else {
+            networkProtectionFeatureVisibility.disableForWaitlistUsers()
         }
 #endif // NETWORK_PROTECTION
 
