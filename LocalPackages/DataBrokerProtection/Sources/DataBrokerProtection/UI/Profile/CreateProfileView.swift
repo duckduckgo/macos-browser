@@ -48,8 +48,9 @@ struct CreateProfileView: View {
                     .padding()
 
                 FormFooterView(viewModel: viewModel, buttonClicked: {
-                    viewModel.saveProfile()
-                    scanButtonClicked()
+                    viewModel.saveProfile {
+                        scanButtonClicked()
+                    }
                 })
                 .padding()
                 .padding(.horizontal, Consts.OuterForm.horizontalPadding)
@@ -434,15 +435,23 @@ private struct FormHeaderView: View {
 
 private struct FormFooterView: View {
     @ObservedObject var viewModel: ProfileViewModel
+
     let buttonClicked: () -> Void
     var body: some View {
         VStack(spacing: 16) {
             Button {
                 buttonClicked()
             } label: {
-                Text("Scan")
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 44)
+                if #available(macOS 11.0, *), viewModel.isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 44)
+                } else {
+                    Text("Scan")
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 44)
+                }
+
             }
             .buttonStyle(CTAButtonStyle(style: .primary))
             .disabled(!viewModel.isProfileValid)
