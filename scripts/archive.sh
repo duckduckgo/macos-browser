@@ -296,7 +296,7 @@ create_dmg() {
 	# https://github.com/actions/runner-images/issues/7522#issuecomment-1566746364
 	if [[ -n $CI ]]; then
 		echo "Killing XProtectBehaviorService to avoid 'Resource busy' error"
-		sudo pkill -9 XProtectBehaviorService >/dev/null 2>&1
+		sudo pkill -9 XProtect >/dev/null 2>&1
 	fi
 
 	rm -rf "${dmg_dir}" "${dmg_output_path}"
