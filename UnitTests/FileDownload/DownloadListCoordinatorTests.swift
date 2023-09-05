@@ -20,7 +20,6 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@available(macOS 11.3, *)
 @MainActor
 final class DownloadListCoordinatorTests: XCTestCase {
     let store = DownloadListStoreMock()

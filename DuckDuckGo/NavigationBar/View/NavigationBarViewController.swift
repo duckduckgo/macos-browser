@@ -272,7 +272,6 @@ final class NavigationBarViewController: NSViewController {
     }
 
 #if NETWORK_PROTECTION
-    @available(macOS 11.4, *)
     @IBAction func networkProtectionButtonAction(_ sender: NSButton) {
         popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
     }
@@ -344,12 +343,10 @@ final class NavigationBarViewController: NSViewController {
                                                name: .loginAutoSaved,
                                                object: nil)
 
-        if #available(macOS 11, *) {
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(showAutoconsentFeedback(_:)),
-                                                   name: AutoconsentUserScript.Constants.newSitePopupHidden,
-                                                   object: nil)
-        }
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(showAutoconsentFeedback(_:)),
+                                               name: AutoconsentUserScript.Constants.newSitePopupHidden,
+                                               object: nil)
     }
 
     @objc private func showPrivateEmailCopiedToClipboard(_ sender: Notification) {
@@ -401,19 +398,17 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @objc private func showAutoconsentFeedback(_ sender: Notification) {
-        if #available(macOS 11, *) {
-            guard view.window?.isKeyWindow == true,
-                  let topUrl = sender.userInfo?["topUrl"] as? URL,
-                  let isCosmetic = sender.userInfo?["isCosmetic"] as? Bool
-            else { return }
+        guard view.window?.isKeyWindow == true,
+              let topUrl = sender.userInfo?["topUrl"] as? URL,
+              let isCosmetic = sender.userInfo?["isCosmetic"] as? Bool
+        else { return }
 
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self, self.tabCollectionViewModel.selectedTabViewModel?.tab.url == topUrl else {
-                    return // if the tab is not active, don't show the popup
-                }
-                let animationType: NavigationBarBadgeAnimationView.AnimationType = isCosmetic ? .cookiePopupHidden : .cookiePopupManaged
-                self.addressBarViewController?.addressBarButtonsViewController?.showBadgeNotification(animationType)
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self, self.tabCollectionViewModel.selectedTabViewModel?.tab.url == topUrl else {
+                return // if the tab is not active, don't show the popup
             }
+            let animationType: NavigationBarBadgeAnimationView.AnimationType = isCosmetic ? .cookiePopupHidden : .cookiePopupManaged
+            self.addressBarViewController?.addressBarButtonsViewController?.showBadgeNotification(animationType)
         }
     }
 
@@ -778,19 +773,17 @@ extension NavigationBarViewController: NSMenuDelegate {
 
 #if NETWORK_PROTECTION
     func showNetworkProtectionStatus() {
-        guard #available(macOS 11.4, *) else { return }
         popovers.showNetworkProtectionPopover(usingView: networkProtectionButton,
                                               withDelegate: networkProtectionButtonModel)
     }
 
     private func setupNetworkProtectionButton() {
-        guard #available(macOS 11.4, *) else { return }
         networkProtectionCancellable = networkProtectionButtonModel.$showButton
             .receive(on: RunLoop.main)
             .sink { [weak self] show in
                 let isPopUpWindow = self?.view.window?.isPopUpWindow ?? false
                 self?.networkProtectionButton.isHidden =  isPopUpWindow || !show
-        }
+            }
 
         networkProtectionInterruptionCancellable = networkProtectionButtonModel.$buttonImage
             .receive(on: RunLoop.main)

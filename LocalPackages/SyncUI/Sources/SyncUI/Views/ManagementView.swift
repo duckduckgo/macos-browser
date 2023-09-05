@@ -21,29 +21,9 @@ import SwiftUIExtensions
 
 enum Const {
     enum Fonts {
-        static let preferencePaneTitle: Font = {
-            if #available(macOS 11.0, *) {
-                return .title2.weight(.semibold)
-            } else {
-                return .system(size: 17, weight: .semibold)
-            }
-        }()
-
-        static let preferencePaneSectionHeader: Font = {
-            if #available(macOS 11.0, *) {
-                return .title3.weight(.semibold)
-            } else {
-                return .system(size: 15, weight: .semibold)
-            }
-        }()
-
-        static let preferencePaneCaption: Font = {
-            if #available(macOS 11.0, *) {
-                return .subheadline
-            } else {
-                return .system(size: 10)
-            }
-        }()
+        static let preferencePaneTitle: Font = .title2.weight(.semibold)
+        static let preferencePaneSectionHeader: Font = .title3.weight(.semibold)
+        static let preferencePaneCaption: Font = .subheadline
     }
 }
 

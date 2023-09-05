@@ -239,33 +239,13 @@ extension WKWebView {
     }
 
     var canPrint: Bool {
-        Self.supportsPrinting && !self.isInFullScreenMode
-    }
-
-    static var supportsPrinting: Bool {
-        if #available(macOS 11.0, *) {
-            return true
-        } else {
-#if !APPSTORE
-            return self.instancesRespond(to: #selector(WKWebView._printOperation(with:)))
-#else
-            return false
-#endif
-        }
+        !self.isInFullScreenMode
     }
 
     func printOperation(with printInfo: NSPrintInfo = .shared, for frame: FrameHandle?) -> NSPrintOperation? {
         let printInfoWithFrame = NSSelectorFromString(Selector.printOperationWithPrintInfoForFrame)
         if let frame = frame, responds(to: printInfoWithFrame) {
             return self.perform(printInfoWithFrame, with: printInfo, with: frame)?.takeUnretainedValue() as? NSPrintOperation
-        }
-
-        guard #available(macOS 11.0, *) else {
-#if !APPSTORE
-            guard self.responds(to: #selector(WKWebView._printOperation(with:))) else { return nil }
-
-            return self._printOperation(with: printInfo)
-#endif
         }
 
         let printInfoDictionary = (NSPrintInfo.shared.dictionary() as? [NSPrintInfo.AttributeKey: Any]) ?? [:]

@@ -40,14 +40,6 @@ final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
         }
     }
 
-    func testWebViewRespondsTo_createWebArchiveDataWithCompletionHandler() throws {
-        if #available(macOS 11.1, *) {
-            throw XCTSkip("createWebArchiveData has been made public in macOS 11.1")
-        } else {
-            XCTAssertTrue(WKWebView.instancesRespond(to: #selector(WKWebView.createWebArchiveData(completionHandler:))))
-        }
-    }
-
     func testWebViewRespondsTo_createPDFWithConfiguration() {
         XCTAssertTrue(WKWebView.instancesRespond(to: #selector(WKWebView.createPDF(withConfiguration:completionHandler:))))
     }

@@ -106,11 +106,7 @@ enum ThirdPartyBrowser: CaseIterable {
     private var applicationPath: String? {
         for bundleID in bundleIdentifiers.all {
             let path: String? = {
-                if #available(macOS 11.0, *) {
-                    return NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)?.path
-                } else {
-                    return NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: bundleID)
-                }
+                return NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)?.path
             }()
 
             if let path = path {

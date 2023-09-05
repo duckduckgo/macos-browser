@@ -23,21 +23,7 @@ import WebKit
 extension WKWebView {
 
     func startDownload(_ request: URLRequest, completionHandler: @escaping (WebKitDownload) -> Void) {
-#if APPSTORE
         startDownload(using: request, completionHandler: completionHandler)
-#else
-        if #available(macOS 11.3, *) {
-            startDownload(using: request, completionHandler: completionHandler)
-        } else if configuration.processPool.responds(to: #selector(WKProcessPool._downloadURLRequest(_:websiteDataStore:originatingWebView:))) {
-            configuration.processPool.setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
-            let download = configuration.processPool._downloadURLRequest(request,
-                                                                         websiteDataStore: self.configuration.websiteDataStore,
-                                                                         originatingWebView: self)
-            completionHandler(download)
-        } else {
-            assertionFailure("WKProcessPool does not respond to _downloadURLRequest:websiteDataStore:originatingWebView:")
-        }
-#endif
     }
 
     func resumeDownload(from resumeData: Data, to localURL: URL, completionHandler: @escaping (WebKitDownload) -> Void) throws {
@@ -45,18 +31,7 @@ extension WKWebView {
         resumeDownload(fromResumeData: resumeData, completionHandler: completionHandler)
 #else
         try NSException.catch {
-            if #available(macOS 11.3, *) {
-                resumeDownload(fromResumeData: resumeData, completionHandler: completionHandler)
-            } else if configuration.processPool.responds(to:
-              #selector(WKProcessPool._resumeDownload(from:websiteDataStore:path:originatingWebView:))) {
-                let download = configuration.processPool._resumeDownload(from: resumeData,
-                                                                         websiteDataStore: self.configuration.websiteDataStore,
-                                                                         path: localURL.path,
-                                                                         originatingWebView: self)
-                completionHandler(download)
-            } else {
-                assertionFailure("WKProcessPool does not respond to _resumeDownloadFromData:websiteDataStore:path:originatingWebView:")
-            }
+            resumeDownload(fromResumeData: resumeData, completionHandler: completionHandler)
         }
 #endif
     }

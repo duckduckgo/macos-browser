@@ -31,7 +31,6 @@ import Networking
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
-@available(macOS 11.4, *)
 final class NetworkProtectionTunnelController: NetworkProtection.TunnelController {
 
     // MARK: - Debug Helpers

@@ -20,61 +20,30 @@ import Foundation
 import UniformTypeIdentifiers
 
 struct UTType: RawRepresentable, Hashable {
-    static let html = {
-        if #available(macOS 11.0, *) {
-            return UTType(rawValue: UniformTypeIdentifiers.UTType.html.identifier as CFString)
-        } else {
-            return UTType(rawValue: kUTTypeHTML)
-        }
-    }()
 
-    static let webArchive = {
-        if #available(macOS 11.0, *) {
-            return UTType(rawValue: UniformTypeIdentifiers.UTType.webArchive.identifier as CFString)
-        } else {
-            return UTType(rawValue: kUTTypeWebArchive)
-        }
-    }()
+    static let html = UTType(rawValue: UniformTypeIdentifiers.UTType.html.identifier as CFString)
 
-    static let pdf = {
-        if #available(macOS 11.0, *) {
-            return UTType(rawValue: UniformTypeIdentifiers.UTType.pdf.identifier as CFString)
-        } else {
-            return UTType(rawValue: kUTTypePDF)
-        }
-    }()
+    static let webArchive = UTType(rawValue: UniformTypeIdentifiers.UTType.webArchive.identifier as CFString)
 
-    static let jpeg = {
-        if #available(macOS 11.0, *) {
-            return UTType(rawValue: UniformTypeIdentifiers.UTType.jpeg.identifier as CFString)
-        } else {
-            return UTType(rawValue: kUTTypeJPEG)
-        }
-    }()
+    static let pdf = UTType(rawValue: UniformTypeIdentifiers.UTType.pdf.identifier as CFString)
 
-    static let data = {
-        if #available(macOS 11.0, *) {
-            return UTType(rawValue: UniformTypeIdentifiers.UTType.data.identifier as CFString)
-        } else {
-            return UTType(rawValue: kUTTypeData)
-        }
-    }()
+    static let jpeg = UTType(rawValue: UniformTypeIdentifiers.UTType.jpeg.identifier as CFString)
+
+    static let data = UTType(rawValue: UniformTypeIdentifiers.UTType.data.identifier as CFString)
 
     static let text = {
-        if let utType = UTType(fileExtension: "txt") { return utType }
-        if #available(macOS 11.0, *) {
-            return UTType(rawValue: UniformTypeIdentifiers.UTType.text.identifier as CFString)
+        if let utType = UTType(fileExtension: "txt") {
+            return utType
         } else {
-            return UTType(rawValue: kUTTypeText)
+            return UTType(rawValue: UniformTypeIdentifiers.UTType.text.identifier as CFString)
         }
     }()
 
     static let log = {
-        if let utType = UTType(fileExtension: "log") { return utType }
-        if #available(macOS 11.0, *) {
-            return UTType(rawValue: UniformTypeIdentifiers.UTType.log.identifier as CFString)
+        if let utType = UTType(fileExtension: "log") {
+            return utType
         } else {
-            return UTType(rawValue: kUTTypeLog)
+            return UTType(rawValue: UniformTypeIdentifiers.UTType.log.identifier as CFString)
         }
     }()
 
@@ -84,28 +53,14 @@ struct UTType: RawRepresentable, Hashable {
     }
 
     init?(mimeType: String) {
-        let contentType: CFString? = {
-            if #available(macOS 11.0, *) {
-                return UniformTypeIdentifiers.UTType(mimeType: mimeType)?.identifier as CFString?
-            } else {
-                return UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, mimeType as CFString, nil)?.takeRetainedValue()
-            }
-        }()
-        guard let contentType else {
+        guard let contentType = UniformTypeIdentifiers.UTType(mimeType: mimeType)?.identifier as CFString? else {
             return nil
         }
         self.rawValue = contentType
     }
 
     init?(fileExtension: String) {
-        let uti: CFString? = {
-            if #available(macOS 11.0, *) {
-                return UniformTypeIdentifiers.UTType(filenameExtension: fileExtension)?.identifier as CFString?
-            } else {
-                return UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileExtension as CFString, nil)?.takeRetainedValue()
-            }
-        }()
-        guard let uti else {
+        guard let uti = UniformTypeIdentifiers.UTType(filenameExtension: fileExtension)?.identifier as CFString? else {
             return nil
         }
         self.rawValue = uti
@@ -116,38 +71,22 @@ struct UTType: RawRepresentable, Hashable {
 extension UTType {
 
     var mimeType: String? {
-        if #available(macOS 11.0, *) {
-            return UniformTypeIdentifiers.UTType(rawValue as String)?.preferredMIMEType
-        } else {
-            return UTTypeCopyPreferredTagWithClass(rawValue, kUTTagClassMIMEType)?.takeRetainedValue() as String?
-        }
+        UniformTypeIdentifiers.UTType(rawValue as String)?.preferredMIMEType
     }
 
     var fileExtension: String? {
-        if #available(macOS 11.0, *) {
-            return UniformTypeIdentifiers.UTType(rawValue as String)?.preferredFilenameExtension
-        } else {
-            return UTTypeCopyPreferredTagWithClass(rawValue, kUTTagClassFilenameExtension)?.takeRetainedValue() as String?
-        }
+        UniformTypeIdentifiers.UTType(rawValue as String)?.preferredFilenameExtension
     }
 
     var description: String? {
-        if #available(macOS 11.0, *) {
-            return UniformTypeIdentifiers.UTType(rawValue as String)?.localizedDescription
-        } else {
-            return UTTypeCopyDescription(rawValue)?.takeRetainedValue() as String?
-        }
+        UniformTypeIdentifiers.UTType(rawValue as String)?.localizedDescription
     }
 
-    @available(OSX 11.0, *)
     private var utType: UniformTypeIdentifiers.UTType {
         UniformTypeIdentifiers.UTType(rawValue as String) ?? .plainText
     }
 
     var icon: NSImage {
-        guard #available(OSX 11.0, *) else {
-            return NSWorkspace.shared.icon(forFileType: rawValue as String)
-        }
         return NSWorkspace.shared.icon(for: self.utType)
     }
 

@@ -18,7 +18,6 @@
 
 import WebKit
 
-@available(macOS 11.3, *)
 @objc protocol WebKitDownloadDelegate: WKDownloadDelegate {
 
     func download(_ download: WKDownload, didReceiveDataWithLength length: UInt64)

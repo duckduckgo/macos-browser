@@ -142,7 +142,6 @@
 		31929FB82A4C4CFF0084EA89 /* PreferencesSidebarModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CD54C627F2FDD100F1F7B9 /* PreferencesSidebarModel.swift */; };
 		31929FB92A4C4CFF0084EA89 /* DuckPlayerURLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767190128E724B2003A2A15 /* DuckPlayerURLExtension.swift */; };
 		31929FBA2A4C4CFF0084EA89 /* BWEncryptionOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D43EB31292788C70065E5D6 /* BWEncryptionOutput.m */; };
-		31929FBB2A4C4CFF0084EA89 /* WKProcessPool+DownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */; };
 		31929FBC2A4C4CFF0084EA89 /* PermissionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BAC26A7BF390013B453 /* PermissionState.swift */; };
 		31929FBD2A4C4CFF0084EA89 /* FeedbackPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */; };
 		31929FBE2A4C4CFF0084EA89 /* NavigationProtectionTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66260DC29AC5D4300E9E3EE /* NavigationProtectionTabExtension.swift */; };
@@ -2443,7 +2442,6 @@
 		B610F2EC27AA8F9400FCEBE9 /* ContentBlockerRulesManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2E727AA397100FCEBE9 /* ContentBlockerRulesManagerMock.swift */; };
 		B61E2CD5294346C000773D8A /* Tab+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61E2CD4294346C000773D8A /* Tab+Navigation.swift */; };
 		B61EF3EC266F91E700B4D78F /* WKWebView+Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */; };
-		B61EF3F1266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */; };
 		B626A7552991413000053070 /* SerpHeadersNavigationResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BF5D922947199A006742B1 /* SerpHeadersNavigationResponder.swift */; };
 		B626A75A29921FAA00053070 /* NavigationActionPolicyExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B626A75929921FAA00053070 /* NavigationActionPolicyExtension.swift */; };
 		B626A75B29921FAA00053070 /* NavigationActionPolicyExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B626A75929921FAA00053070 /* NavigationActionPolicyExtension.swift */; };
@@ -3721,7 +3719,6 @@
 		B610F2E727AA397100FCEBE9 /* ContentBlockerRulesManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerRulesManagerMock.swift; sourceTree = "<group>"; };
 		B61E2CD4294346C000773D8A /* Tab+Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Tab+Navigation.swift"; sourceTree = "<group>"; };
 		B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKWebView+Download.swift"; sourceTree = "<group>"; };
-		B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WKProcessPool+DownloadDelegate.swift"; sourceTree = "<group>"; };
 		B626A75929921FAA00053070 /* NavigationActionPolicyExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigationActionPolicyExtension.swift; sourceTree = "<group>"; };
 		B626A75F2992407C00053070 /* CancellableExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CancellableExtension.swift; sourceTree = "<group>"; };
 		B626A7632992506A00053070 /* SerpHeadersNavigationResponderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SerpHeadersNavigationResponderTests.swift; sourceTree = "<group>"; };
@@ -7006,7 +7003,6 @@
 				B6F41030264D2B23003DA42C /* ProgressExtension.swift */,
 				B66E9DD12670EB2A00E53BB5 /* _WKDownload+WebKitDownload.swift */,
 				B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */,
-				B61EF3F0266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift */,
 				B63B9C502670B2B200C45B91 /* _WKDownload.h */,
 				B63B9C542670B32000C45B91 /* WKProcessPool+Private.h */,
 				B6CF78E2267B0A1900CD4F13 /* WKNavigationAction+Private.h */,
@@ -8604,7 +8600,6 @@
 				31929FB82A4C4CFF0084EA89 /* PreferencesSidebarModel.swift in Sources */,
 				31929FB92A4C4CFF0084EA89 /* DuckPlayerURLExtension.swift in Sources */,
 				31929FBA2A4C4CFF0084EA89 /* BWEncryptionOutput.m in Sources */,
-				31929FBB2A4C4CFF0084EA89 /* WKProcessPool+DownloadDelegate.swift in Sources */,
 				31929FBC2A4C4CFF0084EA89 /* PermissionState.swift in Sources */,
 				31929FBD2A4C4CFF0084EA89 /* FeedbackPresenter.swift in Sources */,
 				31929FBE2A4C4CFF0084EA89 /* NavigationProtectionTabExtension.swift in Sources */,
@@ -10307,7 +10302,6 @@
 				37CD54CE27F2FDD100F1F7B9 /* PreferencesSidebarModel.swift in Sources */,
 				3767190328E724D8003A2A15 /* DuckPlayerURLExtension.swift in Sources */,
 				1D43EB32292788C70065E5D6 /* BWEncryptionOutput.m in Sources */,
-				B61EF3F1266F922200B4D78F /* WKProcessPool+DownloadDelegate.swift in Sources */,
 				B6106BAD26A7BF390013B453 /* PermissionState.swift in Sources */,
 				371C0A2927E33EDC0070591F /* FeedbackPresenter.swift in Sources */,
 				B66260DD29AC5D4300E9E3EE /* NavigationProtectionTabExtension.swift in Sources */,

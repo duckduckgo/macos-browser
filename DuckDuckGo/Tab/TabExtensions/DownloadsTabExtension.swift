@@ -111,34 +111,8 @@ extension DownloadsTabExtension: NavigationResponder {
     }
 
     @MainActor
-    func navigationAction(_ navigationAction: NavigationAction, willBecomeDownloadIn webView: WKWebView) {
-#if !APPSTORE
-        // register the navigationResponse for legacy _WKDownload to be called back on the Tab
-        // further download will be passed to webView:navigationResponse:didBecomeDownload:
-        webView.configuration.processPool
-            .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)?
-            .registerDownloadDidStartCallback(for: navigationAction.url) { [weak self] download in
-                self?.navigationAction(navigationAction, didBecome: download) ?? { download.cancel() }()
-            }
-#endif
-    }
-
-    @MainActor
     func navigationAction(_ navigationAction: NavigationAction, didBecome download: WebKitDownload) {
         enqueueDownload(download, withNavigationAction: navigationAction)
-    }
-
-    @MainActor
-    func navigationResponse(_ navigationResponse: NavigationResponse, willBecomeDownloadIn webView: WKWebView) {
-#if !APPSTORE
-        // register the navigationResponse for legacy _WKDownload to be called back on the Tab
-        // further download will be passed to webView:navigationResponse:didBecomeDownload:
-        webView.configuration.processPool
-            .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)?
-            .registerDownloadDidStartCallback(for: navigationResponse.url) { [weak self] download in
-                self?.navigationResponse(navigationResponse, didBecome: download) ?? { download.cancel() }()
-            }
-#endif
     }
 
     @MainActor

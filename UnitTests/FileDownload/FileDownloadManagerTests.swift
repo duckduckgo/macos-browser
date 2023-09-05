@@ -20,7 +20,6 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@available(macOS 11.3, *)
 final class FileDownloadManagerTests: XCTestCase {
 
     private let testGroupName = "test"
@@ -254,7 +253,6 @@ final class FileDownloadManagerTests: XCTestCase {
 
 }
 
-@available(macOS 11.3, *)
 extension FileDownloadManagerTests: DownloadTaskDelegate {
 
     @MainActor

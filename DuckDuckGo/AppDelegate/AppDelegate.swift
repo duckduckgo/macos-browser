@@ -208,9 +208,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
 #if NETWORK_PROTECTION
-        if #available(macOS 11.4, *) {
-            NetworkProtectionAppEvents().applicationDidFinishLaunching()
-        }
+        NetworkProtectionAppEvents().applicationDidFinishLaunching()
 #endif
 
 #if DBP

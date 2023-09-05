@@ -34,14 +34,8 @@ extension HomePage.Views {
 
                 HStack {
                     Text(isExpanded ? UserText.moreOrLessCollapse : UserText.moreOrLessExpand)
-                    Group {
-                        if #available(macOS 11.0, *) {
-                            Image("HomeArrowUp")
-                        } else {
-                            Text("^")
-                        }
-                    }
-                    .rotationEffect(.degrees(isExpanded ? 0 : 180))
+                    Image("HomeArrowUp")
+                        .rotationEffect(.degrees(isExpanded ? 0 : 180))
                 }
                 .foregroundColor(Color("HomePageMoreOrLessTextColor"))
 

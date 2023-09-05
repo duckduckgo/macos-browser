@@ -39,29 +39,27 @@ final class AppMain {
 
     static func main() {
 #if NETWORK_PROTECTION
-        if #available(macOS 11.4, *) {
-            switch (CommandLine.arguments.first! as NSString).lastPathComponent {
-            case "startVPN":
-                swizzleMainBundle()
+        switch (CommandLine.arguments.first! as NSString).lastPathComponent {
+        case "startVPN":
+            swizzleMainBundle()
 
-                Task {
-                    await NetworkProtectionTunnelController().start(enableLoginItems: false)
-                    exit(0)
-                }
-
-                dispatchMain()
-            case "stopVPN":
-                swizzleMainBundle()
-
-                Task {
-                    await NetworkProtectionTunnelController().stop()
-                    exit(0)
-                }
-
-                dispatchMain()
-            default:
-                break
+            Task {
+                await NetworkProtectionTunnelController().start(enableLoginItems: false)
+                exit(0)
             }
+
+            dispatchMain()
+        case "stopVPN":
+            swizzleMainBundle()
+
+            Task {
+                await NetworkProtectionTunnelController().stop()
+                exit(0)
+            }
+
+            dispatchMain()
+        default:
+            break
         }
 #endif
 

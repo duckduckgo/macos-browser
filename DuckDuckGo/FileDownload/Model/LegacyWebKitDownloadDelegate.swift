@@ -31,7 +31,6 @@ final class LegacyWebKitDownloadDelegate: NSObject {
 
 }
 
-@available(macOS 11.3, *) // objc doesn‘t care about availability and object types
 // https://github.com/WebKit/webkit/blob/main/Source/WebKit/UIProcess/API/Cocoa/_WKDownloadDelegate.h
 private extension LegacyWebKitDownloadDelegate {
 

@@ -241,7 +241,6 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
 }
 
 extension WebKitDownloadTask: WebKitDownloadDelegate {}
-@available(macOS 11.3, *) // objc does‘t care about availability
 @objc extension WebKitDownloadTask {
 
     func download(_: WKDownload,

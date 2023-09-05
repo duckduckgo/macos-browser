@@ -74,17 +74,8 @@ final class DuckPlayerTabExtension {
         youtubePlayerCancellables.removeAll()
         guard duckPlayer.isAvailable else { return }
 
-        // only send push updates on macOS 11+ where it's safe to call window.* messages in the browser
-        let canPushMessagesToJS: Bool = {
-            if #available(macOS 11, *) {
-                return true
-            } else {
-                return false
-            }
-        }()
-
         if let hostname = url?.host, let script = youtubeOverlayScript {
-            if script.messageOriginPolicy.isAllowed(hostname) && canPushMessagesToJS {
+            if script.messageOriginPolicy.isAllowed(hostname) {
                 duckPlayer.$mode
                         .dropFirst()
                         .receive(on: DispatchQueue.main)
@@ -105,22 +96,20 @@ final class DuckPlayerTabExtension {
         if url?.isDuckPlayer == true {
             youtubePlayerScript?.isEnabled = true
 
-            if canPushMessagesToJS {
-                duckPlayer.$mode
-                    .dropFirst()
-                    .receive(on: DispatchQueue.main)
-                    .sink { [weak self] playerMode in
-                        guard let self = self else {
-                            return
-                        }
-                        let userValues = UserValues(
-                                duckPlayerMode: playerMode,
-                                overlayInteracted: self.duckPlayer.overlayInteracted
-                        )
-                        self.youtubePlayerScript?.userValuesUpdated(userValues: userValues)
+            duckPlayer.$mode
+                .dropFirst()
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] playerMode in
+                    guard let self = self else {
+                        return
                     }
-                    .store(in: &youtubePlayerCancellables)
-            }
+                    let userValues = UserValues(
+                            duckPlayerMode: playerMode,
+                            overlayInteracted: self.duckPlayer.overlayInteracted
+                    )
+                    self.youtubePlayerScript?.userValuesUpdated(userValues: userValues)
+                }
+                .store(in: &youtubePlayerCancellables)
         } else {
             youtubePlayerScript?.isEnabled = false
         }

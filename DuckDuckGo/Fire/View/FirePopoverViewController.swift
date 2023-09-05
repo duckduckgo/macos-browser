@@ -63,7 +63,6 @@ final class FirePopoverViewController: NSViewController {
     @IBOutlet weak var cancelButton: NSButton!
     @IBOutlet weak var closeBurnerWindowButton: NSButton!
 
-    private var appearanceCancellable: AnyCancellable?
     private var viewModelCancellable: AnyCancellable?
     private var selectedCancellable: AnyCancellable?
 
@@ -107,7 +106,6 @@ final class FirePopoverViewController: NSViewController {
         updateCloseDetailsButton()
         updateWarningWrapperView()
 
-        appearanceCancellable = view.subscribeForAppApperanceUpdates()
         subscribeToViewModel()
         subscribeToSelected()
     }

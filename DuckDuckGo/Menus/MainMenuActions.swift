@@ -182,11 +182,7 @@ extension AppDelegate {
             accessoryContainer.frame.size = accessoryContainer.fittingSize
 
             savePanel.accessoryView = accessoryContainer
-            if #available(macOS 11.0, *) {
-                savePanel.allowedContentTypes = [.commaSeparatedText]
-            } else {
-                savePanel.allowedFileTypes = ["csv"]
-            }
+            savePanel.allowedContentTypes = [.commaSeparatedText]
 
             savePanel.beginSheetModal(for: window) { response in
                 guard response == .OK, let selectedURL = savePanel.url else { return }
@@ -210,12 +206,7 @@ extension AppDelegate {
 
         let savePanel = NSSavePanel()
         savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportBookmarksFileNameSuffix)"
-
-        if #available(macOS 11.0, *) {
-            savePanel.allowedContentTypes = [.html]
-        } else {
-            savePanel.allowedFileTypes = ["html"]
-        }
+        savePanel.allowedContentTypes = [.html]
 
         savePanel.beginSheetModal(for: window) { response in
             guard response == .OK, let selectedURL = savePanel.url else { return }

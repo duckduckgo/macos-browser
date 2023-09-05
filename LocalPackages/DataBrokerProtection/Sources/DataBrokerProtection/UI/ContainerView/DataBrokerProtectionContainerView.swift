@@ -18,7 +18,6 @@
 
 import SwiftUI
 
-@available(macOS 11.0, *)
 struct DataBrokerProtectionContainerView: View {
     @ObservedObject var containerViewModel: ContainerViewModel
     @ObservedObject var navigationViewModel: ContainerNavigationViewModel
@@ -154,7 +153,6 @@ struct DataBrokerProtectionContainerView: View {
     }
 }
 
-@available(macOS 11.0, *)
 struct DataBrokerProtectionContainerView_Previews: PreviewProvider {
     static var previews: some View {
         let dataManager = PreviewDataManager()

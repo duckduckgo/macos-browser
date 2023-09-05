@@ -88,13 +88,8 @@ extension NSSavePanel {
 
     private(set) var selectedFileType: UTType? {
         get {
-            if #available(macOS 11.0, *) {
-                guard let contentType = self.allowedContentTypes.first else { return nil }
-                return UTType(rawValue: contentType.identifier as CFString)
-            } else {
-                guard let fileType = self.allowedFileTypes?.first else { return nil }
-                return UTType(rawValue: fileType as CFString)
-            }
+            guard let contentType = self.allowedContentTypes.first else { return nil }
+            return UTType(rawValue: contentType.identifier as CFString)
         }
         set {
             let oldFileExtension = selectedFileType?.fileExtension
@@ -108,13 +103,8 @@ extension NSSavePanel {
 
             // 3. now since we‘ve done what we wanted, let‘s use a designated API which isn‘t (always) working
             // e.g. changing .xml -> .rss will change file extension, but .rss -> xml - won‘t  ¯\_(ツ)_/¯
-            if #available(macOS 11.0, *) {
-                self.allowedContentTypes = (newValue.flatMap { UniformTypeIdentifiers.UTType($0.rawValue as String) }.map { [$0] } ?? [])
-                    + [UniformTypeIdentifiers.UTType.data] // always allow any file type
-            } else {
-                self.allowedFileTypes = (newValue.map { [$0.rawValue as String] } ?? [])
-                    + [UTType.data.rawValue as String] // always allow any file type
-            }
+            self.allowedContentTypes = (newValue.flatMap { UniformTypeIdentifiers.UTType($0.rawValue as String) }.map { [$0] } ?? [])
+            + [UniformTypeIdentifiers.UTType.data] // always allow any file type
         }
     }
 
