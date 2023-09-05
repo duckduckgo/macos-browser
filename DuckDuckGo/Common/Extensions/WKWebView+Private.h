@@ -17,7 +17,6 @@
 //  limitations under the License.
 //
 #import <WebKit/WebKit.h>
-#import "_WKDownload.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -29,7 +29,7 @@ extension NSSavePanel {
     static private var preferredFileType: [String: String]
 
     private var defaultsKey: String {
-        fileTypesPopup?.itemArray.compactMap { ($0.representedObject as? UTType)?.mimeType }.joined(separator: ";") ?? ""
+        fileTypesPopup?.itemArray.compactMap { ($0.representedObject as? UTType)?.preferredMIMEType }.joined(separator: ";") ?? ""
     }
 
     static func savePanelWithFileTypeChooser(fileTypes: [UTType], suggestedFilename: String?, directoryURL: URL? = nil) -> NSSavePanel {
@@ -44,7 +44,7 @@ extension NSSavePanel {
             popup.action = #selector(NSSavePanel.fileTypePopUpSelectionDidChange(_:))
 
             for fileType in fileTypes {
-                popup.addItem(withTitle: "\(fileType.description ?? "") (.\(fileType.fileExtension ?? ""))")
+                popup.addItem(withTitle: "\(fileType.description) (.\(fileType.preferredFilenameExtension ?? ""))")
                 let item = popup.item(at: popup.numberOfItems - 1)
                 item?.representedObject = fileType
             }
@@ -79,8 +79,8 @@ extension NSSavePanel {
         self.selectedFileType = fileType
 
         // save selected file mime type
-        if fileType?.fileExtension?.isEmpty == false,
-           let mimeType = fileType?.mimeType {
+        if fileType?.preferredFilenameExtension?.isEmpty == false,
+           let mimeType = fileType?.preferredMIMEType {
 
             Self.preferredFileType[defaultsKey] = mimeType
         }
@@ -88,23 +88,25 @@ extension NSSavePanel {
 
     private(set) var selectedFileType: UTType? {
         get {
-            guard let contentType = self.allowedContentTypes.first else { return nil }
-            return UTType(rawValue: contentType.identifier as CFString)
+            self.allowedContentTypes.first
         }
         set {
-            let oldFileExtension = selectedFileType?.fileExtension
+            let oldFileExtension = selectedFileType?.preferredFilenameExtension
             let setRequiredFileType = NSSelectorFromString("setRequiredFileType:")
             if responds(to: setRequiredFileType) {
                 // 1. make sure the panel has an old extension selected so it is replaced when we change it
                 self.perform(setRequiredFileType, with: oldFileExtension)
                 // 2. use good ol' working method to replace the extension
-                self.perform(setRequiredFileType, with: newValue?.fileExtension)
+                self.perform(setRequiredFileType, with: newValue?.preferredFilenameExtension)
             } else { assertionFailure("NSSavePanel does not respond to setRequiredFileType:") }
 
             // 3. now since we‘ve done what we wanted, let‘s use a designated API which isn‘t (always) working
             // e.g. changing .xml -> .rss will change file extension, but .rss -> xml - won‘t  ¯\_(ツ)_/¯
-            self.allowedContentTypes = (newValue.flatMap { UniformTypeIdentifiers.UTType($0.rawValue as String) }.map { [$0] } ?? [])
-            + [UniformTypeIdentifiers.UTType.data] // always allow any file type
+            var fileTypes = newValue.map { [$0] } ?? []
+            if newValue != .data {
+                fileTypes.append(.data) // always allow any file type
+            }
+            self.allowedContentTypes = fileTypes
         }
     }
 

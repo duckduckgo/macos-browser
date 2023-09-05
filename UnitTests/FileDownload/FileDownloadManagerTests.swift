@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import UniformTypeIdentifiers
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -115,7 +116,7 @@ final class FileDownloadManagerTests: XCTestCase {
             dispatchPrecondition(condition: .onQueue(.main))
             XCTAssertEqual(suggestedFilename, "suggested.filename")
             XCTAssertEqual(directoryURL, downloadsURL)
-            XCTAssertEqual(fileTypes, [UTType(fileExtension: "filename")!, .pdf])
+            XCTAssertEqual(fileTypes, [UTType(filenameExtension: "filename")!, .pdf])
             e1.fulfill()
 
             callback(nil, nil)
@@ -125,7 +126,7 @@ final class FileDownloadManagerTests: XCTestCase {
         dm.add(download, fromBurnerWindow: false, delegate: self, location: .prompt)
 
         let url = URL(string: "https://duckduckgo.com/somefile.html")!
-        let response = URLResponse(url: url, mimeType: UTType.pdf.mimeType, expectedContentLength: 1, textEncodingName: "utf-8")
+        let response = URLResponse(url: url, mimeType: UTType.pdf.preferredMIMEType, expectedContentLength: 1, textEncodingName: "utf-8")
         let e2 = expectation(description: "WKDownload callback called")
         download.delegate?.download(download.asWKDownload(),
                                     decideDestinationUsing: response,
@@ -148,7 +149,7 @@ final class FileDownloadManagerTests: XCTestCase {
             dispatchPrecondition(condition: .onQueue(.main))
             XCTAssertEqual(suggestedFilename, "suggested.filename")
             XCTAssertEqual(directoryURL, downloadsURL)
-            XCTAssertEqual(fileTypes, [UTType(fileExtension: "filename")!, .html])
+            XCTAssertEqual(fileTypes, [UTType(filenameExtension: "filename")!, .html])
             e1.fulfill()
 
             callback(localURL, .html)
@@ -158,7 +159,7 @@ final class FileDownloadManagerTests: XCTestCase {
         dm.add(download, fromBurnerWindow: false, delegate: self, location: .auto)
 
         let url = URL(string: "https://duckduckgo.com/somefile.html")!
-        let response = URLResponse(url: url, mimeType: UTType.html.mimeType, expectedContentLength: 1, textEncodingName: "utf-8")
+        let response = URLResponse(url: url, mimeType: UTType.html.preferredMIMEType, expectedContentLength: 1, textEncodingName: "utf-8")
         let e2 = expectation(description: "WKDownload callback called")
         download.delegate?.download(download.asWKDownload(),
                                     decideDestinationUsing: response,

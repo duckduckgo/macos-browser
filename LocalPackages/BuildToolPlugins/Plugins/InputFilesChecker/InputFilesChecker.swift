@@ -25,8 +25,6 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("BWEncryptionOutput.m", .source),
     .init("BWManager.swift", .source),
     .init("UpdateController.swift", .source),
-    .init("LegacyWebKitDownloadDelegate.swift", .source),
-    .init("_WKDownload+WebKitDownload.swift", .source),
     .init("SystemExtensionManager.swift", .source),
     .init("DuckDuckGo Agent.app", .unknown),
     .init("DuckDuckGo Notifications.app", .unknown),

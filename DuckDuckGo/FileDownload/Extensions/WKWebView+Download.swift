@@ -18,23 +18,10 @@
 
 import Foundation
 import Navigation
+import UniformTypeIdentifiers
 import WebKit
 
 extension WKWebView {
-
-    func startDownload(_ request: URLRequest, completionHandler: @escaping (WebKitDownload) -> Void) {
-        startDownload(using: request, completionHandler: completionHandler)
-    }
-
-    func resumeDownload(from resumeData: Data, to localURL: URL, completionHandler: @escaping (WebKitDownload) -> Void) throws {
-#if APPSTORE
-        resumeDownload(fromResumeData: resumeData, completionHandler: completionHandler)
-#else
-        try NSException.catch {
-            resumeDownload(fromResumeData: resumeData, completionHandler: completionHandler)
-        }
-#endif
-    }
 
     var suggestedFilename: String? {
         guard let title = self.title?.replacingOccurrences(of: "[~#@*+%{}<>\\[\\]|\"\\_^\\/:\\\\]",

@@ -20,6 +20,7 @@ import Combine
 import Common
 import Foundation
 import Navigation
+import UniformTypeIdentifiers
 import WebKit
 
 protocol TabDownloadsDelegate: AnyObject {
@@ -61,9 +62,9 @@ final class DownloadsTabExtension: NSObject {
 
     @MainActor
     private func saveWebViewContentAs(_ webView: WKWebView) async {
-        guard await webView.mimeType == UTType.html.mimeType else {
+        guard await webView.mimeType == UTType.html.preferredMIMEType else {
             if let url = webView.url {
-                webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
+                webView.startDownload(using: URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
                     self.downloadManager.add(download,
                                              fromBurnerWindow: self.isBurner,
                                              delegate: self, location: .prompt)
