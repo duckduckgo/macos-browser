@@ -20,7 +20,7 @@ import Foundation
 import Common
 
 protocol DataBrokerProtectionRepository {
-    func save(_ profile: DataBrokerProtectionProfile)
+    func save(_ profile: DataBrokerProtectionProfile) async
     func fetchProfile() -> DataBrokerProtectionProfile?
 
     func saveOptOutOperation(optOut: OptOutOperationData, extractedProfile: ExtractedProfile) throws
@@ -47,7 +47,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         self.vault = vault
     }
 
-    func save(_ profile: DataBrokerProtectionProfile) {
+    func save(_ profile: DataBrokerProtectionProfile) async {
         do {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
             let profileQueries = profile.profileQueries

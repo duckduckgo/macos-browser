@@ -23,7 +23,7 @@ public protocol DataBrokerProtectionDataManaging {
     var delegate: DataBrokerProtectionDataManagerDelegate? { get set }
 
     init(fakeBrokerFlag: FakeBrokerFlag)
-    func saveProfile(_ profile: DataBrokerProtectionProfile)
+    func saveProfile(_ profile: DataBrokerProtectionProfile) async
     func fetchProfile(ignoresCache: Bool) -> DataBrokerProtectionProfile?
     func fetchDataBrokerInfoData(ignoresCache: Bool) -> [DataBrokerInfoData]
     func fetchBrokerProfileQueryData(ignoresCache: Bool) -> [BrokerProfileQueryData]
@@ -58,8 +58,8 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         self.database = DataBrokerProtectionDatabase(fakeBrokerFlag: fakeBrokerFlag)
     }
 
-    public func saveProfile(_ profile: DataBrokerProtectionProfile) {
-        database.save(profile)
+    public func saveProfile(_ profile: DataBrokerProtectionProfile) async {
+        await database.save(profile)
         cache.invalidate()
         cache.profile = profile
     }
