@@ -75,10 +75,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     // swiftlint:disable:next function_body_length
     func applicationWillFinishLaunching(_ notification: Notification) {
-#if !APPSTORE && !DEBUG
-        PFMoveToApplicationsFolderIfNecessary()
-#endif
-
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
         Configuration.setURLProvider(AppConfigurationURLProvider())
 
@@ -189,7 +185,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         BWManager.shared.initCommunication()
 
-        if WindowsManager.windows.isEmpty,
+        if !(WindowsManager.windows.first?.windowController is MainWindowController),
            case .normal = NSApp.runType {
             WindowsManager.openNewWindow(lazyLoadTabs: true)
         }
