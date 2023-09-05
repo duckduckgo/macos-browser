@@ -120,7 +120,6 @@ struct BadgeAnimationView_Previews: PreviewProvider {
     }
 }
 
-
 private enum Consts {
     enum View {
         static let cornerRadius: CGFloat = 5
