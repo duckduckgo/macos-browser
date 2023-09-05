@@ -246,9 +246,17 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             for broker in brokers {
                 for profileQuery in profileQueries {
                     if let brokerId = broker.id, let profileQueryId = profileQuery.id {
-                        if let brokerProfileQueryData = brokerProfileQueryData(for: brokerId, and: profileQueryId) {
-                            brokerProfileQueryDataList.append(brokerProfileQueryData)
-                        }
+                        guard let scanOperation = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) else { continue }
+                        let optOutOperations = try vault.fetchOptOuts(brokerId: brokerId, profileQueryId: profileQueryId)
+
+                        let brokerProfileQueryData = BrokerProfileQueryData(
+                            dataBroker: broker,
+                            profileQuery: profileQuery,
+                            scanOperationData: scanOperation,
+                            optOutOperationsData: optOutOperations
+                        )
+
+                        brokerProfileQueryDataList.append(brokerProfileQueryData)
                     }
                 }
             }
