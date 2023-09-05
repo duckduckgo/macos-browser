@@ -83,6 +83,7 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
         switch methodName {
         case "getSubscription": return getSubscription
         case "setSubscription": return setSubscription
+        case "backToSettings": return backToSettings
         default:
             return nil
         }
@@ -100,6 +101,17 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
         let token: String
     }
 
+    struct EmailProtectionValues: Codable {
+        enum CodingKeys: String, CodingKey {
+            case token
+            case user
+            case cohort
+        }
+        let token: String
+        let user: String
+        let cohort: String
+    }
+
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let subscription = Subscription(token: savedToken)
         return subscription
@@ -112,6 +124,11 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
         }
 
         savedToken = subscriptionValues.token
+        return nil
+    }
+
+    func backToSettings(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        print(">>> 'backToSettings' was called from the subscriptions web front-end")
         return nil
     }
 }
