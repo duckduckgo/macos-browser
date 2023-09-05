@@ -72,10 +72,10 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
         simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelMemoryOveruse)
     }
 
-    private func simulateFailure(_ simulationFunction: () async throws -> Void) {
+    private func simulateFailure(_ simulationFunction: @escaping () async throws -> Void) {
         Task {
             do {
-                try await simulationFunction
+                try await simulationFunction()
             } catch {
                 await NSAlert(error: error).runModal()
             }
