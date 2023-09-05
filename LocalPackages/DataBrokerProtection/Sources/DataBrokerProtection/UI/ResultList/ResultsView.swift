@@ -24,6 +24,14 @@ struct ResultsView: View {
 
     var body: some View {
         VStack(spacing: Const.verticalSpacing) {
+            if viewModel.isLoading {
+                HeaderView(title: "We are crunching your local data ...",
+                           subtitle: "The list of profiles matches will appear soon",
+                           iconName: "clock.fill",
+                           iconColor: .gray)
+                ProgressView()
+            }
+
             if !viewModel.pendingProfiles.isEmpty {
                 PendingProfilesView(profiles: viewModel.pendingProfiles)
             }

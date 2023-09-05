@@ -97,9 +97,7 @@ final class ProfileViewModel: ObservableObject {
     }
 
     var hasOperationContent: Bool {
-        let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
-        let hasResults = brokerProfileData.contains { $0.hasMatches }
-        return hasResults
+        return self.dataManager.wereThereAnyMatches()
     }
 
     var isProfileValid: Bool {

@@ -25,7 +25,7 @@ public protocol DataBrokerProtectionDataManaging {
     init(fakeBrokerFlag: FakeBrokerFlag)
     func saveProfile(_ profile: DataBrokerProtectionProfile) async
     func fetchProfile(ignoresCache: Bool) -> DataBrokerProtectionProfile?
-    func fetchBrokerProfileQueryData(ignoresCache: Bool) -> [BrokerProfileQueryData]
+    func fetchBrokerProfileQueryData(ignoresCache: Bool) async -> [BrokerProfileQueryData]
     func wereThereAnyMatches() -> Bool
 }
 
@@ -34,8 +34,8 @@ extension DataBrokerProtectionDataManaging {
         fetchProfile(ignoresCache: false)
     }
 
-    func fetchBrokerProfileQueryData() -> [BrokerProfileQueryData] {
-        fetchBrokerProfileQueryData(ignoresCache: false)
+    func fetchBrokerProfileQueryData() async -> [BrokerProfileQueryData] {
+        await fetchBrokerProfileQueryData(ignoresCache: false)
     }
 }
 
@@ -75,7 +75,7 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         }
     }
 
-    public func fetchBrokerProfileQueryData(ignoresCache: Bool = false) -> [BrokerProfileQueryData] {
+    public func fetchBrokerProfileQueryData(ignoresCache: Bool = false) async -> [BrokerProfileQueryData] {
         if !ignoresCache, !cache.brokerProfileQueryData.isEmpty {
             os_log("Returning cached brokerProfileQueryData", log: .dataBrokerProtection)
             return cache.brokerProfileQueryData

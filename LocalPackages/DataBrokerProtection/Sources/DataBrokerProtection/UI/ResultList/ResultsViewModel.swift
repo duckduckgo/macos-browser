@@ -55,6 +55,7 @@ final class ResultsViewModel: ObservableObject {
 
     @Published var removedProfiles =  [RemovedProfile]()
     @Published var pendingProfiles = [PendingProfile]()
+    @Published var isLoading = false
 
     init(dataManager: DataBrokerProtectionDataManaging,
          notificationCenter: NotificationCenter = .default) {
@@ -78,44 +79,50 @@ final class ResultsViewModel: ObservableObject {
     }
 
     private func updateUI(ignoresCache: Bool) {
-        let brokersInfoData = dataManager.fetchBrokerProfileQueryData(ignoresCache: ignoresCache)
-        var removedProfiles = [RemovedProfile]()
-        var pendingProfiles = [PendingProfile]()
+        isLoading = true
+        Task {
+            let brokersInfoData = await dataManager.fetchBrokerProfileQueryData(ignoresCache: ignoresCache)
 
-        for brokerProfileQueryData in brokersInfoData {
-            for optOutOperationData in brokerProfileQueryData.optOutOperationsData {
+            DispatchQueue.main.async {
+                var removedProfiles = [RemovedProfile]()
+                var pendingProfiles = [PendingProfile]()
 
-                if optOutOperationData.extractedProfile.removedDate == nil {
-                    var errorName: String?
-                    var errorDescription: String?
+                for brokerProfileQueryData in brokersInfoData {
+                    for optOutOperationData in brokerProfileQueryData.optOutOperationsData {
+                        if optOutOperationData.extractedProfile.removedDate == nil {
+                            var errorName: String?
+                            var errorDescription: String?
 
-                    let sortedEvents = optOutOperationData.historyEvents.sorted { $0.date < $1.date }
-                    if let lastEvent = sortedEvents.last {
-                        if case .error(let error) = lastEvent.type {
-                            errorName = error.userReadableError.title
-                            errorDescription = error.userReadableError.subtitle
+                            let sortedEvents = optOutOperationData.historyEvents.sorted { $0.date < $1.date }
+                            if let lastEvent = sortedEvents.last {
+                                if case .error(let error) = lastEvent.type {
+                                    errorName = error.userReadableError.title
+                                    errorDescription = error.userReadableError.subtitle
+                                }
+                            }
+
+                            let profile = PendingProfile(
+                                dataBroker: brokerProfileQueryData.dataBroker.name,
+                                profile: optOutOperationData.extractedProfile.fullName ?? "",
+                                address: optOutOperationData.extractedProfile.addresses?.first?.fullAddress ?? "",
+                                error: errorName,
+                                errorDescription: errorDescription,
+                                operationData: optOutOperationData)
+
+                            pendingProfiles.append(profile)
+                        } else {
+                            let profile = RemovedProfile(dataBroker: brokerProfileQueryData.dataBroker.name,
+                                                         scheduledDate: brokerProfileQueryData.scanOperationData.preferredRunDate)
+                            removedProfiles.append(profile)
                         }
                     }
-
-                    let profile = PendingProfile(
-                        dataBroker: brokerProfileQueryData.dataBroker.name,
-                        profile: optOutOperationData.extractedProfile.fullName ?? "",
-                        address: optOutOperationData.extractedProfile.addresses?.first?.fullAddress ?? "",
-                        error: errorName,
-                        errorDescription: errorDescription,
-                        operationData: optOutOperationData)
-
-                    pendingProfiles.append(profile)
-                } else {
-                    let profile = RemovedProfile(dataBroker: brokerProfileQueryData.dataBroker.name,
-                                                 scheduledDate: brokerProfileQueryData.scanOperationData.preferredRunDate)
-                    removedProfiles.append(profile)
                 }
+
+                self.isLoading = false
+                self.removedProfiles = removedProfiles
+                self.pendingProfiles = pendingProfiles
             }
         }
-
-        self.removedProfiles = removedProfiles
-        self.pendingProfiles = pendingProfiles
     }
 
     @objc public func reloadData() {

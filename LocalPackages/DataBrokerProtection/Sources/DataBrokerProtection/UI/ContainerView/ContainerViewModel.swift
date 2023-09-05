@@ -107,13 +107,14 @@ final class ContainerViewModel: ObservableObject {
     }
 
     private func updateHeaderStatus() {
-        let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
-        let scanHistoryEvents = brokerProfileData.flatMap { $0.scanOperationData.historyEvents }
+        //TODO: FIX THIS
+//        let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
+//        let scanHistoryEvents = brokerProfileData.flatMap { $0.scanOperationData.historyEvents }
         var status = ""
 
-        if let date = getLastEventDate(events: scanHistoryEvents) {
-            status = "Last Scan \(date)"
-        }
+//        if let date = getLastEventDate(events: scanHistoryEvents) {
+//            status = "Last Scan \(date)"
+//        }
         self.headerStatusText = status
     }
 
@@ -135,8 +136,7 @@ final class ContainerViewModel: ObservableObject {
             guard let self = self else { return }
 
             DispatchQueue.main.async {
-                let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
-                let hasResults = brokerProfileData.contains { $0.hasMatches }
+                let hasResults = self.dataManager.wereThereAnyMatches()
 
                 if hasResults {
                     completion(.results)
