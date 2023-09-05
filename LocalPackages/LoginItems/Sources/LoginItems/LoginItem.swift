@@ -21,21 +21,6 @@ import os.log // swiftlint:disable:this enforce_os_log_wrapper
 import Foundation
 import ServiceManagement
 
-#if NETWORK_PROTECTION
-
-import LoginItems
-
-extension LoginItem {
-
-    static let vpnMenu = LoginItem(bundleId: Bundle.main.vpnMenuAgentBundleId, url: Bundle.main.vpnMenuAgentURL, log: .networkProtection)
-#if NETP_SYSTEM_EXTENSION
-    static let notificationsAgent = LoginItem(bundleId: Bundle.main.notificationsAgentBundleId, url: Bundle.main.notificationsAgentURL, log: .networkProtection)
-#endif
-
-}
-
-#endif
-
 /// Takes care of enabling and disabling a login item.
 ///
 public struct LoginItem: Equatable, Hashable {

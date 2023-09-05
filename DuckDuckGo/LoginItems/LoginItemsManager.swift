@@ -20,6 +20,8 @@ import Common
 import Foundation
 import LoginItems
 
+#if NETWORK_PROTECTION
+
 extension LoginItemsManager {
     static var networkProtectionLoginItems: Set<LoginItem> {
         var items: Set<LoginItem> = [.vpnMenu]
@@ -29,6 +31,7 @@ extension LoginItemsManager {
         return items
     }
 }
+#endif
 
 /// Class to manage the login items for Network Protection and DBP
 /// 
