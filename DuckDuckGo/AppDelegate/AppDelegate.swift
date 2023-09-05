@@ -185,7 +185,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         BWManager.shared.initCommunication()
 
-        if !(WindowsManager.windows.first?.windowController is MainWindowController),
+        if WindowsManager.windows.isEmpty,
            case .normal = NSApp.runType {
             WindowsManager.openNewWindow(lazyLoadTabs: true)
         }
