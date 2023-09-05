@@ -990,10 +990,24 @@ CQ
                                                                         <action selector="simulateTunnelFailure:" target="iLs-sj-2Gd" id="tZL-Vl-6mu"/>
                                                                     </connections>
                                                                 </menuItem>
+                                                                <menuItem title="Tunnel Crash" id="A5n-J7-hYk" userLabel="Tunnel Crash">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="simulateTunnelCrash:" target="iLs-sj-2Gd" id="VH7-WB-2dD"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="Tunnel Memory Overuse" id="L0R-PE-ZcK" userLabel="Tunnel Memory Overuse">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="simulateTunnelMemoryOveruse:" target="iLs-sj-2Gd" id="hQM-mG-zWl"/>
+                                                                    </connections>
+                                                                </menuItem>
                                                             </items>
                                                             <connections>
                                                                 <outlet property="simulateControllerFailureMenuItem" destination="xyA-ob-gEy" id="1VV-xV-wsB"/>
+                                                                <outlet property="simulateTunnelCrashMenuItem" destination="A5n-J7-hYk" id="gvK-di-vTP"/>
                                                                 <outlet property="simulateTunnelFailureMenuItem" destination="kVa-n8-UNx" id="3Ie-Ed-VtG"/>
+                                                                <outlet property="simulateTunnelMemoryOveruseMenuItem" destination="L0R-PE-ZcK" id="ecV-2C-OrN"/>
                                                             </connections>
                                                         </menu>
                                                     </menuItem>

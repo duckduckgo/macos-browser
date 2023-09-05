@@ -321,6 +321,16 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             options[NetworkProtectionOptionKey.tunnelFailureSimulation] = NetworkProtectionOptionValue.true
         }
 
+        if Self.simulationOptions.isEnabled(.crashFatalError) {
+            Self.simulationOptions.setEnabled(false, option: .crashFatalError)
+            options[NetworkProtectionOptionKey.tunnelFatalErrorCrashSimulation] = NetworkProtectionOptionValue.true
+        }
+
+        if Self.simulationOptions.isEnabled(.crashMemory) {
+            Self.simulationOptions.setEnabled(false, option: .crashMemory)
+            options[NetworkProtectionOptionKey.tunnelMemoryCrashSimulation] = NetworkProtectionOptionValue.true
+        }
+
         if Self.simulationOptions.isEnabled(.controllerFailure) {
             Self.simulationOptions.setEnabled(false, option: .controllerFailure)
             throw StartError.simulateControllerFailureError
@@ -545,13 +555,11 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     @MainActor
-    private func simulateTunnelFailure() async throws {
-        Self.simulationOptions.setEnabled(true, option: .tunnelFailure)
-
+    private func simulateTunnelFailure(_ message: ExtensionMessage) async throws {
         guard await isConnected,
               let activeSession = try await ConnectionSessionUtilities.activeSession() else { return }
 
-        let errorMessage: ExtensionMessageString? = try await activeSession.sendProviderMessage(.simulateTunnelFailure)
+        let errorMessage: ExtensionMessageString? = try await activeSession.sendProviderMessage(message)
         if let errorMessage {
             throw TunnelFailureError(errorDescription: errorMessage.value)
         }
@@ -566,10 +574,30 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         if Self.simulationOptions.isEnabled(.tunnelFailure) {
             Self.simulationOptions.setEnabled(false, option: .tunnelFailure)
         } else {
-            try await simulateTunnelFailure()
+            Self.simulationOptions.setEnabled(true, option: .tunnelFailure)
+            try await simulateTunnelFailure(.simulateTunnelFailure)
         }
     }
 
+    @MainActor
+    func toggleShouldSimulateTunnelFatalError() async throws {
+        if Self.simulationOptions.isEnabled(.crashFatalError) {
+            Self.simulationOptions.setEnabled(false, option: .crashFatalError)
+        } else {
+            Self.simulationOptions.setEnabled(true, option: .crashFatalError)
+            try await simulateTunnelFailure(.simulateTunnelFatalError)
+        }
+    }
+
+    @MainActor
+    func toggleShouldSimulateTunnelMemoryOveruse() async throws {
+        if Self.simulationOptions.isEnabled(.crashMemory) {
+            Self.simulationOptions.setEnabled(false, option: .crashMemory)
+        } else {
+            Self.simulationOptions.setEnabled(true, option: .crashMemory)
+            try await simulateTunnelFailure(.simulateTunnelMemoryOveruse)
+        }
+    }
 }
 
 #endif
