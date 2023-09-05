@@ -292,12 +292,14 @@ private struct PrivateEmailMessage: View {
         VStack {
             if model.shouldShowPrivateEmailSignedOutMesage {
                 if model.isSignedIn {
-                    Text(model.privateEmailMessage)
-                        .font(.subheadline)
-                        .lineLimit(nil)
-                        .multilineTextAlignment(.leading)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .animation(.easeInOut)
+                    withAnimation(.easeInOut) {
+                        Text(model.privateEmailMessage)
+                            .font(.subheadline)
+                            .lineLimit(nil)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
                 } else {
 
                     if #available(macOS 12.0, *) {

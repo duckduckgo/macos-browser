@@ -54,19 +54,11 @@ final class SharingMenu: NSMenu {
     }
 
     @objc func openSharingPreferences(_ sender: NSMenuItem) {
-        let url = URL(fileURLWithPath: "/System/Library/PreferencePanes/Extensions.prefPane")
-        let plist = [
-            "action": "revealExtensionPoint",
-            "protocol": "com.apple.share-services"
-        ]
-        let data = try? PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
-        let descriptor = NSAppleEventDescriptor(descriptorType: .openSharingSubpane, data: data)
-
-        NSWorkspace.shared.open([url],
-                                withAppBundleIdentifier: nil,
-                                options: .async,
-                                additionalEventParamDescriptor: descriptor,
-                                launchIdentifiers: nil)
+        guard let preferencesLink = URL(string: "x-apple.systempreferences:com.apple.preferences.extensions?Sharing") else {
+            assertionFailure("Can't initialize preferences link")
+            return
+        }
+        NSWorkspace.shared.open(preferencesLink)
     }
 
     @objc func sharingItemSelected(_ sender: NSMenuItem) {
