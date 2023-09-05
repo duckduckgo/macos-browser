@@ -154,7 +154,10 @@ final class MainMenu: NSMenu {
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
         updateLoggingMenuItems()
+
+#if NETWORK_PROTECTION
         updateNetworkProtectionItems()
+#endif
     }
 
     @MainActor
@@ -352,6 +355,7 @@ final class MainMenu: NSMenu {
         }
     }
 
+#if NETWORK_PROTECTION
     private func updateNetworkProtectionItems() {
         let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: NetworkProtectionWaitlist.identifier)
         debugNetworkProtectionWaitlistTokenItem?.title = "Waitlist Token: \(waitlistStorage.getWaitlistToken() ?? "N/A")"
@@ -366,6 +370,7 @@ final class MainMenu: NSMenu {
         let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
         debugNetworkProtectionWaitlistTermsAndConditionsAcceptedItem?.title = "T&C Accepted: \(accepted ? "Yes" : "No")"
     }
+#endif
 
     @objc private func loggingMenuItemAction(_ sender: NSMenuItem) {
         guard let category = sender.identifier?.rawValue else { return }

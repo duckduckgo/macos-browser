@@ -718,17 +718,22 @@ extension MainViewController {
     }
 
     @IBAction func resetNetworkProtectionWaitlistState(_ sender: Any?) {
+#if NETWORK_PROTECTION
         NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+#endif
     }
 
     @IBAction func resetNetworkProtectionTermsAndConditionsAcceptance(_ sender: Any?) {
+#if NETWORK_PROTECTION
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+#endif
     }
 
     @IBAction func showNetworkProtectionInviteCodePrompt(_ sender: Any?) {
+#if NETWORK_PROTECTION
         let code = getInviteCode()
 
         Task {
@@ -741,6 +746,7 @@ extension MainViewController {
                 // Do nothing here, this is just a debug menu
             }
         }
+#endif
     }
 
     // MARK: - Developer Tools
@@ -873,8 +879,12 @@ extension MainViewController: NSMenuItemValidation {
         // Network Protection Debugging
         case #selector(MainViewController.showNetworkProtectionInviteCodePrompt(_:)):
             // Only allow testers to enter a custom code if they're on the waitlist, to simulate the correct path through the flow
+#if NETWORK_PROTECTION
             let waitlist = NetworkProtectionWaitlist()
             return waitlist.waitlistStorage.isOnWaitlist || waitlist.waitlistStorage.isInvited
+#else
+            return false
+#endif
         default:
             return true
         }

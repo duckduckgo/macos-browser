@@ -222,9 +222,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         syncService?.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
         syncService?.scheduler.notifyAppLifecycleEvent()
 
+#if NETWORK_PROTECTION
         NetworkProtectionWaitlist().fetchNetworkProtectionInviteCodeIfAvailable { _ in
             // Do nothing when code fetching fails, as the app will try again later
         }
+#endif
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
