@@ -27,6 +27,7 @@ import NetworkProtection
 import NetworkProtectionUI
 import SystemExtensions
 import Networking
+import LoginItems
 
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
@@ -57,7 +58,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     // MARK: - Login Items
 
-    private let loginItemsManager = NetworkProtectionLoginItemsManager()
+    private let loginItemsManager = LoginItemsManager()
 
     // MARK: - Debug Options Support
 
@@ -285,7 +286,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             onboardingStatusRawValue = OnboardingStatus.completed.rawValue
 
             if enableLoginItems {
-                loginItemsManager.enableLoginItems()
+                loginItemsManager.enableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
             }
 
             switch tunnelManager.connection.status {
