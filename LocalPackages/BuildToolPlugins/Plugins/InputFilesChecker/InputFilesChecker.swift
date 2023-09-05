@@ -57,10 +57,7 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
 
     "DuckDuckGo DBP": nonSandboxedExtraInputFiles.union([
         .init("DBPHomeViewController.swift", .source),
-        .init("DataBrokerProfileQueryView.swift", .source),
-        .init("DataBrokerProtectionDebugViewController.swift", .source),
-        .init("SwiftUIWrappers.swift", .source),
-        .init("UserProfileView.swift", .source),
+        .init("DataBrokerProtectionManager.swift", .source)
     ]),
 
     "Unit Tests": [

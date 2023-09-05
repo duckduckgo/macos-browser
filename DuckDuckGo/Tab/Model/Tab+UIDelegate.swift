@@ -83,22 +83,25 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             // proceed to web view creation
             completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
             return
-        // action doesn‘t require Popup Permission as it‘s user-initiated
-        // TO BE FIXED: this also opens a new window when a popup ad is shown on click simultaneously with the main frame navigation:
-        // https://app.asana.com/0/1177771139624306/1203798645462846/f
-        case .none where navigationAction.isUserInitiated == true:
-            // try to guess popup kind from provided windowFeatures
-            let shouldSelectNewTab = !NSApp.isCommandPressed // this is actually not correct, to be fixed later
-            let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab, isBurner: burnerMode.isBurner)
-            // proceed to web view creation
-            completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
-            return
         case .cancel:
             // navigation action was handled before and cancelled
             completionHandler(nil)
             return
         case .none:
             break
+        }
+
+        let shouldSelectNewTab = !NSApp.isCommandPressed // this is actually not correct, to be fixed later
+        // try to guess popup kind from provided windowFeatures
+        let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab, isBurner: burnerMode.isBurner)
+
+        // action doesn‘t require Popup Permission as it‘s user-initiated
+        // TO BE FIXED: this also opens a new window when a popup ad is shown on click simultaneously with the main frame navigation:
+        // https://app.asana.com/0/1177771139624306/1203798645462846/f
+        if navigationAction.isUserInitiated == true {
+            // proceed to web view creation
+            completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
+            return
         }
 
         let url = navigationAction.request.url
@@ -113,7 +116,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                 completionHandler(nil)
                 return
             }
-            let webView = self.createWebView(from: webView, with: configuration, for: navigationAction, of: .popup(origin: windowFeatures.origin, size: windowFeatures.size))
+            let webView = self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind)
 
             completionHandler(webView)
         }

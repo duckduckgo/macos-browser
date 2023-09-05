@@ -79,13 +79,16 @@ final class MainViewController: NSViewController {
         findInPageContainerView.applyDropShadow()
 
         view.registerForDraggedTypes([.URL, .fileURL])
+    }
 
+    override func viewDidAppear() {
+        super.viewDidAppear()
         registerForBookmarkBarPromptNotifications()
-        registerForDidBecomeActiveNotifications()
     }
 
     var bookmarkBarPromptObserver: Any?
     func registerForBookmarkBarPromptNotifications() {
+        guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
         bookmarkBarPromptObserver = NotificationCenter.default.addObserver(
             forName: .bookmarkPromptShouldShow,
             object: nil,
@@ -121,19 +124,6 @@ final class MainViewController: NSViewController {
         updateDividerColor()
     }
 
-    func registerForDidBecomeActiveNotifications() {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(applicationDidBecomeActive),
-                                               name: NSApplication.didBecomeActiveNotification,
-                                               object: nil)
-    }
-
-    @objc func applicationDidBecomeActive() {
-        // Temporary feature flag tester, to validate that phased rollouts are working as intended.
-        // This is to be removed before the end of August 2023.
-        PhasedRolloutFeatureFlagTester.shared.sendFeatureFlagEnabledPixelIfNecessary()
-    }
-
     override func viewDidLayout() {
         findInPageContainerView.applyDropShadow()
     }
@@ -152,8 +142,14 @@ final class MainViewController: NSViewController {
 
     func showBookmarkPromptIfNeeded() {
         guard #available(macOS 11, *) else { return }
-        guard PixelExperiment.cohort == .showBookmarksBarPrompt else { return }
+
         guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
+        if bookmarksBarIsVisible {
+            // Don't show this to users who obviously know about the bookmarks bar already
+            bookmarksBarViewController.bookmarksBarPromptShown = true
+            return
+        }
+
         updateBookmarksBarViewVisibility(visible: true)
         // This won't work until the bookmarks bar is actually visible which it isn't until the next ui cycle
         DispatchQueue.main.async {

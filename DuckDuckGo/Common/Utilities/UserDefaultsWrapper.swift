@@ -65,6 +65,7 @@ public struct UserDefaultsWrapper<T> {
         case askToSaveUsernamesAndPasswords = "preferences.ask-to-save.usernames-passwords"
         case askToSaveAddresses = "preferences.ask-to-save.addresses"
         case askToSavePaymentMethods = "preferences.ask-to-save.payment-methods"
+        case autolockLocksFormFilling = "preferences.lock-autofill-form-fill"
 
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
@@ -151,6 +152,8 @@ public struct UserDefaultsWrapper<T> {
         // or else KVO will just not work as of 2023-08-07
 
         case networkProtectionOnboardingStatusRawValue = "networkProtectionOnboardingStatusRawValue"
+        case networkProtectionWaitlistActiveOverrideRawValue = "networkProtectionWaitlistActiveOverrideRawValue"
+        case networkProtectionWaitlistEnabledOverrideRawValue = "networkProtectionWaitlistEnabledOverrideRawValue"
 
         // Experiments
         case pixelExperimentInstalled = "pixel.experiment.installed"
@@ -162,6 +165,7 @@ public struct UserDefaultsWrapper<T> {
 
     enum RemovedKeys: String, CaseIterable {
         case passwordManagerDoNotPromptDomains = "com.duckduckgo.passwordmanager.do-not-prompt-domains"
+        case incrementalFeatureFlagTestHasSentPixel = "network-protection.incremental-feature-flag-test.has-sent-pixel"
     }
 
     private let key: Key
