@@ -48,9 +48,19 @@ final class DataBrokerProtectionProcessor {
     }
 
     // MARK: - Public functions
-    func runScanOnAllDataBrokers(showWebView: Bool = false, completion: (() -> Void)? = nil) {
+    func runAllScanOperations(showWebView: Bool = false, completion: (() -> Void)? = nil) {
         operationQueue.cancelAllOperations()
         runOperations(operationType: .scan,
+                      priorityDate: nil,
+                      showWebView: showWebView) {
+            os_log("Scans done", log: .dataBrokerProtection)
+            completion?()
+        }
+    }
+
+    func runAllOptOutOperations(showWebView: Bool = false, completion: (() -> Void)? = nil) {
+        operationQueue.cancelAllOperations()
+        runOperations(operationType: .optOut,
                       priorityDate: nil,
                       showWebView: showWebView) {
             os_log("Scans done", log: .dataBrokerProtection)
@@ -67,7 +77,7 @@ final class DataBrokerProtectionProcessor {
         }
     }
 
-    func forceRunOperations(showWebView: Bool = false, completion: (() -> Void)? = nil ) {
+    func runAllOperations(showWebView: Bool = false, completion: (() -> Void)? = nil ) {
         runOperations(operationType: .all,
                       priorityDate: nil,
                       showWebView: showWebView) {
