@@ -89,10 +89,11 @@ final class ResultsViewModel: ObservableObject {
                     var errorName: String?
                     var errorDescription: String?
 
-                    if let lastEvent = optOutOperationData.historyEvents.last {
+                    let sortedEvents = optOutOperationData.historyEvents.sorted { $0.date < $1.date }
+                    if let lastEvent = sortedEvents.last {
                         if case .error(let error) = lastEvent.type {
-                            errorName = error.name
-                            errorDescription = error.localizedDescription
+                            errorName = error.userReadableError.title
+                            errorDescription = error.userReadableError.subtitle
                         }
                     }
 
@@ -121,6 +122,78 @@ final class ResultsViewModel: ObservableObject {
         DispatchQueue.main.async {
 
             self.updateUI(ignoresCache: true)
+        }
+    }
+}
+
+extension DataBrokerProtectionError {
+    var userReadableError: (title: String, subtitle: String) {
+        let genericTitle = "Internal Error"
+
+        switch self {
+        case .malformedURL:
+            return (title: genericTitle, subtitle: "Malformed URL")
+        case .noActionFound:
+            return (title: genericTitle, subtitle: "No action found")
+        case .actionFailed(actionID: let actionID, message: let message):
+            return (title: "Action \(actionID)", subtitle: message)
+        case .parsingErrorObjectFailed:
+            return (title: genericTitle, subtitle: "Parsing error")
+        case .unknownMethodName:
+            return (title: genericTitle, subtitle: "Unknown method name")
+        case .userScriptMessageBrokerNotSet:
+            return (title: genericTitle, subtitle: "User script")
+        case .unknown:
+            return (title: genericTitle, subtitle: "Unknown")
+        case .unrecoverableError:
+            return (title: genericTitle, subtitle: "Unrecoverable")
+        case .noOptOutStep:
+            return (title: genericTitle, subtitle: "Missing step")
+        case .captchaServiceError(let captchaError):
+            let title = "Solver"
+            switch captchaError {
+            case .cantGenerateCaptchaServiceURL:
+                return (title: title, subtitle: "Can't generate URL")
+            case .nilTransactionIdWhenSubmittingCaptcha:
+                return (title: title, subtitle: "Missing ID on submission")
+            case .criticalFailureWhenSubmittingCaptcha:
+                return (title: title, subtitle: "Critical failure")
+            case .invalidRequestWhenSubmittingCaptcha:
+                return (title: title, subtitle: "Submission invalid request")
+            case .timedOutWhenSubmittingCaptcha:
+                return (title: title, subtitle: "Submission timeout")
+            case .errorWhenSubmittingCaptcha:
+                return (title: title, subtitle: "Can't submit action")
+            case .errorWhenFetchingCaptchaResult:
+                return (title: title, subtitle: "Can't fetch result")
+            case .nilDataWhenFetchingCaptchaResult:
+                return (title: title, subtitle: "No data on result")
+            case .timedOutWhenFetchingCaptchaResult:
+                return (title: title, subtitle: "Fetching timeout")
+            case .failureWhenFetchingCaptchaResult:
+                return (title: title, subtitle: "Missing ID on fetch")
+            case .invalidRequestWhenFetchingCaptchaResult:
+                return (title: title, subtitle: "Fetch invalid request")
+            }
+        case .emailError(let emailError):
+            var title = "E-mail"
+            guard let emailError = emailError else {
+                return (title: title, subtitle: "Unknown error")
+            }
+            switch emailError {
+            case .cantGenerateURL:
+                return (title: title, subtitle: "Can't generate URL")
+            case .cantFindEmail:
+                return (title: title, subtitle: "Can't find E-mail")
+            case .invalidEmailLink:
+                return (title: title, subtitle: "Invalid Link")
+            case .linkExtractionTimedOut:
+                return (title: title, subtitle: "Timeout")
+            case .cantDecodeEmailLink:
+                return (title: title, subtitle: "Can't decode link")
+            case .unknownStatusReceived:
+                return (title: title, subtitle: "Unknown Status")
+            }
         }
     }
 }
