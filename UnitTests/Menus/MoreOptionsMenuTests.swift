@@ -169,5 +169,9 @@ final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility 
         return visible
     }
 
+    func disableForWaitlistUsers() {
+        // this is not meant to make the feature invisible, as that's already handled
+        // by this class... it's meant to remove the data that's no longer needed
+    }
 }
 #endif

@@ -40,8 +40,7 @@ final class NetworkProtectionDebugUtilities {
         }
     }
 
-    @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .shared)
-    private(set) var onboardingStatusRawValue: OnboardingStatus.RawValue
+    private let networkProtectionFeatureDisabler = NetworkProtectionFeatureDisabler()
 
     // MARK: - Login Items Management
 
@@ -59,48 +58,13 @@ final class NetworkProtectionDebugUtilities {
 
     // MARK: - Debug commands for the extension
 
-    func resetAllState() async throws {
-        if let activeSession = try? await ConnectionSessionUtilities.activeSession() {
-            try? activeSession.sendProviderMessage(.resetAllState) {
-                os_log("Status was reset in the extension", log: .networkProtection)
-            }
-        }
-
-        // ☝️ Take care of resetting all state within the extension first, and wait half a second
-        try? await Task.sleep(interval: 0.5)
-        // 👇 And only afterwards turn off the tunnel and remove it from preferences
-
-        let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
-
-        if let tunnels = tunnels {
-            for tunnel in tunnels {
-                tunnel.connection.stopVPNTunnel()
-                try? await tunnel.removeFromPreferences()
-            }
-        }
-
-        // We reset the onboarding status incrementally to stay aligned with the actual
-        // status of things.
-        onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
-
-        NetworkProtectionSelectedServerUserDefaultsStore().reset()
-
-        try await removeSystemExtensionAndAgents()
-        onboardingStatusRawValue = OnboardingStatus.default.rawValue
+    func resetAllState(keepAuthToken: Bool) async throws {
+        networkProtectionFeatureDisabler.disable(keepAuthToken: keepAuthToken, uninstallSystemExtension: true)
     }
 
     func removeSystemExtensionAndAgents() async throws {
-        try await loginItemsManager.resetLoginItems()
-
-#if NETP_SYSTEM_EXTENSION
-        do {
-            try await SystemExtensionManager().deactivate()
-        } catch OSSystemExtensionError.extensionNotFound {
-            // This is an intentional no-op to silence this type of error
-        } catch {
-            throw error
-        }
-#endif
+        networkProtectionFeatureDisabler.disableLoginItems()
+        try await networkProtectionFeatureDisabler.disableSystemExtension()
     }
 
     func sendTestNotificationRequest() async throws {

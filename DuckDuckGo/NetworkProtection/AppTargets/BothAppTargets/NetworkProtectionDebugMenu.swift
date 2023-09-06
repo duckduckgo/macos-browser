@@ -106,7 +106,22 @@ final class NetworkProtectionDebugMenu: NSMenu {
             guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
 
             do {
-                try await debugUtilities.resetAllState()
+                try await debugUtilities.resetAllState(keepAuthToken: false)
+            } catch {
+                await NSAlert(error: error).runModal()
+            }
+        }
+    }
+
+    /// Resets all state for NetworkProtection.
+    ///
+    @IBAction
+    func resetAllKeepingInvite(_ sender: Any?) {
+        Task { @MainActor in
+            guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
+
+            do {
+                try await debugUtilities.resetAllState(keepAuthToken: true)
             } catch {
                 await NSAlert(error: error).runModal()
             }

@@ -67,6 +67,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var syncService: DDGSyncing?
     private var syncStateCancellable: AnyCancellable?
     private var bookmarksSyncErrorCancellable: AnyCancellable?
+    private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
 
 #if !APPSTORE
@@ -297,31 +298,43 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     private func subscribeToEmailProtectionStatusNotifications() {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(emailDidSignInNotification(_:)),
-                                               name: .emailDidSignIn,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(emailDidSignOutNotification(_:)),
-                                               name: .emailDidSignOut,
-                                               object: nil)
+        NotificationCenter.default.publisher(for: .emailDidSignIn)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                self?.emailDidSignInNotification(notification)
+            }
+            .store(in: &emailCancellables)
+
+        NotificationCenter.default.publisher(for: .emailDidSignOut)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                self?.emailDidSignOutNotification(notification)
+            }
+            .store(in: &emailCancellables)
     }
 
     private func subscribeToDataImportCompleteNotification() {
         NotificationCenter.default.addObserver(self, selector: #selector(dataImportCompleteNotification(_:)), name: .dataImportComplete, object: nil)
     }
 
-    @objc private func emailDidSignInNotification(_ notification: Notification) {
+    private func emailDidSignInNotification(_ notification: Notification) {
         Pixel.fire(.emailEnabled)
         let repetition = Pixel.Event.Repetition(key: Pixel.Event.emailEnabledInitial.name)
         // Temporary pixel for first time user enables email protection
         if Pixel.isNewUser && repetition == .initial {
             Pixel.fire(.emailEnabledInitial)
         }
+
+        if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
+            syncService?.scheduler.notifyDataChanged()
+        }
     }
 
-    @objc private func emailDidSignOutNotification(_ notification: Notification) {
+    private func emailDidSignOutNotification(_ notification: Notification) {
         Pixel.fire(.emailDisabled)
+        if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
+            syncService?.scheduler.notifyDataChanged()
+        }
     }
 
     @objc private func dataImportCompleteNotification(_ notification: Notification) {

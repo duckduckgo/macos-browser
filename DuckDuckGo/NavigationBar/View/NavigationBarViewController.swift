@@ -773,8 +773,14 @@ extension NavigationBarViewController: NSMenuDelegate {
 
 #if NETWORK_PROTECTION
     func showNetworkProtectionStatus() {
-        popovers.showNetworkProtectionPopover(usingView: networkProtectionButton,
-                                              withDelegate: networkProtectionButtonModel)
+        let featureVisibility = DefaultNetworkProtectionVisibility()
+
+        if featureVisibility.isNetworkProtectionVisible() {
+            popovers.showNetworkProtectionPopover(usingView: networkProtectionButton,
+                                                  withDelegate: networkProtectionButtonModel)
+        } else {
+            featureVisibility.disableForWaitlistUsers()
+        }
     }
 
     private func setupNetworkProtectionButton() {

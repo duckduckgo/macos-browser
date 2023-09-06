@@ -99,7 +99,13 @@ final class NavigationBarPopovers {
         if let networkProtectionPopover, networkProtectionPopover.isShown {
             networkProtectionPopover.close()
         } else {
-            showNetworkProtectionPopover(usingView: view, withDelegate: delegate)
+            let featureVisibility = DefaultNetworkProtectionVisibility()
+
+            if featureVisibility.isNetworkProtectionVisible() {
+                showNetworkProtectionPopover(usingView: view, withDelegate: delegate)
+            } else {
+                featureVisibility.disableForWaitlistUsers()
+            }
         }
 #endif
     }
