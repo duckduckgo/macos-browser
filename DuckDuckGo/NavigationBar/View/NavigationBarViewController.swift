@@ -279,6 +279,12 @@ final class NavigationBarViewController: NSViewController {
 
     @available(macOS 11.4, *)
     private func showNetworkProtectionPopover() {
+        let featureVisibility = DefaultNetworkProtectionVisibility()
+        guard featureVisibility.isNetworkProtectionVisible() else {
+            featureVisibility.disableForWaitlistUsers()
+            return
+        }
+
         // 1. If the user is on the waitlist but hasn't been invited or accepted terms and conditions, show the waitlist screen.
         // 2. If the user has no waitlist state but has an auth token, show the NetP popover.
         // 3. If the user has no state of any kind, show the waitlist screen.
