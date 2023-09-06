@@ -65,10 +65,13 @@ final class SharingMenu: NSMenu {
             "protocol": "com.apple.share-services"
         ]
         let data = try? PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
-        let config = NSWorkspace.OpenConfiguration()
-        config.appleEvent = NSAppleEventDescriptor(descriptorType: .openSharingSubpane, data: data)
+        let descriptor = NSAppleEventDescriptor(descriptorType: .openSharingSubpane, data: data)
 
-        NSWorkspace.shared.open(url, configuration: config)
+        NSWorkspace.shared.open([url],
+                                withAppBundleIdentifier: nil,
+                                options: .async,
+                                additionalEventParamDescriptor: descriptor,
+                                launchIdentifiers: nil)
     }
 
     @objc func sharingItemSelected(_ sender: NSMenuItem) {
