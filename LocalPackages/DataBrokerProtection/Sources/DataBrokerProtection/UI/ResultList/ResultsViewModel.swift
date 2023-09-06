@@ -44,12 +44,21 @@ final class ResultsViewModel: ObservableObject {
         let id = UUID()
         let dataBroker: String
         let profile: String
-        let address: String
+        let addresses: [String]
+        let age: String?
+        let relatives: [String]
         let error: String?
         let errorDescription: String?
         let operationData: OptOutOperationData
         var hasError: Bool {
             error != nil
+        }
+
+        var profileWithAge: String {
+            if let age = age, !age.isEmpty {
+                return "\(profile) (\(age))"
+            }
+            return profile
         }
     }
 
@@ -79,6 +88,7 @@ final class ResultsViewModel: ObservableObject {
                                        object: nil)
     }
 
+    // swiftlint:disable:next function_body_length
     private func updateUI(ignoresCache: Bool) {
         isLoading = true
         Task {
@@ -113,10 +123,15 @@ final class ResultsViewModel: ObservableObject {
                                 }
                             }
 
+                            let addresses = optOutOperationData.extractedProfile.addresses?.map { $0.fullAddress }.sorted() ?? ["No Address Found"]
+                            let relatives = optOutOperationData.extractedProfile.relatives?.sorted() ?? ["No Relatives Found"]
+
                             let profile = PendingProfile(
                                 dataBroker: brokerProfileQueryData.dataBroker.name,
                                 profile: optOutOperationData.extractedProfile.fullName ?? "",
-                                address: optOutOperationData.extractedProfile.addresses?.first?.fullAddress ?? "",
+                                addresses: addresses,
+                                age: optOutOperationData.extractedProfile.age,
+                                relatives: relatives,
                                 error: errorName,
                                 errorDescription: errorDescription,
                                 operationData: optOutOperationData)
@@ -220,7 +235,7 @@ extension DataBrokerProtectionError {
                 return (title: title, subtitle: "Fetch invalid request")
             }
         case .emailError(let emailError):
-            var title = "E-mail"
+            let title = "E-mail"
             guard let emailError = emailError else {
                 return (title: title, subtitle: "Unknown error")
             }
