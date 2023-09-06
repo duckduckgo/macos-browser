@@ -55,7 +55,7 @@ final class ResultsViewModel: ObservableObject {
         }
 
         var profileWithAge: String {
-            if let age = age {
+            if let age = age, !age.isEmpty {
                 return "\(profile) (\(age))"
             }
             return profile
