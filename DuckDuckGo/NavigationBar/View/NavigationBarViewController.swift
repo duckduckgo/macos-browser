@@ -800,8 +800,15 @@ extension NavigationBarViewController: NSMenuDelegate {
 #if NETWORK_PROTECTION
     func showNetworkProtectionStatus() {
         guard #available(macOS 11.4, *) else { return }
-        popovers.showNetworkProtectionPopover(usingView: networkProtectionButton,
-                                              withDelegate: networkProtectionButtonModel)
+
+        let featureVisibility = DefaultNetworkProtectionVisibility()
+
+        if featureVisibility.isNetworkProtectionVisible() {
+            popovers.showNetworkProtectionPopover(usingView: networkProtectionButton,
+                                                  withDelegate: networkProtectionButtonModel)
+        } else {
+            featureVisibility.disableForWaitlistUsers()
+        }
     }
 
     private func setupNetworkProtectionButton() {

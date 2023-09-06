@@ -56,14 +56,14 @@ struct DataBrokerProtectionContainerView: View {
                             viewModel: profileViewModel,
                             scanButtonClicked: {
                                 navigationViewModel.updateNavigation(.scanStarted)
-                                containerViewModel.scan { scanResult in
+                                containerViewModel.scanAfterProfileCreation { scanResult in
                                     switch scanResult {
                                     case .noResults:
                                         navigationViewModel.updateNavigation(.noResults)
                                     case .results:
                                         resultsViewModel.reloadData()
                                         navigationViewModel.updateNavigation(.results)
-                                        containerViewModel.startScheduler()
+                                        containerViewModel.runQueuedOperationsAndStartScheduler()
                                     }
                                 }
                             }, backToDashboardClicked: {
