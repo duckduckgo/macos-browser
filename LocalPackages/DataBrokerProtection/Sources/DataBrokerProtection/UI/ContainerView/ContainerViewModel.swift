@@ -130,7 +130,7 @@ final class ContainerViewModel: ObservableObject {
 
     func scanAfterProfileCreation(completion: @escaping (ScanResult) -> Void) {
         scheduler.stopScheduler()
-        
+
         scheduler.scanAllBrokers(showWebView: showWebView) { [weak self] in
             guard let self = self else { return }
 
