@@ -7,12 +7,12 @@
         <!--Application-->
         <scene sceneID="JPo-4y-FX3">
             <objects>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_DBP" customModuleProvider="target"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <customObject id="WIK-gq-Ncg" customClass="CopyHandler" customModule="DuckDuckGo_DBP" customModuleProvider="target"/>
+                <customObject id="WIK-gq-Ncg" customClass="CopyHandler" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <application id="hnw-xV-0zn" sceneMemberID="viewController">
-                    <menu key="mainMenu" title="Main Menu" systemMenu="main" id="AYu-sK-qS6" customClass="MainMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                    <menu key="mainMenu" title="Main Menu" systemMenu="main" id="AYu-sK-qS6" customClass="MainMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                         <items>
                             <menuItem title="DuckDuckGo" id="1Xt-HY-uBw">
                                 <modifierMask key="keyEquivalentModifierMask"/>
@@ -480,7 +480,7 @@
                             </menuItem>
                             <menuItem title="History" id="aVY-po-b3d">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="History" id="SLT-Z6-mh7" customClass="HistoryMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                <menu key="submenu" title="History" id="SLT-Z6-mh7" customClass="HistoryMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                     <items>
                                         <menuItem title="Back" enabled="NO" keyEquivalent="[" id="VWV-vB-Mtc">
                                             <connections>
@@ -836,7 +836,7 @@ CQ
                                         </menuItem>
                                         <menuItem title="Network Protection" id="Dt6-sj-4hn">
                                             <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Network Protection" id="Rah-lS-gno" customClass="NetworkProtectionDebugMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                            <menu key="submenu" title="Network Protection" id="Rah-lS-gno" customClass="NetworkProtectionDebugMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <items>
                                                     <menuItem title="Reset All State Keeping Invite" id="Mqz-Le-LgQ">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
@@ -897,7 +897,7 @@ CQ
                                                     </menuItem>
                                                     <menuItem title="Onboarding" id="xu6-z0-age">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Onboarding" id="L82-We-Wwv" customClass="NetworkProtectionOnboardingMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                                        <menu key="submenu" title="Onboarding" id="L82-We-Wwv" customClass="NetworkProtectionOnboardingMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                             <items>
                                                                 <menuItem title="Reset Onboarding Status" id="gfc-0G-Ujy">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -982,7 +982,7 @@ CQ
                                                     </menuItem>
                                                     <menuItem title="Simulate Failure" id="K5h-D4-For">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Simulate Failure" id="iLs-sj-2Gd" customClass="NetworkProtectionSimulateFailureMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                                        <menu key="submenu" title="Simulate Failure" id="iLs-sj-2Gd" customClass="NetworkProtectionSimulateFailureMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                             <items>
                                                                 <menuItem title="Enable NetP &gt; Controller Failure" id="xyA-ob-gEy" userLabel="Controller Failure">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
