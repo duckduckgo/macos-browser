@@ -27,24 +27,18 @@ final class ContainerViewModel: ObservableObject {
 
     private let scheduler: DataBrokerProtectionScheduler
     private let dataManager: DataBrokerProtectionDataManaging
-    private let notificationCenter: NotificationCenter
     private var cancellables = Set<AnyCancellable>()
 
-    @Published var headerStatusText = ""
     @Published var schedulerStatus = ""
     @Published var showWebView = false
     @Published var useFakeBroker = false
 
     internal init(scheduler: DataBrokerProtectionScheduler,
-                  dataManager: DataBrokerProtectionDataManaging,
-                  notificationCenter: NotificationCenter = .default) {
+                  dataManager: DataBrokerProtectionDataManaging) {
         self.scheduler = scheduler
         self.dataManager = dataManager
-        self.notificationCenter = notificationCenter
 
         restoreFakeBrokerStatus()
-        updateHeaderStatus()
-        setupNotifications()
         setupCancellable()
     }
 
@@ -75,6 +69,7 @@ final class ContainerViewModel: ObservableObject {
         useFakeBroker = FakeBrokerUserDefaults().isFakeBrokerFlagOn()
     }
 
+<<<<<<< HEAD
     private func setupNotifications() {
         notificationCenter.addObserver(self,
                                        selector: #selector(handleReloadNotification),

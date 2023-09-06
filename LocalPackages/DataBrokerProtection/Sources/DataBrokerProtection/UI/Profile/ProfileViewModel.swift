@@ -155,9 +155,9 @@ final class ProfileViewModel: ObservableObject {
         isLoading = true
         Task {
             await dataManager.saveProfile(profile)
-            completion()
 
             DispatchQueue.main.async {
+                completion()
                 self.isLoading = false
             }
         }

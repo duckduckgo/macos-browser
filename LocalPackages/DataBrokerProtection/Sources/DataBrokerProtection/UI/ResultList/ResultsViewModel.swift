@@ -56,6 +56,7 @@ final class ResultsViewModel: ObservableObject {
     @Published var removedProfiles =  [RemovedProfile]()
     @Published var pendingProfiles = [PendingProfile]()
     @Published var isLoading = false
+    @Published var headerStatusText = ""
 
     init(dataManager: DataBrokerProtectionDataManaging,
          notificationCenter: NotificationCenter = .default) {
@@ -86,6 +87,15 @@ final class ResultsViewModel: ObservableObject {
             DispatchQueue.main.async {
                 var removedProfiles = [RemovedProfile]()
                 var pendingProfiles = [PendingProfile]()
+
+                let scanHistoryEvents = brokersInfoData.flatMap { $0.scanOperationData.historyEvents }
+                var status = ""
+
+                if let date = self.getLastEventDate(events: scanHistoryEvents) {
+                    status = "Last Scan \(date)"
+                }
+
+                self.headerStatusText = status
 
                 for brokerProfileQueryData in brokersInfoData {
                     for optOutOperationData in brokerProfileQueryData.optOutOperationsData {
@@ -125,9 +135,21 @@ final class ResultsViewModel: ObservableObject {
         }
     }
 
+    private func getLastEventDate(events: [HistoryEvent]) -> String? {
+        let sortedEvents = events.sorted(by: { $0.date < $1.date })
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .short
+
+        if let lastEvent = sortedEvents.last {
+            return dateFormatter.string(from: lastEvent.date)
+        } else {
+            return nil
+        }
+    }
+
     @objc public func reloadData() {
         DispatchQueue.main.async {
-
             self.updateUI(ignoresCache: true)
         }
     }
