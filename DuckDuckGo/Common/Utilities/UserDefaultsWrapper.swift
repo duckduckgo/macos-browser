@@ -116,6 +116,7 @@ public struct UserDefaultsWrapper<T> {
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"
+        case emailKeychainMigration = "email.keychain.migration"
 
         case bookmarksBarPromptShown = "bookmarks.bar.prompt.shown"
         case showBookmarksBar = "bookmarks.bar.show"
