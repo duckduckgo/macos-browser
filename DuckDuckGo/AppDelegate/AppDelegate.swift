@@ -358,6 +358,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 }
 
+#if NETWORK_PROTECTION
+
 extension AppDelegate: UNUserNotificationCenterDelegate {
 
     func userNotificationCenter(_ center: UNUserNotificationCenter,
@@ -388,3 +390,5 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
 
 }
+
+#endif
