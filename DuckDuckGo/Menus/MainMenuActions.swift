@@ -749,6 +749,12 @@ extension MainViewController {
 #endif
     }
 
+    @IBAction func sendNetworkProtectionWaitlistAvailableNotification(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        NetworkProtectionWaitlist().sendInviteCodeAvailableNotification()
+#endif
+    }
+
     // MARK: - Developer Tools
 
     @IBAction func toggleDeveloperTools(_ sender: Any?) {

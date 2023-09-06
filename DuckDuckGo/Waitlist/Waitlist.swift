@@ -154,8 +154,8 @@ struct NetworkProtectionWaitlist: Waitlist {
     static let apiProductName: String = "networkprotection_macos"
 
     static let notificationIdentifier = "com.duckduckgo.macos.browser.network-protection.invite-code-available"
-    static let inviteAvailableNotificationTitle = "Network Protection beta is ready!"
-    static let inviteAvailableNotificationBody = "Open your invite"
+    static let inviteAvailableNotificationTitle = UserText.networkProtectionWaitlistNotificationTitle
+    static let inviteAvailableNotificationBody = UserText.networkProtectionWaitlistNotificationText
 
     let waitlistStorage: WaitlistStorage
     let waitlistRequest: WaitlistRequest
@@ -201,6 +201,7 @@ struct NetworkProtectionWaitlist: Waitlist {
                     do {
                         try await networkProtectionCodeRedemption.redeem(inviteCode)
                         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+                        sendInviteCodeAvailableNotification()
                     } catch {
                         assertionFailure("Failed to redeem invite code")
                     }

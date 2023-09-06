@@ -1019,6 +1019,12 @@ CQ
                                                                         <action selector="showNetworkProtectionInviteCodePrompt:" target="Ady-hI-5gd" id="CO5-ar-NTA"/>
                                                                     </connections>
                                                                 </menuItem>
+                                                                <menuItem title="Send Waitlist Notification" id="aqG-g3-Lxa">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="sendNetworkProtectionWaitlistAvailableNotification:" target="Ady-hI-5gd" id="42n-kx-can"/>
+                                                                    </connections>
+                                                                </menuItem>
                                                                 <menuItem isSeparatorItem="YES" id="ggg-Pf-MUh"/>
                                                                 <menuItem title="Waitlist Token:" enabled="NO" identifier="network-protection.waitlist.token" id="wU9-UN-SKZ">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
