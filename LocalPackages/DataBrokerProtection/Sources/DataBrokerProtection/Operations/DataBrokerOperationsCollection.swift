@@ -99,9 +99,7 @@ final class DataBrokerOperationsCollection: Operation {
     }
 
     private func runOperation() async {
-        os_log("Running operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
-
-        let sortedOperationsData: [BrokerOperationData]
+        let filteredAndSortedOperationsData: [BrokerOperationData]
         let operationsData: [BrokerOperationData]
 
         switch operationType {
@@ -114,15 +112,15 @@ final class DataBrokerOperationsCollection: Operation {
         }
 
         if let priorityDate = priorityDate {
-            sortedOperationsData = operationsData
+            filteredAndSortedOperationsData = operationsData
                 .filter { $0.preferredRunDate != nil && $0.preferredRunDate! <= priorityDate }
                 .sorted { $0.preferredRunDate! < $1.preferredRunDate! }
 
         } else {
-            sortedOperationsData = operationsData
+            filteredAndSortedOperationsData = operationsData
         }
 
-        for operationData in sortedOperationsData {
+        for operationData in filteredAndSortedOperationsData {
             if isCancelled {
                 return
             }
@@ -135,12 +133,16 @@ final class DataBrokerOperationsCollection: Operation {
                 continue
             }
             do {
+                os_log("Running operation: %{public}@", log: .dataBrokerProtection, String(describing: operationData))
+
                 try await DataBrokerProfileQueryOperationManager().runOperation(operationData: operationData,
                                                                                 brokerProfileQueryData: brokerProfileData,
                                                                                 database: database,
                                                                                 notificationCenter: notificationCenter,
                                                                                 runner: runner,
                                                                                 showWebView: showWebView)
+                os_log("Finished operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
+
                 if let sleepInterval = intervalBetweenOperations {
                     os_log("Waiting...: %{public}f", log: .dataBrokerProtection, sleepInterval)
                     try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
@@ -155,7 +157,6 @@ final class DataBrokerOperationsCollection: Operation {
                 }
             }
         }
-        os_log("Finished operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
     }
 
     private func finish() {

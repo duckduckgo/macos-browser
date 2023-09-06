@@ -69,13 +69,15 @@ public final class DataBrokerProtectionManager {
         redeemUseCase.shouldAskForInviteCode()
     }
 
-    public func startSchedulerIfPossible() {
+    public func runOperationsAndStartSchedulerIfPossible() {
         guard !redeemUseCase.shouldAskForInviteCode() else { return }
 
         // If there's no saved profileQueryData we don't need to start the scheduler
         // We should probably use a faster query for this, i.e: instead of returning data just check the count in the db
         if !dataManager.fetchBrokerProfileQueryData().isEmpty {
-            scheduler.start()
+            scheduler.runQueuedOperations(showWebView: false) { [weak self] in
+                self?.scheduler.startScheduler()
+            }
         }
     }
 }

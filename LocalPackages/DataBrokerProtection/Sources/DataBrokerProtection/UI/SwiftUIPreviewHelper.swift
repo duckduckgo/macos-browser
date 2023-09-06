@@ -25,12 +25,12 @@ final class PreviewScheduler: DataBrokerProtectionScheduler {
     internal init() {
         self.status = .idle
     }
-
-    func start(showWebView: Bool) { }
-    func forceRunOperations(showWebView: Bool) { }
-    func stop() { }
+    func startScheduler(showWebView: Bool) { }
+    func stopScheduler() { }
+    func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) { }
+    func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) { }
     func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) { }
-
+    func runAllOperations(showWebView: Bool) { }
 }
 
 final class PreviewDataManager: DataBrokerProtectionDataManaging {
