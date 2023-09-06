@@ -52,7 +52,7 @@ final class SharingMenu: NSMenu {
     }
 
     @objc func openSharingPreferences(_ sender: NSMenuItem) {
-        if #available(macOS 12.0, *),
+        if #available(macOS 13.0, *),
            let preferencesLink = URL(string: "x-apple.systempreferences:com.apple.preferences.extensions?Sharing") {
 
             NSWorkspace.shared.open(preferencesLink)
