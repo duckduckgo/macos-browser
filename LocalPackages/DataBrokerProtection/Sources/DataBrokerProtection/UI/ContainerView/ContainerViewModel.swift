@@ -69,50 +69,6 @@ final class ContainerViewModel: ObservableObject {
         useFakeBroker = FakeBrokerUserDefaults().isFakeBrokerFlagOn()
     }
 
-<<<<<<< HEAD
-    private func setupNotifications() {
-        notificationCenter.addObserver(self,
-                                       selector: #selector(handleReloadNotification),
-                                       name: DataBrokerProtectionNotifications.didFinishScan,
-                                       object: nil)
-
-        notificationCenter.addObserver(self,
-                                       selector: #selector(handleReloadNotification),
-                                       name: DataBrokerProtectionNotifications.didFinishOptOut,
-                                       object: nil)
-    }
-
-    private func getLastEventDate(events: [HistoryEvent]) -> String? {
-        let sortedEvents = events.sorted(by: { $0.date < $1.date })
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .short
-        dateFormatter.timeStyle = .short
-
-        if let lastEvent = sortedEvents.last {
-            return dateFormatter.string(from: lastEvent.date)
-        } else {
-            return nil
-        }
-    }
-
-    @objc private func handleReloadNotification() {
-        DispatchQueue.main.async {
-            self.updateHeaderStatus()
-        }
-    }
-
-    private func updateHeaderStatus() {
-        //TODO: FIX THIS
-//        let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
-//        let scanHistoryEvents = brokerProfileData.flatMap { $0.scanOperationData.historyEvents }
-        var status = ""
-
-//        if let date = getLastEventDate(events: scanHistoryEvents) {
-//            status = "Last Scan \(date)"
-//        }
-        self.headerStatusText = status
-    }
-
     func runQueuedOperationsAndStartScheduler() {
         scheduler.runQueuedOperations(showWebView: showWebView) { [weak self] in
             guard let self = self else { return }

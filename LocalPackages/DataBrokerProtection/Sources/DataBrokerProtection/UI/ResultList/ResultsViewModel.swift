@@ -82,7 +82,9 @@ final class ResultsViewModel: ObservableObject {
     private func updateUI(ignoresCache: Bool) {
         isLoading = true
         Task {
+            let startTime = DispatchTime.now().uptimeNanoseconds
             let brokersInfoData = await dataManager.fetchBrokerProfileQueryData(ignoresCache: ignoresCache)
+            let endTime = DispatchTime.now().uptimeNanoseconds
 
             DispatchQueue.main.async {
                 var removedProfiles = [RemovedProfile]()
@@ -128,10 +130,23 @@ final class ResultsViewModel: ObservableObject {
                     }
                 }
 
-                self.isLoading = false
-                self.removedProfiles = removedProfiles
-                self.pendingProfiles = pendingProfiles
+                self.updateLoadingViewWithMinimumDuration(startTime: startTime, endTime: endTime) {
+                    self.isLoading = false
+                    self.removedProfiles = removedProfiles
+                    self.pendingProfiles = pendingProfiles
+                }
             }
+        }
+    }
+
+    private func updateLoadingViewWithMinimumDuration(startTime: UInt64, endTime: UInt64, completion: @escaping () -> Void) {
+        let durationInSeconds = Double(endTime - startTime) / 1_000_000_000
+
+        // Calculate the delay time required to reach a minimum of 2 seconds
+        let delayTime = max(2 - durationInSeconds, 0)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + delayTime) {
+            completion()
         }
     }
 
