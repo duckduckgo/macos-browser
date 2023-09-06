@@ -67,6 +67,8 @@ final class SharingMenu: NSMenu {
         let data = try? PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
         let descriptor = NSAppleEventDescriptor(descriptorType: .openSharingSubpane, data: data)
 
+        // if you want to refactor this to remove the warning - stop now
+        // the suggested method with NSWorkspace.OpenConfiguration doesn‘t work for Sharing Preferences
         NSWorkspace.shared.open([url],
                                 withAppBundleIdentifier: nil,
                                 options: .async,
