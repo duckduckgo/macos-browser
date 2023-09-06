@@ -53,7 +53,7 @@ final class StatisticsLoader {
                         completion()
                     }
                 }
-                if !NSApp.isRunningUnitTests {
+                if !NSApp.isRunningUnitTests && DefaultVariantManager().currentVariant != nil {
                     Pixel.fire(.serpInitial, limitToInitial: true, includeAppVersionParameter: false)
                 }
                 Pixel.fire(.serp)

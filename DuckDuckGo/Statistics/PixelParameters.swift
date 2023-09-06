@@ -42,6 +42,8 @@ extension Pixel {
         // Pixel experiments
         static let experimentCohort = "cohort"
 
+        // ATB experiments
+        static let variant = "av"
     }
 
     enum Values {
@@ -92,13 +94,13 @@ extension Pixel.Event {
         case .launchInitial:
             if let variantManager = (NSApp.isRunningUnitTests ? nil : DefaultVariantManager()),
                let cohort = variantManager.currentVariant?.name {
-                return [Pixel.Parameters.experimentCohort: cohort]
+                return [Pixel.Parameters.variant: cohort]
             }
             return nil
         case .serpInitial:
             if let variantManager = (NSApp.isRunningUnitTests ? nil : DefaultVariantManager()),
                let cohort = variantManager.currentVariant?.name {
-                return [Pixel.Parameters.experimentCohort: cohort]
+                return [Pixel.Parameters.variant: cohort]
             }
             return nil
 

@@ -39,8 +39,8 @@ struct Variant {
 
     static let doNotAllocate = 0
 
-    static let controlVariantName = "a"
-    static let onboardingExperiment1Name = "b"
+    static let controlVariantName = "ma"
+    static let onboardingExperiment1Name = "mb"
 
     // Note: Variants with `doNotAllocate` weight, should always be included so that previous installations are unaffected
     static let defaultVariants: [Variant] = [
