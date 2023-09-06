@@ -128,7 +128,7 @@ struct DataBrokerProtectionContainerView: View {
         if navigationViewModel.bodyViewType != .createProfile {
             VStack {
 
-                DashboardHeaderView(statusText: containerViewModel.headerStatusText,
+                DashboardHeaderView(resultsViewModel: resultsViewModel,
                                     displayProfileButton: navigationViewModel.bodyViewType != .gettingStarted,
                                     faqButtonClicked: {
                     print("FAQ")

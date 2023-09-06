@@ -63,6 +63,8 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func fetchExtractedProfile(with id: Int64) throws -> ExtractedProfileDB?
     func fetchExtractedProfiles(for brokerId: Int64, with profileQueryId: Int64) throws -> [ExtractedProfileDB]
     func updateRemovedDate(for extractedProfileId: Int64, with date: Date?) throws
+
+    func hasMatches() throws -> Bool
  }
 
 final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDatabaseProvider, DataBrokerProtectionDatabaseProvider {
@@ -229,7 +231,11 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             let profileId: Int64 = 1
             try mapperToDB.mapToDB(id: profileId, profile: profile).upsert(db)
 
-            try ScanDB.deleteAll(db) // We need to delete all scans related to a possible old user
+            // We need to delete all scans and opt-outs related to a possible old user
+            try ScanDB.deleteAll(db)
+            try ScanHistoryEventDB.deleteAll(db)
+            try OptOutDB.deleteAll(db)
+            try OptOutHistoryEventDB.deleteAll(db)
 
             try NameDB.deleteAll(db)
             for name in profile.names {
@@ -528,6 +534,12 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             } else {
                 throw DataBrokerProtectionDatabaseErrors.elementNotFound
             }
+        }
+    }
+
+    func hasMatches() throws -> Bool {
+        try db.read { db in
+            return try OptOutDB.fetchCount(db) > 0
         }
     }
 }
