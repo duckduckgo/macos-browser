@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "daniel/autofill-selection-fix",
-        "revision" : "3dfcbc90df9edb5682765e075fc5edd91f55ddbd"
+        "revision" : "fd65ad9ec0427df218b40caaa4404c31a1cee3e5",
+        "version" : "76.1.0"
       }
     },
     {

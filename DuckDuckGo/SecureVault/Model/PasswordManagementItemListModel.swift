@@ -323,15 +323,21 @@ final class PasswordManagementItemListModel: ObservableObject {
     func selectLoginWithDomainOrFirst(domain: String, notify: Bool = true) {
         let websiteAccounts = items
             .compactMap { $0.websiteAccount }
-        let bestMatch = websiteAccounts.sortedForDomain(domain, tld: ContentBlocking.shared.tld, removeDuplicates: true, alphabeticalOnly: true)
-        for section in displayedItems {
-            if let account = section.items.first(where: {
-                $0.websiteAccount?.username == bestMatch.first?.username &&
-                $0.websiteAccount?.domain == bestMatch.first?.domain &&
-                $0.websiteAccount?.signature == bestMatch.first?.signature
-            }) {
-                selected(item: account, notify: notify)
-                return
+        let bestMatch = websiteAccounts.sortedForDomain(domain, tld: ContentBlocking.shared.tld, removeDuplicates: true)
+
+        // If the best match does not include the TLD, just pick the first item in the list
+        if let match = bestMatch.first,
+           tld.eTLDplus1(domain) == tld.eTLDplus1(match.domain) {
+
+            for section in displayedItems {
+                if let account = section.items.first(where: {
+                    $0.websiteAccount?.username == match.username &&
+                    $0.websiteAccount?.domain == match.domain &&
+                    $0.websiteAccount?.signature == match.signature
+                }) {
+                    selected(item: account, notify: notify)
+                    return
+                }
             }
         }
 
