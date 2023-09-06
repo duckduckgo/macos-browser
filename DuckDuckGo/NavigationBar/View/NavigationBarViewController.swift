@@ -513,9 +513,15 @@ final class NavigationBarViewController: NSViewController {
                     && WindowControllersManager.shared.lastKeyMainWindowController?.window === self.downloadsButton.window
 
                 if shouldShowPopover {
-                    self.popovers.showDownloadsPopoverAndAutoHide(usingView: self.downloadsButton,
-                                                                  popoverDelegate: self,
-                                                                  downloadsDelegate: self)
+                    // The following lines ensure that if the popover is shown, the downloads button is also shown.
+                    // Ref: https://app.asana.com/0/1177771139624306/1205405170812428/f
+                    //
+                    self.downloadsButton.isHidden = false
+                    DispatchQueue.main.async {
+                        self.popovers.showDownloadsPopoverAndAutoHide(usingView: self.downloadsButton,
+                                                                      popoverDelegate: self,
+                                                                      downloadsDelegate: self)
+                    }
                 } else {
                     if update.item.isBurner {
                         self.invalidateDownloadButtonHidingTimer()
