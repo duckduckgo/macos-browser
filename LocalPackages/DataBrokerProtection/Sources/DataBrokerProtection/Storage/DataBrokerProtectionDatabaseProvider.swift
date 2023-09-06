@@ -231,7 +231,11 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             let profileId: Int64 = 1
             try mapperToDB.mapToDB(id: profileId, profile: profile).upsert(db)
 
-            try ScanDB.deleteAll(db) // We need to delete all scans related to a possible old user
+            // We need to delete all scans and opt-outs related to a possible old user
+            try ScanDB.deleteAll(db)
+            try ScanHistoryEventDB.deleteAll(db)
+            try OptOutDB.deleteAll(db)
+            try OptOutHistoryEventDB.deleteAll(db)
 
             try NameDB.deleteAll(db)
             for name in profile.names {
