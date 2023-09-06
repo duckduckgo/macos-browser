@@ -23,8 +23,7 @@ enum WaitlistOverride: Int {
     case on
     case off
 
-    // TODO: Leaving this as on by default will mean it's visible to all users in production - need to fix.
-    static let `default`: WaitlistOverride = .on
+    static let `default`: WaitlistOverride = .useRemoteValue
 }
 
 protocol WaitlistBetaOverriding {
