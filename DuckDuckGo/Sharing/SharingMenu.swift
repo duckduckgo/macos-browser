@@ -45,20 +45,30 @@ final class SharingMenu: NSMenu {
             self.addItem(menuItem)
         }
 
-        let moreItem = NSMenuItem(title: UserText.moreMenuItem,
-                                  action: #selector(openSharingPreferences(_:)),
-                                  keyEquivalent: "")
+        let moreItem = NSMenuItem(title: UserText.moreMenuItem, action: #selector(openSharingPreferences(_:)), keyEquivalent: "")
         moreItem.target = self
         moreItem.image = .more
         self.addItem(moreItem)
     }
 
     @objc func openSharingPreferences(_ sender: NSMenuItem) {
-        guard let preferencesLink = URL(string: "x-apple.systempreferences:com.apple.preferences.extensions?Sharing") else {
-            assertionFailure("Can't initialize preferences link")
+        if #available(macOS 12.0, *),
+           let preferencesLink = URL(string: "x-apple.systempreferences:com.apple.preferences.extensions?Sharing") {
+
+            NSWorkspace.shared.open(preferencesLink)
             return
         }
-        NSWorkspace.shared.open(preferencesLink)
+
+        let url = URL(fileURLWithPath: "/System/Library/PreferencePanes/Extensions.prefPane")
+        let plist = [
+            "action": "revealExtensionPoint",
+            "protocol": "com.apple.share-services"
+        ]
+        let data = try? PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
+        let config = NSWorkspace.OpenConfiguration()
+        config.appleEvent = NSAppleEventDescriptor(descriptorType: .openSharingSubpane, data: data)
+
+        NSWorkspace.shared.open(url, configuration: config)
     }
 
     @objc func sharingItemSelected(_ sender: NSMenuItem) {
