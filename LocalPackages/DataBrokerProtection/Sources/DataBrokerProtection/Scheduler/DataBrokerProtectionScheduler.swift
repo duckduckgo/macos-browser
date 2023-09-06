@@ -36,7 +36,7 @@ public protocol DataBrokerProtectionScheduler {
     var status: DataBrokerProtectionSchedulerStatus { get }
 }
 
-extension DataBrokerProtectionScheduler {
+public extension DataBrokerProtectionScheduler {
     func start() {
         start(showWebView: false)
     }
