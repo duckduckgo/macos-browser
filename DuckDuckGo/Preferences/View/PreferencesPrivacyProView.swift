@@ -38,7 +38,7 @@ extension Preferences {
                                button1Name: "Learn More", button2Name: "I Have a Subscription")
 
                     Divider()
-                        .foregroundColor(Color.black.opacity(0.06))
+                        .foregroundColor(Color.secondary)
                         .padding(.horizontal, -10)
 
                     SectionView(title: "VPN",
@@ -46,34 +46,29 @@ extension Preferences {
                                 buttonName: "Manage")
 
                     Divider()
-                        .foregroundColor(Color.black.opacity(0.06))
+                        .foregroundColor(Color.secondary)
 
                     SectionView(title: "Personal Information Removal",
                                 description: "Find and remove your personal information from sites that store and sell it.",
                                 buttonName: "View")
 
                     Divider()
-                        .foregroundColor(Color.black.opacity(0.06))
+                        .foregroundColor(Color.secondary)
 
                     SectionView(title: "Identity Theft Restoration",
                                 description: "Restore stolen accounts and financial losses in the event of identity theft.",
                                 buttonName: "View")
                 }
                 .padding(10)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.black.opacity(0.06), lineWidth: 1)
-                        .background(Color.black.opacity(0.01))
-                        .mask(RoundedRectangle(cornerRadius: 8))
-                )
-            }
+                .roundedBorder()
 
-            // Footer
-            PreferencePaneSection {
-                TextMenuItemHeader(text: "Questions about Privacy Pro?")
-                HStack(alignment: .top, spacing: 6) {
-                    TextMenuItemCaption(text: "Visit our Privacy Pro help pages for answers to frequently asked questions.")
-                    Button("View FAQs") { }
+                // Footer
+                PreferencePaneSection {
+                    TextMenuItemHeader(text: "Questions about Privacy Pro?")
+                    HStack(alignment: .top, spacing: 6) {
+                        TextMenuItemCaption(text: "Visit our Privacy Pro help pages for answers to frequently asked questions.")
+                        Button("View FAQs") { }
+                    }
                 }
             }
         }
