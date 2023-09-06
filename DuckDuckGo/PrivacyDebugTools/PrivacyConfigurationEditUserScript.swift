@@ -41,8 +41,8 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
             guard let debugTools = debugTools else { return }
 
             debugTools.itemsPublisher.sink { (trackers: [DetectedTracker]) in
-                guard let current = debugTools.current else { return }
-                self.publishTrackers(domain: current, trackers: trackers)
+                guard debugTools.isTracking else { return }
+                self.publishTrackers(trackers: trackers)
             }.store(in: &cancellables)
         }
     }
@@ -99,8 +99,8 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
             }
     }
 
-    struct SubscribeToTrackers: Decodable {
-        let domain: String;
+    struct SubscribeToTrackersParams: Decodable {
+        let domains: [String];
     }
 
     struct SubscribeToTrackersResponse: Encodable {
@@ -109,11 +109,11 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
 
     @MainActor
     func handleSubscribeToTrackers(params: Any, message: UserScriptMessage) -> Encodable? {
-        guard let params: SubscribeToTrackers = DecodableHelper.decode(from: params),
+        guard let params: SubscribeToTrackersParams = DecodableHelper.decode(from: params),
               let tools = self.debugTools else {
             return nil
         }
-        tools.setCurrent(domain: params.domain)
+        tools.setCurrent(domains: params.domains)
         return nil
     }
 
@@ -122,13 +122,12 @@ final class PrivacyConfigurationEditUserScript: NSObject, Subfeature {
         guard let tools = self.debugTools else {
             return nil
         }
-        tools.setCurrent(domain: nil)
+        tools.setCurrent(domains: [])
         return nil
     }
 
-    func publishTrackers(domain: String, trackers: [DetectedTracker]) {
+    func publishTrackers(trackers: [DetectedTracker]) {
         guard let webView = webView else {
-            print("webview was absent");
             return
         }
         let response = SubscribeToTrackersResponse.init(requests: trackers.map { $0.request })

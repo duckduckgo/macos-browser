@@ -23,12 +23,15 @@ import Combine
 final class PrivacyDebugTools {
     static let urlHost = "duckduckgo.github.io"
 
-    var current: String? = nil;
+    var current: [String] = [];
     var seen = Set<String>();
     var trackers: [DetectedTracker] = [] {
         didSet {
             trackersSubject.send(trackers)
         }
+    }
+    var isTracking: Bool {
+        current.count > 0
     }
 
     private let trackersSubject = CurrentValueSubject<[DetectedTracker], Never>([])
@@ -37,41 +40,35 @@ final class PrivacyDebugTools {
         trackersSubject.eraseToAnyPublisher()
     }
 
-    public func setCurrent(domain: String?) {
+    public func setCurrent(domains: [String]) {
+        current = domains;
         trackers = []
-        current = domain;
         seen = Set<String>();
     }
 
     public func tracker(tracker: DetectedTracker) -> ()? {
-        guard current != nil else {
-//            print("ignoring, current not set")
+        guard current.count != 0 else {
             return nil
         }
 
         guard let url = URL(string: tracker.request.pageUrl),
               let host = url.host
         else {
-//            print("ignoring, host couldn't be read for incoming pageUrl")
             return nil
         }
 
         if case .thirdPartyRequest = tracker.type {
-//            print("ignoring, third party trackers")
             return nil
         }
 
-        guard current == host else {
-//            print("ignoring, didn't match current, host: \(host), current: \(String(describing: current)) ")
+        guard current.contains(host) else {
             return nil
         }
-
-//        print("current: \(String(describing: current))")
-//        print("trackers: \(String(describing: trackers))")
 
         if seen.contains(tracker.request.url) {
             return nil;
         }
+
         seen.insert(tracker.request.url);
         trackers.append(tracker);
         return nil
