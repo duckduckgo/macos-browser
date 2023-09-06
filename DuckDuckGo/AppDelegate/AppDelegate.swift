@@ -27,6 +27,7 @@ import Bookmarks
 import DDGSync
 import ServiceManagement
 import SyncDataProviders
+import UserNotifications
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -211,6 +212,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         if #available(macOS 11.4, *) {
             NetworkProtectionAppEvents().applicationDidFinishLaunching()
         }
+
+        UNUserNotificationCenter.current().delegate = self
 #endif
 
 #if DBP
@@ -338,6 +341,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         if Pixel.isNewUser && repetition == .initial {
             Pixel.fire(.importDataInitial)
         }
+    }
+
+}
+
+extension AppDelegate: UNUserNotificationCenterDelegate {
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        if #available(macOS 11.0, *) {
+            completionHandler(.banner)
+        } else {
+            completionHandler(.alert)
+        }
+    }
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+        if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
+            if response.notification.request.identifier == NetworkProtectionWaitlist.notificationIdentifier {
+                if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
+                    DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
+                    WaitlistModalViewController.show()
+                } else {
+                    assertionFailure("Accepted waitlist notification in an unexpected state")
+                }
+            }
+        }
+
+        completionHandler()
     }
 
 }

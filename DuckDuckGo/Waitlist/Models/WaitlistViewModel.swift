@@ -189,6 +189,9 @@ public final class WaitlistViewModel: ObservableObject {
         acceptedNetworkProtectionTermsAndConditions = true
         viewState = .readyToEnable
 
+        // Remove delivered NetP notifications in case the user didn't click them.
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [NetworkProtectionWaitlist.notificationIdentifier])
+
         DailyPixel.fire(pixel: .networkProtectionWaitlistTermsAndConditionsAccepted, frequency: .dailyAndCount, includeAppVersionParameter: true)
     }
 

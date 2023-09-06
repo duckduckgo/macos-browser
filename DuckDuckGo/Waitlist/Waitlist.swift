@@ -119,7 +119,11 @@ extension Waitlist {
         let notificationIdentifier = Self.notificationIdentifier
         let request = UNNotificationRequest(identifier: notificationIdentifier, content: notificationContent, trigger: nil)
 
-        UNUserNotificationCenter.current().add(request)
+        UNUserNotificationCenter.current().add(request) { error in
+            if error == nil {
+                DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationShown, frequency: .dailyAndCount, includeAppVersionParameter: true)
+            }
+        }
     }
 
 }

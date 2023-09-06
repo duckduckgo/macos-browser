@@ -167,6 +167,9 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     private func updateVisibility() {
         // The button is visible in the case where NetP has not been activated, but the user has been invited and they haven't accepted T&Cs.
         if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
+            DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointToolbarButtonDisplayed,
+                            frequency: .dailyOnly,
+                            includeAppVersionParameter: true)
             showButton = true
             return
         }
