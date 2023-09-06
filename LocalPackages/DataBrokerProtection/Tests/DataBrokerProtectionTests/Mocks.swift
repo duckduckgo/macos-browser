@@ -524,4 +524,8 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
 
     func updateRemovedDate(for extractedProfileId: Int64, with date: Date?) throws {
     }
+
+    func wereThereAnyMatches() throws -> Bool {
+        false
+    }
 }

@@ -578,6 +578,10 @@ final class MockDatabase: DataBrokerProtectionRepository {
         return lastHistoryEventToReturn
     }
 
+    func wereThereAnyMatches() -> Bool {
+        false
+    }
+
     func clear() {
         wasSaveProfileCalled = false
         wasFetchProfileCalled = false
