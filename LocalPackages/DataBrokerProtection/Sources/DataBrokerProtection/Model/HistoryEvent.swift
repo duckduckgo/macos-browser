@@ -18,8 +18,8 @@
 
 import Foundation
 
-public struct HistoryEvent: Identifiable {
-    public enum EventType: Codable, Equatable {
+public struct HistoryEvent: Identifiable, Sendable {
+    public enum EventType: Codable, Equatable, Sendable {
         case noMatchFound
         case matchesFound
         case error(error: DataBrokerProtectionError)

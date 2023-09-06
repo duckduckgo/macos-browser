@@ -124,7 +124,7 @@ private struct PendingProfileRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            HStack {
+            HStack(alignment: .top) {
                 Button {
                     showModal = true
                 } label: {
@@ -145,8 +145,9 @@ private struct PendingProfileRow: View {
                 }
 
                 Spacer()
+
                 Label {
-                    Text(pendingProfile.profile)
+                    Text(pendingProfile.profileWithAge)
                         .lineLimit(1)
                         .frame(width: 180, alignment: .leading)
 
@@ -157,9 +158,28 @@ private struct PendingProfileRow: View {
                 Spacer()
 
                 Label {
-                    Text(pendingProfile.address)
-                        .lineLimit(1)
-                        .frame(width: 180, alignment: .leading)
+                    VStack (alignment: .leading) {
+                        ForEach(pendingProfile.relatives, id: \.self) {  relative in
+                            Text(relative)
+                                .lineLimit(1)
+                        }
+                    }
+                    .frame(width: 180, alignment: .leading)
+
+                } icon: {
+                    Image(systemName: "person.3")
+                }
+
+                Spacer()
+
+                Label {
+                    VStack (alignment: .leading) {
+                        ForEach(pendingProfile.addresses, id: \.self) {  address in
+                            Text(address)
+                                .lineLimit(1)
+                        }
+                    }
+                    .frame(width: 180, alignment: .leading)
 
                 } icon: {
                     Image(systemName: "house")
