@@ -52,6 +52,7 @@ public struct ManagementView<ViewModel>: View where ViewModel: ManagementViewMod
 
     public init(model: ViewModel) {
         self.model = model
+        model.presentSyncAnotherDeviceDialog2()
     }
 
     public var body: some View {

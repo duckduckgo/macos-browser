@@ -38,17 +38,21 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                     } else {
                         VStack(spacing: 24) {
                             SyncSetupCardView(
-                                title: SyncCard.beginSync.title,
-                                description: SyncCard.beginSync.description,
-                                actionTitle: SyncCard.beginSync.actionTitle,
-                                iconName: SyncCard.beginSync.iconName,
-                                action: model.turnOnSync)
-                            SyncSetupCardView(
                                 title: SyncCard.addDevice.title,
                                 description: SyncCard.addDevice.description,
                                 actionTitle: SyncCard.addDevice.actionTitle,
                                 iconName: SyncCard.addDevice.iconName,
-                                action: model.presentSyncAnotherDeviceDialog)
+                                action: model.presentSyncAnotherDeviceDialog) {
+                                    QRCodeView(recoveryCode: model.codeToDisplay ?? "")
+                                }
+                            SyncSetupCardView(
+                                title: SyncCard.beginSync.title,
+                                description: SyncCard.beginSync.description,
+                                actionTitle: SyncCard.beginSync.actionTitle,
+                                iconName: SyncCard.beginSync.iconName,
+                                action: model.turnOnSync) {
+                                    EmptyView()
+                                }
                         }
                     }
                 }.frame(minWidth: 100)
@@ -57,21 +61,25 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
     }
 }
 
-struct SyncSetupCardView: View {
+struct SyncSetupCardView<Content:View>: View {
     let title: String
     let description: String
     let actionTitle: String
     let iconName: String
     let action: () -> Void
+    let customContentView: (() -> Content)
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
             Image(iconName)
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .fontWeight(.semibold)
-                Text(description)
-                    .foregroundColor(Color("GreyTextColor"))
+            VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .fontWeight(.semibold)
+                    Text(description)
+                        .foregroundColor(Color("GreyTextColor"))
+                }
+                customContentView()
                 Button(actionTitle) {
                     action()
                 }
@@ -128,5 +136,23 @@ extension SyncSetupView {
             }
         }
 
+    }
+}
+
+struct QRCodeView: View {
+    let recoveryCode: String
+
+    var body: some View {
+        VStack {
+            Text("Scan this QR code with another device")
+                .foregroundColor(Color("GreyTextColor"))
+                .frame(alignment: .center)
+            QRCode(string: recoveryCode, size: .init(width: 256, height: 256))
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.0))
+        )
     }
 }

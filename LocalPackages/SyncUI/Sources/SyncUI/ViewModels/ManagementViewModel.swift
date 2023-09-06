@@ -24,6 +24,7 @@ public protocol ManagementViewModel: ObservableObject {
     var isCreatingAccount: Bool { get }
     var shouldShowErrorMessage: Bool { get set }
     var errorMessage: String? { get }
+    var codeToDisplay: String? { get }
 
     var recoveryCode: String? { get }
     var devices: [SyncDevice] { get }
@@ -39,5 +40,6 @@ public protocol ManagementViewModel: ObservableObject {
     func turnOnSync()
     func saveRecoveryPDF()
     func refreshDevices()
-    
+
+    func presentSyncAnotherDeviceDialog2()
 }
