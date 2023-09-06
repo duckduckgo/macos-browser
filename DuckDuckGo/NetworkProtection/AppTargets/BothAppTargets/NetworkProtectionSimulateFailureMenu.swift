@@ -38,7 +38,6 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
     @IBOutlet weak var simulateControllerFailureMenuItem: NSMenuItem!
     @IBOutlet weak var simulateTunnelFailureMenuItem: NSMenuItem!
     @IBOutlet weak var simulateTunnelCrashMenuItem: NSMenuItem!
-    @IBOutlet weak var simulateTunnelMemoryOveruseMenuItem: NSMenuItem!
 
     private var simulationOptions: NetworkProtectionSimulationOptions {
         NetworkProtectionTunnelController.simulationOptions
@@ -65,13 +64,6 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
         simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelFatalError)
     }
 
-    /// Simulates a memory overuse crash on the tunnel the next time Network Protection is started.
-    ///
-    @IBAction
-    func simulateTunnelMemoryOveruse(_ menuItem: NSMenuItem) {
-        simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelMemoryOveruse)
-    }
-
     private func simulateFailure(_ simulationFunction: @escaping () async throws -> Void) {
         Task {
             do {
@@ -86,7 +78,6 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
         simulateControllerFailureMenuItem.state = simulationOptions.isEnabled(.controllerFailure) ? .on : .off
         simulateTunnelFailureMenuItem.state = simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
         simulateTunnelCrashMenuItem.state = simulationOptions.isEnabled(.crashFatalError) ? .on : .off
-        simulateTunnelMemoryOveruseMenuItem.state = simulationOptions.isEnabled(.crashMemory) ? .on : .off
     }
 }
 

@@ -554,17 +554,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         isConnectionTesterEnabled.toggle()
     }
 
-    @MainActor
-    private func simulateTunnelFailure(_ message: ExtensionMessage) async throws {
-        guard await isConnected,
-              let activeSession = try await ConnectionSessionUtilities.activeSession() else { return }
-
-        let errorMessage: ExtensionMessageString? = try await activeSession.sendProviderMessage(message)
-        if let errorMessage {
-            throw TunnelFailureError(errorDescription: errorMessage.value)
-        }
-    }
-
     struct TunnelFailureError: LocalizedError {
         let errorDescription: String?
     }
@@ -575,7 +564,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             Self.simulationOptions.setEnabled(false, option: .tunnelFailure)
         } else {
             Self.simulationOptions.setEnabled(true, option: .tunnelFailure)
-            try await simulateTunnelFailure(.simulateTunnelFailure)
+            try await sendProviderMessageToActiveSession(.simulateTunnelFailure)
         }
     }
 
@@ -585,17 +574,18 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             Self.simulationOptions.setEnabled(false, option: .crashFatalError)
         } else {
             Self.simulationOptions.setEnabled(true, option: .crashFatalError)
-            try await simulateTunnelFailure(.simulateTunnelFatalError)
+            try await sendProviderMessageToActiveSession(.simulateTunnelFatalError)
         }
     }
 
     @MainActor
-    func toggleShouldSimulateTunnelMemoryOveruse() async throws {
-        if Self.simulationOptions.isEnabled(.crashMemory) {
-            Self.simulationOptions.setEnabled(false, option: .crashMemory)
-        } else {
-            Self.simulationOptions.setEnabled(true, option: .crashMemory)
-            try await simulateTunnelFailure(.simulateTunnelMemoryOveruse)
+    private func sendProviderMessageToActiveSession(_ message: ExtensionMessage) async throws {
+        guard await isConnected,
+              let activeSession = try await ConnectionSessionUtilities.activeSession() else { return }
+
+        let errorMessage: ExtensionMessageString? = try await activeSession.sendProviderMessage(message)
+        if let errorMessage {
+            throw TunnelFailureError(errorDescription: errorMessage.value)
         }
     }
 }
