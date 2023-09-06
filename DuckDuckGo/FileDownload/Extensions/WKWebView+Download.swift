@@ -57,7 +57,7 @@ extension WKWebView {
                           as exportType: ContentExportType,
                           completionHandler: ((Result<URL, Error>) -> Void)? = nil) {
         let create: (@escaping (Result<Data, Error>) -> Void) -> Void
-        var transform: (Data) throws -> Data = { return $0 }
+        var transform: (Data) -> Data? = { return $0 }
 
         switch exportType {
         case .webArchive:
@@ -70,15 +70,9 @@ extension WKWebView {
             create = self.createWebArchiveData
             transform = { data in
                 // extract HTML from WebArchive bplist
-                guard let dict = try PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: Any],
-                      let mainResource = dict["WebMainResource"] as? [String: Any],
-                      let resourceData = mainResource["WebResourceData"] as? NSData
-                else {
-                    struct GetWebResourceDataFromWebArchiveData: Error { let data: Data }
-                    throw GetWebResourceDataFromWebArchiveData(data: data)
-                }
-
-                return resourceData as Data
+                let dict = try? PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: Any]
+                let mainResource = dict?["WebMainResource"] as? [String: Any]
+                return mainResource?["WebResourceData"] as? Data
             }
         }
 
@@ -96,17 +90,9 @@ extension WKWebView {
                 progress.unpublish()
             }
             do {
-                switch result {
-                case .failure(let error):
-                    throw error
-                case .success(let data):
-                    guard let data = try? transform(data) else {
-                        throw URLError(.cancelled)
-                    }
-
-                    try data.write(to: url)
-                    completionHandler?(.success(url))
-                }
+                let data = try result.map(transform).get() ?? { throw URLError(.cancelled) }()
+                try data.write(to: url)
+                completionHandler?(.success(url))
             } catch {
                 completionHandler?(.failure(error))
             }

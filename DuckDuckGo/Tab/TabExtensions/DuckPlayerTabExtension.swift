@@ -80,13 +80,8 @@ final class DuckPlayerTabExtension {
                         .dropFirst()
                         .receive(on: DispatchQueue.main)
                         .sink { [weak self] playerMode in
-                            guard let self = self else {
-                                return
-                            }
-                            let userValues = UserValues(
-                                    duckPlayerMode: playerMode,
-                                    overlayInteracted: self.duckPlayer.overlayInteracted
-                            )
+                            guard let self else { return }
+                            let userValues = UserValues(duckPlayerMode: playerMode, overlayInteracted: self.duckPlayer.overlayInteracted)
                             self.youtubeOverlayScript?.userValuesUpdated(userValues: userValues)
                         }
                         .store(in: &youtubePlayerCancellables)
@@ -100,13 +95,8 @@ final class DuckPlayerTabExtension {
                 .dropFirst()
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] playerMode in
-                    guard let self = self else {
-                        return
-                    }
-                    let userValues = UserValues(
-                            duckPlayerMode: playerMode,
-                            overlayInteracted: self.duckPlayer.overlayInteracted
-                    )
+                    guard let self else { return }
+                    let userValues = UserValues(duckPlayerMode: playerMode, overlayInteracted: self.duckPlayer.overlayInteracted)
                     self.youtubePlayerScript?.userValuesUpdated(userValues: userValues)
                 }
                 .store(in: &youtubePlayerCancellables)

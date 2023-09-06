@@ -61,17 +61,10 @@ typedef NS_OPTIONS(NSUInteger, _WKFindOptions) {
 
 @property (nonatomic, readonly) _WKMediaCaptureStateDeprecated _mediaCaptureState API_AVAILABLE(macos(10.15), ios(13.0));
 
-- (void)setMicrophoneCaptureState:(WKMediaCaptureState)state completionHandler:(void (^)(void))completionHandler API_AVAILABLE(macos(12.0), ios(15.0));
-- (void)setCameraCaptureState:(WKMediaCaptureState)state completionHandler:(void (^)(void))completionHandler API_AVAILABLE(macos(12.0), ios(15.0));
 - (void)_stopMediaCapture API_AVAILABLE(macos(10.15.4), ios(13.4));
 - (void)_stopAllMediaPlayback;
 - (_WKMediaMutedState)_mediaMutedState API_AVAILABLE(macos(11.0), ios(14.0));;
 - (void)_setPageMuted:(_WKMediaMutedState)mutedState API_AVAILABLE(macos(10.13), ios(11.0));
-
-- (NSPrintOperation *)_printOperationWithPrintInfo:(NSPrintInfo *)printInfo;
-- (NSPrintOperation * _Nullable)_printOperationWithPrintInfo:(NSPrintInfo *)printInfo forFrame:(id)frame API_AVAILABLE(macos(10.12));
-
-- (NSView *)_fullScreenPlaceholderView API_AVAILABLE(macos(10.13.4));
 
 @end
 

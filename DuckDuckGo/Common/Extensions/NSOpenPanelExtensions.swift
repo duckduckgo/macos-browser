@@ -38,7 +38,7 @@ extension NSOpenPanel {
 
         panel.directoryURL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
         panel.canChooseFiles = true
-        panel.allowedContentTypes = UTType.init(filenameExtension: allowedExtension).map { [$0] } ?? []
+        panel.allowedContentTypes = UTType(filenameExtension: allowedExtension).map { [$0] } ?? []
         panel.canChooseDirectories = false
 
         return panel

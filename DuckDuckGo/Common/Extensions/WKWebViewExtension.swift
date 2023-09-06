@@ -243,9 +243,8 @@ extension WKWebView {
     }
 
     func printOperation(with printInfo: NSPrintInfo = .shared, for frame: FrameHandle?) -> NSPrintOperation? {
-        let printInfoWithFrame = NSSelectorFromString(Selector.printOperationWithPrintInfoForFrame)
-        if let frame = frame, responds(to: printInfoWithFrame) {
-            return self.perform(printInfoWithFrame, with: printInfo, with: frame)?.takeUnretainedValue() as? NSPrintOperation
+        if let frame = frame, responds(to: Selector.printOperationWithPrintInfoForFrame) {
+            return self.perform(Selector.printOperationWithPrintInfoForFrame, with: printInfo, with: frame)?.takeUnretainedValue() as? NSPrintOperation
         }
 
         let printInfoDictionary = (NSPrintInfo.shared.dictionary() as? [NSPrintInfo.AttributeKey: Any]) ?? [:]
@@ -263,8 +262,8 @@ extension WKWebView {
     }
 
     var fullScreenPlaceholderView: NSView? {
-        guard self.responds(to: NSSelectorFromString(Selector.fullScreenPlaceholderView)) else { return nil }
-        return self.value(forKey: Selector.fullScreenPlaceholderView) as? NSView
+        guard self.responds(to: Selector.fullScreenPlaceholderView) else { return nil }
+        return self.value(forKey: NSStringFromSelector(Selector.fullScreenPlaceholderView)) as? NSView
     }
 
     func removeFocusFromWebView() {
@@ -283,9 +282,9 @@ extension WKWebView {
         try await evaluateJavaScript("window.getSelection().removeAllRanges()") as Void?
     }
 
-}
+    enum Selector {
+        static let fullScreenPlaceholderView = NSSelectorFromString("_fullScreenPlaceholderView")
+        static let printOperationWithPrintInfoForFrame = NSSelectorFromString("_printOperationWithPrintInfo:forFrame:")
+    }
 
-private enum Selector {
-    static let fullScreenPlaceholderView = "_fullScreenPlaceholderView"
-    static let printOperationWithPrintInfoForFrame = "_printOperationWithPrintInfo:forFrame:"
 }
