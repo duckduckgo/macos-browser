@@ -140,11 +140,11 @@ extension DataBrokerProtectionError {
         case .parsingErrorObjectFailed:
             return (title: genericTitle, subtitle: "Parsing error")
         case .unknownMethodName:
-            return (title: genericTitle, subtitle: "Unkonwn method name")
+            return (title: genericTitle, subtitle: "Unknown method name")
         case .userScriptMessageBrokerNotSet:
             return (title: genericTitle, subtitle: "User script")
         case .unknown:
-            return (title: genericTitle, subtitle: "Unkonwn")
+            return (title: genericTitle, subtitle: "Unknown")
         case .unrecoverableError:
             return (title: genericTitle, subtitle: "Unrecoverable")
         case .noOptOutStep:
@@ -161,7 +161,7 @@ extension DataBrokerProtectionError {
             case .invalidRequestWhenSubmittingCaptcha:
                 return (title: title, subtitle: "Submission invalid request")
             case .timedOutWhenSubmittingCaptcha:
-                return (title: title, subtitle: "Submission timout")
+                return (title: title, subtitle: "Submission timeout")
             case .errorWhenSubmittingCaptcha:
                 return (title: title, subtitle: "Can't submit action")
             case .errorWhenFetchingCaptchaResult:
