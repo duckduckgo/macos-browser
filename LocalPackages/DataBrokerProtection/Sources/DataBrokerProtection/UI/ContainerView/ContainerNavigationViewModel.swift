@@ -55,7 +55,7 @@ final class ContainerNavigationViewModel: ObservableObject {
     }
 
     private func restoreState() {
-        let hasMatches = dataManager.wereThereAnyMatches()
+        let hasMatches = dataManager.hasMatches()
 
         if hasMatches {
             bodyViewType = .results

@@ -36,7 +36,7 @@ protocol DataBrokerProtectionRepository {
 
     func add(_ historyEvent: HistoryEvent)
     func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) -> HistoryEvent?
-    func wereThereAnyMatches() -> Bool
+    func hasMatches() -> Bool
 }
 
 final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
@@ -291,10 +291,10 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         }
     }
 
-    func wereThereAnyMatches() -> Bool {
+    func hasMatches() -> Bool {
         do {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-            return try vault.wereThereAnyMatches()
+            return try vault.hasMatches()
         } catch {
             os_log("Database error: wereThereAnyMatches, error: %{public}@", log: .error, error.localizedDescription)
             return false

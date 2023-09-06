@@ -50,7 +50,7 @@ final class PreviewDataManager: DataBrokerProtectionDataManaging {
         [BrokerProfileQueryData]()
     }
 
-    func wereThereAnyMatches() -> Bool {
+    func hasMatches() -> Bool {
         return false
     }
 }

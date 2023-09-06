@@ -64,7 +64,7 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func fetchExtractedProfiles(for brokerId: Int64, with profileQueryId: Int64) throws -> [ExtractedProfileDB]
     func updateRemovedDate(for extractedProfileId: Int64, with date: Date?) throws
 
-    func wereThereAnyMatches() throws -> Bool
+    func hasMatches() throws -> Bool
  }
 
 final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDatabaseProvider, DataBrokerProtectionDatabaseProvider {
@@ -533,7 +533,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
-    func wereThereAnyMatches() throws -> Bool {
+    func hasMatches() throws -> Bool {
         try db.read { db in
             return try OptOutDB.fetchCount(db) > 0
         }

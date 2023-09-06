@@ -131,7 +131,7 @@ final class ContainerViewModel: ObservableObject {
             guard let self = self else { return }
 
             DispatchQueue.main.async {
-                let hasResults = self.dataManager.wereThereAnyMatches()
+                let hasResults = self.dataManager.hasMatches()
 
                 if hasResults {
                     completion(.results)

@@ -71,7 +71,7 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
     func fetchExtractedProfiles(for brokerId: Int64, with profileQueryId: Int64) throws -> [ExtractedProfile]
     func updateRemovedDate(for extractedProfileId: Int64, with date: Date?) throws
 
-    func wereThereAnyMatches() throws -> Bool
+    func hasMatches() throws -> Bool
 }
 
 final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDatabaseProvider>: DataBrokerProtectionSecureVault {
@@ -365,9 +365,9 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         }
     }
 
-    func wereThereAnyMatches() throws -> Bool {
+    func hasMatches() throws -> Bool {
         try executeThrowingDatabaseOperation {
-            try self.providers.database.wereThereAnyMatches()
+            try self.providers.database.hasMatches()
         }
     }
 

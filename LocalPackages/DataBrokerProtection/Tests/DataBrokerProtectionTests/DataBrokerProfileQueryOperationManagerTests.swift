@@ -578,7 +578,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
         return lastHistoryEventToReturn
     }
 
-    func wereThereAnyMatches() -> Bool {
+    func hasMatches() -> Bool {
         false
     }
 

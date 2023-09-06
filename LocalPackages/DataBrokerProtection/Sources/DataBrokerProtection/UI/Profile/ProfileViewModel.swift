@@ -97,7 +97,7 @@ final class ProfileViewModel: ObservableObject {
     }
 
     var hasOperationContent: Bool {
-        return self.dataManager.wereThereAnyMatches()
+        return self.dataManager.hasMatches()
     }
 
     var isProfileValid: Bool {
