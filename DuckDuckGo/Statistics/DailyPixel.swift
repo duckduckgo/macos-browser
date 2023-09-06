@@ -46,7 +46,6 @@ final class DailyPixel {
                      includeAppVersionParameter includeAppVersion: Bool,
                      withAdditionalParameters params: [String: String] = [:],
                      onComplete: @escaping (Swift.Error?) -> Void = { _ in }) {
-        
         switch frequency {
         case .dailyOnly:
             if !pixel.hasBeenFiredToday(dailyPixelStorage: storage) {
