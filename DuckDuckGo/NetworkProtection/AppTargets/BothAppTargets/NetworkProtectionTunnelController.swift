@@ -326,11 +326,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             options[NetworkProtectionOptionKey.tunnelFatalErrorCrashSimulation] = NetworkProtectionOptionValue.true
         }
 
-        if Self.simulationOptions.isEnabled(.crashMemory) {
-            Self.simulationOptions.setEnabled(false, option: .crashMemory)
-            options[NetworkProtectionOptionKey.tunnelMemoryCrashSimulation] = NetworkProtectionOptionValue.true
-        }
-
         if Self.simulationOptions.isEnabled(.controllerFailure) {
             Self.simulationOptions.setEnabled(false, option: .controllerFailure)
             throw StartError.simulateControllerFailureError
