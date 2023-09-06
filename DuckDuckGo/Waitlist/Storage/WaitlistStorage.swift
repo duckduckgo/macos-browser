@@ -32,6 +32,10 @@ protocol WaitlistStorage {
 
 extension WaitlistStorage {
 
+    var isWaitlistUser: Bool {
+        return getWaitlistToken() != nil && getWaitlistTimestamp() != nil
+    }
+
     var isOnWaitlist: Bool {
         return getWaitlistToken() != nil && getWaitlistTimestamp() != nil && !isInvited
     }

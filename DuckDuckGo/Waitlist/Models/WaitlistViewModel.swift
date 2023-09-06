@@ -181,11 +181,15 @@ public final class WaitlistViewModel: ObservableObject {
 
     private func showTermsAndConditions() {
         viewState = .termsAndConditions
+
+        DailyPixel.fire(pixel: .networkProtectionWaitlistTermsAndConditionsDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
     }
 
     private func acceptTermsAndConditions() {
         acceptedNetworkProtectionTermsAndConditions = true
         viewState = .readyToEnable
+
+        DailyPixel.fire(pixel: .networkProtectionWaitlistTermsAndConditionsAccepted, frequency: .dailyAndCount, includeAppVersionParameter: true)
     }
 
 }

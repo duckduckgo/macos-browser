@@ -149,6 +149,14 @@ extension Pixel {
         case duckPlayerSettingNever
         case duckPlayerSettingBackToDefault
 
+        // Network Protection Waitlist
+        case networkProtectionWaitlistEntryPointMenuItemDisplayed
+        case networkProtectionWaitlistEntryPointToolbarButtonDisplayed
+        case networkProtectionWaitlistNotificationShown
+        case networkProtectionWaitlistNotificationTapped
+        case networkProtectionWaitlistTermsAndConditionsDisplayed
+        case networkProtectionWaitlistTermsAndConditionsAccepted
+
         enum Debug {
 
             case assertionFailure(message: String, file: StaticString, line: UInt)
@@ -416,6 +424,18 @@ extension Pixel.Event {
         case .duckPlayerSettingBackToDefault:
             return "m_mac_duck-player_setting_back-to-default"
 
+        case .networkProtectionWaitlistEntryPointMenuItemDisplayed:
+            return "m_mac_netp_imp_settings_entry_menu_item"
+        case .networkProtectionWaitlistEntryPointToolbarButtonDisplayed:
+            return "m_mac_netp_imp_settings_entry_toolbar_button"
+        case .networkProtectionWaitlistNotificationShown:
+            return "m_mac_netp_ev_waitlist_notification_shown"
+        case .networkProtectionWaitlistNotificationTapped:
+            return "m_mac_netp_ev_waitlist_notification_launched"
+        case .networkProtectionWaitlistTermsAndConditionsDisplayed:
+            return "m_mac_netp_imp_terms"
+        case .networkProtectionWaitlistTermsAndConditionsAccepted:
+            return "m_mac_netp_ev_terms_accepted"
         }
 
     }

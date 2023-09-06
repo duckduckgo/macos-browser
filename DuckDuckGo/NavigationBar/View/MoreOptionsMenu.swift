@@ -131,6 +131,8 @@ final class MoreOptionsMenu: NSMenu {
             addItem(withTitle: UserText.networkProtection, action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
                 .targetting(self)
                 .withImage(.image(for: .vpnIcon))
+
+            DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
         }
 #endif // NETWORK_PROTECTION
 
