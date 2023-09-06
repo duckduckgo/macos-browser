@@ -52,6 +52,8 @@ extension Preferences {
                                 AppearanceView(model: .shared)
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
+                            case .privacyPro:
+                                PrivacyProView()
                             case .autofill:
                                 AutofillView(model: AutofillPreferencesModel())
                             case .downloads:
