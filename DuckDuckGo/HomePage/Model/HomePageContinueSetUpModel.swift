@@ -109,15 +109,6 @@ extension HomePage.Models {
         @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Calendar.current.date(byAdding: .month, value: -1, to: Date())!)
         private var firstLaunchDate: Date
 
-        @UserDefaultsWrapper(key: .emailKeychainMigration, defaultValue: false)
-        private static var emailKeychainMigrationDone: Bool
-        private static func makeEmailManager() -> EmailManager {
-            defer {
-                emailKeychainMigrationDone = true
-            }
-            return EmailManager(storage: EmailKeychainManager(needsMigration: !emailKeychainMigrationDone))
-        }
-
         var isMoreOrLessButtonNeeded: Bool {
             return featuresMatrix.count > itemsRowCountWhenCollapsed
         }
@@ -141,7 +132,7 @@ extension HomePage.Models {
         init(defaultBrowserProvider: DefaultBrowserProvider,
              dataImportProvider: DataImportStatusProviding,
              tabCollectionViewModel: TabCollectionViewModel,
-             emailManager: EmailManager? = nil,
+             emailManager: EmailManager = EmailManager(),
              privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
              cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
@@ -149,7 +140,7 @@ extension HomePage.Models {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
-            self.emailManager = emailManager ?? Self.makeEmailManager()
+            self.emailManager = emailManager
             self.privacyPreferences = privacyPreferences
             self.cookieConsentPopoverManager = cookieConsentPopoverManager
             self.duckPlayerPreferences = duckPlayerPreferences
