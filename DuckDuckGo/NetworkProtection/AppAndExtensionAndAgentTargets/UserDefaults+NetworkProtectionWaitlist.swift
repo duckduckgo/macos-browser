@@ -39,7 +39,7 @@ final class DefaultWaitlistBetaOverrides: WaitlistBetaOverriding {
     }
 
     var waitlistEnabled: WaitlistOverride {
-        .init(rawValue: userDefaults.networkProtectionWaitlistBetaActiveOverrideRawValue) ?? .default
+        .init(rawValue: userDefaults.networkProtectionWaitlistEnabledOverrideRawValue) ?? .default
     }
 }
 
