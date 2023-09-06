@@ -323,7 +323,7 @@ final class PasswordManagementItemListModel: ObservableObject {
     func selectLoginWithDomainOrFirst(domain: String, notify: Bool = true) {
         let websiteAccounts = items
             .compactMap { $0.websiteAccount }
-        let bestMatch = websiteAccounts.sortedForDomain(domain, tld: ContentBlocking.shared.tld, removeDuplicates: true)
+        let bestMatch = websiteAccounts.sortedForDomain(domain, tld: ContentBlocking.shared.tld, removeDuplicates: true, alphabeticalOnly: true)
         for section in displayedItems {
             if let account = section.items.first(where: {
                 $0.websiteAccount?.username == bestMatch.first?.username &&
