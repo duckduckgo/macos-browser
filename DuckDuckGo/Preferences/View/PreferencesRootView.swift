@@ -53,7 +53,7 @@ extension Preferences {
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
                             case .privacyPro:
-                                PrivacyProView()
+                                PrivacyProView(model: PrivacyProPreferencesModel())
                             case .autofill:
                                 AutofillView(model: AutofillPreferencesModel())
                             case .downloads:

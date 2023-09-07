@@ -22,6 +22,7 @@ import SwiftUIExtensions
 extension Preferences {
 
     struct PrivacyProView: View {
+        @ObservedObject var model: PrivacyProPreferencesModel
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
@@ -33,9 +34,15 @@ extension Preferences {
                     .frame(height: 20)
 
                 VStack {
-                    HeaderView(title: "One subscription, three advanced protections",
-                               description: "Get enhanced protection across all your devices and reduce your online footprint for as little as $9.99/mo.",
-                               button1Name: "Learn More", button2Name: "I Have a Subscription")
+                    if model.isSignedIn {
+                        HeaderActiveView(title: "Privacy Pro is active on this device",
+                                   description: "Your monthly Privacy Pro subscription renews on April 20, 2027.",
+                                   button1Name: "Add to Another Device…", button2Name: "Manage Subscription")
+                    } else {
+                        HeaderView(title: "One subscription, three advanced protections",
+                                   description: "Get enhanced protection across all your devices and reduce your online footprint for as little as $9.99/mo.",
+                                   button1Name: "Learn More", button2Name: "I Have a Subscription")
+                    }
 
                     Divider()
                         .foregroundColor(Color.secondary)
@@ -43,29 +50,21 @@ extension Preferences {
 
                     SectionView(title: "VPN",
                                 description: "Full-device protection with the VPN built for speed and security.",
-                                buttonName: "Manage")
+                                buttonName: model.isSignedIn ? "Manage" : "")
 
                     Divider()
                         .foregroundColor(Color.secondary)
 
                     SectionView(title: "Personal Information Removal",
                                 description: "Find and remove your personal information from sites that store and sell it.",
-                                buttonName: "View")
+                                buttonName: model.isSignedIn ? "View" : "")
 
                     Divider()
                         .foregroundColor(Color.secondary)
 
                     SectionView(title: "Identity Theft Restoration",
                                 description: "Restore stolen accounts and financial losses in the event of identity theft.",
-                                buttonName: "View")
-                }
-                .padding(10)
-                .roundedBorder()
-
-                VStack {
-                    HeaderActiveView(title: "Privacy Pro is active on this device",
-                               description: "Your monthly Privacy Pro subscription renews on April 20, 2027.",
-                               button1Name: "Add to Another Device…", button2Name: "Manage Subscription")
+                                buttonName: model.isSignedIn ? "View" : "")
                 }
                 .padding(10)
                 .roundedBorder()
@@ -187,7 +186,10 @@ extension Preferences {
                             TextMenuItemCaption(text: description)
                                 .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
                         }
-                        Button(buttonName) { }
+
+                        if !buttonName.isEmpty {
+                            Button(buttonName) { }
+                        }
                     }
                 }
             }
