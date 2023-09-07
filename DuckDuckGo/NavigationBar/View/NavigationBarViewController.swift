@@ -282,6 +282,7 @@ final class NavigationBarViewController: NSViewController {
         let featureVisibility = DefaultNetworkProtectionVisibility()
         guard featureVisibility.isNetworkProtectionVisible() else {
             featureVisibility.disableForWaitlistUsers()
+            LocalPinningManager.shared.unpin(.networkProtection)
             return
         }
 

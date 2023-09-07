@@ -22,6 +22,7 @@ import Foundation
 import Networking
 import UserNotifications
 import NetworkProtection
+import BrowserServicesKit
 
 protocol WaitlistConstants {
     static var identifier: String { get }
@@ -199,18 +200,37 @@ struct NetworkProtectionWaitlist: Waitlist {
     func fetchNetworkProtectionInviteCodeIfAvailable(completion: @escaping (WaitlistInviteCodeFetchError?) -> Void) {
         self.fetchInviteCodeIfAvailable { error in
             if let error {
-                completion(error)
+                // Check for users who have waitlist state but have no auth token, for example if the redeem call fails.
+                let networkProtectionKeyStore = NetworkProtectionKeychainTokenStore()
+                if let inviteCode = waitlistStorage.getWaitlistInviteCode(), !networkProtectionKeyStore.isFeatureActivated {
+                    Task { @MainActor in
+                        do {
+                            try await networkProtectionCodeRedemption.redeem(inviteCode)
+                            NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+                            sendInviteCodeAvailableNotification()
+                            completion(nil)
+                        } catch {
+                            assertionFailure("Failed to redeem invite code")
+                            completion(.failure(error))
+                        }
+                    }
+                } else {
+                    completion(error)
+                }
             } else if let inviteCode = waitlistStorage.getWaitlistInviteCode() {
                 Task { @MainActor in
                     do {
                         try await networkProtectionCodeRedemption.redeem(inviteCode)
                         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
                         sendInviteCodeAvailableNotification()
+                        completion(nil)
                     } catch {
                         assertionFailure("Failed to redeem invite code")
+                        completion(.failure(error))
                     }
                 }
             } else {
+                completion(nil)
                 assertionFailure("Didn't get error or invite code")
             }
         }

@@ -380,8 +380,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                 if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
                     DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
                     WaitlistModalViewController.show()
-                } else {
-                    assertionFailure("Accepted waitlist notification in an unexpected state")
                 }
             }
         }
