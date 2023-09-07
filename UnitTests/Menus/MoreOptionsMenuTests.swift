@@ -159,6 +159,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
 #if NETWORK_PROTECTION
 final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility {
+
     var visible: Bool
 
     init(visible: Bool) {
@@ -169,9 +170,12 @@ final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility 
         return visible
     }
 
+    func disableForAllUsers() {
+        // intentional no-op
+    }
+
     func disableForWaitlistUsers() {
-        // this is not meant to make the feature invisible, as that's already handled
-        // by this class... it's meant to remove the data that's no longer needed
+        // intentional no-op
     }
 }
 #endif

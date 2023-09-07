@@ -26,6 +26,7 @@ import NetworkProtectionUI
 
 protocol NetworkProtectionFeatureVisibility {
     func isNetworkProtectionVisible() -> Bool
+    func disableForAllUsers()
     func disableForWaitlistUsers()
 }
 
@@ -105,6 +106,10 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         case .off:
             return false
         }
+    }
+
+    func disableForAllUsers() {
+        featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
     }
 
     func disableForWaitlistUsers() {
