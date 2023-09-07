@@ -301,6 +301,26 @@ extension Pixel {
             case burnerTabMisplaced
 #if DBP
             case dataBrokerProtectionError
+
+            // SLO and SLI Pixels: https://app.asana.com/0/1203581873609357/1205337273100857/f
+
+            // Stage Pixels
+            case optOutStart
+            case optOutEmailGenerate
+            case optOutCaptchaParse
+            case optOutCaptchaSend
+            case optOutCaptchaSolve
+            case optOutSubmit
+            case optOutEmailReceive
+            case optOutEmailConfirm
+            case optOutValidate
+            case optOutFinish
+
+            // Process Pixels
+            case optOutSubmitSuccess
+            case optOutSuccess
+            case optOutFailure
+            case optOutCancel // -> This is not possible
 #endif
         }
 
@@ -687,6 +707,23 @@ extension Pixel.Event.Debug {
 
 #if DBP
         case .dataBrokerProtectionError: return "data_broker_error"
+        // Stage Pixels
+        case .optOutStart: return "dbp.macos.optout.stage.start"
+        case .optOutEmailGenerate: return "dbp.macos.optout.stage.email-generate"
+        case .optOutCaptchaParse: return "dbp.macos.optout.stage.captcha-parse"
+        case .optOutCaptchaSend: return "dbp.macos.optout.stage.captcha-send"
+        case .optOutCaptchaSolve: return "dbp.macos.optout.stage.captcha-solve"
+        case .optOutSubmit: return "dbp.macos.optout.stage.submit"
+        case .optOutEmailReceive: return "dbp.macos.optout.stage.email-receive"
+        case .optOutEmailConfirm: return "dbp.macos.optout.stage.email-confirm"
+        case .optOutValidate: return "dbp.macos.optout.stage.validate"
+        case .optOutFinish: return "dbp.macos.optout.stage.finish"
+
+        // Process Pixels
+        case .optOutSubmitSuccess: return "dbp.macos.optout.process.submit-success"
+        case .optOutSuccess: return "dbp.macos.optout.process.success"
+        case .optOutFailure: return "dbp.macos.optout.process.failure"
+        case .optOutCancel: return "dbp.macos.optout.process.cancel" // -> This is not possible
 #endif
         }
     }
