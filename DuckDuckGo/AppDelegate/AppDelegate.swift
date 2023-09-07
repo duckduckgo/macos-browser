@@ -70,13 +70,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
 
-#if !APPSTORE
+#if !APPSTORE && !DBP
     var updateController: UpdateController!
 #endif
 
     // swiftlint:disable:next function_body_length
     func applicationWillFinishLaunching(_ notification: Notification) {
-#if !APPSTORE && !DEBUG
+#if !APPSTORE && !DEBUG && !DBP
         PFMoveToApplicationsFolderIfNecessary()
 #endif
 
@@ -154,7 +154,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                                                privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
         NSApp.mainMenuTyped.setup(with: featureFlagger)
 
-#if !APPSTORE
+#if !APPSTORE && !DBP
         updateController = UpdateController(internalUserDecider: internalUserDecider)
         stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
 #endif
