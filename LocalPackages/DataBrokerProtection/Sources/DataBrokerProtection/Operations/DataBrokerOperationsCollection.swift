@@ -37,7 +37,7 @@ final class DataBrokerOperationsCollection: Operation {
     private let operationType: OperationType
     private let notificationCenter: NotificationCenter
     private let runner: WebOperationRunner
-    private let errorHandler: EventMapping<DataBrokerProtectionPixels>?
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let showWebView: Bool
 
     deinit {
@@ -51,7 +51,7 @@ final class DataBrokerOperationsCollection: Operation {
          priorityDate: Date? = nil,
          notificationCenter: NotificationCenter = NotificationCenter.default,
          runner: WebOperationRunner,
-         errorHandler: EventMapping<DataBrokerProtectionPixels>? = nil,
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
          showWebView: Bool) {
 
         self.brokerProfileQueriesData = brokerProfileQueriesData
@@ -61,7 +61,7 @@ final class DataBrokerOperationsCollection: Operation {
         self.operationType = operationType
         self.notificationCenter = notificationCenter
         self.runner = runner
-        self.errorHandler = errorHandler
+        self.pixelHandler = pixelHandler
         self.showWebView = showWebView
         super.init()
     }
@@ -143,12 +143,12 @@ final class DataBrokerOperationsCollection: Operation {
                                                                                 database: database,
                                                                                 notificationCenter: notificationCenter,
                                                                                 runner: runner,
+                                                                                pixelHandler: pixelHandler,
                                                                                 showWebView: showWebView,
                                                                                 shouldRunNextStep: { [weak self] in
                     guard let self = self else { return false }
                     return !self.isCancelled
                 })
-
                 os_log("Finished operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
 
                 if let sleepInterval = intervalBetweenOperations {
@@ -159,7 +159,7 @@ final class DataBrokerOperationsCollection: Operation {
                 os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
                 if let error = error as? DataBrokerProtectionError,
                    let dataBrokerName = brokerProfileQueriesData.first?.dataBroker.name {
-                    errorHandler?.fire(.error(error: error, dataBroker: dataBrokerName))
+                    pixelHandler.fire(.error(error: error, dataBroker: dataBrokerName))
                 } else {
                     os_log("Cant handle error", log: .dataBrokerProtection)
                 }

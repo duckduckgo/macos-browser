@@ -67,7 +67,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     private let contentScopeProperties: ContentScopeProperties
     private let dataManager: DataBrokerProtectionDataManager
     private let activity: NSBackgroundActivityScheduler
-    private let errorHandler: EventMapping<DataBrokerProtectionPixels>
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let schedulerIdentifier = "com.duckduckgo.macos.browser.databroker-protection-scheduler"
     private let notificationCenter: NotificationCenter
     private let emailService: EmailServiceProtocol
@@ -88,14 +88,14 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                                              config: DataBrokerProtectionSchedulerConfig(),
                                              operationRunnerProvider: runnerProvider,
                                              notificationCenter: notificationCenter,
-                                             errorHandler: errorHandler)
+                                             pixelHandler: pixelHandler)
     }()
 
     public init(privacyConfigManager: PrivacyConfigurationManaging,
                 contentScopeProperties: ContentScopeProperties,
                 dataManager: DataBrokerProtectionDataManager,
                 notificationCenter: NotificationCenter = NotificationCenter.default,
-                errorHandler: EventMapping<DataBrokerProtectionPixels>,
+                pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 redeemUseCase: DataBrokerProtectionRedeemUseCase
     ) {
 
@@ -108,7 +108,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         self.dataManager = dataManager
         self.privacyConfigManager = privacyConfigManager
         self.contentScopeProperties = contentScopeProperties
-        self.errorHandler = errorHandler
+        self.pixelHandler = pixelHandler
         self.notificationCenter = notificationCenter
 
         self.emailService = EmailService(redeemUseCase: redeemUseCase)

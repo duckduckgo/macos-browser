@@ -34,6 +34,7 @@ protocol OperationsManager {
                       notificationCenter: NotificationCenter,
                       runner: WebOperationRunner,
                       showWebView: Bool,
+                      pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                       shouldRunNextStep: @escaping () -> Bool) async throws
 }
 
@@ -43,6 +44,7 @@ extension OperationsManager {
                       database: DataBrokerProtectionRepository,
                       notificationCenter: NotificationCenter,
                       runner: WebOperationRunner,
+                      pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                       shouldRunNextStep: @escaping () -> Bool) async throws {
 
         try await runOperation(operationData: operationData,
@@ -50,6 +52,7 @@ extension OperationsManager {
                                database: database,
                                notificationCenter: notificationCenter,
                                runner: runner,
+                               pixelHandler: pixelHandler,
                                showWebView: false,
                                shouldRunNextStep: shouldRunNextStep)
     }
@@ -62,6 +65,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                database: DataBrokerProtectionRepository,
                                notificationCenter: NotificationCenter = NotificationCenter.default,
                                runner: WebOperationRunner,
+                               pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                                showWebView: Bool = false,
                                shouldRunNextStep: @escaping () -> Bool) async throws {
 
@@ -70,15 +74,16 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                        brokerProfileQueryData: brokerProfileQueryData,
                                        database: database,
                                        notificationCenter: notificationCenter,
+                                       pixelHandler: pixelHandler,
                                        showWebView: showWebView,
                                        shouldRunNextStep: shouldRunNextStep)
-
         } else if let optOutOperationData = operationData as? OptOutOperationData {
             try await runOptOutOperation(for: optOutOperationData.extractedProfile,
                                          on: runner,
                                          brokerProfileQueryData: brokerProfileQueryData,
                                          database: database,
                                          notificationCenter: notificationCenter,
+                                         pixelHandler: pixelHandler,
                                          showWebView: showWebView,
                                          shouldRunNextStep: shouldRunNextStep)
         }
@@ -89,6 +94,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                    brokerProfileQueryData: BrokerProfileQueryData,
                                    database: DataBrokerProtectionRepository,
                                    notificationCenter: NotificationCenter,
+                                   pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                                    showWebView: Bool = false,
                                    shouldRunNextStep: @escaping () -> Bool) async throws {
         os_log("Running scan operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
@@ -190,6 +196,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                      brokerProfileQueryData: BrokerProfileQueryData,
                                      database: DataBrokerProtectionRepository,
                                      notificationCenter: NotificationCenter,
+                                     pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                                      showWebView: Bool = false,
                                      shouldRunNextStep: @escaping () -> Bool) async throws {
         guard let brokerId = brokerProfileQueryData.dataBroker.id, let profileQueryId = brokerProfileQueryData.profileQuery.id, let extractedProfileId = extractedProfile.id else {
