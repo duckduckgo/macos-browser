@@ -20,6 +20,7 @@ import BrowserServicesKit
 import Cocoa
 import Common
 import WebKit
+import Configuration
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -742,6 +743,23 @@ extension MainViewController {
 
     @IBAction func fetchConfigurationNow(_ sender: Any?) {
         ConfigurationManager.shared.forceRefresh()
+    }
+
+    @IBAction func setCustomConfigurationURL(_ sender: Any?) {
+#if DEBUG || REVIEW
+        let alert = NSAlert.customConfigurationAlert()
+        if alert.runModal() != .cancel {
+            guard let textField = alert.accessoryView as? NSTextField,
+                  let newConfigurationUrl = URL(string: textField.stringValue) else {
+                os_log("Failed to set custom configuration URL", type: .error)
+            }
+
+            let configurationProvider = AppConfigurationURLProvider(customPrivacyConfiguration: newConfigurationUrl)
+            Configuration.setURLProvider(configurationProvider)
+            ConfigurationManager.shared.forceRefresh()
+            os_log("New configuration URL set to \(newConfigurationUrl.absoluteString)", type: .info)
+        }
+#endif
     }
 
     @IBAction func resetNetworkProtectionWaitlistState(_ sender: Any?) {
