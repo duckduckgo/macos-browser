@@ -17,10 +17,12 @@
 //
 
 import Foundation
+import BrowserServicesKit
 
 public enum DataBrokerProtectionPixels {
     struct Consts {
         static let dataBrokerParamKey = "data_broker"
+        static let appVersionParamKey = "app_version"
         static let attemptIdParamKey = "attempt_id"
         static let durationParamKey = "duration"
     }
@@ -46,7 +48,18 @@ public enum DataBrokerProtectionPixels {
 }
 
 public extension DataBrokerProtectionPixels {
+
     var params: [String: String] {
+        var pixelParams = internalParams
+
+        if let appVersion = AppVersionProvider().appVersion() {
+            pixelParams[Consts.appVersionParamKey] = AppVersionProvider().appVersion()
+        }
+
+        return pixelParams
+    }
+
+    private var internalParams: [String: String] {
         switch self {
         case .error(let error, let dataBroker):
             if case let .actionFailed(actionID, message) = error {
