@@ -20,7 +20,7 @@ import Foundation
 import Common
 
 protocol DataBrokerProtectionRepository {
-    func save(_ profile: DataBrokerProtectionProfile)
+    func save(_ profile: DataBrokerProtectionProfile) async
     func fetchProfile() -> DataBrokerProtectionProfile?
 
     func saveOptOutOperation(optOut: OptOutOperationData, extractedProfile: ExtractedProfile) throws
@@ -36,6 +36,7 @@ protocol DataBrokerProtectionRepository {
 
     func add(_ historyEvent: HistoryEvent)
     func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) -> HistoryEvent?
+    func hasMatches() -> Bool
 }
 
 final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
@@ -47,7 +48,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         self.vault = vault
     }
 
-    func save(_ profile: DataBrokerProtectionProfile) {
+    func save(_ profile: DataBrokerProtectionProfile) async {
         do {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
             let profileQueries = profile.profileQueries
@@ -246,9 +247,17 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             for broker in brokers {
                 for profileQuery in profileQueries {
                     if let brokerId = broker.id, let profileQueryId = profileQuery.id {
-                        if let brokerProfileQueryData = brokerProfileQueryData(for: brokerId, and: profileQueryId) {
-                            brokerProfileQueryDataList.append(brokerProfileQueryData)
-                        }
+                        guard let scanOperation = try vault.fetchScan(brokerId: brokerId, profileQueryId: profileQueryId) else { continue }
+                        let optOutOperations = try vault.fetchOptOuts(brokerId: brokerId, profileQueryId: profileQueryId)
+
+                        let brokerProfileQueryData = BrokerProfileQueryData(
+                            dataBroker: broker,
+                            profileQuery: profileQuery,
+                            scanOperationData: scanOperation,
+                            optOutOperationsData: optOutOperations
+                        )
+
+                        brokerProfileQueryDataList.append(brokerProfileQueryData)
                     }
                 }
             }
@@ -279,6 +288,16 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         } catch {
             os_log("Database error: fetchLastEvent, error: %{public}@", log: .error, error.localizedDescription)
             return nil
+        }
+    }
+
+    func hasMatches() -> Bool {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            return try vault.hasMatches()
+        } catch {
+            os_log("Database error: wereThereAnyMatches, error: %{public}@", log: .error, error.localizedDescription)
+            return false
         }
     }
 }

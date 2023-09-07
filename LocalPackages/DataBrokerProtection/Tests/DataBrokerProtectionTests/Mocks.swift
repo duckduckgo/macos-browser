@@ -151,7 +151,7 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
     var wasExecuteCalledForProfileData = false
     var wasExecuteCalledForSolveCaptcha = false
 
-    func initializeWebView(debug: Bool) async {
+    func initializeWebView(showWebView: Bool) async {
         wasInitializeWebViewCalled = true
     }
 
@@ -523,5 +523,9 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
     }
 
     func updateRemovedDate(for extractedProfileId: Int64, with date: Date?) throws {
+    }
+
+    func hasMatches() throws -> Bool {
+        false
     }
 }
