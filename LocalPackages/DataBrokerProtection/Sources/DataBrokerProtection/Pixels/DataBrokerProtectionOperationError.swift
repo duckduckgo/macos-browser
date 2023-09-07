@@ -80,20 +80,3 @@ extension DataBrokerProtectionPixels {
         }
     }
 }
-
-public struct DataBrokerProtectionOperationError {
-    public let error: DataBrokerProtectionError
-    public let dataBrokerName: String
-
-    public var params: [String: String] {
-        if case let .actionFailed(actionID, message) = error {
-            return ["dataBroker": dataBrokerName,
-                    "name": error.name,
-                    "actionID": actionID,
-                    "message": message]
-        } else {
-            return ["dataBroker": dataBrokerName,
-                    "name": error.name]
-        }
-    }
-}

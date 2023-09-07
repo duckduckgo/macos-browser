@@ -37,7 +37,7 @@ final class DataBrokerOperationsCollection: Operation {
     private let operationType: OperationType
     private let notificationCenter: NotificationCenter
     private let runner: WebOperationRunner
-    private let errorHandler: EventMapping<DataBrokerProtectionOperationError>?
+    private let errorHandler: EventMapping<DataBrokerProtectionPixels>?
     private let showWebView: Bool
 
     deinit {
@@ -51,7 +51,7 @@ final class DataBrokerOperationsCollection: Operation {
          priorityDate: Date? = nil,
          notificationCenter: NotificationCenter = NotificationCenter.default,
          runner: WebOperationRunner,
-         errorHandler: EventMapping<DataBrokerProtectionOperationError>? = nil,
+         errorHandler: EventMapping<DataBrokerProtectionPixels>? = nil,
          showWebView: Bool) {
 
         self.brokerProfileQueriesData = brokerProfileQueriesData
@@ -159,7 +159,7 @@ final class DataBrokerOperationsCollection: Operation {
                 os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
                 if let error = error as? DataBrokerProtectionError,
                    let dataBrokerName = brokerProfileQueriesData.first?.dataBroker.name {
-                    errorHandler?.fire(.init(error: error, dataBrokerName: dataBrokerName))
+                    errorHandler?.fire(.error(error: error, dataBroker: dataBrokerName))
                 } else {
                     os_log("Cant handle error", log: .dataBrokerProtection)
                 }

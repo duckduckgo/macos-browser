@@ -30,13 +30,13 @@ final class DataBrokerProtectionProcessor {
     private let operationRunnerProvider: OperationRunnerProvider
     private let notificationCenter: NotificationCenter
     private let operationQueue: OperationQueue
-    private var errorHandler: EventMapping<DataBrokerProtectionOperationError>?
+    private var errorHandler: EventMapping<DataBrokerProtectionPixels>?
 
     init(database: DataBrokerProtectionRepository,
          config: SchedulerConfig,
          operationRunnerProvider: OperationRunnerProvider,
          notificationCenter: NotificationCenter = NotificationCenter.default,
-         errorHandler: EventMapping<DataBrokerProtectionOperationError>? = nil) {
+         errorHandler: EventMapping<DataBrokerProtectionPixels>? = nil) {
 
         self.database = database
         self.config = config

@@ -67,7 +67,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     private let contentScopeProperties: ContentScopeProperties
     private let dataManager: DataBrokerProtectionDataManager
     private let activity: NSBackgroundActivityScheduler
-    private let errorHandler: EventMapping<DataBrokerProtectionOperationError>
+    private let errorHandler: EventMapping<DataBrokerProtectionPixels>
     private let schedulerIdentifier = "com.duckduckgo.macos.browser.databroker-protection-scheduler"
     private let notificationCenter: NotificationCenter
     private let emailService: EmailServiceProtocol
@@ -95,7 +95,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                 contentScopeProperties: ContentScopeProperties,
                 dataManager: DataBrokerProtectionDataManager,
                 notificationCenter: NotificationCenter = NotificationCenter.default,
-                errorHandler: EventMapping<DataBrokerProtectionOperationError>,
+                errorHandler: EventMapping<DataBrokerProtectionPixels>,
                 redeemUseCase: DataBrokerProtectionRedeemUseCase
     ) {
 

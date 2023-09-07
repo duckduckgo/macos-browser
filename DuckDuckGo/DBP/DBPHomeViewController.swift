@@ -106,15 +106,15 @@ extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDeleg
     }
 }
 
-public class DataBrokerProtectionErrorHandling: EventMapping<DataBrokerProtectionOperationError> {
+public class DataBrokerProtectionErrorHandling: EventMapping<DataBrokerProtectionPixels> {
 
     public init() {
         super.init { event, _, _, _ in
-            Pixel.fire(.debug(event: .dataBrokerProtectionError, error: event.error), withAdditionalParameters: event.params)
+//            Pixel.fire(.debug(event: .dataBrokerProtectionError, error: event.error), withAdditionalParameters: event.params)
         }
     }
 
-    override init(mapping: @escaping EventMapping<DataBrokerProtectionOperationError>.Mapping) {
+    override init(mapping: @escaping EventMapping<DataBrokerProtectionPixels>.Mapping) {
         fatalError("Use init()")
     }
 }
