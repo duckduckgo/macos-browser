@@ -67,6 +67,19 @@ struct NetworkProtectionTermsAndConditionsView: View {
                             Text(UserText.networkProtectionTermsOfServiceSection2List).bodyStyle()
                             Text(UserText.networkProtectionTermsOfServiceSection3Title).titleStyle()
                             Text(UserText.networkProtectionTermsOfServiceSection3List).bodyStyle()
+                            Text(UserText.networkProtectionTermsOfServiceSection4Title).titleStyle()
+                            Text(UserText.networkProtectionTermsOfServiceSection4List).bodyStyle()
+                            Text(UserText.networkProtectionTermsOfServiceSection5Title).titleStyle()
+                            Text(UserText.networkProtectionTermsOfServiceSection5List).bodyStyle()
+                        }
+
+                        Group {
+                            Text(UserText.networkProtectionTermsOfServiceSection6Title).titleStyle()
+                            Text(UserText.networkProtectionTermsOfServiceSection6List).bodyStyle()
+                            Text(UserText.networkProtectionTermsOfServiceSection7Title).titleStyle()
+                            Text(UserText.networkProtectionTermsOfServiceSection7List).bodyStyle()
+                            Text(UserText.networkProtectionTermsOfServiceSection8Title).titleStyle()
+                            Text(UserText.networkProtectionTermsOfServiceSection8List).bodyStyle()
                         }
                     }
                     .padding(.all, 20)
