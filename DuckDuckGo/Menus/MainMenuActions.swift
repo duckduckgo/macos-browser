@@ -705,6 +705,13 @@ extension MainViewController {
         WindowsManager.openPopUpWindow(with: tab, origin: nil, contentSize: nil)
     }
 
+    @IBAction func removeUserScripts(_ sender: Any?) {
+#if DEBUG || REVIEW
+        tabCollectionViewModel.selectedTab?.userContentController?.cleanUpBeforeClosing()
+        tabCollectionViewModel.selectedTab?.reload()
+#endif
+    }
+
     @IBAction func resetEmailProtectionInContextPrompt(_ sender: Any?) {
         EmailManager().resetEmailProtectionInContextPrompt()
     }
