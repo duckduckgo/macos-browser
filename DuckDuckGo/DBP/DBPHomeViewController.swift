@@ -134,8 +134,6 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                 Pixel.fire(.debug(event: .optOutValidate), withAdditionalParameters: event.params)
             case .optOutFinish:
                 Pixel.fire(.debug(event: .optOutFinish), withAdditionalParameters: event.params)
-            case .optOutSubmitSuccess:
-                Pixel.fire(.debug(event: .optOutSubmitSuccess), withAdditionalParameters: event.params)
             case .optOutSuccess:
                 Pixel.fire(.debug(event: .optOutSuccess), withAdditionalParameters: event.params)
             case .optOutFailure:

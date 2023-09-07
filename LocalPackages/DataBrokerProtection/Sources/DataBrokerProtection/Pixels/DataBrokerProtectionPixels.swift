@@ -42,7 +42,6 @@ public enum DataBrokerProtectionPixels {
     case optOutFinish(dataBroker: String, attemptId: UUID, duration: UInt64)
 
     // Process Pixels
-    case optOutSubmitSuccess(dataBroker: String, attemptId: UUID, duration: UInt64)
     case optOutSuccess(dataBroker: String, attemptId: UUID, duration: UInt64)
     case optOutFailure(dataBroker: String, attemptId: UUID, duration: UInt64)
 }
@@ -89,8 +88,6 @@ public extension DataBrokerProtectionPixels {
         case .optOutValidate(let dataBroker, let attemptId, let duration):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
         case .optOutFinish(let dataBroker, let attemptId, let duration):
-            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
-        case .optOutSubmitSuccess(let dataBroker, let attemptId, let duration):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
         case .optOutSuccess(let dataBroker, let attemptId, let duration):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
