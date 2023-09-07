@@ -81,7 +81,7 @@ private struct CTAHeaderView: View {
             Button {
                 faqButtonClicked()
             } label: {
-                Text("FAQs")
+                Text("Debug")
             }
             .buttonStyle(.borderless)
             .foregroundColor(.primary)
