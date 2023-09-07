@@ -62,6 +62,14 @@ extension Preferences {
                 .padding(10)
                 .roundedBorder()
 
+                VStack {
+                    HeaderActiveView(title: "Privacy Pro is active on this device",
+                               description: "Your monthly Privacy Pro subscription renews on April 20, 2027.",
+                               button1Name: "Add to Another Device…", button2Name: "Manage Subscription")
+                }
+                .padding(10)
+                .roundedBorder()
+
                 // Footer
                 PreferencePaneSection {
                     TextMenuItemHeader(text: "Questions about Privacy Pro?")
@@ -100,6 +108,51 @@ extension Preferences {
                         Button(button1Name) { }
                             .buttonStyle(DefaultActionButtonStyle(enabled: true))
                         Button(button2Name) { }
+                    }
+                    .padding(.top, 10)
+                }
+                Spacer()
+            }
+            .padding(.vertical, 10)
+        }
+    }
+
+    public struct HeaderActiveView: View {
+        public var title: String
+        public var description: String
+        public var button1Name: String
+        public var button2Name: String
+
+        public init(title: String, description: String, button1Name: String, button2Name: String) {
+            self.title = title
+            self.description = description
+            self.button1Name = button1Name
+            self.button2Name = button2Name
+        }
+
+        public var body: some View {
+            HStack(alignment: .top) {
+                Image("SubscriptionIcon")
+                    .padding(4)
+                    .background(Color.black.opacity(0.06))
+                    .cornerRadius(4)
+                VStack(alignment: .leading, spacing: 8) {
+                    TextMenuItemHeader(text: title)
+                    TextMenuItemCaption(text: description)
+                    HStack {
+                        Button(button1Name) { }
+
+                        if #available(macOS 11.0, *) {
+
+                            Menu {
+                                Button("Change Plan or Billing...", action: {})
+                                Button("Remove From This Device...", action: {})
+                            } label: {
+                                Text(button2Name)
+                            }
+                            .fixedSize()
+
+                        }
                     }
                     .padding(.top, 10)
                 }
