@@ -53,7 +53,7 @@ public extension DataBrokerProtectionPixels {
         var pixelParams = internalParams
 
         if let appVersion = AppVersionProvider().appVersion() {
-            pixelParams[Consts.appVersionParamKey] = AppVersionProvider().appVersion()
+            pixelParams[Consts.appVersionParamKey] = appVersion
         }
 
         return pixelParams
