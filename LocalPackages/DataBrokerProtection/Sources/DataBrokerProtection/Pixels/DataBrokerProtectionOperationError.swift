@@ -18,6 +18,69 @@
 
 import Foundation
 
+public enum DataBrokerProtectionPixels {
+    case error(error: DataBrokerProtectionError, dataBroker: String)
+
+    // Stage Pixels
+    case optOutStart(dataBroker: String, attemptId: Int64)
+    case optOutEmailGenerate(dataBroker: String, attemptId: Int64, duration: UInt64)
+    case optOutCaptchaParse(dataBroker: String, attemptId: Int64, duration: UInt64)
+    case optOutCaptchaSend(dataBroker: String, attemptId: Int64, duration: UInt64)
+    case optOutCaptchaSolve(dataBroker: String, attemptId: Int64, duration: UInt64)
+    case optOutSubmit(dataBroker: String, attemptId: Int64, duration: UInt64)
+    case optOutEmailReceive(dataBroker: String, attemptId: Int64, duration: UInt64)
+    case optOutEmailConfirm(dataBroker: String, attemptId: Int64, duration: UInt64)
+    case optOutValidate(dataBroker: String, attemptId: Int64, duration: UInt64)
+    case optOutFinish(dataBroker: String, attemptId: Int64, duration: UInt64)
+
+    // Process Pixels
+    case optOutSubmitSuccess(dataBroker: String, attemptId: Int64, duration: UInt64)
+    case optOutSuccess(dataBroker: String, attemptId: Int64, duration: UInt64)
+    case optOutFailure(dataBroker: String, attemptId: Int64, duration: UInt64)
+}
+
+extension DataBrokerProtectionPixels {
+    var params: [String: String] {
+        switch self {
+            case .error(let error, let dataBroker):
+            if case let .actionFailed(actionID, message) = error {
+                return ["dataBroker": dataBroker,
+                        "name": error.name,
+                        "actionID": actionID,
+                        "message": message]
+            } else {
+                return ["dataBroker": dataBroker, "name": error.name]
+            }
+        case .optOutStart(let dataBroker, let attemptId):
+            return ["data_broker": dataBroker, "attempt_id": String(attemptId)]
+        case .optOutEmailGenerate(let dataBroker, let attemptId, let duration):
+            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+        case .optOutCaptchaParse(let dataBroker, let attemptId, let duration):
+            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+        case .optOutCaptchaSend(let dataBroker, let attemptId, let duration):
+            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+        case .optOutCaptchaSolve(let dataBroker, let attemptId, let duration):
+            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+        case .optOutSubmit(let dataBroker, let attemptId, let duration):
+            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+        case .optOutEmailReceive(let dataBroker, let attemptId, let duration):
+            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+        case .optOutEmailConfirm(let dataBroker, let attemptId, let duration):
+            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+        case .optOutValidate(let dataBroker, let attemptId, let duration):
+            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+        case .optOutFinish(let dataBroker, let attemptId, let duration):
+            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+        case .optOutSubmitSuccess(let dataBroker, let attemptId, let duration):
+            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+        case .optOutSuccess(let dataBroker, let attemptId, let duration):
+            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+        case .optOutFailure(let dataBroker, let attemptId, let duration):
+            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+        }
+    }
+}
+
 public struct DataBrokerProtectionOperationError {
     public let error: DataBrokerProtectionError
     public let dataBrokerName: String
