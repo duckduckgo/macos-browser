@@ -19,60 +19,25 @@
 import Foundation
 import DataBrokerProtection
 import AppKit
-import SwiftUI
-import BrowserServicesKit
 import Common
+import SwiftUI
 
 public extension Notification.Name {
     static let dbpDidClose = Notification.Name("com.duckduckgo.DBP.DBPDidClose")
 }
 
 final class DBPHomeViewController: NSViewController {
-    private let authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData()
-    private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
-    private let redeemUseCase: DataBrokerProtectionRedeemUseCase
-    private let fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()
-
     private var presentedWindowController: NSWindowController?
+    private let dataBrokerProtectionManager: DataBrokerProtectionManager
 
     lazy var dataBrokerProtectionViewController: DataBrokerProtectionViewController = {
-        DataBrokerProtectionViewController(scheduler: scheduler,
-                                           dataManager: dataManager,
+        DataBrokerProtectionViewController(scheduler: dataBrokerProtectionManager.scheduler,
+                                           dataManager: dataBrokerProtectionManager.dataManager,
                                            notificationCenter: NotificationCenter.default)
     }()
 
-    lazy var dataManager: DataBrokerProtectionDataManager = {
-        DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
-    }()
-
-    lazy var scheduler: DataBrokerProtectionScheduler = {
-        let privacyConfigurationManager = PrivacyFeatures.contentBlocking.privacyConfigurationManager
-        let features = ContentScopeFeatureToggles(emailProtection: false,
-                                                  emailProtectionIncontextSignup: false,
-                                                  credentialsAutofill: false,
-                                                  identitiesAutofill: false,
-                                                  creditCardsAutofill: false,
-                                                  credentialsSaving: false,
-                                                  passwordGeneration: false,
-                                                  inlineIconCredentials: false,
-                                                  thirdPartyCredentialsProvider: false)
-
-        let privacySettings = PrivacySecurityPreferences.shared
-        let sessionKey = UUID().uuidString
-        let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled,
-                                                sessionKey: sessionKey,
-                                                featureToggles: features)
-
-        return DefaultDataBrokerProtectionScheduler(privacyConfigManager: privacyConfigurationManager,
-                                                  contentScopeProperties: prefs,
-                                                  dataManager: dataManager,
-                                                  notificationCenter: NotificationCenter.default,
-                                                  errorHandler: DataBrokerProtectionErrorHandling(),
-                                                  redeemUseCase: redeemUseCase)
-    }()
-
-    init() {
-        self.redeemUseCase = RedeemUseCase(authenticationService: authenticationService, authenticationRepository: authenticationRepository)
+    init(dataBrokerProtectionManager: DataBrokerProtectionManager) {
+        self.dataBrokerProtectionManager = dataBrokerProtectionManager
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -87,7 +52,7 @@ final class DBPHomeViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if !redeemUseCase.shouldAskForInviteCode() {
+        if !dataBrokerProtectionManager.shouldAskForInviteCode() {
             attachDataBrokerContainerView()
         }
     }
@@ -100,7 +65,7 @@ final class DBPHomeViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
 
-        if redeemUseCase.shouldAskForInviteCode() {
+        if dataBrokerProtectionManager.shouldAskForInviteCode() {
             presentInviteCodeFlow()
         }
     }

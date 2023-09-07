@@ -54,11 +54,12 @@ final class ScanOperation: DataBrokerOperation {
 
     func run(inputValue: Void,
              webViewHandler: WebViewHandler? = nil,
-             actionsHandler: ActionsHandler? = nil) async throws -> [ExtractedProfile] {
+             actionsHandler: ActionsHandler? = nil,
+             showWebView: Bool) async throws -> [ExtractedProfile] {
         try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
             Task {
-                await initialize(handler: webViewHandler, isFakeBroker: query.dataBroker.isFakeBroker)
+                await initialize(handler: webViewHandler, isFakeBroker: query.dataBroker.isFakeBroker, showWebView: showWebView)
 
                 do {
                     let scanStep = try query.dataBroker.scanStep()
