@@ -80,6 +80,7 @@ extension DataBrokerOperation {
             actionsHandler?.captchaTransactionId = nil
             if let captchaData = try? await captchaService.submitCaptchaToBeResolved(for: captchaTransactionId,
                                                                                      shouldRunNextStep: shouldRunNextStep) {
+                // TODO: Here we generate the captcha solve pixel
                 await webViewHandler?.execute(action: action, data: .solveCaptcha(CaptchaToken(token: captchaData)))
             } else {
                 await onError(error: .captchaServiceError(CaptchaServiceError.nilDataWhenFetchingCaptchaResult))
@@ -91,6 +92,7 @@ extension DataBrokerOperation {
         if action.needsEmail {
             do {
                 extractedProfile?.email = try await emailService.getEmail()
+                // TODO: Here we generate the email generate pixel
             } catch {
                 await onError(error: .emailError(error as? EmailError))
                 return
@@ -112,7 +114,9 @@ extension DataBrokerOperation {
                 pollingIntervalInSeconds: action.pollingTime,
                 shouldRunNextStep: shouldRunNextStep
             )
+            // TODO: Here we generate the email receive pixel
             try? await webViewHandler?.load(url: url)
+            // TODO: Here we generate the email confirm pixel
         } else {
             throw EmailError.cantFindEmail
         }
@@ -158,8 +162,10 @@ extension DataBrokerOperation {
 
     func captchaInformation(captchaInfo: GetCaptchaInfoResponse) async {
         do {
+            // TODO: Here we generate the captcha parse pixel
             actionsHandler?.captchaTransactionId = try await captchaService.submitCaptchaInformation(captchaInfo,
                                                                                                      shouldRunNextStep: shouldRunNextStep)
+            // TODO: Here we generate the captcha send pixel
             await executeNextStep()
         } catch {
             if let captchaError = error as? CaptchaServiceError {

@@ -209,6 +209,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             return
         }
 
+
+        // TODO: Here we generate the optOutStart pixel
+        // let attemptId = UUID()
+        // pixelHandler.fire(.optOutStart(dataBroker: brokerProfileQueryData.dataBroker.name, attemptId: attemptId))
         os_log("Running opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 
         defer {
@@ -233,8 +237,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                     showWebView: showWebView,
                                     shouldRunNextStep: shouldRunNextStep)
 
+            // TODO: Here we generate the optout validate pixel
             database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested))
         } catch {
+            // TODO: Here we generate the optout process failure pixel
             handleOperationError(
                 brokerId: brokerId,
                 profileQueryId: profileQueryId,
