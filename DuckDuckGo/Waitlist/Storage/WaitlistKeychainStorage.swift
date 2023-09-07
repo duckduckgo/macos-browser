@@ -122,6 +122,7 @@ public class WaitlistKeychainStore: WaitlistStorage {
         return [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrSynchronizable as String: false,
+            kSecUseDataProtectionKeychain as String: true,
             kSecAttrAccessGroup as String: Bundle.main.appGroupName,
             kSecAttrService as String: serviceName,
             kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
