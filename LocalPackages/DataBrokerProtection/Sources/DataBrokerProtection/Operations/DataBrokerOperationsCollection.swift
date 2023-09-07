@@ -122,6 +122,7 @@ final class DataBrokerOperationsCollection: Operation {
 
         for operationData in filteredAndSortedOperationsData {
             if isCancelled {
+                os_log("Cancelled operation, returning...", log: .dataBrokerProtection)
                 return
             }
 
@@ -140,7 +141,12 @@ final class DataBrokerOperationsCollection: Operation {
                                                                                 database: database,
                                                                                 notificationCenter: notificationCenter,
                                                                                 runner: runner,
-                                                                                showWebView: showWebView)
+                                                                                showWebView: showWebView,
+                                                                                shouldRunNextStep: { [weak self] in
+                    guard let self = self else { return false }
+                    return !self.isCancelled
+                })
+
                 os_log("Finished operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
 
                 if let sleepInterval = intervalBetweenOperations {

@@ -24,12 +24,17 @@ enum OperationsError: Error {
 }
 
 protocol OperationsManager {
+
+    // We want to refactor this to return a NSOperation in the future
+    // so we have more control of stopping/starting the queue
+    // for the time being, shouldRunNextStep:@escaping () -> Bool is being used
     func runOperation(operationData: BrokerOperationData,
                       brokerProfileQueryData: BrokerProfileQueryData,
                       database: DataBrokerProtectionRepository,
                       notificationCenter: NotificationCenter,
                       runner: WebOperationRunner,
-                      showWebView: Bool) async throws
+                      showWebView: Bool,
+                      shouldRunNextStep:@escaping () -> Bool) async throws
 }
 
 extension OperationsManager {
@@ -37,14 +42,16 @@ extension OperationsManager {
                       brokerProfileQueryData: BrokerProfileQueryData,
                       database: DataBrokerProtectionRepository,
                       notificationCenter: NotificationCenter,
-                      runner: WebOperationRunner) async throws {
+                      runner: WebOperationRunner,
+                      shouldRunNextStep:@escaping () -> Bool) async throws {
 
         try await runOperation(operationData: operationData,
-                     brokerProfileQueryData: brokerProfileQueryData,
-                     database: database,
-                     notificationCenter: notificationCenter,
-                     runner: runner,
-                     showWebView: false)
+                               brokerProfileQueryData: brokerProfileQueryData,
+                               database: database,
+                               notificationCenter: notificationCenter,
+                               runner: runner,
+                               showWebView: false,
+                               shouldRunNextStep: shouldRunNextStep)
     }
 }
 
@@ -55,14 +62,16 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                database: DataBrokerProtectionRepository,
                                notificationCenter: NotificationCenter = NotificationCenter.default,
                                runner: WebOperationRunner,
-                               showWebView: Bool = false) async throws {
+                               showWebView: Bool = false,
+                               shouldRunNextStep:@escaping () -> Bool) async throws {
 
         if operationData as? ScanOperationData != nil {
             try await runScanOperation(on: runner,
                                        brokerProfileQueryData: brokerProfileQueryData,
                                        database: database,
                                        notificationCenter: notificationCenter,
-                                       showWebView: showWebView)
+                                       showWebView: showWebView,
+                                       shouldRunNextStep: shouldRunNextStep)
 
         } else if let optOutOperationData = operationData as? OptOutOperationData {
             try await runOptOutOperation(for: optOutOperationData.extractedProfile,
@@ -70,7 +79,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                          brokerProfileQueryData: brokerProfileQueryData,
                                          database: database,
                                          notificationCenter: notificationCenter,
-                                         showWebView: showWebView)
+                                         showWebView: showWebView,
+                                         shouldRunNextStep: shouldRunNextStep)
         }
     }
 
@@ -79,7 +89,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                    brokerProfileQueryData: BrokerProfileQueryData,
                                    database: DataBrokerProtectionRepository,
                                    notificationCenter: NotificationCenter,
-                                   showWebView: Bool = false) async throws {
+                                   showWebView: Bool = false,
+                                   shouldRunNextStep:@escaping () -> Bool) async throws {
         os_log("Running scan operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 
         guard let brokerId = brokerProfileQueryData.dataBroker.id, let profileQueryId = brokerProfileQueryData.profileQuery.id else {
@@ -104,7 +115,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .scanStarted)
             database.add(event)
 
-            let extractedProfiles = try await runner.scan(brokerProfileQueryData, showWebView: showWebView)
+            let extractedProfiles = try await runner.scan(brokerProfileQueryData,
+                                                          showWebView: showWebView,
+                                                          shouldRunNextStep: shouldRunNextStep)
+
             os_log("Extracted profiles: %@", log: .dataBrokerProtection, extractedProfiles)
 
             if !extractedProfiles.isEmpty {
@@ -175,7 +189,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                      brokerProfileQueryData: BrokerProfileQueryData,
                                      database: DataBrokerProtectionRepository,
                                      notificationCenter: NotificationCenter,
-                                     showWebView: Bool = false) async throws {
+                                     showWebView: Bool = false,
+                                     shouldRunNextStep:@escaping () -> Bool) async throws {
         guard let brokerId = brokerProfileQueryData.dataBroker.id, let profileQueryId = brokerProfileQueryData.profileQuery.id, let extractedProfileId = extractedProfile.id else {
             // Maybe send pixel?
             throw OperationsError.idsMissingForBrokerOrProfileQuery
@@ -205,7 +220,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         do {
             database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutStarted))
 
-            try await runner.optOut(profileQuery: brokerProfileQueryData, extractedProfile: extractedProfile, showWebView: showWebView)
+            try await runner.optOut(profileQuery: brokerProfileQueryData,
+                                    extractedProfile: extractedProfile,
+                                    showWebView: showWebView,
+                                    shouldRunNextStep: shouldRunNextStep)
 
             database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested))
         } catch {

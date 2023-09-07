@@ -22,18 +22,34 @@ import Common
 
 protocol WebOperationRunner {
 
-    func scan(_ profileQuery: BrokerProfileQueryData, showWebView: Bool) async throws -> [ExtractedProfile]
-    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile, showWebView: Bool) async throws
+    func scan(_ profileQuery: BrokerProfileQueryData,
+              showWebView: Bool,
+              shouldRunNextStep:@escaping () -> Bool) async throws -> [ExtractedProfile]
+
+    func optOut(profileQuery: BrokerProfileQueryData,
+                extractedProfile: ExtractedProfile,
+                showWebView: Bool,
+                shouldRunNextStep:@escaping () -> Bool) async throws
 }
 
 extension WebOperationRunner {
 
-    func scan(_ profileQuery: BrokerProfileQueryData) async throws -> [ExtractedProfile] {
-        try await scan(profileQuery, showWebView: false)
+    func scan(_ profileQuery: BrokerProfileQueryData,
+              shouldRunNextStep:@escaping () -> Bool) async throws -> [ExtractedProfile] {
+
+        try await scan(profileQuery,
+                       showWebView: false,
+                       shouldRunNextStep: shouldRunNextStep)
     }
 
-    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile) async throws {
-        try await optOut(profileQuery: profileQuery, extractedProfile: extractedProfile, showWebView: false)
+    func optOut(profileQuery: BrokerProfileQueryData,
+                extractedProfile: ExtractedProfile,
+                shouldRunNextStep:@escaping () -> Bool) async throws {
+
+        try await optOut(profileQuery: profileQuery,
+                         extractedProfile: extractedProfile,
+                         showWebView: false,
+                         shouldRunNextStep: shouldRunNextStep)
     }
 }
 
@@ -54,26 +70,37 @@ final class DataBrokerOperationRunner: WebOperationRunner {
         self.captchaService = captchaService
     }
 
-    func scan(_ profileQuery: BrokerProfileQueryData, showWebView: Bool) async throws -> [ExtractedProfile] {
+    func scan(_ profileQuery: BrokerProfileQueryData,
+              showWebView: Bool,
+              shouldRunNextStep:@escaping () -> Bool) async throws -> [ExtractedProfile] {
+
         let scan = ScanOperation(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
             query: profileQuery,
             emailService: emailService,
-            captchaService: captchaService
+            captchaService: captchaService,
+            shouldRunNextStep: shouldRunNextStep
         )
-        return try await scan.run(inputValue: (), showWebView: showWebView)
+        return try await scan.run(inputValue: (),
+                                  showWebView: showWebView)
     }
 
-    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile, showWebView: Bool) async throws {
+    func optOut(profileQuery: BrokerProfileQueryData,
+                extractedProfile: ExtractedProfile,
+                showWebView: Bool,
+                shouldRunNextStep:@escaping () -> Bool) async throws {
+
         let optOut = OptOutOperation(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
             query: profileQuery,
             emailService: emailService,
-            captchaService: captchaService
+            captchaService: captchaService,
+            shouldRunNextStep: shouldRunNextStep
         )
-        try await optOut.run(inputValue: extractedProfile, showWebView: showWebView)
+        try await optOut.run(inputValue: extractedProfile,
+                             showWebView: showWebView)
     }
 
     deinit {
