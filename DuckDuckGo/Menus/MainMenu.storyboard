@@ -831,6 +831,12 @@ CQ
                                                             <action selector="fetchConfigurationNow:" target="Ady-hI-5gd" id="31i-Lv-4r5"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Set custom configuration URL" id="Ybo-hH-XcA" userLabel="Fetch configuration now">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="setCustomConfigurationURL:" target="Ady-hI-5gd" id="5FP-dI-ELF"/>
+                                                        </connections>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>

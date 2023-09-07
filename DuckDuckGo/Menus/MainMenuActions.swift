@@ -20,6 +20,7 @@ import BrowserServicesKit
 import Cocoa
 import Common
 import WebKit
+import Configuration
 
 // Actions are sent to objects of responder chain
 
@@ -706,10 +707,8 @@ extension MainViewController {
     }
 
     @IBAction func removeUserScripts(_ sender: Any?) {
-#if DEBUG || REVIEW
         tabCollectionViewModel.selectedTab?.userContentController?.cleanUpBeforeClosing()
         tabCollectionViewModel.selectedTab?.reload()
-#endif
     }
 
     @IBAction func resetEmailProtectionInContextPrompt(_ sender: Any?) {
@@ -718,6 +717,22 @@ extension MainViewController {
 
     @IBAction func fetchConfigurationNow(_ sender: Any?) {
         ConfigurationManager.shared.forceRefresh()
+    }
+
+    @IBAction func setCustomConfigurationURL(_ sender: Any?) {
+        let alert = NSAlert()
+        alert.messageText = "Set custom configuration URL:"
+        alert.addButton(withTitle: UserText.ok)
+        alert.addButton(withTitle: UserText.cancel)
+        let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
+        textField.stringValue = ""
+        alert.accessoryView = textField
+        alert.window.initialFirstResponder = textField
+        if alert.runModal() != .cancel {
+            let configurationProvider = AppConfigurationURLProvider(customPrivacyConfiguration: URL(string: textField.stringValue)!)
+            Configuration.setURLProvider(configurationProvider)
+            ConfigurationManager.shared.forceRefresh()
+        }
     }
 
     // MARK: - Developer Tools
