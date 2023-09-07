@@ -55,7 +55,7 @@ public final class DataBrokerProtectionManager {
                                                   contentScopeProperties: prefs,
                                                   dataManager: dataManager,
                                                   notificationCenter: NotificationCenter.default,
-                                                  errorHandler: DataBrokerProtectionErrorHandling(),
+                                                  errorHandler: DataBrokerProtectionPixelsHandler(),
                                                   redeemUseCase: redeemUseCase)
     }()
 

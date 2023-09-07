@@ -106,8 +106,9 @@ extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDeleg
     }
 }
 
-public class DataBrokerProtectionErrorHandling: EventMapping<DataBrokerProtectionPixels> {
+public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
 
+    // swiftlint:disable:next cyclomatic_complexity
     public init() {
         super.init { event, _, _, _ in
             switch event {
