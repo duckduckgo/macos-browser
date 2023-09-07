@@ -882,6 +882,10 @@ extension UserText {
     static let networkProtectionWaitlistButtonJoinWaitlist = NSLocalizedString("network-protection.waitlist.button.join-waitlist", value: "Join the Waitlist", comment: "Join Waitlist button for Network Protection join waitlist screen")
     static let networkProtectionWaitlistButtonAgreeAndContinue = NSLocalizedString("network-protection.waitlist.button.agree-and-continue", value: "Agree and Continue", comment: "Agree and Continue button for Network Protection join waitlist screen")
 
+    static let networkProtectionBetaEndedCardTitle = NSLocalizedString("network-protection.waitlist.beta-ended-card.title", value: "VPN Beta Closed", comment: "Title for the Network Protection beta ended card")
+    static let networkProtectionBetaEndedCardText = NSLocalizedString("network-protection.waitlist.beta-ended-card.text", value: "Thank you for participating! We look forward to sharing more with you in future product announcements.", comment: "Text for the Network Protection beta ended card")
+    static let networkProtectionBetaEndedCardAction = NSLocalizedString("network-protection.waitlist.beta-ended-card.action", value: "Dismiss", comment: "Action text for the Network Protection beta ended card")
+
 }
 
 // MARK: - Network Protection Terms of Service
