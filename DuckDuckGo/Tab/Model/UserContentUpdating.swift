@@ -77,13 +77,10 @@ final class UserContentUpdating {
 
         // 1. Collect updates from ContentBlockerRulesManager and generate UserScripts based on its output
         cancellable = contentBlockerRulesManager.updatesPublisher
-            // .print("Updates Publisher")
             // regenerate UserScripts on gpcEnabled preference updated
             .combineLatest(privacySecurityPreferences.$gpcEnabled)
             .map { $0.0 } // drop gpcEnabled value: $0.1
-            // .print("After combineLatest")
             .combineLatest(onNotificationWithInitial(.autofillUserSettingsDidChange), combine)
-            // .print("After combineLatest 2")
             // DefaultScriptSourceProvider instance should be created once per rules/config change and fed into UserScripts initialization
             .map(makeValue)
             .assign(to: \.bufferedValue, onWeaklyHeld: self) // buffer latest update value
