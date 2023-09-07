@@ -19,6 +19,12 @@
 import Foundation
 
 public enum DataBrokerProtectionPixels {
+    struct Consts {
+        static let dataBrokerParamKey = "data_broker"
+        static let attemptIdParamKey = "attempt_id"
+        static let durationParamKey = "duration"
+    }
+
     case error(error: DataBrokerProtectionError, dataBroker: String)
 
     // Stage Pixels
@@ -39,10 +45,10 @@ public enum DataBrokerProtectionPixels {
     case optOutFailure(dataBroker: String, attemptId: Int64, duration: UInt64)
 }
 
-extension DataBrokerProtectionPixels {
+public extension DataBrokerProtectionPixels {
     var params: [String: String] {
         switch self {
-            case .error(let error, let dataBroker):
+        case .error(let error, let dataBroker):
             if case let .actionFailed(actionID, message) = error {
                 return ["dataBroker": dataBroker,
                         "name": error.name,
@@ -52,31 +58,31 @@ extension DataBrokerProtectionPixels {
                 return ["dataBroker": dataBroker, "name": error.name]
             }
         case .optOutStart(let dataBroker, let attemptId):
-            return ["data_broker": dataBroker, "attempt_id": String(attemptId)]
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: String(attemptId)]
         case .optOutEmailGenerate(let dataBroker, let attemptId, let duration):
-            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: String(attemptId), Consts.durationParamKey: String(duration)]
         case .optOutCaptchaParse(let dataBroker, let attemptId, let duration):
-            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: String(attemptId), Consts.durationParamKey: String(duration)]
         case .optOutCaptchaSend(let dataBroker, let attemptId, let duration):
-            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: String(attemptId), Consts.durationParamKey: String(duration)]
         case .optOutCaptchaSolve(let dataBroker, let attemptId, let duration):
-            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: String(attemptId), Consts.durationParamKey: String(duration)]
         case .optOutSubmit(let dataBroker, let attemptId, let duration):
-            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: String(attemptId), Consts.durationParamKey: String(duration)]
         case .optOutEmailReceive(let dataBroker, let attemptId, let duration):
-            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: String(attemptId), Consts.durationParamKey: String(duration)]
         case .optOutEmailConfirm(let dataBroker, let attemptId, let duration):
-            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: String(attemptId), Consts.durationParamKey: String(duration)]
         case .optOutValidate(let dataBroker, let attemptId, let duration):
-            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: String(attemptId), Consts.durationParamKey: String(duration)]
         case .optOutFinish(let dataBroker, let attemptId, let duration):
-            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: String(attemptId), Consts.durationParamKey: String(duration)]
         case .optOutSubmitSuccess(let dataBroker, let attemptId, let duration):
-            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: String(attemptId), Consts.durationParamKey: String(duration)]
         case .optOutSuccess(let dataBroker, let attemptId, let duration):
-            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: String(attemptId), Consts.durationParamKey: String(duration)]
         case .optOutFailure(let dataBroker, let attemptId, let duration):
-            return ["data_broker": dataBroker, "attempt_id": String(attemptId), "duration": String(duration)]
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: String(attemptId), Consts.durationParamKey: String(duration)]
         }
     }
 }
