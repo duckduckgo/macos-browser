@@ -42,7 +42,7 @@ enum PixelExperiment: String, CaseIterable {
     // These are the variants. Rename or add/remove them as needed.  If you change the string value
     //  remember to keep it clear for privacy triage.
     case control
-
+    case onboardingExperiment1
 }
 
 /// These functions contain the business logic for determining if the pixel should be fired or not.
@@ -115,6 +115,9 @@ final internal class PixelExperimentLogic {
     // You'll need additional pixels for your experiment.  Pass the cohort as a paramter.
     func fireEnrollmentPixel() {
         // You'll probably need this at least.
+        guard allocatedCohort != nil, let cohort else { return }
+        print("install cohort \(cohort)")
+        Pixel.fire(.launchInitial, limitToInitial: true, includeAppVersionParameter: false)
     }
 
     func cleanup() {

@@ -56,7 +56,8 @@ final class OnboardingViewModel: ObservableObject {
     }
 
     var isNewOnboarding: Bool {
-        variantManager?.isSupported(feature: .newOnboarding) ?? false
+        PixelExperiment.cohort == .onboardingExperiment1
+//        variantManager?.isSupported(feature: .newOnboarding) ?? false
     }
 
     @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
