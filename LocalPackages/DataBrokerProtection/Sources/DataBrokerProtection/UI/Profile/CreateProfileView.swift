@@ -425,10 +425,14 @@ private struct FormHeaderView: View {
                 .font(.title)
                 .bold()
 
-            Text("The following information is required for Data Broker Protection. We’ll scan Data Broker sites for matching info and have it removed.")
-                .multilineTextAlignment(.center)
-                .font(.body)
-                .foregroundColor(.secondary)
+            VStack (spacing: 16) {
+                Text("The following information is required for Data Broker Protection. We’ll scan Data Broker sites for matching info and have it removed.")
+
+                Text("The information you've entered stays on your device, it does not go through DuckDuckGo's servers.")
+            }
+            .multilineTextAlignment(.center)
+            .font(.body)
+            .foregroundColor(.secondary)
         }
     }
 }
@@ -455,12 +459,6 @@ private struct FormFooterView: View {
             }
             .buttonStyle(CTAButtonStyle(style: .primary))
             .disabled(!viewModel.isProfileValid)
-
-            Text("The information you've entered stays on your device, it does not go through DuckDuckGo's servers.")
-                .multilineTextAlignment(.center)
-                .font(.body)
-                .foregroundColor(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }
