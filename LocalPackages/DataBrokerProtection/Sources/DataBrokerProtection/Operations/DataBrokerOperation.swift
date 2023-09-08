@@ -120,7 +120,7 @@ extension DataBrokerOperation {
             )
             stageCalculator?.fireOptOutEmailReceive()
             try? await webViewHandler?.load(url: url)
-            // TODO: Here we generate the email confirm pixel
+            stageCalculator?.fireOptOutEmailConfirm()
         } else {
             throw EmailError.cantFindEmail
         }
