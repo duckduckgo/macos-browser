@@ -44,17 +44,28 @@ final class ResultsViewModel: ObservableObject {
         let id = UUID()
         let dataBroker: String
         let profile: String
-        let address: String
+        let addresses: [String]
+        let age: String?
+        let relatives: [String]
         let error: String?
         let errorDescription: String?
         let operationData: OptOutOperationData
         var hasError: Bool {
             error != nil
         }
+
+        var profileWithAge: String {
+            if let age = age, !age.isEmpty {
+                return "\(profile) (\(age))"
+            }
+            return profile
+        }
     }
 
     @Published var removedProfiles =  [RemovedProfile]()
     @Published var pendingProfiles = [PendingProfile]()
+    @Published var isLoading = false
+    @Published var headerStatusText = ""
 
     init(dataManager: DataBrokerProtectionDataManaging,
          notificationCenter: NotificationCenter = .default) {
@@ -77,50 +88,98 @@ final class ResultsViewModel: ObservableObject {
                                        object: nil)
     }
 
+    // swiftlint:disable:next function_body_length
     private func updateUI(ignoresCache: Bool) {
-        let brokersInfoData = dataManager.fetchBrokerProfileQueryData(ignoresCache: ignoresCache)
-        var removedProfiles = [RemovedProfile]()
-        var pendingProfiles = [PendingProfile]()
+        isLoading = true
+        Task {
+            let startTime = DispatchTime.now().uptimeNanoseconds
+            let brokersInfoData = await dataManager.fetchBrokerProfileQueryData(ignoresCache: ignoresCache)
+            let endTime = DispatchTime.now().uptimeNanoseconds
 
-        for brokerProfileQueryData in brokersInfoData {
-            for optOutOperationData in brokerProfileQueryData.optOutOperationsData {
+            DispatchQueue.main.async {
+                var removedProfiles = [RemovedProfile]()
+                var pendingProfiles = [PendingProfile]()
 
-                if optOutOperationData.extractedProfile.removedDate == nil {
-                    var errorName: String?
-                    var errorDescription: String?
+                let scanHistoryEvents = brokersInfoData.flatMap { $0.scanOperationData.historyEvents }
+                var status = ""
 
-                    let sortedEvents = optOutOperationData.historyEvents.sorted { $0.date < $1.date }
-                    if let lastEvent = sortedEvents.last {
-                        if case .error(let error) = lastEvent.type {
-                            errorName = error.userReadableError.title
-                            errorDescription = error.userReadableError.subtitle
+                if let date = self.getLastEventDate(events: scanHistoryEvents) {
+                    status = "Last Scan \(date)"
+                }
+
+                self.headerStatusText = status
+
+                for brokerProfileQueryData in brokersInfoData {
+                    for optOutOperationData in brokerProfileQueryData.optOutOperationsData {
+                        if optOutOperationData.extractedProfile.removedDate == nil {
+                            var errorName: String?
+                            var errorDescription: String?
+
+                            let sortedEvents = optOutOperationData.historyEvents.sorted { $0.date < $1.date }
+                            if let lastEvent = sortedEvents.last {
+                                if case .error(let error) = lastEvent.type {
+                                    errorName = error.userReadableError.title
+                                    errorDescription = error.userReadableError.subtitle
+                                }
+                            }
+
+                            let addresses = optOutOperationData.extractedProfile.addresses?.map { $0.fullAddress }.sorted() ?? ["No Address Found"]
+                            let relatives = optOutOperationData.extractedProfile.relatives?.sorted() ?? ["No Relatives Found"]
+
+                            let profile = PendingProfile(
+                                dataBroker: brokerProfileQueryData.dataBroker.name,
+                                profile: optOutOperationData.extractedProfile.fullName ?? "",
+                                addresses: addresses,
+                                age: optOutOperationData.extractedProfile.age,
+                                relatives: relatives,
+                                error: errorName,
+                                errorDescription: errorDescription,
+                                operationData: optOutOperationData)
+
+                            pendingProfiles.append(profile)
+                        } else {
+                            let profile = RemovedProfile(dataBroker: brokerProfileQueryData.dataBroker.name,
+                                                         scheduledDate: brokerProfileQueryData.scanOperationData.preferredRunDate)
+                            removedProfiles.append(profile)
                         }
                     }
+                }
 
-                    let profile = PendingProfile(
-                        dataBroker: brokerProfileQueryData.dataBroker.name,
-                        profile: optOutOperationData.extractedProfile.fullName ?? "",
-                        address: optOutOperationData.extractedProfile.addresses?.first?.fullAddress ?? "",
-                        error: errorName,
-                        errorDescription: errorDescription,
-                        operationData: optOutOperationData)
-
-                    pendingProfiles.append(profile)
-                } else {
-                    let profile = RemovedProfile(dataBroker: brokerProfileQueryData.dataBroker.name,
-                                                 scheduledDate: brokerProfileQueryData.scanOperationData.preferredRunDate)
-                    removedProfiles.append(profile)
+                self.updateLoadingViewWithMinimumDuration(startTime: startTime, endTime: endTime) {
+                    self.isLoading = false
+                    self.removedProfiles = removedProfiles
+                    self.pendingProfiles = pendingProfiles
                 }
             }
         }
+    }
 
-        self.removedProfiles = removedProfiles
-        self.pendingProfiles = pendingProfiles
+    private func updateLoadingViewWithMinimumDuration(startTime: UInt64, endTime: UInt64, completion: @escaping () -> Void) {
+        let durationInSeconds = Double(endTime - startTime) / 1_000_000_000
+
+        // Calculate the delay time required to reach a minimum of 2 seconds
+        let delayTime = max(2 - durationInSeconds, 0)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + delayTime) {
+            completion()
+        }
+    }
+
+    private func getLastEventDate(events: [HistoryEvent]) -> String? {
+        let sortedEvents = events.sorted(by: { $0.date < $1.date })
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .short
+
+        if let lastEvent = sortedEvents.last {
+            return dateFormatter.string(from: lastEvent.date)
+        } else {
+            return nil
+        }
     }
 
     @objc public func reloadData() {
         DispatchQueue.main.async {
-
             self.updateUI(ignoresCache: true)
         }
     }
@@ -176,7 +235,7 @@ extension DataBrokerProtectionError {
                 return (title: title, subtitle: "Fetch invalid request")
             }
         case .emailError(let emailError):
-            var title = "E-mail"
+            let title = "E-mail"
             guard let emailError = emailError else {
                 return (title: title, subtitle: "Unknown error")
             }

@@ -77,10 +77,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     // swiftlint:disable:next function_body_length
     func applicationWillFinishLaunching(_ notification: Notification) {
-#if !APPSTORE && !DEBUG
-        PFMoveToApplicationsFolderIfNecessary()
-#endif
-
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
         Configuration.setURLProvider(AppConfigurationURLProvider())
 
@@ -191,7 +187,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         BWManager.shared.initCommunication()
 
-        if WindowsManager.windows.isEmpty,
+        if WindowsManager.windows.first(where: { $0 is MainWindow }) == nil,
            case .normal = NSApp.runType {
             WindowsManager.openNewWindow(lazyLoadTabs: true)
         }
@@ -211,6 +207,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 #if NETWORK_PROTECTION
         if #available(macOS 11.4, *) {
+            /// Once we drop support for macOS versions below 11.4, we can turn `NetworkProtectionAppEvents`
+            /// into a property.  Right now it's easier to avoid it since we can't place macOS version conditions on properties.
+            ///
+            /// In any case this is not going to happen on a high frequency and should not affect performance in any relevant
+            /// way.
             NetworkProtectionAppEvents().applicationDidFinishLaunching()
         }
 
@@ -229,6 +230,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #if NETWORK_PROTECTION
         NetworkProtectionWaitlist().fetchNetworkProtectionInviteCodeIfAvailable { _ in
             // Do nothing when code fetching fails, as the app will try again later
+        }
+
+        if #available(macOS 11.4, *) {
+            /// Once we drop support for macOS versions below 11.4, we can turn `NetworkProtectionAppEvents`
+            /// into a property.  Right now it's easier to avoid it since we can't place macOS version conditions on properties.
+            ///
+            /// In any case this is not going to happen on a high frequency and should not affect performance in any relevant
+            /// way.
+            NetworkProtectionAppEvents().applicationDidBecomeActive()
         }
 #endif
     }
