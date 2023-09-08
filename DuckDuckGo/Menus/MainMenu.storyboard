@@ -853,6 +853,38 @@ CQ
                                                 </items>
                                             </menu>
                                         </menuItem>
+                                        <menuItem title="User Agent" id="FVv-iA-a7M">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="User Agent" id="IiZ-t2-Thq">
+                                                <items>
+                                                    <menuItem title="Webview Default" id="MwE-m5-HEt">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="setWebviewDefaultUserAgent:" target="Ady-hI-5gd" id="sqL-d8-ZNv"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Safari" id="b8t-LB-8dI">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="setSafariUserAgent:" target="Ady-hI-5gd" id="nCQ-T8-YCV"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Chrome" id="ecG-04-6mF">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="setChromeUserAgent:" target="Ady-hI-5gd" id="2Pm-av-sk4"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem isSeparatorItem="YES" id="7Oe-yu-NUo"/>
+                                                    <menuItem title="Reset" id="gla-Io-I7Y">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetUserAgent:" target="Ady-hI-5gd" id="44A-J5-OlI"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
+                                        </menuItem>
                                         <menuItem title="Network Protection" id="Dt6-sj-4hn">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Network Protection" id="Rah-lS-gno" customClass="NetworkProtectionDebugMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">

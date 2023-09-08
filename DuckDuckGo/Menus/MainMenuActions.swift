@@ -711,6 +711,22 @@ extension MainViewController {
         tabCollectionViewModel.selectedTab?.reload()
     }
 
+    @IBAction func setSafariUserAgent(_ sender: Any?) {
+        UserAgent.userAgentForDebugging = UserAgent.safari
+    }
+
+    @IBAction func setChromeUserAgent(_ sender: Any?) {
+        UserAgent.userAgentForDebugging = UserAgent.chrome
+    }
+
+    @IBAction func setWebviewDefaultUserAgent(_ sender: Any?) {
+        UserAgent.userAgentForDebugging = UserAgent.webViewDefault
+    }
+
+    @IBAction func resetUserAgent(_ sender: Any?) {
+        UserAgent.userAgentForDebugging = nil
+    }
+
     @IBAction func resetEmailProtectionInContextPrompt(_ sender: Any?) {
         EmailManager().resetEmailProtectionInContextPrompt()
     }
