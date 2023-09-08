@@ -70,6 +70,7 @@ extension DataBrokerOperation {
     func runNextAction(_ action: Action) async {
         if let emailConfirmationAction = action as? EmailConfirmationAction {
             do {
+                stageCalculator?.fireOptOutSubmit()
                 try await runEmailConfirmationAction(action: emailConfirmationAction)
                 await executeNextStep()
             } catch {
