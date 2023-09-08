@@ -98,6 +98,8 @@ final class DataBrokerOperationsCollection: Operation {
         }
     }
 
+    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable:next function_body_length
     private func runOperation() async {
         let filteredAndSortedOperationsData: [BrokerOperationData]
         let operationsData: [BrokerOperationData]
@@ -122,6 +124,7 @@ final class DataBrokerOperationsCollection: Operation {
 
         for operationData in filteredAndSortedOperationsData {
             if isCancelled {
+                os_log("Cancelled operation, returning...", log: .dataBrokerProtection)
                 return
             }
 
@@ -140,7 +143,12 @@ final class DataBrokerOperationsCollection: Operation {
                                                                                 database: database,
                                                                                 notificationCenter: notificationCenter,
                                                                                 runner: runner,
-                                                                                showWebView: showWebView)
+                                                                                showWebView: showWebView,
+                                                                                shouldRunNextStep: { [weak self] in
+                    guard let self = self else { return false }
+                    return !self.isCancelled
+                })
+
                 os_log("Finished operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
 
                 if let sleepInterval = intervalBetweenOperations {
@@ -158,6 +166,7 @@ final class DataBrokerOperationsCollection: Operation {
             }
         }
     }
+    // swiftlint:enable cyclomatic_complexity
 
     private func finish() {
         willChangeValue(forKey: #keyPath(isExecuting))

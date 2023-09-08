@@ -282,6 +282,8 @@ private struct DebugModalView: View {
             return "captchaServiceError \(captchaError)"
         case .emailError(let emailError):
             return "emailError \(String(describing: emailError))"
+        case .cancelled:
+            return "Cancelled"
         }
     }
 }

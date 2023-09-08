@@ -40,7 +40,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                     scanOperationData: .mock
                 ),
                 database: mockDatabase,
-                notificationCenter: .default
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
         } catch {
@@ -59,7 +60,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                     scanOperationData: .mock
                 ),
                 database: mockDatabase,
-                notificationCenter: .default
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id for broker")
         } catch {
@@ -77,7 +79,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                     scanOperationData: .mock
                 ),
                 database: mockDatabase,
-                notificationCenter: .default
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
             )
             XCTAssertEqual(mockDatabase.eventsAdded.first?.type, .scanStarted)
         } catch {
@@ -95,7 +98,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                     scanOperationData: .mock
                 ),
                 database: mockDatabase,
-                notificationCenter: .default
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .noMatchFound }))
         } catch {
@@ -115,7 +119,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                     optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
-                notificationCenter: .default
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
             )
             XCTAssertFalse(mockDatabase.wasUpdateRemoveDateCalled)
             XCTAssertFalse(mockDatabase.wasSaveOptOutOperationCalled)
@@ -136,7 +141,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                     optOutOperationsData: [OptOutOperationData.mock(with: .mockWithRemovedDate)]
                 ),
                 database: mockDatabase,
-                notificationCenter: .default
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.wasUpdateRemoveDateCalled)
         } catch {
@@ -156,7 +162,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                     optOutOperationsData: [OptOutOperationData.mock(with: .mockWithRemovedDate)]
                 ),
                 database: mockDatabase,
-                notificationCenter: .default
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.wasSaveOptOutOperationCalled)
         } catch {
@@ -176,7 +183,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                     optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
-                notificationCenter: .default
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutConfirmed }))
             XCTAssertTrue(mockDatabase.wasUpdateRemoveDateCalled)
@@ -198,7 +206,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                     optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
-                notificationCenter: .default
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
             )
             XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutConfirmed }))
             XCTAssertFalse(mockDatabase.wasUpdateRemoveDateCalled)
@@ -220,7 +229,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                     optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
-                notificationCenter: .default
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
             )
             XCTFail("Should throw!")
         } catch {
@@ -246,7 +256,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                     optOutOperationsData: [OptOutOperationData.mock(with: .mockWithRemovedDate)]
                 ),
                 database: mockDatabase,
-                notificationCenter: .default
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
         } catch {
@@ -267,7 +278,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                     optOutOperationsData: [OptOutOperationData.mock(with: .mockWithRemovedDate)]
                 ),
                 database: mockDatabase,
-                notificationCenter: .default
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
         } catch {
@@ -288,7 +300,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                     optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutId)]
                 ),
                 database: mockDatabase,
-                notificationCenter: .default
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
         } catch {
@@ -309,7 +322,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                     optOutOperationsData: [OptOutOperationData.mock(with: .mockWithRemovedDate)]
                 ),
                 database: mockDatabase,
-                notificationCenter: .default
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
             )
             XCTAssertFalse(mockDatabase.wasDatabaseCalled)
             XCTAssertFalse(mockWebOperationRunner.wasOptOutCalled)
@@ -330,7 +344,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                     optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
-                notificationCenter: .default
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutStarted }))
         } catch {
@@ -350,7 +365,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                     optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
-                notificationCenter: .default
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutRequested }))
         } catch {
@@ -371,7 +387,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                     optOutOperationsData: [OptOutOperationData.mock(with: .mockWithoutRemovedDate)]
                 ),
                 database: mockDatabase,
-                notificationCenter: .default
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
             )
             XCTFail("Should throw!")
         } catch {
@@ -603,14 +620,13 @@ final class MockDatabase: DataBrokerProtectionRepository {
 }
 
 final class MockWebOperationRunner: WebOperationRunner {
-
     var shouldScanThrow = false
     var shouldOptOutThrow = false
     var scanResults = [ExtractedProfile]()
     var wasScanCalled = false
     var wasOptOutCalled = false
 
-    func scan(_ profileQuery: DataBrokerProtection.BrokerProfileQueryData, showWebView: Bool) async throws -> [ExtractedProfile] {
+    func scan(_ profileQuery: BrokerProfileQueryData, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
         wasScanCalled = true
 
         if shouldScanThrow {
@@ -620,7 +636,7 @@ final class MockWebOperationRunner: WebOperationRunner {
         }
     }
 
-    func optOut(profileQuery: DataBrokerProtection.BrokerProfileQueryData, extractedProfile: DataBrokerProtection.ExtractedProfile, showWebView: Bool) async throws {
+    func optOut(profileQuery: DataBrokerProtection.BrokerProfileQueryData, extractedProfile: DataBrokerProtection.ExtractedProfile, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws {
         wasOptOutCalled = true
 
         if shouldOptOutThrow {
