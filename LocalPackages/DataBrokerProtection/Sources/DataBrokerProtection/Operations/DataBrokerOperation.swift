@@ -168,7 +168,7 @@ extension DataBrokerOperation {
             stageCalculator?.fireOptOutCaptchaParse()
             actionsHandler?.captchaTransactionId = try await captchaService.submitCaptchaInformation(captchaInfo,
                                                                                                      shouldRunNextStep: shouldRunNextStep)
-            // TODO: Here we generate the captcha send pixel
+            stageCalculator?.fireOptOutCaptchaSend()
             await executeNextStep()
         } catch {
             if let captchaError = error as? CaptchaServiceError {
