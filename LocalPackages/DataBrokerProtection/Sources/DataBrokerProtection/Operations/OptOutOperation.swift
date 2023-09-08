@@ -108,6 +108,7 @@ final class OptOutOperation: DataBrokerOperation {
             await runNextAction(action)
         } else {
             await webViewHandler?.finish() // If we executed all steps we release the web view
+            stageCalculator?.fireOptOutValidate()
             complete(())
         }
     }
