@@ -36,7 +36,7 @@ final class ScanOperation: DataBrokerOperation {
     var continuation: CheckedContinuation<[ExtractedProfile], Error>?
     var extractedProfile: ExtractedProfile?
     private let operationAwaitTime: TimeInterval
-    var shouldRunNextStep: () -> Bool
+    let shouldRunNextStep: () -> Bool
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,

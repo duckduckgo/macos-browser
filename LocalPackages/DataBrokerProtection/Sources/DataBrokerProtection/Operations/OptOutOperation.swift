@@ -36,7 +36,7 @@ final class OptOutOperation: DataBrokerOperation {
     var continuation: CheckedContinuation<Void, Error>?
     var extractedProfile: ExtractedProfile?
     private let operationAwaitTime: TimeInterval
-    var shouldRunNextStep: () -> Bool
+    let shouldRunNextStep: () -> Bool
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
