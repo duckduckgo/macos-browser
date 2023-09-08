@@ -18,6 +18,7 @@
 
 import SwiftUI
 import SwiftUIExtensions
+import Bookmarks
 
 extension Preferences {
 
@@ -113,7 +114,26 @@ extension Preferences {
                     ToggleMenuItem(title: UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
                 }
 
-                // SECTION 4: Bookmarks Bar
+                // SECTION 3: Favorites
+                PreferencePaneSection {
+                    Text(UserText.favorites)
+                        .font(Const.Fonts.preferencePaneSectionHeader)
+                    HStack {
+                        Text("Display Favorites from")
+                        NSPopUpButtonView(selection: $model.favoritesConfiguration) {
+                            let button = NSPopUpButton()
+                            button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+
+                            for value in FavoritesConfiguration.availableConfigurations {
+                                let item = button.menu?.addItem(withTitle: value.displayString, action: nil, keyEquivalent: "")
+                                item?.representedObject = value
+                            }
+                            return button
+                        }
+                    }
+                }
+
+                // SECTION 5: Bookmarks Bar
                 PreferencePaneSection {
                     TextMenuItemHeader(text: "Bookmarks Bar")
                     HStack {
@@ -134,7 +154,7 @@ extension Preferences {
                     }
                 }
 
-                // SECTION 5: Zoom Setting
+                // SECTION 6: Zoom Setting
                 PreferencePaneSection {
                     Text(UserText.zoomSettingTitle)
                         .font(Const.Fonts.preferencePaneSectionHeader)

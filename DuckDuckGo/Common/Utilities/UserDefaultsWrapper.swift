@@ -79,6 +79,7 @@ public struct UserDefaultsWrapper<T> {
         case showAutocompleteSuggestions = "preferences.appearance.show-autocomplete-suggestions"
         case defaultPageZoom = "preferences.appearance.default-page-zoom"
         case bookmarksBarAppearance = "preferences.appearance.bookmarks-bar"
+        case favoritesConfiguration = "preferences.appearance.favorites-configuration"
 
         // ATB
         case installDate = "statistics.installdate.key"

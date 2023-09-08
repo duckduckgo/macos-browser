@@ -18,12 +18,14 @@
 
 import Foundation
 import AppKit
+import Bookmarks
 
 protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
     var showAutocompleteSuggestions: Bool { get set }
     var currentThemeName: String { get set }
     var defaultPageZoom: CGFloat { get set }
+    var favoritesConfiguration: String? { get set }
     var isFavoriteVisible: Bool { get set }
     var isContinueSetUpVisible: Bool { get set }
     var isRecentActivityVisible: Bool { get set }
@@ -43,6 +45,9 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: DefaultZoomValue.percent100.rawValue)
     var defaultPageZoom: CGFloat
+
+    @UserDefaultsWrapper(key: .favoritesConfiguration, defaultValue: FavoritesConfiguration.displayNative(.desktop).rawValue)
+    var favoritesConfiguration: String?
 
     @UserDefaultsWrapper(key: .homePageIsFavoriteVisible, defaultValue: true)
     var isFavoriteVisible: Bool
@@ -129,6 +134,41 @@ enum ThemeName: String, Equatable, CaseIterable {
     }
 }
 
+extension FavoritesConfiguration {
+    static let availableConfigurations = [FavoritesConfiguration.displayNative(.desktop), .displayAll(native: .desktop)]
+
+    var rawValue: String? {
+        switch self {
+        case .displayNative:
+            return "displayNative"
+        case .displayAll:
+            return "displayAll"
+        default:
+            return nil
+        }
+    }
+
+    init?(rawValue: String) {
+        switch rawValue {
+        case "displayNative":
+            self = .displayNative(.desktop)
+        case "displayAll":
+            self = .displayAll(native: .desktop)
+        default:
+            return nil
+        }
+    }
+
+    var displayString: String {
+        switch self {
+        case .displayNative:
+            return "Desktop Devices Only"
+        case .displayAll:
+            return "All Synced Devices"
+        }
+    }
+}
+
 final class AppearancePreferences: ObservableObject {
 
     struct Notifications {
@@ -153,6 +193,12 @@ final class AppearancePreferences: ObservableObject {
     @Published var showAutocompleteSuggestions: Bool {
         didSet {
             persistor.showAutocompleteSuggestions = showAutocompleteSuggestions
+        }
+    }
+
+    @Published var favoritesConfiguration: FavoritesConfiguration {
+        didSet {
+            persistor.favoritesConfiguration = favoritesConfiguration.rawValue
         }
     }
 
@@ -218,6 +264,7 @@ final class AppearancePreferences: ObservableObject {
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         showAutocompleteSuggestions = persistor.showAutocompleteSuggestions
+        favoritesConfiguration = persistor.favoritesConfiguration.flatMap(FavoritesConfiguration.init(rawValue:)) ?? .displayNative(.desktop)
         isFavoriteVisible = persistor.isFavoriteVisible
         isRecentActivityVisible = persistor.isRecentActivityVisible
         isContinueSetUpVisible = persistor.isContinueSetUpVisible
