@@ -22,51 +22,40 @@ import Common
 
 protocol WebOperationRunner {
 
-<<<<<<< HEAD
     func scan(_ profileQuery: BrokerProfileQueryData,
+              stageCalculator: DataBrokerProtectionStageDurationCalculator,
               showWebView: Bool,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile]
 
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
+                stageCalculator: DataBrokerProtectionStageDurationCalculator,
                 showWebView: Bool,
                 shouldRunNextStep: @escaping () -> Bool) async throws
-=======
-    func scan(_ profileQuery: BrokerProfileQueryData, stageCalculator: DataBrokerProtectionStageDurationCalculator, showWebView: Bool) async throws -> [ExtractedProfile]
-    func optOut(profileQuery: BrokerProfileQueryData,
-                extractedProfile: ExtractedProfile,
-                stageCalculator: DataBrokerProtectionStageDurationCalculator,
-                showWebView: Bool) async throws
->>>>>>> 81976607 (Inject stage calculator to operations)
 }
 
 extension WebOperationRunner {
 
-<<<<<<< HEAD
     func scan(_ profileQuery: BrokerProfileQueryData,
+              stageCalculator: DataBrokerProtectionStageDurationCalculator,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
 
         try await scan(profileQuery,
+                       stageCalculator: stageCalculator,
                        showWebView: false,
                        shouldRunNextStep: shouldRunNextStep)
     }
 
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
+                stageCalculator: DataBrokerProtectionStageDurationCalculator,
                 shouldRunNextStep: @escaping () -> Bool) async throws {
 
         try await optOut(profileQuery: profileQuery,
                          extractedProfile: extractedProfile,
+                         stageCalculator: stageCalculator,
                          showWebView: false,
                          shouldRunNextStep: shouldRunNextStep)
-=======
-    func scan(_ profileQuery: BrokerProfileQueryData, stageCalculator: DataBrokerProtectionStageDurationCalculator) async throws -> [ExtractedProfile] {
-        try await scan(profileQuery, stageCalculator: stageCalculator, showWebView: false)
-    }
-
-    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile, stageCalculator: DataBrokerProtectionStageDurationCalculator) async throws {
-        try await optOut(profileQuery: profileQuery, extractedProfile: extractedProfile, stageCalculator: stageCalculator, showWebView: false)
->>>>>>> 81976607 (Inject stage calculator to operations)
     }
 }
 
@@ -87,14 +76,10 @@ final class DataBrokerOperationRunner: WebOperationRunner {
         self.captchaService = captchaService
     }
 
-<<<<<<< HEAD
     func scan(_ profileQuery: BrokerProfileQueryData,
+              stageCalculator: DataBrokerProtectionStageDurationCalculator,
               showWebView: Bool,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
-
-=======
-    func scan(_ profileQuery: BrokerProfileQueryData, stageCalculator: DataBrokerProtectionStageDurationCalculator, showWebView: Bool) async throws -> [ExtractedProfile] {
->>>>>>> 81976607 (Inject stage calculator to operations)
         let scan = ScanOperation(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
@@ -103,24 +88,14 @@ final class DataBrokerOperationRunner: WebOperationRunner {
             captchaService: captchaService,
             shouldRunNextStep: shouldRunNextStep
         )
-<<<<<<< HEAD
-        return try await scan.run(inputValue: (),
-                                  showWebView: showWebView)
-=======
         return try await scan.run(inputValue: (), stageCalculator: stageCalculator, showWebView: showWebView)
->>>>>>> 81976607 (Inject stage calculator to operations)
     }
 
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
-<<<<<<< HEAD
+                stageCalculator: DataBrokerProtectionStageDurationCalculator,
                 showWebView: Bool,
                 shouldRunNextStep: @escaping () -> Bool) async throws {
-
-=======
-                stageCalculator: DataBrokerProtectionStageDurationCalculator,
-                showWebView: Bool) async throws {
->>>>>>> 81976607 (Inject stage calculator to operations)
         let optOut = OptOutOperation(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
@@ -129,12 +104,7 @@ final class DataBrokerOperationRunner: WebOperationRunner {
             captchaService: captchaService,
             shouldRunNextStep: shouldRunNextStep
         )
-<<<<<<< HEAD
-        try await optOut.run(inputValue: extractedProfile,
-                             showWebView: showWebView)
-=======
         try await optOut.run(inputValue: extractedProfile, stageCalculator: stageCalculator, showWebView: showWebView)
->>>>>>> 81976607 (Inject stage calculator to operations)
     }
 
     deinit {

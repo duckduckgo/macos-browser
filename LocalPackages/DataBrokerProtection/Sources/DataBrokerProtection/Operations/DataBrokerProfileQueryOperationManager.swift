@@ -33,8 +33,8 @@ protocol OperationsManager {
                       database: DataBrokerProtectionRepository,
                       notificationCenter: NotificationCenter,
                       runner: WebOperationRunner,
-                      showWebView: Bool,
                       pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+                      showWebView: Bool,
                       shouldRunNextStep: @escaping () -> Bool) async throws
 }
 
@@ -235,7 +235,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
             database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested))
         } catch {
-            // TODO: Here we generate the optout process failure pixel
+            stageDurationCalculator.fireOptOutFailure()
             handleOperationError(
                 brokerId: brokerId,
                 profileQueryId: profileQueryId,

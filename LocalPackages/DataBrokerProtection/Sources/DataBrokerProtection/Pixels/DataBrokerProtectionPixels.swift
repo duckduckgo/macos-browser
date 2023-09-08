@@ -26,14 +26,16 @@ class DataBrokerProtectionStageDurationCalculator {
 
     private let attemptId: UUID
     private let dataBroker: String
+    private let startTime: DispatchTime
     private var lastStateTime: DispatchTime
 
     init(attemptId: UUID = UUID(),
-         lastStateTime: DispatchTime = .now(),
+         startTime: DispatchTime = .now(),
          dataBroker: String,
          handler: EventMapping<DataBrokerProtectionPixels>) {
         self.attemptId = attemptId
-        self.lastStateTime = lastStateTime
+        self.startTime = startTime
+        self.lastStateTime = startTime
         self.dataBroker = dataBroker
         self.handler = handler
     }
@@ -43,6 +45,13 @@ class DataBrokerProtectionStageDurationCalculator {
         let now = DispatchTime.now()
         let executionTime = now.uptimeNanoseconds - lastStateTime.uptimeNanoseconds
         self.lastStateTime = now
+        return Double(executionTime) / 1_000_000
+    }
+
+    /// Returned in milliseconds
+    func durationSinceStartTime() -> Double {
+        let now = DispatchTime.now()
+        let executionTime = now.uptimeNanoseconds - startTime.uptimeNanoseconds
         return Double(executionTime) / 1_000_000
     }
 
@@ -80,6 +89,10 @@ class DataBrokerProtectionStageDurationCalculator {
 
     func fireOptOutValidate() {
         handler.fire(.optOutValidate(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
+    }
+
+    func fireOptOutFailure() {
+        handler.fire(.optOutFailure(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceStartTime()))
     }
 }
 
