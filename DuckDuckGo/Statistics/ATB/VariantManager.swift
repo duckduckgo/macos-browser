@@ -20,7 +20,6 @@ import Common
 import Foundation
 
 enum FeatureName: String {
-    case newOnboarding
     // Used for unit tests
     case dummy
 
@@ -38,7 +37,6 @@ struct Variant {
     }
 
     static let doNotAllocate = 0
-
 
     // Note: Variants with `doNotAllocate` weight, should always be included so that previous installations are unaffected
     static let defaultVariants: [Variant] = [

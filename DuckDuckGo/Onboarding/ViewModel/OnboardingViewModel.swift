@@ -56,26 +56,21 @@ final class OnboardingViewModel: ObservableObject {
     }
 
     var isNewOnboarding: Bool {
-        print("Pixel is new onboarding: \(PixelExperiment.cohort == .onboardingExperiment1)")
         return PixelExperiment.cohort == .onboardingExperiment1
-//        variantManager?.isSupported(feature: .newOnboarding) ?? false
     }
 
     @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
     private(set) var onboardingFinished: Bool
 
     private let statisticsLoader: StatisticsLoader?
-    private let variantManager: VariantManager?
 
     weak var delegate: OnboardingDelegate?
 
     init(
         delegate: OnboardingDelegate? = nil,
-        statisticsLoader: StatisticsLoader? = (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared),
-        variantManager: VariantManager? = (NSApp.isRunningUnitTests ? nil : DefaultVariantManager())) {
+        statisticsLoader: StatisticsLoader? = (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)) {
         self.delegate = delegate
         self.statisticsLoader = statisticsLoader
-        self.variantManager = variantManager
         self.state = onboardingFinished ? .startBrowsing : .startFlow
 
             NotificationCenter.default.addObserver(self, selector: #selector(onboardingPageLeft(_:)), name: .onboardingPageLeft, object: nil)
@@ -87,7 +82,7 @@ final class OnboardingViewModel: ObservableObject {
     }
 
     func onStartPressed() {
-        if variantManager?.isSupported(feature: .newOnboarding) ?? false {
+        if isNewOnboarding {
             finishOnboarding()
             delegate?.goToNewTabPage()
         } else {

@@ -177,7 +177,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             Pixel.firstLaunchDate = Date()
             // MARK: Enable pixel experiments here
             PixelExperiment.install()
-            print("install experiment set up")
         }
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in

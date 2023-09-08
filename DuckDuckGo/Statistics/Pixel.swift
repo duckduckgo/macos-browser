@@ -79,7 +79,6 @@ final class Pixel {
                                                      allowedQueryReservedCharacters: allowedQueryReservedCharacters,
                                                      headers: headers)
         let request = APIRequest(configuration: configuration, urlSession: URLSession.session(useMainThreadCallbackQueue: true))
-        print("Pixel \(request)")
         request.fetch { (_, error) in
             onComplete(error)
         }
