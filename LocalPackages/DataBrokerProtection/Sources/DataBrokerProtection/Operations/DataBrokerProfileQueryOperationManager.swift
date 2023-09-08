@@ -119,7 +119,6 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                                         showWebView: showWebView,
                                                         shouldRunNextStep: shouldRunNextStep)
 
-
             os_log("Extracted profiles: %@", log: .dataBrokerProtection, extractedProfiles)
 
             if !extractedProfiles.isEmpty {
