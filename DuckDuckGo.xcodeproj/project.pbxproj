@@ -5820,10 +5820,10 @@
 				9D9AE92B2AAB84FF0026E7DC /* DBPMocks.swift */,
 				9D9AE9172AAA3B450026E7DC /* UserText.swift */,
 				9D9AE9162AAA3B450026E7DC /* Assets.xcassets */,
-				9D9AE9142AAA3B450026E7DC /* Info-AppStore.plist */,
-				9D9AE9182AAA3B450026E7DC /* Info.plist */,
 				9D9AE91A2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgent.entitlements */,
 				9D9AE9192AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppStore.entitlements */,
+				9D9AE9182AAA3B450026E7DC /* Info.plist */,
+				9D9AE9142AAA3B450026E7DC /* Info-AppStore.plist */,
 			);
 			path = DuckDuckGoDBPBackgroundAgent;
 			sourceTree = "<group>";
@@ -11823,6 +11823,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgent.entitlements;
 				INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -11836,6 +11837,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgent.entitlements;
 				INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -11849,6 +11851,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgent.entitlements;
 				INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -11862,6 +11865,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgent.entitlements;
 				INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -11875,6 +11879,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgentAppStore.entitlements;
 				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent/Info-AppStore.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -11888,6 +11893,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgentAppStore.entitlements;
 				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent/Info-AppStore.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -11901,6 +11907,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgentAppStore.entitlements;
 				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent/Info-AppStore.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -11914,6 +11921,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgentAppStore.entitlements;
 				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent/Info-AppStore.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
