@@ -27,12 +27,13 @@ internal class BaseBookmarkEntity {
         return request
     }
 
-    static func favorite(with uuid: String) -> NSFetchRequest<BookmarkEntity> {
+    static func favorite(with uuid: String, folderUUID: String) -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == %@ AND %K != nil AND %K == NO AND %K == NO",
+        request.predicate = NSPredicate(format: "%K == %@ AND ANY %K CONTAINS %@ AND %K == NO AND %K == NO",
                                         #keyPath(BookmarkEntity.uuid),
                                         uuid as CVarArg,
-                                        #keyPath(BookmarkEntity.favoriteFolder),
+                                        #keyPath(BookmarkEntity.favoriteFolders),
+                                        folderUUID,
                                         #keyPath(BookmarkEntity.isFolder),
                                         #keyPath(BookmarkEntity.isPendingDeletion))
         return request
@@ -81,7 +82,7 @@ internal class BaseBookmarkEntity {
             return Bookmark(id: id,
                             url: url,
                             title: title,
-                            isFavorite: managedObject.isFavorite,
+                            isFavorite: managedObject.isFavorite(on: .desktop) || managedObject.isFavorite(on: .all),
                             parentFolderUUID: parentFolderUUID)
         }
     }

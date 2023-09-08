@@ -60,6 +60,13 @@ final class LocalBookmarkManager: BookmarkManager {
     init(bookmarkStore: BookmarkStore, faviconManagement: FaviconManagement) {
         self.bookmarkStore = bookmarkStore
         self.faviconManagement = faviconManagement
+
+        favoritesConfiguration = AppearancePreferences.shared.favoritesConfiguration
+        favoritesConfigurationCancellable = AppearancePreferences.shared.$favoritesConfiguration
+            .sink { [weak self] configuration in
+                self?.favoritesConfiguration = configuration
+                self?.bookmarkStore.applyFavoritesConfiguration(configuration)
+            }
     }
 
     @Published private(set) var list: BookmarkList?
@@ -67,6 +74,9 @@ final class LocalBookmarkManager: BookmarkManager {
 
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared)
     private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
+
+    private var favoritesConfiguration: FavoritesConfiguration = .displayNative(.desktop)
+    private var favoritesConfigurationCancellable: AnyCancellable?
 
     // MARK: - Bookmarks
 

@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Bookmarks
 import Foundation
 
 enum BookmarkStoreFetchPredicateType {
@@ -42,6 +43,8 @@ struct BookmarkImportResult: Equatable {
 }
 
 protocol BookmarkStore {
+
+    func applyFavoritesConfiguration(_ configuration: FavoritesConfiguration)
 
     func loadAll(type: BookmarkStoreFetchPredicateType, completion: @escaping ([BaseBookmarkEntity]?, Error?) -> Void)
     func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?, completion: @escaping (Bool, Error?) -> Void)

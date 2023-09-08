@@ -68,8 +68,7 @@ public class LegacyBookmarksStoreMigration {
         // Prepare destination
         BookmarkUtils.prepareFoldersStructure(in: destination)
 
-        guard let newRoot = BookmarkUtils.fetchRootFolder(destination),
-              let newFavoritesRoot = BookmarkUtils.fetchFavoritesFolder(destination) else {
+        guard let newRoot = BookmarkUtils.fetchRootFolder(destination) else {
 
             if bookmarkRoots.isEmpty {
                 Pixel.fire(.debug(event: .bookmarksCouldNotPrepareDatabase))
@@ -142,6 +141,8 @@ public class LegacyBookmarksStoreMigration {
             index += 1
         }
 
+        let newFavoritesRoots = BookmarkUtils.fetchFavoritesFolders(for: .displayAll(native: .desktop), in: destination)
+
         // Preserve the order of favorites
         if let oldFavoritesRoot = favoriteRoot,
            let oldFavorites = oldFavoritesRoot.favorites?.array as? [BookmarkManagedObject] {
@@ -150,7 +151,7 @@ public class LegacyBookmarksStoreMigration {
 
                 if let favoriteIndex = favoritesToAdd.firstIndex(where: { $0.title == oldFavorite.titleEncrypted as? String && $0.url == (oldFavorite.urlEncrypted as? URL)?.absoluteString}) {
                     let favorite = favoritesToAdd[favoriteIndex]
-                    favorite.addToFavorites(favoritesRoot: newFavoritesRoot)
+                    favorite.addToFavorites(folders: newFavoritesRoots)
                     favoritesToAdd.remove(at: favoriteIndex)
                 }
             }

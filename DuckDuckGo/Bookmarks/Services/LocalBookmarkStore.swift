@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import Common
 import Foundation
 import CoreData
@@ -39,6 +40,7 @@ final class LocalBookmarkStore: BookmarkStore {
     init(contextProvider: @escaping () -> NSManagedObjectContext) {
         self.contextProvider = contextProvider
 
+        favoritesConfiguration = AppearancePreferences.shared.favoritesConfiguration
         removeInvalidBookmarkEntities()
         cacheReadOnlyTopLevelBookmarksFolders()
     }
@@ -62,6 +64,9 @@ final class LocalBookmarkStore: BookmarkStore {
 
     /// All favorites must additionally be children of this special folder. Because this value is used so frequently, it is cached here.
     private var favoritesFolderObjectID: NSManagedObjectID?
+    private var nativeFavoritesFolderObjectID: NSManagedObjectID?
+
+    private var favoritesConfiguration: FavoritesConfiguration
 
     private func makeContext() -> NSManagedObjectContext {
         return contextProvider()
@@ -76,6 +81,13 @@ final class LocalBookmarkStore: BookmarkStore {
 
     private func favoritesRoot(in context: NSManagedObjectContext) -> BookmarkEntity? {
         guard let objectID = self.favoritesFolderObjectID else {
+            return nil
+        }
+        return try? (context.existingObject(with: objectID) as? BookmarkEntity)
+    }
+
+    private func nativeFavoritesRoot(in context: NSManagedObjectContext) -> BookmarkEntity? {
+        guard let objectID = self.nativeFavoritesFolderObjectID else {
             return nil
         }
         return try? (context.existingObject(with: objectID) as? BookmarkEntity)
@@ -203,11 +215,19 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             self.rootLevelFolderObjectID = folder.objectID
-            self.favoritesFolderObjectID = BookmarkUtils.fetchFavoritesFolder(context)?.objectID
+            let favoritesFolderUUID = self.favoritesConfiguration.displayedPlatform.rawValue
+            self.favoritesFolderObjectID = BookmarkUtils.fetchFavoritesFolder(withUUID: favoritesFolderUUID, in: context)?.objectID
+            let nativeFavoritesFolderUUID = self.favoritesConfiguration.nativePlatform.rawValue
+            self.nativeFavoritesFolderObjectID = BookmarkUtils.fetchFavoritesFolder(withUUID: nativeFavoritesFolderUUID, in: context)?.objectID
         }
     }
 
     // MARK: - Bookmarks
+
+    func applyFavoritesConfiguration(_ configuration: FavoritesConfiguration) {
+        favoritesConfiguration = configuration
+        cacheReadOnlyTopLevelBookmarksFolders()
+    }
 
     func loadAll(type: BookmarkStoreFetchPredicateType, completion: @escaping ([BaseBookmarkEntity]?, Error?) -> Void) {
         func mainQueueCompletion(bookmarks: [BaseBookmarkEntity]?, error: Error?) {
@@ -288,10 +308,8 @@ final class LocalBookmarkStore: BookmarkStore {
                                                          parent: parentEntity,
                                                          context: context)
 
-                if bookmark.isFavorite,
-                   let favoritesFolder = self.favoritesRoot(in: context) {
-                    bookmarkMO.addToFavorites(favoritesRoot: favoritesFolder)
-                }
+                let folders = BookmarkUtils.fetchFavoritesFolders(for: favoritesConfiguration, in: context)
+                bookmarkMO.addToFavorites(folders: folders)
             }
 
             bookmarkMO.uuid = bookmark.id
@@ -344,7 +362,8 @@ final class LocalBookmarkStore: BookmarkStore {
                     throw BookmarkStoreError.missingEntity
                 }
 
-                bookmarkMO.update(with: bookmark, favoritesFolder: self.favoritesRoot(in: context))
+                let favoritesFolders = [self.favoritesRoot(in: context), self.nativeFavoritesRoot(in: context)].compactMap { $0 }
+                bookmarkMO.update(with: bookmark, favoritesFolders: favoritesFolders)
             })
 
         } catch {
@@ -430,10 +449,12 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             let favoritesRoot = self.favoritesRoot(in: context)
+            let nativeFavoritesRoot = self.nativeFavoritesRoot(in: context)
+            let favoritesFolders = [favoritesRoot, nativeFavoritesRoot].compactMap({ $0 })
             bookmarkManagedObjects.forEach { managedObject in
                 if let entity = BaseBookmarkEntity.from(managedObject: managedObject, parentFolderUUID: nil) {
                     update(entity)
-                    managedObject.update(with: entity, favoritesFolder: favoritesRoot)
+                    managedObject.update(with: entity, favoritesFolders: favoritesFolders)
                 }
             }
         }, onError: { [weak self] error in
@@ -609,10 +630,12 @@ final class LocalBookmarkStore: BookmarkStore {
                 throw BookmarkStoreError.missingFavoritesRoot
             }
 
+            let favoritesFolderUUID = favoritesConfiguration.displayedPlatform.rawValue
+
             // Guarantee that bookmarks are fetched in the same order as the UUIDs. In the future, this should fetch all objects at once with a
             // batch fetch request and have them sorted in the correct order.
             let bookmarkManagedObjects: [BookmarkEntity] = objectUUIDs.compactMap { uuid in
-                let entityFetchRequest = BaseBookmarkEntity.favorite(with: uuid)
+                let entityFetchRequest = BaseBookmarkEntity.favorite(with: uuid, folderUUID: favoritesFolderUUID)
                 return (try? context.fetch(entityFetchRequest))?.first
             }
 
@@ -952,9 +975,9 @@ fileprivate extension BookmarkEntity {
         return false
     }
 
-    func update(with baseEntity: BaseBookmarkEntity, favoritesFolder: BookmarkEntity?) {
+    func update(with baseEntity: BaseBookmarkEntity, favoritesFolders: [BookmarkEntity]) {
         if let bookmark = baseEntity as? Bookmark {
-            update(with: bookmark, favoritesFolder: favoritesFolder)
+            update(with: bookmark, favoritesFolders: favoritesFolders)
         } else if let folder = baseEntity as? BookmarkFolder {
             update(with: folder)
         } else {
@@ -962,13 +985,11 @@ fileprivate extension BookmarkEntity {
         }
     }
 
-    func update(with bookmark: Bookmark, favoritesFolder: BookmarkEntity?) {
+    func update(with bookmark: Bookmark, favoritesFolders: [BookmarkEntity]) {
         url = bookmark.url
         title = bookmark.title
         if bookmark.isFavorite {
-            if let favoritesFolder = favoritesFolder {
-                addToFavorites(favoritesRoot: favoritesFolder)
-            }
+            addToFavorites(folders: favoritesFolders)
         } else {
             removeFromFavorites()
         }
