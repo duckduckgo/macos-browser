@@ -210,9 +210,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
 
-        // TODO: Here we generate the optOutStart pixel
-        // let attemptId = UUID()
-        // pixelHandler.fire(.optOutStart(dataBroker: brokerProfileQueryData.dataBroker.name, attemptId: attemptId))
+        let stageDurationCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
+        stageDurationCalculator.fireOptOutStart()
         os_log("Running opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 
         defer {
