@@ -20,7 +20,7 @@ import Foundation
 import Common
 import BrowserServicesKit
 
-struct DataBrokerProtectionStageDurationCalculator {
+class DataBrokerProtectionStageDurationCalculator {
 
     let handler: EventMapping<DataBrokerProtectionPixels>
 
@@ -39,7 +39,7 @@ struct DataBrokerProtectionStageDurationCalculator {
     }
 
     /// Returned in milliseconds
-    mutating func durationSinceLastStage() -> Double {
+    func durationSinceLastStage() -> Double {
         let now = DispatchTime.now()
         let executionTime = now.uptimeNanoseconds - lastStateTime.uptimeNanoseconds
         self.lastStateTime = now
@@ -48,6 +48,10 @@ struct DataBrokerProtectionStageDurationCalculator {
 
     func fireOptOutStart() {
         handler.fire(.optOutStart(dataBroker: dataBroker, attemptId: attemptId))
+    }
+
+    func fireOptOutEmailGenerate() {
+        handler.fire(.optOutEmailGenerate(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
     }
 }
 
@@ -63,19 +67,19 @@ public enum DataBrokerProtectionPixels {
 
     // Stage Pixels
     case optOutStart(dataBroker: String, attemptId: UUID)
-    case optOutEmailGenerate(dataBroker: String, attemptId: UUID, duration: UInt64)
-    case optOutCaptchaParse(dataBroker: String, attemptId: UUID, duration: UInt64)
-    case optOutCaptchaSend(dataBroker: String, attemptId: UUID, duration: UInt64)
-    case optOutCaptchaSolve(dataBroker: String, attemptId: UUID, duration: UInt64)
-    case optOutSubmit(dataBroker: String, attemptId: UUID, duration: UInt64)
-    case optOutEmailReceive(dataBroker: String, attemptId: UUID, duration: UInt64)
-    case optOutEmailConfirm(dataBroker: String, attemptId: UUID, duration: UInt64)
-    case optOutValidate(dataBroker: String, attemptId: UUID, duration: UInt64)
-    case optOutFinish(dataBroker: String, attemptId: UUID, duration: UInt64)
+    case optOutEmailGenerate(dataBroker: String, attemptId: UUID, duration: Double)
+    case optOutCaptchaParse(dataBroker: String, attemptId: UUID, duration: Double)
+    case optOutCaptchaSend(dataBroker: String, attemptId: UUID, duration: Double)
+    case optOutCaptchaSolve(dataBroker: String, attemptId: UUID, duration: Double)
+    case optOutSubmit(dataBroker: String, attemptId: UUID, duration: Double)
+    case optOutEmailReceive(dataBroker: String, attemptId: UUID, duration: Double)
+    case optOutEmailConfirm(dataBroker: String, attemptId: UUID, duration: Double)
+    case optOutValidate(dataBroker: String, attemptId: UUID, duration: Double)
+    case optOutFinish(dataBroker: String, attemptId: UUID, duration: Double)
 
     // Process Pixels
-    case optOutSuccess(dataBroker: String, attemptId: UUID, duration: UInt64)
-    case optOutFailure(dataBroker: String, attemptId: UUID, duration: UInt64)
+    case optOutSuccess(dataBroker: String, attemptId: UUID, duration: Double)
+    case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double)
 }
 
 public extension DataBrokerProtectionPixels {

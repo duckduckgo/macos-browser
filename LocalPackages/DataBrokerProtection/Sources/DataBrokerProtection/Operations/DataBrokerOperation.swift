@@ -95,7 +95,7 @@ extension DataBrokerOperation {
         if action.needsEmail {
             do {
                 extractedProfile?.email = try await emailService.getEmail()
-                // TODO: Here we generate the email generate pixel
+                stageCalculator?.fireOptOutEmailGenerate()
             } catch {
                 await onError(error: .emailError(error as? EmailError))
                 return
