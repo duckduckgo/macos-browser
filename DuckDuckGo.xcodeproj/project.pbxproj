@@ -2203,16 +2203,12 @@
 		9D9AE86F2AA76D210026E7DC /* LoginItem+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE8682AA76CDC0026E7DC /* LoginItem+NetworkProtection.swift */; };
 		9D9AE8F92AAA3AD00026E7DC /* DataBrokerProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9AE8F82AAA3AD00026E7DC /* DataBrokerProtection */; };
 		9D9AE8FB2AAA3AD90026E7DC /* DataBrokerProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9AE8FA2AAA3AD90026E7DC /* DataBrokerProtection */; };
-		9D9AE91B2AAA3B450026E7DC /* Info-AppStore.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9D9AE9142AAA3B450026E7DC /* Info-AppStore.plist */; };
-		9D9AE91C2AAA3B450026E7DC /* Info-AppStore.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9D9AE9142AAA3B450026E7DC /* Info-AppStore.plist */; };
 		9D9AE91D2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9152AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift */; };
 		9D9AE91E2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9152AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift */; };
 		9D9AE91F2AAA3B450026E7DC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D9AE9162AAA3B450026E7DC /* Assets.xcassets */; };
 		9D9AE9202AAA3B450026E7DC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D9AE9162AAA3B450026E7DC /* Assets.xcassets */; };
 		9D9AE9212AAA3B450026E7DC /* UserText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9172AAA3B450026E7DC /* UserText.swift */; };
 		9D9AE9222AAA3B450026E7DC /* UserText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9172AAA3B450026E7DC /* UserText.swift */; };
-		9D9AE9232AAA3B450026E7DC /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9D9AE9182AAA3B450026E7DC /* Info.plist */; };
-		9D9AE9242AAA3B450026E7DC /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9D9AE9182AAA3B450026E7DC /* Info.plist */; };
 		9D9AE9292AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9282AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift */; };
 		9D9AE92A2AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9282AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift */; };
 		9D9AE92C2AAB84FF0026E7DC /* DBPMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE92B2AAB84FF0026E7DC /* DBPMocks.swift */; };
@@ -5826,8 +5822,8 @@
 				9D9AE9162AAA3B450026E7DC /* Assets.xcassets */,
 				9D9AE9142AAA3B450026E7DC /* Info-AppStore.plist */,
 				9D9AE9182AAA3B450026E7DC /* Info.plist */,
-				9D9AE9192AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppStore.entitlements */,
 				9D9AE91A2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgent.entitlements */,
+				9D9AE9192AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppStore.entitlements */,
 			);
 			path = DuckDuckGoDBPBackgroundAgent;
 			sourceTree = "<group>";
@@ -7818,7 +7814,6 @@
 				9D9AE8B62AAA39A70026E7DC /* Sources */,
 				9D9AE8C62AAA39A70026E7DC /* Frameworks */,
 				9D9AE8C92AAA39A70026E7DC /* Resources */,
-				9D9AE8CB2AAA39A70026E7DC /* Copy Assets */,
 			);
 			buildRules = (
 			);
@@ -7840,7 +7835,6 @@
 				9D9AE8D72AAA39D30026E7DC /* Sources */,
 				9D9AE8E72AAA39D30026E7DC /* Frameworks */,
 				9D9AE8EA2AAA39D30026E7DC /* Resources */,
-				9D9AE8EC2AAA39D30026E7DC /* Copy Assets */,
 			);
 			buildRules = (
 			);
@@ -8266,8 +8260,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9D9AE91F2AAA3B450026E7DC /* Assets.xcassets in Resources */,
-				9D9AE91B2AAA3B450026E7DC /* Info-AppStore.plist in Resources */,
-				9D9AE9232AAA3B450026E7DC /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8276,8 +8268,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9D9AE9202AAA3B450026E7DC /* Assets.xcassets in Resources */,
-				9D9AE91C2AAA3B450026E7DC /* Info-AppStore.plist in Resources */,
-				9D9AE9242AAA3B450026E7DC /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8619,44 +8609,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "echo \"ditto ${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_ID} $BUILT_PRODUCTS_DIR/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_BUNDLE_ID}\"\n\nditto \"${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_ID}\" \"$BUILT_PRODUCTS_DIR/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_BUNDLE_ID}\" || exit 1\n";
-		};
-		9D9AE8CB2AAA39A70026E7DC /* Copy Assets */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Assets";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/NetworkProtectionUI_NetworkProtectionUI.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
-		};
-		9D9AE8EC2AAA39D30026E7DC /* Copy Assets */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Assets";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/NetworkProtectionUI_NetworkProtectionUI.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
 		};
 		AA8EDF2824925E940071C2E8 /* Swift Lint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -11871,6 +11823,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
+				INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSPrincipalClass = Application;
@@ -11883,6 +11836,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
+				INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSPrincipalClass = Application;
@@ -11895,6 +11849,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
+				INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSPrincipalClass = Application;
@@ -11907,6 +11862,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
+				INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSPrincipalClass = Application;
