@@ -621,7 +621,11 @@ final class NavigationBarViewController: NSViewController {
         downloadsButton.image = hasActiveDownloads ? Self.Constants.activeDownloadsImage : Self.Constants.inactiveDownloadsImage
         let isTimerActive = downloadsButtonHidingTimer != nil
 
-        downloadsButton.isHidden = !(hasActiveDownloads || isTimerActive)
+        if popovers.isDownloadsPopoverShown {
+            downloadsButton.isHidden = false
+        } else {
+            downloadsButton.isHidden = !(hasActiveDownloads || isTimerActive)
+        }
 
         if !downloadsButton.isHidden { setDownloadButtonHidingTimer() }
         downloadsButton.isMouseDown = popovers.isDownloadsPopoverShown
