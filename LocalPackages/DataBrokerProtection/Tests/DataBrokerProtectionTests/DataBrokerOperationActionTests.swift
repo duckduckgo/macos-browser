@@ -42,7 +42,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
             emailService: emailService,
-            operationAwaitTime: 0
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
         )
 
         do {
@@ -63,7 +64,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
             emailService: emailService,
-            operationAwaitTime: 0
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
         )
 
         do {
@@ -91,7 +93,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
             emailService: emailService,
-            operationAwaitTime: 0
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
         )
 
         do {
@@ -117,7 +120,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
             emailService: emailService,
-            operationAwaitTime: 0
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
         sut.extractedProfile = ExtractedProfile()
@@ -136,7 +140,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
             emailService: emailService,
-            operationAwaitTime: 0
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
         )
         emailService.shouldThrow = true
 
@@ -160,7 +165,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             emailService: emailService,
-            operationAwaitTime: 0
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
 
@@ -176,7 +182,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             emailService: emailService,
-            operationAwaitTime: 0
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
 
@@ -194,7 +201,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             captchaService: captchaService,
-            operationAwaitTime: 0
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
         sut.actionsHandler = ActionsHandler(step: step)
@@ -213,7 +221,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(with: [step]),
             captchaService: captchaService,
-            operationAwaitTime: 0
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
         )
         let actionsHandler = ActionsHandler(step: step)
         actionsHandler.captchaTransactionId = "transactionId"
@@ -239,7 +248,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             captchaService: captchaService,
-            operationAwaitTime: 0
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
         sut.actionsHandler = ActionsHandler(step: step)
@@ -258,7 +268,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             captchaService: captchaService,
-            operationAwaitTime: 0
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
         )
         captchaService.shouldThrow = true
         sut.webViewHandler = webViewHandler
@@ -277,7 +288,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             emailService: emailService,
-            operationAwaitTime: 0
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
 
@@ -292,7 +304,8 @@ final class DataBrokerOperationActionTests: XCTestCase {
             prefs: ContentScopeProperties.mock,
             query: BrokerProfileQueryData.mock(),
             emailService: emailService,
-            operationAwaitTime: 0
+            operationAwaitTime: 0,
+            shouldRunNextStep: { true }
         )
         sut.webViewHandler = webViewHandler
 

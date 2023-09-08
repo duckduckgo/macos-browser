@@ -21,6 +21,10 @@ import Cocoa
 import Common
 import WebKit
 
+#if NETWORK_PROTECTION
+import NetworkProtection
+#endif
+
 // Actions are sent to objects of responder chain
 
 // MARK: - Main Menu Actions
@@ -30,7 +34,7 @@ extension AppDelegate {
     // MARK: - DuckDuckGo
 
     @IBAction func checkForUpdates(_ sender: Any?) {
-#if !APPSTORE
+#if !APPSTORE && !DBP
         updateController.checkForUpdates(sender)
 #endif
     }
@@ -713,6 +717,44 @@ extension MainViewController {
         ConfigurationManager.shared.forceRefresh()
     }
 
+    @IBAction func resetNetworkProtectionWaitlistState(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
+        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+#endif
+    }
+
+    @IBAction func resetNetworkProtectionTermsAndConditionsAcceptance(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+#endif
+    }
+
+    @IBAction func showNetworkProtectionInviteCodePrompt(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        let code = getInviteCode()
+
+        Task {
+            do {
+                let redeemer = NetworkProtectionCodeRedemptionCoordinator()
+                try await redeemer.redeem(code)
+                NetworkProtectionWaitlist().waitlistStorage.store(inviteCode: code)
+                NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+            } catch {
+                // Do nothing here, this is just a debug menu
+            }
+        }
+#endif
+    }
+
+    @IBAction func sendNetworkProtectionWaitlistAvailableNotification(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        NetworkProtectionWaitlist().sendInviteCodeAvailableNotification()
+#endif
+    }
+
     // MARK: - Developer Tools
 
     @IBAction func toggleDeveloperTools(_ sender: Any?) {
@@ -840,10 +882,39 @@ extension MainViewController: NSMenuItemValidation {
 
             return true
 
+        // Network Protection Debugging
+        case #selector(MainViewController.showNetworkProtectionInviteCodePrompt(_:)):
+            // Only allow testers to enter a custom code if they're on the waitlist, to simulate the correct path through the flow
+#if NETWORK_PROTECTION
+            let waitlist = NetworkProtectionWaitlist()
+            return waitlist.waitlistStorage.isOnWaitlist || waitlist.waitlistStorage.isInvited
+#else
+            return false
+#endif
         default:
             return true
         }
     }
+
+    func getInviteCode() -> String {
+        let alert = NSAlert()
+        alert.addButton(withTitle: "Use Invite Code")
+        alert.addButton(withTitle: "Cancel")
+        alert.messageText = "Enter Invite Code"
+        alert.informativeText = "Please grab a Network Protection invite code from Asana and enter it here."
+
+        let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
+        alert.accessoryView = textField
+
+        let response = alert.runModal()
+
+        if response == .alertFirstButtonReturn {
+            return textField.stringValue
+        } else {
+            return ""
+        }
+    }
+
     // swiftlint:enable function_body_length
     // swiftlint:enable cyclomatic_complexity
 }
@@ -863,7 +934,7 @@ extension AppDelegate: NSMenuItemValidation {
         case #selector(AppDelegate.reopenAllWindowsFromLastSession(_:)):
             return stateRestorationManager.canRestoreLastSessionState
 
-        // Enables and disables export bookmarks itemz
+        // Enables and disables export bookmarks items
         case #selector(AppDelegate.openExportBookmarks(_:)):
             return bookmarksManager.list?.totalBookmarks != 0
 
