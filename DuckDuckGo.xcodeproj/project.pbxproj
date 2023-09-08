@@ -2203,6 +2203,22 @@
 		9D9AE86F2AA76D210026E7DC /* LoginItem+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE8682AA76CDC0026E7DC /* LoginItem+NetworkProtection.swift */; };
 		9D9AE8F92AAA3AD00026E7DC /* DataBrokerProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9AE8F82AAA3AD00026E7DC /* DataBrokerProtection */; };
 		9D9AE8FB2AAA3AD90026E7DC /* DataBrokerProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9AE8FA2AAA3AD90026E7DC /* DataBrokerProtection */; };
+		9D9AE91B2AAA3B450026E7DC /* Info-AppStore.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9D9AE9142AAA3B450026E7DC /* Info-AppStore.plist */; };
+		9D9AE91C2AAA3B450026E7DC /* Info-AppStore.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9D9AE9142AAA3B450026E7DC /* Info-AppStore.plist */; };
+		9D9AE91D2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9152AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift */; };
+		9D9AE91E2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9152AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift */; };
+		9D9AE91F2AAA3B450026E7DC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D9AE9162AAA3B450026E7DC /* Assets.xcassets */; };
+		9D9AE9202AAA3B450026E7DC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D9AE9162AAA3B450026E7DC /* Assets.xcassets */; };
+		9D9AE9212AAA3B450026E7DC /* UserText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9172AAA3B450026E7DC /* UserText.swift */; };
+		9D9AE9222AAA3B450026E7DC /* UserText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9172AAA3B450026E7DC /* UserText.swift */; };
+		9D9AE9232AAA3B450026E7DC /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9D9AE9182AAA3B450026E7DC /* Info.plist */; };
+		9D9AE9242AAA3B450026E7DC /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9D9AE9182AAA3B450026E7DC /* Info.plist */; };
+		9D9AE9292AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9282AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift */; };
+		9D9AE92A2AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE9282AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift */; };
+		9D9AE92C2AAB84FF0026E7DC /* DBPMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE92B2AAB84FF0026E7DC /* DBPMocks.swift */; };
+		9D9AE92D2AAB84FF0026E7DC /* DBPMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE92B2AAB84FF0026E7DC /* DBPMocks.swift */; };
+		9D9AE92F2AAB8A990026E7DC /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9AE92E2AAB8A990026E7DC /* BrowserServicesKit */; };
+		9D9AE9312AAB8A9E0026E7DC /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9AE9302AAB8A9E0026E7DC /* BrowserServicesKit */; };
 		9DB6E7242AA0DC5800A17F3C /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = 9DB6E7232AA0DC5800A17F3C /* LoginItems */; };
 		9DB6E7262AA0DC6600A17F3C /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = 9DB6E7252AA0DC6600A17F3C /* LoginItems */; };
 		9DC70B1A2AA1FA5B005A844B /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC70B192AA1FA5B005A844B /* LoginItems */; };
@@ -3509,6 +3525,15 @@
 		9D9AE86A2AA76CF90026E7DC /* LoginItemsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginItemsManager.swift; sourceTree = "<group>"; };
 		9D9AE8D12AAA39A70026E7DC /* DuckDuckGoDBPBackgroundAgent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGoDBPBackgroundAgent.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D9AE8F22AAA39D30026E7DC /* DuckDuckGoDBPBackgroundAgentAppStore.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGoDBPBackgroundAgentAppStore.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9D9AE9142AAA3B450026E7DC /* Info-AppStore.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Info-AppStore.plist"; sourceTree = "<group>"; };
+		9D9AE9152AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckDuckGoDBPBackgroundAgentAppDelegate.swift; sourceTree = "<group>"; };
+		9D9AE9162AAA3B450026E7DC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9D9AE9172AAA3B450026E7DC /* UserText.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserText.swift; sourceTree = "<group>"; };
+		9D9AE9182AAA3B450026E7DC /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9D9AE9192AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppStore.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoDBPBackgroundAgentAppStore.entitlements; sourceTree = "<group>"; };
+		9D9AE91A2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgent.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoDBPBackgroundAgent.entitlements; sourceTree = "<group>"; };
+		9D9AE9282AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionBackgroundManager.swift; sourceTree = "<group>"; };
+		9D9AE92B2AAB84FF0026E7DC /* DBPMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBPMocks.swift; sourceTree = "<group>"; };
 		9DB6E7222AA0DA7A00A17F3C /* LoginItems */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LoginItems; sourceTree = "<group>"; };
 		AA0877B726D5160D00B05660 /* SafariVersionReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariVersionReaderTests.swift; sourceTree = "<group>"; };
 		AA0877B926D5161D00B05660 /* WebKitVersionProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitVersionProviderTests.swift; sourceTree = "<group>"; };
@@ -4134,6 +4159,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D9AE92F2AAB8A990026E7DC /* BrowserServicesKit in Frameworks */,
 				9D9AE8F92AAA3AD00026E7DC /* DataBrokerProtection in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4142,6 +4168,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D9AE9312AAB8A9E0026E7DC /* BrowserServicesKit in Frameworks */,
 				9D9AE8FB2AAA3AD90026E7DC /* DataBrokerProtection in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5789,6 +5816,22 @@
 			path = LoginItems;
 			sourceTree = "<group>";
 		};
+		9D9AE9132AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgent */ = {
+			isa = PBXGroup;
+			children = (
+				9D9AE9152AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift */,
+				9D9AE9282AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift */,
+				9D9AE92B2AAB84FF0026E7DC /* DBPMocks.swift */,
+				9D9AE9172AAA3B450026E7DC /* UserText.swift */,
+				9D9AE9162AAA3B450026E7DC /* Assets.xcassets */,
+				9D9AE9142AAA3B450026E7DC /* Info-AppStore.plist */,
+				9D9AE9182AAA3B450026E7DC /* Info.plist */,
+				9D9AE9192AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppStore.entitlements */,
+				9D9AE91A2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgent.entitlements */,
+			);
+			path = DuckDuckGoDBPBackgroundAgent;
+			sourceTree = "<group>";
+		};
 		AA0877B626D515EE00B05660 /* UserAgent */ = {
 			isa = PBXGroup;
 			children = (
@@ -5902,6 +5945,7 @@
 				4B25375C2A11BE7500610219 /* NetworkProtectionSystemExtension */,
 				4B5F14C32A145D6A0060320F /* NetworkProtectionVPNController */,
 				4B2D063A2A11CFBD00DE1F49 /* DuckDuckGoAgent */,
+				9D9AE9132AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgent */,
 				AA585D7F248FD31100E9A3E2 /* Products */,
 				85AE2FF024A33A2D002D507F /* Frameworks */,
 			);
@@ -7783,6 +7827,7 @@
 			name = DuckDuckGoDBPBackgroundAgent;
 			packageProductDependencies = (
 				9D9AE8F82AAA3AD00026E7DC /* DataBrokerProtection */,
+				9D9AE92E2AAB8A990026E7DC /* BrowserServicesKit */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 9D9AE8D12AAA39A70026E7DC /* DuckDuckGoDBPBackgroundAgent.app */;
@@ -7804,6 +7849,7 @@
 			name = DuckDuckGoDBPBackgroundAgentAppStore;
 			packageProductDependencies = (
 				9D9AE8FA2AAA3AD90026E7DC /* DataBrokerProtection */,
+				9D9AE9302AAB8A9E0026E7DC /* BrowserServicesKit */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 9D9AE8F22AAA39D30026E7DC /* DuckDuckGoDBPBackgroundAgentAppStore.app */;
@@ -8219,6 +8265,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D9AE91F2AAA3B450026E7DC /* Assets.xcassets in Resources */,
+				9D9AE91B2AAA3B450026E7DC /* Info-AppStore.plist in Resources */,
+				9D9AE9232AAA3B450026E7DC /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8226,6 +8275,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D9AE9202AAA3B450026E7DC /* Assets.xcassets in Resources */,
+				9D9AE91C2AAA3B450026E7DC /* Info-AppStore.plist in Resources */,
+				9D9AE9242AAA3B450026E7DC /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10411,6 +10463,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D9AE92C2AAB84FF0026E7DC /* DBPMocks.swift in Sources */,
+				9D9AE9292AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift in Sources */,
+				9D9AE91D2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift in Sources */,
+				9D9AE9212AAA3B450026E7DC /* UserText.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10418,6 +10474,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D9AE92D2AAB84FF0026E7DC /* DBPMocks.swift in Sources */,
+				9D9AE92A2AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift in Sources */,
+				9D9AE91E2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift in Sources */,
+				9D9AE9222AAA3B450026E7DC /* UserText.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11811,7 +11871,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = "DuckDuckGoAgent copy-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSPrincipalClass = Application;
@@ -11824,7 +11883,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = "DuckDuckGoAgent copy-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSPrincipalClass = Application;
@@ -11837,7 +11895,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = "DuckDuckGoAgent copy-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSPrincipalClass = Application;
@@ -11850,7 +11907,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = "DuckDuckGoAgent copy-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSPrincipalClass = Application;
@@ -11863,7 +11919,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent copy-Info.plist";
+				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent/Info-AppStore.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSPrincipalClass = Application;
@@ -11876,7 +11932,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent copy-Info.plist";
+				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent/Info-AppStore.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSPrincipalClass = Application;
@@ -11889,7 +11945,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent copy-Info.plist";
+				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent/Info-AppStore.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSPrincipalClass = Application;
@@ -11902,7 +11958,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent copy-Info.plist";
+				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent/Info-AppStore.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSPrincipalClass = Application;
@@ -12660,6 +12716,16 @@
 		9D9AE8FA2AAA3AD90026E7DC /* DataBrokerProtection */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DataBrokerProtection;
+		};
+		9D9AE92E2AAB8A990026E7DC /* BrowserServicesKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = BrowserServicesKit;
+		};
+		9D9AE9302AAB8A9E0026E7DC /* BrowserServicesKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = BrowserServicesKit;
 		};
 		9DB6E7232AA0DC5800A17F3C /* LoginItems */ = {
 			isa = XCSwiftPackageProductDependency;
