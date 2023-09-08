@@ -24,6 +24,7 @@ import NetworkProtection
 import NetworkProtectionUI
 import NetworkExtension
 import SystemExtensions
+import LoginItems
 
 /// Utility code to help implement our debug menu options for Network Protection.
 ///
@@ -44,7 +45,7 @@ final class NetworkProtectionDebugUtilities {
 
     // MARK: - Login Items Management
 
-    private let loginItemsManager: NetworkProtectionLoginItemsManager
+    private let loginItemsManager: LoginItemsManager
 
     // MARK: - Server Selection
 
@@ -52,7 +53,7 @@ final class NetworkProtectionDebugUtilities {
 
     // MARK: - Initializers
 
-    init(loginItemsManager: NetworkProtectionLoginItemsManager = .init()) {
+    init(loginItemsManager: LoginItemsManager = .init()) {
         self.loginItemsManager = loginItemsManager
     }
 
