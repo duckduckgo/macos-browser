@@ -17,7 +17,39 @@
 //
 
 import Foundation
+import Common
 import BrowserServicesKit
+
+struct DataBrokerProtectionStageDurationCalculator {
+
+    let handler: EventMapping<DataBrokerProtectionPixels>
+
+    private let attemptId: UUID
+    private let dataBroker: String
+    private var lastStateTime: DispatchTime
+
+    init(attemptId: UUID = UUID(),
+         lastStateTime: DispatchTime = .now(),
+         dataBroker: String,
+         handler: EventMapping<DataBrokerProtectionPixels>) {
+        self.attemptId = attemptId
+        self.lastStateTime = lastStateTime
+        self.dataBroker = dataBroker
+        self.handler = handler
+    }
+
+    /// Returned in milliseconds
+    mutating func durationSinceLastStage() -> Double {
+        let now = DispatchTime.now()
+        let executionTime = now.uptimeNanoseconds - lastStateTime.uptimeNanoseconds
+        self.lastStateTime = now
+        return Double(executionTime) / 1_000_000
+    }
+
+    func fireOptOutStart() {
+        handler.fire(.optOutStart(dataBroker: dataBroker, attemptId: attemptId))
+    }
+}
 
 public enum DataBrokerProtectionPixels {
     struct Consts {
