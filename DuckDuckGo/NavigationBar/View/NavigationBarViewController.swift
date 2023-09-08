@@ -276,7 +276,6 @@ final class NavigationBarViewController: NSViewController {
         toggleNetworkProtectionPopover()
     }
 
-    @available(macOS 11.4, *)
     private func toggleNetworkProtectionPopover() {
         let featureVisibility = DefaultNetworkProtectionVisibility()
         guard featureVisibility.isNetworkProtectionVisible() else {

@@ -442,7 +442,7 @@ private struct FormFooterView: View {
             Button {
                 buttonClicked()
             } label: {
-                if #available(macOS 11.0, *), viewModel.isLoading {
+                if viewModel.isLoading {
                     ProgressView()
                         .frame(maxWidth: .infinity)
                         .frame(height: 44)
@@ -451,7 +451,6 @@ private struct FormFooterView: View {
                         .frame(maxWidth: .infinity)
                         .frame(height: 44)
                 }
-
             }
             .buttonStyle(CTAButtonStyle(style: .primary))
             .disabled(!viewModel.isProfileValid)
