@@ -60,6 +60,8 @@ enum UserAgent {
     static let `default` = UserAgent.safari
     static let webViewDefault = ""
 
+    static var userAgentForDebugging: String?
+
     static let localUserAgentConfiguration: KeyValuePairs<RegEx, String> = [
         // use safari when serving up PDFs from duckduckgo directly
         regex("https://duckduckgo\\.com/[^?]*\\.pdf"): UserAgent.safari,
@@ -76,6 +78,10 @@ enum UserAgent {
 
     static func `for`(_ url: URL?,
                       privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> String {
+        if let userAgentForDebugging {
+            return userAgentForDebugging
+        }
+
         guard let absoluteString = url?.absoluteString else {
             return Self.default
         }
