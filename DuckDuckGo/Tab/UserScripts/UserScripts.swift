@@ -88,7 +88,9 @@ final class UserScripts: UserScriptsProvider {
 
         if #available(macOS 11, *) {
             userScripts.append(contentScopeUserScriptIsolated)
-            userScripts.append(specialPages)
+            if let specialPages = specialPages {
+                userScripts.append(specialPages)
+            }
         }
     }
 
