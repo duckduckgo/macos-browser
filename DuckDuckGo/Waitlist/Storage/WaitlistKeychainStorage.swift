@@ -18,7 +18,7 @@
 
 import Foundation
 
-public class WaitlistKeychainStore: WaitlistStorage {
+final class WaitlistKeychainStore: WaitlistStorage {
 
     static let inviteCodeDidChangeNotification = Notification.Name("com.duckduckgo.app.waitlist.invite-code-changed")
 
@@ -129,7 +129,7 @@ public class WaitlistKeychainStore: WaitlistStorage {
         ]
     }
 
-    internal func keychainServiceName(for field: WaitlistKeychainField) -> String {
+    func keychainServiceName(for field: WaitlistKeychainField) -> String {
         [keychainPrefix, "waitlist", waitlistIdentifier, field.rawValue].joined(separator: ".")
     }
 

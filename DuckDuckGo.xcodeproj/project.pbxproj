@@ -1797,6 +1797,9 @@
 		4B39AAF627D9B2C700A73FD5 /* NSStackViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B39AAF527D9B2C700A73FD5 /* NSStackViewExtension.swift */; };
 		4B3B8490297A0E1000A384BD /* EmailManagerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3B848F297A0E1000A384BD /* EmailManagerExtension.swift */; };
 		4B3F641E27A8D3BD00E0C118 /* BrowserProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F641D27A8D3BD00E0C118 /* BrowserProfileTests.swift */; };
+		4B4032842AAAC24400CCA602 /* WaitlistActivationDateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4032832AAAC24400CCA602 /* WaitlistActivationDateStore.swift */; };
+		4B4032852AAAC24400CCA602 /* WaitlistActivationDateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4032832AAAC24400CCA602 /* WaitlistActivationDateStore.swift */; };
+		4B4032862AAAC24400CCA602 /* WaitlistActivationDateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4032832AAAC24400CCA602 /* WaitlistActivationDateStore.swift */; };
 		4B434690285ED7A100177407 /* BookmarksBarViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B43468F285ED7A100177407 /* BookmarksBarViewModelTests.swift */; };
 		4B43469528655D1400177407 /* FirefoxDataImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B43469428655D1400177407 /* FirefoxDataImporterTests.swift */; };
 		4B4BEC3D2A11B56B001D9AC5 /* DuckDuckGoNotificationsAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4BEC382A11B509001D9AC5 /* DuckDuckGoNotificationsAppDelegate.swift */; };
@@ -3220,6 +3223,7 @@
 		4B39AAF527D9B2C700A73FD5 /* NSStackViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStackViewExtension.swift; sourceTree = "<group>"; };
 		4B3B848F297A0E1000A384BD /* EmailManagerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailManagerExtension.swift; sourceTree = "<group>"; };
 		4B3F641D27A8D3BD00E0C118 /* BrowserProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserProfileTests.swift; sourceTree = "<group>"; };
+		4B4032832AAAC24400CCA602 /* WaitlistActivationDateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitlistActivationDateStore.swift; sourceTree = "<group>"; };
 		4B43468F285ED7A100177407 /* BookmarksBarViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarViewModelTests.swift; sourceTree = "<group>"; };
 		4B43469428655D1400177407 /* FirefoxDataImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxDataImporterTests.swift; sourceTree = "<group>"; };
 		4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNotifications.xcconfig; sourceTree = "<group>"; };
@@ -5291,6 +5295,7 @@
 			children = (
 				4B9DB00E2A983B24000927DB /* WaitlistStorage.swift */,
 				4B9DB00F2A983B24000927DB /* WaitlistKeychainStorage.swift */,
+				4B4032832AAAC24400CCA602 /* WaitlistActivationDateStore.swift */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -9186,6 +9191,7 @@
 				3192A12C2A4C4CFF0084EA89 /* EncryptionKeyStoring.swift in Sources */,
 				3192A12D2A4C4CFF0084EA89 /* String+Punycode.swift in Sources */,
 				3192A12E2A4C4CFF0084EA89 /* NSException+Catch.m in Sources */,
+				4B4032862AAAC24400CCA602 /* WaitlistActivationDateStore.swift in Sources */,
 				3192A12F2A4C4CFF0084EA89 /* AppStateRestorationManager.swift in Sources */,
 				3192A1302A4C4CFF0084EA89 /* NavigationHotkeyHandler.swift in Sources */,
 				3192A1312A4C4CFF0084EA89 /* ClickToLoadUserScript.swift in Sources */,
@@ -9736,6 +9742,7 @@
 				3706FB90293F65D500E42796 /* CookieManagedNotificationContainerView.swift in Sources */,
 				3706FB91293F65D500E42796 /* FileManagerExtension.swift in Sources */,
 				3706FB92293F65D500E42796 /* PermissionModel.swift in Sources */,
+				4B4032852AAAC24400CCA602 /* WaitlistActivationDateStore.swift in Sources */,
 				3706FB93293F65D500E42796 /* PasteboardFolder.swift in Sources */,
 				3706FB94293F65D500E42796 /* CookieManagedNotificationView.swift in Sources */,
 				4B4D60BE2A0C848A00BCD287 /* NetworkProtection+ConvenienceInitializers.swift in Sources */,
@@ -10674,6 +10681,7 @@
 				4B9DB0202A983B24000927DB /* ProductWaitlistRequest.swift in Sources */,
 				98779A0029999B64005D8EB6 /* Bookmark.xcdatamodeld in Sources */,
 				85589E9E27BFE4500038AD11 /* DefaultBrowserPromptView.swift in Sources */,
+				4B4032842AAAC24400CCA602 /* WaitlistActivationDateStore.swift in Sources */,
 				4B78A86B26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift in Sources */,
 				AA512D1424D99D9800230283 /* FaviconManager.swift in Sources */,
 				7BB108592A43375D000AB95F /* PFMoveApplication.m in Sources */,

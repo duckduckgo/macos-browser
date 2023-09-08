@@ -18,11 +18,11 @@
 
 import Foundation
 
-public enum WaitlistResponse {
+enum WaitlistResponse {
 
     // MARK: Join
 
-    public struct Join: Decodable {
+    struct Join: Decodable {
         public let token: String
         public let timestamp: Int
 
@@ -32,14 +32,14 @@ public enum WaitlistResponse {
         }
     }
 
-    public enum JoinError: Error {
+    enum JoinError: Error {
         case failed
         case noData
     }
 
     // MARK: Status
 
-    public struct Status: Decodable {
+    struct Status: Decodable {
         public let timestamp: Int
 
         public init(timestamp: Int) {
@@ -47,14 +47,14 @@ public enum WaitlistResponse {
         }
     }
 
-    public enum StatusError: Error {
+    enum StatusError: Error {
         case failed
         case noData
     }
 
     // MARK: Invite Code
 
-    public struct InviteCode: Decodable {
+    struct InviteCode: Decodable {
         public let code: String
 
         public init(code: String) {
@@ -62,17 +62,17 @@ public enum WaitlistResponse {
         }
     }
 
-    public enum InviteCodeError: Error {
+    enum InviteCodeError: Error {
         case failed
         case noData
     }
 
 }
 
-public typealias WaitlistJoinResult = Result<WaitlistResponse.Join, WaitlistResponse.JoinError>
-public typealias WaitlistJoinCompletion = (Result<WaitlistResponse.Join, WaitlistResponse.JoinError>) -> Void
+typealias WaitlistJoinResult = Result<WaitlistResponse.Join, WaitlistResponse.JoinError>
+typealias WaitlistJoinCompletion = (Result<WaitlistResponse.Join, WaitlistResponse.JoinError>) -> Void
 
-public protocol WaitlistRequest {
+protocol WaitlistRequest {
 
     func joinWaitlist(completionHandler: @escaping WaitlistJoinCompletion)
     func joinWaitlist() async -> WaitlistJoinResult

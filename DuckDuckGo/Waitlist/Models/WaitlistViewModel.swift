@@ -27,7 +27,7 @@ protocol WaitlistViewModelDelegate: AnyObject {
     func viewHeightChanged(newHeight: CGFloat)
 }
 
-public final class WaitlistViewModel: ObservableObject {
+final class WaitlistViewModel: ObservableObject {
 
     enum ViewState: Equatable {
         case notOnWaitlist

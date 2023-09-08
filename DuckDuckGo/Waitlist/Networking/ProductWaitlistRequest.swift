@@ -18,19 +18,19 @@
 
 import Foundation
 
-public typealias ProductWaitlistMakeHTTPRequest = (URL, _ method: String, _ body: Data?, @escaping ProductWaitlistHTTPRequestCompletion) -> Void
-public typealias ProductWaitlistHTTPRequestCompletion = (Data?, Error?) -> Void
+typealias ProductWaitlistMakeHTTPRequest = (URL, _ method: String, _ body: Data?, @escaping ProductWaitlistHTTPRequestCompletion) -> Void
+typealias ProductWaitlistHTTPRequestCompletion = (Data?, Error?) -> Void
 
-public class ProductWaitlistRequest: WaitlistRequest {
+final class ProductWaitlistRequest: WaitlistRequest {
 
-    public init(productName: String, makeHTTPRequest: @escaping ProductWaitlistMakeHTTPRequest) {
+    init(productName: String, makeHTTPRequest: @escaping ProductWaitlistMakeHTTPRequest) {
         self.productName = productName
         self.makeHTTPRequest = makeHTTPRequest
     }
 
     // MARK: - WaitlistRequesting
 
-    public func joinWaitlist(completionHandler: @escaping (Result<WaitlistResponse.Join, WaitlistResponse.JoinError>) -> Void) {
+    func joinWaitlist(completionHandler: @escaping (Result<WaitlistResponse.Join, WaitlistResponse.JoinError>) -> Void) {
         let url = endpoint.appendingPathComponent(productName).appendingPathComponent("join")
 
         makeHTTPRequest(url, "POST", nil) { data, error in
@@ -58,7 +58,7 @@ public class ProductWaitlistRequest: WaitlistRequest {
         }
     }
 
-    public func joinWaitlist() async -> WaitlistJoinResult {
+    func joinWaitlist() async -> WaitlistJoinResult {
         await withCheckedContinuation { continuation in
             joinWaitlist { result in
                 continuation.resume(returning: result)
@@ -66,7 +66,7 @@ public class ProductWaitlistRequest: WaitlistRequest {
         }
     }
 
-    public func getWaitlistStatus(completionHandler: @escaping (Result<WaitlistResponse.Status, WaitlistResponse.StatusError>) -> Void) {
+    func getWaitlistStatus(completionHandler: @escaping (Result<WaitlistResponse.Status, WaitlistResponse.StatusError>) -> Void) {
         let url = endpoint.appendingPathComponent(productName).appendingPathComponent("status")
 
         makeHTTPRequest(url, "GET", nil) { data, error in
@@ -93,7 +93,7 @@ public class ProductWaitlistRequest: WaitlistRequest {
         }
     }
 
-    public func getInviteCode(token: String, completionHandler: @escaping (Result<WaitlistResponse.InviteCode, WaitlistResponse.InviteCodeError>) -> Void) {
+    func getInviteCode(token: String, completionHandler: @escaping (Result<WaitlistResponse.InviteCode, WaitlistResponse.InviteCodeError>) -> Void) {
         let url = endpoint.appendingPathComponent(productName).appendingPathComponent("code")
 
         var components = URLComponents()
