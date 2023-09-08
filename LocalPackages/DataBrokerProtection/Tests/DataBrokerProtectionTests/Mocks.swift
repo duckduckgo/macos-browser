@@ -226,7 +226,7 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
     var wasSubmitCaptchaToBeResolvedCalled = false
     var shouldThrow = false
 
-    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse, retries: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId{
+    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse, retries: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId {
         if shouldThrow {
             throw CaptchaServiceError.errorWhenSubmittingCaptcha
         }
