@@ -62,19 +62,14 @@ final class OnboardingViewModel: ObservableObject {
     @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
     private(set) var onboardingFinished: Bool
 
-    private let statisticsLoader: StatisticsLoader?
-
     weak var delegate: OnboardingDelegate?
 
     init(
-        delegate: OnboardingDelegate? = nil,
-        statisticsLoader: StatisticsLoader? = (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)) {
+        delegate: OnboardingDelegate? = nil) {
         self.delegate = delegate
-        self.statisticsLoader = statisticsLoader
         self.state = onboardingFinished ? .startBrowsing : .startFlow
 
             NotificationCenter.default.addObserver(self, selector: #selector(onboardingPageLeft(_:)), name: .onboardingPageLeft, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(addressEnterPressed(_:)), name: .addressBarEnterPressed, object: nil)
     }
 
     func onSplashFinished() {
@@ -86,7 +81,6 @@ final class OnboardingViewModel: ObservableObject {
             finishOnboarding()
             delegate?.goToNewTabPage()
         } else {
-            statisticsLoader?.load()
             state = .importData
         }
     }
@@ -137,14 +131,8 @@ final class OnboardingViewModel: ObservableObject {
         finishOnboarding()
     }
 
-    @objc private func addressEnterPressed(_ notification: Notification) {
-        finishOnboarding()
-        delegate?.goToNewTabPage()
-    }
-
     private func finishOnboarding() {
         onboardingFinished = true
-        statisticsLoader?.load()
     }
 
 }

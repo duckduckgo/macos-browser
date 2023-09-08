@@ -183,6 +183,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             // MARK: perform first time launch logic here
         }
 
+        let statisticsLoader = (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)
+        statisticsLoader?.load()
+
         startupSync()
 
         stateRestorationManager.applicationDidFinishLaunching()
