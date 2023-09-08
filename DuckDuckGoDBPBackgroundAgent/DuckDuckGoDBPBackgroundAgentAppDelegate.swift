@@ -54,6 +54,6 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
         //os_log("DuckDuckGoAgent started", log: .networkProtectionLoginItemLog, type: .info)
 
         let manager = DataBrokerProtectionBackgroundManager.shared
-        manager.startSchedulerIfPossible()
+        manager.runOperationsAndStartSchedulerIfPossible()
     }
 }

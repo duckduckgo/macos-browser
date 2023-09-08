@@ -70,16 +70,17 @@ public final class DataBrokerProtectionBackgroundManager {
         redeemUseCase.shouldAskForInviteCode()
     }
 
-    public func startSchedulerIfPossible() {
+    public func runOperationsAndStartSchedulerIfPossible() {
         //TODO deal with authenticating later
         //Do we even need to in the agent? Might be worth a TD or asana task
         //guard !redeemUseCase.shouldAskForInviteCode() else { return }
 
-        // If there's no saved profileQueryData we don't need to start the scheduler
-        // We should probably use a faster query for this, i.e: instead of returning data just check the count in the db
+        // If there's no saved profile we don't need to start the scheduler
         // TODO actually reading data
-        //if !dataManager.fetchBrokerProfileQueryData().isEmpty {
-            scheduler.start(showWebView: false)
+        //if dataManager.fetchProfile() != nil {
+            scheduler.runQueuedOperations(showWebView: false) { [weak self] in
+                self?.scheduler.startScheduler()
+            }
         //}
     }
 }
