@@ -100,7 +100,8 @@ final class EmailServiceTests: XCTestCase {
             _ = try await sut.getConfirmationLink(
                 from: "some@email.com",
                 numberOfRetries: 2,
-                pollingIntervalInSeconds: 2
+                pollingIntervalInSeconds: 2,
+                shouldRunNextStep: { true }
             )
         } catch {
             if let error = error as? EmailError, case .unknownStatusReceived = error {
@@ -125,7 +126,8 @@ final class EmailServiceTests: XCTestCase {
             _ = try await sut.getConfirmationLink(
                 from: "some@email.com",
                 numberOfRetries: 2,
-                pollingIntervalInSeconds: 2
+                pollingIntervalInSeconds: 2,
+                shouldRunNextStep: { true }
             )
         } catch {
             if let error = error as? EmailError, case .linkExtractionTimedOut = error {
@@ -153,7 +155,8 @@ final class EmailServiceTests: XCTestCase {
             let url = try await sut.getConfirmationLink(
                 from: "some@email.com",
                 numberOfRetries: 2,
-                pollingIntervalInSeconds: 2
+                pollingIntervalInSeconds: 2,
+                shouldRunNextStep: { true }
             )
             XCTAssertEqual(url.absoluteString, "www.duckduckgo.com")
         } catch {
@@ -172,7 +175,8 @@ final class EmailServiceTests: XCTestCase {
             _ = try await sut.getConfirmationLink(
                 from: "some@email.com",
                 numberOfRetries: 2,
-                pollingIntervalInSeconds: 2
+                pollingIntervalInSeconds: 2,
+                shouldRunNextStep: { true }
             )
         } catch {
             if let error = error as? EmailError, case .cantFindEmail = error {
@@ -194,7 +198,8 @@ final class EmailServiceTests: XCTestCase {
             _ = try await sut.getConfirmationLink(
                 from: "some@email.com",
                 numberOfRetries: 1,
-                pollingIntervalInSeconds: 1
+                pollingIntervalInSeconds: 1,
+                shouldRunNextStep: { true }
             )
         } catch {
             if let error = error as? EmailError, case .invalidEmailLink = error {
@@ -216,7 +221,8 @@ final class EmailServiceTests: XCTestCase {
             let url = try await sut.getConfirmationLink(
                 from: "some@email.com",
                 numberOfRetries: 1,
-                pollingIntervalInSeconds: 1
+                pollingIntervalInSeconds: 1,
+                shouldRunNextStep: { true }
             )
             XCTAssertEqual(url.absoluteString, "www.duckduckgo.com")
         } catch {
