@@ -319,7 +319,6 @@ extension Pixel {
             // Process Pixels
             case optOutSuccess
             case optOutFailure
-            case optOutCancel // -> This is not possible
 #endif
         }
 
@@ -721,7 +720,6 @@ extension Pixel.Event.Debug {
         // Process Pixels
         case .optOutSuccess: return "dbp.macos.optout.process.success"
         case .optOutFailure: return "dbp.macos.optout.process.failure"
-        case .optOutCancel: return "dbp.macos.optout.process.cancel" // -> This is not possible
 #endif
         }
     }
