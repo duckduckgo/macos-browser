@@ -83,8 +83,12 @@ final class UserScripts: UserScriptsProvider {
         if let youtubePlayerUserScript = youtubePlayerUserScript {
             if let specialPages = specialPages {
                 specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
-                userScripts.append(specialPages)
             }
+        }
+
+        if #available(macOS 11, *) {
+            userScripts.append(contentScopeUserScriptIsolated)
+            userScripts.append(specialPages)
         }
     }
 
@@ -99,7 +103,6 @@ final class UserScripts: UserScriptsProvider {
         hoverUserScript,
         clickToLoadScript,
         contentScopeUserScript,
-        contentScopeUserScriptIsolated,
         autofillScript
     ]
 
