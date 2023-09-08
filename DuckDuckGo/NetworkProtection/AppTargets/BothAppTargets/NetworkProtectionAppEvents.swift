@@ -27,6 +27,12 @@ import NetworkProtection
 @available(macOS 11.4, *)
 final class NetworkProtectionAppEvents {
 
+    private let featureVisibility: NetworkProtectionFeatureVisibility
+
+    init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility()) {
+        self.featureVisibility = featureVisibility
+    }
+
     /// Call this method when the app finishes launching, to run the startup logic for NetP.
     ///
     func applicationDidFinishLaunching() {
@@ -35,14 +41,22 @@ final class NetworkProtectionAppEvents {
         let loginItemsManager = NetworkProtectionLoginItemsManager()
         let keychainStore = NetworkProtectionKeychainTokenStore()
 
-        guard keychainStore.isFeatureActivated else {
-            loginItemsManager.disableLoginItems()
-            LocalPinningManager.shared.unpin(.networkProtection)
+        guard featureVisibility.isNetworkProtectionVisible() else {
+            featureVisibility.disableForAllUsers()
             return
         }
 
         restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
         refreshNetworkProtectionServers()
+    }
+
+    /// Call this method when the app becomes active to run the associated NetP logic.
+    ///
+    func applicationDidBecomeActive() {
+        guard featureVisibility.isNetworkProtectionVisible() else {
+            featureVisibility.disableForAllUsers()
+            return
+        }
     }
 
     /// If necessary, this method migrates the auth token from an unspecified data protection keychain (our previous

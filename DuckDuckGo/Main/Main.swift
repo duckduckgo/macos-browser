@@ -65,6 +65,10 @@ final class AppMain {
         }
 #endif
 
+#if !APPSTORE && !DEBUG && !DBP
+        PFMoveToApplicationsFolderIfNecessary()
+#endif
+
         _ = NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)
     }
 
