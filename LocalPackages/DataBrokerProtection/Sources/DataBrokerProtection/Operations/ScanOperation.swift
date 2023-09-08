@@ -36,13 +36,15 @@ final class ScanOperation: DataBrokerOperation {
     var continuation: CheckedContinuation<[ExtractedProfile], Error>?
     var extractedProfile: ExtractedProfile?
     private let operationAwaitTime: TimeInterval
+    let shouldRunNextStep: () -> Bool
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
          query: BrokerProfileQueryData,
          emailService: EmailServiceProtocol = EmailService(),
          captchaService: CaptchaServiceProtocol = CaptchaService(),
-         operationAwaitTime: TimeInterval = 1
+         operationAwaitTime: TimeInterval = 1,
+         shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
         self.prefs = prefs
@@ -50,6 +52,7 @@ final class ScanOperation: DataBrokerOperation {
         self.emailService = emailService
         self.captchaService = captchaService
         self.operationAwaitTime = operationAwaitTime
+        self.shouldRunNextStep = shouldRunNextStep
     }
 
     func run(inputValue: Void,
@@ -68,7 +71,11 @@ final class ScanOperation: DataBrokerOperation {
                     } else {
                         self.actionsHandler = ActionsHandler(step: scanStep)
                     }
-                    await executeNextStep()
+                    if self.shouldRunNextStep() {
+                        await executeNextStep()
+                    } else {
+                        failed(with: DataBrokerProtectionError.cancelled)
+                    }
                 } catch {
                     failed(with: DataBrokerProtectionError.unknown(error.localizedDescription))
                 }

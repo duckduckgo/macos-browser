@@ -48,8 +48,9 @@ struct CreateProfileView: View {
                     .padding()
 
                 FormFooterView(viewModel: viewModel, buttonClicked: {
-                    viewModel.saveProfile()
-                    scanButtonClicked()
+                    viewModel.saveProfile {
+                        scanButtonClicked()
+                    }
                 })
                 .padding()
                 .padding(.horizontal, Consts.OuterForm.horizontalPadding)
@@ -424,34 +425,40 @@ private struct FormHeaderView: View {
                 .font(.title)
                 .bold()
 
-            Text("The following information is required for Data Broker Protection. We’ll scan Data Broker sites for matching info and have it removed.")
-                .multilineTextAlignment(.center)
-                .font(.body)
-                .foregroundColor(.secondary)
+            VStack (spacing: 16) {
+                Text("The following information is required for Data Broker Protection. We’ll scan Data Broker sites for matching info and have it removed.")
+
+                Text("The information you've entered stays on your device, it does not go through DuckDuckGo's servers.")
+            }
+            .multilineTextAlignment(.center)
+            .font(.body)
+            .foregroundColor(.secondary)
         }
     }
 }
 
 private struct FormFooterView: View {
     @ObservedObject var viewModel: ProfileViewModel
+
     let buttonClicked: () -> Void
     var body: some View {
         VStack(spacing: 16) {
             Button {
                 buttonClicked()
             } label: {
-                Text("Scan")
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 44)
+                if #available(macOS 11.0, *), viewModel.isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 44)
+                } else {
+                    Text("Scan")
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 44)
+                }
+
             }
             .buttonStyle(CTAButtonStyle(style: .primary))
             .disabled(!viewModel.isProfileValid)
-
-            Text("The information you've entered stays on your device, it does not go through DuckDuckGo's servers.")
-                .multilineTextAlignment(.center)
-                .font(.body)
-                .foregroundColor(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }

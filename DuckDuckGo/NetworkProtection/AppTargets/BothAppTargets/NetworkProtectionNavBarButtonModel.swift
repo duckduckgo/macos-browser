@@ -31,6 +31,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     private let networkProtectionStatusReporter: NetworkProtectionStatusReporter
     private var status: NetworkProtection.ConnectionStatus = .disconnected
     private let popovers: NavigationBarPopovers
+    private let waitlistActivationDateStore: WaitlistActivationDateStore
 
     // MARK: - Subscriptions
 
@@ -92,6 +93,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         isHavingConnectivityIssues = networkProtectionStatusReporter.connectivityIssuesObserver.recentValue
         buttonImage = .image(for: iconPublisher.icon)
 
+        self.waitlistActivationDateStore = WaitlistActivationDateStore()
         super.init()
 
         setupSubscriptions()
@@ -103,18 +105,40 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         setupIconSubscription()
         setupStatusSubscription()
         setupInterruptionSubscription()
+        setupWaitlistAvailabilitySubscription()
     }
 
     private func setupIconSubscription() {
         iconPublisherCancellable = iconPublisher.$icon.sink { [weak self] icon in
-            self?.buttonImage = .image(for: icon)
+            self?.buttonImage = self?.buttonImageFromWaitlistState(icon: icon)
         }
+    }
+
+    /// Temporary override used for the NetP waitlist beta, as a different asset is used for users who are invited to join the beta but haven't yet accepted.
+    /// This will be removed once the waitlist beta has ended.
+    private func buttonImageFromWaitlistState(icon: NetworkProtectionAsset?) -> NSImage {
+        let icon = icon ?? iconPublisher.icon
+
+        if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
+            return NSImage(named: "NetworkProtectionAvailableButton")!
+        }
+
+        if NetworkProtectionKeychainTokenStore().isFeatureActivated {
+            return .image(for: icon)!
+        }
+
+        return .image(for: icon)!
     }
 
     private func setupStatusSubscription() {
         statusChangeCancellable = networkProtectionStatusReporter.statusObserver.publisher.sink { [weak self] status in
             guard let self = self else {
                 return
+            }
+
+            switch status {
+            case .connected: waitlistActivationDateStore.setActivationDateIfNecessary()
+            default: break
             }
 
             Task { @MainActor in
@@ -137,8 +161,27 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         }
     }
 
+    private func setupWaitlistAvailabilitySubscription() {
+        NotificationCenter.default.addObserver(forName: .networkProtectionWaitlistAccessChanged, object: nil, queue: .main) { _ in
+            Task { @MainActor in
+                self.buttonImage = self.buttonImageFromWaitlistState(icon: nil)
+                self.updateVisibility()
+            }
+        }
+    }
+
     @MainActor
     private func updateVisibility() {
+        // The button is visible in the case where NetP has not been activated, but the user has been invited and they haven't accepted T&Cs.
+        let networkProtectionVisibility = DefaultNetworkProtectionVisibility()
+        if networkProtectionVisibility.isNetworkProtectionVisible(), NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
+            DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointToolbarButtonDisplayed,
+                            frequency: .dailyOnly,
+                            includeAppVersionParameter: true)
+            showButton = true
+            return
+        }
+
         guard !isPinned,
               !popovers.isNetworkProtectionPopoverShown else {
             showButton = true
@@ -173,7 +216,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
             return
         }
 
-        pinningManager.togglePinning(for: .networkProtection)
+        pinningManager.pin(.networkProtection)
     }
 }
 
