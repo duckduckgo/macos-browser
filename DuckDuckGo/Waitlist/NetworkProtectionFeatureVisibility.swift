@@ -56,7 +56,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     ///
     /// Once the waitlist beta has ended, we can trigger a remote change that removes the user's auth token and turn off the waitlist flag, hiding Network Protection from the user.
     func isNetworkProtectionVisible() -> Bool {
-        isEasterEggUser || isEnabledWaitlistUser
+        isEasterEggUser || waitlistIsOngoing
     }
 
     /// Easter egg users can be identified by them being internal users and having an auth token (NetP being activated).
@@ -73,9 +73,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// Waitlist users are users that have the waitlist enabled and active
     ///
     private var isWaitlistUser: Bool {
-        // In this PR we don't know this, so we're defaulting to false.  This will be
-        // addressed when this is merged back onto the main waitlist PR
-        false
+        NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
     }
 
     private var waitlistIsOngoing: Bool {

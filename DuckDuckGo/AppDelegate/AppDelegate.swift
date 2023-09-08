@@ -27,6 +27,7 @@ import Bookmarks
 import DDGSync
 import ServiceManagement
 import SyncDataProviders
+import UserNotifications
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -213,6 +214,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             /// way.
             NetworkProtectionAppEvents().applicationDidFinishLaunching()
         }
+
+        UNUserNotificationCenter.current().delegate = self
 #endif
 
 #if DBP
@@ -225,6 +228,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         syncService?.scheduler.notifyAppLifecycleEvent()
 
 #if NETWORK_PROTECTION
+        NetworkProtectionWaitlist().fetchNetworkProtectionInviteCodeIfAvailable { _ in
+            // Do nothing when code fetching fails, as the app will try again later
+        }
+
         if #available(macOS 11.4, *) {
             /// Once we drop support for macOS versions below 11.4, we can turn `NetworkProtectionAppEvents`
             /// into a property.  Right now it's easier to avoid it since we can't place macOS version conditions on properties.
@@ -360,3 +367,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
 }
+
+#if NETWORK_PROTECTION
+
+extension AppDelegate: UNUserNotificationCenterDelegate {
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler(.alert)
+    }
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+        if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
+            if response.notification.request.identifier == NetworkProtectionWaitlist.notificationIdentifier {
+                if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
+                    DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
+                    WaitlistModalViewController.show()
+                }
+            }
+        }
+
+        completionHandler()
+    }
+
+}
+
+#endif
