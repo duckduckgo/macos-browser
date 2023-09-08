@@ -115,9 +115,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .scanStarted)
             database.add(event)
 
-            let extractedProfiles = try await runner.scan(brokerProfileQueryData,
-                                                          showWebView: showWebView,
-                                                          shouldRunNextStep: shouldRunNextStep)
+          let extractedProfiles = try await runner.scan(brokerProfileQueryData,
+                                                        showWebView: showWebView,
+                                                        shouldRunNextStep: shouldRunNextStep)
+
 
             os_log("Extracted profiles: %@", log: .dataBrokerProtection, extractedProfiles)
 
@@ -153,27 +154,29 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         try database.saveOptOutOperation(optOut: optOutOperationData, extractedProfile: extractedProfile)
                     }
                 }
-
-                // Check for removed profiles
-                let removedProfiles = brokerProfileQueryData.extractedProfiles.filter { savedProfile in
-                    !extractedProfiles.contains { recentlyFoundProfile in
-                        recentlyFoundProfile.profileUrl == savedProfile.profileUrl
-                    }
-                }
-
-                for removedProfile in removedProfiles {
-                    if let extractedProfileId = removedProfile.id {
-                        let event = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutConfirmed)
-                        database.add(event)
-                        database.updateRemovedDate(Date(), on: extractedProfileId)
-                        database.updatePreferredRunDate(nil, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
-                        os_log("Profile removed from optOutsData: %@", log: .dataBrokerProtection, String(describing: removedProfile))
-                    }
-                }
             } else {
                 let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .noMatchFound)
                 database.add(event)
             }
+
+            // Check for removed profiles
+            let removedProfiles = brokerProfileQueryData.extractedProfiles.filter { savedProfile in
+                !extractedProfiles.contains { recentlyFoundProfile in
+                    recentlyFoundProfile.profileUrl == savedProfile.profileUrl
+                }
+            }
+
+            for removedProfile in removedProfiles {
+                if let extractedProfileId = removedProfile.id {
+                    print("ID \(extractedProfileId)")
+                    let event = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutConfirmed)
+                    database.add(event)
+                    database.updateRemovedDate(Date(), on: extractedProfileId)
+                    database.updatePreferredRunDate(Date(), brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+                    os_log("Profile removed from optOutsData: %@", log: .dataBrokerProtection, String(describing: removedProfile))
+                }
+            }
+
         } catch {
             handleOperationError(brokerId: brokerId,
                                  profileQueryId: profileQueryId,
