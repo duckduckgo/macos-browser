@@ -375,11 +375,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        if #available(macOS 11.0, *) {
-            completionHandler(.banner)
-        } else {
-            completionHandler(.alert)
-        }
+        completionHandler(.alert)
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter,
