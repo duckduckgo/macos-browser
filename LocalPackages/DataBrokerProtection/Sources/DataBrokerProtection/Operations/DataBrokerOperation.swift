@@ -165,7 +165,7 @@ extension DataBrokerOperation {
 
     func captchaInformation(captchaInfo: GetCaptchaInfoResponse) async {
         do {
-            // TODO: Here we generate the captcha parse pixel
+            stageCalculator?.fireOptOutCaptchaParse()
             actionsHandler?.captchaTransactionId = try await captchaService.submitCaptchaInformation(captchaInfo,
                                                                                                      shouldRunNextStep: shouldRunNextStep)
             // TODO: Here we generate the captcha send pixel

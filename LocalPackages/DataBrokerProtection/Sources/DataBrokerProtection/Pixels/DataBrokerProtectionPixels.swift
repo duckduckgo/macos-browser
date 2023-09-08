@@ -53,6 +53,10 @@ class DataBrokerProtectionStageDurationCalculator {
     func fireOptOutEmailGenerate() {
         handler.fire(.optOutEmailGenerate(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
     }
+
+    func fireOptOutCaptchaParse() {
+        handler.fire(.optOutCaptchaParse(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
+    }
 }
 
 public enum DataBrokerProtectionPixels {
