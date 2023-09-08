@@ -43,7 +43,13 @@ struct NetworkProtectionTermsAndConditionsView: View {
 
                         Group {
                             Text(UserText.networkProtectionPrivacyPolicySection1Title).titleStyle()
-                            Text(UserText.networkProtectionPrivacyPolicySection1List).bodyStyle()
+
+                            if #available(macOS 12.0, *) {
+                                Text(LocalizedStringKey(UserText.networkProtectionPrivacyPolicySection1ListMarkdown)).bodyStyle()
+                            } else {
+                                Text(UserText.networkProtectionPrivacyPolicySection1ListNonMarkdown).bodyStyle()
+                            }
+
                             Text(UserText.networkProtectionPrivacyPolicySection2Title).titleStyle()
                             Text(UserText.networkProtectionPrivacyPolicySection2List).bodyStyle()
                             Text(UserText.networkProtectionPrivacyPolicySection3Title).titleStyle()
@@ -64,7 +70,13 @@ struct NetworkProtectionTermsAndConditionsView: View {
                             Text(UserText.networkProtectionTermsOfServiceSection1Title).titleStyle(topPadding: 0)
                             Text(UserText.networkProtectionTermsOfServiceSection1List).bodyStyle()
                             Text(UserText.networkProtectionTermsOfServiceSection2Title).titleStyle()
-                            Text(UserText.networkProtectionTermsOfServiceSection2List).bodyStyle()
+
+                            if #available(macOS 12.0, *) {
+                                Text(LocalizedStringKey(UserText.networkProtectionTermsOfServiceSection2ListMarkdown)).bodyStyle()
+                            } else {
+                                Text(UserText.networkProtectionTermsOfServiceSection2ListNonMarkdown).bodyStyle()
+                            }
+
                             Text(UserText.networkProtectionTermsOfServiceSection3Title).titleStyle()
                             Text(UserText.networkProtectionTermsOfServiceSection3List).bodyStyle()
                             Text(UserText.networkProtectionTermsOfServiceSection4Title).titleStyle()
