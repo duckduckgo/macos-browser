@@ -20,17 +20,17 @@ import Foundation
 import Common
 import BrowserServicesKit
 
-class DataBrokerProtectionStageDurationCalculator {
+final class DataBrokerProtectionStageDurationCalculator {
 
     let handler: EventMapping<DataBrokerProtectionPixels>
 
     private let attemptId: UUID
     private let dataBroker: String
-    private let startTime: DispatchTime
-    private var lastStateTime: DispatchTime
+    private let startTime: Date
+    private var lastStateTime: Date
 
     init(attemptId: UUID = UUID(),
-         startTime: DispatchTime = .now(),
+         startTime: Date = Date(),
          dataBroker: String,
          handler: EventMapping<DataBrokerProtectionPixels>) {
         self.attemptId = attemptId
@@ -42,17 +42,17 @@ class DataBrokerProtectionStageDurationCalculator {
 
     /// Returned in milliseconds
     func durationSinceLastStage() -> Double {
-        let now = DispatchTime.now()
-        let executionTime = now.uptimeNanoseconds - lastStateTime.uptimeNanoseconds
+        let now = Date()
+        let durationSinceLastStage = now.timeIntervalSince(lastStateTime) * 1000
         self.lastStateTime = now
-        return Double(executionTime) / 1_000_000
+
+        return durationSinceLastStage
     }
 
     /// Returned in milliseconds
     func durationSinceStartTime() -> Double {
-        let now = DispatchTime.now()
-        let executionTime = now.uptimeNanoseconds - startTime.uptimeNanoseconds
-        return Double(executionTime) / 1_000_000
+        let now = Date()
+        return now.timeIntervalSince(startTime) * 1000
     }
 
     func fireOptOutStart() {
