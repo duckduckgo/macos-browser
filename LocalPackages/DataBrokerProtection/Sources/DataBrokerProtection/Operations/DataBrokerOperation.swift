@@ -37,7 +37,7 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     var continuation: CheckedContinuation<ReturnValue, Error>? { get set }
     var extractedProfile: ExtractedProfile? { get set }
 
-    var shouldRunNextStep: () -> Bool { get set}
+    let shouldRunNextStep: () -> Bool { get }
 
     func run(inputValue: InputValue,
              webViewHandler: WebViewHandler?,
