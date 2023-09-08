@@ -349,7 +349,7 @@ final class AddressBarTextField: NSTextField {
             finalUrl = url
             userEnteredValue = url.absoluteString
         case .phrase(phrase: let phrase),
-                .unknown(value: let phrase):
+             .unknown(value: let phrase):
             finalUrl = URL.makeSearchUrl(from: phrase)
             userEnteredValue = phrase
         case .none:
