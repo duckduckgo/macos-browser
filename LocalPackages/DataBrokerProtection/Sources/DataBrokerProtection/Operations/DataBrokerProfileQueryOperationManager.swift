@@ -115,7 +115,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .scanStarted)
             database.add(event)
 
-          let extractedProfiles = try await runner.scan(brokerProfileQueryData,
+            let extractedProfiles = try await runner.scan(brokerProfileQueryData,
                                                         showWebView: showWebView,
                                                         shouldRunNextStep: shouldRunNextStep)
 
