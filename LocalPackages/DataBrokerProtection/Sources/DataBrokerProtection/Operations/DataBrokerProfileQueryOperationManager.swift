@@ -27,14 +27,14 @@ protocol OperationsManager {
 
     // We want to refactor this to return a NSOperation in the future
     // so we have more control of stopping/starting the queue
-    // for the time being, shouldRunNextStep:@escaping () -> Bool is being used
+    // for the time being, shouldRunNextStep: @escaping () -> Bool is being used
     func runOperation(operationData: BrokerOperationData,
                       brokerProfileQueryData: BrokerProfileQueryData,
                       database: DataBrokerProtectionRepository,
                       notificationCenter: NotificationCenter,
                       runner: WebOperationRunner,
                       showWebView: Bool,
-                      shouldRunNextStep:@escaping () -> Bool) async throws
+                      shouldRunNextStep: @escaping () -> Bool) async throws
 }
 
 extension OperationsManager {
@@ -43,7 +43,7 @@ extension OperationsManager {
                       database: DataBrokerProtectionRepository,
                       notificationCenter: NotificationCenter,
                       runner: WebOperationRunner,
-                      shouldRunNextStep:@escaping () -> Bool) async throws {
+                      shouldRunNextStep: @escaping () -> Bool) async throws {
 
         try await runOperation(operationData: operationData,
                                brokerProfileQueryData: brokerProfileQueryData,
@@ -63,7 +63,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                notificationCenter: NotificationCenter = NotificationCenter.default,
                                runner: WebOperationRunner,
                                showWebView: Bool = false,
-                               shouldRunNextStep:@escaping () -> Bool) async throws {
+                               shouldRunNextStep: @escaping () -> Bool) async throws {
 
         if operationData as? ScanOperationData != nil {
             try await runScanOperation(on: runner,
@@ -90,7 +90,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                    database: DataBrokerProtectionRepository,
                                    notificationCenter: NotificationCenter,
                                    showWebView: Bool = false,
-                                   shouldRunNextStep:@escaping () -> Bool) async throws {
+                                   shouldRunNextStep: @escaping () -> Bool) async throws {
         os_log("Running scan operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 
         guard let brokerId = brokerProfileQueryData.dataBroker.id, let profileQueryId = brokerProfileQueryData.profileQuery.id else {
@@ -190,7 +190,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                      database: DataBrokerProtectionRepository,
                                      notificationCenter: NotificationCenter,
                                      showWebView: Bool = false,
-                                     shouldRunNextStep:@escaping () -> Bool) async throws {
+                                     shouldRunNextStep: @escaping () -> Bool) async throws {
         guard let brokerId = brokerProfileQueryData.dataBroker.id, let profileQueryId = brokerProfileQueryData.profileQuery.id, let extractedProfileId = extractedProfile.id else {
             // Maybe send pixel?
             throw OperationsError.idsMissingForBrokerOrProfileQuery

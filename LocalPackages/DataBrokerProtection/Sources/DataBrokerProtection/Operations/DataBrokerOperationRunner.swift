@@ -24,18 +24,18 @@ protocol WebOperationRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData,
               showWebView: Bool,
-              shouldRunNextStep:@escaping () -> Bool) async throws -> [ExtractedProfile]
+              shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile]
 
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
                 showWebView: Bool,
-                shouldRunNextStep:@escaping () -> Bool) async throws
+                shouldRunNextStep: @escaping () -> Bool) async throws
 }
 
 extension WebOperationRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData,
-              shouldRunNextStep:@escaping () -> Bool) async throws -> [ExtractedProfile] {
+              shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
 
         try await scan(profileQuery,
                        showWebView: false,
@@ -44,7 +44,7 @@ extension WebOperationRunner {
 
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
-                shouldRunNextStep:@escaping () -> Bool) async throws {
+                shouldRunNextStep: @escaping () -> Bool) async throws {
 
         try await optOut(profileQuery: profileQuery,
                          extractedProfile: extractedProfile,
@@ -72,7 +72,7 @@ final class DataBrokerOperationRunner: WebOperationRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData,
               showWebView: Bool,
-              shouldRunNextStep:@escaping () -> Bool) async throws -> [ExtractedProfile] {
+              shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
 
         let scan = ScanOperation(
             privacyConfig: privacyConfigManager,
@@ -89,7 +89,7 @@ final class DataBrokerOperationRunner: WebOperationRunner {
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
                 showWebView: Bool,
-                shouldRunNextStep:@escaping () -> Bool) async throws {
+                shouldRunNextStep: @escaping () -> Bool) async throws {
 
         let optOut = OptOutOperation(
             privacyConfig: privacyConfigManager,

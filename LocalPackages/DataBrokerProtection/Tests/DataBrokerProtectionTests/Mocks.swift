@@ -236,7 +236,7 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
         return "transactionID"
     }
 
-    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId, retries: Int, pollingInterval: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData{
+    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId, retries: Int, pollingInterval: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
         if shouldThrow {
             throw CaptchaServiceError.errorWhenFetchingCaptchaResult
         }

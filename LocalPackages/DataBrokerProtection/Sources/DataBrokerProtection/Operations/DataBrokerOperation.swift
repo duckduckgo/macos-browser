@@ -51,7 +51,7 @@ extension DataBrokerOperation {
     func run(inputValue: InputValue,
              webViewHandler: WebViewHandler?,
              actionsHandler: ActionsHandler?,
-             shouldRunNextStep:@escaping () -> Bool) async throws -> ReturnValue {
+             shouldRunNextStep: @escaping () -> Bool) async throws -> ReturnValue {
 
         try await run(inputValue: inputValue,
                       webViewHandler: webViewHandler,
