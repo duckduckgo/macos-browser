@@ -347,33 +347,36 @@ extension HomePage.Models {
         private var shouldNetworkProtectionBetaEndedNoticeBeVisible: Bool {
 #if NETWORK_PROTECTION
             // 1. The user has signed up for the waitlist AND used Network Protection at least once:
-            
+
             let waitlistStorage = NetworkProtectionWaitlist().waitlistStorage
             let isWaitlistUser = waitlistStorage.isWaitlistUser && waitlistStorage.isInvited
-            
+
             guard isWaitlistUser else {
                 return false
             }
-            
-            // TODO: Check waitlist sign up timestamp is present
-            
+
+            let activationStore = WaitlistActivationDateStore()
+            guard activationStore.daysSinceActivation() != nil else {
+                return false
+            }
+
             // 2. The `waitlistBetaActive` flag has been set to disabled
-            
+
             let featureOverrides = DefaultWaitlistBetaOverrides()
             let waitlistFlagEnabled: Bool
-            
+
             switch featureOverrides.waitlistActive {
             case .useRemoteValue: waitlistFlagEnabled = privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlistBetaActive)
             case .on: waitlistFlagEnabled = true
             case .off: waitlistFlagEnabled = false
             }
-            
+
             guard !waitlistFlagEnabled else {
                 return false
             }
-            
+
             // 3. The user has not already dismissed the card
-            
+
             return shouldShowNetworkProtectionBetaEndedNotice
 #else
             return false
