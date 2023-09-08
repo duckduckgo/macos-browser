@@ -98,7 +98,7 @@ final class DataBrokerOperationsCollection: Operation {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
+    // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable:next function_body_length
     private func runOperation() async {
         let filteredAndSortedOperationsData: [BrokerOperationData]
@@ -166,6 +166,7 @@ final class DataBrokerOperationsCollection: Operation {
             }
         }
     }
+    // swiftlint:enable cyclomatic_complexity
 
     private func finish() {
         willChangeValue(forKey: #keyPath(isExecuting))
