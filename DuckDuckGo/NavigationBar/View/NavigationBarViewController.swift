@@ -274,11 +274,11 @@ final class NavigationBarViewController: NSViewController {
 #if NETWORK_PROTECTION
     @available(macOS 11.4, *)
     @IBAction func networkProtectionButtonAction(_ sender: NSButton) {
-        showNetworkProtectionPopover()
+        toggleNetworkProtectionPopover()
     }
 
     @available(macOS 11.4, *)
-    private func showNetworkProtectionPopover() {
+    private func toggleNetworkProtectionPopover() {
         let featureVisibility = DefaultNetworkProtectionVisibility()
         guard featureVisibility.isNetworkProtectionVisible() else {
             featureVisibility.disableForWaitlistUsers()
@@ -882,7 +882,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {
 #if NETWORK_PROTECTION
         if #available(macOS 11.4, *) {
-            showNetworkProtectionPopover()
+            toggleNetworkProtectionPopover()
         }
 #else
         fatalError("Tried to open Network Protection when it was disabled")

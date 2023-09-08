@@ -58,7 +58,7 @@ public final class Pixel {
         /// Sent once per day with a `_d` suffix, in addition to every time it is called with a `_c` suffix.
         /// This means a pixel will get sent twice the first time it is called per-day, and subsequent calls that day will only send the `_c` variant.
         /// This is useful in situations where pixels receive spikes in volume, as the daily pixel can be used to determine how many users are actually affected.
-        case dailyAndCount
+        case dailyAndContinuous
     }
 
     /// A closure typealias to request sending pixels through the network.
@@ -154,7 +154,7 @@ public final class Pixel {
         case .dailyOnly:
             updatePixelLastFireDate(pixelName: pixelName)
             fireRequest(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
-        case .dailyAndCount:
+        case .dailyAndContinuous:
             if !pixelHasBeenFiredToday(pixelName, dailyPixelStorage: Self.storage, calendar: self.pixelCalendar) {
                 fireRequest(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, { _ in })
             }

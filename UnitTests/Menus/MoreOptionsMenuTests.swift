@@ -159,7 +159,6 @@ final class MoreOptionsMenuTests: XCTestCase {
 
 #if NETWORK_PROTECTION
 final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility {
-
     var visible: Bool
 
     init(visible: Bool) {

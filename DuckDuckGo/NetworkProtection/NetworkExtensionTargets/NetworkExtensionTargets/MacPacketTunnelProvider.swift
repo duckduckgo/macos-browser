@@ -124,7 +124,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             case .unhandledError(function: let function, line: let line, error: let error):
                 domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
             }
-            Pixel.fire(domainEvent, frequency: .dailyAndCount, includeAppVersionParameter: true)
+            Pixel.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
         }
     }
 
@@ -139,7 +139,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         case .reportLatency(ms: let ms, server: let server, networkType: let networkType):
             Pixel.fire(.networkProtectionLatency(ms: ms, server: server, networkType: networkType), frequency: .standard)
         case .rekeyCompleted:
-            Pixel.fire(.networkProtectionRekeyCompleted, frequency: .dailyAndCount, includeAppVersionParameter: true)
+            Pixel.fire(.networkProtectionRekeyCompleted, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
         }
     }
 
