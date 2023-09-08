@@ -168,7 +168,6 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
             for removedProfile in removedProfiles {
                 if let extractedProfileId = removedProfile.id {
-                    print("ID \(extractedProfileId)")
                     let event = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutConfirmed)
                     database.add(event)
                     database.updateRemovedDate(Date(), on: extractedProfileId)
