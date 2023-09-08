@@ -53,9 +53,8 @@ final class StatisticsLoader {
                         completion()
                     }
                 }
-                if !NSApp.isRunningUnitTests && DefaultVariantManager().currentVariant != nil {
-                    Pixel.fire(.serpInitial, limitToInitial: true, includeAppVersionParameter: false)
-                }
+                PixelExperiment.fireDay21To27SerpPixel()
+                PixelExperiment.fireFirstSerpPixel()
                 Pixel.fire(.serp)
                 Task {
                     await WindowControllersManager.shared.pinnedTabsManager.reportUsage()

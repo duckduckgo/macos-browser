@@ -56,7 +56,8 @@ final class OnboardingViewModel: ObservableObject {
     }
 
     var isNewOnboarding: Bool {
-        PixelExperiment.cohort == .onboardingExperiment1
+        print("Pixel is new onboarding: \(PixelExperiment.cohort == .onboardingExperiment1)")
+        return PixelExperiment.cohort == .onboardingExperiment1
 //        variantManager?.isSupported(feature: .newOnboarding) ?? false
     }
 

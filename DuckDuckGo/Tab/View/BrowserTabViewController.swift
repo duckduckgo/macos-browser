@@ -453,7 +453,7 @@ final class BrowserTabViewController: NSViewController {
 
         case .onboarding:
             removeAllTabContent()
-            if !OnboardingViewModel().onboardingFinished && !DefaultVariantManager().isSupported(feature: .newOnboarding) {
+            if !OnboardingViewModel().onboardingFinished && PixelExperiment.cohort == .control {
                 requestDisableUI()
             }
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))

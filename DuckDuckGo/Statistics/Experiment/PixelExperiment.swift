@@ -41,8 +41,8 @@ enum PixelExperiment: String, CaseIterable {
 
     // These are the variants. Rename or add/remove them as needed.  If you change the string value
     //  remember to keep it clear for privacy triage.
-    case control
-    case onboardingExperiment1
+    case control = "a"
+    case onboardingExperiment1 = "b"
 }
 
 /// These functions contain the business logic for determining if the pixel should be fired or not.
@@ -50,6 +50,18 @@ extension PixelExperiment {
 
     static func fireEnrollmentPixel() {
         logic.fireEnrollmentPixel()
+    }
+
+    static func fireFirstSerpPixel() {
+        logic.fireFirstSerpPixel()
+    }
+
+    static func fireDay21To27SerpPixel() {
+        logic.fireDay21To27SerpPixel()
+    }
+
+    static func firesetAsDefaultInitialPixel() {
+        logic.firesetAsDefaultInitialPixel()
     }
 
 }
@@ -116,8 +128,26 @@ final internal class PixelExperimentLogic {
     func fireEnrollmentPixel() {
         // You'll probably need this at least.
         guard allocatedCohort != nil, let cohort else { return }
-        print("install cohort \(cohort)")
-        Pixel.fire(.launchInitial, limitToInitial: true, includeAppVersionParameter: false)
+        Pixel.fire(.launchInitial(cohort: cohort.rawValue), limitToInitial: true, includeAppVersionParameter: false)
+    }
+
+    func fireFirstSerpPixel() {
+        guard allocatedCohort != nil, let cohort else { return }
+        Pixel.fire(.serpInitial(cohort: cohort.rawValue), limitToInitial: true, includeAppVersionParameter: false)
+    }
+
+    func fireDay21To27SerpPixel() {
+        guard allocatedCohort != nil, let cohort else { return }
+        guard let twentyoneDaysAfterFirstLaunch = Calendar.current.date(byAdding: .day, value: 21, to: Pixel.firstLaunchDate) else { return }
+        guard let twentysevenDaysAfterFirstLaunch = Calendar.current.date(byAdding: .day, value: 27, to: Pixel.firstLaunchDate) else { return }
+        if Date() >= twentyoneDaysAfterFirstLaunch && Date() <= twentysevenDaysAfterFirstLaunch {
+            Pixel.fire(.serpDay21to27(cohort: cohort.rawValue), limitToInitial: true, includeAppVersionParameter: false)
+        }
+    }
+
+    func firesetAsDefaultInitialPixel() {
+        guard allocatedCohort != nil, let cohort else { return }
+        Pixel.fire(.setAsDefaultInitial(cohort: cohort.rawValue), limitToInitial: true)
     }
 
     func cleanup() {

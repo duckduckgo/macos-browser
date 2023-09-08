@@ -91,18 +91,14 @@ extension Pixel.Event {
 
             return params
 
-        case .launchInitial:
-            if let variantManager = (NSApp.isRunningUnitTests ? nil : DefaultVariantManager()),
-               let cohort = variantManager.currentVariant?.name {
-                return [Pixel.Parameters.variant: cohort]
-            }
-            return nil
-        case .serpInitial:
-            if let variantManager = (NSApp.isRunningUnitTests ? nil : DefaultVariantManager()),
-               let cohort = variantManager.currentVariant?.name {
-                return [Pixel.Parameters.variant: cohort]
-            }
-            return nil
+        case .launchInitial(let cohort):
+            return [Pixel.Parameters.experimentCohort: cohort]
+        case .serpInitial(let cohort):
+            return [Pixel.Parameters.experimentCohort: cohort]
+        case .serpDay21to27(let cohort):
+            return [Pixel.Parameters.experimentCohort: cohort, "isDefault": DefaultBrowserPreferences().isDefault.description]
+        case .setAsDefaultInitial(let cohort):
+            return [Pixel.Parameters.experimentCohort: cohort]
 
         // Don't use default to force new items to be thought about
         case .crash,
@@ -130,7 +126,6 @@ extension Pixel.Event {
              .emailEnabledInitial,
              .cookieManagementEnabledInitial,
              .watchInDuckPlayerInitial,
-             .setAsDefaultInitial,
              .importDataInitial,
              .newTabInitial,
              .networkProtectionSystemExtensionUnknownActivationResult,

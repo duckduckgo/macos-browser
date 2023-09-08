@@ -86,10 +86,11 @@ extension Pixel {
                                      result: result)
         }
 
-        case launchInitial
+        case launchInitial(cohort: String)
 
         case serp
-        case serpInitial
+        case serpInitial(cohort: String)
+        case serpDay21to27(cohort: String)
 
         case dataImportFailed(action: DataImportAction, source: DataImportSource)
         case faviconImportFailed(source: DataImportSource)
@@ -126,7 +127,7 @@ extension Pixel {
         case emailEnabledInitial
         case cookieManagementEnabledInitial
         case watchInDuckPlayerInitial
-        case setAsDefaultInitial
+        case setAsDefaultInitial(cohort: String)
         case importDataInitial
 
         // New Tab section removed
@@ -423,6 +424,8 @@ extension Pixel.Event {
             return "m.mac.first-launch"
         case .serpInitial:
             return "m.mac.navigation.first-search"
+        case .serpDay21to27:
+            return "m.mac.search-day-21-27.initial"
         }
 
     }

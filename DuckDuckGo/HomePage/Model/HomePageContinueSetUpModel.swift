@@ -67,7 +67,6 @@ extension HomePage.Models {
         private let privacyPreferences: PrivacySecurityPreferences
         private let cookieConsentPopoverManager: CookieConsentPopoverManager
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
-        private let variantManager: VariantManager?
         private var cookiePopUpVisible = false
 
         weak var delegate: ContinueSetUpVewModelDelegate?
@@ -136,8 +135,7 @@ extension HomePage.Models {
              privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
              cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
-             privacyConfig: PrivacyConfiguration = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig,
-             variantManager: VariantManager? = (NSApp.isRunningUnitTests ? nil : DefaultVariantManager())) {
+             privacyConfig: PrivacyConfiguration = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
@@ -146,7 +144,6 @@ extension HomePage.Models {
             self.cookieConsentPopoverManager = cookieConsentPopoverManager
             self.duckPlayerPreferences = duckPlayerPreferences
             self.privacyConfig = privacyConfig
-            self.variantManager = variantManager
             refreshFeaturesMatrix()
             NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
             NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeKey(_:)), name: NSWindow.didBecomeKeyNotification, object: nil)
@@ -279,7 +276,7 @@ extension HomePage.Models {
         }
 
         var firstRunFeatures: [FeatureType] {
-            if variantManager?.isSupported(feature: .newOnboarding) ?? false {
+            if PixelExperiment.cohort == .onboardingExperiment1 {
                 var features: [FeatureType] = FeatureType.allCases.filter { $0 != .defaultBrowser && $0 != .importBookmarksAndPasswords }
                 features.insert(.defaultBrowser, at: 0)
                 features.insert(.importBookmarksAndPasswords, at: 1)
