@@ -120,11 +120,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         do {
             let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .scanStarted)
             database.add(event)
-
-            let extractedProfiles = try await runner.scan(brokerProfileQueryData,
-                                                        showWebView: showWebView,
-                                                        shouldRunNextStep: shouldRunNextStep)
-
+            let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
+            let extractedProfiles = try await runner.scan(brokerProfileQueryData, stageCalculator: stageCalculator, showWebView: showWebView, shouldRunNextStep: shouldRunNextStep)
             os_log("Extracted profiles: %@", log: .dataBrokerProtection, extractedProfiles)
 
             if !extractedProfiles.isEmpty {
@@ -209,7 +206,6 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             return
         }
 
-
         let stageDurationCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
         stageDurationCalculator.fireOptOutStart()
         os_log("Running opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
@@ -233,6 +229,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
             try await runner.optOut(profileQuery: brokerProfileQueryData,
                                     extractedProfile: extractedProfile,
+                                    stageCalculator: stageDurationCalculator,
                                     showWebView: showWebView,
                                     shouldRunNextStep: shouldRunNextStep)
 

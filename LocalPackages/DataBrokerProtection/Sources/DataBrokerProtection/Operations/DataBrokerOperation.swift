@@ -34,14 +34,15 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
 
     var webViewHandler: WebViewHandler? { get set }
     var actionsHandler: ActionsHandler? { get }
+    var stageCalculator: DataBrokerProtectionStageDurationCalculator? { get }
     var continuation: CheckedContinuation<ReturnValue, Error>? { get set }
     var extractedProfile: ExtractedProfile? { get set }
-
     var shouldRunNextStep: () -> Bool { get }
 
     func run(inputValue: InputValue,
              webViewHandler: WebViewHandler?,
              actionsHandler: ActionsHandler?,
+             stageCalculator: DataBrokerProtectionStageDurationCalculator,
              showWebView: Bool) async throws -> ReturnValue
 
     func executeNextStep() async
@@ -51,11 +52,13 @@ extension DataBrokerOperation {
     func run(inputValue: InputValue,
              webViewHandler: WebViewHandler?,
              actionsHandler: ActionsHandler?,
+             stageCalculator: DataBrokerProtectionStageDurationCalculator,
              shouldRunNextStep: @escaping () -> Bool) async throws -> ReturnValue {
 
         try await run(inputValue: inputValue,
                       webViewHandler: webViewHandler,
                       actionsHandler: actionsHandler,
+                      stageCalculator: stageCalculator,
                       showWebView: false)
     }
 }
