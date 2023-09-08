@@ -103,6 +103,7 @@ final class URLEventHandler {
         if url.scheme == "networkprotection" {
             handleNetworkProtectionURL(url)
         } else {
+            WaitlistModalViewController.dismissWaitlistModalViewControllerIfNecessary(url)
             WindowControllersManager.shared.show(url: url, newTab: true)
         }
 #else

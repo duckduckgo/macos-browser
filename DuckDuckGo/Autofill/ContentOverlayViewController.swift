@@ -222,8 +222,18 @@ extension ContentOverlayViewController: OverlayAutofillUserScriptPresentationDel
 
 extension ContentOverlayViewController: SecureVaultManagerDelegate {
 
-    public func secureVaultManagerIsEnabledStatus(_: SecureVaultManager) -> Bool {
-        return true
+    public func secureVaultManagerIsEnabledStatus(_ manager: SecureVaultManager, forType type: AutofillType?) -> Bool {
+        let prefs = AutofillPreferences()
+        switch type {
+        case .card:
+            return prefs.askToSavePaymentMethods
+        case .identity:
+            return prefs.askToSaveAddresses
+        case.password:
+            return prefs.askToSaveUsernamesAndPasswords
+        case .none:
+            return prefs.askToSaveAddresses || prefs.askToSavePaymentMethods || prefs.askToSaveUsernamesAndPasswords
+        }
     }
 
     public func secureVaultManagerShouldSaveData(_: SecureVaultManager) -> Bool {

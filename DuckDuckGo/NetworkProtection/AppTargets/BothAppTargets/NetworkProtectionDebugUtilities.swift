@@ -60,6 +60,10 @@ final class NetworkProtectionDebugUtilities {
 
     func resetAllState(keepAuthToken: Bool) async throws {
         networkProtectionFeatureDisabler.disable(keepAuthToken: keepAuthToken, uninstallSystemExtension: true)
+
+        NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
+        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
     }
 
     func removeSystemExtensionAndAgents() async throws {
