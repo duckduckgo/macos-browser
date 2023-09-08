@@ -22,7 +22,18 @@ import AppKit
 import SwiftUI
 import UserNotifications
 
+extension Notification.Name {
+    static let waitlistModalViewControllerShouldDismiss = Notification.Name(rawValue: "waitlistModalViewControllerShouldDismiss")
+}
+
 final class WaitlistModalViewController: NSViewController {
+
+    // Small hack to force the waitlist modal view controller to dismiss all instances of itself whenever the user opens a link from the T&C view.
+    static func dismissWaitlistModalViewControllerIfNecessary(_ url: URL) {
+        if ["https://duckduckgo.com/privacy", "https://duckduckgo.com/terms"].contains(url.absoluteString) {
+            NotificationCenter.default.post(name: .waitlistModalViewControllerShouldDismiss, object: nil)
+        }
+    }
 
     private let defaultSize = CGSize(width: 360, height: 650)
     private let model: WaitlistViewModel
@@ -64,6 +75,8 @@ final class WaitlistModalViewController: NSViewController {
             hostingView.leftAnchor.constraint(equalTo: view.leftAnchor),
             hostingView.rightAnchor.constraint(equalTo: view.rightAnchor)
         ])
+
+        NotificationCenter.default.addObserver(self, selector: #selector(dismissModal), name: .waitlistModalViewControllerShouldDismiss, object: nil)
     }
 
     private func updateViewHeight(height: CGFloat) {
@@ -96,6 +109,7 @@ final class WaitlistModalViewController: NSViewController {
 
 extension WaitlistModalViewController: WaitlistViewModelDelegate {
 
+    @objc
     func dismissModal() {
         self.dismiss()
     }
