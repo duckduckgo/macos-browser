@@ -123,6 +123,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 shouldRunNextStep: { true }
             )
             XCTAssertFalse(mockDatabase.wasUpdateRemoveDateCalled)
+            XCTAssertNil(mockDatabase.extractedProfileRemovedDate)
             XCTAssertFalse(mockDatabase.wasSaveOptOutOperationCalled)
         } catch {
             XCTFail("Should not throw")
@@ -145,6 +146,29 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.wasUpdateRemoveDateCalled)
+            XCTAssertNil(mockDatabase.extractedProfileRemovedDate)
+        } catch {
+            XCTFail("Should not throw")
+        }
+    }
+
+    func testWhenScannedProfileIsAlreadyInTheDatabaseAndWasNotFoundInBroker_thenTheRemovedDateIsSet() async {
+        do {
+            mockWebOperationRunner.scanResults = []
+            _ = try await sut.runScanOperation(
+                on: mockWebOperationRunner,
+                brokerProfileQueryData: .init(
+                    dataBroker: .mock,
+                    profileQuery: .mock,
+                    scanOperationData: .mock,
+                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithRemovedDate)]
+                ),
+                database: mockDatabase,
+                notificationCenter: .default,
+                shouldRunNextStep: { true }
+            )
+            XCTAssertTrue(mockDatabase.wasUpdateRemoveDateCalled)
+            XCTAssertNotNil(mockDatabase.extractedProfileRemovedDate)
         } catch {
             XCTFail("Should not throw")
         }
@@ -188,6 +212,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             )
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutConfirmed }))
             XCTAssertTrue(mockDatabase.wasUpdateRemoveDateCalled)
+            XCTAssertNotNil(mockDatabase.extractedProfileRemovedDate)
             XCTAssertTrue(mockDatabase.wasUpdatedPreferredRunDateForOptOutCalled)
         } catch {
             XCTFail("Should not throw")
@@ -211,6 +236,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             )
             XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutConfirmed }))
             XCTAssertFalse(mockDatabase.wasUpdateRemoveDateCalled)
+            XCTAssertNil(mockDatabase.extractedProfileRemovedDate)
             XCTAssertFalse(mockDatabase.wasUpdatedPreferredRunDateForOptOutCalled)
         } catch {
             XCTFail("Should not throw")
@@ -513,6 +539,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var lastHistoryEventToReturn: HistoryEvent?
     var lastPreferredRunDateOnScan: Date?
     var lastPreferredRunDateOnOptOut: Date?
+    var extractedProfileRemovedDate: Date?
 
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
@@ -581,6 +608,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
     }
 
     func updateRemovedDate(_ date: Date?, on extractedProfileId: Int64) {
+        extractedProfileRemovedDate = date
         wasUpdateRemoveDateCalled = true
     }
 
@@ -616,6 +644,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
         lastHistoryEventToReturn = nil
         lastPreferredRunDateOnScan = nil
         lastPreferredRunDateOnOptOut = nil
+        extractedProfileRemovedDate = nil
     }
 }
 

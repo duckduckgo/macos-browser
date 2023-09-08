@@ -135,7 +135,6 @@ struct DataBrokerProtectionContainerView: View {
                 DashboardHeaderView(resultsViewModel: resultsViewModel,
                                     displayProfileButton: navigationViewModel.bodyViewType != .gettingStarted,
                                     faqButtonClicked: {
-                    print("FAQ")
                     shouldShowDebugUI.toggle()
                 },
                                     editProfileClicked: {
