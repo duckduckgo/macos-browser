@@ -20,19 +20,6 @@ import Common
 import Foundation
 import LoginItems
 
-#if NETWORK_PROTECTION
-
-extension LoginItemsManager {
-    static var networkProtectionLoginItems: Set<LoginItem> {
-        var items: Set<LoginItem> = [.vpnMenu]
-#if NETP_SYSTEM_EXTENSION
-        items.insert(.notificationsAgent)
-#endif
-        return items
-    }
-}
-#endif
-
 /// Class to manage the login items for Network Protection and DBP
 /// 
 final class LoginItemsManager {
