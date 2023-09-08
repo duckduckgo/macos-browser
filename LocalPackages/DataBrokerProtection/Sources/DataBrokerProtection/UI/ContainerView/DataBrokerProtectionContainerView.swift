@@ -55,14 +55,14 @@ struct DataBrokerProtectionContainerView: View {
                             viewModel: profileViewModel,
                             scanButtonClicked: {
                                 navigationViewModel.updateNavigation(.scanStarted)
-                                containerViewModel.scan { scanResult in
+                                containerViewModel.scanAfterProfileCreation { scanResult in
                                     switch scanResult {
                                     case .noResults:
                                         navigationViewModel.updateNavigation(.noResults)
                                     case .results:
                                         resultsViewModel.reloadData()
                                         navigationViewModel.updateNavigation(.results)
-                                        containerViewModel.startScheduler()
+                                        containerViewModel.runQueuedOperationsAndStartScheduler()
                                     }
                                 }
                             }, backToDashboardClicked: {
@@ -127,7 +127,7 @@ struct DataBrokerProtectionContainerView: View {
         if navigationViewModel.bodyViewType != .createProfile {
             VStack {
 
-                DashboardHeaderView(statusText: containerViewModel.headerStatusText,
+                DashboardHeaderView(resultsViewModel: resultsViewModel,
                                     displayProfileButton: navigationViewModel.bodyViewType != .gettingStarted,
                                     faqButtonClicked: {
                     print("FAQ")

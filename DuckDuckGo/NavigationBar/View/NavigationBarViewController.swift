@@ -273,7 +273,29 @@ final class NavigationBarViewController: NSViewController {
 
 #if NETWORK_PROTECTION
     @IBAction func networkProtectionButtonAction(_ sender: NSButton) {
-        popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
+        toggleNetworkProtectionPopover()
+    }
+
+    @available(macOS 11.4, *)
+    private func toggleNetworkProtectionPopover() {
+        let featureVisibility = DefaultNetworkProtectionVisibility()
+        guard featureVisibility.isNetworkProtectionVisible() else {
+            featureVisibility.disableForWaitlistUsers()
+            LocalPinningManager.shared.unpin(.networkProtection)
+            return
+        }
+
+        // 1. If the user is on the waitlist but hasn't been invited or accepted terms and conditions, show the waitlist screen.
+        // 2. If the user has no waitlist state but has an auth token, show the NetP popover.
+        // 3. If the user has no state of any kind, show the waitlist screen.
+
+        if NetworkProtectionWaitlist().shouldShowWaitlistViewController {
+            WaitlistModalViewController.show()
+        } else if NetworkProtectionKeychainTokenStore().isFeatureActivated {
+            popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
+        } else {
+            WaitlistModalViewController.show()
+        }
     }
 #endif
 
@@ -314,6 +336,12 @@ final class NavigationBarViewController: NSViewController {
                     self.updateDownloadsButton(updatingFromPinnedViewsNotification: true)
                 case .networkProtection:
 #if NETWORK_PROTECTION
+                    guard NetworkProtectionKeychainTokenStore().isFeatureActivated else {
+                        LocalPinningManager.shared.unpin(.networkProtection)
+                        networkProtectionButtonModel.isPinned = false
+                        return
+                    }
+
                     networkProtectionButtonModel.isPinned = LocalPinningManager.shared.isPinned(.networkProtection)
 #else
                     assertionFailure("Tried to toggle NetP when the feature was disabled")
@@ -588,7 +616,11 @@ final class NavigationBarViewController: NSViewController {
         downloadsButton.image = hasActiveDownloads ? Self.Constants.activeDownloadsImage : Self.Constants.inactiveDownloadsImage
         let isTimerActive = downloadsButtonHidingTimer != nil
 
-        downloadsButton.isHidden = !(hasActiveDownloads || isTimerActive)
+        if popovers.isDownloadsPopoverShown {
+            downloadsButton.isHidden = false
+        } else {
+            downloadsButton.isHidden = !(hasActiveDownloads || isTimerActive)
+        }
 
         if !downloadsButton.isHidden { setDownloadButtonHidingTimer() }
         downloadsButton.isMouseDown = popovers.isDownloadsPopoverShown
@@ -845,7 +877,9 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
     func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {
 #if NETWORK_PROTECTION
-        showNetworkProtectionStatus()
+        if #available(macOS 11.4, *) {
+            toggleNetworkProtectionPopover()
+        }
 #else
         fatalError("Tried to open Network Protection when it was disabled")
 #endif

@@ -24,7 +24,7 @@ private enum Constants {
 }
 
 struct DashboardHeaderView: View {
-    let statusText: String
+    let resultsViewModel: ResultsViewModel
     let displayProfileButton: Bool
     let faqButtonClicked: () -> Void
     let editProfileClicked: () -> Void
@@ -42,7 +42,7 @@ struct DashboardHeaderView: View {
                         .padding()
 
                 }
-                HeaderTitleView(statusText: statusText)
+                HeaderTitleView(resultsViewModel: resultsViewModel)
                 Spacer()
             }
         }
@@ -50,7 +50,7 @@ struct DashboardHeaderView: View {
 }
 
 private struct HeaderTitleView: View {
-    let statusText: String
+    @ObservedObject var resultsViewModel: ResultsViewModel
 
     var body: some View {
         VStack(spacing: 0) {
@@ -61,7 +61,7 @@ private struct HeaderTitleView: View {
                     .font(.title)
                     .bold()
 
-                Text(statusText)
+                Text(resultsViewModel.headerStatusText)
                     .font(.body)
             }
         }
@@ -78,7 +78,7 @@ private struct CTAHeaderView: View {
             Button {
                 faqButtonClicked()
             } label: {
-                Text("FAQs")
+                Text("Debug")
             }
             .buttonStyle(.borderless)
             .foregroundColor(.primary)
@@ -102,7 +102,7 @@ private struct CTAHeaderView: View {
 struct DashboardHeaderView_Previews: PreviewProvider {
     static var previews: some View {
 
-        DashboardHeaderView(statusText: "Scanning...",
+        DashboardHeaderView(resultsViewModel: ResultsViewModel(dataManager: DataBrokerProtectionDataManager()),
                             displayProfileButton: true,
                             faqButtonClicked: {},
                             editProfileClicked: {})

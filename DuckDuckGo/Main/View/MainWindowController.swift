@@ -65,7 +65,7 @@ final class MainWindowController: NSWindowController {
     }
 
     private var shouldShowOnboarding: Bool {
-#if DEBUG
+#if DEBUG || DBP
         return false
 #else
         let onboardingIsComplete = OnboardingViewModel().onboardingFinished || LocalStatisticsStore().waitlistUnlocked

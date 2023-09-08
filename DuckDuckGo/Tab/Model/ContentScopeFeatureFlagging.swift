@@ -22,14 +22,15 @@ import BrowserServicesKit
 extension ContentScopeFeatureToggles {
 
     static func supportedFeaturesOnMacOS(_ privacyConfig: PrivacyConfiguration) -> ContentScopeFeatureToggles {
+        let autofillPrefs = AutofillPreferences()
         return ContentScopeFeatureToggles(emailProtection: true,
                                           emailProtectionIncontextSignup: privacyConfig.isEnabled(featureKey: .incontextSignup),
-                                          credentialsAutofill: true,
-                                          identitiesAutofill: true,
-                                          creditCardsAutofill: true,
-                                          credentialsSaving: true,
-                                          passwordGeneration: true,
-                                          inlineIconCredentials: true,
+                                          credentialsAutofill: autofillPrefs.askToSaveUsernamesAndPasswords,
+                                          identitiesAutofill: autofillPrefs.askToSaveAddresses,
+                                          creditCardsAutofill: autofillPrefs.askToSavePaymentMethods,
+                                          credentialsSaving: autofillPrefs.askToSaveUsernamesAndPasswords,
+                                          passwordGeneration: autofillPrefs.askToSaveUsernamesAndPasswords,
+                                          inlineIconCredentials: autofillPrefs.askToSaveUsernamesAndPasswords,
                                           thirdPartyCredentialsProvider: true)
     }
 }
