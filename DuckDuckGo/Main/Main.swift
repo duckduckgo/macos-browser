@@ -65,7 +65,7 @@ final class AppMain {
         }
 #endif
 
-#if !APPSTORE && !DEBUG
+#if !APPSTORE && !DEBUG && !DBP
         PFMoveToApplicationsFolderIfNecessary()
 #endif
 
