@@ -29,7 +29,7 @@ let package = Package(
             targets: ["DataBrokerProtection"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "75.3.1"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "77.2.0"),
         .package(path: "../SwiftUIExtensions")
     ],
     targets: [
@@ -43,6 +43,9 @@ let package = Package(
         ),
         .testTarget(
             name: "DataBrokerProtectionTests",
-            dependencies: ["DataBrokerProtection"])
+            dependencies: [
+                "DataBrokerProtection",
+                "BrowserServicesKit"
+            ])
     ]
 )

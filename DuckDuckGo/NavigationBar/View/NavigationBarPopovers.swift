@@ -97,11 +97,16 @@ final class NavigationBarPopovers {
     @available(macOS 11.4, *)
     func toggleNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
 #if NETWORK_PROTECTION
-        if let networkProtectionPopover = networkProtectionPopover,
-           networkProtectionPopover.isShown {
+        if let networkProtectionPopover, networkProtectionPopover.isShown {
             networkProtectionPopover.close()
         } else {
-            showNetworkProtectionPopover(usingView: view, withDelegate: delegate)
+            let featureVisibility = DefaultNetworkProtectionVisibility()
+
+            if featureVisibility.isNetworkProtectionVisible() {
+                showNetworkProtectionPopover(usingView: view, withDelegate: delegate)
+            } else {
+                featureVisibility.disableForWaitlistUsers()
+            }
         }
 #endif
     }
@@ -121,7 +126,7 @@ final class NavigationBarPopovers {
         popover.viewController.delegate = downloadsDelegate
         downloadsPopover = popover
 
-        show(popover: popover, usingView: view, preferredEdge: .maxY)
+        show(popover, positionedBelow: view)
     }
 
     private var downloadsPopoverTimer: Timer?
@@ -161,6 +166,12 @@ final class NavigationBarPopovers {
             downloadsPopover?.close()
         }
 
+#if NETWORK_PROTECTION
+        if networkProtectionPopover?.isShown ?? false {
+            networkProtectionPopover?.close()
+        }
+#endif
+
         return true
     }
 
@@ -176,7 +187,7 @@ final class NavigationBarPopovers {
         }
 
         LocalBookmarkManager.shared.requestSync()
-        show(popover: popover, usingView: view)
+        show(popover, positionedBelow: view)
     }
 
     func showPasswordManagementPopover(selectedCategory: SecureVaultSorting.Category?, usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
@@ -186,7 +197,7 @@ final class NavigationBarPopovers {
         passwordManagementPopover = popover
         popover.viewController.domain = passwordManagementDomain
         popover.delegate = delegate
-        show(popover: popover, usingView: view)
+        show(popover, positionedBelow: view)
         popover.select(category: selectedCategory)
     }
 
@@ -194,7 +205,7 @@ final class NavigationBarPopovers {
         let popover = passwordManagementPopover ?? PasswordManagementPopover()
         passwordManagementPopover = popover
         popover.delegate = delegate
-        show(popover: popover, usingView: view)
+        show(popover, positionedBelow: view)
         popover.select(websiteAccount: selectedWebsiteAccount)
     }
 
@@ -251,27 +262,27 @@ final class NavigationBarPopovers {
         let popover = SaveCredentialsPopover()
         popover.delegate = delegate
         saveCredentialsPopover = popover
-        show(popover: popover, usingView: view)
+        show(popover, positionedBelow: view)
     }
 
     private func showSavePaymentMethodPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         let popover = SavePaymentMethodPopover()
         popover.delegate = delegate
         savePaymentMethodPopover = popover
-        show(popover: popover, usingView: view)
+        show(popover, positionedBelow: view)
     }
 
     private func showSaveIdentityPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         let popover = SaveIdentityPopover()
         popover.delegate = delegate
         saveIdentityPopover = popover
-        show(popover: popover, usingView: view)
+        show(popover, positionedBelow: view)
     }
 
-    private func show(popover: NSPopover, usingView view: NSView, preferredEdge edge: NSRectEdge = .minY) {
+    private func show(_ popover: NSPopover, positionedBelow view: NSView) {
         view.isHidden = false
 
-        popover.show(relativeTo: view.bounds.insetFromLineOfDeath(), of: view, preferredEdge: edge)
+        popover.show(positionedBelow: view.bounds.insetFromLineOfDeath(flipped: view.isFlipped), in: view)
     }
 
     // MARK: - Network Protection
@@ -312,7 +323,7 @@ final class NavigationBarPopovers {
             networkProtectionPopover = popover
             return popover
         }()
-        show(popover: popover, usingView: view, preferredEdge: .maxY)
+        show(popover, positionedBelow: view)
     }
 #endif
 }

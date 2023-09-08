@@ -22,10 +22,24 @@ final class BookmarkPopover: NSPopover {
 
     var isNew = false
 
+    private weak var addressBar: NSView?
+
+    /// prefferred bounding box for the popover positioning
+    override var boundingFrame: NSRect {
+        guard let addressBar,
+              let window = addressBar.window else { return .infinite }
+        var frame = window.convertToScreen(addressBar.convert(addressBar.bounds, to: nil))
+
+        frame = frame.insetBy(dx: -36, dy: -window.frame.size.height)
+
+        return frame
+    }
+
     override init() {
         super.init()
 
-        behavior = .transient
+        self.animates = false
+        self.behavior = .transient
         setupContentController()
     }
 
@@ -45,6 +59,11 @@ final class BookmarkPopover: NSPopover {
         contentViewController = controller
     }
     // swiftlint:enable force_cast
+
+    override func show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
+        self.addressBar = positioningView.superview
+        super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
+    }
 
 }
 

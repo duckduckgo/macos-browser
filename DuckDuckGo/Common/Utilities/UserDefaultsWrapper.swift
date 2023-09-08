@@ -112,6 +112,7 @@ public struct UserDefaultsWrapper<T> {
         case homePageIsContinueSetupVisible = "home.page.is.continue.setup.visible"
         case homePageIsRecentActivityVisible = "home.page.is.recent.activity.visible"
         case homePageIsFirstSession = "home.page.is.first.session"
+        case homePageShowNetworkProtectionBetaEndedNotice = "home.page.network-protection.show-beta-ended-notice"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 
@@ -146,6 +147,8 @@ public struct UserDefaultsWrapper<T> {
 
         case agentLaunchTime = "netp.agent.launch-time"
 
+        case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
+
         // Network Protection: Shared Defaults
         // ---
         // Please note that shared defaults MUST have a name that matches exactly their value,
@@ -165,6 +168,7 @@ public struct UserDefaultsWrapper<T> {
 
     enum RemovedKeys: String, CaseIterable {
         case passwordManagerDoNotPromptDomains = "com.duckduckgo.passwordmanager.do-not-prompt-domains"
+        case incrementalFeatureFlagTestHasSentPixel = "network-protection.incremental-feature-flag-test.has-sent-pixel"
     }
 
     private let key: Key

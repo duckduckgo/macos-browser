@@ -26,6 +26,7 @@ import SyncDataProviders
 final class SyncDataProviders: DataProvidersSource {
     public let bookmarksAdapter: SyncBookmarksAdapter
     public let credentialsAdapter: SyncCredentialsAdapter
+    public let settingsAdapter: SyncSettingsAdapter
 
     func makeDataProviders() -> [DataProviding] {
         initializeMetadataDatabaseIfNeeded()
@@ -36,10 +37,12 @@ final class SyncDataProviders: DataProvidersSource {
 
         bookmarksAdapter.setUpProviderIfNeeded(database: bookmarksDatabase, metadataStore: syncMetadata)
         credentialsAdapter.setUpProviderIfNeeded(secureVaultFactory: secureVaultFactory, metadataStore: syncMetadata)
+        settingsAdapter.setUpProviderIfNeeded(metadataDatabase: syncMetadataDatabase.db, metadataStore: syncMetadata)
 
         let providers: [Any] = [
             bookmarksAdapter.provider as Any,
-            credentialsAdapter.provider as Any
+            credentialsAdapter.provider as Any,
+            settingsAdapter.provider as Any
         ]
 
         return providers.compactMap { $0 as? DataProviding }
@@ -76,6 +79,7 @@ final class SyncDataProviders: DataProvidersSource {
         self.secureVaultFactory = secureVaultFactory
         bookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase)
         credentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: secureVaultFactory)
+        settingsAdapter = SyncSettingsAdapter()
     }
 
     private func initializeMetadataDatabaseIfNeeded() {

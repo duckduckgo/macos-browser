@@ -141,7 +141,9 @@ final class PermissionContextMenu: NSMenu {
     }
 
     private func addPersistenceItems() {
-        for (permission, state) in permissions {
+        // only show one persistence option per permission type
+        let reduced = permissions.reduce(into: [:], { $0[$1.key] = $1.value })
+        for (permission, state) in reduced {
             guard permission.canPersistGrantedDecision || permission.canPersistDeniedDecision else { continue }
             if case .disabled = state { continue }
 

@@ -37,6 +37,7 @@ import NetworkProtection
 final class NetworkProtectionSimulateFailureMenu: NSMenu {
     @IBOutlet weak var simulateControllerFailureMenuItem: NSMenuItem!
     @IBOutlet weak var simulateTunnelFailureMenuItem: NSMenuItem!
+    @IBOutlet weak var simulateTunnelCrashMenuItem: NSMenuItem!
 
     private var simulationOptions: NetworkProtectionSimulationOptions {
         NetworkProtectionTunnelController.simulationOptions
@@ -53,9 +54,20 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
     ///
     @IBAction
     func simulateTunnelFailure(_ menuItem: NSMenuItem) {
+        simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelFailure)
+    }
+
+    /// Simulates a fatal error on the tunnel the next time Network Protection is started.
+    ///
+    @IBAction
+    func simulateTunnelCrash(_ menuItem: NSMenuItem) {
+        simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelFatalError)
+    }
+
+    private func simulateFailure(_ simulationFunction: @escaping () async throws -> Void) {
         Task {
             do {
-                try await NetworkProtectionTunnelController().toggleShouldSimulateTunnelFailure()
+                try await simulationFunction()
             } catch {
                 await NSAlert(error: error).runModal()
             }
@@ -65,6 +77,7 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
     override func update() {
         simulateControllerFailureMenuItem.state = simulationOptions.isEnabled(.controllerFailure) ? .on : .off
         simulateTunnelFailureMenuItem.state = simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
+        simulateTunnelCrashMenuItem.state = simulationOptions.isEnabled(.crashFatalError) ? .on : .off
     }
 }
 

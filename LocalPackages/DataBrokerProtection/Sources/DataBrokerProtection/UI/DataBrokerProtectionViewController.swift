@@ -42,8 +42,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
                                             notificationCenter: notificationCenter)
 
         containerViewModel = ContainerViewModel(scheduler: scheduler,
-                                                dataManager: dataManager,
-                                                notificationCenter: notificationCenter)
+                                                dataManager: dataManager)
 
         super.init(nibName: nil, bundle: nil)
     }

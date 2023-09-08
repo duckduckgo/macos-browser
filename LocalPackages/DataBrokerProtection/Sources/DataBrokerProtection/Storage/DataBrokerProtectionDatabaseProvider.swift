@@ -30,7 +30,9 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func fetchProfile(with id: Int64) throws -> FullProfileDB?
 
     func save(_ broker: BrokerDB) throws -> Int64
+    func update(_ broker: BrokerDB) throws
     func fetchBroker(with id: Int64) throws -> BrokerDB?
+    func fetchBroker(with name: String) throws -> BrokerDB?
     func fetchAllBrokers() throws -> [BrokerDB]
 
     func save(_ profileQuery: ProfileQueryDB) throws -> Int64
@@ -61,6 +63,8 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func fetchExtractedProfile(with id: Int64) throws -> ExtractedProfileDB?
     func fetchExtractedProfiles(for brokerId: Int64, with profileQueryId: Int64) throws -> [ExtractedProfileDB]
     func updateRemovedDate(for extractedProfileId: Int64, with date: Date?) throws
+
+    func hasMatches() throws -> Bool
  }
 
 final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDatabaseProvider, DataBrokerProtectionDatabaseProvider {
@@ -227,7 +231,11 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             let profileId: Int64 = 1
             try mapperToDB.mapToDB(id: profileId, profile: profile).upsert(db)
 
-            try ScanDB.deleteAll(db) // We need to delete all scans related to a possible old user
+            // We need to delete all scans and opt-outs related to a possible old user
+            try ScanDB.deleteAll(db)
+            try ScanHistoryEventDB.deleteAll(db)
+            try OptOutDB.deleteAll(db)
+            try OptOutHistoryEventDB.deleteAll(db)
 
             try NameDB.deleteAll(db)
             for name in profile.names {
@@ -264,9 +272,23 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
+    func update(_ broker: BrokerDB) throws {
+        try db.write { db in
+            try broker.update(db)
+        }
+    }
+
     func fetchBroker(with id: Int64) throws -> BrokerDB? {
         try db.read { db in
             return try BrokerDB.fetchOne(db, key: id)
+        }
+    }
+
+    func fetchBroker(with name: String) throws -> BrokerDB? {
+        try db.read { db in
+            return try BrokerDB
+                .filter(Column(BrokerDB.Columns.name.name) == name)
+                .fetchOne(db)
         }
     }
 
@@ -512,6 +534,12 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             } else {
                 throw DataBrokerProtectionDatabaseErrors.elementNotFound
             }
+        }
+    }
+
+    func hasMatches() throws -> Bool {
+        try db.read { db in
+            return try OptOutDB.fetchCount(db) > 0
         }
     }
 }

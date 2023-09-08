@@ -138,8 +138,6 @@ extension Pixel {
         case fireButtonFirstBurn
         case fireButton(option: FireButtonOption)
 
-        case incrementalRolloutTest
-
         // Duck Player
         case duckPlayerDailyUniqueView
         case duckPlayerViewFromYoutubeViaMainOverlay
@@ -150,6 +148,14 @@ extension Pixel {
         case duckPlayerSettingAlways
         case duckPlayerSettingNever
         case duckPlayerSettingBackToDefault
+
+        // Network Protection Waitlist
+        case networkProtectionWaitlistEntryPointMenuItemDisplayed
+        case networkProtectionWaitlistEntryPointToolbarButtonDisplayed
+        case networkProtectionWaitlistNotificationShown
+        case networkProtectionWaitlistNotificationTapped
+        case networkProtectionWaitlistTermsAndConditionsDisplayed
+        case networkProtectionWaitlistTermsAndConditionsAccepted
 
         enum Debug {
 
@@ -281,6 +287,8 @@ extension Pixel {
             case syncBookmarksFailed
             case syncCredentialsProviderInitializationFailed
             case syncCredentialsFailed
+            case syncSettingsFailed
+            case syncSettingsMetadataUpdateFailed
 
             case bookmarksCleanupFailed
             case bookmarksCleanupAttemptedWhileSyncWasEnabled
@@ -399,9 +407,6 @@ extension Pixel.Event {
         case .fireButton(option: let option):
             return "m_mac_fire_button_\(option)"
 
-        case .incrementalRolloutTest:
-            return "m_mac_netp_ev_incremental_rollout_test"
-
         case .duckPlayerDailyUniqueView:
             return "m_mac_duck-player_daily-unique-view"
         case .duckPlayerViewFromYoutubeViaMainOverlay:
@@ -421,6 +426,18 @@ extension Pixel.Event {
         case .duckPlayerSettingBackToDefault:
             return "m_mac_duck-player_setting_back-to-default"
 
+        case .networkProtectionWaitlistEntryPointMenuItemDisplayed:
+            return "m_mac_netp_imp_settings_entry_menu_item"
+        case .networkProtectionWaitlistEntryPointToolbarButtonDisplayed:
+            return "m_mac_netp_imp_settings_entry_toolbar_button"
+        case .networkProtectionWaitlistNotificationShown:
+            return "m_mac_netp_ev_waitlist_notification_shown"
+        case .networkProtectionWaitlistNotificationTapped:
+            return "m_mac_netp_ev_waitlist_notification_launched"
+        case .networkProtectionWaitlistTermsAndConditionsDisplayed:
+            return "m_mac_netp_imp_terms"
+        case .networkProtectionWaitlistTermsAndConditionsAccepted:
+            return "m_mac_netp_ev_terms_accepted"
         }
 
     }
@@ -655,6 +672,8 @@ extension Pixel.Event.Debug {
         case .syncBookmarksFailed: return "sync_bookmarks_failed"
         case .syncCredentialsProviderInitializationFailed: return "sync_credentials_provider_initialization_failed"
         case .syncCredentialsFailed: return "sync_credentials_failed"
+        case .syncSettingsFailed: return "sync_settings_failed"
+        case .syncSettingsMetadataUpdateFailed: return "sync_settings_metadata_update_failed"
 
         case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
         case .bookmarksCleanupAttemptedWhileSyncWasEnabled: return "bookmarks_cleanup_attempted_while_sync_was_enabled"
