@@ -215,7 +215,7 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             self.rootLevelFolderObjectID = folder.objectID
-            let favoritesFolderUUID = self.favoritesConfiguration.displayedPlatform.rawValue
+            let favoritesFolderUUID = FavoritesPlatform.all.rawValue
             self.favoritesFolderObjectID = BookmarkUtils.fetchFavoritesFolder(withUUID: favoritesFolderUUID, in: context)?.objectID
             let nativeFavoritesFolderUUID = self.favoritesConfiguration.nativePlatform.rawValue
             self.nativeFavoritesFolderObjectID = BookmarkUtils.fetchFavoritesFolder(withUUID: nativeFavoritesFolderUUID, in: context)?.objectID
