@@ -25,7 +25,7 @@ protocol AppearancePreferencesPersistor {
     var showAutocompleteSuggestions: Bool { get set }
     var currentThemeName: String { get set }
     var defaultPageZoom: CGFloat { get set }
-    var favoritesConfiguration: String? { get set }
+    var favoritesDisplayMode: String? { get set }
     var isFavoriteVisible: Bool { get set }
     var isContinueSetUpVisible: Bool { get set }
     var isRecentActivityVisible: Bool { get set }
@@ -46,8 +46,8 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
     @UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: DefaultZoomValue.percent100.rawValue)
     var defaultPageZoom: CGFloat
 
-    @UserDefaultsWrapper(key: .favoritesConfiguration, defaultValue: FavoritesConfiguration.displayNative(.desktop).rawValue)
-    var favoritesConfiguration: String?
+    @UserDefaultsWrapper(key: .favoritesDisplayMode, defaultValue: FavoritesDisplayMode.displayNative(.desktop).rawValue)
+    var favoritesDisplayMode: String?
 
     @UserDefaultsWrapper(key: .homePageIsFavoriteVisible, defaultValue: true)
     var isFavoriteVisible: Bool
@@ -134,8 +134,8 @@ enum ThemeName: String, Equatable, CaseIterable {
     }
 }
 
-extension FavoritesConfiguration {
-    static let availableConfigurations = [FavoritesConfiguration.displayNative(.desktop), .displayAll(native: .desktop)]
+extension FavoritesDisplayMode {
+    static let availableConfigurations = [FavoritesDisplayMode.displayNative(.desktop), .displayAll(native: .desktop)]
 
     var rawValue: String? {
         switch self {
@@ -196,9 +196,9 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
-    @Published var favoritesConfiguration: FavoritesConfiguration {
+    @Published var favoritesDisplayMode: FavoritesDisplayMode {
         didSet {
-            persistor.favoritesConfiguration = favoritesConfiguration.rawValue
+            persistor.favoritesDisplayMode = favoritesDisplayMode.rawValue
         }
     }
 
@@ -264,7 +264,7 @@ final class AppearancePreferences: ObservableObject {
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         showAutocompleteSuggestions = persistor.showAutocompleteSuggestions
-        favoritesConfiguration = persistor.favoritesConfiguration.flatMap(FavoritesConfiguration.init(rawValue:)) ?? .displayNative(.desktop)
+        favoritesDisplayMode = persistor.favoritesDisplayMode.flatMap(FavoritesDisplayMode.init(rawValue:)) ?? .displayNative(.desktop)
         isFavoriteVisible = persistor.isFavoriteVisible
         isRecentActivityVisible = persistor.isRecentActivityVisible
         isContinueSetUpVisible = persistor.isContinueSetUpVisible

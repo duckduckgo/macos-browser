@@ -120,11 +120,11 @@ extension Preferences {
                         .font(Const.Fonts.preferencePaneSectionHeader)
                     HStack {
                         Text("Display Favorites from")
-                        NSPopUpButtonView(selection: $model.favoritesConfiguration) {
+                        NSPopUpButtonView(selection: $model.favoritesDisplayMode) {
                             let button = NSPopUpButton()
                             button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
-                            for value in FavoritesConfiguration.availableConfigurations {
+                            for value in FavoritesDisplayMode.availableConfigurations {
                                 let item = button.menu?.addItem(withTitle: value.displayString, action: nil, keyEquivalent: "")
                                 item?.representedObject = value
                             }

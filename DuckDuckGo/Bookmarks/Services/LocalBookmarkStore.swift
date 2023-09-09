@@ -40,7 +40,7 @@ final class LocalBookmarkStore: BookmarkStore {
     init(contextProvider: @escaping () -> NSManagedObjectContext) {
         self.contextProvider = contextProvider
 
-        favoritesConfiguration = AppearancePreferences.shared.favoritesConfiguration
+        favoritesDisplayMode = AppearancePreferences.shared.favoritesDisplayMode
         removeInvalidBookmarkEntities()
         cacheReadOnlyTopLevelBookmarksFolders()
     }
@@ -65,7 +65,7 @@ final class LocalBookmarkStore: BookmarkStore {
     /// All favorites must additionally be children of this special folder. Because this value is used so frequently, it is cached here.
     private var favoritesFolderObjectID: NSManagedObjectID?
 
-    private var favoritesConfiguration: FavoritesConfiguration
+    private var favoritesDisplayMode: FavoritesDisplayMode
 
     private func makeContext() -> NSManagedObjectContext {
         return contextProvider()
@@ -207,15 +207,15 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             self.rootLevelFolderObjectID = folder.objectID
-            let favoritesFolderUUID = favoritesConfiguration.displayedPlatform.rawValue
+            let favoritesFolderUUID = favoritesDisplayMode.displayedPlatform.rawValue
             self.favoritesFolderObjectID = BookmarkUtils.fetchFavoritesFolder(withUUID: favoritesFolderUUID, in: context)?.objectID
         }
     }
 
     // MARK: - Bookmarks
 
-    func applyFavoritesConfiguration(_ configuration: FavoritesConfiguration) {
-        favoritesConfiguration = configuration
+    func applyFavoritesDisplayMode(_ configuration: FavoritesDisplayMode) {
+        favoritesDisplayMode = configuration
         cacheReadOnlyTopLevelBookmarksFolders()
     }
 
@@ -252,7 +252,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 let entities: [BaseBookmarkEntity] = results.compactMap { entity in
                     BaseBookmarkEntity.from(managedObject: entity,
                                             parentFolderUUID: entity.parent?.uuid,
-                                            favoritesConfiguration: self.favoritesConfiguration)
+                                            favoritesDisplayMode: self.favoritesDisplayMode)
                 }
 
                 mainQueueCompletion(bookmarks: entities, error: nil)
@@ -300,7 +300,7 @@ final class LocalBookmarkStore: BookmarkStore {
                                                          context: context)
 
                 if bookmark.isFavorite {
-                    let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesConfiguration, in: context)
+                    let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesDisplayMode, in: context)
                     bookmarkMO.addToFavorites(folders: favoritesFolders)
                 }
             }
@@ -355,7 +355,7 @@ final class LocalBookmarkStore: BookmarkStore {
                     throw BookmarkStoreError.missingEntity
                 }
 
-                let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesConfiguration, in: context)
+                let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesDisplayMode, in: context)
                 bookmarkMO.update(with: bookmark, favoritesFolders: favoritesFolders)
             })
 
@@ -441,9 +441,9 @@ final class LocalBookmarkStore: BookmarkStore {
                 throw BookmarkStoreError.missingEntity
             }
 
-            let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesConfiguration, in: context)
+            let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesDisplayMode, in: context)
             bookmarkManagedObjects.forEach { managedObject in
-                if let entity = BaseBookmarkEntity.from(managedObject: managedObject, parentFolderUUID: nil, favoritesConfiguration: self.favoritesConfiguration) {
+                if let entity = BaseBookmarkEntity.from(managedObject: managedObject, parentFolderUUID: nil, favoritesDisplayMode: self.favoritesDisplayMode) {
                     update(entity)
                     managedObject.update(with: entity, favoritesFolders: favoritesFolders)
                 }
@@ -621,7 +621,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 throw BookmarkStoreError.missingFavoritesRoot
             }
 
-            let favoritesFolderUUID = favoritesConfiguration.displayedPlatform.rawValue
+            let favoritesFolderUUID = favoritesDisplayMode.displayedPlatform.rawValue
 
             // Guarantee that bookmarks are fetched in the same order as the UUIDs. In the future, this should fetch all objects at once with a
             // batch fetch request and have them sorted in the correct order.

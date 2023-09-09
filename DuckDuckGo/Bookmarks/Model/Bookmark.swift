@@ -61,7 +61,7 @@ internal class BaseBookmarkEntity {
     static func from(
         managedObject: BookmarkEntity,
         parentFolderUUID: String? = nil,
-        favoritesConfiguration: FavoritesConfiguration
+        favoritesDisplayMode: FavoritesDisplayMode
     ) -> BaseBookmarkEntity? {
 
         guard let id = managedObject.uuid,
@@ -72,7 +72,7 @@ internal class BaseBookmarkEntity {
 
         if managedObject.isFolder {
             let children: [BaseBookmarkEntity] = managedObject.childrenArray.compactMap {
-                return BaseBookmarkEntity.from(managedObject: $0, parentFolderUUID: id, favoritesConfiguration: favoritesConfiguration)
+                return BaseBookmarkEntity.from(managedObject: $0, parentFolderUUID: id, favoritesDisplayMode: favoritesDisplayMode)
             }
 
             let folder = BookmarkFolder(id: id, title: title, parentFolderUUID: parentFolderUUID, children: children)
@@ -87,7 +87,7 @@ internal class BaseBookmarkEntity {
             return Bookmark(id: id,
                             url: url,
                             title: title,
-                            isFavorite: managedObject.isFavorite(on: favoritesConfiguration.displayedPlatform),
+                            isFavorite: managedObject.isFavorite(on: favoritesDisplayMode.displayedPlatform),
                             parentFolderUUID: parentFolderUUID)
         }
     }

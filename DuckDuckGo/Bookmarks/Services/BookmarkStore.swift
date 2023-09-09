@@ -44,7 +44,7 @@ struct BookmarkImportResult: Equatable {
 
 protocol BookmarkStore {
 
-    func applyFavoritesConfiguration(_ configuration: FavoritesConfiguration)
+    func applyFavoritesDisplayMode(_ configuration: FavoritesDisplayMode)
 
     func loadAll(type: BookmarkStoreFetchPredicateType, completion: @escaping ([BaseBookmarkEntity]?, Error?) -> Void)
     func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?, completion: @escaping (Bool, Error?) -> Void)

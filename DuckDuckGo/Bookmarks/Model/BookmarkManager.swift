@@ -56,22 +56,22 @@ final class LocalBookmarkManager: BookmarkManager {
     static let shared = LocalBookmarkManager()
 
     private init() {
-        self.subscribeToFavoritesConfiguration()
+        self.subscribeToFavoritesDisplayMode()
     }
 
     init(bookmarkStore: BookmarkStore, faviconManagement: FaviconManagement) {
         self.bookmarkStore = bookmarkStore
         self.faviconManagement = faviconManagement
-        self.subscribeToFavoritesConfiguration()
+        self.subscribeToFavoritesDisplayMode()
     }
 
-    private func subscribeToFavoritesConfiguration() {
-        favoritesConfiguration = AppearancePreferences.shared.favoritesConfiguration
-        favoritesConfigurationCancellable = AppearancePreferences.shared.$favoritesConfiguration
+    private func subscribeToFavoritesDisplayMode() {
+        favoritesDisplayMode = AppearancePreferences.shared.favoritesDisplayMode
+        favoritesDisplayModeCancellable = AppearancePreferences.shared.$favoritesDisplayMode
             .dropFirst()
             .sink { [weak self] configuration in
-                self?.favoritesConfiguration = configuration
-                self?.bookmarkStore.applyFavoritesConfiguration(configuration)
+                self?.favoritesDisplayMode = configuration
+                self?.bookmarkStore.applyFavoritesDisplayMode(configuration)
                 self?.loadBookmarks()
             }
     }
@@ -82,8 +82,8 @@ final class LocalBookmarkManager: BookmarkManager {
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared)
     private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
 
-    private var favoritesConfiguration: FavoritesConfiguration = .displayNative(.desktop)
-    private var favoritesConfigurationCancellable: AnyCancellable?
+    private var favoritesDisplayMode: FavoritesDisplayMode = .displayNative(.desktop)
+    private var favoritesDisplayModeCancellable: AnyCancellable?
 
     // MARK: - Bookmarks
 
