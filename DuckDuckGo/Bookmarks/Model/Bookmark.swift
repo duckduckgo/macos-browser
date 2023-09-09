@@ -58,7 +58,12 @@ internal class BaseBookmarkEntity {
         self.isFolder = isFolder
     }
 
-    static func from(managedObject: BookmarkEntity, parentFolderUUID: String? = nil) -> BaseBookmarkEntity? {
+    static func from(
+        managedObject: BookmarkEntity,
+        parentFolderUUID: String? = nil,
+        favoritesConfiguration: FavoritesConfiguration
+    ) -> BaseBookmarkEntity? {
+
         guard let id = managedObject.uuid,
               let title = managedObject.title else {
             assertionFailure("\(#file): Failed to create BaseBookmarkEntity from BookmarkManagedObject")
@@ -67,7 +72,7 @@ internal class BaseBookmarkEntity {
 
         if managedObject.isFolder {
             let children: [BaseBookmarkEntity] = managedObject.childrenArray.compactMap {
-                return BaseBookmarkEntity.from(managedObject: $0, parentFolderUUID: id)
+                return BaseBookmarkEntity.from(managedObject: $0, parentFolderUUID: id, favoritesConfiguration: favoritesConfiguration)
             }
 
             let folder = BookmarkFolder(id: id, title: title, parentFolderUUID: parentFolderUUID, children: children)
@@ -82,7 +87,7 @@ internal class BaseBookmarkEntity {
             return Bookmark(id: id,
                             url: url,
                             title: title,
-                            isFavorite: managedObject.isFavorite(on: .desktop) || managedObject.isFavorite(on: .all),
+                            isFavorite: managedObject.isFavorite(on: favoritesConfiguration.displayedPlatform),
                             parentFolderUUID: parentFolderUUID)
         }
     }

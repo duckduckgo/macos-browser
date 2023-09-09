@@ -64,7 +64,6 @@ final class LocalBookmarkStore: BookmarkStore {
 
     /// All favorites must additionally be children of this special folder. Because this value is used so frequently, it is cached here.
     private var favoritesFolderObjectID: NSManagedObjectID?
-    private var nativeFavoritesFolderObjectID: NSManagedObjectID?
 
     private var favoritesConfiguration: FavoritesConfiguration
 
@@ -81,13 +80,6 @@ final class LocalBookmarkStore: BookmarkStore {
 
     private func favoritesRoot(in context: NSManagedObjectContext) -> BookmarkEntity? {
         guard let objectID = self.favoritesFolderObjectID else {
-            return nil
-        }
-        return try? (context.existingObject(with: objectID) as? BookmarkEntity)
-    }
-
-    private func nativeFavoritesRoot(in context: NSManagedObjectContext) -> BookmarkEntity? {
-        guard let objectID = self.nativeFavoritesFolderObjectID else {
             return nil
         }
         return try? (context.existingObject(with: objectID) as? BookmarkEntity)
@@ -215,10 +207,8 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             self.rootLevelFolderObjectID = folder.objectID
-            let favoritesFolderUUID = FavoritesPlatform.all.rawValue
+            let favoritesFolderUUID = favoritesConfiguration.displayedPlatform.rawValue
             self.favoritesFolderObjectID = BookmarkUtils.fetchFavoritesFolder(withUUID: favoritesFolderUUID, in: context)?.objectID
-            let nativeFavoritesFolderUUID = self.favoritesConfiguration.nativePlatform.rawValue
-            self.nativeFavoritesFolderObjectID = BookmarkUtils.fetchFavoritesFolder(withUUID: nativeFavoritesFolderUUID, in: context)?.objectID
         }
     }
 
@@ -261,7 +251,8 @@ final class LocalBookmarkStore: BookmarkStore {
 
                 let entities: [BaseBookmarkEntity] = results.compactMap { entity in
                     BaseBookmarkEntity.from(managedObject: entity,
-                                            parentFolderUUID: entity.parent?.uuid)
+                                            parentFolderUUID: entity.parent?.uuid,
+                                            favoritesConfiguration: self.favoritesConfiguration)
                 }
 
                 mainQueueCompletion(bookmarks: entities, error: nil)
@@ -308,8 +299,10 @@ final class LocalBookmarkStore: BookmarkStore {
                                                          parent: parentEntity,
                                                          context: context)
 
-                let folders = BookmarkUtils.fetchFavoritesFolders(for: favoritesConfiguration, in: context)
-                bookmarkMO.addToFavorites(folders: folders)
+                if bookmark.isFavorite {
+                    let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesConfiguration, in: context)
+                    bookmarkMO.addToFavorites(folders: favoritesFolders)
+                }
             }
 
             bookmarkMO.uuid = bookmark.id
@@ -362,7 +355,7 @@ final class LocalBookmarkStore: BookmarkStore {
                     throw BookmarkStoreError.missingEntity
                 }
 
-                let favoritesFolders = [self.favoritesRoot(in: context), self.nativeFavoritesRoot(in: context)].compactMap { $0 }
+                let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesConfiguration, in: context)
                 bookmarkMO.update(with: bookmark, favoritesFolders: favoritesFolders)
             })
 
@@ -448,11 +441,9 @@ final class LocalBookmarkStore: BookmarkStore {
                 throw BookmarkStoreError.missingEntity
             }
 
-            let favoritesRoot = self.favoritesRoot(in: context)
-            let nativeFavoritesRoot = self.nativeFavoritesRoot(in: context)
-            let favoritesFolders = [favoritesRoot, nativeFavoritesRoot].compactMap({ $0 })
+            let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesConfiguration, in: context)
             bookmarkManagedObjects.forEach { managedObject in
-                if let entity = BaseBookmarkEntity.from(managedObject: managedObject, parentFolderUUID: nil) {
+                if let entity = BaseBookmarkEntity.from(managedObject: managedObject, parentFolderUUID: nil, favoritesConfiguration: self.favoritesConfiguration) {
                     update(entity)
                     managedObject.update(with: entity, favoritesFolders: favoritesFolders)
                 }

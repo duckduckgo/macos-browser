@@ -55,17 +55,24 @@ final class LocalBookmarkManager: BookmarkManager {
 
     static let shared = LocalBookmarkManager()
 
-    private init() {}
+    private init() {
+        self.subscribeToFavoritesConfiguration()
+    }
 
     init(bookmarkStore: BookmarkStore, faviconManagement: FaviconManagement) {
         self.bookmarkStore = bookmarkStore
         self.faviconManagement = faviconManagement
+        self.subscribeToFavoritesConfiguration()
+    }
 
+    private func subscribeToFavoritesConfiguration() {
         favoritesConfiguration = AppearancePreferences.shared.favoritesConfiguration
         favoritesConfigurationCancellable = AppearancePreferences.shared.$favoritesConfiguration
+            .dropFirst()
             .sink { [weak self] configuration in
                 self?.favoritesConfiguration = configuration
                 self?.bookmarkStore.applyFavoritesConfiguration(configuration)
+                self?.loadBookmarks()
             }
     }
 
