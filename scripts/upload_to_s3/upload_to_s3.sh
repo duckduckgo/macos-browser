@@ -131,7 +131,7 @@ done
 MISSING_FILES+=("appcast2.xml")
 
 # Notify the user about files to be uploaded
-if [[ ${#MISSING_FILES[@]} -gt 0 ]] || [[ ! -z "$OVERWRITE_DMG_VERSION" ]]; then
+if [[ ${#MISSING_FILES[@]} -gt 0 ]] || [[ -n "$OVERWRITE_DMG_VERSION" ]]; then
     if [[ ${#MISSING_FILES[@]} -gt 0 ]]; then
         echo "The following files will be uploaded:"
         for FILE in "${MISSING_FILES[@]}"; do
@@ -139,7 +139,7 @@ if [[ ${#MISSING_FILES[@]} -gt 0 ]] || [[ ! -z "$OVERWRITE_DMG_VERSION" ]]; then
         done
     fi
 
-    if [[ ! -z "$OVERWRITE_DMG_VERSION" ]]; then
+    if [[ -n "$OVERWRITE_DMG_VERSION" ]]; then
         echo "The file duckduckgo-$OVERWRITE_DMG_VERSION.dmg will be used to overwrite duckduckgo.dmg on S3."
     fi
 
@@ -152,13 +152,13 @@ fi
 
 # Upload each missing file
 for FILE in "${MISSING_FILES[@]}"; do
-    AWS_CMD="aws --profile $PROFILE s3 cp $DIRECTORY/$FILE ${S3_PATH}$FILE --acl public-read"
+    AWS_CMD="aws --profile $PROFILE s3 cp \"${DIRECTORY}/${FILE}\" ${S3_PATH}${FILE} --acl public-read"
     execute_aws "$AWS_CMD"
 done
 
 # If the overwrite flag was set, overwrite the primary dmg
-if [[ ! -z "$OVERWRITE_DMG_VERSION" ]]; then
-    AWS_CMD="aws --profile $PROFILE s3 cp $DIRECTORY/duckduckgo-$OVERWRITE_DMG_VERSION.dmg ${S3_PATH}duckduckgo.dmg --acl public-read"
+if [[ -n "$OVERWRITE_DMG_VERSION" ]]; then
+    AWS_CMD="aws --profile $PROFILE s3 cp \"${DIRECTORY}/duckduckgo-$OVERWRITE_DMG_VERSION.dmg\" ${S3_PATH}duckduckgo.dmg --acl public-read"
     execute_aws "$AWS_CMD"
 fi
 
