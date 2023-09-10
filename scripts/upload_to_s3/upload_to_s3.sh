@@ -16,11 +16,14 @@ NAME
     upload_to_s3.sh – automation tool for uploading files to AWS S3 for macOS Desktop Browser
 
 SYNOPSIS
-    $0 [--directory directory_path] [--overwrite-duckduckgo-dmg version] [--debug]
+    $0 --run [--directory directory_path] [--overwrite-duckduckgo-dmg version] [--debug]
     $0 --help
 
 DESCRIPTION
     This script is a tool for uploading macOS Desktop Browser files, specifically appcast2.xml, .dmg, and .delta files, to AWS S3.
+
+    --run
+        Executes the upload process. Without this flag, the script will display the help message.
 
     --directory directory_path
         Specifies the directory that contains the appcast2.xml, .dmg, and .delta files. If not provided, the default value is: $DIRECTORY.
@@ -35,11 +38,14 @@ DESCRIPTION
         Displays this help message.
 
 EXAMPLES
+    Displaying help:
+        $0 --help
+
     Internal release (default settings):
-        ./scripts/upload_to_s3/upload_to_s3.sh
+        $0 --run
 
     Public release:
-        ./scripts/upload_to_s3/upload_to_s3.sh --overwrite-duckduckgo-dmg 2.0.1
+        $0 --run --overwrite-duckduckgo-dmg 2.0.1
 "
 }
 
@@ -53,16 +59,29 @@ function execute_aws() {
 }
 
 # Argument parsing
+if [[ "$#" -eq 0 ]]; then
+    print_usage
+    exit 0
+fi
+
+RUN_COMMAND=0
+
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --directory) DIRECTORY="$2"; shift ;;
         --overwrite-duckduckgo-dmg) OVERWRITE_DMG_VERSION="$2"; shift ;;
         --debug) DEBUG=1 ;;
         --help) print_usage; exit 0 ;; # Display the help and exit immediately.
+        --run) RUN_COMMAND=1 ;;
         *) echo "Unknown parameter passed: $1"; print_usage; exit 1 ;; # Display the help and exit with error.
     esac
     shift
 done
+
+if [[ $RUN_COMMAND -eq 0 ]]; then
+    print_usage
+    exit 0
+fi
 
 # Perform AWS login
 aws sso login --profile $PROFILE
