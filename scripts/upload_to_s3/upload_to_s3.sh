@@ -119,7 +119,7 @@ for FILENAME in $FILES_TO_UPLOAD; do
     # Check if the file exists on S3
     AWS_CMD="aws --profile $PROFILE s3 ls ${S3_PATH}${FILENAME}"
     echo "Checking S3 for ${S3_PATH}${FILENAME}..."
-    if ! $(aws --profile $PROFILE s3 ls ${S3_PATH}${FILENAME} > /dev/null 2>&1); then
+    if ! aws --profile "$PROFILE" s3 ls "${S3_PATH}${FILENAME}" > /dev/null 2>&1; then
         echo "$FILENAME not found on S3. Marking for upload."
         MISSING_FILES+=("$FILENAME")
     else
