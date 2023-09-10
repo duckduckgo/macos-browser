@@ -56,12 +56,8 @@ final class UserScripts: UserScriptsProvider {
 
         autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
 
-        if #available(macOS 11, *) {
-            autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider,
-                                                          config: sourceProvider.privacyConfigurationManager.privacyConfig)
-        } else {
-            autoconsentUserScript = nil
-        }
+        autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider,
+                                                      config: sourceProvider.privacyConfigurationManager.privacyConfig)
 
         if DuckPlayer.shared.isAvailable {
             youtubeOverlayScript = YoutubeOverlayUserScript()

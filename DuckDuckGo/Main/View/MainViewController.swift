@@ -141,8 +141,6 @@ final class MainViewController: NSViewController {
     }
 
     func showBookmarkPromptIfNeeded() {
-        guard #available(macOS 11, *) else { return }
-
         guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
         if bookmarksBarIsVisible {
             // Don't show this to users who obviously know about the bookmarks bar already

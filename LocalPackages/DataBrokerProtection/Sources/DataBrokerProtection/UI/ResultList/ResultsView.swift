@@ -18,7 +18,6 @@
 
 import SwiftUI
 
-@available(macOS 11.0, *)
 struct ResultsView: View {
     @ObservedObject var viewModel: ResultsViewModel
 
@@ -43,7 +42,6 @@ struct ResultsView: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct RemovedProfilesView: View {
     let profiles: [ResultsViewModel.RemovedProfile]
 
@@ -68,7 +66,6 @@ private struct RemovedProfilesView: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct PendingProfilesView: View {
     let profiles: [ResultsViewModel.PendingProfile]
 
@@ -94,7 +91,6 @@ private struct PendingProfilesView: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct RemovedProfileRow: View {
     let removedProfile: ResultsViewModel.RemovedProfile
 
@@ -117,7 +113,6 @@ private struct RemovedProfileRow: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct PendingProfileRow: View {
     let pendingProfile: ResultsViewModel.PendingProfile
     @State private var showModal = false
@@ -313,7 +308,6 @@ private extension View {
 }
 
 // MARK: - Preview
-@available(macOS 11.0, *)
 struct ResultsView_Previews: PreviewProvider {
     static var previews: some View {
         let dataManager = DataBrokerProtectionDataManager()

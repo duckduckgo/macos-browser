@@ -18,7 +18,6 @@
 
 import SwiftUI
 
-@available(macOS 11.0, *)
 struct GettingStartedView: View {
     let buttonClicked: () -> Void
 
@@ -106,7 +105,6 @@ private struct RowItem: Identifiable {
     let subtitle: String
 }
 
-@available(macOS 11.0, *)
 private struct BodyView: View {
     let rowItems: [RowItem]
 
@@ -119,7 +117,6 @@ private struct BodyView: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct RowItemView: View {
     let item: RowItem
 
@@ -165,7 +162,6 @@ private enum Constants {
     static let titleViewSpacing: CGFloat = 16
 }
 
-@available(macOS 11.0, *)
 struct GettingStartedView_Previews: PreviewProvider {
     static var previews: some View {
         GettingStartedView(buttonClicked: {}).frame(width: 600, height: 400)
