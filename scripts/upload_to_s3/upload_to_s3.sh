@@ -27,14 +27,19 @@ DESCRIPTION
 
     --overwrite-duckduckgo-dmg version
         Overwrites the primary duckduckgo.dmg in S3 with the dmg version specified. This option is usually used for public releases.
-        Example:
-        $0 --overwrite-duckduckgo-dmg 2.0.1
 
     --debug
         In debug mode, no 'aws cp' commands will be executed; they will only be printed to stdout.
 
     --help
         Displays this help message.
+
+EXAMPLES
+    Internal release (default settings):
+        ./scripts/upload_to_s3/upload_to_s3.sh
+
+    Public release:
+        ./scripts/upload_to_s3/upload_to_s3.sh --overwrite-duckduckgo-dmg 2.0.1
 "
 }
 
