@@ -626,7 +626,7 @@ final class LocalBookmarkStore: BookmarkStore {
             // Guarantee that bookmarks are fetched in the same order as the UUIDs. In the future, this should fetch all objects at once with a
             // batch fetch request and have them sorted in the correct order.
             let bookmarkManagedObjects: [BookmarkEntity] = objectUUIDs.compactMap { uuid in
-                let entityFetchRequest = BaseBookmarkEntity.favorite(with: uuid, folderUUID: favoritesFolderUUID)
+                let entityFetchRequest = BaseBookmarkEntity.favorite(with: uuid, favoritesFolder: favoritesFolder)
                 return (try? context.fetch(entityFetchRequest))?.first
             }
 
@@ -641,7 +641,7 @@ final class LocalBookmarkStore: BookmarkStore {
                         adjustedInsertionIndex -= 1
                     }
 
-                    bookmarkManagedObject.removeFromFavorites()
+                    bookmarkManagedObject.removeFromFavorites(favoritesRoot: favoritesFolder)
                     if adjustedInsertionIndex < (favoritesFolder.favorites?.count ?? 0) {
                         bookmarkManagedObject.addToFavorites(insertAt: adjustedInsertionIndex,
                                                              favoritesRoot: favoritesFolder)
@@ -653,7 +653,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
             } else {
                 for bookmarkManagedObject in bookmarkManagedObjects {
-                    bookmarkManagedObject.removeFromFavorites()
+                    bookmarkManagedObject.removeFromFavorites(favoritesRoot: favoritesFolder)
                     bookmarkManagedObject.addToFavorites(favoritesRoot: favoritesFolder)
                 }
             }

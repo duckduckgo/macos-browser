@@ -27,13 +27,13 @@ internal class BaseBookmarkEntity {
         return request
     }
 
-    static func favorite(with uuid: String, folderUUID: String) -> NSFetchRequest<BookmarkEntity> {
+    static func favorite(with uuid: String, favoritesFolder: BookmarkEntity) -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
         request.predicate = NSPredicate(format: "%K == %@ AND ANY %K CONTAINS %@ AND %K == NO AND %K == NO",
                                         #keyPath(BookmarkEntity.uuid),
                                         uuid as CVarArg,
                                         #keyPath(BookmarkEntity.favoriteFolders),
-                                        folderUUID,
+                                        favoritesFolder,
                                         #keyPath(BookmarkEntity.isFolder),
                                         #keyPath(BookmarkEntity.isPendingDeletion))
         return request
