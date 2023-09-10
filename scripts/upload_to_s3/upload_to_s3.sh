@@ -8,6 +8,7 @@ DIRECTORY="$HOME/Developer/sparkle-updates"
 PROFILE="ddg-macos"
 DEBUG=0
 OVERWRITE_DMG_VERSION=""
+RUN_COMMAND=0
 
 # Print the usage
 function print_usage() {
@@ -49,6 +50,16 @@ EXAMPLES
 "
 }
 
+# Check if AWS CLI is installed
+function check_aws_installed() {
+    if ! type aws > /dev/null 2>&1; then
+        echo "AWS CLI not found on your system."
+        echo "Please refer to the release task in Asana for instructions on how to install and configure the AWS CLI."
+        echo "Once completed, run this script again."
+        exit 1
+    fi
+}
+
 # Execute AWS command, but just echo it if in debug mode
 function execute_aws() {
     AWS_CMD="$1"
@@ -58,13 +69,13 @@ function execute_aws() {
     fi
 }
 
+check_aws_installed
+
 # Argument parsing
 if [[ "$#" -eq 0 ]]; then
     print_usage
     exit 0
 fi
-
-RUN_COMMAND=0
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
