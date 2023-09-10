@@ -112,8 +112,8 @@ MISSING_FILES=()
 for FILENAME in $FILES_TO_UPLOAD; do
     # Check if the file exists locally
     if [[ ! -f "$DIRECTORY/$FILENAME" ]]; then
-        echo "Warning: File $FILENAME does not exist locally."
-        continue
+        echo "Error: File $FILENAME listed in appcast2.xml does not exist locally."
+        exit 1
     fi
 
     # Check if the file exists on S3
