@@ -77,11 +77,11 @@ public final class DataBrokerProtectionBackgroundManager {
 
         // If there's no saved profile we don't need to start the scheduler
         // TODO actually reading data
-        //if dataManager.fetchProfile() != nil {
+        if dataManager.fetchProfile() != nil {
             scheduler.runQueuedOperations(showWebView: false) { [weak self] in
                 self?.scheduler.startScheduler()
             }
-        //}
+        }
     }
 }
 
