@@ -243,6 +243,14 @@ final class NavigationBarViewController: NSViewController {
         }
     }
 
+    @IBAction func homeButtonAction(_ sender: NSButton) {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("%s: Selected tab view model is nil", type: .error, className)
+            return
+        }
+        selectedTabViewModel.tab.openHomePage()
+    }
+
     // swiftlint:disable force_cast
     @IBAction func optionsButtonAction(_ sender: NSButton) {
 
