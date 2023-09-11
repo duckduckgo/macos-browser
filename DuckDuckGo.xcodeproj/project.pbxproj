@@ -3622,6 +3622,7 @@
 		9D9AE9282AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionBackgroundManager.swift; sourceTree = "<group>"; };
 		9D9AE92B2AAB84FF0026E7DC /* DBPMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBPMocks.swift; sourceTree = "<group>"; };
 		9DB6E7222AA0DA7A00A17F3C /* LoginItems */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LoginItems; sourceTree = "<group>"; };
+		9DD587672AAF8D0D00A5BFA8 /* DuckDuckGo DBP.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "DuckDuckGo DBP.entitlements"; sourceTree = "<group>"; };
 		AA0877B726D5160D00B05660 /* SafariVersionReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariVersionReaderTests.swift; sourceTree = "<group>"; };
 		AA0877B926D5161D00B05660 /* WebKitVersionProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitVersionProviderTests.swift; sourceTree = "<group>"; };
 		AA0F3DB6261A566C0077F2D9 /* SuggestionLoadingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionLoadingMock.swift; sourceTree = "<group>"; };
@@ -6104,6 +6105,7 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
+				9DD587672AAF8D0D00A5BFA8 /* DuckDuckGo DBP.entitlements */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -11671,6 +11673,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3192A2712A4CBD3A0084EA89 /* DuckDuckGoDBP.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "DuckDuckGo DBP.entitlements";
 			};
 			name = Debug;
 		};
@@ -11678,6 +11681,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3192A2712A4CBD3A0084EA89 /* DuckDuckGoDBP.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "DuckDuckGo DBP.entitlements";
 			};
 			name = CI;
 		};
@@ -11685,6 +11689,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3192A2712A4CBD3A0084EA89 /* DuckDuckGoDBP.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "DuckDuckGo DBP.entitlements";
 			};
 			name = Release;
 		};
@@ -11692,6 +11697,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3192A2712A4CBD3A0084EA89 /* DuckDuckGoDBP.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "DuckDuckGo DBP.entitlements";
 			};
 			name = Review;
 		};
