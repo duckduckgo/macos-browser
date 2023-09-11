@@ -248,7 +248,7 @@ extension Preferences {
                 Spacer()
             }
             .padding()
-            .frame(width: 480, height: 650)
+            .frame(width: 480, height: 450)
         }
 
         private func selectDeselect(_ item: MenuItem) {
@@ -272,6 +272,8 @@ extension Preferences {
         let name: String
         let isExpanded: Bool
 
+        @State var fullHeight: CGFloat = 0.0
+
         var body: some View {
             VStack(alignment: .leading) {
 
@@ -293,21 +295,44 @@ extension Preferences {
                 }
                 .drawingGroup()
 
-                if isExpanded {
-                    VStack(alignment: .leading) {
-                        TextMenuItemCaption(text: "Your subscription is automatically available on any device signed in to the same Apple ID.")
-                            .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
-                        TextMenuItemCaption(text: "Your subscription is automatically available on any device signed in to the same Apple ID.")
-                            .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
-                        TextMenuItemCaption(text: "Your subscription is automatically available on any device signed in to the same Apple ID.")
-                            .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
+//                if isExpanded {
+                    ZStack {
+//                        Rectangle()
+//                            .foregroundColor(.red)
+                        VStack(alignment: .leading) {
+                            Group {
+                                TextMenuItemCaption(text: "111111 Your subscription is automatically available on any device signed in to the same Apple ID.")
+                                    .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
+                                TextMenuItemCaption(text: "2222222222222 Your subscription is automatically available on any device signed in to the same Apple ID.")
+                                    .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
+                                TextMenuItemCaption(text: "33 Your subscription is automatically available on any device signed in to the same Apple ID.")
+                                    .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
 
-                        Button("Button") { }
+                                Button("Button") { }
+
+                            }
+                            .frame(alignment: .topLeading)
+                        }
+                        .background(
+                            GeometryReader { proxy in
+                                Color.clear.onAppear {
+                                    fullHeight = proxy.size.height
+                                    print("Height = \(fullHeight)")
+                                }
+                            }
+                        )
+//                        .animation(.none?.delay(2))
+                        .transaction { t in
+                            t.animation = nil
+                        }
+
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxHeight: isExpanded ? fullHeight : 0)
                     .clipped()
+
                 }
-            }
+//            }
+            
         }
     }
 }
