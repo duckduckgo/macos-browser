@@ -216,6 +216,8 @@ extension Preferences {
                      MenuItem(name: "Sync", image: "", description: "")]
         @State private var selection: Set<MenuItem> = []
 
+        @State private var selected: String = ""
+
         var body: some View {
             Button("X") {
                 dismiss()
@@ -226,6 +228,7 @@ extension Preferences {
                     .font(.title)
                 Text("Access your Privacy Pro subscription on this device via Sync, Apple ID or an email address.")
 
+
                 VStack {
                     ForEach(items) { item in
                         PlaceView(name: item.name, isExpanded: self.selection.contains(item))
@@ -233,17 +236,16 @@ extension Preferences {
                             .onTapGesture {
                                 self.selectDeselect(item)
                             }
-                            .animation(.linear(duration: 2.3))
 
                         if items.last != item {
                             Divider()
-                                .animation(.linear(duration: 2.3))
                         }
                     }
                 }
                 .frame(minWidth: 440)
                 .padding(10)
                 .roundedBorder()
+                .animation(.linear(duration: 0.3))
 
                 Spacer()
             }
@@ -295,44 +297,31 @@ extension Preferences {
                 }
                 .drawingGroup()
 
-//                if isExpanded {
-                    ZStack {
-//                        Rectangle()
-//                            .foregroundColor(.red)
-                        VStack(alignment: .leading) {
-                            Group {
-                                TextMenuItemCaption(text: "111111 Your subscription is automatically available on any device signed in to the same Apple ID.")
-                                    .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
-                                TextMenuItemCaption(text: "2222222222222 Your subscription is automatically available on any device signed in to the same Apple ID.")
-                                    .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
-                                TextMenuItemCaption(text: "33 Your subscription is automatically available on any device signed in to the same Apple ID.")
-                                    .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
+                VStack(alignment: .leading) {
+                    TextMenuItemCaption(text: "111111 Your subscription is automatically available on any device signed in to the same Apple ID.")
+                        .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
+                    TextMenuItemCaption(text: "2222222222222 Your subscription is automatically available on any device signed in to the same Apple ID.")
+                        .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
+                    TextMenuItemCaption(text: "33 Your subscription is automatically available on any device signed in to the same Apple ID.")
+                        .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
 
-                                Button("Button") { }
-
-                            }
-                            .frame(alignment: .topLeading)
-                        }
-                        .background(
-                            GeometryReader { proxy in
-                                Color.clear.onAppear {
-                                    fullHeight = proxy.size.height
-                                    print("Height = \(fullHeight)")
-                                }
-                            }
-                        )
-//                        .animation(.none?.delay(2))
-                        .transaction { t in
-                            t.animation = nil
-                        }
-
-                    }
-                    .frame(maxHeight: isExpanded ? fullHeight : 0)
-                    .clipped()
-
+                    Button("Button") { }
                 }
-//            }
-            
+                .background(
+                    GeometryReader { proxy in
+                        Color.clear.onAppear {
+                            fullHeight = proxy.size.height
+                            print("Height = \(fullHeight)")
+                        }
+                    }
+                )
+                .transaction { t in
+                    t.animation = nil
+                }
+                .frame(maxHeight: isExpanded ? fullHeight : 0, alignment: .top)
+                .clipped()
+                .opacity(isExpanded ? 1.0 : 0.0)
+            }
         }
     }
 }
