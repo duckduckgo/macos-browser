@@ -201,35 +201,11 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     private func migrateToFormFactorSpecificFavoritesFolders() {
-        // 1. Create form-factor-specific Favorites Folders if needed
-        // 2. Create a relationship between all favorites and the Desktop Favorites Folder
-
         let context = makeContext()
 
         context.performAndWait {
             do {
-                guard let favoritesFolder = BookmarkUtils.fetchFavoritesFolder(withUUID: BookmarkEntity.Constants.favoritesFolderID, in: context) else {
-                    return
-                }
-
-                if BookmarkUtils.fetchFavoritesFolder(withUUID: BookmarkEntity.Constants.desktopFavoritesFolderID, in: context) == nil {
-                    let desktopFavoritesFolder = BookmarkEntity.init(context: context)
-                    desktopFavoritesFolder.title = "Desktop Favorites Folder"
-                    desktopFavoritesFolder.isFolder = true
-                    desktopFavoritesFolder.uuid = BookmarkEntity.Constants.desktopFavoritesFolderID
-
-                    favoritesFolder.favoritesArray.forEach { bookmark in
-                        bookmark.addToFavorites(folders: [desktopFavoritesFolder])
-                    }
-                }
-
-                if BookmarkUtils.fetchFavoritesFolder(withUUID: BookmarkEntity.Constants.mobileFavoritesFolderID, in: context) == nil {
-                    let mobileFavoritesFolder = BookmarkEntity.init(context: context)
-                    mobileFavoritesFolder.title = "Mobile Favorites Folder"
-                    mobileFavoritesFolder.isFolder = true
-                    mobileFavoritesFolder.uuid = BookmarkEntity.Constants.mobileFavoritesFolderID
-                    mobileFavoritesFolder.shouldManageModifiedAt = false
-                }
+                BookmarkUtils.migrateToFormFactorSpecificFavorites(byCopyingExistingTo: .desktop, in: context)
 
                 if context.hasChanges {
                     try context.save()
