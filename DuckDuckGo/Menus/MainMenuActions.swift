@@ -21,6 +21,7 @@ import Cocoa
 import Common
 import WebKit
 import Accounts
+import Subscription
 
 // Actions are sent to objects of responder chain
 
@@ -742,6 +743,10 @@ extension MainViewController {
 
     @IBAction func simulateAccountSignOut(_ sender: Any?) {
         AccountManager().signOut()
+    }
+
+    @IBAction func managePurchases(_ sender: Any?) {
+        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(DebugManagePurchasesViewController())
     }
 
     // MARK: - Developer Tools

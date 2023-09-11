@@ -28,6 +28,12 @@ public enum StoreError: Error {
     case failedVerification
 }
 
+public class AnotherSubsTestingClass {
+    public static func test() {
+        print("test")
+    }
+}
+
 @available(macOS 12.0, *)
 @MainActor
 final class PurchaseManager: ObservableObject {
@@ -97,7 +103,7 @@ final class PurchaseManager: ObservableObject {
         }
     }
 
-    private let session = URLSession(configuration: .ephemeral)
+//    private let session = URLSession(configuration: .ephemeral)
 
 //    @MainActor
 //    func sendPurchaseConfirmation(for transaction: Transaction) async {

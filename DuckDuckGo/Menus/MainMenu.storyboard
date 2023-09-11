@@ -1071,6 +1071,12 @@ CQ
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem isSeparatorItem="YES" id="Xtf-rp-WJR"/>
+                                                    <menuItem title="Manage Purchases" id="8QF-Aw-Mfn">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="managePurchases:" target="Ady-hI-5gd" id="ha5-Yv-msM"/>
+                                                        </connections>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>
