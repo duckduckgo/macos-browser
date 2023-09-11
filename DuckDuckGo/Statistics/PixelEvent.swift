@@ -211,6 +211,7 @@ extension Pixel {
 
             case bookmarksStoreRootFolderMigrationFailed
             case bookmarksStoreFavoritesFolderMigrationFailed
+            case bookmarksStoreFormFactorSpecificFavoritesMigrationFailed
 
             case adAttributionCompilationFailedForAttributedRulesList
             case adAttributionGlobalAttributedRulesDoNotExist
@@ -548,6 +549,8 @@ extension Pixel.Event.Debug {
             return "bookmarks_store_root_folder_migration_failed"
         case .bookmarksStoreFavoritesFolderMigrationFailed:
             return "bookmarks_store_favorites_folder_migration_failed"
+        case .bookmarksStoreFormFactorSpecificFavoritesMigrationFailed:
+            return "bookmarks_store_form_factor_specific_favorites_migration_failed"
 
         case .adAttributionCompilationFailedForAttributedRulesList:
             return "ad_attribution_compilation_failed_for_attributed_rules_list"

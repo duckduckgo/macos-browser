@@ -90,7 +90,6 @@ extension LegacyBookmarkStore {
     func migrate(context: NSManagedObjectContext) {
         migrateTopLevelStorageToRootLevelBookmarksFolder(context: context)
         migrateToFavoritesFolder(context: context)
-        migrateToFormFactorSpecificFavoritesFolders(context: context)
     }
 
     private func migrateTopLevelStorageToRootLevelBookmarksFolder(context: NSManagedObjectContext) {
@@ -214,46 +213,6 @@ extension LegacyBookmarkStore {
         } catch {
             Pixel.fire(.debug(event: .bookmarksStoreRootFolderMigrationFailed, error: error))
         }
-    }
-
-    private func migrateToFormFactorSpecificFavoritesFolders(context: NSManagedObjectContext) {
-//        // 1. Create Favorites Folder if needed
-//        // 2. Create a relationship between all favorites and the Favorites Folder
-//
-//        let favoritesFolderFetchRequest = LegacyBookmarkQueries.favoritesFolderFetchRequest()
-//
-//        let favoritesFetchRequest = NSFetchRequest<BookmarkManagedObject>(entityName: "BookmarkManagedObject")
-//        favoritesFetchRequest.predicate = NSPredicate(format: "isFolder == NO AND isFavorite == YES")
-//        favoritesFetchRequest.sortDescriptors = [.init(key: "dateAdded", ascending: true)]
-//
-//        do {
-//            // 0. Up front, check if a Favorites Folder exists, and if it does, return early (already migrated)
-//
-//            if (try context.fetch(favoritesFolderFetchRequest).first) != nil {
-//                return
-//            }
-//
-//            // 1. Create Favorites Folder
-//            let managedObject = BookmarkManagedObject.createFavoritesFolder(in: context)
-//
-//            guard let favoritesFolder = managedObject as? BookmarkManagedObject else {
-//                assertionFailure("LocalBookmarkStore: Failed to create Favorites Folder")
-//                return
-//            }
-//
-//            try context.save()
-//
-//            // 2. Get existing favorites:
-//            let existingFavoritesEntities = try context.fetch(favoritesFetchRequest)
-//
-//            // 3. Add favorites to Favorites Folder
-//            favoritesFolder.mutableFavorites.addObjects(from: existingFavoritesEntities)
-//
-//            // 4. Save the migration:
-//            try context.save()
-//        } catch {
-//            Pixel.fire(.debug(event: .bookmarksStoreRootFolderMigrationFailed, error: error))
-//        }
     }
 }
 
