@@ -138,10 +138,10 @@ final class AddressBarTextField: NSTextField {
                 let originalStringValue = suggestion.userStringValue
                 if value.string.lowercased().hasPrefix(originalStringValue.lowercased()) {
 
-                    selectToTheEnd(from: originalStringValue.count)
+                    editor?.selectToTheEnd(from: originalStringValue.count)
                 } else {
                     // if suggestion doesn't start with the user input select whole string
-                    currentEditor()?.selectAll(nil)
+                    editor?.selectAll(nil)
                 }
             }
         }
@@ -157,12 +157,11 @@ final class AddressBarTextField: NSTextField {
         return stringValue.dropping(suffix: suffix.string)
     }
 
-    var stringValueWithoutSuffixRange: NSRange {
-        let stringValue = currentEditor()?.string ?? stringValue
+    var stringValueWithoutSuffixRange: Range<String.Index> {
+        let string = editor?.string ?? stringValue
         guard let suffix = suffix?.string,
-              stringValue.hasSuffix(suffix) else { return stringValue.fullRange }
-        let range = stringValue.startIndex..<stringValue.index(stringValue.endIndex, offsetBy: -suffix.count)
-        return NSRange(range, in: stringValue)
+              string.hasSuffix(suffix) else { return string.startIndex..<string.endIndex }
+        return string.startIndex..<string.index(string.endIndex, offsetBy: -suffix.count)
     }
 
     private func updateAttributedStringValue() {
@@ -395,17 +394,6 @@ final class AddressBarTextField: NSTextField {
             isUndoDisabled = false
         }
         return job()
-    }
-
-    // MARK: - Cursor & Selection
-
-    private func selectToTheEnd(from offset: Int) {
-        guard let currentEditor = currentEditor() else { return }
-
-        let string = currentEditor.string
-        let startIndex = string.index(string.startIndex, offsetBy: string.count > offset ? offset : 0)
-        let endIndex = max(startIndex, string.index(string.endIndex, offsetBy: -(suffix?.string.count ?? 0)))
-        currentEditor.selectedRange = NSRange(startIndex..<endIndex, in: string)
     }
 
     // MARK: - Suggestion window
@@ -916,7 +904,8 @@ extension AddressBarTextField: NSTextViewDelegate {
             isUndoDisabled = true
         }
 
-        // process the insertion
+        // call `AddressBarTextEditor:super.insertText(typedString, replacementRange: insertionRange)`
+        // which will call `controlTextDidChange:` with `isHandlingUserAppendingText`/`isUndoDisabled` flags set if suited
         callback()
 
         isHandlingUserAppendingText = false
@@ -928,7 +917,8 @@ extension AddressBarTextField: NSTextViewDelegate {
             // artifacts can appear when the selection changes, especially if the size of the field has changed, this clears them
             textView.needsDisplay = true
         }
-        return range.adjusted(to: stringValueWithoutSuffixRange)
+        guard let range = Range(range, in: textView.string) else { return range }
+        return NSRange(range.clamped(to: stringValueWithoutSuffixRange), in: textView.string)
     }
 
     func textView(_ view: NSTextView, menu: NSMenu, for event: NSEvent, at charIndex: Int) -> NSMenu? {

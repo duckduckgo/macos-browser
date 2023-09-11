@@ -2497,6 +2497,9 @@
 		B60C6F8B29B1CAC0007BFAA8 /* FileManagerTempDirReplacement.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60C6F8329B1BAD3007BFAA8 /* FileManagerTempDirReplacement.swift */; };
 		B60C6F8D29B200AB007BFAA8 /* SavePanelAccessoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60C6F8C29B200AB007BFAA8 /* SavePanelAccessoryView.swift */; };
 		B60C6F8E29B200AB007BFAA8 /* SavePanelAccessoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60C6F8C29B200AB007BFAA8 /* SavePanelAccessoryView.swift */; };
+		B60D64492AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60D64482AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift */; };
+		B60D644A2AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60D64482AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift */; };
+		B60D644B2AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60D64482AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift */; };
 		B6106BA026A7BE0B0013B453 /* PermissionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106B9F26A7BE0B0013B453 /* PermissionManagerTests.swift */; };
 		B6106BA726A7BECC0013B453 /* PermissionAuthorizationQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BA526A7BEC80013B453 /* PermissionAuthorizationQuery.swift */; };
 		B6106BAB26A7BF1D0013B453 /* PermissionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106BAA26A7BF1D0013B453 /* PermissionType.swift */; };
@@ -2606,9 +2609,6 @@
 		B6676BE12AA986A700525A21 /* AddressBarTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6676BE02AA986A700525A21 /* AddressBarTextEditor.swift */; };
 		B6676BE22AA986A700525A21 /* AddressBarTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6676BE02AA986A700525A21 /* AddressBarTextEditor.swift */; };
 		B6676BE32AA986A700525A21 /* AddressBarTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6676BE02AA986A700525A21 /* AddressBarTextEditor.swift */; };
-		B6676BE52AA98D7700525A21 /* NSRangeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6676BE42AA98D7700525A21 /* NSRangeExtension.swift */; };
-		B6676BE62AA98D7700525A21 /* NSRangeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6676BE42AA98D7700525A21 /* NSRangeExtension.swift */; };
-		B6676BE72AA98D7700525A21 /* NSRangeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6676BE42AA98D7700525A21 /* NSRangeExtension.swift */; };
 		B6685E3D29A602D90043D2EE /* ExternalAppSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B687B7CB2947A1E9001DEA6F /* ExternalAppSchemeHandler.swift */; };
 		B6685E3F29A606190043D2EE /* WorkspaceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6685E3E29A606190043D2EE /* WorkspaceProtocol.swift */; };
 		B6685E4029A606190043D2EE /* WorkspaceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6685E3E29A606190043D2EE /* WorkspaceProtocol.swift */; };
@@ -3804,6 +3804,7 @@
 		B60C6F8029B1B4AD007BFAA8 /* TestRunHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestRunHelper.swift; sourceTree = "<group>"; };
 		B60C6F8329B1BAD3007BFAA8 /* FileManagerTempDirReplacement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManagerTempDirReplacement.swift; sourceTree = "<group>"; };
 		B60C6F8C29B200AB007BFAA8 /* SavePanelAccessoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavePanelAccessoryView.swift; sourceTree = "<group>"; };
+		B60D64482AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarTextSelectionNavigation.swift; sourceTree = "<group>"; };
 		B6106B9D26A565DA0013B453 /* BundleExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleExtension.swift; sourceTree = "<group>"; };
 		B6106B9F26A7BE0B0013B453 /* PermissionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionManagerTests.swift; sourceTree = "<group>"; };
 		B6106BA526A7BEC80013B453 /* PermissionAuthorizationQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionAuthorizationQuery.swift; sourceTree = "<group>"; };
@@ -3884,7 +3885,6 @@
 		B662D3D82755D7AD0035D4D6 /* PixelStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelStoreTests.swift; sourceTree = "<group>"; };
 		B662D3DD275613BB0035D4D6 /* EncryptionKeyStoreMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionKeyStoreMock.swift; sourceTree = "<group>"; };
 		B6676BE02AA986A700525A21 /* AddressBarTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBarTextEditor.swift; sourceTree = "<group>"; };
-		B6676BE42AA98D7700525A21 /* NSRangeExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSRangeExtension.swift; sourceTree = "<group>"; };
 		B6685E3E29A606190043D2EE /* WorkspaceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceProtocol.swift; sourceTree = "<group>"; };
 		B6685E4129A61C460043D2EE /* DownloadsTabExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadsTabExtension.swift; sourceTree = "<group>"; };
 		B66B9C5B29A5EBAD0010E8F3 /* NavigationActionExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigationActionExtension.swift; sourceTree = "<group>"; };
@@ -6499,16 +6499,17 @@
 			isa = PBXGroup;
 			children = (
 				AA7EB6EE27E880EA00036718 /* Animations */,
-				85589E8C27BBBB870038AD11 /* NavigationBar.storyboard */,
-				AA68C3D22490ED62001B8783 /* NavigationBarViewController.swift */,
-				14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */,
+				AAC5E4F025D6BF10007F5990 /* AddressBarButton.swift */,
+				AAC5E4F525D6BF2C007F5990 /* AddressBarButtonsViewController.swift */,
 				AABEE6AE24AD22B90043105B /* AddressBarTextField.swift */,
 				B6676BE02AA986A700525A21 /* AddressBarTextEditor.swift */,
-				AAC5E4F525D6BF2C007F5990 /* AddressBarButtonsViewController.swift */,
-				AAC5E4F025D6BF10007F5990 /* AddressBarButton.swift */,
-				AAA0CC32252F181A0079BC96 /* NavigationButtonMenuDelegate.swift */,
+				B60D64482AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift */,
+				14D9B8F924F7E089000D4D13 /* AddressBarViewController.swift */,
 				AAA0CC462533833C0079BC96 /* MoreOptionsMenu.swift */,
+				85589E8C27BBBB870038AD11 /* NavigationBar.storyboard */,
+				AAA0CC32252F181A0079BC96 /* NavigationButtonMenuDelegate.swift */,
 				85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */,
+				AA68C3D22490ED62001B8783 /* NavigationBarViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -6943,7 +6944,6 @@
 				AA5C8F5D2590EEE800748EB7 /* NSPointExtension.swift */,
 				1D6A491F29CF7A490011DF74 /* NSPopoverExtension.swift */,
 				85625999269CA0A600EE44BC /* NSRectExtension.swift */,
-				B6676BE42AA98D7700525A21 /* NSRangeExtension.swift */,
 				B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */,
 				AAC5E4E325D6BA9C007F5990 /* NSSizeExtension.swift */,
 				4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */,
@@ -8931,7 +8931,6 @@
 				3192A0342A4C4CFF0084EA89 /* Favicons.xcdatamodeld in Sources */,
 				3192A0352A4C4CFF0084EA89 /* Publisher.asVoid.swift in Sources */,
 				3192A0362A4C4CFF0084EA89 /* NavigationButtonMenuDelegate.swift in Sources */,
-				B6676BE72AA98D7700525A21 /* NSRangeExtension.swift in Sources */,
 				3192A0372A4C4CFF0084EA89 /* CrashReport.swift in Sources */,
 				3192A0382A4C4CFF0084EA89 /* NSPopoverExtension.swift in Sources */,
 				3192A0392A4C4CFF0084EA89 /* NSPathControlView.swift in Sources */,
@@ -9044,6 +9043,7 @@
 				3192A09C2A4C4CFF0084EA89 /* CookieConsentPopoverManager.swift in Sources */,
 				3192A09D2A4C4CFF0084EA89 /* PasswordManagementIdentityItemView.swift in Sources */,
 				3192A09E2A4C4CFF0084EA89 /* ProgressExtension.swift in Sources */,
+				B60D644B2AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift in Sources */,
 				3192A09F2A4C4CFF0084EA89 /* CSVParser.swift in Sources */,
 				3192A0A02A4C4CFF0084EA89 /* PixelDataModel.xcdatamodeld in Sources */,
 				3192A0A12A4C4CFF0084EA89 /* PrivacyDashboardWebView.swift in Sources */,
@@ -9456,6 +9456,7 @@
 				3706FA93293F65D500E42796 /* WKWebView+Download.swift in Sources */,
 				3706FA94293F65D500E42796 /* TabShadowConfig.swift in Sources */,
 				3706FA97293F65D500E42796 /* WindowDraggingView.swift in Sources */,
+				B60D644A2AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift in Sources */,
 				3706FA98293F65D500E42796 /* SecureVaultSorting.swift in Sources */,
 				3706FA99293F65D500E42796 /* PreferencesSidebarModel.swift in Sources */,
 				3706FA9A293F65D500E42796 /* DuckPlayerURLExtension.swift in Sources */,
@@ -9948,7 +9949,6 @@
 				3706FC2F293F65D500E42796 /* MouseOverButton.swift in Sources */,
 				3706FC30293F65D500E42796 /* FireInfoViewController.swift in Sources */,
 				3706FC31293F65D500E42796 /* PermissionButton.swift in Sources */,
-				B6676BE62AA98D7700525A21 /* NSRangeExtension.swift in Sources */,
 				3706FC32293F65D500E42796 /* MoreOptionsMenu.swift in Sources */,
 				3706FC34293F65D500E42796 /* PermissionAuthorizationViewController.swift in Sources */,
 				3706FC35293F65D500E42796 /* BookmarkNode.swift in Sources */,
@@ -10572,6 +10572,7 @@
 				B68458CD25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift in Sources */,
 				85AC7ADD27BEB6EE00FFB69B /* HomePageDefaultBrowserModel.swift in Sources */,
 				AAC30A26268DFEE200D2D9CD /* CrashReporter.swift in Sources */,
+				B60D64492AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift in Sources */,
 				3184AC6D288F29D800C35E4B /* BadgeNotificationAnimationModel.swift in Sources */,
 				857FFEC027D239DC00415E7A /* HyperLink.swift in Sources */,
 				37445F992A1566420029F789 /* SyncDataProviders.swift in Sources */,
@@ -10989,7 +10990,6 @@
 				85707F31276A7DCA00DC0649 /* OnboardingViewModel.swift in Sources */,
 				85AC3B0525D6B1D800C7D2AA /* ScriptSourceProviding.swift in Sources */,
 				4BB99D0026FE191E001E4761 /* CoreDataBookmarkImporter.swift in Sources */,
-				B6676BE52AA98D7700525A21 /* NSRangeExtension.swift in Sources */,
 				4B4D60B52A0C847A00BCD287 /* LoginItem.swift in Sources */,
 				AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */,
 				4B9292A326670D2A00AD2C21 /* BookmarkManagedObject.swift in Sources */,

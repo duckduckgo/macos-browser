@@ -31,6 +31,16 @@ final class AddressBarTextEditor: NSTextView {
         return addressBar
     }
 
+    @available(macOS 12.0, *)
+    override var textLayoutManager: NSTextLayoutManager? {
+        if let textLayoutManager = super.textLayoutManager,
+           !(textLayoutManager.textSelectionNavigation is AddressBarTextSelectionNavigation) {
+            textLayoutManager.textSelectionNavigation = AddressBarTextSelectionNavigation(dataSource: textLayoutManager)
+        }
+
+        return super.textLayoutManager
+    }
+
     override func paste(_ sender: Any?) {
         // Fixes an issue when url-name instead of url is pasted
         if let url = NSPasteboard.general.url {
@@ -44,38 +54,16 @@ final class AddressBarTextEditor: NSTextView {
         CopyHandler().copy(sender)
     }
 
-    override func selectionRange(forProposedRange proposedCharRange: NSRange, granularity: NSSelectionGranularity) -> NSRange {
-        let selectableRange = addressBar?.stringValueWithoutSuffixRange ?? self.string.fullRange
-
-        var range: NSRange
-        switch granularity {
-        case .selectByParagraph:
-            // select all and then adjust by removing suffix
-            range = selectableRange
-
-        case .selectByWord:
-            range = proposedCharRange.adjusted(to: selectableRange)
-            // if selection for word included suffix, move one character before adjusted range to select last word w/o suffix
-            if range != proposedCharRange,
-               range.location > 0 {
-                range.location -= 1
-            }
-            // select word and then adjust by removing suffix
-            range = super.selectionRange(forProposedRange: range, granularity: granularity)
-
-        case .selectByCharacter: fallthrough
-        @unknown default:
-            // adjust caret location only
-            range = proposedCharRange
-        }
-        return range.adjusted(to: selectableRange)
-    }
+    // MARK: - Exclude “ – Search with DuckDuckGo” suffix from selection range
 
     override func setSelectedRanges(_ ranges: [NSValue], affinity: NSSelectionAffinity, stillSelecting stillSelectingFlag: Bool) {
-        let selectableRange = addressBar?.stringValueWithoutSuffixRange ?? self.string.fullRange
-        guard let range = ranges.map(\.rangeValue).first?.adjusted(to: selectableRange) else { return }
+        let string = self.string
+        guard let selectableRange = addressBar?.stringValueWithoutSuffixRange,
+              !ranges.isEmpty,
+              let range = Range(ranges[0].rangeValue, in: string) else { return }
 
-        super.setSelectedRanges([NSValue(range: range)], affinity: affinity, stillSelecting: stillSelectingFlag)
+        let clamped = range.clamped(to: selectableRange)
+        super.setSelectedRanges([NSValue(range: NSRange(clamped, in: string))], affinity: affinity, stillSelecting: stillSelectingFlag)
     }
 
     override func characterIndexForInsertion(at point: NSPoint) -> Int {
@@ -94,13 +82,71 @@ final class AddressBarTextEditor: NSTextView {
         }
     }
 
+    func selectToTheEnd(from offset: Int) {
+        let string = self.string
+        let startIndex = string.index(string.startIndex, offsetBy: min(string.count, offset))
+        let range = NSRange(startIndex..., in: string)
+
+        self.setSelectedRanges([NSValue(range: range)], affinity: .downstream /* rtl */, stillSelecting: false)
+    }
+
+    // MARK: - Moving selection by word
+
+    @available(macOS, deprecated: 12.0, message: "Move this logic to AddressBarTextSelectionNavigation")
+    override func selectionRange(forProposedRange proposedCharRange: NSRange, granularity: NSSelectionGranularity) -> NSRange {
+        let string = self.string
+        guard let selectableRange = addressBar?.stringValueWithoutSuffixRange,
+              var proposedRange = Range(proposedCharRange, in: string)?.clamped(to: selectableRange) else { return proposedCharRange }
+
+        let range: Range<String.Index>
+        switch granularity {
+        case .selectByParagraph:
+            // select all
+            range = selectableRange
+
+        case .selectByWord:
+            // if at the end of string: adjust proposed selection to include last character
+            if proposedRange.lowerBound == selectableRange.upperBound, !selectableRange.isEmpty {
+                proposedRange = string.index(selectableRange.upperBound, offsetBy: -1)..<selectableRange.upperBound
+            } else if proposedRange.upperBound < selectableRange.upperBound, proposedRange.isEmpty {
+                // include at least one character in selection
+                proposedRange = proposedRange.lowerBound..<string.index(after: proposedRange.lowerBound)
+            }
+
+            // index of separator before the selected character (including the character itself)
+            let startIndex = min(string.rangeOfCharacter(from: .urlWordBoundCharacters,
+                                                         options: .backwards,
+                                                         // search from the beginning of selectable range to the end of the clicked character
+                                                         range: selectableRange.lowerBound..<proposedRange.upperBound)?.upperBound
+                                 // separator not found: the selectable range start index
+                                 ?? selectableRange.lowerBound,
+                                 // if the clicked character is a separator itself - selection should start from the character
+                                 proposedRange.lowerBound)
+            // index of separator after the selected character (including the character itself)
+            let endIndex = max(string.rangeOfCharacter(from: .urlWordBoundCharacters,
+                                                       options: [],
+                                                       // search from the beginning of the clicked character to the end of the selectable range
+                                                       range: proposedRange.lowerBound..<selectableRange.upperBound)?.lowerBound
+                               // separator not found: use the selectable range end index
+                               ?? selectableRange.upperBound,
+                               // if the clicked character is a separator itself - selection should start from the character
+                               proposedRange.upperBound)
+            range = startIndex..<endIndex
+
+        case .selectByCharacter: fallthrough
+        @unknown default:
+            // adjust caret location only
+            range = proposedRange
+        }
+
+        return NSRange(range, in: string)
+    }
+
     private func nextWordSelectionIndex(backwards: Bool) -> Int? {
         let string = self.string
 
-        guard let selectableNsRange = addressBar?.stringValueWithoutSuffixRange else { return nil }
-        let selectedNsRange = selectedRange().adjusted(to: selectableNsRange)
-        guard let selectableRange = Range(selectableNsRange, in: string),
-              let selectedRange = Range(selectedNsRange, in: string) else { return nil }
+        guard let selectableRange = addressBar?.stringValueWithoutSuffixRange,
+              let selectedRange = Range(selectedRange(), in: string)?.clamped(to: selectableRange) else { return nil }
 
         var index = backwards ? selectedRange.lowerBound : selectedRange.upperBound
         var searchRange: Range<String.Index> {
@@ -160,9 +206,12 @@ final class AddressBarTextEditor: NSTextView {
     }
 
     override func deleteForward(_ sender: Any?) {
-        let selectedRange = self.selectedRange()
-        // Collision of suffix and forward deleting
-        guard selectedRange.length > 0 || selectedRange.upperBound != addressBar?.stringValueWithoutSuffixRange.upperBound else { return }
+        let string = self.string
+
+        guard let selectedRange = Range(self.selectedRange(), in: string),
+              let addressBar,
+              // Collision of suffix and forward deleting
+              !selectedRange.isEmpty || selectedRange.upperBound < addressBar.stringValueWithoutSuffixRange.upperBound else { return }
 
         super.deleteForward(sender)
     }
