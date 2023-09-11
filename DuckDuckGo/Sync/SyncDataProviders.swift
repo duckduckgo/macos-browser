@@ -63,14 +63,19 @@ final class SyncDataProviders: DataProvidersSource {
             .removeDuplicates()
 
         syncAuthStateDidChangeCancellable = syncAuthStateDidChangePublisher
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] isSyncDisabled in
                 self?.bookmarksAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: isSyncDisabled)
                 self?.credentialsAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: isSyncDisabled)
+                if isSyncDisabled {
+                    AppearancePreferences.shared.favoritesDisplayMode = .displayNative(.desktop)
+                }
             }
 
         if syncService.authState == .inactive {
             bookmarksAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: true)
             credentialsAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: true)
+            AppearancePreferences.shared.favoritesDisplayMode = .displayNative(.desktop)
         }
     }
 

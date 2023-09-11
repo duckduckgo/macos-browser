@@ -83,6 +83,7 @@ extension Preferences {
 
     struct AppearanceView: View {
         @ObservedObject var model: AppearancePreferences
+        let shouldShowFavoritesSettings: Bool
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
@@ -114,21 +115,23 @@ extension Preferences {
                     ToggleMenuItem(title: UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
                 }
 
-                // SECTION 3: Favorites
-                PreferencePaneSection {
-                    Text(UserText.favorites)
-                        .font(Const.Fonts.preferencePaneSectionHeader)
-                    HStack {
-                        Text("Display Favorites from")
-                        NSPopUpButtonView(selection: $model.favoritesDisplayMode) {
-                            let button = NSPopUpButton()
-                            button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+                if shouldShowFavoritesSettings {
+                    // SECTION 4: Favorites
+                    PreferencePaneSection {
+                        Text(UserText.favorites)
+                            .font(Const.Fonts.preferencePaneSectionHeader)
+                        HStack {
+                            Text("Display Favorites from")
+                            NSPopUpButtonView(selection: $model.favoritesDisplayMode) {
+                                let button = NSPopUpButton()
+                                button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
-                            for value in FavoritesDisplayMode.availableConfigurations {
-                                let item = button.menu?.addItem(withTitle: value.displayString, action: nil, keyEquivalent: "")
-                                item?.representedObject = value
+                                for value in FavoritesDisplayMode.availableConfigurations {
+                                    let item = button.menu?.addItem(withTitle: value.displayString, action: nil, keyEquivalent: "")
+                                    item?.representedObject = value
+                                }
+                                return button
                             }
-                            return button
                         }
                     }
                 }
