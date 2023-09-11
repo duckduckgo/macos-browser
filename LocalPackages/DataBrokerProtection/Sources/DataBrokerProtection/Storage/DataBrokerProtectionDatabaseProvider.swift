@@ -65,6 +65,9 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func updateRemovedDate(for extractedProfileId: Int64, with date: Date?) throws
 
     func hasMatches() throws -> Bool
+
+    func fetchAttemptInformation(for extractedProfileId: Int64) throws -> OptOutAttemptDB?
+    func save(_ optOutAttemptDB: OptOutAttemptDB) throws
  }
 
 final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDatabaseProvider, DataBrokerProtectionDatabaseProvider {
@@ -76,6 +79,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     public init(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(), key: Data) throws {
         try super.init(file: file, key: key, writerType: .queue) { migrator in
             migrator.registerMigration("v1", migrate: Self.migrateV1(database:))
+            migrator.registerMigration("v2", migrate: Self.migrateV2(database:))
         }
     }
 
@@ -221,6 +225,20 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
     // swiftlint:enable function_body_length
+
+    static func migrateV2(database: Database) throws {
+        try database.create(table: OptOutAttemptDB.databaseTableName) {
+            $0.primaryKey([OptOutAttemptDB.Columns.extractedProfileId.name])
+
+            $0.foreignKey([OptOutAttemptDB.Columns.extractedProfileId.name], references: ExtractedProfileDB.databaseTableName)
+
+            $0.column(OptOutAttemptDB.Columns.extractedProfileId.name, .integer).notNull()
+            $0.column(OptOutAttemptDB.Columns.dataBroker.name, .text).notNull()
+            $0.column(OptOutAttemptDB.Columns.attemptId.name, .text).notNull()
+            $0.column(OptOutAttemptDB.Columns.lastStageDate.name, .date).notNull()
+            $0.column(OptOutAttemptDB.Columns.startDate.name, .date).notNull()
+        }
+    }
 
     func saveProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {
         try db.write { db in
@@ -540,6 +558,18 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     func hasMatches() throws -> Bool {
         try db.read { db in
             return try OptOutDB.fetchCount(db) > 0
+        }
+    }
+
+    func fetchAttemptInformation(for extractedProfileId: Int64) throws -> OptOutAttemptDB? {
+        try db.read { db in
+            return try OptOutAttemptDB.fetchOne(db, key: extractedProfileId)
+        }
+    }
+
+    func save(_ optOutAttemptDB: OptOutAttemptDB) throws {
+        try db.write { db in
+            try optOutAttemptDB.insert(db)
         }
     }
 }

@@ -110,6 +110,14 @@ struct MapperToDB {
             timestamp: historyEvent.date
         )
     }
+
+    func mapToDB(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) -> OptOutAttemptDB {
+        .init(extractedProfileId: extractedProfileId,
+              dataBroker: dataBroker,
+              attemptId: attemptUUID.uuidString,
+              lastStageDate: lastStageDate,
+              startDate: startTime)
+    }
 }
 
 struct MapperToModel {
@@ -235,6 +243,14 @@ struct MapperToModel {
             type: decodedEventType,
             date: optOutEvent.timestamp
         )
+    }
+
+    func mapToModel(_ optOutAttempt: OptOutAttemptDB) -> AttemptInformation {
+        .init(extractedProfileId: optOutAttempt.extractedProfileId,
+              dataBroker: optOutAttempt.dataBroker,
+              attemptId: optOutAttempt.attemptId,
+              lastStageDate: optOutAttempt.lastStageDate,
+              startDate: optOutAttempt.startDate)
     }
 }
 

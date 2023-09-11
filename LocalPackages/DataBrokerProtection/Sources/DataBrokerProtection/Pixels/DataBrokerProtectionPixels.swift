@@ -23,11 +23,10 @@ import BrowserServicesKit
 final class DataBrokerProtectionStageDurationCalculator {
 
     let handler: EventMapping<DataBrokerProtectionPixels>
-
-    private let attemptId: UUID
-    private let dataBroker: String
-    private let startTime: Date
-    private var lastStateTime: Date
+    let attemptId: UUID
+    let dataBroker: String
+    let startTime: Date
+    var lastStateTime: Date
 
     init(attemptId: UUID = UUID(),
          startTime: Date = Date(),

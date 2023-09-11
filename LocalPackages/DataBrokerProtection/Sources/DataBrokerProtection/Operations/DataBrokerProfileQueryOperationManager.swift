@@ -175,6 +175,15 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                     database.updateRemovedDate(Date(), on: extractedProfileId)
                     database.updatePreferredRunDate(Date(), brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
                     os_log("Profile removed from optOutsData: %@", log: .dataBrokerProtection, String(describing: removedProfile))
+
+                    // Add a comment explaining this piece of code
+                    if let attempt = database.fetchAttemptInformation(for: extractedProfileId), let attemptUUID = UUID(uuidString: attempt.attemptId) {
+                        let now = Date()
+                        let calculateDurationSinceLastStage = now.timeIntervalSince(attempt.lastStageDate) * 1000
+                        let calculateDurationSinceStart = now.timeIntervalSince(attempt.startDate) * 1000
+                        pixelHandler.fire(.optOutFinish(dataBroker: attempt.dataBroker, attemptId: attemptUUID, duration: calculateDurationSinceLastStage))
+                        pixelHandler.fire(.optOutSuccess(dataBroker: attempt.dataBroker, attemptId: attemptUUID, duration: calculateDurationSinceStart))
+                    }
                 }
             }
 
@@ -233,6 +242,11 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                     showWebView: showWebView,
                                     shouldRunNextStep: shouldRunNextStep)
 
+            database.addAttempt(extractedProfileId: extractedProfileId,
+                                attemptUUID: stageDurationCalculator.attemptId,
+                                dataBroker: stageDurationCalculator.dataBroker,
+                                lastStageDate: stageDurationCalculator.lastStateTime,
+                                startTime: stageDurationCalculator.startTime)
             database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested))
         } catch {
             stageDurationCalculator.fireOptOutFailure()
