@@ -71,6 +71,8 @@ final class ProfileViewModel: ObservableObject {
     @Published var selectedName: Name?
     @Published var selectedAddress: Address?
 
+    @Published var isLoading = false
+
     static let defaultSuffixSelection = "No suffix"
     static let defaultStateSelection = ""
 
@@ -95,9 +97,7 @@ final class ProfileViewModel: ObservableObject {
     }
 
     var hasOperationContent: Bool {
-        let brokerProfileData = self.dataManager.fetchBrokerProfileQueryData()
-        let hasResults = brokerProfileData.contains { $0.hasMatches }
-        return hasResults
+        return self.dataManager.hasMatches()
     }
 
     var isProfileValid: Bool {
@@ -149,10 +149,18 @@ final class ProfileViewModel: ObservableObject {
         addresses.removeAll(where: {$0.id == id})
     }
 
-    func saveProfile() {
+    func saveProfile(completion: @escaping () -> Void) {
         // It should edit or delete the profile before saving if there was a previous profile saved
         let profile = mapProfileUIToModel()
-        dataManager.saveProfile(profile)
+        isLoading = true
+        Task {
+            await dataManager.saveProfile(profile)
+
+            DispatchQueue.main.async {
+                completion()
+                self.isLoading = false
+            }
+        }
     }
 
     private func restoreSavedProfile() {

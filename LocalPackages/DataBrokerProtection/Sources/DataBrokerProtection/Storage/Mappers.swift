@@ -218,7 +218,7 @@ struct MapperToModel {
                      reportId: extractedProfile.reportId,
                      age: extractedProfile.age,
                      email: extractedProfile.email,
-                     removedDate: extractedProfile.removedDate)
+                     removedDate: extractedProfileDB.removedDate)
     }
 
     func mapToModel(_ scanEvent: ScanHistoryEventDB) throws -> HistoryEvent {

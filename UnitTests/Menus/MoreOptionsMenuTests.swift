@@ -159,6 +159,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 
 #if NETWORK_PROTECTION
 final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility {
+
     var visible: Bool
 
     init(visible: Bool) {
@@ -169,5 +170,12 @@ final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility 
         return visible
     }
 
+    func disableForAllUsers() {
+        // intentional no-op
+    }
+
+    func disableForWaitlistUsers() {
+        // intentional no-op
+    }
 }
 #endif

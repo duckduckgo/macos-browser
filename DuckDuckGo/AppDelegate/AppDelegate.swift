@@ -27,6 +27,7 @@ import Bookmarks
 import DDGSync
 import ServiceManagement
 import SyncDataProviders
+import UserNotifications
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -67,6 +68,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var syncService: DDGSyncing?
     private var syncStateCancellable: AnyCancellable?
     private var bookmarksSyncErrorCancellable: AnyCancellable?
+    private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
 
 #if !APPSTORE
@@ -75,10 +77,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     // swiftlint:disable:next function_body_length
     func applicationWillFinishLaunching(_ notification: Notification) {
-#if !APPSTORE && !DEBUG
-        PFMoveToApplicationsFolderIfNecessary()
-#endif
-
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
         Configuration.setURLProvider(AppConfigurationURLProvider())
 
@@ -189,7 +187,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         BWManager.shared.initCommunication()
 
-        if WindowsManager.windows.isEmpty,
+        if WindowsManager.windows.first(where: { $0 is MainWindow }) == nil,
            case .normal = NSApp.runType {
             WindowsManager.openNewWindow(lazyLoadTabs: true)
         }
@@ -208,15 +206,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
 #if NETWORK_PROTECTION
-        if #available(macOS 11.4, *) {
-            NetworkProtectionAppEvents().applicationDidFinishLaunching()
-        }
+        NetworkProtectionAppEvents().applicationDidFinishLaunching()
+        UNUserNotificationCenter.current().delegate = self
+#endif
+
+#if DBP
+        DataBrokerProtectionManager.shared.runOperationsAndStartSchedulerIfPossible()
 #endif
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
         syncService?.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
         syncService?.scheduler.notifyAppLifecycleEvent()
+
+#if NETWORK_PROTECTION
+        NetworkProtectionWaitlist().fetchNetworkProtectionInviteCodeIfAvailable { _ in
+            // Do nothing when code fetching fails, as the app will try again later
+        }
+
+        NetworkProtectionAppEvents().applicationDidBecomeActive()
+#endif
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -295,31 +304,43 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     private func subscribeToEmailProtectionStatusNotifications() {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(emailDidSignInNotification(_:)),
-                                               name: .emailDidSignIn,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(emailDidSignOutNotification(_:)),
-                                               name: .emailDidSignOut,
-                                               object: nil)
+        NotificationCenter.default.publisher(for: .emailDidSignIn)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                self?.emailDidSignInNotification(notification)
+            }
+            .store(in: &emailCancellables)
+
+        NotificationCenter.default.publisher(for: .emailDidSignOut)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                self?.emailDidSignOutNotification(notification)
+            }
+            .store(in: &emailCancellables)
     }
 
     private func subscribeToDataImportCompleteNotification() {
         NotificationCenter.default.addObserver(self, selector: #selector(dataImportCompleteNotification(_:)), name: .dataImportComplete, object: nil)
     }
 
-    @objc private func emailDidSignInNotification(_ notification: Notification) {
+    private func emailDidSignInNotification(_ notification: Notification) {
         Pixel.fire(.emailEnabled)
         let repetition = Pixel.Event.Repetition(key: Pixel.Event.emailEnabledInitial.name)
         // Temporary pixel for first time user enables email protection
         if Pixel.isNewUser && repetition == .initial {
             Pixel.fire(.emailEnabledInitial)
         }
+
+        if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
+            syncService?.scheduler.notifyDataChanged()
+        }
     }
 
-    @objc private func emailDidSignOutNotification(_ notification: Notification) {
+    private func emailDidSignOutNotification(_ notification: Notification) {
         Pixel.fire(.emailDisabled)
+        if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
+            syncService?.scheduler.notifyDataChanged()
+        }
     }
 
     @objc private func dataImportCompleteNotification(_ notification: Notification) {
@@ -331,3 +352,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
 }
+
+#if NETWORK_PROTECTION
+
+extension AppDelegate: UNUserNotificationCenterDelegate {
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler(.alert)
+    }
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+        if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
+            if response.notification.request.identifier == NetworkProtectionWaitlist.notificationIdentifier {
+                if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
+                    DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
+                    WaitlistModalViewController.show()
+                }
+            }
+        }
+
+        completionHandler()
+    }
+
+}
+
+#endif

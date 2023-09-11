@@ -16,30 +16,20 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import AppKit
-import Common
+import os.log // swiftlint:disable:this enforce_os_log_wrapper
 import Foundation
 import ServiceManagement
 
-extension LoginItem {
-
-    static let vpnMenu = LoginItem(bundleId: Bundle.main.vpnMenuAgentBundleId, url: Bundle.main.vpnMenuAgentURL)
-#if NETP_SYSTEM_EXTENSION
-    static let notificationsAgent = LoginItem(bundleId: Bundle.main.notificationsAgentBundleId, url: Bundle.main.notificationsAgentURL)
-#endif
-
-}
-
 /// Takes care of enabling and disabling a login item.
 ///
-struct LoginItem: Equatable {
+public struct LoginItem: Equatable, Hashable {
 
     let agentBundleID: String
     let url: URL
+    private let log: OSLog
 
-    var isRunning: Bool {
+    public var isRunning: Bool {
         !runningApplications.isEmpty
     }
 
@@ -47,13 +37,13 @@ struct LoginItem: Equatable {
         NSRunningApplication.runningApplications(withBundleIdentifier: agentBundleID)
     }
 
-    enum Status {
+    public enum Status {
         case notRegistered
         case enabled
         case requiresApproval
         case notFound
 
-        var isEnabled: Bool {
+        public var isEnabled: Bool {
             self == .enabled
         }
 
@@ -69,25 +59,26 @@ struct LoginItem: Equatable {
         }
     }
 
-    var status: Status {
+    public var status: Status {
         guard #available(macOS 13.0, *) else {
             guard let job = ServiceManagement.copyAllJobDictionaries(kSMDomainUserLaunchd).first(where: {
                 $0["Label"] as? String == agentBundleID
             }) else { return .notRegistered }
 
-            os_log("🟢 found login item job: %{public}@", log: .networkProtection, job.debugDescription)
+            os_log("🟢 found login item job: %{public}@", log: log, job.debugDescription)
             return job["OnDemand"] as? Bool == true ? .enabled : .requiresApproval
         }
         return Status(SMAppService.loginItem(identifier: agentBundleID).status)
     }
 
-    init(bundleId: String, url: URL) {
+    public init(bundleId: String, url: URL, log: OSLog) {
         self.agentBundleID = bundleId
         self.url = url
+        self.log = log
     }
 
-    func enable() throws {
-        os_log("🟢 registering login item %{public}@", log: .networkProtection, self.debugDescription)
+    public func enable() throws {
+        os_log("🟢 registering login item %{public}@", log: log, self.debugDescription)
 
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).register()
@@ -96,8 +87,8 @@ struct LoginItem: Equatable {
         }
     }
 
-    func disable() throws {
-        os_log("🟢 unregistering login item %{public}@", log: .networkProtection, self.debugDescription)
+    public func disable() throws {
+        os_log("🟢 unregistering login item %{public}@", log: log, self.debugDescription)
 
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).unregister()
@@ -111,23 +102,23 @@ struct LoginItem: Equatable {
     ///
     /// This call will only enable the login item if it was enabled to begin with.
     ///
-    func restart() throws {
+    public func restart() throws {
         guard [.enabled, .requiresApproval].contains(status) else {
-            os_log("🟢 restart not needed for login item %{public}@", log: .networkProtection, self.debugDescription)
+            os_log("🟢 restart not needed for login item %{public}@", log: log, self.debugDescription)
             return
         }
         try? disable()
         try enable()
     }
 
-    func launch() async throws {
-        os_log("🟢 launching login item %{public}@", log: .networkProtection, self.debugDescription)
+    public func launch() async throws {
+        os_log("🟢 launching login item %{public}@", log: log, self.debugDescription)
         _ = try await NSWorkspace.shared.openApplication(at: url, configuration: .init())
     }
 
     private func stop() {
         let runningApplications = runningApplications
-        os_log("🟢 stopping %{public}@", log: .networkProtection, runningApplications.map { $0.processIdentifier }.description)
+        os_log("🟢 stopping %{public}@", log: log, runningApplications.map { $0.processIdentifier }.description)
         runningApplications.forEach { $0.terminate() }
     }
 
@@ -135,7 +126,7 @@ struct LoginItem: Equatable {
 
 extension LoginItem: CustomDebugStringConvertible {
 
-    var debugDescription: String {
+    public var debugDescription: String {
         "<LoginItem \(agentBundleID) isEnabled: \(status) isRunning: \(isRunning)>"
     }
 
@@ -165,5 +156,3 @@ private struct SM: ServiceManagementProtocol {
 }
 
 private var ServiceManagement: ServiceManagementProtocol { SM() } // swiftlint:disable:this identifier_name
-
-#endif

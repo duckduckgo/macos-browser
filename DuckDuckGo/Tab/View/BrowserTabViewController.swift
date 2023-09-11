@@ -144,9 +144,7 @@ final class BrowserTabViewController: NSViewController {
         }
         if let previouslySelectedTab = self.previouslySelectedTab {
             tabCollectionViewModel.select(tab: previouslySelectedTab)
-            if #available(macOS 11.0, *) {
-                previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
-            }
+            previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
             self.previouslySelectedTab = nil
         }
     }
@@ -493,7 +491,7 @@ final class BrowserTabViewController: NSViewController {
     var dataBrokerProtectionHomeViewController: DBPHomeViewController?
     private func dataBrokerProtectionHomeViewControllerCreatingIfNeeded() -> DBPHomeViewController {
         return dataBrokerProtectionHomeViewController ?? {
-            let dataBrokerProtectionHomeViewController = DBPHomeViewController()
+            let dataBrokerProtectionHomeViewController = DBPHomeViewController(dataBrokerProtectionManager: DataBrokerProtectionManager.shared)
             self.dataBrokerProtectionHomeViewController = dataBrokerProtectionHomeViewController
             return dataBrokerProtectionHomeViewController
         }()

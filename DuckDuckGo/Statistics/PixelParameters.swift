@@ -133,7 +133,13 @@ extension Pixel.Event {
              .duckPlayerViewFromOther,
              .duckPlayerSettingAlways,
              .duckPlayerSettingNever,
-             .duckPlayerSettingBackToDefault:
+             .duckPlayerSettingBackToDefault,
+             .networkProtectionWaitlistEntryPointMenuItemDisplayed,
+             .networkProtectionWaitlistEntryPointToolbarButtonDisplayed,
+             .networkProtectionWaitlistNotificationShown,
+             .networkProtectionWaitlistNotificationTapped,
+             .networkProtectionWaitlistTermsAndConditionsDisplayed,
+             .networkProtectionWaitlistTermsAndConditionsAccepted:
             return nil
         }
     }

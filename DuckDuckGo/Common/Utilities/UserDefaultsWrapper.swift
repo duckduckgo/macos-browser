@@ -112,6 +112,7 @@ public struct UserDefaultsWrapper<T> {
         case homePageIsContinueSetupVisible = "home.page.is.continue.setup.visible"
         case homePageIsRecentActivityVisible = "home.page.is.recent.activity.visible"
         case homePageIsFirstSession = "home.page.is.first.session"
+        case homePageShowNetworkProtectionBetaEndedNotice = "home.page.network-protection.show-beta-ended-notice"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 
@@ -144,7 +145,9 @@ public struct UserDefaultsWrapper<T> {
 
         case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
 
-        case agentLaunchTime = "netp.agent.launch-time"
+        case netpMenuAgentLaunchTime = "netp.agent.launch-time"
+
+        case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
 
         // Network Protection: Shared Defaults
         // ---

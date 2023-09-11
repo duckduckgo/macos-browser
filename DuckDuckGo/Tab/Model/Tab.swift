@@ -380,10 +380,11 @@ protocol NewWindowPolicyDecisionMaker {
             handleFavicon()
         }
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onDuckDuckGoEmailSignOut),
-                                               name: .emailDidSignOut,
-                                               object: nil)
+        emailDidSignOutCancellable = NotificationCenter.default.publisher(for: .emailDidSignOut)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                self?.onDuckDuckGoEmailSignOut(notification)
+            }
 
         addDeallocationChecks(for: webView)
     }
@@ -873,6 +874,7 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     private var webViewCancellables = Set<AnyCancellable>()
+    private var emailDidSignOutCancellable: AnyCancellable?
 
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = navigationDelegate

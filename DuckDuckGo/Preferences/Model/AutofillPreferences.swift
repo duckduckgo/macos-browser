@@ -66,6 +66,7 @@ enum AutofillAutoLockThreshold: String, CaseIterable {
 
 extension NSNotification.Name {
     static let autofillAutoLockSettingsDidChange = NSNotification.Name("autofillAutoLockSettingsDidChange")
+    static let autofillUserSettingsDidChange = NSNotification.Name("autofillUserSettingsDidChange")
 }
 
 final class AutofillPreferences: AutofillPreferencesPersistor {

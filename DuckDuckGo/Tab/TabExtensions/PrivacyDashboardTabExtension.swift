@@ -53,9 +53,7 @@ final class PrivacyDashboardTabExtension {
         self.contentBlocking = contentBlocking
 
         autoconsentUserScriptPublisher.sink { [weak self] autoconsentUserScript in
-            if #available(macOS 11, *) {
-                autoconsentUserScript?.delegate = self
-            }
+            autoconsentUserScript?.delegate = self
         }.store(in: &cancellables)
 
         didUpgradeToHttpsPublisher.sink { [weak self] upgradedUrl in
@@ -161,7 +159,6 @@ extension PrivacyDashboardTabExtension: NavigationResponder {
 
 }
 
-@available(macOS 11, *)
 extension PrivacyDashboardTabExtension: AutoconsentUserScriptDelegate {
 
     func autoconsentUserScript(consentStatus: CookieConsentInfo) {

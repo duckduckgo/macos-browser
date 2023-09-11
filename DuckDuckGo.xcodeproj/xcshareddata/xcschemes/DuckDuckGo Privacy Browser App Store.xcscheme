@@ -135,6 +135,9 @@
                <Test
                   Identifier = "NavigationProtectionIntegrationTests/testAMPLinks()">
                </Test>
+               <Test
+                  Identifier = "NavigationProtectionIntegrationTests/testReferrerTrimming()">
+               </Test>
             </SkippedTests>
          </TestableReference>
          <TestableReference
