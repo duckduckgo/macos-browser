@@ -20,6 +20,7 @@ import AppKit
 import Combine
 import Common
 import Navigation
+import UniformTypeIdentifiers
 
 protocol FileDownloadManagerProtocol: AnyObject {
     var downloads: Set<WebKitDownloadTask> { get }
@@ -151,7 +152,8 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
             }
 
             if let originalRect = self.downloadTaskDelegates[task]?()?.fileIconFlyAnimationOriginalRect(for: task) {
-                task.progress.flyToImage = (UTType(fileExtension: url.pathExtension) ?? fileType)?.icon
+                let utType = UTType(filenameExtension: url.pathExtension) ?? fileType ?? .data
+                task.progress.flyToImage = NSWorkspace.shared.icon(for: utType)
                 task.progress.fileIconOriginalRect = originalRect
             }
 
@@ -188,17 +190,17 @@ extension FileDownloadManager: WebKitDownloadTaskDelegate {
         }
 
         var fileTypes = [UTType]()
-        let fileExtension = (suggestedFilename as NSString).pathExtension
+        let fileExtension = suggestedFilename.pathExtension
         // add file type from file extension first
         if !fileExtension.isEmpty,
-           let utType = UTType(fileExtension: fileExtension),
+           let utType = UTType(filenameExtension: fileExtension),
            fileType != utType {
 
             fileTypes = [utType]
         }
         // append file type from mime
         if let fileType,
-           fileType.fileExtension != nil || fileTypes.isEmpty {
+           fileType.preferredFilenameExtension != nil || fileTypes.isEmpty {
             fileTypes.append(fileType)
         }
 

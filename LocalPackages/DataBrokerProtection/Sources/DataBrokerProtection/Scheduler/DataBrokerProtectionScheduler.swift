@@ -141,6 +141,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         os_log("Stopping scheduler...", log: .dataBrokerProtection)
         activity.invalidate()
         status = .stopped
+        dataBrokerProcessor.stopAllOperations()
     }
 
     public func runAllOperations(showWebView: Bool = false) {

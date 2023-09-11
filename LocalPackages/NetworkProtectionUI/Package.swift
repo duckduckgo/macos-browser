@@ -7,7 +7,7 @@ let package = Package(
     name: "NetworkProtectionUI",
     platforms: [
         .iOS("14.0"),
-        .macOS("10.15")
+        .macOS("11.4")
     ],
     products: [
         .library(

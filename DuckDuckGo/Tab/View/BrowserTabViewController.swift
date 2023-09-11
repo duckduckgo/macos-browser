@@ -144,9 +144,7 @@ final class BrowserTabViewController: NSViewController {
         }
         if let previouslySelectedTab = self.previouslySelectedTab {
             tabCollectionViewModel.select(tab: previouslySelectedTab)
-            if #available(macOS 11.0, *) {
-                previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
-            }
+            previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
             self.previouslySelectedTab = nil
         }
     }

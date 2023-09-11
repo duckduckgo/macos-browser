@@ -31,12 +31,12 @@ protocol NetworkProtectionFeatureDisabling {
 
 final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling {
     private let log: OSLog
-    private let loginItemsManager: NetworkProtectionLoginItemsManager
+    private let loginItemsManager: LoginItemsManager
     private let pinningManager: LocalPinningManager
     private let selectedServerUserDefaultsStore: NetworkProtectionSelectedServerUserDefaultsStore
     private let userDefaults: UserDefaults
 
-    init(loginItemsManager: NetworkProtectionLoginItemsManager = NetworkProtectionLoginItemsManager(),
+    init(loginItemsManager: LoginItemsManager = LoginItemsManager(),
          pinningManager: LocalPinningManager = .shared,
          userDefaults: UserDefaults = .shared,
          selectedServerUserDefaultsStore: NetworkProtectionSelectedServerUserDefaultsStore = NetworkProtectionSelectedServerUserDefaultsStore(),
@@ -80,7 +80,7 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     }
 
     func disableLoginItems() {
-        loginItemsManager.disableLoginItems()
+        loginItemsManager.disableLoginItems(LoginItemsManager.networkProtectionLoginItems)
     }
 
     func disableSystemExtension() async throws {

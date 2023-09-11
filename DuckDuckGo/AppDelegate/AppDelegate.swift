@@ -206,15 +206,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
 #if NETWORK_PROTECTION
-        if #available(macOS 11.4, *) {
-            /// Once we drop support for macOS versions below 11.4, we can turn `NetworkProtectionAppEvents`
-            /// into a property.  Right now it's easier to avoid it since we can't place macOS version conditions on properties.
-            ///
-            /// In any case this is not going to happen on a high frequency and should not affect performance in any relevant
-            /// way.
-            NetworkProtectionAppEvents().applicationDidFinishLaunching()
-        }
-
+        NetworkProtectionAppEvents().applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
 #endif
 
@@ -232,14 +224,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             // Do nothing when code fetching fails, as the app will try again later
         }
 
-        if #available(macOS 11.4, *) {
-            /// Once we drop support for macOS versions below 11.4, we can turn `NetworkProtectionAppEvents`
-            /// into a property.  Right now it's easier to avoid it since we can't place macOS version conditions on properties.
-            ///
-            /// In any case this is not going to happen on a high frequency and should not affect performance in any relevant
-            /// way.
-            NetworkProtectionAppEvents().applicationDidBecomeActive()
-        }
+        NetworkProtectionAppEvents().applicationDidBecomeActive()
 #endif
     }
 

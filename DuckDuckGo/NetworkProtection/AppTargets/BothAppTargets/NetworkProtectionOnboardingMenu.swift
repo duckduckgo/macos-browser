@@ -32,7 +32,6 @@ import NetworkProtectionUI
 
 /// Implements the logic for Network Protection's onboarding menu.
 ///
-@available(macOS 11.4, *)
 @objc
 @MainActor
 final class NetworkProtectionOnboardingMenu: NSMenu {

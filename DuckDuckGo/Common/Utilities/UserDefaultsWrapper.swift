@@ -145,7 +145,7 @@ public struct UserDefaultsWrapper<T> {
 
         case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
 
-        case agentLaunchTime = "netp.agent.launch-time"
+        case netpMenuAgentLaunchTime = "netp.agent.launch-time"
 
         case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
 
