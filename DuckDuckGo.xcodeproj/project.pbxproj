@@ -12071,6 +12071,12 @@
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgent.entitlements;
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=*][arch=*]" = (
+					"DEBUG=1",
+					"$(inherited)",
+					"DBP=1",
+					"NETP_SYSTEM_EXTENSION=1",
+				);
 				INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -12085,6 +12091,13 @@
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgent.entitlements;
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=*][arch=*]" = (
+					"NETP_SYSTEM_EXTENSION=1",
+					"DBP=1",
+					"DEBUG=1",
+					"CI=1",
+					"$(inherited)",
+				);
 				INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -12099,6 +12112,10 @@
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgent.entitlements;
+				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = (
+					"DBP=1",
+					"NETP_SYSTEM_EXTENSION=1",
+				);
 				INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -12113,6 +12130,12 @@
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgent.entitlements;
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=*][arch=*]" = (
+					"REVIEW=1",
+					"$(inherited)",
+					"NETP_SYSTEM_EXTENSION=1",
+					"DBP=1",
+				);
 				INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -12127,6 +12150,12 @@
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgentAppStore.entitlements;
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=*][arch=*]" = (
+					"DEBUG=1",
+					"$(inherited)",
+					"DBP=1",
+					"NETP_SYSTEM_EXTENSION=1",
+				);
 				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent/Info-AppStore.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -12141,6 +12170,13 @@
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgentAppStore.entitlements;
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=*][arch=*]" = (
+					"NETP_SYSTEM_EXTENSION=1",
+					"DBP=1",
+					"DEBUG=1",
+					"CI=1",
+					"$(inherited)",
+				);
 				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent/Info-AppStore.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -12155,6 +12191,10 @@
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgentAppStore.entitlements;
+				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = (
+					"DBP=1",
+					"NETP_SYSTEM_EXTENSION=1",
+				);
 				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent/Info-AppStore.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -12169,6 +12209,12 @@
 			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgentAppStore.entitlements;
+				"GCC_PREPROCESSOR_DEFINITIONS[sdk=*][arch=*]" = (
+					"REVIEW=1",
+					"$(inherited)",
+					"NETP_SYSTEM_EXTENSION=1",
+					"DBP=1",
+				);
 				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent/Info-AppStore.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
