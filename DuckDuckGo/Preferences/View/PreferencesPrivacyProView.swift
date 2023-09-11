@@ -23,6 +23,7 @@ extension Preferences {
 
     struct PrivacyProView: View {
         @ObservedObject var model: PrivacyProPreferencesModel
+        @State private var showingSheet = false
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
@@ -32,6 +33,15 @@ extension Preferences {
 
                 Spacer()
                     .frame(height: 20)
+
+                Button("show") {
+                    showingSheet.toggle()
+                }
+                .sheet(isPresented: $showingSheet) {
+                    if #available(macOS 12.0, *) {
+                        SheetView()
+                    }
+                }
 
                 VStack {
                     if model.isSignedIn {
@@ -194,6 +204,110 @@ extension Preferences {
                 }
             }
             .padding(.vertical, 7)
+        }
+    }
+
+    @available(macOS 12.0, *)
+    struct SheetView: View {
+        @Environment(\.dismiss) var dismiss
+
+        let items = [MenuItem(name: "Apple ID", image: "", description: ""),
+                     MenuItem(name: "Email", image: "", description: ""),
+                     MenuItem(name: "Sync", image: "", description: "")]
+        @State private var selection: Set<MenuItem> = []
+
+        var body: some View {
+            Button("X") {
+                dismiss()
+            }
+
+            VStack {
+                Text("Activate your subscription on this device")
+                    .font(.title)
+                Text("Access your Privacy Pro subscription on this device via Sync, Apple ID or an email address.")
+
+                VStack {
+                    ForEach(items) { item in
+                        PlaceView(name: item.name, isExpanded: self.selection.contains(item))
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                self.selectDeselect(item)
+                            }
+                            .animation(.linear(duration: 2.3))
+
+                        if items.last != item {
+                            Divider()
+                                .animation(.linear(duration: 2.3))
+                        }
+                    }
+                }
+                .frame(minWidth: 440)
+                .padding(10)
+                .roundedBorder()
+
+                Spacer()
+            }
+            .padding()
+            .frame(width: 480, height: 650)
+        }
+
+        private func selectDeselect(_ item: MenuItem) {
+            if selection.contains(item) {
+                selection.remove(item)
+            } else {
+                selection.removeAll()
+                selection.insert(item)
+            }
+        }
+    }
+
+    struct MenuItem: Identifiable, Hashable {
+        var id = UUID()
+        var name: String
+        var image: String
+        var description: String
+    }
+
+    struct PlaceView: View {
+        let name: String
+        let isExpanded: Bool
+
+        var body: some View {
+            VStack(alignment: .leading) {
+
+                HStack(alignment: .center, spacing: 8) {
+                    Image("SubscriptionIcon")
+                        .padding(4)
+                        .background(Color.black.opacity(0.06))
+                        .cornerRadius(4)
+
+                    TextMenuItemCaption(text: name)
+
+                    Spacer()
+                        .contentShape(Rectangle())
+
+                    if #available(macOS 11.0, *) {
+                        Image(systemName: "chevron.down")
+                            .rotationEffect(Angle(degrees: isExpanded ? -180 : 0))
+                    }
+                }
+                .drawingGroup()
+
+                if isExpanded {
+                    VStack(alignment: .leading) {
+                        TextMenuItemCaption(text: "Your subscription is automatically available on any device signed in to the same Apple ID.")
+                            .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
+                        TextMenuItemCaption(text: "Your subscription is automatically available on any device signed in to the same Apple ID.")
+                            .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
+                        TextMenuItemCaption(text: "Your subscription is automatically available on any device signed in to the same Apple ID.")
+                            .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
+
+                        Button("Button") { }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .clipped()
+                }
+            }
         }
     }
 }
