@@ -34,6 +34,7 @@ public enum DataBrokerProtectionError: Error, Equatable, Codable {
     case noOptOutStep
     case captchaServiceError(CaptchaServiceError)
     case emailError(EmailError?)
+    case cancelled
 
     static func parse(params: Any) -> DataBrokerProtectionError {
         let errorDataResult = try? JSONSerialization.data(withJSONObject: params)
@@ -76,6 +77,8 @@ extension DataBrokerProtectionError {
             return "captchaServiceError"
         case .emailError:
             return "emailError"
+        case .cancelled:
+            return "Cancelled"
         }
     }
 }

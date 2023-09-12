@@ -45,15 +45,20 @@ final class SharingMenu: NSMenu {
             self.addItem(menuItem)
         }
 
-        let moreItem = NSMenuItem(title: UserText.moreMenuItem,
-                                  action: #selector(openSharingPreferences(_:)),
-                                  keyEquivalent: "")
+        let moreItem = NSMenuItem(title: UserText.moreMenuItem, action: #selector(openSharingPreferences(_:)), keyEquivalent: "")
         moreItem.target = self
         moreItem.image = .more
         self.addItem(moreItem)
     }
 
     @objc func openSharingPreferences(_ sender: NSMenuItem) {
+        if #available(macOS 13.0, *),
+           let preferencesLink = URL(string: "x-apple.systempreferences:com.apple.preferences.extensions?Sharing") {
+
+            NSWorkspace.shared.open(preferencesLink)
+            return
+        }
+
         let url = URL(fileURLWithPath: "/System/Library/PreferencePanes/Extensions.prefPane")
         let plist = [
             "action": "revealExtensionPoint",
@@ -62,6 +67,8 @@ final class SharingMenu: NSMenu {
         let data = try? PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
         let descriptor = NSAppleEventDescriptor(descriptorType: .openSharingSubpane, data: data)
 
+        // if you want to refactor this to remove the warning - stop now
+        // the suggested method with NSWorkspace.OpenConfiguration doesn‘t work for Sharing Preferences
         NSWorkspace.shared.open([url],
                                 withAppBundleIdentifier: nil,
                                 options: .async,

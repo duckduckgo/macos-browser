@@ -42,8 +42,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
                                             notificationCenter: notificationCenter)
 
         containerViewModel = ContainerViewModel(scheduler: scheduler,
-                                                dataManager: dataManager,
-                                                notificationCenter: notificationCenter)
+                                                dataManager: dataManager)
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -53,17 +52,14 @@ final public class DataBrokerProtectionViewController: NSViewController {
     }
 
     override public func loadView() {
-        if #available(macOS 11.0, *) {
+        let containerView = DataBrokerProtectionContainerView(
+            containerViewModel: containerViewModel,
+            navigationViewModel: navigationViewModel,
+            profileViewModel: profileViewModel,
+            resultsViewModel: resultsViewModel)
 
-            let containerView = DataBrokerProtectionContainerView(
-                containerViewModel: containerViewModel,
-                navigationViewModel: navigationViewModel,
-                profileViewModel: profileViewModel,
-                resultsViewModel: resultsViewModel)
-
-            let hostingController = NSHostingController(rootView: containerView)
-            view = hostingController.view
-        }
+        let hostingController = NSHostingController(rootView: containerView)
+        view = hostingController.view
     }
 
 }

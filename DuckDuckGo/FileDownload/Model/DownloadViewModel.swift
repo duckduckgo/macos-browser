@@ -18,6 +18,7 @@
 
 import Foundation
 import Combine
+import UniformTypeIdentifiers
 
 final class DownloadViewModel {
 

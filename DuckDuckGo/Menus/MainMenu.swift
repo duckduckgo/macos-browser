@@ -87,6 +87,12 @@ final class MainMenu: NSMenu {
 
     @IBOutlet weak var debugMenuItem: NSMenuItem?
 
+    @IBOutlet weak var debugNetworkProtectionWaitlistTokenItem: NSMenuItem?
+    @IBOutlet weak var debugNetworkProtectionWaitlistTimestampItem: NSMenuItem?
+    @IBOutlet weak var debugNetworkProtectionWaitlistInviteCodeItem: NSMenuItem?
+    @IBOutlet weak var debugNetworkProtectionWaitlistTermsAndConditionsAcceptedItem: NSMenuItem?
+    @IBOutlet weak var debugNetworkProtectionWaitlistEnterInviteCodeItem: NSMenuItem?
+
     private func setupDebugMenuItem(with featureFlagger: FeatureFlagger) {
         guard let debugMenuItem else {
             assertionFailure("debugMenuItem missing")
@@ -134,11 +140,6 @@ final class MainMenu: NSMenu {
             NSApplication.shared.helpMenu = helpMenuItem?.submenu
         }
 
-        if !WKWebView.supportsPrinting {
-            printMenuItem?.removeFromParent()
-            printSeparatorItem?.removeFromParent()
-        }
-
         sharingMenu.title = shareMenuItem.title
         shareMenuItem.submenu = sharingMenu
 
@@ -148,13 +149,17 @@ final class MainMenu: NSMenu {
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
         updateLoggingMenuItems()
+
+#if NETWORK_PROTECTION
+        updateNetworkProtectionItems()
+#endif
     }
 
     @MainActor
     func setup(with featureFlagger: FeatureFlagger) {
         self.delegate = self
 
-#if APPSTORE
+#if APPSTORE || DBP
         checkForUpdatesMenuItem?.removeFromParent()
         checkForUpdatesSeparatorItem?.removeFromParent()
 #endif
@@ -290,7 +295,7 @@ final class MainMenu: NSMenu {
         toggleDownloadsShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
 
 #if NETWORK_PROTECTION
-        if #available(macOS 11.4, *), NetworkProtectionKeychainTokenStore().isFeatureActivated {
+        if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             toggleNetworkProtectionShortcutMenuItem?.isHidden = false
             toggleNetworkProtectionShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
         } else {
@@ -344,6 +349,23 @@ final class MainMenu: NSMenu {
             item.state = enabledCategories.contains(category) ? .on : .off
         }
     }
+
+#if NETWORK_PROTECTION
+    private func updateNetworkProtectionItems() {
+        let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: NetworkProtectionWaitlist.identifier)
+        debugNetworkProtectionWaitlistTokenItem?.title = "Waitlist Token: \(waitlistStorage.getWaitlistToken() ?? "N/A")"
+        debugNetworkProtectionWaitlistInviteCodeItem?.title = "Waitlist Invite Code: \(waitlistStorage.getWaitlistInviteCode() ?? "N/A")"
+
+        if let timestamp = waitlistStorage.getWaitlistTimestamp() {
+            debugNetworkProtectionWaitlistTimestampItem?.title = "Waitlist Timestamp: \(String(describing: timestamp))"
+        } else {
+            debugNetworkProtectionWaitlistTimestampItem?.title = "Waitlist Timestamp: N/A"
+        }
+
+        let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+        debugNetworkProtectionWaitlistTermsAndConditionsAcceptedItem?.title = "T&C Accepted: \(accepted ? "Yes" : "No")"
+    }
+#endif
 
     @objc private func loggingMenuItemAction(_ sender: NSMenuItem) {
         guard let category = sender.identifier?.rawValue else { return }

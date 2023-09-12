@@ -103,6 +103,9 @@ extension HomePage.Models {
         @UserDefaultsWrapper(key: .homePageShowSurveyDay7, defaultValue: true)
         private var shouldShowSurveyDay7: Bool
 
+        @UserDefaultsWrapper(key: .homePageShowNetworkProtectionBetaEndedNotice, defaultValue: true)
+        private var shouldShowNetworkProtectionBetaEndedNotice: Bool
+
         @UserDefaultsWrapper(key: .homePageIsFirstSession, defaultValue: true)
         private var isFirstSession: Bool
 
@@ -185,6 +188,8 @@ extension HomePage.Models {
                 visitSurvey(day: .day0)
             case .surveyDay7:
                 visitSurvey(day: .day7)
+            case .networkProtectionBetaEndedNotice:
+                removeItem(for: .networkProtectionBetaEndedNotice)
             }
         }
         // swiftlint:enable cyclomatic_complexity
@@ -205,6 +210,8 @@ extension HomePage.Models {
                 shouldShowSurveyDay0 = false
             case .surveyDay7:
                 shouldShowSurveyDay7 = false
+            case .networkProtectionBetaEndedNotice:
+                shouldShowNetworkProtectionBetaEndedNotice = false
             }
             refreshFeaturesMatrix()
         }
@@ -212,6 +219,10 @@ extension HomePage.Models {
         // swiftlint:disable cyclomatic_complexity
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
+
+            if shouldNetworkProtectionBetaEndedNoticeBeVisible {
+                features.append(.networkProtectionBetaEndedNotice)
+            }
 
             for feature in listOfFeatures {
                 switch feature {
@@ -243,6 +254,8 @@ extension HomePage.Models {
                     if shouldSurveyDay7BeVisible {
                         features.append(feature)
                     }
+                case .networkProtectionBetaEndedNotice:
+                    break // Do nothing, as the NetP beta ended notice will always be added to the start of the list
                 }
             }
             featuresMatrix = features.chunked(into: itemsPerRow)
@@ -327,6 +340,50 @@ extension HomePage.Models {
             firstLaunchDate <= oneWeekAgo
         }
 
+        /// The Network Protection beta ended card should only be displayed under the following conditions:
+        ///
+        /// 1. The user has gone through the waitlist AND used Network Protection at least once
+        /// 2. The `waitlistBetaActive` flag has been set to disabled
+        /// 3. The user has not already dismissed the card
+        private var shouldNetworkProtectionBetaEndedNoticeBeVisible: Bool {
+#if NETWORK_PROTECTION
+            // 1. The user has signed up for the waitlist AND used Network Protection at least once:
+
+            let waitlistStorage = NetworkProtectionWaitlist().waitlistStorage
+            let isWaitlistUser = waitlistStorage.isWaitlistUser && waitlistStorage.isInvited
+
+            guard isWaitlistUser else {
+                return false
+            }
+
+            let activationStore = WaitlistActivationDateStore()
+            guard activationStore.daysSinceActivation() != nil else {
+                return false
+            }
+
+            // 2. The `waitlistBetaActive` flag has been set to disabled
+
+            let featureOverrides = DefaultWaitlistBetaOverrides()
+            let waitlistFlagEnabled: Bool
+
+            switch featureOverrides.waitlistActive {
+            case .useRemoteValue: waitlistFlagEnabled = privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlistBetaActive)
+            case .on: waitlistFlagEnabled = true
+            case .off: waitlistFlagEnabled = false
+            }
+
+            guard !waitlistFlagEnabled else {
+                return false
+            }
+
+            // 3. The user has not already dismissed the card
+
+            return shouldShowNetworkProtectionBetaEndedNotice
+#else
+            return false
+#endif
+        }
+
         private enum SurveyDay {
             case day0
             case day7
@@ -366,6 +423,7 @@ extension HomePage.Models {
         case importBookmarksAndPasswords
         case surveyDay0
         case surveyDay7
+        case networkProtectionBetaEndedNotice
 
         var title: String {
             switch self {
@@ -383,6 +441,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpSurveyDay0CardTitle
             case .surveyDay7:
                 return UserText.newTabSetUpSurveyDay7CardTitle
+            case .networkProtectionBetaEndedNotice:
+                return UserText.networkProtectionBetaEndedCardTitle
             }
         }
 
@@ -402,6 +462,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpSurveyDay0Summary
             case .surveyDay7:
                 return UserText.newTabSetUpSurveyDay7Summary
+            case .networkProtectionBetaEndedNotice:
+                return UserText.networkProtectionBetaEndedCardText
             }
         }
 
@@ -421,6 +483,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpSurveyDay0Action
             case .surveyDay7:
                 return UserText.newTabSetUpSurveyDay7Action
+            case .networkProtectionBetaEndedNotice:
+                return UserText.networkProtectionBetaEndedCardAction
             }
         }
 
@@ -442,6 +506,8 @@ extension HomePage.Models {
                 return NSImage(named: "Survey-128")!.resized(to: iconSize)!
             case .surveyDay7:
                 return NSImage(named: "Survey-128")!.resized(to: iconSize)!
+            case .networkProtectionBetaEndedNotice:
+                return NSImage(named: "VPN-Ended")!.resized(to: iconSize)!
             }
         }
     }

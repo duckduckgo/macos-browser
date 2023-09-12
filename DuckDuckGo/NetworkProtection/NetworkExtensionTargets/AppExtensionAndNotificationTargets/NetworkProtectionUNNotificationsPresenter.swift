@@ -150,12 +150,7 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
 extension NetworkProtectionUNNotificationsPresenter: UNUserNotificationCenterDelegate {
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
-
-        if #available(macOS 11, *) {
-            return .banner
-        } else {
-            return .alert
-        }
+        return .banner
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {

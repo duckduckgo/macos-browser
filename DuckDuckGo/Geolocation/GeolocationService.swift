@@ -65,7 +65,7 @@ final class GeolocationService: NSObject, GeolocationServiceProtocol {
 
     init(locationManager: CLLocationManager = .init()) {
         self.locationManager = locationManager
-        self.authorizationStatus = type(of: locationManager).authorizationStatus()
+        self.authorizationStatus = locationManager.authorizationStatus
         self.locationServicesEnabled = type(of: locationManager).locationServicesEnabled
         super.init()
 
@@ -134,8 +134,8 @@ final class GeolocationService: NSObject, GeolocationServiceProtocol {
 
 extension GeolocationService: CLLocationManagerDelegate {
 
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        self.authorizationStatus = status
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        authorizationStatus = manager.authorizationStatus
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {

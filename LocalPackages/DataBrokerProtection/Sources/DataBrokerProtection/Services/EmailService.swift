@@ -26,13 +26,15 @@ public enum EmailError: Error, Equatable, Codable {
     case linkExtractionTimedOut
     case cantDecodeEmailLink
     case unknownStatusReceived(email: String)
+    case cancelled
 }
 
 protocol EmailServiceProtocol {
     func getEmail() async throws -> String
     func getConfirmationLink(from email: String,
                              numberOfRetries: Int,
-                             pollingIntervalInSeconds: Int) async throws -> URL
+                             pollingIntervalInSeconds: Int,
+                             shouldRunNextStep: @escaping () -> Bool) async throws -> URL
 }
 
 struct EmailService: EmailServiceProtocol {
@@ -70,11 +72,16 @@ struct EmailService: EmailServiceProtocol {
 
     func getConfirmationLink(from email: String,
                              numberOfRetries: Int = 100,
-                             pollingIntervalInSeconds: Int = 30) async throws -> URL {
+                             pollingIntervalInSeconds: Int = 30,
+                             shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
         let pollingTimeInNanoSecondsSeconds = UInt64(pollingIntervalInSeconds) * NSEC_PER_SEC
 
         guard let emailResult = try? await extractEmailLink(email: email) else {
             throw EmailError.cantFindEmail
+        }
+
+        if !shouldRunNextStep() {
+            throw EmailError.cancelled
         }
 
         switch emailResult.status {
@@ -92,7 +99,10 @@ struct EmailService: EmailServiceProtocol {
             }
             os_log("No email yet. Waiting for a new request ...", log: .service)
             try await Task.sleep(nanoseconds: pollingTimeInNanoSecondsSeconds)
-            return try await getConfirmationLink(from: email, numberOfRetries: numberOfRetries - 1, pollingIntervalInSeconds: pollingIntervalInSeconds)
+            return try await getConfirmationLink(from: email,
+                                                 numberOfRetries: numberOfRetries - 1,
+                                                 pollingIntervalInSeconds: pollingIntervalInSeconds,
+                                                 shouldRunNextStep: shouldRunNextStep)
         case .unknown:
             throw EmailError.unknownStatusReceived(email: email)
         }

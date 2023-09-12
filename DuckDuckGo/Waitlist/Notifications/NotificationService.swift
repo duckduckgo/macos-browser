@@ -1,7 +1,7 @@
 //
-//  WebKitDownloadDelegate.swift
+//  NotificationService.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,11 +16,20 @@
 //  limitations under the License.
 //
 
-import WebKit
+import Foundation
+import UserNotifications
 
-@available(macOS 11.3, *)
-@objc protocol WebKitDownloadDelegate: WKDownloadDelegate {
+public protocol NotificationService {
 
-    func download(_ download: WKDownload, didReceiveDataWithLength length: UInt64)
+    func requestAuthorization(options: UNAuthorizationOptions) async throws -> Bool
+    func authorizationStatus() async -> UNAuthorizationStatus
+
+}
+
+extension UNUserNotificationCenter: NotificationService {
+
+    public func authorizationStatus() async -> UNAuthorizationStatus {
+        await notificationSettings().authorizationStatus
+    }
 
 }
