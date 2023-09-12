@@ -10,12 +10,12 @@
       }
     },
     {
-      "identity" : "browserserviceskit",
+      "identity" : "browserserviceskit-dbp",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/BrowserServicesKit",
+      "location" : "https://github.com/duckduckgo/BrowserServicesKit-DBP",
       "state" : {
-        "revision" : "fd65ad9ec0427df218b40caaa4404c31a1cee3e5",
-        "version" : "76.1.0"
+        "branch" : "elle/secure-vault-app-group-plus-ccs-dbp",
+        "revision" : "2da3e9d0472dfd65b5b88109031ab7233ce49856"
       }
     },
     {
@@ -129,7 +129,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
       "state" : {
         "revision" : "4684440d03304e7638a2c8086895367e90987463",
         "version" : "1.2.1"

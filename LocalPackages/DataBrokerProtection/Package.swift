@@ -29,14 +29,14 @@ let package = Package(
             targets: ["DataBrokerProtection"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "77.2.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit-DBP", branch: "elle/secure-vault-app-group-plus-ccs-dbp"),
         .package(path: "../SwiftUIExtensions")
     ],
     targets: [
         .target(
             name: "DataBrokerProtection",
             dependencies: [
-                .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
+                .product(name: "BrowserServicesKit", package: "BrowserServicesKit-DBP"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
             ],
             resources: [.process("Resources")]
@@ -45,7 +45,7 @@ let package = Package(
             name: "DataBrokerProtectionTests",
             dependencies: [
                 "DataBrokerProtection",
-                "BrowserServicesKit"
+                .product(name: "BrowserServicesKit", package: "BrowserServicesKit-DBP")
             ])
     ]
 )

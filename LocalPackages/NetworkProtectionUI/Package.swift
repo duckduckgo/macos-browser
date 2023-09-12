@@ -15,14 +15,14 @@ let package = Package(
             targets: ["NetworkProtectionUI"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "77.2.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit-DBP", branch: "elle/secure-vault-app-group-plus-ccs-dbp"),
         .package(path: "../SwiftUIExtensions")
     ],
     targets: [
         .target(
             name: "NetworkProtectionUI",
             dependencies: [
-                .product(name: "NetworkProtection", package: "BrowserServicesKit"),
+                .product(name: "NetworkProtection", package: "BrowserServicesKit-DBP"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
             ],
             resources: [
@@ -32,7 +32,7 @@ let package = Package(
             name: "NetworkProtectionUITests",
             dependencies: [
                 "NetworkProtectionUI",
-                .product(name: "NetworkProtectionTestUtils", package: "BrowserServicesKit")
+                .product(name: "NetworkProtectionTestUtils", package: "BrowserServicesKit-DBP")
             ])
     ]
 )
