@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionDebugMenu.swift
+//  NetworkProtectionConnectionTesterMenu.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,206 +19,58 @@
 import AppKit
 import Common
 import Foundation
-import NetworkProtectionUI
-
-#if !NETWORK_PROTECTION
-
-/// App store placedholder.  Should be replaced with the actual thing once we enable NetP in App Store builds.
-///
-@objc
-final class NetworkProtectionDebugMenu: NSMenu {
-    /// This is just present so we can remove this menu item in App Store builds.
-    ///
-    @IBOutlet weak var mainMenuItem: NSMenuItem?
-
-    override func awakeFromNib() {
-        // Hide the entire NetP debug menu when the feature is disabled:
-        mainMenuItem?.removeFromParent()
-    }
-}
-
-#else
-
 import NetworkProtection
+
+/// The model that handles the logic for the debug menu.
+///
+public protocol ConnectionTesterMenuModel {
+    /// Whether the connection tester can disable the Network Protection tester.
+    ///
+    var canDisableNetworkProtection: Bool { get set }
+
+    /// Resets all settings to their default values
+    ///
+    func resetToDefaults()
+}
 
 /// Controller for the Network Protection debug menu.
 ///
 @objc
 @MainActor
-final class NetworkProtectionDebugMenu: NSMenu {
+public final class ConnectionTesterMenu: NSMenu {
 
-    override func awakeFromNib() {
-        self.items.append(ConnectionTesterMenu())
+    private var model: ConnectionTesterMenuModel
+
+    private let resetToDefaultsMenuItem = NSMenuItem(title: "Reset to Defaults", action: #selector(resetToDefaults), keyEquivalent: "")
+    private let canDisableNetworkProtectionMenuItem = NSMenuItem(title: "Can disable NetP", action: #selector(toggleCanDisableNetworkProtection), keyEquivalent: "")
+
+    public init(title: String, model: ConnectionTesterMenuModel) {
+        self.model = model
+
+        super.init(title: title)
+
+        self.items = [
+            resetToDefaultsMenuItem,
+            .separator(),
+            canDisableNetworkProtectionMenuItem
+        ]
     }
 
-    // MARK: - Outlets: Menus
-
-    @IBOutlet weak var preferredServerMenu: NSMenu? {
-        didSet {
-            populateNetworkProtectionServerListMenuItems()
-        }
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
-    @IBOutlet weak var registrationKeyValidityMenu: NSMenu? {
-        didSet {
-            populateNetworkProtectionRegistrationKeyValidityMenuItems()
-        }
+    @objc
+    func resetToDefaults() {
+        model.resetToDefaults()
     }
 
-    @IBOutlet weak var exclusionsMenu: NSMenu! {
-        didSet {
-            populateExclusionsMenuItems()
-        }
+    @objc
+    func toggleCanDisableNetworkProtection() {
+        model.canDisableNetworkProtection.toggle()
     }
 
-    // MARK: - Outlets: Menu Items
-
-    /// This is just present so we can remove this menu item in App Store builds.
-    ///
-    @IBOutlet weak var mainMenuItem: NSMenuItem!
-    @IBOutlet weak var registrationKeyValidityMenuSeparatorItem: NSMenuItem!
-    @IBOutlet weak var registrationKeyValidityMenuItem: NSMenuItem!
-    @IBOutlet weak var registrationKeyValidityAutomaticItem: NSMenuItem!
-    @IBOutlet weak var preferredServerAutomaticItem: NSMenuItem!
-
-    @IBOutlet weak var enableConnectOnDemandMenuItem: NSMenuItem!
-    @IBOutlet weak var shouldEnforceRoutesMenuItem: NSMenuItem!
-    @IBOutlet weak var shouldIncludeAllNetworksMenuItem: NSMenuItem!
-    @IBOutlet weak var connectOnLogInMenuItem: NSMenuItem!
-
-    @IBOutlet weak var excludeDDGRouteMenuItem: NSMenuItem!
-    @IBOutlet weak var excludeLocalNetworksMenuItem: NSMenuItem!
-
-    @IBOutlet weak var connectionTesterEnabledMenuItem: NSMenuItem!
-
-    // MARK: - Debug Logic
-
-    private let debugUtilities = NetworkProtectionDebugUtilities()
-
-    // MARK: - Debug Menu IBActions
-
-    /// Resets all state for NetworkProtection.
-    ///
-    @IBAction
-    func resetAllState(_ sender: Any?) {
-        Task { @MainActor in
-            guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
-
-            do {
-                try await debugUtilities.resetAllState(keepAuthToken: false)
-            } catch {
-                await NSAlert(error: error).runModal()
-            }
-        }
-    }
-
-    /// Resets all state for NetworkProtection.
-    ///
-    @IBAction
-    func resetAllKeepingInvite(_ sender: Any?) {
-        Task { @MainActor in
-            guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
-
-            do {
-                try await debugUtilities.resetAllState(keepAuthToken: true)
-            } catch {
-                await NSAlert(error: error).runModal()
-            }
-        }
-    }
-
-    /// Removes the system extension and agents for Network Protection.
-    ///
-    @IBAction
-    func removeSystemExtensionAndAgents(_ sender: Any?) {
-        Task { @MainActor in
-            guard case .alertFirstButtonReturn = await NSAlert.removeSystemExtensionAndAgentsAlert().runModal() else { return }
-
-            do {
-                try await debugUtilities.removeSystemExtensionAndAgents()
-            } catch {
-                await NSAlert(error: error).runModal()
-            }
-        }
-    }
-
-    /// Sends a test user notification.
-    ///
-    @IBAction
-    func sendTestNotification(_ sender: Any?) {
-        Task { @MainActor in
-            do {
-                try await debugUtilities.sendTestNotificationRequest()
-            } catch {
-                await NSAlert(error: error).runModal()
-            }
-        }
-    }
-
-    /// Sets the selected server.
-    ///
-    @IBAction
-    func setSelectedServer(_ menuItem: NSMenuItem) {
-        let title = menuItem.title
-        let selectedServer: SelectedNetworkProtectionServer
-
-        if title == "Automatic" {
-            selectedServer = .automatic
-        } else {
-            let titleComponents = title.components(separatedBy: " ")
-            selectedServer = .endpoint(titleComponents.first!)
-        }
-
-        debugUtilities.setSelectedServer(selectedServer: selectedServer)
-    }
-
-    /// Expires the registration key immediately.
-    ///
-    @IBAction
-    func expireRegistrationKeyNow(_ sender: Any?) {
-        Task {
-            await debugUtilities.expireRegistrationKeyNow()
-        }
-    }
-
-    /// Sets the registration key validity.
-    ///
-    @IBAction
-    func setRegistrationKeyValidity(_ menuItem: NSMenuItem) {
-        // nil means automatic
-        let validity = menuItem.representedObject as? TimeInterval
-
-        debugUtilities.registrationKeyValidity = validity
-    }
-
-    @IBAction
-    func toggleEnforceRoutesAction(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleShouldEnforceRoutes()
-    }
-
-    @IBAction
-    func toggleIncludeAllNetworks(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleShouldIncludeAllNetworks()
-    }
-
-    @IBAction
-    func toggleShouldExcludeLocalRoutes(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleShouldExcludeLocalRoutes()
-    }
-
-    @IBAction
-    func toggleConnectOnLogInAction(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleShouldAutoConnectOnLogIn()
-    }
-
-    @IBAction
-    func toggleExclusionAction(_ sender: NSMenuItem) {
-        guard let addressRange = sender.representedObject as? String else {
-            assertionFailure("Unexpected representedObject")
-            return
-        }
-        NetworkProtectionTunnelController().setExcludedRoute(addressRange, enabled: sender.state == .off)
-    }
+    /*
 
     // MARK: Populating Menu Items
 
@@ -320,44 +172,15 @@ final class NetworkProtectionDebugMenu: NSMenu {
             }
             exclusionsMenu.addItem(menuItem)
         }
-    }
+    }*/
 
     // MARK: - Menu State Update
 
     override func update() {
-        updatePreferredServerMenu()
-        updateRekeyValidityMenu()
-        updateNetworkProtectionMenuItemsState()
+        //updateRekeyValidityMenu()
+        canDisableNetworkProtectionMenuItem.state = model.canDisableNetworkProtection ? .on : .off
     }
-
-    private func updatePreferredServerMenu() {
-        guard let menu = preferredServerMenu else {
-            assertionFailure("Outlet not connected for preferredServerMenu")
-            return
-        }
-
-        let selectedServerName = debugUtilities.selectedServerName()
-
-        if selectedServerName == nil {
-            menu.items.first?.state = .on
-        } else {
-            menu.items.first?.state = .off
-        }
-
-        // We're skipping the first two items because they're the automatic menu item and
-        // the separator line.
-        let serverItems = menu.items.dropFirst(2)
-
-        for item in serverItems {
-            if let selectedServerName,
-               item.title.hasPrefix(selectedServerName) {
-                item.state = .on
-            } else {
-                item.state = .off
-            }
-        }
-    }
-
+/*
     private func updateRekeyValidityMenu() {
         guard let menu = registrationKeyValidityMenu else {
             assertionFailure("Outlet not connected for preferredServerMenu")
@@ -394,9 +217,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
         excludeLocalNetworksMenuItem.state = controller.shouldExcludeLocalRoutes ? .on : .off
         connectionTesterEnabledMenuItem.state = controller.isConnectionTesterEnabled ? .on : .off
-    }
-
+    }*/
 }
+/*
 extension NetworkProtectionDebugMenu: NSMenuDelegate {
 
     func menuNeedsUpdate(_ menu: NSMenu) {
@@ -411,6 +234,4 @@ extension NetworkProtectionDebugMenu: NSMenuDelegate {
         }
     }
 
-}
-
-#endif
+}*/

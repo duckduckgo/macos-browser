@@ -115,6 +115,36 @@ final class NetworkProtectionDebugUtilities {
             try? activeSession.sendProviderMessage(.setSelectedServer(selectedServer.stringValue))
         }
     }
+
+    // MARK: - Connection Tester
+
+    var connectionTesterCanDisableNetworkProtection: Bool {
+        get async {
+            Task {
+                guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
+                    return
+                }
+
+                try? activeSession.sendProviderMessage(.setSelectedServer(selectedServer.stringValue))
+            }
+        }
+    }
+
+    func connectionTesterCanDisableNetworkProtection() -> Bool {
+        selectedServerStore.selectedServer.stringValue
+    }
+
+    func setSelectedServer(selectedServer: SelectedNetworkProtectionServer) {
+        selectedServerStore.selectedServer = selectedServer
+
+        Task {
+            guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
+                return
+            }
+
+            try? activeSession.sendProviderMessage(.setSelectedServer(selectedServer.stringValue))
+        }
+    }
 }
 
 #endif

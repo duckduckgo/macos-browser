@@ -1,5 +1,5 @@
 //
-//  NavigationBarIconProvider.swift
+//  NetworkProtectionConnectionTesterMenuModel.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,24 +16,16 @@
 //  limitations under the License.
 //
 
-import AppKit
 import Foundation
+import NetworkProtectionUI
 
-/// Network Protection icon shown in the navigation bar.
-///
-public final class NavigationBarIconProvider: IconProvider {
+final class NetworkProtectionConnectionTesterMenuModel: ConnectionTesterMenuModel {
 
-    public init() {}
+    var canDisableNetworkProtection: Bool
 
-    public var onIcon: NetworkProtectionAsset {
-        .appVPNOnIcon
+    func resetToDefaults() {
+        <#code#>
     }
 
-    public var offIcon: NetworkProtectionAsset {
-        .appVPNOffIcon
-    }
 
-    public var issueIcon: NetworkProtectionAsset {
-        .appVPNIssueIcon
-    }
 }

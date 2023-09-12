@@ -158,6 +158,7 @@ public struct UserDefaultsWrapper<T> {
         case networkProtectionOnboardingStatusRawValue = "networkProtectionOnboardingStatusRawValue"
         case networkProtectionWaitlistActiveOverrideRawValue = "networkProtectionWaitlistActiveOverrideRawValue"
         case networkProtectionWaitlistEnabledOverrideRawValue = "networkProtectionWaitlistEnabledOverrideRawValue"
+        case networkProtectionConnectionTesterCanDisableNetP = "networkProtectionConnectionTesterCanDisableNetP"
 
         // Experiments
         case pixelExperimentInstalled = "pixel.experiment.installed"
