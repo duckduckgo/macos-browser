@@ -76,11 +76,12 @@ public final class DataBrokerProtectionBackgroundManager {
         //guard !redeemUseCase.shouldAskForInviteCode() else { return }
 
         // If there's no saved profile we don't need to start the scheduler
-        // TODO actually reading data
         if dataManager.fetchProfile() != nil {
             scheduler.runQueuedOperations(showWebView: false) { [weak self] in
                 self?.scheduler.startScheduler()
             }
+
+            scheduler.scanAllBrokers()
         }
     }
 }
