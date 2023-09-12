@@ -67,6 +67,23 @@ final class ResultsViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var headerStatusText = ""
 
+    private let verecorChildSites = [
+        "Centeda",
+        "Dataveria",
+        "Infover",
+        "Pub360",
+        "Vericora",
+        "Veriforia",
+        "Veripages"
+    ]
+
+    private let peopleFindersChildSites = [
+        "Advanced Background Checks",
+        "Smart Background Checks",
+        "USA People Search",
+        "USPhoneBook"
+    ]
+
     init(dataManager: DataBrokerProtectionDataManaging,
          notificationCenter: NotificationCenter = .default) {
         self.dataManager = dataManager
@@ -137,10 +154,12 @@ final class ResultsViewModel: ObservableObject {
                                 operationData: optOutOperationData)
 
                             pendingProfiles.append(profile)
+                            pendingProfiles.append(contentsOf: self.addChildrenSites(for: profile))
                         } else {
                             let profile = RemovedProfile(dataBroker: brokerProfileQueryData.dataBroker.name,
                                                          scheduledDate: brokerProfileQueryData.scanOperationData.preferredRunDate)
                             removedProfiles.append(profile)
+                            removedProfiles.append(contentsOf: self.addChildrenSites(for: profile))
                         }
                     }
                 }
@@ -152,6 +171,48 @@ final class ResultsViewModel: ObservableObject {
                 }
             }
         }
+    }
+
+    private func addChildrenSites(for profile: RemovedProfile) -> [RemovedProfile] {
+        if profile.dataBroker.isVerecor {
+            return verecorChildSites.map {
+                .init(dataBroker: $0, scheduledDate: profile.scheduledDate)
+            }
+        } else if profile.dataBroker.isPeopleFinders {
+            return peopleFindersChildSites.map {
+                .init(dataBroker: $0, scheduledDate: profile.scheduledDate)
+            }
+        }
+
+        return [RemovedProfile]()
+    }
+
+    private func addChildrenSites(for profile: PendingProfile) -> [PendingProfile] {
+        if profile.dataBroker.isVerecor {
+            return verecorChildSites.map {
+                .init(dataBroker: $0,
+                      profile: profile.profile,
+                      addresses: profile.addresses,
+                      age: profile.age,
+                      relatives: profile.relatives,
+                      error: profile.error,
+                      errorDescription: profile.errorDescription,
+                      operationData: profile.operationData)
+            }
+        } else if profile.dataBroker.isPeopleFinders {
+            return peopleFindersChildSites.map {
+                .init(dataBroker: $0,
+                      profile: profile.profile,
+                      addresses: profile.addresses,
+                      age: profile.age,
+                      relatives: profile.relatives,
+                      error: profile.error,
+                      errorDescription: profile.errorDescription,
+                      operationData: profile.operationData)
+            }
+        }
+
+        return [PendingProfile]()
     }
 
     private func updateLoadingViewWithMinimumDuration(startTime: UInt64, endTime: UInt64, completion: @escaping () -> Void) {
@@ -182,6 +243,17 @@ final class ResultsViewModel: ObservableObject {
         DispatchQueue.main.async {
             self.updateUI(ignoresCache: true)
         }
+    }
+}
+
+extension String {
+
+    var isVerecor: Bool {
+        self == "verecor.com"
+    }
+
+    var isPeopleFinders: Bool {
+        self == "peoplefinders.com"
     }
 }
 
