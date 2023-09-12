@@ -58,23 +58,26 @@ final class AddressBarTextEditor: NSTextView {
 
     override func setSelectedRanges(_ ranges: [NSValue], affinity: NSSelectionAffinity, stillSelecting stillSelectingFlag: Bool) {
         let string = self.string
-        guard let selectableRange = addressBar?.stringValueWithoutSuffixRange,
-              !ranges.isEmpty,
-              let range = Range(ranges[0].rangeValue, in: string) else { return }
+        let range = ranges.first.flatMap { Range($0.rangeValue, in: string) }
 
-        let clamped = range.clamped(to: selectableRange)
-        super.setSelectedRanges([NSValue(range: NSRange(clamped, in: string))], affinity: affinity, stillSelecting: stillSelectingFlag)
+        let selectableRange = addressBar?.stringValueWithoutSuffixRange
+        let clamped = selectableRange.flatMap { range?.clamped(to: $0) } ?? range
+        let ranges = clamped.map { [NSValue(range: NSRange($0, in: string))] } ?? []
+
+        super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelectingFlag)
     }
 
     override func characterIndexForInsertion(at point: NSPoint) -> Int {
         let index = super.characterIndexForInsertion(at: point)
-        let adjustedRange = selectionRange(forProposedRange: NSRange(location: index, length: 0),
-                                           granularity: .selectByCharacter)
+        let adjustedRange = selectionRange(forProposedRange: NSRange(location: index, length: 0), granularity: .selectByCharacter)
         return adjustedRange.location
     }
 
     override func insertText(_ string: Any, replacementRange: NSRange) {
-        guard let addressBar, let string = string as? String else { return }
+        guard let addressBar, let string = string as? String else {
+            super.insertText(string, replacementRange: replacementRange)
+            return
+        }
         breakUndoCoalescingIfNeeded(for: InputType(string))
 
         addressBar.textView(self, userTypedString: string, at: replacementRange.location == NSNotFound ? self.selectedRange() : replacementRange) {
