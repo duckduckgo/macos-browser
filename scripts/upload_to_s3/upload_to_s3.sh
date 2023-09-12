@@ -60,14 +60,33 @@ function check_aws_installed() {
     fi
 }
 
+# Check if there‘s a valid token
+function check_and_login_aws_sso() {
+    SSO_ACCOUNT_PROFILE=$(aws sts get-caller-identity --query "Account" --profile $PROFILE)
+
+    if [ ${#SSO_ACCOUNT_PROFILE} -eq 14 ]; then
+        echo "Session is still valid"
+    else
+        echo "Session has expired"
+        aws sso login --profile $PROFILE
+    fi
+}
+
 # Execute AWS command, but just echo it if in debug mode
 function execute_aws() {
     AWS_CMD="$1"
     echo "$AWS_CMD"
     if [[ $DEBUG -eq 0 ]]; then
-        $AWS_CMD
+        eval "$AWS_CMD"
     fi
 }
+
+# Handle SIGINT
+function terminated() {
+    exit 1
+}
+
+trap terminated INT
 
 check_aws_installed
 
@@ -94,8 +113,8 @@ if [[ $RUN_COMMAND -eq 0 ]]; then
     exit 0
 fi
 
-# Perform AWS login
-aws sso login --profile $PROFILE
+# Perform AWS login if needed
+check_and_login_aws_sso
 
 # Ensure appcast2.xml exists
 if [[ ! -f "$DIRECTORY/appcast2.xml" ]]; then
@@ -112,7 +131,7 @@ MISSING_FILES=()
 for FILENAME in $FILES_TO_UPLOAD; do
     # Check if the file exists locally
     if [[ ! -f "$DIRECTORY/$FILENAME" ]]; then
-        echo "Error: File $FILENAME listed in appcast2.xml does not exist locally."
+        echo "Error: File \"$DIRECTORY/$FILENAME\" listed in appcast2.xml does not exist locally."
         exit 1
     fi
 
@@ -153,13 +172,13 @@ fi
 # Upload each missing file
 for FILE in "${MISSING_FILES[@]}"; do
     AWS_CMD="aws --profile $PROFILE s3 cp \"${DIRECTORY}/${FILE}\" ${S3_PATH}${FILE} --acl public-read"
-    execute_aws "$AWS_CMD"
+    execute_aws "$AWS_CMD" || exit -1
 done
 
 # If the overwrite flag was set, overwrite the primary dmg
 if [[ -n "$OVERWRITE_DMG_VERSION" ]]; then
     AWS_CMD="aws --profile $PROFILE s3 cp \"${DIRECTORY}/duckduckgo-$OVERWRITE_DMG_VERSION.dmg\" ${S3_PATH}duckduckgo.dmg --acl public-read"
-    execute_aws "$AWS_CMD"
+    execute_aws "$AWS_CMD" || exit -1
 fi
 
 echo "Upload complete!"
