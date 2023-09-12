@@ -51,4 +51,10 @@ ASSETCATALOG_COMPILER_APPICON_NAME[config=CI][sdk=*] = Icon - DBP
 ASSETCATALOG_COMPILER_APPICON_NAME[config=Review][sdk=*] = Icon - DBP
 ASSETCATALOG_COMPILER_APPICON_NAME[config=Release][sdk=*] = Icon - DBP
 
+SYSEX_BUNDLE_ID[sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
+SYSEX_BUNDLE_ID[config=CI][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
+SYSEX_BUNDLE_ID[config=Review][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
+SYSEX_BUNDLE_ID[config=Debug][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
+SYSEX_BUNDLE_ID[config=Release][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
+
 #include? "../../LocalOverrides.xcconfig"
