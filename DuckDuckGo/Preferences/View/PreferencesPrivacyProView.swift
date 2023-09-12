@@ -244,7 +244,7 @@ extension Preferences {
                 .frame(minWidth: 440)
                 .padding(10)
                 .roundedBorder()
-                .animation(.easeOut(duration: 2.3))
+                .animation(.easeOut(duration: 0.3))
 
                 Spacer()
             }
