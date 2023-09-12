@@ -172,13 +172,13 @@ fi
 # Upload each missing file
 for FILE in "${MISSING_FILES[@]}"; do
     AWS_CMD="aws --profile $PROFILE s3 cp \"${DIRECTORY}/${FILE}\" ${S3_PATH}${FILE} --acl public-read"
-    execute_aws "$AWS_CMD" || exit -1
+    execute_aws "$AWS_CMD" || exit 1
 done
 
 # If the overwrite flag was set, overwrite the primary dmg
 if [[ -n "$OVERWRITE_DMG_VERSION" ]]; then
     AWS_CMD="aws --profile $PROFILE s3 cp \"${DIRECTORY}/duckduckgo-$OVERWRITE_DMG_VERSION.dmg\" ${S3_PATH}duckduckgo.dmg --acl public-read"
-    execute_aws "$AWS_CMD" || exit -1
+    execute_aws "$AWS_CMD" || exit 1
 fi
 
 echo "Upload complete!"
