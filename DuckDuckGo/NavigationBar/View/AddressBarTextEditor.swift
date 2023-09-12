@@ -327,6 +327,6 @@ extension AddressBarTextField {
 }
 
 private extension CharacterSet {
-    static let urlWordCharacters = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "+=_~"))
+    static let urlWordCharacters = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "+_~"))
     static let urlWordBoundCharacters = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "_")).inverted
 }
