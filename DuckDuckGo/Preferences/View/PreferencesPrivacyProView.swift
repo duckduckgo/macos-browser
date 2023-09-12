@@ -211,9 +211,9 @@ extension Preferences {
     struct SheetView: View {
         @Environment(\.dismiss) var dismiss
 
-        let items = [MenuItem(name: "Apple ID", image: "", description: ""),
-                     MenuItem(name: "Email", image: "", description: ""),
-                     MenuItem(name: "Sync", image: "", description: "")]
+        let items = [MenuItem(name: "Apple ID", image: "", description: "Your subscription is automatically available on any device signed in to the same Apple ID."),
+                     MenuItem(name: "Email", image: "", description: "Use your email to access your subscription on this device"),
+                     MenuItem(name: "Sync", image: "", description: "DuckDuckPro is automatically available on your Synced devices. Manage your synced devices in Sync settings.")]
         @State private var selection: Set<MenuItem> = []
 
         @State private var selected: String = ""
@@ -228,10 +228,9 @@ extension Preferences {
                     .font(.title)
                 Text("Access your Privacy Pro subscription on this device via Sync, Apple ID or an email address.")
 
-
                 VStack {
                     ForEach(items) { item in
-                        PlaceView(name: item.name, isExpanded: self.selection.contains(item))
+                        PlaceView(name: item.name, description: item.description, isExpanded: self.selection.contains(item))
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 self.selectDeselect(item)
@@ -245,7 +244,7 @@ extension Preferences {
                 .frame(minWidth: 440)
                 .padding(10)
                 .roundedBorder()
-                .animation(.linear(duration: 0.3))
+                .animation(.easeOut(duration: 2.3))
 
                 Spacer()
             }
@@ -272,6 +271,7 @@ extension Preferences {
 
     struct PlaceView: View {
         let name: String
+        let description: String
         let isExpanded: Bool
 
         @State var fullHeight: CGFloat = 0.0
@@ -298,14 +298,15 @@ extension Preferences {
                 .drawingGroup()
 
                 VStack(alignment: .leading) {
-                    TextMenuItemCaption(text: "111111 Your subscription is automatically available on any device signed in to the same Apple ID.")
-                        .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
-                    TextMenuItemCaption(text: "2222222222222 Your subscription is automatically available on any device signed in to the same Apple ID.")
-                        .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
-                    TextMenuItemCaption(text: "33 Your subscription is automatically available on any device signed in to the same Apple ID.")
+                    TextMenuItemCaption(text: description)
                         .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
 
-                    Button("Button") { }
+                    Button("Action") { }
+                        .fixedSize()
+                        .frame(alignment: .top)
+                        .transaction { t in
+                            t.animation = nil
+                        }
                 }
                 .background(
                     GeometryReader { proxy in
