@@ -78,19 +78,3 @@ public final class ConnectionTesterMenu: NSMenu {
         useNewConnectionTesterBehaviorMenuItem.state = model.useNewConnectionTesterBehavior ? .on : .off
     }
 }
-/*
-extension NetworkProtectionDebugMenu: NSMenuDelegate {
-
-    func menuNeedsUpdate(_ menu: NSMenu) {
-        if menu === exclusionsMenu {
-            let controller = NetworkProtectionTunnelController()
-            for item in menu.items {
-                guard let route = item.representedObject as? String else { continue }
-                item.state = controller.isExcludedRouteEnabled(route) ? .on : .off
-                // TO BE fixed: see NetworkProtectionTunnelController.excludedRoutes()
-                item.isEnabled = !(controller.shouldEnforceRoutes && route == "10.0.0.0/8")
-            }
-        }
-    }
-
-}*/
