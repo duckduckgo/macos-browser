@@ -71,6 +71,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
 
+    private var didFinishLaunching = false
+
 #if !APPSTORE
     var updateController: UpdateController!
 #endif
@@ -161,6 +163,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !NSApp.isRunningUnitTests else { return }
+        defer {
+            didFinishLaunching = true
+        }
 
         HistoryCoordinator.shared.loadHistory()
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
@@ -216,6 +221,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
+        guard didFinishLaunching else { return }
+
         syncService?.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
         syncService?.scheduler.notifyAppLifecycleEvent()
 
