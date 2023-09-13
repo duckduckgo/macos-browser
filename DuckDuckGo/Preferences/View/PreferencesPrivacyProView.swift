@@ -18,6 +18,7 @@
 
 import SwiftUI
 import SwiftUIExtensions
+import Subscription
 
 extension Preferences {
 
@@ -38,9 +39,7 @@ extension Preferences {
                     showingSheet.toggle()
                 }
                 .sheet(isPresented: $showingSheet) {
-                    if #available(macOS 12.0, *) {
-                        SheetView()
-                    }
+                    SubscriptionAccessView()
                 }
 
                 VStack {
@@ -204,125 +203,6 @@ extension Preferences {
                 }
             }
             .padding(.vertical, 7)
-        }
-    }
-
-    @available(macOS 12.0, *)
-    struct SheetView: View {
-        @Environment(\.dismiss) var dismiss
-
-        let items = [MenuItem(name: "Apple ID", image: "", description: "Your subscription is automatically available on any device signed in to the same Apple ID."),
-                     MenuItem(name: "Email", image: "", description: "Use your email to access your subscription on this device"),
-                     MenuItem(name: "Sync", image: "", description: "DuckDuckPro is automatically available on your Synced devices. Manage your synced devices in Sync settings.")]
-        @State private var selection: Set<MenuItem> = []
-
-        @State private var selected: String = ""
-
-        var body: some View {
-            Button("X") {
-                dismiss()
-            }
-
-            VStack {
-                Text("Activate your subscription on this device")
-                    .font(.title)
-                Text("Access your Privacy Pro subscription on this device via Sync, Apple ID or an email address.")
-
-                VStack {
-                    ForEach(items) { item in
-                        PlaceView(name: item.name, description: item.description, isExpanded: self.selection.contains(item))
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                self.selectDeselect(item)
-                            }
-
-                        if items.last != item {
-                            Divider()
-                        }
-                    }
-                }
-                .frame(minWidth: 440)
-                .padding(10)
-                .roundedBorder()
-                .animation(.easeOut(duration: 0.3))
-
-                Spacer()
-            }
-            .padding()
-            .frame(width: 480, height: 450)
-        }
-
-        private func selectDeselect(_ item: MenuItem) {
-            if selection.contains(item) {
-                selection.remove(item)
-            } else {
-                selection.removeAll()
-                selection.insert(item)
-            }
-        }
-    }
-
-    struct MenuItem: Identifiable, Hashable {
-        var id = UUID()
-        var name: String
-        var image: String
-        var description: String
-    }
-
-    struct PlaceView: View {
-        let name: String
-        let description: String
-        let isExpanded: Bool
-
-        @State var fullHeight: CGFloat = 0.0
-
-        var body: some View {
-            VStack(alignment: .leading) {
-
-                HStack(alignment: .center, spacing: 8) {
-                    Image("SubscriptionIcon")
-                        .padding(4)
-                        .background(Color.black.opacity(0.06))
-                        .cornerRadius(4)
-
-                    TextMenuItemCaption(text: name)
-
-                    Spacer()
-                        .contentShape(Rectangle())
-
-                    if #available(macOS 11.0, *) {
-                        Image(systemName: "chevron.down")
-                            .rotationEffect(Angle(degrees: isExpanded ? -180 : 0))
-                    }
-                }
-                .drawingGroup()
-
-                VStack(alignment: .leading) {
-                    TextMenuItemCaption(text: description)
-                        .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
-
-                    Button("Action") { }
-                        .fixedSize()
-                        .frame(alignment: .top)
-                        .transaction { t in
-                            t.animation = nil
-                        }
-                }
-                .background(
-                    GeometryReader { proxy in
-                        Color.clear.onAppear {
-                            fullHeight = proxy.size.height
-                            print("Height = \(fullHeight)")
-                        }
-                    }
-                )
-                .transaction { t in
-                    t.animation = nil
-                }
-                .frame(maxHeight: isExpanded ? fullHeight : 0, alignment: .top)
-                .clipped()
-                .opacity(isExpanded ? 1.0 : 0.0)
-            }
         }
     }
 }

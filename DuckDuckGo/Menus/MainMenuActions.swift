@@ -746,7 +746,8 @@ extension MainViewController {
     }
 
     @IBAction func managePurchases(_ sender: Any?) {
-        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(DebugManagePurchasesViewController())
+//        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(DebugManagePurchasesViewController())
+        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(SubscriptionAccessViewController())
     }
 
     // MARK: - Developer Tools
