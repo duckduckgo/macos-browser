@@ -363,8 +363,8 @@ final class AddressBarTextField: NSTextField {
         let userEnteredValue: String
         switch suggestion {
         case .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _),
-                .historyEntry(title: _, url: let url, allowedInTopHits: _),
-                .website(url: let url):
+             .historyEntry(title: _, url: let url, allowedInTopHits: _),
+             .website(url: let url):
             finalUrl = url
             userEnteredValue = url.absoluteString
         case .phrase(phrase: let phrase),

@@ -39,7 +39,7 @@ final class SuggestionContainerViewModel {
         suggestionContainer.result?.count ?? 0
     }
 
-    @Published var selectionIndex: Int? {
+    @Published private(set) var selectionIndex: Int? {
         didSet { updateSelectedSuggestionViewModel() }
     }
 
