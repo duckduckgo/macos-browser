@@ -36,6 +36,8 @@ final class PreviewScheduler: DataBrokerProtectionScheduler {
 final class PreviewDataManager: DataBrokerProtectionDataManaging {
     var delegate: DataBrokerProtectionDataManagerDelegate?
 
+    let cache = InMemoryDataCache()
+
     init(fakeBrokerFlag: FakeBrokerFlag) { }
 
     init() { }

@@ -18,6 +18,8 @@
 
 import Cocoa
 import SwiftUI
+import BrowserServicesKit
+import WebKit
 
 final public class DataBrokerProtectionViewController: NSViewController {
     private let navigationViewModel: ContainerNavigationViewModel
@@ -28,12 +30,76 @@ final public class DataBrokerProtectionViewController: NSViewController {
     private let scheduler: DataBrokerProtectionScheduler
     private let notificationCenter: NotificationCenter
 
+    private let privacyConfig: PrivacyConfigurationManaging?
+    private let prefs: ContentScopeProperties?
+    private var communicationLayer: DBPUICommunicationLayer?
+    private var webView: WKWebView?
+
+    private let debugPage: String = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+        <form>
+            <input type="button" value="Add Name" onclick="setState()">
+            <input type="button" value="Set State" onclick="handshake()">
+            <input type="button" value="Get Profile" onclick="getProfile()">
+        </form>
+
+        <p id="output"></p>
+
+        <script type="text/javascript">
+            function setState() {
+                window.webkit.messageHandlers.dbpui.postMessage({
+                    "context": "dbpui",
+                    "featureName": "dbpuiCommunication",
+                    "method": "addNameToCurrentUserProfile",
+                    "params": {
+                        "first": "John",
+                        "middle": "Jacob",
+                        "last": "JingleHeimerSchmidt"
+                    }
+                })
+            }
+
+            function handshake() {
+                window.webkit.messageHandlers.dbpui.postMessage({
+                    "context": "dbpui",
+                    "featureName": "dbpuiCommunication",
+                    "method": "setState",
+                    "params": {
+                        "state": "ProfileReview"
+                    }
+                })
+            }
+
+            function getProfile() {
+                window.webkit.messageHandlers.dbpui.postMessage({
+                    "context": "dbpui",
+                    "featureName": "dbpuiCommunication",
+                    "method": "getCurrentUserProfile"
+                }).then(data => {
+                    document.getElementById('output').textContent = JSON.stringify(data, null, 4)
+                })
+            }
+        </script>
+    </body>
+    </html>
+    """
+
     public init(scheduler: DataBrokerProtectionScheduler,
                 dataManager: DataBrokerProtectionDataManaging,
-                notificationCenter: NotificationCenter = .default) {
+                notificationCenter: NotificationCenter = .default,
+                privacyConfig: PrivacyConfigurationManaging? = nil, prefs: ContentScopeProperties? = nil) {
         self.scheduler = scheduler
         self.dataManager = dataManager
         self.notificationCenter = notificationCenter
+        self.privacyConfig = privacyConfig
+        self.prefs = prefs
 
         navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
         profileViewModel = ProfileViewModel(dataManager: dataManager)
@@ -44,6 +110,8 @@ final public class DataBrokerProtectionViewController: NSViewController {
         containerViewModel = ContainerViewModel(scheduler: scheduler,
                                                 dataManager: dataManager)
 
+        dataManager.fetchProfile(ignoresCache: true)
+
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -52,14 +120,36 @@ final public class DataBrokerProtectionViewController: NSViewController {
     }
 
     override public func loadView() {
-        let containerView = DataBrokerProtectionContainerView(
-            containerViewModel: containerViewModel,
-            navigationViewModel: navigationViewModel,
-            profileViewModel: profileViewModel,
-            resultsViewModel: resultsViewModel)
+//        let containerView = DataBrokerProtectionContainerView(
+//            containerViewModel: containerViewModel,
+//            navigationViewModel: navigationViewModel,
+//            profileViewModel: profileViewModel,
+//            resultsViewModel: resultsViewModel)
+//
+//        let hostingController = NSHostingController(rootView: containerView)
+//        view = hostingController.view
 
-        let hostingController = NSHostingController(rootView: containerView)
-        view = hostingController.view
+        guard let privacyConfig = privacyConfig else { return }
+        guard let prefs = prefs else { return }
+
+        let configuration = WKWebViewConfiguration()
+        configuration.applyDBPUIConfiguration(privacyConfig: privacyConfig, prefs: prefs, delegate: dataManager.cache)
+        configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
+
+        if let dbpUIContentController = configuration.userContentController as? DBPUIUserContentController {
+            communicationLayer = dbpUIContentController.dbpUIUserScripts.dbpUICommunicationLayer
+        }
+
+        webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1024, height: 768), configuration: configuration)
+        view = webView!
+
+        webView?.loadHTMLString(debugPage, baseURL: nil)
+
+//        let button = NSButton(title: "Set State", target: self, action: #selector(setUIState))
+//        button.setButtonType(.momentaryLight)
+//        button.contentTintColor = .black
+//        button.frame = CGRect(x: 10, y: 100, width: 100, height: 50)
+//        view.addSubview(button)
     }
 
 }

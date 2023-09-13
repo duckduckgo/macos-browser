@@ -20,6 +20,7 @@ import Foundation
 import Common
 
 public protocol DataBrokerProtectionDataManaging {
+    var cache: InMemoryDataCache { get }
     var delegate: DataBrokerProtectionDataManagerDelegate? { get set }
 
     init(fakeBrokerFlag: FakeBrokerFlag)
@@ -44,7 +45,7 @@ public protocol DataBrokerProtectionDataManagerDelegate: AnyObject {
 }
 
 public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
-    private let cache = InMemoryDataCache()
+    public let cache = InMemoryDataCache()
 
     public weak var delegate: DataBrokerProtectionDataManagerDelegate?
 
@@ -52,6 +53,7 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
 
     required public init(fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()) {
         self.database = DataBrokerProtectionDatabase(fakeBrokerFlag: fakeBrokerFlag)
+        cache.delegate = self
     }
 
     public func saveProfile(_ profile: DataBrokerProtectionProfile) async {
@@ -91,12 +93,132 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
     }
 }
 
-private final class InMemoryDataCache {
+extension DataBrokerProtectionDataManager: InMemoryDataCacheDelegate {
+    public func flushCache(profile: DataBrokerProtectionProfile?) async {
+        guard let profile = profile else { return }
+        await saveProfile(profile)
+    }
+}
+
+public protocol InMemoryDataCacheDelegate: AnyObject {
+    func flushCache(profile: DataBrokerProtectionProfile?) async
+}
+
+public final class InMemoryDataCache {
     var profile: DataBrokerProtectionProfile?
     var brokerProfileQueryData = [BrokerProfileQueryData]()
+
+    weak var delegate: InMemoryDataCacheDelegate?
+
+    private let emptyProfile: DataBrokerProtectionProfile = {
+        DataBrokerProtectionProfile(names: [], addresses: [], phones: [], birthYear: -1)
+    }()
 
     public func invalidate() {
         profile = nil
         brokerProfileQueryData.removeAll()
+    }
+}
+
+extension InMemoryDataCache: DBPUICommunicationDelegate {
+    func setState() {
+        // TODO: other set state tasks
+
+        Task {
+            await delegate?.flushCache(profile: profile)
+        }
+    }
+
+    func getUserProfile() -> DBPUIUserProfile? {
+        let profile = profile ?? emptyProfile
+
+        let names = profile.names.map { DBPUIUserProfileName(first: $0.firstName, middle: $0.middleName ?? "", last: $0.lastName) }
+        let addresses = profile.addresses.map { DBPUIUserProfileAddress(street: $0.street ?? "", city: $0.city, state: $0.state) }
+
+        return DBPUIUserProfile(names: names, birthYear: profile.birthYear, addresses: addresses)
+    }
+
+    func addNameToCurrentUserProfile(_ name: DBPUIUserProfileName) -> Bool {
+        let profile = profile ?? emptyProfile
+
+        var names = profile.names
+        names.append(DataBrokerProtectionProfile.Name(firstName: name.first, lastName: name.last, middleName: name.middle))
+
+        self.profile = DataBrokerProtectionProfile(names: names, addresses: profile.addresses, phones: profile.phones, birthYear: profile.birthYear)
+
+        return true
+    }
+
+    func removeNameFromUserProfile(_ name: DBPUIUserProfileName) -> Bool {
+        let profile = profile ?? emptyProfile
+
+        var names = profile.names
+        if let idx = names.firstIndex(where: { $0.firstName == name.first && $0.lastName == name.last && $0.middleName == name.middle }) {
+            names.remove(at: idx)
+            self.profile = DataBrokerProtectionProfile(names: names, addresses: profile.addresses, phones: profile.phones, birthYear: profile.birthYear)
+            return true
+        }
+
+        return false
+    }
+
+    func removeNameAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool {
+        let profile = profile ?? emptyProfile
+
+        var names = profile.names
+        if index.index < names.count {
+            names.remove(at: index.index)
+            self.profile = DataBrokerProtectionProfile(names: names, addresses: profile.addresses, phones: profile.phones, birthYear: profile.birthYear)
+            return true
+        }
+
+        return false
+    }
+
+    func setBirthYearForCurrentUserProfile(_ year: DBPUIBirthYear) {
+        let profile = profile ?? emptyProfile
+
+        self.profile = DataBrokerProtectionProfile(names: profile.names, addresses: profile.addresses, phones: profile.phones, birthYear: year.year)
+    }
+
+    func addAddressToCurrentUserProfile(_ address: DBPUIUserProfileAddress) -> Bool {
+        let profile = profile ?? emptyProfile
+
+        var addresses = profile.addresses
+        addresses.append(DataBrokerProtectionProfile.Address(city: address.city, state: address.state, street: address.street))
+
+        self.profile = DataBrokerProtectionProfile(names: profile.names, addresses: addresses, phones: profile.phones, birthYear: profile.birthYear)
+
+        return true
+    }
+
+    func removeAddressFromCurrentUserProfile(_ address: DBPUIUserProfileAddress) -> Bool {
+        let profile = profile ?? emptyProfile
+
+        var addresses = profile.addresses
+        if let idx = addresses.firstIndex(where: { $0.street == address.street && $0.state == address.state && $0.city == address.city }) {
+            addresses.remove(at: idx)
+            self.profile = DataBrokerProtectionProfile(names: profile.names, addresses: addresses, phones: profile.phones, birthYear: profile.birthYear)
+            return true
+        }
+
+        return false
+    }
+
+    func removeAddressAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool {
+        let profile = profile ?? emptyProfile
+
+        var addresses = profile.addresses
+        if index.index < addresses.count {
+            addresses.remove(at: index.index)
+            self.profile = DataBrokerProtectionProfile(names: profile.names, addresses: addresses, phones: profile.phones, birthYear: profile.birthYear)
+            return true
+        }
+
+        return false
+    }
+
+    func startScanAndOptOut() -> Bool {
+        return false
     }
 }
