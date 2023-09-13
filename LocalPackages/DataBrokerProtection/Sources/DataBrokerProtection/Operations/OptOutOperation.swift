@@ -43,7 +43,7 @@ final class OptOutOperation: DataBrokerOperation {
          query: BrokerProfileQueryData,
          emailService: EmailServiceProtocol = EmailService(),
          captchaService: CaptchaServiceProtocol = CaptchaService(),
-         operationAwaitTime: TimeInterval = 1,
+         operationAwaitTime: TimeInterval = 3,
          shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
