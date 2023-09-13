@@ -1608,6 +1608,9 @@
 		3707C72E294B5D4400682A9F /* ContentBlockerRulesManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2E727AA397100FCEBE9 /* ContentBlockerRulesManagerMock.swift */; };
 		3707C72F294B5D4F00682A9F /* WebViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3783F92229432E1800BCA897 /* WebViewTests.swift */; };
 		3707C730294B5D5C00682A9F /* DuckPlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E828EDBAAB0056C57A /* DuckPlayerTests.swift */; };
+		370A34B12AB24E3700C77F7C /* SyncDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370A34B02AB24E3700C77F7C /* SyncDebugMenu.swift */; };
+		370A34B22AB24E3700C77F7C /* SyncDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370A34B02AB24E3700C77F7C /* SyncDebugMenu.swift */; };
+		370A34B32AB24E3700C77F7C /* SyncDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370A34B02AB24E3700C77F7C /* SyncDebugMenu.swift */; };
 		3714B1E728EDB7FA0056C57A /* DuckPlayerPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E628EDB7FA0056C57A /* DuckPlayerPreferencesTests.swift */; };
 		3714B1E928EDBAAB0056C57A /* DuckPlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3714B1E828EDBAAB0056C57A /* DuckPlayerTests.swift */; };
 		37197EA12942441700394917 /* Tab+UIDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBDE293C8F7F00C3C99E /* Tab+UIDelegate.swift */; };
@@ -3058,6 +3061,7 @@
 		3706FE99293F661700E42796 /* Unit Tests App Store.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Unit Tests App Store.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3706FEB2293F662100E42796 /* Integration Tests App Store.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Integration Tests App Store.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3706FEC7293F6F7500E42796 /* BWManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BWManagement.swift; sourceTree = "<group>"; };
+		370A34B02AB24E3700C77F7C /* SyncDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncDebugMenu.swift; sourceTree = "<group>"; };
 		3714B1E628EDB7FA0056C57A /* DuckPlayerPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerPreferencesTests.swift; sourceTree = "<group>"; };
 		3714B1E828EDBAAB0056C57A /* DuckPlayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerTests.swift; sourceTree = "<group>"; };
 		371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackPresenter.swift; sourceTree = "<group>"; };
@@ -4503,6 +4507,7 @@
 		3775913429AB99DA00E26367 /* Sync */ = {
 			isa = PBXGroup;
 			children = (
+				370A34B02AB24E3700C77F7C /* SyncDebugMenu.swift */,
 				3775913529AB9A1C00E26367 /* SyncManagementDialogViewController.swift */,
 				373D9B4729EEAC1B00381FDD /* SyncMetadataDatabase.swift */,
 				37445F982A1566420029F789 /* SyncDataProviders.swift */,
@@ -9300,6 +9305,7 @@
 				3192A1AC2A4C4CFF0084EA89 /* RandomAccessCollectionExtension.swift in Sources */,
 				3192A1AD2A4C4CFF0084EA89 /* NSOutlineViewExtensions.swift in Sources */,
 				3192A1AE2A4C4CFF0084EA89 /* AppDelegate.swift in Sources */,
+				370A34B32AB24E3700C77F7C /* SyncDebugMenu.swift in Sources */,
 				3192A1AF2A4C4CFF0084EA89 /* ContentOverlayViewController.swift in Sources */,
 				3192A1B02A4C4CFF0084EA89 /* ContentBlockingTabExtension.swift in Sources */,
 				3192A1B12A4C4CFF0084EA89 /* OnboardingViewController.swift in Sources */,
@@ -9714,6 +9720,7 @@
 				4B4032852AAAC24400CCA602 /* WaitlistActivationDateStore.swift in Sources */,
 				3706FB93293F65D500E42796 /* PasteboardFolder.swift in Sources */,
 				3706FB94293F65D500E42796 /* CookieManagedNotificationView.swift in Sources */,
+				370A34B22AB24E3700C77F7C /* SyncDebugMenu.swift in Sources */,
 				4B4D60BE2A0C848A00BCD287 /* NetworkProtection+ConvenienceInitializers.swift in Sources */,
 				3706FB95293F65D500E42796 /* PermissionType.swift in Sources */,
 				3706FB96293F65D500E42796 /* RecentlyClosedWindow.swift in Sources */,
@@ -10788,6 +10795,7 @@
 				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
 				AA9E9A5625A3AE8400D1959D /* NSWindowExtension.swift in Sources */,
 				7BD3AF5D2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift in Sources */,
+				370A34B12AB24E3700C77F7C /* SyncDebugMenu.swift in Sources */,
 				AAC5E4C725D6A6E8007F5990 /* BookmarkPopover.swift in Sources */,
 				37CC53F027E8D1440028713D /* PreferencesDownloadsView.swift in Sources */,
 				B6F7127E29F6779000594A45 /* QRSharingService.swift in Sources */,
@@ -12276,8 +12284,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 77.3.1;
+				branch = "dominik/sync-env-switcher";
+				kind = branch;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
