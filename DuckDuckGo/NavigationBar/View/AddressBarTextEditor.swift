@@ -62,9 +62,9 @@ final class AddressBarTextEditor: NSTextView {
 
         let selectableRange = addressBar?.stringValueWithoutSuffixRange
         let clamped = selectableRange.flatMap { range?.clamped(to: $0) } ?? range
-        let ranges = clamped.map { [NSValue(range: NSRange($0, in: string))] } ?? []
+        let result = clamped.map { [NSValue(range: NSRange($0, in: string))] } ?? []
 
-        super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelectingFlag)
+        super.setSelectedRanges(result, affinity: affinity, stillSelecting: stillSelectingFlag)
     }
 
     override func characterIndexForInsertion(at point: NSPoint) -> Int {
@@ -99,7 +99,8 @@ final class AddressBarTextEditor: NSTextView {
     override func selectionRange(forProposedRange proposedCharRange: NSRange, granularity: NSSelectionGranularity) -> NSRange {
         let string = self.string
         guard let selectableRange = addressBar?.stringValueWithoutSuffixRange,
-              var proposedRange = Range(proposedCharRange, in: string)?.clamped(to: selectableRange) else { return proposedCharRange }
+              var clampedRange = Range(proposedCharRange, in: string)?.clamped(to: selectableRange) else { return proposedCharRange }
+        guard !selectableRange.isEmpty else { return NSRange(selectableRange, in: string) }
 
         let range: Range<String.Index>
         switch granularity {
@@ -108,38 +109,38 @@ final class AddressBarTextEditor: NSTextView {
             range = selectableRange
 
         case .selectByWord:
-            // if at the end of string: adjust proposed selection to include last character
-            if proposedRange.lowerBound == selectableRange.upperBound, !selectableRange.isEmpty {
-                proposedRange = string.index(selectableRange.upperBound, offsetBy: -1)..<selectableRange.upperBound
-            } else if proposedRange.upperBound < selectableRange.upperBound, proposedRange.isEmpty {
+            // if at the end of string: adjust proposed selection to include at least the last character
+            if clampedRange.lowerBound == selectableRange.upperBound {
+                clampedRange = string.index(selectableRange.upperBound, offsetBy: -1)..<selectableRange.upperBound
+            } else if clampedRange.isEmpty /* assuming clampedRange.upperBound < selectableRange.upperBound - as of the previous check */ {
                 // include at least one character in selection
-                proposedRange = proposedRange.lowerBound..<string.index(after: proposedRange.lowerBound)
+                clampedRange = clampedRange.lowerBound..<string.index(after: clampedRange.lowerBound)
             }
 
-            // index of separator before the selected character (including the character itself)
+            // index of separator before the first selected character (including the character itself)
             let startIndex = min(string.rangeOfCharacter(from: .urlWordBoundCharacters,
                                                          options: .backwards,
-                                                         // search from the beginning of selectable range to the end of the clicked character
-                                                         range: selectableRange.lowerBound..<proposedRange.upperBound)?.upperBound
-                                 // separator not found: the selectable range start index
+                                                         // search from the first proposed range character INCLUSIVE to the beginning of the selectable range
+                                                         range: selectableRange.lowerBound..<string.index(after: clampedRange.lowerBound))?.upperBound
+                                 // separator not found: use the selectable range start index
                                  ?? selectableRange.lowerBound,
                                  // if the clicked character is a separator itself - selection should start from the character
-                                 proposedRange.lowerBound)
-            // index of separator after the selected character (including the character itself)
+                                 clampedRange.lowerBound)
+            // index of separator after the last selected character (including the character itself)
             let endIndex = max(string.rangeOfCharacter(from: .urlWordBoundCharacters,
                                                        options: [],
-                                                       // search from the beginning of the clicked character to the end of the selectable range
-                                                       range: proposedRange.lowerBound..<selectableRange.upperBound)?.lowerBound
+                                                       // search from the last proposed range character INCLUSIVE to the end of the selectable range
+                                                       range: string.index(before: clampedRange.upperBound)..<selectableRange.upperBound)?.lowerBound
                                // separator not found: use the selectable range end index
                                ?? selectableRange.upperBound,
-                               // if the clicked character is a separator itself - selection should start from the character
-                               proposedRange.upperBound)
+                               // if the clicked character is a separator itself - selection should end with the character
+                               clampedRange.upperBound)
             range = startIndex..<endIndex
 
         case .selectByCharacter: fallthrough
         @unknown default:
             // adjust caret location only
-            range = proposedRange
+            range = clampedRange
         }
 
         return NSRange(range, in: string)
