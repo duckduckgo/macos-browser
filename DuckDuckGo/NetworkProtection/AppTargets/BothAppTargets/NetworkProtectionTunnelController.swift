@@ -95,6 +95,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .shared)
     private(set) var onboardingStatusRawValue: OnboardingStatus.RawValue
 
+    @UserDefaultsWrapper(key: .networkProtectionConnectionTesterUseNewBehavior, defaultValue: NetworkProtectionUserDefaultsConstants.useNewConnectionTesterBehavior, defaults: .shared)
+    private(set) var useNewConnectionTesterBehavior: Bool
+
     // MARK: - Connection Status
 
     private let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusObserver: ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter, platformDidWakeNotification: NSWorkspace.didWakeNotification), transitionTimeout: .seconds(4))
@@ -314,7 +317,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         options[NetworkProtectionOptionKey.authToken] = try tokenStore.fetchToken() as NSString?
         options[NetworkProtectionOptionKey.selectedServer] = debugUtilities.selectedServerName() as NSString?
         options[NetworkProtectionOptionKey.keyValidity] = debugUtilities.registrationKeyValidity.map(String.init(describing:)) as NSString?
-        options[NetworkProtectionOptionKey.connectionTesterEnabled] = await NSNumber(value: isConnectionTesterEnabled)
+        options[NetworkProtectionOptionKey.useNewConnectionTesterBehavior] = NSNumber(value: useNewConnectionTesterBehavior)
 
         if Self.simulationOptions.isEnabled(.tunnelFailure) {
             Self.simulationOptions.setEnabled(false, option: .tunnelFailure)
@@ -377,6 +380,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     func disableOnDemand(tunnelManager: NETunnelProviderManager) async throws {
         tunnelManager.isOnDemandEnabled = false
 
+        os_log("🔥 app is disabling on demand", log: .networkProtectionConnectionTesterLog)
         try await tunnelManager.saveToPreferences()
     }
 

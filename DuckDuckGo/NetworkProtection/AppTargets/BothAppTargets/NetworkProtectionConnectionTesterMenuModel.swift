@@ -21,11 +21,24 @@ import NetworkProtectionUI
 
 final class NetworkProtectionConnectionTesterMenuModel: ConnectionTesterMenuModel {
 
-    var canDisableNetworkProtection: Bool
+    private let debugUtilities: NetworkProtectionDebugUtilities
 
-    func resetToDefaults() {
-        <#code#>
+    init(debugUtilities: NetworkProtectionDebugUtilities = .init()) {
+        self.debugUtilities = debugUtilities
+    }
+
+    var useNewConnectionTesterBehavior: Bool {
+        get {
+            debugUtilities.useNewTesterBehavior
+        }
+
+        set {
+            debugUtilities.useNewTesterBehavior = newValue
+        }
     }
 
 
+    func resetToDefaults() {
+        NetworkProtectionDebugUtilities().resetConnectionTesterDebugOptionsToDefault()
+    }
 }

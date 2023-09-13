@@ -2116,6 +2116,13 @@
 		7B430EA12A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */; };
 		7B430EA22A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */; };
 		7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4CE8E626F02134009134B1 /* TabBarTests.swift */; };
+		7B70122B2AB0DFAB00DA1F2E /* NetworkProtectionConnectionTesterMenuModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B38DC4C2AB09BDE002F9482 /* NetworkProtectionConnectionTesterMenuModel.swift */; };
+		7B70122C2AB0DFAD00DA1F2E /* NetworkProtectionConnectionTesterMenuModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B38DC4C2AB09BDE002F9482 /* NetworkProtectionConnectionTesterMenuModel.swift */; };
+		7B70122E2AB0E82B00DA1F2E /* UserDefaults+NetworkProtectionConnectionTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B70122D2AB0E82B00DA1F2E /* UserDefaults+NetworkProtectionConnectionTester.swift */; };
+		7B70122F2AB0E82B00DA1F2E /* UserDefaults+NetworkProtectionConnectionTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B70122D2AB0E82B00DA1F2E /* UserDefaults+NetworkProtectionConnectionTester.swift */; };
+		7B7012302AB0E82B00DA1F2E /* UserDefaults+NetworkProtectionConnectionTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B70122D2AB0E82B00DA1F2E /* UserDefaults+NetworkProtectionConnectionTester.swift */; };
+		7B7012312AB0E82B00DA1F2E /* UserDefaults+NetworkProtectionConnectionTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B70122D2AB0E82B00DA1F2E /* UserDefaults+NetworkProtectionConnectionTester.swift */; };
+		7B7012322AB0E82B00DA1F2E /* UserDefaults+NetworkProtectionConnectionTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B70122D2AB0E82B00DA1F2E /* UserDefaults+NetworkProtectionConnectionTester.swift */; };
 		7B736E582A4A22B700F9922A /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5F14C52A145D6A0060320F /* Main.swift */; };
 		7B736E6A2A4A22FC00F9922A /* enableOnDemand.app in Embed NetP Controller Apps */ = {isa = PBXBuildFile; fileRef = 7B736E5F2A4A22B700F9922A /* enableOnDemand.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7B838C382A1DD8DD00E05A13 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4B2D06522A11D19B00DE1F49 /* Assets.xcassets */; };
@@ -3466,6 +3473,7 @@
 		7B4CE8E626F02134009134B1 /* TabBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarTests.swift; sourceTree = "<group>"; };
 		7B5291882A1697680022E406 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B5291892A169BC90022E406 /* NetworkProtectionDeveloperID.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionDeveloperID.xcconfig; sourceTree = "<group>"; };
+		7B70122D2AB0E82B00DA1F2E /* UserDefaults+NetworkProtectionConnectionTester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+NetworkProtectionConnectionTester.swift"; sourceTree = "<group>"; };
 		7B736E5F2A4A22B700F9922A /* enableOnDemand.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = enableOnDemand.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B934C3D2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionOnboardingMenu.swift; sourceTree = "<group>"; };
 		7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaults+NetworkProtectionShared.swift"; sourceTree = "<group>"; };
@@ -7552,6 +7560,7 @@
 				EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */,
 				B6F92BA42A691A44002ABA6B /* NetworkProtectionUserDefaultsConstants.swift */,
 				7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */,
+				7B70122D2AB0E82B00DA1F2E /* UserDefaults+NetworkProtectionConnectionTester.swift */,
 				7BFE95532A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift */,
 			);
 			path = AppAndExtensionAndAgentTargets;
@@ -8780,6 +8789,7 @@
 				31929FBC2A4C4CFF0084EA89 /* PermissionState.swift in Sources */,
 				31929FBD2A4C4CFF0084EA89 /* FeedbackPresenter.swift in Sources */,
 				31929FBE2A4C4CFF0084EA89 /* NavigationProtectionTabExtension.swift in Sources */,
+				7B7012322AB0E82B00DA1F2E /* UserDefaults+NetworkProtectionConnectionTester.swift in Sources */,
 				31929FBF2A4C4CFF0084EA89 /* UserAgent.swift in Sources */,
 				31929FC02A4C4CFF0084EA89 /* LegacyBookmarkStore.swift in Sources */,
 				316C7A842A7E9C1700AA3BAE /* PixelExperiment.swift in Sources */,
@@ -8843,6 +8853,7 @@
 				31929FFA2A4C4CFF0084EA89 /* BWKeyStorage.swift in Sources */,
 				31929FFB2A4C4CFF0084EA89 /* VisitViewModel.swift in Sources */,
 				31929FFC2A4C4CFF0084EA89 /* Atb.swift in Sources */,
+				7B70122C2AB0DFAD00DA1F2E /* NetworkProtectionConnectionTesterMenuModel.swift in Sources */,
 				31929FFD2A4C4CFF0084EA89 /* BrowserTabView.swift in Sources */,
 				31929FFE2A4C4CFF0084EA89 /* DownloadsViewController.swift in Sources */,
 				31929FFF2A4C4CFF0084EA89 /* DataExtension.swift in Sources */,
@@ -9869,6 +9880,7 @@
 				3706FC0B293F65D500E42796 /* CSVLoginExporter.swift in Sources */,
 				37197EAC294244D600394917 /* FutureExtension.swift in Sources */,
 				4B9DB0452A983B24000927DB /* WaitlistModalViewController.swift in Sources */,
+				7B70122F2AB0E82B00DA1F2E /* UserDefaults+NetworkProtectionConnectionTester.swift in Sources */,
 				3706FC0C293F65D500E42796 /* NSAttributedStringExtension.swift in Sources */,
 				3706FC0D293F65D500E42796 /* AnimationView.swift in Sources */,
 				3706FC0E293F65D500E42796 /* NSRectExtension.swift in Sources */,
@@ -9927,6 +9939,7 @@
 				3706FC3F293F65D500E42796 /* ApplicationDockMenu.swift in Sources */,
 				4B9DB03C2A983B24000927DB /* InvitedToWaitlistView.swift in Sources */,
 				3706FC40293F65D500E42796 /* SaveIdentityViewController.swift in Sources */,
+				7B70122B2AB0DFAB00DA1F2E /* NetworkProtectionConnectionTesterMenuModel.swift in Sources */,
 				3706FC41293F65D500E42796 /* FileStore.swift in Sources */,
 				3706FC42293F65D500E42796 /* PixelArguments.swift in Sources */,
 				3706FC43293F65D500E42796 /* PinnedTabsViewModel.swift in Sources */,
@@ -10375,6 +10388,7 @@
 				7B2DDD072A93C17D0039D884 /* UserText.swift in Sources */,
 				B6F92BAC2A6937B3002ABA6B /* OptionalExtension.swift in Sources */,
 				7BFE95562A9DF29B0081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */,
+				7B7012302AB0E82B00DA1F2E /* UserDefaults+NetworkProtectionConnectionTester.swift in Sources */,
 				7B2DDD092A93C2440039D884 /* AppLauncher+DefaultInitializer.swift in Sources */,
 				B6F92BAA2A691A44002ABA6B /* NetworkProtectionUserDefaultsConstants.swift in Sources */,
 				EEC589DB2A4F1CE700BCD60C /* AppLauncher.swift in Sources */,
@@ -10389,6 +10403,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B2DDCFB2A93B25F0039D884 /* KeychainType+ClientDefault.swift in Sources */,
+				7B7012312AB0E82B00DA1F2E /* UserDefaults+NetworkProtectionConnectionTester.swift in Sources */,
 				B6F92BA32A691583002ABA6B /* UserDefaultsWrapper.swift in Sources */,
 				4B2D067C2A13340900DE1F49 /* Logging.swift in Sources */,
 				4B2D067A2A1333EF00DE1F49 /* DuckDuckGoAgentAppDelegate.swift in Sources */,
@@ -10778,6 +10793,7 @@
 				B6C416A7294A4AE500C4F2E7 /* DuckPlayerTabExtension.swift in Sources */,
 				AA5C1DD5285C780C0089850C /* RecentlyClosedCoordinator.swift in Sources */,
 				AA88D14B252A557100980B4E /* URLRequestExtension.swift in Sources */,
+				7B70122E2AB0E82B00DA1F2E /* UserDefaults+NetworkProtectionConnectionTester.swift in Sources */,
 				AA6197C6276B3168008396F0 /* FaviconHostReference.swift in Sources */,
 				B6685E4229A61C470043D2EE /* DownloadsTabExtension.swift in Sources */,
 				AAD8078527B3F3BE00CF7703 /* WebsiteBreakageSender.swift in Sources */,

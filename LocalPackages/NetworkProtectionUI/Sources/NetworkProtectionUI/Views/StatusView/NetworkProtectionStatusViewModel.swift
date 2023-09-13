@@ -179,12 +179,9 @@ extension NetworkProtectionStatusView {
         private var lastTunnelErrorMessage: String?
 
         var issueDescription: String? {
-            if let lastControllerErrorMessage = lastControllerErrorMessage {
-                return lastControllerErrorMessage
-            }
-
-            if let lastTunnelErrorMessage = lastTunnelErrorMessage {
-                return lastTunnelErrorMessage
+            // We won't show any error if the connection is up.
+            if case .connected = connectionStatus {
+                return nil
             }
 
             if isHavingConnectivityIssues {
@@ -194,11 +191,19 @@ extension NetworkProtectionStatusView {
                 case .disconnecting, .disconnected:
                     return UserText.networkProtectionInterrupted
                 default:
-                    return nil
+                    break
                 }
-            } else {
-                return nil
             }
+
+            if let lastControllerErrorMessage = lastControllerErrorMessage {
+                return lastControllerErrorMessage
+            }
+
+            if let lastTunnelErrorMessage = lastTunnelErrorMessage {
+                return lastTunnelErrorMessage
+            }
+
+            return nil
         }
 
         private func timeLapsedString(since date: Date) -> String {

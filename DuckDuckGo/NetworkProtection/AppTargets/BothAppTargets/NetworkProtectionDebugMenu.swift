@@ -48,7 +48,13 @@ import NetworkProtection
 final class NetworkProtectionDebugMenu: NSMenu {
 
     override func awakeFromNib() {
-        self.items.append(ConnectionTesterMenu())
+        //super.init(title: title)
+
+        let model = NetworkProtectionConnectionTesterMenuModel()
+        let connectionTesterMenuItem = NSMenuItem(title: "Connection Tester")
+        connectionTesterMenuItem.submenu = ConnectionTesterMenu(title: "Connection Tester", model: model)
+
+        self.items.append(connectionTesterMenuItem)
     }
 
     // MARK: - Outlets: Menus
@@ -88,8 +94,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     @IBOutlet weak var excludeDDGRouteMenuItem: NSMenuItem!
     @IBOutlet weak var excludeLocalNetworksMenuItem: NSMenuItem!
-
-    @IBOutlet weak var connectionTesterEnabledMenuItem: NSMenuItem!
 
     // MARK: - Debug Logic
 
@@ -393,7 +397,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
         connectOnLogInMenuItem.state = controller.shouldAutoConnectOnLogIn ? .on : .off
 
         excludeLocalNetworksMenuItem.state = controller.shouldExcludeLocalRoutes ? .on : .off
-        connectionTesterEnabledMenuItem.state = controller.isConnectionTesterEnabled ? .on : .off
     }
 
 }
