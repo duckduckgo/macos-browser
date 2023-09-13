@@ -52,7 +52,13 @@ final class AddressBarTextField: NSTextField {
     private var addressBarStringCancellable: AnyCancellable?
     private var contentTypeCancellable: AnyCancellable?
 
-    private var isHandlingUserAppendingText = false
+    private enum TextDidChangeEventType {
+        case none
+        case userAppendingTextToTheEnd
+        case userModifiedText
+    }
+    // flag when updating the Value from `handleTextDidChange()`
+    private var currentTextDidChangeEvent: TextDidChangeEventType = .none
 
     // MARK: - Lifecycle
 
@@ -134,14 +140,24 @@ final class AddressBarTextField: NSTextField {
             saveValue(oldValue: oldValue)
             updateAttributedStringValue()
 
-            if case .suggestion(let suggestion) = value {
+            if let editor, case .suggestion(let suggestion) = value {
                 let originalStringValue = suggestion.userStringValue
                 if value.string.lowercased().hasPrefix(originalStringValue.lowercased()) {
 
-                    editor?.selectToTheEnd(from: originalStringValue.count)
+                    editor.selectToTheEnd(from: originalStringValue.count)
                 } else {
                     // if suggestion doesn't start with the user input select whole string
-                    editor?.selectAll(nil)
+                    editor.selectAll(nil)
+                }
+
+            } else if let editor, editor.undoManager?.isRedoing == true {
+                // also select to the end when redo action appends a suggestion as a .text Value after current selection
+                let string = stringValueWithoutSuffix
+                if let selectedRange = Range(editor.selectedRange(), in: string),
+                   selectedRange.isEmpty,
+                   selectedRange.upperBound < string.endIndex {
+
+                    editor.selectToTheEnd(from: string.distance(from: string.startIndex, to: selectedRange.lowerBound))
                 }
             }
         }
@@ -177,13 +193,17 @@ final class AddressBarTextField: NSTextField {
     private func saveValue(oldValue: Value) {
         tabCollectionViewModel.selectedTabViewModel?.lastAddressBarTextFieldValue = value
 
-        if let undoManager = undoManager,
-           oldValue.isSuggestion || value.isSuggestion && !oldValue.isSuggestion {
-            undoManager.registerUndo(withTarget: self) { this in
-                this.value = oldValue
-                if let suggestion = oldValue.suggestion {
-                    this.suggestionContainerViewModel?.setUserStringValue(suggestion.userStringValue, userAppendedStringToTheEnd: false)
-                }
+        guard let undoManager else { return }
+        // disable recording undo Value when iterating through suggestions
+        if oldValue.isSuggestion && value.isSuggestion { return }
+        // disable recording undo Value when updating value from `controlTextDidChange`
+        // `isUndoDisabled` is set when the TextField undo record creation is disabled for current `controlTextDidChange` action
+        guard currentTextDidChangeEvent == .none || isUndoDisabled else { return }
+
+        undoManager.registerUndo(withTarget: self) { this in
+            this.value = oldValue
+            if let suggestion = oldValue.suggestion {
+                this.suggestionContainerViewModel?.setUserStringValue(suggestion.userStringValue, userAppendedStringToTheEnd: false /* disable autocompletion */)
             }
         }
     }
@@ -386,6 +406,8 @@ final class AddressBarTextField: NSTextField {
         undoManager?.removeAllActions()
     }
 
+    /// flag is set when the TextField undo record creation is disabled for current `controlTextDidChange` action
+    /// AddressBarTextEditor checks the flag and disables UndoManager while it‘s set to prevent doubling Undo action for both text change and direct Value setting
     private(set) var isUndoDisabled = false
 
     func withUndoDisabled<R>(do job: () -> R) -> R {
@@ -793,40 +815,42 @@ extension AddressBarTextField: NSTextFieldDelegate {
         handleTextDidChange()
     }
 
-    private func autocompleteSuggestionBeingTypedOverByUser(at insertionRange: NSRange?, with newUserEnteredValue: String) -> SuggestionViewModel? {
-        if isHandlingUserAppendingText, // only when typing over
-           case .suggestion(let suggestion) = self.value, // current value should be an autocompletion suggestion
-           !newUserEnteredValue.contains(" "), // disable autocompletion when user entered Space
-           newUserEnteredValue.hasPrefix(suggestion.userStringValue), // newly typed value should start with a previous value
-           suggestion.autocompletionString.hasPrefix(newUserEnteredValue), // new typed value should still match the selected suggestion
-           insertionRange?.location == newUserEnteredValue.length() { // cursor position should be at the end of the typed value
-
-            return suggestion
-        }
-        return nil
-    }
-
     private func handleTextDidChange() {
         let stringValueWithoutSuffix = self.stringValueWithoutSuffix
+        self.currentTextDidChangeEvent = (currentTextDidChangeEvent != .none) ? currentTextDidChangeEvent : .userModifiedText
+        defer {
+            self.currentTextDidChangeEvent = .none
+        }
 
         // if user continues typing letters from displayed Suggestion
         // don't blink and keep the Suggestion displayed
-        if isHandlingUserAppendingText,
-            let suggestion = autocompleteSuggestionBeingTypedOverByUser(at: editor?.selectedRange(), with: stringValueWithoutSuffix) {
+        if case .userAppendingTextToTheEnd = currentTextDidChangeEvent,
+            let suggestion = autocompleteSuggestionBeingTypedOverByUser(with: stringValueWithoutSuffix) {
             self.value = .suggestion(SuggestionViewModel(isHomePage: isHomePage, suggestion: suggestion.suggestion, userStringValue: stringValueWithoutSuffix))
 
         } else {
             suggestionContainerViewModel?.clearSelection()
-            self.value = Value(stringValue: stringValueWithoutSuffix, userTyped: editor?.isUndoingOrRedoing == false)
+            self.value = Value(stringValue: stringValueWithoutSuffix, userTyped: true)
         }
 
         if stringValue.isEmpty {
             suggestionContainerViewModel?.clearUserStringValue()
             hideSuggestionWindow()
         } else {
-            suggestionContainerViewModel?.setUserStringValue(stringValueWithoutSuffix,
-                                                             userAppendedStringToTheEnd: isHandlingUserAppendingText)
+            suggestionContainerViewModel?.setUserStringValue(stringValueWithoutSuffix, userAppendedStringToTheEnd: currentTextDidChangeEvent == .userAppendingTextToTheEnd)
         }
+    }
+
+    private func autocompleteSuggestionBeingTypedOverByUser(with newUserEnteredValue: String) -> SuggestionViewModel? {
+        if case .userAppendingTextToTheEnd = currentTextDidChangeEvent, // only when typing over
+           case .suggestion(let suggestion) = self.value, // current value should be an autocompletion suggestion
+           !newUserEnteredValue.contains(" "), // disable autocompletion when user entered Space
+           newUserEnteredValue.hasPrefix(suggestion.userStringValue), // newly typed value should start with a previous value
+           suggestion.autocompletionString.hasPrefix(newUserEnteredValue) { // new typed value should still match the selected suggestion
+
+            return suggestion
+        }
+        return nil
     }
 
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
@@ -876,30 +900,30 @@ extension AddressBarTextField: NSTextFieldDelegate {
 // MARK: - NSTextViewDelegate
 extension AddressBarTextField: NSTextViewDelegate {
 
-    func textView(_ textView: NSTextView, userTypedString typedString: String, at insertionRange: NSRange, callback: () -> Void) {
+    func textView(_ textView: NSTextView, userTypedString typedString: String, at insertionNsRange: NSRange, callback: () -> Void) {
         let oldValue = stringValueWithoutSuffix
-        let selectionStart = min(oldValue.index(oldValue.startIndex, offsetBy: suggestionContainerViewModel?.userStringValue?.count ?? 0), oldValue.endIndex)
+        let insertionRange = Range(insertionNsRange, in: oldValue) ?? oldValue.startIndex..<oldValue.endIndex
+
+        let selectionStart = min(oldValue.index(oldValue.startIndex,
+                                                // selected area starts from the user-typed value end and goes to the end of the autocomplete suggestion
+                                                offsetBy: min(suggestionContainerViewModel?.userStringValue?.count ?? 0, oldValue.count)),
+                                 oldValue.endIndex)
         let selectionEnd = oldValue.endIndex
-        let selectedSuggestionRange = selectionStart..<selectionEnd
+
         // this range should match editor selection range when user is overtyping currently displayed suggestion
-        let selectedSuggestionNsRange = NSRange(selectionStart..<selectionEnd, in: oldValue)
+        let selectedSuggestionRange = selectionStart..<selectionEnd
 
-        // if user types over selected autocomplete suggestion
-        if insertionRange == selectedSuggestionNsRange
-            // or appends to the end of string
-            || insertionRange.length >= oldValue.length()
-            // or replaces the whole string
-            || insertionRange.location == NSNotFound {
-
+        // if user types over selected autocomplete suggestion or appends to the end of string or replaces the whole string
+        if insertionRange.upperBound >= oldValue.endIndex {
             // we'll select the first suggested item or update userEnteredText in currently selected suggestion
-            isHandlingUserAppendingText = true
-            // disable TextField built-in undo
-
+            currentTextDidChangeEvent = .userAppendingTextToTheEnd
+        } else {
+            currentTextDidChangeEvent = .userModifiedText
         }
+
         // when typing over the autocomplete suggestion
-        if insertionRange == selectedSuggestionNsRange,
-           autocompleteSuggestionBeingTypedOverByUser(at: NSRange(location: insertionRange.location + typedString.length(), length: 0),
-                                                      with: oldValue.replacingCharacters(in: selectedSuggestionRange, with: typedString)) != nil {
+        if insertionRange == selectedSuggestionRange,
+           autocompleteSuggestionBeingTypedOverByUser(with: oldValue.replacingCharacters(in: selectedSuggestionRange, with: typedString)) != nil {
             // disable TextEditor‘s built-in undo, we‘ll save the Suggestion Value to the Undo Manager instead
             isUndoDisabled = true
         }
@@ -908,7 +932,7 @@ extension AddressBarTextField: NSTextViewDelegate {
         // which will call `controlTextDidChange:` with `isHandlingUserAppendingText`/`isUndoDisabled` flags set if suited
         callback()
 
-        isHandlingUserAppendingText = false
+        currentTextDidChangeEvent = .none
         isUndoDisabled = false
     }
 

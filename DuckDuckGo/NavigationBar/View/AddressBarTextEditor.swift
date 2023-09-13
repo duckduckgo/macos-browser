@@ -243,10 +243,6 @@ final class AddressBarTextEditor: NSTextView {
 
     // MARK: Undo
 
-    var isUndoingOrRedoing: Bool {
-        ((undoManager?.isUndoing ?? false) || (undoManager?.isRedoing ?? false)) == false
-    }
-
     override var allowsUndo: Bool {
         get {
             !(addressBar?.isUndoDisabled ?? false) && super.allowsUndo
