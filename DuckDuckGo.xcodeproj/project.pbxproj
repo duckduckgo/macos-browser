@@ -9470,7 +9470,6 @@
 				3706FAC4293F65D500E42796 /* PrintingUserScript.swift in Sources */,
 				9D9AE86C2AA76D1B0026E7DC /* LoginItemsManager.swift in Sources */,
 				4B9DB0392A983B24000927DB /* JoinedWaitlistView.swift in Sources */,
-				4B4D60B42A0C847900BCD287 /* LoginItem.swift in Sources */,
 				3706FEBF293F6EFF00E42796 /* BWError.swift in Sources */,
 				3706FAC6293F65D500E42796 /* ConnectBitwardenViewController.swift in Sources */,
 				EEC589DA2A4F1CE400BCD60C /* AppLauncher.swift in Sources */,
@@ -12278,7 +12277,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 77.3.0;
+				version = 77.3.1;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
