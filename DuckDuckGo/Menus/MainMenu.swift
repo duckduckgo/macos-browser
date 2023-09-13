@@ -159,7 +159,7 @@ final class MainMenu: NSMenu {
     func setup(with featureFlagger: FeatureFlagger) {
         self.delegate = self
 
-#if APPSTORE || DBP
+#if !SPARKLE
         checkForUpdatesMenuItem?.removeFromParent()
         checkForUpdatesSeparatorItem?.removeFromParent()
 #endif

@@ -71,7 +71,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
 
-#if !APPSTORE
+#if SPARKLE
     var updateController: UpdateController!
 #endif
 
@@ -151,7 +151,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                                                privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
         NSApp.mainMenuTyped.setup(with: featureFlagger)
 
-#if !APPSTORE
+#if SPARKLE
         updateController = UpdateController(internalUserDecider: internalUserDecider)
         stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
 #endif
@@ -360,7 +360,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler(.alert)
+        completionHandler(.banner)
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter,

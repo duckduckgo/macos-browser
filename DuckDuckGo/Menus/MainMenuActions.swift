@@ -34,7 +34,7 @@ extension AppDelegate {
     // MARK: - DuckDuckGo
 
     @IBAction func checkForUpdates(_ sender: Any?) {
-#if !APPSTORE && !DBP
+#if SPARKLE
         updateController.checkForUpdates(sender)
 #endif
     }
