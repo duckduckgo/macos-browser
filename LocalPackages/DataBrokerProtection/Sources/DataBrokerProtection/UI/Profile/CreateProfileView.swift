@@ -422,7 +422,7 @@ private struct FormHeaderView: View {
                 .bold()
 
             VStack (spacing: 16) {
-                Text("The following information is required for Data Broker Protection. We’ll scan Data Broker sites for matching info and have it removed.")
+                Text("The following information is required for Personal Information Removal. We’ll scan Data Broker sites for matching info and have it removed.")
 
                 Text("The information you've entered stays on your device, it does not go through DuckDuckGo's servers.")
             }
