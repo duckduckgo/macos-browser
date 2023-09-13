@@ -42,7 +42,7 @@ public final class ConnectionTesterMenu: NSMenu {
     private var model: ConnectionTesterMenuModel
 
     private let resetToDefaultsMenuItem = NSMenuItem(title: "Reset to Defaults", action: #selector(resetToDefaults), keyEquivalent: "")
-    private var useNewConnectionTesterBehaviorMenuItem = NSMenuItem(title: "Use new proposed behavior", action: #selector(toggleUseNewConnectionTesterBehavior), keyEquivalent: "")
+    private var useNewConnectionTesterBehaviorMenuItem = NSMenuItem(title: "Prevent Disconnections When Connectivity Fails", action: #selector(toggleUseNewConnectionTesterBehavior), keyEquivalent: "")
 
     public init(title: String, model: ConnectionTesterMenuModel) {
         self.model = model
