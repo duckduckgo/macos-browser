@@ -45,7 +45,9 @@ final public class DataBrokerProtectionViewController: NSViewController {
     </head>
     <body>
         <form>
-            <input type="button" value="Add Name" onclick="setState()">
+            <input type="button" value="Add Name" onclick="addName()">
+            <input type="button" value="Add Address" onclick="addAddress()">
+            <input type="button" value="Set Birth Year" onclick="setBirthYear()">
             <input type="button" value="Set State" onclick="handshake()">
             <input type="button" value="Get Profile" onclick="getProfile()">
         </form>
@@ -53,15 +55,42 @@ final public class DataBrokerProtectionViewController: NSViewController {
         <p id="output"></p>
 
         <script type="text/javascript">
-            function setState() {
+            function addName() {
                 window.webkit.messageHandlers.dbpui.postMessage({
                     "context": "dbpui",
                     "featureName": "dbpuiCommunication",
                     "method": "addNameToCurrentUserProfile",
+                    "id": "abc123",
                     "params": {
                         "first": "John",
                         "middle": "Jacob",
                         "last": "JingleHeimerSchmidt"
+                    }
+                })
+            }
+
+            function addAddress() {
+                window.webkit.messageHandlers.dbpui.postMessage({
+                    "context": "dbpui",
+                    "featureName": "dbpuiCommunication",
+                    "method": "addAddressToCurrentUserProfile",
+                    "id": "abc123",
+                    "params": {
+                        "street": "123 easy ln",
+                        "city": "Anytown",
+                        "state": "TX"
+                    }
+                })
+            }
+
+            function setBirthYear() {
+                let year = Math.floor(Math.random() * 10) + 1990
+                window.webkit.messageHandlers.dbpui.postMessage({
+                    "context": "dbpui",
+                    "featureName": "dbpuiCommunication",
+                    "method": "setBirthYearForCurrentUserProfile",
+                    "params": {
+                        "year": year
                     }
                 })
             }
@@ -71,6 +100,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
                     "context": "dbpui",
                     "featureName": "dbpuiCommunication",
                     "method": "setState",
+                    "id": "abc123",
                     "params": {
                         "state": "ProfileReview"
                     }
@@ -81,7 +111,8 @@ final public class DataBrokerProtectionViewController: NSViewController {
                 window.webkit.messageHandlers.dbpui.postMessage({
                     "context": "dbpui",
                     "featureName": "dbpuiCommunication",
-                    "method": "getCurrentUserProfile"
+                    "method": "getCurrentUserProfile",
+                    "id": "abc123",
                 }).then(data => {
                     document.getElementById('output').textContent = JSON.stringify(data, null, 4)
                 })

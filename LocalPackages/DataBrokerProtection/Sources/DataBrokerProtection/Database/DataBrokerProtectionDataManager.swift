@@ -122,7 +122,7 @@ public final class InMemoryDataCache {
 
 extension InMemoryDataCache: DBPUICommunicationDelegate {
     func setState() {
-        // TODO: other set state tasks
+        // other set state tasks
 
         Task {
             await delegate?.flushCache(profile: profile)
