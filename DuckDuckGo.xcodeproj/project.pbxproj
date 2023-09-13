@@ -2211,6 +2211,7 @@
 		98EB5D1027516A4800681FE6 /* AppPrivacyConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98EB5D0F27516A4800681FE6 /* AppPrivacyConfigurationTests.swift */; };
 		9D29FF8C2AB0C27A00865A09 /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9D29FF8B2AB0C27A00865A09 /* BrowserServicesKit */; };
 		9D3A7CD92AB0C45D00FF163F /* DataBrokerProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 9D3A7CD82AB0C45D00FF163F /* DataBrokerProtection */; };
+		9D5E58C92AB205E100B7E5C5 /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9D5E58C82AB205E100B7E5C5 /* BrowserServicesKit */; };
 		9D7828372AB0BD8200421DB1 /* Bookmarks in Frameworks */ = {isa = PBXBuildFile; productRef = 9D7828362AB0BD8200421DB1 /* Bookmarks */; };
 		9D78283B2AB0BD8F00421DB1 /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 9D78283A2AB0BD8F00421DB1 /* Common */; };
 		9D78283D2AB0BD9200421DB1 /* Configuration in Frameworks */ = {isa = PBXBuildFile; productRef = 9D78283C2AB0BD9200421DB1 /* Configuration */; };
@@ -4190,6 +4191,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D5E58C92AB205E100B7E5C5 /* BrowserServicesKit in Frameworks */,
 				9D3A7CD92AB0C45D00FF163F /* DataBrokerProtection in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7907,6 +7909,7 @@
 			name = DuckDuckGoDBPBackgroundAgent;
 			packageProductDependencies = (
 				9D3A7CD82AB0C45D00FF163F /* DataBrokerProtection */,
+				9D5E58C82AB205E100B7E5C5 /* BrowserServicesKit */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 9D9AE8D12AAA39A70026E7DC /* DuckDuckGoDBPBackgroundAgent.app */;
@@ -12479,8 +12482,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit-DBP";
 			requirement = {
-				branch = "elle/secure-vault-app-group-plus-ccs-dbp";
-				kind = branch;
+				kind = revision;
+				revision = c840508eaa948235460959ee4c1cd36094df672b;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
@@ -12554,6 +12557,11 @@
 		9D3A7CD82AB0C45D00FF163F /* DataBrokerProtection */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DataBrokerProtection;
+		};
+		9D5E58C82AB205E100B7E5C5 /* BrowserServicesKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit-DBP" */;
+			productName = BrowserServicesKit;
 		};
 		9D7828362AB0BD8200421DB1 /* Bookmarks */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -14,17 +14,15 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit-DBP",
       "state" : {
-        "branch" : "elle/secure-vault-app-group-plus-ccs-dbp",
-        "revision" : "2da3e9d0472dfd65b5b88109031ab7233ce49856"
+        "revision" : "c840508eaa948235460959ee4c1cd36094df672b"
       }
     },
     {
-      "identity" : "content-scope-scripts",
+      "identity" : "content-scope-scripts-dbp",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/content-scope-scripts",
+      "location" : "https://github.com/duckduckgo/content-scope-scripts-DBP",
       "state" : {
-        "revision" : "8def15fe8a4c2fb76730f640507e9fd1d6c1f8a7",
-        "version" : "4.32.0"
+        "revision" : "a39755271ab226057e7bb6bbfdbe8d272a684ed5"
       }
     },
     {
