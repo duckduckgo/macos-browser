@@ -59,8 +59,8 @@ final class ProfileViewModel: ObservableObject {
         }
 
         var fullAddress: String {
-            let components = [street, city, state, zip].filter { !$0.isEmpty }
-            return components.joined(separator: ", ")
+            let components = [street, city, state].filter { !$0.isEmpty }
+            return components.joined(separator: ", ") + " \(zip)"
         }
     }
 
