@@ -22,6 +22,11 @@ struct NavigateResponse: Decodable {
     let url: String
 }
 
+struct SolveCaptchaCallback: Encodable {
+    let callback: String
+    let token: String
+}
+
 struct GetCaptchaInfoResponse: Decodable {
     let siteKey: String
     let url: String
@@ -47,6 +52,15 @@ struct GetCaptchaInfoResponse: Decodable {
     }
 }
 
+
+struct EvalResponse: Decodable {
+    let eval: String
+}
+
+struct SolveCaptchaResponse: Decodable {
+    let callback: EvalResponse
+}
+
 enum CCFSuccessData {
     case navigate(NavigateResponse)
     case extract([ExtractedProfile])
@@ -54,7 +68,7 @@ enum CCFSuccessData {
     case click
     case expectation
     case getCaptchaInfo(GetCaptchaInfoResponse)
-    case solveCaptcha
+    case solveCaptcha(SolveCaptchaResponse)
 }
 
 struct CCFSuccessResponse: Decodable {
@@ -89,7 +103,7 @@ struct CCFSuccessResponse: Decodable {
         case .getCaptchaInfo:
             self.response = .getCaptchaInfo(try container.decode(GetCaptchaInfoResponse.self, forKey: .response))
         case .solveCaptcha:
-            self.response = .solveCaptcha
+            self.response = .solveCaptcha(try container.decode(SolveCaptchaResponse.self, forKey: .response))
         }
     }
 }

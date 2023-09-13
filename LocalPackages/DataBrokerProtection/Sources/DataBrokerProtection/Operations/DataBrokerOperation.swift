@@ -80,6 +80,7 @@ extension DataBrokerOperation {
             actionsHandler?.captchaTransactionId = nil
             if let captchaData = try? await captchaService.submitCaptchaToBeResolved(for: captchaTransactionId,
                                                                                      shouldRunNextStep: shouldRunNextStep) {
+                actionsHandler?.captchaToken = captchaData
                 await webViewHandler?.execute(action: action, data: .solveCaptcha(CaptchaToken(token: captchaData)))
             } else {
                 await onError(error: .captchaServiceError(CaptchaServiceError.nilDataWhenFetchingCaptchaResult))
@@ -167,6 +168,16 @@ extension DataBrokerOperation {
             } else {
                 await onError(error: DataBrokerProtectionError.captchaServiceError(.errorWhenSubmittingCaptcha))
             }
+        }
+    }
+
+    func solveCaptcha(with response: SolveCaptchaResponse) async {
+        do {
+            try await webViewHandler?.evaluateJavaScript(response.callback.eval)
+
+            await executeNextStep()
+        } catch {
+            await onError(error: .solvingCaptchaWithCallbackError)
         }
     }
 

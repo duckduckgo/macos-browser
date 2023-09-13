@@ -279,6 +279,8 @@ private struct DebugModalView: View {
             return "emailError \(String(describing: emailError))"
         case .cancelled:
             return "Cancelled"
+        case .solvingCaptchaWithCallbackError:
+            return "Solving captcha with callback failed"
         }
     }
 }

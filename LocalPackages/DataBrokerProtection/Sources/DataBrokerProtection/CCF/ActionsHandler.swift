@@ -20,6 +20,7 @@ final class ActionsHandler {
     private var lastExecutedActionIndex: Int?
 
     var captchaTransactionId: CaptchaTransactionId?
+    var captchaToken: String?
 
     let step: Step
 
