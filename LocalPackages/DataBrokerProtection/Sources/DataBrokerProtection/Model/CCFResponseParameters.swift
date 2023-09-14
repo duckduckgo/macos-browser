@@ -52,7 +52,6 @@ struct GetCaptchaInfoResponse: Decodable {
     }
 }
 
-
 struct EvalResponse: Decodable {
     let eval: String
 }
