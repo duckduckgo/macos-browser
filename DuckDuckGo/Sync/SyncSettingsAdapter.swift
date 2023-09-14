@@ -23,6 +23,10 @@ import DDGSync
 import Persistence
 import SyncDataProviders
 
+extension SettingsProvider.Setting {
+    static let favoritesDisplayMode = SettingsProvider.Setting(key: "favorites_display_mode")
+}
+
 final class SyncSettingsAdapter {
 
     private(set) var provider: SettingsProvider?
@@ -39,10 +43,18 @@ final class SyncSettingsAdapter {
         }
         let emailManager = EmailManager()
 
+        let favoritesDisplayModeHandler = UserDefaultsSyncHandler(
+            setting: .favoritesDisplayMode,
+            userDefaults: UserDefaultsWrapper<String>.sharedDefaults,
+            userDefaultsKey: UserDefaultsWrapper<String>.Key.favoritesDisplayMode.rawValue,
+            didChangePublisher: AppearancePreferences.shared.$favoritesDisplayMode.dropFirst().asVoid().eraseToAnyPublisher()
+        )
+
         let provider = SettingsProvider(
             metadataDatabase: metadataDatabase,
             metadataStore: metadataStore,
             emailManager: emailManager,
+            userDefaultsHandlers: [favoritesDisplayModeHandler],
             syncDidUpdateData: { [weak self] in
                 self?.syncDidCompleteSubject.send()
             }

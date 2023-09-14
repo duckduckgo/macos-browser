@@ -79,7 +79,6 @@ public struct UserDefaultsWrapper<T> {
         case showAutocompleteSuggestions = "preferences.appearance.show-autocomplete-suggestions"
         case defaultPageZoom = "preferences.appearance.default-page-zoom"
         case bookmarksBarAppearance = "preferences.appearance.bookmarks-bar"
-        case favoritesDisplayMode = "preferences.appearance.favorites-display-mode"
 
         // ATB
         case installDate = "statistics.installdate.key"
@@ -170,6 +169,7 @@ public struct UserDefaultsWrapper<T> {
         // Sync
 
         case syncEnvironment = "sync.environment"
+        case favoritesDisplayMode = "sync.favorites-display-mode"
     }
 
     enum RemovedKeys: String, CaseIterable {
