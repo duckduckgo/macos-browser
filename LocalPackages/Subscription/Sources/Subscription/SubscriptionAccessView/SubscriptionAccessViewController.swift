@@ -30,15 +30,15 @@ public final class SubscriptionAccessViewController: NSViewController {
     }
 
     public override func loadView() {
-        view = NSView(frame: NSRect(x: 0, y: 0, width: 650, height: 700))
-
-        let subscriptionAccessView = SubscriptionAccessView { [weak self] in
-            guard let self = self else { return }
-            self.presentingViewController?.dismiss(self)
-        }
+        let subscriptionAccessView = SubscriptionAccessView(dismiss: { [weak self] in
+                guard let self = self else { return }
+                self.presentingViewController?.dismiss(self)
+        })
 
         let hostingView = NSHostingView(rootView: subscriptionAccessView)
+        let size = hostingView.fittingSize
 
+        view = NSView(frame: NSRect(x: 0, y: 0, width: size.width, height: size.height))
         hostingView.frame = view.bounds
         hostingView.autoresizingMask = [.height, .width]
         hostingView.translatesAutoresizingMaskIntoConstraints = true
