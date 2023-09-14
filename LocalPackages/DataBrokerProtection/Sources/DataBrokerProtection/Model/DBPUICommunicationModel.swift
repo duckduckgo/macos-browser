@@ -130,7 +130,7 @@ struct DBPUIWebSetState: DBPUISendableMessage {
 }
 
 /// Message representing the state of any scans and opt outs
-struct ScanAndOptOutState: DBPUISendableMessage {
+struct DBPUIScanAndOptOutState: DBPUISendableMessage {
     let status: DBPUIScanAndOptOutStatus
     let inProgressOptOuts: [DBPUIDataBrokerProfileMatch]
     let completedOptOuts: [DBPUIDataBrokerProfileMatch]

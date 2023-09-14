@@ -146,6 +146,18 @@ final public class DataBrokerProtectionViewController: NSViewController {
         super.init(nibName: nil, bundle: nil)
     }
 
+    private func setupNotifications() {
+        notificationCenter.addObserver(self,
+                                       selector: #selector(reloadData),
+                                       name: DataBrokerProtectionNotifications.didFinishScan,
+                                       object: nil)
+
+        notificationCenter.addObserver(self,
+                                       selector: #selector(reloadData),
+                                       name: DataBrokerProtectionNotifications.didFinishOptOut,
+                                       object: nil)
+    }
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -176,11 +188,57 @@ final public class DataBrokerProtectionViewController: NSViewController {
 
         webView?.loadHTMLString(debugPage, baseURL: nil)
 
-//        let button = NSButton(title: "Set State", target: self, action: #selector(setUIState))
-//        button.setButtonType(.momentaryLight)
-//        button.contentTintColor = .black
-//        button.frame = CGRect(x: 10, y: 100, width: 100, height: 50)
-//        view.addSubview(button)
+        let button = NSButton(title: "Set State", target: self, action: #selector(reloadData))
+        button.setButtonType(.momentaryLight)
+        button.contentTintColor = .black
+        button.frame = CGRect(x: 10, y: 100, width: 100, height: 50)
+        view.addSubview(button)
+    }
+
+    @objc func reloadData() {
+        guard let webView = webView else { return }
+
+        Task {
+            var inProgress: [DBPUIDataBrokerProfileMatch] = []
+            var completed: [DBPUIDataBrokerProfileMatch] = []
+            // Step 1 - Get Data from database (brokerInfo)
+            let brokerInfoData = await dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
+
+            // Step 3 - For profileQueryData in brokerInfo
+            for profileQueryData in brokerInfoData {
+                // Step 3a - For optOut in profileQueryData
+                for optOutOperationData in profileQueryData.optOutOperationsData {
+                    // if optOut.extractedProfile.removedData == nil
+                    if optOutOperationData.extractedProfile.removedDate == nil {
+                        // Add as a pending removal profile
+                        inProgress.append(DBPUIDataBrokerProfileMatch(
+                            dataBroker: DBPUIDataBroker(name: profileQueryData.dataBroker.name),
+                            names: [DBPUIUserProfileName(first: optOutOperationData.extractedProfile.fullName ?? "", middle: "", last: "")],
+                            addresses: optOutOperationData.extractedProfile.addresses?.map {
+                                DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state)
+                            } ?? []
+                        ))
+                    } else {
+                        // else add as removed profile
+                        completed.append(DBPUIDataBrokerProfileMatch(
+                            dataBroker: DBPUIDataBroker(name: profileQueryData.dataBroker.name),
+                            names: [DBPUIUserProfileName(first: optOutOperationData.extractedProfile.fullName ?? "", middle: "", last: "")],
+                            addresses: optOutOperationData.extractedProfile.addresses?.map {
+                                DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state)
+                            } ?? []
+                        ))
+                    }
+                }
+            }
+
+            let message = DBPUIScanAndOptOutState(
+                status: .removingProfile,
+                inProgressOptOuts: inProgress,
+                completedOptOuts: completed
+            )
+
+            communicationLayer?.sendMessageToUI(method: .scanAndOptOutStatusChanged, params: message, into: webView)
+        }
     }
 
 }
