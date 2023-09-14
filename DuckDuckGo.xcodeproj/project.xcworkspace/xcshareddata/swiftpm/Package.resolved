@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "dominik/sync-env-switcher",
-        "revision" : "82ec004df10ff8d0eaa7027daa3b5faed796a123"
+        "revision" : "2a3dc29c9f0a2d90465a75afe47083a78ecaafe8",
+        "version" : "78.0.0"
       }
     },
     {
