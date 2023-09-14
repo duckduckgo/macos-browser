@@ -19,6 +19,7 @@
 import AppKit
 import Common
 import Foundation
+import QuickLookUI
 
 final class AddressBarTextEditor: NSTextView {
 
@@ -41,6 +42,106 @@ final class AddressBarTextEditor: NSTextView {
         return super.textLayoutManager
     }
 
+    override var smartInsertDeleteEnabled: Bool {
+        get { false }
+        set {}
+    }
+
+    override var isAutomaticQuoteSubstitutionEnabled: Bool {
+        get { false }
+        set {}
+    }
+
+    override var isAutomaticLinkDetectionEnabled: Bool {
+        get { false }
+        set {}
+    }
+
+    override var isAutomaticDataDetectionEnabled: Bool {
+        get { false }
+        set {}
+    }
+
+    override var isAutomaticDashSubstitutionEnabled: Bool {
+        get { false }
+        set {}
+    }
+
+    override var isAutomaticTextReplacementEnabled: Bool {
+        get { false }
+        set {}
+    }
+
+    override var isAutomaticSpellingCorrectionEnabled: Bool {
+        get { false }
+        set {}
+    }
+
+    override var isGrammarCheckingEnabled: Bool {
+        get { false }
+        set {}
+    }
+
+    override var isAutomaticTextCompletionEnabled: Bool {
+        get { false }
+        set {}
+    }
+
+    override var isContinuousSpellCheckingEnabled: Bool {
+        get { false }
+        set {}
+    }
+
+    override var isIncrementalSearchingEnabled: Bool {
+        get { false }
+        set {}
+    }
+
+    override var inlinePredictionType: NSTextInputTraitType {
+        get { .no }
+        set {}
+    }
+
+    override var usesFindPanel: Bool {
+        get { false }
+        set {}
+    }
+
+    override var usesFindBar: Bool {
+        get { false }
+        set {}
+    }
+
+    override var usesRuler: Bool {
+        get { false }
+        set {}
+    }
+
+    override var usesFontPanel: Bool {
+        get { false }
+        set {}
+    }
+
+    override var usesInspectorBar: Bool {
+        get { false }
+        set {}
+    }
+
+    override func acceptsPreviewPanelControl(_ panel: QLPreviewPanel!) -> Bool {
+        false
+    }
+
+    override var enabledTextCheckingTypes: NSTextCheckingTypes {
+        get { 0 }
+        set {}
+    }
+
+    // MARK: - Copy/Paste
+
+    override func copy(_ sender: Any?) {
+        CopyHandler().copy(sender)
+    }
+
     override func paste(_ sender: Any?) {
         // Fixes an issue when url-name instead of url is pasted
         if let url = NSPasteboard.general.url {
@@ -48,10 +149,6 @@ final class AddressBarTextEditor: NSTextView {
         } else {
             super.paste(sender)
         }
-    }
-
-    override func copy(_ sender: Any?) {
-        CopyHandler().copy(sender)
     }
 
     // MARK: - Exclude “ – Search with DuckDuckGo” suffix from selection range
@@ -85,9 +182,17 @@ final class AddressBarTextEditor: NSTextView {
         }
     }
 
-    func selectToTheEnd(from offset: Int) {
+    func selectToTheEnd(from offset: Int? = nil) {
         let string = self.string
-        let startIndex = string.index(string.startIndex, offsetBy: min(string.count, offset))
+        let startIndex: String.Index
+        if let offset {
+            startIndex = string.index(string.startIndex, offsetBy: min(string.count, offset))
+        } else if let selectedRange = Range(self.selectedRange(), in: string) {
+            startIndex = selectedRange.lowerBound
+        } else {
+            startIndex = string.startIndex
+        }
+
         let range = NSRange(startIndex..., in: string)
 
         self.setSelectedRanges([NSValue(range: range)], affinity: .downstream /* rtl */, stillSelecting: false)
@@ -230,7 +335,7 @@ final class AddressBarTextEditor: NSTextView {
             self.moveWordRightAndModifySelection(sender)
         }
 
-        super.deleteForward(sender)
+        self.deleteForward(sender)
     }
 
     override func deleteWordBackward(_ sender: Any?) {
@@ -238,7 +343,19 @@ final class AddressBarTextEditor: NSTextView {
             self.moveWordLeftAndModifySelection(sender)
         }
 
-        super.deleteBackward(sender)
+        self.deleteBackward(sender)
+    }
+
+    override func deleteToEndOfLine(_ sender: Any?) {
+        if selectedRange.length == 0 {
+            self.selectToTheEnd()
+        }
+
+        self.deleteForward(sender)
+    }
+
+    override func deleteToEndOfParagraph(_ sender: Any?) {
+        self.deleteToEndOfLine(sender)
     }
 
     // MARK: Undo

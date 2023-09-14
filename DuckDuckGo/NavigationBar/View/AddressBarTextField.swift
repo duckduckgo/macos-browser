@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import Carbon.HIToolbox
 import Combine
 import Common
 import BrowserServicesKit
@@ -552,7 +553,7 @@ final class AddressBarTextField: NSTextField {
 
     // MARK: - Menu Actions
 
-    @objc private func pasteAndGo(_ menuItem: NSMenuItem) {
+    @objc func pasteAndGo(_ menuItem: NSMenuItem) {
         guard let pasteboardString = NSPasteboard.general.string(forType: .string)?.trimmingWhitespace(),
               let url = URL(trimmedAddressBarString: pasteboardString) else {
             assertionFailure("Pasteboard doesn't contain URL")
@@ -562,7 +563,7 @@ final class AddressBarTextField: NSTextField {
         tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(url, userEntered: pasteboardString)
     }
 
-    @objc private func pasteAndSearch(_ menuItem: NSMenuItem) {
+    @objc func pasteAndSearch(_ menuItem: NSMenuItem) {
         guard let pasteboardString = NSPasteboard.general.string(forType: .string)?.trimmingWhitespace(),
               let searchURL = URL.makeSearchUrl(from: pasteboardString) else {
             assertionFailure("Can't create search URL from pasteboard string")
@@ -572,7 +573,7 @@ final class AddressBarTextField: NSTextField {
         tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(searchURL, userEntered: pasteboardString)
     }
 
-    @objc private func toggleAutocomplete(_ menuItem: NSMenuItem) {
+    @objc func toggleAutocomplete(_ menuItem: NSMenuItem) {
         AppearancePreferences.shared.showAutocompleteSuggestions.toggle()
 
         let shouldShowAutocomplete = AppearancePreferences.shared.showAutocompleteSuggestions
@@ -586,7 +587,7 @@ final class AddressBarTextField: NSTextField {
         }
     }
 
-    @objc private func toggleShowFullWebsiteAddress(_ menuItem: NSMenuItem) {
+    @objc func toggleShowFullWebsiteAddress(_ menuItem: NSMenuItem) {
         AppearancePreferences.shared.showFullURL.toggle()
 
         let shouldShowFullURL = AppearancePreferences.shared.showFullURL
@@ -854,6 +855,8 @@ extension AddressBarTextField: NSTextFieldDelegate {
     }
 
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        print("doCommandBy", commandSelector)
+
         if NSApp.isReturnOrEnterPressed {
             self.addressBarEnterPressed()
             return true
@@ -862,6 +865,19 @@ extension AddressBarTextField: NSTextFieldDelegate {
         if commandSelector == #selector(NSResponder.insertTab(_:)) {
             window?.makeFirstResponder(nextKeyView)
             return false
+
+        } else if commandSelector == #selector(noop(_:)),
+                  let event = NSApp.currentEvent,
+                  case .keyDown = event.type,
+                  event.keyCode == kVK_ForwardDelete,
+                  event.modifierFlags.contains(.command) {
+            // Cmd + Forward Delete
+            if isSuggestionWindowVisible {
+                suggestionContainerViewModel?.clearSelection()
+            }
+
+            textView.deleteToEndOfLine(control)
+            return true
         }
 
         if isSuggestionWindowVisible {
@@ -946,63 +962,50 @@ extension AddressBarTextField: NSTextViewDelegate {
     }
 
     func textView(_ view: NSTextView, menu: NSMenu, for event: NSEvent, at charIndex: Int) -> NSMenu? {
-        let textViewMenu = removingAttributeChangingMenuItems(from: menu)
-        let additionalMenuItems = [
-            makeAutocompleteSuggestionsMenuItem(),
-            makeFullWebsiteAddressMenuItem(),
-            NSMenuItem.separator()
+        removeUnwantedMenuItems(from: menu)
+
+        if let pasteAndGoMenuItem = NSMenuItem.makePasteAndGoMenuItem() {
+            let pasteMenuItemIndex = menu.indexOfItem(withTarget: nil, andAction: #selector(NSText.paste)) // ?? -1
+            menu.insertItem(pasteAndGoMenuItem, at: pasteMenuItemIndex + 1)
+        }
+
+        if let sharingMenuItem = menu.item(with: Self.shareMenuItemAction) {
+            sharingMenuItem.title = UserText.shareMenuItem
+            sharingMenuItem.submenu = SharingMenu(title: UserText.shareMenuItem)
+        }
+
+        let additionalMenuItems: [NSMenuItem] = [
+            .toggleAutocompleteSuggestionsMenuItem,
+            .toggleFullWebsiteAddressMenuItem,
+            .separator()
         ]
-
-        if let pasteMenuItemIndex = pasteMenuItemIndex(within: menu),
-           let pasteAndDoMenuItem = makePasteAndGoMenuItem() {
-            textViewMenu.insertItem(pasteAndDoMenuItem, at: pasteMenuItemIndex + 1)
+        let insertionPoint = menuItemInsertionPoint(within: menu)
+        for (idx, item) in additionalMenuItems.enumerated() {
+            menu.insertItem(item, at: insertionPoint + idx)
         }
 
-        if let insertionPoint = menuItemInsertionPoint(within: menu) {
-            additionalMenuItems.reversed().forEach { item in
-                textViewMenu.insertItem(item, at: insertionPoint)
-            }
-        } else {
-            additionalMenuItems.forEach { item in
-                textViewMenu.addItem(item)
-            }
-        }
-
-        return textViewMenu
+        return menu
     }
 
     /// Returns the menu item after which new items should be added.
     /// This will be the first separator that comes after a predefined list of items: Cut, Copy, or Paste.
     ///
     /// - Returns: The preferred menu item. If none are found, nil is returned.
-    private func menuItemInsertionPoint(within menu: NSMenu) -> Int? {
-        let preferredSelectorNames = ["cut:", "copy:", "paste:"]
-        var foundPreferredSelector = false
+    private func menuItemInsertionPoint(within menu: NSMenu) -> Int {
+        let cutItemIndex = max(0, menu.indexOfItem(withTarget: nil, andAction: #selector(NSText.cut)) /* ?? -1 */)
+        let separatorIndex = menu.items[cutItemIndex...].firstIndex(where: { $0.isSeparatorItem })
 
-        for (index, item) in menu.items.enumerated() {
-            if foundPreferredSelector && item.isSeparatorItem {
-                let indexAfterSeparator = index + 1
-                return menu.items.indices.contains(indexAfterSeparator) ? indexAfterSeparator : index
-            }
-
-            if let action = item.action, preferredSelectorNames.contains(action.description) {
-                foundPreferredSelector = true
-            }
+        if let separatorIndex {
+            return separatorIndex + 1
         }
-
-        return nil
+        return menu.numberOfItems
     }
 
-    private func pasteMenuItemIndex(within menu: NSMenu) -> Int? {
-        let pasteSelector = "paste:"
-        let index = menu.items.firstIndex { menuItem in
-            guard let action = menuItem.action else { return false }
-            return pasteSelector == action.description
-        }
-        return index
-    }
-
-    private static var selectorsToRemove: Set<Selector> = Set([
+    private static var selectorsToRemove = Set([
+        Selector(("_openLinkFromMenu:")),
+        NSSelectorFromString("invoke"),
+        Selector(("_openPreview")),
+        Selector(("runActionForDictionary:")),
         Selector(("_makeLinkFromMenu:")),
         Selector(("_searchWithGoogleFromMenu:")),
         #selector(NSFontManager.orderFrontFontPanel(_:)),
@@ -1010,32 +1013,27 @@ extension AddressBarTextField: NSTextViewDelegate {
         Selector(("replaceQuotesInSelection:")),
         #selector(NSStandardKeyBindingResponding.uppercaseWord(_:)),
         #selector(NSTextView.startSpeaking(_:)),
-        #selector(NSTextView.changeLayoutOrientation(_:))
+        #selector(NSTextView.changeLayoutOrientation(_:)),
+        #selector(NSTextView.orderFrontSubstitutionsPanel(_:))
     ])
+    private static let shareMenuItemAction = Selector(("_performStandardShareMenuItem:"))
 
-    private func removingAttributeChangingMenuItems(from menu: NSMenu) -> NSMenu {
-        menu.items.reversed().forEach { menuItem in
-            if let action = menuItem.action, Self.selectorsToRemove.contains(action) {
-                menu.removeItem(menuItem)
-            } else {
-                if let submenu = menuItem.submenu, submenu.items.first(where: { submenuItem in
-                    if let submenuAction = submenuItem.action, Self.selectorsToRemove.contains(submenuAction) {
-                        return true
-                    } else {
-                        return false
-                    }
-                }) != nil {
-                    menu.removeItem(menuItem)
-                }
-            }
+    private func removeUnwantedMenuItems(from menu: NSMenu) {
+        // filter out menu items with action from `selectorsToRemove` or containing submenu items with action from the list
+        menu.items = menu.items.filter { menuItem in
+            menuItem.action.map { action in  Self.selectorsToRemove.contains(action) } != true
+                && Self.selectorsToRemove.isDisjoint(with: menuItem.submenu?.items.compactMap(\.action) ?? [])
         }
-        return menu
     }
 
-    private func makeAutocompleteSuggestionsMenuItem() -> NSMenuItem {
+}
+
+private extension NSMenuItem {
+
+    static var toggleAutocompleteSuggestionsMenuItem: NSMenuItem {
         let menuItem = NSMenuItem(
             title: UserText.showAutocompleteSuggestions.localizedCapitalized,
-            action: #selector(toggleAutocomplete(_:)),
+            action: #selector(AddressBarTextField.toggleAutocomplete(_:)),
             keyEquivalent: ""
         )
         menuItem.state = AppearancePreferences.shared.showAutocompleteSuggestions ? .on : .off
@@ -1043,10 +1041,10 @@ extension AddressBarTextField: NSTextViewDelegate {
         return menuItem
     }
 
-    private func makeFullWebsiteAddressMenuItem() -> NSMenuItem {
+    static var toggleFullWebsiteAddressMenuItem: NSMenuItem {
         let menuItem = NSMenuItem(
             title: UserText.showFullWebsiteAddress.localizedCapitalized,
-            action: #selector(toggleShowFullWebsiteAddress(_:)),
+            action: #selector(AddressBarTextField.toggleShowFullWebsiteAddress(_:)),
             keyEquivalent: ""
         )
         menuItem.state = AppearancePreferences.shared.showFullURL ? .on : .off
@@ -1057,7 +1055,7 @@ extension AddressBarTextField: NSTextViewDelegate {
     private static var pasteAndGoMenuItem: NSMenuItem {
         NSMenuItem(
             title: UserText.pasteAndGo,
-            action: #selector(pasteAndGo(_:)),
+            action: #selector(AddressBarTextField.pasteAndGo(_:)),
             keyEquivalent: ""
         )
     }
@@ -1065,12 +1063,12 @@ extension AddressBarTextField: NSTextViewDelegate {
     private static var pasteAndSearchMenuItem: NSMenuItem {
         NSMenuItem(
             title: UserText.pasteAndSearch,
-            action: #selector(pasteAndSearch(_:)),
+            action: #selector(AddressBarTextField.pasteAndSearch(_:)),
             keyEquivalent: ""
         )
     }
 
-    private func makePasteAndGoMenuItem() -> NSMenuItem? {
+    static func makePasteAndGoMenuItem() -> NSMenuItem? {
         if let trimmedPasteboardString = NSPasteboard.general.string(forType: .string)?.trimmingWhitespace(),
            trimmedPasteboardString.count > 0 {
             if URL(trimmedAddressBarString: trimmedPasteboardString) != nil {
@@ -1109,4 +1107,10 @@ extension Notification.Name {
 
 fileprivate extension NSStoryboard {
     static let suggestion = NSStoryboard(name: "Suggestion", bundle: .main)
+}
+
+extension NSResponder {
+
+    @objc func noop(_: Any?) {}
+
 }
