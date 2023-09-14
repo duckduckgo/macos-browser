@@ -855,8 +855,6 @@ extension AddressBarTextField: NSTextFieldDelegate {
     }
 
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
-        print("doCommandBy", commandSelector)
-
         if NSApp.isReturnOrEnterPressed {
             self.addressBarEnterPressed()
             return true
