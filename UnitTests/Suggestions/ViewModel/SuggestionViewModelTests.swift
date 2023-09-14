@@ -161,7 +161,7 @@ final class SuggestionViewModelTests: XCTestCase {
 }
 
 extension SuggestionViewModel {
-    convenience init(suggestion: Suggestion, userStringValue: String) {
+    init(suggestion: Suggestion, userStringValue: String) {
         self.init(isHomePage: false, suggestion: suggestion, userStringValue: userStringValue)
     }
 }
