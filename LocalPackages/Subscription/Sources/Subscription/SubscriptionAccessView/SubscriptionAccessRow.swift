@@ -33,8 +33,7 @@ public struct SubscriptionAccessRow: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading) {
-
+        VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center, spacing: 8) {
                 Image("SubscriptionIcon")
                     .padding(4)
@@ -55,24 +54,23 @@ public struct SubscriptionAccessRow: View {
             .drawingGroup()
 
             VStack(alignment: .leading) {
+                Spacer()
+                    .frame(height: 10)
+
                 Text(description)
                     .fixMultilineScrollableText()
 
-//                TextMenuItemCaption(text: description)
-//                    .font(Preferences.Const.Fonts.preferencePaneDisclaimer)
-
                 Button("Action") { }
-                    .fixedSize()
-                    .frame(alignment: .top)
-                    .transaction { t in
-                        t.animation = nil
-                    }
+                    .buttonStyle(DefaultActionButtonStyle(enabled: true))
+
+                Spacer()
+                    .frame(height: 10)
             }
             .background(
                 GeometryReader { proxy in
                     Color.clear.onAppear {
                         fullHeight = proxy.size.height
-                        print("Height = \(fullHeight)")
+                        print(fullHeight)
                     }
                 }
             )
@@ -81,7 +79,6 @@ public struct SubscriptionAccessRow: View {
             }
             .frame(maxHeight: isExpanded ? fullHeight : 0, alignment: .top)
             .clipped()
-//            .animation(.easeOut.speed(3.0))
             .opacity(isExpanded ? 1.0 : 0.0)
         }
     }

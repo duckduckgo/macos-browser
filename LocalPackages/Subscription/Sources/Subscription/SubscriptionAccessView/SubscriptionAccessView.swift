@@ -26,36 +26,47 @@ public struct SubscriptionAccessView: View {
 
     let items = AccessChannel.activateItems()
     @State private var selection: UUID?
+    @State var fullHeight: CGFloat = 0.0
 
     public init(dismiss: (() -> Void)? = nil) {
             self.dismissAction = dismiss
+        print(" -- init SubscriptionAccessView")
     }
 
     public var body: some View {
-        VStack {
+        VStack(spacing: 8) {
             Text("Activate your subscription on this device")
                 .font(.title)
             Text("Access your Privacy Pro subscription on this device via Sync, Apple ID or an email address.")
+                .multilineTextAlignment(.center)
+                .fixMultilineScrollableText()
 
-            VStack {
+            VStack(spacing: 0) {
                 ForEach(items) { item in
                     SubscriptionAccessRow(name: item.name, description: item.description, isExpanded: self.selection == item.id)
                         .contentShape(Rectangle())
                         .onTapGesture {
                             self.selection = (selection == item.id) ? nil : item.id
                         }
+                        .padding(.vertical, 10)
 
                     if items.last != item {
                         Divider()
                     }
                 }
+                .padding(.horizontal, 20)
+                .animation(.easeOut(duration: 0.3))
             }
-            .frame(minWidth: 440)
-            .padding(10)
             .roundedBorder()
-            .animation(.easeOut(duration: 0.3))
 
             Spacer()
+                .frame(height: 110)
+                .frame(minHeight: 8)
+
+            Divider()
+
+            Spacer()
+                .frame(height: 8)
 
             HStack {
                 Spacer()
@@ -66,7 +77,7 @@ public struct SubscriptionAccessView: View {
                 }
             }
         }
-        .padding()
-        .frame(width: 480, height: 450)
+        .padding(20)
+        .frame(width: 480)
     }
 }
