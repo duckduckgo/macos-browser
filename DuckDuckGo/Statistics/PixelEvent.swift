@@ -302,6 +302,7 @@ extension Pixel {
 #if DBP
             case dataBrokerProtectionError
 #endif
+            case compilationFailed
         }
 
     }
@@ -688,6 +689,7 @@ extension Pixel.Event.Debug {
 #if DBP
         case .dataBrokerProtectionError: return "data_broker_error"
 #endif
+        case .compilationFailed: return "compilation_failed"
         }
     }
 }

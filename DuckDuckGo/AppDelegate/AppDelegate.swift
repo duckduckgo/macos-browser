@@ -208,6 +208,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         subscribeToEmailProtectionStatusNotifications()
         subscribeToDataImportCompleteNotification()
 
+        fireFailedCompilationsPixelIfNeeded()
+
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
 #if NETWORK_PROTECTION
@@ -218,6 +220,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #if DBP
         DataBrokerProtectionManager.shared.runOperationsAndStartSchedulerIfPossible()
 #endif
+    }
+
+    private func fireFailedCompilationsPixelIfNeeded() {
+        let store = FailedCompilationsStore()
+        if store.hasAnyFailures {
+            DailyPixel.fire(pixel: .debug(event: .compilationFailed),
+                            frequency: .dailyOnly,
+                            includeAppVersionParameter: true,
+                            withAdditionalParameters: store.summary) { error in
+                if error == nil {
+                    store.cleanup()
+                }
+            }
+        }
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
