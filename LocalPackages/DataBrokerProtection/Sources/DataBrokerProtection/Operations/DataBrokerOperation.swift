@@ -80,7 +80,6 @@ extension DataBrokerOperation {
             actionsHandler?.captchaTransactionId = nil
             if let captchaData = try? await captchaService.submitCaptchaToBeResolved(for: captchaTransactionId,
                                                                                      shouldRunNextStep: shouldRunNextStep) {
-                actionsHandler?.captchaToken = captchaData
                 await webViewHandler?.execute(action: action, data: .solveCaptcha(CaptchaToken(token: captchaData)))
             } else {
                 await onError(error: .captchaServiceError(CaptchaServiceError.nilDataWhenFetchingCaptchaResult))
