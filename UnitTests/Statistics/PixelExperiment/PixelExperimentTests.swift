@@ -121,7 +121,7 @@ class PixelExperimentTests: XCTestCase {
         Pixel.firstLaunchDate = start
         PixelExperiment.install()
 
-        var enrollment = expectation(description: "first pixel fired")
+        let enrollment = expectation(description: "first pixel fired")
         var e: XCTestExpectation!
         Pixel.setUp(store: self.store) { [unowned self] event in
             switch event {
@@ -162,7 +162,7 @@ class PixelExperimentTests: XCTestCase {
         Pixel.firstLaunchDate = start
         PixelExperiment.install()
 
-        var enrollment = expectation(description: "first pixel fired")
+        let enrollment = expectation(description: "first pixel fired")
         var e: XCTestExpectation!
         Pixel.setUp(store: self.store) { [unowned self] event in
             switch event {
@@ -199,7 +199,7 @@ class PixelExperimentTests: XCTestCase {
         Pixel.firstLaunchDate = start
         PixelExperiment.install()
 
-        var enrollment = expectation(description: "first pixel fired")
+        let enrollment = expectation(description: "first pixel fired")
         Pixel.setUp(store: self.store) { [unowned self] event in
             switch event {
             case .launchInitial(cohort: cohort.rawValue):

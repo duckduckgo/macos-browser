@@ -33,7 +33,7 @@ struct CallToAction: View {
     @State var typingFinished = false
 
     var body: some View {
-        var shouldNotDelayButton = model.state == .startBrowsing  && model.isNewOnboarding
+        let shouldNotDelayButton = model.state == .startBrowsing  && model.isNewOnboarding
         VStack(spacing: 15) {
             DaxSpeech(text: text) {
                 withAnimation {

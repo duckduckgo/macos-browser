@@ -97,6 +97,9 @@ extension Pixel.Event {
         case .setAsDefaultInitial(let cohort):
             return [Pixel.Parameters.experimentCohort: cohort]
 
+        case .dailyPixel(let pixel, isFirst: _):
+            return pixel.parameters
+
         // Don't use default to force new items to be thought about
         case .crash,
              .brokenSiteReport,

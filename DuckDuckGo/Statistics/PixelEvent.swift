@@ -23,7 +23,7 @@ import Configuration
 
 extension Pixel {
 
-    enum Event {
+    indirect enum Event {
         case crash
 
         case brokenSiteReport
@@ -160,6 +160,8 @@ extension Pixel {
         case networkProtectionWaitlistNotificationTapped
         case networkProtectionWaitlistTermsAndConditionsDisplayed
         case networkProtectionWaitlistTermsAndConditionsAccepted
+
+        case dailyPixel(Event, isFirst: Bool)
 
         enum Debug {
 
@@ -449,6 +451,9 @@ extension Pixel.Event {
             return "m_mac_netp_imp_terms"
         case .networkProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_netp_ev_terms_accepted"
+
+        case .dailyPixel(let pixel, isFirst: let isFirst):
+            return pixel.name + (isFirst ? "_d" : "_c")
         }
 
     }
