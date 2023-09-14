@@ -18,6 +18,7 @@
 
 import Cocoa
 import Combine
+import UniformTypeIdentifiers
 
 final class DownloadsCellView: NSTableCellView {
 
@@ -85,8 +86,8 @@ final class DownloadsCellView: NSTableCellView {
 
     private func subscribe(to viewModel: DownloadViewModel) {
         viewModel.$filename.map { filename in
-            let fileType = UTType(fileExtension: (filename as NSString).pathExtension) ?? .data
-            return fileType.icon
+            let utType = UTType(filenameExtension: filename.pathExtension) ?? .data
+            return NSWorkspace.shared.icon(for: utType)
         }
             .assign(to: \.image, on: imageView!)
             .store(in: &cancellables)

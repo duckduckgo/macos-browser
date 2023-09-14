@@ -142,9 +142,7 @@ final class GeolocationProviderTests: XCTestCase {
     }
 
     func testWhenGeolocationContainsOptionalFieldsThenTheyAreAvailableInCallback() {
-        let coordinate: CLLocation
-        if #available(macOS 10.15.4, *) {
-            coordinate = CLLocation(coordinate: CLLocationCoordinate2D(latitude: -26.8, longitude: -54.1),
+        let coordinate = CLLocation(coordinate: CLLocationCoordinate2D(latitude: -26.8, longitude: -54.1),
                                     altitude: 12.8,
                                     horizontalAccuracy: 0.8,
                                     verticalAccuracy: 0.9,
@@ -153,9 +151,6 @@ final class GeolocationProviderTests: XCTestCase {
                                     speed: 123,
                                     speedAccuracy: 0.9,
                                     timestamp: Date())
-        } else {
-            fatalError()
-        }
         geolocationServiceMock.currentLocationPublished = .success(coordinate)
 
         let e = expectation(description: "location received")
@@ -741,18 +736,14 @@ extension GeolocationProviderTests {
 }
 extension CLLocation {
     func removingAltitude() -> CLLocation {
-        if #available(macOS 10.15.4, *) {
-            return CLLocation(coordinate: coordinate,
-                              altitude: -1,
-                              horizontalAccuracy: horizontalAccuracy,
-                              verticalAccuracy: -1,
-                              course: course,
-                              courseAccuracy: courseAccuracy,
-                              speed: speed,
-                              speedAccuracy: speedAccuracy,
-                              timestamp: timestamp)
-        } else {
-            fatalError()
-        }
+        return CLLocation(coordinate: coordinate,
+                          altitude: -1,
+                          horizontalAccuracy: horizontalAccuracy,
+                          verticalAccuracy: -1,
+                          course: course,
+                          courseAccuracy: courseAccuracy,
+                          speed: speed,
+                          speedAccuracy: speedAccuracy,
+                          timestamp: timestamp)
     }
 }

@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import UniformTypeIdentifiers
 
 extension String {
 
@@ -60,11 +61,15 @@ extension String {
     static func uniqueFilename(for fileType: UTType? = nil) -> String {
         let fileName = UUID().uuidString
 
-        if let ext = fileType?.fileExtension {
+        if let ext = fileType?.preferredFilenameExtension {
             return fileName.appending("." + ext)
         }
 
         return fileName
+    }
+
+    var pathExtension: String {
+        (self as NSString).pathExtension
     }
 
     // MARK: - Mutating

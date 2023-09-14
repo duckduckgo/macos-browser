@@ -23,7 +23,7 @@ import ServiceManagement
 
 /// Takes care of enabling and disabling a login item.
 ///
-public struct LoginItem: Equatable {
+public struct LoginItem: Equatable, Hashable {
 
     let agentBundleID: String
     let url: URL

@@ -140,11 +140,6 @@ final class MainMenu: NSMenu {
             NSApplication.shared.helpMenu = helpMenuItem?.submenu
         }
 
-        if !WKWebView.supportsPrinting {
-            printMenuItem?.removeFromParent()
-            printSeparatorItem?.removeFromParent()
-        }
-
         sharingMenu.title = shareMenuItem.title
         shareMenuItem.submenu = sharingMenu
 
@@ -164,7 +159,7 @@ final class MainMenu: NSMenu {
     func setup(with featureFlagger: FeatureFlagger) {
         self.delegate = self
 
-#if APPSTORE
+#if APPSTORE || DBP
         checkForUpdatesMenuItem?.removeFromParent()
         checkForUpdatesSeparatorItem?.removeFromParent()
 #endif
@@ -300,7 +295,7 @@ final class MainMenu: NSMenu {
         toggleDownloadsShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
 
 #if NETWORK_PROTECTION
-        if #available(macOS 11.4, *), NetworkProtectionKeychainTokenStore().isFeatureActivated {
+        if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             toggleNetworkProtectionShortcutMenuItem?.isHidden = false
             toggleNetworkProtectionShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
         } else {

@@ -23,7 +23,6 @@ private enum Constants {
     static let titleSubtitlePadding: CGFloat = 5
 }
 
-@available(macOS 11.0, *)
 struct DashboardHeaderView: View {
     let resultsViewModel: ResultsViewModel
     let displayProfileButton: Bool
@@ -50,7 +49,6 @@ struct DashboardHeaderView: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct HeaderTitleView: View {
     @ObservedObject var resultsViewModel: ResultsViewModel
 
@@ -70,7 +68,6 @@ private struct HeaderTitleView: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct CTAHeaderView: View {
     let displayProfileButton: Bool
     let faqButtonClicked: () -> Void
@@ -81,7 +78,7 @@ private struct CTAHeaderView: View {
             Button {
                 faqButtonClicked()
             } label: {
-                Text("FAQs")
+                Text("Debug")
             }
             .buttonStyle(.borderless)
             .foregroundColor(.primary)
@@ -102,7 +99,6 @@ private struct CTAHeaderView: View {
     }
 }
 
-@available(macOS 11.0, *)
 struct DashboardHeaderView_Previews: PreviewProvider {
     static var previews: some View {
 

@@ -117,6 +117,7 @@ public struct UserDefaultsWrapper<T> {
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"
+        case emailKeychainMigration = "email.keychain.migration"
 
         case bookmarksBarPromptShown = "bookmarks.bar.prompt.shown"
         case showBookmarksBar = "bookmarks.bar.show"
@@ -145,7 +146,7 @@ public struct UserDefaultsWrapper<T> {
 
         case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
 
-        case agentLaunchTime = "netp.agent.launch-time"
+        case netpMenuAgentLaunchTime = "netp.agent.launch-time"
 
         case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
 

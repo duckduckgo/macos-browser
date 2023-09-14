@@ -208,6 +208,8 @@ extension DataBrokerProtectionError {
             return (title: genericTitle, subtitle: "Unrecoverable")
         case .noOptOutStep:
             return (title: genericTitle, subtitle: "Missing step")
+        case .cancelled:
+            return (title: genericTitle, subtitle: "Cancelled")
         case .captchaServiceError(let captchaError):
             let title = "Solver"
             switch captchaError {
@@ -233,6 +235,9 @@ extension DataBrokerProtectionError {
                 return (title: title, subtitle: "Missing ID on fetch")
             case .invalidRequestWhenFetchingCaptchaResult:
                 return (title: title, subtitle: "Fetch invalid request")
+            case .cancelled:
+                return (title: title, subtitle: "Cancelled")
+
             }
         case .emailError(let emailError):
             let title = "E-mail"
@@ -252,6 +257,8 @@ extension DataBrokerProtectionError {
                 return (title: title, subtitle: "Can't decode link")
             case .unknownStatusReceived:
                 return (title: title, subtitle: "Unknown Status")
+            case .cancelled:
+                return (title: title, subtitle: "Cancelled")
             }
         }
     }
