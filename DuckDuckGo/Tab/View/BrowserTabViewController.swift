@@ -144,9 +144,7 @@ final class BrowserTabViewController: NSViewController {
         }
         if let previouslySelectedTab = self.previouslySelectedTab {
             tabCollectionViewModel.select(tab: previouslySelectedTab)
-            if #available(macOS 11.0, *) {
-                previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
-            }
+            previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
             self.previouslySelectedTab = nil
         }
     }
@@ -273,10 +271,7 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func subscribeToTabContent(of tabViewModel: TabViewModel?) {
-        tabContentCancellable = nil
-        guard let tabViewModel else { return }
-
-        let tabContentPublisher = tabViewModel.tab.$content
+        tabContentCancellable = tabViewModel?.tab.$content
             .dropFirst()
             .removeDuplicates(by: { old, new in
                 // no need to call showTabContent if webView stays in place and only its URL changes
@@ -285,11 +280,8 @@ final class BrowserTabViewController: NSViewController {
                 }
                 return old == new
             })
-            .receive(on: DispatchQueue.main)
-
-        tabContentCancellable = tabContentPublisher
             .map { [weak tabViewModel] tabContent -> AnyPublisher<Void, Never> in
-                guard let tabViewModel = tabViewModel, tabContent.isUrl else {
+                guard let tabViewModel, tabContent.isUrl else {
                     return Just(()).eraseToAnyPublisher()
                 }
 
@@ -302,10 +294,9 @@ final class BrowserTabViewController: NSViewController {
                 .eraseToAnyPublisher()
             }
             .switchToLatest()
+            .receive(on: DispatchQueue.main)
             .sink { [weak self, weak tabViewModel] in
-                guard let tabViewModel = tabViewModel else {
-                    return
-                }
+                guard let tabViewModel else { return }
                 self?.showTabContent(of: tabViewModel)
             }
     }
@@ -500,7 +491,7 @@ final class BrowserTabViewController: NSViewController {
     var dataBrokerProtectionHomeViewController: DBPHomeViewController?
     private func dataBrokerProtectionHomeViewControllerCreatingIfNeeded() -> DBPHomeViewController {
         return dataBrokerProtectionHomeViewController ?? {
-            let dataBrokerProtectionHomeViewController = DBPHomeViewController()
+            let dataBrokerProtectionHomeViewController = DBPHomeViewController(dataBrokerProtectionManager: DataBrokerProtectionManager.shared)
             self.dataBrokerProtectionHomeViewController = dataBrokerProtectionHomeViewController
             return dataBrokerProtectionHomeViewController
         }()

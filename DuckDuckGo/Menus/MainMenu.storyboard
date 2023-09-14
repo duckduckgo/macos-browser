@@ -840,11 +840,37 @@ CQ
                                                 </items>
                                             </menu>
                                         </menuItem>
+                                        <menuItem title="Sync" id="8rI-iH-wNC">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="Sync" id="Kw4-67-mit" customClass="SyncDebugMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                                <items>
+                                                    <menuItem title="Environment" id="qD7-Gw-s2h">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Environment" id="lRd-Ih-n5j">
+                                                            <items>
+                                                                <menuItem title="Item" id="amC-1R-0QS">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                </menuItem>
+                                                            </items>
+                                                        </menu>
+                                                    </menuItem>
+                                                </items>
+                                                <connections>
+                                                    <outlet property="environmentMenu" destination="lRd-Ih-n5j" id="xxg-yh-bfI"/>
+                                                </connections>
+                                            </menu>
+                                        </menuItem>
                                         <menuItem title="Network Protection" id="Dt6-sj-4hn">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Network Protection" id="Rah-lS-gno" customClass="NetworkProtectionDebugMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                                 <items>
-                                                    <menuItem title="Reset Network Protection State" id="p4h-oC-tpw">
+                                                    <menuItem title="Reset All State Keeping Invite" id="Mqz-Le-LgQ">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetAllKeepingInvite:" target="Rah-lS-gno" id="ypd-Ao-CzY"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Reset All State" id="p4h-oC-tpw">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="resetAllState:" target="Rah-lS-gno" id="TDN-VH-bgV"/>
@@ -996,42 +1022,67 @@ CQ
                                                                         <action selector="simulateTunnelFailure:" target="iLs-sj-2Gd" id="tZL-Vl-6mu"/>
                                                                     </connections>
                                                                 </menuItem>
+                                                                <menuItem title="Tunnel Crash" id="A5n-J7-hYk" userLabel="Tunnel Crash">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="simulateTunnelCrash:" target="iLs-sj-2Gd" id="VH7-WB-2dD"/>
+                                                                    </connections>
+                                                                </menuItem>
                                                             </items>
                                                             <connections>
                                                                 <outlet property="simulateControllerFailureMenuItem" destination="xyA-ob-gEy" id="1VV-xV-wsB"/>
+                                                                <outlet property="simulateTunnelCrashMenuItem" destination="A5n-J7-hYk" id="gvK-di-vTP"/>
                                                                 <outlet property="simulateTunnelFailureMenuItem" destination="kVa-n8-UNx" id="3Ie-Ed-VtG"/>
                                                             </connections>
                                                         </menu>
                                                     </menuItem>
-                                                    <menuItem isSeparatorItem="YES" id="7LI-vT-hd9"/>
-                                                    <menuItem title="Kill Switch (alternative approach)" id="Gdx-Ng-vit">
+                                                    <menuItem title="NetP Waitlist" id="iSU-Wj-V9c">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Kill Switch (alternative approach)" id="wo0-bZ-WF3">
+                                                        <menu key="submenu" title="NetP Waitlist" id="FmX-fq-tGP">
                                                             <items>
-                                                                <menuItem title="includeAllNetworks" id="mSZ-AV-Dee" userLabel="Include All Networks">
+                                                                <menuItem title="Reset Waitlist State" id="8FJ-Ns-JDn">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="toggleIncludeAllNetworks:" target="Rah-lS-gno" id="c1r-Fw-0ca"/>
+                                                                        <action selector="resetNetworkProtectionWaitlistState:" target="Ady-hI-5gd" id="Adj-8o-hsb"/>
                                                                     </connections>
                                                                 </menuItem>
-                                                                <menuItem title="excludeLocalNetworks" id="Zak-JJ-7hc" userLabel="Exclude Local Networks">
+                                                                <menuItem title="Reset T&amp;C Acceptance" id="WmA-2m-7PX">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="toggleShouldExcludeLocalRoutes:" target="Rah-lS-gno" id="Wdd-D6-yWy"/>
+                                                                        <action selector="resetNetworkProtectionTermsAndConditionsAcceptance:" target="Ady-hI-5gd" id="AIX-0X-WMH"/>
                                                                     </connections>
                                                                 </menuItem>
-                                                                <menuItem title="enable Connection Tester" id="L06-y6-zv3">
+                                                                <menuItem title="Enter Waitlist Invite Code" id="Fkp-YK-NDy">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="toggleConnectionTesterEnabled:" target="Rah-lS-gno" id="iei-t7-7pG"/>
+                                                                        <action selector="showNetworkProtectionInviteCodePrompt:" target="Ady-hI-5gd" id="CO5-ar-NTA"/>
                                                                     </connections>
+                                                                </menuItem>
+                                                                <menuItem title="Send Waitlist Notification" id="aqG-g3-Lxa">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="sendNetworkProtectionWaitlistAvailableNotification:" target="Ady-hI-5gd" id="42n-kx-can"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem isSeparatorItem="YES" id="ggg-Pf-MUh"/>
+                                                                <menuItem title="Waitlist Token:" enabled="NO" identifier="network-protection.waitlist.token" id="wU9-UN-SKZ">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                </menuItem>
+                                                                <menuItem title="Waitlist Timestamp:" enabled="NO" id="fJW-6O-O6J">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                </menuItem>
+                                                                <menuItem title="Waitlist Invite Code:" enabled="NO" id="R8L-HN-frT">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                </menuItem>
+                                                                <menuItem title="T&amp;C Accepted:" enabled="NO" id="LKh-12-jwj">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
                                                                 </menuItem>
                                                             </items>
                                                         </menu>
                                                     </menuItem>
-                                                    <menuItem title="Waitlist" id="xot-uM-W8R">
+                                                    <menuItem title="NetP Waitlist Feature Flag Overrides" id="xot-uM-W8R">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Waitlist" id="M1G-na-mOc" customClass="NetworkProtectionWaitlistMenu" customModule="DuckDuckGo_Privacy_Browser">
+                                                        <menu key="submenu" title="NetP Waitlist Feature Flag Overrides" id="M1G-na-mOc" customClass="NetworkProtectionWaitlistMenu" customModule="DuckDuckGo_Privacy_Browser">
                                                             <items>
                                                                 <menuItem title="Reset Waitlist Overrides" id="soP-sz-xwK">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -1101,6 +1152,32 @@ CQ
                                                             </connections>
                                                         </menu>
                                                     </menuItem>
+                                                    <menuItem isSeparatorItem="YES" id="7LI-vT-hd9"/>
+                                                    <menuItem title="Kill Switch (alternative approach)" id="Gdx-Ng-vit">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Kill Switch (alternative approach)" id="wo0-bZ-WF3">
+                                                            <items>
+                                                                <menuItem title="includeAllNetworks" id="mSZ-AV-Dee" userLabel="Include All Networks">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="toggleIncludeAllNetworks:" target="Rah-lS-gno" id="c1r-Fw-0ca"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="excludeLocalNetworks" id="Zak-JJ-7hc" userLabel="Exclude Local Networks">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="toggleShouldExcludeLocalRoutes:" target="Rah-lS-gno" id="Wdd-D6-yWy"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="enable Connection Tester" id="L06-y6-zv3">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="toggleConnectionTesterEnabled:" target="Rah-lS-gno" id="iei-t7-7pG"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                            </items>
+                                                        </menu>
+                                                    </menuItem>
                                                 </items>
                                                 <connections>
                                                     <outlet property="connectOnLogInMenuItem" destination="fSA-hH-Vum" id="HSf-v8-MYh"/>
@@ -1162,6 +1239,11 @@ CQ
                             <outlet property="closeTabMenuItem" destination="DVo-aG-piG" id="Hr0-hn-2p1"/>
                             <outlet property="closeWindowMenuItem" destination="CzI-4o-2re" id="32H-X4-8Ub"/>
                             <outlet property="debugMenuItem" destination="ilv-5f-YpZ" id="4F7-9b-Mve"/>
+                            <outlet property="debugNetworkProtectionWaitlistEnterInviteCodeItem" destination="Fkp-YK-NDy" id="eii-tb-KsQ"/>
+                            <outlet property="debugNetworkProtectionWaitlistInviteCodeItem" destination="R8L-HN-frT" id="Hh6-eO-1pR"/>
+                            <outlet property="debugNetworkProtectionWaitlistTermsAndConditionsAcceptedItem" destination="LKh-12-jwj" id="GeC-Bi-JA8"/>
+                            <outlet property="debugNetworkProtectionWaitlistTimestampItem" destination="fJW-6O-O6J" id="86y-48-c5m"/>
+                            <outlet property="debugNetworkProtectionWaitlistTokenItem" destination="wU9-UN-SKZ" id="5F5-Ny-yoO"/>
                             <outlet property="exportBookmarksMenuItem" destination="3K6-pB-Kea" id="LbP-Ft-aAT"/>
                             <outlet property="favoriteThisPageMenuItem" destination="cHZ-Fb-aKU" id="uPM-LY-AmL"/>
                             <outlet property="favoritesMenuItem" destination="Y9I-ZC-gGg" id="zk1-XL-x3e"/>

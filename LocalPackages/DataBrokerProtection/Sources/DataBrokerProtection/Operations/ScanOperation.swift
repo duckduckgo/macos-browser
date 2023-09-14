@@ -36,13 +36,15 @@ final class ScanOperation: DataBrokerOperation {
     var continuation: CheckedContinuation<[ExtractedProfile], Error>?
     var extractedProfile: ExtractedProfile?
     private let operationAwaitTime: TimeInterval
+    let shouldRunNextStep: () -> Bool
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
          query: BrokerProfileQueryData,
          emailService: EmailServiceProtocol = EmailService(),
          captchaService: CaptchaServiceProtocol = CaptchaService(),
-         operationAwaitTime: TimeInterval = 1
+         operationAwaitTime: TimeInterval = 1,
+         shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
         self.prefs = prefs
@@ -50,15 +52,17 @@ final class ScanOperation: DataBrokerOperation {
         self.emailService = emailService
         self.captchaService = captchaService
         self.operationAwaitTime = operationAwaitTime
+        self.shouldRunNextStep = shouldRunNextStep
     }
 
     func run(inputValue: Void,
              webViewHandler: WebViewHandler? = nil,
-             actionsHandler: ActionsHandler? = nil) async throws -> [ExtractedProfile] {
+             actionsHandler: ActionsHandler? = nil,
+             showWebView: Bool) async throws -> [ExtractedProfile] {
         try await withCheckedThrowingContinuation { continuation in
             self.continuation = continuation
             Task {
-                await initialize(handler: webViewHandler, isFakeBroker: query.dataBroker.isFakeBroker)
+                await initialize(handler: webViewHandler, isFakeBroker: query.dataBroker.isFakeBroker, showWebView: showWebView)
 
                 do {
                     let scanStep = try query.dataBroker.scanStep()
@@ -67,7 +71,11 @@ final class ScanOperation: DataBrokerOperation {
                     } else {
                         self.actionsHandler = ActionsHandler(step: scanStep)
                     }
-                    await executeNextStep()
+                    if self.shouldRunNextStep() {
+                        await executeNextStep()
+                    } else {
+                        failed(with: DataBrokerProtectionError.cancelled)
+                    }
                 } catch {
                     failed(with: DataBrokerProtectionError.unknown(error.localizedDescription))
                 }

@@ -153,6 +153,14 @@ extension Pixel {
         case duckPlayerSettingNever
         case duckPlayerSettingBackToDefault
 
+        // Network Protection Waitlist
+        case networkProtectionWaitlistEntryPointMenuItemDisplayed
+        case networkProtectionWaitlistEntryPointToolbarButtonDisplayed
+        case networkProtectionWaitlistNotificationShown
+        case networkProtectionWaitlistNotificationTapped
+        case networkProtectionWaitlistTermsAndConditionsDisplayed
+        case networkProtectionWaitlistTermsAndConditionsAccepted
+
         enum Debug {
 
             case assertionFailure(message: String, file: StaticString, line: UInt)
@@ -283,6 +291,8 @@ extension Pixel {
             case syncBookmarksFailed
             case syncCredentialsProviderInitializationFailed
             case syncCredentialsFailed
+            case syncSettingsFailed
+            case syncSettingsMetadataUpdateFailed
 
             case bookmarksCleanupFailed
             case bookmarksCleanupAttemptedWhileSyncWasEnabled
@@ -426,6 +436,19 @@ extension Pixel.Event {
             return "m.mac.navigation.first-search"
         case .serpDay21to27:
             return "m.mac.search-day-21-27.initial"
+
+        case .networkProtectionWaitlistEntryPointMenuItemDisplayed:
+            return "m_mac_netp_imp_settings_entry_menu_item"
+        case .networkProtectionWaitlistEntryPointToolbarButtonDisplayed:
+            return "m_mac_netp_imp_settings_entry_toolbar_button"
+        case .networkProtectionWaitlistNotificationShown:
+            return "m_mac_netp_ev_waitlist_notification_shown"
+        case .networkProtectionWaitlistNotificationTapped:
+            return "m_mac_netp_ev_waitlist_notification_launched"
+        case .networkProtectionWaitlistTermsAndConditionsDisplayed:
+            return "m_mac_netp_imp_terms"
+        case .networkProtectionWaitlistTermsAndConditionsAccepted:
+            return "m_mac_netp_ev_terms_accepted"
         }
 
     }
@@ -668,6 +691,8 @@ extension Pixel.Event.Debug {
         case .syncBookmarksFailed: return "sync_bookmarks_failed"
         case .syncCredentialsProviderInitializationFailed: return "sync_credentials_provider_initialization_failed"
         case .syncCredentialsFailed: return "sync_credentials_failed"
+        case .syncSettingsFailed: return "sync_settings_failed"
+        case .syncSettingsMetadataUpdateFailed: return "sync_settings_metadata_update_failed"
 
         case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
         case .bookmarksCleanupAttemptedWhileSyncWasEnabled: return "bookmarks_cleanup_attempted_while_sync_was_enabled"

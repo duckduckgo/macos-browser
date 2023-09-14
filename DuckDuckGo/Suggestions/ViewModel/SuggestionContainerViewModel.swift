@@ -124,7 +124,7 @@ final class SuggestionContainerViewModel {
             return
         }
 
-        if suggestionViewModel(at: index) !== self.selectedSuggestionViewModel {
+        if suggestionViewModel(at: index) != self.selectedSuggestionViewModel {
             selectionIndex = index
         }
     }

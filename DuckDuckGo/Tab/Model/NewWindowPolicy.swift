@@ -28,8 +28,10 @@ enum NewWindowPolicy {
         if windowFeatures.toolbarsVisibility?.boolValue == true {
             self = .tab(selected: shouldSelectNewTab,
                         burner: isBurner)
-        } else {
+        } else if windowFeatures.width != nil {
             self = .popup(origin: windowFeatures.origin, size: windowFeatures.size)
+        } else {
+            self = .window(active: true, burner: isBurner)
         }
     }
 

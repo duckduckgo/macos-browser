@@ -55,9 +55,9 @@ struct MapperToDB {
         .init(phoneNumber: try mechanism(phone.encoded), profileId: profileId)
     }
 
-    func mapToDB(_ broker: DataBroker) throws -> BrokerDB {
+    func mapToDB(_ broker: DataBroker, id: Int64? = nil) throws -> BrokerDB {
         let encodedBroker = try jsonEncoder.encode(broker)
-        return .init(id: nil, name: broker.name, json: encodedBroker, version: broker.version)
+        return .init(id: id, name: broker.name, json: encodedBroker, version: broker.version)
     }
 
     func mapToDB(_ profileQuery: ProfileQuery, relatedTo profileId: Int64) throws -> ProfileQueryDB {
@@ -218,7 +218,7 @@ struct MapperToModel {
                      reportId: extractedProfile.reportId,
                      age: extractedProfile.age,
                      email: extractedProfile.email,
-                     removedDate: extractedProfile.removedDate)
+                     removedDate: extractedProfileDB.removedDate)
     }
 
     func mapToModel(_ scanEvent: ScanHistoryEventDB) throws -> HistoryEvent {

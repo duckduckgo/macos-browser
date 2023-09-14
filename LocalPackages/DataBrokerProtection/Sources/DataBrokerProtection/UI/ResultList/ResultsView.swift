@@ -18,12 +18,19 @@
 
 import SwiftUI
 
-@available(macOS 11.0, *)
 struct ResultsView: View {
     @ObservedObject var viewModel: ResultsViewModel
 
     var body: some View {
         VStack(spacing: Const.verticalSpacing) {
+            if viewModel.isLoading && viewModel.pendingProfiles.isEmpty && viewModel.removedProfiles.isEmpty {
+                HeaderView(title: "We are crunching your local data ...",
+                           subtitle: "The list of profiles matches will appear soon",
+                           iconName: "clock.fill",
+                           iconColor: .gray)
+                ProgressView()
+            }
+
             if !viewModel.pendingProfiles.isEmpty {
                 PendingProfilesView(profiles: viewModel.pendingProfiles)
             }
@@ -35,7 +42,6 @@ struct ResultsView: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct RemovedProfilesView: View {
     let profiles: [ResultsViewModel.RemovedProfile]
 
@@ -60,7 +66,6 @@ private struct RemovedProfilesView: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct PendingProfilesView: View {
     let profiles: [ResultsViewModel.PendingProfile]
 
@@ -86,7 +91,6 @@ private struct PendingProfilesView: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct RemovedProfileRow: View {
     let removedProfile: ResultsViewModel.RemovedProfile
 
@@ -109,14 +113,13 @@ private struct RemovedProfileRow: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct PendingProfileRow: View {
     let pendingProfile: ResultsViewModel.PendingProfile
     @State private var showModal = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            HStack {
+            HStack(alignment: .top) {
                 Button {
                     showModal = true
                 } label: {
@@ -137,8 +140,9 @@ private struct PendingProfileRow: View {
                 }
 
                 Spacer()
+
                 Label {
-                    Text(pendingProfile.profile)
+                    Text(pendingProfile.profileWithAge)
                         .lineLimit(1)
                         .frame(width: 180, alignment: .leading)
 
@@ -149,9 +153,28 @@ private struct PendingProfileRow: View {
                 Spacer()
 
                 Label {
-                    Text(pendingProfile.address)
-                        .lineLimit(1)
-                        .frame(width: 180, alignment: .leading)
+                    VStack (alignment: .leading) {
+                        ForEach(pendingProfile.relatives, id: \.self) {  relative in
+                            Text(relative)
+                                .lineLimit(1)
+                        }
+                    }
+                    .frame(width: 180, alignment: .leading)
+
+                } icon: {
+                    Image(systemName: "person.3")
+                }
+
+                Spacer()
+
+                Label {
+                    VStack (alignment: .leading) {
+                        ForEach(pendingProfile.addresses, id: \.self) {  address in
+                            Text(address)
+                                .lineLimit(1)
+                        }
+                    }
+                    .frame(width: 180, alignment: .leading)
 
                 } icon: {
                     Image(systemName: "house")
@@ -254,6 +277,8 @@ private struct DebugModalView: View {
             return "captchaServiceError \(captchaError)"
         case .emailError(let emailError):
             return "emailError \(String(describing: emailError))"
+        case .cancelled:
+            return "Cancelled"
         }
     }
 }
@@ -283,7 +308,6 @@ private extension View {
 }
 
 // MARK: - Preview
-@available(macOS 11.0, *)
 struct ResultsView_Previews: PreviewProvider {
     static var previews: some View {
         let dataManager = DataBrokerProtectionDataManager()

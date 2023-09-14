@@ -36,26 +36,20 @@ extension HomePage.Views {
 
         var body: some View {
             if isBurner {
-
                 BurnerHomePageView()
-
             } else {
-                if #available(macOS 11.0, *) {
-                    regularHomePageView(includingContinueSetUpCards: model.isContinueSetUpAvailable)
-                        .contextMenu(ContextMenu(menuItems: {
-                            if model.isContinueSetUpAvailable {
-                                Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
-                                    .toggleStyle(.checkbox)
-                                    .visibility(continueSetUpModel.hasContent ? .visible : .gone)
-                            }
-                            Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavoriteVisible)
+                regularHomePageView(includingContinueSetUpCards: model.isContinueSetUpAvailable)
+                    .contextMenu(ContextMenu(menuItems: {
+                        if model.isContinueSetUpAvailable {
+                            Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
                                 .toggleStyle(.checkbox)
-                            Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
-                                .toggleStyle(.checkbox)
-                        }))
-                } else {
-                    regularHomePageView(includingContinueSetUpCards: false)
-                }
+                                .visibility(continueSetUpModel.hasContent ? .visible : .gone)
+                        }
+                        Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavoriteVisible)
+                            .toggleStyle(.checkbox)
+                        Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
+                            .toggleStyle(.checkbox)
+                    }))
             }
         }
 

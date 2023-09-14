@@ -345,18 +345,11 @@ private struct ButtonsView: View {
                 }
             }
 
-            if #available(macOS 11.0, *) {
-                Button(viewModel.viewState.confirmButtonTitle) {
-                    viewModel.process(action: .confirm)
-                }
-                .keyboardShortcut(.defaultAction)
-                .disabled(!viewModel.viewState.canContinue)
-            } else {
-                Button(viewModel.viewState.confirmButtonTitle) {
-                    viewModel.process(action: .confirm)
-                }
-                .disabled(!viewModel.viewState.canContinue)
+            Button(viewModel.viewState.confirmButtonTitle) {
+                viewModel.process(action: .confirm)
             }
+            .keyboardShortcut(.defaultAction)
+            .disabled(!viewModel.viewState.canContinue)
         }
         .padding([.trailing, .bottom], 16)
         .padding(.top, 10)

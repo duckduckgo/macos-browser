@@ -267,12 +267,10 @@ final class DownloadListCoordinator {
                 struct ThrowableError: Error {}
                 throw ThrowableError()
             }
-            try webView.resumeDownload(from: resumeData,
-                                       to: tempURL,
-                                       completionHandler: self.downloadRestartedCallback(for: item, webView: webView))
+            webView.resumeDownload(fromResumeData: resumeData, completionHandler: self.downloadRestartedCallback(for: item, webView: webView))
         } catch {
             let request = item.createRequest()
-            webView.startDownload(request, completionHandler: self.downloadRestartedCallback(for: item, webView: webView))
+            webView.startDownload(using: request, completionHandler: self.downloadRestartedCallback(for: item, webView: webView))
         }
     }
 

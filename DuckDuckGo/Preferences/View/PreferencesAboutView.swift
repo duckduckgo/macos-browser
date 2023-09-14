@@ -21,13 +21,7 @@ import SwiftUIExtensions
 
 fileprivate extension Font {
     static let companyName: Font = .title
-    static let privacySimplified: Font = {
-        if #available(macOS 11.0, *) {
-            return .title3.weight(.semibold)
-        } else {
-            return .system(size: 15, weight: .semibold)
-        }
-    }()
+    static let privacySimplified: Font = .title3.weight(.semibold)
 }
 
 extension Preferences {

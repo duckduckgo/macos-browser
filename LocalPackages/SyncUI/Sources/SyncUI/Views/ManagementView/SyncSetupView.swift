@@ -30,11 +30,7 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                 Spacer()
                 Group {
                     if model.isCreatingAccount {
-                        if #available(macOS 11.0, *) {
-                            ProgressView()
-                        } else {
-                            EmptyView()
-                        }
+                        ProgressView()
                     } else {
                         Button(UserText.turnOnSyncWithEllipsis) {
                             model.presentEnableSyncDialog()

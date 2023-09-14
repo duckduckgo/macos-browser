@@ -19,6 +19,7 @@
 import Foundation
 import Navigation
 import WebKit
+import UniformTypeIdentifiers
 
 struct SavePanelParameters {
     let suggestedFilename: String?

@@ -23,10 +23,10 @@ public protocol DataBrokerProtectionDataManaging {
     var delegate: DataBrokerProtectionDataManagerDelegate? { get set }
 
     init(fakeBrokerFlag: FakeBrokerFlag)
-    func saveProfile(_ profile: DataBrokerProtectionProfile)
+    func saveProfile(_ profile: DataBrokerProtectionProfile) async
     func fetchProfile(ignoresCache: Bool) -> DataBrokerProtectionProfile?
-    func fetchDataBrokerInfoData(ignoresCache: Bool) -> [DataBrokerInfoData]
-    func fetchBrokerProfileQueryData(ignoresCache: Bool) -> [BrokerProfileQueryData]
+    func fetchBrokerProfileQueryData(ignoresCache: Bool) async -> [BrokerProfileQueryData]
+    func hasMatches() -> Bool
 }
 
 extension DataBrokerProtectionDataManaging {
@@ -34,12 +34,8 @@ extension DataBrokerProtectionDataManaging {
         fetchProfile(ignoresCache: false)
     }
 
-    func fetchDataBrokerInfoData() -> [DataBrokerInfoData] {
-        fetchDataBrokerInfoData(ignoresCache: false)
-    }
-
-    func fetchBrokerProfileQueryData() -> [BrokerProfileQueryData] {
-        fetchBrokerProfileQueryData(ignoresCache: false)
+    func fetchBrokerProfileQueryData() async -> [BrokerProfileQueryData] {
+        await fetchBrokerProfileQueryData(ignoresCache: false)
     }
 }
 
@@ -58,8 +54,8 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         self.database = DataBrokerProtectionDatabase(fakeBrokerFlag: fakeBrokerFlag)
     }
 
-    public func saveProfile(_ profile: DataBrokerProtectionProfile) {
-        database.save(profile)
+    public func saveProfile(_ profile: DataBrokerProtectionProfile) async {
+        await database.save(profile)
         cache.invalidate()
         cache.profile = profile
     }
@@ -79,7 +75,7 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         }
     }
 
-    public func fetchBrokerProfileQueryData(ignoresCache: Bool = false) -> [BrokerProfileQueryData] {
+    public func fetchBrokerProfileQueryData(ignoresCache: Bool = false) async -> [BrokerProfileQueryData] {
         if !ignoresCache, !cache.brokerProfileQueryData.isEmpty {
             os_log("Returning cached brokerProfileQueryData", log: .dataBrokerProtection)
             return cache.brokerProfileQueryData
@@ -90,64 +86,17 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         return queryData
     }
 
-    public func fetchDataBrokerInfoData(ignoresCache: Bool = false) -> [DataBrokerInfoData] {
-        if !ignoresCache, !cache.dataBrokerInfoData.isEmpty {
-            os_log("Returning cached dataBrokerInfoData", log: .dataBrokerProtection)
-            return cache.dataBrokerInfoData
-        }
-
-        let profileQueriesData = database.fetchAllBrokerProfileQueryData(for: 1) // We assume one profile for now
-        let result = profileQueriesData.map { brokerProfileQuery in
-            let scanData = DataBrokerInfoData.ScanData(historyEvents: brokerProfileQuery.scanOperationData.historyEvents,
-                                                       preferredRunDate: brokerProfileQuery.scanOperationData.preferredRunDate)
-
-            let optOutsData = brokerProfileQuery.optOutOperationsData.map {
-                DataBrokerInfoData.OptOutData(historyEvents: $0.historyEvents,
-                                              extractedProfileName: $0.extractedProfile.name ?? "No name",
-                                              preferredRunDate: $0.preferredRunDate)
-            }
-
-            return DataBrokerInfoData(userFirstName: brokerProfileQuery.profileQuery.firstName,
-                                      userLastName: brokerProfileQuery.profileQuery.lastName,
-                                      dataBrokerName: brokerProfileQuery.dataBroker.name,
-                                      scanData: scanData,
-                                      optOutsData: optOutsData)
-        }
-        cache.dataBrokerInfoData = result
-        return result
+    public func hasMatches() -> Bool {
+        return database.hasMatches()
     }
-}
-
-public struct DataBrokerInfoData: Identifiable {
-    public struct ScanData: Identifiable {
-        public let id = UUID()
-        public let historyEvents: [HistoryEvent]
-        public let preferredRunDate: Date?
-    }
-
-    public struct OptOutData: Identifiable {
-        public let id = UUID()
-        public let historyEvents: [HistoryEvent]
-        public let extractedProfileName: String
-        public let preferredRunDate: Date?
-    }
-
-    public let id = UUID()
-    public let userFirstName: String
-    public let userLastName: String
-    public let dataBrokerName: String
-    public let scanData: ScanData
-    public let optOutsData: [OptOutData]
 }
 
 private final class InMemoryDataCache {
     var profile: DataBrokerProtectionProfile?
     var brokerProfileQueryData = [BrokerProfileQueryData]()
-    var dataBrokerInfoData = [DataBrokerInfoData]()
 
     public func invalidate() {
         profile = nil
         brokerProfileQueryData.removeAll()
-        dataBrokerInfoData.removeAll()
     }
 }
