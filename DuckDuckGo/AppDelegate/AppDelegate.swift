@@ -287,8 +287,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     // MARK: - Sync
 
     private func startupSync() {
+#if DEBUG || REVIEW
+        let environment = ServerEnvironment(
+            UserDefaultsWrapper(
+                key: .syncEnvironment,
+                defaultValue: ServerEnvironment.production.description
+            ).wrappedValue
+        ) ?? .production
+#else
+        let environment = ServerEnvironment.production
+#endif
         let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
-        let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync)
+        let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync, environment: environment)
         syncService.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
         syncDataProviders.setUpDatabaseCleaners(syncService: syncService)
 

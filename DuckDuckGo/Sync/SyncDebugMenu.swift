@@ -19,13 +19,24 @@
 import Foundation
 import DDGSync
 
-extension ServerEnvironment: CustomStringConvertible {
+extension ServerEnvironment: LosslessStringConvertible {
     public var description: String {
         switch self {
         case .development:
             return "Development"
         case .production:
             return "Production"
+        }
+    }
+
+    public init?(_ description: String) {
+        switch description {
+        case "Development":
+            self = .development
+        case "Production":
+            self = .production
+        default:
+            return nil
         }
     }
 }
@@ -66,6 +77,7 @@ final class SyncDebugMenu: NSMenu {
     }
 
     @objc func switchSyncEnvironment(_ sender: NSMenuItem) {
+#if DEBUG || REVIEW
         guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService,
               let environment = sender.representedObject as? ServerEnvironment
         else {
@@ -73,5 +85,7 @@ final class SyncDebugMenu: NSMenu {
         }
 
         syncService.updateServerEnvironment(environment)
-        }
+        UserDefaults.standard.set(environment.description, forKey: UserDefaultsWrapper<String>.Key.syncEnvironment.rawValue)
+#endif
+    }
 }
