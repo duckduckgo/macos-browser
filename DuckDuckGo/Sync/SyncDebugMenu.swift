@@ -19,28 +19,6 @@
 import Foundation
 import DDGSync
 
-extension ServerEnvironment: LosslessStringConvertible {
-    public var description: String {
-        switch self {
-        case .development:
-            return "Development"
-        case .production:
-            return "Production"
-        }
-    }
-
-    public init?(_ description: String) {
-        switch description {
-        case "Development":
-            self = .development
-        case "Production":
-            self = .production
-        default:
-            return nil
-        }
-    }
-}
-
 @objc @MainActor
 final class SyncDebugMenu: NSMenu {
 
