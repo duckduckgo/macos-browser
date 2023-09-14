@@ -71,7 +71,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
 
-#if !APPSTORE
+    private var didFinishLaunching = false
+
+#if SPARKLE
     var updateController: UpdateController!
 #endif
 
@@ -151,7 +153,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                                                privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
         NSApp.mainMenuTyped.setup(with: featureFlagger)
 
-#if !APPSTORE
+#if SPARKLE
         updateController = UpdateController(internalUserDecider: internalUserDecider)
         stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
 #endif
@@ -161,6 +163,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !NSApp.isRunningUnitTests else { return }
+        defer {
+            didFinishLaunching = true
+        }
 
         HistoryCoordinator.shared.loadHistory()
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
@@ -216,6 +221,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
+        guard didFinishLaunching else { return }
+
         syncService?.initializeIfNeeded()
         syncService?.scheduler.notifyAppLifecycleEvent()
 
@@ -287,15 +294,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     // MARK: - Sync
 
     private func startupSync() {
+#if DEBUG
+        let defaultEnvironment = ServerEnvironment.development
+#else
+        let defaultEnvironment = ServerEnvironment.production
+#endif
+
 #if DEBUG || REVIEW
         let environment = ServerEnvironment(
             UserDefaultsWrapper(
                 key: .syncEnvironment,
-                defaultValue: ServerEnvironment.production.description
+                defaultValue: defaultEnvironment.description
             ).wrappedValue
-        ) ?? .production
+        ) ?? defaultEnvironment
 #else
-        let environment = ServerEnvironment.production
+        let environment = defaultEnvironment
 #endif
         let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
         let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync, environment: environment)
