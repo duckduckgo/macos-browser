@@ -27,6 +27,7 @@ public protocol ManagementViewModel: ObservableObject {
 
     var recoveryCode: String? { get }
     var devices: [SyncDevice] { get }
+    var isUnifiedFavoritesEnabled: Bool { get set }
 
     func presentEnableSyncDialog()
     func presentRecoverSyncAccountDialog()

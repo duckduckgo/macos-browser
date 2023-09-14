@@ -23,6 +23,7 @@ enum Const {
     enum Fonts {
         static let preferencePaneTitle: Font = .title2.weight(.semibold)
         static let preferencePaneSectionHeader: Font = .title3.weight(.semibold)
+        static let preferencePaneOptionTitle: Font = .title3
         static let preferencePaneCaption: Font = .subheadline
     }
 }

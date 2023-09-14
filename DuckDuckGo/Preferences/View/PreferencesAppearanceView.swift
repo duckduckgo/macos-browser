@@ -83,7 +83,6 @@ extension Preferences {
 
     struct AppearanceView: View {
         @ObservedObject var model: AppearancePreferences
-        let shouldShowFavoritesSettings: Bool
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
@@ -115,28 +114,7 @@ extension Preferences {
                     ToggleMenuItem(title: UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
                 }
 
-                if shouldShowFavoritesSettings {
-                    // SECTION 4: Favorites
-                    PreferencePaneSection {
-                        Text(UserText.favorites)
-                            .font(Const.Fonts.preferencePaneSectionHeader)
-                        HStack {
-                            Text("Display Favorites from")
-                            NSPopUpButtonView(selection: $model.favoritesDisplayMode) {
-                                let button = NSPopUpButton()
-                                button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-
-                                for value in FavoritesDisplayMode.availableConfigurations {
-                                    let item = button.menu?.addItem(withTitle: value.displayString, action: nil, keyEquivalent: "")
-                                    item?.representedObject = value
-                                }
-                                return button
-                            }
-                        }
-                    }
-                }
-
-                // SECTION 5: Bookmarks Bar
+                // SECTION 4: Bookmarks Bar
                 PreferencePaneSection {
                     TextMenuItemHeader(text: "Bookmarks Bar")
                     HStack {
@@ -157,7 +135,7 @@ extension Preferences {
                     }
                 }
 
-                // SECTION 6: Zoom Setting
+                // SECTION 5: Zoom Setting
                 PreferencePaneSection {
                     Text(UserText.zoomSettingTitle)
                         .font(Const.Fonts.preferencePaneSectionHeader)

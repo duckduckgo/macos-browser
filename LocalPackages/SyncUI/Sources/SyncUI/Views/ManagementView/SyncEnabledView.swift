@@ -45,6 +45,24 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         }
 
         PreferencePaneSection {
+            Text("Options")
+                .font(Const.Fonts.preferencePaneSectionHeader)
+
+            Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Unified favorites")
+                            .font(Const.Fonts.preferencePaneOptionTitle)
+                        Text("Use the same favorites on all devices. Switch off to maintain separate favorites for mobile and desktop.")
+                            .font(Const.Fonts.preferencePaneCaption)
+                    }
+                    Spacer(minLength: 30)
+                }
+            }
+            .toggleStyle(.switch)
+        }
+
+        PreferencePaneSection {
             Text(UserText.recovery)
                 .font(Const.Fonts.preferencePaneSectionHeader)
 

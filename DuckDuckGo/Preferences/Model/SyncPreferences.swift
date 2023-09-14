@@ -51,6 +51,12 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     @Published var isCreatingAccount: Bool = false
 
+    @Published var isUnifiedFavoritesEnabled: Bool {
+        didSet {
+            AppearancePreferences.shared.favoritesDisplayMode = isUnifiedFavoritesEnabled ? .displayAll(native: .desktop) : .displayNative(.desktop)
+        }
+    }
+
     var recoveryCode: String? {
         syncService.account?.recoveryCode
     }
@@ -109,6 +115,13 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     init(syncService: DDGSyncing) {
         self.syncService = syncService
+
+        if case .displayAll = AppearancePreferences.shared.favoritesDisplayMode {
+            self.isUnifiedFavoritesEnabled = true
+        } else {
+            self.isUnifiedFavoritesEnabled = false
+        }
+
         self.managementDialogModel = ManagementDialogModel()
         self.managementDialogModel.delegate = self
 

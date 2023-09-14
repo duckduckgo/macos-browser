@@ -50,7 +50,7 @@ extension Preferences {
                                 SyncView()
                             case .appearance:
                                 if let syncService = (NSApp.delegate as? AppDelegate)?.syncService {
-                                    AppearanceView(model: .shared, shouldShowFavoritesSettings: syncService.authState == .active)
+                                    AppearanceView(model: .shared)
                                 } else {
                                     FailedAssertionView("Failed to initialize AppearanceView")
                                 }
