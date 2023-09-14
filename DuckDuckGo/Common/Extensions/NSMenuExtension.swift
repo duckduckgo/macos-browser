@@ -28,13 +28,20 @@ extension NSMenu {
         }
     }
 
-    func index(ofItemWithIdentifier id: String) -> Int? {
-        guard let item = items.first(where: { $0.identifier?.rawValue == id }) else { return nil }
-        return index(of: item)
+    func indexOfItem(withIdentifier id: String) -> Int? {
+        return items.enumerated().first(where: { $0.element.identifier?.rawValue == id })?.offset
     }
 
     func item(with identifier: WKMenuItemIdentifier) -> NSMenuItem? {
-        return index(ofItemWithIdentifier: identifier.rawValue).map { self.items[$0] }
+        return indexOfItem(withIdentifier: identifier.rawValue).map { self.items[$0] }
+    }
+
+    func indexOfItem(with action: Selector) -> Int? {
+        return items.enumerated().first(where: { $0.element.action == action })?.offset
+    }
+
+    func item(with action: Selector) -> NSMenuItem? {
+        return indexOfItem(with: action).map { self.items[$0] }
     }
 
     func replaceItem(at index: Int, with newItem: NSMenuItem) {
