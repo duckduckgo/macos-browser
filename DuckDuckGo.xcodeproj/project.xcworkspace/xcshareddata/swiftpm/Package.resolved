@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "a459d5a65c57ca03cbc4e337f025781aa54b53e3",
-        "version" : "77.3.0"
+        "branch" : "anya/ios-phased-rollout-feature-flag-dry-run",
+        "revision" : "dc5296e73c58596285ccad6303c9e6335d9fbec5"
       }
     },
     {
