@@ -154,21 +154,6 @@ private struct PendingProfileRow: View {
 
                 Label {
                     VStack (alignment: .leading) {
-                        ForEach(pendingProfile.relatives, id: \.self) {  relative in
-                            Text(relative)
-                                .lineLimit(1)
-                        }
-                    }
-                    .frame(width: 180, alignment: .leading)
-
-                } icon: {
-                    Image(systemName: "person.3")
-                }
-
-                Spacer()
-
-                Label {
-                    VStack (alignment: .leading) {
                         ForEach(pendingProfile.addresses, id: \.self) {  address in
                             Text(address)
                                 .lineLimit(1)
@@ -178,6 +163,21 @@ private struct PendingProfileRow: View {
 
                 } icon: {
                     Image(systemName: "house")
+                }
+
+                Spacer()
+
+                Label {
+                    VStack (alignment: .leading) {
+                        ForEach(pendingProfile.relatives, id: \.self) {  relative in
+                            Text(relative)
+                                .lineLimit(1)
+                        }
+                    }
+                    .frame(width: 180, alignment: .leading)
+
+                } icon: {
+                    Image(systemName: "person.3")
                 }
             }
             if pendingProfile.hasError {
