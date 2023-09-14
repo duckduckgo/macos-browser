@@ -304,7 +304,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         let environment = ServerEnvironment(
             UserDefaultsWrapper(
                 key: .syncEnvironment,
-                defaultValue: ServerEnvironment.production.description
+                defaultValue: defaultEnvironment.description
             ).wrappedValue
         ) ?? defaultEnvironment
 #else
