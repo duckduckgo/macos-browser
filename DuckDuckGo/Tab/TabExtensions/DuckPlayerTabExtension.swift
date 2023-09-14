@@ -321,7 +321,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
             return
         }
         if navigation.url.isDuckPlayer {
-            Pixel.fire(.duckPlayerDailyUniqueView, limitToOnceADay: true)
+            Pixel.fire(.duckPlayerDailyUniqueView, limitTo: .dailyFirst)
         }
     }
 

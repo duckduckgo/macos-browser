@@ -80,7 +80,7 @@ final class DefaultBrowserPreferences: ObservableObject {
             }
 #endif
             if Pixel.isNewUser && isDefault {
-                PixelExperiment.firesetAsDefaultInitialPixel()
+                PixelExperiment.fireSetAsDefaultInitialPixel()
             }
         }
     }

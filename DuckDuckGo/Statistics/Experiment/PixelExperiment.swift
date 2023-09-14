@@ -20,9 +20,7 @@ import Foundation
 
 enum PixelExperiment: String, CaseIterable {
 
-    fileprivate static let logic = PixelExperimentLogic {
-        Pixel.fire($0)
-    }
+    static var logic = PixelExperimentLogic()
 
     /// When `cohort` is accessed for the first time after the experiment is installed with `install()`,
     ///  allocate and return a cohort.  Subsequently, return the same cohort.
@@ -60,16 +58,18 @@ extension PixelExperiment {
         logic.fireDay21To27SerpPixel()
     }
 
-    static func firesetAsDefaultInitialPixel() {
-        logic.firesetAsDefaultInitialPixel()
+    static func fireSetAsDefaultInitialPixel() {
+        logic.fireSetAsDefaultInitialPixel()
     }
 
 }
 
 final internal class PixelExperimentLogic {
 
+    private let now: () -> Date
+
     var cohort: PixelExperiment? {
-        guard installed else { return nil }
+        guard isInstalled else { return nil }
 
         if let allocatedCohort,
            // if the stored cohort doesn't match, allocate a new one
@@ -80,23 +80,23 @@ final internal class PixelExperimentLogic {
         // For now, just use equal distribution of all cohorts.
         let cohort = PixelExperiment.allCases.randomElement()!
         allocatedCohort = cohort.rawValue
-        enrollmentDate = Date()
+        enrollmentDate = now()
         fireEnrollmentPixel()
         return cohort
     }
 
     @UserDefaultsWrapper(key: .pixelExperimentInstalled, defaultValue: false)
-    var installed: Bool
+    private var isInstalled: Bool
 
     @UserDefaultsWrapper(key: .pixelExperimentCohort, defaultValue: nil)
-    var allocatedCohort: String?
+    private var allocatedCohort: String?
 
     @UserDefaultsWrapper(key: .pixelExperimentEnrollmentDate, defaultValue: nil)
-    var enrollmentDate: Date?
+    private var enrollmentDate: Date?
 
     private var daysSinceEnrollment: Int {
         guard let enrollmentDate else { return 0 }
-        let diff = Date().timeIntervalSince1970 - enrollmentDate.timeIntervalSince1970
+        let diff = now().timeIntervalSince1970 - enrollmentDate.timeIntervalSince1970
         let days = Int(diff / 60 / 60 / 24)
         return days
     }
@@ -108,50 +108,46 @@ final internal class PixelExperimentLogic {
         get {
             Set<String>(firedPixelsStorage)
         }
-
         set {
             firedPixelsStorage = Array(newValue)
         }
     }
 
-    private let fire: (Pixel.Event) -> Void
-
-    init(fire: @escaping (Pixel.Event) -> Void) {
-        self.fire = fire
+    init(now: @escaping () -> Date = Date.init) {
+        self.now = now
     }
 
     func install() {
-        installed = true
+        isInstalled = true
     }
 
     // You'll need additional pixels for your experiment.  Pass the cohort as a paramter.
     func fireEnrollmentPixel() {
         // You'll probably need this at least.
-        guard allocatedCohort != nil, let cohort else { return }
-        Pixel.fire(.launchInitial(cohort: cohort.rawValue), limitToInitial: true, includeAppVersionParameter: false)
+        guard let cohort else { return }
+        Pixel.fire(.launchInitial(cohort: cohort.rawValue), limitTo: .initial, includeAppVersionParameter: false)
     }
 
     func fireFirstSerpPixel() {
-        guard allocatedCohort != nil, let cohort else { return }
-        Pixel.fire(.serpInitial(cohort: cohort.rawValue), limitToInitial: true, includeAppVersionParameter: false)
+        guard let cohort else { return }
+        Pixel.fire(.serpInitial(cohort: cohort.rawValue), limitTo: .initial, includeAppVersionParameter: false)
     }
 
     func fireDay21To27SerpPixel() {
-        guard allocatedCohort != nil, let cohort else { return }
-        guard let twentyoneDaysAfterFirstLaunch = Calendar.current.date(byAdding: .day, value: 21, to: Pixel.firstLaunchDate) else { return }
-        guard let twentysevenDaysAfterFirstLaunch = Calendar.current.date(byAdding: .day, value: 27, to: Pixel.firstLaunchDate) else { return }
-        if Date() >= twentyoneDaysAfterFirstLaunch && Date() <= twentysevenDaysAfterFirstLaunch {
-            Pixel.fire(.serpDay21to27(cohort: cohort.rawValue), limitToInitial: true, includeAppVersionParameter: false)
+        guard let cohort else { return }
+
+        if now() >= Pixel.firstLaunchDate.adding(.days(21)) && now() <= Pixel.firstLaunchDate.adding(.days(27)) {
+            Pixel.fire(.serpDay21to27(cohort: cohort.rawValue), limitTo: .initial, includeAppVersionParameter: false)
         }
     }
 
-    func firesetAsDefaultInitialPixel() {
-        guard allocatedCohort != nil, let cohort else { return }
-        Pixel.fire(.setAsDefaultInitial(cohort: cohort.rawValue), limitToInitial: true)
+    func fireSetAsDefaultInitialPixel() {
+        guard let cohort else { return }
+        Pixel.fire(.setAsDefaultInitial(cohort: cohort.rawValue), limitTo: .initial)
     }
 
     func cleanup() {
-        installed = false
+        isInstalled = false
         allocatedCohort = nil
         enrollmentDate = nil
         firedPixelsStorage = []

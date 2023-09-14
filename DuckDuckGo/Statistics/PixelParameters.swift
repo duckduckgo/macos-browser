@@ -41,9 +41,6 @@ extension Pixel {
 
         // Pixel experiments
         static let experimentCohort = "cohort"
-
-        // ATB experiments
-        static let variant = "av"
     }
 
     enum Values {

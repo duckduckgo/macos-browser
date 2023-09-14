@@ -431,6 +431,14 @@ extension Pixel.Event {
     }
 }
 
+extension Pixel.Event: Equatable {
+
+    static func == (lhs: Pixel.Event, rhs: Pixel.Event) -> Bool {
+        lhs.name == rhs.name && lhs.parameters == rhs.parameters
+    }
+
+}
+
 extension Pixel.Event.Debug {
 
     var name: String {

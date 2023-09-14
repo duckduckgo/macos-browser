@@ -205,7 +205,7 @@ extension DownloadListItem {
               let modified = managedObject.modified,
               let url = managedObject.urlEncrypted as? URL
         else {
-            Pixel.fire(.debug(event: .downloadListItemDecryptionFailedUnique), limitToOnceADay: true)
+            Pixel.fire(.debug(event: .downloadListItemDecryptionFailedUnique), limitTo: .dailyFirst)
             assertionFailure("DownloadListItem: Failed to init from ManagedObject")
             return nil
         }
