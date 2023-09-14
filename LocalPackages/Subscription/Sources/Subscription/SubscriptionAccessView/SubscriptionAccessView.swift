@@ -55,9 +55,10 @@ public struct SubscriptionAccessView: View {
                     }
                 }
                 .padding(.horizontal, 20)
-                .animation(.easeOut(duration: 0.3))
+
             }
             .roundedBorder()
+            .animation(.easeOut(duration: 0.3))
 
             Spacer()
                 .frame(height: 110)
