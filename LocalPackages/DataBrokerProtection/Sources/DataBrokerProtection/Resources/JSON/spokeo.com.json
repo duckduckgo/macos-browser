@@ -9,12 +9,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "c4ae7b6c-6002-4f97-a4e0-794c8f8184a4",
+          "id": "9b9ca680-a65c-4ab7-a425-466140a13a2b",
           "url": "https://www.spokeo.com/${firstName}-${lastName}/${stateFull}/${city}"
         },
         {
           "actionType": "extract",
-          "id": "55d9e28c-8979-4cbc-add1-29f939d38b28",
+          "id": "77b0db3b-e7c9-4a1f-879f-04380c0f5991",
           "selector": ".single-column-list-item",
           "profile": {
             "name": {
@@ -46,12 +46,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "5f112b7c-29f1-4706-a119-a3cc3bac8fa5",
+          "id": "0843c5ba-866a-4bf6-85c2-1f3361c259bf",
           "url": "https://www.spokeo.com/optout"
         },
         {
           "actionType": "fillForm",
-          "id": "64381dde-e83a-4de5-bde0-8cb8a828c176",
+          "id": "a322b3e2-c717-439c-8791-4e46fe184875",
           "selector": ".optout_container",
           "elements": [
             {
@@ -66,17 +66,17 @@
         },
         {
           "actionType": "getCaptchaInfo",
-          "id": "de29c4ce-e839-4352-98b1-b4e1f3e27821",
+          "id": "89e966cb-fbc3-4e1c-ad6d-816a021f9fdf",
           "selector": "#g-recaptcha"
         },
         {
           "actionType": "solveCaptcha",
-          "id": "89dcd441-3b8e-4708-ae89-69920b71f294",
+          "id": "3e350a87-b310-4790-9351-774f72e18fcb",
           "selector": "#g-recaptcha"
         },
         {
           "actionType": "click",
-          "id": "33a1436d-ab9e-42b1-94fa-5519a03d2999",
+          "id": "6896ac98-8663-4564-8836-2610060224a1",
           "elements": [
             {
               "type": "button",
@@ -86,7 +86,7 @@
         },
         {
           "actionType": "expectation",
-          "id": "0514c031-78dd-4631-ad1a-2668391ae2ed",
+          "id": "046b0dee-d380-41c6-935a-a90ecec80381",
           "expectations": [
             {
               "type": "text",
@@ -97,8 +97,19 @@
         },
         {
           "actionType": "emailConfirmation",
-          "id": "491d7d46-07a8-4216-8ec0-71d41118ab93",
+          "id": "c8d03ce7-9d0a-48fb-b98e-7f29745546be",
           "pollingTime": 30
+        },
+        {
+          "actionType": "expectation",
+          "id": "9bbcfbf2-da07-45f9-a493-f0baddb770bb",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "We've received your request to remove this listing"
+            }
+          ]
         }
       ]
     }
