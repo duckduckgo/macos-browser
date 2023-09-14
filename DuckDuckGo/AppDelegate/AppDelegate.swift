@@ -73,7 +73,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     private var didFinishLaunching = false
 
-#if !APPSTORE
+#if SPARKLE
     var updateController: UpdateController!
 #endif
 
@@ -153,7 +153,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                                                privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
         NSApp.mainMenuTyped.setup(with: featureFlagger)
 
-#if !APPSTORE
+#if SPARKLE
         updateController = UpdateController(internalUserDecider: internalUserDecider)
         stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
 #endif
