@@ -189,7 +189,6 @@ final class AppearancePreferences: ObservableObject {
     @Published var favoritesDisplayMode: FavoritesDisplayMode {
         didSet {
             persistor.favoritesDisplayMode = favoritesDisplayMode.description
-            requestSync()
         }
     }
 

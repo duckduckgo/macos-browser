@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Common
 import SwiftUI
 import SwiftUIExtensions
 import SyncUI
@@ -92,9 +93,21 @@ struct SyncView: View {
     var body: some View {
         if let syncService = (NSApp.delegate as? AppDelegate)?.syncService {
             SyncUI.ManagementView(model: SyncPreferences(syncService: syncService))
+                .onAppear {
+                    requestSync()
+                }
         } else {
             FailedAssertionView("Failed to initialize Sync Management View")
         }
     }
 
+    private func requestSync() {
+        Task { @MainActor in
+            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
+                return
+            }
+            os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+            syncService.scheduler.notifyDataChanged()
+        }
+    }
 }

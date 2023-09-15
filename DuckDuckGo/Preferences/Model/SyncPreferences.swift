@@ -54,8 +54,14 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @Published var isUnifiedFavoritesEnabled: Bool {
         didSet {
             AppearancePreferences.shared.favoritesDisplayMode = isUnifiedFavoritesEnabled ? .displayAll(native: .desktop) : .displayNative(.desktop)
+            if shouldRequestSyncOnFavoritesOptionChange {
+                syncService.scheduler.notifyDataChanged()
+            } else {
+                shouldRequestSyncOnFavoritesOptionChange = true
+            }
         }
     }
+    private var shouldRequestSyncOnFavoritesOptionChange: Bool = true
 
     var recoveryCode: String? {
         syncService.account?.recoveryCode
@@ -113,17 +119,26 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         }
     }
 
-    init(syncService: DDGSyncing) {
+    init(syncService: DDGSyncing, apperancePreferences: AppearancePreferences = .shared) {
         self.syncService = syncService
 
-        if case .displayAll = AppearancePreferences.shared.favoritesDisplayMode {
-            self.isUnifiedFavoritesEnabled = true
-        } else {
-            self.isUnifiedFavoritesEnabled = false
-        }
+        self.isUnifiedFavoritesEnabled = AppearancePreferences.shared.favoritesDisplayMode.isDisplayAll
 
         self.managementDialogModel = ManagementDialogModel()
         self.managementDialogModel.delegate = self
+
+        AppearancePreferences.shared.$favoritesDisplayMode
+            .map(\.isDisplayAll)
+            .sink { [weak self] isUnifiedFavoritesEnabled in
+                guard let self else {
+                    return
+                }
+                if self.isUnifiedFavoritesEnabled != isUnifiedFavoritesEnabled {
+                    self.shouldRequestSyncOnFavoritesOptionChange = false
+                    self.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
+                }
+            }
+            .store(in: &cancellables)
 
         syncService.authStatePublisher
             .removeDuplicates()

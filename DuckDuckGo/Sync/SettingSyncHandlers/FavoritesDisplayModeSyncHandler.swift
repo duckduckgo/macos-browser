@@ -33,7 +33,9 @@ final class FavoritesDisplayModeSyncHandler: SettingSyncHandler {
 
     override func setValue(_ value: String?) throws {
         if let value, let displayMode = FavoritesDisplayMode(value) {
-            preferences.favoritesDisplayMode = displayMode
+            DispatchQueue.main.async {
+                self.preferences.favoritesDisplayMode = displayMode
+            }
         }
     }
 
