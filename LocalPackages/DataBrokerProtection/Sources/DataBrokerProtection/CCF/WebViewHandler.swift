@@ -111,12 +111,7 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     }
 
     func evaluateJavaScript(_ javaScript: String) async throws {
-        if #available(macOS 12.0, *) {
-            print(javaScript)
-            _ = webView?.evaluateJavaScript(javaScript, in: nil, in: WKContentWorld.page)
-        } else {
-            // Fallback on earlier versions
-        }
+        _ = webView?.evaluateJavaScript(javaScript, in: nil, in: WKContentWorld.page)
     }
 }
 
