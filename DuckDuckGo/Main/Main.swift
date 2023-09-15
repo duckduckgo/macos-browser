@@ -40,8 +40,23 @@ final class AppMain {
     static func main() {
 #if NETWORK_PROTECTION
         if #available(macOS 11.4, *) {
-            switch (CommandLine.arguments.first! as NSString).lastPathComponent {
-            case "startVPN":
+            for argument in CommandLine.arguments {
+                os_log("🔵 DEBUG: AppMain launching with command line argument %{public}@", type: .error, argument)
+            }
+            
+            for argument in ProcessInfo.processInfo.arguments {
+                os_log("🔵 DEBUG: AppMain launching with argument %{public}@", type: .error, argument)
+            }
+            
+            if let variable = ProcessInfo.processInfo.environment["NetworkProtectionLaunchAction"] {
+                os_log("🔵 DEBUG: AppMain launching with environment variable %{public}s", type: .error, variable)
+            } else {
+                os_log("🔵 DEBUG: AppMain launching without environment variable", type: .error)
+            }
+            
+            if ProcessInfo.processInfo.arguments.contains("startVPN") {
+                os_log("🔵 DEBUG: AppMain launching with startVPN", type: .error)
+                
                 swizzleMainBundle()
 
                 Task {
@@ -50,7 +65,9 @@ final class AppMain {
                 }
 
                 dispatchMain()
-            case "stopVPN":
+            } else if ProcessInfo.processInfo.arguments.contains("stopVPN") {
+                os_log("🔵 DEBUG: AppMain launching with stopVPN", type: .error)
+                
                 swizzleMainBundle()
 
                 Task {
@@ -59,8 +76,6 @@ final class AppMain {
                 }
 
                 dispatchMain()
-            default:
-                break
             }
         }
 #endif
