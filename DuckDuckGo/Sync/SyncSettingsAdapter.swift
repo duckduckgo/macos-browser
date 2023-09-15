@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Bookmarks
 import BrowserServicesKit
 import Combine
 import Common
@@ -43,18 +44,11 @@ final class SyncSettingsAdapter {
         }
         let emailManager = EmailManager()
 
-        let favoritesDisplayModeHandler = UserDefaultsSyncHandler(
-            setting: .favoritesDisplayMode,
-            userDefaults: UserDefaultsWrapper<String>.sharedDefaults,
-            userDefaultsKey: UserDefaultsWrapper<String>.Key.favoritesDisplayMode.rawValue,
-            didChangePublisher: AppearancePreferences.shared.$favoritesDisplayMode.dropFirst().asVoid().eraseToAnyPublisher()
-        )
-
         let provider = SettingsProvider(
             metadataDatabase: metadataDatabase,
             metadataStore: metadataStore,
             emailManager: emailManager,
-            userDefaultsHandlers: [favoritesDisplayModeHandler],
+            userDefaultsHandlers: [FavoritesDisplayModeSyncHandler()],
             syncDidUpdateData: { [weak self] in
                 self?.syncDidCompleteSubject.send()
             }

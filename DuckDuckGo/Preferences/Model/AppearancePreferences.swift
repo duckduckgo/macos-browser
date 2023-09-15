@@ -47,7 +47,7 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
     @UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: DefaultZoomValue.percent100.rawValue)
     var defaultPageZoom: CGFloat
 
-    @UserDefaultsWrapper(key: .favoritesDisplayMode, defaultValue: FavoritesDisplayMode.displayNative(.desktop).rawValue)
+    @UserDefaultsWrapper(key: .favoritesDisplayMode, defaultValue: FavoritesDisplayMode.displayNative(.desktop).description)
     var favoritesDisplayMode: String?
 
     @UserDefaultsWrapper(key: .homePageIsFavoriteVisible, defaultValue: true)
@@ -135,37 +135,26 @@ enum ThemeName: String, Equatable, CaseIterable {
     }
 }
 
-extension FavoritesDisplayMode {
-    static let availableConfigurations = [FavoritesDisplayMode.displayNative(.desktop), .displayAll(native: .desktop)]
+extension FavoritesDisplayMode: LosslessStringConvertible {
+    static let `default` = FavoritesDisplayMode.displayNative(.desktop)
 
-    var rawValue: String? {
+    public var description: String {
         switch self {
         case .displayNative:
             return "displayNative"
         case .displayAll:
             return "displayAll"
-        default:
-            return nil
         }
     }
 
-    init?(rawValue: String) {
-        switch rawValue {
+    public init?(_ description: String) {
+        switch description {
         case "displayNative":
             self = .displayNative(.desktop)
         case "displayAll":
             self = .displayAll(native: .desktop)
         default:
             return nil
-        }
-    }
-
-    var displayString: String {
-        switch self {
-        case .displayNative:
-            return "Desktop Devices Only"
-        case .displayAll:
-            return "All Synced Devices"
         }
     }
 }
@@ -199,7 +188,7 @@ final class AppearancePreferences: ObservableObject {
 
     @Published var favoritesDisplayMode: FavoritesDisplayMode {
         didSet {
-            persistor.favoritesDisplayMode = favoritesDisplayMode.rawValue
+            persistor.favoritesDisplayMode = favoritesDisplayMode.description
             requestSync()
         }
     }
@@ -266,7 +255,7 @@ final class AppearancePreferences: ObservableObject {
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         showAutocompleteSuggestions = persistor.showAutocompleteSuggestions
-        favoritesDisplayMode = persistor.favoritesDisplayMode.flatMap(FavoritesDisplayMode.init(rawValue:)) ?? .displayNative(.desktop)
+        favoritesDisplayMode = persistor.favoritesDisplayMode.flatMap(FavoritesDisplayMode.init) ?? .default
         isFavoriteVisible = persistor.isFavoriteVisible
         isRecentActivityVisible = persistor.isRecentActivityVisible
         isContinueSetUpVisible = persistor.isContinueSetUpVisible
