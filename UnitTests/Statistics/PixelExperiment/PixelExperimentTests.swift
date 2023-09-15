@@ -71,15 +71,27 @@ class PixelExperimentTests: XCTestCase {
         PixelExperiment.fireSetAsDefaultInitialPixel()
     }
 
-    func testEnrollmentPixel() {
+    func testWhenNoCohort_NoEnrollmentPixelFired() {
         Pixel.firstLaunchDate = now
         PixelExperiment.install()
 
+        Pixel.setUp(store: self.store) { _ in
+            XCTFail("shouldn‘t fire pixels")
+        }
+
+        PixelExperiment.fireEnrollmentPixel()
+    }
+
+    func testEnrollmentPixel() {
         let e = expectation(description: "pixel fired")
         Pixel.setUp(store: self.store) { [unowned self] event in
             XCTAssertEqual(event, .launchInitial(cohort: cohort!.rawValue))
             e.fulfill()
         }
+
+        Pixel.firstLaunchDate = now
+        PixelExperiment.install()
+        _=PixelExperiment.cohort
 
         PixelExperiment.fireEnrollmentPixel()
         // only initial is set
@@ -91,9 +103,6 @@ class PixelExperimentTests: XCTestCase {
     }
 
     func testFirstSerpPixel() {
-        Pixel.firstLaunchDate = now
-        PixelExperiment.install()
-
         let e = expectation(description: "enrollment pixel fired")
         let e2 = expectation(description: "serp pixel fired")
         Pixel.setUp(store: self.store) { [unowned self] event in
@@ -107,6 +116,10 @@ class PixelExperimentTests: XCTestCase {
             }
         }
 
+        Pixel.firstLaunchDate = now
+        PixelExperiment.install()
+        _=PixelExperiment.cohort
+
         PixelExperiment.fireFirstSerpPixel()
         // only initial is set
         PixelExperiment.fireFirstSerpPixel()
@@ -117,10 +130,6 @@ class PixelExperimentTests: XCTestCase {
     }
 
     func testDay21SerpPixel() {
-        let start = now
-        Pixel.firstLaunchDate = start
-        PixelExperiment.install()
-
         let enrollment = expectation(description: "first pixel fired")
         var e: XCTestExpectation!
         Pixel.setUp(store: self.store) { [unowned self] event in
@@ -133,6 +142,11 @@ class PixelExperimentTests: XCTestCase {
                 XCTFail("unexpected \(event)")
             }
         }
+
+        let start = now
+        Pixel.firstLaunchDate = start
+        PixelExperiment.install()
+        _=PixelExperiment.cohort
 
         // only enrollment should fire
         PixelExperiment.fireDay21To27SerpPixel()
@@ -158,10 +172,6 @@ class PixelExperimentTests: XCTestCase {
     }
 
     func testDay27SerpPixel() {
-        let start = now
-        Pixel.firstLaunchDate = start
-        PixelExperiment.install()
-
         let enrollment = expectation(description: "first pixel fired")
         var e: XCTestExpectation!
         Pixel.setUp(store: self.store) { [unowned self] event in
@@ -174,6 +184,11 @@ class PixelExperimentTests: XCTestCase {
                 XCTFail("unexpected \(event)")
             }
         }
+
+        let start = now
+        Pixel.firstLaunchDate = start
+        PixelExperiment.install()
+        _=PixelExperiment.cohort
 
         // only enrollment should fire
         PixelExperiment.fireDay21To27SerpPixel()
@@ -195,10 +210,6 @@ class PixelExperimentTests: XCTestCase {
     }
 
     func testDay28SerpPixel() {
-        let start = now
-        Pixel.firstLaunchDate = start
-        PixelExperiment.install()
-
         let enrollment = expectation(description: "first pixel fired")
         Pixel.setUp(store: self.store) { [unowned self] event in
             switch event {
@@ -208,6 +219,11 @@ class PixelExperimentTests: XCTestCase {
                 XCTFail("unexpected \(event)")
             }
         }
+
+        let start = now
+        Pixel.firstLaunchDate = start
+        PixelExperiment.install()
+        _=PixelExperiment.cohort
 
         // only enrollment should fire
         PixelExperiment.fireDay21To27SerpPixel()

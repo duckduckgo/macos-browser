@@ -124,17 +124,17 @@ final internal class PixelExperimentLogic {
     // You'll need additional pixels for your experiment.  Pass the cohort as a paramter.
     func fireEnrollmentPixel() {
         // You'll probably need this at least.
-        guard let cohort else { return }
+        guard allocatedCohort != nil, let cohort else { return }
         Pixel.fire(.launchInitial(cohort: cohort.rawValue), limitTo: .initial, includeAppVersionParameter: false)
     }
 
     func fireFirstSerpPixel() {
-        guard let cohort else { return }
+        guard allocatedCohort != nil, let cohort else { return }
         Pixel.fire(.serpInitial(cohort: cohort.rawValue), limitTo: .initial, includeAppVersionParameter: false)
     }
 
     func fireDay21To27SerpPixel() {
-        guard let cohort else { return }
+        guard allocatedCohort != nil, let cohort else { return }
 
         if now() >= Pixel.firstLaunchDate.adding(.days(21)) && now() <= Pixel.firstLaunchDate.adding(.days(27)) {
             Pixel.fire(.serpDay21to27(cohort: cohort.rawValue), limitTo: .initial, includeAppVersionParameter: false)
@@ -142,7 +142,7 @@ final internal class PixelExperimentLogic {
     }
 
     func fireSetAsDefaultInitialPixel() {
-        guard let cohort else { return }
+        guard allocatedCohort != nil, let cohort else { return }
         Pixel.fire(.setAsDefaultInitial(cohort: cohort.rawValue), limitTo: .initial)
     }
 
