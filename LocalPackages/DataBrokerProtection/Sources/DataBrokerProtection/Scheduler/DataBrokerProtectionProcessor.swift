@@ -86,13 +86,17 @@ final class DataBrokerProtectionProcessor {
         }
     }
 
+    func stopAllOperations() {
+        operationQueue.cancelAllOperations()
+    }
+
     // MARK: - Private functions
     private func runOperations(operationType: DataBrokerOperationsCollection.OperationType,
                                priorityDate: Date?,
                                showWebView: Bool,
                                completion: @escaping () -> Void) {
 
-        // Before running new operatiosn we check if there is any updates to the broker files.
+        // Before running new operations we check if there is any updates to the broker files.
         // This runs only once per 24 hours.
         if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil) {
             let brokerUpdater = DataBrokerProtectionBrokerUpdater(vault: vault)

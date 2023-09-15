@@ -18,7 +18,6 @@
 
 import SwiftUI
 
-@available(macOS 11.0, *)
 struct ResultsView: View {
     @ObservedObject var viewModel: ResultsViewModel
 
@@ -43,7 +42,6 @@ struct ResultsView: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct RemovedProfilesView: View {
     let profiles: [ResultsViewModel.RemovedProfile]
 
@@ -68,7 +66,6 @@ private struct RemovedProfilesView: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct PendingProfilesView: View {
     let profiles: [ResultsViewModel.PendingProfile]
 
@@ -94,7 +91,6 @@ private struct PendingProfilesView: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct RemovedProfileRow: View {
     let removedProfile: ResultsViewModel.RemovedProfile
 
@@ -117,7 +113,6 @@ private struct RemovedProfileRow: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct PendingProfileRow: View {
     let pendingProfile: ResultsViewModel.PendingProfile
     @State private var showModal = false
@@ -159,21 +154,6 @@ private struct PendingProfileRow: View {
 
                 Label {
                     VStack (alignment: .leading) {
-                        ForEach(pendingProfile.relatives, id: \.self) {  relative in
-                            Text(relative)
-                                .lineLimit(1)
-                        }
-                    }
-                    .frame(width: 180, alignment: .leading)
-
-                } icon: {
-                    Image(systemName: "person.3")
-                }
-
-                Spacer()
-
-                Label {
-                    VStack (alignment: .leading) {
                         ForEach(pendingProfile.addresses, id: \.self) {  address in
                             Text(address)
                                 .lineLimit(1)
@@ -183,6 +163,21 @@ private struct PendingProfileRow: View {
 
                 } icon: {
                     Image(systemName: "house")
+                }
+
+                Spacer()
+
+                Label {
+                    VStack (alignment: .leading) {
+                        ForEach(pendingProfile.relatives, id: \.self) {  relative in
+                            Text(relative)
+                                .lineLimit(1)
+                        }
+                    }
+                    .frame(width: 180, alignment: .leading)
+
+                } icon: {
+                    Image(systemName: "person.3")
                 }
             }
             if pendingProfile.hasError {
@@ -282,6 +277,10 @@ private struct DebugModalView: View {
             return "captchaServiceError \(captchaError)"
         case .emailError(let emailError):
             return "emailError \(String(describing: emailError))"
+        case .cancelled:
+            return "Cancelled"
+        case .solvingCaptchaWithCallbackError:
+            return "Solving captcha with callback failed"
         }
     }
 }
@@ -311,7 +310,6 @@ private extension View {
 }
 
 // MARK: - Preview
-@available(macOS 11.0, *)
 struct ResultsView_Previews: PreviewProvider {
     static var previews: some View {
         let dataManager = DataBrokerProtectionDataManager()

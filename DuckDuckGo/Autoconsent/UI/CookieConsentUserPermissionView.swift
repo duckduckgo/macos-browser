@@ -102,14 +102,10 @@ struct CookieConsentUserPermissionView_Previews: PreviewProvider {
     static var previews: some View {
         let result: (Bool) -> Void = { _ in }
 
-        if #available(macOS 11.0, *) {
-            CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), type: .site, result: result).preferredColorScheme(.dark)
-                .padding()
-            CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), type: .site, result: result).preferredColorScheme(.light)
-                .padding()
-        } else {
-            CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), type: .site, result: result)
-        }
+        CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), type: .site, result: result).preferredColorScheme(.dark)
+            .padding()
+        CookieConsentUserPermissionView(sketchAnimationModel: CookieConsentAnimationMock(), type: .site, result: result).preferredColorScheme(.light)
+            .padding()
     }
 }
 

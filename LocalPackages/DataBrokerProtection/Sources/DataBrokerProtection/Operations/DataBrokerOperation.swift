@@ -37,13 +37,26 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     var continuation: CheckedContinuation<ReturnValue, Error>? { get set }
     var extractedProfile: ExtractedProfile? { get set }
 
-    func run(inputValue: InputValue, webViewHandler: WebViewHandler?, actionsHandler: ActionsHandler?, showWebView: Bool) async throws -> ReturnValue
+    var shouldRunNextStep: () -> Bool { get }
+
+    func run(inputValue: InputValue,
+             webViewHandler: WebViewHandler?,
+             actionsHandler: ActionsHandler?,
+             showWebView: Bool) async throws -> ReturnValue
+
     func executeNextStep() async
 }
 
 extension DataBrokerOperation {
-    func run(inputValue: InputValue, webViewHandler: WebViewHandler?, actionsHandler: ActionsHandler?) async throws -> ReturnValue {
-        try await run(inputValue: inputValue, webViewHandler: webViewHandler, actionsHandler: actionsHandler, showWebView: false)
+    func run(inputValue: InputValue,
+             webViewHandler: WebViewHandler?,
+             actionsHandler: ActionsHandler?,
+             shouldRunNextStep: @escaping () -> Bool) async throws -> ReturnValue {
+
+        try await run(inputValue: inputValue,
+                      webViewHandler: webViewHandler,
+                      actionsHandler: actionsHandler,
+                      showWebView: false)
     }
 }
 
@@ -65,7 +78,8 @@ extension DataBrokerOperation {
 
         if action as? SolveCaptchaAction != nil, let captchaTransactionId = actionsHandler?.captchaTransactionId {
             actionsHandler?.captchaTransactionId = nil
-            if let captchaData = try? await captchaService.submitCaptchaToBeResolved(for: captchaTransactionId) {
+            if let captchaData = try? await captchaService.submitCaptchaToBeResolved(for: captchaTransactionId,
+                                                                                     shouldRunNextStep: shouldRunNextStep) {
                 await webViewHandler?.execute(action: action, data: .solveCaptcha(CaptchaToken(token: captchaData)))
             } else {
                 await onError(error: .captchaServiceError(CaptchaServiceError.nilDataWhenFetchingCaptchaResult))
@@ -95,7 +109,8 @@ extension DataBrokerOperation {
             let url =  try await emailService.getConfirmationLink(
                 from: email,
                 numberOfRetries: 100, // Move to constant
-                pollingIntervalInSeconds: action.pollingTime
+                pollingIntervalInSeconds: action.pollingTime,
+                shouldRunNextStep: shouldRunNextStep
             )
             try? await webViewHandler?.load(url: url)
         } else {
@@ -143,7 +158,8 @@ extension DataBrokerOperation {
 
     func captchaInformation(captchaInfo: GetCaptchaInfoResponse) async {
         do {
-            actionsHandler?.captchaTransactionId = try await captchaService.submitCaptchaInformation(captchaInfo)
+            actionsHandler?.captchaTransactionId = try await captchaService.submitCaptchaInformation(captchaInfo,
+                                                                                                     shouldRunNextStep: shouldRunNextStep)
             await executeNextStep()
         } catch {
             if let captchaError = error as? CaptchaServiceError {
@@ -151,6 +167,16 @@ extension DataBrokerOperation {
             } else {
                 await onError(error: DataBrokerProtectionError.captchaServiceError(.errorWhenSubmittingCaptcha))
             }
+        }
+    }
+
+    func solveCaptcha(with response: SolveCaptchaResponse) async {
+        do {
+            try await webViewHandler?.evaluateJavaScript(response.callback.eval)
+
+            await executeNextStep()
+        } catch {
+            await onError(error: .solvingCaptchaWithCallbackError)
         }
     }
 

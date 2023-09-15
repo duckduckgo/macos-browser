@@ -78,11 +78,9 @@ struct SyncedDevicesList: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            if #available(macOS 11.0, *) {
-                if devices.isEmpty {
-                    ProgressView()
-                        .padding()
-                }
+            if devices.isEmpty {
+                ProgressView()
+                    .padding()
             }
 
             ForEach(devices) { device in

@@ -18,7 +18,6 @@
 
 import SwiftUI
 
-@available(macOS 11.0, *)
 struct NoResultsFoundView: View {
     let buttonClicked: () -> Void
 
@@ -41,7 +40,6 @@ struct NoResultsFoundView: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct InfoView: View {
     let buttonClicked: () -> Void
 
@@ -99,7 +97,6 @@ private struct RowItem: Identifiable {
     let text: String
 }
 
-@available(macOS 11.0, *)
 struct NoResultsFoundView_Previews: PreviewProvider {
     static var previews: some View {
 

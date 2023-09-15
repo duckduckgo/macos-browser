@@ -155,17 +155,9 @@ fileprivate struct SpeechBubble: View {
 
                 }
                 .fill(Color(NSColor.interfaceBackgroundColor))
-                .shadow(color: Color("OnboardingDaxSpeechShadowColor"), radius: 2, x: shadowXOffset, y: 0)
+                .shadow(color: Color("OnboardingDaxSpeechShadowColor"), radius: 2, x: 0, y: 0)
             }
 
-        }
-    }
-
-    var shadowXOffset: CGFloat {
-        if #available(macOS 11.0, *) {
-            return 0
-        } else {
-            return tailSize
         }
     }
 }
@@ -173,13 +165,5 @@ fileprivate struct SpeechBubble: View {
 }
 
 fileprivate extension Font {
-
-    static var daxSpeech: Font = {
-        if #available(macOS 11.0, *) {
-            return .system(size: 15, weight: .light, design: .default)
-        } else {
-            return .system(size: 15)
-        }
-    }()
-
+    static var daxSpeech: Font = .system(size: 15, weight: .light, design: .default)
 }

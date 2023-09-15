@@ -34,7 +34,7 @@ extension AppDelegate {
     // MARK: - DuckDuckGo
 
     @IBAction func checkForUpdates(_ sender: Any?) {
-#if !APPSTORE
+#if SPARKLE
         updateController.checkForUpdates(sender)
 #endif
     }
@@ -186,11 +186,7 @@ extension AppDelegate {
             accessoryContainer.frame.size = accessoryContainer.fittingSize
 
             savePanel.accessoryView = accessoryContainer
-            if #available(macOS 11.0, *) {
-                savePanel.allowedContentTypes = [.commaSeparatedText]
-            } else {
-                savePanel.allowedFileTypes = ["csv"]
-            }
+            savePanel.allowedContentTypes = [.commaSeparatedText]
 
             savePanel.beginSheetModal(for: window) { response in
                 guard response == .OK, let selectedURL = savePanel.url else { return }
@@ -214,12 +210,7 @@ extension AppDelegate {
 
         let savePanel = NSSavePanel()
         savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportBookmarksFileNameSuffix)"
-
-        if #available(macOS 11.0, *) {
-            savePanel.allowedContentTypes = [.html]
-        } else {
-            savePanel.allowedFileTypes = ["html"]
-        }
+        savePanel.allowedContentTypes = [.html]
 
         savePanel.beginSheetModal(for: window) { response in
             guard response == .OK, let selectedURL = savePanel.url else { return }
@@ -305,6 +296,13 @@ extension MainViewController {
         // instead of closing a pinned tab we select the first regular tab
         // (this is in line with Safari behavior)
         // If there are no regular tabs, we close the window.
+        var isHandlingKeyDownEvent: Bool {
+            guard sender is NSMenuItem,
+                  let currentEvent = NSApp.currentEvent,
+                  case .keyDown = currentEvent.type,
+                  currentEvent.modifierFlags.contains(.command) else { return false }
+             return true
+        }
         if isHandlingKeyDownEvent, tab.isPinned {
             if tabCollectionViewModel.tabCollection.tabs.isEmpty {
                 view.window?.performClose(sender)
