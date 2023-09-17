@@ -62,7 +62,7 @@ public final class AppLauncher: AppLaunching {
             configuration.createsNewApplicationInstance = false
             configuration.hides = false
         }
-        
+
         do {
             if let launchURL = command.launchURL {
                 try await NSWorkspace.shared.open([launchURL], withApplicationAt: mainBundleURL, configuration: configuration)
