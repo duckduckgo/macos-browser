@@ -39,44 +39,24 @@ final class AppMain {
 
     static func main() {
 #if NETWORK_PROTECTION
-        if #available(macOS 11.4, *) {
-            for argument in CommandLine.arguments {
-                os_log("🔵 DEBUG: AppMain launching with command line argument %{public}@", type: .error, argument)
+        if let startVPN = AppLaunchCommand.startVPN.rawValue, ProcessInfo.processInfo.arguments.contains(startVPN) {
+            swizzleMainBundle()
+            
+            Task {
+                await NetworkProtectionTunnelController().start(enableLoginItems: false)
+                exit(0)
             }
             
-            for argument in ProcessInfo.processInfo.arguments {
-                os_log("🔵 DEBUG: AppMain launching with argument %{public}@", type: .error, argument)
+            dispatchMain()
+        } else if let stopVPN = AppLaunchCommand.stopVPN.rawValue, ProcessInfo.processInfo.arguments.contains(stopVPN) {
+            swizzleMainBundle()
+            
+            Task {
+                await NetworkProtectionTunnelController().stop()
+                exit(0)
             }
             
-            if let variable = ProcessInfo.processInfo.environment["NetworkProtectionLaunchAction"] {
-                os_log("🔵 DEBUG: AppMain launching with environment variable %{public}s", type: .error, variable)
-            } else {
-                os_log("🔵 DEBUG: AppMain launching without environment variable", type: .error)
-            }
-            
-            if ProcessInfo.processInfo.arguments.contains("startVPN") {
-                os_log("🔵 DEBUG: AppMain launching with startVPN", type: .error)
-                
-                swizzleMainBundle()
-
-                Task {
-                    await NetworkProtectionTunnelController().start(enableLoginItems: false)
-                    exit(0)
-                }
-
-                dispatchMain()
-            } else if ProcessInfo.processInfo.arguments.contains("stopVPN") {
-                os_log("🔵 DEBUG: AppMain launching with stopVPN", type: .error)
-                
-                swizzleMainBundle()
-
-                Task {
-                    await NetworkProtectionTunnelController().stop()
-                    exit(0)
-                }
-
-                dispatchMain()
-            }
+            dispatchMain()
         }
 #endif
 

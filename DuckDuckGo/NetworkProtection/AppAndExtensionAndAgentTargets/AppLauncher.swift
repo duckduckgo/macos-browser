@@ -46,22 +46,15 @@ public final class AppLauncher: AppLaunching {
     public func launchApp(withCommand command: AppLaunchCommand) async {
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.allowsRunningApplicationSubstitution = false
-
-        os_log("🔵 DEBUG: Launching app via process %{public}@", type: .error, ProcessInfo.processInfo.processName)
         
         if command.hideApp {
-                    
             configuration.activates = false
             configuration.addsToRecentItems = false
             configuration.createsNewApplicationInstance = true
             configuration.hides = true
             
             if let rawValue = command.rawValue {
-                os_log("🔵 DEBUG: Hiding app with argument %{public}@", type: .error, rawValue)
                 configuration.arguments = [rawValue]
-                configuration.environment = ["NetworkProtectionLaunchAction": rawValue]
-            } else {
-                os_log("🔵 DEBUG: Hiding app with no arguments", type: .error)
             }
         } else {
             configuration.activates = true
@@ -70,28 +63,19 @@ public final class AppLauncher: AppLaunching {
             configuration.hides = false
             
             if let rawValue = command.rawValue {
-                os_log("🔵 DEBUG: Showing app with argument %{public}@", type: .error, rawValue)
                 configuration.arguments = [rawValue]
-                configuration.environment = ["NetworkProtectionLaunchAction": rawValue]
-            } else {
-                os_log("🔵 DEBUG: Showing app with no arguments", type: .error)
             }
         }
         
         do {
             if let launchURL = command.launchURL {
-                os_log("🔵 DEBUG: Open Application with launch URL: %{public}@", type: .error, launchURL.absoluteString)
                 try await NSWorkspace.shared.open([launchURL], withApplicationAt: mainBundleURL, configuration: configuration)
             } else if let helperAppPath = command.helperAppPath {
                 let launchURL = mainBundleURL.appending(helperAppPath)
-                // let resolved = mainBundleURL.appending(helperAppPath).resolvingSymlinksInPath()
-                os_log("🔵 DEBUG: Open Application with helper path launch URL: %{public}@", type: .error, launchURL.absoluteString)
-                
                 try await NSWorkspace.shared.openApplication(at: launchURL, configuration: configuration)
             }
         } catch {
-            let error = error as NSError
-            os_log("🔵 DEBUG: Open Application failed: %{public}d, %{public}@, %{public}@", type: .error, error.code, error.domain, error.localizedDescription)
+            os_log("🔵 openApplication failed: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
         }
     }
 }
