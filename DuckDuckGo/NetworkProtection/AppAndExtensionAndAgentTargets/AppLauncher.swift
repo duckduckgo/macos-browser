@@ -24,11 +24,14 @@ import Common
 import NetworkProtection
 
 extension AppLaunchCommand {
-    var rawValue: String? {
+    var rawValue: String {
         switch self {
         case .startVPN: return "startVPN"
         case .stopVPN: return "stopVPN"
-        default: return nil
+        case .justOpen: return "justOpen"
+        case .shareFeedback: return "shareFeedback"
+        case .showStatus: return "showStatus"
+        case .enableOnDemand: return "enableOnDemand"
         }
     }
 }
@@ -46,25 +49,18 @@ public final class AppLauncher: AppLaunching {
     public func launchApp(withCommand command: AppLaunchCommand) async {
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.allowsRunningApplicationSubstitution = false
+        configuration.arguments = [command.rawValue]
 
         if command.hideApp {
             configuration.activates = false
             configuration.addsToRecentItems = false
             configuration.createsNewApplicationInstance = true
             configuration.hides = true
-
-            if let rawValue = command.rawValue {
-                configuration.arguments = [rawValue]
-            }
         } else {
             configuration.activates = true
             configuration.addsToRecentItems = true
             configuration.createsNewApplicationInstance = false
             configuration.hides = false
-
-            if let rawValue = command.rawValue {
-                configuration.arguments = [rawValue]
-            }
         }
         
         do {
