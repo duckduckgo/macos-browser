@@ -46,13 +46,13 @@ public final class AppLauncher: AppLaunching {
     public func launchApp(withCommand command: AppLaunchCommand) async {
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.allowsRunningApplicationSubstitution = false
-        
+
         if command.hideApp {
             configuration.activates = false
             configuration.addsToRecentItems = false
             configuration.createsNewApplicationInstance = true
             configuration.hides = true
-            
+
             if let rawValue = command.rawValue {
                 configuration.arguments = [rawValue]
             }
@@ -61,7 +61,7 @@ public final class AppLauncher: AppLaunching {
             configuration.addsToRecentItems = true
             configuration.createsNewApplicationInstance = false
             configuration.hides = false
-            
+
             if let rawValue = command.rawValue {
                 configuration.arguments = [rawValue]
             }
@@ -75,7 +75,7 @@ public final class AppLauncher: AppLaunching {
                 try await NSWorkspace.shared.openApplication(at: launchURL, configuration: configuration)
             }
         } catch {
-            os_log("🔵 openApplication failed: %{public}@", log: .networkProtection, type: .error, error.localizedDescription)
+            os_log("🔵 Open Application failed: %{public}@", type: .error, error.localizedDescription)
         }
     }
 }
