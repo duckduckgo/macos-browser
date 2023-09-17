@@ -801,6 +801,8 @@
 		3192A2612A4C4CFF0084EA89 /* DuckDuckGo Agent.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 4B2D06392A11CFBB00DE1F49 /* DuckDuckGo Agent.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3192A2622A4C4CFF0084EA89 /* DuckDuckGo Notifications.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3192A2642A4C4CFF0084EA89 /* enableOnDemand.app in Embed NetP Controller Apps */ = {isa = PBXBuildFile; fileRef = 7B736E5F2A4A22B700F9922A /* enableOnDemand.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3192A2652A4C4CFF0084EA89 /* stopVPN.app in Embed NetP Controller Apps */ = {isa = PBXBuildFile; fileRef = 4B5F14E12A1476BD0060320F /* stopVPN.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3192A2662A4C4CFF0084EA89 /* startVPN.app in Embed NetP Controller Apps */ = {isa = PBXBuildFile; fileRef = 4B5F14CB2A14702C0060320F /* startVPN.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3192EC882A4DCF21001E97A5 /* DBPHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3192EC872A4DCF21001E97A5 /* DBPHomeViewController.swift */; };
 		3198FCAC2A5D8A3C002EF5F8 /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
 		31A031A6288191230090F792 /* CookieConsentAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A031A5288191230090F792 /* CookieConsentAnimationView.swift */; };
@@ -1849,6 +1851,8 @@
 		4B5A4F4C27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A4F4B27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift */; };
 		4B5F14DC2A1470AA0060320F /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5F14C52A145D6A0060320F /* Main.swift */; };
 		4B5F14F22A1476EF0060320F /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5F14C52A145D6A0060320F /* Main.swift */; };
+		4B5F14F42A14824F0060320F /* startVPN.app in Embed NetP Controller Apps */ = {isa = PBXBuildFile; fileRef = 4B5F14CB2A14702C0060320F /* startVPN.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4B5F14F52A1482530060320F /* stopVPN.app in Embed NetP Controller Apps */ = {isa = PBXBuildFile; fileRef = 4B5F14E12A1476BD0060320F /* stopVPN.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4B5FF67826B602B100D42879 /* FirefoxDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5FF67726B602B100D42879 /* FirefoxDataImporter.swift */; };
 		4B65143E263924B5005B46EB /* EmailUrlExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */; };
 		4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B677427255DBEB800025BD8 /* httpsMobileV2BloomSpec.json */; };
@@ -2924,6 +2928,8 @@
 			dstSubfolderSpec = 7;
 			files = (
 				3192A2642A4C4CFF0084EA89 /* enableOnDemand.app in Embed NetP Controller Apps */,
+				3192A2652A4C4CFF0084EA89 /* stopVPN.app in Embed NetP Controller Apps */,
+				3192A2662A4C4CFF0084EA89 /* startVPN.app in Embed NetP Controller Apps */,
 			);
 			name = "Embed NetP Controller Apps";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2947,6 +2953,8 @@
 			dstSubfolderSpec = 7;
 			files = (
 				7B736E6A2A4A22FC00F9922A /* enableOnDemand.app in Embed NetP Controller Apps */,
+				4B5F14F52A1482530060320F /* stopVPN.app in Embed NetP Controller Apps */,
+				4B5F14F42A14824F0060320F /* startVPN.app in Embed NetP Controller Apps */,
 			);
 			name = "Embed NetP Controller Apps";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8467,7 +8475,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"Replace and Sign\" # for easier build log search\n\n# enableOnDemand\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/enableOnDemand.app/Contents/MacOS\"\nrm ./enableOnDemand\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./enableOnDemand\ncd ../../.. \npopd\n";
+			shellScript = "echo \"Replace and Sign\" # for easier build log search\n\n# startVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/startVPN.app/Contents/MacOS\"\nrm ./startVPN\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./startVPN\npopd\n\n# stopVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/stopVPN.app/Contents/MacOS\"\nrm ./stopVPN\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./stopVPN\ncd ../../.. \npopd\n\n# enableOnDemand\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/enableOnDemand.app/Contents/MacOS\"\nrm ./enableOnDemand\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./enableOnDemand\ncd ../../.. \npopd\n";
 		};
 		3192A2682A4C4CFF0084EA89 /* Embed System Network Extension */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -8617,7 +8625,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"Replace and Sign\" # for easier build log search\n\n# enableOnDemand\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/enableOnDemand.app/Contents/MacOS\"\nrm ./enableOnDemand\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./enableOnDemand\ncd ../../.. \npopd\n";
+			shellScript = "echo \"Replace and Sign\" # for easier build log search\n\n# startVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/startVPN.app/Contents/MacOS\"\nrm ./startVPN\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./startVPN\npopd\n\n# stopVPN\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/stopVPN.app/Contents/MacOS\"\nrm ./stopVPN\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./stopVPN\ncd ../../.. \npopd\n\n# enableOnDemand\n\npushd \"${CONFIGURATION_BUILD_DIR}/${WRAPPER_NAME}/Contents/Resources/enableOnDemand.app/Contents/MacOS\"\nrm ./enableOnDemand\nln -s \"../../../../MacOS/${PRODUCT_NAME}\" ./enableOnDemand\ncd ../../.. \npopd\n";
 		};
 		7B6469992A165AE00095095A /* Embed System Network Extension */ = {
 			isa = PBXShellScriptBuildPhase;
