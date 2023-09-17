@@ -41,21 +41,21 @@ final class AppMain {
 #if NETWORK_PROTECTION
         if let startVPN = AppLaunchCommand.startVPN.rawValue, ProcessInfo.processInfo.arguments.contains(startVPN) {
             swizzleMainBundle()
-            
+
             Task {
                 await NetworkProtectionTunnelController().start(enableLoginItems: false)
                 exit(0)
             }
-            
+
             dispatchMain()
         } else if let stopVPN = AppLaunchCommand.stopVPN.rawValue, ProcessInfo.processInfo.arguments.contains(stopVPN) {
             swizzleMainBundle()
-            
+
             Task {
                 await NetworkProtectionTunnelController().stop()
                 exit(0)
             }
-            
+
             dispatchMain()
         }
 #endif

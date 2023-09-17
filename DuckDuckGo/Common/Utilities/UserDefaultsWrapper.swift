@@ -117,6 +117,7 @@ public struct UserDefaultsWrapper<T> {
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"
+        case emailKeychainMigration = "email.keychain.migration"
 
         case bookmarksBarPromptShown = "bookmarks.bar.prompt.shown"
         case showBookmarksBar = "bookmarks.bar.show"
@@ -164,6 +165,10 @@ public struct UserDefaultsWrapper<T> {
         case pixelExperimentEnrollmentDate = "pixel.experiment.enrollment.date"
         case pixelExperimentFiredPixels = "pixel.experiment.pixels.fired"
         case campaignVariant = "campaign.variant"
+
+        // Sync
+
+        case syncEnvironment = "sync.environment"
     }
 
     enum RemovedKeys: String, CaseIterable {

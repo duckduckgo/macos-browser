@@ -18,7 +18,6 @@
 
 import SwiftUI
 
-@available(macOS 11.0, *)
 struct CreateProfileView: View {
     @ObservedObject var viewModel: ProfileViewModel
     let scanButtonClicked: () -> Void
@@ -65,7 +64,6 @@ struct CreateProfileView: View {
 
 // MARK: - Birthday
 
-@available(macOS 11.0, *)
 private struct BirthYearComponentView: View {
     @ObservedObject var viewModel: ProfileViewModel
     @State var isEditViewVisible = false
@@ -158,7 +156,6 @@ private struct BirthYearFormView: View {
 
 // MARK: - Name
 
-@available(macOS 11.0, *)
 private struct NameComponentView: View {
     @ObservedObject var viewModel: ProfileViewModel
     @State private var isEditViewVisible = false
@@ -284,7 +281,6 @@ private struct NameFormView: View {
 
 // MARK: - Address
 
-@available(macOS 11.0, *)
 private struct AddressComponentView: View {
     @ObservedObject var viewModel: ProfileViewModel
     @State private var isEditViewVisible = false
@@ -426,7 +422,7 @@ private struct FormHeaderView: View {
                 .bold()
 
             VStack (spacing: 16) {
-                Text("The following information is required for Data Broker Protection. We’ll scan Data Broker sites for matching info and have it removed.")
+                Text("The following information is required for Personal Information Removal. We’ll scan Data Broker sites for matching info and have it removed.")
 
                 Text("The information you've entered stays on your device, it does not go through DuckDuckGo's servers.")
             }
@@ -446,7 +442,7 @@ private struct FormFooterView: View {
             Button {
                 buttonClicked()
             } label: {
-                if #available(macOS 11.0, *), viewModel.isLoading {
+                if viewModel.isLoading {
                     ProgressView()
                         .frame(maxWidth: .infinity)
                         .frame(height: 44)
@@ -455,7 +451,6 @@ private struct FormFooterView: View {
                         .frame(maxWidth: .infinity)
                         .frame(height: 44)
                 }
-
             }
             .buttonStyle(CTAButtonStyle(style: .primary))
             .disabled(!viewModel.isProfileValid)
@@ -465,7 +460,6 @@ private struct FormFooterView: View {
 
 // MARK: - Helpers
 
-@available(macOS 11.0, *)
 struct EditViewList<Data, Content: View>: View where Data: RandomAccessCollection, Data.Element: Identifiable {
     let data: Data
     let content: (Data.Element) -> Content
@@ -493,7 +487,6 @@ struct EditViewList<Data, Content: View>: View where Data: RandomAccessCollectio
     }
 }
 
-@available(macOS 11.0, *)
 private struct ComponentsContainerView: View {
     @ObservedObject var viewModel: ProfileViewModel
 
@@ -613,7 +606,6 @@ private struct CTAFooterView: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct ComponentHeaderView: View {
     let title: String
     let subtitle: String
@@ -666,7 +658,6 @@ private enum Consts {
     }
 }
 
-@available(macOS 11.0, *)
 struct CreateProfileView_Previews: PreviewProvider {
     static var previews: some View {
         CreateProfileView(viewModel: ProfileViewModel(dataManager: DataBrokerProtectionDataManager()),

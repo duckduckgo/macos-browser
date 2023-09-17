@@ -20,7 +20,6 @@ import Navigation
 import WebKit
 @testable import DuckDuckGo_Privacy_Browser
 
-@available(macOS 11.3, *)
 final class WKDownloadMock: NSObject, WebKitDownload, ProgressReporting {
     var originalRequest: URLRequest?
     var webView: WKWebView?

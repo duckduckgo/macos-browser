@@ -73,12 +73,7 @@ struct BadgeAnimationView: View {
     }
 
     private var viewWidth: CGFloat {
-        let fontWidth: CGFloat
-        if #available(macOS 11.0, *) {
-            fontWidth = text.width(withFont: NSFont.preferredFont(forTextStyle: .body))
-        } else {
-            fontWidth = text.width(withFont: NSFont.systemFont(ofSize: NSFont.systemFontSize))
-        }
+        let fontWidth = text.width(withFont: NSFont.preferredFont(forTextStyle: .body))
 
         let iconSize: CGFloat = 32
         let margins: CGFloat = 4
@@ -118,14 +113,10 @@ struct ExpandableRectangle: View {
 
 struct BadgeAnimationView_Previews: PreviewProvider {
     static var previews: some View {
-        if #available(macOS 11.0, *) {
-            BadgeAnimationView(animationModel: BadgeNotificationAnimationModel(),
-                               iconView: AnyView(Image(systemName: "globle")),
-                                                 text: "Test")
+        BadgeAnimationView(animationModel: BadgeNotificationAnimationModel(),
+                           iconView: AnyView(Image(systemName: "globe")),
+                           text: "Test")
             .frame(width: 100, height: 30)
-        } else {
-            Text("No Preview")
-        }
     }
 }
 

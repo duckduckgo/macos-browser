@@ -42,7 +42,6 @@ import NetworkProtection
 
 /// Controller for the Network Protection debug menu.
 ///
-@available(macOS 11.4, *)
 @objc
 @MainActor
 final class NetworkProtectionDebugMenu: NSMenu {
@@ -404,7 +403,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
 }
-@available(macOS 11.4, *)
 extension NetworkProtectionDebugMenu: NSMenuDelegate {
 
     func menuNeedsUpdate(_ menu: NSMenu) {

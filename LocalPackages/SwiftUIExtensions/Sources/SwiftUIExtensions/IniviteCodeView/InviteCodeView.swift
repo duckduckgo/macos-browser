@@ -36,7 +36,7 @@ public struct InviteCodeView<ViewModel>: View where ViewModel: InviteCodeViewMod
                 Text(viewModel.messageText)
                     .font(.system(size: 13))
                     .multilineTextAlignment(.center)
-                if viewModel.showProgressView, #available(macOS 11.0, *) {
+                if viewModel.showProgressView {
                     ProgressView()
                 } else {
                     TextField(viewModel.textFieldPlaceholder, text: $viewModel.textFieldText, onCommit: {

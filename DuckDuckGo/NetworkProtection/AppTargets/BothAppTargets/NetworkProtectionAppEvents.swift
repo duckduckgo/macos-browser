@@ -24,7 +24,6 @@ import NetworkProtection
 
 /// Implements the sequence of steps that Network Protection needs to execute when the App starts up.
 ///
-@available(macOS 11.4, *)
 final class NetworkProtectionAppEvents {
 
     private let featureVisibility: NetworkProtectionFeatureVisibility

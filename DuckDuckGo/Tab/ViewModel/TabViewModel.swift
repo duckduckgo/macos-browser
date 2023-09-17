@@ -69,7 +69,6 @@ final class TabViewModel {
     @Published private(set) var addressBarString: String = ""
     @Published private(set) var passiveAddressBarString: String = ""
     var lastAddressBarTextFieldValue: AddressBarTextField.Value?
-    var lastHomePageTextFieldValue: AddressBarTextField.Value?
 
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage?
