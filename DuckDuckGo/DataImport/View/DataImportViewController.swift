@@ -79,36 +79,7 @@ final class DataImportViewController: NSViewController {
     private var viewState: ViewState = .defaultState() {
         didSet {
             renderCurrentViewState()
-
-            let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
-
-            do {
-                switch viewState.selectedImportSource {
-                case .brave:
-                    self.dataImporter = try BraveDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
-                case .chrome:
-                    self.dataImporter = try ChromeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
-                case .edge:
-                    self.dataImporter = try EdgeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
-                case .firefox:
-                    self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(),
-                                                                bookmarkImporter: bookmarkImporter,
-                                                                faviconManager: FaviconManager.shared)
-                case .safari where !(currentChildViewController is FileImportViewController):
-                    self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter, faviconManager: FaviconManager.shared)
-                case .bookmarksHTML:
-                    if !(self.dataImporter is BookmarkHTMLImporter) {
-                        self.dataImporter = nil
-                    }
-                case .csv, .onePassword7, .onePassword8, .lastPass, .safari /* csv only */:
-                    if !(self.dataImporter is CSVImporter) {
-                        self.dataImporter = nil
-                    }
-                }
-            } catch {
-                os_log("dataImporter initialization failed: %{public}s", type: .error, error.localizedDescription)
-                self.presentAlert(for: .generic(.cannotAccessSecureVault))
-            }
+            refreshDataImporter()
         }
     }
 
@@ -173,6 +144,7 @@ final class DataImportViewController: NSViewController {
 
         importSourcePopUpButton.displayImportSources()
         renderCurrentViewState()
+        refreshDataImporter()
 
         selectedImportSourceCancellable = importSourcePopUpButton.selectionPublisher.sink { [weak self] _ in
             self?.refreshViewState()
@@ -220,7 +192,38 @@ final class DataImportViewController: NSViewController {
                 self.viewState = newState
             }
         }
+    }
 
+    func refreshDataImporter() {
+        let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
+
+        do {
+            switch viewState.selectedImportSource {
+            case .brave:
+                self.dataImporter = try BraveDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+            case .chrome:
+                self.dataImporter = try ChromeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+            case .edge:
+                self.dataImporter = try EdgeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+            case .firefox:
+                self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(),
+                                                            bookmarkImporter: bookmarkImporter,
+                                                            faviconManager: FaviconManager.shared)
+            case .safari where !(currentChildViewController is FileImportViewController):
+                self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter, faviconManager: FaviconManager.shared)
+            case .bookmarksHTML:
+                if !(self.dataImporter is BookmarkHTMLImporter) {
+                    self.dataImporter = nil
+                }
+            case .csv, .onePassword7, .onePassword8, .lastPass, .safari /* csv only */:
+                if !(self.dataImporter is CSVImporter) {
+                    self.dataImporter = nil
+                }
+            }
+        } catch {
+            os_log("dataImporter initialization failed: %{public}s", type: .error, error.localizedDescription)
+            self.presentAlert(for: .generic(.cannotAccessSecureVault))
+        }
     }
 
     var loginsSelected: Bool {
