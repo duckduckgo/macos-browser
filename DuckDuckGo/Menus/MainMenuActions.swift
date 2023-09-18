@@ -379,6 +379,10 @@ extension MainViewController {
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
     }
 
+    @IBAction func toggleHomeButton(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .homeButton)
+    }
+
     // MARK: - History
 
     @IBAction func back(_ sender: Any?) {
