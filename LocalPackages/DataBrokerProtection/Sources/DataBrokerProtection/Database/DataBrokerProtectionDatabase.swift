@@ -27,6 +27,7 @@ protocol DataBrokerProtectionRepository {
 
     func brokerProfileQueryData(for brokerId: Int64, and profileQueryId: Int64) -> BrokerProfileQueryData?
     func fetchAllBrokerProfileQueryData(for profileId: Int64) -> [BrokerProfileQueryData]
+    func fetchExtractedProfiles(for brokerId: Int64) -> [ExtractedProfile]
 
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64)
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64)
@@ -159,6 +160,17 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         } catch {
             os_log("Database error: brokerProfileQueryData, error: %{public}@", log: .error, error.localizedDescription)
             return nil
+        }
+    }
+
+    func fetchExtractedProfiles(for brokerId: Int64) -> [ExtractedProfile] {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+
+            return try vault.fetchExtractedProfiles(for: brokerId)
+        } catch {
+            os_log("Database error: fetchExtractedProfiles for scan, error: %{public}@", log: .error, error.localizedDescription)
+            return [ExtractedProfile]()
         }
     }
 
