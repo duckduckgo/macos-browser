@@ -19,7 +19,6 @@
 import AppKit
 import Common
 import Foundation
-import NetworkProtectionUI
 
 #if !NETWORK_PROTECTION
 
