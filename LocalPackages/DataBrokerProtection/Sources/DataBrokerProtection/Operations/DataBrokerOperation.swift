@@ -170,6 +170,16 @@ extension DataBrokerOperation {
         }
     }
 
+    func solveCaptcha(with response: SolveCaptchaResponse) async {
+        do {
+            try await webViewHandler?.evaluateJavaScript(response.callback.eval)
+
+            await executeNextStep()
+        } catch {
+            await onError(error: .solvingCaptchaWithCallbackError)
+        }
+    }
+
     func onError(error: DataBrokerProtectionError) async {
         await webViewHandler?.finish()
         failed(with: error)

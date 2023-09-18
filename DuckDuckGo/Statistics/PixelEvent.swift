@@ -23,7 +23,7 @@ import Configuration
 
 extension Pixel {
 
-    enum Event {
+    indirect enum Event {
         case crash
 
         case brokenSiteReport
@@ -86,7 +86,11 @@ extension Pixel {
                                      result: result)
         }
 
+        case launchInitial(cohort: String)
+
         case serp
+        case serpInitial(cohort: String)
+        case serpDay21to27(cohort: String)
 
         case dataImportFailed(action: DataImportAction, source: DataImportSource)
         case faviconImportFailed(source: DataImportSource)
@@ -123,7 +127,7 @@ extension Pixel {
         case emailEnabledInitial
         case cookieManagementEnabledInitial
         case watchInDuckPlayerInitial
-        case setAsDefaultInitial
+        case setAsDefaultInitial(cohort: String)
         case importDataInitial
 
         // New Tab section removed
@@ -156,6 +160,8 @@ extension Pixel {
         case networkProtectionWaitlistNotificationTapped
         case networkProtectionWaitlistTermsAndConditionsDisplayed
         case networkProtectionWaitlistTermsAndConditionsAccepted
+
+        case dailyPixel(Event, isFirst: Bool)
 
         enum Debug {
 
@@ -426,6 +432,13 @@ extension Pixel.Event {
         case .duckPlayerSettingBackToDefault:
             return "m_mac_duck-player_setting_back-to-default"
 
+        case .launchInitial:
+            return "m.mac.first-launch"
+        case .serpInitial:
+            return "m.mac.navigation.first-search"
+        case .serpDay21to27:
+            return "m.mac.search-day-21-27.initial"
+
         case .networkProtectionWaitlistEntryPointMenuItemDisplayed:
             return "m_mac_netp_imp_settings_entry_menu_item"
         case .networkProtectionWaitlistEntryPointToolbarButtonDisplayed:
@@ -438,9 +451,20 @@ extension Pixel.Event {
             return "m_mac_netp_imp_terms"
         case .networkProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_netp_ev_terms_accepted"
+
+        case .dailyPixel(let pixel, isFirst: let isFirst):
+            return pixel.name + (isFirst ? "_d" : "_c")
         }
 
     }
+}
+
+extension Pixel.Event: Equatable {
+
+    static func == (lhs: Pixel.Event, rhs: Pixel.Event) -> Bool {
+        lhs.name == rhs.name && lhs.parameters == rhs.parameters
+    }
+
 }
 
 extension Pixel.Event.Debug {
