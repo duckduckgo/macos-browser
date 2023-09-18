@@ -33,7 +33,7 @@ struct TimedPixel {
         var newParams = pixel.parameters ?? [:]
         newParams.merge(params, uniquingKeysWith: { $1 })
         newParams[Pixel.Parameters.duration] = duration
-        Pixel.shared?.fire(pixelNamed: pixel.name, withAdditionalParameters: newParams)
+        Pixel.shared?.fire(pixel, withAdditionalParameters: newParams)
     }
 
 }
