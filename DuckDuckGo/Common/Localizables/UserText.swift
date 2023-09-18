@@ -314,7 +314,13 @@ struct UserText {
     static let makeDefaultBrowser = NSLocalizedString("preferences.default-browser.button.make-default", value: "Make DuckDuckGo Default...", comment: "")
     static let onStartup = NSLocalizedString("preferences.on-startup", value: "On Startup", comment: "Name of the preferences section related to app startup")
     static let reopenAllWindowsFromLastSession = NSLocalizedString("preferences.reopen-windows", value: "Reopen all windows from last session", comment: "Option to control session restoration")
-    static let showHomePage = NSLocalizedString("preferences.show-home", value: "Show Home Page", comment: "Option to control session startup (Show home page")
+    static let showHomePage = NSLocalizedString("preferences.show-home", value: "Show Home Page", comment: "Option to control session startup (Show home page)")
+    
+    static let homePage = NSLocalizedString("preferences-homepage", value: "Home Page", comment: "Title for Home page section in settings")
+    static let newTab = NSLocalizedString("preferences-homepage-newTab", value: "New Tab", comment: "Option to control Home page")
+    static let specificPage = NSLocalizedString("preferences-homepage-customPage", value: "Specific Page", comment: "Option to control Specific Home Page")
+    static let setPage = NSLocalizedString("preferences-homepage-set-page", value: "Set Page...", comment: "Option to control the Specific Page")
+    
     static let theme = NSLocalizedString("preferences.appearance.theme", value: "Theme", comment: "Theme preferences")
     static let addressBar = NSLocalizedString("preferences.appearance.address-bar", value: "Address Bar", comment: "Theme preferences")
     static let showFullWebsiteAddress = NSLocalizedString("preferences.appearance.show-full-url", value: "Full website address", comment: "Option to show full URL in the address bar")

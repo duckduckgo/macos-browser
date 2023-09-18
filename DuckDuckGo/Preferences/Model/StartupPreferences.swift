@@ -20,11 +20,23 @@ import Foundation
 
 protocol StartupPreferencesPersistor {
     var restorePreviousSession: Bool { get set }
+    var launchToCustomHomePage: Bool { get set }
+    var customHomePageURL: String { get set }
 }
 
 struct StartupPreferencesUserDefaultsPersistor: StartupPreferencesPersistor {
+
+    static let defaultURL = "https://duckduckgo.com"
+
     @UserDefaultsWrapper(key: .restorePreviousSession, defaultValue: false)
     var restorePreviousSession: Bool
+
+    @UserDefaultsWrapper(key: .launchToCustomHomePage, defaultValue: false)
+    var launchToCustomHomePage: Bool
+
+    @UserDefaultsWrapper(key: .customHomePageURL, defaultValue: Self.defaultURL)
+    var customHomePageURL: String
+
 }
 
 final class StartupPreferences: ObservableObject {
@@ -35,10 +47,38 @@ final class StartupPreferences: ObservableObject {
         }
     }
 
+    @Published var launchToCustomHomePage: Bool {
+        didSet {
+            persistor.launchToCustomHomePage = launchToCustomHomePage
+        }
+    }
+
+    @Published var customHomePageURL: String {
+        didSet {
+            persistor.customHomePageURL = customHomePageURL
+        }
+    }
+
     init(persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
         restorePreviousSession = persistor.restorePreviousSession
+        launchToCustomHomePage = persistor.launchToCustomHomePage
+        customHomePageURL = persistor.customHomePageURL
     }
 
     private var persistor: StartupPreferencesPersistor
+}
+
+extension StartupPreferences {
+    var customHomePageFormatted: String {
+        var formattedURL = customHomePageURL.replacingOccurrences(of: "http://", with: "")
+        formattedURL = formattedURL.replacingOccurrences(of: "https://", with: "")
+
+        if formattedURL.count > 100 {
+            let index = formattedURL.index(formattedURL.startIndex, offsetBy: 97)
+            formattedURL = String(formattedURL[..<index]) + "..."
+        }
+
+        return formattedURL
+    }
 }

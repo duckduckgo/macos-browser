@@ -62,6 +62,27 @@ extension Preferences {
                     .offset(x: Const.pickerHorizontalOffset)
                 }
 
+                // SECTION 3: Home Page
+                PreferencePaneSection {
+                    TextMenuItemHeader(text: UserText.homePage)
+                    Picker(selection: $startupModel.launchToCustomHomePage, label: EmptyView()) {
+                        Text(UserText.newTab).tag(false)
+                        VStack(alignment: .leading) {
+                            HStack(spacing: 15) {
+                                Text(UserText.specificPage)
+                                Button(UserText.setPage) {}
+                                    .disabled(!startupModel.launchToCustomHomePage)
+                            }
+                            TextMenuItemCaption(text: startupModel.customHomePageFormatted)
+                                .padding(.top, 0)
+                                .visibility(!startupModel.launchToCustomHomePage ? .gone : .visible)
+                        }.tag(true)
+                    }
+                    .pickerStyle(.radioGroup)
+                    .offset(x: Const.pickerHorizontalOffset)
+                    .padding(.bottom, 0)
+                }
+
             }
         }
     }
