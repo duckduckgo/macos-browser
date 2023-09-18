@@ -376,7 +376,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     func disableOnDemand(tunnelManager: NETunnelProviderManager) async throws {
         tunnelManager.isOnDemandEnabled = false
 
-        os_log("🔥 app is disabling on demand", log: .networkProtectionConnectionTesterLog)
         try await tunnelManager.saveToPreferences()
     }
 
