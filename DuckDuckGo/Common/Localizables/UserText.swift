@@ -58,7 +58,7 @@ struct UserText {
     static let openInNewTab = NSLocalizedString("open.in.new.tab", value: "Open in New Tab", comment: "Menu item that opens the link in a new tab")
     static let openInNewWindow = NSLocalizedString("open.in.new.window", value: "Open in New Window", comment: "Menu item that opens the link in a new window")
 
-    static let tabHomeTitle = NSLocalizedString("tab.home.title", value: "Home", comment: "Tab home title")
+    static let tabHomeTitle = NSLocalizedString("tab.home.title", value: "New Tab", comment: "Tab home title")
     static let tabPreferencesTitle = NSLocalizedString("tab.preferences.title", value: "Settings", comment: "Tab preferences title")
     static let tabBookmarksTitle = NSLocalizedString("tab.bookmarks.title", value: "Bookmarks", comment: "Tab bookmarks title")
     static let tabOnboardingTitle = NSLocalizedString("tab.onboarding.title", value: "Welcome", comment: "Tab onboarding title")
