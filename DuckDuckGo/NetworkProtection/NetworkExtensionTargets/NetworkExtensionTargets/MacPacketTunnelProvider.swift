@@ -284,15 +284,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
         super.startTunnel(options: options) { [self] error in
             guard error == nil else {
-                // if connection is failing when activated by system on-demand
-                // ask the Main App to disable the on-demand rule to prevent activation loop
-                if !useNewConnectionTesterBehavior && isOnDemand && !self.isKillSwitchEnabled {
-                    Task { [self] in
-                        await self.appLauncher?.launchApp(withCommand: .stopVPN)
-                        completionHandler(error)
-                    }
-                    return
-                }
                 completionHandler(error)
                 return
             }
@@ -304,15 +295,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
         super.stopTunnel(with: reason) {
             Task {
-                if !self.useNewConnectionTesterBehavior,
-                   case .userInitiated = reason {
-
-                    // stop requested by user from System Settings
-                    // we can‘t prevent a respawn with on-demand rule ON
-                    // request the main app to reconfigure with on-demand OFF
-                    os_log("🔥 Cancelling", log: .networkProtectionConnectionTesterLog)
-                    await self.appLauncher?.launchApp(withCommand: .stopVPN)
-                }
                 completionHandler()
 
                 // From what I'm seeing in my tests the next call to start the tunnel is MUCH
@@ -327,13 +309,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     override func cancelTunnelWithError(_ error: Error?) {
         Task {
-            if !self.useNewConnectionTesterBehavior,
-               !isKillSwitchEnabled {
-                os_log("🔥 Cancelling", log: .networkProtectionConnectionTesterLog)
-                // ensure on-demand rule is taken down on connection retry failure
-                await self.appLauncher?.launchApp(withCommand: .stopVPN)
-            }
-
             super.cancelTunnelWithError(error)
             exit(EXIT_SUCCESS)
         }
