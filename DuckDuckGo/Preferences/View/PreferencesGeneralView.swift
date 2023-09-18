@@ -51,10 +51,15 @@ extension Preferences {
                     }
                 }
 
-                // SECTION 2: On Stap
+                // SECTION 2: On Startup
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.onStartup)
-                    ToggleMenuItem(title: UserText.reopenAllWindowsFromLastSession, isOn: $startupModel.restorePreviousSession)
+                    Picker(selection: $startupModel.restorePreviousSession, content: {
+                        Text(UserText.showHomePage).tag(false)
+                        Text(UserText.reopenAllWindowsFromLastSession).tag(true)
+                    }, label: {})
+                    .pickerStyle(.radioGroup)
+                    .offset(x: Const.pickerHorizontalOffset)
                 }
 
             }
