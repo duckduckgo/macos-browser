@@ -450,8 +450,6 @@ final class MainViewController: NSViewController {
         adjustFirstResponder()
     }
 
-    private(set) var isHandlingKeyDownEvent: Bool = false
-
 }
 extension MainViewController: NSDraggingDestination {
 
@@ -492,12 +490,8 @@ extension MainViewController {
     }
 
     func customKeyDown(with event: NSEvent) -> Bool {
-        isHandlingKeyDownEvent = true
-        defer {
-            isHandlingKeyDownEvent = false
-        }
-       guard let locWindow = self.view.window,
-          NSApplication.shared.keyWindow === locWindow else { return false }
+        guard let locWindow = self.view.window,
+              NSApplication.shared.keyWindow === locWindow else { return false }
 
         let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
             .subtracting(.capsLock)

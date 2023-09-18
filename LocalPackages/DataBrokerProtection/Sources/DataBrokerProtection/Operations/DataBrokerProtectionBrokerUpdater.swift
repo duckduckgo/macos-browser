@@ -67,8 +67,6 @@ final class BrokerUpdaterUserDefaults: BrokerUpdaterRepository {
         static let shouldCheckForUpdatesKey = "macos.browser.data-broker-protection.ShouldCheckForNewBrokers"
     }
 
-    private let encoder = PropertyListEncoder()
-    private let decoder = PropertyListDecoder()
     private let userDefaults: UserDefaults
 
     init(userDefaults: UserDefaults = .standard) {
@@ -76,18 +74,13 @@ final class BrokerUpdaterUserDefaults: BrokerUpdaterRepository {
     }
 
     func saveLastRunDate(date: Date) {
-        let encodedDate = try? encoder.encode(Date())
-        UserDefaults.standard.set(encodedDate, forKey: Consts.shouldCheckForUpdatesKey)
+        UserDefaults.standard.set(date, forKey: Consts.shouldCheckForUpdatesKey)
     }
 
     func getLastRunDate() -> Date? {
-        guard let lastRunDateData = UserDefaults.standard.data(forKey: Consts.shouldCheckForUpdatesKey) else { return nil }
+        guard let lastRunDateData = UserDefaults.standard.object(forKey: Consts.shouldCheckForUpdatesKey) as? Date else { return nil }
 
-        if let lastRunDate = try? decoder.decode(Date.self, from: lastRunDateData) {
-            return lastRunDate
-        }
-
-        return nil
+        return lastRunDateData
     }
 }
 
@@ -157,12 +150,8 @@ struct DataBrokerProtectionBrokerUpdater {
     // 3. We create the new scans operations for the profile queries and the new broker id
     private func add(_ broker: DataBroker) throws {
         let brokerId = try vault.save(broker: broker)
-
-        guard let profile = try vault.fetchProfile(with: 1) else {
-            return
-        }
-
-        let profileQueryIDs = profile.profileQueries.compactMap({ $0.id })
+        let profileQueries = try vault.fetchAllProfileQueries(for: 1)
+        let profileQueryIDs = profileQueries.compactMap({ $0.id })
 
         for profileQueryId in profileQueryIDs {
             try vault.save(brokerId: brokerId, profileQueryId: profileQueryId, lastRunDate: nil, preferredRunDate: nil)
