@@ -165,6 +165,10 @@ public struct UserDefaultsWrapper<T> {
         case pixelExperimentEnrollmentDate = "pixel.experiment.enrollment.date"
         case pixelExperimentFiredPixels = "pixel.experiment.pixels.fired"
         case campaignVariant = "campaign.variant"
+
+        // Sync
+
+        case syncEnvironment = "sync.environment"
     }
 
     enum RemovedKeys: String, CaseIterable {

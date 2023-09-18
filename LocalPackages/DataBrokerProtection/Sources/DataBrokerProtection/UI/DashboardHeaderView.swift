@@ -57,7 +57,7 @@ private struct HeaderTitleView: View {
             Image("header-hero", bundle: .module)
                 .padding(.bottom, Constants.heroBottomPadding)
             VStack (spacing: Constants.titleSubtitlePadding) {
-                Text("Data Broker Protection")
+                Text("Personal Information Removal")
                     .font(.title)
                     .bold()
 

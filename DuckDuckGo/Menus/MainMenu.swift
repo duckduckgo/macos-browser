@@ -127,7 +127,7 @@ final class MainMenu: NSMenu {
 #endif
     }
 
-    let sharingMenu = SharingMenu()
+    let sharingMenu = SharingMenu(title: UserText.shareMenuItem)
 
     // MARK: - Lifecycle
 
@@ -139,9 +139,6 @@ final class MainMenu: NSMenu {
         if NSApplication.shared.helpMenu != helpMenuItem?.submenu {
             NSApplication.shared.helpMenu = helpMenuItem?.submenu
         }
-
-        sharingMenu.title = shareMenuItem.title
-        shareMenuItem.submenu = sharingMenu
 
         // To be safe, hide the NetP shortcut menu item by default.
         toggleNetworkProtectionShortcutMenuItem?.isHidden = true
@@ -157,13 +154,12 @@ final class MainMenu: NSMenu {
 
     @MainActor
     func setup(with featureFlagger: FeatureFlagger) {
-        self.delegate = self
-
-#if APPSTORE || DBP
+#if !SPARKLE
         checkForUpdatesMenuItem?.removeFromParent()
         checkForUpdatesSeparatorItem?.removeFromParent()
 #endif
 
+        shareMenuItem.submenu = sharingMenu
         setupHelpMenuItem()
         setupDebugMenuItem(with: featureFlagger)
         subscribeToBookmarkList()
@@ -447,20 +443,5 @@ final class MainMenu: NSMenu {
         } catch {
             NSAlert(error: error).runModal()
         }
-    }
-}
-
-extension MainMenu: NSMenuDelegate {
-
-    func menuHasKeyEquivalent(_ menu: NSMenu,
-                              for event: NSEvent,
-                              target: AutoreleasingUnsafeMutablePointer<AnyObject?>,
-                              action: UnsafeMutablePointer<Selector?>) -> Bool {
-#if DEBUG
-        if NSApp.isRunningUnitTests { return false }
-#endif
-        sharingMenu.update()
-        shareMenuItem.submenu = sharingMenu
-        return false
     }
 }

@@ -210,6 +210,8 @@ extension DataBrokerProtectionError {
             return (title: genericTitle, subtitle: "Missing step")
         case .cancelled:
             return (title: genericTitle, subtitle: "Cancelled")
+        case .solvingCaptchaWithCallbackError:
+            return (title: genericTitle, subtitle: "Solving captcha with callback failed")
         case .captchaServiceError(let captchaError):
             let title = "Solver"
             switch captchaError {

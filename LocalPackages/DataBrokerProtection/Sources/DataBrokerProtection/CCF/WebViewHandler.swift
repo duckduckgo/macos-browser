@@ -28,6 +28,7 @@ protocol WebViewHandler: NSObject {
     func waitForWebViewLoad(timeoutInSeconds: Int) async throws
     func finish() async
     func execute(action: Action, data: CCFRequestData) async
+    func evaluateJavaScript(_ javaScript: String) async throws
 }
 
 @MainActor
@@ -107,6 +108,10 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
             webView: self.webView!,
             params: Params(state: ActionRequest(action: action, data: data))
         )
+    }
+
+    func evaluateJavaScript(_ javaScript: String) async throws {
+        _ = webView?.evaluateJavaScript(javaScript, in: nil, in: WKContentWorld.page)
     }
 }
 
