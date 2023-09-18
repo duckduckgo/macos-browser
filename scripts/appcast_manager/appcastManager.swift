@@ -2,6 +2,7 @@
 
 // swiftlint:disable line_length
 // swiftlint:disable file_header
+// swiftlint:disable function_body_length
 
 import Foundation
 
@@ -547,3 +548,4 @@ func verifyAppcastContainsBuild(_ buildVersion: String, in filePath: URL) -> Boo
 }
 
 // swiftlint:enable line_length
+// swiftlint:enable function_body_length
