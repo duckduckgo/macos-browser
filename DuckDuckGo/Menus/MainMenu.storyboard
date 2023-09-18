@@ -839,6 +839,26 @@ CQ
                                                 </items>
                                             </menu>
                                         </menuItem>
+                                        <menuItem title="Sync" id="8rI-iH-wNC">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="Sync" id="Kw4-67-mit" customClass="SyncDebugMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                                <items>
+                                                    <menuItem title="Environment" id="qD7-Gw-s2h">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Environment" id="lRd-Ih-n5j">
+                                                            <items>
+                                                                <menuItem title="Item" id="amC-1R-0QS">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                </menuItem>
+                                                            </items>
+                                                        </menu>
+                                                    </menuItem>
+                                                </items>
+                                                <connections>
+                                                    <outlet property="environmentMenu" destination="lRd-Ih-n5j" id="xxg-yh-bfI"/>
+                                                </connections>
+                                            </menu>
+                                        </menuItem>
                                         <menuItem title="Network Protection" id="Dt6-sj-4hn">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Network Protection" id="Rah-lS-gno" customClass="NetworkProtectionDebugMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">

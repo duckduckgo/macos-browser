@@ -40,7 +40,9 @@ final class WebView: WKWebView {
         stopLoading()
         stopMediaCapture()
         stopAllMediaPlayback()
-        fullscreenWindowController?.close()
+        if isInFullScreenMode {
+            fullscreenWindowController?.window?.toggleFullScreen(self)
+        }
         if isInspectorShown {
             closeDeveloperTools()
         }

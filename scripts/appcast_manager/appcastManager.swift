@@ -479,8 +479,8 @@ func runGenerateAppcast(withVersions versions: String, channel: String? = nil, r
         commandComponents.append("--phased-rollout-interval \(rolloutInterval)")
     }
 
-    commandComponents.append("--embed-release-notes")
-    commandComponents.append("--auto-prune-update-files \(specificDir.path)")
+    commandComponents.append("--embed-release-notes ")
+    commandComponents.append("\(specificDir.path)")
 
     let command = commandComponents.joined(separator: " ")
 

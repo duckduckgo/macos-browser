@@ -21,6 +21,8 @@ import Combine
 import Sparkle
 import BrowserServicesKit
 
+#if SPARKLE
+
 final class UpdateController: NSObject {
 
     enum Constants {
@@ -124,3 +126,5 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
 }
+
+#endif
