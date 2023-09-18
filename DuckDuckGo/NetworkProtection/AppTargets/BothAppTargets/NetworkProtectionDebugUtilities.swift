@@ -41,9 +41,6 @@ final class NetworkProtectionDebugUtilities {
         }
     }
 
-    @UserDefaultsWrapper(key: .networkProtectionConnectionTesterUseNewBehavior, defaultValue: NetworkProtectionUserDefaultsConstants.useNewConnectionTesterBehavior, defaults: .shared)
-    private var useNewConnectionTesterBehavior: Bool
-
     private let networkProtectionFeatureDisabler = NetworkProtectionFeatureDisabler()
 
     // MARK: - Login Items Management
@@ -116,30 +113,6 @@ final class NetworkProtectionDebugUtilities {
             }
 
             try? activeSession.sendProviderMessage(.setSelectedServer(selectedServer.stringValue))
-        }
-    }
-
-    // MARK: - Connection Tester
-
-    func resetConnectionTesterDebugOptionsToDefault() {
-        useNewTesterBehavior = NetworkProtectionUserDefaultsConstants.useNewConnectionTesterBehavior
-    }
-
-    var useNewTesterBehavior: Bool {
-        get {
-            useNewConnectionTesterBehavior
-        }
-
-        set {
-            useNewConnectionTesterBehavior = newValue
-
-            Task {
-                guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
-                    return
-                }
-
-                try? activeSession.sendProviderMessage(.request(.setUseNewTesterBehavior(newValue)))
-            }
         }
     }
 }

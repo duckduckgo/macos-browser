@@ -47,16 +47,6 @@ import NetworkProtection
 @MainActor
 final class NetworkProtectionDebugMenu: NSMenu {
 
-    override func awakeFromNib() {
-        //super.init(title: title)
-
-        let model = NetworkProtectionConnectionTesterMenuModel()
-        let connectionTesterMenuItem = NSMenuItem(title: "Connection Tester")
-        connectionTesterMenuItem.submenu = ConnectionTesterMenu(title: "Connection Tester", model: model)
-
-        self.items.append(connectionTesterMenuItem)
-    }
-
     // MARK: - Outlets: Menus
 
     @IBOutlet weak var preferredServerMenu: NSMenu? {
