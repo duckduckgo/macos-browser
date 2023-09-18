@@ -186,7 +186,11 @@ final public class DataBrokerProtectionViewController: NSViewController {
         webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1024, height: 768), configuration: configuration)
         view = webView!
 
+        // FOR LOCAL WEB UI DEVELOPMENT:
+        // Comment this line 👇
         webView?.loadHTMLString(debugPage, baseURL: nil)
+        // Uncomment this line and add your dev URL 👇
+//        webView?.load(URL(string: "https://<your url>")!)
 
         let button = NSButton(title: "Set State", target: self, action: #selector(reloadData))
         button.setButtonType(.momentaryLight)
