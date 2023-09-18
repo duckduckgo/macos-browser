@@ -19,27 +19,33 @@
 
 // https://github.com/WebKit/WebKit/blob/8afe31a018b11741abdf9b4d5bb973d7c1d9ff05/Source/WebKit/UIProcess/API/C/WKGeolocationManager.h
 
-typedef void (*WKGeolocationProviderStartUpdatingCallback)(const void * geolocationManager, const void* clientInfo);
-typedef void (*WKGeolocationProviderStopUpdatingCallback)(const void * geolocationManager, const void* clientInfo);
-typedef void (*WKGeolocationProviderSetEnableHighAccuracyCallback)(const void * geolocationManager, bool enabled, const void* clientInfo);
+#include <WebKit/WKBase.h>
+
+// Provider.
+typedef void (*WKGeolocationProviderStartUpdatingCallback)(WKGeolocationManagerRef geolocationManager, const void* clientInfo);
+typedef void (*WKGeolocationProviderStopUpdatingCallback)(WKGeolocationManagerRef geolocationManager, const void* clientInfo);
+typedef void (*WKGeolocationProviderSetEnableHighAccuracyCallback)(WKGeolocationManagerRef geolocationManager, bool enabled, const void* clientInfo);
 
 typedef struct WKGeolocationProviderBase {
-    int version;
-    const void * clientInfo;
+    int                                                                 version;
+    const void *                                                        clientInfo;
 } WKGeolocationProviderBase;
 
 typedef struct WKGeolocationProviderV0 {
-    WKGeolocationProviderBase base;
+    WKGeolocationProviderBase                                           base;
 
-    WKGeolocationProviderStartUpdatingCallback startUpdating;
-    WKGeolocationProviderStopUpdatingCallback stopUpdating;
+    // Version 0.
+    WKGeolocationProviderStartUpdatingCallback                          startUpdating;
+    WKGeolocationProviderStopUpdatingCallback                           stopUpdating;
 } WKGeolocationProviderV0;
 
 typedef struct WKGeolocationProviderV1 {
-    WKGeolocationProviderBase base;
+    WKGeolocationProviderBase                                           base;
 
-    WKGeolocationProviderStartUpdatingCallback startUpdating;
-    WKGeolocationProviderStopUpdatingCallback stopUpdating;
+    // Version 0.
+    WKGeolocationProviderStartUpdatingCallback                          startUpdating;
+    WKGeolocationProviderStopUpdatingCallback                           stopUpdating;
 
-    WKGeolocationProviderSetEnableHighAccuracyCallback setEnableHighAccuracy;
+    // Version 1.
+    WKGeolocationProviderSetEnableHighAccuracyCallback                  setEnableHighAccuracy;
 } WKGeolocationProviderV1;

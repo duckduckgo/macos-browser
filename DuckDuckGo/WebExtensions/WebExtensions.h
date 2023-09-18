@@ -12,8 +12,9 @@
 #import <WebKit/_WKWebExtensionPermission.h>
 #import <WebKit/_WKWebExtensionPrivate.h>
 #import <WebKit/_WKWebExtensionTab.h>
-#import <WebKit/_WKWebExtensionUtilities.h>
+#import <WebKit/_WKWebExtensionTabCreationOptions.h>
 #import <WebKit/_WKWebExtensionWebNavigationURLFilter.h>
 #import <WebKit/_WKWebExtensionWindow.h>
+#import <WebKit/_WKWebExtensionWindowCreationOptions.h>
 
 #import "WKWebViewConfiguration+Private.h"

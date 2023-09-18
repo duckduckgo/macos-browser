@@ -52,6 +52,10 @@ typedef NS_OPTIONS(NSUInteger, _WKFindOptions) {
     _WKFindOptionsShowHighlight = 1 << 7,
     _WKFindOptionsNoIndexChange = 1 << 8,
     _WKFindOptionsDetermineMatchIndex = 1 << 9,
+
+    _WKFindOptionsIrrelevantForIncrementalResults = _WKFindOptionsShowOverlay | _WKFindOptionsShowFindIndicator | _WKFindOptionsShowHighlight | _WKFindOptionsDetermineMatchIndex,
+    _WKFindOptionsIrrelevantForBatchResults = _WKFindOptionsBackwards | _WKFindOptionsWrapAround | _WKFindOptionsIrrelevantForIncrementalResults
+
 } API_AVAILABLE(macos(10.10));
 
 @interface WKWebView (Private)

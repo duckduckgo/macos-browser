@@ -173,19 +173,23 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
     // https://github.com/WebKit/WebKit/blob/995f6b1595611c934e742a4f3a9af2e678bc6b8d/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegate.h#L147
     @objc(webView:requestMediaCapturePermissionForOrigin:initiatedByFrame:type:decisionHandler:)
-    @available(macOS 12, *)
+    @available(macOS 11.4, *)
     func webView(_ webView: WKWebView,
                  requestMediaCapturePermissionFor origin: WKSecurityOrigin,
                  initiatedByFrame frame: WKFrameInfo,
                  type: WKMediaCaptureType,
                  decisionHandler: @escaping (WKPermissionDecision) -> Void) {
-        guard let permissions = [PermissionType](devices: type) else {
-            assertionFailure("Could not decode PermissionType")
-            decisionHandler(.deny)
-            return
-        }
+        if #available(macOS 12, *) {
+            guard let permissions = [PermissionType](devices: type) else {
+                assertionFailure("Could not decode PermissionType")
+                decisionHandler(.deny)
+                return
+            }
 
-        self.permissions.permissions(permissions, requestedForDomain: origin.host, decisionHandler: decisionHandler)
+            self.permissions.permissions(permissions, requestedForDomain: origin.host, decisionHandler: decisionHandler)
+        } else {
+            decisionHandler(.deny)
+        }
     }
 
     // https://github.com/WebKit/WebKit/blob/9d7278159234e0bfa3d27909a19e695928f3b31e/Source/WebKit/UIProcess/API/Cocoa/WKUIDelegatePrivate.h#L126

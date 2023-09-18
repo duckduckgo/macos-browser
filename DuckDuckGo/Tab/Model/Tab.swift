@@ -283,7 +283,7 @@ protocol NewWindowPolicyDecisionMaker {
                   webViewSize: webViewSize)
     }
 
-#if WEBKIT_EXTENSIONS
+//#if WEBKIT_EXTENSIONS
     @available(macOS 13.1, *)
     private var extensionController: _WKWebExtensionController {
         // swiftlint:disable:next force_cast
@@ -310,7 +310,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         try controller.loadExtensionContext(context)
     }
-#endif
+//#endif
 
     @MainActor
     // swiftlint:disable:next function_body_length
@@ -356,14 +356,14 @@ protocol NewWindowPolicyDecisionMaker {
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
 
-#if WEBKIT_EXTENSIONS
+//#if WEBKIT_EXTENSIONS
         var extensionController: Any?
         // This must be done before initializing WKWebView with the configuration
         if #available(macOS 13.1, *) {
             extensionController = Self.setUpWebExtensionController(for: configuration)
             _extensionController = extensionController
         }
-#endif
+//#endif
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking, burnerMode: burnerMode)
         self.webViewConfiguration = configuration
         let userContentController = configuration.userContentController as? UserContentController
@@ -375,12 +375,12 @@ protocol NewWindowPolicyDecisionMaker {
         permissions = PermissionModel(permissionManager: permissionManager,
                                       geolocationService: geolocationService)
 
-#if WEBKIT_EXTENSIONS
+//#if WEBKIT_EXTENSIONS
         if #available(macOS 13.1, *) {
             // swiftlint:disable:next force_try force_cast
             try! Self.loadWebExtension(for: extensionController as! _WKWebExtensionController)
         }
-#endif
+//#endif
 
         let userContentControllerPromise = Future<UserContentController, Never>.promise()
         let userScriptsPublisher = userContentControllerPromise.future
