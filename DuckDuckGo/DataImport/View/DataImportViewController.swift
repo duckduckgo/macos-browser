@@ -26,12 +26,12 @@ final class DataImportViewController: NSViewController {
     @UserDefaultsWrapper(key: .homePageContinueSetUpImport, defaultValue: nil)
     var successfulImportHappened: Bool?
 
-    enum Constants {
+    private enum Constants {
         static let storyboardName = "DataImport"
         static let identifier = "DataImportViewController"
     }
 
-    enum InteractionState: Equatable {
+    private enum InteractionState: Equatable {
         case unableToImport
         case permissionsRequired([DataImport.DataType])
         case ableToImport
@@ -66,7 +66,7 @@ final class DataImportViewController: NSViewController {
         }
     }
 
-    static func create() -> DataImportViewController {
+    private static func create() -> DataImportViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
         return storyboard.instantiateController(identifier: Constants.identifier)
     }
@@ -194,7 +194,7 @@ final class DataImportViewController: NSViewController {
         }
     }
 
-    func refreshDataImporter() {
+    private func refreshDataImporter() {
         let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
 
         do {
@@ -226,7 +226,7 @@ final class DataImportViewController: NSViewController {
         }
     }
 
-    var loginsSelected: Bool {
+    private var loginsSelected: Bool {
         if let browserViewController = self.currentChildViewController as? BrowserImportViewController {
             return browserViewController.selectedImportOptions.contains(.logins)
         }
@@ -376,11 +376,11 @@ final class DataImportViewController: NSViewController {
         cancelButton.title = UserText.navigateBack
     }
 
-    var selectedProfile: DataImport.BrowserProfile? {
+    private var selectedProfile: DataImport.BrowserProfile? {
         return browserImportViewController?.selectedProfile
     }
 
-    var selectedImportOptions: [DataImport.DataType] {
+    private var selectedImportOptions: [DataImport.DataType] {
         guard let importer = self.dataImporter else {
             assertionFailure("\(#file): No data importer or profile found")
             return []
