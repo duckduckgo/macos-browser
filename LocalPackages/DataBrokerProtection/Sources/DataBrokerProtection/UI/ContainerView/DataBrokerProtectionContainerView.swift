@@ -18,7 +18,6 @@
 
 import SwiftUI
 
-@available(macOS 11.0, *)
 struct DataBrokerProtectionContainerView: View {
     @ObservedObject var containerViewModel: ContainerViewModel
     @ObservedObject var navigationViewModel: ContainerNavigationViewModel
@@ -57,6 +56,9 @@ struct DataBrokerProtectionContainerView: View {
                             scanButtonClicked: {
                                 navigationViewModel.updateNavigation(.scanStarted)
                                 containerViewModel.scanAfterProfileCreation { scanResult in
+                                    if navigationViewModel.bodyViewType != .scanStarted {
+                                        return
+                                    }
                                     switch scanResult {
                                     case .noResults:
                                         navigationViewModel.updateNavigation(.noResults)
@@ -67,6 +69,7 @@ struct DataBrokerProtectionContainerView: View {
                                     }
                                 }
                             }, backToDashboardClicked: {
+                                containerViewModel.runQueuedOperationsAndStartScheduler()
                                 navigationViewModel.updateNavigation(.results)
                             })
                         .frame(width: 670)
@@ -131,10 +134,10 @@ struct DataBrokerProtectionContainerView: View {
                 DashboardHeaderView(resultsViewModel: resultsViewModel,
                                     displayProfileButton: navigationViewModel.bodyViewType != .gettingStarted,
                                     faqButtonClicked: {
-                    print("FAQ")
                     shouldShowDebugUI.toggle()
                 },
                                     editProfileClicked: {
+                    containerViewModel.stopAllOperations()
                     navigationViewModel.updateNavigation(.createProfile)
                 })
                 .frame(height: 300)
@@ -154,7 +157,6 @@ struct DataBrokerProtectionContainerView: View {
     }
 }
 
-@available(macOS 11.0, *)
 struct DataBrokerProtectionContainerView_Previews: PreviewProvider {
     static var previews: some View {
         let dataManager = PreviewDataManager()

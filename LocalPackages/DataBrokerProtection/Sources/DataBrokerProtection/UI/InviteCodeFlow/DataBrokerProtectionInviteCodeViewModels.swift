@@ -30,7 +30,7 @@ final class DataBrokerProtectionInviteCodeViewModel: InviteCodeViewModel {
     private weak var delegate: DataBrokerProtectionInviteCodeViewModelDelegate?
 
     var titleText: String {
-        "Data Broker Protection"
+        "Personal Information Removal"
     }
 
     var messageText: String {
@@ -99,7 +99,7 @@ final class DataBrokerProtectionInviteCodeSuccessViewModel: InviteCodeSuccessVie
     private weak var delegate: DataBrokerProtectionInviteCodeSuccessViewModelDelegate?
 
     var titleText: String {
-        "Data Broker Protection"
+        "Personal Information Removal"
     }
 
     var messageText: String {

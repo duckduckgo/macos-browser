@@ -24,7 +24,6 @@ import NetworkProtection
 
 /// Implements the sequence of steps that Network Protection needs to execute when the App starts up.
 ///
-@available(macOS 11.4, *)
 final class NetworkProtectionAppEvents {
 
     private let featureVisibility: NetworkProtectionFeatureVisibility
@@ -38,7 +37,7 @@ final class NetworkProtectionAppEvents {
     func applicationDidFinishLaunching() {
         migrateNetworkProtectionAuthTokenToSharedKeychainIfNecessary()
 
-        let loginItemsManager = NetworkProtectionLoginItemsManager()
+        let loginItemsManager = LoginItemsManager()
         let keychainStore = NetworkProtectionKeychainTokenStore()
 
         guard featureVisibility.isNetworkProtectionVisible() else {
@@ -93,7 +92,7 @@ final class NetworkProtectionAppEvents {
         }
     }
 
-    private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: NetworkProtectionLoginItemsManager) {
+    private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: LoginItemsManager) {
         let currentVersion = AppVersion.shared.versionNumber
         let versionStore = NetworkProtectionLastVersionRunStore()
         defer {
@@ -111,12 +110,12 @@ final class NetworkProtectionAppEvents {
             restartNetworkProtectionTunnelAndMenu(using: loginItemsManager)
         } else {
             // If login items failed to launch (e.g. because of the App bundle rename), launch using NSWorkspace
-            loginItemsManager.ensureLoginItemsAreRunning(.ifLoginItemsAreEnabled, after: 1)
+            loginItemsManager.ensureLoginItemsAreRunning(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection, condition: .ifLoginItemsAreEnabled, after: 1)
         }
     }
 
-    private func restartNetworkProtectionTunnelAndMenu(using loginItemsManager: NetworkProtectionLoginItemsManager) {
-        loginItemsManager.restartLoginItems()
+    private func restartNetworkProtectionTunnelAndMenu(using loginItemsManager: LoginItemsManager) {
+        loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
 
         Task {
             let provider = NetworkProtectionTunnelController()

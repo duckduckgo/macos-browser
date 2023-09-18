@@ -53,6 +53,7 @@ final class MoreOptionsMenu: NSMenu {
     private let emailManager: EmailManager
     private let passwordManagerCoordinator: PasswordManagerCoordinating
     private let internalUserDecider: InternalUserDecider
+    private lazy var sharingMenu = SharingMenu(title: UserText.shareMenuItem)
 
 #if NETWORK_PROTECTION
     private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
@@ -317,7 +318,7 @@ final class MoreOptionsMenu: NSMenu {
         addItem(withTitle: UserText.shareMenuItem, action: nil, keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "Share"))
-            .withSubmenu(SharingMenu())
+            .withSubmenu(sharingMenu)
 
         addItem(withTitle: UserText.printMenuItem, action: #selector(doPrint(_:)), keyEquivalent: "")
             .targetting(self)

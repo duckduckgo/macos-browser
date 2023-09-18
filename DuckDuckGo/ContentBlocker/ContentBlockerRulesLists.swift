@@ -77,12 +77,10 @@ final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
         // Add new ones
         let etag = MD5(data: Self.fbTrackerDataFile)
         let dataSet: TrackerDataManager.DataSet = TrackerDataManager.DataSet(Self.fbTrackerDataSet, etag)
-        if #available(OSX 11, *) {  // disable CTL for Catalina and earlier
-            let CTLRulesList = ContentBlockerRulesList(name: Constants.clickToLoadRulesListName,
-                                                              trackerData: nil,
-                                                              fallbackTrackerData: dataSet)
+        let CTLRulesList = ContentBlockerRulesList(name: Constants.clickToLoadRulesListName,
+                                                   trackerData: nil,
+                                                   fallbackTrackerData: dataSet)
             result.append(CTLRulesList)
-        }
 
         return result
     }

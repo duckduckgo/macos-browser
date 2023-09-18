@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Combine
 import Common
@@ -1040,7 +1041,7 @@ extension URL {
     var isLocalURL: Bool {
         if let host = self.host {
             for regex in Self.compiledRegexes
-            where regex.firstMatch(in: host, options: [], range: NSRange(location: 0, length: host.utf16.count)) != nil {
+            where regex.firstMatch(in: host, options: [], range: host.fullRange) != nil {
                 return true
             }
         }
