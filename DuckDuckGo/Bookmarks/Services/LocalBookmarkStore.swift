@@ -373,7 +373,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
 
                 let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesDisplayMode, in: context)
-                bookmarkMO.update(with: bookmark, favoritesFolders: favoritesFolders, favoritesDisplayMode: favoritesDisplayMode)
+                bookmarkMO.update(with: bookmark, favoritesFoldersToAddFavorite: favoritesFolders, favoritesDisplayMode: favoritesDisplayMode)
             })
 
         } catch {
@@ -462,7 +462,7 @@ final class LocalBookmarkStore: BookmarkStore {
             bookmarkManagedObjects.forEach { managedObject in
                 if let entity = BaseBookmarkEntity.from(managedObject: managedObject, parentFolderUUID: nil, favoritesDisplayMode: self.favoritesDisplayMode) {
                     update(entity)
-                    managedObject.update(with: entity, favoritesFolders: favoritesFolders, favoritesDisplayMode: self.favoritesDisplayMode)
+                    managedObject.update(with: entity, favoritesFoldersToAddFavorite: favoritesFolders, favoritesDisplayMode: self.favoritesDisplayMode)
                 }
             }
         }, onError: { [weak self] error in
@@ -660,7 +660,7 @@ final class LocalBookmarkStore: BookmarkStore {
                         adjustedInsertionIndex -= 1
                     }
 
-                    bookmarkManagedObject.removeFromFavorites(for: favoritesDisplayMode)
+                    bookmarkManagedObject.removeFromFavorites(with: favoritesDisplayMode)
                     if adjustedInsertionIndex < (displayedFavoritesFolder.favorites?.count ?? 0) {
                         bookmarkManagedObject.addToFavorites(insertAt: adjustedInsertionIndex,
                                                              favoritesRoot: displayedFavoritesFolder)
@@ -673,7 +673,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
             } else {
                 for bookmarkManagedObject in bookmarkManagedObjects {
-                    bookmarkManagedObject.removeFromFavorites(for: favoritesDisplayMode)
+                    bookmarkManagedObject.removeFromFavorites(with: favoritesDisplayMode)
                     bookmarkManagedObject.addToFavorites(folders: favoritesFolders)
                 }
             }
@@ -987,9 +987,9 @@ fileprivate extension BookmarkEntity {
         return false
     }
 
-    func update(with baseEntity: BaseBookmarkEntity, favoritesFolders: [BookmarkEntity], favoritesDisplayMode: FavoritesDisplayMode) {
+    func update(with baseEntity: BaseBookmarkEntity, favoritesFoldersToAddFavorite: [BookmarkEntity], favoritesDisplayMode: FavoritesDisplayMode) {
         if let bookmark = baseEntity as? Bookmark {
-            update(with: bookmark, favoritesFolders: favoritesFolders, favoritesDisplayMode: favoritesDisplayMode)
+            update(with: bookmark, favoritesFoldersToAddFavorite: favoritesFoldersToAddFavorite, favoritesDisplayMode: favoritesDisplayMode)
         } else if let folder = baseEntity as? BookmarkFolder {
             update(with: folder)
         } else {
@@ -997,13 +997,13 @@ fileprivate extension BookmarkEntity {
         }
     }
 
-    func update(with bookmark: Bookmark, favoritesFolders: [BookmarkEntity], favoritesDisplayMode: FavoritesDisplayMode) {
+    func update(with bookmark: Bookmark, favoritesFoldersToAddFavorite: [BookmarkEntity], favoritesDisplayMode: FavoritesDisplayMode) {
         url = bookmark.url
         title = bookmark.title
         if bookmark.isFavorite {
-            addToFavorites(folders: favoritesFolders)
+            addToFavorites(folders: favoritesFoldersToAddFavorite)
         } else {
-            removeFromFavorites(for: favoritesDisplayMode)
+            removeFromFavorites(with: favoritesDisplayMode)
         }
     }
 

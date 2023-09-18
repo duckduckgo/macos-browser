@@ -490,7 +490,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         }
 
         XCTAssertEqual(topLevelEntities.count, 2)
-        XCTAssertFalse(topLevelEntities.map(\.id).contains(BookmarkEntity.Constants.favoritesFolderID))
+        XCTAssertFalse(topLevelEntities.map(\.id).contains(FavoritesFolderID.all.rawValue))
     }
 
     func testWhenBookmarkIsMarkedAsFavorite_ThenItDoesNotChangeParentFolder() async {

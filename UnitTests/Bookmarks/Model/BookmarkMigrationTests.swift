@@ -169,7 +169,7 @@ class BookmarksMigrationTests: XCTestCase {
         LegacyBookmarksStoreMigration.setupAndMigrate(from: sourceStack.viewContext, to: context)
 
         XCTAssertNotNil(BookmarkUtils.fetchRootFolder(context))
-        XCTAssertNotNil(BookmarkUtils.fetchFavoritesFolder(context))
+        XCTAssertNotNil(BookmarkUtils.fetchFavoritesFolder(withUUID: FavoritesFolderID.all.rawValue, in: context))
 
         // Simulate subsequent app instantiations
         LegacyBookmarksStoreMigration.setupAndMigrate(from: sourceStack.viewContext, to: context)
@@ -179,7 +179,7 @@ class BookmarksMigrationTests: XCTestCase {
         countRequest.predicate = NSPredicate(value: true)
 
         let count = try context.count(for: countRequest)
-        XCTAssertEqual(count, 2)
+        XCTAssertEqual(count, FavoritesFolderID.allCases.count + 1)
     }
 
     func testWhenRegularMigrationIsNeededThenItIsDone() {
@@ -189,7 +189,7 @@ class BookmarksMigrationTests: XCTestCase {
         let context = destinationStack.makeContext(concurrencyType: .mainQueueConcurrencyType)
         LegacyBookmarksStoreMigration.setupAndMigrate(from: sourceStack.viewContext, to: context)
 
-        let favoritesRoot = BookmarkUtils.fetchFavoritesFolder(context)
+        let favoritesRoot = BookmarkUtils.fetchFavoritesFolder(withUUID: FavoritesFolderID.all.rawValue, in: context)
         XCTAssertNotNil(BookmarkUtils.fetchRootFolder(context))
         XCTAssertNotNil(favoritesRoot)
 
@@ -200,6 +200,7 @@ class BookmarksMigrationTests: XCTestCase {
         XCTAssertEqual(favorites[2].title, "Three")
 
         let topLevel = BookmarkListViewModel(bookmarksDatabase: destinationStack,
+                                             favoritesDisplayMode: .displayAll(native: .desktop),
                                              parentID: nil,
                                              errorEvents: .init(mapping: { event, _, _, _ in
             XCTFail("Unexpected error: \(event)")
@@ -213,7 +214,7 @@ class BookmarksMigrationTests: XCTestCase {
 
         let bookOne = topLevel.bookmarks[0]
         XCTAssertEqual(bookOne.isFolder, false)
-        XCTAssertEqual(bookOne.isFavorite, false)
+        XCTAssertEqual(bookOne.isFavorite(on: .all), false)
         XCTAssertEqual(bookOne.title, "One")
 
         let folderA = topLevel.bookmarks[1]
@@ -222,14 +223,14 @@ class BookmarksMigrationTests: XCTestCase {
 
         let favFour = topLevel.bookmarks[2]
         XCTAssertEqual(favFour.isFolder, false)
-        XCTAssertEqual(favFour.isFavorite, true)
+        XCTAssertEqual(favFour.isFavorite(on: .all), true)
         XCTAssertEqual(favFour.title, "Four")
         XCTAssertEqual(favFour.url, url(for: "four").absoluteString)
 
         let folderAContents = folderA.childrenArray
 
         XCTAssertEqual(folderAContents[1].isFolder, false)
-        XCTAssertEqual(folderAContents[1].isFavorite, true)
+        XCTAssertEqual(folderAContents[1].isFavorite(on: .all), true)
         XCTAssertEqual(folderAContents[1].title, "Two")
 
         let folderB = folderAContents[0]
@@ -239,7 +240,7 @@ class BookmarksMigrationTests: XCTestCase {
         let folderBContents = folderB.childrenArray
         XCTAssertEqual(folderBContents.count, 1)
         XCTAssertEqual(folderBContents[0].isFolder, false)
-        XCTAssertEqual(folderBContents[0].isFavorite, true)
+        XCTAssertEqual(folderBContents[0].isFavorite(on: .all), true)
         XCTAssertEqual(folderBContents[0].title, "Three")
     }
 
