@@ -154,7 +154,7 @@ final class MainMenu: NSMenu {
 
     @MainActor
     func setup(with featureFlagger: FeatureFlagger) {
-#if APPSTORE || DBP
+#if !SPARKLE
         checkForUpdatesMenuItem?.removeFromParent()
         checkForUpdatesSeparatorItem?.removeFromParent()
 #endif
