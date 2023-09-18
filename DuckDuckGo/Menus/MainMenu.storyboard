@@ -400,7 +400,7 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="Ucx-oU-4kc"/>
-                                        <menuItem title="Show Home Button" keyEquivalent="Y" id="RnQ-KJ-UFS">
+                                        <menuItem title="Show Home Shortcut" keyEquivalent="Y" id="RnQ-KJ-UFS">
                                             <connections>
                                                 <action selector="toggleHomeButton:" target="Ady-hI-5gd" id="y6x-ir-qWg"/>
                                             </connections>
