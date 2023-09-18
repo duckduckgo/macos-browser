@@ -132,7 +132,7 @@ final class BrowserTabViewController: NSViewController {
     @objc
     private func onDuckDuckGoEmailIncontextSignup(_ notification: Notification) {
         self.previouslySelectedTab = tabCollectionViewModel.selectedTab
-        let tab = Tab(content: .url(EmailUrls().emailProtectionInContextSignupLink), shouldLoadInBackground: true)
+        let tab = Tab(content: .url(EmailUrls().emailProtectionInContextSignupLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab)
     }
 
