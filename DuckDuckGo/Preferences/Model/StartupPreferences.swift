@@ -67,6 +67,20 @@ final class StartupPreferences: ObservableObject {
     }
 
     private var persistor: StartupPreferencesPersistor
+
+    @MainActor
+    func presentHomePageDialog() {
+        let fireproofDomainsWindowController = FireproofDomainsViewController.create().wrappedInWindowController()
+
+        guard let fireproofDomainsWindow = fireproofDomainsWindowController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        else {
+            assertionFailure("Privacy Preferences: Failed to present FireproofDomainsViewController")
+            return
+        }
+        parentWindowController.window?.beginSheet(fireproofDomainsWindow)
+    }
+
 }
 
 extension StartupPreferences {

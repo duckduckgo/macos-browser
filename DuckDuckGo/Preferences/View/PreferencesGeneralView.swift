@@ -26,6 +26,7 @@ extension Preferences {
     struct GeneralView: View {
         @ObservedObject var defaultBrowserModel: DefaultBrowserPreferences
         @ObservedObject var startupModel: StartupPreferences
+        @State private var showingCustomHomePageSheet = false
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
@@ -70,8 +71,9 @@ extension Preferences {
                         VStack(alignment: .leading) {
                             HStack(spacing: 15) {
                                 Text(UserText.specificPage)
-                                Button(UserText.setPage) {}
-                                    .disabled(!startupModel.launchToCustomHomePage)
+                                Button(UserText.setPage) {
+                                    showingCustomHomePageSheet.toggle()
+                                }.disabled(!startupModel.launchToCustomHomePage)
                             }
                             TextMenuItemCaption(text: startupModel.customHomePageFormatted)
                                 .padding(.top, 0)
@@ -81,9 +83,42 @@ extension Preferences {
                     .pickerStyle(.radioGroup)
                     .offset(x: Const.pickerHorizontalOffset)
                     .padding(.bottom, 0)
+                }.sheet(isPresented: $showingCustomHomePageSheet) {
+                    CustomHomePageSheet(startupModel: startupModel)
                 }
 
             }
         }
+    }
+}
+
+struct CustomHomePageSheet: View {
+
+    @ObservedObject var startupModel: StartupPreferences
+
+    var body: some View {
+        VStack(alignment: .center) {
+            Text("Set Homepage")
+                .font(Preferences.Const.Fonts.preferencePaneTitle)
+                .padding(.vertical, 8)
+            Group {
+                HStack {
+                    Text("Address: ")
+                    TextField("", text: $startupModel.customHomePageURL)
+                        .frame(width: 250)
+                }
+                .padding(8)
+            }
+            .roundedBorder()
+            .padding(EdgeInsets(top: 10, leading: 15, bottom: 1, trailing: 15))
+            Divider()
+            VStack(alignment: .trailing, content: {
+                HStack(alignment: .center) {
+                    Button("Cancel") {}
+                    Button("Save") {}
+                }
+            })
+            .padding(.vertical, 8)
+        }.padding(.vertical, 10)
     }
 }
