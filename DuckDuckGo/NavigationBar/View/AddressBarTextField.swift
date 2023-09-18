@@ -864,7 +864,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
             window?.makeFirstResponder(nextKeyView)
             return false
 
-        } else if commandSelector == #selector(noop(_:)),
+        } else if commandSelector == Selector(("noop:")),
                   let event = NSApp.currentEvent,
                   case .keyDown = event.type,
                   event.keyCode == kVK_ForwardDelete,
@@ -1105,10 +1105,4 @@ extension Notification.Name {
 
 fileprivate extension NSStoryboard {
     static let suggestion = NSStoryboard(name: "Suggestion", bundle: .main)
-}
-
-extension NSResponder {
-
-    @objc func noop(_: Any?) {}
-
 }
