@@ -275,23 +275,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - Start/Stop Tunnel
 
-    override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
-
-        // when activated by system "on-demand" the option is set
-        var isOnDemand: Bool {
-            options?[NetworkProtectionOptionKey.isOnDemand] as? Bool == true
-        }
-
-        super.startTunnel(options: options) { [self] error in
-            guard error == nil else {
-                completionHandler(error)
-                return
-            }
-
-            completionHandler(nil)
-        }
-    }
-
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
         super.stopTunnel(with: reason) {
             Task {
