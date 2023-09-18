@@ -75,8 +75,10 @@ function check_and_login_aws_sso() {
 # Execute AWS command, but just echo it if in debug mode
 function execute_aws() {
     AWS_CMD="$1"
-    echo "$AWS_CMD"
-    if [[ $DEBUG -eq 0 ]]; then
+    if [[ $DEBUG -eq 1 ]]; then
+        echo "[DEBUG ONLY]: $AWS_CMD"
+    else
+        echo "Executing: $AWS_CMD"
         eval "$AWS_CMD"
     fi
 }
