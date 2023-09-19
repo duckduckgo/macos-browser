@@ -34,10 +34,10 @@ extension HomePage.Models {
         let itemsRowCountWhenCollapsed = HomePage.featureRowCountWhenCollapsed
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
-        let privacyConfig: PrivacyConfiguration
+        let privacyConfig: PrivacyConfigurationManaging
 
         var isDay0SurveyEnabled: Bool {
-            let newTabContinueSetUpSettings = privacyConfig.settings(for: .newTabContinueSetUp)
+            let newTabContinueSetUpSettings = privacyConfig.privacyConfig.settings(for: .newTabContinueSetUp)
             if let day0SurveyString =  newTabContinueSetUpSettings["surveyCardDay0"] as? String {
                 if day0SurveyString == "enabled" {
                     return true
@@ -46,7 +46,7 @@ extension HomePage.Models {
             return false
         }
         var isDay7SurveyEnabled: Bool {
-            let newTabContinueSetUpSettings = privacyConfig.settings(for: .newTabContinueSetUp)
+            let newTabContinueSetUpSettings = privacyConfig.privacyConfig.settings(for: .newTabContinueSetUp)
             if let day7SurveyString =  newTabContinueSetUpSettings["surveyCardDay7"] as? String {
                 if day7SurveyString == "enabled" {
                     return true
@@ -55,7 +55,7 @@ extension HomePage.Models {
             return false
         }
         var duckPlayerURL: String {
-            let duckPlayerSettings = privacyConfig.settings(for: .duckPlayer)
+            let duckPlayerSettings = privacyConfig.privacyConfig.settings(for: .duckPlayer)
             return duckPlayerSettings["tryDuckPlayerLink"] as? String ?? "https://www.youtube.com/watch?v=yKWIA-Pys4c"
         }
         var day0SurveyURL: String = "https://selfserve.decipherinc.com/survey/selfserve/32ab/230701?list=1"
@@ -139,7 +139,7 @@ extension HomePage.Models {
              privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
              cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
-             privacyConfig: PrivacyConfiguration = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig) {
+             privacyConfig: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
@@ -380,9 +380,12 @@ extension HomePage.Models {
             let waitlistFlagEnabled: Bool
 
             switch featureOverrides.waitlistActive {
-            case .useRemoteValue: waitlistFlagEnabled = privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlistBetaActive)
-            case .on: waitlistFlagEnabled = true
-            case .off: waitlistFlagEnabled = false
+            case .useRemoteValue:
+                waitlistFlagEnabled = privacyConfig.privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlistBetaActive)
+            case .on:
+                waitlistFlagEnabled = true
+            case .off:
+                waitlistFlagEnabled = false
             }
 
             guard !waitlistFlagEnabled else {
