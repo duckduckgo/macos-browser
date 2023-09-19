@@ -119,6 +119,16 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionKeychainWriteError(field: field, status: status)
             case .keychainDeleteError(let status):
                 domainEvent = .networkProtectionKeychainDeleteError(status: status)
+            case .wireGuardCannotLocateTunnelFileDescriptor:
+                domainEvent = .networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor
+            case .wireGuardInvalidState:
+                domainEvent = .networkProtectionWireguardErrorInvalidState
+            case .wireGuardDnsResolution:
+                domainEvent = .networkProtectionWireguardErrorFailedDNSResolution
+            case .wireGuardSetNetworkSettings(let error):
+                domainEvent = .networkProtectionWireguardErrorCannotSetNetworkSettings(error: error)
+            case .startWireGuardBackend(let code):
+                domainEvent = .networkProtectionWireguardErrorCannotStartWireguardBackend(code: code)
             case .noAuthTokenFound:
                 domainEvent = .networkProtectionNoAuthTokenFoundError
             case .unhandledError(function: let function, line: let line, error: let error):
