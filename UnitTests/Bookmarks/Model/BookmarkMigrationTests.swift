@@ -200,8 +200,8 @@ class BookmarksMigrationTests: XCTestCase {
         XCTAssertEqual(favorites[2].title, "Three")
 
         let topLevel = BookmarkListViewModel(bookmarksDatabase: destinationStack,
-                                             favoritesDisplayMode: .displayAll(native: .desktop),
                                              parentID: nil,
+                                             favoritesDisplayMode: .displayAll(native: .desktop),
                                              errorEvents: .init(mapping: { event, _, _, _ in
             XCTFail("Unexpected error: \(event)")
         }))
