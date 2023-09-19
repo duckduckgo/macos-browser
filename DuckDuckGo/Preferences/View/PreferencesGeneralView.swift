@@ -140,12 +140,12 @@ struct CustomHomePageSheet: View {
         })
     }
 
-    func saveChanges() {
+    private func saveChanges() {
         startupModel.customHomePageURL = url
         isSheetPresented.toggle()
     }
 
-    func validateURL(_ url: String) {
+    private func validateURL(_ url: String) {
         isValidURL = startupModel.isValidURL(url)
     }
 }
