@@ -56,6 +56,7 @@ final class StartupPreferences: ObservableObject {
     @Published var customHomePageURL: String {
         didSet {
             persistor.customHomePageURL = customHomePageURL
+            Pixel.fire(.setnewHomePage)
         }
     }
 
