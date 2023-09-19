@@ -106,15 +106,43 @@ extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDeleg
     }
 }
 
-public class DataBrokerProtectionErrorHandling: EventMapping<DataBrokerProtectionOperationError> {
+public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
 
+    // swiftlint:disable:next cyclomatic_complexity
     public init() {
         super.init { event, _, _, _ in
-            Pixel.fire(.debug(event: .dataBrokerProtectionError, error: event.error), withAdditionalParameters: event.params)
+            switch event {
+            case .error(let error, _):
+                Pixel.fire(.debug(event: .dataBrokerProtectionError, error: error), withAdditionalParameters: event.params)
+            case .optOutStart:
+                Pixel.fire(.debug(event: .optOutStart), withAdditionalParameters: event.params)
+            case .optOutEmailGenerate:
+                Pixel.fire(.debug(event: .optOutEmailGenerate), withAdditionalParameters: event.params)
+            case .optOutCaptchaParse:
+                Pixel.fire(.debug(event: .optOutCaptchaParse), withAdditionalParameters: event.params)
+            case .optOutCaptchaSend:
+                Pixel.fire(.debug(event: .optOutCaptchaSend), withAdditionalParameters: event.params)
+            case .optOutCaptchaSolve:
+                Pixel.fire(.debug(event: .optOutCaptchaSolve), withAdditionalParameters: event.params)
+            case .optOutSubmit:
+                Pixel.fire(.debug(event: .optOutSubmit), withAdditionalParameters: event.params)
+            case .optOutEmailReceive:
+                Pixel.fire(.debug(event: .optOutEmailReceive), withAdditionalParameters: event.params)
+            case .optOutEmailConfirm:
+                Pixel.fire(.debug(event: .optOutEmailConfirm), withAdditionalParameters: event.params)
+            case .optOutValidate:
+                Pixel.fire(.debug(event: .optOutValidate), withAdditionalParameters: event.params)
+            case .optOutFinish:
+                Pixel.fire(.debug(event: .optOutFinish), withAdditionalParameters: event.params)
+            case .optOutSuccess:
+                Pixel.fire(.debug(event: .optOutSuccess), withAdditionalParameters: event.params)
+            case .optOutFailure:
+                Pixel.fire(.debug(event: .optOutFailure), withAdditionalParameters: event.params)
+            }
         }
     }
 
-    override init(mapping: @escaping EventMapping<DataBrokerProtectionOperationError>.Mapping) {
+    override init(mapping: @escaping EventMapping<DataBrokerProtectionPixels>.Mapping) {
         fatalError("Use init()")
     }
 }
