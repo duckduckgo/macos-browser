@@ -69,13 +69,11 @@ final class AddressBarViewController: NSViewController {
     }
 
     private var cancellables = Set<AnyCancellable>()
-    private var passiveAddressBarStringCancellable: AnyCancellable?
-    private var tabContentCancellable: AnyCancellable?
-    private var progressCancellable: AnyCancellable?
-    private var loadingCancellable: AnyCancellable?
-
-    private var clickPoint: NSPoint?
+    private var tabViewModelCancellables = Set<AnyCancellable>()
     private var eventMonitorCancellables = Set<AnyCancellable>()
+
+    /// save mouse-down position to handle same-place clicks outside of the Address Bar to remove first responder
+    private var clickPoint: NSPoint?
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarViewController: Bad initializer")
@@ -101,9 +99,9 @@ final class AddressBarViewController: NSViewController {
         updateView()
         // only activate active text field leading constraint on its appearance to avoid constraint conflicts
         activeTextFieldMinXConstraint.isActive = false
-        addressBarTextField.addressBarTextFieldDelegate = self
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
         subscribeToSelectedTabViewModel()
+        subscribeToAddressBarValue()
         registerForMouseEnteredAndExitedEvents()
     }
 
@@ -188,38 +186,55 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet var shadowView: ShadowView!
 
     private func subscribeToSelectedTabViewModel() {
-        tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.subscribeToTabContent()
-            self?.subscribeToPassiveAddressBarString()
-            self?.subscribeToProgressEvents()
-            // don't resign first responder on tab switching
-            self?.clickPoint = nil
-        }.store(in: &cancellables)
+        tabCollectionViewModel.$selectedTabViewModel
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+
+                tabViewModelCancellables.removeAll()
+
+                subscribeToTabContent()
+                subscribeToPassiveAddressBarString()
+                subscribeToProgressEvents()
+
+                // don't resign first responder on tab switching
+                clickPoint = nil
+            }
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToAddressBarValue() {
+        addressBarTextField.$value
+            .sink { [weak self] value in
+                guard let self else { return }
+
+                updateMode(value: value)
+                addressBarButtonsViewController?.textFieldValue = value
+                updateView()
+            }
+            .store(in: &cancellables)
     }
 
     private func subscribeToTabContent() {
-        tabContentCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$content
+        tabCollectionViewModel.selectedTabViewModel?.tab.$content
             .receive(on: DispatchQueue.main)
             .map { $0 == .homePage }
             .assign(to: \.isHomePage, onWeaklyHeld: self)
+            .store(in: &tabViewModelCancellables)
     }
 
     private func subscribeToPassiveAddressBarString() {
-        passiveAddressBarStringCancellable = nil
-
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             passiveTextField.stringValue = ""
             return
         }
-        passiveAddressBarStringCancellable = selectedTabViewModel.$passiveAddressBarString
+        selectedTabViewModel.$passiveAddressBarString
             .receive(on: DispatchQueue.main)
             .assign(to: \.stringValue, onWeaklyHeld: passiveTextField)
+            .store(in: &tabViewModelCancellables)
     }
 
     private func subscribeToProgressEvents() {
-        progressCancellable = nil
-        loadingCancellable = nil
-
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             progressIndicator.hide(animated: false)
             return
@@ -231,16 +246,18 @@ final class AddressBarViewController: NSViewController {
             progressIndicator.hide(animated: false)
         }
 
-        progressCancellable = selectedTabViewModel.$progress.sink { [weak self] value in
-            guard selectedTabViewModel.isLoading,
-                  let progressIndicator = self?.progressIndicator,
-                  progressIndicator.isShown
-            else { return }
+        selectedTabViewModel.$progress
+            .sink { [weak self] value in
+                guard selectedTabViewModel.isLoading,
+                      let progressIndicator = self?.progressIndicator,
+                      progressIndicator.isShown
+                else { return }
 
-            progressIndicator.increaseProgress(to: value)
-        }
+                progressIndicator.increaseProgress(to: value)
+            }
+            .store(in: &tabViewModelCancellables)
 
-        loadingCancellable = selectedTabViewModel.$isLoading
+        selectedTabViewModel.$isLoading
             .sink { [weak self] isLoading in
                 guard let progressIndicator = self?.progressIndicator else { return }
 
@@ -252,7 +269,8 @@ final class AddressBarViewController: NSViewController {
                 } else if progressIndicator.isShown {
                     progressIndicator.finishAndHide()
                 }
-        }
+            }
+            .store(in: &tabViewModelCancellables)
     }
 
     private func subscribeToButtonsWidth() {
@@ -264,7 +282,7 @@ final class AddressBarViewController: NSViewController {
     }
 
     private func subscribeForShadowViewUpdates() {
-        addressBarTextField.suggestionWindowVisible
+        addressBarTextField.isSuggestionWindowVisiblePublisher
             .sink { [weak self] isSuggestionsWindowVisible in
                 self?.updateShadowView(isSuggestionsWindowVisible)
             }
@@ -481,16 +499,6 @@ extension AddressBarViewController: AddressBarButtonsViewControllerDelegate {
 
     func addressBarButtonsViewControllerClearButtonClicked(_ addressBarButtonsViewController: AddressBarButtonsViewController) {
         addressBarTextField.clearValue()
-    }
-
-}
-
-extension AddressBarViewController: AddressBarTextFieldDelegate {
-
-    func adressBarTextField(_ addressBarTextField: AddressBarTextField, didChangeValue value: AddressBarTextField.Value) {
-        updateMode(value: value)
-        addressBarButtonsViewController?.textFieldValue = value
-        updateView()
     }
 
 }

@@ -21,7 +21,8 @@
               "selector": ".//h4[@class='record__title']"
             },
             "alternativeNamesList": {
-              "selector": ".//ul[@class='clean-list mb-0 mt-2']"
+                "selector": "(.//ul[@class='clean-list mb-0 mt-2'])[1]//li//li[@class='text-dark']",
+                "findElements": true
             },
             "age": {
               "selector": ".col-lg-1"

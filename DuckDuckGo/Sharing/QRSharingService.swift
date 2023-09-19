@@ -20,18 +20,20 @@ import Combine
 import Foundation
 import QuickLookUI
 
+extension NSSharingService {
+    static let qrCode = QRSharingService()
+}
+
 final class QRSharingService: NSSharingService {
 
     private enum Constants {
         static let menuIcon = NSImage(named: "QR-Icon")!
     }
 
-    private var qrImage: NSImage?
-    private var imageUrl: URL?
+    fileprivate var qrImage: NSImage?
+    fileprivate var imageUrl: URL?
 
-    private var cancellables = Set<AnyCancellable>()
-
-    init() {
+    fileprivate init() {
         super.init(title: UserText.shareViaQRCodeMenuItem, image: Constants.menuIcon, alternateImage: nil) {}
     }
 
@@ -90,32 +92,15 @@ final class QRSharingService: NSSharingService {
     }
 
     private func showQuickLook() {
-        self.cancellables.removeAll()
+        guard let qlPanel = QLPreviewPanel.shared() else { return }
 
-        let qlPanel: QLPreviewPanel = QLPreviewPanel.shared()
-        qlPanel.dataSource = self
-        qlPanel.delegate = self
-
-        if qlPanel.isVisible {
-            qlPanel.reloadData()
-        } else {
+        if !qlPanel.isVisible {
             qlPanel.makeKeyAndOrderFront(nil)
         }
-
-        qlPanel.publisher(for: \.delegate).dropFirst().sink { [weak self] delegate in
-            if delegate !== self {
-                self?.cleanup()
-            }
-        }.store(in: &cancellables)
-
-        qlPanel.publisher(for: \.isVisible).dropFirst().sink { [weak self] isVisible in
-            if !isVisible {
-                self?.cleanup()
-            }
-        }.store(in: &cancellables)
+        qlPanel.updateController()
     }
 
-    private func cleanup() {
+    fileprivate func cleanup() {
         guard let imageUrl else { return }
 
         if let qlPanel = QLPreviewPanel.shared(),
@@ -127,7 +112,6 @@ final class QRSharingService: NSSharingService {
         try? FileManager.default.removeItem(at: imageUrl)
         self.imageUrl = nil
         self.qrImage = nil
-        self.cancellables.removeAll()
     }
 
 }
@@ -148,6 +132,55 @@ extension QRSharingService: QLPreviewPanelDataSource, QLPreviewPanelDelegate {
 
     func previewPanel(_ panel: QLPreviewPanel!, transitionImageFor item: QLPreviewItem!, contentRect: UnsafeMutablePointer<NSRect>!) -> Any! {
         return qrImage
+    }
+
+}
+
+extension NSView {
+
+    open override func acceptsPreviewPanelControl(_ panel: QLPreviewPanel!) -> Bool {
+        NSSharingService.qrCode.imageUrl != nil && NSSharingService.qrCode.qrImage != nil || panel.isVisible
+    }
+
+    open override func beginPreviewPanelControl(_ qlPanel: QLPreviewPanel!) {
+        let qrCode = NSSharingService.qrCode
+        guard qrCode.imageUrl != nil && qrCode.qrImage != nil else {
+            qlPanel.closeIfNeeded()
+            return
+        }
+
+        qlPanel.dataSource = qrCode
+        qlPanel.delegate = qrCode
+        qlPanel.reloadData()
+    }
+
+    open override func endPreviewPanelControl(_ qlPanel: QLPreviewPanel!) {
+        qlPanel.dataSource = nil
+        qlPanel.delegate = nil
+        qlPanel.reloadData()
+        qlPanel.closeIfNeeded()
+
+        NSSharingService.qrCode.cleanup()
+    }
+
+}
+
+private extension QLPreviewPanel {
+
+    private static var isClosing = false
+
+    func closeIfNeeded() {
+        guard !Self.isClosing else { return }
+        guard isVisible else {
+            Self.isClosing = false
+            return
+        }
+        Self.isClosing = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            Self.isClosing = false
+        }
+
+        self.close()
     }
 
 }

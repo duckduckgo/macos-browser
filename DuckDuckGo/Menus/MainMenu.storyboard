@@ -7,12 +7,12 @@
         <!--Application-->
         <scene sceneID="JPo-4y-FX3">
             <objects>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_DBP" customModuleProvider="target"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <customObject id="WIK-gq-Ncg" customClass="CopyHandler" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
+                <customObject id="WIK-gq-Ncg" customClass="CopyHandler" customModule="DuckDuckGo_DBP" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <application id="hnw-xV-0zn" sceneMemberID="viewController">
-                    <menu key="mainMenu" title="Main Menu" systemMenu="main" id="AYu-sK-qS6" customClass="MainMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <menu key="mainMenu" title="Main Menu" systemMenu="main" id="AYu-sK-qS6" customClass="MainMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                         <items>
                             <menuItem title="DuckDuckGo" id="1Xt-HY-uBw">
                                 <modifierMask key="keyEquivalentModifierMask"/>
@@ -480,7 +480,7 @@
                             </menuItem>
                             <menuItem title="History" id="aVY-po-b3d">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="History" id="SLT-Z6-mh7" customClass="HistoryMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <menu key="submenu" title="History" id="SLT-Z6-mh7" customClass="HistoryMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                     <items>
                                         <menuItem title="Back" enabled="NO" keyEquivalent="[" id="VWV-vB-Mtc">
                                             <connections>
@@ -769,19 +769,25 @@ CQ
                                                                 <menuItem title="Today" keyEquivalent="N" id="0lm-tL-hli">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="changeInstallDateToToday:" target="Ady-hI-5gd" id="Lsi-xW-usu"/>
+                                                                        <action selector="changeInstallDateToToday:" target="Ady-hI-5gd" id="K8Z-Av-gjf"/>
                                                                     </connections>
                                                                 </menuItem>
-                                                                <menuItem title="Less Than a Week Ago" id="KhK-Zf-YHA">
+                                                                <menuItem title="Less Than a 21 days Ago" id="KhK-Zf-YHA">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="changeInstallDateToLessThanAWeekAgo:" target="Ady-hI-5gd" id="J0j-gf-bhG"/>
+                                                                        <action selector="changeInstallDateToLessThan21DaysAgo:" target="Ady-hI-5gd" id="Bj7-ao-Qhw"/>
                                                                     </connections>
                                                                 </menuItem>
-                                                                <menuItem title="More Than a Week Ago" id="mYW-2j-Ckg">
+                                                                <menuItem title="More Than 21 Days Ago" id="mYW-2j-Ckg">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="changeInstallDateToMoreThanAWeekAgo:" target="Ady-hI-5gd" id="Ygn-GW-JkY"/>
+                                                                        <action selector="changeInstallDateToMoreThan21DaysAgoButLessThan27:" target="Ady-hI-5gd" id="UVq-Pb-JKM"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="More Than 27 Days Ago" id="M8x-GE-Z7r">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="changeInstallDateToMoreThan27DaysAgo:" target="Ady-hI-5gd" id="NH6-ku-op3"/>
                                                                     </connections>
                                                                 </menuItem>
                                                             </items>
@@ -834,9 +840,29 @@ CQ
                                                 </items>
                                             </menu>
                                         </menuItem>
+                                        <menuItem title="Sync" id="8rI-iH-wNC">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="Sync" id="Kw4-67-mit" customClass="SyncDebugMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                                <items>
+                                                    <menuItem title="Environment" id="qD7-Gw-s2h">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Environment" id="lRd-Ih-n5j">
+                                                            <items>
+                                                                <menuItem title="Item" id="amC-1R-0QS">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                </menuItem>
+                                                            </items>
+                                                        </menu>
+                                                    </menuItem>
+                                                </items>
+                                                <connections>
+                                                    <outlet property="environmentMenu" destination="lRd-Ih-n5j" id="xxg-yh-bfI"/>
+                                                </connections>
+                                            </menu>
+                                        </menuItem>
                                         <menuItem title="Network Protection" id="Dt6-sj-4hn">
                                             <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Network Protection" id="Rah-lS-gno" customClass="NetworkProtectionDebugMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                            <menu key="submenu" title="Network Protection" id="Rah-lS-gno" customClass="NetworkProtectionDebugMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                                 <items>
                                                     <menuItem title="Reset All State Keeping Invite" id="Mqz-Le-LgQ">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
@@ -897,7 +923,7 @@ CQ
                                                     </menuItem>
                                                     <menuItem title="Onboarding" id="xu6-z0-age">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Onboarding" id="L82-We-Wwv" customClass="NetworkProtectionOnboardingMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                        <menu key="submenu" title="Onboarding" id="L82-We-Wwv" customClass="NetworkProtectionOnboardingMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                                             <items>
                                                                 <menuItem title="Reset Onboarding Status" id="gfc-0G-Ujy">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -982,7 +1008,7 @@ CQ
                                                     </menuItem>
                                                     <menuItem title="Simulate Failure" id="K5h-D4-For">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Simulate Failure" id="iLs-sj-2Gd" customClass="NetworkProtectionSimulateFailureMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                        <menu key="submenu" title="Simulate Failure" id="iLs-sj-2Gd" customClass="NetworkProtectionSimulateFailureMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                                             <items>
                                                                 <menuItem title="Enable NetP &gt; Controller Failure" id="xyA-ob-gEy" userLabel="Controller Failure">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
