@@ -81,12 +81,18 @@ final class StartupPreferences: ObservableObject {
         parentWindowController.window?.beginSheet(fireproofDomainsWindow)
     }
 
+    func isValidURL(_ url: String) -> Bool {
+        let urlPattern = #"^https://([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*/?$"#
+        let regex = try? NSRegularExpression(pattern: urlPattern, options: .caseInsensitive)
+        let range = NSRange(location: 0, length: url.utf16.count)
+        return regex?.firstMatch(in: url, options: [], range: range) != nil
+    }
+
 }
 
 extension StartupPreferences {
     var customHomePageFormatted: String {
-        var formattedURL = customHomePageURL.replacingOccurrences(of: "http://", with: "")
-        formattedURL = formattedURL.replacingOccurrences(of: "https://", with: "")
+        var formattedURL = customHomePageURL.replacingOccurrences(of: "https://", with: "")
 
         if formattedURL.count > 100 {
             let index = formattedURL.index(formattedURL.startIndex, offsetBy: 97)

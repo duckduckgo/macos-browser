@@ -84,7 +84,7 @@ extension Preferences {
                     .offset(x: Const.pickerHorizontalOffset)
                     .padding(.bottom, 0)
                 }.sheet(isPresented: $showingCustomHomePageSheet) {
-                    CustomHomePageSheet(startupModel: startupModel)
+                    CustomHomePageSheet(startupModel: startupModel, isSheetPresented: $showingCustomHomePageSheet)
                 }
 
             }
@@ -95,30 +95,57 @@ extension Preferences {
 struct CustomHomePageSheet: View {
 
     @ObservedObject var startupModel: StartupPreferences
+    @State var url: String = ""
+    @State var isValidURL: Bool = true
+    @Binding var isSheetPresented: Bool
 
     var body: some View {
         VStack(alignment: .center) {
-            Text("Set Homepage")
+            Text(UserText.setHomePage)
                 .font(Preferences.Const.Fonts.preferencePaneTitle)
-                .padding(.vertical, 8)
+                .padding(.vertical, 10)
+
             Group {
                 HStack {
-                    Text("Address: ")
-                    TextField("", text: $startupModel.customHomePageURL)
+                    Text(UserText.addressLabel)
+                    TextField("", text: $url)
                         .frame(width: 250)
+                        .onChange(of: url) { newValue in
+                            validateURL(newValue)
+                        }
                 }
                 .padding(8)
             }
             .roundedBorder()
-            .padding(EdgeInsets(top: 10, leading: 15, bottom: 1, trailing: 15))
+            .padding(EdgeInsets(top: 10, leading: 15, bottom: 10, trailing: 15))
+
             Divider()
-            VStack(alignment: .trailing, content: {
-                HStack(alignment: .center) {
-                    Button("Cancel") {}
-                    Button("Save") {}
+
+            HStack(alignment: .center) {
+                Spacer()
+                Button(UserText.cancel) {
+                    isSheetPresented.toggle()
                 }
-            })
-            .padding(.vertical, 8)
-        }.padding(.vertical, 10)
+                Button(UserText.save) {
+                    saveChanges()
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(!isValidURL)
+            }.padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 15))
+
+        }
+        .padding(.vertical, 10)
+        .onAppear(perform: {
+            url = startupModel.customHomePageURL
+        })
+    }
+
+    func saveChanges() {
+        startupModel.customHomePageURL = url
+        isSheetPresented.toggle()
+    }
+
+    func validateURL(_ url: String) {
+        isValidURL = startupModel.isValidURL(url)
     }
 }

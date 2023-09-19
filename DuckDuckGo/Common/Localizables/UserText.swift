@@ -321,6 +321,9 @@ struct UserText {
     static let specificPage = NSLocalizedString("preferences-homepage-customPage", value: "Specific Page", comment: "Option to control Specific Home Page")
     static let setPage = NSLocalizedString("preferences-homepage-set-page", value: "Set Page...", comment: "Option to control the Specific Page")
     
+    static let setHomePage = NSLocalizedString("preferences-homepage-set-homePage", value: "Set Home Page", comment: "Set Home Page dialog title")
+    static let addressLabel = NSLocalizedString("preferences-homepage-address", value: "Address: ", comment: "Home Page address field label")
+    
     static let theme = NSLocalizedString("preferences.appearance.theme", value: "Theme", comment: "Theme preferences")
     static let addressBar = NSLocalizedString("preferences.appearance.address-bar", value: "Address Bar", comment: "Theme preferences")
     static let showFullWebsiteAddress = NSLocalizedString("preferences.appearance.show-full-url", value: "Full website address", comment: "Option to show full URL in the address bar")
