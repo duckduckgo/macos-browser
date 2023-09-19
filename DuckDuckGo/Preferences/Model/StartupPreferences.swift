@@ -41,6 +41,8 @@ struct StartupPreferencesUserDefaultsPersistor: StartupPreferencesPersistor {
 
 final class StartupPreferences: ObservableObject {
 
+    static let shared = StartupPreferences()
+
     @Published var restorePreviousSession: Bool {
         didSet {
             persistor.restorePreviousSession = restorePreviousSession
