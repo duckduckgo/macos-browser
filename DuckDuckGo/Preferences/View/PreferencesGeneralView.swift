@@ -66,6 +66,7 @@ extension Preferences {
                 // SECTION 3: Home Page
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.homePage)
+                    TextMenuItemCaption(text: UserText.homePageDescription)
                     Picker(selection: $startupModel.launchToCustomHomePage, label: EmptyView()) {
                         Text(UserText.newTab).tag(false)
                         VStack(alignment: .leading) {
