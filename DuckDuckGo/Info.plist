@@ -88,6 +88,8 @@
 	<string>MainMenu</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allows you to share recordings</string>
+    <key>NSAppDataUsageDescription</key>
+    <string>DuckDuckGo will securely access your Bitwarden vault to autofill your passwords. To prevent this dialog in the future, go to macOS System Settings > Privacy > Full Disk Access and toggle on DuckDuckGo, or, switch back to the built in password manager.</string>
 	<key>NSSupportsAutomaticTermination</key>
 	<false/>
 	<key>NSSupportsSuddenTermination</key>
