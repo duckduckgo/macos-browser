@@ -171,6 +171,7 @@ final class NavigationBarViewController: NSViewController {
             goForwardButton.isHidden = true
             refreshOrStopButton.isHidden = true
             optionsButton.isHidden = true
+            homeButton.isHidden = true
             addressBarTopConstraint.constant = 0
             addressBarBottomConstraint.constant = 0
             addressBarLeftToNavButtonsConstraint.isActive = false

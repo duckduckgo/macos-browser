@@ -387,11 +387,6 @@ protocol NewWindowPolicyDecisionMaker {
             handleFavicon()
         }
 
-        // Navigate to custom Home page if required
-        if content == .homePage {
-            openHomePage()
-        }
-
         emailDidSignOutCancellable = NotificationCenter.default.publisher(for: .emailDidSignOut)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
@@ -746,10 +741,11 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     func openHomePage() {
-        content = .homePage
         if startupPreferences.launchToCustomHomePage,
            let customURL = URL(string: startupPreferences.customHomePageURL) {
             webView.load(URLRequest(url: customURL))
+        } else {
+            content = .homePage
         }
     }
 
