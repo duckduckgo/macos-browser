@@ -1,3 +1,6 @@
+//
+//  NoOpController.swift
+//
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +16,20 @@
 //  limitations under the License.
 //
 
-#include "NetworkProtectionVPNHelpersBase.xcconfig"
+import Foundation
+import NetworkProtection
 
-PRODUCT_BUNDLE_IDENTIFIER=com.duckduckgo.macos.browser.network-protection.start-vpn
+/// This is a temporary controller meant to ease the migration of NetP's VPN ownership to the menu agent.
+///
+public final class NoOpController: TunnelController {
 
-PROVISIONING_PROFILE_SPECIFIER[config=Debug][sdk=macosx*] =
-PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
-PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = MacOS Browser NetP - Start VPN
-PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = MacOS Browser NetP - Start VPN
+    public init() {}
+
+    public func start() async {
+        // Intentional no-op
+    }
+
+    public func stop() async {
+        // Intentional no-op
+    }
+}

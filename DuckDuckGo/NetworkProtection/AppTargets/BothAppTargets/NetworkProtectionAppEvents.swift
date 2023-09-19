@@ -115,6 +115,8 @@ final class NetworkProtectionAppEvents {
     }
 
     private func restartNetworkProtectionTunnelAndMenu(using loginItemsManager: LoginItemsManager) {
+        // TODO: reimplement this through IPC
+        /*
         loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
 
         Task {
@@ -126,6 +128,7 @@ final class NetworkProtectionAppEvents {
                 await provider.start()
             }
         }
+         */
     }
 
     /// Fetches a new list of Network Protection servers, and updates the existing set.

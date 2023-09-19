@@ -194,36 +194,44 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     @IBAction
     func toggleEnforceRoutesAction(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleShouldEnforceRoutes()
+        // TODO: reimplement this through IPC
+        //NetworkProtectionTunnelController().toggleShouldEnforceRoutes()
     }
 
     @IBAction
     func toggleIncludeAllNetworks(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleShouldIncludeAllNetworks()
+        // TODO: reimplement this through IPC
+        //NetworkProtectionTunnelController().toggleShouldIncludeAllNetworks()
     }
 
     @IBAction
     func toggleShouldExcludeLocalRoutes(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleShouldExcludeLocalRoutes()
+        // TODO: reimplement this through IPC
+        //NetworkProtectionTunnelController().toggleShouldExcludeLocalRoutes()
     }
 
     @IBAction
     func toggleConnectOnLogInAction(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleShouldAutoConnectOnLogIn()
+        // TODO: reimplement this through IPC
+        //NetworkProtectionTunnelController().toggleShouldAutoConnectOnLogIn()
     }
 
     @IBAction
     func toggleExclusionAction(_ sender: NSMenuItem) {
+        // TODO: reimplement this through IPC
+        /*
         guard let addressRange = sender.representedObject as? String else {
             assertionFailure("Unexpected representedObject")
             return
         }
         NetworkProtectionTunnelController().setExcludedRoute(addressRange, enabled: sender.state == .off)
+         */
     }
 
     @IBAction
     func toggleConnectionTesterEnabled(_ sender: Any) {
-        NetworkProtectionTunnelController().toggleConnectionTesterEnabled()
+        // TODO: reimplement this through IPC
+        //NetworkProtectionTunnelController().toggleConnectionTesterEnabled()
     }
 
     // MARK: Populating Menu Items
@@ -311,6 +319,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private func populateExclusionsMenuItems() {
         exclusionsMenu.removeAllItems()
 
+        // TODO: reimplement this, probably moving the exclusion list definition elsewhere
+        /*
         for item in NetworkProtectionTunnelController.exclusionList {
             let menuItem: NSMenuItem
             switch item {
@@ -326,6 +336,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
             }
             exclusionsMenu.addItem(menuItem)
         }
+         */
     }
 
     // MARK: - Menu State Update
@@ -392,6 +403,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     private func updateNetworkProtectionMenuItemsState() {
+        // TODO: reimplement this through IPC
+        /*
         let controller = NetworkProtectionTunnelController()
 
         shouldEnforceRoutesMenuItem.state = controller.shouldEnforceRoutes ? .on : .off
@@ -400,12 +413,15 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
         excludeLocalNetworksMenuItem.state = controller.shouldExcludeLocalRoutes ? .on : .off
         connectionTesterEnabledMenuItem.state = controller.isConnectionTesterEnabled ? .on : .off
+         */
     }
 
 }
 extension NetworkProtectionDebugMenu: NSMenuDelegate {
 
     func menuNeedsUpdate(_ menu: NSMenu) {
+        // TODO: reimplement this probably getting the routes data from elsewhere
+        /*
         if menu === exclusionsMenu {
             let controller = NetworkProtectionTunnelController()
             for item in menu.items {
@@ -415,6 +431,7 @@ extension NetworkProtectionDebugMenu: NSMenuDelegate {
                 item.isEnabled = !(controller.shouldEnforceRoutes && route == "10.0.0.0/8")
             }
         }
+         */
     }
 
 }
