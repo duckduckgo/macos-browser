@@ -746,10 +746,11 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     func openHomePage() {
-        content = .homePage
         if startupPreferences.launchToCustomHomePage,
            let customURL = URL(string: startupPreferences.customHomePageURL) {
             webView.load(URLRequest(url: customURL))
+        } else {
+            content = .homePage
         }
     }
 
