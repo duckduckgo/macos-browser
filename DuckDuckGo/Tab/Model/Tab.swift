@@ -748,7 +748,7 @@ protocol NewWindowPolicyDecisionMaker {
         content = .homePage
         if startupPreferences.launchToCustomHomePage,
            let customURL = URL(string: startupPreferences.customHomePageURL) {
-            content = TabContent.url(customURL)
+            webView.load(URLRequest(url: customURL))
         }
 
     }
