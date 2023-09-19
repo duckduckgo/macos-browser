@@ -207,6 +207,7 @@ protocol NewWindowPolicyDecisionMaker {
     private let webViewConfiguration: WKWebViewConfiguration
 
     let startupPreferences: StartupPreferences
+    lazy var customHomePage = startupPreferences.customHomePageURL
 
     private var extensions: TabExtensions
     // accesing TabExtensions‘ Public Protocols projecting tab.extensions.extensionName to tab.extensionName
@@ -244,7 +245,7 @@ protocol NewWindowPolicyDecisionMaker {
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,
                      webViewSize: CGSize = CGSize(width: 1024, height: 768),
-                     startupPreferences: StartupPreferences = StartupPreferences()
+                     startupPreferences: StartupPreferences = StartupPreferences.shared
     ) {
 
         let duckPlayer = duckPlayer
@@ -750,7 +751,6 @@ protocol NewWindowPolicyDecisionMaker {
            let customURL = URL(string: startupPreferences.customHomePageURL) {
             webView.load(URLRequest(url: customURL))
         }
-
     }
 
     func startOnboarding() {
