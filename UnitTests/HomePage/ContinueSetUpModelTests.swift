@@ -60,7 +60,7 @@ final class ContinueSetUpModelTests: XCTestCase {
             emailManager: emailManager,
             privacyPreferences: privacyPreferences,
             duckPlayerPreferences: duckPlayerPreferences,
-            privacyConfig: privacyConfigManager
+            privacyConfigurationManager: privacyConfigManager
         )
 
         delegate = CapturingSetUpVewModelDelegate()
@@ -494,6 +494,6 @@ extension HomePage.Models.ContinueSetUpModel {
             emailManager: emailManager,
             privacyPreferences: privacyPreferences,
             duckPlayerPreferences: duckPlayerPreferences,
-            privacyConfig: manager)
+            privacyConfigurationManager: manager)
     }
 }
