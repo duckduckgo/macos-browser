@@ -102,7 +102,7 @@ final class TabCollectionViewModel: NSObject {
     private var homePage: Tab.TabContent {
         var homePage: Tab.TabContent = .homePage
         if startupPreferences.launchToCustomHomePage,
-           let customURL = URL(string: startupPreferences.customHomePageURL) {
+           let customURL = URL(string: startupPreferences.formattedcustomHomePageURL) {
             homePage = Tab.TabContent.contentFromURL(customURL)
         }
         return homePage

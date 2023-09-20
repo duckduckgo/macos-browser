@@ -36,7 +36,7 @@ class StartupPreferencesTests: XCTestCase {
     func testWhenInitializedThenItLoadsPersistedValues() throws {
         var model = StartupPreferences(persistor: StartupPreferencesPersistorMock(launchToCustomHomePage: false, customHomePageURL: "duckduckgo.com", restorePreviousSession: false))
         XCTAssertEqual(model.launchToCustomHomePage, false)
-        XCTAssertEqual(model.customHomePageURL, "http://duckduckgo.com")
+        XCTAssertEqual(model.customHomePageURL, "duckduckgo.com")
         XCTAssertEqual(model.restorePreviousSession, false)
 
         model = StartupPreferences(persistor: StartupPreferencesPersistorMock(launchToCustomHomePage: true, customHomePageURL: "http://duckduckgo.com", restorePreviousSession: true))
@@ -49,6 +49,15 @@ class StartupPreferencesTests: XCTestCase {
 
         model = StartupPreferences(persistor: StartupPreferencesPersistorMock(launchToCustomHomePage: true, customHomePageURL: "https://mail.google.com/mail/u/1/#spam/FMfcgzGtxKRZFPXfxKMWSKVgwJlswxnH", restorePreviousSession: true))
         XCTAssertEqual(model.friendlyURL, "mail.google.com/mail/u/1/#s...")
+
+        model = StartupPreferences(persistor: StartupPreferencesPersistorMock(launchToCustomHomePage: true, customHomePageURL: "https://www.rnids.rs/национални-домени/регистрација-националних-домена", restorePreviousSession: true))
+        XCTAssertEqual(model.friendlyURL, "www.rnids.rs/национални-дом...")
+
+        model = StartupPreferences(persistor: StartupPreferencesPersistorMock(launchToCustomHomePage: true, customHomePageURL: "www.rnids.rs/национални-домени/регистрација-националних-домена", restorePreviousSession: true))
+        XCTAssertEqual(model.friendlyURL, "www.rnids.rs/национални-дом...")
+
+        model = StartupPreferences(persistor: StartupPreferencesPersistorMock(launchToCustomHomePage: true, customHomePageURL: "https://💩.la", restorePreviousSession: true))
+        XCTAssertEqual(model.friendlyURL, "💩.la")
 
     }
 

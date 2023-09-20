@@ -207,7 +207,6 @@ protocol NewWindowPolicyDecisionMaker {
     private let webViewConfiguration: WKWebViewConfiguration
 
     let startupPreferences: StartupPreferences
-    lazy var customHomePage = startupPreferences.customHomePageURL
 
     private var extensions: TabExtensions
     // accesing TabExtensions‘ Public Protocols projecting tab.extensions.extensionName to tab.extensionName
@@ -742,7 +741,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     func openHomePage() {
         if startupPreferences.launchToCustomHomePage,
-           let customURL = URL(string: startupPreferences.customHomePageURL) {
+           let customURL = URL(string: startupPreferences.formattedcustomHomePageURL) {
             webView.load(URLRequest(url: customURL))
         } else {
             content = .homePage

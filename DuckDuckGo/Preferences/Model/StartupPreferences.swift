@@ -55,23 +55,23 @@ final class StartupPreferences: ObservableObject {
         }
     }
 
-    @Published private var _customHomePageURL: String = ""
-    var customHomePageURL: String {
-        get {
-            _customHomePageURL
-        }
-        set {
-            let url = formattedURLString(newValue) ?? StartupPreferencesUserDefaultsPersistor.defaultURL
-            _customHomePageURL = url
-            persistor.customHomePageURL = _customHomePageURL
+    @Published var customHomePageURL: String {
+        didSet {
+            persistor.customHomePageURL = customHomePageURL
         }
     }
 
-    var friendlyURL: String {
-        guard let url = URL(string: customHomePageURL) else {
-            return ""
+    var formattedcustomHomePageURL: String {
+        let trimmedURL = customHomePageURL.trimmingWhitespace()
+        guard let url = URL(trimmedAddressBarString: trimmedURL) else {
+            return StartupPreferencesUserDefaultsPersistor.defaultURL
         }
-        var friendlyURL = url.toString(decodePunycode: false, dropScheme: true, dropTrailingSlash: false)
+        return url.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: false)
+    }
+
+    var friendlyURL: String {
+        let regexPattern = "https?://"
+        var friendlyURL = customHomePageURL.replacingOccurrences(of: regexPattern, with: "", options: .regularExpression)
         if friendlyURL.count > 30 {
             let index = friendlyURL.index(friendlyURL.startIndex, offsetBy: 27)
             friendlyURL = String(friendlyURL[..<index]) + "..."
@@ -87,14 +87,6 @@ final class StartupPreferences: ObservableObject {
     }
 
     private var persistor: StartupPreferencesPersistor
-
-    private func formattedURLString(_ text: String) -> String? {
-        let trimmedURL = text.trimmingWhitespace()
-        guard let url = URL(trimmedAddressBarString: trimmedURL) else {
-            return nil
-        }
-        return url.toString(decodePunycode: false, dropScheme: false, dropTrailingSlash: false)
-    }
 
     func isValidURL(_ text: String) -> Bool {
         guard let url = text.url else { return false }
