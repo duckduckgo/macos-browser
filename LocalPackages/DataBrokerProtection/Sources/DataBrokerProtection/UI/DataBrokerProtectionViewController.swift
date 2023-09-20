@@ -22,10 +22,6 @@ import BrowserServicesKit
 import WebKit
 import Combine
 
-protocol DBPUIScanOps: AnyObject {
-    func startScan() -> Bool
-}
-
 final public class DataBrokerProtectionViewController: NSViewController {
     private let navigationViewModel: ContainerNavigationViewModel
     private let profileViewModel: ProfileViewModel
@@ -34,13 +30,9 @@ final public class DataBrokerProtectionViewController: NSViewController {
     private let containerViewModel: ContainerViewModel
     private let scheduler: DataBrokerProtectionScheduler
     private let notificationCenter: NotificationCenter
-
-    private let privacyConfig: PrivacyConfigurationManaging?
-    private let prefs: ContentScopeProperties?
-    private var communicationLayer: DBPUICommunicationLayer?
     private var webView: WKWebView?
-    private var cancellables = Set<AnyCancellable>()
-    private var lastSchedulerStatus: DataBrokerProtectionSchedulerStatus = .idle
+
+    private let webUIViewModel: DBPUIViewModel
 
     private let debugPage: String = """
     <!DOCTYPE html>
@@ -144,8 +136,8 @@ final public class DataBrokerProtectionViewController: NSViewController {
         self.scheduler = scheduler
         self.dataManager = dataManager
         self.notificationCenter = notificationCenter
-        self.privacyConfig = privacyConfig
-        self.prefs = prefs
+
+        self.webUIViewModel = DBPUIViewModel(dataManager: dataManager, scheduler: scheduler, privacyConfig: privacyConfig, prefs: prefs, webView: webView)
 
         navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
         profileViewModel = ProfileViewModel(dataManager: dataManager)
@@ -159,29 +151,6 @@ final public class DataBrokerProtectionViewController: NSViewController {
         dataManager.fetchProfile(ignoresCache: true)
 
         super.init(nibName: nil, bundle: nil)
-
-        setupCancellable()
-    }
-
-    private func setupCancellable() {
-        scheduler.statusPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-                self?.lastSchedulerStatus = status
-                self?.reloadData()
-            }.store(in: &cancellables)
-    }
-
-    private func setupNotifications() {
-        notificationCenter.addObserver(self,
-                                       selector: #selector(reloadData),
-                                       name: DataBrokerProtectionNotifications.didFinishScan,
-                                       object: nil)
-
-        notificationCenter.addObserver(self,
-                                       selector: #selector(reloadData),
-                                       name: DataBrokerProtectionNotifications.didFinishOptOut,
-                                       object: nil)
     }
 
     required init?(coder: NSCoder) {
@@ -198,17 +167,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
 //        let hostingController = NSHostingController(rootView: containerView)
 //        view = hostingController.view
 
-        guard let privacyConfig = privacyConfig else { return }
-        guard let prefs = prefs else { return }
-
-        let configuration = WKWebViewConfiguration()
-        configuration.applyDBPUIConfiguration(privacyConfig: privacyConfig, prefs: prefs, delegate: dataManager.cache)
-        dataManager.cache.scanDelegate = self
-        configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
-
-        if let dbpUIContentController = configuration.userContentController as? DBPUIUserContentController {
-            communicationLayer = dbpUIContentController.dbpUIUserScripts.dbpUICommunicationLayer
-        }
+        guard let configuration = webUIViewModel.setupCommunicationLayer() else { return }
 
         webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1024, height: 768), configuration: configuration)
         view = webView!
@@ -219,64 +178,11 @@ final public class DataBrokerProtectionViewController: NSViewController {
         // Uncomment this line and add your dev URL 👇
 //        webView?.load(URL(string: "https://<your url>")!)
 
-        let button = NSButton(title: "Set State", target: self, action: #selector(reloadData))
+        let button = NSButton(title: "Set State", target: self, action: #selector(webUIViewModel.reloadData))
         button.setButtonType(.momentaryLight)
         button.contentTintColor = .black
         button.frame = CGRect(x: 10, y: 100, width: 100, height: 50)
         view.addSubview(button)
     }
 
-    @objc func reloadData() {
-        guard let webView = webView else { return }
-
-        Task {
-            var inProgress: [DBPUIDataBrokerProfileMatch] = []
-            var completed: [DBPUIDataBrokerProfileMatch] = []
-            // Step 1 - Get Data from database (brokerInfo)
-            let brokerInfoData = await dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
-
-            // Step 3 - For profileQueryData in brokerInfo
-            for profileQueryData in brokerInfoData {
-                // Step 3a - For optOut in profileQueryData
-                for optOutOperationData in profileQueryData.optOutOperationsData {
-                    // if optOut.extractedProfile.removedData == nil
-                    if optOutOperationData.extractedProfile.removedDate == nil {
-                        // Add as a pending removal profile
-                        inProgress.append(DBPUIDataBrokerProfileMatch(
-                            dataBroker: DBPUIDataBroker(name: profileQueryData.dataBroker.name),
-                            names: [DBPUIUserProfileName(first: optOutOperationData.extractedProfile.fullName ?? "", middle: "", last: "")],
-                            addresses: optOutOperationData.extractedProfile.addresses?.map {
-                                DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state)
-                            } ?? []
-                        ))
-                    } else {
-                        // else add as removed profile
-                        completed.append(DBPUIDataBrokerProfileMatch(
-                            dataBroker: DBPUIDataBroker(name: profileQueryData.dataBroker.name),
-                            names: [DBPUIUserProfileName(first: optOutOperationData.extractedProfile.fullName ?? "", middle: "", last: "")],
-                            addresses: optOutOperationData.extractedProfile.addresses?.map {
-                                DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state)
-                            } ?? []
-                        ))
-                    }
-                }
-            }
-
-            let message = DBPUIScanAndOptOutState(
-                status: DBPUIScanAndOptOutStatus.from(schedulerStatus: lastSchedulerStatus),
-                inProgressOptOuts: inProgress,
-                completedOptOuts: completed
-            )
-
-            communicationLayer?.sendMessageToUI(method: .scanAndOptOutStatusChanged, params: message, into: webView)
-        }
-    }
-
-}
-
-extension DataBrokerProtectionViewController: DBPUIScanOps {
-    func startScan() -> Bool {
-        scheduler.scanAllBrokers(showWebView: true, completion: nil)
-        return true
-    }
 }
