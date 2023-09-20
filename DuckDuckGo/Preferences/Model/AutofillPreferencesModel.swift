@@ -178,7 +178,7 @@ final class AutofillPreferencesModel: ObservableObject {
     }
 
     func openSettings() {
-        guard let link = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles") else {
+        guard let link = URL.fullDiskAccess else {
             assertionFailure("Can't initialize link to Settings")
             return
         }

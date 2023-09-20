@@ -142,7 +142,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
             } else if viewState == .disclaimer {
                 viewState = .lookingForBitwarden
             } else if viewState == .accessToContainersNotApproved {
-                guard let link = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles") else {
+                guard let link = URL.fullDiskAccess else {
                     assertionFailure("Can't initialize link to Settings")
                     return
                 }
