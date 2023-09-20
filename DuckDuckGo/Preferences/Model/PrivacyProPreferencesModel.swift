@@ -18,12 +18,14 @@
 
 import Foundation
 import Accounts
+import AppKit
 
 final class PrivacyProPreferencesModel: ObservableObject {
 
     @Published
     var isSignedIn: Bool = false
 
+    private let accountManager: AccountManager
 
     init(accountManager: AccountManager = AccountManager()) {
         self.accountManager = accountManager
@@ -39,5 +41,29 @@ final class PrivacyProPreferencesModel: ObservableObject {
         }
     }
 
-    private let accountManager: AccountManager
+    @MainActor
+    private func openURL(_ url: URL) {
+        WindowControllersManager.shared.show(url: url, newTab: true)
+    }
+
+    @MainActor
+    func learnMoreAction() {
+        openURL(.aboutDuckDuckGo)
+    }
+
+    @MainActor
+    func changePlanOrBillingAction() {
+        NSWorkspace.shared.open(URL(string: "macappstores://apps.apple.com/account/subscriptions")!)
+    }
+
+    @MainActor
+    func removeFromThisDeviceAction() {
+        accountManager.signOut()
+    }
+
+    @MainActor
+    func openFAQ() {
+        openURL(.aboutDuckDuckGo)
+    }
+
 }
