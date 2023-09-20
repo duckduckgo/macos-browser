@@ -23,6 +23,10 @@ final class PinnedTabsHostingView: NSHostingView<PinnedTabsView> {
 
     let middleClickPublisher: AnyPublisher<CGPoint, Never>
 
+    override var mouseDownCanMoveWindow: Bool {
+        false
+    }
+
     override func otherMouseDown(with event: NSEvent) {
         guard event.buttonNumber == 2 else { return }
 
