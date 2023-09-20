@@ -71,7 +71,7 @@ final class StartupPreferences: ObservableObject {
         guard let url = URL(string: customHomePageURL) else {
             return ""
         }
-        var friendlyURL = url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: false)
+        var friendlyURL = url.toString(decodePunycode: false, dropScheme: true, dropTrailingSlash: false)
         if friendlyURL.count > 30 {
             let index = friendlyURL.index(friendlyURL.startIndex, offsetBy: 27)
             friendlyURL = String(friendlyURL[..<index]) + "..."
@@ -93,7 +93,7 @@ final class StartupPreferences: ObservableObject {
         guard let url = URL(trimmedAddressBarString: trimmedURL) else {
             return nil
         }
-        return url.absoluteString
+        return url.toString(decodePunycode: false, dropScheme: false, dropTrailingSlash: false)
     }
 
     func isValidURL(_ text: String) -> Bool {
