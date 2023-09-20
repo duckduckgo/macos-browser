@@ -201,7 +201,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         window = WindowsManager.openNewWindow(with: tab)!
         let tabViewModel = (window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
 
-        let url = URL(string: "https://privacy-test-pages.site/privacy-protections/gpc/")!
+        let url = URL(string: "https://privacy-test-pages.glitch.me/privacy-protections/gpc/")!
         // disable GPC redirects
         PrivacySecurityPreferences.shared.gpcEnabled = false
         _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
