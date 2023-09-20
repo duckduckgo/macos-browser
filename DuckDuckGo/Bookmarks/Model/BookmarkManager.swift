@@ -45,6 +45,8 @@ protocol BookmarkManager: AnyObject {
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
+    func handleFavoritesAfterDisablingSync()
+
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
     var list: BookmarkList? { get }
@@ -69,9 +71,9 @@ final class LocalBookmarkManager: BookmarkManager {
         favoritesDisplayMode = AppearancePreferences.shared.favoritesDisplayMode
         favoritesDisplayModeCancellable = AppearancePreferences.shared.$favoritesDisplayMode
             .dropFirst()
-            .sink { [weak self] configuration in
-                self?.favoritesDisplayMode = configuration
-                self?.bookmarkStore.applyFavoritesDisplayMode(configuration)
+            .sink { [weak self] displayMode in
+                self?.favoritesDisplayMode = displayMode
+                self?.bookmarkStore.applyFavoritesDisplayMode(displayMode)
                 self?.loadBookmarks()
             }
     }
@@ -321,16 +323,10 @@ final class LocalBookmarkManager: BookmarkManager {
         return results
     }
 
-    // MARK: - Debugging
+    // MARK: - Sync
 
-    func resetBookmarks() {
-        guard let store = bookmarkStore as? LocalBookmarkStore else {
-            return
-        }
-
-        store.resetBookmarks()
-        loadBookmarks()
-        requestSync()
+    func handleFavoritesAfterDisablingSync() {
+        bookmarkStore.handleFavoritesAfterDisablingSync()
     }
 
     func requestSync() {
@@ -341,5 +337,17 @@ final class LocalBookmarkManager: BookmarkManager {
             os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
             syncService.scheduler.notifyDataChanged()
         }
+    }
+
+    // MARK: - Debugging
+
+    func resetBookmarks() {
+        guard let store = bookmarkStore as? LocalBookmarkStore else {
+            return
+        }
+
+        store.resetBookmarks()
+        loadBookmarks()
+        requestSync()
     }
 }

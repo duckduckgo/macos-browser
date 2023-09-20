@@ -68,7 +68,7 @@ final class SyncDataProviders: DataProvidersSource {
                 self?.bookmarksAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: isSyncDisabled)
                 self?.credentialsAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: isSyncDisabled)
                 if isSyncDisabled {
-                    AppearancePreferences.shared.favoritesDisplayMode = .displayNative(.desktop)
+                    self?.bookmarksAdapter.handleFavoritesAfterDisablingSync()
                 }
             }
 

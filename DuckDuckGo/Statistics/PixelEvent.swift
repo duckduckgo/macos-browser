@@ -293,6 +293,7 @@ extension Pixel {
 
             case bookmarksCleanupFailed
             case bookmarksCleanupAttemptedWhileSyncWasEnabled
+            case favoritesCleanupFailed
 
             case credentialsDatabaseCleanupFailed
             case credentialsCleanupAttemptedWhileSyncWasEnabled
@@ -680,6 +681,7 @@ extension Pixel.Event.Debug {
 
         case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
         case .bookmarksCleanupAttemptedWhileSyncWasEnabled: return "bookmarks_cleanup_attempted_while_sync_was_enabled"
+        case .favoritesCleanupFailed: return "favorites_cleanup_failed"
 
         case .credentialsDatabaseCleanupFailed: return "credentials_database_cleanup_failed"
         case .credentialsCleanupAttemptedWhileSyncWasEnabled: return "credentials_cleanup_attempted_while_sync_was_enabled"

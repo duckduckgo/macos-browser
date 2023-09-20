@@ -28,7 +28,14 @@ final class SyncBookmarksAdapter {
     private(set) var provider: BookmarksProvider?
     let databaseCleaner: BookmarkDatabaseCleaner
 
-    init(database: CoreDataDatabase) {
+    init(
+        database: CoreDataDatabase,
+        bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+        appearancePreferences: AppearancePreferences = .shared
+    ) {
+        self.database = database
+        self.bookmarkManager = bookmarkManager
+        self.appearancePreferences = appearancePreferences
         databaseCleaner = BookmarkDatabaseCleaner(
             bookmarkDatabase: database,
             errorEvents: BookmarksCleanupErrorHandling(),
@@ -42,6 +49,13 @@ final class SyncBookmarksAdapter {
             databaseCleaner.scheduleRegularCleaning()
         } else {
             databaseCleaner.cancelCleaningSchedule()
+        }
+    }
+
+    func handleFavoritesAfterDisablingSync() {
+        bookmarkManager.handleFavoritesAfterDisablingSync()
+        if appearancePreferences.favoritesDisplayMode.isDisplayAll {
+            appearancePreferences.favoritesDisplayMode = .displayNative(.desktop)
         }
     }
 
@@ -76,4 +90,7 @@ final class SyncBookmarksAdapter {
     }
 
     private var syncErrorCancellable: AnyCancellable?
+    private let bookmarkManager: BookmarkManager
+    private let database: CoreDataDatabase
+    private let appearancePreferences: AppearancePreferences
 }

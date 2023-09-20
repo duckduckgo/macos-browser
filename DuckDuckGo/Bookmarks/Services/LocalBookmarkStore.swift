@@ -37,10 +37,10 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     // Directly used in tests
-    init(contextProvider: @escaping () -> NSManagedObjectContext) {
+    init(contextProvider: @escaping () -> NSManagedObjectContext, appearancePreferences: AppearancePreferences = .shared) {
         self.contextProvider = contextProvider
 
-        favoritesDisplayMode = AppearancePreferences.shared.favoritesDisplayMode
+        favoritesDisplayMode = appearancePreferences.favoritesDisplayMode
         migrateToFormFactorSpecificFavoritesFolders()
         removeInvalidBookmarkEntities()
         cacheReadOnlyTopLevelBookmarksFolders()
@@ -231,8 +231,8 @@ final class LocalBookmarkStore: BookmarkStore {
 
     // MARK: - Bookmarks
 
-    func applyFavoritesDisplayMode(_ configuration: FavoritesDisplayMode) {
-        favoritesDisplayMode = configuration
+    func applyFavoritesDisplayMode(_ displayMode: FavoritesDisplayMode) {
+        favoritesDisplayMode = displayMode
         cacheReadOnlyTopLevelBookmarksFolders()
     }
 
@@ -877,6 +877,26 @@ final class LocalBookmarkStore: BookmarkStore {
         }
 
         cacheReadOnlyTopLevelBookmarksFolders()
+    }
+
+    // MARK: - Sync
+
+    func handleFavoritesAfterDisablingSync() {
+        applyChangesAndSave { [weak self] context in
+            guard let self else {
+                return
+            }
+            if self.favoritesDisplayMode.isDisplayAll {
+                BookmarkUtils.copyFavorites(from: .unified, to: .desktop, removingNonNativeFavoritesFrom: .mobile, in: context)
+            } else {
+                BookmarkUtils.copyFavorites(from: .desktop, to: .unified, removingNonNativeFavoritesFrom: .mobile, in: context)
+            }
+        } onError: { error in
+            let nsError = error as NSError
+            let processedErrors = CoreDataErrorsParser.parse(error: nsError)
+            let params = processedErrors.errorPixelParameters
+            Pixel.fire(.debug(event: .favoritesCleanupFailed, error: error), withAdditionalParameters: params)
+        } onDidSave: {}
     }
 
     // MARK: - Concurrency
