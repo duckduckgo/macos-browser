@@ -190,6 +190,11 @@ extension Preferences {
                                     title: UserText.bitwardenWaitingForHandshake,
                                     buttonValue: .init(title: UserText.bitwardenPreferencesCompleteSetup, action: { model.presentBitwardenSetupFlow() }))
                 .offset(x: Preferences.Const.autoLockWarningOffset)
+            case .accessToContainersNotApproved:
+                BitwardenStatusView(iconType: .error,
+                                    title: UserText.bitwardenCantAccessContainer,
+                                    buttonValue: .init(title: UserText.openSystemSettins, action: { model.openSettings() }))
+                .offset(x: Preferences.Const.autoLockWarningOffset)
             case .handshakeNotApproved:
                 BitwardenStatusView(iconType: .error,
                                     title: UserText.bitwardenHanshakeNotApproved,
@@ -262,6 +267,8 @@ private struct BitwardenStatusView: View {
             HStack {
                 Image(iconType.imageName)
                 Text(title)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding([.leading, .trailing], 6)
             .padding([.top, .bottom], 2)

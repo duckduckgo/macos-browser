@@ -177,4 +177,12 @@ final class AutofillPreferencesModel: ObservableObject {
         PasswordManagerCoordinator.shared.openPasswordManager()
     }
 
+    func openSettings() {
+        guard let link = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles") else {
+            assertionFailure("Can't initialize link to Settings")
+            return
+        }
+        NSWorkspace.shared.open(link)
+    }
+
 }
