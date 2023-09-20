@@ -834,6 +834,12 @@ extension NavigationBarViewController: NSMenuDelegate {
     @objc
     private func toggleHomeButtonPinning(_ sender: NSMenuItem) {
         LocalPinningManager.shared.togglePinning(for: .homeButton)
+        if LocalPinningManager.shared.isPinned(.homeButton) {
+            Pixel.fire(.enableHomeButton)
+        } else {
+            Pixel.fire(.disableHomeButton)
+        }
+
     }
 
     // MARK: - Network Protection

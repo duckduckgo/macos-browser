@@ -157,6 +157,11 @@ extension Pixel {
         case networkProtectionWaitlistTermsAndConditionsDisplayed
         case networkProtectionWaitlistTermsAndConditionsAccepted
 
+        // 28-day Home Button
+        case enableHomeButton
+        case disableHomeButton
+        case setnewHomePage
+
         enum Debug {
 
             case assertionFailure(message: String, file: StaticString, line: UInt)
@@ -438,6 +443,14 @@ extension Pixel.Event {
             return "m_mac_netp_imp_terms"
         case .networkProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_netp_ev_terms_accepted"
+
+        // 28-day Home Button
+        case .enableHomeButton:
+            return "m_mac_enable_home_button"
+        case .disableHomeButton:
+            return "m_mac_disable_home_button"
+        case .setnewHomePage:
+            return "m_mac_set_new_homepage"
         }
 
     }
