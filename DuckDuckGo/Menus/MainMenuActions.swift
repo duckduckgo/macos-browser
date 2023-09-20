@@ -34,7 +34,7 @@ extension AppDelegate {
     // MARK: - DuckDuckGo
 
     @IBAction func checkForUpdates(_ sender: Any?) {
-#if !APPSTORE && !DBP
+#if SPARKLE
         updateController.checkForUpdates(sender)
 #endif
     }
@@ -296,6 +296,13 @@ extension MainViewController {
         // instead of closing a pinned tab we select the first regular tab
         // (this is in line with Safari behavior)
         // If there are no regular tabs, we close the window.
+        var isHandlingKeyDownEvent: Bool {
+            guard sender is NSMenuItem,
+                  let currentEvent = NSApp.currentEvent,
+                  case .keyDown = currentEvent.type,
+                  currentEvent.modifierFlags.contains(.command) else { return false }
+             return true
+        }
         if isHandlingKeyDownEvent, tab.isPinned {
             if tabCollectionViewModel.tabCollection.tabs.isEmpty {
                 view.window?.performClose(sender)
@@ -667,14 +674,19 @@ extension MainViewController {
         UserDefaults.standard.set(Date(), forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @IBAction func changeInstallDateToLessThanAWeekAgo(_ sender: Any?) {
-        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())
-        UserDefaults.standard.set(yesterday, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @IBAction func changeInstallDateToLessThan21DaysAgo(_ sender: Any?) {
+        let lessThanTwentyOneDaysAgo = Calendar.current.date(byAdding: .day, value: -20, to: Date())
+        UserDefaults.standard.set(lessThanTwentyOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @IBAction func changeInstallDateToMoreThanAWeekAgo(_ sender: Any?) {
-        let aWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())
-        UserDefaults.standard.set(aWeekAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @IBAction func changeInstallDateToMoreThan21DaysAgoButLessThan27(_ sender: Any?) {
+        let twentyOneDaysAgo = Calendar.current.date(byAdding: .day, value: -21, to: Date())
+        UserDefaults.standard.set(twentyOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    }
+
+    @IBAction func changeInstallDateToMoreThan27DaysAgo(_ sender: Any?) {
+        let twentyEightDaysAgo = Calendar.current.date(byAdding: .day, value: -28, to: Date())
+        UserDefaults.standard.set(twentyEightDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {

@@ -109,6 +109,7 @@ public final class InMemoryDataCache {
     var brokerProfileQueryData = [BrokerProfileQueryData]()
 
     weak var delegate: InMemoryDataCacheDelegate?
+    weak var scanDelegate: DBPUIScanOps?
 
     private let emptyProfile: DataBrokerProtectionProfile = {
         DataBrokerProtectionProfile(names: [], addresses: [], phones: [], birthYear: -1)
@@ -219,6 +220,6 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
     }
 
     func startScanAndOptOut() -> Bool {
-        return false
+        return scanDelegate?.startScan() ?? false
     }
 }

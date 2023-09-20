@@ -532,6 +532,7 @@ struct UserText {
 
     static let onboardingWelcomeTitle = NSLocalizedString("onboarding.welcome.title", value: "Welcome to DuckDuckGo!", comment: "General welcome to the app title")
     static let onboardingWelcomeText = NSLocalizedString("onboarding.welcome.text", value: "Tired of being tracked online? You've come to the right place 👍\n\nI'll help you stay private️ as you search and browse the web. Trackers be gone!", comment: "Detailed welcome to the app text")
+    static let onboardingWelcomeTextV2 = NSLocalizedString("onboarding.welcome.text.v2", value: "Tired of being tracked online? You've come to the right place 👍\n\nTry searching or visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible\u{00A0}🔒", comment: "Detailed welcome to the app text")
     static let onboardingImportDataText = NSLocalizedString("onboarding.importdata.text", value: "First, let me help you import your bookmarks 📖 and passwords 🔑 from those less private browsers.", comment: "Call to action to import data from other browsers")
     static let onboardingSetDefaultText = NSLocalizedString("onboarding.setdefault.text", value: "Next, try setting DuckDuckGo as your default️ browser, so you can open links with peace of mind, every time.", comment: "Call to action to set the browser as default")
     static let onboardingStartBrowsingText = NSLocalizedString("onboarding.startbrowsing.text", value: "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible\u{00A0}🔒", comment: "Call to action to start using the app as a browser")
@@ -827,8 +828,8 @@ struct UserText {
     static let disable = NSLocalizedString("disable", value: "Disable", comment: "Email protection Disable button text")
 
 #if DBP
-    static let dataBrokerProtectionOptionsMenuItem = NSLocalizedString("data-broker-protection.optionsMenu", value: "Data Broker Protection", comment: "Menu item data broker protection feature")
-    static let tabDataBrokerProtectionTitle = NSLocalizedString("tab.dbp.title", value: "Data Broker Protection", comment: "Tab data broker protection title")
+    static let dataBrokerProtectionOptionsMenuItem = NSLocalizedString("data-broker-protection.optionsMenu", value: "Personal Information Removal", comment: "Menu item data broker protection feature")
+    static let tabDataBrokerProtectionTitle = NSLocalizedString("tab.dbp.title", value: "Personal Information Removal", comment: "Tab data broker protection title")
 #endif //DBP
 
     // Bookmarks bar prompt

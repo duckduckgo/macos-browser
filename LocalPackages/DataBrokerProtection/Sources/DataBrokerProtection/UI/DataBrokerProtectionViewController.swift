@@ -20,6 +20,11 @@ import Cocoa
 import SwiftUI
 import BrowserServicesKit
 import WebKit
+import Combine
+
+protocol DBPUIScanOps: AnyObject {
+    func startScan() -> Bool
+}
 
 final public class DataBrokerProtectionViewController: NSViewController {
     private let navigationViewModel: ContainerNavigationViewModel
@@ -34,6 +39,8 @@ final public class DataBrokerProtectionViewController: NSViewController {
     private let prefs: ContentScopeProperties?
     private var communicationLayer: DBPUICommunicationLayer?
     private var webView: WKWebView?
+    private var cancellables = Set<AnyCancellable>()
+    private var lastSchedulerStatus: DataBrokerProtectionSchedulerStatus = .idle
 
     private let debugPage: String = """
     <!DOCTYPE html>
@@ -50,6 +57,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
             <input type="button" value="Set Birth Year" onclick="setBirthYear()">
             <input type="button" value="Set State" onclick="handshake()">
             <input type="button" value="Get Profile" onclick="getProfile()">
+            <input type="button" value="Start Scan" onclick="startScan()">
         </form>
 
         <p id="output"></p>
@@ -62,9 +70,9 @@ final public class DataBrokerProtectionViewController: NSViewController {
                     "method": "addNameToCurrentUserProfile",
                     "id": "abc123",
                     "params": {
-                        "first": "John",
-                        "middle": "Jacob",
-                        "last": "JingleHeimerSchmidt"
+                        "first": "Bradley",
+                        "middle": "Curtis",
+                        "last": "Slayter"
                     }
                 })
             }
@@ -76,22 +84,29 @@ final public class DataBrokerProtectionViewController: NSViewController {
                     "method": "addAddressToCurrentUserProfile",
                     "id": "abc123",
                     "params": {
-                        "street": "123 easy ln",
-                        "city": "Anytown",
+                        "street": "3003 Lake Ridge Dr",
+                        "city": "Sanger",
                         "state": "TX"
                     }
                 })
             }
 
             function setBirthYear() {
-                let year = Math.floor(Math.random() * 10) + 1990
                 window.webkit.messageHandlers.dbpui.postMessage({
                     "context": "dbpui",
                     "featureName": "dbpuiCommunication",
                     "method": "setBirthYearForCurrentUserProfile",
                     "params": {
-                        "year": year
+                        "year": 1993
                     }
+                })
+            }
+
+            function startScan() {
+                window.webkit.messageHandlers.dbpui.postMessage({
+                    "context": "dbpui",
+                    "featureName": "dbpuiCommunication",
+                    "method": "startScanAndOptOut"
                 })
             }
 
@@ -144,6 +159,17 @@ final public class DataBrokerProtectionViewController: NSViewController {
         dataManager.fetchProfile(ignoresCache: true)
 
         super.init(nibName: nil, bundle: nil)
+
+        setupCancellable()
+    }
+
+    private func setupCancellable() {
+        scheduler.statusPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                self?.lastSchedulerStatus = status
+                self?.reloadData()
+            }.store(in: &cancellables)
     }
 
     private func setupNotifications() {
@@ -177,6 +203,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
 
         let configuration = WKWebViewConfiguration()
         configuration.applyDBPUIConfiguration(privacyConfig: privacyConfig, prefs: prefs, delegate: dataManager.cache)
+        dataManager.cache.scanDelegate = self
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
 
         if let dbpUIContentController = configuration.userContentController as? DBPUIUserContentController {
@@ -236,7 +263,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
             }
 
             let message = DBPUIScanAndOptOutState(
-                status: .removingProfile,
+                status: DBPUIScanAndOptOutStatus.from(schedulerStatus: lastSchedulerStatus),
                 inProgressOptOuts: inProgress,
                 completedOptOuts: completed
             )
@@ -245,4 +272,11 @@ final public class DataBrokerProtectionViewController: NSViewController {
         }
     }
 
+}
+
+extension DataBrokerProtectionViewController: DBPUIScanOps {
+    func startScan() -> Bool {
+        scheduler.scanAllBrokers(showWebView: true, completion: nil)
+        return true
+    }
 }

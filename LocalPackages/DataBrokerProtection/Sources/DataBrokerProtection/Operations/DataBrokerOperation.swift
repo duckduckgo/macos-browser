@@ -34,14 +34,15 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
 
     var webViewHandler: WebViewHandler? { get set }
     var actionsHandler: ActionsHandler? { get }
+    var stageCalculator: DataBrokerProtectionStageDurationCalculator? { get }
     var continuation: CheckedContinuation<ReturnValue, Error>? { get set }
     var extractedProfile: ExtractedProfile? { get set }
-
     var shouldRunNextStep: () -> Bool { get }
 
     func run(inputValue: InputValue,
              webViewHandler: WebViewHandler?,
              actionsHandler: ActionsHandler?,
+             stageCalculator: DataBrokerProtectionStageDurationCalculator,
              showWebView: Bool) async throws -> ReturnValue
 
     func executeNextStep() async
@@ -51,11 +52,13 @@ extension DataBrokerOperation {
     func run(inputValue: InputValue,
              webViewHandler: WebViewHandler?,
              actionsHandler: ActionsHandler?,
+             stageCalculator: DataBrokerProtectionStageDurationCalculator,
              shouldRunNextStep: @escaping () -> Bool) async throws -> ReturnValue {
 
         try await run(inputValue: inputValue,
                       webViewHandler: webViewHandler,
                       actionsHandler: actionsHandler,
+                      stageCalculator: stageCalculator,
                       showWebView: false)
     }
 }
@@ -67,6 +70,7 @@ extension DataBrokerOperation {
     func runNextAction(_ action: Action) async {
         if let emailConfirmationAction = action as? EmailConfirmationAction {
             do {
+                stageCalculator?.fireOptOutSubmit()
                 try await runEmailConfirmationAction(action: emailConfirmationAction)
                 await executeNextStep()
             } catch {
@@ -80,6 +84,7 @@ extension DataBrokerOperation {
             actionsHandler?.captchaTransactionId = nil
             if let captchaData = try? await captchaService.submitCaptchaToBeResolved(for: captchaTransactionId,
                                                                                      shouldRunNextStep: shouldRunNextStep) {
+                stageCalculator?.fireOptOutCaptchaSolve()
                 await webViewHandler?.execute(action: action, data: .solveCaptcha(CaptchaToken(token: captchaData)))
             } else {
                 await onError(error: .captchaServiceError(CaptchaServiceError.nilDataWhenFetchingCaptchaResult))
@@ -91,6 +96,7 @@ extension DataBrokerOperation {
         if action.needsEmail {
             do {
                 extractedProfile?.email = try await emailService.getEmail()
+                stageCalculator?.fireOptOutEmailGenerate()
             } catch {
                 await onError(error: .emailError(error as? EmailError))
                 return
@@ -112,7 +118,9 @@ extension DataBrokerOperation {
                 pollingIntervalInSeconds: action.pollingTime,
                 shouldRunNextStep: shouldRunNextStep
             )
+            stageCalculator?.fireOptOutEmailReceive()
             try? await webViewHandler?.load(url: url)
+            stageCalculator?.fireOptOutEmailConfirm()
         } else {
             throw EmailError.cantFindEmail
         }
@@ -158,8 +166,10 @@ extension DataBrokerOperation {
 
     func captchaInformation(captchaInfo: GetCaptchaInfoResponse) async {
         do {
+            stageCalculator?.fireOptOutCaptchaParse()
             actionsHandler?.captchaTransactionId = try await captchaService.submitCaptchaInformation(captchaInfo,
                                                                                                      shouldRunNextStep: shouldRunNextStep)
+            stageCalculator?.fireOptOutCaptchaSend()
             await executeNextStep()
         } catch {
             if let captchaError = error as? CaptchaServiceError {
@@ -167,6 +177,16 @@ extension DataBrokerOperation {
             } else {
                 await onError(error: DataBrokerProtectionError.captchaServiceError(.errorWhenSubmittingCaptcha))
             }
+        }
+    }
+
+    func solveCaptcha(with response: SolveCaptchaResponse) async {
+        do {
+            try await webViewHandler?.evaluateJavaScript(response.callback.eval)
+
+            await executeNextStep()
+        } catch {
+            await onError(error: .solvingCaptchaWithCallbackError)
         }
     }
 

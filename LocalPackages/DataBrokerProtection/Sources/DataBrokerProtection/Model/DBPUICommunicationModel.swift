@@ -72,6 +72,17 @@ enum DBPUIScanAndOptOutStatus: String, Codable {
     case noProfileMatch
     case removingProfile
     case complete
+
+    static func from(schedulerStatus status: DataBrokerProtectionSchedulerStatus) -> DBPUIScanAndOptOutStatus {
+        switch status {
+        case .idle:
+            return .notRunning
+        case .running:
+            return .removingProfile
+        case .stopped:
+            return .complete
+        }
+    }
 }
 
 /// Message Object representing a user profile name
