@@ -683,14 +683,19 @@ extension MainViewController {
         UserDefaults.standard.set(Date(), forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @IBAction func changeInstallDateToLessThanAWeekAgo(_ sender: Any?) {
-        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())
-        UserDefaults.standard.set(yesterday, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @IBAction func changeInstallDateToLessThan21DaysAgo(_ sender: Any?) {
+        let lessThanTwentyOneDaysAgo = Calendar.current.date(byAdding: .day, value: -20, to: Date())
+        UserDefaults.standard.set(lessThanTwentyOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @IBAction func changeInstallDateToMoreThanAWeekAgo(_ sender: Any?) {
-        let aWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())
-        UserDefaults.standard.set(aWeekAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @IBAction func changeInstallDateToMoreThan21DaysAgoButLessThan27(_ sender: Any?) {
+        let twentyOneDaysAgo = Calendar.current.date(byAdding: .day, value: -21, to: Date())
+        UserDefaults.standard.set(twentyOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    }
+
+    @IBAction func changeInstallDateToMoreThan27DaysAgo(_ sender: Any?) {
+        let twentyEightDaysAgo = Calendar.current.date(byAdding: .day, value: -28, to: Date())
+        UserDefaults.standard.set(twentyEightDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {

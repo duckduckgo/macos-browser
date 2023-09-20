@@ -179,12 +179,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         if LocalStatisticsStore().atb == nil {
             Pixel.firstLaunchDate = Date()
             // MARK: Enable pixel experiments here
+            PixelExperiment.install()
         }
-        PixelExperiment.cleanup()
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
             // MARK: perform first time launch logic here
         }
+
+        let statisticsLoader = (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)
+        statisticsLoader?.load()
 
         startupSync()
 

@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionOperationError.swift
+//  AttemptInformation.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,19 +18,10 @@
 
 import Foundation
 
-public struct DataBrokerProtectionOperationError {
-    public let error: DataBrokerProtectionError
-    public let dataBrokerName: String
-
-    public var params: [String: String] {
-        if case let .actionFailed(actionID, message) = error {
-            return ["dataBroker": dataBrokerName,
-                    "name": error.name,
-                    "actionID": actionID,
-                    "message": message]
-        } else {
-            return ["dataBroker": dataBrokerName,
-                    "name": error.name]
-        }
-    }
+struct AttemptInformation {
+    let extractedProfileId: Int64
+    let dataBroker: String
+    let attemptId: String
+    let lastStageDate: Date
+    let startDate: Date
 }
