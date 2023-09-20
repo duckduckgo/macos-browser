@@ -49,16 +49,16 @@ final class DailyPixel {
         switch frequency {
         case .dailyOnly:
             if !pixel.hasBeenFiredToday(dailyPixelStorage: storage) {
-                Pixel.shared?.fire(pixelNamed: pixel.name + "_d", withAdditionalParameters: params, includeAppVersionParameter: includeAppVersion)
+                Pixel.shared?.fire(.dailyPixel(pixel, isFirst: true), withAdditionalParameters: params, includeAppVersionParameter: includeAppVersion)
                 updatePixelLastFireDate(pixel: pixel)
             }
         case .dailyAndCount:
             if !pixel.hasBeenFiredToday(dailyPixelStorage: storage) {
-                Pixel.shared?.fire(pixelNamed: pixel.name + "_d", withAdditionalParameters: params, includeAppVersionParameter: includeAppVersion)
+                Pixel.shared?.fire(.dailyPixel(pixel, isFirst: true), withAdditionalParameters: params, includeAppVersionParameter: includeAppVersion)
                 updatePixelLastFireDate(pixel: pixel)
             }
 
-            Pixel.shared?.fire(pixelNamed: pixel.name + "_c", withAdditionalParameters: params, includeAppVersionParameter: includeAppVersion)
+            Pixel.shared?.fire(.dailyPixel(pixel, isFirst: false), withAdditionalParameters: params, includeAppVersionParameter: includeAppVersion)
         }
     }
 

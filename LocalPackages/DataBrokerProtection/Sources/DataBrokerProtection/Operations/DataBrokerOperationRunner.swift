@@ -23,11 +23,13 @@ import Common
 protocol WebOperationRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData,
+              stageCalculator: DataBrokerProtectionStageDurationCalculator,
               showWebView: Bool,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile]
 
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
+                stageCalculator: DataBrokerProtectionStageDurationCalculator,
                 showWebView: Bool,
                 shouldRunNextStep: @escaping () -> Bool) async throws
 }
@@ -35,19 +37,23 @@ protocol WebOperationRunner {
 extension WebOperationRunner {
 
     func scan(_ profileQuery: BrokerProfileQueryData,
+              stageCalculator: DataBrokerProtectionStageDurationCalculator,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
 
         try await scan(profileQuery,
+                       stageCalculator: stageCalculator,
                        showWebView: false,
                        shouldRunNextStep: shouldRunNextStep)
     }
 
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
+                stageCalculator: DataBrokerProtectionStageDurationCalculator,
                 shouldRunNextStep: @escaping () -> Bool) async throws {
 
         try await optOut(profileQuery: profileQuery,
                          extractedProfile: extractedProfile,
+                         stageCalculator: stageCalculator,
                          showWebView: false,
                          shouldRunNextStep: shouldRunNextStep)
     }
@@ -71,9 +77,9 @@ final class DataBrokerOperationRunner: WebOperationRunner {
     }
 
     func scan(_ profileQuery: BrokerProfileQueryData,
+              stageCalculator: DataBrokerProtectionStageDurationCalculator,
               showWebView: Bool,
               shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
-
         let scan = ScanOperation(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
@@ -82,15 +88,14 @@ final class DataBrokerOperationRunner: WebOperationRunner {
             captchaService: captchaService,
             shouldRunNextStep: shouldRunNextStep
         )
-        return try await scan.run(inputValue: (),
-                                  showWebView: showWebView)
+        return try await scan.run(inputValue: (), stageCalculator: stageCalculator, showWebView: showWebView)
     }
 
     func optOut(profileQuery: BrokerProfileQueryData,
                 extractedProfile: ExtractedProfile,
+                stageCalculator: DataBrokerProtectionStageDurationCalculator,
                 showWebView: Bool,
                 shouldRunNextStep: @escaping () -> Bool) async throws {
-
         let optOut = OptOutOperation(
             privacyConfig: privacyConfigManager,
             prefs: contentScopeProperties,
@@ -99,8 +104,7 @@ final class DataBrokerOperationRunner: WebOperationRunner {
             captchaService: captchaService,
             shouldRunNextStep: shouldRunNextStep
         )
-        try await optOut.run(inputValue: extractedProfile,
-                             showWebView: showWebView)
+        try await optOut.run(inputValue: extractedProfile, stageCalculator: stageCalculator, showWebView: showWebView)
     }
 
     deinit {

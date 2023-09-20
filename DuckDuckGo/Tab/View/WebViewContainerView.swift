@@ -133,7 +133,7 @@ final class WebViewContainerView: NSView {
                     // this would slightly break UX in case multiple Full Screen windows are open but it fixes the bug
                     if #available(macOS 12.0, *) {
                         webView.closeAllMediaPresentations {}
-                    } else if #available(macOS 11.4, *) {
+                    } else {
                         webView.closeAllMediaPresentations()
                     }
 
