@@ -40,7 +40,9 @@ final class WebView: WKWebView {
         stopLoading()
         stopMediaCapture()
         stopAllMediaPlayback()
-        fullscreenWindowController?.close()
+        if isInFullScreenMode {
+            fullscreenWindowController?.window?.toggleFullScreen(self)
+        }
         if isInspectorShown {
             closeDeveloperTools()
         }
@@ -56,17 +58,10 @@ final class WebView: WKWebView {
 
     var zoomLevel: DefaultZoomValue {
         get {
-            if #available(macOS 11.0, *) {
-                return DefaultZoomValue(rawValue: pageZoom) ?? .percent100
-            }
-            return DefaultZoomValue(rawValue: magnification) ?? .percent100
+            return DefaultZoomValue(rawValue: pageZoom) ?? .percent100
         }
         set {
-            if #available(macOS 11.0, *) {
-                pageZoom = newValue.rawValue
-            } else {
-                magnification = newValue.rawValue
-            }
+            pageZoom = newValue.rawValue
         }
     }
 
@@ -217,8 +212,6 @@ final class WebView: WKWebView {
 
         // native WKWebView find
         guard self.responds(to: Selector.findString) else {
-            guard #available(macOS 11.0, *) else { fatalError("find in page should be available in X̴P̴ Catalina ( °-° )") }
-
             // fallback to official `findSting:`
             let config = WKFindConfiguration()
             config.backwards = options.contains(.backwards)

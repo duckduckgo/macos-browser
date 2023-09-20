@@ -144,9 +144,7 @@ final class BrowserTabViewController: NSViewController {
         }
         if let previouslySelectedTab = self.previouslySelectedTab {
             tabCollectionViewModel.select(tab: previouslySelectedTab)
-            if #available(macOS 11.0, *) {
-                previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
-            }
+            previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
             self.previouslySelectedTab = nil
         }
     }
@@ -446,7 +444,7 @@ final class BrowserTabViewController: NSViewController {
 
         case .onboarding:
             removeAllTabContent()
-            if !OnboardingViewModel().onboardingFinished {
+            if !OnboardingViewModel().onboardingFinished && PixelExperiment.cohort == .control {
                 requestDisableUI()
             }
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
@@ -910,6 +908,12 @@ extension BrowserTabViewController: OnboardingDelegate {
 
     func onboardingHasFinished() {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: false)
+    }
+
+    func goToNewTabPage() {
+        tabViewModel?.tab.setContent(.homePage)
+        guard let mainVC = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else { return }
+        mainVC.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
     }
 
 }

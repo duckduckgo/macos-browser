@@ -19,6 +19,7 @@
 import Combine
 import Foundation
 import Navigation
+import UniformTypeIdentifiers
 
 final class FindInPageTabExtension: TabExtension {
 
@@ -87,7 +88,7 @@ final class FindInPageTabExtension: TabExtension {
         // hide overlay and reset matchIndex
         webView?.clearFindInPageState()
         try? await webView?.deselectAll()
-        self.isPdf = (await webView?.mimeType == UTType.pdf.mimeType)
+        self.isPdf = (await webView?.mimeType == UTType.pdf.preferredMIMEType)
     }
 
     @MainActor

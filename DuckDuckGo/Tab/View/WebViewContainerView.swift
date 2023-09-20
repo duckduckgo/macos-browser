@@ -20,6 +20,7 @@ import AppKit
 import Combine
 
 final class WebViewContainerView: NSView {
+    @objc
     let webView: WebView
     weak var tab: Tab?
 
@@ -50,7 +51,9 @@ final class WebViewContainerView: NSView {
     }
 
     private var blurViewIsHiddenCancellable: AnyCancellable?
+    private var fullScreenWindowWillCloseCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
+
     override func didAddSubview(_ subview: NSView) {
         // if fullscreen placeholder is shown
         guard self.webView.tabContentView !== self.webView else {
@@ -130,13 +133,30 @@ final class WebViewContainerView: NSView {
                     // this would slightly break UX in case multiple Full Screen windows are open but it fixes the bug
                     if #available(macOS 12.0, *) {
                         webView.closeAllMediaPresentations {}
-                    } else if #available(macOS 11.4, *) {
+                    } else {
                         webView.closeAllMediaPresentations()
                     }
 
                 }
             }
             .store(in: &cancellables)
+
+        fullScreenWindowWillCloseCancellable = NotificationCenter.default.publisher(for: NSWindow.willCloseNotification, object: fullScreenWindow)
+            .sink { [weak self] notification in
+                self?.fullScreenWindowWillCloseCancellable = nil
+                let fullScreenWindowController = (notification.object as? NSWindow)?.windowController
+                DispatchQueue.main.async { [weak fullScreenWindowController] in
+                    guard let fullScreenWindowController else { return }
+                    // just in case.
+                    // if WKFullScreenWindowController receives `close()` the next time it‘s open it will crash because its _webView is nil
+                    // https://errors.duckduckgo.com/organizations/ddg/issues/3411/?project=6&referrer=release-issue-stream
+                    NSException.try {
+                        fullScreenWindowController.setValue(NSView(), forKeyPath: #keyPath(webView))
+                    }
+
+                }
+            }
+
     }
 
     override func removeFromSuperview() {

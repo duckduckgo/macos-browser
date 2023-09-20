@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import BrowserServicesKit
 import Common
+import Foundation
 
 extension HomePage.Models {
 
@@ -121,7 +122,7 @@ extension HomePage.Models {
 
         lazy var statisticsStore: StatisticsStore = LocalStatisticsStore()
 
-        lazy var listOfFeatures = isFirstSession ? FeatureType.allCases: randomiseFeatures()
+        lazy var listOfFeatures = isFirstSession ? firstRunFeatures : randomisedFeatures
 
         private var featuresMatrix: [[FeatureType]] = [[]] {
             didSet {
@@ -264,7 +265,7 @@ extension HomePage.Models {
         // Helper Functions
         @objc private func newTabOpenNotification(_ notification: Notification) {
             if !isFirstSession {
-                listOfFeatures = randomiseFeatures()
+                listOfFeatures = randomisedFeatures
             }
 #if DEBUG
             isFirstSession = false
@@ -278,13 +279,26 @@ extension HomePage.Models {
             refreshFeaturesMatrix()
         }
 
-        private func randomiseFeatures() -> [FeatureType] {
+        var randomisedFeatures: [FeatureType] {
             var features = FeatureType.allCases
             features.shuffle()
             for (index, feature) in features.enumerated() where feature == .defaultBrowser {
                 features.remove(at: index)
                 features.insert(feature, at: 0)
             }
+            return features
+        }
+
+        var firstRunFeatures: [FeatureType] {
+            if PixelExperiment.cohort == .onboardingExperiment1 {
+                var features: [FeatureType] = FeatureType.allCases.filter { $0 != .defaultBrowser && $0 != .importBookmarksAndPasswords }
+                features.insert(.defaultBrowser, at: 0)
+                features.insert(.importBookmarksAndPasswords, at: 1)
+                return features
+            }
+            var features: [FeatureType] = FeatureType.allCases.filter { $0 != .duckplayer && $0 != .cookiePopUp }
+            features.insert(.duckplayer, at: 0)
+            features.insert(.cookiePopUp, at: 1)
             return features
         }
 

@@ -292,12 +292,14 @@ private struct PrivateEmailMessage: View {
         VStack {
             if model.shouldShowPrivateEmailSignedOutMesage {
                 if model.isSignedIn {
-                    Text(model.privateEmailMessage)
-                        .font(.subheadline)
-                        .lineLimit(nil)
-                        .multilineTextAlignment(.leading)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .animation(.easeInOut)
+                    withAnimation(.easeInOut) {
+                        Text(model.privateEmailMessage)
+                            .font(.subheadline)
+                            .lineLimit(nil)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
                 } else {
 
                     if #available(macOS 12.0, *) {
@@ -462,15 +464,17 @@ private struct NotesView: View {
     let characterLimit: Int = 10000
 
     var body: some View {
-
         Text(UserText.pmNotes)
             .bold()
             .padding(.bottom, itemSpacing)
 
         if model.isEditing || model.isNew {
+#if APPSTORE
+            FocusableTextEditor()
+#else
             if #available(macOS 12, *) {
                 FocusableTextEditor()
-            } else if #available(macOS 11, *) {
+            } else {
                 TextEditor(text: $model.notes)
                     .frame(height: 197.0)
                     .font(.body)
@@ -489,21 +493,8 @@ private struct NotesView: View {
                                 .fill(Color(NSColor.textEditorBackgroundColor))
                         }
                     )
-            } else {
-                EditableTextView(text: $model.notes, maxLength: characterLimit)
-                    .frame(height: 197.0)
-                    .clipShape(RoundedRectangle(cornerRadius: cornerRadius,
-                                                style: .continuous))
-                    .overlay(
-                        ZStack {
-                            RoundedRectangle(cornerRadius: cornerRadius)
-                                .stroke(Color(NSColor.textEditorBorderColor), lineWidth: borderWidth)
-                            RoundedRectangle(cornerRadius: cornerRadius)
-                                .fill(Color(NSColor.textEditorBackgroundColor))
-                        }
-                        .allowsHitTesting(false)
-                    )
             }
+#endif
         } else {
             Text(model.notes)
                 .padding(.bottom, interItemSpacing)
@@ -514,7 +505,6 @@ private struct NotesView: View {
                     })
                 }))
         }
-
     }
 
 }

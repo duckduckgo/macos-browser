@@ -30,20 +30,20 @@ final class DataBrokerProtectionProcessor {
     private let operationRunnerProvider: OperationRunnerProvider
     private let notificationCenter: NotificationCenter
     private let operationQueue: OperationQueue
-    private var errorHandler: EventMapping<DataBrokerProtectionOperationError>?
+    private var pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
     init(database: DataBrokerProtectionRepository,
          config: SchedulerConfig,
          operationRunnerProvider: OperationRunnerProvider,
          notificationCenter: NotificationCenter = NotificationCenter.default,
-         errorHandler: EventMapping<DataBrokerProtectionOperationError>? = nil) {
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
 
         self.database = database
         self.config = config
         self.operationRunnerProvider = operationRunnerProvider
         self.notificationCenter = notificationCenter
         self.operationQueue = OperationQueue()
-        self.errorHandler = errorHandler
+        self.pixelHandler = pixelHandler
         self.operationQueue.maxConcurrentOperationCount = config.concurrentOperationsDifferentBrokers
     }
 
@@ -86,13 +86,17 @@ final class DataBrokerProtectionProcessor {
         }
     }
 
+    func stopAllOperations() {
+        operationQueue.cancelAllOperations()
+    }
+
     // MARK: - Private functions
     private func runOperations(operationType: DataBrokerOperationsCollection.OperationType,
                                priorityDate: Date?,
                                showWebView: Bool,
                                completion: @escaping () -> Void) {
 
-        // Before running new operatiosn we check if there is any updates to the broker files.
+        // Before running new operations we check if there is any updates to the broker files.
         // This runs only once per 24 hours.
         if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil) {
             let brokerUpdater = DataBrokerProtectionBrokerUpdater(vault: vault)
@@ -135,7 +139,7 @@ final class DataBrokerProtectionProcessor {
                                                                 priorityDate: priorityDate,
                                                                 notificationCenter: notificationCenter,
                                                                 runner: operationRunnerProvider.getOperationRunner(),
-                                                                errorHandler: errorHandler,
+                                                                pixelHandler: pixelHandler,
                                                                 showWebView: showWebView)
                 collections.append(collection)
 

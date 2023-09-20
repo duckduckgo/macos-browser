@@ -80,6 +80,10 @@ final class ContainerViewModel: ObservableObject {
         scheduler.runAllOperations(showWebView: showWebView)
     }
 
+    func stopAllOperations() {
+        scheduler.stopScheduler()
+    }
+
     func scanAfterProfileCreation(completion: @escaping (ScanResult) -> Void) {
         scheduler.stopScheduler()
 

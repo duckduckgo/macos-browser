@@ -69,9 +69,13 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
     func save(extractedProfile: ExtractedProfile, brokerId: Int64, profileQueryId: Int64) throws -> Int64
     func fetchExtractedProfile(with id: Int64) throws -> ExtractedProfile?
     func fetchExtractedProfiles(for brokerId: Int64, with profileQueryId: Int64) throws -> [ExtractedProfile]
+    func fetchExtractedProfiles(for brokerId: Int64) throws -> [ExtractedProfile]
     func updateRemovedDate(for extractedProfileId: Int64, with date: Date?) throws
 
     func hasMatches() throws -> Bool
+
+    func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation?
+    func save(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) throws
 }
 
 final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDatabaseProvider>: DataBrokerProtectionSecureVault {
@@ -359,6 +363,15 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         }
     }
 
+    func fetchExtractedProfiles(for brokerId: Int64) throws -> [ExtractedProfile] {
+        try executeThrowingDatabaseOperation {
+            let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+            let extractedProfiles = try self.providers.database.fetchExtractedProfiles(for: brokerId)
+
+            return try extractedProfiles.map(mapper.mapToModel(_:))
+        }
+    }
+
     func updateRemovedDate(for extractedProfileId: Int64, with date: Date?) throws {
         try executeThrowingDatabaseOperation {
             try self.providers.database.updateRemovedDate(for: extractedProfileId, with: date)
@@ -368,6 +381,28 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
     func hasMatches() throws -> Bool {
         try executeThrowingDatabaseOperation {
             try self.providers.database.hasMatches()
+        }
+    }
+
+    func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation? {
+        try executeThrowingDatabaseOperation {
+            let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+            if let attemptDB = try self.providers.database.fetchAttemptInformation(for: extractedProfileId) {
+                return mapper.mapToModel(attemptDB)
+            } else {
+                return nil
+            }
+        }
+    }
+
+    func save(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) throws {
+        try executeThrowingDatabaseOperation {
+            let mapper = MapperToDB(mechanism: l2Encrypt(data:))
+            try self.providers.database.save(mapper.mapToDB(extractedProfileId: extractedProfileId,
+                                                            attemptUUID: attemptUUID,
+                                                            dataBroker: dataBroker,
+                                                            lastStageDate: lastStageDate,
+                                                            startTime: startTime))
         }
     }
 

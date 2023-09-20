@@ -18,26 +18,14 @@
 
 import Foundation
 import BrowserServicesKit
+import UniformTypeIdentifiers
 
 extension String {
 
     // MARK: - General
 
-    func nsRange(from range: Range<String.Index>? = nil) -> NSRange {
-        if let range = range {
-            return NSRange(location: self[..<range.lowerBound].utf16.count,
-                           length: self[range].utf16.count)
-        } else {
-            return NSRange(location: 0, length: utf16.count)
-        }
-    }
-
     func truncated(length: Int, trailing: String = "…") -> String {
       return (self.count > length) ? self.prefix(length) + trailing : self
-    }
-
-    subscript (_ range: NSRange) -> Self {
-        .init(self[utf16.index(startIndex, offsetBy: range.lowerBound) ..< utf16.index(startIndex, offsetBy: range.upperBound)])
     }
 
     func escapedJavaScriptString() -> String {
@@ -73,11 +61,15 @@ extension String {
     static func uniqueFilename(for fileType: UTType? = nil) -> String {
         let fileName = UUID().uuidString
 
-        if let ext = fileType?.fileExtension {
+        if let ext = fileType?.preferredFilenameExtension {
             return fileName.appending("." + ext)
         }
 
         return fileName
+    }
+
+    var pathExtension: String {
+        (self as NSString).pathExtension
     }
 
     // MARK: - Mutating

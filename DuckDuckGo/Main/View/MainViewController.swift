@@ -141,8 +141,6 @@ final class MainViewController: NSViewController {
     }
 
     func showBookmarkPromptIfNeeded() {
-        guard #available(macOS 11, *) else { return }
-
         guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
         if bookmarksBarIsVisible {
             // Don't show this to users who obviously know about the bookmarks bar already
@@ -424,8 +422,10 @@ final class MainViewController: NSViewController {
         }
 
         switch selectedTabViewModel.tab.content {
-        case .homePage, .onboarding:
+        case .homePage:
             navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+        case .onboarding:
+            self.view.makeMeFirstResponder()
         case .url:
             browserTabViewController.makeWebViewFirstResponder()
         case .preferences:
@@ -451,8 +451,6 @@ final class MainViewController: NSViewController {
         shouldAdjustFirstResponderOnContentChange = false
         adjustFirstResponder()
     }
-
-    private(set) var isHandlingKeyDownEvent: Bool = false
 
 }
 extension MainViewController: NSDraggingDestination {
@@ -494,12 +492,8 @@ extension MainViewController {
     }
 
     func customKeyDown(with event: NSEvent) -> Bool {
-        isHandlingKeyDownEvent = true
-        defer {
-            isHandlingKeyDownEvent = false
-        }
-       guard let locWindow = self.view.window,
-          NSApplication.shared.keyWindow === locWindow else { return false }
+        guard let locWindow = self.view.window,
+              NSApplication.shared.keyWindow === locWindow else { return false }
 
         let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
             .subtracting(.capsLock)

@@ -23,6 +23,19 @@ import Foundation
 import Common
 import NetworkProtection
 
+extension AppLaunchCommand {
+    var rawValue: String {
+        switch self {
+        case .startVPN: return "startVPN"
+        case .stopVPN: return "stopVPN"
+        case .justOpen: return "justOpen"
+        case .shareFeedback: return "shareFeedback"
+        case .showStatus: return "showStatus"
+        case .enableOnDemand: return "enableOnDemand"
+        }
+    }
+}
+
 /// Launches the main App
 ///
 public final class AppLauncher: AppLaunching {
@@ -36,6 +49,7 @@ public final class AppLauncher: AppLaunching {
     public func launchApp(withCommand command: AppLaunchCommand) async {
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.allowsRunningApplicationSubstitution = false
+        configuration.arguments = [command.rawValue]
 
         if command.hideApp {
             configuration.activates = false
@@ -79,11 +93,11 @@ extension AppLaunchCommand {
     var helperAppPath: String? {
         switch self {
         case .startVPN:
-            return "./Contents/Resources/startVPN.app"
+            return "Contents/Resources/startVPN.app"
         case .stopVPN:
-            return "./Contents/Resources/stopVPN.app"
+            return "Contents/Resources/stopVPN.app"
         case .enableOnDemand:
-            return "./Contents/Resources/enableOnDemand.app"
+            return "Contents/Resources/enableOnDemand.app"
         default:
             return nil
         }

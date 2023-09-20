@@ -346,7 +346,7 @@ private extension NSMenuItem {
     static func popupPermissionRequested(domain: String?) -> NSMenuItem {
         let title = UserText.permissionPopupTitle
         let attributedTitle = NSMutableAttributedString(string: title)
-        attributedTitle.setAttributes([.font: NSFont.systemFont(ofSize: 11.0)], range: title.nsRange())
+        attributedTitle.setAttributes([.font: NSFont.systemFont(ofSize: 11.0)], range: title.fullRange)
 
         let menuItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
         menuItem.attributedTitle = attributedTitle
@@ -366,7 +366,7 @@ private extension NSMenuItem {
         }
 
         let attributedTitle = NSMutableAttributedString(string: title)
-        attributedTitle.setAttributes([.font: NSFont.systemFont(ofSize: 11.0)], range: title.nsRange())
+        attributedTitle.setAttributes([.font: NSFont.systemFont(ofSize: 11.0)], range: title.fullRange)
 
         let menuItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
         menuItem.attributedTitle = attributedTitle

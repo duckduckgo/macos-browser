@@ -142,7 +142,6 @@ extension ContentScopeFeatureToggles {
 }
 
 final class WebViewHandlerMock: NSObject, WebViewHandler {
-
     var wasInitializeWebViewCalled = false
     var wasLoadCalledWithURL: URL?
     var wasWaitForWebViewLoadCalled = false
@@ -150,6 +149,7 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
     var wasExecuteCalledForExtractedProfile = false
     var wasExecuteCalledForProfileData = false
     var wasExecuteCalledForSolveCaptcha = false
+    var wasExecuteJavascriptCalled = false
 
     func initializeWebView(showWebView: Bool) async {
         wasInitializeWebViewCalled = true
@@ -184,6 +184,10 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         }
     }
 
+    func evaluateJavaScript(_ javaScript: String) async throws {
+        wasExecuteJavascriptCalled = true
+    }
+
     func reset() {
         wasInitializeWebViewCalled = false
         wasLoadCalledWithURL = nil
@@ -192,10 +196,12 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         wasExecuteCalledForExtractedProfile = false
         wasExecuteCalledForSolveCaptcha = false
         wasExecuteCalledForProfileData = false
+        wasExecuteJavascriptCalled = false
     }
 }
 
 final class EmailServiceMock: EmailServiceProtocol {
+
     var shouldThrow: Bool = false
 
     func getEmail() async throws -> String {
@@ -206,7 +212,7 @@ final class EmailServiceMock: EmailServiceProtocol {
         return "test@duck.com"
     }
 
-    func getConfirmationLink(from email: String, numberOfRetries: Int, pollingIntervalInSeconds: Int) async throws -> URL {
+    func getConfirmationLink(from email: String, numberOfRetries: Int, pollingIntervalInSeconds: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
         if shouldThrow {
             throw DataBrokerProtectionError.emailError(nil)
         }
@@ -225,7 +231,7 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
     var wasSubmitCaptchaToBeResolvedCalled = false
     var shouldThrow = false
 
-    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse, retries: Int) async throws -> CaptchaTransactionId {
+    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse, retries: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId {
         if shouldThrow {
             throw CaptchaServiceError.errorWhenSubmittingCaptcha
         }
@@ -235,7 +241,7 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
         return "transactionID"
     }
 
-    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId, retries: Int, pollingInterval: Int) async throws -> CaptchaResolveData {
+    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId, retries: Int, pollingInterval: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
         if shouldThrow {
             throw CaptchaServiceError.errorWhenFetchingCaptchaResult
         }
@@ -519,6 +525,10 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
     }
 
     func fetchExtractedProfiles(for brokerId: Int64, with profileQueryId: Int64) throws -> [ExtractedProfile] {
+        return [ExtractedProfile]()
+    }
+
+    func fetchExtractedProfiles(for brokerId: Int64) throws -> [ExtractedProfile] {
         return [ExtractedProfile]()
     }
 

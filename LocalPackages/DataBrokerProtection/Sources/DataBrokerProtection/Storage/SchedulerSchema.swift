@@ -309,3 +309,41 @@ extension ExtractedProfileDB: PersistableRecord, FetchableRecord {
         container[Columns.removedDate] = removedDate
     }
 }
+
+struct OptOutAttemptDB: Codable {
+    let extractedProfileId: Int64
+    let dataBroker: String
+    var attemptId: String
+    var lastStageDate: Date
+    var startDate: Date
+}
+
+extension OptOutAttemptDB: PersistableRecord, FetchableRecord {
+    static let databaseTableName: String = "optOutAttempt"
+
+    static let extractedProfile = belongsTo(ExtractedProfileDB.self)
+
+    enum Columns: String, ColumnExpression {
+        case extractedProfileId
+        case dataBroker
+        case attemptId
+        case lastStageDate
+        case startDate
+    }
+
+    init(row: Row) throws {
+        extractedProfileId = row[Columns.extractedProfileId]
+        dataBroker = row[Columns.dataBroker]
+        attemptId = row[Columns.attemptId]
+        lastStageDate = row[Columns.lastStageDate]
+        startDate = row[Columns.startDate]
+    }
+
+    func encode(to container: inout PersistenceContainer) throws {
+        container[Columns.extractedProfileId] = extractedProfileId
+        container[Columns.dataBroker] = dataBroker
+        container[Columns.attemptId] = attemptId
+        container[Columns.lastStageDate] = lastStageDate
+        container[Columns.startDate] = startDate
+    }
+}
