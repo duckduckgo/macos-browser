@@ -23,13 +23,17 @@ public struct SubscriptionAccessRow: View {
     let name: String
     let description: String
     let isExpanded: Bool
+    let buttonTitle: String?
+    let buttonAction: (() -> Void)?
 
     @State var fullHeight: CGFloat = 0.0
 
-    public init(name: String, description: String, isExpanded: Bool) {
+    public init(name: String, description: String, isExpanded: Bool, buttonTitle: String? = nil, buttonAction: (() -> Void)? = nil) {
         self.name = name
         self.description = description
         self.isExpanded = isExpanded
+        self.buttonTitle = buttonTitle
+        self.buttonAction = buttonAction
     }
 
     public var body: some View {
@@ -60,8 +64,10 @@ public struct SubscriptionAccessRow: View {
                 Text(description)
                     .fixMultilineScrollableText()
 
-                Button("Action") { }
-                    .buttonStyle(DefaultActionButtonStyle(enabled: true))
+                if let title = buttonTitle, let action = buttonAction {
+                    Button(title) { action() }
+                        .buttonStyle(DefaultActionButtonStyle(enabled: true))
+                }
 
                 Spacer()
                     .frame(height: 10)

@@ -18,16 +18,16 @@
 
 import Foundation
 
-public struct AccessChannel: Identifiable, Hashable {
-    public var id = UUID()
-    public var name: String
-    public var image: String
-    public var description: String
-
-    public static func activateItems() -> [AccessChannel] {
-        [AccessChannel(name: "Apple ID", image: "", description: "Your subscription is automatically available on any device signed in to the same Apple ID."),
-         AccessChannel(name: "Email", image: "", description: "Use your email to access your subscription on this device"),
-//         AccessChannel(name: "Zzzzz", image: "", description: "Use your email to access your subscription on this device. Use your email to access your subscription on this device. Use your email to access your subscription on this device. Use your email to access your subscription on this device. Use your email to access your subscription on this device. Use your email to access your subscription on this device. "),
-         AccessChannel(name: "Sync", image: "", description: "DuckDuckPro is automatically available on your Synced devices. Manage your synced devices in Sync settings.")]
-    }
-}
+//public struct AccessChannel: Identifiable, Hashable {
+//    public var id = UUID()
+//    public var name: String
+//    public var image: String
+//    public var description: String
+//
+//    public static func activateItems() -> [AccessChannel] {
+//        [AccessChannel(name: "Apple ID", image: "", description: "Your subscription is automatically available on any device signed in to the same Apple ID."),
+//         AccessChannel(name: "Email", image: "", description: "Use your email to access your subscription on this device"),
+////         AccessChannel(name: "Zzzzz", image: "", description: "Use your email to access your subscription on this device. Use your email to access your subscription on this device. Use your email to access your subscription on this device. Use your email to access your subscription on this device. Use your email to access your subscription on this device. Use your email to access your subscription on this device. "),
+//         AccessChannel(name: "Sync", image: "", description: "DuckDuckPro is automatically available on your Synced devices. Manage your synced devices in Sync settings.")]
+//    }
+//}

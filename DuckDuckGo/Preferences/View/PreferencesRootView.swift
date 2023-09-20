@@ -19,6 +19,7 @@
 import SwiftUI
 import SwiftUIExtensions
 import SyncUI
+import Subscription
 
 fileprivate extension Preferences.Const {
     static let sidebarWidth: CGFloat = 256
@@ -53,7 +54,12 @@ extension Preferences {
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
                             case .privacyPro:
-                                PrivacyProView(model: PrivacyProPreferencesModel())
+                                let actionHandler = ActivateSubscriptionAccessActionHandlers(openURLHandler: { url in
+                                    WindowControllersManager.shared.show(url: url, newTab: true)
+                                }, goToSyncPreferences: {                                    self.model.selectPane(.sync)
+                                })
+                                let model = PrivacyProPreferencesModel(sheetActionHandler: actionHandler)
+                                PrivacyProView(model: model)
                             case .autofill:
                                 AutofillView(model: AutofillPreferencesModel())
                             case .downloads:

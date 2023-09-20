@@ -18,17 +18,23 @@
 
 import Foundation
 import Accounts
+import Subscription
 import AppKit
 
 final class PrivacyProPreferencesModel: ObservableObject {
 
     @Published
     var isSignedIn: Bool = false
+    lazy var sheetModel: SubscriptionAccessModel = {
+        ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
+    }()
 
     private let accountManager: AccountManager
+    private let sheetActionHandler: ActivateSubscriptionAccessActionHandlers
 
-    init(accountManager: AccountManager = AccountManager()) {
+    init(accountManager: AccountManager = AccountManager(), sheetActionHandler: ActivateSubscriptionAccessActionHandlers) {
         self.accountManager = accountManager
+        self.sheetActionHandler = sheetActionHandler
 
         isSignedIn = accountManager.isSignedIn
 

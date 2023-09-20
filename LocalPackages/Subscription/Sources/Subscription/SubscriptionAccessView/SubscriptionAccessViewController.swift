@@ -30,7 +30,15 @@ public final class SubscriptionAccessViewController: NSViewController {
     }
 
     public override func loadView() {
-        let subscriptionAccessView = SubscriptionAccessView(dismiss: { [weak self] in
+        let actionHandlers = ActivateSubscriptionAccessActionHandlers(openURLHandler: { _ in
+            // open URL here
+        }, goToSyncPreferences: {
+            // go to sync
+        })
+
+        let model = ActivateSubscriptionAccessModel(actionHandlers: actionHandlers)
+        let subscriptionAccessView = SubscriptionAccessView(model: model,
+                                                            dismiss: { [weak self] in
                 guard let self = self else { return }
                 self.presentingViewController?.dismiss(self)
         })

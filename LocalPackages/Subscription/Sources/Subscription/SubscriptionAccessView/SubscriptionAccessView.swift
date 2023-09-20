@@ -22,14 +22,16 @@ import SwiftUIExtensions
 public struct SubscriptionAccessView: View {
 
     @Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
+    private let model: SubscriptionAccessModel
+
     private let dismissAction: (() -> Void)?
 
-    let items = AccessChannel.activateItems()
-    @State private var selection: UUID?
+    @State private var selection: AccessChan?
     @State var fullHeight: CGFloat = 0.0
 
-    public init(dismiss: (() -> Void)? = nil) {
-            self.dismissAction = dismiss
+    public init(model: SubscriptionAccessModel, dismiss: (() -> Void)? = nil) {
+        self.model = model
+        self.dismissAction = dismiss
         print(" -- init SubscriptionAccessView")
     }
 
@@ -42,15 +44,23 @@ public struct SubscriptionAccessView: View {
                 .fixMultilineScrollableText()
 
             VStack(spacing: 0) {
-                ForEach(items) { item in
-                    SubscriptionAccessRow(name: item.name, description: item.description, isExpanded: self.selection == item.id)
+                ForEach(model.items) { item in
+                    SubscriptionAccessRow(name: model.title(for: item),
+                                          description: model.description(for: item),
+                                          isExpanded: self.selection == item.id,
+                                          buttonTitle: model.buttonTitle(for: item),
+                                          buttonAction: {
+                        dismiss {
+                            model.handleAction(for: item)
+                        }
+                    })
                         .contentShape(Rectangle())
                         .onTapGesture {
-                            self.selection = (selection == item.id) ? nil : item.id
+                            self.selection = (selection == item) ? nil : item
                         }
                         .padding(.vertical, 10)
 
-                    if items.last != item {
+                    if model.items.last != item {
                         Divider()
                     }
                 }
@@ -73,12 +83,22 @@ public struct SubscriptionAccessView: View {
                 Spacer()
 
                 Button("Cancel") {
-                    dismissAction?()
-                    presentationMode.wrappedValue.dismiss()
+                    dismiss()
                 }
             }
         }
         .padding(20)
         .frame(width: 480)
+    }
+
+    private func dismiss(completion: (() -> Void)? = nil) {
+        dismissAction?()
+        presentationMode.wrappedValue.dismiss()
+
+        if let completion = completion {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                completion()
+            }
+        }
     }
 }

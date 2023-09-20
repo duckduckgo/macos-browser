@@ -32,7 +32,7 @@ extension Preferences {
                 // TITLE
                 TextMenuTitle(text: "Privacy Pro")
                     .sheet(isPresented: $showingSheet) {
-                        SubscriptionAccessView()
+                        SubscriptionAccessView(model: model.sheetModel)
                     }
 
                 Spacer()
