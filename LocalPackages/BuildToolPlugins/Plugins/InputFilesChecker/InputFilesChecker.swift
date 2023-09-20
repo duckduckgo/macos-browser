@@ -34,7 +34,11 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("PFMoveApplication.m", .source),
     .init("NetworkProtectionBundle.swift", .source),
     .init("NetworkProtectionAppEvents.swift", .source),
-    .init("KeychainType+ClientDefault.swift", .source)
+    .init("KeychainType+ClientDefault.swift", .source),
+    .init("NetworkProtectionRemoteMessage.swift", .source),
+    .init("NetworkProtectionRemoteMessaging.swift", .source),
+    .init("NetworkProtectionRemoteMessagingStorage.swift", .source),
+    .init("NetworkProtectionRemoteMessagingRequest.swift", .source)
 ]
 
 /**
@@ -59,7 +63,9 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
 
     "Unit Tests": [
         .init("BWEncryptionTests.swift", .source),
-        .init("WKWebViewPrivateMethodsAvailabilityTests.swift", .source)
+        .init("WKWebViewPrivateMethodsAvailabilityTests.swift", .source),
+        .init("NetworkProtectionRemoteMessageTests.swift", .source),
+        .init("network-protection-messages.json", .resource)
     ],
 
     "Integration Tests": []

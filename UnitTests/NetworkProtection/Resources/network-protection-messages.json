@@ -1,0 +1,17 @@
+[
+    {
+        "id": "123",
+        "daysSinceNetworkProtectionEnabled": 1,
+        "cardTitle": "Title 1",
+        "cardDescription": "Description 1",
+        "cardAction": "Action 1"
+    },
+    {
+        "id": "456",
+        "daysSinceNetworkProtectionEnabled": 2,
+        "cardTitle": "Title 2",
+        "cardDescription": "Description 2",
+        "cardAction": "Action 2",
+        "surveyURL": "https://duckduckgo.com/"
+    }
+]
