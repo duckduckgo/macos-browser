@@ -17,7 +17,9 @@ let package = Package(
     targets: [
         .target(
             name: "Subscription",
-            dependencies: []),
+            dependencies: [
+                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
+            ]),
         .testTarget(
             name: "SubscriptionTests",
             dependencies: ["Subscription"]),
