@@ -876,9 +876,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
     func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {
 #if NETWORK_PROTECTION
-        if #available(macOS 11.4, *) {
-            toggleNetworkProtectionPopover()
-        }
+        toggleNetworkProtectionPopover()
 #else
         fatalError("Tried to open Network Protection when it was disabled")
 #endif
