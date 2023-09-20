@@ -131,7 +131,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                     let extractedProfilesForBroker = database.fetchExtractedProfiles(for: brokerId)
                     let doesProfileExistsInDatabase = extractedProfilesForBroker.contains { $0.profileUrl == extractedProfile.profileUrl }
 
-                    // If the profile exists we do not create a new opt-out operation, it should exist, and we do not insert the profile into the database.
+                    // If the profile exists we do not create a new opt-out operation
                     if doesProfileExistsInDatabase, let alreadyInDatabaseProfile = extractedProfilesForBroker.first(where: { $0.profileUrl == extractedProfile.profileUrl }), let id = alreadyInDatabaseProfile.id {
                         // If it was removed in the past but was found again when scanning, it means it appearead again, so we reset the remove date.
                         if alreadyInDatabaseProfile.removedDate != nil {
