@@ -1169,19 +1169,12 @@ CQ
                                                                         <action selector="toggleShouldExcludeLocalRoutes:" target="Rah-lS-gno" id="Wdd-D6-yWy"/>
                                                                     </connections>
                                                                 </menuItem>
-                                                                <menuItem title="enable Connection Tester" id="L06-y6-zv3">
-                                                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                                                    <connections>
-                                                                        <action selector="toggleConnectionTesterEnabled:" target="Rah-lS-gno" id="iei-t7-7pG"/>
-                                                                    </connections>
-                                                                </menuItem>
                                                             </items>
                                                         </menu>
                                                     </menuItem>
                                                 </items>
                                                 <connections>
                                                     <outlet property="connectOnLogInMenuItem" destination="fSA-hH-Vum" id="HSf-v8-MYh"/>
-                                                    <outlet property="connectionTesterEnabledMenuItem" destination="L06-y6-zv3" id="uhM-4n-eOm"/>
                                                     <outlet property="excludeLocalNetworksMenuItem" destination="Zak-JJ-7hc" id="vYu-wC-dTl"/>
                                                     <outlet property="exclusionsMenu" destination="j7y-fb-xa6" id="igE-bU-qW4"/>
                                                     <outlet property="mainMenuItem" destination="Dt6-sj-4hn" id="vwa-T8-0ak"/>
