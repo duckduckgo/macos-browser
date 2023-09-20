@@ -98,22 +98,34 @@ final class TabCollectionViewModel: NSObject {
 
     private var cancellables = Set<AnyCancellable>()
 
+    private var startupPreferences: StartupPreferences
+    private var homePage: Tab.TabContent {
+        var homePage: Tab.TabContent = .homePage
+        if startupPreferences.launchToCustomHomePage,
+           let customURL = URL(string: startupPreferences.formattedcustomHomePageURL) {
+            homePage = Tab.TabContent.contentFromURL(customURL)
+        }
+        return homePage
+    }
+
     init(
         tabCollection: TabCollection,
         selectionIndex: Int = 0,
         pinnedTabsManager: PinnedTabsManager?,
-        burnerMode: BurnerMode = .regular
+        burnerMode: BurnerMode = .regular,
+        startupPreferences: StartupPreferences = StartupPreferences.shared
     ) {
         self.tabCollection = tabCollection
         self.pinnedTabsManager = pinnedTabsManager
         self.burnerMode = burnerMode
+        self.startupPreferences = startupPreferences
         super.init()
 
         subscribeToTabs()
         subscribeToPinnedTabsManager()
 
         if tabCollection.tabs.isEmpty {
-            appendNewTab(with: .homePage)
+            appendNewTab(with: homePage)
         }
         self.selectionIndex = .unpinned(selectionIndex)
     }

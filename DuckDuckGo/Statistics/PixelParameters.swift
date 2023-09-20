@@ -139,7 +139,10 @@ extension Pixel.Event {
              .networkProtectionWaitlistNotificationShown,
              .networkProtectionWaitlistNotificationTapped,
              .networkProtectionWaitlistTermsAndConditionsDisplayed,
-             .networkProtectionWaitlistTermsAndConditionsAccepted:
+             .networkProtectionWaitlistTermsAndConditionsAccepted,
+             .enableHomeButton,
+             .disableHomeButton,
+             .setnewHomePage:
             return nil
         }
     }
