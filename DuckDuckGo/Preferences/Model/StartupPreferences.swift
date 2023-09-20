@@ -66,7 +66,7 @@ final class StartupPreferences: ObservableObject {
         guard let url = URL(trimmedAddressBarString: trimmedURL) else {
             return StartupPreferencesUserDefaultsPersistor.defaultURL
         }
-        return url.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: false)
+        return url.toString(decodePunycode: false, dropScheme: false, dropTrailingSlash: false)
     }
 
     var friendlyURL: String {
