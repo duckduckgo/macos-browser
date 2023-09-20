@@ -388,6 +388,11 @@ extension MainViewController {
 
     @IBAction func toggleHomeButton(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .homeButton)
+        if LocalPinningManager.shared.isPinned(.homeButton) {
+            Pixel.fire(.enableHomeButton)
+        } else {
+            Pixel.fire(.disableHomeButton)
+        }
     }
 
     // MARK: - History

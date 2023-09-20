@@ -26,6 +26,7 @@ extension Preferences {
     struct GeneralView: View {
         @ObservedObject var defaultBrowserModel: DefaultBrowserPreferences
         @ObservedObject var startupModel: StartupPreferences
+        @State private var showingCustomHomePageSheet = false
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
@@ -51,13 +52,101 @@ extension Preferences {
                     }
                 }
 
-                // SECTION 2: On Stap
+                // SECTION 2: On Startup
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.onStartup)
-                    ToggleMenuItem(title: UserText.reopenAllWindowsFromLastSession, isOn: $startupModel.restorePreviousSession)
+                    Picker(selection: $startupModel.restorePreviousSession, content: {
+                        Text(UserText.showHomePage).tag(false)
+                        Text(UserText.reopenAllWindowsFromLastSession).tag(true)
+                    }, label: {})
+                    .pickerStyle(.radioGroup)
+                    .offset(x: Const.pickerHorizontalOffset)
+                }
+
+                // SECTION 3: Home Page
+                PreferencePaneSection {
+                    TextMenuItemHeader(text: UserText.homePage)
+                    TextMenuItemCaption(text: UserText.homePageDescription)
+                    Picker(selection: $startupModel.launchToCustomHomePage, label: EmptyView()) {
+                        Text(UserText.newTab).tag(false)
+                        VStack(alignment: .leading) {
+                            HStack(spacing: 15) {
+                                Text(UserText.specificPage)
+                                Button(UserText.setPage) {
+                                    showingCustomHomePageSheet.toggle()
+                                }.disabled(!startupModel.launchToCustomHomePage)
+                            }
+                            TextMenuItemCaption(text: startupModel.friendlyURL)
+                                .padding(.top, 0)
+                                .visibility(!startupModel.launchToCustomHomePage ? .gone : .visible)
+                        }.tag(true)
+                    }
+                    .pickerStyle(.radioGroup)
+                    .offset(x: Const.pickerHorizontalOffset)
+                    .padding(.bottom, 0)
+                }.sheet(isPresented: $showingCustomHomePageSheet) {
+                    CustomHomePageSheet(startupModel: startupModel, isSheetPresented: $showingCustomHomePageSheet)
                 }
 
             }
         }
+    }
+}
+
+struct CustomHomePageSheet: View {
+
+    @ObservedObject var startupModel: StartupPreferences
+    @State var url: String = ""
+    @State var isValidURL: Bool = true
+    @Binding var isSheetPresented: Bool
+
+    var body: some View {
+        VStack(alignment: .center) {
+            Text(UserText.setHomePage)
+                .font(Preferences.Const.Fonts.preferencePaneTitle)
+                .padding(.vertical, 10)
+
+            Group {
+                HStack {
+                    Text(UserText.addressLabel)
+                    TextField("", text: $url)
+                        .frame(width: 250)
+                        .onChange(of: url) { newValue in
+                            validateURL(newValue)
+                        }
+                }
+                .padding(8)
+            }
+            .roundedBorder()
+            .padding(EdgeInsets(top: 10, leading: 15, bottom: 10, trailing: 15))
+
+            Divider()
+
+            HStack(alignment: .center) {
+                Spacer()
+                Button(UserText.cancel) {
+                    isSheetPresented.toggle()
+                }
+                Button(UserText.save) {
+                    saveChanges()
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(!isValidURL)
+            }.padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 15))
+
+        }
+        .padding(.vertical, 10)
+        .onAppear(perform: {
+            url = startupModel.customHomePageURL
+        })
+    }
+
+    private func saveChanges() {
+        startupModel.customHomePageURL = url
+        isSheetPresented.toggle()
+    }
+
+    private func validateURL(_ url: String) {
+        isValidURL = startupModel.isValidURL(url)
     }
 }

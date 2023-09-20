@@ -171,6 +171,7 @@ final class NavigationBarViewController: NSViewController {
             goForwardButton.isHidden = true
             refreshOrStopButton.isHidden = true
             optionsButton.isHidden = true
+            homeButton.isHidden = true
             addressBarTopConstraint.constant = 0
             addressBarBottomConstraint.constant = 0
             addressBarLeftToNavButtonsConstraint.isActive = false
@@ -833,6 +834,12 @@ extension NavigationBarViewController: NSMenuDelegate {
     @objc
     private func toggleHomeButtonPinning(_ sender: NSMenuItem) {
         LocalPinningManager.shared.togglePinning(for: .homeButton)
+        if LocalPinningManager.shared.isPinned(.homeButton) {
+            Pixel.fire(.enableHomeButton)
+        } else {
+            Pixel.fire(.disableHomeButton)
+        }
+
     }
 
     // MARK: - Network Protection

@@ -314,6 +314,17 @@ struct UserText {
     static let makeDefaultBrowser = NSLocalizedString("preferences.default-browser.button.make-default", value: "Make DuckDuckGo Default...", comment: "")
     static let onStartup = NSLocalizedString("preferences.on-startup", value: "On Startup", comment: "Name of the preferences section related to app startup")
     static let reopenAllWindowsFromLastSession = NSLocalizedString("preferences.reopen-windows", value: "Reopen all windows from last session", comment: "Option to control session restoration")
+    static let showHomePage = NSLocalizedString("preferences.show-home", value: "Open a fresh new window", comment: "Option to control session startup")
+    
+    static let homePage = NSLocalizedString("preferences-homepage", value: "Homepage", comment: "Title for Homepage section in settings")
+    static let homePageDescription = NSLocalizedString("preferences-homepage", value: "When clicking the home button or opening new windows", comment: "Homepage behavior description")
+    static let newTab = NSLocalizedString("preferences-homepage-newTab", value: "New Tab page", comment: "Option to open a new tab")
+    static let specificPage = NSLocalizedString("preferences-homepage-customPage", value: "Specific page", comment: "Option to control Specific Home Page")
+    static let setPage = NSLocalizedString("preferences-homepage-set-page", value: "Set Page...", comment: "Option to control the Specific Page")
+    
+    static let setHomePage = NSLocalizedString("preferences-homepage-set-homePage", value: "Set Homepage", comment: "Set Homepage dialog title")
+    static let addressLabel = NSLocalizedString("preferences-homepage-address", value: "Address: ", comment: "Homepage address field label")
+    
     static let theme = NSLocalizedString("preferences.appearance.theme", value: "Theme", comment: "Theme preferences")
     static let addressBar = NSLocalizedString("preferences.appearance.address-bar", value: "Address Bar", comment: "Theme preferences")
     static let showFullWebsiteAddress = NSLocalizedString("preferences.appearance.show-full-url", value: "Full website address", comment: "Option to show full URL in the address bar")
