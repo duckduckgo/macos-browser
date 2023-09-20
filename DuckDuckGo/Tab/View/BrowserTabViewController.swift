@@ -151,7 +151,9 @@ final class BrowserTabViewController: NSViewController {
 
     @objc
     private func onCloseDataBrokerProtection(_ notification: Notification) {
-        guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab else { return }
+        guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab,
+              view.window?.isKeyWindow == true else { return }
+
         self.closeTab(activeTab)
 
         if let previouslySelectedTab = self.previouslySelectedTab {
