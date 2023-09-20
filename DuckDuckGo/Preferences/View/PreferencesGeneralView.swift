@@ -76,7 +76,7 @@ extension Preferences {
                                     showingCustomHomePageSheet.toggle()
                                 }.disabled(!startupModel.launchToCustomHomePage)
                             }
-                            TextMenuItemCaption(text: startupModel.customHomePageFormatted)
+                            TextMenuItemCaption(text: startupModel.friendlyURL)
                                 .padding(.top, 0)
                                 .visibility(!startupModel.launchToCustomHomePage ? .gone : .visible)
                         }.tag(true)

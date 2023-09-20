@@ -55,11 +55,28 @@ final class StartupPreferences: ObservableObject {
         }
     }
 
-    @Published var customHomePageURL: String {
-        didSet {
-            persistor.customHomePageURL = customHomePageURL
-            Pixel.fire(.setnewHomePage)
+    @Published private var _customHomePageURL: String = ""
+    var customHomePageURL: String {
+        get {
+            _customHomePageURL
         }
+        set {
+            let url = formattedURLString(newValue) ?? StartupPreferencesUserDefaultsPersistor.defaultURL
+            _customHomePageURL = url
+            persistor.customHomePageURL = _customHomePageURL
+        }
+    }
+
+    var friendlyURL: String {
+        guard let url = URL(string: customHomePageURL) else {
+            return ""
+        }
+        var friendlyURL = url.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: false)
+        if friendlyURL.count > 30 {
+            let index = friendlyURL.index(friendlyURL.startIndex, offsetBy: 27)
+            friendlyURL = String(friendlyURL[..<index]) + "..."
+        }
+        return friendlyURL
     }
 
     init(persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor()) {
@@ -71,37 +88,17 @@ final class StartupPreferences: ObservableObject {
 
     private var persistor: StartupPreferencesPersistor
 
-    @MainActor
-    func presentHomePageDialog() {
-        let fireproofDomainsWindowController = FireproofDomainsViewController.create().wrappedInWindowController()
-
-        guard let fireproofDomainsWindow = fireproofDomainsWindowController.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
-        else {
-            assertionFailure("Privacy Preferences: Failed to present FireproofDomainsViewController")
-            return
+    private func formattedURLString(_ text: String) -> String? {
+        let trimmedURL = text.trimmingWhitespace()
+        guard let url = URL(trimmedAddressBarString: trimmedURL) else {
+            return nil
         }
-        parentWindowController.window?.beginSheet(fireproofDomainsWindow)
+        return url.absoluteString
     }
 
-    func isValidURL(_ url: String) -> Bool {
-        let urlPattern = #"^https://([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*/?$"#
-        let regex = try? NSRegularExpression(pattern: urlPattern, options: .caseInsensitive)
-        let range = NSRange(location: 0, length: url.utf16.count)
-        return regex?.firstMatch(in: url, options: [], range: range) != nil
+    func isValidURL(_ text: String) -> Bool {
+        guard let url = text.url else { return false }
+        return !text.isEmpty && url.isValid
     }
 
-}
-
-extension StartupPreferences {
-    var customHomePageFormatted: String {
-        var formattedURL = customHomePageURL.replacingOccurrences(of: "https://", with: "")
-
-        if formattedURL.count > 100 {
-            let index = formattedURL.index(formattedURL.startIndex, offsetBy: 97)
-            formattedURL = String(formattedURL[..<index]) + "..."
-        }
-
-        return formattedURL
-    }
 }
