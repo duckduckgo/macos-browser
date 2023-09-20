@@ -12222,8 +12222,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 62.0.3;
+				kind = revision;
+				revision = 60a4e8fda4bfc47ee14c7e7e5b572da88c411504;
 			};
 		};
 		31929F912A4C4CFF0084EA89 /* XCRemoteSwiftPackageReference "OpenSSL-XCFramework" */ = {
@@ -12294,8 +12294,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 78.2.0;
+				kind = revision;
+				revision = 60a4e8fda4bfc47ee14c7e7e5b572da88c411504;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
