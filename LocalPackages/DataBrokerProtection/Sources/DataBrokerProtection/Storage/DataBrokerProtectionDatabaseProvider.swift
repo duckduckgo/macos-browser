@@ -62,6 +62,7 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func save(_ extractedProfile: ExtractedProfileDB) throws -> Int64
     func fetchExtractedProfile(with id: Int64) throws -> ExtractedProfileDB?
     func fetchExtractedProfiles(for brokerId: Int64, with profileQueryId: Int64) throws -> [ExtractedProfileDB]
+    func fetchExtractedProfiles(for brokerId: Int64) throws -> [ExtractedProfileDB]
     func updateRemovedDate(for extractedProfileId: Int64, with date: Date?) throws
 
     func hasMatches() throws -> Bool
@@ -540,6 +541,14 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             return try ExtractedProfileDB
                 .filter(Column(ExtractedProfileDB.Columns.brokerId.name) == brokerId &&
                         Column(ExtractedProfileDB.Columns.profileQueryId.name) == profileQueryId)
+                .fetchAll(db)
+        }
+    }
+
+    func fetchExtractedProfiles(for brokerId: Int64) throws -> [ExtractedProfileDB] {
+        try db.read { db in
+            return try ExtractedProfileDB
+                .filter(Column(ExtractedProfileDB.Columns.brokerId.name) == brokerId)
                 .fetchAll(db)
         }
     }
