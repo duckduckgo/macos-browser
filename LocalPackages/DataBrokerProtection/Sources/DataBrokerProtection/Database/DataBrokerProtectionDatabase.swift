@@ -37,9 +37,13 @@ protocol DataBrokerProtectionRepository {
     func add(_ historyEvent: HistoryEvent)
     func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) -> HistoryEvent?
     func hasMatches() -> Bool
+
+    func fetchAttemptInformation(for extractedProfileId: Int64) -> AttemptInformation?
+    func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date)
 }
 
 final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
+
     private let fakeBrokerFlag: FakeBrokerFlag
     private let vault: (any DataBrokerProtectionSecureVault)?
 
@@ -298,6 +302,29 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         } catch {
             os_log("Database error: wereThereAnyMatches, error: %{public}@", log: .error, error.localizedDescription)
             return false
+        }
+    }
+
+    func fetchAttemptInformation(for extractedProfileId: Int64) -> AttemptInformation? {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            return try vault.fetchAttemptInformation(for: extractedProfileId)
+        } catch {
+            os_log("Database error: fetchAttemptInformation, error: %{public}@", log: .error, error.localizedDescription)
+            return nil
+        }
+    }
+
+    func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            try vault.save(extractedProfileId: extractedProfileId,
+                           attemptUUID: attemptUUID,
+                           dataBroker: dataBroker,
+                           lastStageDate: lastStageDate,
+                           startTime: startTime)
+        } catch {
+            os_log("Database error: addAttempt, error: %{public}@", log: .error, error.localizedDescription)
         }
     }
 }
