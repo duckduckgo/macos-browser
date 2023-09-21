@@ -106,6 +106,19 @@ final class ContainerViewModel: ObservableObject {
         scheduler.stopScheduler()
     }
 
+    func cleanData() {
+        let fileManager = FileManager.default
+        // Not the best way to hardcode this, but it's just for the debug UI
+        let filePath = NSHomeDirectory() + "/Library/Containers/com.duckduckgo.macos.browser.dbp.debug/Data/Library/Application Support/DBP/Vault.db"
+
+        do {
+            try fileManager.removeItem(atPath: filePath)
+        } catch {
+            print("Error removing file: \(error.localizedDescription)")
+        }
+        exit(0)
+    }
+
     func scanAfterProfileCreation(completion: @escaping (ScanResult) -> Void) {
         scanAndUpdateUI(completion: completion)
     }

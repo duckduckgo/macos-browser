@@ -57,6 +57,10 @@ struct DataBrokerProtectionContainerView: View {
                                 navigationViewModel.updateNavigation(.scanStarted)
                                 containerViewModel.scanAfterProfileCreation { scanResult in
                                     updateUIWithScanResult(scanResult: scanResult)
+
+                                    if scanResult == .results && !DataBrokerDebugFlagBlockScheduler().isFlagOn() {
+                                        containerViewModel.runQueuedOperationsAndStartScheduler()
+                                    }
                                 }
                             }, backToDashboardClicked: {
                                 containerViewModel.runQueuedOperationsAndStartScheduler()
@@ -95,7 +99,6 @@ struct DataBrokerProtectionContainerView: View {
         case .results:
             resultsViewModel.reloadData()
             navigationViewModel.updateNavigation(.results)
-            containerViewModel.runQueuedOperationsAndStartScheduler()
         }
     }
 
@@ -130,6 +133,12 @@ struct DataBrokerProtectionContainerView: View {
                 Text("Run Opt-Outs")
             }
 
+            Button {
+                containerViewModel.cleanData()
+            } label: {
+                Text("Clean Data & Close")
+            }
+
             HStack {
                 Picker(selection: $navigationViewModel.bodyViewType,
                        label: Text("Body View Type")) {
@@ -143,7 +152,6 @@ struct DataBrokerProtectionContainerView: View {
         }
         .padding()
         .blurredBackground()
-
     }
 
     @ViewBuilder
