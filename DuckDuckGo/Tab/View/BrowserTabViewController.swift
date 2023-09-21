@@ -48,7 +48,7 @@ final class BrowserTabViewController: NSViewController {
     private var cancellables = Set<AnyCancellable>()
     private var mouseDownCancellable: AnyCancellable?
 
-    private var previouslySelectedTab: Tab?
+    private weak var previouslySelectedTab: Tab?
 
     private var hoverLabelWorkItem: DispatchWorkItem?
 
@@ -131,22 +131,28 @@ final class BrowserTabViewController: NSViewController {
 
     @objc
     private func onDuckDuckGoEmailIncontextSignup(_ notification: Notification) {
+        guard WindowControllersManager.shared.lastKeyMainWindowController === self.view.window?.windowController else { return }
+
         self.previouslySelectedTab = tabCollectionViewModel.selectedTab
-        let tab = Tab(content: .url(EmailUrls().emailProtectionInContextSignupLink), shouldLoadInBackground: true)
+        let tab = Tab(content: .url(EmailUrls().emailProtectionInContextSignupLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab)
     }
 
     @objc
     private func onCloseDuckDuckGoEmailProtection(_ notification: Notification) {
-        guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab else { return }
-        if activeTab.url != nil && EmailUrls().isDuckDuckGoEmailProtection(url: activeTab.url!) {
+        guard WindowControllersManager.shared.lastKeyMainWindowController === self.view.window?.windowController,
+              let previouslySelectedTab else { return }
+
+        if let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab,
+           let url = activeTab.url,
+           EmailUrls().isDuckDuckGoEmailProtection(url: url) {
+
             self.closeTab(activeTab)
         }
-        if let previouslySelectedTab = self.previouslySelectedTab {
-            tabCollectionViewModel.select(tab: previouslySelectedTab)
-            previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
-            self.previouslySelectedTab = nil
-        }
+
+        tabCollectionViewModel.select(tab: previouslySelectedTab)
+        previouslySelectedTab.webView.evaluateJavaScript("window.openAutofillAfterClosingEmailProtectionTab()", in: nil, in: WKContentWorld.defaultClient)
+        self.previouslySelectedTab = nil
     }
 
     @objc
