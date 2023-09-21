@@ -72,7 +72,6 @@ final class SyncDataProviders: DataProvidersSource {
         if syncService.authState == .inactive {
             bookmarksAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: true)
             credentialsAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: true)
-            AppearancePreferences.shared.favoritesDisplayMode = .displayNative(.desktop)
         }
     }
 
