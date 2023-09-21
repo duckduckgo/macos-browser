@@ -720,6 +720,12 @@ protocol NewWindowPolicyDecisionMaker {
             return nil
         }
 
+        // If going back from pages like about:home just reload the existing page
+        // See: https://app.asana.com/0/1201037661562251/1205542173604241/f
+        if self.url == nil {
+            return webView.navigator()?.reload(withExpectedNavigationType: .reload)
+        }
+
         guard error == nil else {
             return webView.navigator()?.reload(withExpectedNavigationType: .reload)
         }
@@ -744,7 +750,9 @@ protocol NewWindowPolicyDecisionMaker {
            let customURL = URL(string: startupPreferences.formattedcustomHomePageURL) {
             webView.load(URLRequest(url: customURL))
         } else {
-            content = .homePage
+            let url = URL(string: "about:home")!
+            webView.load(URLRequest(url: url))
+            // content = .homePage
         }
     }
 
