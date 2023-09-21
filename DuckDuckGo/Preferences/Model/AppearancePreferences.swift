@@ -138,20 +138,11 @@ enum ThemeName: String, Equatable, CaseIterable {
 extension FavoritesDisplayMode: LosslessStringConvertible {
     static let `default` = FavoritesDisplayMode.displayNative(.desktop)
 
-    public var description: String {
-        switch self {
-        case .displayNative:
-            return "display_native"
-        case .displayUnified:
-            return "display_all"
-        }
-    }
-
     public init?(_ description: String) {
         switch description {
-        case "display_native":
+        case FavoritesDisplayMode.displayNative(.desktop).description:
             self = .displayNative(.desktop)
-        case "display_all":
+        case FavoritesDisplayMode.displayUnified(native: .desktop).description:
             self = .displayUnified(native: .desktop)
         default:
             return nil

@@ -21,11 +21,7 @@ import Combine
 import Foundation
 import SyncDataProviders
 
-final class FavoritesDisplayModeSyncHandler: SettingSyncHandler {
-
-    override var setting: SettingsProvider.Setting {
-        .favoritesDisplayMode
-    }
+final class FavoritesDisplayModeSyncHandler: FavoritesDisplayModeSyncHandlerBase {
 
     override func getValue() throws -> String? {
         preferences.favoritesDisplayMode.description

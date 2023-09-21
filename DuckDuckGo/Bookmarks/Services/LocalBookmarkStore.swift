@@ -887,9 +887,9 @@ final class LocalBookmarkStore: BookmarkStore {
                 return
             }
             if self.favoritesDisplayMode.isDisplayUnified {
-                BookmarkUtils.copyFavorites(from: .unified, to: .desktop, removingNonNativeFavoritesFrom: .mobile, in: context)
+                BookmarkUtils.copyFavorites(from: .unified, to: .desktop, clearingNonNativeFavoritesFolder: .mobile, in: context)
             } else {
-                BookmarkUtils.copyFavorites(from: .desktop, to: .unified, removingNonNativeFavoritesFrom: .mobile, in: context)
+                BookmarkUtils.copyFavorites(from: .desktop, to: .unified, clearingNonNativeFavoritesFolder: .mobile, in: context)
             }
         } onError: { error in
             let nsError = error as NSError

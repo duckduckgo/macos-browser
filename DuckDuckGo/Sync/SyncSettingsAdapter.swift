@@ -47,8 +47,7 @@ final class SyncSettingsAdapter {
         let provider = SettingsProvider(
             metadataDatabase: metadataDatabase,
             metadataStore: metadataStore,
-            emailManager: emailManager,
-            settingsHandlers: [FavoritesDisplayModeSyncHandler()],
+            settingsHandlers: [FavoritesDisplayModeSyncHandler(), EmailProtectionSyncHandler(emailManager: emailManager)],
             syncDidUpdateData: { [weak self] in
                 self?.syncDidCompleteSubject.send()
             }
