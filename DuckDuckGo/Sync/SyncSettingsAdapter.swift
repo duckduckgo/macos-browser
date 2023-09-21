@@ -48,7 +48,7 @@ final class SyncSettingsAdapter {
             metadataDatabase: metadataDatabase,
             metadataStore: metadataStore,
             emailManager: emailManager,
-            userDefaultsHandlers: [FavoritesDisplayModeSyncHandler()],
+            settingsHandlers: [FavoritesDisplayModeSyncHandler()],
             syncDidUpdateData: { [weak self] in
                 self?.syncDidCompleteSubject.send()
             }

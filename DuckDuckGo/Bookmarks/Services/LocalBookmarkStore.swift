@@ -224,7 +224,7 @@ final class LocalBookmarkStore: BookmarkStore {
             }
 
             self.rootLevelFolderObjectID = folder.objectID
-            let favoritesFolderUUID = favoritesDisplayMode.displayedPlatform.rawValue
+            let favoritesFolderUUID = favoritesDisplayMode.displayedFolder.rawValue
             self.favoritesFolderObjectID = BookmarkUtils.fetchFavoritesFolder(withUUID: favoritesFolderUUID, in: context)?.objectID
         }
     }
@@ -634,7 +634,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 throw BookmarkStoreError.storeDeallocated
             }
 
-            let displayedFavoritesFolderUUID = favoritesDisplayMode.displayedPlatform.rawValue
+            let displayedFavoritesFolderUUID = favoritesDisplayMode.displayedFolder.rawValue
             guard let displayedFavoritesFolder = BookmarkUtils.fetchFavoritesFolder(withUUID: displayedFavoritesFolderUUID, in: context) else {
                 throw BookmarkStoreError.missingFavoritesRoot
             }

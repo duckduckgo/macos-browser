@@ -87,7 +87,7 @@ internal class BaseBookmarkEntity {
             return Bookmark(id: id,
                             url: url,
                             title: title,
-                            isFavorite: managedObject.isFavorite(on: favoritesDisplayMode.displayedPlatform),
+                            isFavorite: managedObject.isFavorite(on: favoritesDisplayMode.displayedFolder),
                             parentFolderUUID: parentFolderUUID)
         }
     }
