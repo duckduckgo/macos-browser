@@ -85,6 +85,8 @@ class MockBookmarkManager: BookmarkManager {
         BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
     }
 
+    func handleFavoritesAfterDisablingSync() {}
+
     @Published var list: BookmarkList?
 
     var listPublisher: Published<BookmarkList?>.Publisher { $list }

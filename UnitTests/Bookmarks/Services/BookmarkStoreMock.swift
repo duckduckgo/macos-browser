@@ -110,4 +110,5 @@ final class BookmarkStoreMock: BookmarkStore {
     }
 
     func applyFavoritesDisplayMode(_ configuration: FavoritesDisplayMode) {}
+    func handleFavoritesAfterDisablingSync() {}
 }
