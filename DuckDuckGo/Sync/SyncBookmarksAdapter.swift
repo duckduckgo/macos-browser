@@ -47,15 +47,9 @@ final class SyncBookmarksAdapter {
         databaseCleaner.cleanUpDatabaseNow()
         if shouldEnable {
             databaseCleaner.scheduleRegularCleaning()
+            handleFavoritesAfterDisablingSync()
         } else {
             databaseCleaner.cancelCleaningSchedule()
-        }
-    }
-
-    func handleFavoritesAfterDisablingSync() {
-        bookmarkManager.handleFavoritesAfterDisablingSync()
-        if appearancePreferences.favoritesDisplayMode.isDisplayUnified {
-            appearancePreferences.favoritesDisplayMode = .displayNative(.desktop)
         }
     }
 
@@ -87,6 +81,13 @@ final class SyncBookmarksAdapter {
             }
 
         self.provider = provider
+    }
+
+    private func handleFavoritesAfterDisablingSync() {
+        bookmarkManager.handleFavoritesAfterDisablingSync()
+        if appearancePreferences.favoritesDisplayMode.isDisplayUnified {
+            appearancePreferences.favoritesDisplayMode = .displayNative(.desktop)
+        }
     }
 
     private var syncErrorCancellable: AnyCancellable?

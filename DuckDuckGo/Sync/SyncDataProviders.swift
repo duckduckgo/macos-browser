@@ -67,9 +67,6 @@ final class SyncDataProviders: DataProvidersSource {
             .sink { [weak self] isSyncDisabled in
                 self?.bookmarksAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: isSyncDisabled)
                 self?.credentialsAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: isSyncDisabled)
-                if isSyncDisabled {
-                    self?.bookmarksAdapter.handleFavoritesAfterDisablingSync()
-                }
             }
 
         if syncService.authState == .inactive {
