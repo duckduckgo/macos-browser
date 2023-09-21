@@ -54,7 +54,7 @@ final class SyncBookmarksAdapter {
 
     func handleFavoritesAfterDisablingSync() {
         bookmarkManager.handleFavoritesAfterDisablingSync()
-        if appearancePreferences.favoritesDisplayMode.isDisplayAll {
+        if appearancePreferences.favoritesDisplayMode.isDisplayUnified {
             appearancePreferences.favoritesDisplayMode = .displayNative(.desktop)
         }
     }

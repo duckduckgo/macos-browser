@@ -141,18 +141,18 @@ extension FavoritesDisplayMode: LosslessStringConvertible {
     public var description: String {
         switch self {
         case .displayNative:
-            return "displayNative"
-        case .displayAll:
-            return "displayAll"
+            return "display_native"
+        case .displayUnified:
+            return "display_all"
         }
     }
 
     public init?(_ description: String) {
         switch description {
-        case "displayNative":
+        case "display_native":
             self = .displayNative(.desktop)
-        case "displayAll":
-            self = .displayAll(native: .desktop)
+        case "display_all":
+            self = .displayUnified(native: .desktop)
         default:
             return nil
         }

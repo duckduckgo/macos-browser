@@ -53,7 +53,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     @Published var isUnifiedFavoritesEnabled: Bool {
         didSet {
-            AppearancePreferences.shared.favoritesDisplayMode = isUnifiedFavoritesEnabled ? .displayAll(native: .desktop) : .displayNative(.desktop)
+            AppearancePreferences.shared.favoritesDisplayMode = isUnifiedFavoritesEnabled ? .displayUnified(native: .desktop) : .displayNative(.desktop)
             if shouldRequestSyncOnFavoritesOptionChange {
                 syncService.scheduler.notifyDataChanged()
             } else {
@@ -122,13 +122,13 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     init(syncService: DDGSyncing, apperancePreferences: AppearancePreferences = .shared) {
         self.syncService = syncService
 
-        self.isUnifiedFavoritesEnabled = AppearancePreferences.shared.favoritesDisplayMode.isDisplayAll
+        self.isUnifiedFavoritesEnabled = AppearancePreferences.shared.favoritesDisplayMode.isDisplayUnified
 
         self.managementDialogModel = ManagementDialogModel()
         self.managementDialogModel.delegate = self
 
         AppearancePreferences.shared.$favoritesDisplayMode
-            .map(\.isDisplayAll)
+            .map(\.isDisplayUnified)
             .sink { [weak self] isUnifiedFavoritesEnabled in
                 guard let self else {
                     return

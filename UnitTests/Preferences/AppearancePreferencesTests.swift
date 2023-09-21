@@ -87,7 +87,7 @@ final class AppearancePreferencesTests: XCTestCase {
                 showFullURL: true,
                 showAutocompleteSuggestions: false,
                 currentThemeName: ThemeName.light.rawValue,
-                favoritesDisplayMode: FavoritesDisplayMode.displayAll(native: .desktop).description,
+                favoritesDisplayMode: FavoritesDisplayMode.displayUnified(native: .desktop).description,
                 defaultPageZoom: DefaultZoomValue.percent50.rawValue,
                 isContinueSetUpVisible: false,
                 isFavoriteVisible: false,
@@ -97,7 +97,7 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.showFullURL, true)
         XCTAssertEqual(model.showAutocompleteSuggestions, false)
         XCTAssertEqual(model.currentThemeName, ThemeName.light)
-        XCTAssertEqual(model.favoritesDisplayMode, .displayAll(native: .desktop))
+        XCTAssertEqual(model.favoritesDisplayMode, .displayUnified(native: .desktop))
         XCTAssertEqual(model.defaultPageZoom, DefaultZoomValue.percent50)
         XCTAssertEqual(model.isFavoriteVisible, false)
         XCTAssertEqual(model.isContinueSetUpVisible, false)

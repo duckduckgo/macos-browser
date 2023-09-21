@@ -141,7 +141,7 @@ public class LegacyBookmarksStoreMigration {
             index += 1
         }
 
-        let newFavoritesRoots = BookmarkUtils.fetchFavoritesFolders(for: .displayAll(native: .desktop), in: destination)
+        let newFavoritesRoots = BookmarkUtils.fetchFavoritesFolders(for: .displayUnified(native: .desktop), in: destination)
 
         // Preserve the order of favorites
         if let oldFavoritesRoot = favoriteRoot,

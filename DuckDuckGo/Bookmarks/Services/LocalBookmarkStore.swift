@@ -886,7 +886,7 @@ final class LocalBookmarkStore: BookmarkStore {
             guard let self else {
                 return
             }
-            if self.favoritesDisplayMode.isDisplayAll {
+            if self.favoritesDisplayMode.isDisplayUnified {
                 BookmarkUtils.copyFavorites(from: .unified, to: .desktop, removingNonNativeFavoritesFrom: .mobile, in: context)
             } else {
                 BookmarkUtils.copyFavorites(from: .desktop, to: .unified, removingNonNativeFavoritesFrom: .mobile, in: context)
