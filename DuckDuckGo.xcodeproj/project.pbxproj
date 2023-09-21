@@ -12295,7 +12295,7 @@
 			repositoryURL = "https://github.com/duckduckgo/OpenSSL-XCFramework";
 			requirement = {
 				kind = exactVersion;
-				version = 1.1.1900;
+				version = 3.1.2000;
 			};
 		};
 		4B2AAAF329E70DEA0026AFC0 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {

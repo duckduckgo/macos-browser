@@ -65,7 +65,12 @@ extension EventMapping where Event == NetworkProtectionError {
                 .failedToDecodeServerList,
                 .failedToWriteServerList,
                 .couldNotCreateServerListDirectory,
-                .failedToReadServerList:
+                .failedToReadServerList,
+                .wireGuardCannotLocateTunnelFileDescriptor,
+                .wireGuardInvalidState,
+                .wireGuardDnsResolution,
+                .wireGuardSetNetworkSettings,
+                .startWireGuardBackend:
             domainEvent = .networkProtectionUnhandledError(function: #function, line: #line, error: event)
             return
         case .unhandledError(function: let function, line: let line, error: let error):
