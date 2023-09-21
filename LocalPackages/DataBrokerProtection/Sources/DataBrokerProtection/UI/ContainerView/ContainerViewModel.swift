@@ -32,6 +32,7 @@ final class ContainerViewModel: ObservableObject {
     @Published var schedulerStatus = ""
     @Published var showWebView = false
     @Published var useFakeBroker = false
+    @Published var preventSchedulerStart = false
 
     internal init(scheduler: DataBrokerProtectionScheduler,
                   dataManager: DataBrokerProtectionDataManaging) {
@@ -60,13 +61,26 @@ final class ContainerViewModel: ObservableObject {
         $useFakeBroker
             .receive(on: DispatchQueue.main)
             .sink { value in
-                FakeBrokerUserDefaults().setFakeBrokerFlag(value)
+                DataBrokerDebugFlagFakeBroker().setFlag(value)
             }.store(in: &cancellables)
 
+        $preventSchedulerStart
+            .receive(on: DispatchQueue.main)
+            .sink { value in
+                DataBrokerDebugFlagBlockScheduler().setFlag(value)
+            }.store(in: &cancellables)
+
+        $showWebView
+            .receive(on: DispatchQueue.main)
+            .sink { value in
+                DataBrokerDebugFlagShowWebView().setFlag(value)
+            }.store(in: &cancellables)
     }
 
     private func restoreFakeBrokerStatus() {
-        useFakeBroker = FakeBrokerUserDefaults().isFakeBrokerFlagOn()
+        useFakeBroker = DataBrokerDebugFlagFakeBroker().isFlagOn()
+        preventSchedulerStart = DataBrokerDebugFlagBlockScheduler().isFlagOn()
+        showWebView = DataBrokerDebugFlagShowWebView().isFlagOn()
     }
 
     func runQueuedOperationsAndStartScheduler() {
@@ -80,11 +94,23 @@ final class ContainerViewModel: ObservableObject {
         scheduler.runAllOperations(showWebView: showWebView)
     }
 
+    func forceRunScans(completion: @escaping (ScanResult) -> Void) {
+        scanAndUpdateUI(completion: completion)
+    }
+
+    func forceRunOptOuts() {
+        scheduler.optOutAllBrokers(showWebView: showWebView, completion: {})
+    }
+
     func stopAllOperations() {
         scheduler.stopScheduler()
     }
 
     func scanAfterProfileCreation(completion: @escaping (ScanResult) -> Void) {
+        scanAndUpdateUI(completion: completion)
+    }
+
+    private func scanAndUpdateUI(completion: @escaping (ScanResult) -> Void) {
         scheduler.stopScheduler()
 
         scheduler.scanAllBrokers(showWebView: showWebView) { [weak self] in
