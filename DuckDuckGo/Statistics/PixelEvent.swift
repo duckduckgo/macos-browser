@@ -23,7 +23,7 @@ import Configuration
 
 extension Pixel {
 
-    enum Event {
+    indirect enum Event {
         case crash
 
         case brokenSiteReport
@@ -86,7 +86,11 @@ extension Pixel {
                                      result: result)
         }
 
+        case launchInitial(cohort: String)
+
         case serp
+        case serpInitial(cohort: String)
+        case serpDay21to27(cohort: String)
 
         case dataImportFailed(action: DataImportAction, source: DataImportSource)
         case faviconImportFailed(source: DataImportSource)
@@ -123,7 +127,7 @@ extension Pixel {
         case emailEnabledInitial
         case cookieManagementEnabledInitial
         case watchInDuckPlayerInitial
-        case setAsDefaultInitial
+        case setAsDefaultInitial(cohort: String)
         case importDataInitial
 
         // New Tab section removed
@@ -156,6 +160,8 @@ extension Pixel {
         case networkProtectionWaitlistNotificationTapped
         case networkProtectionWaitlistTermsAndConditionsDisplayed
         case networkProtectionWaitlistTermsAndConditionsAccepted
+
+        case dailyPixel(Event, isFirst: Bool)
 
         enum Debug {
 
@@ -303,6 +309,24 @@ extension Pixel {
             case burnerTabMisplaced
 #if DBP
             case dataBrokerProtectionError
+
+            // SLO and SLI Pixels: https://app.asana.com/0/1203581873609357/1205337273100857/f
+
+            // Stage Pixels
+            case optOutStart
+            case optOutEmailGenerate
+            case optOutCaptchaParse
+            case optOutCaptchaSend
+            case optOutCaptchaSolve
+            case optOutSubmit
+            case optOutEmailReceive
+            case optOutEmailConfirm
+            case optOutValidate
+            case optOutFinish
+
+            // Process Pixels
+            case optOutSuccess
+            case optOutFailure
 #endif
         }
 
@@ -428,6 +452,13 @@ extension Pixel.Event {
         case .duckPlayerSettingBackToDefault:
             return "m_mac_duck-player_setting_back-to-default"
 
+        case .launchInitial:
+            return "m.mac.first-launch"
+        case .serpInitial:
+            return "m.mac.navigation.first-search"
+        case .serpDay21to27:
+            return "m.mac.search-day-21-27.initial"
+
         case .networkProtectionWaitlistEntryPointMenuItemDisplayed:
             return "m_mac_netp_imp_settings_entry_menu_item"
         case .networkProtectionWaitlistEntryPointToolbarButtonDisplayed:
@@ -440,9 +471,20 @@ extension Pixel.Event {
             return "m_mac_netp_imp_terms"
         case .networkProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_netp_ev_terms_accepted"
+
+        case .dailyPixel(let pixel, isFirst: let isFirst):
+            return pixel.name + (isFirst ? "_d" : "_c")
         }
 
     }
+}
+
+extension Pixel.Event: Equatable {
+
+    static func == (lhs: Pixel.Event, rhs: Pixel.Event) -> Bool {
+        lhs.name == rhs.name && lhs.parameters == rhs.parameters
+    }
+
 }
 
 extension Pixel.Event.Debug {
@@ -692,6 +734,21 @@ extension Pixel.Event.Debug {
 
 #if DBP
         case .dataBrokerProtectionError: return "data_broker_error"
+        // Stage Pixels
+        case .optOutStart: return "dbp.macos.optout.stage.start"
+        case .optOutEmailGenerate: return "dbp.macos.optout.stage.email-generate"
+        case .optOutCaptchaParse: return "dbp.macos.optout.stage.captcha-parse"
+        case .optOutCaptchaSend: return "dbp.macos.optout.stage.captcha-send"
+        case .optOutCaptchaSolve: return "dbp.macos.optout.stage.captcha-solve"
+        case .optOutSubmit: return "dbp.macos.optout.stage.submit"
+        case .optOutEmailReceive: return "dbp.macos.optout.stage.email-receive"
+        case .optOutEmailConfirm: return "dbp.macos.optout.stage.email-confirm"
+        case .optOutValidate: return "dbp.macos.optout.stage.validate"
+        case .optOutFinish: return "dbp.macos.optout.stage.finish"
+
+        // Process Pixels
+        case .optOutSuccess: return "dbp.macos.optout.process.success"
+        case .optOutFailure: return "dbp.macos.optout.process.failure"
 #endif
         }
     }

@@ -769,19 +769,25 @@ CQ
                                                                 <menuItem title="Today" keyEquivalent="N" id="0lm-tL-hli">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="changeInstallDateToToday:" target="Ady-hI-5gd" id="Lsi-xW-usu"/>
+                                                                        <action selector="changeInstallDateToToday:" target="Ady-hI-5gd" id="K8Z-Av-gjf"/>
                                                                     </connections>
                                                                 </menuItem>
-                                                                <menuItem title="Less Than a Week Ago" id="KhK-Zf-YHA">
+                                                                <menuItem title="Less Than a 21 days Ago" id="KhK-Zf-YHA">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="changeInstallDateToLessThanAWeekAgo:" target="Ady-hI-5gd" id="J0j-gf-bhG"/>
+                                                                        <action selector="changeInstallDateToLessThan21DaysAgo:" target="Ady-hI-5gd" id="Bj7-ao-Qhw"/>
                                                                     </connections>
                                                                 </menuItem>
-                                                                <menuItem title="More Than a Week Ago" id="mYW-2j-Ckg">
+                                                                <menuItem title="More Than 21 Days Ago" id="mYW-2j-Ckg">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="changeInstallDateToMoreThanAWeekAgo:" target="Ady-hI-5gd" id="Ygn-GW-JkY"/>
+                                                                        <action selector="changeInstallDateToMoreThan21DaysAgoButLessThan27:" target="Ady-hI-5gd" id="UVq-Pb-JKM"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="More Than 27 Days Ago" id="M8x-GE-Z7r">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="changeInstallDateToMoreThan27DaysAgo:" target="Ady-hI-5gd" id="NH6-ku-op3"/>
                                                                     </connections>
                                                                 </menuItem>
                                                             </items>
@@ -1163,19 +1169,12 @@ CQ
                                                                         <action selector="toggleShouldExcludeLocalRoutes:" target="Rah-lS-gno" id="Wdd-D6-yWy"/>
                                                                     </connections>
                                                                 </menuItem>
-                                                                <menuItem title="enable Connection Tester" id="L06-y6-zv3">
-                                                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                                                    <connections>
-                                                                        <action selector="toggleConnectionTesterEnabled:" target="Rah-lS-gno" id="iei-t7-7pG"/>
-                                                                    </connections>
-                                                                </menuItem>
                                                             </items>
                                                         </menu>
                                                     </menuItem>
                                                 </items>
                                                 <connections>
                                                     <outlet property="connectOnLogInMenuItem" destination="fSA-hH-Vum" id="HSf-v8-MYh"/>
-                                                    <outlet property="connectionTesterEnabledMenuItem" destination="L06-y6-zv3" id="uhM-4n-eOm"/>
                                                     <outlet property="excludeLocalNetworksMenuItem" destination="Zak-JJ-7hc" id="vYu-wC-dTl"/>
                                                     <outlet property="exclusionsMenu" destination="j7y-fb-xa6" id="igE-bU-qW4"/>
                                                     <outlet property="mainMenuItem" destination="Dt6-sj-4hn" id="vwa-T8-0ak"/>

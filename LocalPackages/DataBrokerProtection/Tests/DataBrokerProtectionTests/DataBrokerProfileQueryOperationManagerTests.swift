@@ -109,6 +109,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
 
     func testWhenScannedProfileIsAlreadyInTheDatabase_noOptOutOperationIsCreated() async {
         do {
+            mockDatabase.extractedProfilesFromBroker = [.mockWithoutRemovedDate]
             mockWebOperationRunner.scanResults = [.mockWithoutRemovedDate]
             _ = try await sut.runScanOperation(
                 on: mockWebOperationRunner,
@@ -132,6 +133,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
 
     func testWhenScannedProfileIsAlreadyInTheDatabaseAndWasRemoved_thenTheRemovedDateIsSetBackToNil() async {
         do {
+            mockDatabase.extractedProfilesFromBroker = [.mockWithRemovedDate]
             mockWebOperationRunner.scanResults = [.mockWithRemovedDate]
             _ = try await sut.runScanOperation(
                 on: mockWebOperationRunner,
@@ -540,6 +542,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var lastPreferredRunDateOnScan: Date?
     var lastPreferredRunDateOnOptOut: Date?
     var extractedProfileRemovedDate: Date?
+    var extractedProfilesFromBroker = [ExtractedProfile]()
 
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
@@ -627,6 +630,10 @@ final class MockDatabase: DataBrokerProtectionRepository {
         false
     }
 
+    func fetchExtractedProfiles(for brokerId: Int64) -> [ExtractedProfile] {
+        return extractedProfilesFromBroker
+    }
+
     func clear() {
         wasSaveProfileCalled = false
         wasFetchProfileCalled = false
@@ -645,6 +652,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
         lastPreferredRunDateOnScan = nil
         lastPreferredRunDateOnOptOut = nil
         extractedProfileRemovedDate = nil
+        extractedProfilesFromBroker.removeAll()
     }
 }
 
