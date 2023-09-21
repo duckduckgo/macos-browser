@@ -142,7 +142,6 @@ extension ContentScopeFeatureToggles {
 }
 
 final class WebViewHandlerMock: NSObject, WebViewHandler {
-
     var wasInitializeWebViewCalled = false
     var wasLoadCalledWithURL: URL?
     var wasWaitForWebViewLoadCalled = false
@@ -150,6 +149,7 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
     var wasExecuteCalledForExtractedProfile = false
     var wasExecuteCalledForProfileData = false
     var wasExecuteCalledForSolveCaptcha = false
+    var wasExecuteJavascriptCalled = false
 
     func initializeWebView(showWebView: Bool) async {
         wasInitializeWebViewCalled = true
@@ -184,6 +184,10 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         }
     }
 
+    func evaluateJavaScript(_ javaScript: String) async throws {
+        wasExecuteJavascriptCalled = true
+    }
+
     func reset() {
         wasInitializeWebViewCalled = false
         wasLoadCalledWithURL = nil
@@ -192,6 +196,7 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         wasExecuteCalledForExtractedProfile = false
         wasExecuteCalledForSolveCaptcha = false
         wasExecuteCalledForProfileData = false
+        wasExecuteJavascriptCalled = false
     }
 }
 
@@ -520,6 +525,10 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
     }
 
     func fetchExtractedProfiles(for brokerId: Int64, with profileQueryId: Int64) throws -> [ExtractedProfile] {
+        return [ExtractedProfile]()
+    }
+
+    func fetchExtractedProfiles(for brokerId: Int64) throws -> [ExtractedProfile] {
         return [ExtractedProfile]()
     }
 
