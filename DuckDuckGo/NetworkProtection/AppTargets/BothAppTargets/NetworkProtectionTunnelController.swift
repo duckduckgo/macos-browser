@@ -27,7 +27,8 @@ import NetworkProtection
 import NetworkProtectionUI
 import SystemExtensions
 import Networking
-import LoginItems
+// TODO: this should be removed cleanly
+//import LoginItems
 
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
@@ -55,13 +56,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// Auth token store
     private let tokenStore: NetworkProtectionTokenStore
 
-    // MARK: - Login Items
-
-    private let loginItemsManager = LoginItemsManager()
-
     // MARK: - Debug Options Support
 
-    private let debugUtilities = NetworkProtectionDebugUtilities()
+    // TODO: replace this with a shared store
+    //private let debugUtilities = NetworkProtectionDebugUtilities()
 
     /// Kill Switch: Enable enforceRoutes flag
     ///
@@ -283,10 +281,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             }
             onboardingStatusRawValue = OnboardingStatus.completed.rawValue
 
-            if enableLoginItems {
-                loginItemsManager.enableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
-            }
-
             switch tunnelManager.connection.status {
             case .invalid:
                 throw StartError.connectionStatusInvalid
@@ -312,8 +306,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
         options[NetworkProtectionOptionKey.authToken] = try tokenStore.fetchToken() as NSString?
-        options[NetworkProtectionOptionKey.selectedServer] = debugUtilities.selectedServerName() as NSString?
-        options[NetworkProtectionOptionKey.keyValidity] = debugUtilities.registrationKeyValidity.map(String.init(describing:)) as NSString?
+        // TODO: bring back support for this
+        //options[NetworkProtectionOptionKey.selectedServer] = debugUtilities.selectedServerName() as NSString?
+        //options[NetworkProtectionOptionKey.keyValidity] = debugUtilities.registrationKeyValidity.map(String.init(describing:)) as NSString?
         options[NetworkProtectionOptionKey.connectionTesterEnabled] = await NSNumber(value: isConnectionTesterEnabled)
 
         if Self.simulationOptions.isEnabled(.tunnelFailure) {
@@ -367,7 +362,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     @MainActor
     func enableOnDemand(tunnelManager: NETunnelProviderManager) async throws {
-        tunnelManager.onDemandRules = [NEOnDemandRuleConnect(interfaceType: .any)]
+        let rule = NEOnDemandRuleConnect()
+        rule.interfaceTypeMatch = .any
+
+        tunnelManager.onDemandRules = [rule]
         tunnelManager.isOnDemandEnabled = true
 
         try await tunnelManager.saveToPreferences()

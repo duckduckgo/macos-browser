@@ -1,5 +1,5 @@
 //
-//  Pixel.swift
+//  PixelKit.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,9 +19,75 @@
 import Foundation
 import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
-public protocol PixelEvent {
+public protocol PixelKitEvent {
     var name: String { get }
     var parameters: [String: String]? { get }
+}
+
+protocol ErrorWithParameters {
+    var errorParameters: [String: String] { get }
+}
+
+/// Provides some basic shared logic for predefined and custom debug events.
+///
+public final class DebugEvent: PixelKitEvent {
+    public enum EventType {
+        case assertionFailure(message: String, file: StaticString, line: UInt)
+        case custom(_ event: PixelKitEvent)
+    }
+
+    public let eventType: EventType
+    private let error: Error?
+
+    public init(eventType: EventType, error: Error? = nil) {
+        self.eventType = eventType
+        self.error = error
+    }
+
+    public var name: String {
+        switch eventType {
+        case .assertionFailure:
+            return "assertion_failure"
+        case .custom(let event):
+            return event.name
+        }
+    }
+
+    public var parameters: [String: String]? {
+        var params = [String: String]()
+
+        if let errorWithUserInfo = error as? ErrorWithParameters {
+            params = errorWithUserInfo.errorParameters
+        }
+
+        if case let .assertionFailure(message, file, line) = eventType {
+            params[PixelKit.Parameters.assertionMessage] = message
+            params[PixelKit.Parameters.assertionFile] = String(file)
+            params[PixelKit.Parameters.assertionLine] = String(line)
+        }
+
+        if let error = error {
+            let nsError = error as NSError
+
+            params[PixelKit.Parameters.errorCode] = "\(nsError.code)"
+            params[PixelKit.Parameters.errorDesc] = nsError.domain
+
+            if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
+                params[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
+                params[PixelKit.Parameters.underlyingErrorDesc] = underlyingError.domain
+            }
+
+            if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {
+                params[PixelKit.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
+            }
+
+            if let sqlExtendedErrorCode = nsError.userInfo["SQLiteExtendedResultCode"] as? NSNumber {
+                params[PixelKit.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
+            }
+        }
+
+        return params
+    }
 }
 
 extension URL {
@@ -38,7 +104,7 @@ extension URL {
     }
 }
 
-public final class Pixel {
+public final class PixelKit {
 
     enum Header {
         static let acceptEncoding = "Accept-Encoding"
@@ -48,7 +114,7 @@ public final class Pixel {
         static let moreInfo = "X-DuckDuckGo-MoreInfo"
     }
 
-    public enum PixelFrequency {
+    public enum Frequency {
         /// The default frequency for pixels. This fires pixels with the event names as-is.
         case standard
 
@@ -71,7 +137,7 @@ public final class Pixel {
         _ callBackOnMainThread: Bool,
         _ onComplete: @escaping (Error?) -> Void) -> Void
 
-    public typealias Event = PixelEvent
+    public typealias Event = PixelKitEvent
 
     static let duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 
@@ -82,14 +148,14 @@ public final class Pixel {
         return calendar
     }()
 
-    public private(set) static var shared: Pixel?
+    public private(set) static var shared: PixelKit?
     private let appVersion: String
     private let defaultHeaders: [String: String]
     private let log: OSLog
     private let fireRequest: FireRequest
 
     public static func setUp(dryRun: Bool = false, appVersion: String, defaultHeaders: [String: String], log: OSLog, fireRequest: @escaping FireRequest) {
-        shared = Pixel(dryRun: dryRun, appVersion: appVersion, defaultHeaders: defaultHeaders, log: log, fireRequest: fireRequest)
+        shared = PixelKit(dryRun: dryRun, appVersion: appVersion, defaultHeaders: defaultHeaders, log: log, fireRequest: fireRequest)
     }
 
     static func tearDown() {
@@ -114,7 +180,7 @@ public final class Pixel {
     }
 
     public func fire(pixelNamed pixelName: String,
-                     frequency: PixelFrequency,
+                     frequency: Frequency,
                      withHeaders headers: [String: String]? = nil,
                      withAdditionalParameters params: [String: String]? = nil,
                      allowedQueryReservedCharacters: CharacterSet? = nil,
@@ -165,8 +231,16 @@ public final class Pixel {
         }
     }
 
-    public static func fire(_ event: Pixel.Event,
-                            frequency: PixelFrequency,
+    private static func prefixedName(for event: Event) -> String {
+        if let debugEvent = event as? DebugEvent {
+            return "m_mac_debug_\(debugEvent.name)"
+        } else {
+            return "m_mac\(event.name)"
+        }
+    }
+
+    public static func fire(_ event: Event,
+                            frequency: Frequency,
                             withHeaders headers: [String: String],
                             withAdditionalParameters parameters: [String: String]? = nil,
                             allowedQueryReservedCharacters: CharacterSet? = nil,
@@ -184,7 +258,7 @@ public final class Pixel {
             newParams = nil
         }
 
-        Self.shared?.fire(pixelNamed: event.name,
+        Self.shared?.fire(pixelNamed: prefixedName(for: event),
                           frequency: frequency,
                           withHeaders: headers,
                           withAdditionalParameters: newParams,

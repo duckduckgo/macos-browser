@@ -1,5 +1,5 @@
 //
-//  PixelParameters.swift
+//  PixelKit+Parameters.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import Foundation
 
-extension Pixel {
+extension PixelKit {
 
     enum Parameters {
         static let duration = "duration"
@@ -33,6 +33,10 @@ extension Pixel {
         static let underlyingErrorDesc = "ud"
         static let underlyingErrorSQLiteCode = "sqlrc"
         static let underlyingErrorSQLiteExtendedCode = "sqlerc"
+
+        static let assertionMessage = "message"
+        static let assertionFile = "file"
+        static let assertionLine = "line"
     }
 
     enum Values {
@@ -46,19 +50,19 @@ extension Error {
         var parameters = [String: String]()
         let nsError = self as NSError
 
-        parameters[Pixel.Parameters.errorCode] = "\(nsError.code)"
-        parameters[Pixel.Parameters.errorDesc] = nsError.domain
+        parameters[PixelKit.Parameters.errorCode] = "\(nsError.code)"
+        parameters[PixelKit.Parameters.errorDesc] = nsError.domain
         if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
-            parameters[Pixel.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
-            parameters[Pixel.Parameters.underlyingErrorDesc] = underlyingError.domain
+            parameters[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
+            parameters[PixelKit.Parameters.underlyingErrorDesc] = underlyingError.domain
         }
 
         if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {
-            parameters[Pixel.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
+            parameters[PixelKit.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
         }
 
         if let sqlExtendedErrorCode = nsError.userInfo["SQLiteExtendedResultCode"] as? NSNumber {
-            parameters[Pixel.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
+            parameters[PixelKit.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
         }
 
         return parameters

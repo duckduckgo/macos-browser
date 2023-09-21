@@ -289,7 +289,7 @@ final class NavigationBarPopovers {
 #if NETWORK_PROTECTION
     func showNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         let popover = networkProtectionPopover ?? {
-            // TODO: before merging implement an controller the launches and communicates with the login item
+            // TODO: implement an IPC controller
             let controller = NoOpController()
             //let controller = NetworkProtectionTunnelController()
             let statusObserver = ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,

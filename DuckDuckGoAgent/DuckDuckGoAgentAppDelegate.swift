@@ -62,9 +62,11 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
     private let appLauncher = AppLauncher()
     private let bouncer = NetworkProtectionBouncer()
 
+    private lazy var tunnelController = NetworkProtectionTunnelController()
+    /*
     private lazy var tunnelController: FeatureProtectingTunnelController = {
         FeatureProtectingTunnelController(appLauncher: appLauncher, bouncer: bouncer)
-    }()
+    }()*/
 
     /// The status bar NetworkProtection menu
     ///

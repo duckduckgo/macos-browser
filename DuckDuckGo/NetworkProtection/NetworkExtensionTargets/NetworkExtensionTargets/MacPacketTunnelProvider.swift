@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import Common
 import NetworkProtection
+import NetworkProtectionPixels
 import NetworkExtension
 import Networking
 import PixelKit
@@ -61,7 +62,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     // swiftlint:disable:next cyclomatic_complexity function_body_length
     private static func networkProtectionDebugEvents(controllerErrorStore: NetworkProtectionTunnelErrorStore) -> EventMapping<NetworkProtectionError>? {
         return EventMapping { event, _, _, _ in
-            let domainEvent: NetworkProtectionPixelEvent
+            let domainEvent: NetworkProtectionPixelKitEvent
 #if DEBUG
             // Makes sure we see the error in the yellow NetP alert.
             controllerErrorStore.lastErrorMessage = "[Debug] Error event: \(event.localizedDescription)"
@@ -124,7 +125,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             case .unhandledError(function: let function, line: let line, error: let error):
                 domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
             }
-            Pixel.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
+
+            PixelKit.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
         }
     }
 
@@ -135,11 +137,11 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     private static var packetTunnelProviderEvents: EventMapping<PacketTunnelProvider.Event> = .init { event, _, _, _ in
         switch event {
         case .userBecameActive:
-            Pixel.fire(.networkProtectionActiveUser, frequency: .dailyOnly, includeAppVersionParameter: true)
+            PixelKit.fire(.networkProtectionActiveUser, frequency: .dailyOnly, includeAppVersionParameter: true)
         case .reportLatency(ms: let ms, server: let server, networkType: let networkType):
-            Pixel.fire(.networkProtectionLatency(ms: ms, server: server, networkType: networkType), frequency: .standard)
+            PixelKit.fire(.networkProtectionLatency(ms: ms, server: server, networkType: networkType.description), frequency: .standard)
         case .rekeyCompleted:
-            Pixel.fire(.networkProtectionRekeyCompleted, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
+            PixelKit.fire(.networkProtectionRekeyCompleted, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
         }
     }
 
@@ -345,10 +347,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         dryRun = false
 #endif
 
-        Pixel.setUp(dryRun: dryRun,
-                    appVersion: AppVersion.shared.versionNumber,
-                    defaultHeaders: defaultHeaders,
-                    log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
+        PixelKit.setUp(dryRun: dryRun,
+                       appVersion: AppVersion.shared.versionNumber,
+                       defaultHeaders: defaultHeaders,
+                       log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
             let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself

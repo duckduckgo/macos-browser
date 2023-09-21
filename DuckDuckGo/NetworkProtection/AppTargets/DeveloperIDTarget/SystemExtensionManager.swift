@@ -20,6 +20,7 @@ import Foundation
 import Cocoa
 import Combine
 @preconcurrency import SystemExtensions
+import PixelKit
 
 struct SystemExtensionManager {
 
@@ -162,7 +163,8 @@ extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
         @unknown default:
             // Not much we can do about this, so let's assume it's a good result and not show any errors
             continuation?.yield(.activated)
-            Pixel.fire(.networkProtectionSystemExtensionUnknownActivationResult)
+            // TODO: verify this works fine
+            PixelKit.fire(.networkProtectionSystemExtensionUnknownActivationResult, frequency: .standard)
         }
 
         continuation?.finish()
