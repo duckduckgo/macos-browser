@@ -17,8 +17,24 @@
 //
 
 import XCTest
-@testable import DuckDuckGo_Privacy_Browser
 import BrowserServicesKit
+@testable import DuckDuckGo_Privacy_Browser
+
+final class MockNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging {
+
+    func fetchRemoteMessages() {
+
+    }
+
+    func presentableRemoteMessages() -> [NetworkProtectionRemoteMessage] {
+        return []
+    }
+
+    func dismissRemoteMessage(with id: String) {
+
+    }
+
+}
 
 final class ContinueSetUpModelTests: XCTestCase {
 
@@ -52,7 +68,7 @@ final class ContinueSetUpModelTests: XCTestCase {
         ] as! [String: String]
         delegate = CapturingSetUpVewModelDelegate()
 
-        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences, privacyConfig: privacyConfig)
+        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences, networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(), privacyConfig: privacyConfig)
         vm.delegate = delegate
     }
 
@@ -88,7 +104,7 @@ final class ContinueSetUpModelTests: XCTestCase {
         capturingDataImportProvider.didImport = true
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
         privacyPreferences.autoconsentEnabled = true
-        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences)
+        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences, networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging())
         XCTAssertFalse(vm.isMoreOrLessButtonNeeded)
     }
 
@@ -391,7 +407,7 @@ final class ContinueSetUpModelTests: XCTestCase {
         userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.homePageShowSurveyDay0.rawValue)
         userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.homePageShowSurveyDay7.rawValue)
 
-        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences)
+        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences, networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging())
 
         XCTAssertEqual(vm.visibleFeaturesMatrix, [[]])
     }
@@ -481,6 +497,7 @@ extension HomePage.Models.ContinueSetUpModel {
             emailManager: emailManager,
             privacyPreferences: privacyPreferences,
             duckPlayerPreferences: duckPlayerPreferences,
+            networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
             privacyConfig: privacyConfig)
     }
 }

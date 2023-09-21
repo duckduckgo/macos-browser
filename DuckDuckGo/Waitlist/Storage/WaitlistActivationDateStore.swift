@@ -20,7 +20,13 @@
 
 import Foundation
 
-struct WaitlistActivationDateStore {
+protocol WaitlistActivationDateStore {
+
+    func daysSinceActivation() -> Int?
+
+}
+
+struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
 
     private enum Constants {
         static let networkProtectionActivationDateKey = "com.duckduckgo.network-protection.activation-date"

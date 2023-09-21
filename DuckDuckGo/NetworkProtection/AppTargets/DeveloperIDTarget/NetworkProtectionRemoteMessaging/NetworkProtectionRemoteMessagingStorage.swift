@@ -30,6 +30,16 @@ protocol NetworkProtectionRemoteMessagingStorage {
 
 final class DefaultNetworkProtectionRemoteMessagingStorage: NetworkProtectionRemoteMessagingStorage {
 
+    private enum Constants {
+        static let dismissedMessageIdentifiersKey = "home.page.network-protection.dismissed-message-identifiers"
+    }
+
+    private let userDefaults: UserDefaults
+
+    init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
+    }
+
     func store(messages: [NetworkProtectionRemoteMessage]) {
         // TODO
     }
@@ -39,11 +49,19 @@ final class DefaultNetworkProtectionRemoteMessagingStorage: NetworkProtectionRem
     }
 
     func dismissRemoteMessage(with id: String) {
-        // TODO
+        var dismissedMessages = dismissedMessageIDs()
+
+        guard !dismissedMessages.contains(id) else {
+            return
+        }
+
+        dismissedMessages.append(id)
+        userDefaults.set(dismissedMessages, forKey: Constants.dismissedMessageIdentifiersKey)
     }
 
     func dismissedMessageIDs() -> [String] {
-        return []
+        let messages = userDefaults.array(forKey: Constants.dismissedMessageIdentifiersKey) as? [String]
+        return messages ?? []
     }
 
 }

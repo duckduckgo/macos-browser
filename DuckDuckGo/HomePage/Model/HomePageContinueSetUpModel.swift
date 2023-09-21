@@ -34,6 +34,7 @@ extension HomePage.Models {
         let itemsRowCountWhenCollapsed = HomePage.featureRowCountWhenCollapsed
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
+        let networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging
         let privacyConfig: PrivacyConfiguration
 
         var isDay0SurveyEnabled: Bool {
@@ -136,6 +137,7 @@ extension HomePage.Models {
              privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
              cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
+             networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging,
              privacyConfig: PrivacyConfiguration = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
@@ -144,6 +146,7 @@ extension HomePage.Models {
             self.privacyPreferences = privacyPreferences
             self.cookieConsentPopoverManager = cookieConsentPopoverManager
             self.duckPlayerPreferences = duckPlayerPreferences
+            self.networkProtectionRemoteMessaging = networkProtectionRemoteMessaging
             self.privacyConfig = privacyConfig
             refreshFeaturesMatrix()
             NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
@@ -185,6 +188,14 @@ extension HomePage.Models {
                 visitSurvey(day: .day0)
             case .surveyDay7:
                 visitSurvey(day: .day7)
+            case .networkProtectionRemoteMessage(let message):
+                if let surveyURLString = message.surveyURL, let surveyURL = URL(string: surveyURLString) {
+                    let tab = Tab(content: .url(surveyURL), shouldLoadInBackground: true)
+                    tabCollectionViewModel.append(tab: tab)
+                }
+
+                // Dismiss the message after the user opens the survey, even if they just close the tab immediately afterwards.
+                networkProtectionRemoteMessaging.dismissRemoteMessage(with: message.id)
             }
         }
         // swiftlint:enable cyclomatic_complexity
@@ -205,6 +216,8 @@ extension HomePage.Models {
                 shouldShowSurveyDay0 = false
             case .surveyDay7:
                 shouldShowSurveyDay7 = false
+            case .networkProtectionRemoteMessage(let message):
+                networkProtectionRemoteMessaging.dismissRemoteMessage(with: message.id)
             }
             refreshFeaturesMatrix()
         }
@@ -212,6 +225,10 @@ extension HomePage.Models {
         // swiftlint:disable cyclomatic_complexity
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
+
+            for message in networkProtectionRemoteMessaging.presentableRemoteMessages() {
+                features.append(.networkProtectionRemoteMessage(message))
+            }
 
             for feature in listOfFeatures {
                 switch feature {
@@ -243,6 +260,8 @@ extension HomePage.Models {
                     if shouldSurveyDay7BeVisible {
                         features.append(feature)
                     }
+                case .networkProtectionRemoteMessage:
+                    break // Do nothing, NetP remote messages get appended first
                 }
             }
             featuresMatrix = features.chunked(into: itemsPerRow)
@@ -371,7 +390,15 @@ extension HomePage.Models {
     }
 
     // MARK: Feature Type
-    enum FeatureType: CaseIterable {
+    enum FeatureType: CaseIterable, Equatable, Hashable {
+
+        // CaseIterable doesn't work with enums that have associated values, so we have to implement it manually.
+        // We ignore the `networkProtectionRemoteMessage` case here to avoid it getting accidentally included - it has special handling and will get
+        // included elsewhere.
+        static var allCases: [HomePage.Models.FeatureType] {
+            [.duckplayer, .cookiePopUp, .emailProtection, .defaultBrowser, .importBookmarksAndPasswords, .surveyDay0, .surveyDay7]
+        }
+
         case duckplayer
         case cookiePopUp
         case emailProtection
@@ -379,6 +406,7 @@ extension HomePage.Models {
         case importBookmarksAndPasswords
         case surveyDay0
         case surveyDay7
+        case networkProtectionRemoteMessage(NetworkProtectionRemoteMessage)
 
         var title: String {
             switch self {
@@ -396,6 +424,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpSurveyDay0CardTitle
             case .surveyDay7:
                 return UserText.newTabSetUpSurveyDay7CardTitle
+            case .networkProtectionRemoteMessage(let message):
+                return message.cardTitle
             }
         }
 
@@ -415,6 +445,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpSurveyDay0Summary
             case .surveyDay7:
                 return UserText.newTabSetUpSurveyDay7Summary
+            case .networkProtectionRemoteMessage(let message):
+                return message.cardDescription
             }
         }
 
@@ -434,6 +466,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpSurveyDay0Action
             case .surveyDay7:
                 return UserText.newTabSetUpSurveyDay7Action
+            case .networkProtectionRemoteMessage(let message):
+                return message.cardAction
             }
         }
 
@@ -455,6 +489,8 @@ extension HomePage.Models {
                 return NSImage(named: "Survey-128")!.resized(to: iconSize)!
             case .surveyDay7:
                 return NSImage(named: "Survey-128")!.resized(to: iconSize)!
+            case .networkProtectionRemoteMessage:
+                return NSImage(named: "VPN-Ended")!.resized(to: iconSize)!
             }
         }
     }

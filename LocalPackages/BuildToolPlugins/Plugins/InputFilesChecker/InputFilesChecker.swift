@@ -34,11 +34,7 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("PFMoveApplication.m", .source),
     .init("NetworkProtectionBundle.swift", .source),
     .init("NetworkProtectionAppEvents.swift", .source),
-    .init("KeychainType+ClientDefault.swift", .source),
-    .init("NetworkProtectionRemoteMessage.swift", .source),
-    .init("NetworkProtectionRemoteMessaging.swift", .source),
-    .init("NetworkProtectionRemoteMessagingStorage.swift", .source),
-    .init("NetworkProtectionRemoteMessagingRequest.swift", .source)
+    .init("KeychainType+ClientDefault.swift", .source)
 ]
 
 /**

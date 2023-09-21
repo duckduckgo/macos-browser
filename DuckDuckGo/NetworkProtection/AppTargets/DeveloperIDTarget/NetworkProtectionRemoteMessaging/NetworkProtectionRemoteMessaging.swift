@@ -18,6 +18,10 @@
 
 import Foundation
 
+extension Notification.Name {
+    static let NetworkProtectionRemoteMessagesChanged = NSNotification.Name("NetworkProtectionRemoteMessagesChanged")
+}
+
 protocol NetworkProtectionRemoteMessaging {
 
     func fetchRemoteMessages()
@@ -30,26 +34,87 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
 
     private let messageRequest: NetworkProtectionRemoteMessagingRequest
     private let messageStorage: NetworkProtectionRemoteMessagingStorage
+    private let waitlistActivationDateStore: WaitlistActivationDateStore
 
     init(
         messageRequest: NetworkProtectionRemoteMessagingRequest = DefaultNetworkProtectionRemoteMessagingRequest(),
-        messageStorage: NetworkProtectionRemoteMessagingStorage = DefaultNetworkProtectionRemoteMessagingStorage()
+        messageStorage: NetworkProtectionRemoteMessagingStorage = DefaultNetworkProtectionRemoteMessagingStorage(),
+        waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore()
     ) {
         self.messageRequest = messageRequest
         self.messageStorage = messageStorage
+        self.waitlistActivationDateStore = waitlistActivationDateStore
     }
 
     func fetchRemoteMessages() {
-        // 1. Fetch remote messages
-        // 2. Store them
+#if NETWORK_PROTECTION
+        // Don't fetch messages if the user hasn't used NetP
+        guard waitlistActivationDateStore.daysSinceActivation() != nil else {
+            return
+        }
+
+        messageRequest.fetchNetworkProtectionRemoteMessages { [weak self] result in
+            guard let self else { return }
+
+            switch result {
+            case .success(let messages):
+                self.messageStorage.store(messages: messages)
+                NotificationCenter.default.post(name: .NetworkProtectionRemoteMessagesChanged, object: nil)
+            case .failure(let error):
+                // TODO: Handle error, send pixel if messages can't be decoded
+                break
+            }
+        }
+#endif
     }
 
+    /// Uses the "days since Network Protection activated" count combined with the set of dismissed messages to determine which messages should be displayed to the user.
     func presentableRemoteMessages() -> [NetworkProtectionRemoteMessage] {
+#if NETWORK_PROTECTION
+        guard let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation() else {
+            return []
+        }
+
+        let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
+        let possibleMessages = [
+            NetworkProtectionRemoteMessage(
+                id: "1234",
+                cardTitle: "Title",
+                cardDescription: "Description",
+                cardAction: "Action",
+                daysSinceNetworkProtectionEnabled: nil,
+                surveyURL: "https://duckduckgo.com"
+            )
+        ]
+
+        // Only show messages that haven't been dismissed, and check whether they have a requirement on how long the user
+        // has used Network Protection for.
+        let filteredMessages = possibleMessages.filter { message in
+            if !dismissedMessageIDs.contains(message.id) {
+                return false
+            }
+
+            if let daysSinceNetworkProtectionEnabled = message.daysSinceNetworkProtectionEnabled {
+                if daysSinceNetworkProtectionEnabled >= daysSinceActivation {
+                    return true
+                } else {
+                    return false
+                }
+            } else {
+                return true
+            }
+        }
+
+        return filteredMessages
+#else
         return []
+#endif
     }
 
     func dismissRemoteMessage(with id: String) {
-
+#if NETWORK_PROTECTION
+        messageStorage.dismissRemoteMessage(with: id)
+#endif
     }
 
 }

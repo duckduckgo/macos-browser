@@ -18,11 +18,11 @@
 
 import Foundation
 
-struct NetworkProtectionRemoteMessage: Codable {
+struct NetworkProtectionRemoteMessage: Codable, Equatable, Hashable {
     let id: String
     let cardTitle: String
     let cardDescription: String
     let cardAction: String
-    let daysSinceNetworkProtectionEnabled: Int
+    let daysSinceNetworkProtectionEnabled: Int?
     let surveyURL: String?
 }

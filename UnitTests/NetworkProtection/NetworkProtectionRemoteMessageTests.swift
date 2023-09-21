@@ -28,29 +28,40 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
         let decoder = JSONDecoder()
         let decodedMessages = try decoder.decode([NetworkProtectionRemoteMessage].self, from: data)
 
-        XCTAssertEqual(decodedMessages.count, 2)
+        XCTAssertEqual(decodedMessages.count, 3)
 
         guard let firstMessage = decodedMessages.first(where: { $0.id == "123"}) else {
             XCTFail("Failed to find expected message")
             return
         }
 
-        XCTAssertEqual(firstMessage.daysSinceNetworkProtectionEnabled, 1)
         XCTAssertEqual(firstMessage.cardTitle, "Title 1")
         XCTAssertEqual(firstMessage.cardDescription, "Description 1")
         XCTAssertEqual(firstMessage.cardAction, "Action 1")
         XCTAssertNil(firstMessage.surveyURL)
+        XCTAssertNil(firstMessage.daysSinceNetworkProtectionEnabled)
 
         guard let secondMessage = decodedMessages.first(where: { $0.id == "456"}) else {
             XCTFail("Failed to find expected message")
             return
         }
 
-        XCTAssertEqual(secondMessage.daysSinceNetworkProtectionEnabled, 2)
+        XCTAssertEqual(secondMessage.daysSinceNetworkProtectionEnabled, 1)
         XCTAssertEqual(secondMessage.cardTitle, "Title 2")
         XCTAssertEqual(secondMessage.cardDescription, "Description 2")
         XCTAssertEqual(secondMessage.cardAction, "Action 2")
-        XCTAssertEqual(secondMessage.surveyURL, "https://duckduckgo.com/")
+        XCTAssertNil(firstMessage.surveyURL)
+
+        guard let thirdMessage = decodedMessages.first(where: { $0.id == "789"}) else {
+            XCTFail("Failed to find expected message")
+            return
+        }
+
+        XCTAssertEqual(thirdMessage.daysSinceNetworkProtectionEnabled, 5)
+        XCTAssertEqual(thirdMessage.cardTitle, "Title 3")
+        XCTAssertEqual(thirdMessage.cardDescription, "Description 3")
+        XCTAssertEqual(thirdMessage.cardAction, "Action 3")
+        XCTAssertEqual(thirdMessage.surveyURL, "https://duckduckgo.com/")
     }
 
     private func mockMessagesURL() -> URL {

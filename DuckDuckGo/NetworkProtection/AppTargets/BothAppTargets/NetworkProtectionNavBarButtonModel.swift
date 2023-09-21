@@ -31,7 +31,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     private let networkProtectionStatusReporter: NetworkProtectionStatusReporter
     private var status: NetworkProtection.ConnectionStatus = .disconnected
     private let popovers: NavigationBarPopovers
-    private let waitlistActivationDateStore: WaitlistActivationDateStore
+    private let waitlistActivationDateStore: DefaultWaitlistActivationDateStore
 
     // MARK: - Subscriptions
 
@@ -93,7 +93,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         isHavingConnectivityIssues = networkProtectionStatusReporter.connectivityIssuesObserver.recentValue
         buttonImage = .image(for: iconPublisher.icon)
 
-        self.waitlistActivationDateStore = WaitlistActivationDateStore()
+        self.waitlistActivationDateStore = DefaultWaitlistActivationDateStore()
         super.init()
 
         setupSubscriptions()
