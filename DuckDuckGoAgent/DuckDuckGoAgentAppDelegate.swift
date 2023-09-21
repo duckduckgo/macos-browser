@@ -72,6 +72,7 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
     ///
     /// For some reason the App will crash if this is initialized right away, which is why it was changed to be lazy.
     ///
+    @MainActor
     private lazy var networkProtectionMenu: StatusBarMenu = {
         #if DEBUG
         let iconProvider = DebugMenuIconProvider()
