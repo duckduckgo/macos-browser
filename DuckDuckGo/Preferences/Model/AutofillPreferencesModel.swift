@@ -23,6 +23,7 @@ final class AutofillPreferencesModel: ObservableObject {
     @Published var askToSaveUsernamesAndPasswords: Bool {
         didSet {
             persistor.askToSaveUsernamesAndPasswords = askToSaveUsernamesAndPasswords
+            NotificationCenter.default.post(name: .autofillUserSettingsDidChange, object: nil)
         }
     }
 
@@ -35,6 +36,7 @@ final class AutofillPreferencesModel: ObservableObject {
     @Published var askToSavePaymentMethods: Bool {
         didSet {
             persistor.askToSavePaymentMethods = askToSavePaymentMethods
+            NotificationCenter.default.post(name: .autofillUserSettingsDidChange, object: nil)
         }
     }
 
@@ -44,9 +46,16 @@ final class AutofillPreferencesModel: ObservableObject {
         }
     }
 
+    var previousAutoLockThreshold: AutofillAutoLockThreshold
     @Published private(set) var autoLockThreshold: AutofillAutoLockThreshold {
         didSet {
             persistor.autoLockThreshold = autoLockThreshold
+        }
+    }
+
+    @Published var autolockLocksFormFilling: Bool {
+        didSet {
+            persistor.autolockLocksFormFilling = autolockLocksFormFilling
         }
     }
 
@@ -73,6 +82,7 @@ final class AutofillPreferencesModel: ObservableObject {
             return
         }
 
+        previousAutoLockThreshold = self.autoLockThreshold
         let isAutoLockEnabled = isAutoLockEnabledNewValue ?? self.isAutoLockEnabled
         let autoLockThreshold = autoLockThresholdNewValue ?? self.autoLockThreshold
 
@@ -88,6 +98,8 @@ final class AutofillPreferencesModel: ObservableObject {
 
                 if autoLockThreshold != self.autoLockThreshold {
                     self.autoLockThreshold = autoLockThreshold
+                } else {
+                    self.autoLockThreshold = previousAutoLockThreshold
                 }
             }
         }
@@ -125,9 +137,11 @@ final class AutofillPreferencesModel: ObservableObject {
 
         isAutoLockEnabled = persistor.isAutoLockEnabled
         autoLockThreshold = persistor.autoLockThreshold
+        previousAutoLockThreshold = persistor.autoLockThreshold
         askToSaveUsernamesAndPasswords = persistor.askToSaveUsernamesAndPasswords
         askToSaveAddresses = persistor.askToSaveAddresses
         askToSavePaymentMethods = persistor.askToSavePaymentMethods
+        autolockLocksFormFilling = persistor.autolockLocksFormFilling
         passwordManager = persistor.passwordManager
     }
 

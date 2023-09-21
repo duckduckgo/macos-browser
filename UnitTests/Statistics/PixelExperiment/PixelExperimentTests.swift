@@ -21,221 +21,217 @@ import XCTest
 
 class PixelExperimentTests: XCTestCase {
 
+    var now = Date()
+    var logic: PixelExperimentLogic {
+        PixelExperiment.logic
+    }
+    var cohort: PixelExperiment! {
+        logic.cohort
+    }
+
+    lazy var container: NSPersistentContainer = {
+        CoreData.createInMemoryPersistentContainer(modelName: "PixelDataModel", bundle: Bundle(for: PixelData.self))
+    }()
+    var context: NSManagedObjectContext!
+    private var _store: LocalPixelDataStore<PixelData>?
+    var store: LocalPixelDataStore<PixelData> {
+        if let store = _store {
+            return store
+        }
+        context = container.newBackgroundContext()
+        let store = LocalPixelDataStore(context: context, updateModel: PixelData.update)
+        _store = store
+        return store
+    }
+
     override func setUp() {
         super.setUp()
-        PixelExperimentLogic { _ in }.reset()
+        now = Date()
+        PixelExperiment.logic = PixelExperimentLogic(now: { [unowned self] in
+            self.now
+        })
+        logic.cleanup()
+    }
+
+    override func tearDown() {
+        logic.cleanup()
+        Pixel.tearDown()
+        _store = nil
     }
 
     func testWhenNotInstalledThenCohortIsNill() {
-        let logic = PixelExperimentLogic { _ in }
         XCTAssertNil(logic.cohort)
+        Pixel.setUp { _ in
+            XCTFail("shouldn‘t fire pixels")
+        }
+
+        PixelExperiment.fireEnrollmentPixel()
+        PixelExperiment.fireFirstSerpPixel()
+        PixelExperiment.fireDay21To27SerpPixel()
+        PixelExperiment.fireSetAsDefaultInitialPixel()
     }
 
-    func testWhenSecondInteractionWithBookmarksBarOnDayThenCorrectPixelFired() {
-        let logic = PixelExperimentLogic { _ in }
+    func testWhenNoCohort_NoEnrollmentPixelFired() {
+        Pixel.firstLaunchDate = now
+        PixelExperiment.install()
 
-        assertWhenSecondInteractionWithBookmarksBarOnDayThenNoPixelFired(0)
-        logic.reset()
+        Pixel.setUp(store: self.store) { _ in
+            XCTFail("shouldn‘t fire pixels")
+        }
 
-        assertWhenSecondInteractionWithBookmarksBarOnDayThenNoPixelFired(1)
-        logic.reset()
-
-        assertWhenSecondInteractionWithBookmarksBarOnDayThenPixelFired(2)
-        logic.reset()
-
-        assertWhenSecondInteractionWithBookmarksBarOnDayThenPixelFired(3)
-        logic.reset()
-
-        assertWhenSecondInteractionWithBookmarksBarOnDayThenPixelFired(4)
-        logic.reset()
-
-        assertWhenSecondInteractionWithBookmarksBarOnDayThenPixelFired(5)
-        logic.reset()
-
-        assertWhenSecondInteractionWithBookmarksBarOnDayThenPixelFired(6)
-        logic.reset()
-
-        assertWhenSecondInteractionWithBookmarksBarOnDayThenPixelFired(7)
-        logic.reset()
-
-        assertWhenSecondInteractionWithBookmarksBarOnDayThenPixelFired(8)
-        logic.reset()
-
-        assertWhenSecondInteractionWithBookmarksBarOnDayThenNoPixelFired(9)
-        logic.reset()
-
-        assertWhenSecondInteractionWithBookmarksBarOnDayThenNoPixelFired(10)
-        logic.reset()
+        PixelExperiment.fireEnrollmentPixel()
     }
 
-    func testWhenFirstInteractionWithBookmarksBarThenCorrectPixelFired() {
-        var pixelEvent: Pixel.Event?
-        let logic = PixelExperimentLogic {
-            pixelEvent = $0
+    func testEnrollmentPixel() {
+        let e = expectation(description: "pixel fired")
+        Pixel.setUp(store: self.store) { [unowned self] event in
+            XCTAssertEqual(event, .launchInitial(cohort: cohort!.rawValue))
+            e.fulfill()
         }
-        logic.install()
-        _ = logic.cohort
 
-        logic.fireBookmarksBarInteractionPixel()
-        if case .bookmarksBarOnboardingFirstInteraction(let cohort) = pixelEvent {
-            XCTAssertEqual(cohort, logic.allocatedCohort)
-        } else {
-            XCTFail("Unexpected pixel")
-        }
+        Pixel.firstLaunchDate = now
+        PixelExperiment.install()
+        _=PixelExperiment.cohort
+
+        PixelExperiment.fireEnrollmentPixel()
+        // only initial is set
+        PixelExperiment.fireEnrollmentPixel()
+        now = now.adding(.days(5))
+        PixelExperiment.fireEnrollmentPixel()
+
+        waitForExpectations(timeout: 0)
     }
 
-    func testWhenDay4to8ThenSearchPixelSentWithCorrectCohort() {
-        let logic = PixelExperimentLogic { _ in }
+    func testFirstSerpPixel() {
+        let e = expectation(description: "enrollment pixel fired")
+        let e2 = expectation(description: "serp pixel fired")
+        Pixel.setUp(store: self.store) { [unowned self] event in
+            switch event {
+            case .launchInitial(cohort: cohort.rawValue):
+                e.fulfill()
+            case .serpInitial(cohort: cohort.rawValue):
+                e2.fulfill()
+            default:
+                XCTFail("unexpected \(event)")
+            }
+        }
 
-        assertSearchPixelNotSentWhenEnrolledDaysAgo(0)
-        logic.reset()
+        Pixel.firstLaunchDate = now
+        PixelExperiment.install()
+        _=PixelExperiment.cohort
 
-        assertSearchPixelNotSentWhenEnrolledDaysAgo(1)
-        logic.reset()
+        PixelExperiment.fireFirstSerpPixel()
+        // only initial is set
+        PixelExperiment.fireFirstSerpPixel()
+        now = now.adding(.days(5))
+        PixelExperiment.fireFirstSerpPixel()
 
-        assertSearchPixelNotSentWhenEnrolledDaysAgo(2)
-        logic.reset()
-
-        assertSearchPixelNotSentWhenEnrolledDaysAgo(3)
-        logic.reset()
-
-        assertSearchPixelSentWhenEnrolledDaysAgo(4)
-        logic.reset()
-
-        assertSearchPixelSentWhenEnrolledDaysAgo(5)
-        logic.reset()
-
-        assertSearchPixelSentWhenEnrolledDaysAgo(6)
-        logic.reset()
-
-        assertSearchPixelSentWhenEnrolledDaysAgo(7)
-        logic.reset()
-
-        assertSearchPixelSentWhenEnrolledDaysAgo(8)
-        logic.reset()
-
-        assertSearchPixelNotSentWhenEnrolledDaysAgo(9)
-        logic.reset()
-
-        assertSearchPixelNotSentWhenEnrolledDaysAgo(10)
-        logic.reset()
+        waitForExpectations(timeout: 0)
     }
 
-    func testWhenSubsequentAccessThenNoAllocationOccursAndNoPixelFired() {
-        var pixelEvent: Pixel.Event?
-        let logic = PixelExperimentLogic {
-            pixelEvent = $0
+    func testDay21SerpPixel() {
+        let enrollment = expectation(description: "first pixel fired")
+        var e: XCTestExpectation!
+        Pixel.setUp(store: self.store) { [unowned self] event in
+            switch event {
+            case .launchInitial(cohort: cohort.rawValue):
+                enrollment.fulfill()
+            case .serpDay21to27(cohort: cohort.rawValue):
+                e.fulfill()
+            default:
+                XCTFail("unexpected \(event)")
+            }
         }
-        logic.install()
-        let originalCohort = logic.cohort
 
-        pixelEvent = nil
-        let newCohort = logic.cohort
+        let start = now
+        Pixel.firstLaunchDate = start
+        PixelExperiment.install()
+        _=PixelExperiment.cohort
 
-        XCTAssertNil(pixelEvent)
-        XCTAssertEqual(originalCohort, newCohort)
+        // only enrollment should fire
+        PixelExperiment.fireDay21To27SerpPixel()
+        waitForExpectations(timeout: 0)
+
+        // shouldn‘t fire after 20 days
+        now = Calendar.current.date(byAdding: .day, value: 20, to: start)!
+        PixelExperiment.fireDay21To27SerpPixel()
+
+        // should fire after 21 days
+        e = expectation(description: "21d pixel fired")
+        now = Calendar.current.date(byAdding: .day, value: 21, to: start)!
+        PixelExperiment.fireDay21To27SerpPixel()
+        waitForExpectations(timeout: 0)
+
+        // shouldn‘t fire after 26 days (only initial)
+        now = Calendar.current.date(byAdding: .day, value: 26, to: start)!
+        PixelExperiment.fireDay21To27SerpPixel()
+
+        // shouldn‘t fire after 27 days
+        now = Calendar.current.date(byAdding: .day, value: 27, to: start)!
+        PixelExperiment.fireDay21To27SerpPixel()
     }
 
-    func testWhenFirstAccessedThenAllocationOccursAndPixelFired() {
-        var pixelEvent: Pixel.Event?
-        let logic = PixelExperimentLogic {
-            pixelEvent = $0
+    func testDay27SerpPixel() {
+        let enrollment = expectation(description: "first pixel fired")
+        var e: XCTestExpectation!
+        Pixel.setUp(store: self.store) { [unowned self] event in
+            switch event {
+            case .launchInitial(cohort: cohort.rawValue):
+                enrollment.fulfill()
+            case .serpDay21to27(cohort: cohort.rawValue):
+                e.fulfill()
+            default:
+                XCTFail("unexpected \(event)")
+            }
         }
-        logic.install()
-        XCTAssertNil(logic.allocatedCohort)
-        XCTAssertNil(pixelEvent)
-        _ = logic.cohort
-        XCTAssertNotNil(logic.allocatedCohort)
-        XCTAssertNotNil(pixelEvent)
 
-        if case .bookmarksBarOnboardingEnrollment(let cohort) = pixelEvent {
-            XCTAssertEqual(cohort, logic.allocatedCohort)
-        } else {
-            XCTFail("Unexpected pixel")
-        }
+        let start = now
+        Pixel.firstLaunchDate = start
+        PixelExperiment.install()
+        _=PixelExperiment.cohort
+
+        // only enrollment should fire
+        PixelExperiment.fireDay21To27SerpPixel()
+        waitForExpectations(timeout: 0)
+
+        // shouldn‘t fire after 20 days
+        now = Calendar.current.date(byAdding: .day, value: 20, to: start)!
+        PixelExperiment.fireDay21To27SerpPixel()
+
+        // should fire after 26 days
+        e = expectation(description: "27d pixel fired")
+        now = Calendar.current.date(byAdding: .day, value: 27, to: start)!
+        PixelExperiment.fireDay21To27SerpPixel()
+        waitForExpectations(timeout: 0)
+
+        // shouldn‘t fire after 27 days
+        now = Calendar.current.date(byAdding: .day, value: 28, to: start)!
+        PixelExperiment.fireDay21To27SerpPixel()
     }
 
-    func testWhenNoCohortThenPixelsNotSent() {
-        var pixelEvent: Pixel.Event?
-        let logic = PixelExperimentLogic {
-            pixelEvent = $0
-        }
-        logic.install()
-        logic.fireEnrollmentPixel()
-        logic.fireSearchOnDay4to8Pixel()
-        logic.fireBookmarksBarInteractionPixel()
-        XCTAssertNil(pixelEvent)
-    }
-
-    func assertSearchPixelSentWhenEnrolledDaysAgo(_ daysAgo: Int, file: StaticString = #file, line: UInt = #line) {
-        var pixelEvent: Pixel.Event?
-        let logic = PixelExperimentLogic {
-            pixelEvent = $0
-        }
-        logic.install()
-        _ = logic.cohort
-        logic.enrollmentDate = Date.daysAgo(daysAgo)
-        pixelEvent = nil
-
-        logic.fireSearchOnDay4to8Pixel()
-
-        if case .bookmarksBarOnboardingSearched4to8days(let cohort) = pixelEvent {
-            XCTAssertEqual(cohort, logic.allocatedCohort)
-        } else {
-            XCTFail("Unexpected pixel \(String(describing: pixelEvent))", file: file, line: line)
-        }
-    }
-
-    func assertSearchPixelNotSentWhenEnrolledDaysAgo(_ daysAgo: Int, file: StaticString = #file, line: UInt = #line) {
-        var pixelEvent: Pixel.Event?
-        let logic = PixelExperimentLogic {
-            pixelEvent = $0
-        }
-        logic.install()
-        _ = logic.cohort
-        pixelEvent = nil
-
-        logic.enrollmentDate = Date.daysAgo(daysAgo)
-
-        logic.fireSearchOnDay4to8Pixel()
-        XCTAssertNil(pixelEvent, file: file, line: line)
-    }
-
-    func assertWhenSecondInteractionWithBookmarksBarOnDayThenPixelFired(_ daysAgo: Int, file: StaticString = #file, line: UInt = #line) {
-        var pixelEvent: Pixel.Event?
-        let logic = PixelExperimentLogic {
-            pixelEvent = $0
-        }
-        logic.install()
-        _ = logic.cohort
-        logic.enrollmentDate = Date.daysAgo(daysAgo)
-
-        logic.fireBookmarksBarInteractionPixel()
-        pixelEvent = nil
-        logic.fireBookmarksBarInteractionPixel()
-
-        if case .bookmarksBarOnboardingInteraction2to8days(let cohort) = pixelEvent {
-            XCTAssertEqual(cohort, logic.allocatedCohort)
-        } else {
-            XCTFail("Unexpected pixel \(String(describing: pixelEvent))", file: file, line: line)
+    func testDay28SerpPixel() {
+        let enrollment = expectation(description: "first pixel fired")
+        Pixel.setUp(store: self.store) { [unowned self] event in
+            switch event {
+            case .launchInitial(cohort: cohort.rawValue):
+                enrollment.fulfill()
+            default:
+                XCTFail("unexpected \(event)")
+            }
         }
 
-    }
+        let start = now
+        Pixel.firstLaunchDate = start
+        PixelExperiment.install()
+        _=PixelExperiment.cohort
 
-    func assertWhenSecondInteractionWithBookmarksBarOnDayThenNoPixelFired(_ daysAgo: Int) {
-        var pixelEvent: Pixel.Event?
-        let logic = PixelExperimentLogic {
-            pixelEvent = $0
-        }
-        logic.install()
-        _ = logic.cohort
-        logic.enrollmentDate = Date.daysAgo(daysAgo)
+        // only enrollment should fire
+        PixelExperiment.fireDay21To27SerpPixel()
+        waitForExpectations(timeout: 0)
 
-        logic.fireBookmarksBarInteractionPixel()
-        pixelEvent = nil
-        logic.fireBookmarksBarInteractionPixel()
-
-        XCTAssertNil(pixelEvent)
+        // shouldn‘t fire after 28 days
+        now = Calendar.current.date(byAdding: .day, value: 28, to: start)!
+        PixelExperiment.fireDay21To27SerpPixel()
     }
 
 }

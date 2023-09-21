@@ -523,11 +523,7 @@ struct SmallCircleText: View {
 extension View {
 
     @ViewBuilder func tooltip(_ message: String) -> some View {
-        if #available(macOS 11, *) {
-            self.help(message)
-        } else {
-            self
-        }
+        self.help(message)
     }
 
 }

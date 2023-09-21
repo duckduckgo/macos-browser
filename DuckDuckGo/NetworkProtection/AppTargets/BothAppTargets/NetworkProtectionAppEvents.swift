@@ -24,25 +24,38 @@ import NetworkProtection
 
 /// Implements the sequence of steps that Network Protection needs to execute when the App starts up.
 ///
-@available(macOS 11.4, *)
 final class NetworkProtectionAppEvents {
+
+    private let featureVisibility: NetworkProtectionFeatureVisibility
+
+    init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility()) {
+        self.featureVisibility = featureVisibility
+    }
 
     /// Call this method when the app finishes launching, to run the startup logic for NetP.
     ///
     func applicationDidFinishLaunching() {
         migrateNetworkProtectionAuthTokenToSharedKeychainIfNecessary()
 
-        let loginItemsManager = NetworkProtectionLoginItemsManager()
+        let loginItemsManager = LoginItemsManager()
         let keychainStore = NetworkProtectionKeychainTokenStore()
 
-        guard keychainStore.isFeatureActivated else {
-            loginItemsManager.disableLoginItems()
-            LocalPinningManager.shared.unpin(.networkProtection)
+        guard featureVisibility.isNetworkProtectionVisible() else {
+            featureVisibility.disableForAllUsers()
             return
         }
 
         restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
         refreshNetworkProtectionServers()
+    }
+
+    /// Call this method when the app becomes active to run the associated NetP logic.
+    ///
+    func applicationDidBecomeActive() {
+        guard featureVisibility.isNetworkProtectionVisible() else {
+            featureVisibility.disableForAllUsers()
+            return
+        }
     }
 
     /// If necessary, this method migrates the auth token from an unspecified data protection keychain (our previous
@@ -61,9 +74,12 @@ final class NetworkProtectionAppEvents {
             return
         }
 
-        let anyDataProtectionKeychainStore = NetworkProtectionKeychainTokenStore(keychainType: .dataProtection(.unspecified), errorEvents: nil)
+        let legacyServiceName = "\(Bundle.main.bundleIdentifier!).authToken"
+        let legacyKeychainStore = NetworkProtectionKeychainTokenStore(keychainType: .dataProtection(.unspecified),
+                                                                      serviceName: legacyServiceName,
+                                                                      errorEvents: nil)
 
-        guard let token = try? anyDataProtectionKeychainStore.fetchToken() else {
+        guard let token = try? legacyKeychainStore.fetchToken() else {
             // If fetching the token fails, we just assume we can't migrate anything and the user
             // will need to re-enable NetP.
             return
@@ -76,7 +92,7 @@ final class NetworkProtectionAppEvents {
         }
     }
 
-    private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: NetworkProtectionLoginItemsManager) {
+    private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: LoginItemsManager) {
         let currentVersion = AppVersion.shared.versionNumber
         let versionStore = NetworkProtectionLastVersionRunStore()
         defer {
@@ -94,12 +110,12 @@ final class NetworkProtectionAppEvents {
             restartNetworkProtectionTunnelAndMenu(using: loginItemsManager)
         } else {
             // If login items failed to launch (e.g. because of the App bundle rename), launch using NSWorkspace
-            loginItemsManager.ensureLoginItemsAreRunning(.ifLoginItemsAreEnabled, after: 1)
+            loginItemsManager.ensureLoginItemsAreRunning(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection, condition: .ifLoginItemsAreEnabled, after: 1)
         }
     }
 
-    private func restartNetworkProtectionTunnelAndMenu(using loginItemsManager: NetworkProtectionLoginItemsManager) {
-        loginItemsManager.restartLoginItems()
+    private func restartNetworkProtectionTunnelAndMenu(using loginItemsManager: LoginItemsManager) {
+        loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
 
         Task {
             let provider = NetworkProtectionTunnelController()

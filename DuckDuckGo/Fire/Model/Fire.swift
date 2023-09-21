@@ -113,13 +113,7 @@ final class Fire {
         self.syncDataProviders = syncDataProviders ?? (NSApp.delegate as? AppDelegate)?.syncDataProviders
         self.secureVaultFactory = secureVaultFactory
         self.tld = tld
-
-        if #available(macOS 11, *), autoconsentManagement == nil {
-            self.autoconsentManagement = AutoconsentManagement.shared
-        } else {
-            self.autoconsentManagement = autoconsentManagement
-        }
-
+        self.autoconsentManagement = autoconsentManagement ?? AutoconsentManagement.shared
         if let stateRestorationManager = stateRestorationManager {
             self.stateRestorationManager = stateRestorationManager
         } else if let appDelegate = NSApp.delegate as? AppDelegate {
@@ -499,9 +493,7 @@ final class Fire {
     // MARK: - Autoconsent visit cache
 
     private func burnAutoconsentCache() {
-        if #available(macOS 11, *), self.autoconsentManagement != nil {
-            self.autoconsentManagement!.clearCache()
-        }
+        self.autoconsentManagement?.clearCache()
     }
 
     // MARK: - Last Session State

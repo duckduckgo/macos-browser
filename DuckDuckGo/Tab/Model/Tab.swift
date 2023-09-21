@@ -49,6 +49,9 @@ protocol NewWindowPolicyDecisionMaker {
         case bookmarks
         case onboarding
         case none
+#if DBP
+        case dataBrokerProtection
+#endif
 
         static func contentFromURL(_ url: URL?, userEntered: String? = nil) -> TabContent {
             if url == .homePage {
@@ -98,6 +101,10 @@ protocol NewWindowPolicyDecisionMaker {
                 return true
             case (.bookmarks, .bookmarks):
                 return true
+#if DBP
+            case (.dataBrokerProtection, .dataBrokerProtection):
+                return true
+#endif
             default:
                 return false
             }
@@ -109,6 +116,9 @@ protocol NewWindowPolicyDecisionMaker {
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle
+#if DBP
+            case .dataBrokerProtection: return UserText.tabDataBrokerProtectionTitle
+#endif
             }
         }
 
@@ -138,6 +148,10 @@ protocol NewWindowPolicyDecisionMaker {
                 return .blankPage
             case .onboarding:
                 return .welcome
+#if DBP
+            case .dataBrokerProtection:
+                return .dataBrokerProtection
+#endif
             case .none:
                 return nil
             }
@@ -366,10 +380,11 @@ protocol NewWindowPolicyDecisionMaker {
             handleFavicon()
         }
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onDuckDuckGoEmailSignOut),
-                                               name: .emailDidSignOut,
-                                               object: nil)
+        emailDidSignOutCancellable = NotificationCenter.default.publisher(for: .emailDidSignOut)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                self?.onDuckDuckGoEmailSignOut(notification)
+            }
 
         addDeallocationChecks(for: webView)
     }
@@ -499,6 +514,9 @@ protocol NewWindowPolicyDecisionMaker {
             }
             handleFavicon(oldValue: oldValue)
             invalidateInteractionStateData()
+            if navigationDelegate.currentNavigation == nil {
+                updateCanGoBackForward(withCurrentNavigation: nil)
+            }
             error = nil
         }
     }
@@ -856,6 +874,7 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     private var webViewCancellables = Set<AnyCancellable>()
+    private var emailDidSignOutCancellable: AnyCancellable?
 
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = navigationDelegate

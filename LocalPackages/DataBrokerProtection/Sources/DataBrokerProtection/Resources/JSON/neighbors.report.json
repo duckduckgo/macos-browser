@@ -1,0 +1,134 @@
+{
+  "name": "neighbor.report",
+  "version": "0.1.0",
+  "addedDatetime": 1692590400000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "762a26ed-5b41-4f68-88d2-6149f61d0752",
+          "url": "https://neighbor.report/${firstName}-${lastName}/${stateFullHyphenated}/${cityHyphenated}"
+        },
+        {
+          "actionType": "extract",
+          "id": "eaf8bf52-1336-4f3e-9dc3-237d98f71a32",
+          "selector": ".lstd",
+          "profile": {
+            "name": {
+              "selector": "(.//a[@class='persons'])[1]"
+            },
+            "age": {
+              "selector": ".age"
+            },
+            "addressFull": {
+              "selector": ".i_room"
+            },
+            "addressCityState": {
+              "selector": ".i_home"
+            },
+            "phone": {
+              "selector": ".i_phone"
+            },
+            "relativesList": {
+              "selector": ".i_people",
+              "afterText": "Associated persons:",
+              "separator": ","
+            },
+            "profileUrl": {
+              "selector": "(.//a[@class='persons'])[1]"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "057fcd2d-cd54-4cad-919d-35fdb5b33842",
+          "url": "https://neighbor.report/remove"
+        },
+        {
+          "actionType": "fillForm",
+          "id": "b12bface-f263-46e6-88b5-3306d288fb58",
+          "selector": ".form-horizontal",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": ".//input[@name='inputName']"
+            },
+            {
+              "type": "email",
+              "selector": ".//input[@name='inputEmail']"
+            },
+            {
+              "type": "profileUrl",
+              "selector": ".//input[@name='inputURL']"
+            }
+          ]
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "id": "6dad4f78-26a2-48fa-9c96-19e38ad62053",
+          "selector": ".recaptcha-div"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "id": "f94b2c54-37bc-48cd-aaf8-c4f1cc3074b5",
+          "selector": ".recaptcha-div"
+        },
+        {
+          "actionType": "click",
+          "id": "cfa554fc-5d9b-42ed-ae87-b20448074bdb",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".submit-comment"
+            }
+          ]
+        },
+        {
+          "actionType": "click",
+          "id": "35cee2ee-d5c6-4ffe-9a4c-cf50ef49d872",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".btn-danger"
+            }
+          ]
+        },
+        {
+            "actionType": "click",
+            "id": "0799cab9-7e76-4502-812d-4e94add0038a",
+            "elements": [
+              {
+                "type": "button",
+                "selector": ".btn-success"
+              }
+            ]
+          },
+        {
+          "actionType": "expectation",
+          "id": "9064235e-b469-4f0a-bd8a-a651bb1e1a51",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "we've removed your data from the Neighbor Report website"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}

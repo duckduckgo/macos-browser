@@ -20,11 +20,11 @@ import Cocoa
 import Carbon.HIToolbox
 import Combine
 
-protocol FindInPageDelegate: AnyObject {
+@objc protocol FindInPageDelegate: AnyObject {
 
-    func findInPageNext(_ controller: FindInPageViewController)
-    func findInPagePrevious(_ controller: FindInPageViewController)
-    func findInPageDone(_ controller: FindInPageViewController)
+    func findInPageNext(_ sender: Any)
+    func findInPagePrevious(_ sender: Any)
+    func findInPageDone(_ sender: Any)
 
 }
 

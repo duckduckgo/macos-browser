@@ -28,6 +28,8 @@ extension UserDefaults {
 public struct UserDefaultsWrapper<T> {
 
     public enum Key: String, CaseIterable {
+        /// system setting defining window title double-click action
+        case appleActionOnDoubleClick = "AppleActionOnDoubleClick"
 
         case configLastUpdated = "config.last.updated"
         case configStorageTrackerRadarEtag = "config.storage.trackerradar.etag"
@@ -63,6 +65,7 @@ public struct UserDefaultsWrapper<T> {
         case askToSaveUsernamesAndPasswords = "preferences.ask-to-save.usernames-passwords"
         case askToSaveAddresses = "preferences.ask-to-save.addresses"
         case askToSavePaymentMethods = "preferences.ask-to-save.payment-methods"
+        case autolockLocksFormFilling = "preferences.lock-autofill-form-fill"
 
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
@@ -109,10 +112,12 @@ public struct UserDefaultsWrapper<T> {
         case homePageIsContinueSetupVisible = "home.page.is.continue.setup.visible"
         case homePageIsRecentActivityVisible = "home.page.is.recent.activity.visible"
         case homePageIsFirstSession = "home.page.is.first.session"
+        case homePageShowNetworkProtectionBetaEndedNotice = "home.page.network-protection.show-beta-ended-notice"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"
+        case emailKeychainMigration = "email.keychain.migration"
 
         case bookmarksBarPromptShown = "bookmarks.bar.prompt.shown"
         case showBookmarksBar = "bookmarks.bar.show"
@@ -130,7 +135,6 @@ public struct UserDefaultsWrapper<T> {
 
         // Network Protection
 
-        case networkProtectionOnDemandActivation = "netp.ondemand"
         case networkProtectionShouldEnforceRoutes = "netp.enforce-routes"
         case networkProtectionShouldIncludeAllNetworks = "netp.include-all-networks"
 
@@ -142,7 +146,9 @@ public struct UserDefaultsWrapper<T> {
 
         case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
 
-        case agentLaunchTime = "netp.agent.launch-time"
+        case netpMenuAgentLaunchTime = "netp.agent.launch-time"
+
+        case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
 
         // Network Protection: Shared Defaults
         // ---
@@ -150,16 +156,24 @@ public struct UserDefaultsWrapper<T> {
         // or else KVO will just not work as of 2023-08-07
 
         case networkProtectionOnboardingStatusRawValue = "networkProtectionOnboardingStatusRawValue"
+        case networkProtectionWaitlistActiveOverrideRawValue = "networkProtectionWaitlistActiveOverrideRawValue"
+        case networkProtectionWaitlistEnabledOverrideRawValue = "networkProtectionWaitlistEnabledOverrideRawValue"
 
         // Experiments
         case pixelExperimentInstalled = "pixel.experiment.installed"
         case pixelExperimentCohort = "pixel.experiment.cohort"
         case pixelExperimentEnrollmentDate = "pixel.experiment.enrollment.date"
         case pixelExperimentFiredPixels = "pixel.experiment.pixels.fired"
+        case campaignVariant = "campaign.variant"
+
+        // Sync
+
+        case syncEnvironment = "sync.environment"
     }
 
     enum RemovedKeys: String, CaseIterable {
         case passwordManagerDoNotPromptDomains = "com.duckduckgo.passwordmanager.do-not-prompt-domains"
+        case incrementalFeatureFlagTestHasSentPixel = "network-protection.incremental-feature-flag-test.has-sent-pixel"
     }
 
     private let key: Key
@@ -193,24 +207,49 @@ public struct UserDefaultsWrapper<T> {
 
     public var wrappedValue: T {
         get {
-            if let storedValue = defaults.object(forKey: key.rawValue),
-               let typedValue = storedValue as? T {
+            guard let storedValue = defaults.object(forKey: key.rawValue) else {
+                if setIfEmpty {
+                    setValue(defaultValue)
+                }
+
+                return defaultValue
+            }
+
+            if let typedValue = storedValue as? T {
                 return typedValue
             }
 
-            if setIfEmpty {
-                defaults.set(defaultValue, forKey: key.rawValue)
+            guard let rawRepresentableType = T.self as? any RawRepresentable.Type,
+                  let value = rawRepresentableType.init(anyRawValue: storedValue) as? T else {
+                return defaultValue
             }
 
-            return defaultValue
+            return value
         }
         set {
-            if (newValue as? AnyOptional)?.isNil == true {
-                defaults.removeObject(forKey: key.rawValue)
-            } else {
-                defaults.set(newValue, forKey: key.rawValue)
-            }
+            setValue(newValue)
         }
+    }
+
+    private func setValue(_ value: T) {
+        guard (value as? AnyOptional)?.isNil != true else {
+            defaults.removeObject(forKey: key.rawValue)
+            return
+        }
+
+        if PropertyListSerialization.propertyList(value, isValidFor: .binary) {
+            defaults.set(value, forKey: key.rawValue)
+            return
+        }
+
+        guard let rawRepresentable = value as? any RawRepresentable,
+              PropertyListSerialization.propertyList(rawRepresentable.rawValue, isValidFor: .binary) else {
+            assertionFailure("\(value) cannot be stored in UserDefaults")
+            return
+        }
+
+        defaults.set(rawRepresentable.rawValue, forKey: key.rawValue)
+
     }
 
     static func clearAll() {
@@ -241,6 +280,18 @@ extension UserDefaultsWrapper where T: OptionalProtocol {
 
     init(key: Key, defaults: UserDefaults? = nil) {
         self.init(key: key, defaultValue: .none, defaults: defaults)
+    }
+
+}
+
+private extension RawRepresentable {
+
+    init?(anyRawValue: Any) {
+        guard let rawValue = anyRawValue as? RawValue else {
+            assertionFailure("\(anyRawValue) is not \(RawValue.self)")
+            return nil
+        }
+        self.init(rawValue: rawValue)
     }
 
 }

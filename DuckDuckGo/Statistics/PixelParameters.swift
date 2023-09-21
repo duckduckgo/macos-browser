@@ -41,7 +41,6 @@ extension Pixel {
 
         // Pixel experiments
         static let experimentCohort = "cohort"
-
     }
 
     enum Values {
@@ -89,14 +88,17 @@ extension Pixel.Event {
 
             return params
 
-        case .bookmarksBarOnboardingEnrollment(let cohort):
+        case .launchInitial(let cohort):
             return [Pixel.Parameters.experimentCohort: cohort]
-        case .bookmarksBarOnboardingSearched4to8days(let cohort):
+        case .serpInitial(let cohort):
             return [Pixel.Parameters.experimentCohort: cohort]
-        case .bookmarksBarOnboardingFirstInteraction(let cohort):
+        case .serpDay21to27(let cohort):
+            return [Pixel.Parameters.experimentCohort: cohort, "isDefault": DefaultBrowserPreferences().isDefault.description]
+        case .setAsDefaultInitial(let cohort):
             return [Pixel.Parameters.experimentCohort: cohort]
-        case .bookmarksBarOnboardingInteraction2to8days(let cohort):
-            return [Pixel.Parameters.experimentCohort: cohort]
+
+        case .dailyPixel(let pixel, isFirst: _):
+            return pixel.parameters
 
         // Don't use default to force new items to be thought about
         case .crash,
@@ -124,7 +126,6 @@ extension Pixel.Event {
              .emailEnabledInitial,
              .cookieManagementEnabledInitial,
              .watchInDuckPlayerInitial,
-             .setAsDefaultInitial,
              .importDataInitial,
              .newTabInitial,
              .networkProtectionSystemExtensionUnknownActivationResult,
@@ -134,7 +135,6 @@ extension Pixel.Event {
              .userHasPinnedTab,
              .fireButtonFirstBurn,
              .fireButton,
-             .incrementalRolloutTest,
              .duckPlayerDailyUniqueView,
              .duckPlayerViewFromYoutubeViaMainOverlay,
              .duckPlayerViewFromYoutubeViaHoverButton,
@@ -143,7 +143,13 @@ extension Pixel.Event {
              .duckPlayerViewFromOther,
              .duckPlayerSettingAlways,
              .duckPlayerSettingNever,
-             .duckPlayerSettingBackToDefault:
+             .duckPlayerSettingBackToDefault,
+             .networkProtectionWaitlistEntryPointMenuItemDisplayed,
+             .networkProtectionWaitlistEntryPointToolbarButtonDisplayed,
+             .networkProtectionWaitlistNotificationShown,
+             .networkProtectionWaitlistNotificationTapped,
+             .networkProtectionWaitlistTermsAndConditionsDisplayed,
+             .networkProtectionWaitlistTermsAndConditionsAccepted:
             return nil
         }
     }

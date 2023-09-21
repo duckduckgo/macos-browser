@@ -54,8 +54,8 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
     private var shouldAutoConnect: Bool
 
     /// Agent launch time saved by the main app to distinguish between Log In launch and Main App launch to prevent connection when started by the Main App
-    @UserDefaultsWrapper(key: .agentLaunchTime, defaultValue: .distantPast, defaults: .shared)
-    private var agentLaunchTime: Date
+    @UserDefaultsWrapper(key: .netpMenuAgentLaunchTime, defaultValue: .distantPast, defaults: .shared)
+    private var netpMenuAgentLaunchTime: Date
 
     private static let recentThreshold: TimeInterval = 5.0
 
@@ -104,7 +104,7 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
         // Connect on Log In
         if shouldAutoConnect,
            // are we launched by the system?
-           agentLaunchTime.addingTimeInterval(Self.recentThreshold) > Date() {
+           netpMenuAgentLaunchTime.addingTimeInterval(Self.recentThreshold) > Date() {
             Task {
                 await appLauncher.launchApp(withCommand: .startVPN)
             }

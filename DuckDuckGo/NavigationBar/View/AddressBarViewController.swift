@@ -22,8 +22,8 @@ import Lottie
 
 final class AddressBarViewController: NSViewController {
 
-    @IBOutlet weak var addressBarTextField: AddressBarTextField!
-    @IBOutlet weak var passiveTextField: NSTextField!
+    @IBOutlet var addressBarTextField: AddressBarTextField!
+    @IBOutlet var passiveTextField: NSTextField!
     @IBOutlet var inactiveBackgroundView: NSView!
     @IBOutlet var activeBackgroundView: NSView!
     @IBOutlet var activeOuterBorderView: NSView!
@@ -69,14 +69,11 @@ final class AddressBarViewController: NSViewController {
     }
 
     private var cancellables = Set<AnyCancellable>()
-    private var passiveAddressBarStringCancellable: AnyCancellable?
-    private var tabContentCancellable: AnyCancellable?
-    private var progressCancellable: AnyCancellable?
-    private var loadingCancellable: AnyCancellable?
+    private var tabViewModelCancellables = Set<AnyCancellable>()
+    private var eventMonitorCancellables = Set<AnyCancellable>()
 
+    /// save mouse-down position to handle same-place clicks outside of the Address Bar to remove first responder
     private var clickPoint: NSPoint?
-    private var mouseDownMonitor: Any?
-    private var mouseUpMonitor: Any?
 
     required init?(coder: NSCoder) {
         fatalError("AddressBarViewController: Bad initializer")
@@ -100,9 +97,11 @@ final class AddressBarViewController: NSViewController {
         view.layer?.masksToBounds = false
 
         updateView()
-        addressBarTextField.addressBarTextFieldDelegate = self
+        // only activate active text field leading constraint on its appearance to avoid constraint conflicts
+        activeTextFieldMinXConstraint.isActive = false
         addressBarTextField.tabCollectionViewModel = tabCollectionViewModel
         subscribeToSelectedTabViewModel()
+        subscribeToAddressBarValue()
         registerForMouseEnteredAndExitedEvents()
     }
 
@@ -147,7 +146,7 @@ final class AddressBarViewController: NSViewController {
     // swiftlint:disable notification_center_detachment
     override func viewWillDisappear() {
         NotificationCenter.default.removeObserver(self)
-        removeMouseMonitors()
+        eventMonitorCancellables.removeAll()
     }
     // swiftlint:enable notification_center_detachment
 
@@ -187,40 +186,55 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet var shadowView: ShadowView!
 
     private func subscribeToSelectedTabViewModel() {
-        tabCollectionViewModel.$selectedTabViewModel.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.subscribeToTabContent()
-            self?.subscribeToPassiveAddressBarString()
-            self?.subscribeToProgressEvents()
-            // don't resign first responder on tab switching
-            self?.clickPoint = nil
-        }.store(in: &cancellables)
+        tabCollectionViewModel.$selectedTabViewModel
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+
+                tabViewModelCancellables.removeAll()
+
+                subscribeToTabContent()
+                subscribeToPassiveAddressBarString()
+                subscribeToProgressEvents()
+
+                // don't resign first responder on tab switching
+                clickPoint = nil
+            }
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToAddressBarValue() {
+        addressBarTextField.$value
+            .sink { [weak self] value in
+                guard let self else { return }
+
+                updateMode(value: value)
+                addressBarButtonsViewController?.textFieldValue = value
+                updateView()
+            }
+            .store(in: &cancellables)
     }
 
     private func subscribeToTabContent() {
-        tabContentCancellable?.cancel()
-
-        tabContentCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$content
+        tabCollectionViewModel.selectedTabViewModel?.tab.$content
             .receive(on: DispatchQueue.main)
             .map { $0 == .homePage }
             .assign(to: \.isHomePage, onWeaklyHeld: self)
+            .store(in: &tabViewModelCancellables)
     }
 
     private func subscribeToPassiveAddressBarString() {
-        passiveAddressBarStringCancellable?.cancel()
-
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             passiveTextField.stringValue = ""
             return
         }
-        passiveAddressBarStringCancellable = selectedTabViewModel.$passiveAddressBarString
+        selectedTabViewModel.$passiveAddressBarString
             .receive(on: DispatchQueue.main)
             .assign(to: \.stringValue, onWeaklyHeld: passiveTextField)
+            .store(in: &tabViewModelCancellables)
     }
 
     private func subscribeToProgressEvents() {
-        progressCancellable = nil
-        loadingCancellable = nil
-
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             progressIndicator.hide(animated: false)
             return
@@ -232,16 +246,18 @@ final class AddressBarViewController: NSViewController {
             progressIndicator.hide(animated: false)
         }
 
-        progressCancellable = selectedTabViewModel.$progress.sink { [weak self] value in
-            guard selectedTabViewModel.isLoading,
-                  let progressIndicator = self?.progressIndicator,
-                  progressIndicator.isShown
-            else { return }
+        selectedTabViewModel.$progress
+            .sink { [weak self] value in
+                guard selectedTabViewModel.isLoading,
+                      let progressIndicator = self?.progressIndicator,
+                      progressIndicator.isShown
+                else { return }
 
-            progressIndicator.increaseProgress(to: value)
-        }
+                progressIndicator.increaseProgress(to: value)
+            }
+            .store(in: &tabViewModelCancellables)
 
-        loadingCancellable = selectedTabViewModel.$isLoading
+        selectedTabViewModel.$isLoading
             .sink { [weak self] isLoading in
                 guard let progressIndicator = self?.progressIndicator else { return }
 
@@ -253,7 +269,8 @@ final class AddressBarViewController: NSViewController {
                 } else if progressIndicator.isShown {
                     progressIndicator.finishAndHide()
                 }
-        }
+            }
+            .store(in: &tabViewModelCancellables)
     }
 
     private func subscribeToButtonsWidth() {
@@ -265,7 +282,7 @@ final class AddressBarViewController: NSViewController {
     }
 
     private func subscribeForShadowViewUpdates() {
-        addressBarTextField.suggestionWindowVisible
+        addressBarTextField.isSuggestionWindowVisiblePublisher
             .sink { [weak self] isSuggestionsWindowVisible in
                 self?.updateShadowView(isSuggestionsWindowVisible)
             }
@@ -379,6 +396,7 @@ extension AddressBarViewController {
     @objc func textFieldFirstReponderNotification(_ notification: Notification) {
         if view.window?.firstResponder == addressBarTextField.currentEditor() {
             isFirstResponder = true
+            activeTextFieldMinXConstraint.isActive = true
         } else {
             isFirstResponder = false
         }
@@ -424,25 +442,15 @@ extension AddressBarViewController {
     }
 
     func addMouseMonitors() {
-        guard mouseDownMonitor == nil, mouseUpMonitor == nil else { return }
-
-        self.mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
-            self?.mouseDown(with: event)
-        }
-        self.mouseUpMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseUp) { [weak self] event in
-            self?.mouseUp(with: event)
-        }
-    }
-
-    func removeMouseMonitors() {
-        if let monitor = mouseDownMonitor {
-            NSEvent.removeMonitor(monitor)
-        }
-        if let monitor = mouseUpMonitor {
-            NSEvent.removeMonitor(monitor)
-        }
-        self.mouseUpMonitor = nil
-        self.mouseDownMonitor = nil
+        eventMonitorCancellables.removeAll()
+        NSEvent.addLocalCancellableMonitor(forEventsMatching: .leftMouseDown) { [weak self] event in
+            guard let self else { return event }
+            return self.mouseDown(with: event)
+        }.store(in: &eventMonitorCancellables)
+        NSEvent.addLocalCancellableMonitor(forEventsMatching: .leftMouseUp) { [weak self] event in
+            guard let self else { return event }
+            return self.mouseUp(with: event)
+        }.store(in: &eventMonitorCancellables)
     }
 
     func mouseDown(with event: NSEvent) -> NSEvent? {
@@ -491,16 +499,6 @@ extension AddressBarViewController: AddressBarButtonsViewControllerDelegate {
 
     func addressBarButtonsViewControllerClearButtonClicked(_ addressBarButtonsViewController: AddressBarButtonsViewController) {
         addressBarTextField.clearValue()
-    }
-
-}
-
-extension AddressBarViewController: AddressBarTextFieldDelegate {
-
-    func adressBarTextField(_ addressBarTextField: AddressBarTextField, didChangeValue value: AddressBarTextField.Value) {
-        updateMode(value: value)
-        addressBarButtonsViewController?.textFieldValue = value
-        updateView()
     }
 
 }

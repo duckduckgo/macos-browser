@@ -42,16 +42,9 @@ import NetworkProtection
 
 /// Controller for the Network Protection debug menu.
 ///
-@available(macOS 11.4, *)
 @objc
 @MainActor
 final class NetworkProtectionDebugMenu: NSMenu {
-
-    override func awakeFromNib() {
-        if #unavailable(macOS 11.4) {
-            mainMenuItem?.removeFromParent()
-        }
-    }
 
     // MARK: - Outlets: Menus
 
@@ -91,8 +84,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
     @IBOutlet weak var excludeDDGRouteMenuItem: NSMenuItem!
     @IBOutlet weak var excludeLocalNetworksMenuItem: NSMenuItem!
 
-    @IBOutlet weak var connectionTesterEnabledMenuItem: NSMenuItem!
-
     // MARK: - Debug Logic
 
     private let debugUtilities = NetworkProtectionDebugUtilities()
@@ -107,7 +98,22 @@ final class NetworkProtectionDebugMenu: NSMenu {
             guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
 
             do {
-                try await debugUtilities.resetAllState()
+                try await debugUtilities.resetAllState(keepAuthToken: false)
+            } catch {
+                await NSAlert(error: error).runModal()
+            }
+        }
+    }
+
+    /// Resets all state for NetworkProtection.
+    ///
+    @IBAction
+    func resetAllKeepingInvite(_ sender: Any?) {
+        Task { @MainActor in
+            guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
+
+            do {
+                try await debugUtilities.resetAllState(keepAuthToken: true)
             } catch {
                 await NSAlert(error: error).runModal()
             }
@@ -179,11 +185,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     @IBAction
-    func toggleConnectOnDemandAction(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleOnDemandEnabled()
-    }
-
-    @IBAction
     func toggleEnforceRoutesAction(_ sender: Any?) {
         NetworkProtectionTunnelController().toggleShouldEnforceRoutes()
     }
@@ -210,11 +211,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
             return
         }
         NetworkProtectionTunnelController().setExcludedRoute(addressRange, enabled: sender.state == .off)
-    }
-
-    @IBAction
-    func toggleConnectionTesterEnabled(_ sender: Any) {
-        NetworkProtectionTunnelController().toggleConnectionTesterEnabled()
     }
 
     // MARK: Populating Menu Items
@@ -385,20 +381,14 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private func updateNetworkProtectionMenuItemsState() {
         let controller = NetworkProtectionTunnelController()
 
-        enableConnectOnDemandMenuItem.state = controller.isOnDemandEnabled ? .on : .off
-        // On-Demand should always be enabled for the Kill Switch to work
-        enableConnectOnDemandMenuItem.isEnabled = !controller.shouldEnforceRoutes
-
         shouldEnforceRoutesMenuItem.state = controller.shouldEnforceRoutes ? .on : .off
         shouldIncludeAllNetworksMenuItem.state = controller.shouldIncludeAllNetworks ? .on : .off
         connectOnLogInMenuItem.state = controller.shouldAutoConnectOnLogIn ? .on : .off
 
         excludeLocalNetworksMenuItem.state = controller.shouldExcludeLocalRoutes ? .on : .off
-        connectionTesterEnabledMenuItem.state = controller.isConnectionTesterEnabled ? .on : .off
     }
 
 }
-@available(macOS 11.4, *)
 extension NetworkProtectionDebugMenu: NSMenuDelegate {
 
     func menuNeedsUpdate(_ menu: NSMenu) {

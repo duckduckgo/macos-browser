@@ -19,6 +19,7 @@
 import Navigation
 import Combine
 import Foundation
+import UniformTypeIdentifiers
 import WebKit
 
 protocol WebKitDownloadTaskDelegate: AnyObject {
@@ -240,9 +241,7 @@ final class WebKitDownloadTask: NSObject, ProgressReporting, @unchecked Sendable
 
 }
 
-extension WebKitDownloadTask: WebKitDownloadDelegate {}
-@available(macOS 11.3, *) // objc does‘t care about availability
-@objc extension WebKitDownloadTask {
+extension WebKitDownloadTask: WKDownloadDelegate {
 
     func download(_: WKDownload,
                   decideDestinationUsing response: URLResponse,
@@ -270,7 +269,7 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {}
         // sometimes suggesteFilename has an extension appended to already present URL file extension
         // e.g. feed.xml.rss for www.domain.com/rss.xml
         if let urlSuggestedFilename = response.url?.suggestedFilename,
-           !(urlSuggestedFilename as NSString).pathExtension.isEmpty,
+           !urlSuggestedFilename.pathExtension.isEmpty,
            suggestedFilename.hasPrefix(urlSuggestedFilename) {
             suggestedFilename = urlSuggestedFilename
         }
@@ -327,10 +326,6 @@ extension WebKitDownloadTask: WebKitDownloadDelegate {}
 
     func download(_: WKDownload, didFailWithError error: Error, resumeData: Data?) {
         downloadDidFail(with: error, resumeData: resumeData)
-    }
-
-    func download(_: WKDownload, didReceiveDataWithLength length: UInt64) {
-        self.progress.completedUnitCount += Int64(length)
     }
 
 }

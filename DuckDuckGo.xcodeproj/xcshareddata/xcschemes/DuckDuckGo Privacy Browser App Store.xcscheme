@@ -94,9 +94,6 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "AutoconsentMessageProtocolTests/testEval()">
-               </Test>
-               <Test
                   Identifier = "BrokenSiteReportingReferenceTests/testBrokenSiteReporting()">
                </Test>
                <Test
@@ -127,10 +124,7 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "AutoconsentIntegrationTests/testCosmeticRule_whenFakeCookieBannerIsDisplayedAndScriptsAreReloaded_bannerIsHidden()">
-               </Test>
-               <Test
-                  Identifier = "AutoconsentIntegrationTests/testCosmeticRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden()">
+                  Identifier = "AutoconsentIntegrationTests/testWhenAutoconsentDisabled_promptIsDisplayed()">
                </Test>
                <Test
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
@@ -143,6 +137,9 @@
                </Test>
                <Test
                   Identifier = "NavigationProtectionIntegrationTests/testAMPLinks()">
+               </Test>
+               <Test
+                  Identifier = "NavigationProtectionIntegrationTests/testReferrerTrimming()">
                </Test>
             </SkippedTests>
          </TestableReference>
@@ -188,6 +185,18 @@
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "OS_ACTIVITY_DT_MODE"
+            value = "YES"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "OS_ACTIVITY_MODE"
+            value = "debug"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

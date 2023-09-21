@@ -141,7 +141,9 @@ final class PermissionContextMenu: NSMenu {
     }
 
     private func addPersistenceItems() {
-        for (permission, state) in permissions {
+        // only show one persistence option per permission type
+        let reduced = permissions.reduce(into: [:], { $0[$1.key] = $1.value })
+        for (permission, state) in reduced {
             guard permission.canPersistGrantedDecision || permission.canPersistDeniedDecision else { continue }
             if case .disabled = state { continue }
 
@@ -344,7 +346,7 @@ private extension NSMenuItem {
     static func popupPermissionRequested(domain: String?) -> NSMenuItem {
         let title = UserText.permissionPopupTitle
         let attributedTitle = NSMutableAttributedString(string: title)
-        attributedTitle.setAttributes([.font: NSFont.systemFont(ofSize: 11.0)], range: title.nsRange())
+        attributedTitle.setAttributes([.font: NSFont.systemFont(ofSize: 11.0)], range: title.fullRange)
 
         let menuItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
         menuItem.attributedTitle = attributedTitle
@@ -364,7 +366,7 @@ private extension NSMenuItem {
         }
 
         let attributedTitle = NSMutableAttributedString(string: title)
-        attributedTitle.setAttributes([.font: NSFont.systemFont(ofSize: 11.0)], range: title.nsRange())
+        attributedTitle.setAttributes([.font: NSFont.systemFont(ofSize: 11.0)], range: title.fullRange)
 
         let menuItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
         menuItem.attributedTitle = attributedTitle

@@ -28,11 +28,21 @@ final class WebView: WKWebView {
 
     weak var contextMenuDelegate: WebViewContextMenuDelegate?
 
+    override var isInFullScreenMode: Bool {
+        if #available(macOS 13.0, *) {
+            return self.fullscreenState != .notInFullscreen
+        } else {
+            return self.tabContentView !== self
+        }
+    }
+
     func stopAllMediaAndLoading() {
         stopLoading()
         stopMediaCapture()
         stopAllMediaPlayback()
-        fullscreenWindowController?.close()
+        if isInFullScreenMode {
+            fullscreenWindowController?.window?.toggleFullScreen(self)
+        }
         if isInspectorShown {
             closeDeveloperTools()
         }
@@ -48,30 +58,23 @@ final class WebView: WKWebView {
 
     var zoomLevel: DefaultZoomValue {
         get {
-            if #available(macOS 11.0, *) {
-                return DefaultZoomValue(rawValue: pageZoom) ?? .percent100
-            }
-            return DefaultZoomValue(rawValue: magnification) ?? .percent100
+            return DefaultZoomValue(rawValue: pageZoom) ?? .percent100
         }
         set {
-            if #available(macOS 11.0, *) {
-                pageZoom = newValue.rawValue
-            } else {
-                magnification = newValue.rawValue
-            }
+            pageZoom = newValue.rawValue
         }
     }
 
     var canZoomToActualSize: Bool {
-        window != nil && zoomLevel != defaultZoomValue
+        window != nil && zoomLevel != defaultZoomValue && !self.isInFullScreenMode
     }
 
     var canZoomIn: Bool {
-        window != nil && zoomLevel.index < DefaultZoomValue.allCases.count - 1
+        window != nil && zoomLevel.index < DefaultZoomValue.allCases.count - 1 && !self.isInFullScreenMode
     }
 
     var canZoomOut: Bool {
-        window != nil && zoomLevel.index > 0
+        window != nil && zoomLevel.index > 0 && !self.isInFullScreenMode
     }
 
     func resetZoomLevel() {
@@ -209,8 +212,6 @@ final class WebView: WKWebView {
 
         // native WKWebView find
         guard self.responds(to: Selector.findString) else {
-            guard #available(macOS 11.0, *) else { fatalError("find in page should be available in X̴P̴ Catalina ( °-° )") }
-
             // fallback to official `findSting:`
             let config = WKFindConfiguration()
             config.backwards = options.contains(.backwards)

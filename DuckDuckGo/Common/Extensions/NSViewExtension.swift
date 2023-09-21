@@ -64,7 +64,7 @@ extension NSView {
 
     func applyDropShadow() {
         wantsLayer = true
-        layer?.shadowColor = NSColor.controlShadowColor.cgColor
+        layer?.shadowColor = NSColor.black.withAlphaComponent(0.2).cgColor
         layer?.shadowOpacity = 1.0
         layer?.masksToBounds = false
     }
@@ -90,7 +90,7 @@ extension NSView {
             NSLayoutConstraintToAttribute(attribute: .width, multiplier: multiplier, constant: const)
         }
         static func height(multiplier: CGFloat = 1.0, const: CGFloat = 0.0) -> NSLayoutConstraintToAttribute {
-            NSLayoutConstraintToAttribute(attribute: .width, multiplier: multiplier, constant: const)
+            NSLayoutConstraintToAttribute(attribute: .height, multiplier: multiplier, constant: const)
         }
 
         static func const(multiplier: CGFloat = 1.0, _ const: CGFloat) -> NSLayoutConstraintToAttribute {
@@ -144,32 +144,6 @@ extension NSView {
     func applyFaviconStyle() {
         wantsLayer = true
         layer?.cornerRadius = 3.0
-    }
-
-    // MARK: - Appearance updates
-
-    /**
-     * Sets current app appearance to the view and subscribes for subsequent updates.
-     *
-     * This is needed on Catalina for views displayed in popovers that have custom, opaque backgrounds.
-     * Presentation in popover overrides view appearance to `.vibrantLight` or `.vibrantDark`, which
-     * makes subviews such as `NSTextField` and `NSButton` draw their backgrounds with vibrancy effect,
-     * which in turn removes opaque background locally. Calling this method on the top-level view seems
-     * to be solving the issue.
-     *
-     * See [](https://app.asana.com/0/1177771139624306/1202121324275642/f) for an example screenshot.
-     */
-    func subscribeForAppApperanceUpdates() -> AnyCancellable? {
-        if #available(macOS 11.0, *) {
-            return nil
-        }
-
-        appearance = NSApp.effectiveAppearance
-
-        return NSApp
-            .publisher(for: \.effectiveAppearance)
-            .map { $0 as NSAppearance? }
-            .assign(to: \.appearance, onWeaklyHeld: self)
     }
 
 }

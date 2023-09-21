@@ -21,6 +21,10 @@ import Cocoa
 import Common
 import WebKit
 
+#if NETWORK_PROTECTION
+import NetworkProtection
+#endif
+
 // Actions are sent to objects of responder chain
 
 // MARK: - Main Menu Actions
@@ -30,7 +34,7 @@ extension AppDelegate {
     // MARK: - DuckDuckGo
 
     @IBAction func checkForUpdates(_ sender: Any?) {
-#if !APPSTORE
+#if SPARKLE
         updateController.checkForUpdates(sender)
 #endif
     }
@@ -182,11 +186,7 @@ extension AppDelegate {
             accessoryContainer.frame.size = accessoryContainer.fittingSize
 
             savePanel.accessoryView = accessoryContainer
-            if #available(macOS 11.0, *) {
-                savePanel.allowedContentTypes = [.commaSeparatedText]
-            } else {
-                savePanel.allowedFileTypes = ["csv"]
-            }
+            savePanel.allowedContentTypes = [.commaSeparatedText]
 
             savePanel.beginSheetModal(for: window) { response in
                 guard response == .OK, let selectedURL = savePanel.url else { return }
@@ -210,12 +210,7 @@ extension AppDelegate {
 
         let savePanel = NSSavePanel()
         savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportBookmarksFileNameSuffix)"
-
-        if #available(macOS 11.0, *) {
-            savePanel.allowedContentTypes = [.html]
-        } else {
-            savePanel.allowedFileTypes = ["html"]
-        }
+        savePanel.allowedContentTypes = [.html]
 
         savePanel.beginSheetModal(for: window) { response in
             guard response == .OK, let selectedURL = savePanel.url else { return }
@@ -240,26 +235,52 @@ extension AppDelegate {
             assertionFailure("No reference to main window controller")
             return
         }
-    windowController.mainViewController.browserTabViewController.openNewTab(with: .url(URL.duckDuckGoEmailLogin))
+        windowController.mainViewController.browserTabViewController.openNewTab(with: .url(URL.duckDuckGoEmailLogin))
     }
 
 }
 
 extension MainViewController {
 
+    /// Finds currently active Tab even if it‘s playing a Full Screen video
+    private func getActiveTabAndIndex() -> (tab: Tab, index: TabIndex)? {
+        guard let tab = NSApp.keyWindow?.windowController?.activeTab else {
+            assertionFailure("Could not get currently active Tab")
+            return nil
+        }
+        guard let index = tabCollectionViewModel.indexInAllTabs(of: tab) else {
+            assertionFailure("Could not get Tab index")
+            return nil
+        }
+        return (tab, index)
+    }
+
+    var activeTabViewModel: TabViewModel? {
+        getActiveTabAndIndex().flatMap { tabCollectionViewModel.tabViewModel(at: $0.index) }
+    }
+
+    func makeKeyIfNeeded() {
+        if view.window?.isKeyWindow != true {
+            view.window?.makeKeyAndOrderFront(nil)
+        }
+    }
+
     // MARK: - Main Menu
 
     @IBAction func openPreferences(_ sender: Any?) {
+        makeKeyIfNeeded()
         browserTabViewController.openNewTab(with: .anyPreferencePane)
     }
 
     // MARK: - File
 
     @IBAction func newTab(_ sender: Any?) {
+        makeKeyIfNeeded()
         browserTabViewController.openNewTab(with: .homePage)
     }
 
     @IBAction func openLocation(_ sender: Any?) {
+        makeKeyIfNeeded()
         guard let addressBarTextField = navigationBarViewController?.addressBarViewController?.addressBarTextField else {
             os_log("MainViewController: Cannot reference address bar text field", type: .error)
             return
@@ -268,66 +289,54 @@ extension MainViewController {
     }
 
     @IBAction func closeTab(_ sender: Any?) {
+        guard let (tab, index) = getActiveTabAndIndex() else { return }
+        makeKeyIfNeeded()
+
         // when close is triggered by a keyboard shortcut,
         // instead of closing a pinned tab we select the first regular tab
         // (this is in line with Safari behavior)
         // If there are no regular tabs, we close the window.
-        if isHandlingKeyDownEvent, tabCollectionViewModel.selectionIndex?.isPinnedTab == true {
+        var isHandlingKeyDownEvent: Bool {
+            guard sender is NSMenuItem,
+                  let currentEvent = NSApp.currentEvent,
+                  case .keyDown = currentEvent.type,
+                  currentEvent.modifierFlags.contains(.command) else { return false }
+             return true
+        }
+        if isHandlingKeyDownEvent, tab.isPinned {
             if tabCollectionViewModel.tabCollection.tabs.isEmpty {
                 view.window?.performClose(sender)
             } else {
+                tab.stopAllMediaAndLoading()
                 tabCollectionViewModel.select(at: .unpinned(0))
             }
-        } else {
-            tabCollectionViewModel.removeSelected()
+            return
         }
+
+        tabCollectionViewModel.remove(at: index)
     }
 
     // MARK: - View
 
     @IBAction func reloadPage(_ sender: Any) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
-            return
-        }
-
-        selectedTabViewModel.reload()
+        makeKeyIfNeeded()
+        activeTabViewModel?.reload()
     }
 
     @IBAction func stopLoadingPage(_ sender: Any) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
-            return
-        }
-
-        selectedTabViewModel.tab.stopLoading()
+        getActiveTabAndIndex()?.tab.stopLoading()
     }
 
     @IBAction func zoomIn(_ sender: Any) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
-            return
-        }
-
-        selectedTabViewModel.tab.webView.zoomIn()
+        getActiveTabAndIndex()?.tab.webView.zoomIn()
     }
 
     @IBAction func zoomOut(_ sender: Any) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
-            return
-        }
-
-        selectedTabViewModel.tab.webView.zoomOut()
+        getActiveTabAndIndex()?.tab.webView.zoomOut()
     }
 
     @IBAction func actualSize(_ sender: Any) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
-            return
-        }
-
-        selectedTabViewModel.tab.webView.resetZoomLevel()
+        getActiveTabAndIndex()?.tab.webView.resetZoomLevel()
     }
 
     @IBAction func toggleDownloads(_ sender: Any) {
@@ -380,34 +389,24 @@ extension MainViewController {
     // MARK: - History
 
     @IBAction func back(_ sender: Any?) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
-            return
-        }
-
-        selectedTabViewModel.tab.goBack()
+        makeKeyIfNeeded()
+        getActiveTabAndIndex()?.tab.goBack()
     }
 
     @IBAction func forward(_ sender: Any?) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
-            return
-        }
-
-        selectedTabViewModel.tab.goForward()
+        makeKeyIfNeeded()
+        getActiveTabAndIndex()?.tab.goForward()
     }
 
     @IBAction func home(_ sender: Any?) {
-        guard view.window?.isPopUpWindow == false else {
+        guard view.window?.isPopUpWindow == false,
+            let (tab, _) = getActiveTabAndIndex(), tab === tabCollectionViewModel.selectedTab else {
+
             browserTabViewController.openNewTab(with: .homePage)
             return
         }
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
-            return
-        }
-
-        selectedTabViewModel.tab.openHomePage()
+        makeKeyIfNeeded()
+        tab.openHomePage()
     }
 
     @objc func openVisit(_ sender: NSMenuItem) {
@@ -417,12 +416,8 @@ extension MainViewController {
             return
         }
 
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
-            return
-        }
-
-        selectedTabViewModel.tab.setContent(.contentFromURL(url))
+        makeKeyIfNeeded()
+        getActiveTabAndIndex()?.tab.setContent(.contentFromURL(url))
         adjustFirstResponder()
     }
 
@@ -461,6 +456,12 @@ extension MainViewController {
     // MARK: - Bookmarks
 
     @IBAction func bookmarkThisPage(_ sender: Any) {
+        guard let tabIndex = getActiveTabAndIndex()?.index else { return }
+        if tabCollectionViewModel.selectedTabIndex != tabIndex {
+            tabCollectionViewModel.select(at: tabIndex)
+        }
+        makeKeyIfNeeded()
+
         navigationBarViewController?
             .addressBarViewController?
             .addressBarButtonsViewController?
@@ -468,6 +469,12 @@ extension MainViewController {
     }
 
     @IBAction func favoriteThisPage(_ sender: Any) {
+        guard let tabIndex = getActiveTabAndIndex()?.index else { return }
+        if tabCollectionViewModel.selectedTabIndex != tabIndex {
+            tabCollectionViewModel.select(at: tabIndex)
+        }
+        makeKeyIfNeeded()
+
         navigationBarViewController?
             .addressBarViewController?
             .addressBarButtonsViewController?
@@ -480,9 +487,8 @@ extension MainViewController {
             return
         }
 
-        guard let bookmark = menuItem.representedObject as? Bookmark else {
-            return
-        }
+        guard let bookmark = menuItem.representedObject as? Bookmark else { return }
+        makeKeyIfNeeded()
 
         WindowControllersManager.shared.open(bookmark: bookmark)
     }
@@ -506,20 +512,33 @@ extension MainViewController {
     }
 
     @IBAction func showManageBookmarks(_ sender: Any?) {
+        makeKeyIfNeeded()
         browserTabViewController.openNewTab(with: .bookmarks)
     }
 
     // MARK: - Window
 
     @IBAction func showPreviousTab(_ sender: Any?) {
+        makeKeyIfNeeded()
+        guard let (tab, index) = getActiveTabAndIndex() else { return }
+        if tabCollectionViewModel.selectedTab !== tab {
+            tabCollectionViewModel.select(at: index)
+        }
         tabCollectionViewModel.selectPrevious()
     }
 
     @IBAction func showNextTab(_ sender: Any?) {
+        guard let (tab, index) = getActiveTabAndIndex() else { return }
+        makeKeyIfNeeded()
+
+        if tabCollectionViewModel.selectedTab !== tab {
+            tabCollectionViewModel.select(at: index)
+        }
         tabCollectionViewModel.selectNext()
     }
 
     @IBAction func showTab(_ sender: Any?) {
+        makeKeyIfNeeded()
         guard let sender = sender as? NSMenuItem else {
             os_log("MainViewController: Casting to NSMenuItem failed", type: .error)
             return
@@ -537,21 +556,14 @@ extension MainViewController {
     }
 
     @IBAction func moveTabToNewWindow(_ sender: Any?) {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
-            return
-        }
+        guard let (tab, index) = getActiveTabAndIndex() else { return }
 
-        let tab = selectedTabViewModel.tab
-        tabCollectionViewModel.removeSelected()
+        tabCollectionViewModel.remove(at: index)
         WindowsManager.openNewWindow(with: tab)
     }
 
     @IBAction func pinOrUnpinTab(_ sender: Any?) {
-        guard let selectedTabIndex = tabCollectionViewModel.selectionIndex else {
-            os_log("MainViewController: No tab view model selected", type: .error)
-            return
-        }
+        guard let (_, selectedTabIndex) = getActiveTabAndIndex() else { return }
 
         switch selectedTabIndex {
         case .pinned(let index):
@@ -575,48 +587,16 @@ extension MainViewController {
         tabCollectionViewModel.tabCollection.localHistoryOfRemovedTabs += otherLocalHistoryOfRemovedTabs
     }
 
-    // MARK: - Edit
-
-    @IBAction func findInPage(_ sender: Any?) {
-        tabCollectionViewModel.selectedTabViewModel?.showFindInPage()
-    }
-
-    @IBAction func findInPageNext(_ sender: Any?) {
-        self.tabCollectionViewModel.selectedTabViewModel?.findInPageNext()
-    }
-
-    @IBAction func findInPagePrevious(_ sender: Any?) {
-        self.tabCollectionViewModel.selectedTabViewModel?.findInPagePrevious()
-    }
-
-    /// Declines handling findInPage action if there's no page loaded currently.
-    override func responds(to aSelector: Selector!) -> Bool {
-        if aSelector == #selector(findInPage(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.content.url == nil {
-            return false
-        }
-
-        if aSelector == #selector(printWebView(_:)) && tabCollectionViewModel.selectedTabViewModel?.tab.webView.url == nil {
-            return false
-        }
-
-        return super.responds(to: aSelector)
-    }
-
     // MARK: - Printing
 
     @IBAction func printWebView(_ sender: Any?) {
-        tabCollectionViewModel.selectedTabViewModel?.tab.print()
+        getActiveTabAndIndex()?.tab.print()
     }
 
     // MARK: - Saving
 
     @IBAction func saveAs(_ sender: Any) {
-        guard let tabViewModel = self.tabCollectionViewModel.selectedTabViewModel else {
-            os_log("MainViewController: No tab view model selected", type: .error)
-            return
-        }
-
-        tabViewModel.tab.saveWebContentAs()
+        getActiveTabAndIndex()?.tab.saveWebContentAs()
     }
 
     // MARK: - Debug
@@ -694,14 +674,19 @@ extension MainViewController {
         UserDefaults.standard.set(Date(), forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @IBAction func changeInstallDateToLessThanAWeekAgo(_ sender: Any?) {
-        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())
-        UserDefaults.standard.set(yesterday, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @IBAction func changeInstallDateToLessThan21DaysAgo(_ sender: Any?) {
+        let lessThanTwentyOneDaysAgo = Calendar.current.date(byAdding: .day, value: -20, to: Date())
+        UserDefaults.standard.set(lessThanTwentyOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @IBAction func changeInstallDateToMoreThanAWeekAgo(_ sender: Any?) {
-        let aWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())
-        UserDefaults.standard.set(aWeekAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @IBAction func changeInstallDateToMoreThan21DaysAgoButLessThan27(_ sender: Any?) {
+        let twentyOneDaysAgo = Calendar.current.date(byAdding: .day, value: -21, to: Date())
+        UserDefaults.standard.set(twentyOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    }
+
+    @IBAction func changeInstallDateToMoreThan27DaysAgo(_ sender: Any?) {
+        let twentyEightDaysAgo = Calendar.current.date(byAdding: .day, value: -28, to: Date())
+        UserDefaults.standard.set(twentyEightDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
@@ -724,7 +709,7 @@ extension MainViewController {
                       canBeClosedWithBack: false,
                       webViewSize: .zero)
 
-        WindowsManager.openPopUpWindow(with: tab, contentSize: nil)
+        WindowsManager.openPopUpWindow(with: tab, origin: nil, contentSize: nil)
     }
 
     @IBAction func resetEmailProtectionInContextPrompt(_ sender: Any?) {
@@ -735,26 +720,66 @@ extension MainViewController {
         ConfigurationManager.shared.forceRefresh()
     }
 
+    @IBAction func resetNetworkProtectionWaitlistState(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
+        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+#endif
+    }
+
+    @IBAction func resetNetworkProtectionTermsAndConditionsAcceptance(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+#endif
+    }
+
+    @IBAction func showNetworkProtectionInviteCodePrompt(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        let code = getInviteCode()
+
+        Task {
+            do {
+                let redeemer = NetworkProtectionCodeRedemptionCoordinator()
+                try await redeemer.redeem(code)
+                NetworkProtectionWaitlist().waitlistStorage.store(inviteCode: code)
+                NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+            } catch {
+                // Do nothing here, this is just a debug menu
+            }
+        }
+#endif
+    }
+
+    @IBAction func sendNetworkProtectionWaitlistAvailableNotification(_ sender: Any?) {
+#if NETWORK_PROTECTION
+        NetworkProtectionWaitlist().sendInviteCodeAvailableNotification()
+#endif
+    }
+
     // MARK: - Developer Tools
 
     @IBAction func toggleDeveloperTools(_ sender: Any?) {
-        if tabCollectionViewModel.selectedTabViewModel?.tab.webView.isInspectorShown == true {
-            tabCollectionViewModel.selectedTabViewModel?.tab.webView.closeDeveloperTools()
+        guard let webView = getActiveTabAndIndex()?.tab.webView else { return }
+
+        if webView.isInspectorShown == true {
+            webView.closeDeveloperTools()
         } else {
-            tabCollectionViewModel.selectedTabViewModel?.tab.webView.openDeveloperTools()
+            webView.openDeveloperTools()
         }
     }
 
     @IBAction func openJavaScriptConsole(_ sender: Any?) {
-        tabCollectionViewModel.selectedTabViewModel?.tab.webView.openJavaScriptConsole()
+        getActiveTabAndIndex()?.tab.webView.openJavaScriptConsole()
     }
 
     @IBAction func showPageSource(_ sender: Any?) {
-        tabCollectionViewModel.selectedTabViewModel?.tab.webView.showPageSource()
+        getActiveTabAndIndex()?.tab.webView.showPageSource()
     }
 
     @IBAction func showPageResources(_ sender: Any?) {
-        tabCollectionViewModel.selectedTabViewModel?.tab.webView.showPageSource()
+        getActiveTabAndIndex()?.tab.webView.showPageSource()
     }
 }
 
@@ -771,35 +796,45 @@ extension MainViewController: NSMenuItemValidation {
         switch menuItem.action {
         // Back/Forward
         case #selector(MainViewController.back(_:)):
-            return tabCollectionViewModel.selectedTabViewModel?.canGoBack == true
+            return activeTabViewModel?.canGoBack == true
         case #selector(MainViewController.forward(_:)):
-            return tabCollectionViewModel.selectedTabViewModel?.canGoForward == true
+            return activeTabViewModel?.canGoForward == true
 
         case #selector(MainViewController.stopLoadingPage(_:)):
-            return tabCollectionViewModel.selectedTabViewModel?.isLoading == true
+            return activeTabViewModel?.isLoading == true
 
         case #selector(MainViewController.reloadPage(_:)):
-            return tabCollectionViewModel.selectedTabViewModel?.canReload == true
+            return activeTabViewModel?.canReload == true
+
+        // Find In Page
+        case #selector(findInPage),
+             #selector(findInPageNext),
+             #selector(findInPagePrevious):
+            return activeTabViewModel?.canReload == true // must have content loaded
+                && view.window?.isKeyWindow == true // disable in full screen
+
+        case #selector(findInPageDone):
+            return getActiveTabAndIndex()?.tab.findInPage?.isActive == true
 
         // Zoom
         case #selector(MainViewController.zoomIn(_:)):
-            return tabCollectionViewModel.selectedTabViewModel?.tab.webView.canZoomIn == true
+            return getActiveTabAndIndex()?.tab.webView.canZoomIn == true
         case #selector(MainViewController.zoomOut(_:)):
-            return tabCollectionViewModel.selectedTabViewModel?.tab.webView.canZoomOut == true
+            return getActiveTabAndIndex()?.tab.webView.canZoomOut == true
         case #selector(MainViewController.actualSize(_:)):
-            return tabCollectionViewModel.selectedTabViewModel?.tab.webView.canZoomToActualSize == true
+            return getActiveTabAndIndex()?.tab.webView.canZoomToActualSize == true
 
         // Bookmarks
         case #selector(MainViewController.bookmarkThisPage(_:)),
              #selector(MainViewController.favoriteThisPage(_:)):
-            return tabCollectionViewModel.selectedTabViewModel?.canBeBookmarked == true
+            return activeTabViewModel?.canBeBookmarked == true
         case #selector(MainViewController.openBookmark(_:)),
              #selector(MainViewController.showManageBookmarks(_:)):
             return true
 
         // Pin Tab
         case #selector(MainViewController.pinOrUnpinTab(_:)):
-            guard tabCollectionViewModel.selectedTabViewModel?.tab.isUrl == true,
+            guard getActiveTabAndIndex()?.tab.isUrl == true,
                   tabCollectionViewModel.pinnedTabsManager != nil
             else {
                 return false
@@ -814,10 +849,13 @@ extension MainViewController: NSMenuItemValidation {
             }
             return false
 
-        // Printing/saving
-        case #selector(MainViewController.saveAs(_:)),
-             #selector(MainViewController.printWebView(_:)):
-            return tabCollectionViewModel.selectedTabViewModel?.canReload == true
+        // Save Content
+        case #selector(MainViewController.saveAs(_:)):
+            return activeTabViewModel?.canSaveContent == true
+
+        // Printing
+        case #selector(MainViewController.printWebView(_:)):
+            return activeTabViewModel?.canPrint == true
 
         // Merge all windows
         case #selector(MainViewController.mergeAllWindows(_:)):
@@ -833,13 +871,13 @@ extension MainViewController: NSMenuItemValidation {
 
         // Developer Tools
         case #selector(MainViewController.toggleDeveloperTools(_:)):
-            let isInspectorShown = tabCollectionViewModel.selectedTabViewModel?.tab.webView.isInspectorShown ?? false
+            let isInspectorShown = getActiveTabAndIndex()?.tab.webView.isInspectorShown ?? false
             menuItem.title = isInspectorShown ? UserText.closeDeveloperTools : UserText.openDeveloperTools
             fallthrough
         case #selector(MainViewController.openJavaScriptConsole(_:)),
              #selector(MainViewController.showPageSource(_:)),
              #selector(MainViewController.showPageResources(_:)):
-            return tabCollectionViewModel.selectedTabViewModel?.canReload == true
+            return activeTabViewModel?.canReload == true
 
         case #selector(MainViewController.toggleDownloads(_:)):
             let isDownloadsPopoverShown = self.navigationBarViewController.isDownloadsPopoverShown
@@ -847,10 +885,39 @@ extension MainViewController: NSMenuItemValidation {
 
             return true
 
+        // Network Protection Debugging
+        case #selector(MainViewController.showNetworkProtectionInviteCodePrompt(_:)):
+            // Only allow testers to enter a custom code if they're on the waitlist, to simulate the correct path through the flow
+#if NETWORK_PROTECTION
+            let waitlist = NetworkProtectionWaitlist()
+            return waitlist.waitlistStorage.isOnWaitlist || waitlist.waitlistStorage.isInvited
+#else
+            return false
+#endif
         default:
             return true
         }
     }
+
+    func getInviteCode() -> String {
+        let alert = NSAlert()
+        alert.addButton(withTitle: "Use Invite Code")
+        alert.addButton(withTitle: "Cancel")
+        alert.messageText = "Enter Invite Code"
+        alert.informativeText = "Please grab a Network Protection invite code from Asana and enter it here."
+
+        let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
+        alert.accessoryView = textField
+
+        let response = alert.runModal()
+
+        if response == .alertFirstButtonReturn {
+            return textField.stringValue
+        } else {
+            return ""
+        }
+    }
+
     // swiftlint:enable function_body_length
     // swiftlint:enable cyclomatic_complexity
 }
@@ -870,7 +937,7 @@ extension AppDelegate: NSMenuItemValidation {
         case #selector(AppDelegate.reopenAllWindowsFromLastSession(_:)):
             return stateRestorationManager.canRestoreLastSessionState
 
-        // Enables and disables export bookmarks itemz
+        // Enables and disables export bookmarks items
         case #selector(AppDelegate.openExportBookmarks(_:)):
             return bookmarksManager.list?.totalBookmarks != 0
 
@@ -911,16 +978,20 @@ extension AppDelegate: NSMenuItemValidation {
 
 extension MainViewController: FindInPageDelegate {
 
-    func findInPageNext(_ controller: FindInPageViewController) {
-        self.tabCollectionViewModel.selectedTabViewModel?.findInPageNext()
+    @IBAction func findInPage(_ sender: Any) {
+        activeTabViewModel?.showFindInPage()
     }
 
-    func findInPagePrevious(_ controller: FindInPageViewController) {
-        self.tabCollectionViewModel.selectedTabViewModel?.findInPagePrevious()
+    @IBAction func findInPageNext(_ sender: Any) {
+        activeTabViewModel?.findInPageNext()
     }
 
-    func findInPageDone(_ controller: FindInPageViewController) {
-        self.tabCollectionViewModel.selectedTabViewModel?.closeFindInPage()
+    @IBAction func findInPagePrevious(_ sender: Any) {
+        activeTabViewModel?.findInPagePrevious()
+    }
+
+    @IBAction func findInPageDone(_ sender: Any) {
+        activeTabViewModel?.closeFindInPage()
     }
 
 }

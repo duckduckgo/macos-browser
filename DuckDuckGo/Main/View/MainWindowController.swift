@@ -23,7 +23,6 @@ import Common
 @MainActor
 final class MainWindowController: NSWindowController {
 
-    private static let windowFrameSaveName = "MainWindow"
     private var fireViewModel: FireViewModel
     private static var knownFullScreenMouseDetectionWindows = Set<NSValue>()
 
@@ -66,7 +65,7 @@ final class MainWindowController: NSWindowController {
     }
 
     private var shouldShowOnboarding: Bool {
-#if DEBUG
+#if DEBUG || DBP
         return false
 #else
         let onboardingIsComplete = OnboardingViewModel().onboardingFinished || LocalStatisticsStore().waitlistUnlocked
@@ -76,7 +75,6 @@ final class MainWindowController: NSWindowController {
 
     private func setupWindow() {
         window?.delegate = self
-        window?.setFrameAutosaveName(Self.windowFrameSaveName)
 
         if shouldShowOnboarding {
             mainViewController.tabCollectionViewModel.selectedTabViewModel?.tab.startOnboarding()

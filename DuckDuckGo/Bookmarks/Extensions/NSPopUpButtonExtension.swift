@@ -58,4 +58,12 @@ extension NSPopUpButton {
         selectItem(withTitle: title)
     }
 
+    @discardableResult
+    func addItem(withTitle title: String, representedObject: Any?) -> NSMenuItem {
+        self.addItem(withTitle: title)
+        let item = self.item(at: self.numberOfItems - 1)!
+        item.representedObject = representedObject
+        return item
+    }
+
 }

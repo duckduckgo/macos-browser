@@ -77,11 +77,11 @@ final class ContentBlockerRulesLists: DefaultContentBlockerRulesListsSource {
         // Add new ones
         let etag = MD5(data: Self.fbTrackerDataFile)
         let dataSet: TrackerDataManager.DataSet = TrackerDataManager.DataSet(Self.fbTrackerDataSet, etag)
-        let additionalRulesList = ContentBlockerRulesList(name: Constants.clickToLoadRulesListName,
-                                                          trackerData: nil,
-                                                          fallbackTrackerData: dataSet)
+        let CTLRulesList = ContentBlockerRulesList(name: Constants.clickToLoadRulesListName,
+                                                   trackerData: nil,
+                                                   fallbackTrackerData: dataSet)
+            result.append(CTLRulesList)
 
-        result.append(additionalRulesList)
         return result
     }
 }

@@ -20,6 +20,23 @@ import Foundation
 import PackagePlugin
 import XcodeProjectPlugin
 
+let nonSandboxedExtraInputFiles: Set<InputFile> = [
+    .init("BWEncryption.m", .source),
+    .init("BWEncryptionOutput.m", .source),
+    .init("BWManager.swift", .source),
+    .init("UpdateController.swift", .source),
+    .init("SystemExtensionManager.swift", .source),
+    .init("DuckDuckGo Agent.app", .unknown),
+    .init("DuckDuckGo Notifications.app", .unknown),
+    .init("startVPN.app", .unknown),
+    .init("stopVPN.app", .unknown),
+    .init("enableOnDemand.app", .unknown),
+    .init("PFMoveApplication.m", .source),
+    .init("NetworkProtectionBundle.swift", .source),
+    .init("NetworkProtectionAppEvents.swift", .source),
+    .init("KeychainType+ClientDefault.swift", .source)
+]
+
 /**
  * This dictionary keeps track of input files that are not present in all targets.
  *
@@ -31,27 +48,14 @@ import XcodeProjectPlugin
  * were otherwise not included in all app/test targets, the build will stop with an error.
  */
 let extraInputFiles: [TargetName: Set<InputFile>] = [
-    "DuckDuckGo Privacy Browser": [
-        .init("BWEncryption.m", .source),
-        .init("BWEncryptionOutput.m", .source),
-        .init("BWManager.swift", .source),
-        .init("UpdateController.swift", .source),
-        .init("LegacyWebKitDownloadDelegate.swift", .source),
-        .init("WKProcessPool+DownloadDelegate.swift", .source),
-        .init("_WKDownload+WebKitDownload.swift", .source),
-        .init("SystemExtensionManager.swift", .source),
-        .init("DuckDuckGo Agent.app", .unknown),
-        .init("DuckDuckGo Notifications.app", .unknown),
-        .init("startVPN.app", .unknown),
-        .init("stopVPN.app", .unknown),
-        .init("enableOnDemand.app", .unknown),
-        .init("PFMoveApplication.m", .source),
-        .init("NetworkProtectionBundle.swift", .source),
-        .init("NetworkProtectionAppEvents.swift", .source),
-        .init("KeychainType+ClientDefault.swift", .source)
-    ],
+    "DuckDuckGo Privacy Browser": nonSandboxedExtraInputFiles,
 
     "DuckDuckGo Privacy Browser App Store": [],
+
+    "DuckDuckGo DBP": nonSandboxedExtraInputFiles.union([
+        .init("DBPHomeViewController.swift", .source),
+        .init("DataBrokerProtectionManager.swift", .source)
+    ]),
 
     "Unit Tests": [
         .init("BWEncryptionTests.swift", .source),
@@ -96,6 +100,8 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
         context.xcodeProject.targets.forEach { target in
             switch target.product?.kind {
             case .application where target.displayName.starts(with: "DuckDuckGo Privacy Browser"):
+                appTargets.append(target)
+            case .application where target.displayName == "DuckDuckGo DBP": // To be removed after the DBP target is deleted
                 appTargets.append(target)
             case .other("com.apple.product-type.bundle.unit-test"):
                 if target.displayName.starts(with: "Unit Tests") {

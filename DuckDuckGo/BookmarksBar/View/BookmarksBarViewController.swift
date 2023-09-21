@@ -30,7 +30,7 @@ final class BookmarksBarViewController: NSViewController {
     private let viewModel: BookmarksBarViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
 
-    private var viewModelCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
     fileprivate var clipThreshold: CGFloat {
         let viewWidthWithoutClipIndicator = view.frame.width - clippedItemsIndicator.frame.minX
@@ -85,13 +85,15 @@ final class BookmarksBarViewController: NSViewController {
 
     override func viewWillAppear() {
         super.viewWillAppear()
+
         subscribeToEvents()
         refreshFavicons()
     }
 
     override func viewDidAppear() {
         super.viewDidAppear()
-        frameChangeNotification()
+
+        frameDidChangeNotification()
     }
 
     func showBookmarksBarPrompt() {
@@ -99,24 +101,9 @@ final class BookmarksBarViewController: NSViewController {
         self.bookmarksBarPromptShown = true
     }
 
-    private func subscribeToViewModel() {
-        guard viewModelCancellable.isNil else {
-            assertionFailure("Tried to subscribe to view model while it is already subscribed")
-            return
-        }
-
-        viewModelCancellable = viewModel.$clippedItems.receive(on: RunLoop.main).sink { [weak self] _ in
-            self?.refreshClippedIndicator()
-        }
-    }
-
-    @objc
-    private func frameChangeNotification() {
-        // Wait until the frame change has taken effect for subviews before calculating changes to the list of items.
-        DispatchQueue.main.async {
-            self.viewModel.clipOrRestoreBookmarksBarItems()
-            self.refreshClippedIndicator()
-        }
+    private func frameDidChangeNotification() {
+        self.viewModel.clipOrRestoreBookmarksBarItems()
+        self.refreshClippedIndicator()
     }
 
     override func removeFromParent() {
@@ -125,25 +112,32 @@ final class BookmarksBarViewController: NSViewController {
     }
 
     private func subscribeToEvents() {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(frameChangeNotification),
-                                               name: NSView.frameDidChangeNotification,
-                                               object: view)
+        guard cancellables.isEmpty else { return }
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(refreshFavicons),
-                                               name: .faviconCacheUpdated,
-                                               object: nil)
+        NotificationCenter.default.publisher(for: NSView.frameDidChangeNotification, object: view)
+            // Wait until the frame change has taken effect for subviews before calculating changes to the list of items.
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.frameDidChangeNotification()
+            }
+            .store(in: &cancellables)
 
-        subscribeToViewModel()
+        NotificationCenter.default.publisher(for: .faviconCacheUpdated)
+            .sink { [weak self] _ in
+                self?.refreshFavicons()
+            }
+            .store(in: &cancellables)
+
+        viewModel.$clippedItems
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.refreshClippedIndicator()
+            }
+            .store(in: &cancellables)
     }
 
     private func unsubscribeFromEvents() {
-        NotificationCenter.default.removeObserver(self, name: NSView.frameDidChangeNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .faviconCacheUpdated, object: nil)
-
-        viewModelCancellable?.cancel()
-        viewModelCancellable = nil
+        cancellables.removeAll()
     }
 
     // MARK: - Layout
@@ -163,7 +157,6 @@ final class BookmarksBarViewController: NSViewController {
         self.clippedItemsIndicator.isHidden = viewModel.clippedItems.isEmpty
     }
 
-    @objc
     private func refreshFavicons() {
         bookmarksBarCollectionView.reloadData()
     }
@@ -181,7 +174,6 @@ final class BookmarksBarViewController: NSViewController {
 extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
 
     func bookmarksBarViewModelReceived(action: BookmarksBarViewModel.BookmarksBarItemAction, for item: BookmarksBarCollectionViewItem) {
-        PixelExperiment.fireBookmarksBarInteractionPixel()
         guard let indexPath = bookmarksBarCollectionView.indexPath(for: item) else {
             assertionFailure("Failed to look up index path for clicked item")
             return

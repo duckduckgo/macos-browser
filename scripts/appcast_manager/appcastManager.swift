@@ -2,6 +2,7 @@
 
 // swiftlint:disable line_length
 // swiftlint:disable file_header
+// swiftlint:disable function_body_length
 
 import Foundation
 
@@ -13,6 +14,7 @@ let specificDir = tmpDirURL.appendingPathComponent("sparkle-updates")
 let appcastFilePath = specificDir.appendingPathComponent("appcast2.xml")
 let backupAppcastFilePath = "\(tmpDir)/appcast.xml.backup"
 let backupFileURL = URL(fileURLWithPath: backupAppcastFilePath)
+let lastCatalinaBuildVersion = "1.55.0"
 
 // MARK: - Arguments
 
@@ -479,8 +481,8 @@ func runGenerateAppcast(withVersions versions: String, channel: String? = nil, r
         commandComponents.append("--phased-rollout-interval \(rolloutInterval)")
     }
 
-    commandComponents.append("--embed-release-notes")
-    commandComponents.append("--auto-prune-update-files \(specificDir.path)")
+    commandComponents.append("--embed-release-notes ")
+    commandComponents.append("\(specificDir.path)")
 
     let command = commandComponents.joined(separator: " ")
 
@@ -498,6 +500,12 @@ func runGenerateAppcast(withVersions versions: String, channel: String? = nil, r
     }
 
     print("generate_appcast command executed successfully.")
+
+    // Verify presense of old builds
+    if !verifyAppcastContainsBuild(lastCatalinaBuildVersion, in: appcastFilePath) {
+        print("Error: Appcast does not contain the build (\(lastCatalinaBuildVersion)).")
+        exit(1)
+    }
 
     // Get and save the diff
     let diffResult = shell("diff", backupAppcastFilePath, appcastFilePath.path)
@@ -527,4 +535,17 @@ func runGenerateAppcast(withVersions versions: String, channel: String? = nil, r
     return String(data: data, encoding: .utf8) ?? ""
 }
 
+// - MARK: - Ensuring old builds remain in the appcast
+
+func verifyAppcastContainsBuild(_ buildVersion: String, in filePath: URL) -> Bool {
+    guard let appcastContent = try? String(contentsOf: filePath, encoding: .utf8) else {
+        print("Failed to read the appcast file.")
+        return false
+    }
+
+    let buildString = "<sparkle:version>\(buildVersion)</sparkle:version>"
+    return appcastContent.contains(buildString)
+}
+
 // swiftlint:enable line_length
+// swiftlint:enable function_body_length

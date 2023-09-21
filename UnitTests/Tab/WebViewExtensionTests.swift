@@ -17,6 +17,7 @@
 //
 
 import XCTest
+import UniformTypeIdentifiers
 import WebKit
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -35,7 +36,7 @@ final class WebViewExtensionTests: XCTestCase {
         let e = expectation(description: "mimeType callback")
         Task {
             let mimeType = await webView.mimeType
-            XCTAssertEqual(mimeType, UTType.html.mimeType!)
+            XCTAssertEqual(mimeType, UTType.html.preferredMIMEType!)
             e.fulfill()
         }
         waitForExpectations(timeout: 1)
@@ -57,7 +58,7 @@ final class WebViewExtensionTests: XCTestCase {
         let e = expectation(description: "mimeType callback")
         Task {
             let mimeType = await webView.mimeType
-            XCTAssertEqual(mimeType, UTType.jpeg.mimeType!)
+            XCTAssertEqual(mimeType, UTType.jpeg.preferredMIMEType!)
             e.fulfill()
         }
         waitForExpectations(timeout: 1)
