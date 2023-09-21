@@ -208,10 +208,11 @@ final class LocalBookmarkStore: BookmarkStore {
                 BookmarkUtils.migrateToFormFactorSpecificFavorites(byCopyingExistingTo: .desktop, in: context)
 
                 if context.hasChanges {
-                    try context.save()
+                    try context.save(onErrorFire: .bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders)
                 }
             } catch {
-                Pixel.fire(.debug(event: .bookmarksStoreFormFactorSpecificFavoritesMigrationFailed, error: error))
+                Thread.sleep(forTimeInterval: 1)
+                fatalError("Could not prepare Bookmarks DB structure")
             }
         }
     }

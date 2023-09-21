@@ -217,7 +217,6 @@ extension Pixel {
 
             case bookmarksStoreRootFolderMigrationFailed
             case bookmarksStoreFavoritesFolderMigrationFailed
-            case bookmarksStoreFormFactorSpecificFavoritesMigrationFailed
 
             case adAttributionCompilationFailedForAttributedRulesList
             case adAttributionGlobalAttributedRulesDoNotExist
@@ -287,6 +286,7 @@ extension Pixel {
             case bookmarksMigrationCouldNotPrepareDatabase
             case bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration
             case bookmarksMigrationCouldNotRemoveOldStore
+            case bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders
 
             case syncSentUnauthenticatedRequest
             case syncMetadataCouldNotLoadDatabase
@@ -592,8 +592,6 @@ extension Pixel.Event.Debug {
             return "bookmarks_store_root_folder_migration_failed"
         case .bookmarksStoreFavoritesFolderMigrationFailed:
             return "bookmarks_store_favorites_folder_migration_failed"
-        case .bookmarksStoreFormFactorSpecificFavoritesMigrationFailed:
-            return "bookmarks_store_form_factor_specific_favorites_migration_failed"
 
         case .adAttributionCompilationFailedForAttributedRulesList:
             return "ad_attribution_compilation_failed_for_attributed_rules_list"
@@ -711,6 +709,8 @@ extension Pixel.Event.Debug {
         case .bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration:
             return "bookmarks_migration_could_not_prepare_database_on_failed_migration"
         case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
+        case .bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders:
+            return "bookmarks_migration_could_not_prepare_multiple_favorite_folders"
 
         case .syncSentUnauthenticatedRequest: return "sync_sent_unauthenticated_request"
         case .syncMetadataCouldNotLoadDatabase: return "sync_metadata_could_not_load_database"
