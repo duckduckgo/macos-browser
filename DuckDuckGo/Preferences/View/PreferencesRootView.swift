@@ -50,11 +50,7 @@ extension Preferences {
                             case .sync:
                                 SyncView()
                             case .appearance:
-                                if let syncService = (NSApp.delegate as? AppDelegate)?.syncService {
-                                    AppearanceView(model: .shared)
-                                } else {
-                                    FailedAssertionView("Failed to initialize AppearanceView")
-                                }
+                                AppearanceView(model: .shared)
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
                             case .autofill:

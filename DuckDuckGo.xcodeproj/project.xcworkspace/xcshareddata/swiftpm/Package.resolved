@@ -15,7 +15,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "dominik/sync-ffs-favorites",
-        "revision" : "738826ca8d175983b69a6d3115b3afa58fb851f5"
+        "revision" : "ef90667c17d9e87ae72cb76eb2282de13d517887"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "20a6aeddbd86b43fd83c42aa45fdd9ec6db0e0f7",
-        "version" : "8.2.0"
+        "revision" : "f3eccad8647fdba2b5d180a02a0513c61375b8fb",
+        "version" : "8.4.0"
       }
     },
     {
