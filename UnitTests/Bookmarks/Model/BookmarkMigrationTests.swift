@@ -179,7 +179,7 @@ class BookmarksMigrationTests: XCTestCase {
         countRequest.predicate = NSPredicate(value: true)
 
         let count = try context.count(for: countRequest)
-        XCTAssertEqual(count, FavoritesFolderID.allCases.count + 1)
+        XCTAssertEqual(count, 2)
     }
 
     func testWhenRegularMigrationIsNeededThenItIsDone() {
