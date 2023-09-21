@@ -78,7 +78,8 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel {
         case .appleID:
             print("prrr")
         case .email:
-            actionHandlers.openURLHandler(URL(string: "https://duckduckgo.com/about")!)
+            actionHandlers.openURLHandler(URL(string: "https://abrown.duckduckgo.com/subscriptions/activate")!)
+//            actionHandlers.openURLHandler(URL(string: "https://duckduckgo.com/about")!)
         case .sync:
             actionHandlers.goToSyncPreferences()
         }
