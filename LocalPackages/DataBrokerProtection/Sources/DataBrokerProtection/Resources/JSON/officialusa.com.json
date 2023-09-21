@@ -1,0 +1,51 @@
+{
+  "name": "officialusa.com",
+  "version": "0.1.0",
+  "parent": "neighbor.report",
+  "addedDatetime": 1692590400000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "dad25b4c-743b-4bca-a395-05f1e76ef5c9",
+          "url": "https://officialusa.com/names/${firstName}-${lastName}/"
+        },
+        {
+          "actionType": "extract",
+          "id": "b867d570-6124-40d9-9076-7ee0fa5b4d68",
+          "selector": ".person",
+          "profile": {
+            "name": {
+              "selector": ".//span[@itemprop='name']"
+            },
+            "age": null,
+            "addressFull": {
+              "selector": "(.//div[@class='detail-block__main-item-block']//li)[1]"
+            },
+            "addressCityState": {
+              "selector": ".//span[@itemprop='address']"
+            },
+            "phone": {
+              "selector": ".//span[@itemprop='telephone']"
+            },
+            "relativesList": null,
+            "profileUrl": null
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}
