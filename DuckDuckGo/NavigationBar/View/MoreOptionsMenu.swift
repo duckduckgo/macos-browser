@@ -42,6 +42,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
 #if DBP
     func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu)
 #endif
+    func optionsButtonMenuRequestedSubscriptionPreferences(_ menu: NSMenu)
 }
 
 @MainActor
@@ -222,6 +223,10 @@ final class MoreOptionsMenu: NSMenu {
         actionDelegate?.optionsButtonMenuRequestedAppearancePreferences(self)
     }
 
+    @objc func openSubscriptionPreferences(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedSubscriptionPreferences(self)
+    }
+
     @objc func findInPage(_ sender: NSMenuItem) {
         tabCollectionViewModel.selectedTabViewModel?.showFindInPage()
     }
@@ -327,7 +332,7 @@ final class MoreOptionsMenu: NSMenu {
 
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
         let privacyProItem = NSMenuItem(title: "",
-                                        action: #selector(openPreferences(_:)),
+                                        action: #selector(openSubscriptionPreferences(_:)),
                                         keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "SubscriptionIcon"))
