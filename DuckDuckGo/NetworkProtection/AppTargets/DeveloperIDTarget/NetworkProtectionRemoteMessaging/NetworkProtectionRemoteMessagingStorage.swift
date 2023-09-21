@@ -20,7 +20,7 @@ import Foundation
 
 protocol NetworkProtectionRemoteMessagingStorage {
 
-    func store(messages: [NetworkProtectionRemoteMessage])
+    func store(messages: [NetworkProtectionRemoteMessage]) throws
     func storedMessages() -> [NetworkProtectionRemoteMessage]
 
     func dismissRemoteMessage(with id: String)
@@ -32,20 +32,33 @@ final class DefaultNetworkProtectionRemoteMessagingStorage: NetworkProtectionRem
 
     private enum Constants {
         static let dismissedMessageIdentifiersKey = "home.page.network-protection.dismissed-message-identifiers"
+        static let networkProtectionMessagesFileName = "network-protection-messages.json"
     }
 
     private let userDefaults: UserDefaults
+    private var messagesURL: URL {
+        URL.sandboxApplicationSupportURL.appendingPathComponent(Constants.networkProtectionMessagesFileName)
+    }
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
     }
 
-    func store(messages: [NetworkProtectionRemoteMessage]) {
-        // TODO
+    func store(messages: [NetworkProtectionRemoteMessage]) throws {
+        let encoded = try JSONEncoder().encode(messages)
+        try encoded.write(to: messagesURL)
     }
 
     func storedMessages() -> [NetworkProtectionRemoteMessage] {
-        return []
+        do {
+            let messagesData = try Data(contentsOf: messagesURL)
+            let messages = try JSONDecoder().decode([NetworkProtectionRemoteMessage].self, from: messagesData)
+
+            return messages
+        } catch {
+            // TODO: Handle error
+            return []
+        }
     }
 
     func dismissRemoteMessage(with id: String) {

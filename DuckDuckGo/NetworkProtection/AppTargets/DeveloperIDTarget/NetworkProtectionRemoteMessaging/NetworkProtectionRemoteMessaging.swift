@@ -58,8 +58,15 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
 
             switch result {
             case .success(let messages):
-                self.messageStorage.store(messages: messages)
-                NotificationCenter.default.post(name: .NetworkProtectionRemoteMessagesChanged, object: nil)
+                do {
+                    try self.messageStorage.store(messages: messages)
+
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(name: .NetworkProtectionRemoteMessagesChanged, object: nil)
+                    }
+                } catch {
+                    // TODO: Handle error
+                }
             case .failure(let error):
                 // TODO: Handle error, send pixel if messages can't be decoded
                 break
@@ -76,31 +83,26 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
         }
 
         let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
-        let possibleMessages = [
-            NetworkProtectionRemoteMessage(
-                id: "1234",
-                cardTitle: "Title",
-                cardDescription: "Description",
-                cardAction: "Action",
-                daysSinceNetworkProtectionEnabled: nil,
-                surveyURL: "https://duckduckgo.com"
-            )
-        ]
+        let possibleMessages = messageStorage.storedMessages()
 
         // Only show messages that haven't been dismissed, and check whether they have a requirement on how long the user
         // has used Network Protection for.
         let filteredMessages = possibleMessages.filter { message in
-            if !dismissedMessageIDs.contains(message.id) {
+            if dismissedMessageIDs.contains(message.id) {
+                print("DEBUG: Not showing message titled '\(message.cardTitle)'")
                 return false
             }
 
-            if let daysSinceNetworkProtectionEnabled = message.daysSinceNetworkProtectionEnabled {
-                if daysSinceNetworkProtectionEnabled >= daysSinceActivation {
+            if let requiredDaysSinceActivation = message.daysSinceNetworkProtectionEnabled {
+                if requiredDaysSinceActivation <= daysSinceActivation {
+                    print("DEBUG: Showing message titled '\(message.cardTitle)'")
                     return true
                 } else {
+                    print("DEBUG: Not showing message titled '\(message.cardTitle)'")
                     return false
                 }
             } else {
+                print("DEBUG: Showing message titled '\(message.cardTitle)'")
                 return true
             }
         }

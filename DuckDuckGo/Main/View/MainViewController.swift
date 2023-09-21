@@ -134,6 +134,7 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
+        refreshNetworkProtectionMessages()
     }
 
     func windowDidResignKey() {
@@ -153,6 +154,12 @@ final class MainViewController: NSViewController {
         DispatchQueue.main.async {
             self.bookmarksBarViewController.showBookmarksBarPrompt()
         }
+    }
+
+    private let networkProtectionMessaging = DefaultNetworkProtectionRemoteMessaging()
+
+    func refreshNetworkProtectionMessages() {
+        networkProtectionMessaging.fetchRemoteMessages()
     }
 
     override func encodeRestorableState(with coder: NSCoder) {

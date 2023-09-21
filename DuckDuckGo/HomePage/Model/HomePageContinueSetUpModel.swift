@@ -196,6 +196,7 @@ extension HomePage.Models {
 
                 // Dismiss the message after the user opens the survey, even if they just close the tab immediately afterwards.
                 networkProtectionRemoteMessaging.dismissRemoteMessage(with: message.id)
+                refreshFeaturesMatrix()
             }
         }
         // swiftlint:enable cyclomatic_complexity
