@@ -58,6 +58,8 @@ final class LocalBookmarkStore: BookmarkStore {
         case saveLoopError(Error?)
     }
 
+    private(set) var favoritesDisplayMode: FavoritesDisplayMode
+
     private let contextProvider: () -> NSManagedObjectContext
 
     /// All entities within the bookmarks store must exist under this root level folder. Because this value is used so frequently, it is cached here.
@@ -65,8 +67,6 @@ final class LocalBookmarkStore: BookmarkStore {
 
     /// All favorites must additionally be children of this special folder. Because this value is used so frequently, it is cached here.
     private var favoritesFolderObjectID: NSManagedObjectID?
-
-    private var favoritesDisplayMode: FavoritesDisplayMode
 
     private func makeContext() -> NSManagedObjectContext {
         return contextProvider()
@@ -318,8 +318,7 @@ final class LocalBookmarkStore: BookmarkStore {
                                                          context: context)
 
                 if bookmark.isFavorite {
-                    let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesDisplayMode, in: context)
-                    bookmarkMO.addToFavorites(folders: favoritesFolders)
+                    bookmarkMO.addToFavorites(with: favoritesDisplayMode, in: context)
                 }
             }
 
