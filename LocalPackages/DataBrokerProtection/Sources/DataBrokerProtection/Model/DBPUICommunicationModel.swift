@@ -97,6 +97,7 @@ struct DBPUIUserProfileAddress: Codable {
     let street: String
     let city: String
     let state: String
+    let zipCode: String
 }
 
 /// Message Object representing a user profile containing one or more names and addresses

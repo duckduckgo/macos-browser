@@ -108,7 +108,7 @@ final class DBPUIViewModel {
                             dataBroker: DBPUIDataBroker(name: profileQueryData.dataBroker.name),
                             names: [DBPUIUserProfileName(first: optOutOperationData.extractedProfile.fullName ?? "", middle: "", last: "")],
                             addresses: optOutOperationData.extractedProfile.addresses?.map {
-                                DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state)
+                                DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state, zipCode: "")
                             } ?? []
                         ))
                     } else {
@@ -117,7 +117,7 @@ final class DBPUIViewModel {
                             dataBroker: DBPUIDataBroker(name: profileQueryData.dataBroker.name),
                             names: [DBPUIUserProfileName(first: optOutOperationData.extractedProfile.fullName ?? "", middle: "", last: "")],
                             addresses: optOutOperationData.extractedProfile.addresses?.map {
-                                DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state)
+                                DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state, zipCode: "")
                             } ?? []
                         ))
                     }

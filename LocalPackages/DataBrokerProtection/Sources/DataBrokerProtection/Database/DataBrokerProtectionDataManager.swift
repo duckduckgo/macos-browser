@@ -130,17 +130,46 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
         }
     }
 
+    private func indexForName(matching name: DBPUIUserProfileName, in profile: DataBrokerProtectionProfile) -> Int? {
+        if let idx = profile.names.firstIndex(where: { $0.firstName == name.first && $0.lastName == name.last && $0.middleName == name.middle }) {
+            return idx
+        }
+
+        return nil
+    }
+
+    private func indexForAddress(matching address: DBPUIUserProfileAddress, in profile: DataBrokerProtectionProfile) -> Int? {
+        if let idx = profile.addresses.firstIndex(where: { $0.street == address.street && $0.state == address.state && $0.city == address.city }) {
+            return idx
+        }
+
+        return nil
+    }
+
+    private func isNameEmpty(_ name: DBPUIUserProfileName) -> Bool {
+        return name.first.isEmpty || name.last.isEmpty
+    }
+
+    private func addressIsEmpty(_ address: DBPUIUserProfileAddress) -> Bool {
+        return address.city.isEmpty || address.state.isEmpty
+    }
+
     func getUserProfile() -> DBPUIUserProfile? {
         let profile = profile ?? emptyProfile
 
         let names = profile.names.map { DBPUIUserProfileName(first: $0.firstName, middle: $0.middleName ?? "", last: $0.lastName) }
-        let addresses = profile.addresses.map { DBPUIUserProfileAddress(street: $0.street ?? "", city: $0.city, state: $0.state) }
+        let addresses = profile.addresses.map { DBPUIUserProfileAddress(street: $0.street ?? "", city: $0.city, state: $0.state, zipCode: $0.zipCode ?? "") }
 
         return DBPUIUserProfile(names: names, birthYear: profile.birthYear, addresses: addresses)
     }
 
     func addNameToCurrentUserProfile(_ name: DBPUIUserProfileName) -> Bool {
         let profile = profile ?? emptyProfile
+
+        guard !isNameEmpty(name) else { return false }
+
+        // No duplicates
+        guard indexForName(matching: name, in: profile) == nil else { return false }
 
         var names = profile.names
         names.append(DataBrokerProtectionProfile.Name(firstName: name.first, lastName: name.last, middleName: name.middle))
@@ -154,7 +183,7 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
         let profile = profile ?? emptyProfile
 
         var names = profile.names
-        if let idx = names.firstIndex(where: { $0.firstName == name.first && $0.lastName == name.last && $0.middleName == name.middle }) {
+        if let idx = indexForName(matching: name, in: profile) {
             names.remove(at: idx)
             self.profile = DataBrokerProtectionProfile(names: names, addresses: profile.addresses, phones: profile.phones, birthYear: profile.birthYear)
             return true
@@ -184,6 +213,11 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
 
     func addAddressToCurrentUserProfile(_ address: DBPUIUserProfileAddress) -> Bool {
         let profile = profile ?? emptyProfile
+
+        guard !addressIsEmpty(address) else { return false }
+
+        // No duplicates
+        guard indexForAddress(matching: address, in: profile) == nil else { return false }
 
         var addresses = profile.addresses
         addresses.append(DataBrokerProtectionProfile.Address(city: address.city, state: address.state, street: address.street))
