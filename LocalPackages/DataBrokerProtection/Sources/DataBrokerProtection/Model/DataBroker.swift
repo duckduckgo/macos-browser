@@ -36,6 +36,7 @@ struct DataBroker: Codable, Sendable {
     let steps: [Step]
     let version: String
     let schedulingConfig: DataBrokerScheduleConfig
+    let parent: String?
 
     var isFakeBroker: Bool {
         name.contains("fake") // A future improvement will be to add a property in the JSON file.
@@ -46,14 +47,22 @@ struct DataBroker: Codable, Sendable {
         case steps
         case version
         case schedulingConfig
+        case parent
     }
 
-    init(id: Int64? = nil, name: String, steps: [Step], version: String, schedulingConfig: DataBrokerScheduleConfig) {
+    init(id: Int64? = nil,
+         name: String,
+         steps: [Step],
+         version: String,
+         schedulingConfig: DataBrokerScheduleConfig,
+         parent: String? = nil
+    ) {
         self.id = id
         self.name = name
         self.steps = steps
         self.version = version
         self.schedulingConfig = schedulingConfig
+        self.parent = parent
     }
 
     init(from decoder: Decoder) throws {
@@ -62,6 +71,7 @@ struct DataBroker: Codable, Sendable {
         version = try container.decode(String.self, forKey: .version)
         steps = try container.decode([Step].self, forKey: .steps)
         schedulingConfig = try container.decode(DataBrokerScheduleConfig.self, forKey: .schedulingConfig)
+        parent = try? container.decode(String.self, forKey: .parent)
         id = nil
     }
 
