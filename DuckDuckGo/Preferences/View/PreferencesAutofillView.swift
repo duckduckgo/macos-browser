@@ -263,12 +263,14 @@ private struct BitwardenStatusView: View {
 
     var body: some View {
 
-        HStack {
-            HStack {
+        VStack(alignment: .leading) {
+            HStack(alignment: .top) {
                 Image(iconType.imageName)
+                    .padding(.top, 2)
                 Text(title)
                     .lineLimit(nil)
                     .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 2)
             }
             .padding([.leading, .trailing], 6)
             .padding([.top, .bottom], 2)
