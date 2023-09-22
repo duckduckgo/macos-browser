@@ -193,7 +193,7 @@ extension Preferences {
             case .accessToContainersNotApproved:
                 BitwardenStatusView(iconType: .error,
                                     title: UserText.bitwardenCantAccessContainer,
-                                    buttonValue: .init(title: UserText.openSystemSettins, action: { model.openSettings() }))
+                                    buttonValue: .init(title: UserText.openSystemSettings, action: { model.openSettings() }))
                 .offset(x: Preferences.Const.autoLockWarningOffset)
             case .handshakeNotApproved:
                 BitwardenStatusView(iconType: .error,
