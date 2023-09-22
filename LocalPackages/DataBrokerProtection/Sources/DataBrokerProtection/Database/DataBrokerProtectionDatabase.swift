@@ -45,10 +45,10 @@ protocol DataBrokerProtectionRepository {
 
 final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
 
-    private let fakeBrokerFlag: FakeBrokerFlag
+    private let fakeBrokerFlag: DataBrokerDebugFlag
     private let vault: (any DataBrokerProtectionSecureVault)?
 
-    init(fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults(), vault: (any DataBrokerProtectionSecureVault)? = nil) {
+    init(fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker(), vault: (any DataBrokerProtectionSecureVault)? = nil) {
         self.fakeBrokerFlag = fakeBrokerFlag
         self.vault = vault
     }
