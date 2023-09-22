@@ -97,7 +97,6 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var closeButton: MouseOverButton!
     @IBOutlet weak var rightSeparatorView: ColorView!
     @IBOutlet weak var mouseOverView: MouseOverView!
-    @IBOutlet weak var mouseClickView: MouseClickView!
     @IBOutlet weak var faviconWrapperView: NSView!
     @IBOutlet weak var faviconWrapperViewCenterConstraint: NSLayoutConstraint!
     @IBOutlet weak var faviconWrapperViewLeadingConstraint: NSLayoutConstraint!

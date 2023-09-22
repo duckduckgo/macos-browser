@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22154" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22154"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -21,7 +21,7 @@
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
                 </customView>
-                <textField wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DFD-8r-YGx" userLabel="Title Text Field">
+                <textField wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DFD-8r-YGx" userLabel="Title Text Field">
                     <rect key="frame" x="30" y="9" width="264" height="16"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="16" id="vWW-sG-CAf"/>
@@ -53,15 +53,15 @@
                 </customView>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="XdB-Qn-iD9" userLabel="Active Permission" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                     <rect key="frame" x="255" y="9" width="16" height="16"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="16" id="a1w-Dc-Tkz"/>
-                        <constraint firstAttribute="width" constant="16" id="nLR-Qf-xCM"/>
-                    </constraints>
                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Camera-Tab-Active" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="8II-A1-ote">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <color key="contentTintColor" name="ButtonColor"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="16" id="a1w-Dc-Tkz"/>
+                        <constraint firstAttribute="width" constant="16" id="nLR-Qf-xCM"/>
+                    </constraints>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                             <real key="value" value="2"/>
@@ -79,15 +79,15 @@
                 </button>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="vuD-rY-Vzl" userLabel="Close Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                     <rect key="frame" x="275" y="8" width="16" height="16"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="16" id="Jud-dv-fco"/>
-                        <constraint firstAttribute="height" constant="16" id="hNW-Ia-KQk"/>
-                    </constraints>
                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Close" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ykX-aF-551">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <color key="contentTintColor" name="ButtonColor"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="16" id="Jud-dv-fco"/>
+                        <constraint firstAttribute="height" constant="16" id="hNW-Ia-KQk"/>
+                    </constraints>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                             <real key="value" value="2"/>
@@ -115,8 +115,11 @@
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
                 </customView>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="890-3t-v5O" customClass="MouseClickView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="890-3t-v5O" customClass="MouseOverView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                     <rect key="frame" x="0.0" y="0.0" width="300" height="33"/>
+                    <connections>
+                        <outlet property="delegate" destination="4MN-w4-aCk" id="Fnb-31-k2v"/>
+                    </connections>
                 </customView>
             </subviews>
             <constraints>
@@ -154,7 +157,6 @@
                 <outlet property="faviconWrapperView" destination="A6g-eG-dOW" id="5ol-jq-QwE"/>
                 <outlet property="faviconWrapperViewCenterConstraint" destination="PF1-mZ-U4m" id="5KT-Cu-bbm"/>
                 <outlet property="faviconWrapperViewLeadingConstraint" destination="TSx-41-S2A" id="342-tk-EzF"/>
-                <outlet property="mouseClickView" destination="890-3t-v5O" id="rcf-rO-cap"/>
                 <outlet property="mouseOverView" destination="jlg-2n-tzm" id="mX4-Hq-XHD"/>
                 <outlet property="permissionButton" destination="XdB-Qn-iD9" id="Cav-HW-zvK"/>
                 <outlet property="permissionCloseButtonTrailingConstraint" destination="lqC-R5-KOi" id="G6L-Zh-eBV"/>
