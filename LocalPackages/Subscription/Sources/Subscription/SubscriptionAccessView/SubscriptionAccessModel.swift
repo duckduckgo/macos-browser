@@ -18,7 +18,7 @@
 
 import Foundation
 
-public enum AccessChan: String, Identifiable {
+public enum AccessChan: String, CaseIterable, Identifiable {
     public var id: Self { self }
 
     case appleID, email, sync
@@ -27,37 +27,92 @@ public enum AccessChan: String, Identifiable {
 public protocol SubscriptionAccessModel {
     var items: [AccessChan] { get }
 
+    var title: String { get }
+    var description: String { get }
+
     func title(for channel: AccessChan) -> String
     func description(for channel: AccessChan) -> String
     func buttonTitle(for channel: AccessChan) -> String?
     func handleAction(for channel: AccessChan)
 }
 
-public final class ActivateSubscriptionAccessActionHandlers {
-    var openURLHandler: (URL) -> Void
-    var goToSyncPreferences: () -> Void
+extension SubscriptionAccessModel {
+    public var items: [AccessChan] { AccessChan.allCases }
 
-    public init(openURLHandler: @escaping (URL) -> Void, goToSyncPreferences: @escaping () -> Void) {
-        self.openURLHandler = openURLHandler
-        self.goToSyncPreferences = goToSyncPreferences
+    public func title(for channel: AccessChan) -> String {
+        switch channel {
+        case .appleID:
+            return "Apple ID"
+        case .email:
+            return "Email"
+        case .sync:
+            return "Sync"
+        }
     }
 }
 
 public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel {
+    public var actionHandlers: SubscriptionAccessActionHandlers
+    public var title = "Activate your subscription on this device"
+    public var description = "Access your Privacy Pro subscription on this device via Sync, Apple ID or an email address."
 
-    public var items: [AccessChan] = [.appleID, .email, .sync]
-    var actionHandlers: ActivateSubscriptionAccessActionHandlers
-
-    public init(actionHandlers: ActivateSubscriptionAccessActionHandlers) {
+    public init(actionHandlers: SubscriptionAccessActionHandlers) {
         self.actionHandlers = actionHandlers
     }
 
-    public func title(for channel: AccessChan) -> String {
-        channel.rawValue
+    public func description(for channel: AccessChan) -> String {
+        switch channel {
+        case .appleID:
+            return "Your subscription is automatically available on any device signed in to the same Apple ID."
+        case .email:
+            return "Use your email to access your subscription on this device."
+        case .sync:
+            return "Privacy Pro is automatically available on your Synced devices. Manage your synced devices in Sync settings."
+        }
+    }
+
+    public func buttonTitle(for channel: AccessChan) -> String? {
+        switch channel {
+        case .appleID:
+            return "Restore Purchases"
+        case .email:
+            return "Enter Email"
+        case .sync:
+            return "Go to Sync Settings"
+        }
+    }
+
+    public func handleAction(for channel: AccessChan) {
+        switch channel {
+        case .appleID:
+            // TODO: Add support to restore purchases here
+            print("restore purchase")
+        case .email:
+            actionHandlers.openURLHandler(URL(string: "https://abrown.duckduckgo.com/subscriptions/activate")!)
+        case .sync:
+            actionHandlers.goToSyncPreferences()
+        }
+    }
+}
+
+public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
+    public var actionHandlers: SubscriptionAccessActionHandlers
+    public var title = "Use your subscription on all your devices"
+    public var description = "Access your Privacy Pro subscription on any of your devices via Sync, Apple ID or by adding an email address."
+
+    public init(actionHandlers: SubscriptionAccessActionHandlers) {
+        self.actionHandlers = actionHandlers
     }
 
     public func description(for channel: AccessChan) -> String {
-        String(repeating: channel.rawValue, count: 22)
+        switch channel {
+        case .appleID:
+            return "Your subscription is automatically available on any device signed in to the same Apple ID."
+        case .email:
+            return "Add an email address to access your subscription on your other devices. We’ll only use this address to verify your subscription."
+        case .sync:
+            return "Privacy Pro is automatically available on your Synced devices. Manage your synced devices in Sync settings."
+        }
     }
 
     public func buttonTitle(for channel: AccessChan) -> String? {
@@ -65,22 +120,30 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel {
         case .appleID:
             return nil
         case .email:
-            return "Make \(channel.rawValue)"
+            return "Enter Email"
         case .sync:
-            return "Make \(channel.rawValue)"
+            return "Go to Sync Settings"
         }
     }
 
     public func handleAction(for channel: AccessChan) {
-        print("this is \(channel.rawValue)")
-
         switch channel {
         case .appleID:
-            print("prrr")
+            return
         case .email:
-            actionHandlers.openURLHandler(URL(string: "https://abrown.duckduckgo.com/subscriptions/activate")!)
+            actionHandlers.openURLHandler(URL(string: "https://abrown.duckduckgo.com/subscriptions/add-email")!)
         case .sync:
             actionHandlers.goToSyncPreferences()
         }
+    }
+}
+
+public final class SubscriptionAccessActionHandlers {
+    var openURLHandler: (URL) -> Void
+    var goToSyncPreferences: () -> Void
+
+    public init(openURLHandler: @escaping (URL) -> Void, goToSyncPreferences: @escaping () -> Void) {
+        self.openURLHandler = openURLHandler
+        self.goToSyncPreferences = goToSyncPreferences
     }
 }

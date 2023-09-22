@@ -23,28 +23,32 @@ import AppKit
 
 final class PrivacyProPreferencesModel: ObservableObject {
 
-    @Published
-    var isSignedIn: Bool = false
-    lazy var sheetModel: SubscriptionAccessModel = {
-        ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
-    }()
+    @Published var isSignedIn: Bool = false
+    var sheetModel: SubscriptionAccessModel
 
     private let accountManager: AccountManager
-    private let sheetActionHandler: ActivateSubscriptionAccessActionHandlers
+    private let sheetActionHandler: SubscriptionAccessActionHandlers
 
-    init(accountManager: AccountManager = AccountManager(), sheetActionHandler: ActivateSubscriptionAccessActionHandlers) {
+    init(accountManager: AccountManager = AccountManager(), sheetActionHandler: SubscriptionAccessActionHandlers) {
         self.accountManager = accountManager
         self.sheetActionHandler = sheetActionHandler
 
-        isSignedIn = accountManager.isSignedIn
+        let isSignedIn = accountManager.isSignedIn
+        self.isSignedIn = isSignedIn
+        sheetModel = isSignedIn ? ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler) : ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
 
         NotificationCenter.default.addObserver(forName: .accountDidSignIn, object: nil, queue: nil) { _ in
-            self.isSignedIn = true
+            self.updateSignInState(true)
         }
 
         NotificationCenter.default.addObserver(forName: .accountDidSignOut, object: nil, queue: nil) { _ in
-            self.isSignedIn = false
+            self.updateSignInState(false)
         }
+    }
+
+    private func updateSignInState(_ isSignedIn: Bool) {
+        self.isSignedIn = isSignedIn
+        sheetModel = isSignedIn ? ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler) : ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
     }
 
     @MainActor

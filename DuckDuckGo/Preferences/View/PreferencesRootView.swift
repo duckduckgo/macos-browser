@@ -54,7 +54,7 @@ extension Preferences {
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
                             case .privacyPro:
-                                let actionHandler = ActivateSubscriptionAccessActionHandlers(openURLHandler: { url in
+                                let actionHandler = SubscriptionAccessActionHandlers(openURLHandler: { url in
                                     WindowControllersManager.shared.show(url: url, newTab: true)
                                 }, goToSyncPreferences: {                                    self.model.selectPane(.sync)
                                 })

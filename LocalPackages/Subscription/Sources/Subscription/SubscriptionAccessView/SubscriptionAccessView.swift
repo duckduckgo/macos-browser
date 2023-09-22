@@ -37,9 +37,9 @@ public struct SubscriptionAccessView: View {
 
     public var body: some View {
         VStack(spacing: 8) {
-            Text("Activate your subscription on this device")
+            Text(model.title)
                 .font(.title)
-            Text("Access your Privacy Pro subscription on this device via Sync, Apple ID or an email address.")
+            Text(model.description)
                 .multilineTextAlignment(.center)
                 .fixMultilineScrollableText()
 
