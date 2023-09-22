@@ -270,7 +270,7 @@ private struct BitwardenStatusView: View {
                 Text(title)
                     .lineLimit(nil)
                     .fixedSize(horizontal: false, vertical: true)
-                    .padding(.top, 2)
+                    .padding([.top, .bottom], 2)
             }
             .padding([.leading, .trailing], 6)
             .padding([.top, .bottom], 2)
