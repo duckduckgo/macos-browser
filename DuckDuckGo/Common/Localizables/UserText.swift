@@ -314,10 +314,10 @@ struct UserText {
     static let makeDefaultBrowser = NSLocalizedString("preferences.default-browser.button.make-default", value: "Make DuckDuckGo Default...", comment: "")
     static let onStartup = NSLocalizedString("preferences.on-startup", value: "On Startup", comment: "Name of the preferences section related to app startup")
     static let reopenAllWindowsFromLastSession = NSLocalizedString("preferences.reopen-windows", value: "Reopen all windows from last session", comment: "Option to control session restoration")
-    static let showHomePage = NSLocalizedString("preferences.show-home", value: "Open a fresh new window", comment: "Option to control session startup")
+    static let showHomePage = NSLocalizedString("preferences.show-home", value: "Open a new window", comment: "Option to control session startup")
     
     static let homePage = NSLocalizedString("preferences-homepage", value: "Homepage", comment: "Title for Homepage section in settings")
-    static let homePageDescription = NSLocalizedString("preferences-homepage", value: "When clicking the home button or opening new windows", comment: "Homepage behavior description")
+    static let homePageDescription = NSLocalizedString("preferences-homepage", value: "When navigating home or opening new windows.", comment: "Homepage behavior description")
     static let newTab = NSLocalizedString("preferences-homepage-newTab", value: "New Tab page", comment: "Option to open a new tab")
     static let specificPage = NSLocalizedString("preferences-homepage-customPage", value: "Specific page", comment: "Option to control Specific Home Page")
     static let setPage = NSLocalizedString("preferences-homepage-set-page", value: "Set Page...", comment: "Option to control the Specific Page")
@@ -692,8 +692,9 @@ struct UserText {
     static let showNetworkProtectionShortcut = NSLocalizedString("pinning.show-netp-shortcut", value: "Show Network Protection", comment: "Menu item for showing the NetP shortcut")
     static let hideNetworkProtectionShortcut = NSLocalizedString("pinning.hide-netp-shortcut", value: "Hide Network Protection", comment: "Menu item for hiding the NetP shortcut")
 
-    static let showHomeShortcut = NSLocalizedString("pinning.show-home-shortcut", value: "Show Home Shortcut", comment: "Menu item for showing the Home shortcut")
-    static let hideHomeShortcut = NSLocalizedString("pinning.hide-home-shortcut", value: "Hide Home Shortcut", comment: "Menu item for hiding the Home shortcut")
+    static let showHomeShortcut = NSLocalizedString("pinning.show-home-shortcut", value: "Show Home Button", comment: "Menu item for showing the Home shortcut")
+    static let hideHomeShortcut = NSLocalizedString("pinning.hide-home-shortcut", value: "Hide Home Button", comment: "Menu item for hiding the Home shortcut")
+    static let showHomeButtonSettings = NSLocalizedString("settings.hide-home-shortcut", value: "Show Home Button in Toolbar", comment: "Settings Optionm to set Home Button visibility")
     
     // MARK: - Tooltips
 

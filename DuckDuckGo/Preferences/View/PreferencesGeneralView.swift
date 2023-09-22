@@ -79,11 +79,16 @@ extension Preferences {
                             TextMenuItemCaption(text: startupModel.friendlyURL)
                                 .padding(.top, 0)
                                 .visibility(!startupModel.launchToCustomHomePage ? .gone : .visible)
+
                         }.tag(true)
                     }
                     .pickerStyle(.radioGroup)
                     .offset(x: Const.pickerHorizontalOffset)
                     .padding(.bottom, 0)
+                    ToggleMenuItem(title: UserText.showHomeButtonSettings, isOn: $startupModel.isHomeButtonVisible)
+                        .onChange(of: startupModel.isHomeButtonVisible) { _ in
+                            startupModel.toggleHomeButton()
+                        }
                 }.sheet(isPresented: $showingCustomHomePageSheet) {
                     CustomHomePageSheet(startupModel: startupModel, isSheetPresented: $showingCustomHomePageSheet)
                 }
