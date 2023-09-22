@@ -162,6 +162,8 @@ extension Pixel {
         case networkProtectionWaitlistTermsAndConditionsAccepted
 
         case networkProtectionRemoteMessageDisplayed(messageID: String)
+        case networkProtectionRemoteMessageDismissed(messageID: String)
+        case networkProtectionRemoteMessageOpened(messageID: String)
 
         case dailyPixel(Event, isFirst: Bool)
 
@@ -478,6 +480,10 @@ extension Pixel.Event {
 
         case .networkProtectionRemoteMessageDisplayed(let messageID):
             return "m_mac_netp_remote_message_displayed_\(messageID)"
+        case .networkProtectionRemoteMessageDismissed(let messageID):
+            return "m_mac_netp_remote_message_dismissed_\(messageID)"
+        case .networkProtectionRemoteMessageOpened(let messageID):
+            return "m_mac_netp_remote_message_opened_\(messageID)"
 
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")

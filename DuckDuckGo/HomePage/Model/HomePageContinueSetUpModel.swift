@@ -192,6 +192,9 @@ extension HomePage.Models {
                 if let surveyURLString = message.surveyURL, let surveyURL = URL(string: surveyURLString) {
                     let tab = Tab(content: .url(surveyURL), shouldLoadInBackground: true)
                     tabCollectionViewModel.append(tab: tab)
+                    Pixel.fire(.networkProtectionRemoteMessageOpened(messageID: message.id))
+                } else {
+                    Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: message.id))
                 }
 
                 // Dismiss the message after the user opens the survey, even if they just close the tab immediately afterwards.
@@ -219,6 +222,7 @@ extension HomePage.Models {
                 shouldShowSurveyDay7 = false
             case .networkProtectionRemoteMessage(let message):
                 networkProtectionRemoteMessaging.dismissRemoteMessage(with: message.id)
+                Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: message.id))
             }
             refreshFeaturesMatrix()
         }
@@ -229,6 +233,7 @@ extension HomePage.Models {
 
             for message in networkProtectionRemoteMessaging.presentableRemoteMessages() {
                 features.append(.networkProtectionRemoteMessage(message))
+                // TODO: Make this daily
                 Pixel.fire(.networkProtectionRemoteMessageDisplayed(messageID: message.id))
             }
 
