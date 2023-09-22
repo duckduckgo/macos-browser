@@ -1,0 +1,67 @@
+{
+  "name": "vericora.com",
+  "version": "0.1.0",
+  "parent": "verecor.com",
+  "addedDatetime": 1677733200000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "d59a6a08-8e9d-47f5-9fad-b43d3f2432c5",
+          "url": "https://vericora.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${ageRange}",
+          "ageRange": [
+            "18-30",
+            "31-40",
+            "41-50",
+            "51-60",
+            "61-70",
+            "71-80",
+            "81+"
+          ]
+        },
+        {
+          "actionType": "extract",
+          "id": "9b670f06-63c8-40a8-b5c3-b1882ff842b7",
+          "selector": ".search-item",
+          "profile": {
+            "name": {
+              "selector": ".//div[@class='col-sm-24 col-md-19 col-text']"
+            },
+            "alternativeNamesList": {
+              "selector": ".//div[@class='col-sm-24 col-md-16 name']//li",
+              "findElements": true
+            },
+            "age": {
+              "selector": ".age"
+            },
+            "addressCityStateList": {
+              "selector": ".//span[@itemprop='address']",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//li[@itemprop='relatedTo']",
+              "findElements": true,
+              "beforeText": ","
+            },
+            "profileUrl": {
+              "selector": "a"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}

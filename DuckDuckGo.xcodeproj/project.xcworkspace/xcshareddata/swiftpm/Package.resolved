@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "4d8d505e6747ed21b4b4120543fb039dad967aa1",
-        "version" : "78.2.4"
+        "revision" : "ec5dc5931efc496aef2573b2f082607a3c82b655",
+        "version" : "80.0.0"
       }
     },
     {
@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/OpenSSL-XCFramework",
       "state" : {
-        "revision" : "238e8f700809ff0e1cad5f906cb4c3b0f77f44f9",
-        "version" : "1.1.1900"
+        "revision" : "bb7bfc010ef4d2e7913c343663b167e2a984ac79",
+        "version" : "3.1.2000"
       }
     },
     {
