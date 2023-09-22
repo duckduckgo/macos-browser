@@ -201,7 +201,7 @@ private extension [NSSharingService] {
 
     static var urlSharingServices: [NSSharingService] {
         // not real sharing URL, used for generating items for NSURL and NSString
-        NSSharingService.sharingServices(forItems: [URL.duckDuckGo, ""]).filter {
+        NSSharingService.sharingServices(forItems: [URL.duckDuckGo]).filter {
             $0 != NSSharingService.addToSafariReadingList
         }
     }
