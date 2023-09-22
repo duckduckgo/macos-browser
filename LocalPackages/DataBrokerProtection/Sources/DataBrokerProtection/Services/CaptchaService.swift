@@ -39,7 +39,7 @@ public enum CaptchaServiceError: Error, Codable {
 
 struct CaptchaTransaction: Codable {
     enum Message: String, Codable {
-        case success = "SUCCESS"    
+        case success = "SUCCESS"
         case invalidRequest = "INVALID_REQUEST"
         case failureTransient = "FAILURE_TRANSIENT"
         case failureCritical = "FAILURE_CRITICAL"

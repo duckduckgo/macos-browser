@@ -659,6 +659,10 @@ final class MockDatabase: DataBrokerProtectionRepository {
     func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) {
     }
 
+    func fetchChildBrokers(for parentBroker: String) -> [DataBroker] {
+        return [DataBroker]()
+    }
+
     func clear() {
         wasSaveProfileCalled = false
         wasFetchProfileCalled = false
