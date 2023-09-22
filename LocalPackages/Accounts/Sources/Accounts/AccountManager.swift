@@ -24,8 +24,6 @@ public extension Notification.Name {
     static let accountDidSignOut = Notification.Name("com.duckduckgo.browserServicesKit.AccountDidSignOut")
 }
 
-
-
 public protocol AccountServiceStorage: AnyObject {
     func getToken() throws -> String?
     func store(token: String) throws
@@ -36,9 +34,13 @@ public class AccountManager {
 
     private let storage: AccountServiceStorage
 
-    private var token: String? {
+    public var token: String? {
+        print("[[AccountManager]] token")
         do {
-            return try storage.getToken()
+//            return try storage.getToken()
+            let token = try storage.getToken()
+            print("[[AccountManager]] token: \(token)")
+            return token
         } catch {
             if let error = error as? AccountKeychainAccessError {
 //                requestDelegate?.emailManagerKeychainAccessFailed(accessType: .getToken, error: error)
@@ -51,7 +53,9 @@ public class AccountManager {
     }
 
     public var isSignedIn: Bool {
-        return token != nil
+        let t = token
+        print("[[AccountManager]] isSignedIn: \(t != nil ? "YES" : "NO")")
+        return t != nil
     }
 
     public init(storage: AccountServiceStorage = AccountKeychainStorage()) {
@@ -59,6 +63,7 @@ public class AccountManager {
     }
 
     public func storeToken(_ token: String) {
+        print("[[AccountManager]] storeToken: \(token)")
         do {
             try storage.store(token: token)
         } catch {
@@ -73,6 +78,7 @@ public class AccountManager {
     }
 
     public func signOut() {
+        print("[[AccountManager]] signOut")
         do {
             try storage.clearToken()
         } catch {
