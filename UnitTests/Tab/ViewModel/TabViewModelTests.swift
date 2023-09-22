@@ -95,10 +95,10 @@ final class TabViewModelTests: XCTestCase {
 
     // MARK: - Title
 
-    func testWhenURLIsNilThenTitleIsHome() {
+    func testWhenURLIsNilThenTitleIsNewTab() {
         let tabViewModel = TabViewModel.aTabViewModel
 
-        XCTAssertEqual(tabViewModel.title, "Home")
+        XCTAssertEqual(tabViewModel.title, "New Tab")
     }
 
     func testWhenTabTitleIsNotNilThenTitleReflectsTabTitle() {

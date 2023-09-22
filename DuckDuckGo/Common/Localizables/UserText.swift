@@ -58,7 +58,7 @@ struct UserText {
     static let openInNewTab = NSLocalizedString("open.in.new.tab", value: "Open in New Tab", comment: "Menu item that opens the link in a new tab")
     static let openInNewWindow = NSLocalizedString("open.in.new.window", value: "Open in New Window", comment: "Menu item that opens the link in a new window")
 
-    static let tabHomeTitle = NSLocalizedString("tab.home.title", value: "Home", comment: "Tab home title")
+    static let tabHomeTitle = NSLocalizedString("tab.home.title", value: "New Tab", comment: "Tab home title")
     static let tabPreferencesTitle = NSLocalizedString("tab.preferences.title", value: "Settings", comment: "Tab preferences title")
     static let tabBookmarksTitle = NSLocalizedString("tab.bookmarks.title", value: "Bookmarks", comment: "Tab bookmarks title")
     static let tabOnboardingTitle = NSLocalizedString("tab.onboarding.title", value: "Welcome", comment: "Tab onboarding title")
@@ -314,6 +314,17 @@ struct UserText {
     static let makeDefaultBrowser = NSLocalizedString("preferences.default-browser.button.make-default", value: "Make DuckDuckGo Default...", comment: "")
     static let onStartup = NSLocalizedString("preferences.on-startup", value: "On Startup", comment: "Name of the preferences section related to app startup")
     static let reopenAllWindowsFromLastSession = NSLocalizedString("preferences.reopen-windows", value: "Reopen all windows from last session", comment: "Option to control session restoration")
+    static let showHomePage = NSLocalizedString("preferences.show-home", value: "Open a new window", comment: "Option to control session startup")
+    
+    static let homePage = NSLocalizedString("preferences-homepage", value: "Homepage", comment: "Title for Homepage section in settings")
+    static let homePageDescription = NSLocalizedString("preferences-homepage", value: "When navigating home or opening new windows.", comment: "Homepage behavior description")
+    static let newTab = NSLocalizedString("preferences-homepage-newTab", value: "New Tab page", comment: "Option to open a new tab")
+    static let specificPage = NSLocalizedString("preferences-homepage-customPage", value: "Specific page", comment: "Option to control Specific Home Page")
+    static let setPage = NSLocalizedString("preferences-homepage-set-page", value: "Set Page...", comment: "Option to control the Specific Page")
+    
+    static let setHomePage = NSLocalizedString("preferences-homepage-set-homePage", value: "Set Homepage", comment: "Set Homepage dialog title")
+    static let addressLabel = NSLocalizedString("preferences-homepage-address", value: "Address:", comment: "Homepage address field label")
+    
     static let theme = NSLocalizedString("preferences.appearance.theme", value: "Theme", comment: "Theme preferences")
     static let addressBar = NSLocalizedString("preferences.appearance.address-bar", value: "Address Bar", comment: "Theme preferences")
     static let showFullWebsiteAddress = NSLocalizedString("preferences.appearance.show-full-url", value: "Full website address", comment: "Option to show full URL in the address bar")
@@ -681,9 +692,15 @@ struct UserText {
     static let showNetworkProtectionShortcut = NSLocalizedString("pinning.show-netp-shortcut", value: "Show Network Protection", comment: "Menu item for showing the NetP shortcut")
     static let hideNetworkProtectionShortcut = NSLocalizedString("pinning.hide-netp-shortcut", value: "Hide Network Protection", comment: "Menu item for hiding the NetP shortcut")
 
+    static let showHomeShortcut = NSLocalizedString("pinning.show-home-shortcut", value: "Show Home Button", comment: "Menu item for showing the Home shortcut")
+    static let hideHomeShortcut = NSLocalizedString("pinning.hide-home-shortcut", value: "Hide Home Button", comment: "Menu item for hiding the Home shortcut")
+    static let showHomeButtonSettings = NSLocalizedString("settings.hide-home-shortcut", value: "Show Home Button in Toolbar", comment: "Settings Optionm to set Home Button visibility")
+    
     // MARK: - Tooltips
 
     static let autofillShortcutTooltip = NSLocalizedString("tooltip.autofill.shortcut", value: "Autofill", comment: "Tooltip for the autofill shortcut")
+    
+    static let homeButtonTooltip = NSLocalizedString("tooltip.home.button", value: "Home", comment: "Tooltip for the home button")
     
     static let bookmarksShortcutTooltip = NSLocalizedString("tooltip.bookmarks.shortcut", value: "Bookmarks", comment: "Tooltip for the bookmarks shortcut")
     static let downloadsShortcutTooltip = NSLocalizedString("tooltip.downloads.shortcut", value: "Downloads", comment: "Tooltip for the downloads shortcut")
