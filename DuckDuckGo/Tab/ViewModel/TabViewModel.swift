@@ -233,8 +233,8 @@ final class TabViewModel {
 
         guard let hostURL = tabHostURL else {
             // also lands here for about:blank and about:home
-            // addressBarString = ""
-            // passiveAddressBarString = ""
+            addressBarString = ""
+            passiveAddressBarString = ""
             return
         }
 

@@ -79,7 +79,7 @@ final class StartupPreferences: ObservableObject {
 
     @Published var isHomeButtonVisible: Bool
 
-    var formattedcustomHomePageURL: String {
+    var formattedCustomHomePageURL: String {
         let trimmedURL = customHomePageURL.trimmingWhitespace()
         guard let url = URL(trimmedAddressBarString: trimmedURL) else {
             return StartupPreferencesUserDefaultsPersistor.defaultURL
