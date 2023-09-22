@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Networking
 
 extension Notification.Name {
     static let NetworkProtectionRemoteMessagesChanged = NSNotification.Name("NetworkProtectionRemoteMessagesChanged")
@@ -32,18 +33,25 @@ protocol NetworkProtectionRemoteMessaging {
 
 final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging {
 
+    enum NetworkProtectionRemoteMessagingError {
+        case test
+    }
+
     private let messageRequest: NetworkProtectionRemoteMessagingRequest
     private let messageStorage: NetworkProtectionRemoteMessagingStorage
     private let waitlistActivationDateStore: WaitlistActivationDateStore
+    private let userDefaults: UserDefaults
 
     init(
         messageRequest: NetworkProtectionRemoteMessagingRequest = DefaultNetworkProtectionRemoteMessagingRequest(),
         messageStorage: NetworkProtectionRemoteMessagingStorage = DefaultNetworkProtectionRemoteMessagingStorage(),
-        waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore()
+        waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(),
+        userDefaults: UserDefaults = .standard
     ) {
         self.messageRequest = messageRequest
         self.messageStorage = messageStorage
         self.waitlistActivationDateStore = waitlistActivationDateStore
+        self.userDefaults = userDefaults
     }
 
     func fetchRemoteMessages() {
@@ -52,6 +60,8 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
         guard waitlistActivationDateStore.daysSinceActivation() != nil else {
             return
         }
+
+        // TODO: Don't fetch messages if this has already been done recently
 
         messageRequest.fetchNetworkProtectionRemoteMessages { [weak self] result in
             guard let self else { return }
@@ -65,11 +75,15 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
                         NotificationCenter.default.post(name: .NetworkProtectionRemoteMessagesChanged, object: nil)
                     }
                 } catch {
-                    // TODO: Handle error
+                    Pixel.fire(.debug(event: .networkProtectionRemoteMessageStorageFailed, error: error))
                 }
             case .failure(let error):
-                // TODO: Handle error, send pixel if messages can't be decoded
-                break
+                // Ignore 403 errors, those happen when a file can't be found on S3
+                if case APIRequest.Error.invalidStatusCode(403) = error {
+                    return
+                }
+
+                Pixel.fire(.debug(event: .networkProtectionRemoteMessageFetchingFailed, error: error))
             }
         }
 #endif

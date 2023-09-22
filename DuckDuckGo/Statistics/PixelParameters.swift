@@ -149,7 +149,8 @@ extension Pixel.Event {
              .networkProtectionWaitlistNotificationShown,
              .networkProtectionWaitlistNotificationTapped,
              .networkProtectionWaitlistTermsAndConditionsDisplayed,
-             .networkProtectionWaitlistTermsAndConditionsAccepted:
+             .networkProtectionWaitlistTermsAndConditionsAccepted,
+             .networkProtectionRemoteMessageDisplayed:
             return nil
         }
     }

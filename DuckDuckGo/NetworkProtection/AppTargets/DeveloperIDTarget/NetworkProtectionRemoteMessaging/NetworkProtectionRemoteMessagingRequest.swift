@@ -61,7 +61,6 @@ final class DefaultNetworkProtectionRemoteMessagingRequest: NetworkProtectionRem
 
         request.fetch { response, error in
             if let error {
-                // TODO: Handle 403/404 errors since those will be expected if no file is found
                 completion(Result.failure(error))
             } else if let responseData = response?.data {
                 do {

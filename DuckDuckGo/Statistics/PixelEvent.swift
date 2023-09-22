@@ -161,6 +161,8 @@ extension Pixel {
         case networkProtectionWaitlistTermsAndConditionsDisplayed
         case networkProtectionWaitlistTermsAndConditionsAccepted
 
+        case networkProtectionRemoteMessageDisplayed(messageID: String)
+
         case dailyPixel(Event, isFirst: Bool)
 
         enum Debug {
@@ -305,6 +307,10 @@ extension Pixel {
             case invalidPayload(Configuration)
 
             case burnerTabMisplaced
+
+            case networkProtectionRemoteMessageFetchingFailed
+            case networkProtectionRemoteMessageStorageFailed
+
 #if DBP
             case dataBrokerProtectionError
 
@@ -469,6 +475,9 @@ extension Pixel.Event {
             return "m_mac_netp_imp_terms"
         case .networkProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_netp_ev_terms_accepted"
+
+        case .networkProtectionRemoteMessageDisplayed(let messageID):
+            return "m_mac_netp_remote_message_displayed_\(messageID)"
 
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")
@@ -726,6 +735,9 @@ extension Pixel.Event.Debug {
         case .invalidPayload(let configuration): return "m_d_\(configuration.rawValue)_invalid_payload".lowercased()
 
         case .burnerTabMisplaced: return "burner_tab_misplaced"
+
+        case .networkProtectionRemoteMessageFetchingFailed: return "netp_remote_message_fetching_failed"
+        case .networkProtectionRemoteMessageStorageFailed: return "netp_remote_message_storage_failed"
 
 #if DBP
         case .dataBrokerProtectionError: return "data_broker_error"

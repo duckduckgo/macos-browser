@@ -229,6 +229,7 @@ extension HomePage.Models {
 
             for message in networkProtectionRemoteMessaging.presentableRemoteMessages() {
                 features.append(.networkProtectionRemoteMessage(message))
+                Pixel.fire(.networkProtectionRemoteMessageDisplayed(messageID: message.id))
             }
 
             for feature in listOfFeatures {
