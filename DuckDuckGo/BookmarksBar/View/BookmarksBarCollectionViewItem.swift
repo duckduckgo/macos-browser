@@ -37,7 +37,6 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
     static let identifier = NSUserInterfaceItemIdentifier(rawValue: "BookmarksBarCollectionViewItem")
 
     @IBOutlet var stackView: NSStackView!
-    @IBOutlet private var mouseOverView: MouseOverView!
     @IBOutlet private var faviconView: NSImageView! {
         didSet {
             faviconView.setCornerRadius(3.0)
@@ -45,11 +44,6 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
     }
 
     @IBOutlet private var titleLabel: NSTextField!
-    @IBOutlet private var mouseClickView: MouseClickView! {
-        didSet {
-            mouseClickView.delegate = self
-        }
-    }
 
     private enum EntityType {
         case bookmark(title: String, url: String, favicon: NSImage?, isFavorite: Bool)
@@ -66,20 +60,11 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
     weak var delegate: BookmarksBarCollectionViewItemDelegate?
     private var entityType: EntityType?
 
-    /// MouseClickView is prone to sending mouseUp events without a preceding mouseDown.
-    /// This tracks whether to consider a click as legitimate and use it to trigger navigation from the bookmarks bar.
-    private var receivedMouseDownEvent = false
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
         configureLayer()
         createMenu()
-    }
-
-    override func viewDidLayout() {
-        super.viewDidLayout()
-        mouseOverView.updateTrackingAreas()
     }
 
     func updateItem(from entity: BaseBookmarkEntity) {
@@ -126,23 +111,6 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         let menu = NSMenu()
         menu.delegate = self
         view.menu = menu
-    }
-
-}
-
-extension BookmarksBarCollectionViewItem: MouseClickViewDelegate {
-
-    func mouseClickView(_ mouseClickView: MouseClickView, mouseDownEvent: NSEvent) {
-        receivedMouseDownEvent = true
-    }
-
-    func mouseClickView(_ mouseClickView: MouseClickView, mouseUpEvent: NSEvent) {
-        guard receivedMouseDownEvent else {
-            return
-        }
-
-        receivedMouseDownEvent = false
-        delegate?.bookmarksBarCollectionViewItemClicked(self)
     }
 
 }

@@ -35,6 +35,10 @@ internal class AddressBarButton: MouseOverButton {
 
     var position: Position = .center {
         didSet {
+            guard let backgroundLayer = super.backgroundLayer(createIfNeeded: true) else {
+                assertionFailure("no background layer")
+                return
+            }
             switch position {
             case .left:
                 backgroundLayer.maskedCorners = [.layerMinXMaxYCorner, .layerMinXMinYCorner]
