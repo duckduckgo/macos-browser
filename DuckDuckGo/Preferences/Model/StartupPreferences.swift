@@ -35,7 +35,7 @@ struct StartupPreferencesUserDefaultsPersistor: StartupPreferencesPersistor {
     @UserDefaultsWrapper(key: .launchToCustomHomePage, defaultValue: false)
     var launchToCustomHomePage: Bool
 
-    @UserDefaultsWrapper(key: .customHomePageURL, defaultValue: Self.defaultURL)
+    @UserDefaultsWrapper(key: .customHomePageURL, defaultValue: URL.duckDuckGo.absoluteString)
     var customHomePageURL: String
 
 }

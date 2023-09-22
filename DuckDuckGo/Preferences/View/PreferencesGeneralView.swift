@@ -114,6 +114,7 @@ struct CustomHomePageSheet: View {
             Group {
                 HStack {
                     Text(UserText.addressLabel)
+                        .padding(.trailing, 10)
                     TextField("", text: $url)
                         .frame(width: 250)
                         .onChange(of: url) { newValue in
