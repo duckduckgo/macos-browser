@@ -27,8 +27,6 @@ protocol StartupPreferencesPersistor {
 
 struct StartupPreferencesUserDefaultsPersistor: StartupPreferencesPersistor {
 
-    static let defaultURL = "https://duckduckgo.com"
-
     @UserDefaultsWrapper(key: .restorePreviousSession, defaultValue: false)
     var restorePreviousSession: Bool
 
@@ -82,7 +80,7 @@ final class StartupPreferences: ObservableObject {
     var formattedCustomHomePageURL: String {
         let trimmedURL = customHomePageURL.trimmingWhitespace()
         guard let url = URL(trimmedAddressBarString: trimmedURL) else {
-            return StartupPreferencesUserDefaultsPersistor.defaultURL
+            return URL.duckDuckGo.absoluteString
         }
         return url.absoluteString
     }
