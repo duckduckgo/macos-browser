@@ -79,14 +79,8 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel {
             print("prrr")
         case .email:
             actionHandlers.openURLHandler(URL(string: "https://abrown.duckduckgo.com/subscriptions/activate")!)
-//            actionHandlers.openURLHandler(URL(string: "https://duckduckgo.com/about")!)
         case .sync:
             actionHandlers.goToSyncPreferences()
         }
     }
 }
-
-//final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
-//    var items: [AccessChannel] = []
-//
-//}
