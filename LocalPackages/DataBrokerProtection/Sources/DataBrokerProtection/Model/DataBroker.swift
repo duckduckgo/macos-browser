@@ -84,12 +84,18 @@ struct DataBroker: Codable, Sendable {
         return scanStep
     }
 
-    func optOutStep() throws -> Step? {
+    func optOutStep() -> Step? {
         guard let optOutStep = steps.first(where: { $0.type == .optOut }) else {
             return nil
         }
 
         return optOutStep
+    }
+
+    func needParentOptOut() -> Bool {
+        guard let optOutStep = optOutStep(), let optOutType = optOutStep.optOutType else { return false }
+
+        return optOutType == .parentSiteOptOut
     }
 
     static func initFromResource(_ url: URL) -> DataBroker {
