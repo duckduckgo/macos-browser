@@ -750,7 +750,7 @@ protocol NewWindowPolicyDecisionMaker {
            let customURL = URL(string: startupPreferences.formattedCustomHomePageURL) {
             webView.load(URLRequest(url: customURL))
         } else {
-             content = .homePage
+            content = .homePage
         }
     }
 
