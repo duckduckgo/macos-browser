@@ -147,11 +147,11 @@ final class HoverTrackingArea: NSTrackingArea {
 
     @objc dynamic var isMouseDown: Bool { get }
 
-    var isMouseOver: Bool { get set }
-
 }
 
 protocol Hoverable: NSView, HoverableProperties {
+
+    var isMouseOver: Bool { get set }
 
     func backgroundLayer(createIfNeeded: Bool) -> CALayer?
 
