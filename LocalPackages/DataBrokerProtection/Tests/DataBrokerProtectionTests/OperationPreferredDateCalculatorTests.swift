@@ -29,7 +29,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         maintenanceScan: 3000
     )
 
-    func testNoMatchFound()  {
+    func testNoMatchFound() {
         let expectedScanDate = Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
         let expectedOptOutDate: Date? = nil
 
@@ -38,7 +38,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                          brokerId: 1,
                          profileQueryId: 1,
                          type: .noMatchFound)]
-
 
         let calculator = OperationPreferredDateCalculator()
 
@@ -76,7 +75,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                          profileQueryId: 1,
                          type: .matchesFound)]
 
-
         let calculator = OperationPreferredDateCalculator()
 
         let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: nil,
@@ -107,7 +105,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                          profileQueryId: 1,
                          type: .matchesFound)]
 
-
         let calculator = OperationPreferredDateCalculator()
 
         let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: nil,
@@ -132,7 +129,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                          brokerId: 1,
                          profileQueryId: 1,
                          type: .error(error: DataBrokerProtectionError.malformedURL))]
-
 
         let calculator = OperationPreferredDateCalculator()
 
@@ -254,10 +250,9 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 
-
     // If we have a most recent date saved, the calculator should not change it no matter the case.
 
-    func testNoMatchFoundWithMostRecentDate()  {
+    func testNoMatchFoundWithMostRecentDate() {
         let expectedScanDate = Date()
         let expectedOptOutDate: Date? = nil
 
@@ -266,7 +261,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                          brokerId: 1,
                          profileQueryId: 1,
                          type: .noMatchFound)]
-
 
         let calculator = OperationPreferredDateCalculator()
 
@@ -304,7 +298,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                          profileQueryId: 1,
                          type: .matchesFound)]
 
-
         let calculator = OperationPreferredDateCalculator()
 
         let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: Date(),
@@ -335,7 +328,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                          profileQueryId: 1,
                          type: .matchesFound)]
 
-
         let calculator = OperationPreferredDateCalculator()
 
         let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: Date(),
@@ -360,7 +352,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                          brokerId: 1,
                          profileQueryId: 1,
                          type: .error(error: DataBrokerProtectionError.malformedURL))]
-
 
         let calculator = OperationPreferredDateCalculator()
 

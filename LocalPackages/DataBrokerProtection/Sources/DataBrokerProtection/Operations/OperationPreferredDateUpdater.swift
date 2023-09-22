@@ -48,7 +48,6 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
                                                                    extractedProfileID: extractedProfileId,
                                                                    schedulingConfig: schedulingConfig)
 
-
         if newScanPreferredDate != currentScanPreferredDate {
             updatePreferredRunDate(newScanPreferredDate,
                                    brokerId: brokerId,

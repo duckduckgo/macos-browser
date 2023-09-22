@@ -50,9 +50,9 @@ struct OperationPreferredDateCalculator {
     }
 
     func dateForOptOutOperation(currentPreferredRunDate: Date?,
-                              historyEvents: [HistoryEvent],
-                              extractedProfileID: Int64?,
-                              schedulingConfig: DataBrokerScheduleConfig) -> Date? {
+                                historyEvents: [HistoryEvent],
+                                extractedProfileID: Int64?,
+                                schedulingConfig: DataBrokerScheduleConfig) -> Date? {
 
         var newDate: Date?
 
@@ -95,7 +95,7 @@ struct OperationPreferredDateCalculator {
             return date1
         }
     }
-    
+
     // If the last time we removed the profile has a bigger time difference than the current date + maintenance we should schedule for a new optout
     private func shouldScheduleNewOptOut(events: [HistoryEvent],
                                          extractedProfileId: Int64,
