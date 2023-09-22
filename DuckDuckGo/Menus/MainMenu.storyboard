@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22154" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22154"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -1034,6 +1034,37 @@ CQ
                                                                 <outlet property="simulateTunnelCrashMenuItem" destination="A5n-J7-hYk" id="gvK-di-vTP"/>
                                                                 <outlet property="simulateTunnelFailureMenuItem" destination="kVa-n8-UNx" id="3Ie-Ed-VtG"/>
                                                             </connections>
+                                                        </menu>
+                                                    </menuItem>
+                                                    <menuItem title="Override NetP Activation Date" id="1gh-1t-gP3">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Override NetP Activation Date" id="eU6-PJ-6Kx">
+                                                            <items>
+                                                                <menuItem title="Reset Activation Date" id="STc-AS-sXb">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="resetNetworkProtectionActivationDate:" target="Ady-hI-5gd" id="m9x-mw-hqK"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="Set Activation Date to Now" id="Wv8-wW-iVa">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="overrideNetworkProtectionActivationDateToNow:" target="Ady-hI-5gd" id="gEW-vP-EQc"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="Set Activation Date to 5 Days Ago" id="fkt-Z6-tdp">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="overrideNetworkProtectionActivationDateTo5DaysAgo:" target="Ady-hI-5gd" id="cy3-fK-Ld1"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="Set Activation Date to 10 Days Ago" id="ofD-Xp-Idm">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="overrideNetworkProtectionActivationDateTo10DaysAgo:" target="Ady-hI-5gd" id="lNr-gR-7kh"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                            </items>
                                                         </menu>
                                                     </menuItem>
                                                     <menuItem title="NetP Waitlist" id="iSU-Wj-V9c">

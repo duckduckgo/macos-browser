@@ -89,20 +89,16 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
         // has used Network Protection for.
         let filteredMessages = possibleMessages.filter { message in
             if dismissedMessageIDs.contains(message.id) {
-                print("DEBUG: Not showing message titled '\(message.cardTitle)'")
                 return false
             }
 
             if let requiredDaysSinceActivation = message.daysSinceNetworkProtectionEnabled {
                 if requiredDaysSinceActivation <= daysSinceActivation {
-                    print("DEBUG: Showing message titled '\(message.cardTitle)'")
                     return true
                 } else {
-                    print("DEBUG: Not showing message titled '\(message.cardTitle)'")
                     return false
                 }
             } else {
-                print("DEBUG: Showing message titled '\(message.cardTitle)'")
                 return true
             }
         }

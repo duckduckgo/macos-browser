@@ -43,7 +43,7 @@ struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
             return
         }
 
-        userDefaults.set(Date().timeIntervalSinceReferenceDate, forKey: Constants.networkProtectionActivationDateKey)
+        updateActivationDate(Date())
     }
 
     func daysSinceActivation() -> Int? {
@@ -58,6 +58,14 @@ struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
 
         let numberOfDays = Calendar.current.dateComponents([.day], from: activationDate, to: currentDate)
         return numberOfDays.day
+    }
+
+    func removeActivationDate() {
+        userDefaults.removeObject(forKey: Constants.networkProtectionActivationDateKey)
+    }
+
+    func updateActivationDate(_ date: Date) {
+        userDefaults.set(date.timeIntervalSinceReferenceDate, forKey: Constants.networkProtectionActivationDateKey)
     }
 
 }

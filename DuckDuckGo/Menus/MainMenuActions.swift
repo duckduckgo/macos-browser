@@ -758,6 +758,32 @@ extension MainViewController {
 #endif
     }
 
+    @IBAction func resetNetworkProtectionActivationDate(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: nil)
+    }
+
+    @IBAction func overrideNetworkProtectionActivationDateToNow(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: Date())
+    }
+
+    @IBAction func overrideNetworkProtectionActivationDateTo5DaysAgo(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: Date.daysAgo(5))
+    }
+
+    @IBAction func overrideNetworkProtectionActivationDateTo10DaysAgo(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: Date.daysAgo(10))
+    }
+
+    private func overrideNetworkProtectionActivationDate(to date: Date?) {
+        let store = DefaultWaitlistActivationDateStore()
+
+        if let date {
+            store.updateActivationDate(date)
+        } else {
+            store.removeActivationDate()
+        }
+    }
+
     // MARK: - Developer Tools
 
     @IBAction func toggleDeveloperTools(_ sender: Any?) {
