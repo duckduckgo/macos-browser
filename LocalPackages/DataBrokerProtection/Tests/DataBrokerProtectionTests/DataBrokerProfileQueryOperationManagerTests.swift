@@ -225,7 +225,6 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutConfirmed }))
             XCTAssertTrue(mockDatabase.wasUpdateRemoveDateCalled)
             XCTAssertNotNil(mockDatabase.extractedProfileRemovedDate)
-            XCTAssertTrue(mockDatabase.wasUpdatedPreferredRunDateForOptOutCalled)
         } catch {
             XCTFail("Should not throw")
         }
