@@ -19,10 +19,6 @@
 import Foundation
 import Networking
 
-extension Notification.Name {
-    static let NetworkProtectionRemoteMessagesChanged = NSNotification.Name("NetworkProtectionRemoteMessagesChanged")
-}
-
 protocol NetworkProtectionRemoteMessaging {
 
     func fetchRemoteMessages()
@@ -33,24 +29,27 @@ protocol NetworkProtectionRemoteMessaging {
 
 final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging {
 
-    enum NetworkProtectionRemoteMessagingError {
-        case test
+    enum Constants {
+        static let remoteMessagingRateLimitedOperationKey = "network-protection.remote-messaging.fetch"
     }
 
     private let messageRequest: NetworkProtectionRemoteMessagingRequest
     private let messageStorage: NetworkProtectionRemoteMessagingStorage
     private let waitlistActivationDateStore: WaitlistActivationDateStore
+    private let rateLimitedOperation: RateLimitedOperation
     private let userDefaults: UserDefaults
 
     init(
         messageRequest: NetworkProtectionRemoteMessagingRequest = DefaultNetworkProtectionRemoteMessagingRequest(),
         messageStorage: NetworkProtectionRemoteMessagingStorage = DefaultNetworkProtectionRemoteMessagingStorage(),
         waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(),
+        rateLimitedOperation: RateLimitedOperation = UserDefaultsRateLimitedOperation(debug: .seconds(30), release: .hours(8)),
         userDefaults: UserDefaults = .standard
     ) {
         self.messageRequest = messageRequest
         self.messageStorage = messageStorage
         self.waitlistActivationDateStore = waitlistActivationDateStore
+        self.rateLimitedOperation = rateLimitedOperation
         self.userDefaults = userDefaults
     }
 
@@ -61,29 +60,29 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
             return
         }
 
-        // TODO: Don't fetch messages if this has already been done recently
+        rateLimitedOperation.performRateLimitedOperation(operationName: Constants.remoteMessagingRateLimitedOperationKey) { completion in
+            self.messageRequest.fetchNetworkProtectionRemoteMessages { [weak self] result in
+                defer {
+                    completion()
+                }
 
-        messageRequest.fetchNetworkProtectionRemoteMessages { [weak self] result in
-            guard let self else { return }
+                guard let self else { return }
 
-            switch result {
-            case .success(let messages):
-                do {
-                    try self.messageStorage.store(messages: messages)
-
-                    DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: .NetworkProtectionRemoteMessagesChanged, object: nil)
+                switch result {
+                case .success(let messages):
+                    do {
+                        try self.messageStorage.store(messages: messages)
+                    } catch {
+                        Pixel.fire(.debug(event: .networkProtectionRemoteMessageStorageFailed, error: error))
                     }
-                } catch {
-                    Pixel.fire(.debug(event: .networkProtectionRemoteMessageStorageFailed, error: error))
-                }
-            case .failure(let error):
-                // Ignore 403 errors, those happen when a file can't be found on S3
-                if case APIRequest.Error.invalidStatusCode(403) = error {
-                    return
-                }
+                case .failure(let error):
+                    // Ignore 403 errors, those happen when a file can't be found on S3
+                    if case APIRequest.Error.invalidStatusCode(403) = error {
+                        return
+                    }
 
-                Pixel.fire(.debug(event: .networkProtectionRemoteMessageFetchingFailed, error: error))
+                    Pixel.fire(.debug(event: .networkProtectionRemoteMessageFetchingFailed, error: error))
+                }
             }
         }
 #endif
