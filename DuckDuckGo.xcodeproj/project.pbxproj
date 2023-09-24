@@ -2063,6 +2063,8 @@
 		4BD57BFC2AC0EA1A00B580EE /* RateLimitedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57BFB2AC0EA1A00B580EE /* RateLimitedOperation.swift */; };
 		4BD57BFD2AC0EA1A00B580EE /* RateLimitedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57BFB2AC0EA1A00B580EE /* RateLimitedOperation.swift */; };
 		4BD57BFE2AC0EA1A00B580EE /* RateLimitedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57BFB2AC0EA1A00B580EE /* RateLimitedOperation.swift */; };
+		4BD57C012AC0FF7500B580EE /* NetworkProtectionRemoteMessagingStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57BFF2AC0FC4E00B580EE /* NetworkProtectionRemoteMessagingStorageTests.swift */; };
+		4BD57C022AC0FFCD00B580EE /* NetworkProtectionRemoteMessagingStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57BFF2AC0FC4E00B580EE /* NetworkProtectionRemoteMessagingStorageTests.swift */; };
 		4BDFA4AE27BF19E500648192 /* ToggleableScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */; };
 		4BE0DF06267819A1006337B7 /* NSStoryboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */; };
 		4BE4005327CF3DC3007D3161 /* SavePaymentMethodPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE4005227CF3DC3007D3161 /* SavePaymentMethodPopover.swift */; };
@@ -3437,6 +3439,7 @@
 		4BD18EFF283F0BC500058124 /* BookmarksBarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksBarViewController.swift; sourceTree = "<group>"; };
 		4BD18F04283F151F00058124 /* BookmarksBar.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BookmarksBar.storyboard; sourceTree = "<group>"; };
 		4BD57BFB2AC0EA1A00B580EE /* RateLimitedOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RateLimitedOperation.swift; sourceTree = "<group>"; };
+		4BD57BFF2AC0FC4E00B580EE /* NetworkProtectionRemoteMessagingStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionRemoteMessagingStorageTests.swift; sourceTree = "<group>"; };
 		4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleableScrollView.swift; sourceTree = "<group>"; };
 		4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStoryboardExtension.swift; sourceTree = "<group>"; };
 		4BE15DB12A0B0DD500898243 /* PixelKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = PixelKit; sourceTree = "<group>"; };
@@ -5514,6 +5517,7 @@
 			children = (
 				4BCF15E62ABB98A20083F6DF /* Resources */,
 				4BCF15E42ABB98990083F6DF /* NetworkProtectionRemoteMessageTests.swift */,
+				4BD57BFF2AC0FC4E00B580EE /* NetworkProtectionRemoteMessagingStorageTests.swift */,
 			);
 			path = NetworkProtection;
 			sourceTree = "<group>";
@@ -10321,6 +10325,7 @@
 				5682C69429B79B57004DE3C8 /* TabBarViewItemTests.swift in Sources */,
 				3706FE77293F661700E42796 /* PreferencesSidebarModelTests.swift in Sources */,
 				3706FE78293F661700E42796 /* HistoryCoordinatingMock.swift in Sources */,
+				4BD57C022AC0FFCD00B580EE /* NetworkProtectionRemoteMessagingStorageTests.swift in Sources */,
 				3706FE79293F661700E42796 /* AppearancePreferencesTests.swift in Sources */,
 				3706FE7A293F661700E42796 /* FirePopoverViewModelTests.swift in Sources */,
 				3706FE7B293F661700E42796 /* HistoryStoringMock.swift in Sources */,
@@ -11315,6 +11320,7 @@
 				B60C6F8129B1B4AD007BFAA8 /* TestRunHelper.swift in Sources */,
 				4B9DB0582A983B55000927DB /* MockNetworkProtectionCodeRedeemer.swift in Sources */,
 				4B9292BE2667103100AD2C21 /* PasteboardFolderTests.swift in Sources */,
+				4BD57C012AC0FF7500B580EE /* NetworkProtectionRemoteMessagingStorageTests.swift in Sources */,
 				4B9292C52667104B00AD2C21 /* CoreDataTestUtilities.swift in Sources */,
 				4B723E1926B000DC00E14D75 /* TemporaryFileCreator.swift in Sources */,
 				98EB5D1027516A4800681FE6 /* AppPrivacyConfigurationTests.swift in Sources */,

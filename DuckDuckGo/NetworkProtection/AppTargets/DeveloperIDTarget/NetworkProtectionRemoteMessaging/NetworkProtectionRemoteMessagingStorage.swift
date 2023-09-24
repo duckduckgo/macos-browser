@@ -36,12 +36,17 @@ final class DefaultNetworkProtectionRemoteMessagingStorage: NetworkProtectionRem
     }
 
     private let userDefaults: UserDefaults
-    private var messagesURL: URL {
+    private let messagesURL: URL
+    private static var applicationSupportURL: URL {
         URL.sandboxApplicationSupportURL.appendingPathComponent(Constants.networkProtectionMessagesFileName)
     }
 
-    init(userDefaults: UserDefaults = .standard) {
+    init(
+        userDefaults: UserDefaults = .standard,
+        messagesURL: URL = DefaultNetworkProtectionRemoteMessagingStorage.applicationSupportURL
+    ) {
         self.userDefaults = userDefaults
+        self.messagesURL = messagesURL
     }
 
     func store(messages: [NetworkProtectionRemoteMessage]) throws {
