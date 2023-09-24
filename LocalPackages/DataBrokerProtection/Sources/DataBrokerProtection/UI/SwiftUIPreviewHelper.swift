@@ -36,7 +36,7 @@ final class PreviewScheduler: DataBrokerProtectionScheduler {
 final class PreviewDataManager: DataBrokerProtectionDataManaging {
     var delegate: DataBrokerProtectionDataManagerDelegate?
 
-    init(fakeBrokerFlag: FakeBrokerFlag) { }
+    init(fakeBrokerFlag: DataBrokerDebugFlag) { }
 
     init() { }
 

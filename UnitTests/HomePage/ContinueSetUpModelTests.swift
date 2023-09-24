@@ -31,7 +31,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     var privacyPreferences: PrivacySecurityPreferences!
     var duckPlayerPreferences: DuckPlayerPreferencesPersistor!
     var delegate: CapturingSetUpVewModelDelegate!
-    var privacyConfig: MockPrivacyConfiguration!
+    var privacyConfigManager: MockPrivacyConfigurationManager!
     let userDefaults = UserDefaults(suiteName: Bundle.main.bundleIdentifier! + "." + NSApp.runType.description)!
 
     @MainActor override func setUp() {
@@ -45,14 +45,25 @@ final class ContinueSetUpModelTests: XCTestCase {
         emailManager = EmailManager(storage: emailStorage)
         privacyPreferences = PrivacySecurityPreferences.shared
         duckPlayerPreferences = DuckPlayerPreferencesPersistorMock()
-        privacyConfig = MockPrivacyConfiguration()
-        privacyConfig.featureSettings = [
+        privacyConfigManager = MockPrivacyConfigurationManager()
+        let config = MockPrivacyConfiguration()
+        config.featureSettings = [
             "surveyCardDay0": "enabled",
             "surveyCardDay7": "enabled"
         ] as! [String: String]
-        delegate = CapturingSetUpVewModelDelegate()
+        privacyConfigManager.privacyConfig = config
 
-        vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: capturingDefaultBrowserProvider, dataImportProvider: capturingDataImportProvider, tabCollectionViewModel: tabCollectionVM, emailManager: emailManager, privacyPreferences: privacyPreferences, duckPlayerPreferences: duckPlayerPreferences, privacyConfig: privacyConfig)
+        vm = HomePage.Models.ContinueSetUpModel(
+            defaultBrowserProvider: capturingDefaultBrowserProvider,
+            dataImportProvider: capturingDataImportProvider,
+            tabCollectionViewModel: tabCollectionVM,
+            emailManager: emailManager,
+            privacyPreferences: privacyPreferences,
+            duckPlayerPreferences: duckPlayerPreferences,
+            privacyConfigurationManager: privacyConfigManager
+        )
+
+        delegate = CapturingSetUpVewModelDelegate()
         vm.delegate = delegate
     }
 
@@ -474,6 +485,8 @@ extension HomePage.Models.ContinueSetUpModel {
             "surveyCardDay7": "enabled",
             "networkProtection": "disabled"
         ] as! [String: String]
+        let manager = MockPrivacyConfigurationManager()
+        manager.privacyConfig = privacyConfig
         return HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: defaultBrowserProvider,
             dataImportProvider: dataImportProvider,
@@ -481,6 +494,6 @@ extension HomePage.Models.ContinueSetUpModel {
             emailManager: emailManager,
             privacyPreferences: privacyPreferences,
             duckPlayerPreferences: duckPlayerPreferences,
-            privacyConfig: privacyConfig)
+            privacyConfigurationManager: manager)
     }
 }

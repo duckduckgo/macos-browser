@@ -386,6 +386,15 @@ extension MainViewController {
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
     }
 
+    @IBAction func toggleHomeButton(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .homeButton)
+        if LocalPinningManager.shared.isPinned(.homeButton) {
+            Pixel.fire(.enableHomeButton)
+        } else {
+            Pixel.fire(.disableHomeButton)
+        }
+    }
+
     // MARK: - History
 
     @IBAction func back(_ sender: Any?) {
@@ -575,13 +584,21 @@ extension MainViewController {
 
     @IBAction func mergeAllWindows(_ sender: Any?) {
         guard let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
-        let otherWindowControllers = WindowControllersManager.shared.mainWindowControllers.filter { $0 !== mainWindowController }
+        assert(!self.isBurner)
+
+        let otherWindowControllers = WindowControllersManager.shared.mainWindowControllers.filter {
+            $0 !== mainWindowController && $0.mainViewController.isBurner == false
+        }
+        let excludedWindowControllers = WindowControllersManager.shared.mainWindowControllers.filter {
+            $0 === mainWindowController || $0.mainViewController.isBurner == true
+        }
+
         let otherMainViewControllers = otherWindowControllers.compactMap { $0.mainViewController }
         let otherTabCollectionViewModels = otherMainViewControllers.map { $0.tabCollectionViewModel }
         let otherTabs = otherTabCollectionViewModels.flatMap { $0.tabCollection.tabs }
         let otherLocalHistoryOfRemovedTabs = Set(otherTabCollectionViewModels.flatMap { $0.tabCollection.localHistoryOfRemovedTabs })
 
-        WindowsManager.closeWindows(except: view.window)
+        WindowsManager.closeWindows(except: excludedWindowControllers.compactMap(\.window))
 
         tabCollectionViewModel.append(tabs: otherTabs)
         tabCollectionViewModel.tabCollection.localHistoryOfRemovedTabs += otherLocalHistoryOfRemovedTabs
@@ -859,7 +876,7 @@ extension MainViewController: NSMenuItemValidation {
 
         // Merge all windows
         case #selector(MainViewController.mergeAllWindows(_:)):
-            return WindowControllersManager.shared.mainWindowControllers.count > 1
+            return WindowControllersManager.shared.mainWindowControllers.filter({ !$0.mainViewController.isBurner }).count > 1 && !self.isBurner
 
         // Move Tab to New Window, Select Next/Prev Tab
         case #selector(MainViewController.moveTabToNewWindow(_:)):
