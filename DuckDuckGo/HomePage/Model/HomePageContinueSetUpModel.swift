@@ -233,8 +233,11 @@ extension HomePage.Models {
 
             for message in networkProtectionRemoteMessaging.presentableRemoteMessages() {
                 features.append(.networkProtectionRemoteMessage(message))
-                // TODO: Make this daily
-                Pixel.fire(.networkProtectionRemoteMessageDisplayed(messageID: message.id))
+                DailyPixel.fire(
+                    pixel: .networkProtectionRemoteMessageDisplayed(messageID: message.id),
+                    frequency: .dailyOnly,
+                    includeAppVersionParameter: true
+                )
             }
 
             for feature in listOfFeatures {
