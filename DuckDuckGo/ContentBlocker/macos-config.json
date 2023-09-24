@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1694791154730,
+    "version": 1695309715890,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -3220,11 +3220,32 @@
                                 "type": "override"
                             }
                         ]
+                    },
+                    {
+                        "domain": "privacy-test-pages.site",
+                        "rules": [
+                            {
+                                "selector": ".hide-test",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".hide-empty-test",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".closest-empty-test",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": "[class^='ad-container']",
+                                "type": "override"
+                            }
+                        ]
                     }
                 ]
             },
             "state": "enabled",
-            "hash": "046895776cc6beb9b68b770e9d5fd268"
+            "hash": "8d80829a474c5d6ca9ca80ce87e477be"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4066,10 +4087,11 @@
                     "globalprivacycontrol.org",
                     "washingtonpost.com",
                     "nytimes.com",
-                    "privacy-test-pages.glitch.me"
+                    "privacy-test-pages.glitch.me",
+                    "privacy-test-pages.site"
                 ]
             },
-            "hash": "8bbdafd961fcd054b37c6367c472f387"
+            "hash": "9962dbae2a6a668fbdae3b20f02bcbad"
         },
         "harmfulApis": {
             "settings": {

@@ -93,7 +93,7 @@ final class SharingMenu: NSMenu {
         }
 
         service.subject = sharingData.title
-        service.perform(withItems: sharingData.items)
+        service.perform(withItems: sharingData.items.filter { service.canPerform(withItems: [$0]) })
     }
 
 }
@@ -110,7 +110,7 @@ extension SharingMenu: NSMenuItemValidation {
                 return true
             }
 
-            return service.canPerform(withItems: sharingData.items)
+            return sharingData.items.contains(where: { service.canPerform(withItems: [$0]) })
 
         case #selector(openSharingPreferences):
             return true
@@ -201,7 +201,7 @@ private extension [NSSharingService] {
 
     static var urlSharingServices: [NSSharingService] {
         // not real sharing URL, used for generating items for NSURL and NSString
-        NSSharingService.sharingServices(forItems: [URL.duckDuckGo, ""]).filter {
+        NSSharingService.sharingServices(forItems: [URL.duckDuckGo]).filter {
             $0 != NSSharingService.addToSafariReadingList
         }
     }

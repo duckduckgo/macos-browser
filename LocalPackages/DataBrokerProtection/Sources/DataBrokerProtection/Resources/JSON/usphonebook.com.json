@@ -1,0 +1,59 @@
+{
+  "name": "usphonebook.com",
+  "version": "0.1.0",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1678078800000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "99ede9cb-96a1-42ed-b721-53432fe4c14f",
+          "url": "https://www.usphonebook.com/${firstName}-${lastName}/${stateFull}/${city}"
+        },
+        {
+          "actionType": "extract",
+          "id": "1a35ecd2-883a-45fa-b6b9-04dab35a3249",
+          "selector": ".ls_contacts-people-finder-wrapper",
+          "profile": {
+            "name": {
+              "selector": ".//span[@itemprop='name']"
+            },
+            "age": {
+              "selector": ".ls_number-text",
+              "afterText": ", Age"
+            },
+            "addressCityState": {
+              "selector": "(.//div[@class='ls_success-content-extra-info'])[1]",
+              "afterText": "Lives in: "
+            },
+            "addressCityStateList": {
+              "selector": ".//span[@itemprop='address']",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": "(.//div[@class='ls_success-content-extra-info'])[2]",
+              "afterText": "Relatives:",
+              "separator": ","
+            },
+            "profileUrl": {
+              "selector": ".ls_success-extra-margin"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}

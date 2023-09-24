@@ -412,6 +412,7 @@ final class DataImportViewController: NSViewController {
 
                 NotificationCenter.default.post(name: .dataImportComplete, object: nil)
             case .failure(let error):
+                os_log("import failed: %{public}s", type: .error, error.localizedDescription)
                 switch error.errorType {
                 case .needsLoginPrimaryPassword:
                     self.presentAlert(for: error)
@@ -464,7 +465,7 @@ final class DataImportViewController: NSViewController {
 extension DataImportViewController: FileImportViewControllerDelegate {
 
     func fileImportViewController(_ viewController: FileImportViewController, didSelectBookmarksFileWithURL url: URL?) {
-        guard let url = url else {
+        guard let url else {
             self.viewState.interactionState = .unableToImport
             return
         }
@@ -476,7 +477,7 @@ extension DataImportViewController: FileImportViewControllerDelegate {
     }
 
     func fileImportViewController(_ viewController: FileImportViewController, didSelectCSVFileWithURL url: URL?) {
-        guard let url = url else {
+        guard let url else {
             self.viewState.interactionState = .unableToImport
             return
         }
@@ -489,6 +490,7 @@ extension DataImportViewController: FileImportViewControllerDelegate {
                                             defaultColumnPositions: .init(source: self.viewState.selectedImportSource))
             self.viewState.interactionState = .ableToImport
         } catch {
+            os_log("file import failed: %{public}s", type: .error, error.localizedDescription)
             self.viewState.interactionState = .unableToImport
             self.presentAlert(for: .logins(.cannotAccessSecureVault))
         }

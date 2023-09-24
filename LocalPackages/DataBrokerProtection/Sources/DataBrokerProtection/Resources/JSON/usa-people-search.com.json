@@ -1,0 +1,65 @@
+{
+  "name": "usa-people-search.com",
+  "version": "0.1.0",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1678078800000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "2da14c82-c712-48a8-ba4f-19706c009bb9",
+          "url": "https://usa-people-search.com/name/${firstName}-${lastName}/${city}-${state}?age=${age}"
+        },
+        {
+          "actionType": "extract",
+          "id": "4254d010-f71f-419f-b38d-ef9895a9bd44",
+          "selector": ".card-block",
+          "profile": {
+            "name": {
+              "selector": ".card-title",
+              "beforeText": " Age "
+            },
+            "alternativeNamesList": {
+              "selector": "(.//p[@class='card-text max-lines-1'])[1]",
+              "afterText": "AKA:",
+              "separator": ","
+            },
+            "age": {
+              "selector": ".person-age"
+            },
+            "addressCityState": {
+              "selector": "(.//p[@class='card-text'])[1]",
+              "afterText": "Lives in:"
+            },
+            "addressCityStateList": {
+              "selector": ".//p[@class='card-text address-link-list']",
+              "afterText": "Used to live:",
+              "separator": ","
+            },
+            "relativesList": {
+              "selector": "(.//p[@class='card-text max-lines-1'])[2]",
+              "afterText": "Related to:",
+              "separator": ","
+            },
+            "profileUrl": {
+              "selector": ".link-to-details"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}

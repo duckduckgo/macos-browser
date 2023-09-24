@@ -103,6 +103,12 @@ enum NetworkProtectionPixelEvent {
     case networkProtectionKeychainWriteError(field: String, status: Int32)
     case networkProtectionKeychainDeleteError(status: Int32)
 
+    case networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor
+    case networkProtectionWireguardErrorInvalidState
+    case networkProtectionWireguardErrorFailedDNSResolution
+    case networkProtectionWireguardErrorCannotSetNetworkSettings(error: Error)
+    case networkProtectionWireguardErrorCannotStartWireguardBackend(code: Int32)
+
     case networkProtectionNoAuthTokenFoundError
 
     case networkProtectionRekeyCompleted
@@ -185,6 +191,21 @@ enum NetworkProtectionPixelEvent {
         case .networkProtectionKeychainDeleteError:
             return "m_mac_netp_keychain_error_delete_failed"
 
+        case .networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor:
+            return "m_mac_netp_wireguard_error_cannot_locate_tunnel_file_descriptor"
+
+        case .networkProtectionWireguardErrorInvalidState:
+            return "m_mac_netp_wireguard_error_invalid_state"
+
+        case .networkProtectionWireguardErrorFailedDNSResolution:
+            return "m_mac_netp_wireguard_error_failed_dns_resolution"
+
+        case .networkProtectionWireguardErrorCannotSetNetworkSettings:
+            return "m_mac_netp_wireguard_error_cannot_set_network_settings"
+
+        case .networkProtectionWireguardErrorCannotStartWireguardBackend:
+            return "m_mac_netp_wireguard_error_cannot_start_wireguard_backend"
+
         case .networkProtectionNoAuthTokenFoundError:
             return "m_mac_netp_no_auth_token_found_error"
 
@@ -248,6 +269,14 @@ enum NetworkProtectionPixelEvent {
                 Pixel.Parameters.networkType: networkType.description
             ]
 
+        case .networkProtectionWireguardErrorCannotSetNetworkSettings(error: let error):
+            return error.pixelParameters
+
+        case .networkProtectionWireguardErrorCannotStartWireguardBackend(code: let code):
+            return [
+                Pixel.Parameters.errorCode: String(code)
+            ]
+
         case .networkProtectionTunnelConfigurationNoServerRegistrationInfo,
              .networkProtectionTunnelConfigurationCouldNotSelectClosestServer,
              .networkProtectionTunnelConfigurationCouldNotGetPeerPublicKey,
@@ -264,6 +293,9 @@ enum NetworkProtectionPixelEvent {
              .networkProtectionServerListStoreFailedToDecodeServerList,
              .networkProtectionNoAuthTokenFoundError,
              .networkProtectionRekeyCompleted,
+             .networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor,
+             .networkProtectionWireguardErrorInvalidState,
+             .networkProtectionWireguardErrorFailedDNSResolution,
              .networkProtectionActiveUser:
 
             return nil

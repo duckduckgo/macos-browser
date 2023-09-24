@@ -152,7 +152,10 @@ extension Pixel.Event {
              .networkProtectionWaitlistTermsAndConditionsAccepted,
              .networkProtectionRemoteMessageDisplayed,
              .networkProtectionRemoteMessageDismissed,
-             .networkProtectionRemoteMessageOpened:
+             .networkProtectionRemoteMessageOpened,
+             .enableHomeButton,
+             .disableHomeButton,
+             .setnewHomePage:
             return nil
         }
     }

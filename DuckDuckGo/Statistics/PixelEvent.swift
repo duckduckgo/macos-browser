@@ -160,10 +160,14 @@ extension Pixel {
         case networkProtectionWaitlistNotificationTapped
         case networkProtectionWaitlistTermsAndConditionsDisplayed
         case networkProtectionWaitlistTermsAndConditionsAccepted
-
         case networkProtectionRemoteMessageDisplayed(messageID: String)
         case networkProtectionRemoteMessageDismissed(messageID: String)
         case networkProtectionRemoteMessageOpened(messageID: String)
+
+        // 28-day Home Button
+        case enableHomeButton
+        case disableHomeButton
+        case setnewHomePage
 
         case dailyPixel(Event, isFirst: Bool)
 
@@ -477,7 +481,6 @@ extension Pixel.Event {
             return "m_mac_netp_imp_terms"
         case .networkProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_netp_ev_terms_accepted"
-
         case .networkProtectionRemoteMessageDisplayed(let messageID):
             return "m_mac_netp_remote_message_displayed_\(messageID)"
         case .networkProtectionRemoteMessageDismissed(let messageID):
@@ -485,8 +488,17 @@ extension Pixel.Event {
         case .networkProtectionRemoteMessageOpened(let messageID):
             return "m_mac_netp_remote_message_opened_\(messageID)"
 
+        // 28-day Home Button
+        case .enableHomeButton:
+            return "m_mac_enable_home_button"
+        case .disableHomeButton:
+            return "m_mac_disable_home_button"
+        case .setnewHomePage:
+            return "m_mac_set_new_homepage"
+
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")
+
         }
 
     }
