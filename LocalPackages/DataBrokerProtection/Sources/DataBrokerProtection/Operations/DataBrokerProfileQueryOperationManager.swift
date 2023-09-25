@@ -169,7 +169,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         database.add(event)
                         database.updateRemovedDate(Date(), on: extractedProfileId)
 
-                        updateOperationDataDates(
+                        try updateOperationDataDates(
                             brokerId: brokerId,
                             profileQueryId: profileQueryId,
                             extractedProfileId: extractedProfileId,
@@ -190,7 +190,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                     }
                 }
             } else {
-                updateOperationDataDates(
+                try updateOperationDataDates(
                     brokerId: brokerId,
                     profileQueryId: profileQueryId,
                     extractedProfileId: nil,
@@ -235,13 +235,23 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             os_log("Finished opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 
             database.updateLastRunDate(Date(), brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
-            updateOperationDataDates(
-                brokerId: brokerId,
-                profileQueryId: profileQueryId,
-                extractedProfileId: extractedProfileId,
-                schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig,
-                database: database
-            )
+            do {
+                try updateOperationDataDates(
+                    brokerId: brokerId,
+                    profileQueryId: profileQueryId,
+                    extractedProfileId: extractedProfileId,
+                    schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig,
+                    database: database
+                )
+            } catch {
+                handleOperationError(
+                    brokerId: brokerId,
+                    profileQueryId: profileQueryId,
+                    extractedProfileId: extractedProfileId,
+                    error: error,
+                    database: database
+                )
+            }
             notificationCenter.post(name: DataBrokerProtectionNotifications.didFinishOptOut, object: brokerProfileQueryData.dataBroker.name)
         }
 
@@ -278,10 +288,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         profileQueryId: Int64,
         extractedProfileId: Int64?,
         schedulingConfig: DataBrokerScheduleConfig,
-        database: DataBrokerProtectionRepository) {
+        database: DataBrokerProtectionRepository) throws {
 
             let dateUpdater = OperationPreferredDateUpdaterUseCase(database: database)
-            dateUpdater.updateOperationDataDates(brokerId: brokerId,
+            try dateUpdater.updateOperationDataDates(brokerId: brokerId,
                                                  profileQueryId: profileQueryId,
                                                  extractedProfileId: extractedProfileId,
                                                  schedulingConfig: schedulingConfig)

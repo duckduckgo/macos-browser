@@ -23,10 +23,12 @@ struct OperationPreferredDateCalculator {
     func dateForScanOperation(currentPreferredRunDate: Date?,
                               historyEvents: [HistoryEvent],
                               extractedProfileID: Int64?,
-                              schedulingConfig: DataBrokerScheduleConfig) -> Date? {
+                              schedulingConfig: DataBrokerScheduleConfig) throws -> Date? {
 
         var newDate: Date?
-        guard let lastEvent = historyEvents.last else { return currentPreferredRunDate }
+        guard let lastEvent = historyEvents.last else {
+            throw DataBrokerProtectionError.cantCalculatePreferredRunDate
+        }
 
         switch lastEvent.type {
 
@@ -46,11 +48,13 @@ struct OperationPreferredDateCalculator {
     func dateForOptOutOperation(currentPreferredRunDate: Date?,
                                 historyEvents: [HistoryEvent],
                                 extractedProfileID: Int64?,
-                                schedulingConfig: DataBrokerScheduleConfig) -> Date? {
+                                schedulingConfig: DataBrokerScheduleConfig) throws -> Date? {
 
         var newDate: Date?
 
-        guard let lastEvent = historyEvents.last else { return currentPreferredRunDate }
+        guard let lastEvent = historyEvents.last else {
+            throw DataBrokerProtectionError.cantCalculatePreferredRunDate
+        }
 
         switch lastEvent.type {
 

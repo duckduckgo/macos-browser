@@ -25,7 +25,7 @@ protocol OperationPreferredDateUpdater {
     func updateOperationDataDates(brokerId: Int64,
                                   profileQueryId: Int64,
                                   extractedProfileId: Int64?,
-                                  schedulingConfig: DataBrokerScheduleConfig)
+                                  schedulingConfig: DataBrokerScheduleConfig) throws
 }
 
 struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
@@ -34,7 +34,7 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
     internal func updateOperationDataDates(brokerId: Int64,
                                            profileQueryId: Int64,
                                            extractedProfileId: Int64?,
-                                           schedulingConfig: DataBrokerScheduleConfig) {
+                                           schedulingConfig: DataBrokerScheduleConfig) throws {
 
         guard let brokerProfileQuery = database.brokerProfileQueryData(for: brokerId,
                                                                        and: profileQueryId) else { return }
@@ -43,7 +43,7 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let newScanPreferredDate = calculator.dateForScanOperation(currentPreferredRunDate: currentScanPreferredDate,
+        let newScanPreferredDate = try calculator.dateForScanOperation(currentPreferredRunDate: currentScanPreferredDate,
                                                                    historyEvents: brokerProfileQuery.events,
                                                                    extractedProfileID: extractedProfileId,
                                                                    schedulingConfig: schedulingConfig)
@@ -60,7 +60,7 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
             let optOutOperation = brokerProfileQuery.optOutOperationsData.filter { $0.extractedProfile.id == extractedProfileId }.first
             let currentOptOutPreferredDate = optOutOperation?.preferredRunDate
 
-            let newOptOutPreferredDate = calculator.dateForOptOutOperation(currentPreferredRunDate: currentOptOutPreferredDate,
+            let newOptOutPreferredDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: currentOptOutPreferredDate,
                                                                            historyEvents: brokerProfileQuery.events,
                                                                            extractedProfileID: extractedProfileId,
                                                                            schedulingConfig: schedulingConfig)
