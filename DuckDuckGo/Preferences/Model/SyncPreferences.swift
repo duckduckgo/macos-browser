@@ -42,6 +42,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         syncService.account != nil
     }
 
+    public var codeToDisplay: String?
     let managementDialogModel: ManagementDialogModel
 
     @Published var devices: [SyncDevice] = []

@@ -28,9 +28,22 @@ enum UserText {
     static let copy = NSLocalizedString("copy", value: "Copy", comment: "Copy button")
     static let pasteFromClipboard = NSLocalizedString("paste-from-clipboard", value: "Paste from Clipboard", comment: "Paste button")
 
-    static let sync = NSLocalizedString("preferences.sync", value: "Sync", comment: "Show sync preferences")
+    static let sync = NSLocalizedString("preferences.sync", value: "Sync and Back Up", comment: "Show sync preferences")
+    static let syncSetupExplanation = NSLocalizedString("preferences.sync.setup-explanation", value: "Securely sync and back up your bookmarks and Logins.", comment: "Sync setup explanation")
 
-    static let syncSetupExplanation = NSLocalizedString("preferences.sync.setup-explanation", value: "Sync your bookmarks and Autofill logins across your devices and save an encrypted backup on DuckDuckGo’s servers.", comment: "Sync setup explanation")
+    static let syncAddDeviceCardExplanation = NSLocalizedString("preferences.sync.add-device-explanation", value: "To sync with another device, open the DuckDuckGo app on that device. Navigate to Settings > Sync & Back Up and scan the QR code below.", comment: "Sync add device explanation")
+    static let syncAddDeviceCardActionsExplanation = NSLocalizedString("preferences.sync.add-device-actions-explanation", value: "Can't scan the QR code? Copy and paste the text code instead.", comment: "Sync add device actions explanation")
+    static let syncAddDeviceShowTextActionTitle = NSLocalizedString("preferences.sync.add-device-show-text-action-title", value: "Show Text Code", comment: "Sync add device show text action title")
+    static let syncAddDeviceEnterCodeActionTitle = NSLocalizedString("preferences.sync.add-device-enter-code-action-title", value: "Manually Enter Code", comment: "Sync add device enter code action title")
+
+    static let syncFirstDeviceSetUpCardTitle = NSLocalizedString("preferences.sync.first-device-setup-title", value: "Single-Device Setup", comment: "Sync first device setup title")
+    static let syncFirstDeviceSetUpCardExplanation = NSLocalizedString("preferences.sync.first-device-setup-explanation", value: "Set up this device now, sync with other devices later.", comment: "Sync add device enter code action explanation")
+    static let syncFirstDeviceSetUpActionTitle = NSLocalizedString("preferences.sync.first-device-setup-action-title", value: "Start Sync & Back Up", comment: "Sync first device setup action title")
+
+    static let syncRecoverDataActionTitle = NSLocalizedString("preferences.sync.recover-data-action-title", value: "Recover Your Data", comment: "Sync recover data action title")
+
+    static let syncSetUpFooter = NSLocalizedString("preferences.sync.setup-footer", value: "Your data is end-to-end encrypted, and DuckDuckGo does not have access to the decryption key.", comment: "Sync setup footer")
+
     static let turnOnSync = NSLocalizedString("preferences.sync.turn-on", value: "Turn on Sync", comment: "Enable sync button caption")
     static let turnOnSyncWithEllipsis = NSLocalizedString("preferences.sync.turn-on-ellipsis", value: "Turn on Sync...", comment: "Enable sync button caption")
     static let turnOff = NSLocalizedString("preferences.sync.turn-off", value: "Turn Off", comment: "Turn off sync confirmation dialog button title")

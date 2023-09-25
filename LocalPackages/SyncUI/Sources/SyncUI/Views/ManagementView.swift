@@ -52,15 +52,18 @@ public struct ManagementView<ViewModel>: View where ViewModel: ManagementViewMod
             .background(RoundedRectangle(cornerRadius: 8).foregroundColor(.yellow))
             .padding(.bottom, 10)
 
-            Text(UserText.sync)
-                .font(Const.Fonts.preferencePaneTitle)
+            VStack(alignment: .leading, spacing: 8) {
+                Text(UserText.sync)
+                    .font(Const.Fonts.preferencePaneTitle)
+                    .padding(.horizontal, 16)
 
-            if model.isSyncEnabled {
-                SyncEnabledView<ViewModel>()
-                    .environmentObject(model)
-            } else {
-                SyncSetupView<ViewModel>()
-                    .environmentObject(model)
+                if model.isSyncEnabled {
+                    SyncEnabledView<ViewModel>()
+                        .environmentObject(model)
+                } else {
+                    SyncSetupView<ViewModel>()
+                        .environmentObject(model)
+                }
             }
         }
         .alert(isPresented: $model.shouldShowErrorMessage) {
