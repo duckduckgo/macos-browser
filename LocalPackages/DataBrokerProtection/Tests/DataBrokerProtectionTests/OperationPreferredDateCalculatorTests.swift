@@ -29,7 +29,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         maintenanceScan: 3000
     )
 
-    func testNoMatchFound() {
+    func testNoMatchFound() throws {
         let expectedScanDate = Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
         let expectedOptOutDate: Date? = nil
 
@@ -41,12 +41,12 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: nil,
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: nil,
                                                              historyEvents: historyEvents,
                                                              extractedProfileID: nil,
                                                              schedulingConfig: schedulingConfig)
 
-        let actualOptOutDate = calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
@@ -58,7 +58,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
     /*
      If the last time we removed the profile has a bigger time difference than the current date + maintenance (expired) we should schedule for a new optout because the broker didn't honor the request
      */
-    func testMatchFoundProfileRemovalExpired() {
+    func testMatchFoundProfileRemovalExpired() throws {
         let expiredDate = Date().addingTimeInterval(-schedulingConfig.maintenanceScan.hoursToSeconds)
 
         let expectedScanDate = Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
@@ -77,12 +77,12 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: nil,
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: nil,
                                                              historyEvents: historyEvents,
                                                              extractedProfileID: nil,
                                                              schedulingConfig: schedulingConfig)
 
-        let actualOptOutDate = calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: 1,
                                                                  schedulingConfig: schedulingConfig)
@@ -91,7 +91,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 
-    func testMatchFoundProfileRemovalNotExpired() {
+    func testMatchFoundProfileRemovalNotExpired() throws {
         let expectedScanDate = Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
         let expectedOptOutDate: Date? = nil
 
@@ -107,12 +107,12 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: nil,
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: nil,
                                                              historyEvents: historyEvents,
                                                              extractedProfileID: nil,
                                                              schedulingConfig: schedulingConfig)
 
-        let actualOptOutDate = calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: 1,
                                                                  schedulingConfig: schedulingConfig)
@@ -120,7 +120,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))}
 
-    func testError() {
+    func testError() throws {
         let expectedScanDate = Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
         let expectedOptOutDate = Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
 
@@ -132,12 +132,12 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: nil,
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: nil,
                                                              historyEvents: historyEvents,
                                                              extractedProfileID: nil,
                                                              schedulingConfig: schedulingConfig)
 
-        let actualOptOutDate = calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
@@ -146,7 +146,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 
-    func testOptOutStarted() {
+    func testOptOutStarted() throws { 
         let expectedScanDate: Date? = nil
         let expectedOptOutDate: Date? = nil
 
@@ -158,12 +158,12 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: nil,
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: nil,
                                                              historyEvents: historyEvents,
                                                              extractedProfileID: nil,
                                                              schedulingConfig: schedulingConfig)
 
-        let actualOptOutDate = calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
@@ -172,7 +172,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 
-    func testOptOutConfirmed() {
+    func testOptOutConfirmed() throws {
         let expectedScanDate = Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
         let expectedOptOutDate: Date? = nil
 
@@ -184,12 +184,12 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: nil,
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: nil,
                                                              historyEvents: historyEvents,
                                                              extractedProfileID: nil,
                                                              schedulingConfig: schedulingConfig)
 
-        let actualOptOutDate = calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
@@ -198,7 +198,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 
-    func testOptOutRequested() {
+    func testOptOutRequested() throws {
         let expectedScanDate = Date().addingTimeInterval(schedulingConfig.confirmOptOutScan.hoursToSeconds)
         let expectedOptOutDate: Date? = nil
 
@@ -210,12 +210,12 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: nil,
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: nil,
                                                              historyEvents: historyEvents,
                                                              extractedProfileID: nil,
                                                              schedulingConfig: schedulingConfig)
 
-        let actualOptOutDate = calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
@@ -224,7 +224,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 
-    func testScanStarted() {
+    func testScanStarted() throws {
         let expectedScanDate: Date? = nil
         let expectedOptOutDate: Date? = nil
 
@@ -236,12 +236,12 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: nil,
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: nil,
                                                              historyEvents: historyEvents,
                                                              extractedProfileID: nil,
                                                              schedulingConfig: schedulingConfig)
 
-        let actualOptOutDate = calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
@@ -264,12 +264,12 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: Date(),
+        let actualScanDate = try! calculator.dateForScanOperation(currentPreferredRunDate: Date(),
                                                              historyEvents: historyEvents,
                                                              extractedProfileID: nil,
                                                              schedulingConfig: schedulingConfig)
 
-        let actualOptOutDate = calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+        let actualOptOutDate = try! calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
@@ -281,7 +281,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
     /*
      If the last time we removed the profile has a bigger time difference than the current date + maintenance (expired) we should schedule for a new optout because the broker didn't honor the request
      */
-    func testMatchFoundProfileRemovalExpiredWithMostRecentDate() {
+    func testMatchFoundProfileRemovalExpiredWithMostRecentDate() throws {
         let expiredDate = Date().addingTimeInterval(-schedulingConfig.maintenanceScan.hoursToSeconds)
 
         let expectedScanDate = Date()
@@ -300,12 +300,12 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: Date(),
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: Date(),
                                                              historyEvents: historyEvents,
                                                              extractedProfileID: nil,
                                                              schedulingConfig: schedulingConfig)
 
-        let actualOptOutDate = calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: 1,
                                                                  schedulingConfig: schedulingConfig)
@@ -314,7 +314,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 
-    func testMatchFoundProfileRemovalNotExpiredWithMostRecentDate() {
+    func testMatchFoundProfileRemovalNotExpiredWithMostRecentDate() throws {
         let expectedScanDate = Date()
         let expectedOptOutDate: Date? = nil
 
@@ -330,12 +330,12 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: Date(),
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: Date(),
                                                              historyEvents: historyEvents,
                                                              extractedProfileID: nil,
                                                              schedulingConfig: schedulingConfig)
 
-        let actualOptOutDate = calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: 1,
                                                                  schedulingConfig: schedulingConfig)
@@ -343,7 +343,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))}
 
-    func testErrorWithMostRecentDate() {
+    func testErrorWithMostRecentDate() throws {
         let expectedScanDate = Date()
         let expectedOptOutDate = Date()
 
@@ -355,12 +355,12 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: Date(),
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: Date(),
                                                              historyEvents: historyEvents,
                                                              extractedProfileID: nil,
                                                              schedulingConfig: schedulingConfig)
 
-        let actualOptOutDate = calculator.dateForOptOutOperation(currentPreferredRunDate: Date(),
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: Date(),
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
@@ -369,7 +369,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 
-    func testOptOutStartedWithMostRecentDate() {
+    func testOptOutStartedWithMostRecentDate() throws {
         let expectedScanDate = Date()
         let expectedOptOutDate = Date()
 
@@ -381,12 +381,12 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: Date(),
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: Date(),
                                                              historyEvents: historyEvents,
                                                              extractedProfileID: nil,
                                                              schedulingConfig: schedulingConfig)
 
-        let actualOptOutDate = calculator.dateForOptOutOperation(currentPreferredRunDate: Date(),
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: Date(),
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
@@ -395,7 +395,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 
-    func testOptOutConfirmedWithMostRecentDate() {
+    func testOptOutConfirmedWithMostRecentDate() throws {
         let expectedScanDate = Date()
         let expectedOptOutDate: Date? = nil
 
@@ -407,12 +407,12 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: Date(),
+        let actualScanDate = try! calculator.dateForScanOperation(currentPreferredRunDate: Date(),
                                                              historyEvents: historyEvents,
                                                              extractedProfileID: nil,
                                                              schedulingConfig: schedulingConfig)
 
-        let actualOptOutDate = calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+        let actualOptOutDate = try! calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
@@ -421,7 +421,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 
-    func testOptOutRequestedWithMostRecentDate() {
+    func testOptOutRequestedWithMostRecentDate() throws {
         let expectedScanDate = Date()
         let expectedOptOutDate: Date? = nil
 
@@ -433,12 +433,12 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: Date(),
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: Date(),
                                                              historyEvents: historyEvents,
                                                              extractedProfileID: nil,
                                                              schedulingConfig: schedulingConfig)
 
-        let actualOptOutDate = calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
@@ -447,7 +447,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 
-    func testScanStartedWithMostRecentDate() {
+    func testScanStartedWithMostRecentDate() throws {
         let expectedScanDate = Date()
         let expectedOptOutDate: Date? = nil
 
@@ -459,12 +459,12 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = calculator.dateForScanOperation(currentPreferredRunDate: Date(),
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: Date(),
                                                              historyEvents: historyEvents,
                                                              extractedProfileID: nil,
                                                              schedulingConfig: schedulingConfig)
 
-        let actualOptOutDate = calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
