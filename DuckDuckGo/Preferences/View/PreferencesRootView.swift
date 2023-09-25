@@ -20,7 +20,7 @@ import SwiftUI
 import SwiftUIExtensions
 import SyncUI
 import Subscription
-import Accounts
+import Account
 
 fileprivate extension Preferences.Const {
     static let sidebarWidth: CGFloat = 256
@@ -56,19 +56,19 @@ extension Preferences {
                                 PrivacyView(model: PrivacyPreferencesModel())
                             case .privacyPro:
                                 let actionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
-                                    if #available(macOS 12.0, *) {
-                                        Task {
-                                            guard let (payload, jwsRepresentation) = await PurchaseManager.mostRecentTransaction() else { return }
-
-                                            switch await AccountsService.storeLogin(payload: payload, signature: jwsRepresentation) {
-                                            case .success(let response):
-                                                print("\(response)")
-                                                AccountManager().storeAccount(token: response.authToken, email: response.email)
-                                            case .failure(let error):
-                                                print("Error: \(error)")
-                                            }
-                                        }
-                                    }
+//                                    if #available(macOS 12.0, *) {
+//                                        Task {
+//                                            guard let (payload, jwsRepresentation) = await PurchaseManager.mostRecentTransaction() else { return }
+//
+//                                            switch await AuthService.storeLogin(payload: payload, signature: jwsRepresentation) {
+//                                            case .success(let response):
+//                                                print("\(response)")
+//                                                AccountManager().storeAccount(token: response.authToken, email: response.email)
+//                                            case .failure(let error):
+//                                                print("Error: \(error)")
+//                                            }
+//                                        }
+//                                    }
                                 }, openURLHandler: { url in
                                     WindowControllersManager.shared.show(url: url, newTab: true)
                                 }, goToSyncPreferences: {

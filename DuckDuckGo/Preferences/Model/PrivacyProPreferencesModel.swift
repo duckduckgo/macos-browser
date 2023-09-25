@@ -17,7 +17,7 @@
 //
 
 import Foundation
-import Accounts
+import Account
 import Subscription
 import AppKit
 
