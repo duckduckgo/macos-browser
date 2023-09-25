@@ -39,13 +39,13 @@ public struct AccountsService {
 
     // MARK: -
 
-//    static func getAccessToken() async -> Result<AccessTokenResponse, AccountsService.Error> {
-//        await executeAPICall(method: "GET", endpoint: "access-token", headers: EmailManager().emailHeaders)
-//    }
+    public static func getAccessToken(token: String) async -> Result<AccessTokenResponse, AccountsService.Error> {
+        await executeAPICall(method: "GET", endpoint: "access-token", headers: ["Authorization": "Bearer " + token])
+    }
 
-//    struct AccessTokenResponse: Decodable {
-//        let accessToken: String
-//    }
+    public struct AccessTokenResponse: Decodable {
+        public let accessToken: String
+    }
 
     // MARK: -
 
@@ -55,12 +55,12 @@ public struct AccountsService {
 
     // swiftlint:disable nesting
     public struct ValidateTokenResponse: Decodable {
-        let account: Account
+        public let account: Account
 
-        struct Account: Decodable {
-            let email: String
+        public struct Account: Decodable {
+            public let email: String
             let entitlements: [Entitlement]
-            let externalID: String
+            public let externalID: String
 
             enum CodingKeys: String, CodingKey {
                 case email, entitlements, externalID = "externalId" // no underscores due to keyDecodingStrategy = .convertFromSnakeCase
@@ -105,7 +105,6 @@ public struct AccountsService {
 
         let s = String(data: bodyData, encoding: .utf8)
         print(s)
-
 
         return await executeAPICall(method: "POST", endpoint: "store-login", headers: [:], body: bodyData)
     }
