@@ -29,7 +29,7 @@ public protocol AccountServiceStorage: AnyObject {
     func store(token: String) throws
     func getEmail() throws -> String?
     func store(email: String?) throws
-    func clearAll() throws
+    func clearAuthenticationState() throws
 }
 
 public class AccountManager {
@@ -92,7 +92,7 @@ public class AccountManager {
     public func signOut() {
         print("[[AccountManager]] signOut")
         do {
-            try storage.clearAll()
+            try storage.clearAuthenticationState()
         } catch {
             if let error = error as? AccountKeychainAccessError {
 //                self.requestDelegate?.emailManagerKeychainAccessFailed(accessType: .deleteAuthenticationState, error: error)

@@ -61,7 +61,7 @@ public class AccountKeychainStorage: AccountServiceStorage {
         }
     }
 
-    public func clearAll() throws {
+    public func clearAuthenticationState() throws {
         try Self.deleteItem(forField: .token)
         try Self.deleteItem(forField: .email)
     }
