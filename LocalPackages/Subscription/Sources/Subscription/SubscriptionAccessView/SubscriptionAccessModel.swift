@@ -98,9 +98,13 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
     public var actionHandlers: SubscriptionAccessActionHandlers
     public var title = "Use your subscription on all your devices"
     public var description = "Access your Privacy Pro subscription on any of your devices via Sync, Apple ID or by adding an email address."
+    private var email: String?
 
-    public init(actionHandlers: SubscriptionAccessActionHandlers) {
+    private var hasEmail: Bool { !(email?.isEmpty ?? true) }
+
+    public init(actionHandlers: SubscriptionAccessActionHandlers, email: String?) {
         self.actionHandlers = actionHandlers
+        self.email = email
     }
 
     public func description(for channel: AccessChan) -> String {
@@ -108,7 +112,7 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
         case .appleID:
             return "Your subscription is automatically available on any device signed in to the same Apple ID."
         case .email:
-            return "Add an email address to access your subscription on your other devices. We’ll only use this address to verify your subscription."
+            return hasEmail ? "\(email)\nMange your email address" : "Add an email address to access your subscription on your other devices. We’ll only use this address to verify your subscription."
         case .sync:
             return "Privacy Pro is automatically available on your Synced devices. Manage your synced devices in Sync settings."
         }
@@ -119,7 +123,7 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
         case .appleID:
             return nil
         case .email:
-            return "Enter Email"
+            return hasEmail ? "Manage" : "Enter Email"
         case .sync:
             return "Go to Sync Settings"
         }
@@ -130,7 +134,9 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
         case .appleID:
             actionHandlers.restorePurchases()
         case .email:
-            actionHandlers.openURLHandler(URL(string: "https://abrown.duckduckgo.com/subscriptions/add-email")!)
+            let manageEmailURL = URL(string: "https://abrown.duckduckgo.com/subscriptions/manage")!
+            let addEmailURL = URL(string: "https://abrown.duckduckgo.com/subscriptions/add-email")!
+            actionHandlers.openURLHandler(hasEmail ? manageEmailURL : addEmailURL)
         case .sync:
             actionHandlers.goToSyncPreferences()
         }

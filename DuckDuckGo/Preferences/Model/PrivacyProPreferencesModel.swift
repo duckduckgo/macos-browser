@@ -35,7 +35,7 @@ final class PrivacyProPreferencesModel: ObservableObject {
 
         let isSignedIn = accountManager.isSignedIn
         self.isSignedIn = isSignedIn
-        sheetModel = isSignedIn ? ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler) : ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
+        sheetModel = isSignedIn ? ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email) : ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
 
         NotificationCenter.default.addObserver(forName: .accountDidSignIn, object: nil, queue: nil) { _ in
             self.updateSignInState(true)
@@ -48,7 +48,7 @@ final class PrivacyProPreferencesModel: ObservableObject {
 
     private func updateSignInState(_ isSignedIn: Bool) {
         self.isSignedIn = isSignedIn
-        sheetModel = isSignedIn ? ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler) : ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
+        sheetModel = isSignedIn ? ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email) : ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
     }
 
     @MainActor
