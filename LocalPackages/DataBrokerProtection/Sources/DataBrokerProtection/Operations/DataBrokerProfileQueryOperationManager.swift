@@ -208,7 +208,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             throw error
         }
     }
-
+    // swiftlint:disable:next function_body_length
     internal func runOptOutOperation(for extractedProfile: ExtractedProfile,
                                      on runner: WebOperationRunner,
                                      brokerProfileQueryData: BrokerProfileQueryData,

@@ -47,7 +47,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
 
-
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
     }
 
@@ -100,7 +99,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
 
-
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
     }
 
@@ -120,7 +118,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
 
-
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
     }
 
@@ -139,7 +136,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
-
 
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
     }
@@ -179,7 +175,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
 
-
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
     }
 
@@ -204,7 +199,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
     // If we have a most recent date saved, the calculator should not change it no matter the case.
 
-    func testNoMatchFoundWithRecentDate_thenScanDateDoesNotChange() {
+    func testNoMatchFoundWithRecentDate_thenScanDateDoesNotChange() throws {
         let expectedScanDate = Date()
 
         let historyEvents = [
@@ -215,11 +210,10 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = try! calculator.dateForScanOperation(currentPreferredRunDate: Date(),
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: Date(),
                                                                   historyEvents: historyEvents,
                                                                   extractedProfileID: nil,
                                                                   schedulingConfig: schedulingConfig)
-
 
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
     }
@@ -250,7 +244,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
 
-
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
     }
 
@@ -274,7 +267,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
 
-
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
     }
 
@@ -293,7 +285,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
-
 
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
     }
@@ -314,7 +305,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
 
-
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
     }
 
@@ -329,11 +319,10 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualScanDate = try! calculator.dateForScanOperation(currentPreferredRunDate: Date(),
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: Date(),
                                                                   historyEvents: historyEvents,
                                                                   extractedProfileID: nil,
                                                                   schedulingConfig: schedulingConfig)
-
 
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
     }
@@ -354,7 +343,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
 
-
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
     }
 
@@ -373,7 +361,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                                                                  historyEvents: historyEvents,
                                                                  extractedProfileID: nil,
                                                                  schedulingConfig: schedulingConfig)
-
 
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
     }
@@ -554,8 +541,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-
-        let actualOptOutDate = try! calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                       historyEvents: historyEvents,
                                                                       extractedProfileID: nil,
                                                                       schedulingConfig: schedulingConfig)
@@ -606,7 +592,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                          type: .matchesFound)]
 
         let calculator = OperationPreferredDateCalculator()
-
 
         let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                      historyEvents: historyEvents,
@@ -665,7 +650,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
 
         let calculator = OperationPreferredDateCalculator()
 
-        let actualOptOutDate = try! calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                       historyEvents: historyEvents,
                                                                       extractedProfileID: nil,
                                                                       schedulingConfig: schedulingConfig)
