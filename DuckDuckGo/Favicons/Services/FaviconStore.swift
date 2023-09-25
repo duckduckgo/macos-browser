@@ -42,9 +42,11 @@ final class FaviconStore: FaviconStoring {
         case savingFailed
     }
 
-    private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "Favicons")
+    private let context: NSManagedObjectContext
 
-    init() {}
+    init() {
+        context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "Favicons")
+    }
 
     init(context: NSManagedObjectContext) {
         self.context = context
