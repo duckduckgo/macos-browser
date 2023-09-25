@@ -22,7 +22,7 @@ import Foundation
 import Navigation
 import WebKit
 import UserScript
-import Account
+import Accounts
 
 public extension Notification.Name {
     static let subscriptionPageCloseAndOpenPreferences = Notification.Name("com.duckduckgo.subscriptionPage.CloseAndOpenPreferences")
