@@ -157,8 +157,8 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
     func getUserProfile() -> DBPUIUserProfile? {
         let profile = profile ?? emptyProfile
 
-        let names = profile.names.map { DBPUIUserProfileName(first: $0.firstName, middle: $0.middleName ?? "", last: $0.lastName) }
-        let addresses = profile.addresses.map { DBPUIUserProfileAddress(street: $0.street ?? "", city: $0.city, state: $0.state, zipCode: $0.zipCode ?? "") }
+        let names = profile.names.map { DBPUIUserProfileName(first: $0.firstName, middle: $0.middleName, last: $0.lastName) }
+        let addresses = profile.addresses.map { DBPUIUserProfileAddress(street: $0.street, city: $0.city, state: $0.state, zipCode: $0.zipCode) }
 
         return DBPUIUserProfile(names: names, birthYear: profile.birthYear, addresses: addresses)
     }
@@ -179,12 +179,12 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
         return true
     }
 
-    func removeNameFromUserProfile(_ name: DBPUIUserProfileName) -> Bool {
+    func setNameAtIndexInCurrentUserProfile(_ payload: DBPUINameAtIndex) -> Bool {
         let profile = profile ?? emptyProfile
 
         var names = profile.names
-        if let idx = indexForName(matching: name, in: profile) {
-            names.remove(at: idx)
+        if payload.index < names.count {
+            names[payload.index] = DataBrokerProtectionProfile.Name(firstName: payload.name.first, lastName: payload.name.last, middleName: payload.name.middle)
             self.profile = DataBrokerProtectionProfile(names: names, addresses: profile.addresses, phones: profile.phones, birthYear: profile.birthYear)
             return true
         }
@@ -227,12 +227,13 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
         return true
     }
 
-    func removeAddressFromCurrentUserProfile(_ address: DBPUIUserProfileAddress) -> Bool {
+    func setAddressAtIndexInCurrentUserProfile(_ payload: DBPUIAddressAtIndex) -> Bool {
         let profile = profile ?? emptyProfile
 
         var addresses = profile.addresses
-        if let idx = addresses.firstIndex(where: { $0.street == address.street && $0.state == address.state && $0.city == address.city }) {
-            addresses.remove(at: idx)
+        if payload.index < addresses.count {
+            addresses[payload.index] = DataBrokerProtectionProfile.Address(city: payload.address.city, state: payload.address.state,
+                                                                           street: payload.address.street, zipCode: payload.address.zipCode)
             self.profile = DataBrokerProtectionProfile(names: profile.names, addresses: addresses, phones: profile.phones, birthYear: profile.birthYear)
             return true
         }

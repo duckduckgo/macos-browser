@@ -88,16 +88,16 @@ enum DBPUIScanAndOptOutStatus: String, Codable {
 /// Message Object representing a user profile name
 struct DBPUIUserProfileName: Codable {
     let first: String
-    let middle: String
+    let middle: String?
     let last: String
 }
 
 /// Message Object representing a user profile address
 struct DBPUIUserProfileAddress: Codable {
-    let street: String
+    let street: String?
     let city: String
     let state: String
-    let zipCode: String
+    let zipCode: String?
 }
 
 /// Message Object representing a user profile containing one or more names and addresses
@@ -112,6 +112,16 @@ struct DBPUIUserProfile: Codable {
 /// address that should be removed from a user profile
 struct DBPUIIndex: Codable {
     let index: Int
+}
+
+struct DBPUINameAtIndex: Codable {
+    let index: Int
+    let name: DBPUIUserProfileName
+}
+
+struct DBPUIAddressAtIndex: Codable {
+    let index: Int
+    let address: DBPUIUserProfileAddress
 }
 
 /// Message Object representing a data broker

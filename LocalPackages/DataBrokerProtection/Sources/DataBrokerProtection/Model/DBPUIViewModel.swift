@@ -106,18 +106,18 @@ final class DBPUIViewModel {
                         // Add as a pending removal profile
                         inProgress.append(DBPUIDataBrokerProfileMatch(
                             dataBroker: DBPUIDataBroker(name: profileQueryData.dataBroker.name),
-                            names: [DBPUIUserProfileName(first: optOutOperationData.extractedProfile.fullName ?? "", middle: "", last: "")],
+                            names: [DBPUIUserProfileName(first: optOutOperationData.extractedProfile.fullName ?? "", middle: nil, last: "")],
                             addresses: optOutOperationData.extractedProfile.addresses?.map {
-                                DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state, zipCode: "")
+                                DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state, zipCode: nil)
                             } ?? []
                         ))
                     } else {
                         // else add as removed profile
                         completed.append(DBPUIDataBrokerProfileMatch(
                             dataBroker: DBPUIDataBroker(name: profileQueryData.dataBroker.name),
-                            names: [DBPUIUserProfileName(first: optOutOperationData.extractedProfile.fullName ?? "", middle: "", last: "")],
+                            names: [DBPUIUserProfileName(first: optOutOperationData.extractedProfile.fullName ?? "", middle: nil, last: "")],
                             addresses: optOutOperationData.extractedProfile.addresses?.map {
-                                DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state, zipCode: "")
+                                DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state, zipCode: nil)
                             } ?? []
                         ))
                     }
