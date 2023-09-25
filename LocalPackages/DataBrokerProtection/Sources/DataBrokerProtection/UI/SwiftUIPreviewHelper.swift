@@ -38,7 +38,7 @@ final class PreviewDataManager: DataBrokerProtectionDataManaging {
 
     let cache = InMemoryDataCache()
 
-    init(fakeBrokerFlag: FakeBrokerFlag) { }
+    init(fakeBrokerFlag: DataBrokerDebugFlag) { }
 
     init() { }
 

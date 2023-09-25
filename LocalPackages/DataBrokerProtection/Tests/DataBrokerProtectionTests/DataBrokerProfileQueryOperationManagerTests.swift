@@ -17,6 +17,7 @@
 //
 
 import XCTest
+import BrowserServicesKit
 @testable import DataBrokerProtection
 
 final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
@@ -41,6 +42,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
@@ -61,6 +63,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id for broker")
@@ -80,6 +83,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertEqual(mockDatabase.eventsAdded.first?.type, .scanStarted)
@@ -99,6 +103,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .noMatchFound }))
@@ -109,6 +114,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
 
     func testWhenScannedProfileIsAlreadyInTheDatabase_noOptOutOperationIsCreated() async {
         do {
+            mockDatabase.extractedProfilesFromBroker = [.mockWithoutRemovedDate]
             mockWebOperationRunner.scanResults = [.mockWithoutRemovedDate]
             _ = try await sut.runScanOperation(
                 on: mockWebOperationRunner,
@@ -120,6 +126,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertFalse(mockDatabase.wasUpdateRemoveDateCalled)
@@ -132,6 +139,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
 
     func testWhenScannedProfileIsAlreadyInTheDatabaseAndWasRemoved_thenTheRemovedDateIsSetBackToNil() async {
         do {
+            mockDatabase.extractedProfilesFromBroker = [.mockWithRemovedDate]
             mockWebOperationRunner.scanResults = [.mockWithRemovedDate]
             _ = try await sut.runScanOperation(
                 on: mockWebOperationRunner,
@@ -143,6 +151,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.wasUpdateRemoveDateCalled)
@@ -165,6 +174,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.wasUpdateRemoveDateCalled)
@@ -187,6 +197,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.wasSaveOptOutOperationCalled)
@@ -208,6 +219,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutConfirmed }))
@@ -232,6 +244,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutConfirmed }))
@@ -256,6 +269,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Should throw!")
@@ -283,6 +297,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
@@ -305,6 +320,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
@@ -327,6 +343,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
@@ -349,6 +366,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertFalse(mockDatabase.wasDatabaseCalled)
@@ -371,6 +389,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutStarted }))
@@ -392,6 +411,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutRequested }))
@@ -414,6 +434,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Should throw!")
@@ -540,6 +561,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var lastPreferredRunDateOnScan: Date?
     var lastPreferredRunDateOnOptOut: Date?
     var extractedProfileRemovedDate: Date?
+    var extractedProfilesFromBroker = [ExtractedProfile]()
 
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
@@ -627,6 +649,17 @@ final class MockDatabase: DataBrokerProtectionRepository {
         false
     }
 
+    func fetchExtractedProfiles(for brokerId: Int64) -> [ExtractedProfile] {
+        return extractedProfilesFromBroker
+    }
+
+    func fetchAttemptInformation(for extractedProfileId: Int64) -> AttemptInformation? {
+        return nil
+    }
+
+    func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) {
+    }
+
     func clear() {
         wasSaveProfileCalled = false
         wasFetchProfileCalled = false
@@ -645,17 +678,19 @@ final class MockDatabase: DataBrokerProtectionRepository {
         lastPreferredRunDateOnScan = nil
         lastPreferredRunDateOnOptOut = nil
         extractedProfileRemovedDate = nil
+        extractedProfilesFromBroker.removeAll()
     }
 }
 
 final class MockWebOperationRunner: WebOperationRunner {
+
     var shouldScanThrow = false
     var shouldOptOutThrow = false
     var scanResults = [ExtractedProfile]()
     var wasScanCalled = false
     var wasOptOutCalled = false
 
-    func scan(_ profileQuery: BrokerProfileQueryData, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
+    func scan(_ profileQuery: BrokerProfileQueryData, stageCalculator: DataBrokerProtectionStageDurationCalculator, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
         wasScanCalled = true
 
         if shouldScanThrow {
@@ -665,7 +700,7 @@ final class MockWebOperationRunner: WebOperationRunner {
         }
     }
 
-    func optOut(profileQuery: DataBrokerProtection.BrokerProfileQueryData, extractedProfile: DataBrokerProtection.ExtractedProfile, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws {
+    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile, stageCalculator: DataBrokerProtectionStageDurationCalculator, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws {
         wasOptOutCalled = true
 
         if shouldOptOutThrow {

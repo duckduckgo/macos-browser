@@ -76,17 +76,11 @@ final class FirefoxBookmarksReader {
                 let allFolders = try FolderRow.fetchAll(database, sql: allFoldersQuery(), arguments: [tagsFolder?.id ?? 0])
 
                 let foldersByParent: [Int: [FolderRow]] = allFolders.reduce(into: [:]) { result, folder in
-                    var children: [FolderRow] = result[folder.parent] ?? []
-                    children.append(folder)
-
-                    result[folder.parent] = children
+                    result[folder.parent, default: []].append(folder)
                 }
 
                 let bookmarksByFolder: [Int: [BookmarkRow]] = allBookmarks.reduce(into: [:]) { result, bookmark in
-                    var children: [BookmarkRow] = result[bookmark.parent] ?? []
-                    children.append(bookmark)
-
-                    result[bookmark.parent] = children
+                    result[bookmark.parent, default: []].append(bookmark)
                 }
 
                 return DatabaseBookmarks(topLevelFolders: topLevelFolders, foldersByParent: foldersByParent, bookmarksByFolder: bookmarksByFolder)

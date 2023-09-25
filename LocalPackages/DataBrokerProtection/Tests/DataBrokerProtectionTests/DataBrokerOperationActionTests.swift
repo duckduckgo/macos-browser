@@ -26,6 +26,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
     let webViewHandler = WebViewHandlerMock()
     let emailService = EmailServiceMock()
     let captchaService = CaptchaServiceMock()
+    let stageCalulator = DataBrokerProtectionStageDurationCalculator(dataBroker: "broker", handler: MockDataBrokerProtectionPixelsHandler())
 
     override func tearDown() async throws {
         webViewHandler.reset()
@@ -47,7 +48,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
         )
 
         do {
-            _ = try await sut.run(inputValue: extractedProfile, webViewHandler: webViewHandler)
+            _ = try await sut.run(inputValue: extractedProfile, webViewHandler: webViewHandler, stageCalculator: stageCalulator)
             XCTAssertEqual(webViewHandler.wasLoadCalledWithURL?.absoluteString, "https://www.duckduckgo.com")
             XCTAssertTrue(webViewHandler.wasFinishCalled)
         } catch {
@@ -69,7 +70,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
         )
 
         do {
-            _ = try await sut.run(inputValue: noEmailExtractedProfile, webViewHandler: webViewHandler)
+            _ = try await sut.run(inputValue: noEmailExtractedProfile, webViewHandler: webViewHandler, stageCalculator: stageCalulator)
             XCTFail("Expected an error to be thrown")
         } catch {
             XCTAssertNil(webViewHandler.wasLoadCalledWithURL?.absoluteString)
@@ -98,7 +99,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
         )
 
         do {
-            _ = try await sut.run(inputValue: extractedProfile, webViewHandler: webViewHandler)
+            _ = try await sut.run(inputValue: extractedProfile, webViewHandler: webViewHandler, stageCalculator: stageCalulator)
             XCTFail("Expected an error to be thrown")
         } catch {
             XCTAssertNil(webViewHandler.wasLoadCalledWithURL?.absoluteString)
@@ -146,7 +147,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
         emailService.shouldThrow = true
 
         do {
-            _ = try await sut.run(inputValue: ExtractedProfile(), webViewHandler: webViewHandler)
+            _ = try await sut.run(inputValue: ExtractedProfile(), webViewHandler: webViewHandler, stageCalculator: stageCalulator)
             XCTFail("Expected an error to be thrown")
         } catch {
             XCTAssertTrue(webViewHandler.wasFinishCalled)
@@ -229,7 +230,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
         captchaService.shouldThrow = true
 
         do {
-            _ = try await sut.run(inputValue: ExtractedProfile(), webViewHandler: webViewHandler, actionsHandler: actionsHandler)
+            _ = try await sut.run(inputValue: ExtractedProfile(), webViewHandler: webViewHandler, actionsHandler: actionsHandler, stageCalculator: stageCalulator)
             XCTFail("Expected an error to be thrown")
         } catch {
             if let error = error as? DataBrokerProtectionError, case .captchaServiceError(.nilDataWhenFetchingCaptchaResult) = error {

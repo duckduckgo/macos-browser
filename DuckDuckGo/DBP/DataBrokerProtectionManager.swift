@@ -27,7 +27,7 @@ public final class DataBrokerProtectionManager {
     private let authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData()
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
-    private let fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()
+    private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
 
     lazy var dataManager: DataBrokerProtectionDataManager = {
         DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
@@ -70,7 +70,7 @@ public final class DataBrokerProtectionManager {
     }
 
     public func runOperationsAndStartSchedulerIfPossible() {
-        guard !redeemUseCase.shouldAskForInviteCode() else { return }
+        guard !redeemUseCase.shouldAskForInviteCode() && !DataBrokerDebugFlagBlockScheduler().isFlagOn() else { return }
 
         // If there's no saved profile we don't need to start the scheduler
         if dataManager.fetchProfile() != nil {
