@@ -1225,7 +1225,13 @@ CQ
                                                 </connections>
                                             </menu>
                                         </menuItem>
-                                        <menuItem title="Trigger Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">
+                                        <menuItem title="Open App Container in Finder" id="rUh-SZ-Ens">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="openAppContainerInFinder:" target="Ady-hI-5gd" id="Wub-im-mcf"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Trigger Fatal Error" id="FeS-hb-rvM">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="triggerFatalError:" target="Ady-hI-5gd" id="pS0-iQ-TPe"/>
