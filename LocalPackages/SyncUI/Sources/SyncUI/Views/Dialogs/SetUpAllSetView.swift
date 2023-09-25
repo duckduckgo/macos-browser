@@ -1,5 +1,5 @@
 //
-//  AskToSyncAnotherDeviceView.swift
+//  SetUpAllSetView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,31 +19,31 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct AskToSyncAnotherDeviceView<ViewModel>: View where ViewModel: ManagementDialogModel {
-
-    @EnvironmentObject var model: ViewModel
+struct SetUpAllSetView: View {
+    @EnvironmentObject var model: ManagementDialogModel
 
     var body: some View {
         SyncDialog {
-            VStack(spacing: 20) {
-                Image("SyncAnotherDeviceDialog")
-                Text(UserText.syncAnotherDeviceTitle)
+            VStack(spacing: 20.0) {
+                Image("Sync-setup-success")
+                Text(UserText.allSetDialogTitle)
                     .font(.system(size: 17, weight: .bold))
-                Text(UserText.syncAnotherDeviceExplanation1)
-                    .multilineTextAlignment(.center)
-                Text(UserText.syncAnotherDeviceExplanation2)
-                    .multilineTextAlignment(.center)
+                Text(UserText.allSetDialogCaption1)
+                +
+                Text(UserText.allSetDialogCaption2)
+                    .fontWeight(.bold)
+                +
+                Text(UserText.allSetDialogCaption3)
+                +
+                Text(UserText.allSetDialogCaption4)
+                    .fontWeight(.bold)
             }
         } buttons: {
-            Button(UserText.notNow) {
-//                model.delegate?.dontSyncAnotherDeviceNow()
-                model.endFlow()
-            }
-            Button(UserText.syncAnotherDevice) {
-                model.delegate?.presentSyncAnotherDeviceDialog()
+            Button(UserText.next) {
+                model.delegate?.presentSaveRecoveryPDF()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
-        .frame(width: 360, height: 314)
+        .frame(height: 266)
     }
 }

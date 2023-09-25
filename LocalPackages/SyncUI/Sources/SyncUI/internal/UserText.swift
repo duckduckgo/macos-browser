@@ -73,6 +73,12 @@ enum UserText {
     static let recoveryInstructions = NSLocalizedString("prefrences.sync.recovery-instructions", value: "If you lose your device, you will need this recovery code to restore your synced data.", comment: "Instructions on how to restore synced data")
     static let saveRecoveryPDF = NSLocalizedString("prefrences.sync.save-recovery-pdf", value: "Save Recovery PDF", comment: "Caption for a button to save Sync recovery PDF")
 
+    static let allSetDialogTitle = NSLocalizedString("prefrences.sync.all-set-dyalog-title", value: "All Set!", comment: "Title for all set dialog title")
+    static let allSetDialogCaption1 = NSLocalizedString("prefrences.all-set-dyalog-caption-1", value: "You can sync this device’s bookmarks and Logins with additional devices at any time from the ", comment: "Caption for all set dialog 1")
+    static let allSetDialogCaption2 = NSLocalizedString("prefrences.all-set-dyalog-caption-2", value: "Sync & Back Up ", comment: "Caption for all set dialog 2")
+    static let allSetDialogCaption3 = NSLocalizedString("prefrences.all-set-dyalog-caption-3", value: "menu in ", comment: "Caption for all set dialog 3")
+    static let allSetDialogCaption4 = NSLocalizedString("prefrences.all-set-dyalog-caption-4", value: "Settings.", comment: "Caption for all set dialog 4")
+
     static let turnOnSyncQuestion = NSLocalizedString("preferences.sync.turn-on-question", value: "Turn on Sync?", comment: "Sync setup dialog title")
     static let turnOnSyncExplanation1 = NSLocalizedString("preferences.sync.turn-on-explanation1", value: "This will save an encrypted backup of your bookmarks and Autofill logins on DuckDuckGo’s servers, which can be synced with your other devices.", comment: "Sync setup dialog content")
     static let turnOnSyncExplanation2 = NSLocalizedString("preferences.sync.turn-on-explanation2", value: "The decryption key is stored on your device and cannot be read by DuckDuckGo.", comment: "Sync setup dialog content")

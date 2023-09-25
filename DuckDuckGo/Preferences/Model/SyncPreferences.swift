@@ -280,12 +280,12 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         presentDialog(for: .deviceSynced(syncedDevices))
     }
 
-    @MainActor
-    func turnOnSync() {
-        presentDialog(for: .askToSyncAnotherDevice)
-    }
+//    @MainActor
+//    func turnOnSync() {
+//        presentDialog(for: .askToSyncAnotherDevice)
+//    }
 
-    func dontSyncAnotherDeviceNow() {
+    func turnOnSync() {
         Task { @MainActor in
             isCreatingAccount = true
             defer {
@@ -300,6 +300,22 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             }
         }
     }
+
+//    func dontSyncAnotherDeviceNow() {
+//        Task { @MainActor in
+//            isCreatingAccount = true
+//            defer {
+//                isCreatingAccount = false
+//            }
+//            do {
+//                let device = deviceInfo()
+//                try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+//                confirmSetupComplete()
+//            } catch {
+//                managementDialogModel.errorMessage = String(describing: error)
+//            }
+//        }
+//    }
 
     func recoverDevice(using recoveryCode: String) {
         Task { @MainActor in
@@ -355,6 +371,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     @MainActor
     func confirmSetupComplete() {
+        presentDialog(for: .setUpAllSet)
+    }
+
+    @MainActor
+    func presentSaveRecoveryPDF() {
         presentDialog(for: .saveRecoveryPDF)
     }
 
