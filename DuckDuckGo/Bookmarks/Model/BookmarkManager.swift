@@ -286,6 +286,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Favicons
 
+    @MainActor(unsafe)
     private func favicon(for host: String?) -> NSImage? {
         if let host = host {
             return faviconManagement.getCachedFavicon(for: host, sizeCategory: .small)?.image

@@ -1,5 +1,5 @@
 //
-//  FaviconManagerTests.swift
+//  ResultExtension.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,16 +16,23 @@
 //  limitations under the License.
 //
 
-import XCTest
-import Combine
-@testable import DuckDuckGo_Privacy_Browser
+import Foundation
 
-@MainActor
-class FaviconManagerTests: XCTestCase {
+extension Result where Failure == Error {
 
-    func testWhenFaviconManagerIsInMemory_ThenItMustInitNullStore() {
-        let faviconManager = FaviconManager(cacheType: .inMemory)
-        XCTAssertNotNil(faviconManager.store as? FaviconNullStore)
+    init(catching expr: () async throws -> Success) async {
+        do {
+            self = try await .success(expr())
+        } catch {
+            self = .failure(error)
+        }
+    }
+
+    var error: Error? {
+        if case .failure(let error) = self {
+            return error
+        }
+        return nil
     }
 
 }

@@ -21,13 +21,12 @@ import Combine
 import Common
 import BrowserServicesKit
 
+@MainActor
 final class FaviconImageCache {
 
     private let storing: FaviconStoring
 
     private var entries = [URL: Favicon]()
-
-    private var cancellables = Set<AnyCancellable>()
 
     init(faviconStoring: FaviconStoring) {
         storing = faviconStoring
@@ -35,131 +34,140 @@ final class FaviconImageCache {
 
     private(set) var loaded = false
 
-    func loadFavicons(completionHandler: ((Error?) -> Void)? = nil) {
-        storing.loadFavicons()
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    os_log("Favicons loaded successfully", log: .favicons)
-                    completionHandler?(nil)
-                case .failure(let error):
-                    os_log("Loading of favicons failed: %s", log: .favicons, type: .error, error.localizedDescription)
-                    completionHandler?(error)
-                }
-            }, receiveValue: { [weak self] favicons in
-                favicons.forEach { favicon in
-                    self?.entries[favicon.url] = favicon
-                }
-                self?.loaded = true
-            })
-            .store(in: &self.cancellables)
+    nonisolated func loadFavicons(completionHandler: ((Error?) -> Void)? = nil) {
+        Task.run(operation: {
+            try await self.load()
+        }, completionHandler: completionHandler.map { completionHandler in
+            { result in // swiftlint:disable:this opening_brace
+                completionHandler(result.error)
+            }
+        })
     }
 
-    func insert(_ favicon: Favicon) {
+    func load() async throws {
+        let favicons: [Favicon]
+        do {
+            favicons = try await storing.loadFavicons()
+            os_log("Favicons loaded successfully", log: .favicons)
+        } catch {
+            os_log("Loading of favicons failed: %s", log: .favicons, type: .error, error.localizedDescription)
+            throw error
+        }
+
+        for favicon in favicons {
+            entries[favicon.url] = favicon
+        }
+        loaded = true
+    }
+
+    func insert(_ favicons: [Favicon]) {
         guard loaded else { return }
 
         // Remove existing favicon with the same URL
-        if let oldFavicon = entries[favicon.url] {
-            removeFaviconsFromStore([oldFavicon])
+        let oldFavicons = favicons.compactMap { entries[$0.url] }
+
+        // Save the new ones
+        for favicon in favicons {
+            entries[favicon.url] = favicon
         }
 
-        // Save the new one
-        entries[favicon.url] = favicon
-        storing.save(favicon: favicon)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    os_log("Favicon saved successfully. URL: %s", log: .favicons, favicon.url.absoluteString)
+        Task {
+            do {
+                await removeFaviconsFromStore(oldFavicons)
+                try await storing.save(favicons)
+                os_log("Favicon saved successfully. URL: %s", log: .favicons, favicons.map(\.url.absoluteString))
+                await MainActor.run {
                     NotificationCenter.default.post(name: .faviconCacheUpdated, object: nil)
-                case .failure(let error):
-                    os_log("Saving of favicon failed: %s", log: .favicons, type: .error, error.localizedDescription)
                 }
-            }, receiveValue: {})
-            .store(in: &self.cancellables)
+            } catch {
+                os_log("Saving of favicon failed: %s", log: .favicons, type: .error, error.localizedDescription)
+            }
+        }
     }
 
     func get(faviconUrl: URL) -> Favicon? {
-        guard loaded else {
-            return nil
-        }
+        guard loaded else { return nil }
 
         return entries[faviconUrl]
     }
 
+    func getFavicons(with urls: some Sequence<URL>) -> [Favicon]? {
+        guard loaded else { return nil }
+
+        return urls.compactMap { faviconUrl in entries[faviconUrl] }
+    }
+
     // MARK: - Clean
 
-    func cleanOldExcept(fireproofDomains: FireproofDomains,
-                        bookmarkManager: BookmarkManager,
-                        completion: @escaping () -> Void) {
-        removeFavicons(filter: { favicon in
-            guard let host = favicon.documentUrl.host else {
-                return false
-            }
-            return favicon.dateCreated < Date.monthAgo &&
+    nonisolated func cleanOldExcept(fireproofDomains: FireproofDomains,
+                                    bookmarkManager: BookmarkManager,
+                                    completion: @escaping () -> Void) {
+        Task.run(operation: {
+            await self.removeFavicons(filter: { favicon in
+                guard let host = favicon.documentUrl.host else {
+                    return false
+                }
+                return favicon.dateCreated < Date.monthAgo &&
                 !fireproofDomains.isFireproof(fireproofDomain: host) &&
                 !bookmarkManager.isHostInBookmarks(host: host)
+            })
         }, completionHandler: completion)
     }
 
     // MARK: - Burning
 
-    func burnExcept(fireproofDomains: FireproofDomains,
-                    bookmarkManager: BookmarkManager,
-                    savedLogins: Set<String>,
-                    completion: @escaping () -> Void) {
-        removeFavicons(filter: { favicon in
-            guard let host = favicon.documentUrl.host else {
-                return false
-            }
-            return !(fireproofDomains.isFireproof(fireproofDomain: host) ||
-                     bookmarkManager.isHostInBookmarks(host: host) ||
-                     savedLogins.contains(host)
-            )
+    nonisolated func burnExcept(fireproofDomains: FireproofDomains,
+                                bookmarkManager: BookmarkManager,
+                                savedLogins: Set<String>,
+                                completion: @escaping () -> Void) {
+        Task.run(operation: {
+            await self.removeFavicons(filter: { favicon in
+                guard let host = favicon.documentUrl.host else {
+                    return false
+                }
+                return !(fireproofDomains.isFireproof(fireproofDomain: host) ||
+                         bookmarkManager.isHostInBookmarks(host: host) ||
+                         savedLogins.contains(host)
+                )
+            })
         }, completionHandler: completion)
     }
 
-    func burnDomains(_ baseDomains: Set<String>,
-                     exceptBookmarks bookmarkManager: BookmarkManager,
-                     exceptSavedLogins logins: Set<String>,
-                     exceptHistoryDomains history: Set<String>,
-                     tld: TLD,
-                     completion: @escaping () -> Void) {
-        removeFavicons(filter: { favicon in
-            guard let host = favicon.documentUrl.host, let baseDomain = tld.eTLDplus1(host) else {
-                return false
-            }
-            return baseDomains.contains(baseDomain) &&
-            !bookmarkManager.isHostInBookmarks(host: host) &&
-            !logins.contains(host) &&
-            !history.contains(host)
+    nonisolated func burnDomains(_ baseDomains: Set<String>,
+                                 exceptBookmarks bookmarkManager: BookmarkManager,
+                                 exceptSavedLogins logins: Set<String>,
+                                 exceptHistoryDomains history: Set<String>,
+                                 tld: TLD,
+                                 completion: @escaping () -> Void) {
+        Task.run(operation: {
+            await self.removeFavicons(filter: { favicon in
+                guard let host = favicon.documentUrl.host, let baseDomain = tld.eTLDplus1(host) else { return false }
+                return baseDomains.contains(baseDomain)
+                    && !bookmarkManager.isHostInBookmarks(host: host)
+                    && !logins.contains(host)
+                    && !history.contains(host)
+            })
         }, completionHandler: completion)
     }
 
     // MARK: - Private
 
-    private func removeFavicons(filter isRemoved: (Favicon) -> Bool, completionHandler: (() -> Void)? = nil) {
+    private func removeFavicons(filter isRemoved: (Favicon) -> Bool) async {
         let faviconsToRemove = entries.values.filter(isRemoved)
         faviconsToRemove.forEach { entries[$0.url] = nil }
 
-        removeFaviconsFromStore(faviconsToRemove, completionHandler: completionHandler)
+        await removeFaviconsFromStore(faviconsToRemove)
     }
 
-    private func removeFaviconsFromStore(_ favicons: [Favicon], completionHandler: (() -> Void)? = nil) {
-        guard !favicons.isEmpty else { completionHandler?(); return }
+    private nonisolated func removeFaviconsFromStore(_ favicons: [Favicon]) async {
+        guard !favicons.isEmpty else { return }
 
-        storing.removeFavicons(favicons)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    os_log("Favicons removed successfully.", log: .favicons)
-                case .failure(let error):
-                    os_log("Removing of favicons failed: %s", log: .favicons, type: .error, error.localizedDescription)
-                }
-                completionHandler?()
-            }, receiveValue: {})
-            .store(in: &self.cancellables)
+        do {
+            try await storing.removeFavicons(favicons)
+            os_log("Favicons removed successfully.", log: .favicons)
+        } catch {
+            os_log("Removing of favicons failed: %s", log: .favicons, type: .error, error.localizedDescription)
+        }
     }
+
 }

@@ -21,15 +21,16 @@ import Combine
 import BrowserServicesKit
 import Common
 
+@MainActor
 protocol FaviconManagement: AnyObject {
 
     var areFaviconsLoaded: Bool { get }
 
     func loadFavicons()
 
-    func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL, completion: @escaping (Favicon?) -> Void)
+    func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL, completion: @escaping @MainActor (Favicon?) -> Void)
 
-    func handleFavicons(_ favicons: [Favicon], documentUrl: URL)
+    func handleFaviconsByDocumentUrl(_ faviconsByDocumentUrl: [URL: [Favicon]])
 
     func getCachedFavicon(for documentUrl: URL, sizeCategory: Favicon.SizeCategory) -> Favicon?
 
@@ -37,17 +38,18 @@ protocol FaviconManagement: AnyObject {
 
     func getCachedFavicon(forDomainOrAnySubdomain domain: String, sizeCategory: Favicon.SizeCategory) -> Favicon?
 
-    func burnExcept(fireproofDomains: FireproofDomains, bookmarkManager: BookmarkManager, savedLogins: Set<String>, completion: @escaping () -> Void)
+    func burnExcept(fireproofDomains: FireproofDomains, bookmarkManager: BookmarkManager, savedLogins: Set<String>, completion: @escaping @MainActor () -> Void)
 
     func burnDomains(_ domains: Set<String>,
                      exceptBookmarks bookmarkManager: BookmarkManager,
                      exceptSavedLogins: Set<String>,
                      exceptExistingHistory history: History,
                      tld: TLD,
-                     completion: @escaping () -> Void)
+                     completion: @escaping @MainActor () -> Void)
 
 }
 
+@MainActor
 final class FaviconManager: FaviconManagement {
 
     static let shared = FaviconManager(cacheType: .standard)
@@ -78,7 +80,7 @@ final class FaviconManager: FaviconManagement {
 
     @Published var faviconsLoaded = false
 
-    func loadFavicons() {
+    nonisolated func loadFavicons() {
         imageCache.loadFavicons { _ in
             self.imageCache.cleanOldExcept(fireproofDomains: FireproofDomains.shared,
                                            bookmarkManager: LocalBookmarkManager.shared) {
@@ -97,74 +99,64 @@ final class FaviconManager: FaviconManagement {
 
     // MARK: - Fetching & Cache
 
-    private var imageCache: FaviconImageCache
-    private var referenceCache: FaviconReferenceCache
+    private let imageCache: FaviconImageCache
+    private let referenceCache: FaviconReferenceCache
 
-    func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink],
-                            documentUrl: URL,
-                            completion: @escaping (Favicon?) -> Void) {
+    nonisolated func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink],
+                                        documentUrl: URL,
+                                        completion: @escaping @MainActor (Favicon?) -> Void) {
+        Task.run {
+            // Manually add favicon.ico into links
+            let faviconLinks = self.createFallbackLinksIfNeeded(faviconLinks, documentUrl: documentUrl)
 
-        // Manually add favicon.ico into links
-        let faviconLinks = createFallbackLinksIfNeeded(faviconLinks, documentUrl: documentUrl)
-
-        // Fetch favicons if needed
-        let faviconLinksToFetch = filteringAlreadyFetchedFaviconLinks(from: faviconLinks)
-        fetchFavicons(faviconLinks: faviconLinksToFetch, documentUrl: documentUrl) { [weak self] newFavicons in
-            guard let self = self else { return }
+            // Fetch favicons if needed
+            let faviconLinksToFetch = await self.filteringAlreadyFetchedFaviconLinks(from: faviconLinks)
+            let newFavicons = await self.fetchFavicons(faviconLinks: faviconLinksToFetch, documentUrl: documentUrl)
 
             // Insert new favicons to cache
-            newFavicons.forEach { newFavicon in
-                self.imageCache.insert(newFavicon)
-            }
+            await self.imageCache.insert(newFavicons)
 
             // Pick most suitable favicons
-            let cachedFavicons: [Favicon] = faviconLinks
-                .compactMap { faviconLink -> Favicon? in
-                    guard let faviconUrl = URL(string: faviconLink.href) else {
-                        return nil
-                    }
+            let weekAgo = Date.weekAgo
 
-                    if let favicon = self.imageCache.get(faviconUrl: faviconUrl), favicon.dateCreated > Date.weekAgo {
-                        return favicon
-                    }
-
-                    return nil
+            let cachedFavicons = await self.imageCache.getFavicons(with: faviconLinks.lazy.compactMap { URL(string: $0.href) })?
+                .filter { favicon in
+                    favicon.dateCreated > weekAgo
                 }
 
-            let favicon = self.handleFaviconReferenceCacheInsertion(documentURL: documentUrl,
-                                                                    cachedFavicons: cachedFavicons,
-                                                                    newFavicons: newFavicons)
+            let favicon = await self.handleFaviconReferenceCacheInsertion(documentURL: documentUrl,
+                                                                          cachedFavicons: cachedFavicons ?? [],
+                                                                          newFavicons: newFavicons)
 
+            return favicon
+
+        } completionHandler: { favicon in
             completion(favicon)
         }
     }
 
-    func handleFavicons(_ newFavicons: [Favicon], documentUrl: URL) {
+    func handleFaviconsByDocumentUrl(_ faviconsByDocumentUrl: [URL: [Favicon]]) {
         // Insert new favicons to cache
-        newFavicons.forEach { newFavicon in
-            self.imageCache.insert(newFavicon)
-        }
-
-        let faviconLinks = newFavicons.map(\.url)
+        self.imageCache.insert(faviconsByDocumentUrl.values.reduce([], +))
 
         // Pick most suitable favicons
-        let cachedFavicons: [Favicon] = faviconLinks.compactMap { faviconLink -> Favicon? in
-            if let favicon = self.imageCache.get(faviconUrl: faviconLink), favicon.dateCreated > Date.weekAgo {
-                return favicon
-            }
+        for (documentUrl, newFavicons) in faviconsByDocumentUrl {
+            let weekAgo = Date.weekAgo
+            let cachedFavicons = self.imageCache.getFavicons(with: newFavicons.lazy.map(\.url))?
+                .filter { favicon in
+                    favicon.dateCreated > weekAgo
+                }
 
-            return nil
+            self.handleFaviconReferenceCacheInsertion(documentURL: documentUrl, cachedFavicons: cachedFavicons ?? [], newFavicons: newFavicons)
         }
-
-        handleFaviconReferenceCacheInsertion(documentURL: documentUrl, cachedFavicons: cachedFavicons, newFavicons: newFavicons)
     }
 
     @discardableResult
     private func handleFaviconReferenceCacheInsertion(documentURL: URL, cachedFavicons: [Favicon], newFavicons: [Favicon]) -> Favicon? {
-        let noFaviconPickedYet = self.referenceCache.getFaviconUrl(for: documentURL, sizeCategory: .small) == nil
+        let noFaviconPickedYet = referenceCache.getFaviconUrl(for: documentURL, sizeCategory: .small) == nil
         let newFaviconLoaded = !newFavicons.isEmpty
-        let currentSmallFaviconUrl = self.referenceCache.getFaviconUrl(for: documentURL, sizeCategory: .small)
-        let currentMediumFaviconUrl = self.referenceCache.getFaviconUrl(for: documentURL, sizeCategory: .medium)
+        let currentSmallFaviconUrl = referenceCache.getFaviconUrl(for: documentURL, sizeCategory: .small)
+        let currentMediumFaviconUrl = referenceCache.getFaviconUrl(for: documentURL, sizeCategory: .medium)
         let cachedFaviconUrls = cachedFavicons.map {$0.url}
         let faviconsOutdated: Bool = {
             if let currentSmallFaviconUrl = currentSmallFaviconUrl, !cachedFaviconUrls.contains(currentSmallFaviconUrl) {
@@ -182,11 +174,11 @@ final class FaviconManager: FaviconManagement {
             let sortedCachedFavicons = cachedFavicons.sorted(by: { $0.longestSide < $1.longestSide })
             let mediumFavicon = FaviconSelector.getMostSuitableFavicon(for: .medium, favicons: sortedCachedFavicons)
             let smallFavicon = FaviconSelector.getMostSuitableFavicon(for: .small, favicons: sortedCachedFavicons)
-            self.referenceCache.insert(faviconUrls: (smallFavicon?.url, mediumFavicon?.url), documentUrl: documentURL)
+            referenceCache.insert(faviconUrls: (smallFavicon?.url, mediumFavicon?.url), documentUrl: documentURL)
             return smallFavicon
         } else {
             guard let currentSmallFaviconUrl = currentSmallFaviconUrl,
-                  let cachedFavicon = self.imageCache.get(faviconUrl: currentSmallFaviconUrl) else {
+                  let cachedFavicon = imageCache.get(faviconUrl: currentSmallFaviconUrl) else {
                       return nil
                   }
 
@@ -228,10 +220,10 @@ final class FaviconManager: FaviconManagement {
 
     // MARK: - Burning
 
-    func burnExcept(fireproofDomains: FireproofDomains,
-                    bookmarkManager: BookmarkManager,
-                    savedLogins: Set<String> = [],
-                    completion: @escaping () -> Void) {
+    nonisolated func burnExcept(fireproofDomains: FireproofDomains,
+                                bookmarkManager: BookmarkManager,
+                                savedLogins: Set<String> = [],
+                                completion: @escaping @MainActor () -> Void) {
         self.referenceCache.burnExcept(fireproofDomains: fireproofDomains,
                                        bookmarkManager: bookmarkManager,
                                        savedLogins: savedLogins) {
@@ -243,12 +235,12 @@ final class FaviconManager: FaviconManagement {
         }
     }
 
-    func burnDomains(_ baseDomains: Set<String>,
-                     exceptBookmarks bookmarkManager: BookmarkManager,
-                     exceptSavedLogins: Set<String> = [],
-                     exceptExistingHistory history: History,
-                     tld: TLD,
-                     completion: @escaping () -> Void) {
+    nonisolated func burnDomains(_ baseDomains: Set<String>,
+                                 exceptBookmarks bookmarkManager: BookmarkManager,
+                                 exceptSavedLogins: Set<String> = [],
+                                 exceptExistingHistory history: History,
+                                 tld: TLD,
+                                 completion: @escaping @MainActor () -> Void) {
         let existingHistoryDomains = Set(history.compactMap { $0.url.host })
 
         self.referenceCache.burnDomains(baseDomains, exceptBookmarks: bookmarkManager,
@@ -269,7 +261,7 @@ final class FaviconManager: FaviconManagement {
 
     // MARK: - Private
 
-    private func createFallbackLinksIfNeeded(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL) -> [FaviconUserScript.FaviconLink] {
+    private nonisolated func createFallbackLinksIfNeeded(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL) -> [FaviconUserScript.FaviconLink] {
         guard faviconLinks.isEmpty, let host = documentUrl.host else { return faviconLinks }
         return [
             FaviconUserScript.FaviconLink(href: "\(URL.NavigationalScheme.https.separated())\(host)/favicon.ico",
@@ -277,56 +269,46 @@ final class FaviconManager: FaviconManagement {
         ]
     }
 
-    private func filteringAlreadyFetchedFaviconLinks(from faviconLinks: [FaviconUserScript.FaviconLink]) -> [FaviconUserScript.FaviconLink] {
-        return faviconLinks.filter { faviconLink in
-            guard let faviconUrl = URL(string: faviconLink.href) else {
-                return false
+    private nonisolated func filteringAlreadyFetchedFaviconLinks(from faviconLinks: [FaviconUserScript.FaviconLink]) async -> [FaviconUserScript.FaviconLink] {
+        let map = faviconLinks.reduce(into: [URL: FaviconUserScript.FaviconLink]()) { result, faviconLink in
+            guard let url = URL(string: faviconLink.href) else { return }
+            result[url] = faviconLink
+        }
+        let weekAgo = Date.weekAgo
+        let cachedFavicons = await self.imageCache.getFavicons(with: map.keys)?
+            .filter { favicon in
+                favicon.dateCreated > weekAgo
             }
 
-            if let favicon = imageCache.get(faviconUrl: faviconUrl), favicon.dateCreated > Date.weekAgo {
-                return false
-            } else {
-                return true
-            }
-        }
+        return cachedFavicons?.compactMap { map[$0.url] } ?? []
     }
 
-    private func fetchFavicons(faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL, completion: @escaping ([Favicon]) -> Void) {
-        guard !faviconLinks.isEmpty else {
-            completion([])
-            return
-        }
+    private nonisolated func fetchFavicons(faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL) async -> [Favicon] {
+        guard !faviconLinks.isEmpty else { return [] }
 
-        let group = DispatchGroup()
-        var favicons = [Favicon]()
+        return await withTaskGroup(of: Favicon?.self) { [faviconURLSession] group in
+            for faviconLink in faviconLinks {
+                guard let faviconUrl = URL(string: faviconLink.href) else { continue }
+                group.addTask {
+                    guard let data = try? await faviconURLSession.data(from: faviconUrl).0 else { return nil }
 
-        faviconLinks.forEach { faviconLink in
-            guard let faviconUrl = URL(string: faviconLink.href) else {
-                return
+                    let favicon = Favicon(identifier: UUID(),
+                                          url: faviconUrl,
+                                          image: NSImage(data: data),
+                                          relationString: faviconLink.rel,
+                                          documentUrl: documentUrl,
+                                          dateCreated: Date())
+                    return favicon
+                }
+            }
+            var favicons = [Favicon]()
+            for await result in group {
+                if let favicon = result {
+                    favicons.append(favicon)
+                }
             }
 
-            group.enter()
-            faviconURLSession.dataTask(with: faviconUrl) { data, _, error in
-                guard let data = data, error == nil else {
-                    group.leave()
-                    return
-                }
-
-                let favicon = Favicon(identifier: UUID(),
-                                      url: faviconUrl,
-                                      image: NSImage(data: data),
-                                      relationString: faviconLink.rel,
-                                      documentUrl: documentUrl,
-                                      dateCreated: Date())
-                DispatchQueue.main.async {
-                    favicons.append(favicon)
-                    group.leave()
-                }
-            }.resume()
-        }
-
-        group.notify(queue: .main) {
-            completion(favicons)
+            return favicons
         }
     }
 }

@@ -204,7 +204,7 @@ final class Fire {
 
             group.enter()
             self.burnTabs(burningEntity: .allWindows(mainWindowControllers: windowControllers, selectedDomains: Set())) {
-                Task {
+                Task { @MainActor in
                     await self.burnWebCache()
                     self.burnHistory {
                         self.burnPermissions {
@@ -390,6 +390,7 @@ final class Fire {
         return Set(accounts.compactMap { $0.domain })
     }
 
+    @MainActor
     private func burnFavicons(completion: @escaping () -> Void) {
         let autofillDomains = autofillDomains()
         self.faviconManagement.burnExcept(fireproofDomains: FireproofDomains.shared,
@@ -398,6 +399,7 @@ final class Fire {
                                           completion: completion)
     }
 
+    @MainActor
     private func burnFavicons(for baseDomains: Set<String>, completion: @escaping () -> Void) {
         let autofillDomains = autofillDomains()
         self.faviconManagement.burnDomains(baseDomains,

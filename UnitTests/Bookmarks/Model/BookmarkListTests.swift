@@ -135,6 +135,7 @@ final class BookmarkListTests: XCTestCase {
 
 fileprivate extension Bookmark {
 
+    @MainActor(unsafe)
     static var aBookmark: Bookmark = Bookmark(id: UUID().uuidString,
                                               url: URL.duckDuckGo.absoluteString,
                                               title: "Title",
