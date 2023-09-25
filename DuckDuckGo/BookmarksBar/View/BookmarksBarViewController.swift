@@ -158,6 +158,7 @@ final class BookmarksBarViewController: NSViewController {
     }
 
     private func refreshFavicons() {
+        dispatchPrecondition(condition: .onQueue(.main))
         bookmarksBarCollectionView.reloadData()
     }
 
