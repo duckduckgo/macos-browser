@@ -49,8 +49,21 @@ public class AccountKeychainStorage: AccountServiceStorage {
         try Self.set(string: token, forField: .token)
     }
 
-    public func clearToken() throws {
+    public func getEmail() throws -> String? {
+        try Self.getString(forField: .email)
+    }
+
+    public func store(email: String?) throws {
+        if let email = email, !email.isEmpty {
+            try Self.set(string: email, forField: .email)
+        } else {
+            try Self.deleteItem(forField: .email)
+        }
+    }
+
+    public func clearAll() throws {
         try Self.deleteItem(forField: .token)
+        try Self.deleteItem(forField: .email)
     }
 
 }
@@ -63,6 +76,7 @@ private extension AccountKeychainStorage {
     */
     enum AccountKeychainField: String, CaseIterable {
         case token = "account.token"
+        case email = "account.email"
 
         var keyValue: String {
             (Bundle.main.bundleIdentifier ?? "com.duckduckgo") + "." + rawValue

@@ -738,7 +738,7 @@ extension MainViewController {
     }
 
     @IBAction func simulateAccountSignIn(_ sender: Any?) {
-        AccountManager().storeToken("aaa")
+        AccountManager().storeAccount(token: "fake-token", email: "fake@email.com")
     }
 
     @IBAction func simulateAccountSignOut(_ sender: Any?) {
@@ -771,7 +771,7 @@ extension MainViewController {
                 switch await AccountsService.storeLogin(payload: payload, signature: jwsRepresentation) {
                 case .success(let response):
                     print("\(response)")
-                    AccountManager().storeToken(response.authToken)
+                    AccountManager().storeAccount(token: response.authToken, email: response.email)
                 case .failure(let error):
                     print("Error: \(error)")
                 }

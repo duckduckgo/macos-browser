@@ -63,7 +63,7 @@ extension Preferences {
                                             switch await AccountsService.storeLogin(payload: payload, signature: jwsRepresentation) {
                                             case .success(let response):
                                                 print("\(response)")
-                                                AccountManager().storeToken(response.authToken)
+                                                AccountManager().storeAccount(token: response.authToken, email: response.email)
                                             case .failure(let error):
                                                 print("Error: \(error)")
                                             }

@@ -27,7 +27,9 @@ public extension Notification.Name {
 public protocol AccountServiceStorage: AnyObject {
     func getToken() throws -> String?
     func store(token: String) throws
-    func clearToken() throws
+    func getEmail() throws -> String?
+    func store(email: String?) throws
+    func clearAll() throws
 }
 
 public class AccountManager {
@@ -37,10 +39,21 @@ public class AccountManager {
     public var token: String? {
         print("[[AccountManager]] token")
         do {
-//            return try storage.getToken()
-            let token = try storage.getToken()
-            print("[[AccountManager]] token: \(token)")
-            return token
+            return try storage.getToken()
+        } catch {
+            if let error = error as? AccountKeychainAccessError {
+//                requestDelegate?.emailManagerKeychainAccessFailed(accessType: .getToken, error: error)
+            } else {
+                assertionFailure("Expected AccountKeychainAccessError")
+            }
+
+            return nil
+        }
+    }
+
+    public var email: String? {
+        do {
+            return try storage.getEmail()
         } catch {
             if let error = error as? AccountKeychainAccessError {
 //                requestDelegate?.emailManagerKeychainAccessFailed(accessType: .getToken, error: error)
@@ -53,19 +66,18 @@ public class AccountManager {
     }
 
     public var isSignedIn: Bool {
-        let t = token
-        print("[[AccountManager]] isSignedIn: \(t != nil ? "YES" : "NO")")
-        return t != nil
+        return token != nil
     }
 
     public init(storage: AccountServiceStorage = AccountKeychainStorage()) {
         self.storage = storage
     }
 
-    public func storeToken(_ token: String) {
-        print("[[AccountManager]] storeToken: \(token)")
+    public func storeAccount(token: String, email: String?) {
+        print("[[AccountManager]] storeAccount token: \(token) email: \(email)")
         do {
             try storage.store(token: token)
+            try storage.store(email: email)
         } catch {
             if let error = error as? AccountKeychainAccessError {
 //                requestDelegate?.emailManagerKeychainAccessFailed(accessType: .storeTokenUsernameCohort, error: error)
@@ -80,7 +92,7 @@ public class AccountManager {
     public func signOut() {
         print("[[AccountManager]] signOut")
         do {
-            try storage.clearToken()
+            try storage.clearAll()
         } catch {
             if let error = error as? AccountKeychainAccessError {
 //                self.requestDelegate?.emailManagerKeychainAccessFailed(accessType: .deleteAuthenticationState, error: error)
