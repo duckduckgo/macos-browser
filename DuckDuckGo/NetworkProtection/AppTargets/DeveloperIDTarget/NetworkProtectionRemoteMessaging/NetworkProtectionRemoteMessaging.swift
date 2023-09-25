@@ -21,9 +21,9 @@ import Networking
 
 protocol NetworkProtectionRemoteMessaging {
 
-    func fetchRemoteMessages()
+    func fetchRemoteMessages(completion: (() -> Void)?)
     func presentableRemoteMessages() -> [NetworkProtectionRemoteMessage]
-    func dismissRemoteMessage(with id: String)
+    func dismiss(message: NetworkProtectionRemoteMessage)
 
 }
 
@@ -56,17 +56,19 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
         self.userDefaults = userDefaults
     }
 
-    func fetchRemoteMessages() {
+    func fetchRemoteMessages(completion fetchCompletion: (() -> Void)? = nil) {
 #if NETWORK_PROTECTION
+
         // Don't fetch messages if the user hasn't used NetP or didn't sign up via the waitlist
         guard waitlistStorage.isWaitlistUser, waitlistActivationDateStore.daysSinceActivation() != nil else {
             return
         }
 
-        rateLimitedOperation.performRateLimitedOperation(operationName: Constants.remoteMessagingRateLimitedOperationKey) { completion in
+        rateLimitedOperation.performRateLimitedOperation(operationName: Constants.remoteMessagingRateLimitedOperationKey) { operationCompletion in
             self.messageRequest.fetchNetworkProtectionRemoteMessages { [weak self] result in
                 defer {
-                    completion()
+                    operationCompletion()
+                    fetchCompletion?()
                 }
 
                 guard let self else { return }
@@ -88,6 +90,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
                 }
             }
         }
+
 #endif
     }
 
@@ -125,9 +128,9 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
 #endif
     }
 
-    func dismissRemoteMessage(with id: String) {
+    func dismiss(message: NetworkProtectionRemoteMessage) {
 #if NETWORK_PROTECTION
-        messageStorage.dismissRemoteMessage(with: id)
+        messageStorage.dismissRemoteMessage(with: message.id)
 #endif
     }
 

@@ -22,17 +22,17 @@ import BrowserServicesKit
 
 final class MockNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging {
 
-    func fetchRemoteMessages() {
+    var messages: [NetworkProtectionRemoteMessage] = []
 
+    func fetchRemoteMessages(completion fetchCompletion: (() -> Void)? = nil) {
+        fetchCompletion?()
     }
 
     func presentableRemoteMessages() -> [NetworkProtectionRemoteMessage] {
-        return []
+        messages
     }
 
-    func dismissRemoteMessage(with id: String) {
-
-    }
+    func dismiss(message: NetworkProtectionRemoteMessage) {}
 
 }
 

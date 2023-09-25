@@ -198,7 +198,7 @@ extension HomePage.Models {
                 }
 
                 // Dismiss the message after the user opens the survey, even if they just close the tab immediately afterwards.
-                networkProtectionRemoteMessaging.dismissRemoteMessage(with: message.id)
+                networkProtectionRemoteMessaging.dismiss(message: message)
                 refreshFeaturesMatrix()
             }
         }
@@ -221,7 +221,7 @@ extension HomePage.Models {
             case .surveyDay7:
                 shouldShowSurveyDay7 = false
             case .networkProtectionRemoteMessage(let message):
-                networkProtectionRemoteMessaging.dismissRemoteMessage(with: message.id)
+                networkProtectionRemoteMessaging.dismiss(message: message)
                 Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: message.id))
             }
             refreshFeaturesMatrix()
