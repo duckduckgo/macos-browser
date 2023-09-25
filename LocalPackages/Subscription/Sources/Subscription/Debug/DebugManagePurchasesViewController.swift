@@ -21,6 +21,7 @@ import AppKit
 import SwiftUI
 import Combine
 import StoreKit
+import Purchase
 
 @available(macOS 12.0, *)
 public final class DebugManagePurchasesViewController: NSViewController {

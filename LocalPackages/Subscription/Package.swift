@@ -12,13 +12,15 @@ let package = Package(
             targets: ["Subscription"]),
     ],
     dependencies: [
-        .package(path: "../SwiftUIExtensions")
+        .package(path: "../SwiftUIExtensions"),
+        .package(path: "../Purchase")
     ],
     targets: [
         .target(
             name: "Subscription",
             dependencies: [
-                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
+                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
+                .product(name: "Purchase", package: "Purchase")
             ]),
         .testTarget(
             name: "SubscriptionTests",

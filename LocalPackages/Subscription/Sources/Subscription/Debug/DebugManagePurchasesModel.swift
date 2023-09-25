@@ -18,6 +18,7 @@
 
 import Foundation
 import StoreKit
+import Purchase
 
 @available(macOS 12.0, *)
 public final class DebugManagePurchasesModel: ObservableObject {

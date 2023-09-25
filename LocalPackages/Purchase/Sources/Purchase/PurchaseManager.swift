@@ -45,11 +45,11 @@ public final class PurchaseManager: ObservableObject {
                                      "renewable.1month", "test.subscription.region.pl.1month",
                                      "monthly1"]
 
-    static let shared = PurchaseManager()
+    public static let shared = PurchaseManager()
 
-    @Published private(set) var availableProducts: [Product] = []
-    @Published private(set) var purchasedProductIDs: [String] = []
-    @Published private(set) var purchaseQueue: [String] = []
+    @Published public private(set) var availableProducts: [Product] = []
+    @Published public private(set) var purchasedProductIDs: [String] = []
+    @Published public private(set) var purchaseQueue: [String] = []
 
     @Published private(set) var subscriptionGroupStatus: RenewalState?
 
@@ -87,7 +87,7 @@ public final class PurchaseManager: ObservableObject {
 //    }
 
     @MainActor
-    func updateAvailableProducts() async {
+    public func updateAvailableProducts() async {
         print(" -- [PurchaseManager] updateAvailableProducts()")
 
         do {
@@ -104,7 +104,7 @@ public final class PurchaseManager: ObservableObject {
     }
 
     @MainActor
-    func fetchAvailableProducts() async -> [Product] {
+    public func fetchAvailableProducts() async -> [Product] {
         print(" -- [PurchaseManager] fetchAvailableProducts()")
 
         do {
@@ -137,7 +137,7 @@ public final class PurchaseManager: ObservableObject {
 //    }
 
     @MainActor
-    func updatePurchasedProducts() async {
+    public func updatePurchasedProducts() async {
         print(" -- [PurchaseManager] updatePurchasedProducts()")
 
         var purchasedSubscriptions: [String] = []
@@ -213,7 +213,7 @@ public final class PurchaseManager: ObservableObject {
     }
 
     @MainActor
-    func purchase(_ product: Product, customUUID: String) {
+    public func purchase(_ product: Product, customUUID: String) {
         print(" -- [PurchaseManager] buy: \(product.displayName) (customUUID: \(customUUID))")
 
         print("purchaseQueue append!")

@@ -21,6 +21,7 @@ import SwiftUIExtensions
 import SyncUI
 import Subscription
 import Account
+import Purchase
 
 fileprivate extension Preferences.Const {
     static let sidebarWidth: CGFloat = 256

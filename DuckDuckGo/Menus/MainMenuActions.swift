@@ -22,6 +22,7 @@ import Common
 import WebKit
 import Account
 import Subscription
+import Purchase
 
 // Actions are sent to objects of responder chain
 
