@@ -23,7 +23,7 @@ public protocol ManagementDialogModelDelegate: AnyObject {
     func turnOnSync()
 //    func dontSyncAnotherDeviceNow()
     func recoverDevice(using recoveryCode: String)
-    func presentSyncAnotherDeviceDialog()
+//    func presentSyncAnotherDeviceDialog()
     func confirmSetupComplete()
     func saveRecoveryPDF()
     func turnOffSync()

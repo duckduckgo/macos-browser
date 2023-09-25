@@ -97,7 +97,7 @@ enum UserText {
     static let syncNewDeviceEnterCodeInstructions = NSLocalizedString("prefrences.sync.sync-new-device-enter-code-instructions", value: "Enter the code on your Recovery PDF, or another synced device below to recover your synced data.", comment: "Instructions for adding a new device to sync")
 
     static let deviceSynced = NSLocalizedString("prefrences.sync.device-synced", value: "Device Synced!", comment: "Sync setup dialog title")
-    static let deviceSyncedExplanation = NSLocalizedString("prefrences.sync.device-synced-explanation", value: "Your bookmarks and Autofill logins are now syncing with this device.", comment: "Sync setup completion confirmation")
+    static let deviceSyncedExplanation = NSLocalizedString("prefrences.sync.device-synced-explanation", value: "Your bookmarks and Autofill logins are now syncing with", comment: "Sync setup completion confirmation")
 
     static let recoveryPDFExplanation1 = NSLocalizedString("prefrences.sync.recovery-pdf-explanation1", value: "If you lose access to your devices, you will need the code recover your synced data. You can save this code to your device as a PDF.", comment: "Sync recovery PDF explanation")
     static let recoveryPDFExplanation2 = NSLocalizedString("prefrences.sync.recovery-pdf-explanation2", value: "Anyone with access to this code can access your synced data, so please keep it in a safe place.", comment: "Sync recovery PDF explanation")

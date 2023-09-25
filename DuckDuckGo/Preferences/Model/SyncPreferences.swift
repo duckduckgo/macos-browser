@@ -42,7 +42,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         syncService.account != nil
     }
 
-    public var codeToDisplay: String?
+    @Published var codeToDisplay: String?
     let managementDialogModel: ManagementDialogModel
 
     @Published var devices: [SyncDevice] = []
@@ -301,6 +301,28 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         }
     }
 
+    func startPollingForRecoveryKey() {
+        Task { @MainActor in
+            do {
+                self.connector = try syncService.remoteConnect()
+                self.codeToDisplay = connector?.code
+                if let recoveryKey = try await connector?.pollForRecoveryKey() {
+                    try await loginAndShowPresentedDialog(recoveryKey)
+                } else {
+                    // Polling was likeley cancelled elsewhere (e.g. dialog closed)
+                    return
+                }
+            } catch {
+                managementDialogModel.errorMessage = String(describing: error)
+            }
+        }
+    }
+
+    func stopPollingForRecoveryKey() {
+        self.connector?.stopPolling()
+        self.connector = nil
+    }
+
 //    func dontSyncAnotherDeviceNow() {
 //        Task { @MainActor in
 //            isCreatingAccount = true
@@ -346,23 +368,23 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         }
     }
 
-    func presentSyncAnotherDeviceDialog() {
-        Task { @MainActor in
-            do {
-                self.connector = try syncService.remoteConnect()
-                managementDialogModel.codeToDisplay = connector?.code
-                presentDialog(for: .syncAnotherDevice)
-                if let recoveryKey = try await connector?.pollForRecoveryKey() {
-                    try await loginAndShowPresentedDialog(recoveryKey)
-                } else {
-                    // Polling was likeley cancelled elsewhere (e.g. dialog closed)
-                    return
-                }
-            } catch {
-                managementDialogModel.errorMessage = String(describing: error)
-            }
-        }
-    }
+//    func presentSyncAnotherDeviceDialog() {
+//        Task { @MainActor in
+//            do {
+//                self.connector = try syncService.remoteConnect()
+//                managementDialogModel.codeToDisplay = connector?.code
+//                presentDialog(for: .syncAnotherDevice)
+//                if let recoveryKey = try await connector?.pollForRecoveryKey() {
+//                    try await loginAndShowPresentedDialog(recoveryKey)
+//                } else {
+//                    // Polling was likeley cancelled elsewhere (e.g. dialog closed)
+//                    return
+//                }
+//            } catch {
+//                managementDialogModel.errorMessage = String(describing: error)
+//            }
+//        }
+//    }
 
     @MainActor
     func presentDeleteAccount() {

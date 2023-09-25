@@ -34,6 +34,12 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                     } else {
                         VStack(spacing: 24) {
                             SyncSetupSyncAnotherDeviceCardView()
+                                .onAppear {
+                                    model.startPollingForRecoveryKey()
+                                }
+                                .onDisappear {
+                                    model.stopPollingForRecoveryKey()
+                                }
                             SyncSetupStartCardView()
                             SyncSetupRecoverCardView()
                             Text(UserText.syncAddDeviceCardExplanation)

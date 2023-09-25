@@ -19,31 +19,31 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct AskToSyncAnotherDeviceView<ViewModel>: View where ViewModel: ManagementDialogModel {
-
-    @EnvironmentObject var model: ViewModel
-
-    var body: some View {
-        SyncDialog {
-            VStack(spacing: 20) {
-                Image("SyncAnotherDeviceDialog")
-                Text(UserText.syncAnotherDeviceTitle)
-                    .font(.system(size: 17, weight: .bold))
-                Text(UserText.syncAnotherDeviceExplanation1)
-                    .multilineTextAlignment(.center)
-                Text(UserText.syncAnotherDeviceExplanation2)
-                    .multilineTextAlignment(.center)
-            }
-        } buttons: {
-            Button(UserText.notNow) {
-//                model.delegate?.dontSyncAnotherDeviceNow()
-                model.endFlow()
-            }
-            Button(UserText.syncAnotherDevice) {
-                model.delegate?.presentSyncAnotherDeviceDialog()
-            }
-            .buttonStyle(DefaultActionButtonStyle(enabled: true))
-        }
-        .frame(width: 360, height: 314)
-    }
-}
+//struct AskToSyncAnotherDeviceView<ViewModel>: View where ViewModel: ManagementDialogModel {
+//
+//    @EnvironmentObject var model: ViewModel
+//
+//    var body: some View {
+//        SyncDialog {
+//            VStack(spacing: 20) {
+//                Image("SyncAnotherDeviceDialog")
+//                Text(UserText.syncAnotherDeviceTitle)
+//                    .font(.system(size: 17, weight: .bold))
+//                Text(UserText.syncAnotherDeviceExplanation1)
+//                    .multilineTextAlignment(.center)
+//                Text(UserText.syncAnotherDeviceExplanation2)
+//                    .multilineTextAlignment(.center)
+//            }
+//        } buttons: {
+//            Button(UserText.notNow) {
+////                model.delegate?.dontSyncAnotherDeviceNow()
+//                model.endFlow()
+//            }
+//            Button(UserText.syncAnotherDevice) {
+//                model.delegate?.presentSyncAnotherDeviceDialog()
+//            }
+//            .buttonStyle(DefaultActionButtonStyle(enabled: true))
+//        }
+//        .frame(width: 360, height: 314)
+//    }
+//}

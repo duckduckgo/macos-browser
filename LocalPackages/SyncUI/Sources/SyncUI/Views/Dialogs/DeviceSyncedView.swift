@@ -1,5 +1,5 @@
 //
-//  SyncSetupCompleteView.swift
+//  DeviceSyncedView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import SwiftUI
 
-struct SyncSetupCompleteView: View {
+struct DeviceSyncedView: View {
     @EnvironmentObject var model: ManagementDialogModel
 
     let devices: [SyncDevice]
@@ -26,7 +26,7 @@ struct SyncSetupCompleteView: View {
     var body: some View {
         SyncDialog(spacing: 20.0) {
             VStack(spacing: 20) {
-                Image("SyncSetupComplete")
+                Image("Sync-setup-success")
                 Text(UserText.deviceSynced)
                     .font(.system(size: 17, weight: .bold))
                 Text(UserText.deviceSyncedExplanation)
@@ -39,7 +39,7 @@ struct SyncSetupCompleteView: View {
             }
         } buttons: {
             Button(UserText.next) {
-                model.delegate?.confirmSetupComplete()
+                model.endFlow()
             }
         }
         .frame(width: 360,

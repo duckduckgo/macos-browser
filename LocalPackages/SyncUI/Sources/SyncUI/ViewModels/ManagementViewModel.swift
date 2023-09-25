@@ -42,4 +42,6 @@ public protocol ManagementViewModel: ObservableObject {
 
     var codeToDisplay: String? { get }
     func turnOnSync()
+    func startPollingForRecoveryKey()
+    func stopPollingForRecoveryKey()
 }
