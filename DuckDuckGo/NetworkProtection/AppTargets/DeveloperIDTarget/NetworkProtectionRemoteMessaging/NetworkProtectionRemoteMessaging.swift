@@ -43,7 +43,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     init(
         messageRequest: NetworkProtectionRemoteMessagingRequest = DefaultNetworkProtectionRemoteMessagingRequest(),
         messageStorage: NetworkProtectionRemoteMessagingStorage = DefaultNetworkProtectionRemoteMessagingStorage(),
-        waitlistStorage: WaitlistStorage = WaitlistKeychainStore(waitlistIdentifier: ""),
+        waitlistStorage: WaitlistStorage = WaitlistKeychainStore(waitlistIdentifier: "networkprotection"),
         waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(),
         rateLimitedOperation: RateLimitedOperation = UserDefaultsRateLimitedOperation(debug: .seconds(30), release: .hours(8)),
         userDefaults: UserDefaults = .standard
