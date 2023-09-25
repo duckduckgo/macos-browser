@@ -57,19 +57,7 @@ extension Preferences {
                                 PrivacyView(model: PrivacyPreferencesModel())
                             case .privacyPro:
                                 let actionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
-                                    if #available(macOS 12.0, *) {
-                                        Task {
-                                            guard let (payload, jwsRepresentation) = await PurchaseManager.mostRecentTransaction() else { return }
-
-                                            switch await AccountsService.storeLogin(payload: payload, signature: jwsRepresentation) {
-                                            case .success(let response):
-                                                print("\(response)")
-                                                AccountManager().storeAccount(token: response.authToken, email: response.email)
-                                            case .failure(let error):
-                                                print("Error: \(error)")
-                                            }
-                                        }
-                                    }
+                                    AccountManager().signInByRestoringPastPurchases()
                                 }, openURLHandler: { url in
                                     WindowControllersManager.shared.show(url: url, newTab: true)
                                 }, goToSyncPreferences: {

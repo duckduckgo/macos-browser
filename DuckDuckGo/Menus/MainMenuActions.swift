@@ -766,52 +766,7 @@ extension MainViewController {
     }
 
     @IBAction func restorePurchases(_ sender: Any?) {
-        if #available(macOS 12.0, *) {
-            Task {
-                // Fetch most recent purchase
-                guard let (payload, jwsRepresentation) = await PurchaseManager.mostRecentTransaction() else { return }
-                
-                // Do the store login to get short-lived token
-                let shortToken: String
-                switch await AccountsService.storeLogin(payload: payload, signature: jwsRepresentation) {
-                case .success(let response):
-                    print("\(response)")
-                    shortToken = response.authToken
-//                    AccountManager().storeAccount(token: response.authToken, email: response.email)
-                case .failure(let error):
-                    print("Error: \(error)")
-                    return
-                }
-
-                // Exchange short-lived token to a long-lived one
-                let longToken: String
-                switch await AccountsService.getAccessToken(token: shortToken) {
-                case .success(let response):
-                    print("\(response)")
-                    longToken = response.accessToken
-//                    AccountManager().storeAccount(token: response.authToken, email: response.email)
-                case .failure(let error):
-                    print("Error: \(error)")
-                    return
-                }
-
-                // Fetch entitlements and account details and store the data
-                switch await AccountsService.validateToken(accessToken: longToken) {
-                case .success(let response):
-                    print("\(response)")
-                    
-                    AccountManager().storeAccount(token: longToken,
-                                                  email: response.account.email)
-                case .failure(let error):
-                    print("Error: \(error)")
-                    return
-                }
-
-
-
-
-            }
-        }
+        
     }
 
 
