@@ -126,10 +126,7 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
             return nil
         }
 
-        let savedToken = subscriptionValues.token
-//        AccountManager().storeToken(savedToken)
-        AccountManager().storeAccount(token: savedToken, email: nil, externalID: nil)
-        // TODO: call to verify account to update email and entitlements
+        AccountManager().refreshEntitlements(with: subscriptionValues.token)
         return nil
     }
 
@@ -139,7 +136,7 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)
         }
-        
+
         return nil
     }
 }
