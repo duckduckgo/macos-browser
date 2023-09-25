@@ -102,6 +102,7 @@ final class FaviconImageCache {
     nonisolated func cleanOldExcept(fireproofDomains: FireproofDomains,
                                     bookmarkManager: BookmarkManager,
                                     completion: @escaping () -> Void) {
+        let bookmarkedHosts = bookmarkManager.allHosts()
         Task.run(operation: {
             await self.removeFavicons(filter: { favicon in
                 guard let host = favicon.documentUrl.host else {
@@ -109,7 +110,7 @@ final class FaviconImageCache {
                 }
                 return favicon.dateCreated < Date.monthAgo &&
                 !fireproofDomains.isFireproof(fireproofDomain: host) &&
-                !bookmarkManager.isHostInBookmarks(host: host)
+                !bookmarkedHosts.contains(host)
             })
         }, completionHandler: completion)
     }
@@ -120,13 +121,14 @@ final class FaviconImageCache {
                                 bookmarkManager: BookmarkManager,
                                 savedLogins: Set<String>,
                                 completion: @escaping () -> Void) {
+        let bookmarkedHosts = bookmarkManager.allHosts()
         Task.run(operation: {
             await self.removeFavicons(filter: { favicon in
                 guard let host = favicon.documentUrl.host else {
                     return false
                 }
                 return !(fireproofDomains.isFireproof(fireproofDomain: host) ||
-                         bookmarkManager.isHostInBookmarks(host: host) ||
+                         bookmarkedHosts.contains(host) ||
                          savedLogins.contains(host)
                 )
             })
@@ -139,11 +141,12 @@ final class FaviconImageCache {
                                  exceptHistoryDomains history: Set<String>,
                                  tld: TLD,
                                  completion: @escaping () -> Void) {
+        let bookmarkedHosts = bookmarkManager.allHosts()
         Task.run(operation: {
             await self.removeFavicons(filter: { favicon in
                 guard let host = favicon.documentUrl.host, let baseDomain = tld.eTLDplus1(host) else { return false }
                 return baseDomains.contains(baseDomain)
-                    && !bookmarkManager.isHostInBookmarks(host: host)
+                    && !bookmarkedHosts.contains(host)
                     && !logins.contains(host)
                     && !history.contains(host)
             })

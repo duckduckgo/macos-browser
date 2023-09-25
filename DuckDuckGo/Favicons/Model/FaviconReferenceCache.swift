@@ -158,12 +158,13 @@ final class FaviconReferenceCache {
     }
 
     func cleanOld(except fireproofDomains: FireproofDomains, bookmarkManager: BookmarkManager) async {
+        let bookmarkedHosts = bookmarkManager.allHosts()
         // Remove host references
         await removeHostReferences(filter: { hostReference in
             let host = hostReference.host
             return hostReference.dateCreated < Date.monthAgo &&
                 !fireproofDomains.isFireproof(fireproofDomain: host) &&
-                !bookmarkManager.isHostInBookmarks(host: host)
+                !bookmarkedHosts.contains(host)
         }).value
         // Remove URL references
         await removeUrlReferences(filter: { urlReference in
@@ -172,7 +173,7 @@ final class FaviconReferenceCache {
             }
             return urlReference.dateCreated < Date.monthAgo &&
             !fireproofDomains.isFireproof(fireproofDomain: host) &&
-            !bookmarkManager.isHostInBookmarks(host: host)
+            !bookmarkedHosts.contains(host)
         }).value
     }
 
@@ -188,9 +189,10 @@ final class FaviconReferenceCache {
     }
 
     func burn(except fireproofDomains: FireproofDomains, bookmarkManager: BookmarkManager, savedLogins: Set<String>) async {
+        let bookmarkedHosts = bookmarkManager.allHosts()
         func isHostApproved(host: String) -> Bool {
             return fireproofDomains.isFireproof(fireproofDomain: host) ||
-                bookmarkManager.isHostInBookmarks(host: host) ||
+                bookmarkedHosts.contains(host) ||
                 savedLogins.contains(host)
         }
 
@@ -225,17 +227,18 @@ final class FaviconReferenceCache {
                      exceptHistoryDomains history: Set<String>,
                      tld: TLD) async {
         // Remove host references
+        let bookmarkedHosts = bookmarkManager.allHosts()
         await removeHostReferences(filter: { hostReference in
             let host = hostReference.host
             let baseDomain = tld.eTLDplus1(host) ?? ""
-            return baseDomains.contains(baseDomain) && !bookmarkManager.isHostInBookmarks(host: host) && !logins.contains(host) && !history.contains(host)
+            return baseDomains.contains(baseDomain) && !bookmarkedHosts.contains(host) && !logins.contains(host) && !history.contains(host)
         }).value
         // Remove URL references
         await removeUrlReferences(filter: { urlReference in
             guard let host = urlReference.documentUrl.host else {
                 return false
             }
-            return baseDomains.contains(host) && !bookmarkManager.isHostInBookmarks(host: host) && !logins.contains(host) && !history.contains(host)
+            return baseDomains.contains(host) && !bookmarkedHosts.contains(host) && !logins.contains(host) && !history.contains(host)
         }).value
     }
 
