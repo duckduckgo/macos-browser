@@ -128,7 +128,7 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
 
         let savedToken = subscriptionValues.token
 //        AccountManager().storeToken(savedToken)
-        AccountManager().storeAccount(token: savedToken, email: nil)
+        AccountManager().storeAccount(token: savedToken, email: nil, externalID: nil)
         // TODO: call to verify account to update email and entitlements
         return nil
     }

@@ -739,7 +739,7 @@ extension MainViewController {
     }
 
     @IBAction func simulateAccountSignIn(_ sender: Any?) {
-        AccountManager().storeAccount(token: "fake-token", email: "fake@email.com")
+        AccountManager().storeAccount(token: "fake-token", email: "fake@email.com", externalID: "fake-externalID")
     }
 
     @IBAction func simulateAccountSignOut(_ sender: Any?) {

@@ -37,7 +37,7 @@ public enum AccountKeychainAccessError: Error, Equatable {
     }
 }
 
-public class AccountKeychainStorage: AccountServiceStorage {
+public class AccountKeychainStorage: AccountStorage {
 
     public init() { }
 
@@ -61,9 +61,22 @@ public class AccountKeychainStorage: AccountServiceStorage {
         }
     }
 
+    public func getExternalID() throws -> String? {
+        try Self.getString(forField: .externalID)
+    }
+
+    public func store(externalID: String?) throws {
+        if let externalID = externalID, !externalID.isEmpty {
+            try Self.set(string: externalID, forField: .externalID)
+        } else {
+            try Self.deleteItem(forField: .externalID)
+        }
+    }
+
     public func clearAuthenticationState() throws {
         try Self.deleteItem(forField: .token)
         try Self.deleteItem(forField: .email)
+        try Self.deleteItem(forField: .externalID)
     }
 
 }
@@ -77,6 +90,7 @@ private extension AccountKeychainStorage {
     enum AccountKeychainField: String, CaseIterable {
         case token = "account.token"
         case email = "account.email"
+        case externalID = "account.external_id"
 
         var keyValue: String {
             (Bundle.main.bundleIdentifier ?? "com.duckduckgo") + "." + rawValue

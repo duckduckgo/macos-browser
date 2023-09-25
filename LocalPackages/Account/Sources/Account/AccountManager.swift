@@ -25,17 +25,9 @@ public extension Notification.Name {
     static let accountDidSignOut = Notification.Name("com.duckduckgo.browserServicesKit.AccountDidSignOut")
 }
 
-public protocol AccountServiceStorage: AnyObject {
-    func getToken() throws -> String?
-    func store(token: String) throws
-    func getEmail() throws -> String?
-    func store(email: String?) throws
-    func clearAuthenticationState() throws
-}
-
 public class AccountManager {
 
-    private let storage: AccountServiceStorage
+    private let storage: AccountStorage
 
     public var token: String? {
         print("[[AccountManager]] token")
@@ -71,15 +63,16 @@ public class AccountManager {
         return token != nil
     }
 
-    public init(storage: AccountServiceStorage = AccountKeychainStorage()) {
+    public init(storage: AccountStorage = AccountKeychainStorage()) {
         self.storage = storage
     }
 
-    public func storeAccount(token: String, email: String?) {
+    public func storeAccount(token: String, email: String?, externalID: String?) {
         print("[[AccountManager]] storeAccount token: \(token) email: \(email)")
         do {
             try storage.store(token: token)
             try storage.store(email: email)
+            try storage.store(externalID: externalID)
         } catch {
             if let error = error as? AccountKeychainAccessError {
 //                requestDelegate?.emailManagerKeychainAccessFailed(accessType: .storeTokenUsernameCohort, error: error)
@@ -118,7 +111,6 @@ public class AccountManager {
                 case .success(let response):
                     print("\(response)")
                     shortToken = response.authToken
-                    //                    AccountManager().storeAccount(token: response.authToken, email: response.email)
                 case .failure(let error):
                     print("Error: \(error)")
                     return
@@ -130,7 +122,6 @@ public class AccountManager {
                 case .success(let response):
                     print("\(response)")
                     longToken = response.accessToken
-                    //                    AccountManager().storeAccount(token: response.authToken, email: response.email)
                 case .failure(let error):
                     print("Error: \(error)")
                     return
@@ -142,7 +133,8 @@ public class AccountManager {
                     print("\(response)")
 
                     self.storeAccount(token: longToken,
-                                      email: response.account.email)
+                                      email: response.account.email,
+                                      externalID: response.account.externalID)
 
                 case .failure(let error):
                     print("Error: \(error)")
