@@ -41,5 +41,8 @@ public protocol ManagementViewModel: ObservableObject {
     func saveRecoveryPDF()
     func refreshDevices()
 
+
+    // New design
     func presentSyncAnotherDeviceDialog2()
+
 }

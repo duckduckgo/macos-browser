@@ -33,31 +33,100 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                         ProgressView()
                     } else {
                         VStack(spacing: 24) {
-                            SyncSetupCardView(
-                                title: SyncCard.addDevice.title,
-                                description: SyncCard.addDevice.description,
-                                actionTitle: SyncCard.addDevice.actionTitle,
-                                iconName: SyncCard.addDevice.iconName,
-                                action: model.presentSyncAnotherDeviceDialog) {
-                                    QRCodeView(recoveryCode: model.codeToDisplay ?? "")
-                                }
-                            SyncSetupCardView(
-                                title: SyncCard.beginSync.title,
-                                description: SyncCard.beginSync.description,
-                                actionTitle: SyncCard.beginSync.actionTitle,
-                                iconName: SyncCard.beginSync.iconName,
-                                action: model.turnOnSync) {
-                                    EmptyView()
-                                }
+                            SyncSetupSyncAnotherDeviceCardView()
+                            SyncSetupStartSyncView()
                         }
                     }
                 }.frame(minWidth: 100)
             }
         }
     }
+
+    struct SyncSetupSyncAnotherDeviceCardView: View {
+        @EnvironmentObject var model: ViewModel
+        var body: some View {
+            HStack(alignment: .top, spacing: 8) {
+                VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(SyncCard.addDevice.title)
+                            .fontWeight(.semibold)
+                        Text(SyncCard.addDevice.description)
+                            .foregroundColor(.black.opacity(0.6))
+                    }
+                    QRCodeView(recoveryCode: model.codeToDisplay ?? "")
+                    VStack(alignment: .leading, spacing: 8) {
+                        if let extraContext = SyncCard.addDevice.extraContext {
+                            Text(extraContext)
+                                .foregroundColor(.black.opacity(0.6))
+                        }
+                        Text(SyncCard.addDevice.actionTitle)
+                            .fontWeight(.semibold)
+                            .foregroundColor(Color("LinkBlueColor"))
+                        if let secondActionTitle = SyncCard.addDevice.actionTitle2 {
+                            Text(secondActionTitle)
+                                .fontWeight(.semibold)
+                                .foregroundColor(Color("LinkBlueColor"))
+                        }
+                    }
+                }
+                .frame(width: 424)
+                Image(SyncCard.addDevice.iconName)
+            }
+            .padding(32)
+            .background(Color.black.opacity(0.01))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.0))
+            )
+        }
+    }
+
+    struct SyncSetupStartSyncView: View {
+        @EnvironmentObject var model: ViewModel
+        var body: some View {
+            HStack(alignment: .top, spacing: 8) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(SyncCard.beginSync.title)
+                        .fontWeight(.semibold)
+                    Text(SyncCard.beginSync.description)
+                        .foregroundColor(.black.opacity(0.6))
+                    Button(SyncCard.beginSync.actionTitle) {
+                        model.turnOnSync()
+                    }
+                    .padding(.top, 8)
+                }
+                .frame(width: 424)
+                Image(SyncCard.addDevice.iconName)
+            }
+            .padding(32)
+            .background(Color.black.opacity(0.01))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.0))
+            )
+        }
+    }
 }
 
-struct SyncSetupCardView<Content:View>: View {
+struct SyncSetUpCardDescription: View {
+    let title: String
+    let description: String
+    let iconName: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .fontWeight(.semibold)
+                Text(description)
+                    .foregroundColor(.black.opacity(0.6))
+            }
+            Image(iconName)
+        }
+    }
+}
+
+struct SyncSetupCardView<Content: View>: View {
     let title: String
     let description: String
     let actionTitle: String
@@ -67,7 +136,6 @@ struct SyncSetupCardView<Content:View>: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
-            Image(iconName)
             VStack(alignment: .leading, spacing: 16) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title)
@@ -81,6 +149,7 @@ struct SyncSetupCardView<Content:View>: View {
                 }
                 .padding(.top, 8)
             }
+            Image(iconName)
         }
         .padding(16)
         .frame(width: 512)
@@ -101,7 +170,7 @@ extension SyncSetupView {
             case .beginSync:
                 return "Begin New Sync"
             case .addDevice:
-                return "Reconnect to Previous Sync"
+                return "Sync with Another Device"
             }
         }
 
@@ -110,16 +179,34 @@ extension SyncSetupView {
             case .beginSync:
                 return "Initiate a new sync, capturing your current bookmarks and logins. This will not merge with previous backups."
             case .addDevice:
-                return "Retrieve your saved bookmarks and logins from an earlier synchronization. You'll need a device that was synced earlier or your Backup Code."
+                return "To sync with another device, open the DuckDuckGo app on that device. Navigate to Settings > Sync & Back Up and scan the QR code below."
             }
         }
 
         var actionTitle: String {
             switch self {
             case .beginSync:
-                return "Start Fresh"
+                return "Start Sync & Back Up"
             case .addDevice:
-                return "Reconnect Now"
+                return "Show Text Code"
+            }
+        }
+
+        var actionTitle2: String? {
+            switch self {
+            case .beginSync:
+                return nil
+            case .addDevice:
+                return "Manually Enter Code"
+            }
+        }
+
+        var extraContext: String? {
+            switch self {
+            case .beginSync:
+                return nil
+            case .addDevice:
+                return "Can't scan the QR code? Copy and paste the text code instead."
             }
         }
 

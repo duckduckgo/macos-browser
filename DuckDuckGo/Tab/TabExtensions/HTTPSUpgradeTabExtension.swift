@@ -46,7 +46,7 @@ extension HTTPSUpgradeTabExtension: NavigationResponder {
             || navigationAction.request.mainDocumentURL?.host != lastUpgradedURL?.host {
             lastUpgradedURL = nil
         }
-
+    
         guard case let .success(upgradedURL) = await httpsUpgrade.upgrade(url: navigationAction.url),
               lastUpgradedURL != upgradedURL
         else { return .next }
