@@ -30,23 +30,17 @@ struct OperationPreferredDateCalculator {
 
         switch lastEvent.type {
 
-        case .noMatchFound:
-            newDate = Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
-        case .matchesFound:
+        case .noMatchFound, .matchesFound, .optOutConfirmed:
             newDate = Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
         case .error:
             newDate = Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
-        case .optOutStarted:
+        case .optOutStarted, .scanStarted:
             newDate = currentPreferredRunDate
         case .optOutRequested:
             newDate = Date().addingTimeInterval(schedulingConfig.confirmOptOutScan.hoursToSeconds)
-        case .optOutConfirmed:
-            newDate = Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
-        case .scanStarted:
-            newDate = currentPreferredRunDate
         }
 
-        return returnMostRecentDate(newDate, date2: currentPreferredRunDate)
+        return returnMostRecentDate(newDate, currentPreferredRunDate)
     }
 
     func dateForOptOutOperation(currentPreferredRunDate: Date?,
@@ -72,28 +66,20 @@ struct OperationPreferredDateCalculator {
             }
         case .error:
             newDate = Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
-        case .optOutStarted:
+        case .optOutStarted, .scanStarted:
             newDate = currentPreferredRunDate
-        case .optOutRequested:
+        case .optOutConfirmed, .optOutRequested:
             newDate = nil
-        case .optOutConfirmed:
-            newDate = nil
-        case .scanStarted:
-            newDate = currentPreferredRunDate
         }
 
-        return returnMostRecentDate(newDate, date2: currentPreferredRunDate)
+        return returnMostRecentDate(newDate, currentPreferredRunDate)
     }
 
-    private func returnMostRecentDate(_ date1: Date?, date2: Date?) -> Date? {
+    private func returnMostRecentDate(_ date1: Date?, _ date2: Date?) -> Date? {
         guard let date1 = date1 else { return date2 }
         guard let date2 = date2 else { return date1 }
 
-        if date1 > date2 {
-            return date2
-        } else {
-            return date1
-        }
+        return min(date1, date2)
     }
 
     // If the last time we removed the profile has a bigger time difference than the current date + maintenance we should schedule for a new optout
