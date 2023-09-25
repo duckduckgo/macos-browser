@@ -19,7 +19,7 @@
 import Cocoa
 import Common
 import BrowserServicesKit
-import Accounts
+import Account
 
 #if NETWORK_PROTECTION
 import NetworkProtection

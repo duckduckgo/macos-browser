@@ -20,7 +20,7 @@ import BrowserServicesKit
 import Cocoa
 import Common
 import WebKit
-import Accounts
+import Account
 import Subscription
 
 // Actions are sent to objects of responder chain

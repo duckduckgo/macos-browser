@@ -4,24 +4,24 @@
 import PackageDescription
 
 let package = Package(
-    name: "Accounts",
+    name: "Account",
     platforms: [ .macOS(.v10_15) ],
     products: [
         .library(
-            name: "Accounts",
-            targets: ["Accounts"]),
+            name: "Account",
+            targets: ["Account"]),
     ],
     dependencies: [
 //        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "75.2.0")
     ],
     targets: [
         .target(
-            name: "Accounts",
+            name: "Account",
             dependencies: [
 //                .product(name: "BrowserServicesKit", package: "BrowserServicesKit")
             ]),
         .testTarget(
-            name: "AccountsTests",
-            dependencies: ["Accounts"]),
+            name: "AccountTests",
+            dependencies: ["Account"]),
     ]
 )
