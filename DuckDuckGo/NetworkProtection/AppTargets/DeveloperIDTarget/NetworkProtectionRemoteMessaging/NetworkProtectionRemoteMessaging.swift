@@ -35,6 +35,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
 
     private let messageRequest: NetworkProtectionRemoteMessagingRequest
     private let messageStorage: NetworkProtectionRemoteMessagingStorage
+    private let waitlistStorage: WaitlistStorage
     private let waitlistActivationDateStore: WaitlistActivationDateStore
     private let rateLimitedOperation: RateLimitedOperation
     private let userDefaults: UserDefaults
@@ -42,12 +43,14 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     init(
         messageRequest: NetworkProtectionRemoteMessagingRequest = DefaultNetworkProtectionRemoteMessagingRequest(),
         messageStorage: NetworkProtectionRemoteMessagingStorage = DefaultNetworkProtectionRemoteMessagingStorage(),
+        waitlistStorage: WaitlistStorage = WaitlistKeychainStore(waitlistIdentifier: ""),
         waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(),
         rateLimitedOperation: RateLimitedOperation = UserDefaultsRateLimitedOperation(debug: .seconds(30), release: .hours(8)),
         userDefaults: UserDefaults = .standard
     ) {
         self.messageRequest = messageRequest
         self.messageStorage = messageStorage
+        self.waitlistStorage = waitlistStorage
         self.waitlistActivationDateStore = waitlistActivationDateStore
         self.rateLimitedOperation = rateLimitedOperation
         self.userDefaults = userDefaults
@@ -55,8 +58,8 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
 
     func fetchRemoteMessages() {
 #if NETWORK_PROTECTION
-        // Don't fetch messages if the user hasn't used NetP
-        guard waitlistActivationDateStore.daysSinceActivation() != nil else {
+        // Don't fetch messages if the user hasn't used NetP or didn't sign up via the waitlist
+        guard waitlistStorage.isWaitlistUser, waitlistActivationDateStore.daysSinceActivation() != nil else {
             return
         }
 

@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 
 protocol WaitlistActivationDateStore {
@@ -69,5 +67,3 @@ struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
     }
 
 }
-
-#endif
