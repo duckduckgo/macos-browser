@@ -18,6 +18,7 @@
 //
 
 import Foundation
+import Purchase
 
 public extension Notification.Name {
     static let accountDidSignIn = Notification.Name("com.duckduckgo.browserServicesKit.AccountDidSignIn")
@@ -38,6 +39,8 @@ public class AccountManager {
 
     public var token: String? {
         print("[[AccountManager]] token")
+        _ = Purchase()
+        
         do {
             return try storage.getToken()
         } catch {

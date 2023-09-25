@@ -12,13 +12,13 @@ let package = Package(
             targets: ["Account"]),
     ],
     dependencies: [
-//        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "75.2.0")
+        .package(path: "../Purchase")
     ],
     targets: [
         .target(
             name: "Account",
             dependencies: [
-//                .product(name: "BrowserServicesKit", package: "BrowserServicesKit")
+                .product(name: "Purchase", package: "Purchase")
             ]),
         .testTarget(
             name: "AccountTests",
