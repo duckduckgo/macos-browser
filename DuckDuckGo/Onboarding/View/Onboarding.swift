@@ -22,5 +22,6 @@ import SwiftUI
 struct Onboarding {
 
     static let speechWidth: CGFloat = 320
+    static let buttonHeight: CGFloat = 40
 
 }

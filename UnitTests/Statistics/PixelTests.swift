@@ -75,7 +75,7 @@ class PixelTests: XCTestCase {
         }
 
         let headers = APIRequest.Headers(userAgent: testAgent)
-        Pixel.shared!.fire(pixelNamed: "test", withHeaders: headers)
+        Pixel.shared!.fire(.serp, withHeaders: headers)
 
         wait(for: [expectation], timeout: 1.0)
 
@@ -138,7 +138,7 @@ class PixelTests: XCTestCase {
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
 
-        Pixel.shared!.fire(pixelNamed: "test") { error in
+        Pixel.shared!.fire(.serp) { error in
             XCTAssertNil(error)
             expectation.fulfill()
         }
@@ -153,7 +153,7 @@ class PixelTests: XCTestCase {
             return HTTPStubsResponse(data: Data(), statusCode: 404, headers: nil)
         }
 
-        Pixel.shared!.fire(pixelNamed: "test") { error in
+        Pixel.shared!.fire(.serp) { error in
             XCTAssertNotNil(error)
             expectation.fulfill()
         }

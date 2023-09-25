@@ -35,6 +35,9 @@ enum BWStatus: Equatable {
     // User didn't approve DuckDuckGo browser
     case integrationNotApproved
 
+    // User didn't approve access to sandbox containers
+    case accessToContainersNotApproved
+
     // There is handshake necessary in order to receive the shared key
     case missingHandshake
 

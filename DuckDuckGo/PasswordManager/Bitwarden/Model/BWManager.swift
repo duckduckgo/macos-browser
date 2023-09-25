@@ -93,6 +93,13 @@ final class BWManager: BWManagement, ObservableObject {
             return
         }
 
+        // Check wether user approved access to sandbox containers
+        guard installationService.isSandboxContainerAccessApproved else {
+            status = .accessToContainersNotApproved
+            scheduleConnectionAttempt()
+            return
+        }
+
         // Check whether user approved integration with DuckDuckGo in Bitwarden
         guard installationService.isIntegrationWithDuckDuckGoEnabled else {
             status = .integrationNotApproved

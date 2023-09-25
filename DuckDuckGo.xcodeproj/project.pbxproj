@@ -12279,7 +12279,7 @@
 			repositoryURL = "https://github.com/duckduckgo/OpenSSL-XCFramework";
 			requirement = {
 				kind = exactVersion;
-				version = 1.1.1900;
+				version = 3.1.2000;
 			};
 		};
 		4B2AAAF329E70DEA0026AFC0 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
@@ -12294,8 +12294,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "jacek/compilation-pixel";
-				kind = branch;
+				kind = exactVersion;
+				version = 80.2.0;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {

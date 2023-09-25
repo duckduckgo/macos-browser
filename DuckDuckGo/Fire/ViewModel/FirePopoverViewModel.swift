@@ -187,7 +187,7 @@ final class FirePopoverViewModel {
     // MARK: - Burning
 
     func burn() {
-        Pixel.fire(.fireButtonFirstBurn, limitToOnceADay: true)
+        Pixel.fire(.fireButtonFirstBurn, limitTo: .dailyFirst)
 
         switch (clearingOption, areAllSelected) {
         case (.currentTab, _):

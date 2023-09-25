@@ -289,7 +289,7 @@ private struct AddressComponentView: View {
 
         VStack(alignment: .leading) {
             ComponentHeaderView(title: "Address",
-                                subtitle: "Providing your full address can help us find a match faster. You can add up to 3 previous addresses.",
+                                subtitle: "Providing your full address is optional, but increases the accuracy of your results. Additionally, we recommend you add at least 2 previous addresses for the best matching.",
                                 isValidated: viewModel.isAddressValid)
 
             EditViewList(viewModel.addresses) { address in
@@ -422,7 +422,7 @@ private struct FormHeaderView: View {
                 .bold()
 
             VStack (spacing: 16) {
-                Text("The following information is required for Data Broker Protection. We’ll scan Data Broker sites for matching info and have it removed.")
+                Text("The following information is required for Personal Information Removal. We’ll scan Data Broker sites for matching info and have it removed.")
 
                 Text("The information you've entered stays on your device, it does not go through DuckDuckGo's servers.")
             }

@@ -1,5 +1,5 @@
 //
-//  FakeBrokerFlag.swift
+//  AttemptInformation.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,24 +18,10 @@
 
 import Foundation
 
-public struct FakeBrokerFlagKey {
-    public static let useFakeBrokerKey = "useFakeBrokerKey"
-}
-
-public protocol FakeBrokerFlag {
-    func isFakeBrokerFlagOn() -> Bool
-    func setFakeBrokerFlag(_ status: Bool)
-}
-
-public class FakeBrokerUserDefaults: FakeBrokerFlag {
-
-    public init() { }
-
-    public func isFakeBrokerFlagOn() -> Bool {
-        return UserDefaults.standard.bool(forKey: FakeBrokerFlagKey.useFakeBrokerKey)
-    }
-
-    public func setFakeBrokerFlag(_ status: Bool) {
-        UserDefaults.standard.set(status, forKey: FakeBrokerFlagKey.useFakeBrokerKey)
-    }
+struct AttemptInformation {
+    let extractedProfileId: Int64
+    let dataBroker: String
+    let attemptId: String
+    let lastStageDate: Date
+    let startDate: Date
 }

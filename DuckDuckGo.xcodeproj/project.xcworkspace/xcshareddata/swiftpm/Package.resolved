@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "jacek/compilation-pixel",
-        "revision" : "c6e13e86d051600dc4ee5db7f50df3c16e91d7d1"
+        "revision" : "2bc934304fd9d5e2b51dfe78a0c95ba10f1ab5a5",
+        "version" : "80.2.0"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "20a6aeddbd86b43fd83c42aa45fdd9ec6db0e0f7",
-        "version" : "8.2.0"
+        "revision" : "f3eccad8647fdba2b5d180a02a0513c61375b8fb",
+        "version" : "8.4.0"
       }
     },
     {
@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/OpenSSL-XCFramework",
       "state" : {
-        "revision" : "238e8f700809ff0e1cad5f906cb4c3b0f77f44f9",
-        "version" : "1.1.1900"
+        "revision" : "bb7bfc010ef4d2e7913c343663b167e2a984ac79",
+        "version" : "3.1.2000"
       }
     },
     {
