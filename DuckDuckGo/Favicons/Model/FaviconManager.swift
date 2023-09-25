@@ -78,7 +78,7 @@ final class FaviconManager: FaviconManagement {
 
     private let faviconURLSession = URLSession(configuration: .ephemeral)
 
-    @Published var faviconsLoaded = false
+    @Published private(set) var faviconsLoaded = false
 
     nonisolated func loadFavicons() {
         imageCache.loadFavicons { _ in
@@ -97,6 +97,19 @@ final class FaviconManager: FaviconManagement {
         imageCache.loaded && referenceCache.loaded
     }
 
+    private func awaitFaviconsLoaded() async {
+        if faviconsLoaded { return }
+        await withCheckedContinuation { continuation in
+            $faviconsLoaded
+                .filter { $0 == true }
+                .first()
+                .promise()
+                .receive { _ in
+                    continuation.resume(returning: ())
+                }
+        }
+    }
+
     // MARK: - Fetching & Cache
 
     private let imageCache: FaviconImageCache
@@ -109,6 +122,7 @@ final class FaviconManager: FaviconManagement {
             // Manually add favicon.ico into links
             let faviconLinks = self.createFallbackLinksIfNeeded(faviconLinks, documentUrl: documentUrl)
 
+            await self.awaitFaviconsLoaded()
             // Fetch favicons if needed
             let faviconLinksToFetch = await self.filteringAlreadyFetchedFaviconLinks(from: faviconLinks)
             let newFavicons = await self.fetchFavicons(faviconLinks: faviconLinksToFetch, documentUrl: documentUrl)
@@ -270,17 +284,22 @@ final class FaviconManager: FaviconManagement {
     }
 
     private nonisolated func filteringAlreadyFetchedFaviconLinks(from faviconLinks: [FaviconUserScript.FaviconLink]) async -> [FaviconUserScript.FaviconLink] {
-        let map = faviconLinks.reduce(into: [URL: FaviconUserScript.FaviconLink]()) { result, faviconLink in
+        let urlsToLinks = faviconLinks.reduce(into: [URL: FaviconUserScript.FaviconLink]()) { result, faviconLink in
             guard let url = URL(string: faviconLink.href) else { return }
             result[url] = faviconLink
         }
         let weekAgo = Date.weekAgo
-        let cachedFavicons = await self.imageCache.getFavicons(with: map.keys)?
+        let cachedFavicons = await self.imageCache.getFavicons(with: urlsToLinks.keys)?
             .filter { favicon in
                 favicon.dateCreated > weekAgo
-            }
+            } ?? []
+        let cachedUrls = Set(cachedFavicons.map(\.url))
 
-        return cachedFavicons?.compactMap { map[$0.url] } ?? []
+        let nonCachedFavicons = urlsToLinks.filter { url, _ in
+            !cachedUrls.contains(url)
+        }.values
+
+        return Array(nonCachedFavicons)
     }
 
     private nonisolated func fetchFavicons(faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL) async -> [Favicon] {
