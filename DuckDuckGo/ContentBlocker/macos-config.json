@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1695309715890,
+    "version": 1695630192250,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -276,6 +276,10 @@
                     "reason": "https://github.com/duckduckgo/autoconsent/issues/254"
                 },
                 {
+                    "domain": "yum.com",
+                    "reason": "https://github.com/duckduckgo/autoconsent/issues/259"
+                },
+                {
                     "domain": "earth.google.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1099"
                 },
@@ -298,7 +302,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "d28139f3a183492cd9cb6d16e1430a36"
+            "hash": "6b201ccc9308a1e9b574b8a7da5a9b52"
         },
         "autofill": {
             "exceptions": [
@@ -4368,14 +4372,10 @@
                 {
                     "domain": "paramountplus.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1085"
-                },
-                {
-                    "domain": "accounts.google.com",
-                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1295"
                 }
             ],
-            "state": "enabled",
-            "hash": "40e3b8c99b7973983b38807c6ac59a08"
+            "state": "disabled",
+            "hash": "6fb4590e0f11214e27a5386f24f1962f"
         },
         "requestFilterer": {
             "state": "disabled",
