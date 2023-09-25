@@ -20,6 +20,7 @@ import SwiftUI
 import SwiftUIExtensions
 import SyncUI
 import Subscription
+import Accounts
 
 fileprivate extension Preferences.Const {
     static let sidebarWidth: CGFloat = 256
@@ -54,9 +55,24 @@ extension Preferences {
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
                             case .privacyPro:
-                                let actionHandler = SubscriptionAccessActionHandlers(openURLHandler: { url in
+                                let actionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
+                                    if #available(macOS 12.0, *) {
+                                        Task {
+                                            guard let (payload, jwsRepresentation) = await PurchaseManager.mostRecentTransaction() else { return }
+
+                                            switch await AccountsService.storeLogin(payload: payload, signature: jwsRepresentation) {
+                                            case .success(let response):
+                                                print("\(response)")
+                                                AccountManager().storeToken(response.authToken)
+                                            case .failure(let error):
+                                                print("Error: \(error)")
+                                            }
+                                        }
+                                    }
+                                }, openURLHandler: { url in
                                     WindowControllersManager.shared.show(url: url, newTab: true)
-                                }, goToSyncPreferences: {                                    self.model.selectPane(.sync)
+                                }, goToSyncPreferences: {
+                                    self.model.selectPane(.sync)
                                 })
                                 let model = PrivacyProPreferencesModel(sheetActionHandler: actionHandler)
                                 PrivacyProView(model: model)

@@ -85,8 +85,7 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel {
     public func handleAction(for channel: AccessChan) {
         switch channel {
         case .appleID:
-            // TODO: Add support to restore purchases here
-            print("restore purchase")
+            actionHandlers.restorePurchases()
         case .email:
             actionHandlers.openURLHandler(URL(string: "https://abrown.duckduckgo.com/subscriptions/activate")!)
         case .sync:
@@ -129,7 +128,7 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
     public func handleAction(for channel: AccessChan) {
         switch channel {
         case .appleID:
-            return
+            actionHandlers.restorePurchases()
         case .email:
             actionHandlers.openURLHandler(URL(string: "https://abrown.duckduckgo.com/subscriptions/add-email")!)
         case .sync:
@@ -139,10 +138,12 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
 }
 
 public final class SubscriptionAccessActionHandlers {
+    var restorePurchases: () -> Void
     var openURLHandler: (URL) -> Void
     var goToSyncPreferences: () -> Void
 
-    public init(openURLHandler: @escaping (URL) -> Void, goToSyncPreferences: @escaping () -> Void) {
+    public init(restorePurchases: @escaping () -> Void, openURLHandler: @escaping (URL) -> Void, goToSyncPreferences: @escaping () -> Void) {
+        self.restorePurchases = restorePurchases
         self.openURLHandler = openURLHandler
         self.goToSyncPreferences = goToSyncPreferences
     }

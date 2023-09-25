@@ -1077,6 +1077,18 @@ CQ
                                                             <action selector="managePurchases:" target="Ady-hI-5gd" id="ha5-Yv-msM"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Validate Token" id="t6E-Ul-tj9">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="validateToken:" target="Ady-hI-5gd" id="M0U-fT-sgu"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Restore Purchases" id="w1M-PT-MG5">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="restorePurchases:" target="Ady-hI-5gd" id="j7b-ey-Vhj"/>
+                                                        </connections>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>

@@ -30,11 +30,15 @@ public final class SubscriptionAccessViewController: NSViewController {
     }
 
     public override func loadView() {
-        let actionHandlers = SubscriptionAccessActionHandlers(openURLHandler: { _ in
-            // open URL here
-        }, goToSyncPreferences: {
-            // go to sync
-        })
+        let actionHandlers = SubscriptionAccessActionHandlers(
+            restorePurchases: {
+                // restore purchases
+            },
+            openURLHandler: { _ in
+                // open URL here
+            }, goToSyncPreferences: {
+                // go to sync
+            })
 
         let model = ActivateSubscriptionAccessModel(actionHandlers: actionHandlers)
 //        let model = ShareSubscriptionAccessModel(actionHandlers: actionHandlers)

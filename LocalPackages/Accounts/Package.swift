@@ -11,10 +11,15 @@ let package = Package(
             name: "Accounts",
             targets: ["Accounts"]),
     ],
+    dependencies: [
+//        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "75.2.0")
+    ],
     targets: [
         .target(
             name: "Accounts",
-            dependencies: []),
+            dependencies: [
+//                .product(name: "BrowserServicesKit", package: "BrowserServicesKit")
+            ]),
         .testTarget(
             name: "AccountsTests",
             dependencies: ["Accounts"]),

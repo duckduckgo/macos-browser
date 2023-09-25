@@ -745,6 +745,41 @@ extension MainViewController {
         AccountManager().signOut()
     }
 
+    @IBAction func validateToken(_ sender: Any?) {
+        guard let token = AccountManager().token else { return }
+
+        Task {
+            switch await AccountsService.validateToken(accessToken: token) {
+            case .success(let response):
+                print("\(response)")
+                //                    self.model.externalID = response.account.externalID
+                //                    self.model.currentEntitlements = response.account.entitlements
+                //                            await manager.updatePurchasedProducts()
+                //                            await manager.updateAvailableProducts()
+                //                            self.update(for: .readyToPurchase)
+            case .failure(let error):
+                print("Error: \(error)")
+            }
+        }
+    }
+
+    @IBAction func restorePurchases(_ sender: Any?) {
+        if #available(macOS 12.0, *) {
+            Task {
+                guard let (payload, jwsRepresentation) = await PurchaseManager.mostRecentTransaction() else { return }
+                
+                switch await AccountsService.storeLogin(payload: payload, signature: jwsRepresentation) {
+                case .success(let response):
+                    print("\(response)")
+                    AccountManager().storeToken(response.authToken)
+                case .failure(let error):
+                    print("Error: \(error)")
+                }
+            }
+        }
+    }
+
+
     @IBAction func managePurchases(_ sender: Any?) {
         if #available(macOS 12.0, *) {
             WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(DebugManagePurchasesViewController())

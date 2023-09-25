@@ -36,7 +36,7 @@ public class AnotherSubsTestingClass {
 
 @available(macOS 12.0, *)
 @MainActor
-final class PurchaseManager: ObservableObject {
+public final class PurchaseManager: ObservableObject {
 
     static let productIdentifiers = ["subscription.1week", "subscription.1month", "subscription.1year",
                                      "review.subscription.1week", "review.subscription.1month", "review.subscription.1year",
@@ -56,7 +56,7 @@ final class PurchaseManager: ObservableObject {
     private var transactionUpdates: Task<Void, Never>?
     private var storefrontChanges: Task<Void, Never>?
 
-    init() {
+    public init() {
         transactionUpdates = observeTransactionUpdates()
         storefrontChanges = observeStorefrontChanges()
     }
@@ -172,7 +172,7 @@ final class PurchaseManager: ObservableObject {
     }
 
     @MainActor
-    func mostRecentTransaction() async -> (String, String)? {
+    public static func mostRecentTransaction() async -> (String, String)? {
         print(" -- [PurchaseManager] updatePurchasedProducts()")
 
         var transactions: [VerificationResult<Transaction>] = []
