@@ -44,7 +44,7 @@ struct DeviceSyncedView: View {
         }
         .frame(width: 360,
                // Grow with the number of devices, up to a point
-               height: min(410, 258 + (CGFloat(devices.count) * 44)))
+               height: min(410, 270 + (CGFloat(devices.count) * 44)))
 
     }
 }
