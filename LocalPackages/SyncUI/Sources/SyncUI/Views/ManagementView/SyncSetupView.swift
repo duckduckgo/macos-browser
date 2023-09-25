@@ -112,7 +112,7 @@ extension SyncSetupView {
         var body: some View {
             HStack {
                 Button(UserText.syncRecoverDataActionTitle) {
-                    print("")
+                    model.presentRecoverSyncAccountDialog()
                 }
                 Spacer()
             }
