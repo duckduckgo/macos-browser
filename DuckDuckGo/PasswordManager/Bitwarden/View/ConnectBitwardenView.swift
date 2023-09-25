@@ -97,8 +97,9 @@ struct ConnectBitwardenView: View {
         case .lookingForBitwarden: BitwardenInstallationDetectionView(bitwardenDetected: false, bitwardenNeedsUpdate: false)
         case .oldVersion: BitwardenInstallationDetectionView(bitwardenDetected: true, bitwardenNeedsUpdate: true)
         case .bitwardenFound: BitwardenInstallationDetectionView(bitwardenDetected: true, bitwardenNeedsUpdate: false)
-        case .waitingForConnectionPermission: ConnectToBitwardenView(canConnect: false)
-        case .connectToBitwarden: ConnectToBitwardenView(canConnect: true)
+        case .accessToContainersNotApproved: ConnectToBitwardenView(canConnect: false, canNotAccessSandboxContainers: true)
+        case .waitingForConnectionPermission: ConnectToBitwardenView(canConnect: false, canNotAccessSandboxContainers: false)
+        case .connectToBitwarden: ConnectToBitwardenView(canConnect: true, canNotAccessSandboxContainers: false)
         case .connectedToBitwarden: ConnectedToBitwardenView()
         }
     }
@@ -217,6 +218,7 @@ private struct ConnectToBitwardenView: View {
     @EnvironmentObject var viewModel: ConnectBitwardenViewModel
 
     let canConnect: Bool
+    let canNotAccessSandboxContainers: Bool
 
     private var selectBitwardenStepTwoText: String {
         if #available(macOS 13.0, *) {
@@ -275,12 +277,24 @@ private struct ConnectToBitwardenView: View {
                     Spacer()
                 }
             } else {
+                if canNotAccessSandboxContainers {
+                    HStack(alignment: .top) {
+                        ActivityIndicator(isAnimating: .constant(true), style: .spinning)
+                            .frame(maxWidth: 8, maxHeight: 8)
+                            .padding(.top, 8)
 
-                HStack {
-                    ActivityIndicator(isAnimating: .constant(true), style: .spinning)
-                        .frame(maxWidth: 8, maxHeight: 8)
+                        Text(UserText.bitwardenCantAccessContainer)
+                            .lineLimit(nil)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                } else {
+                    HStack {
+                        ActivityIndicator(isAnimating: .constant(true), style: .spinning)
+                            .frame(maxWidth: 8, maxHeight: 8)
 
-                    Text(UserText.bitwardenWaitingForPermissions)
+                        Text(UserText.bitwardenWaitingForPermissions)
+
+                    }
                 }
             }
         }

@@ -91,7 +91,7 @@ final class PasswordManagerCoordinator: PasswordManagerCoordinating {
 
     func askToUnlock(completionHandler: @escaping () -> Void) {
         switch bitwardenManagement.status {
-        case .disabled, .notInstalled, .oldVersion, .missingHandshake, .handshakeNotApproved, .error:
+        case .disabled, .notInstalled, .oldVersion, .missingHandshake, .handshakeNotApproved, .error, .accessToContainersNotApproved:
             Task {
                 await WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .autofill)
             }
