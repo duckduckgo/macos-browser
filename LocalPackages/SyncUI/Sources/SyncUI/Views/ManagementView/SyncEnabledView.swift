@@ -40,31 +40,28 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             Text(UserText.syncNewDevice)
                 .font(Const.Fonts.preferencePaneSectionHeader)
 
-            SyncNewDeviceView<ViewModel>()
-                .environmentObject(model)
-        }
+            VStack(spacing: 0) {
+                SyncSetupSyncAnotherDeviceCardView<ViewModel>(isConnected: true)
+                    .environmentObject(model)
 
-        PreferencePaneSection {
-            Text("Options")
-                .font(Const.Fonts.preferencePaneSectionHeader)
-
-            Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
-                HStack {
-                    IconOnBackground(image: NSImage(imageLiteralResourceName: "SyncAllDevices"))
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Unified favorites")
-                            .font(Const.Fonts.preferencePaneOptionTitle)
-                        Text("Use the same favorites on all devices. Switch off to maintain separate favorites for mobile and desktop.")
-                            .font(Const.Fonts.preferencePaneCaption)
-                            .foregroundColor(Color("BlackWhite60"))
+                Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
+                    HStack {
+                        IconOnBackground(image: NSImage(imageLiteralResourceName: "SyncAllDevices"))
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Unified favorites")
+                                .font(Const.Fonts.preferencePaneOptionTitle)
+                            Text("Use the same favorites on all devices. Switch off to maintain separate favorites for mobile and desktop.")
+                                .font(Const.Fonts.preferencePaneCaption)
+                                .foregroundColor(Color("BlackWhite60"))
+                        }
+                        Spacer(minLength: 30)
                     }
-                    Spacer(minLength: 30)
                 }
+                .toggleStyle(.switch)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .roundedBorder()
             }
-            .toggleStyle(.switch)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .roundedBorder()
         }
 
         PreferencePaneSection {

@@ -33,7 +33,8 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                         ProgressView()
                     } else {
                         VStack(spacing: 24) {
-                            SyncSetupSyncAnotherDeviceCardView()
+                            SyncSetupSyncAnotherDeviceCardView<ViewModel>(isConnected: false)
+                                .environmentObject(model)
                                 .onAppear {
                                     model.startPollingForRecoveryKey()
                                 }
@@ -57,43 +58,6 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
 
 // MARK: - Card Views
 extension SyncSetupView {
-    struct SyncSetupSyncAnotherDeviceCardView: View {
-        @EnvironmentObject var model: ViewModel
-        var body: some View {
-            HStack(alignment: .top, spacing: 8) {
-                VStack(alignment: .leading, spacing: 16) {
-                    Text(UserText.syncAddDeviceCardExplanation)
-                        .foregroundColor(Color("GreyTextColor"))
-                    QRCodeView(recoveryCode: model.codeToDisplay ?? "")
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(UserText.syncAddDeviceCardActionsExplanation)
-                            .foregroundColor(Color("GreyTextColor"))
-                        Text(UserText.syncAddDeviceShowTextActionTitle)
-                            .fontWeight(.semibold)
-                            .foregroundColor(Color("LinkBlueColor"))
-                            .onTapGesture {
-                                model.presentShowTextCodeDialog()
-                            }
-                        Text(UserText.syncAddDeviceEnterCodeActionTitle)
-                            .fontWeight(.semibold)
-                            .foregroundColor(Color("LinkBlueColor"))
-                            .onTapGesture {
-                                model.presentRecoverSyncAccountDialog()
-                            }
-                    }
-                }
-                .frame(width: 424, alignment: .topLeading)
-                Image("Sync-Pair-96x96")
-            }
-            .padding(16)
-            .background(Color.black.opacity(0.01))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.0))
-            )
-        }
-    }
-
     struct SyncSetupStartCardView: View {
         @EnvironmentObject var model: ViewModel
         var body: some View {
@@ -140,23 +104,23 @@ extension SyncSetupView {
 }
 
 // MARK: - QRCodeView
-extension SyncSetupView {
-    struct QRCodeView: View {
-        let recoveryCode: String
+struct QRCodeView: View {
+    let recoveryCode: String
 
-        var body: some View {
-            VStack(alignment: .center) {
-                QRCode(string: recoveryCode, size: .init(width: 256, height: 256))
-                Text("Scan this QR code with another device")
-                    .foregroundColor(Color("GreyTextColor"))
-            }
-            .padding(.vertical, 16)
-            .frame(width: 480)
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.0))
-            )
+    var body: some View {
+        VStack(alignment: .center) {
+            QRCode(string: recoveryCode, size: .init(width: 256, height: 256))
+            Text("Scan this QR code with another device")
+                .foregroundColor(Color("GreyTextColor"))
         }
+        .padding(.vertical, 16)
+        .frame(width: 480)
+        background(ZStack {
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color("BlackWhite10"), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color("BlackWhite1"))
+        })
     }
 }
 
@@ -190,3 +154,50 @@ extension SyncSetupView {
 //                model.presentRecoverSyncAccountDialog()
 //            }
 //        }
+
+struct SyncSetupSyncAnotherDeviceCardView<ViewModel>: View where ViewModel: ManagementViewModel {
+    @EnvironmentObject var model: ViewModel
+    let isConnected: Bool
+    var code: String {
+        if isConnected {
+            return model.recoveryCode ?? ""
+        }
+        return model.codeToDisplay ?? ""
+    }
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            VStack(alignment: .leading, spacing: 16) {
+                Text(UserText.syncAddDeviceCardExplanation)
+                    .foregroundColor(Color("GreyTextColor"))
+                QRCodeView(recoveryCode: code)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(UserText.syncAddDeviceCardActionsExplanation)
+                        .foregroundColor(Color("GreyTextColor"))
+                    Text(UserText.syncAddDeviceShowTextActionTitle)
+                        .fontWeight(.semibold)
+                        .foregroundColor(Color("LinkBlueColor"))
+                        .onTapGesture {
+                            model.presentShowTextCodeDialog()
+                        }
+                    Text(UserText.syncAddDeviceEnterCodeActionTitle)
+                        .fontWeight(.semibold)
+                        .foregroundColor(Color("LinkBlueColor"))
+                        .onTapGesture {
+                            model.presentRecoverSyncAccountDialog()
+                        }
+                }
+            }
+            .frame(width: 424, alignment: .topLeading)
+            Image("Sync-Pair-96x96")
+        }
+        .padding(16)
+        .roundedBorder()
+//        .padding(16)
+//        .background(Color.black.opacity(0.01))
+//        .overlay(
+//            RoundedRectangle(cornerRadius: 12)
+//                .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.0))
+//        )
+    }
+}

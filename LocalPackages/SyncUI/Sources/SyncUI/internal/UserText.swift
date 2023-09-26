@@ -54,7 +54,7 @@ enum UserText {
     static let recoverSyncedData = NSLocalizedString("preferences.sync.recover", value: "Recover synced data with backup code", comment: "Caption for a button to recover synced data")
     static let syncConnected = NSLocalizedString("preferences.sync.connected", value: "Connected", comment: "Sync state")
     static let syncedDevices = NSLocalizedString("preferences.sync.synced-devices", value: "Synced Devices", comment: "Settings section title")
-    static let syncNewDevice = NSLocalizedString("preferences.sync.sync-new-device", value: "Sync New Device", comment: "Settings section title")
+    static let syncNewDevice = NSLocalizedString("preferences.sync.sync-new-device", value: "Sync with Another Device", comment: "Settings section title")
     static let thisDevice = NSLocalizedString("preferences.sync.this-device", value: "This Device", comment: "Indicator of a current user's device on the list")
     static let currentDeviceDetails = NSLocalizedString("preferences.sync.current-device-details", value: "Details...", comment: "Sync Settings device details button")
     static let removeDeviceButton = NSLocalizedString("preferences.sync.remove-device", value: "Remove...", comment: "Button to remove a device")
