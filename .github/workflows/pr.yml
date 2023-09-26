@@ -44,7 +44,6 @@ jobs:
         SHELLCHECK_OPTS: -x -P scripts -P scripts/helpers
 
   tests:
-
     name: Test
 
     strategy:
@@ -55,8 +54,6 @@ jobs:
             flavor: Non-Sandbox
           - scheme: DuckDuckGo Privacy Browser App Store
             flavor: Sandbox
-          - scheme: DataBrokerProtectionTests
-            flavor: Non-Sandbox
           - active-arch: YES
             flavor: Non-Sandbox
           - active-arch: NO
@@ -122,6 +119,19 @@ jobs:
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
           | tee ${{ matrix.flavor }}-xcodebuild.log \
           | xcbeautify --report junit --report-path . --junit-report-filename ${{ matrix.flavor }}.xml
+
+    - name: Test DBP
+      run: |
+        echo "Runner ${RUNNER_NAME} (${RUNNER_TRACKING_ID})"
+        export OS_ACTIVITY_MODE=debug
+        set -o pipefail && xcodebuild test \
+          -scheme "DataBrokerProtectionTests" \
+          -derivedDataPath "DerivedData" \
+          -configuration "CI" \
+          ENABLE_TESTABILITY=true \
+          ONLY_ACTIVE_ARCH=YES \
+          | tee DataBrokerProtectionTests-Non-Sandbox-xcodebuild.log \
+          | xcbeautify --report junit --report-path . --junit-report-filename DataBrokerProtectionTests.xml
 
     - name: Check private API usage
       id: private-api
