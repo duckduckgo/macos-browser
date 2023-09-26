@@ -31,6 +31,7 @@ public protocol SubscriptionAccessModel {
     var description: String { get }
 
     func title(for channel: AccessChan) -> String
+    func descriptionHeader(for channel: AccessChan) -> String?
     func description(for channel: AccessChan) -> String
     func buttonTitle(for channel: AccessChan) -> String?
     func handleAction(for channel: AccessChan)
@@ -49,6 +50,8 @@ extension SubscriptionAccessModel {
             return "Sync"
         }
     }
+
+    public func descriptionHeader(for channel: AccessChan) -> String? { nil }
 }
 
 public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel {
@@ -107,12 +110,16 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
         self.email = email
     }
 
+    public func descriptionHeader(for channel: AccessChan) -> String? {
+        hasEmail && channel == .email ? email : nil
+    }
+
     public func description(for channel: AccessChan) -> String {
         switch channel {
         case .appleID:
             return "Your subscription is automatically available on any device signed in to the same Apple ID."
         case .email:
-            return hasEmail ? "\(email)\nMange your email address" : "Add an email address to access your subscription on your other devices. We’ll only use this address to verify your subscription."
+            return hasEmail ? "You can use this email to activate your subscription on your other devices." : "Add an email address to access your subscription on your other devices. We’ll only use this address to verify your subscription."
         case .sync:
             return "Privacy Pro is automatically available on your Synced devices. Manage your synced devices in Sync settings."
         }

@@ -21,6 +21,7 @@ import SwiftUIExtensions
 
 public struct SubscriptionAccessRow: View {
     let name: String
+    let descriptionHeader: String?
     let description: String
     let isExpanded: Bool
     let buttonTitle: String?
@@ -28,8 +29,9 @@ public struct SubscriptionAccessRow: View {
 
     @State var fullHeight: CGFloat = 0.0
 
-    public init(name: String, description: String, isExpanded: Bool, buttonTitle: String? = nil, buttonAction: (() -> Void)? = nil) {
+    public init(name: String, descriptionHeader: String? = nil, description: String, isExpanded: Bool, buttonTitle: String? = nil, buttonAction: (() -> Void)? = nil) {
         self.name = name
+        self.descriptionHeader = descriptionHeader
         self.description = description
         self.isExpanded = isExpanded
         self.buttonTitle = buttonTitle
@@ -57,14 +59,21 @@ public struct SubscriptionAccessRow: View {
             }
             .drawingGroup()
 
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Spacer()
                     .frame(height: 10)
+
+                if let header = descriptionHeader, !header.isEmpty {
+                    Text(header)
+                        .bold()
+                }
 
                 Text(description)
                     .fixMultilineScrollableText()
 
                 if let title = buttonTitle, let action = buttonAction {
+                    Spacer()
+                        .frame(height: 8)
                     Button(title) { action() }
                         .buttonStyle(DefaultActionButtonStyle(enabled: true))
                 }

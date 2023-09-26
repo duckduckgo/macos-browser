@@ -46,6 +46,7 @@ public struct SubscriptionAccessView: View {
             VStack(spacing: 0) {
                 ForEach(model.items) { item in
                     SubscriptionAccessRow(name: model.title(for: item),
+                                          descriptionHeader: model.descriptionHeader(for: item),
                                           description: model.description(for: item),
                                           isExpanded: self.selection == item.id,
                                           buttonTitle: model.buttonTitle(for: item),
