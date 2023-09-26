@@ -430,4 +430,8 @@ extension URL {
         }
 
     }
+
+    // MARK: - System Settings
+
+    static var fullDiskAccess = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
 }

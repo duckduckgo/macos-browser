@@ -22,7 +22,7 @@ import Common
 public protocol DataBrokerProtectionDataManaging {
     var delegate: DataBrokerProtectionDataManagerDelegate? { get set }
 
-    init(fakeBrokerFlag: FakeBrokerFlag)
+    init(fakeBrokerFlag: DataBrokerDebugFlag)
     func saveProfile(_ profile: DataBrokerProtectionProfile) async
     func fetchProfile(ignoresCache: Bool) -> DataBrokerProtectionProfile?
     func fetchBrokerProfileQueryData(ignoresCache: Bool) async -> [BrokerProfileQueryData]
@@ -50,7 +50,7 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
 
     internal let database: DataBrokerProtectionRepository
 
-    required public init(fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()) {
+    required public init(fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()) {
         self.database = DataBrokerProtectionDatabase(fakeBrokerFlag: fakeBrokerFlag)
     }
 
