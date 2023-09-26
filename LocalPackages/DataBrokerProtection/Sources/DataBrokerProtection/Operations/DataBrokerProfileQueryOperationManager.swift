@@ -318,15 +318,4 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
         os_log("Error on operation : %{public}@", log: .dataBrokerProtection, error.localizedDescription)
     }
-
-    // If the last time we removed the profile has a bigger time difference than the current date + maintenance we should schedule for a new optout
-    private func shouldScheduleNewOptOut(events: [HistoryEvent],
-                                         extractedProfileId: Int64,
-                                         schedulingConfig: DataBrokerScheduleConfig) -> Bool {
-        guard let lastRemovalEvent = events.last(where: { $0.type == .optOutRequested && $0.extractedProfileId == extractedProfileId }) else {
-            return false
-        }
-
-        return lastRemovalEvent.date.addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds) < Date()
-    }
 }

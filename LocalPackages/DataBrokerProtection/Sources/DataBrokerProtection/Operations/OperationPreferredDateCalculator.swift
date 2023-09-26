@@ -58,8 +58,6 @@ struct OperationPreferredDateCalculator {
 
         switch lastEvent.type {
 
-        case .noMatchFound:
-            newDate = currentPreferredRunDate
         case .matchesFound:
             if let extractedProfileID = extractedProfileID, shouldScheduleNewOptOut(events: historyEvents,
                                                                                     extractedProfileId: extractedProfileID,
@@ -70,7 +68,7 @@ struct OperationPreferredDateCalculator {
             }
         case .error:
             newDate = Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
-        case .optOutStarted, .scanStarted:
+        case .optOutStarted, .scanStarted, .noMatchFound:
             newDate = currentPreferredRunDate
         case .optOutConfirmed, .optOutRequested:
             newDate = nil
@@ -86,7 +84,7 @@ struct OperationPreferredDateCalculator {
         return min(date1, date2)
     }
 
-    // If the last time we removed the profile has a bigger time difference than the current date + maintenance we should schedule for a new optout
+    // If the time elapsed since the last profile removal exceeds the current date plus maintenance period (expired), we should proceed with scheduling a new opt-out request as the broker has failed to honor the previous one.
     private func shouldScheduleNewOptOut(events: [HistoryEvent],
                                          extractedProfileId: Int64,
                                          schedulingConfig: DataBrokerScheduleConfig) -> Bool {

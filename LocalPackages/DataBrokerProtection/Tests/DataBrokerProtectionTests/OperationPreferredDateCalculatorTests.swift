@@ -51,7 +51,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
     }
 
     /*
-     If the last time we removed the profile has a bigger time difference than the current date + maintenance (expired) we should schedule for a new optout because the broker didn't honor the request
+     If the time elapsed since the last profile removal exceeds the current date plus maintenance period (expired), we should proceed with scheduling a new opt-out request as the broker has failed to honor the previous one.
      */
     func testMatchFoundWithExpiredProfile_thenScanDateIsMaintenance() throws {
         let expiredDate = Date().addingTimeInterval(-schedulingConfig.maintenanceScan.hoursToSeconds)
@@ -219,7 +219,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
     }
 
     /*
-     If the last time we removed the profile has a bigger time difference than the current date + maintenance (expired) we should schedule for a new optout because the broker didn't honor the request
+     If the time elapsed since the last profile removal exceeds the current date plus maintenance period (expired), we should proceed with scheduling a new opt-out request as the broker has failed to honor the previous one.
      */
     func testMatchFoundWithExpiredProfileWithRecentDate_thenScanDateDoesNotChange() throws {
         let expiredDate = Date().addingTimeInterval(-schedulingConfig.maintenanceScan.hoursToSeconds)
@@ -550,7 +550,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
     }
 
     /*
-     If the last time we removed the profile has a bigger time difference than the current date + maintenance (expired) we should schedule for a new optout because the broker didn't honor the request
+     If the time elapsed since the last profile removal exceeds the current date plus maintenance period (expired), we should proceed with scheduling a new opt-out request as the broker has failed to honor the previous one.
      */
     func testMatchFoundWithExpiredProfileWithRecentDate_thenOptOutDateDoesNotChange() throws {
         let expiredDate = Date().addingTimeInterval(-schedulingConfig.maintenanceScan.hoursToSeconds)
