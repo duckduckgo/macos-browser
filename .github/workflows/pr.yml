@@ -174,12 +174,14 @@ jobs:
       with:
         name: ${{ matrix.flavor }}-xcodebuild.log
         path: ${{ matrix.flavor }}-xcodebuild.log
+        retention-days: 7
     - name: Upload failed xcresult
       uses: actions/upload-artifact@v3
       if: failure()
       with:
         name: ${{ matrix.flavor }}.xcresult
         path: ${{ matrix.flavor }}.xcresult
+        retention-days: 7
 
   private-api:
     name: Private API Report
@@ -268,6 +270,7 @@ jobs:
       with:
         name: release-xcodebuild.log
         path: release-xcodebuild.log
+        retention-days: 7
 
   verify-autoconsent-bundle:
     name: 'Verify autoconsent bundle'
