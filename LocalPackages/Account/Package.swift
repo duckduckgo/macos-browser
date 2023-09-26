@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "Account",
-    platforms: [ .macOS(.v10_15) ],
+    platforms: [ .macOS(.v11) ],
     products: [
         .library(
             name: "Account",

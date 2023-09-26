@@ -59,6 +59,21 @@ public class AccountManager {
         }
     }
 
+    public var externalID: String? {
+        do {
+            return try storage.getExternalID()
+        } catch {
+            if let error = error as? AccountKeychainAccessError {
+//                requestDelegate?.emailManagerKeychainAccessFailed(accessType: .getToken, error: error)
+            } else {
+                assertionFailure("Expected AccountKeychainAccessError")
+            }
+
+            return nil
+        }
+    }
+
+
     public var isSignedIn: Bool {
         return token != nil
     }

@@ -5,22 +5,24 @@ import PackageDescription
 
 let package = Package(
     name: "Subscription",
-    platforms: [ .macOS(.v10_15) ],
+    platforms: [ .macOS(.v11) ],
     products: [
         .library(
             name: "Subscription",
             targets: ["Subscription"]),
     ],
     dependencies: [
-        .package(path: "../SwiftUIExtensions"),
-        .package(path: "../Purchase")
+        .package(path: "../Account"),
+        .package(path: "../Purchase"),
+        .package(path: "../SwiftUIExtensions")
     ],
     targets: [
         .target(
             name: "Subscription",
             dependencies: [
-                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
-                .product(name: "Purchase", package: "Purchase")
+                .product(name: "Account", package: "Account"),
+                .product(name: "Purchase", package: "Purchase"),
+                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
             ]),
         .testTarget(
             name: "SubscriptionTests",

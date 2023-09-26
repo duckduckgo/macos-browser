@@ -790,18 +790,13 @@ extension MainViewController {
         guard let token = AccountManager().token else { return }
 
         Task {
+            await AccountsService.validateToken(accessToken: token)
 //            switch await AccountsService.validateToken(accessToken: token) {
-            switch await AccountsService.getAccessToken(token: token) {
-            case .success(let response):
-                print("\(response)")
-                //                    self.model.externalID = response.account.externalID
-                //                    self.model.currentEntitlements = response.account.entitlements
-                //                            await manager.updatePurchasedProducts()
-                //                            await manager.updateAvailableProducts()
-                //                            self.update(for: .readyToPurchase)
-            case .failure(let error):
-                print("Error: \(error)")
-            }
+//            case .success(let response):
+//                print("\(response)")
+//            case .failure(let error):
+//                print("Error: \(error)")
+//            }
         }
     }
 

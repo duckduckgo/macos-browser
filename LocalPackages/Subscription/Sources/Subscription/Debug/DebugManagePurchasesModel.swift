@@ -19,6 +19,7 @@
 import Foundation
 import StoreKit
 import Purchase
+import Account
 
 @available(macOS 12.0, *)
 public final class DebugManagePurchasesModel: ObservableObject {
@@ -33,8 +34,12 @@ public final class DebugManagePurchasesModel: ObservableObject {
 
     @MainActor
     func purchase(_ product: Product) {
-        print("Purchasing \(product.displayName)")
-        manager.purchase(product, customUUID: "")  //model.externalID ?? "")
+        print("Attempting purchase: \(product.displayName)")
+
+        guard let externalID = AccountManager().externalID else { return }
+        print("ExternalID: \(externalID)")
+
+        manager.purchase(product, customUUID: externalID)
     }
 }
 
