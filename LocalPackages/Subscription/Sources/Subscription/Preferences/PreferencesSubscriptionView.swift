@@ -175,7 +175,7 @@ public struct SectionView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .fixMultilineScrollableText()
                             .font(.system(size: 11, weight: .regular, design: .default))
-                            .foregroundColor(Color("TextSecondary", bundle: .module))\
+                            .foregroundColor(Color("TextSecondary", bundle: .module))
                     }
 
                     if !buttonName.isEmpty {
