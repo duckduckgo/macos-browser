@@ -69,8 +69,6 @@ class PixelArgumentsTests: XCTestCase {
         let mainMenu = makeMenu()
         let ap = Pixel.Event.AccessPoint(sender: mainMenu.item, default: .tabMenu) { $0 === mainMenu.menu }
         XCTAssertEqual(ap, .mainMenu)
-        // test failure
-        (["a"] as NSArray).perform(NSSelectorFromString("UTF8String"))
     }
 
     func testWhenInitWithHotKeyThenAccessPointIsHotKey() {

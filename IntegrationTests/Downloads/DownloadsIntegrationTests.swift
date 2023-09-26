@@ -104,9 +104,6 @@ class DownloadsIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigationActionIsBlob_downloadStarts() async throws {
-        // test failure
-        (["a"] as NSArray).perform(NSSelectorFromString("UTF8String"))
-
         var persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
