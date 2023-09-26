@@ -248,13 +248,14 @@
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="TabBarShadowLeft" id="crE-9i-66r"/>
                             </imageView>
                             <customView horizontalHuggingPriority="251" horizontalCompressionResistancePriority="749" translatesAutoresizingMaskIntoConstraints="NO" id="G3c-kC-Gu9">
-                                <rect key="frame" x="76" y="0.0" width="0.0" height="34"/>
+                                <rect key="frame" x="76" y="0.0" width="0.0" height="32"/>
                                 <constraints>
+                                    <constraint firstAttribute="height" constant="32" id="1BZ-3V-sPc"/>
                                     <constraint firstAttribute="width" placeholder="YES" id="WbS-dd-RX8"/>
                                 </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="1Zn-JZ-2g3" customClass="WindowDraggingView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
-                                <rect key="frame" x="76" y="0.0" width="0.0" height="34"/>
+                                <rect key="frame" x="76" y="0.0" width="0.0" height="32"/>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="efe-Pc-ueT" userLabel="Window Dragging View" customClass="WindowDraggingView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                 <rect key="frame" x="76" y="0.0" width="687" height="38"/>
@@ -298,7 +299,6 @@
                             <constraint firstItem="1Zn-JZ-2g3" firstAttribute="leading" secondItem="G3c-kC-Gu9" secondAttribute="leading" id="kBj-jh-X0L"/>
                             <constraint firstItem="efe-Pc-ueT" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" priority="750" id="kNA-2I-L0U"/>
                             <constraint firstAttribute="bottom" secondItem="G3d-9f-GhJ" secondAttribute="bottom" id="m1b-9d-wVV"/>
-                            <constraint firstItem="G3c-kC-Gu9" firstAttribute="height" secondItem="O0X-yp-zLn" secondAttribute="height" id="n4S-57-Odv"/>
                             <constraint firstAttribute="bottom" secondItem="8Av-Au-VBq" secondAttribute="bottom" id="pat-VC-dVb"/>
                             <constraint firstItem="kOb-4q-pAe" firstAttribute="leading" secondItem="G3c-kC-Gu9" secondAttribute="trailing" id="qU6-dU-yJw"/>
                             <constraint firstAttribute="bottom" secondItem="yvS-k9-opP" secondAttribute="bottom" id="tUv-Mi-H0G"/>
