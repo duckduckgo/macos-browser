@@ -44,7 +44,7 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                             SyncSetupRecoverCardView()
                             Text(UserText.syncAddDeviceCardExplanation)
                                 .font(.system(size: 11))
-                                .foregroundColor(.black.opacity(0.6))
+                                .foregroundColor(Color("GreyTextColor"))
                                 .padding(.horizontal, 16)
                         }
                     }
@@ -63,17 +63,23 @@ extension SyncSetupView {
             HStack(alignment: .top, spacing: 8) {
                 VStack(alignment: .leading, spacing: 16) {
                     Text(UserText.syncAddDeviceCardExplanation)
-                        .foregroundColor(.black.opacity(0.6))
+                        .foregroundColor(Color("GreyTextColor"))
                     QRCodeView(recoveryCode: model.codeToDisplay ?? "")
                     VStack(alignment: .leading, spacing: 8) {
                         Text(UserText.syncAddDeviceCardActionsExplanation)
-                            .foregroundColor(.black.opacity(0.6))
+                            .foregroundColor(Color("GreyTextColor"))
                         Text(UserText.syncAddDeviceShowTextActionTitle)
                             .fontWeight(.semibold)
                             .foregroundColor(Color("LinkBlueColor"))
+                            .onTapGesture {
+                                model.presentShowTextCodeDialog()
+                            }
                         Text(UserText.syncAddDeviceEnterCodeActionTitle)
                             .fontWeight(.semibold)
                             .foregroundColor(Color("LinkBlueColor"))
+                            .onTapGesture {
+                                model.presentRecoverSyncAccountDialog()
+                            }
                     }
                 }
                 .frame(width: 424, alignment: .topLeading)
@@ -96,7 +102,7 @@ extension SyncSetupView {
                     Text(UserText.syncFirstDeviceSetUpCardTitle)
                         .fontWeight(.semibold)
                     Text(UserText.syncFirstDeviceSetUpCardExplanation)
-                        .foregroundColor(.black.opacity(0.6))
+                        .foregroundColor(Color("GreyTextColor"))
                     Button(UserText.syncFirstDeviceSetUpActionTitle) {
                         model.turnOnSync()
                     }

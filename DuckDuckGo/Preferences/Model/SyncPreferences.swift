@@ -79,6 +79,12 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     }
 
     @MainActor
+    func presentShowTextCodeDialog() {
+        managementDialogModel.codeToDisplay = self.codeToDisplay
+        presentDialog(for: .showTextCode)
+    }
+
+    @MainActor
     func presentTurnOffSyncConfirmDialog() {
         presentDialog(for: .turnOffSync)
     }
@@ -313,7 +319,9 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     return
                 }
             } catch {
-                managementDialogModel.errorMessage = String(describing: error)
+                if syncService.account == nil {
+                    managementDialogModel.errorMessage = String(describing: error)
+                }
             }
         }
     }

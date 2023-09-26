@@ -30,6 +30,7 @@ public enum ManagementDialogKind: Equatable {
     case deviceDetails(_ device: SyncDevice)
     case removeDevice(_ device: SyncDevice)
     case setUpAllSet
+    case showTextCode
 }
 
 public struct ManagementDialog: View {
@@ -77,6 +78,8 @@ public struct ManagementDialog: View {
                 DeleteAccountView(devices: devices)
             case .setUpAllSet:
                 SetUpAllSetView()
+            case .showTextCode:
+                ShowTextCodeView()
 
             default:
                 EmptyView()

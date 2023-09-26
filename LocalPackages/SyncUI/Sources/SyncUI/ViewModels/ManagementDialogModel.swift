@@ -57,4 +57,5 @@ public final class ManagementDialogModel: ObservableObject {
     }
 
     private var shouldShowErrorMessageCancellable: AnyCancellable?
+    
 }
