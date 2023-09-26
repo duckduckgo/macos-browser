@@ -75,7 +75,7 @@ final class FaviconImageCache {
             do {
                 await removeFaviconsFromStore(oldFavicons)
                 try await storing.save(favicons)
-                os_log("Favicon saved successfully. URL: %s", log: .favicons, favicons.map(\.url.absoluteString))
+                os_log("Favicon saved successfully. URL: %s", log: .favicons, favicons.map(\.url.absoluteString).description)
                 await MainActor.run {
                     NotificationCenter.default.post(name: .faviconCacheUpdated, object: nil)
                 }
