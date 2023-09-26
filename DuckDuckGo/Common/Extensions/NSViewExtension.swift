@@ -22,7 +22,7 @@ import Common
 
 extension NSView {
 
-    static var swizzleVisibleRectOnce: Void = {
+    private static var swizzleVisibleRectOnce: Void = {
         guard #available(macOS 13.0, *) else { return }
         let originalVisibleRect = class_getInstanceMethod(NSView.self, #selector(getter: NSView.visibleRect))!
         let swizzledVisibleRect = class_getInstanceMethod(NSView.self, #selector(NSView.swizzledVisibleRect))!
