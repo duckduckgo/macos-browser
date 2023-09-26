@@ -52,10 +52,9 @@ public struct SubscriptionAccessRow: View {
                 Spacer()
                     .contentShape(Rectangle())
 
-                if #available(macOS 11.0, *) {
-                    Image(systemName: "chevron.down")
-                        .rotationEffect(Angle(degrees: isExpanded ? -180 : 0))
-                }
+                Image(systemName: "chevron.down")
+                    .rotationEffect(Angle(degrees: isExpanded ? -180 : 0))
+
             }
             .drawingGroup()
 

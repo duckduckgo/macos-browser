@@ -50,19 +50,14 @@ extension Preferences {
                     } buttons: {
                         if model.isSignedIn {
                             Button("Add to Another Device…") { showingSheet.toggle() }
-                            if #available(macOS 11.0, *) {
-                                Menu {
-                                    Button("Change Plan or Billing...", action: { model.changePlanOrBillingAction() })
-                                    Button("Remove From This Device...", action: { model.removeFromThisDeviceAction() })
-                                } label: {
-                                    Text("Manage Subscription")
-                                }
-                                .fixedSize()
-                            } else {
-                                // Same buttons as above
+
+                            Menu {
                                 Button("Change Plan or Billing...", action: { model.changePlanOrBillingAction() })
                                 Button("Remove From This Device...", action: { model.removeFromThisDeviceAction() })
+                            } label: {
+                                Text("Manage Subscription")
                             }
+                            .fixedSize()
                         } else {
                             Button("Learn More") { model.learnMoreAction() }
                                 .buttonStyle(DefaultActionButtonStyle(enabled: true))

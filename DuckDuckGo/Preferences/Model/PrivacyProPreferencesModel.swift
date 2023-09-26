@@ -37,11 +37,11 @@ final class PrivacyProPreferencesModel: ObservableObject {
         self.isSignedIn = isSignedIn
         sheetModel = isSignedIn ? ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email) : ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
 
-        NotificationCenter.default.addObserver(forName: .accountDidSignIn, object: nil, queue: nil) { _ in
+        NotificationCenter.default.addObserver(forName: .accountDidSignIn, object: nil, queue: .main) { _ in
             self.updateSignInState(true)
         }
 
-        NotificationCenter.default.addObserver(forName: .accountDidSignOut, object: nil, queue: nil) { _ in
+        NotificationCenter.default.addObserver(forName: .accountDidSignOut, object: nil, queue: .main) { _ in
             self.updateSignInState(false)
         }
     }
