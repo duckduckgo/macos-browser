@@ -20,6 +20,7 @@ import SwiftUI
 import SwiftUIExtensions
 
 public struct SubscriptionAccessRow: View {
+    let iconName: String
     let name: String
     let descriptionHeader: String?
     let description: String
@@ -29,7 +30,8 @@ public struct SubscriptionAccessRow: View {
 
     @State var fullHeight: CGFloat = 0.0
 
-    public init(name: String, descriptionHeader: String? = nil, description: String, isExpanded: Bool, buttonTitle: String? = nil, buttonAction: (() -> Void)? = nil) {
+    public init(iconName: String, name: String, descriptionHeader: String? = nil, description: String, isExpanded: Bool, buttonTitle: String? = nil, buttonAction: (() -> Void)? = nil) {
+        self.iconName = iconName
         self.name = name
         self.descriptionHeader = descriptionHeader
         self.description = description
@@ -41,13 +43,10 @@ public struct SubscriptionAccessRow: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center, spacing: 8) {
-                Image("SubscriptionIcon")
-                    .padding(4)
-                    .background(Color.black.opacity(0.06))
-                    .cornerRadius(4)
+                Image(iconName, bundle: .module)
 
-//                TextMenuItemCaption(text: name)
                 Text(name)
+                    .font(.system(size: 14, weight: .regular, design: .default))
 
                 Spacer()
                     .contentShape(Rectangle())
@@ -56,18 +55,20 @@ public struct SubscriptionAccessRow: View {
                     .rotationEffect(Angle(degrees: isExpanded ? -180 : 0))
 
             }
+            .padding([.top, .bottom], 8)
             .drawingGroup()
 
             VStack(alignment: .leading, spacing: 4) {
-                Spacer()
-                    .frame(height: 10)
 
                 if let header = descriptionHeader, !header.isEmpty {
                     Text(header)
                         .bold()
+                        .foregroundColor(Color("TextPrimary", bundle: .module))
                 }
 
                 Text(description)
+                    .font(.system(size: 13, weight: .regular, design: .default))
+                    .foregroundColor(Color("TextSecondary", bundle: .module))
                     .fixMultilineScrollableText()
 
                 if let title = buttonTitle, let action = buttonAction {
@@ -78,7 +79,7 @@ public struct SubscriptionAccessRow: View {
                 }
 
                 Spacer()
-                    .frame(height: 10)
+                    .frame(height: 4)
             }
             .background(
                 GeometryReader { proxy in

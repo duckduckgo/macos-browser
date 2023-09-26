@@ -37,15 +37,23 @@ public struct SubscriptionAccessView: View {
 
     public var body: some View {
         VStack(spacing: 8) {
-            Text(model.title)
-                .font(.title)
-            Text(model.description)
-                .multilineTextAlignment(.center)
-                .fixMultilineScrollableText()
+            VStack(spacing: 8) {
+                Text(model.title)
+                    .font(.title2)
+                    .bold()
+                    .foregroundColor(Color("TextPrimary", bundle: .module))
+                Text(model.description)
+                    .font(.body)
+                    .multilineTextAlignment(.center)
+                    .fixMultilineScrollableText()
+                    .foregroundColor(Color("TextPrimary", bundle: .module))
+            }
+            .padding(4)
 
             VStack(spacing: 0) {
                 ForEach(model.items) { item in
-                    SubscriptionAccessRow(name: model.title(for: item),
+                    SubscriptionAccessRow(iconName: item.iconName,
+                                          name: item.title,
                                           descriptionHeader: model.descriptionHeader(for: item),
                                           description: model.description(for: item),
                                           isExpanded: self.selection == item.id,

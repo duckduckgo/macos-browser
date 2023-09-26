@@ -22,26 +22,9 @@ public enum AccessChan: String, CaseIterable, Identifiable {
     public var id: Self { self }
 
     case appleID, email, sync
-}
 
-public protocol SubscriptionAccessModel {
-    var items: [AccessChan] { get }
-
-    var title: String { get }
-    var description: String { get }
-
-    func title(for channel: AccessChan) -> String
-    func descriptionHeader(for channel: AccessChan) -> String?
-    func description(for channel: AccessChan) -> String
-    func buttonTitle(for channel: AccessChan) -> String?
-    func handleAction(for channel: AccessChan)
-}
-
-extension SubscriptionAccessModel {
-    public var items: [AccessChan] { AccessChan.allCases }
-
-    public func title(for channel: AccessChan) -> String {
-        switch channel {
+    var title: String {
+        switch self {
         case .appleID:
             return "Apple ID"
         case .email:
@@ -50,6 +33,33 @@ extension SubscriptionAccessModel {
             return "Sync"
         }
     }
+
+    var iconName: String {
+        switch self {
+        case .appleID:
+            return "apple-id-icon"
+        case .email:
+            return "email-icon"
+        case .sync:
+            return "sync-icon"
+        }
+    }
+}
+
+public protocol SubscriptionAccessModel {
+    var items: [AccessChan] { get }
+
+    var title: String { get }
+    var description: String { get }
+
+    func descriptionHeader(for channel: AccessChan) -> String?
+    func description(for channel: AccessChan) -> String
+    func buttonTitle(for channel: AccessChan) -> String?
+    func handleAction(for channel: AccessChan)
+}
+
+extension SubscriptionAccessModel {
+    public var items: [AccessChan] { AccessChan.allCases }
 
     public func descriptionHeader(for channel: AccessChan) -> String? { nil }
 }

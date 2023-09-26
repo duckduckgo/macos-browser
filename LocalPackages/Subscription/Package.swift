@@ -23,6 +23,9 @@ let package = Package(
                 .product(name: "Account", package: "Account"),
                 .product(name: "Purchase", package: "Purchase"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
+            ],
+            resources: [
+                .process("Resources")
             ]),
         .testTarget(
             name: "SubscriptionTests",
