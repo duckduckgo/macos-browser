@@ -23,7 +23,7 @@ import Foundation
 final class HoverTrackingArea: NSTrackingArea {
 
     static func updateTrackingAreas(in view: NSView & Hoverable) {
-        if let trackingArea = view.trackingAreas.first(where: { $0 is HoverTrackingArea }) {
+        for trackingArea in view.trackingAreas where trackingArea is HoverTrackingArea {
             view.removeTrackingArea(trackingArea)
         }
         let trackingArea = HoverTrackingArea(owner: view)
@@ -52,10 +52,11 @@ final class HoverTrackingArea: NSTrackingArea {
             owner.observe(\.mouseOverColor) { [weak self] _, _ in self?.updateLayer() },
             owner.observe(\.mouseDownColor) { [weak self] _, _ in self?.updateLayer() },
             owner.observe(\.cornerRadius) { [weak self] _, _ in self?.updateLayer() },
-            owner.observe(\.cornerRadius) { [weak self] _, _ in self?.updateLayer() },
+            owner.observe(\.backgroundInset) { [weak self] _, _ in self?.updateLayer() },
+            (owner as? NSControl)?.observe(\.isEnabled) { [weak self] _, _ in self?.updateLayer() },
             owner.observe(\.isMouseDown) { [weak self] _, _ in self?.mouseDownDidChange() },
             owner.observe(\.frame) { [weak self] _, _ in self?.viewFrameDidChange() },
-        ]
+        ].compactMap { $0 }
     }
 
     required init?(coder: NSCoder) {

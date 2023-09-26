@@ -71,6 +71,10 @@ internal class MouseOverButton: NSButton, Hoverable {
         normalTintColor = self.contentTintColor
     }
 
+    override func viewWillMove(toWindow newWindow: NSWindow?) {
+        isMouseDown = false
+    }
+
     @Published var isMouseOver = false {
         didSet {
             updateTintColor()
