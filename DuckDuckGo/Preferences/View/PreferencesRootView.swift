@@ -56,15 +56,13 @@ extension Preferences {
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
                             case .privacyPro:
-                                let actionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
+                                SubscriptionView(actionHandler: .init(restorePurchases: {
                                     AccountManager().signInByRestoringPastPurchases()
                                 }, openURLHandler: { url in
                                     WindowControllersManager.shared.show(url: url, newTab: true)
                                 }, goToSyncPreferences: {
                                     self.model.selectPane(.sync)
-                                })
-                                let model = PrivacyProPreferencesModel(sheetActionHandler: actionHandler)
-                                PrivacyProView(model: model)
+                                }))
                             case .autofill:
                                 AutofillView(model: AutofillPreferencesModel())
                             case .downloads:
@@ -104,6 +102,17 @@ struct SyncView: View {
         } else {
             FailedAssertionView("Failed to initialize Sync Management View")
         }
+    }
+
+}
+
+struct SubscriptionView: View {
+
+    var actionHandler: SubscriptionAccessActionHandlers
+
+    var body: some View {
+        let model = PreferencesSubscriptionModel(sheetActionHandler: actionHandler)
+        Subscription.PreferencesSubscriptionView(model: model)
     }
 
 }

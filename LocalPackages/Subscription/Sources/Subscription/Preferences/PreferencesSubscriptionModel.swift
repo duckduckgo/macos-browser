@@ -1,5 +1,5 @@
 //
-//  PrivacyProPreferencesModel.swift
+//  PreferencesSubscriptionModel.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,10 +18,9 @@
 
 import Foundation
 import Account
-import Subscription
-import AppKit
+//import AppKit
 
-final class PrivacyProPreferencesModel: ObservableObject {
+public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isSignedIn: Bool = false
     var sheetModel: SubscriptionAccessModel
@@ -29,7 +28,7 @@ final class PrivacyProPreferencesModel: ObservableObject {
     private let accountManager: AccountManager
     private let sheetActionHandler: SubscriptionAccessActionHandlers
 
-    init(accountManager: AccountManager = AccountManager(), sheetActionHandler: SubscriptionAccessActionHandlers) {
+    public init(accountManager: AccountManager = AccountManager(), sheetActionHandler: SubscriptionAccessActionHandlers) {
         self.accountManager = accountManager
         self.sheetActionHandler = sheetActionHandler
 
@@ -53,17 +52,17 @@ final class PrivacyProPreferencesModel: ObservableObject {
 
     @MainActor
     private func openURL(_ url: URL) {
-        WindowControllersManager.shared.show(url: url, newTab: true)
+//        WindowControllersManager.shared.show(url: url, newTab: true)
     }
 
     @MainActor
     func learnMoreAction() {
-        openURL(.aboutDuckDuckGo)
+//        openURL(.aboutDuckDuckGo)
     }
 
     @MainActor
     func changePlanOrBillingAction() {
-        NSWorkspace.shared.open(URL(string: "macappstores://apps.apple.com/account/subscriptions")!)
+//        NSWorkspace.shared.open(URL(string: "macappstores://apps.apple.com/account/subscriptions")!)
     }
 
     @MainActor
@@ -73,7 +72,7 @@ final class PrivacyProPreferencesModel: ObservableObject {
 
     @MainActor
     func openFAQ() {
-        openURL(.aboutDuckDuckGo)
+//        openURL(.aboutDuckDuckGo)
     }
 
 }

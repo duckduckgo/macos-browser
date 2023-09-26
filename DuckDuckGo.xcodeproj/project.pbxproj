@@ -85,12 +85,6 @@
 		1E7E2E9229029F9B00C01B54 /* WebsiteBreakageReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E9129029F9B00C01B54 /* WebsiteBreakageReporter.swift */; };
 		1E7E2E942902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */; };
 		1E862A8A2A9FC03300F84D4B /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = 1E862A892A9FC03300F84D4B /* Subscription */; };
-		1E862A902AA8788000F84D4B /* PreferencesPrivacyProView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E862A8F2AA8787F00F84D4B /* PreferencesPrivacyProView.swift */; };
-		1E862A912AA8788000F84D4B /* PreferencesPrivacyProView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E862A8F2AA8787F00F84D4B /* PreferencesPrivacyProView.swift */; };
-		1E862A922AA8788000F84D4B /* PreferencesPrivacyProView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E862A8F2AA8787F00F84D4B /* PreferencesPrivacyProView.swift */; };
-		1E86DF782AAA08BD00DD9908 /* PrivacyProPreferencesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E86DF772AAA08BD00DD9908 /* PrivacyProPreferencesModel.swift */; };
-		1E86DF792AAA08BD00DD9908 /* PrivacyProPreferencesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E86DF772AAA08BD00DD9908 /* PrivacyProPreferencesModel.swift */; };
-		1E86DF7A2AAA08BD00DD9908 /* PrivacyProPreferencesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E86DF772AAA08BD00DD9908 /* PrivacyProPreferencesModel.swift */; };
 		1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E3E2912A10D0051A99B /* ContentBlocking */; };
 		1E950E412912A10D0051A99B /* PrivacyDashboard in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E402912A10D0051A99B /* PrivacyDashboard */; };
 		1E950E432912A10D0051A99B /* UserScript in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E422912A10D0051A99B /* UserScript */; };
@@ -3040,8 +3034,6 @@
 		1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPermissionHandler.swift; sourceTree = "<group>"; };
 		1E862A852A9FBD7000F84D4B /* Account */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Account; sourceTree = "<group>"; };
 		1E862A882A9FC01200F84D4B /* Subscription */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Subscription; sourceTree = "<group>"; };
-		1E862A8F2AA8787F00F84D4B /* PreferencesPrivacyProView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesPrivacyProView.swift; sourceTree = "<group>"; };
-		1E86DF772AAA08BD00DD9908 /* PrivacyProPreferencesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyProPreferencesModel.swift; sourceTree = "<group>"; };
 		1EC88CA22AC1DE82003A4471 /* Purchase */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Purchase; sourceTree = "<group>"; };
 		3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionViewController.swift; sourceTree = "<group>"; };
 		310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofingReferenceTests.swift; sourceTree = "<group>"; };
@@ -4661,7 +4653,6 @@
 				3775912C29AAC72700E26367 /* SyncPreferences.swift */,
 				37CD54C727F2FDD100F1F7B9 /* AppearancePreferences.swift */,
 				37CD54C127F2FDD100F1F7B9 /* PrivacyPreferencesModel.swift */,
-				1E86DF772AAA08BD00DD9908 /* PrivacyProPreferencesModel.swift */,
 				4B0511A6262CAA5A00F6079C /* PrivacySecurityPreferences.swift */,
 				37F19A6628E1B43200740DC6 /* DuckPlayerPreferences.swift */,
 				37CD54C227F2FDD100F1F7B9 /* AutofillPreferencesModel.swift */,
@@ -4758,7 +4749,6 @@
 				37AFCE8A27DB69BC00471A10 /* PreferencesGeneralView.swift */,
 				37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */,
 				37CC53EB27E8A4D10028713D /* PreferencesPrivacyView.swift */,
-				1E862A8F2AA8787F00F84D4B /* PreferencesPrivacyProView.swift */,
 				37F19A6428E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift */,
 				379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */,
 				37CC53EF27E8D1440028713D /* PreferencesDownloadsView.swift */,
@@ -8868,7 +8858,6 @@
 				31929FEF2A4C4CFF0084EA89 /* BWManager.swift in Sources */,
 				31929FF02A4C4CFF0084EA89 /* AppTrackerDataSetProvider.swift in Sources */,
 				31929FF12A4C4CFF0084EA89 /* EncryptionKeyGeneration.swift in Sources */,
-				1E86DF7A2AAA08BD00DD9908 /* PrivacyProPreferencesModel.swift in Sources */,
 				31929FF22A4C4CFF0084EA89 /* TabLazyLoader.swift in Sources */,
 				31929FF32A4C4CFF0084EA89 /* FileImportViewController.swift in Sources */,
 				31929FF42A4C4CFF0084EA89 /* SaveCredentialsViewController.swift in Sources */,
@@ -8945,7 +8934,6 @@
 				3192A0392A4C4CFF0084EA89 /* NSPathControlView.swift in Sources */,
 				3192A03A2A4C4CFF0084EA89 /* HTTPSUpgradeTabExtension.swift in Sources */,
 				3192A03B2A4C4CFF0084EA89 /* AppIconChanger.swift in Sources */,
-				1E862A922AA8788000F84D4B /* PreferencesPrivacyProView.swift in Sources */,
 				3192A03C2A4C4CFF0084EA89 /* Main.swift in Sources */,
 				3192A03D2A4C4CFF0084EA89 /* Bookmark.xcdatamodeld in Sources */,
 				3192A03E2A4C4CFF0084EA89 /* DefaultBrowserPromptView.swift in Sources */,
@@ -9506,7 +9494,6 @@
 				4B9DB0332A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */,
 				3706FABA293F65D500E42796 /* BookmarkOutlineViewDataSource.swift in Sources */,
 				3706FABB293F65D500E42796 /* PasswordManagementBitwardenItemView.swift in Sources */,
-				1E862A912AA8788000F84D4B /* PreferencesPrivacyProView.swift in Sources */,
 				3706FABC293F65D500E42796 /* CookieConsentPopover.swift in Sources */,
 				3706FABD293F65D500E42796 /* NSNotificationName+PasswordManager.swift in Sources */,
 				3706FABE293F65D500E42796 /* RulesCompilationMonitor.swift in Sources */,
@@ -9982,7 +9969,6 @@
 				3706FC45293F65D500E42796 /* BookmarkTableRowView.swift in Sources */,
 				3706FC47293F65D500E42796 /* FavoritesView.swift in Sources */,
 				3706FC48293F65D500E42796 /* HomePage.swift in Sources */,
-				1E86DF792AAA08BD00DD9908 /* PrivacyProPreferencesModel.swift in Sources */,
 				3706FC49293F65D500E42796 /* RoundedSelectionRowView.swift in Sources */,
 				4B9DB01E2A983B24000927DB /* Waitlist.swift in Sources */,
 				3706FC4A293F65D500E42796 /* LocalStatisticsStore.swift in Sources */,
@@ -10559,7 +10545,6 @@
 				4B7A60A1273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift in Sources */,
 				B693955326F04BEC0015B914 /* WindowDraggingView.swift in Sources */,
 				4B1E6EED27AB5E5100F51793 /* SecureVaultSorting.swift in Sources */,
-				1E86DF782AAA08BD00DD9908 /* PrivacyProPreferencesModel.swift in Sources */,
 				37CD54CE27F2FDD100F1F7B9 /* PreferencesSidebarModel.swift in Sources */,
 				3767190328E724D8003A2A15 /* DuckPlayerURLExtension.swift in Sources */,
 				1D43EB32292788C70065E5D6 /* BWEncryptionOutput.m in Sources */,
@@ -10991,7 +10976,6 @@
 				AAE7527A263B046100B973F8 /* History.xcdatamodeld in Sources */,
 				B64C853D26944B940048FEBE /* PermissionStore.swift in Sources */,
 				AA75A0AE26F3500C0086B667 /* PrivacyIconViewModel.swift in Sources */,
-				1E862A902AA8788000F84D4B /* PreferencesPrivacyProView.swift in Sources */,
 				4BB99D0126FE191E001E4761 /* ChromiumBookmarksReader.swift in Sources */,
 				B6C0B23426E71BCD0031CB7F /* Downloads.xcdatamodeld in Sources */,
 				AAE8B110258A456C00E81239 /* TabPreviewViewController.swift in Sources */,
