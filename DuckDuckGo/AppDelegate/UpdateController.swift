@@ -21,6 +21,8 @@ import Combine
 import Sparkle
 import BrowserServicesKit
 
+#if SPARKLE
+
 final class UpdateController: NSObject {
 
     enum Constants {
@@ -38,6 +40,10 @@ final class UpdateController: NSObject {
     }
 
     func checkForUpdates(_ sender: Any!) {
+        if !SupportedOSChecker.isCurrentOSReceivingUpdates {
+            showNotSupportedInfo()
+        }
+
         NSApp.windows.forEach {
             if let controller = $0.windowController, "\(type(of: controller))" == "SUUpdateAlert" {
                 $0.orderFrontRegardless()
@@ -63,6 +69,13 @@ final class UpdateController: NSObject {
         updater.updater.automaticallyChecksForUpdates = false
         updater.updater.updateCheckInterval = 0
 #endif
+    }
+
+    private func showNotSupportedInfo() {
+        if NSAlert.osNotSupported().runModal() != .cancel {
+            let url = Preferences.UnsupportedDeviceInfoBox.softwareUpdateURL
+            NSWorkspace.shared.open(url)
+        }
     }
 
 }
@@ -113,3 +126,5 @@ extension UpdateController: SPUUpdaterDelegate {
     }
 
 }
+
+#endif

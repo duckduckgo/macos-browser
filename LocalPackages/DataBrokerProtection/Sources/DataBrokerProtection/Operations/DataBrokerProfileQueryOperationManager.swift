@@ -24,11 +24,38 @@ enum OperationsError: Error {
 }
 
 protocol OperationsManager {
+
+    // We want to refactor this to return a NSOperation in the future
+    // so we have more control of stopping/starting the queue
+    // for the time being, shouldRunNextStep: @escaping () -> Bool is being used
     func runOperation(operationData: BrokerOperationData,
                       brokerProfileQueryData: BrokerProfileQueryData,
                       database: DataBrokerProtectionRepository,
                       notificationCenter: NotificationCenter,
-                      runner: WebOperationRunner) async throws
+                      runner: WebOperationRunner,
+                      pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+                      showWebView: Bool,
+                      shouldRunNextStep: @escaping () -> Bool) async throws
+}
+
+extension OperationsManager {
+    func runOperation(operationData: BrokerOperationData,
+                      brokerProfileQueryData: BrokerProfileQueryData,
+                      database: DataBrokerProtectionRepository,
+                      notificationCenter: NotificationCenter,
+                      runner: WebOperationRunner,
+                      pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+                      shouldRunNextStep: @escaping () -> Bool) async throws {
+
+        try await runOperation(operationData: operationData,
+                               brokerProfileQueryData: brokerProfileQueryData,
+                               database: database,
+                               notificationCenter: notificationCenter,
+                               runner: runner,
+                               pixelHandler: pixelHandler,
+                               showWebView: false,
+                               shouldRunNextStep: shouldRunNextStep)
+    }
 }
 
 struct DataBrokerProfileQueryOperationManager: OperationsManager {
@@ -37,20 +64,28 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                brokerProfileQueryData: BrokerProfileQueryData,
                                database: DataBrokerProtectionRepository,
                                notificationCenter: NotificationCenter = NotificationCenter.default,
-                               runner: WebOperationRunner) async throws {
+                               runner: WebOperationRunner,
+                               pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+                               showWebView: Bool = false,
+                               shouldRunNextStep: @escaping () -> Bool) async throws {
 
         if operationData as? ScanOperationData != nil {
             try await runScanOperation(on: runner,
                                        brokerProfileQueryData: brokerProfileQueryData,
                                        database: database,
-                                       notificationCenter: notificationCenter)
-
+                                       notificationCenter: notificationCenter,
+                                       pixelHandler: pixelHandler,
+                                       showWebView: showWebView,
+                                       shouldRunNextStep: shouldRunNextStep)
         } else if let optOutOperationData = operationData as? OptOutOperationData {
             try await runOptOutOperation(for: optOutOperationData.extractedProfile,
                                          on: runner,
                                          brokerProfileQueryData: brokerProfileQueryData,
                                          database: database,
-                                         notificationCenter: notificationCenter)
+                                         notificationCenter: notificationCenter,
+                                         pixelHandler: pixelHandler,
+                                         showWebView: showWebView,
+                                         shouldRunNextStep: shouldRunNextStep)
         }
     }
 
@@ -58,7 +93,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
     internal func runScanOperation(on runner: WebOperationRunner,
                                    brokerProfileQueryData: BrokerProfileQueryData,
                                    database: DataBrokerProtectionRepository,
-                                   notificationCenter: NotificationCenter) async throws {
+                                   notificationCenter: NotificationCenter,
+                                   pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+                                   showWebView: Bool = false,
+                                   shouldRunNextStep: @escaping () -> Bool) async throws {
         os_log("Running scan operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 
         guard let brokerId = brokerProfileQueryData.dataBroker.id, let profileQueryId = brokerProfileQueryData.profileQuery.id else {
@@ -68,13 +106,6 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
         defer {
             database.updateLastRunDate(Date(), brokerId: brokerId, profileQueryId: profileQueryId)
-            updateOperationDataDates(
-                brokerId: brokerId,
-                profileQueryId: profileQueryId,
-                extractedProfileId: nil,
-                schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig,
-                database: database
-            )
             os_log("Finished scan operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
             notificationCenter.post(name: DataBrokerProtectionNotifications.didFinishScan, object: brokerProfileQueryData.dataBroker.name)
         }
@@ -82,8 +113,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         do {
             let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .scanStarted)
             database.add(event)
-
-            let extractedProfiles = try await runner.scan(brokerProfileQueryData)
+            let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
+            let extractedProfiles = try await runner.scan(brokerProfileQueryData, stageCalculator: stageCalculator, showWebView: showWebView, shouldRunNextStep: shouldRunNextStep)
             os_log("Extracted profiles: %@", log: .dataBrokerProtection, extractedProfiles)
 
             if !extractedProfiles.isEmpty {
@@ -93,10 +124,11 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                 for extractedProfile in extractedProfiles {
 
                     // We check if the profile exists in the database.
-                    let doesProfileExistsInDatabase = brokerProfileQueryData.extractedProfiles.contains { $0.profileUrl == extractedProfile.profileUrl }
+                    let extractedProfilesForBroker = database.fetchExtractedProfiles(for: brokerId)
+                    let doesProfileExistsInDatabase = extractedProfilesForBroker.contains { $0.profileUrl == extractedProfile.profileUrl }
 
-                    // If the profile exists we do not create a new opt-out operation, it should exist, and we do not insert the profile into the database.
-                    if doesProfileExistsInDatabase, let alreadyInDatabaseProfile = brokerProfileQueryData.extractedProfiles.first(where: { $0.profileUrl == extractedProfile.profileUrl }), let id = alreadyInDatabaseProfile.id {
+                    // If the profile exists we do not create a new opt-out operation
+                    if doesProfileExistsInDatabase, let alreadyInDatabaseProfile = extractedProfilesForBroker.first(where: { $0.profileUrl == extractedProfile.profileUrl }), let id = alreadyInDatabaseProfile.id {
                         // If it was removed in the past but was found again when scanning, it means it appearead again, so we reset the remove date.
                         if alreadyInDatabaseProfile.removedDate != nil {
                             database.updateRemovedDate(nil, on: id)
@@ -118,27 +150,55 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         try database.saveOptOutOperation(optOut: optOutOperationData, extractedProfile: extractedProfile)
                     }
                 }
+            } else {
+                let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .noMatchFound)
+                database.add(event)
+            }
 
-                // Check for removed profiles
-                let removedProfiles = brokerProfileQueryData.extractedProfiles.filter { savedProfile in
-                    !extractedProfiles.contains { recentlyFoundProfile in
-                        recentlyFoundProfile.profileUrl == savedProfile.profileUrl
-                    }
+            // Check for removed profiles
+            let removedProfiles = brokerProfileQueryData.extractedProfiles.filter { savedProfile in
+                !extractedProfiles.contains { recentlyFoundProfile in
+                    recentlyFoundProfile.profileUrl == savedProfile.profileUrl
                 }
+            }
 
+            if !removedProfiles.isEmpty {
                 for removedProfile in removedProfiles {
                     if let extractedProfileId = removedProfile.id {
                         let event = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutConfirmed)
                         database.add(event)
                         database.updateRemovedDate(Date(), on: extractedProfileId)
-                        database.updatePreferredRunDate(nil, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
+
+                        updateOperationDataDates(
+                            brokerId: brokerId,
+                            profileQueryId: profileQueryId,
+                            extractedProfileId: extractedProfileId,
+                            schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig,
+                            database: database
+                        )
+
                         os_log("Profile removed from optOutsData: %@", log: .dataBrokerProtection, String(describing: removedProfile))
+
+                        // Add a comment explaining this piece of code
+                        if let attempt = database.fetchAttemptInformation(for: extractedProfileId), let attemptUUID = UUID(uuidString: attempt.attemptId) {
+                            let now = Date()
+                            let calculateDurationSinceLastStage = now.timeIntervalSince(attempt.lastStageDate) * 1000
+                            let calculateDurationSinceStart = now.timeIntervalSince(attempt.startDate) * 1000
+                            pixelHandler.fire(.optOutFinish(dataBroker: attempt.dataBroker, attemptId: attemptUUID, duration: calculateDurationSinceLastStage))
+                            pixelHandler.fire(.optOutSuccess(dataBroker: attempt.dataBroker, attemptId: attemptUUID, duration: calculateDurationSinceStart))
+                        }
                     }
                 }
             } else {
-                let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .noMatchFound)
-                database.add(event)
+                updateOperationDataDates(
+                    brokerId: brokerId,
+                    profileQueryId: profileQueryId,
+                    extractedProfileId: nil,
+                    schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig,
+                    database: database
+                )
             }
+
         } catch {
             handleOperationError(brokerId: brokerId,
                                  profileQueryId: profileQueryId,
@@ -153,7 +213,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                      on runner: WebOperationRunner,
                                      brokerProfileQueryData: BrokerProfileQueryData,
                                      database: DataBrokerProtectionRepository,
-                                     notificationCenter: NotificationCenter) async throws {
+                                     notificationCenter: NotificationCenter,
+                                     pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+                                     showWebView: Bool = false,
+                                     shouldRunNextStep: @escaping () -> Bool) async throws {
         guard let brokerId = brokerProfileQueryData.dataBroker.id, let profileQueryId = brokerProfileQueryData.profileQuery.id, let extractedProfileId = extractedProfile.id else {
             // Maybe send pixel?
             throw OperationsError.idsMissingForBrokerOrProfileQuery
@@ -164,6 +227,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             return
         }
 
+        let stageDurationCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
+        stageDurationCalculator.fireOptOutStart()
         os_log("Running opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 
         defer {
@@ -183,10 +248,20 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         do {
             database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutStarted))
 
-            try await runner.optOut(profileQuery: brokerProfileQueryData, extractedProfile: extractedProfile)
+            try await runner.optOut(profileQuery: brokerProfileQueryData,
+                                    extractedProfile: extractedProfile,
+                                    stageCalculator: stageDurationCalculator,
+                                    showWebView: showWebView,
+                                    shouldRunNextStep: shouldRunNextStep)
 
+            database.addAttempt(extractedProfileId: extractedProfileId,
+                                attemptUUID: stageDurationCalculator.attemptId,
+                                dataBroker: stageDurationCalculator.dataBroker,
+                                lastStageDate: stageDurationCalculator.lastStateTime,
+                                startTime: stageDurationCalculator.startTime)
             database.add(.init(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested))
         } catch {
+            stageDurationCalculator.fireOptOutFailure()
             handleOperationError(
                 brokerId: brokerId,
                 profileQueryId: profileQueryId,
@@ -207,13 +282,13 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         schedulingConfig: DataBrokerScheduleConfig,
         database: DataBrokerProtectionRepository
     ) {
-        let maintenanceScanDate = Date().addingTimeInterval(schedulingConfig.maintenanceScan)
+        let maintenanceScanDate = Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
 
         if let brokerProfileQuery = database.brokerProfileQueryData(for: brokerId, and: profileQueryId),
            let lastHistoryEvent = brokerProfileQuery.events.last {
             switch lastHistoryEvent.type {
             case .error:
-                let retryOperationDate = Date().addingTimeInterval(schedulingConfig.retryError)
+                let retryOperationDate = Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
                 updatePreferredRunDate(
                     retryOperationDate,
                     brokerId: brokerId,
@@ -222,7 +297,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                     database: database
                 )
             case .optOutRequested:
-                let confirmOptOutDate = Date().addingTimeInterval(schedulingConfig.confirmOptOutScan)
+                let confirmOptOutDate = Date().addingTimeInterval(schedulingConfig.confirmOptOutScan.hoursToSeconds)
 
                 // We set extractedProfileId to nil because we want to update the scan operation
                 updatePreferredRunDate(
@@ -306,7 +381,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         extractedProfileId: Int64?,
         database: DataBrokerProtectionRepository
     ) {
-        if  let extractedProfileId = extractedProfileId {
+        if let extractedProfileId = extractedProfileId {
             database.updatePreferredRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
         } else {
             database.updatePreferredRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId)
@@ -345,6 +420,6 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             return false
         }
 
-        return lastRemovalEvent.date.addingTimeInterval(schedulingConfig.maintenanceScan) < Date()
+        return lastRemovalEvent.date.addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds) < Date()
     }
 }

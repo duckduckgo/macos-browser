@@ -116,7 +116,6 @@ class OnboardingTests: XCTestCase {
 }
 
 final class MockOnboardingDelegate: NSObject, OnboardingDelegate {
-
     var didRequestImportDataCalled = 0
     var didRequestSetDefaultCalled = 0
     var hasFinishedCalled = 0
@@ -134,5 +133,7 @@ final class MockOnboardingDelegate: NSObject, OnboardingDelegate {
     func onboardingHasFinished() {
         hasFinishedCalled += 1
     }
+
+    func goToNewTabPage() {}
 
 }

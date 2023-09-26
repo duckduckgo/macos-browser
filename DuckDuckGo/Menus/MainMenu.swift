@@ -82,10 +82,17 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var toggleBookmarksShortcutMenuItem: NSMenuItem?
     @IBOutlet weak var toggleDownloadsShortcutMenuItem: NSMenuItem?
     @IBOutlet weak var toggleNetworkProtectionShortcutMenuItem: NSMenuItem?
+    @IBOutlet weak var toggleHomeButtonMenuItem: NSMenuItem?
 
     // MARK: - Debug
 
     @IBOutlet weak var debugMenuItem: NSMenuItem?
+
+    @IBOutlet weak var debugNetworkProtectionWaitlistTokenItem: NSMenuItem?
+    @IBOutlet weak var debugNetworkProtectionWaitlistTimestampItem: NSMenuItem?
+    @IBOutlet weak var debugNetworkProtectionWaitlistInviteCodeItem: NSMenuItem?
+    @IBOutlet weak var debugNetworkProtectionWaitlistTermsAndConditionsAcceptedItem: NSMenuItem?
+    @IBOutlet weak var debugNetworkProtectionWaitlistEnterInviteCodeItem: NSMenuItem?
 
     private func setupDebugMenuItem(with featureFlagger: FeatureFlagger) {
         guard let debugMenuItem else {
@@ -121,7 +128,7 @@ final class MainMenu: NSMenu {
 #endif
     }
 
-    let sharingMenu = SharingMenu()
+    let sharingMenu = SharingMenu(title: UserText.shareMenuItem)
 
     // MARK: - Lifecycle
 
@@ -134,31 +141,26 @@ final class MainMenu: NSMenu {
             NSApplication.shared.helpMenu = helpMenuItem?.submenu
         }
 
-        if !WKWebView.canPrint {
-            printMenuItem?.removeFromParent()
-            printSeparatorItem?.removeFromParent()
-        }
-
-        sharingMenu.title = shareMenuItem.title
-        shareMenuItem.submenu = sharingMenu
-
         // To be safe, hide the NetP shortcut menu item by default.
         toggleNetworkProtectionShortcutMenuItem?.isHidden = true
 
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
         updateLoggingMenuItems()
+
+#if NETWORK_PROTECTION
+        updateNetworkProtectionItems()
+#endif
     }
 
     @MainActor
     func setup(with featureFlagger: FeatureFlagger) {
-        self.delegate = self
-
-#if APPSTORE
+#if !SPARKLE
         checkForUpdatesMenuItem?.removeFromParent()
         checkForUpdatesSeparatorItem?.removeFromParent()
 #endif
 
+        shareMenuItem.submenu = sharingMenu
         setupHelpMenuItem()
         setupDebugMenuItem(with: featureFlagger)
         subscribeToBookmarkList()
@@ -288,11 +290,10 @@ final class MainMenu: NSMenu {
         toggleAutofillShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         toggleBookmarksShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
         toggleDownloadsShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
+        toggleHomeButtonMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .homeButton)
 
 #if NETWORK_PROTECTION
-        let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore()
-        if #available(macOS 11.4, *),
-           networkProtectionFeatureVisibility.isFeatureActivated {
+        if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             toggleNetworkProtectionShortcutMenuItem?.isHidden = false
             toggleNetworkProtectionShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
         } else {
@@ -346,6 +347,23 @@ final class MainMenu: NSMenu {
             item.state = enabledCategories.contains(category) ? .on : .off
         }
     }
+
+#if NETWORK_PROTECTION
+    private func updateNetworkProtectionItems() {
+        let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: NetworkProtectionWaitlist.identifier)
+        debugNetworkProtectionWaitlistTokenItem?.title = "Waitlist Token: \(waitlistStorage.getWaitlistToken() ?? "N/A")"
+        debugNetworkProtectionWaitlistInviteCodeItem?.title = "Waitlist Invite Code: \(waitlistStorage.getWaitlistInviteCode() ?? "N/A")"
+
+        if let timestamp = waitlistStorage.getWaitlistTimestamp() {
+            debugNetworkProtectionWaitlistTimestampItem?.title = "Waitlist Timestamp: \(String(describing: timestamp))"
+        } else {
+            debugNetworkProtectionWaitlistTimestampItem?.title = "Waitlist Timestamp: N/A"
+        }
+
+        let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+        debugNetworkProtectionWaitlistTermsAndConditionsAcceptedItem?.title = "T&C Accepted: \(accepted ? "Yes" : "No")"
+    }
+#endif
 
     @objc private func loggingMenuItemAction(_ sender: NSMenuItem) {
         guard let category = sender.identifier?.rawValue else { return }
@@ -427,20 +445,5 @@ final class MainMenu: NSMenu {
         } catch {
             NSAlert(error: error).runModal()
         }
-    }
-}
-
-extension MainMenu: NSMenuDelegate {
-
-    func menuHasKeyEquivalent(_ menu: NSMenu,
-                              for event: NSEvent,
-                              target: AutoreleasingUnsafeMutablePointer<AnyObject?>,
-                              action: UnsafeMutablePointer<Selector?>) -> Bool {
-#if DEBUG
-        if NSApp.isRunningUnitTests { return false }
-#endif
-        sharingMenu.update()
-        shareMenuItem.submenu = sharingMenu
-        return false
     }
 }

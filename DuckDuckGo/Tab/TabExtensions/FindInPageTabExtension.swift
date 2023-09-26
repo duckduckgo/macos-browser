@@ -19,6 +19,7 @@
 import Combine
 import Foundation
 import Navigation
+import UniformTypeIdentifiers
 
 final class FindInPageTabExtension: TabExtension {
 
@@ -26,7 +27,7 @@ final class FindInPageTabExtension: TabExtension {
     private weak var webView: WebView?
     private var cancellable: AnyCancellable?
 
-    private var isFindInPageActive = false
+    private(set) var isActive = false
     private var isPdf = false
 
     private enum Constants {
@@ -56,7 +57,11 @@ final class FindInPageTabExtension: TabExtension {
 
     @MainActor
     private func showFindInPage() async {
-        guard !model.isVisible else {
+        let alreadyVisible = model.isVisible
+        // makes Find In Page a first responder if re-requested
+        model.show()
+
+        guard !alreadyVisible else {
             // Find In Page is already active
             guard !model.text.isEmpty,
                   // would just find next for PDF
@@ -66,8 +71,6 @@ final class FindInPageTabExtension: TabExtension {
             await find(model.text, with: [.noIndexChange, .determineMatchIndex, .showOverlay])
             return
         }
-
-        model.show()
 
         await reset()
         guard !model.text.isEmpty else { return }
@@ -80,12 +83,12 @@ final class FindInPageTabExtension: TabExtension {
     @MainActor
     private func reset() async {
         model.update(currentSelection: nil, matchesFound: nil)
-        isFindInPageActive = false
+        isActive = false
 
         // hide overlay and reset matchIndex
         webView?.clearFindInPageState()
         try? await webView?.deselectAll()
-        self.isPdf = (await webView?.mimeType == UTType.pdf.mimeType)
+        self.isPdf = (await webView?.mimeType == UTType.pdf.preferredMIMEType)
     }
 
     @MainActor
@@ -97,7 +100,7 @@ final class FindInPageTabExtension: TabExtension {
 
         var options = _WKFindOptions.showOverlay
 
-        if isFindInPageActive {
+        if isActive {
             // continue search from current matched result
             options.insert(.noIndexChange)
         }
@@ -128,7 +131,7 @@ final class FindInPageTabExtension: TabExtension {
         }
 
         var options = options.union([.caseInsensitive, .wrapAround, .showFindIndicator])
-        if !self.isFindInPageActive {
+        if !self.isActive {
             options.remove(.showOverlay)
         }
 
@@ -141,8 +144,8 @@ final class FindInPageTabExtension: TabExtension {
 
             // first search _sometimes_ won‘t highlight the first match
             // search again to ensure highlighting with noIndexChange to find the same match
-            if !self.isFindInPageActive {
-                self.isFindInPageActive = true
+            if !self.isActive {
+                self.isActive = true
 
                 // don‘t apply for cmd+[shift]+g search when Find In Page is hidden
                 guard self.model.isVisible,
@@ -154,7 +157,7 @@ final class FindInPageTabExtension: TabExtension {
 
         case .notFound:
             self.webView?.clearFindInPageState()
-            self.isFindInPageActive = false
+            self.isActive = false
             self.model.update(currentSelection: 0, matchesFound: 0)
 
         case .cancelled, .none:
@@ -187,16 +190,16 @@ final class FindInPageTabExtension: TabExtension {
         model.close()
         cancellable = nil
         webView?.clearFindInPageState()
-        isFindInPageActive = false
+        isActive = false
     }
 
     func findNext() {
         guard !model.text.isEmpty else { return }
-        Task { @MainActor [isFindInPageActive /* copy value before search */] in
+        Task { @MainActor [isActive /* copy value before search */] in
             await find(model.text, with: model.isVisible ? .showOverlay : [])
 
             // pdf would reset search index for cmd+g, at least fix the doubling search result here
-            await doItOneMoreTimeForPdf(with: model.text, oldValue: (isFindInPageActive ? model.text : ""))
+            await doItOneMoreTimeForPdf(with: model.text, oldValue: (isActive ? model.text : ""))
         }
     }
 
@@ -225,6 +228,8 @@ extension FindInPageTabExtension: NavigationResponder {
 
 protocol FindInPageProtocol: AnyObject, NavigationResponder {
     var model: FindInPageModel { get }
+    var isActive: Bool { get }
+
     func show(with webView: WebView)
     func close()
     func findNext()

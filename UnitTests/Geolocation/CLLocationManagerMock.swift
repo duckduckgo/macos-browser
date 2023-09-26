@@ -27,7 +27,7 @@ final class CLLocationManagerMock: CLLocationManager {
         didSet {
             for value in instances {
                 guard let instance = value.nonretainedObjectValue as? CLLocationManagerMock else { fatalError() }
-                instance.delegate?.locationManager?(instance, didChangeAuthorization: authStatus)
+                instance.delegate?.locationManagerDidChangeAuthorization?(instance)
             }
         }
     }
@@ -35,7 +35,7 @@ final class CLLocationManagerMock: CLLocationManager {
         didSet {
             for value in instances {
                 guard let instance = value.nonretainedObjectValue as? CLLocationManagerMock else { fatalError() }
-                instance.delegate?.locationManager?(instance, didChangeAuthorization: authStatus)
+                instance.delegate?.locationManagerDidChangeAuthorization?(instance)
             }
         }
     }
@@ -54,8 +54,8 @@ final class CLLocationManagerMock: CLLocationManager {
         Self.instances.remove(at: Self.instances.firstIndex(of: selfRef)!)
     }
 
-    override class func authorizationStatus() -> CLAuthorizationStatus {
-        authStatus
+    override var authorizationStatus: CLAuthorizationStatus {
+        Self.authStatus
     }
 
     override class func locationServicesEnabled() -> Bool {

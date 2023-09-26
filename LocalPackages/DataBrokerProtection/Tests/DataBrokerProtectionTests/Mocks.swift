@@ -19,6 +19,9 @@
 import Foundation
 import Combine
 import BrowserServicesKit
+import Common
+import SecureStorage
+import GRDB
 @testable import DataBrokerProtection
 
 extension BrokerProfileQueryData {
@@ -38,7 +41,7 @@ extension BrokerProfileQueryData {
 
 extension DataBrokerScheduleConfig {
     static var mock: DataBrokerScheduleConfig {
-        DataBrokerScheduleConfig(retryError: TimeInterval.pi, confirmOptOutScan: TimeInterval.pi, maintenanceScan: TimeInterval.pi)
+        DataBrokerScheduleConfig(retryError: 1, confirmOptOutScan: 2, maintenanceScan: 3)
     }
 }
 
@@ -140,7 +143,6 @@ extension ContentScopeFeatureToggles {
 }
 
 final class WebViewHandlerMock: NSObject, WebViewHandler {
-
     var wasInitializeWebViewCalled = false
     var wasLoadCalledWithURL: URL?
     var wasWaitForWebViewLoadCalled = false
@@ -148,8 +150,9 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
     var wasExecuteCalledForExtractedProfile = false
     var wasExecuteCalledForProfileData = false
     var wasExecuteCalledForSolveCaptcha = false
+    var wasExecuteJavascriptCalled = false
 
-    func initializeWebView(debug: Bool) async {
+    func initializeWebView(showWebView: Bool) async {
         wasInitializeWebViewCalled = true
     }
 
@@ -182,6 +185,10 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         }
     }
 
+    func evaluateJavaScript(_ javaScript: String) async throws {
+        wasExecuteJavascriptCalled = true
+    }
+
     func reset() {
         wasInitializeWebViewCalled = false
         wasLoadCalledWithURL = nil
@@ -190,10 +197,12 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         wasExecuteCalledForExtractedProfile = false
         wasExecuteCalledForSolveCaptcha = false
         wasExecuteCalledForProfileData = false
+        wasExecuteJavascriptCalled = false
     }
 }
 
 final class EmailServiceMock: EmailServiceProtocol {
+
     var shouldThrow: Bool = false
 
     func getEmail() async throws -> String {
@@ -204,7 +213,7 @@ final class EmailServiceMock: EmailServiceProtocol {
         return "test@duck.com"
     }
 
-    func getConfirmationLink(from email: String, numberOfRetries: Int, pollingIntervalInSeconds: Int) async throws -> URL {
+    func getConfirmationLink(from email: String, numberOfRetries: Int, pollingIntervalInSeconds: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
         if shouldThrow {
             throw DataBrokerProtectionError.emailError(nil)
         }
@@ -223,7 +232,7 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
     var wasSubmitCaptchaToBeResolvedCalled = false
     var shouldThrow = false
 
-    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse, retries: Int) async throws -> CaptchaTransactionId {
+    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse, retries: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId {
         if shouldThrow {
             throw CaptchaServiceError.errorWhenSubmittingCaptcha
         }
@@ -233,7 +242,7 @@ final class CaptchaServiceMock: CaptchaServiceProtocol {
         return "transactionID"
     }
 
-    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId, retries: Int, pollingInterval: Int) async throws -> CaptchaResolveData {
+    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId, retries: Int, pollingInterval: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
         if shouldThrow {
             throw CaptchaServiceError.errorWhenFetchingCaptchaResult
         }
@@ -320,5 +329,262 @@ final class MockAuthenticationRepository: AuthenticationRepository {
         shouldSendNilAccessToken = false
         wasInviteCodeSaveCalled = false
         wasAccessTokenSaveCalled = false
+    }
+}
+
+final class BrokerUpdaterRepositoryMock: BrokerUpdaterRepository {
+    var wasSaveLastRunDateCalled = false
+    var lastRunDate: Date?
+
+    func saveLastRunDate(date: Date) {
+        wasSaveLastRunDateCalled = true
+    }
+
+    func getLastRunDate() -> Date? {
+        return lastRunDate
+    }
+
+    func reset() {
+        wasSaveLastRunDateCalled = false
+        lastRunDate = nil
+    }
+}
+
+final class ResourcesRepositoryMock: ResourcesRepository {
+    var wasFetchBrokerFromResourcesFilesCalled = false
+    var brokersList: [DataBroker]?
+
+    func fetchBrokerFromResourceFiles() -> [DataBroker]? {
+        wasFetchBrokerFromResourcesFilesCalled = true
+        return brokersList
+    }
+
+    func reset() {
+        wasFetchBrokerFromResourcesFilesCalled = false
+        brokersList?.removeAll()
+        brokersList = nil
+    }
+}
+
+final class EmptySecureStorageKeyStoreProviderMock: SecureStorageKeyStoreProvider {
+    var generatedPasswordEntryName: String = ""
+
+    var l1KeyEntryName: String = ""
+
+    var l2KeyEntryName: String = ""
+
+    var keychainServiceName: String = ""
+
+    func attributesForEntry(named: String, serviceName: String) -> [String: Any] {
+        return [String: Any]()
+    }
+}
+
+final class EmptySecureStorageCryptoProviderMock: SecureStorageCryptoProvider {
+    var passwordSalt: Data = Data()
+
+    var keychainServiceName: String = ""
+
+    var keychainAccountName: String = ""
+}
+
+final class SecureStorageDatabaseProviderMock: SecureStorageDatabaseProvider {
+    let db: DatabaseWriter
+
+    init() throws {
+        do {
+            self.db = try DatabaseQueue()
+        } catch {
+            throw DataBrokerProtectionError.unknown("")
+        }
+    }
+}
+
+final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault {
+    func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation? {
+        return nil
+    }
+
+    func save(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) throws {
+    }
+
+    var shouldReturnOldVersionBroker = false
+    var shouldReturnNewVersionBroker = false
+    var wasBrokerUpdateCalled = false
+    var wasBrokerSavedCalled = false
+
+    typealias DatabaseProvider = SecureStorageDatabaseProviderMock
+
+    required init(providers: SecureStorageProviders<SecureStorageDatabaseProviderMock>) {
+    }
+
+    func reset() {
+        shouldReturnOldVersionBroker = false
+        shouldReturnNewVersionBroker = false
+        wasBrokerUpdateCalled = false
+        wasBrokerSavedCalled = false
+    }
+
+    func save(profile: DataBrokerProtectionProfile) throws -> Int64 {
+        return 1
+    }
+
+    func fetchProfile(with id: Int64) throws -> DataBrokerProtectionProfile? {
+        return nil
+    }
+
+    func save(broker: DataBroker) throws -> Int64 {
+        wasBrokerSavedCalled = true
+        return 1
+    }
+
+    func update(_ broker: DataBroker, with id: Int64) throws {
+        wasBrokerUpdateCalled = true
+    }
+
+    func fetchBroker(with id: Int64) throws -> DataBroker? {
+        return nil
+    }
+
+    func fetchBroker(with name: String) throws -> DataBroker? {
+        if shouldReturnOldVersionBroker {
+            return .init(id: 1, name: "Broker", steps: [Step](), version: "1.0.0", schedulingConfig: .mock)
+        } else if shouldReturnNewVersionBroker {
+            return .init(id: 1, name: "Broker", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)
+        }
+
+        return nil
+    }
+
+    func fetchAllBrokers() throws -> [DataBroker] {
+        return [DataBroker]()
+    }
+
+    func save(profileQuery: ProfileQuery, profileId: Int64) throws -> Int64 {
+        return 1
+    }
+
+    func fetchProfileQuery(with id: Int64) throws -> ProfileQuery? {
+        return nil
+    }
+
+    func fetchAllProfileQueries(for profileId: Int64) throws -> [ProfileQuery] {
+        return [ProfileQuery]()
+    }
+
+    func save(brokerId: Int64, profileQueryId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws {
+
+    }
+
+    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws {
+    }
+
+    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws {
+    }
+
+    func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanOperationData? {
+        return nil
+    }
+
+    func fetchAllScans() throws -> [ScanOperationData] {
+        return [ScanOperationData]()
+    }
+
+    func save(brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfile, lastRunDate: Date?, preferredRunDate: Date?) throws {
+    }
+
+    func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws {
+    }
+
+    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    }
+
+    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    }
+
+    func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutOperationData? {
+        return nil
+    }
+
+    func fetchOptOuts(brokerId: Int64, profileQueryId: Int64) throws -> [OptOutOperationData] {
+        return [OptOutOperationData]()
+    }
+
+    func fetchAllOptOuts() throws -> [OptOutOperationData] {
+        return [OptOutOperationData]()
+    }
+
+    func save(historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64) throws {
+    }
+
+    func save(historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    }
+
+    func fetchEvents(brokerId: Int64, profileQueryId: Int64) throws -> [HistoryEvent] {
+        return [HistoryEvent]()
+    }
+
+    func save(extractedProfile: ExtractedProfile, brokerId: Int64, profileQueryId: Int64) throws -> Int64 {
+        return 1
+    }
+
+    func fetchExtractedProfile(with id: Int64) throws -> ExtractedProfile? {
+        return nil
+    }
+
+    func fetchExtractedProfiles(for brokerId: Int64, with profileQueryId: Int64) throws -> [ExtractedProfile] {
+        return [ExtractedProfile]()
+    }
+
+    func fetchExtractedProfiles(for brokerId: Int64) throws -> [ExtractedProfile] {
+        return [ExtractedProfile]()
+    }
+
+    func updateRemovedDate(for extractedProfileId: Int64, with date: Date?) throws {
+    }
+
+    func hasMatches() throws -> Bool {
+        false
+    }
+}
+
+public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
+
+    // swiftlint:disable:next cyclomatic_complexity
+    public init() {
+        super.init { event, _, _, _ in
+            switch event {
+            case .error(let error, _):
+                print("PIXEL: Error: \(error)")
+            case .optOutStart:
+                print("PIXEL: optOutStart")
+            case .optOutEmailGenerate:
+                print("PIXEL: optOutEmailGenerate")
+            case .optOutCaptchaParse:
+                print("PIXEL: optOutCaptchaParse")
+            case .optOutCaptchaSend:
+                print("PIXEL: optOutCaptchaSend")
+            case .optOutCaptchaSolve:
+                print("PIXEL: optOutCaptchaSolve")
+            case .optOutSubmit:
+                print("PIXEL: optOutSubmit")
+            case .optOutEmailReceive:
+                print("PIXEL: optOutEmailReceive")
+            case .optOutEmailConfirm:
+                print("PIXEL: optOutEmailConfirm")
+            case .optOutValidate:
+                print("PIXEL: optOutValidate")
+            case .optOutFinish:
+                print("PIXEL: optOutFinish")
+            case .optOutSuccess:
+                print("PIXEL: optOutSuccess")
+            case .optOutFailure:
+                print("PIXEL: optOutFailure")
+            }
+        }
+    }
+
+    override init(mapping: @escaping EventMapping<DataBrokerProtectionPixels>.Mapping) {
+        fatalError("Use init()")
     }
 }

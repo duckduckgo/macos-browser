@@ -34,6 +34,7 @@ public enum CaptchaServiceError: Error, Codable {
     case timedOutWhenFetchingCaptchaResult
     case failureWhenFetchingCaptchaResult
     case invalidRequestWhenFetchingCaptchaResult
+    case cancelled
 }
 
 struct CaptchaTransaction: Codable {
@@ -80,9 +81,11 @@ protocol CaptchaServiceProtocol {
     ///
     /// - Parameters:
     ///   - captchaInfo: A struct that containers a `siteKey`, `url` and `type`
+    ///   - shouldRunNextStep: A closure that defines if the retry should keep happening
     /// - Returns: `CaptchaTransactionId` an identifier so we can later use to fetch the resolved captcha information
     func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse,
-                                  retries: Int) async throws -> CaptchaTransactionId
+                                  retries: Int,
+                                  shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId
 
     /// Fetches the resolved captcha information with the passed transaction ID.
     ///
@@ -90,19 +93,21 @@ protocol CaptchaServiceProtocol {
     ///   - transactionID: The transaction ID of the previous submitted captcha information
     ///   - retries: The number of retries until we timed out. Defaults to 100
     ///   - pollingInterval: The time between each poll in seconds. Defaults to 40 seconds
+    ///   - shouldRunNextStep: A closure that defines if the retry should keep happening
     /// - Returns: `CaptchaResolveData` a string containing the data to resolve the captcha
     func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId,
                                    retries: Int,
-                                   pollingInterval: Int) async throws -> CaptchaResolveData
+                                   pollingInterval: Int,
+                                   shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData
 }
 
 extension CaptchaServiceProtocol {
-    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse) async throws -> CaptchaTransactionId {
-        try await submitCaptchaInformation(captchaInfo, retries: 5)
+    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId {
+        try await submitCaptchaInformation(captchaInfo, retries: 5, shouldRunNextStep: shouldRunNextStep)
     }
 
-    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId) async throws -> CaptchaResolveData {
-        try await submitCaptchaToBeResolved(for: transactionID, retries: 100, pollingInterval: 40)
+    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
+        try await submitCaptchaToBeResolved(for: transactionID, retries: 100, pollingInterval: 40, shouldRunNextStep: shouldRunNextStep)
     }
 }
 
@@ -131,9 +136,14 @@ struct CaptchaService: CaptchaServiceProtocol {
     }
 
     func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse,
-                                  retries: Int = 5) async throws -> CaptchaTransactionId {
+                                  retries: Int = 5,
+                                  shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId {
         guard let captchaSubmitResult = try? await submitCaptchaInformationRequest(captchaInfo) else {
             throw CaptchaServiceError.errorWhenSubmittingCaptcha
+        }
+
+        if !shouldRunNextStep() {
+            throw CaptchaServiceError.cancelled
         }
 
         switch  captchaSubmitResult.message {
@@ -148,7 +158,9 @@ struct CaptchaService: CaptchaServiceProtocol {
                 throw CaptchaServiceError.timedOutWhenSubmittingCaptcha
             }
             try await Task.sleep(nanoseconds: UInt64(1 * Double(NSEC_PER_SEC)))
-            return try await submitCaptchaInformation(captchaInfo, retries: retries - 1)
+            return try await submitCaptchaInformation(captchaInfo,
+                                                      retries: retries - 1,
+                                                      shouldRunNextStep: shouldRunNextStep)
         case .failureCritical:
             throw CaptchaServiceError.criticalFailureWhenSubmittingCaptcha
         case .invalidRequest:
@@ -183,9 +195,14 @@ struct CaptchaService: CaptchaServiceProtocol {
 
     func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId,
                                    retries: Int = 100,
-                                   pollingInterval: Int = 40) async throws -> CaptchaResolveData {
+                                   pollingInterval: Int = 40,
+                                   shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
         guard let captchaResolveResult = try? await submitCaptchaToBeResolvedRequest(transactionID) else {
             throw CaptchaServiceError.errorWhenFetchingCaptchaResult
+        }
+
+        if !shouldRunNextStep() {
+            throw CaptchaServiceError.cancelled
         }
 
         switch captchaResolveResult.message {
@@ -202,7 +219,10 @@ struct CaptchaService: CaptchaServiceProtocol {
                 throw CaptchaServiceError.timedOutWhenFetchingCaptchaResult
             }
             try await Task.sleep(nanoseconds: UInt64(pollingInterval) * NSEC_PER_SEC)
-            return try await submitCaptchaToBeResolved(for: transactionID, retries: retries - 1, pollingInterval: pollingInterval)
+            return try await submitCaptchaToBeResolved(for: transactionID,
+                                                       retries: retries - 1,
+                                                       pollingInterval: pollingInterval,
+                                                       shouldRunNextStep: shouldRunNextStep)
         case .failure:
             os_log("Captcha failure ...", log: .service)
             throw CaptchaServiceError.failureWhenFetchingCaptchaResult

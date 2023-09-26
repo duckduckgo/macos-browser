@@ -119,6 +119,16 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionKeychainWriteError(field: field, status: status)
             case .keychainDeleteError(let status):
                 domainEvent = .networkProtectionKeychainDeleteError(status: status)
+            case .wireGuardCannotLocateTunnelFileDescriptor:
+                domainEvent = .networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor
+            case .wireGuardInvalidState:
+                domainEvent = .networkProtectionWireguardErrorInvalidState
+            case .wireGuardDnsResolution:
+                domainEvent = .networkProtectionWireguardErrorFailedDNSResolution
+            case .wireGuardSetNetworkSettings(let error):
+                domainEvent = .networkProtectionWireguardErrorCannotSetNetworkSettings(error: error)
+            case .startWireGuardBackend(let code):
+                domainEvent = .networkProtectionWireguardErrorCannotStartWireguardBackend(code: code)
             case .noAuthTokenFound:
                 domainEvent = .networkProtectionNoAuthTokenFoundError
             case .unhandledError(function: let function, line: let line, error: let error):
@@ -143,6 +153,14 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
     }
 
+    static var tokenServiceName: String {
+#if NETP_SYSTEM_EXTENSION
+        "\(Bundle.main.bundleIdentifier!).authToken"
+#else
+        NetworkProtectionKeychainTokenStore.Defaults.tokenStoreService
+#endif
+    }
+
     // MARK: - Initialization
 
     @objc public init() {
@@ -150,12 +168,17 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
+        let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
+        let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: NetworkProtectionBundle.keychainType,
+                                                             serviceName: Self.tokenServiceName,
+                                                             errorEvents: debugEvents)
 
         super.init(notificationsPresenter: Self.makeNotificationsPresenter(),
                    tunnelHealthStore: tunnelHealthStore,
                    controllerErrorStore: controllerErrorStore,
                    keychainType: NetworkProtectionBundle.keychainType,
-                   debugEvents: Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore),
+                   tokenStore: tokenStore,
+                   debugEvents: debugEvents,
                    providerEvents: Self.packetTunnelProviderEvents)
 
         observeConnectionStatusChanges()
@@ -262,50 +285,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     // MARK: - Start/Stop Tunnel
 
-    override func startTunnel(options: [String: NSObject]?, completionHandler: @escaping (Error?) -> Void) {
-
-        // when activated by system "on-demand" the option is set
-        var isOnDemand: Bool {
-            options?[NetworkProtectionOptionKey.isOnDemand] as? Bool == true
-        }
-
-        super.startTunnel(options: options) { [self] error in
-            guard error == nil else {
-                // if connection is failing when activated by system on-demand
-                // ask the Main App to disable the on-demand rule to prevent activation loop
-                if isOnDemand, !self.isKillSwitchEnabled {
-                    Task { [self] in
-                        await self.appLauncher?.launchApp(withCommand: .stopVPN)
-                        completionHandler(error)
-                    }
-                    return
-                }
-                completionHandler(error)
-                return
-            }
-
-            completionHandler(nil)
-            if !isOnDemand {
-                Task { [self] in
-                    // We're handling a successful connection started by request.
-                    // We want to call the completion handler before turning on-demand
-                    // ON so that on-demand won't start the connection on its own.
-                    await self.appLauncher?.launchApp(withCommand: .enableOnDemand)
-                }
-            }
-        }
-    }
-
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
         super.stopTunnel(with: reason) {
-            Task { [self] in
-                if case .userInitiated = reason {
-                    // stop requested by user from System Settings
-                    // we can‘t prevent a respawn with on-demand rule ON
-                    // request the main app to reconfigure with on-demand OFF
-
-                    await self.appLauncher?.launchApp(withCommand: .stopVPN)
-                }
+            Task {
                 completionHandler()
 
                 // From what I'm seeing in my tests the next call to start the tunnel is MUCH
@@ -320,11 +302,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     override func cancelTunnelWithError(_ error: Error?) {
         Task {
-            if !isKillSwitchEnabled {
-                // ensure on-demand rule is taken down on connection retry failure
-                await self.appLauncher?.launchApp(withCommand: .stopVPN)
-            }
-
             super.cancelTunnelWithError(error)
             exit(EXIT_SUCCESS)
         }

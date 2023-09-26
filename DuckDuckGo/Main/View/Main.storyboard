@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22154" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22154"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -9,8 +9,8 @@
         <!--Main View Controller-->
         <scene sceneID="hIz-AP-VOD">
             <objects>
-                <viewController storyboardIdentifier="mainViewController" id="XfG-lQ-9wD" customClass="MainViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="m2S-Jp-Qdl" customClass="MainView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                <viewController storyboardIdentifier="mainViewController" id="XfG-lQ-9wD" customClass="MainViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="m2S-Jp-Qdl" customClass="MainView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="1024" height="789"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
@@ -23,7 +23,7 @@
                                     <segue destination="Nfk-V8-FAE" kind="embed" destinationCreationSelector="createTabBarViewControllerWithCoder:sender:segueIdentifier:" id="dL6-gI-9Hl"/>
                                 </connections>
                             </containerView>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="af1-Eb-VaG" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="af1-Eb-VaG" userLabel="Separator" customClass="ColorView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="708" width="1024" height="1"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="1" id="hrt-pu-NuL"/>
@@ -63,7 +63,7 @@
                                 </connections>
                             </containerView>
                             <containerView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jbn-9T-FNt" userLabel="Find in Page Container View">
-                                <rect key="frame" x="312" y="673" width="400" height="40"/>
+                                <rect key="frame" x="312" y="638" width="400" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="Hzq-Qn-wpU"/>
                                     <constraint firstAttribute="width" constant="400" id="Ndt-bt-exS"/>
@@ -82,6 +82,7 @@
                         <constraints>
                             <constraint firstItem="UE1-Pg-JIe" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="0gU-MO-6kc"/>
                             <constraint firstAttribute="trailing" secondItem="wFH-xq-50o" secondAttribute="trailing" id="4Cb-FA-sMo"/>
+                            <constraint firstItem="Jbn-9T-FNt" firstAttribute="top" secondItem="kfs-1U-pfm" secondAttribute="bottom" constant="-4" id="8Xi-Uh-eq2"/>
                             <constraint firstAttribute="trailing" secondItem="UE1-Pg-JIe" secondAttribute="trailing" id="DIS-8Z-gS4"/>
                             <constraint firstAttribute="trailing" secondItem="SYo-8W-jl3" secondAttribute="trailing" id="EJ8-cX-El9"/>
                             <constraint firstAttribute="trailing" secondItem="lYg-bX-QrJ" secondAttribute="trailing" id="HkZ-fV-qYb"/>
@@ -100,7 +101,7 @@
                             <constraint firstAttribute="bottom" secondItem="UE1-Pg-JIe" secondAttribute="bottom" id="qBJ-Ud-uhY"/>
                             <constraint firstAttribute="bottom" secondItem="SYo-8W-jl3" secondAttribute="bottom" id="tLa-XX-e8i"/>
                             <constraint firstItem="SYo-8W-jl3" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="woj-yk-97j"/>
-                            <constraint firstItem="Jbn-9T-FNt" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" constant="-4" id="xdc-Pw-CDZ"/>
+                            <constraint firstItem="Jbn-9T-FNt" firstAttribute="top" secondItem="wFH-xq-50o" secondAttribute="bottom" priority="900" constant="-4" id="xdc-Pw-CDZ"/>
                             <constraint firstAttribute="trailing" secondItem="af1-Eb-VaG" secondAttribute="trailing" id="y1o-Rd-sxm"/>
                         </constraints>
                     </view>

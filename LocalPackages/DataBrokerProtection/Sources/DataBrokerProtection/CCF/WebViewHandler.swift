@@ -23,11 +23,12 @@ import UserScript
 import Common
 
 protocol WebViewHandler: NSObject {
-    func initializeWebView(debug: Bool) async
+    func initializeWebView(showWebView: Bool) async
     func load(url: URL) async throws
     func waitForWebViewLoad(timeoutInSeconds: Int) async throws
     func finish() async
     func execute(action: Action, data: CCFRequestData) async
+    func evaluateJavaScript(_ javaScript: String) async throws
 }
 
 @MainActor
@@ -54,16 +55,16 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
         self.userContentController = userContentController
     }
 
-    func initializeWebView(debug: Bool = true) async {
+    func initializeWebView(showWebView: Bool) async {
         webView = WKWebView(frame: CGRect(origin: .zero, size: CGSize(width: 1024, height: 1024)), configuration: webViewConfiguration)
         webView?.navigationDelegate = self
 
-        if debug {
+        if showWebView {
             window = NSWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 1024, height: 1024), styleMask: [.titled],
                 backing: .buffered, defer: false
             )
-            window?.title = "Debug"
+            window?.title = "Data Broker Protection"
             window?.contentView = self.webView
             window?.makeKeyAndOrderFront(nil)
         }
@@ -107,6 +108,10 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
             webView: self.webView!,
             params: Params(state: ActionRequest(action: action, data: data))
         )
+    }
+
+    func evaluateJavaScript(_ javaScript: String) async throws {
+        _ = webView?.evaluateJavaScript(javaScript, in: nil, in: WKContentWorld.page)
     }
 }
 

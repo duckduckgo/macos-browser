@@ -54,8 +54,8 @@ final class TabBarViewController: NSViewController {
     private let pinnedTabsView: PinnedTabsView?
     private let pinnedTabsHostingView: PinnedTabsHostingView?
 
-    private var tabsCancellable: AnyCancellable?
     private var selectionIndexCancellable: AnyCancellable?
+    private var mouseDownCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
     @IBOutlet weak var shadowView: TabShadowView!
@@ -80,7 +80,7 @@ final class TabBarViewController: NSViewController {
             let pinnedTabsView = PinnedTabsView(model: pinnedTabsViewModel)
             self.pinnedTabsViewModel = pinnedTabsViewModel
             self.pinnedTabsView = pinnedTabsView
-            self.pinnedTabsHostingView = .init(rootView: pinnedTabsView)
+            self.pinnedTabsHostingView = PinnedTabsHostingView(rootView: pinnedTabsView)
         } else {
             self.pinnedTabsViewModel = nil
             self.pinnedTabsView = nil
@@ -117,7 +117,8 @@ final class TabBarViewController: NSViewController {
 
     override func viewWillDisappear() {
         super.viewWillDisappear()
-        removeMouseMonitors()
+
+        mouseDownCancellable = nil
     }
 
     override func viewDidLayout() {
@@ -154,6 +155,7 @@ final class TabBarViewController: NSViewController {
     private func setupFireButton() {
         fireButton.toolTip = UserText.clearBrowsingHistoryTooltip
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
+        fireButton.sendAction(on: .leftMouseDown)
     }
 
     private func setupAsBurnerWindowIfNeeded() {
@@ -379,7 +381,8 @@ final class TabBarViewController: NSViewController {
     }
 
     private func moveToNewWindow(from index: Int, droppingPoint: NSPoint? = nil, burner: Bool) {
-        guard tabCollectionViewModel.tabCollection.tabs.count > 1 else { return }
+        // only allow dragging Tab out when there‘s tabs (or pinned tabs) left
+        guard tabCollectionViewModel.tabCollection.tabs.count > 1 || pinnedTabsViewModel?.items.isEmpty == false else { return }
         guard let tabViewModel = tabCollectionViewModel.tabViewModel(at: index) else {
             assertionFailure("TabBarViewController: Failed to get tab view model")
             return
@@ -392,22 +395,11 @@ final class TabBarViewController: NSViewController {
 
     // MARK: - Mouse Monitor
 
-    private var mouseDownMonitor: Any?
-
     private func addMouseMonitors() {
-        guard mouseDownMonitor == nil else { return }
-
-        mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
-            self?.mouseDown(with: event)
+        mouseDownCancellable = NSEvent.addLocalCancellableMonitor(forEventsMatching: .leftMouseDown) { [weak self] event in
+            guard let self else { return event }
+            return self.mouseDown(with: event)
         }
-    }
-
-    private func removeMouseMonitors() {
-        if let monitor = mouseDownMonitor {
-            NSEvent.removeMonitor(monitor)
-        }
-
-        mouseDownMonitor = nil
     }
 
     func mouseDown(with event: NSEvent) -> NSEvent? {

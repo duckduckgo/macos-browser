@@ -81,8 +81,18 @@ final class AutofillTabExtension: TabExtension {
 
 extension AutofillTabExtension: SecureVaultManagerDelegate {
 
-    public func secureVaultManagerIsEnabledStatus(_: SecureVaultManager) -> Bool {
-        return true
+    func secureVaultManagerIsEnabledStatus(_ manager: SecureVaultManager, forType type: AutofillType?) -> Bool {
+        let prefs = AutofillPreferences()
+        switch type {
+        case .card:
+            return prefs.askToSavePaymentMethods
+        case .identity:
+            return prefs.askToSaveAddresses
+        case.password:
+            return prefs.askToSaveUsernamesAndPasswords
+        case .none:
+            return prefs.askToSaveAddresses || prefs.askToSavePaymentMethods || prefs.askToSaveUsernamesAndPasswords
+        }
     }
 
     func secureVaultManagerShouldSaveData(_: BrowserServicesKit.SecureVaultManager) -> Bool {
@@ -103,6 +113,35 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
 
     func secureVaultManager(_: SecureVaultManager, promptUserWithGeneratedPassword password: String, completionHandler: @escaping (Bool) -> Void) {
         // no-op on macOS
+    }
+
+    public func secureVaultManager(_: SecureVaultManager,
+                                   isAuthenticatedFor type: AutofillType,
+                                   completionHandler: @escaping (Bool) -> Void) {
+
+        switch type {
+
+        // Require bio authentication for filling sensitive data via DDG password manager
+        case .card, .password:
+            let autofillPrefs = AutofillPreferences()
+            if DeviceAuthenticator.shared.requiresAuthentication &&
+                autofillPrefs.autolockLocksFormFilling &&
+                autofillPrefs.passwordManager == .duckduckgo {
+                DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { result in
+                    if case .success = result {
+                        completionHandler(true)
+                    } else {
+                        completionHandler(false)
+                    }
+                }
+            } else {
+                completionHandler(true)
+            }
+
+        default:
+            completionHandler(true)
+        }
+
     }
 
     func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {

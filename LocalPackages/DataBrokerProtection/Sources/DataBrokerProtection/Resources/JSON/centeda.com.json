@@ -1,0 +1,63 @@
+{
+  "name": "centeda.com",
+  "version": "0.1.0",
+  "parent": "verecor.com",
+  "addedDatetime": 1677733200000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "ef932ac1-61d8-4a6b-8577-d407aed69b6e",
+          "url": "https://centeda.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${ageRange}",
+          "ageRange": [
+            "18-30",
+            "31-40",
+            "41-50",
+            "51-60",
+            "61-70",
+            "71-80",
+            "81+"
+          ]
+        },
+        {
+          "actionType": "extract",
+          "id": "c21af767-a34d-43d8-aca6-e3eae7298ef4",
+          "selector": ".search-item",
+          "profile": {
+            "name": {
+              "selector": ".title",
+              "beforeText": "Age "
+            },
+            "alternativeNamesList": {
+              "selector": ".//div[@class='col-sm-24 col-md-8 known-as']//li",
+              "findElements": true
+            },
+            "age": {
+              "selector": ".age"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[@class='col-sm-24 col-md-8 lived-in']//li",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".get-report-btn"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}

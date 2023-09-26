@@ -21,39 +21,48 @@ import Cocoa
 @MainActor
 final class SharingMenu: NSMenu {
 
+    override init(title: String) {
+        super.init(title: title)
+
+        self.autoenablesItems = true
+        self.delegate = self
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     override func update() {
-        self.removeAllItems()
-        self.autoenablesItems = false
+        let services = .copyLink + .urlSharingServices + .qrCode
 
-        let isEnabled = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-            .tabCollectionViewModel.selectedTabViewModel?.canReload ?? false
+        guard services != items.compactMap({ $0.representedObject as? NSSharingService }) else { return }
 
-        // not real sharing URL, used for generating items for NSURL
-        var services = NSSharingService.sharingServices(forItems: [URL.duckDuckGo])
+        self.items = services.map { service in
+            NSMenuItem(service: service, target: self, action: #selector(sharingItemSelected))
+        } + [
+            NSMenuItem(title: UserText.moreMenuItem, action: #selector(openSharingPreferences), target: self).withImage(.more)
+        ]
+    }
 
-        if let copyLink = NSSharingService(named: .copyLink) {
-            services.insert(copyLink, at: 0)
-        }
-        services.append(QRSharingService())
+    typealias SharingData = (title: String?, items: [Any])
+    private func sharingData() -> SharingData? {
+        guard let tabViewModel = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.tabCollectionViewModel.selectedTabViewModel,
+              tabViewModel.canReload,
+              let url = tabViewModel.tab.content.url else { return nil }
 
-        let readingListService = NSSharingService(named: .addToSafariReadingList)
-        for service in services where service != readingListService {
-            let menuItem = NSMenuItem(service: service)
-            menuItem.target = self
-            menuItem.action = #selector(sharingItemSelected(_:))
-            menuItem.isEnabled = isEnabled
-            self.addItem(menuItem)
-        }
+        let sharingData = DuckPlayer.shared.sharingData(for: tabViewModel.title, url: url) ?? (tabViewModel.title, url)
 
-        let moreItem = NSMenuItem(title: UserText.moreMenuItem,
-                                  action: #selector(openSharingPreferences(_:)),
-                                  keyEquivalent: "")
-        moreItem.target = self
-        moreItem.image = .more
-        self.addItem(moreItem)
+        return (sharingData.title, [url, url.absoluteString])
     }
 
     @objc func openSharingPreferences(_ sender: NSMenuItem) {
+        if #available(macOS 13.0, *),
+           let preferencesLink = URL(string: "x-apple.systempreferences:com.apple.preferences.extensions?Sharing") {
+
+            NSWorkspace.shared.open(preferencesLink)
+            return
+        }
+
         let url = URL(fileURLWithPath: "/System/Library/PreferencePanes/Extensions.prefPane")
         let plist = [
             "action": "revealExtensionPoint",
@@ -62,6 +71,8 @@ final class SharingMenu: NSMenu {
         let data = try? PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
         let descriptor = NSAppleEventDescriptor(descriptorType: .openSharingSubpane, data: data)
 
+        // if you want to refactor this to remove the warning - stop now
+        // the suggested method with NSWorkspace.OpenConfiguration doesn‘t work for Sharing Preferences
         NSWorkspace.shared.open([url],
                                 withAppBundleIdentifier: nil,
                                 options: .async,
@@ -74,27 +85,73 @@ final class SharingMenu: NSMenu {
             assertionFailure("representedObject is not NSSharingService")
             return
         }
-        guard let tabViewModel = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-                .tabCollectionViewModel.selectedTabViewModel,
-              let url = tabViewModel.tab.content.url
-        else {
-            return
-        }
-        if service == NSSharingService(named: .copyLink) {
-            NSPasteboard.general.copy(url)
+        guard let sharingData = self.sharingData(), !sharingData.items.isEmpty else { return }
+
+        if service == .copyLink {
+            NSPasteboard.general.copy(sharingData.items)
             return
         }
 
-        let sharingData = DuckPlayer.shared.sharingData(for: tabViewModel.title, url: url) ?? (tabViewModel.title, url)
         service.subject = sharingData.title
-        service.perform(withItems: [sharingData.url])
+        service.perform(withItems: sharingData.items.filter { service.canPerform(withItems: [$0]) })
+    }
+
+}
+
+extension SharingMenu: NSMenuItemValidation {
+
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        switch menuItem.action {
+        case #selector(sharingItemSelected):
+            guard let sharingData = self.sharingData(),
+                  let service = menuItem.representedObject as? NSSharingService else { return false }
+
+            if service == .copyLink {
+                return true
+            }
+
+            return sharingData.items.contains(where: { service.canPerform(withItems: [$0]) })
+
+        case #selector(openSharingPreferences):
+            return true
+
+        default:
+            return true
+        }
+    }
+
+}
+
+extension SharingMenu: NSMenuDelegate {
+
+    func menuHasKeyEquivalent(_ menu: NSMenu, for event: NSEvent, target: AutoreleasingUnsafeMutablePointer<AnyObject?>, action: UnsafeMutablePointer<Selector?>) -> Bool {
+        if self.numberOfItems == 0 {
+            self.update()
+        }
+        return false
+    }
+
+}
+
+private extension NSPasteboard {
+
+    func copy(_ sharedItems: [Any]) {
+        let url = sharedItems.first(where: { $0 is URL }) as? URL
+        let string = sharedItems.first(where: { $0 is String }) as? String
+        if let url {
+            self.copy(url, withString: string)
+        } else if let string {
+            self.copy(string)
+        } else {
+            assertionFailure("Cannot copy items \(sharedItems)")
+        }
     }
 
 }
 
 private extension NSMenuItem {
 
-    convenience init(service: NSSharingService) {
+    convenience init(service: NSSharingService, target: AnyObject, action: Selector) {
         var isMailService = false
         if service.responds(to: NSSelectorFromString("name")),
            let name = service.value(forKey: "name") as? NSSharingService.Name,
@@ -108,6 +165,8 @@ private extension NSMenuItem {
         }
         self.image = service.image
         self.representedObject = service
+        self.target = target
+        self.action = action
     }
 
 }
@@ -125,6 +184,27 @@ private extension NSImage {
 private extension DescType {
 
     static let openSharingSubpane: DescType = 0x70747275
+
+}
+
+private extension NSSharingService {
+
+    static let copyLink = NSSharingService(named: .copyLink)
+    static let addToSafariReadingList = NSSharingService(named: .addToSafariReadingList)
+
+}
+
+private extension [NSSharingService] {
+
+    static let copyLink = NSSharingService(named: .copyLink).map { [$0] } ?? []
+    static let qrCode = [NSSharingService.qrCode]
+
+    static var urlSharingServices: [NSSharingService] {
+        // not real sharing URL, used for generating items for NSURL and NSString
+        NSSharingService.sharingServices(forItems: [URL.duckDuckGo]).filter {
+            $0 != NSSharingService.addToSafariReadingList
+        }
+    }
 
 }
 

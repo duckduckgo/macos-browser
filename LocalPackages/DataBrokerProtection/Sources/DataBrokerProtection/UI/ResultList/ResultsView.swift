@@ -18,12 +18,19 @@
 
 import SwiftUI
 
-@available(macOS 11.0, *)
 struct ResultsView: View {
     @ObservedObject var viewModel: ResultsViewModel
 
     var body: some View {
         VStack(spacing: Const.verticalSpacing) {
+            if viewModel.isLoading && viewModel.pendingProfiles.isEmpty && viewModel.removedProfiles.isEmpty {
+                HeaderView(title: "We are crunching your local data ...",
+                           subtitle: "The list of profiles matches will appear soon",
+                           iconName: "clock.fill",
+                           iconColor: .gray)
+                ProgressView()
+            }
+
             if !viewModel.pendingProfiles.isEmpty {
                 PendingProfilesView(profiles: viewModel.pendingProfiles)
             }
@@ -35,7 +42,6 @@ struct ResultsView: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct RemovedProfilesView: View {
     let profiles: [ResultsViewModel.RemovedProfile]
 
@@ -60,7 +66,6 @@ private struct RemovedProfilesView: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct PendingProfilesView: View {
     let profiles: [ResultsViewModel.PendingProfile]
 
@@ -86,18 +91,29 @@ private struct PendingProfilesView: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct RemovedProfileRow: View {
     let removedProfile: ResultsViewModel.RemovedProfile
+    @State private var showModal = false
 
     var body: some View {
         HStack {
-            Label {
-                Text(removedProfile.dataBroker)
-            } icon: {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.green)
+            Button {
+                showModal = true
+            } label: {
+                Label {
+                    Text(removedProfile.dataBroker)
+                } icon: {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                }
             }
+            .buttonStyle(PlainButtonStyle())
+            .sheet(isPresented: $showModal) {
+
+                DebugModalView(optOutOperationData: removedProfile.operationData,
+                               showingModal: $showModal)
+            }
+
             Spacer()
 
             HStack {
@@ -109,22 +125,39 @@ private struct RemovedProfileRow: View {
     }
 }
 
-@available(macOS 11.0, *)
 private struct PendingProfileRow: View {
     let pendingProfile: ResultsViewModel.PendingProfile
+    @State private var showModal = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            HStack {
-                Label {
-                    Text(pendingProfile.dataBroker)
-                } icon: {
-                    Image(systemName: pendingProfile.hasError ? "exclamationmark.triangle.fill" : "clock.fill")
-                        .foregroundColor(.yellow)
+            HStack(alignment: .top) {
+                Button {
+                    showModal = true
+                } label: {
+                    Label {
+                        Text(pendingProfile.dataBroker)
+                            .frame(width: 220, alignment: .leading)
+
+                    } icon: {
+                        Image(systemName: pendingProfile.hasError ? "exclamationmark.triangle.fill" : "clock.fill")
+                            .foregroundColor(.yellow)
+                    }
                 }
+                .buttonStyle(PlainButtonStyle())
+                .sheet(isPresented: $showModal) {
+
+                    DebugModalView(optOutOperationData: pendingProfile.operationData,
+                                   showingModal: $showModal)
+                }
+
                 Spacer()
+
                 Label {
-                    Text("John Smith")
+                    Text(pendingProfile.profileWithAge)
+                        .lineLimit(1)
+                        .frame(width: 180, alignment: .leading)
+
                 } icon: {
                     Image(systemName: "person")
                 }
@@ -132,12 +165,31 @@ private struct PendingProfileRow: View {
                 Spacer()
 
                 Label {
-                    Text(pendingProfile.address)
-                        .lineLimit(1)
-                        .frame(width: 180, alignment: .leading)
+                    VStack (alignment: .leading) {
+                        ForEach(pendingProfile.addresses, id: \.self) {  address in
+                            Text(address)
+                                .lineLimit(1)
+                        }
+                    }
+                    .frame(width: 180, alignment: .leading)
 
                 } icon: {
                     Image(systemName: "house")
+                }
+
+                Spacer()
+
+                Label {
+                    VStack (alignment: .leading) {
+                        ForEach(pendingProfile.relatives, id: \.self) {  relative in
+                            Text(relative)
+                                .lineLimit(1)
+                        }
+                    }
+                    .frame(width: 180, alignment: .leading)
+
+                } icon: {
+                    Image(systemName: "person.3")
                 }
             }
             if pendingProfile.hasError {
@@ -145,6 +197,102 @@ private struct PendingProfileRow: View {
                     .layoutPriority(1)
                     .padding(.leading, 24)
             }
+        }
+    }
+}
+
+// MARK: - DebugModalView
+
+private struct DebugModalView: View {
+    let optOutOperationData: OptOutOperationData
+    @Binding var showingModal: Bool
+
+    var sortedEvents: [HistoryEvent] {
+        optOutOperationData.historyEvents.sorted { $0.date < $1.date }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            ScrollView {
+                ForEach(sortedEvents) { event in
+                    VStack {
+                        Text("Event \(labelForEvent(event))")
+                        Text("Date: \(formatDate(event.date))")
+                        Divider()
+                    }
+                }
+            }.frame(width: 400, height: 600)
+
+            if let date = optOutOperationData.preferredRunDate {
+                Text("Preferred Run Date \(formatDate(date))")
+            } else {
+                Text("Preferred Run Date not set")
+            }
+
+            Button {
+                showingModal = false
+            } label: {
+                Text("Close")
+            }
+
+        }.padding()
+    }
+
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
+    }
+
+    private func labelForEvent(_ event: HistoryEvent) -> String {
+        switch event.type {
+        case .noMatchFound:
+            return "No match found"
+        case .matchesFound:
+            return "Matches found"
+        case .error(error: let error):
+            return labelForErrorEvent(error)
+        case .optOutStarted:
+            return "Opt-out started for extracted profile with id: \(event.extractedProfileId!)"
+        case .optOutRequested:
+            return "Opt-out requested for extracted profile with id: \(event.extractedProfileId!)"
+        case .optOutConfirmed:
+            return "Opt-out confirmed for extracted profile with id: \(event.extractedProfileId!)"
+        case .scanStarted:
+            return "Scan Started"
+        }
+    }
+
+    // swiftlint:disable:next cyclomatic_complexity
+    private func labelForErrorEvent(_ error: DataBrokerProtectionError) -> String {
+        switch error {
+        case .malformedURL:
+            return "malformedURL"
+        case .noActionFound:
+            return "noActionFound"
+        case .actionFailed(actionID: let actionID, message: let message):
+            return "actionFailed \(actionID) \(message)"
+        case .parsingErrorObjectFailed:
+            return "parsingErrorObjectFailed"
+        case .unknownMethodName:
+            return "unknownMethodName"
+        case .userScriptMessageBrokerNotSet:
+            return "userScriptMessageBrokerNotSet"
+        case .unknown(let value):
+            return "unknown \(value)"
+        case .unrecoverableError:
+            return "unrecoverableError"
+        case .noOptOutStep:
+            return "noOptOutStep"
+        case .captchaServiceError(let captchaError):
+            return "captchaServiceError \(captchaError)"
+        case .emailError(let emailError):
+            return "emailError \(String(describing: emailError))"
+        case .cancelled:
+            return "Cancelled"
+        case .solvingCaptchaWithCallbackError:
+            return "Solving captcha with callback failed"
         }
     }
 }
@@ -174,10 +322,13 @@ private extension View {
 }
 
 // MARK: - Preview
-@available(macOS 11.0, *)
 struct ResultsView_Previews: PreviewProvider {
     static var previews: some View {
-        ResultsView(viewModel: ResultsViewModel()).frame(height: 700)
+        let dataManager = DataBrokerProtectionDataManager()
+        let resultsViewModel = ResultsViewModel(dataManager: dataManager)
+
+        ResultsView(viewModel: resultsViewModel)
+            .frame(height: 700)
             .padding()
     }
 }

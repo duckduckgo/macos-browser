@@ -65,7 +65,7 @@ final class MainWindowController: NSWindowController {
     }
 
     private var shouldShowOnboarding: Bool {
-#if DEBUG
+#if DEBUG || DBP
         return false
 #else
         let onboardingIsComplete = OnboardingViewModel().onboardingFinished || LocalStatisticsStore().waitlistUnlocked
@@ -193,6 +193,7 @@ final class MainWindowController: NSWindowController {
 extension MainWindowController: NSWindowDelegate {
 
     func windowDidBecomeKey(_ notification: Notification) {
+        NotificationCenter.default.post(name: .windowDidBecomeKey, object: nil)
         mainViewController.windowDidBecomeMain()
 
         if (notification.object as? NSWindow)?.isPopUpWindow == false {
@@ -322,5 +323,11 @@ fileprivate extension NavigationBarViewController {
                 addressBarViewController?.passiveTextField
         ]
     }
+
+}
+
+extension Notification.Name {
+
+    static let windowDidBecomeKey = Notification.Name(rawValue: "windowDidBecomeKey")
 
 }

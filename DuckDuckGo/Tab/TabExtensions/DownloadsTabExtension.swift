@@ -20,6 +20,7 @@ import Combine
 import Common
 import Foundation
 import Navigation
+import UniformTypeIdentifiers
 import WebKit
 
 protocol TabDownloadsDelegate: AnyObject {
@@ -61,9 +62,9 @@ final class DownloadsTabExtension: NSObject {
 
     @MainActor
     private func saveWebViewContentAs(_ webView: WKWebView) async {
-        guard await webView.mimeType == UTType.html.mimeType else {
+        guard await webView.mimeType == UTType.html.preferredMIMEType else {
             if let url = webView.url {
-                webView.startDownload(URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
+                webView.startDownload(using: URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)) { download in
                     self.downloadManager.add(download,
                                              fromBurnerWindow: self.isBurner,
                                              delegate: self, location: .prompt)
@@ -111,34 +112,8 @@ extension DownloadsTabExtension: NavigationResponder {
     }
 
     @MainActor
-    func navigationAction(_ navigationAction: NavigationAction, willBecomeDownloadIn webView: WKWebView) {
-#if !APPSTORE
-        // register the navigationResponse for legacy _WKDownload to be called back on the Tab
-        // further download will be passed to webView:navigationResponse:didBecomeDownload:
-        webView.configuration.processPool
-            .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)?
-            .registerDownloadDidStartCallback(for: navigationAction.url) { [weak self] download in
-                self?.navigationAction(navigationAction, didBecome: download) ?? { download.cancel() }()
-            }
-#endif
-    }
-
-    @MainActor
     func navigationAction(_ navigationAction: NavigationAction, didBecome download: WebKitDownload) {
         enqueueDownload(download, withNavigationAction: navigationAction)
-    }
-
-    @MainActor
-    func navigationResponse(_ navigationResponse: NavigationResponse, willBecomeDownloadIn webView: WKWebView) {
-#if !APPSTORE
-        // register the navigationResponse for legacy _WKDownload to be called back on the Tab
-        // further download will be passed to webView:navigationResponse:didBecomeDownload:
-        webView.configuration.processPool
-            .setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)?
-            .registerDownloadDidStartCallback(for: navigationResponse.url) { [weak self] download in
-                self?.navigationResponse(navigationResponse, didBecome: download) ?? { download.cancel() }()
-            }
-#endif
     }
 
     @MainActor

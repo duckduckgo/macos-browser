@@ -19,6 +19,7 @@
 import Foundation
 import DataBrokerProtection
 import AppKit
+import Common
 import SwiftUI
 
 public extension Notification.Name {
@@ -26,19 +27,17 @@ public extension Notification.Name {
 }
 
 final class DBPHomeViewController: NSViewController {
-    private var debugWindowController: NSWindowController?
-    private let authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData()
-    private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
-    private let redeemUseCase: DataBrokerProtectionRedeemUseCase
-
     private var presentedWindowController: NSWindowController?
+    private let dataBrokerProtectionManager: DataBrokerProtectionManager
 
     lazy var dataBrokerProtectionViewController: DataBrokerProtectionViewController = {
-        DataBrokerProtectionViewController()
+        DataBrokerProtectionViewController(scheduler: dataBrokerProtectionManager.scheduler,
+                                           dataManager: dataBrokerProtectionManager.dataManager,
+                                           notificationCenter: NotificationCenter.default)
     }()
 
-    init() {
-        self.redeemUseCase = RedeemUseCase(authenticationService: authenticationService, authenticationRepository: authenticationRepository)
+    init(dataBrokerProtectionManager: DataBrokerProtectionManager) {
+        self.dataBrokerProtectionManager = dataBrokerProtectionManager
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -53,7 +52,7 @@ final class DBPHomeViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if !redeemUseCase.shouldAskForInviteCode() {
+        if !dataBrokerProtectionManager.shouldAskForInviteCode() {
             attachDataBrokerContainerView()
         }
     }
@@ -66,9 +65,7 @@ final class DBPHomeViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
 
-        if !redeemUseCase.shouldAskForInviteCode() {
-            openDebugUI()
-        } else {
+        if dataBrokerProtectionManager.shouldAskForInviteCode() {
             presentInviteCodeFlow()
         }
     }
@@ -93,25 +90,6 @@ final class DBPHomeViewController: NSViewController {
         }
         parentWindowController.window?.beginSheet(newWindow)
     }
-
-    private func openDebugUI() {
-        if debugWindowController == nil {
-            let windowRect = NSRect(x: 0, y: 0, width: 1024, height: 768)
-            let debugWindow = NSWindow(contentRect: windowRect,
-                                  styleMask: [.titled, .closable, .resizable],
-                                  backing: .buffered,
-                                  defer: false)
-            debugWindow.title = "Debug Window"
-            debugWindow.center()
-            debugWindow.hidesOnDeactivate = true
-            let debugViewController = DataBrokerProtectionDebugViewController(redeemUseCase: redeemUseCase)
-            debugWindow.contentViewController = debugViewController
-
-            debugWindowController = NSWindowController(window: debugWindow)
-        }
-
-        debugWindowController?.showWindow(self)
-    }
 }
 
 extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDelegate {
@@ -119,12 +97,52 @@ extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDeleg
         presentedWindowController?.window?.close()
         presentedWindowController = nil
         attachDataBrokerContainerView()
-        openDebugUI()
     }
 
     func dataBrokerProtectionInviteDialogsViewModelDidCancel(_ viewModel: DataBrokerProtectionInviteDialogsViewModel) {
         presentedWindowController?.window?.close()
         presentedWindowController = nil
         NotificationCenter.default.post(name: .dbpDidClose, object: nil)
+    }
+}
+
+public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
+
+    // swiftlint:disable:next cyclomatic_complexity
+    public init() {
+        super.init { event, _, _, _ in
+            switch event {
+            case .error(let error, _):
+                Pixel.fire(.debug(event: .dataBrokerProtectionError, error: error), withAdditionalParameters: event.params)
+            case .optOutStart:
+                Pixel.fire(.debug(event: .optOutStart), withAdditionalParameters: event.params)
+            case .optOutEmailGenerate:
+                Pixel.fire(.debug(event: .optOutEmailGenerate), withAdditionalParameters: event.params)
+            case .optOutCaptchaParse:
+                Pixel.fire(.debug(event: .optOutCaptchaParse), withAdditionalParameters: event.params)
+            case .optOutCaptchaSend:
+                Pixel.fire(.debug(event: .optOutCaptchaSend), withAdditionalParameters: event.params)
+            case .optOutCaptchaSolve:
+                Pixel.fire(.debug(event: .optOutCaptchaSolve), withAdditionalParameters: event.params)
+            case .optOutSubmit:
+                Pixel.fire(.debug(event: .optOutSubmit), withAdditionalParameters: event.params)
+            case .optOutEmailReceive:
+                Pixel.fire(.debug(event: .optOutEmailReceive), withAdditionalParameters: event.params)
+            case .optOutEmailConfirm:
+                Pixel.fire(.debug(event: .optOutEmailConfirm), withAdditionalParameters: event.params)
+            case .optOutValidate:
+                Pixel.fire(.debug(event: .optOutValidate), withAdditionalParameters: event.params)
+            case .optOutFinish:
+                Pixel.fire(.debug(event: .optOutFinish), withAdditionalParameters: event.params)
+            case .optOutSuccess:
+                Pixel.fire(.debug(event: .optOutSuccess), withAdditionalParameters: event.params)
+            case .optOutFailure:
+                Pixel.fire(.debug(event: .optOutFailure), withAdditionalParameters: event.params)
+            }
+        }
+    }
+
+    override init(mapping: @escaping EventMapping<DataBrokerProtectionPixels>.Mapping) {
+        fatalError("Use init()")
     }
 }

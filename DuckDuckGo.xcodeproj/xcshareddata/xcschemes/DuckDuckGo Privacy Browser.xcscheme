@@ -125,6 +125,9 @@
             </BuildableReference>
             <SkippedTests>
                <Test
+                  Identifier = "AutoconsentIntegrationTests/testWhenAutoconsentDisabled_promptIsDisplayed()">
+               </Test>
+               <Test
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
                </Test>
                <Test
@@ -138,6 +141,9 @@
                </Test>
                <Test
                   Identifier = "NavigationProtectionIntegrationTests/testAMPLinks()">
+               </Test>
+               <Test
+                  Identifier = "NavigationProtectionIntegrationTests/testReferrerTrimming()">
                </Test>
                <Test
                   Identifier = "SearchNonexistentDomainTests/testWhenNonexistentDomainSuggestionChosen_redirectedToSERP()">

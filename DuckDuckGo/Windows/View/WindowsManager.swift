@@ -26,10 +26,25 @@ final class WindowsManager {
         return NSApplication.shared.windows
     }
 
-    class func closeWindows(except window: NSWindow? = nil) {
-        for controller in WindowControllersManager.shared.mainWindowControllers where controller.window !== window {
+    class func closeWindows(except windows: [NSWindow] = []) {
+        for controller in WindowControllersManager.shared.mainWindowControllers {
+            guard let window = controller.window, !windows.contains(window) else { continue }
             controller.close()
         }
+    }
+
+    /// finds window to position newly opened (or popup) windows against
+    private class func findPositioningSourceWindow(for tab: Tab?) -> NSWindow? {
+        if let parentTab = tab?.parentTab,
+           let sourceWindowController = WindowControllersManager.shared.mainWindowControllers.first(where: {
+               $0.mainViewController.tabCollectionViewModel.tabs.contains(parentTab)
+           }) {
+            // window that initiated the new window opening
+            return sourceWindowController.window
+        }
+
+        // fallback to last known main window
+        return WindowControllersManager.shared.lastKeyMainWindowController?.window
     }
 
     @discardableResult
@@ -44,14 +59,17 @@ final class WindowsManager {
                                                  popUp: popUp,
                                                  burnerMode: burnerMode)
 
-        if let droppingPoint = droppingPoint {
+        if let contentSize {
+            mainWindowController.window?.setContentSize(contentSize)
+        }
+
+        if let droppingPoint {
             mainWindowController.window?.setFrameOrigin(droppingPoint: droppingPoint)
+
+        } else if let sourceWindow = self.findPositioningSourceWindow(for: tabCollectionViewModel?.tabs.first) {
+            mainWindowController.window?.setFrameOrigin(cascadedFrom: sourceWindow)
         }
-        if let contentSize = contentSize {
-            let frame = NSRect(origin: droppingPoint ?? CGPoint.zero,
-                               size: contentSize)
-            mainWindowController.window?.setFrame(frame, display: true)
-        }
+
         if showWindow {
             mainWindowController.showWindow(self)
             if !NSApp.isActive {
@@ -103,13 +121,37 @@ final class WindowsManager {
         tabCollectionViewModel.setUpLazyLoadingIfNeeded()
     }
 
-    class func openPopUpWindow(with tab: Tab, contentSize: NSSize?) {
+    private static let defaultPopUpWidth: CGFloat = 1024
+    private static let defaultPopUpHeight: CGFloat = 752
+    private static let fallbackHeadlessScreenFrame = NSRect(x: 0, y: 100, width: 1280, height: 900)
+
+    class func openPopUpWindow(with tab: Tab, origin: NSPoint?, contentSize: NSSize?) {
         if let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController,
            mainWindowController.window?.styleMask.contains(.fullScreen) == true,
            mainWindowController.window?.isPopUpWindow == false {
+
             mainWindowController.mainViewController.tabCollectionViewModel.insert(tab, selected: true)
+
         } else {
-            self.openNewWindow(with: tab, contentSize: contentSize, popUp: true)
+            let screenFrame = (self.findPositioningSourceWindow(for: tab)?.screen ?? .main)?.visibleFrame ?? Self.fallbackHeadlessScreenFrame
+
+            // limit popUp content size to screen visible frame
+            // fallback to default if nil or zero
+            var contentSize = contentSize ?? .zero
+            contentSize = NSSize(width: min(screenFrame.width, contentSize.width > 0 ? contentSize.width : Self.defaultPopUpWidth),
+                                 height: min(screenFrame.height, contentSize.height > 0 ? contentSize.height : Self.defaultPopUpHeight))
+
+            // if origin provided, popup should be fully positioned on screen
+            let origin = origin.map { origin in
+                NSPoint(x: max(screenFrame.minX, min(screenFrame.maxX - contentSize.width, screenFrame.minX + origin.x)),
+                        y: min(screenFrame.maxY, max(screenFrame.minY + contentSize.height, screenFrame.maxY - origin.y)))
+            }
+
+            let droppingPoint = origin.map { origin in
+                NSPoint(x: origin.x + contentSize.width / 2, y: origin.y)
+            }
+
+            self.openNewWindow(with: tab, droppingPoint: droppingPoint, contentSize: contentSize, popUp: true)
         }
     }
 

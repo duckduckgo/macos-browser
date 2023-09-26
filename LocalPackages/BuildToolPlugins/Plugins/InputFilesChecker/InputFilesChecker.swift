@@ -25,9 +25,6 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("BWEncryptionOutput.m", .source),
     .init("BWManager.swift", .source),
     .init("UpdateController.swift", .source),
-    .init("LegacyWebKitDownloadDelegate.swift", .source),
-    .init("WKProcessPool+DownloadDelegate.swift", .source),
-    .init("_WKDownload+WebKitDownload.swift", .source),
     .init("SystemExtensionManager.swift", .source),
     .init("DuckDuckGo Agent.app", .unknown),
     .init("DuckDuckGo Notifications.app", .unknown),
@@ -57,10 +54,7 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
 
     "DuckDuckGo DBP": nonSandboxedExtraInputFiles.union([
         .init("DBPHomeViewController.swift", .source),
-        .init("DataBrokerProfileQueryView.swift", .source),
-        .init("DataBrokerProtectionDebugViewController.swift", .source),
-        .init("SwiftUIWrappers.swift", .source),
-        .init("UserProfileView.swift", .source),
+        .init("DataBrokerProtectionManager.swift", .source)
     ]),
 
     "Unit Tests": [

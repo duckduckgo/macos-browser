@@ -98,22 +98,34 @@ final class TabCollectionViewModel: NSObject {
 
     private var cancellables = Set<AnyCancellable>()
 
+    private var startupPreferences: StartupPreferences
+    private var homePage: Tab.TabContent {
+        var homePage: Tab.TabContent = .homePage
+        if startupPreferences.launchToCustomHomePage,
+           let customURL = URL(string: startupPreferences.formattedCustomHomePageURL) {
+            homePage = Tab.TabContent.contentFromURL(customURL)
+        }
+        return homePage
+    }
+
     init(
         tabCollection: TabCollection,
         selectionIndex: Int = 0,
         pinnedTabsManager: PinnedTabsManager?,
-        burnerMode: BurnerMode = .regular
+        burnerMode: BurnerMode = .regular,
+        startupPreferences: StartupPreferences = StartupPreferences.shared
     ) {
         self.tabCollection = tabCollection
         self.pinnedTabsManager = pinnedTabsManager
         self.burnerMode = burnerMode
+        self.startupPreferences = startupPreferences
         super.init()
 
         subscribeToTabs()
         subscribeToPinnedTabsManager()
 
         if tabCollection.tabs.isEmpty {
-            appendNewTab(with: .homePage)
+            appendNewTab(with: homePage)
         }
         self.selectionIndex = .unpinned(selectionIndex)
     }
@@ -153,14 +165,17 @@ final class TabCollectionViewModel: NSObject {
         tabLazyLoader?.scheduleLazyLoading()
     }
 
-    func tabViewModel(at index: Int) -> TabViewModel? {
-        guard index >= 0, tabCollection.tabs.count > index else {
-            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
-            return nil
-        }
+    func tabViewModel(at unpinnedIndex: Int) -> TabViewModel? {
+        return tabViewModel(at: .unpinned(unpinnedIndex))
+    }
 
-        let tab = tabCollection.tabs[index]
-        return tabViewModels[tab]
+    func tabViewModel(at index: TabIndex) -> TabViewModel? {
+        switch index {
+        case .unpinned(let index):
+            return tabs[safe: index].flatMap { tabViewModels[$0] }
+        case .pinned(let index):
+            return pinnedTabsManager?.tabViewModel(at: index)
+        }
     }
 
     // MARK: - Selection
@@ -648,9 +663,9 @@ final class TabCollectionViewModel: NSObject {
 
         switch tabCollection {
         case self.tabCollection:
-            selectedTabViewModel = tabViewModel(at: selectionIndex.item)
+            selectedTabViewModel = tabViewModel(at: .unpinned(selectionIndex.item))
         case pinnedTabsCollection:
-            selectedTabViewModel = pinnedTabsManager?.tabViewModel(at: selectionIndex.item)
+            selectedTabViewModel = tabViewModel(at: .pinned(selectionIndex.item))
         default:
             break
         }
@@ -673,7 +688,7 @@ extension TabCollectionViewModel {
         }
     }
 
-    private func indexInAllTabs(of tab: Tab) -> TabIndex? {
+    func indexInAllTabs(of tab: Tab) -> TabIndex? {
         if let index = pinnedTabsCollection?.tabs.firstIndex(of: tab) {
             return .pinned(index)
         }

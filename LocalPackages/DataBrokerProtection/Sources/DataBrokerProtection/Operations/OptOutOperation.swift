@@ -35,14 +35,17 @@ final class OptOutOperation: DataBrokerOperation {
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<Void, Error>?
     var extractedProfile: ExtractedProfile?
+    var stageCalculator: DataBrokerProtectionStageDurationCalculator?
     private let operationAwaitTime: TimeInterval
+    let shouldRunNextStep: () -> Bool
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
          query: BrokerProfileQueryData,
          emailService: EmailServiceProtocol = EmailService(),
          captchaService: CaptchaServiceProtocol = CaptchaService(),
-         operationAwaitTime: TimeInterval = 1
+         operationAwaitTime: TimeInterval = 3,
+         shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
         self.prefs = prefs
@@ -50,17 +53,23 @@ final class OptOutOperation: DataBrokerOperation {
         self.emailService = emailService
         self.captchaService = captchaService
         self.operationAwaitTime = operationAwaitTime
+        self.shouldRunNextStep = shouldRunNextStep
     }
 
     func run(inputValue: ExtractedProfile,
              webViewHandler: WebViewHandler? = nil,
-             actionsHandler: ActionsHandler? = nil) async throws {
+             actionsHandler: ActionsHandler? = nil,
+             stageCalculator: DataBrokerProtectionStageDurationCalculator,
+             showWebView: Bool = false) async throws {
         try await withCheckedThrowingContinuation { continuation in
             self.extractedProfile = inputValue.merge(with: query.profileQuery)
+            self.stageCalculator = stageCalculator
             self.continuation = continuation
 
             Task {
-                await initialize(handler: webViewHandler, isFakeBroker: query.dataBroker.isFakeBroker)
+                await initialize(handler: webViewHandler,
+                                 isFakeBroker: query.dataBroker.isFakeBroker,
+                                 showWebView: showWebView)
 
                 do {
                     if let optOutStep = try query.dataBroker.optOutStep() {
@@ -70,7 +79,12 @@ final class OptOutOperation: DataBrokerOperation {
                             self.actionsHandler = ActionsHandler(step: optOutStep)
                         }
 
-                        await executeNextStep()
+                        if self.shouldRunNextStep() {
+                            await executeNextStep()
+                        } else {
+                            failed(with: DataBrokerProtectionError.cancelled)
+                        }
+
                     } else {
                         // If we try to run an optout on a broker without an optout step, we throw.
                         failed(with: .noOptOutStep)
@@ -90,10 +104,11 @@ final class OptOutOperation: DataBrokerOperation {
         os_log("OPTOUT Waiting %{public}f seconds...", log: .action, operationAwaitTime)
         try? await Task.sleep(nanoseconds: UInt64(operationAwaitTime) * 1_000_000_000)
 
-        if let action = actionsHandler?.nextAction() {
+        if let action = actionsHandler?.nextAction(), self.shouldRunNextStep() {
             await runNextAction(action)
         } else {
             await webViewHandler?.finish() // If we executed all steps we release the web view
+            stageCalculator?.fireOptOutValidate()
             complete(())
         }
     }

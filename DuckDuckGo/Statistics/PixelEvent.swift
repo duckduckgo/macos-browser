@@ -23,7 +23,7 @@ import Configuration
 
 extension Pixel {
 
-    enum Event {
+    indirect enum Event {
         case crash
 
         case brokenSiteReport
@@ -86,7 +86,11 @@ extension Pixel {
                                      result: result)
         }
 
+        case launchInitial(cohort: String)
+
         case serp
+        case serpInitial(cohort: String)
+        case serpDay21to27(cohort: String)
 
         case dataImportFailed(action: DataImportAction, source: DataImportSource)
         case faviconImportFailed(source: DataImportSource)
@@ -123,7 +127,7 @@ extension Pixel {
         case emailEnabledInitial
         case cookieManagementEnabledInitial
         case watchInDuckPlayerInitial
-        case setAsDefaultInitial
+        case setAsDefaultInitial(cohort: String)
         case importDataInitial
 
         // New Tab section removed
@@ -131,20 +135,12 @@ extension Pixel {
         case recentActivitySectionHidden
         case continueSetUpSectionHidden
 
-        // Bookmarks bar onboarding
-        case bookmarksBarOnboardingEnrollment(cohort: String)
-        case bookmarksBarOnboardingSearched4to8days(cohort: String)
-        case bookmarksBarOnboardingFirstInteraction(cohort: String)
-        case bookmarksBarOnboardingInteraction2to8days(cohort: String)
-
         // Pinned tabs
         case userHasPinnedTab
 
         // Fire Button
         case fireButtonFirstBurn
         case fireButton(option: FireButtonOption)
-
-        case incrementalRolloutTest
 
         // Duck Player
         case duckPlayerDailyUniqueView
@@ -156,6 +152,21 @@ extension Pixel {
         case duckPlayerSettingAlways
         case duckPlayerSettingNever
         case duckPlayerSettingBackToDefault
+
+        // Network Protection Waitlist
+        case networkProtectionWaitlistEntryPointMenuItemDisplayed
+        case networkProtectionWaitlistEntryPointToolbarButtonDisplayed
+        case networkProtectionWaitlistNotificationShown
+        case networkProtectionWaitlistNotificationTapped
+        case networkProtectionWaitlistTermsAndConditionsDisplayed
+        case networkProtectionWaitlistTermsAndConditionsAccepted
+
+        // 28-day Home Button
+        case enableHomeButton
+        case disableHomeButton
+        case setnewHomePage
+
+        case dailyPixel(Event, isFirst: Bool)
 
         enum Debug {
 
@@ -287,6 +298,8 @@ extension Pixel {
             case syncBookmarksFailed
             case syncCredentialsProviderInitializationFailed
             case syncCredentialsFailed
+            case syncSettingsFailed
+            case syncSettingsMetadataUpdateFailed
 
             case bookmarksCleanupFailed
             case bookmarksCleanupAttemptedWhileSyncWasEnabled
@@ -299,6 +312,24 @@ extension Pixel {
             case burnerTabMisplaced
 #if DBP
             case dataBrokerProtectionError
+
+            // SLO and SLI Pixels: https://app.asana.com/0/1203581873609357/1205337273100857/f
+
+            // Stage Pixels
+            case optOutStart
+            case optOutEmailGenerate
+            case optOutCaptchaParse
+            case optOutCaptchaSend
+            case optOutCaptchaSolve
+            case optOutSubmit
+            case optOutEmailReceive
+            case optOutEmailConfirm
+            case optOutValidate
+            case optOutFinish
+
+            // Process Pixels
+            case optOutSuccess
+            case optOutFailure
 #endif
         }
 
@@ -395,16 +426,6 @@ extension Pixel.Event {
         case .continueSetUpSectionHidden:
             return "m_mac.continue-setup-section-hidden"
 
-        // Bookmarks bar experiement
-        case .bookmarksBarOnboardingEnrollment:
-            return "m_mac_bookmarksbarexperiment_enrollment"
-        case .bookmarksBarOnboardingSearched4to8days:
-            return "m_mac_bookmarksbarexperiment_searched4to8days"
-        case .bookmarksBarOnboardingFirstInteraction:
-            return "m_mac_bookmarksbarexperiment_firstinteraction"
-        case .bookmarksBarOnboardingInteraction2to8days:
-            return "m_mac_bookmarksbarexperiment_interaction2to8days"
-
         // Pinned tabs
         case .userHasPinnedTab:
             return "m_mac_user_has_pinned_tab"
@@ -414,9 +435,6 @@ extension Pixel.Event {
             return "m_mac_fire_button_first_burn"
         case .fireButton(option: let option):
             return "m_mac_fire_button_\(option)"
-
-        case .incrementalRolloutTest:
-            return "m_mac_netp_ev_incremental_rollout_test"
 
         case .duckPlayerDailyUniqueView:
             return "m_mac_duck-player_daily-unique-view"
@@ -437,9 +455,48 @@ extension Pixel.Event {
         case .duckPlayerSettingBackToDefault:
             return "m_mac_duck-player_setting_back-to-default"
 
+        case .launchInitial:
+            return "m.mac.first-launch"
+        case .serpInitial:
+            return "m.mac.navigation.first-search"
+        case .serpDay21to27:
+            return "m.mac.search-day-21-27.initial"
+
+        case .networkProtectionWaitlistEntryPointMenuItemDisplayed:
+            return "m_mac_netp_imp_settings_entry_menu_item"
+        case .networkProtectionWaitlistEntryPointToolbarButtonDisplayed:
+            return "m_mac_netp_imp_settings_entry_toolbar_button"
+        case .networkProtectionWaitlistNotificationShown:
+            return "m_mac_netp_ev_waitlist_notification_shown"
+        case .networkProtectionWaitlistNotificationTapped:
+            return "m_mac_netp_ev_waitlist_notification_launched"
+        case .networkProtectionWaitlistTermsAndConditionsDisplayed:
+            return "m_mac_netp_imp_terms"
+        case .networkProtectionWaitlistTermsAndConditionsAccepted:
+            return "m_mac_netp_ev_terms_accepted"
+
+        // 28-day Home Button
+        case .enableHomeButton:
+            return "m_mac_enable_home_button"
+        case .disableHomeButton:
+            return "m_mac_disable_home_button"
+        case .setnewHomePage:
+            return "m_mac_set_new_homepage"
+
+        case .dailyPixel(let pixel, isFirst: let isFirst):
+            return pixel.name + (isFirst ? "_d" : "_c")
+
         }
 
     }
+}
+
+extension Pixel.Event: Equatable {
+
+    static func == (lhs: Pixel.Event, rhs: Pixel.Event) -> Bool {
+        lhs.name == rhs.name && lhs.parameters == rhs.parameters
+    }
+
 }
 
 extension Pixel.Event.Debug {
@@ -671,6 +728,8 @@ extension Pixel.Event.Debug {
         case .syncBookmarksFailed: return "sync_bookmarks_failed"
         case .syncCredentialsProviderInitializationFailed: return "sync_credentials_provider_initialization_failed"
         case .syncCredentialsFailed: return "sync_credentials_failed"
+        case .syncSettingsFailed: return "sync_settings_failed"
+        case .syncSettingsMetadataUpdateFailed: return "sync_settings_metadata_update_failed"
 
         case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
         case .bookmarksCleanupAttemptedWhileSyncWasEnabled: return "bookmarks_cleanup_attempted_while_sync_was_enabled"
@@ -684,6 +743,21 @@ extension Pixel.Event.Debug {
 
 #if DBP
         case .dataBrokerProtectionError: return "data_broker_error"
+        // Stage Pixels
+        case .optOutStart: return "dbp.macos.optout.stage.start"
+        case .optOutEmailGenerate: return "dbp.macos.optout.stage.email-generate"
+        case .optOutCaptchaParse: return "dbp.macos.optout.stage.captcha-parse"
+        case .optOutCaptchaSend: return "dbp.macos.optout.stage.captcha-send"
+        case .optOutCaptchaSolve: return "dbp.macos.optout.stage.captcha-solve"
+        case .optOutSubmit: return "dbp.macos.optout.stage.submit"
+        case .optOutEmailReceive: return "dbp.macos.optout.stage.email-receive"
+        case .optOutEmailConfirm: return "dbp.macos.optout.stage.email-confirm"
+        case .optOutValidate: return "dbp.macos.optout.stage.validate"
+        case .optOutFinish: return "dbp.macos.optout.stage.finish"
+
+        // Process Pixels
+        case .optOutSuccess: return "dbp.macos.optout.process.success"
+        case .optOutFailure: return "dbp.macos.optout.process.failure"
 #endif
         }
     }
