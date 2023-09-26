@@ -20,9 +20,13 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 struct StartupPreferencesPersistorMock: StartupPreferencesPersistor {
+    var launchToCustomHomePage: Bool
+    var customHomePageURL: String
     var restorePreviousSession: Bool
 
-    init(restorePreviousSession: Bool = false) {
+    init(launchToCustomHomePage: Bool, customHomePageURL: String, restorePreviousSession: Bool = false) {
+        self.customHomePageURL = customHomePageURL
+        self.launchToCustomHomePage = launchToCustomHomePage
         self.restorePreviousSession = restorePreviousSession
     }
 }
@@ -30,13 +34,40 @@ struct StartupPreferencesPersistorMock: StartupPreferencesPersistor {
 class StartupPreferencesTests: XCTestCase {
 
     func testWhenInitializedThenItLoadsPersistedValues() throws {
-        var model = StartupPreferences(persistor: StartupPreferencesPersistorMock(restorePreviousSession: true))
+        var model = StartupPreferences(persistor: StartupPreferencesPersistorMock(launchToCustomHomePage: false, customHomePageURL: "duckduckgo.com", restorePreviousSession: false))
+        XCTAssertEqual(model.launchToCustomHomePage, false)
+        XCTAssertEqual(model.customHomePageURL, "duckduckgo.com")
+        XCTAssertEqual(model.restorePreviousSession, false)
 
+        model = StartupPreferences(persistor: StartupPreferencesPersistorMock(launchToCustomHomePage: true, customHomePageURL: "http://duckduckgo.com", restorePreviousSession: true))
+        XCTAssertEqual(model.launchToCustomHomePage, true)
+        XCTAssertEqual(model.customHomePageURL, "http://duckduckgo.com")
         XCTAssertEqual(model.restorePreviousSession, true)
 
-        model = StartupPreferences(persistor: StartupPreferencesPersistorMock(restorePreviousSession: false))
+        model = StartupPreferences(persistor: StartupPreferencesPersistorMock(launchToCustomHomePage: true, customHomePageURL: "https://duckduckgo.com", restorePreviousSession: true))
+        XCTAssertEqual(model.customHomePageURL, "https://duckduckgo.com")
 
-        XCTAssertEqual(model.restorePreviousSession, false)
+        model = StartupPreferences(persistor: StartupPreferencesPersistorMock(launchToCustomHomePage: true, customHomePageURL: "https://mail.google.com/mail/u/1/#spam/FMfcgzGtxKRZFPXfxKMWSKVgwJlswxnH", restorePreviousSession: true))
+        XCTAssertEqual(model.friendlyURL, "mail.google.com/mail/u/1/#s...")
+
+        model = StartupPreferences(persistor: StartupPreferencesPersistorMock(launchToCustomHomePage: true, customHomePageURL: "https://www.rnids.rs/национални-домени/регистрација-националних-домена", restorePreviousSession: true))
+        XCTAssertEqual(model.friendlyURL, "www.rnids.rs/национални-дом...")
+
+        model = StartupPreferences(persistor: StartupPreferencesPersistorMock(launchToCustomHomePage: true, customHomePageURL: "www.rnids.rs/национални-домени/регистрација-националних-домена", restorePreviousSession: true))
+        XCTAssertEqual(model.friendlyURL, "www.rnids.rs/национални-дом...")
+
+        model = StartupPreferences(persistor: StartupPreferencesPersistorMock(launchToCustomHomePage: true, customHomePageURL: "https://💩.la", restorePreviousSession: true))
+        XCTAssertEqual(model.friendlyURL, "💩.la")
+
+    }
+
+    func testIsValidURL() {
+        XCTAssertFalse(StartupPreferences().isValidURL("invalid url"))
+        XCTAssertFalse(StartupPreferences().isValidURL("invalidUrl"))
+        XCTAssertFalse(StartupPreferences().isValidURL(""))
+        XCTAssertTrue(StartupPreferences().isValidURL("test.com"))
+        XCTAssertTrue(StartupPreferences().isValidURL("http://test.com"))
+        XCTAssertTrue(StartupPreferences().isValidURL("https://test.com"))
     }
 
 }

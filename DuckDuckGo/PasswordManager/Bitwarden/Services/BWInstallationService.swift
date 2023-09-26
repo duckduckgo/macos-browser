@@ -78,6 +78,15 @@ final class LocalBitwardenInstallationService: BWInstallationService {
         return .installed
     }
 
+    var isSandboxContainerAccessApproved: Bool {
+        if FileManager.default.fileExists(atPath: sandboxDataFileUrl.path) {
+            return FileManager.default.isReadableFile(atPath: sandboxDataFileUrl.path)
+        }
+
+        // User installed the DMG version which doesn't require an approval
+        return true
+    }
+
     var isIntegrationWithDuckDuckGoEnabled: Bool {
         // Select correct data file and check the integration setting
         let isIntegrationInSandboxDataFileEnabled = isIntegrationEnabled(in: sandboxDataFileUrl)

@@ -56,20 +56,13 @@ struct DataBrokerProtectionContainerView: View {
                             scanButtonClicked: {
                                 navigationViewModel.updateNavigation(.scanStarted)
                                 containerViewModel.scanAfterProfileCreation { scanResult in
-                                    if navigationViewModel.bodyViewType != .scanStarted {
-                                        return
-                                    }
-                                    switch scanResult {
-                                    case .noResults:
-                                        navigationViewModel.updateNavigation(.noResults)
-                                    case .results:
-                                        resultsViewModel.reloadData()
-                                        navigationViewModel.updateNavigation(.results)
+                                    updateUIWithScanResult(scanResult: scanResult)
+
+                                    if scanResult == .results && !DataBrokerDebugFlagBlockScheduler().isFlagOn() {
                                         containerViewModel.runQueuedOperationsAndStartScheduler()
                                     }
                                 }
                             }, backToDashboardClicked: {
-                                containerViewModel.runQueuedOperationsAndStartScheduler()
                                 navigationViewModel.updateNavigation(.results)
                             })
                         .frame(width: 670)
@@ -95,6 +88,19 @@ struct DataBrokerProtectionContainerView: View {
         )
     }
 
+    private func updateUIWithScanResult(scanResult: ContainerViewModel.ScanResult) {
+        if navigationViewModel.bodyViewType != .scanStarted {
+            return
+        }
+        switch scanResult {
+        case .noResults:
+            navigationViewModel.updateNavigation(.noResults)
+        case .results:
+            resultsViewModel.reloadData()
+            navigationViewModel.updateNavigation(.results)
+        }
+    }
+
     @ViewBuilder
     private func debugUI() -> some View {
         VStack(alignment: .leading) {
@@ -104,10 +110,32 @@ struct DataBrokerProtectionContainerView: View {
 
             Toggle("Display WebViews", isOn: $containerViewModel.showWebView)
 
+            Toggle("Block Scheduler", isOn: $containerViewModel.preventSchedulerStart)
+
             Button {
                 containerViewModel.forceSchedulerRun()
             } label: {
                 Text("Force operations run")
+            }
+
+            Button {
+                containerViewModel.forceRunScans { result in
+                    updateUIWithScanResult(scanResult: result)
+                }
+            } label: {
+                Text("Run Scans")
+            }
+
+            Button {
+                containerViewModel.forceRunOptOuts()
+            } label: {
+                Text("Run Opt-Outs")
+            }
+
+            Button {
+                containerViewModel.cleanData()
+            } label: {
+                Text("Clean Data & Close")
             }
 
             HStack {
@@ -123,7 +151,6 @@ struct DataBrokerProtectionContainerView: View {
         }
         .padding()
         .blurredBackground()
-
     }
 
     @ViewBuilder
