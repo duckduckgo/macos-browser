@@ -22,6 +22,14 @@ struct DeviceSyncedView: View {
     @EnvironmentObject var model: ManagementDialogModel
 
     let devices: [SyncDevice]
+    let shouldShowOptions: Bool
+    var height: CGFloat {
+        if shouldShowOptions {
+            return 500
+        } else {
+            return min(450, 290 + (CGFloat(devices.count) * 44))
+        }
+    }
 
     var body: some View {
         SyncDialog(spacing: 20.0) {
@@ -35,16 +43,45 @@ struct DeviceSyncedView: View {
                 ScrollView {
                     SyncedDevicesList(devices: devices)
                 }
-
+                if shouldShowOptions {
+                    OptionsView()
+                }
             }
+            .frame(width: 320)
+            .padding(20)
         } buttons: {
             Button(UserText.next) {
                 model.endFlow()
             }
         }
         .frame(width: 360,
-               // Grow with the number of devices, up to a point
-               height: min(410, 270 + (CGFloat(devices.count) * 44)))
+               height: height)
+    }
 
+    struct OptionsView: View {
+        @EnvironmentObject var model: ManagementDialogModel
+        var body: some View {
+            VStack(spacing: 8) {
+                Text("Sync Options")
+                VStack {
+                    Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Sync Favorites")
+                                .font(Const.Fonts.preferencePaneOptionTitle)
+                            Text("Automatically fetch icons for synced bookmarks on your other devices.")
+                                .font(Const.Fonts.preferencePaneCaption)
+                                .foregroundColor(Color("BlackWhite60"))
+                        }
+                        .frame(width: 254)
+                    }
+                    .frame(height: 65)
+                    .toggleStyle(.switch)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .roundedBorder()
+                }
+                .frame(width: 320)
+            }
+        }
     }
 }

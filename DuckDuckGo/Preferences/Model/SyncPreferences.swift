@@ -60,6 +60,9 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             } else {
                 shouldRequestSyncOnFavoritesOptionChange = true
             }
+            if managementDialogModel.isUnifiedFavoritesEnabled != isUnifiedFavoritesEnabled {
+                managementDialogModel.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
+            }
         }
     }
     private var shouldRequestSyncOnFavoritesOptionChange: Bool = true
@@ -97,7 +100,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 .dropFirst()
                 .prefix(1)
                 .sink { [weak self] value in
-                    self?.presentDialog(for: .deviceSynced(value.filter { !$0.isCurrent }))
+                    self?.presentDialog(for: .deviceSynced(value.filter { !$0.isCurrent }, shouldShowOptions: true))
                     self?.objectWillChange.send()
                 }.store(in: &cancellables)
             managementDialogModel.codeToDisplay = syncService.account?.recoveryCode
@@ -133,6 +136,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
         self.managementDialogModel = ManagementDialogModel()
         self.managementDialogModel.delegate = self
+        self.managementDialogModel.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
 
         AppearancePreferences.shared.$favoritesDisplayMode
             .map(\.isDisplayUnified)
@@ -275,7 +279,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
     @MainActor
-    private func loginAndShowPresentedDialog(_ recoveryKey: SyncCode.RecoveryKey) async throws {
+    private func loginAndShowPresentedDialog(_ recoveryKey: SyncCode.RecoveryKey, shouldShowOptions: Bool) async throws {
         let device = deviceInfo()
         let knownDevices = Set(self.devices.map { $0.id })
         let devices = try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
@@ -283,7 +287,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         let syncedDevices = self.devices.filter { !knownDevices.contains($0.id) && !$0.isCurrent }
 
         managementDialogModel.endFlow()
-        presentDialog(for: .deviceSynced(syncedDevices))
+        presentDialog(for: .deviceSynced(syncedDevices, shouldShowOptions: shouldShowOptions))
     }
 
 //    @MainActor
@@ -313,7 +317,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 self.connector = try syncService.remoteConnect()
                 self.codeToDisplay = connector?.code
                 if let recoveryKey = try await connector?.pollForRecoveryKey() {
-                    try await loginAndShowPresentedDialog(recoveryKey)
+                    try await loginAndShowPresentedDialog(recoveryKey, shouldShowOptions: false)
                 } else {
                     // Polling was likeley cancelled elsewhere (e.g. dialog closed)
                     return
@@ -356,7 +360,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 }
                 if let recoveryKey = syncCode.recovery {
                     // This will error if the account already exists, we don't have good UI for this just now
-                    try await loginAndShowPresentedDialog(recoveryKey)
+                    try await loginAndShowPresentedDialog(recoveryKey, shouldShowOptions: true)
                 } else if let connectKey = syncCode.connect {
                     if syncService.account == nil {
                         let device = deviceInfo()

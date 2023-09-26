@@ -31,6 +31,7 @@ public protocol ManagementDialogModelDelegate: AnyObject {
     func removeDevice(_ device: SyncDevice)
     func deleteAccount()
     func presentSaveRecoveryPDF()
+    var isUnifiedFavoritesEnabled: Bool { get set }
 }
 
 public final class ManagementDialogModel: ObservableObject {
@@ -40,6 +41,13 @@ public final class ManagementDialogModel: ObservableObject {
 
     @Published public var shouldShowErrorMessage: Bool = false
     @Published public var errorMessage: String?
+    @Published public var isUnifiedFavoritesEnabled: Bool = false {
+        didSet {
+            if delegate?.isUnifiedFavoritesEnabled != isUnifiedFavoritesEnabled {
+                delegate?.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
+            }
+        }
+    }
 
     public weak var delegate: ManagementDialogModelDelegate?
 
@@ -57,5 +65,4 @@ public final class ManagementDialogModel: ObservableObject {
     }
 
     private var shouldShowErrorMessageCancellable: AnyCancellable?
-    
 }
