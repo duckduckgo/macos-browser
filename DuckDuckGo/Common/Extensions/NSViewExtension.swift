@@ -36,20 +36,16 @@ extension NSView {
                 || visibleRect.size.width > bounds.size.width || visibleRect.size.height > bounds.size.height,
               let superview else { return visibleRect }
 
-        visibleRect = bounds
+        let frame = self.frame
+        visibleRect = frame
 
-        let flipped = isFlipped
-        let superViewFlipped = superview.isFlipped
-
-        var rect = frame
-
-        if superViewFlipped != flipped {
-            rect.origin.y = superview.bounds.height - rect.origin.y - rect.height
+        if superview.isFlipped != isFlipped {
+            visibleRect.origin.y = superview.bounds.height - visibleRect.origin.y - visibleRect.height
         }
 
-        visibleRect = rect.intersection(superview.visibleRect)
-        visibleRect.origin.x -= rect.origin.x
-        visibleRect.origin.y -= rect.origin.y
+        visibleRect = visibleRect.intersection(superview.visibleRect)
+        visibleRect.origin.x -= frame.origin.x
+        visibleRect.origin.y -= frame.origin.y
 
         return visibleRect
     }
