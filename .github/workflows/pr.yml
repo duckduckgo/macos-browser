@@ -55,6 +55,8 @@ jobs:
             flavor: Non-Sandbox
           - scheme: DuckDuckGo Privacy Browser App Store
             flavor: Sandbox
+          - scheme: DataBrokerProtectionTests
+            flavor: Non-Sandbox
           - active-arch: YES
             flavor: Non-Sandbox
           - active-arch: NO
