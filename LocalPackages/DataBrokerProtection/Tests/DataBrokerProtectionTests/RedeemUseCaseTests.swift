@@ -34,7 +34,7 @@ final class RedeemUseCaseTests: XCTestCase {
 
         let sut = RedeemUseCase(authenticationService: service, authenticationRepository: repository)
 
-        XCTAssertFalse(sut.shouldAskForInviteCode())
+        XCTAssertTrue(sut.shouldAskForInviteCode())
     }
 
     func testWhenAccessTokenIsNotNil_thenShouldAskForInviteCodeReturnsFalse() {
