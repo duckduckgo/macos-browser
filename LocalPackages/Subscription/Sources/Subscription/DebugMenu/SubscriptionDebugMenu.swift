@@ -75,7 +75,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func validateToken() {
         Task {
             guard let token = accountManager.token else { return }
-            switch await AccountsService.validateToken(accessToken: token) {
+            switch await AuthService.validateToken(accessToken: token) {
             case .success(let response):
                 showAlert(title: "Validate token", message: "\(response)")
             case .failure(let error):

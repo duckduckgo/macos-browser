@@ -121,7 +121,7 @@ public class AccountManager {
 
                 // Do the store login to get short-lived token
                 let shortLivedToken: String
-                switch await AccountsService.storeLogin(payload: payload, signature: jwsRepresentation) {
+                switch await AuthService.storeLogin(payload: payload, signature: jwsRepresentation) {
                 case .success(let response):
                     print("\(response)")
                     shortLivedToken = response.authToken
@@ -139,7 +139,7 @@ public class AccountManager {
         Task {
             // Exchange short-lived token to a long-lived one
             let longToken: String
-            switch await AccountsService.getAccessToken(token: shortLivedToken) {
+            switch await AuthService.getAccessToken(token: shortLivedToken) {
             case .success(let response):
                 print("\(response)")
                 longToken = response.accessToken
@@ -149,7 +149,7 @@ public class AccountManager {
             }
 
             // Fetch entitlements and account details and store the data
-            switch await AccountsService.validateToken(accessToken: longToken) {
+            switch await AuthService.validateToken(accessToken: longToken) {
             case .success(let response):
                 print("\(response)")
 

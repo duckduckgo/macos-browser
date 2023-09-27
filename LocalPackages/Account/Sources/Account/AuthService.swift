@@ -1,5 +1,5 @@
 //
-//  AccountsService.swift
+//  AuthService.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,7 +18,7 @@
 
 import Foundation
 
-public struct AccountsService {
+public struct AuthService {
 
     public enum Error: Swift.Error {
         case decodingError
@@ -38,7 +38,7 @@ public struct AccountsService {
 
     // MARK: -
 
-    public static func getAccessToken(token: String) async -> Result<AccessTokenResponse, AccountsService.Error> {
+    public static func getAccessToken(token: String) async -> Result<AccessTokenResponse, AuthService.Error> {
         await executeAPICall(method: "GET", endpoint: "access-token", headers: ["Authorization": "Bearer " + token])
     }
 
@@ -48,7 +48,7 @@ public struct AccountsService {
 
     // MARK: -
 
-    public static func validateToken(accessToken: String) async -> Result<ValidateTokenResponse, AccountsService.Error> {
+    public static func validateToken(accessToken: String) async -> Result<ValidateTokenResponse, AuthService.Error> {
         await executeAPICall(method: "GET", endpoint: "validate-token", headers: ["Authorization": "Bearer " + accessToken])
     }
 
@@ -76,7 +76,7 @@ public struct AccountsService {
 
     // MARK: -
 
-    static func createAccount() async -> Result<CreateAccountResponse, AccountsService.Error> {
+    static func createAccount() async -> Result<CreateAccountResponse, AuthService.Error> {
         await executeAPICall(method: "POST", endpoint: "account/create", headers: [:])
     }
 
@@ -92,7 +92,7 @@ public struct AccountsService {
 
     // MARK: -
 
-    public static func storeLogin(payload: String, signature: String) async -> Result<StoreLoginResponse, AccountsService.Error> {
+    public static func storeLogin(payload: String, signature: String) async -> Result<StoreLoginResponse, AuthService.Error> {
 
         let bodyDict = ["signature": signature,
 //                        "signed_data": payload,
@@ -122,7 +122,7 @@ public struct AccountsService {
 
     // MARK: - Private API
 
-    private static func executeAPICall<T>(method: String, endpoint: String, headers: [String: String], body: Data? = nil) async -> Result<T, AccountsService.Error> where T: Decodable {
+    private static func executeAPICall<T>(method: String, endpoint: String, headers: [String: String], body: Data? = nil) async -> Result<T, AuthService.Error> where T: Decodable {
         let request = makeAPIRequest(method: method, endpoint: endpoint, headers: headers, body: body)
 
         do {
