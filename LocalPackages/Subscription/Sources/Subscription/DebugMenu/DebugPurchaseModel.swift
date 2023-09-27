@@ -1,5 +1,5 @@
 //
-//  DebugManagePurchasesModel.swift
+//  DebugPurchaseModel.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,7 @@ import Purchase
 import Account
 
 @available(macOS 12.0, *)
-public final class DebugManagePurchasesModel: ObservableObject {
+public final class DebugPurchaseModel: ObservableObject {
 
     var manager: PurchaseManager
     @Published var subscriptions: [SubscriptionRowModel]

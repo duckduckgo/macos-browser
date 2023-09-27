@@ -44,7 +44,9 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         menu.addItem(NSMenuItem(title: "Validate Token", action: #selector(validateToken), target: self))
         menu.addItem(NSMenuItem(title: "Restore Subscription from App Store transaction", action: #selector(restorePurchases), target: self))
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: "Purchase Subscription from App Store", action: #selector(showPurchaseView), target: self))
+        if #available(macOS 12.0, *) {
+            menu.addItem(NSMenuItem(title: "Purchase Subscription from App Store", action: #selector(showPurchaseView), target: self))
+        }
 
         return menu
     }()
@@ -90,7 +92,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @IBAction func showPurchaseView(_ sender: Any?) {
         if #available(macOS 12.0, *) {
-            currentViewController()?.presentAsSheet(DebugManagePurchasesViewController())
+            currentViewController()?.presentAsSheet(DebugPurchaseViewController())
         }
     }
 

@@ -1,5 +1,5 @@
 //
-//  DebugManagePurchasesViewController.swift
+//  DebugPurchaseViewController.swift
 //  DuckDuckGo
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
@@ -24,10 +24,10 @@ import StoreKit
 import Purchase
 
 @available(macOS 12.0, *)
-public final class DebugManagePurchasesViewController: NSViewController {
+public final class DebugPurchaseViewController: NSViewController {
 
     private let manager: PurchaseManager
-    private let model: DebugManagePurchasesModel
+    private let model: DebugPurchaseModel
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -37,18 +37,14 @@ public final class DebugManagePurchasesViewController: NSViewController {
 
     public init() {
         manager = PurchaseManager.shared
-        model = DebugManagePurchasesModel(manager: manager)
+        model = DebugPurchaseModel(manager: manager)
 
         super.init(nibName: nil, bundle: nil)
     }
 
-    deinit {
-        print(" -- DebugManagePurchasesViewController deinit --")
-    }
-
     public override func loadView() {
 
-        let purchaseView = DebugManagePurchasesView(model: model, dismissAction: { [weak self] in
+        let purchaseView = DebugPurchaseView(model: model, dismissAction: { [weak self] in
             guard let self = self else { return }
             self.presentingViewController?.dismiss(self)
         })

@@ -28,22 +28,12 @@ public enum StoreError: Error {
     case failedVerification
 }
 
-public class AnotherSubsTestingClass {
-    public static func test() {
-        print("test")
-    }
-}
-
 @available(macOS 12.0, *)
 @MainActor
 public final class PurchaseManager: ObservableObject {
 
     static let productIdentifiers = ["subscription.1week", "subscription.1month", "subscription.1year",
-                                     "review.subscription.1week", "review.subscription.1month", "review.subscription.1year",
-                                     "iap.cat", "iap.dog", "iap.rabbit",
-                                     "monthly.subscription", "three.month.subscription",
-                                     "renewable.1month", "test.subscription.region.pl.1month",
-                                     "monthly1"]
+                                     "review.subscription.1week", "review.subscription.1month", "review.subscription.1year"]
 
     public static let shared = PurchaseManager()
 

@@ -1,5 +1,5 @@
 //
-//  DebugManagePurchasesView.swift
+//  DebugPurchaseView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -20,9 +20,9 @@ import SwiftUI
 import StoreKit
 
 @available(macOS 12.0, *)
-public struct DebugManagePurchasesView: View {
+public struct DebugPurchaseView: View {
 
-    @ObservedObject var model: DebugManagePurchasesModel
+    @ObservedObject var model: DebugPurchaseModel
     public let dismissAction: () -> Void
 
     public var body: some View {
