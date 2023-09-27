@@ -804,6 +804,12 @@ CQ
                                                             <action selector="resetEmailProtectionInContextPrompt:" target="Ady-hI-5gd" id="bRN-Eo-xL1"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Reset Daily Pixels" id="Tyu-AZ-Y2g">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetDailyPixels:" target="Ady-hI-5gd" id="Bqp-wC-pao"/>
+                                                        </connections>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>
