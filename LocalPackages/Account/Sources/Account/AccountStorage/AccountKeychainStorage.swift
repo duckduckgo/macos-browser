@@ -19,6 +19,16 @@
 
 import Foundation
 
+public enum AccountKeychainAccessType: String {
+    case getToken
+    case storeToken
+    case getEmail
+    case storeEmail
+    case getExternalID
+    case storeExternalID
+    case clearAuthenticationData
+}
+
 public enum AccountKeychainAccessError: Error, Equatable {
     case failedToDecodeKeychainValueAsData
     case failedToDecodeKeychainDataAsString

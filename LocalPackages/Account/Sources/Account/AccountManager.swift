@@ -25,18 +25,29 @@ public extension Notification.Name {
     static let accountDidSignOut = Notification.Name("com.duckduckgo.browserServicesKit.AccountDidSignOut")
 }
 
+public protocol AccountManagerKeychainAccessDelegate: AnyObject {
+    func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError)
+}
+
 public class AccountManager {
 
     private let storage: AccountStorage
+    public weak var delegate: AccountManagerKeychainAccessDelegate?
+
+    public var isSignedIn: Bool {
+        return token != nil
+    }
+
+    public init(storage: AccountStorage = AccountKeychainStorage()) {
+        self.storage = storage
+    }
 
     public var token: String? {
-        print("[[AccountManager]] token")
-
         do {
             return try storage.getToken()
         } catch {
             if let error = error as? AccountKeychainAccessError {
-//                requestDelegate?.emailManagerKeychainAccessFailed(accessType: .getToken, error: error)
+                delegate?.accountManagerKeychainAccessFailed(accessType: .getToken, error: error)
             } else {
                 assertionFailure("Expected AccountKeychainAccessError")
             }
@@ -50,7 +61,7 @@ public class AccountManager {
             return try storage.getEmail()
         } catch {
             if let error = error as? AccountKeychainAccessError {
-//                requestDelegate?.emailManagerKeychainAccessFailed(accessType: .getToken, error: error)
+                delegate?.accountManagerKeychainAccessFailed(accessType: .getEmail, error: error)
             } else {
                 assertionFailure("Expected AccountKeychainAccessError")
             }
@@ -64,7 +75,7 @@ public class AccountManager {
             return try storage.getExternalID()
         } catch {
             if let error = error as? AccountKeychainAccessError {
-//                requestDelegate?.emailManagerKeychainAccessFailed(accessType: .getToken, error: error)
+                delegate?.accountManagerKeychainAccessFailed(accessType: .getExternalID, error: error)
             } else {
                 assertionFailure("Expected AccountKeychainAccessError")
             }
@@ -73,23 +84,33 @@ public class AccountManager {
         }
     }
 
-    public var isSignedIn: Bool {
-        return token != nil
-    }
-
-    public init(storage: AccountStorage = AccountKeychainStorage()) {
-        self.storage = storage
-    }
-
     public func storeAccount(token: String, email: String?, externalID: String?) {
         print("[[AccountManager]] storeAccount token: \(token) email: \(email)")
         do {
             try storage.store(token: token)
+        } catch {
+            if let error = error as? AccountKeychainAccessError {
+                delegate?.accountManagerKeychainAccessFailed(accessType: .storeToken, error: error)
+            } else {
+                assertionFailure("Expected AccountKeychainAccessError")
+            }
+        }
+
+        do {
             try storage.store(email: email)
+        } catch {
+            if let error = error as? AccountKeychainAccessError {
+                delegate?.accountManagerKeychainAccessFailed(accessType: .storeEmail, error: error)
+            } else {
+                assertionFailure("Expected AccountKeychainAccessError")
+            }
+        }
+
+        do {
             try storage.store(externalID: externalID)
         } catch {
             if let error = error as? AccountKeychainAccessError {
-//                requestDelegate?.emailManagerKeychainAccessFailed(accessType: .storeTokenUsernameCohort, error: error)
+                delegate?.accountManagerKeychainAccessFailed(accessType: .storeExternalID, error: error)
             } else {
                 assertionFailure("Expected AccountKeychainAccessError")
             }
@@ -99,12 +120,11 @@ public class AccountManager {
     }
 
     public func signOut() {
-        print("[[AccountManager]] signOut")
         do {
             try storage.clearAuthenticationState()
         } catch {
             if let error = error as? AccountKeychainAccessError {
-//                self.requestDelegate?.emailManagerKeychainAccessFailed(accessType: .deleteAuthenticationState, error: error)
+                delegate?.accountManagerKeychainAccessFailed(accessType: .clearAuthenticationData, error: error)
             } else {
                 assertionFailure("Expected AccountKeychainAccessError")
             }
@@ -112,6 +132,8 @@ public class AccountManager {
 
         NotificationCenter.default.post(name: .accountDidSignOut, object: self, userInfo: nil)
     }
+
+    // MARK: -
 
     public func signInByRestoringPastPurchases() {
         if #available(macOS 12.0, *) {
@@ -123,7 +145,6 @@ public class AccountManager {
                 let shortLivedToken: String
                 switch await AuthService.storeLogin(signature: jwsRepresentation) {
                 case .success(let response):
-                    print("\(response)")
                     shortLivedToken = response.authToken
                 case .failure(let error):
                     print("Error: \(error)")
@@ -138,22 +159,19 @@ public class AccountManager {
     public func exchangeTokenAndRefreshEntitlements(with shortLivedToken: String) {
         Task {
             // Exchange short-lived token to a long-lived one
-            let longToken: String
+            let longLivedToken: String
             switch await AuthService.getAccessToken(token: shortLivedToken) {
             case .success(let response):
-                print("\(response)")
-                longToken = response.accessToken
+                longLivedToken = response.accessToken
             case .failure(let error):
                 print("Error: \(error)")
                 return
             }
 
             // Fetch entitlements and account details and store the data
-            switch await AuthService.validateToken(accessToken: longToken) {
+            switch await AuthService.validateToken(accessToken: longLivedToken) {
             case .success(let response):
-                print("\(response)")
-
-                self.storeAccount(token: longToken,
+                self.storeAccount(token: longLivedToken,
                                   email: response.account.email,
                                   externalID: response.account.externalID)
 
