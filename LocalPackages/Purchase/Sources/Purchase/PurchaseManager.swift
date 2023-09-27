@@ -56,25 +56,25 @@ public final class PurchaseManager: ObservableObject {
         storefrontChanges?.cancel()
     }
 
-//    @MainActor
-//    func restorePurchases() {
-//        Task {
-//            do {
-//                purchaseQueue.removeAll()
-//
-//                print("Before AppStore.sync()")
-//
-//                try await AppStore.sync()
-//
-//                print("After AppStore.sync()")
-//
-//                await updatePurchasedProducts()
-//                await updateAvailableProducts()
-//            } catch {
-//                print("AppStore.sync error: \(error)")
-//            }
-//        }
-//    }
+    @MainActor
+    func restorePurchases() {
+        Task {
+            do {
+                purchaseQueue.removeAll()
+
+                print("Before AppStore.sync()")
+
+                try await AppStore.sync()
+
+                print("After AppStore.sync()")
+
+                await updatePurchasedProducts()
+                await updateAvailableProducts()
+            } catch {
+                print("AppStore.sync error: \(error)")
+            }
+        }
+    }
 
     @MainActor
     public func updateAvailableProducts() async {
@@ -107,24 +107,6 @@ public final class PurchaseManager: ObservableObject {
             return []
         }
     }
-
-//    private let session = URLSession(configuration: .ephemeral)
-
-//    @MainActor
-//    func sendPurchaseConfirmation(for transaction: Transaction) async {
-//        print(transaction)
-//
-//        var request = URLRequest(url: URL(string: "https://use-subspoc1.eastus.cloudapp.azure.com/newAppleSubscription")!)
-//        request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
-//        request.httpMethod = "POST"
-//        request.httpBody = transaction.debugDescription.data(using: .utf8)
-//
-//        session.dataTask(with: request) { (_, _, error) in
-//            if error != nil {
-////                assertionFailure("PurchaseManager: Failed to send the purchase confirmation")
-//            }
-//        }.resume()
-//    }
 
     @MainActor
     public func updatePurchasedProducts() async {
@@ -167,38 +149,13 @@ public final class PurchaseManager: ObservableObject {
 
         var transactions: [VerificationResult<Transaction>] = []
 
-//        do {
-            for await result in Transaction.all {
-//                let transaction = try checkVerified(result)
-
-//                guard transaction.productType == .autoRenewable else { continue }
-//                guard transaction.revocationDate == nil else { continue }
-//
-//                if let expirationDate = transaction.expirationDate, expirationDate > .now {
-//                    purchasedSubscriptions.append(transaction.productID)
-//
-//                    if let token = transaction.appAccountToken {
-//                        print(" -- [PurchaseManager] updatePurchasedProducts(): \(transaction.productID) -- custom UUID: \(token)" )
-//                    }
-//                }
-                transactions.append(result)
-            }
-//        } catch {
-//            print("Error fetching transactions: \(error)")
-//        }
+        for await result in Transaction.all {
+            transactions.append(result)
+        }
 
         print(" -- [PurchaseManager] mostRecentTransaction(): fetched \(transactions.count) transactions")
 
-        guard let rawTransaction = transactions.first else { return nil }
-
-//        guard let payload = String(data: rawTransaction.payloadData, encoding: .utf8) else { return nil}
-
-        print("External user ID: \(rawTransaction.unsafePayloadValue.appAccountToken)")
-//        let payload = rawTransaction.payloadData
-//        let signature = rawTransaction.signatureData
-
-
-        return rawTransaction.jwsRepresentation
+        return transactions.first?.jwsRepresentation
     }
 
     @MainActor
@@ -227,7 +184,6 @@ public final class PurchaseManager: ObservableObject {
             case let .success(.verified(transaction)):
                 // Successful purchase
                 await transaction.finish()
-//                await sendPurchaseConfirmation(for: transaction)
                 await self.updatePurchasedProducts()
             case let .success(.unverified(_, error)):
                 // Successful purchase but transaction/receipt can't be verified
@@ -265,7 +221,6 @@ public final class PurchaseManager: ObservableObject {
 
                 if case .verified(let transaction) = result {
                     await transaction.finish()
-//                    await sendPurchaseConfirmation(for: transaction)
                 }
 
                 await self.updatePurchasedProducts()
