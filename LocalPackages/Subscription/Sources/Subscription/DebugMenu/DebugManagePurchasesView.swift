@@ -55,28 +55,24 @@ public struct DebugManagePurchasesView: View {
     }
 
     private var purchaseSubscriptionSection: some View {
+        VStack {
+            Text("Purchase Subscription")
+                .font(.largeTitle)
+            Spacer(minLength: 16)
             VStack {
-                Text("Purchase Subscription")
-                    .font(.largeTitle)
-                Spacer(minLength: 16)
-                //                ScrollView {
-                VStack(spacing: 32) {
-                    ForEach(model.subscriptions, id: \.id) { rowModel in
-                        SubscriptionRow(product: rowModel.product,
-                                        isPurchased: rowModel.isPurchased,
-                                        isBeingPurchased: rowModel.isBeingPurchased,
-                                        buyButtonAction: { model.purchase(rowModel.product) })
-                        Divider()
-                        
-                    }
-                    .padding(10)
+                ForEach(model.subscriptions, id: \.id) { rowModel in
+                    SubscriptionRow(product: rowModel.product,
+                                    isPurchased: rowModel.isPurchased,
+                                    isBeingPurchased: rowModel.isBeingPurchased,
+                                    buyButtonAction: { model.purchase(rowModel.product) })
+                    Divider()
                 }
-                .roundedBorder()
-                //                }
-                //                .disabled(model.hasOngoingPurchase)
-                //                .opacity(model.hasOngoingPurchase ? 0.5 : 1.0)
+                .padding(10)
             }
+            .roundedBorder()
+            Spacer(minLength: 16)
         }
+    }
 }
 
 struct ActivityIndicator: NSViewRepresentable {
@@ -111,13 +107,12 @@ struct SubscriptionRow: View {
     var buyButtonAction: () -> Void
 
     var body: some View {
-        HStack {
+        HStack(alignment: .center) {
             VStack(alignment: .leading) {
                 Text(product.displayName)
                     .font(.title)
                 Text(product.description)
                     .font(.body)
-                Spacer()
                 Text("Price: \(product.displayPrice)")
                     .font(.caption)
             }

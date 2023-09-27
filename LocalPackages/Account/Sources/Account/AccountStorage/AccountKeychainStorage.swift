@@ -39,7 +39,7 @@ public enum AccountKeychainAccessError: Error, Equatable {
 
 public class AccountKeychainStorage: AccountStorage {
 
-    public init() { }
+    public init() {}
 
     public func getToken() throws -> String? {
         try Self.getString(forField: .token)

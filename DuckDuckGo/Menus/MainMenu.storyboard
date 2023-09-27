@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22154" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22154"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -1199,44 +1199,6 @@ CQ
                                             <connections>
                                                 <action selector="triggerFatalError:" target="Ady-hI-5gd" id="pS0-iQ-TPe"/>
                                             </connections>
-                                        </menuItem>
-                                        <menuItem title="Subscription" id="Odm-KS-5NY">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Subscription" id="WtL-sw-jsa">
-                                                <items>
-                                                    <menuItem title="Simulate Account Sign In" id="a0P-6H-d2K">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="simulateAccountSignIn:" target="Ady-hI-5gd" id="UWQ-TB-Wao"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Simulate Account Sign Out" id="i5P-Nt-Cmg">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="simulateAccountSignOut:" target="Ady-hI-5gd" id="3y3-1C-lk2"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem isSeparatorItem="YES" id="Xtf-rp-WJR"/>
-                                                    <menuItem title="Manage Purchases" id="8QF-Aw-Mfn">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="managePurchases:" target="Ady-hI-5gd" id="ha5-Yv-msM"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Validate Token" id="t6E-Ul-tj9">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="validateToken:" target="Ady-hI-5gd" id="M0U-fT-sgu"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Restore Purchases" id="w1M-PT-MG5">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="restorePurchases:" target="Ady-hI-5gd" id="j7b-ey-Vhj"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                </items>
-                                            </menu>
                                         </menuItem>
                                     </items>
                                 </menu>

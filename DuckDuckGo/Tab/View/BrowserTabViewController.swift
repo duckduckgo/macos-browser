@@ -183,7 +183,7 @@ final class BrowserTabViewController: NSViewController {
             self.previouslySelectedTab = nil
         }
 
-        openNewTab(with: .preferences(pane: .privacyPro))
+        openNewTab(with: .preferences(pane: .subscription))
     }
 
     private func subscribeToSelectedTabViewModel() {

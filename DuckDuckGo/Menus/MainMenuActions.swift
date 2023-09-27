@@ -778,40 +778,6 @@ extension MainViewController {
 #endif
     }
 
-    @IBAction func simulateAccountSignIn(_ sender: Any?) {
-        AccountManager().storeAccount(token: "fake-token", email: "fake@email.com", externalID: "fake-externalID")
-    }
-
-    @IBAction func simulateAccountSignOut(_ sender: Any?) {
-        AccountManager().signOut()
-    }
-
-    @IBAction func validateToken(_ sender: Any?) {
-        guard let token = AccountManager().token else { return }
-
-        Task {
-            await AccountsService.validateToken(accessToken: token)
-//            switch await AccountsService.validateToken(accessToken: token) {
-//            case .success(let response):
-//                print("\(response)")
-//            case .failure(let error):
-//                print("Error: \(error)")
-//            }
-        }
-    }
-
-    @IBAction func restorePurchases(_ sender: Any?) {
-        
-    }
-
-
-    @IBAction func managePurchases(_ sender: Any?) {
-        if #available(macOS 12.0, *) {
-            WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(DebugManagePurchasesViewController())
-        }
-//        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(SubscriptionAccessViewController())
-    }
-
     // MARK: - Developer Tools
 
     @IBAction func toggleDeveloperTools(_ sender: Any?) {
