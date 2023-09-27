@@ -72,11 +72,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     }
 
     @MainActor
-    func presentEnableSyncDialog() {
-        presentDialog(for: .enableSync)
-    }
-
-    @MainActor
     func presentRecoverSyncAccountDialog() {
         presentDialog(for: .recoverAccount)
     }
@@ -95,22 +90,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @MainActor
     func presentTurnOffSyncConfirmDialog() {
         presentDialog(for: .turnOffSync)
-    }
-
-    @MainActor
-    func presentShowOrEnterCodeDialog() {
-        Task { @MainActor in
-            self.$devices
-                .removeDuplicates()
-                .dropFirst()
-                .prefix(1)
-                .sink { [weak self] value in
-                    self?.presentDialog(for: .deviceSynced(value.filter { !$0.isCurrent }, shouldShowOptions: true))
-                    self?.objectWillChange.send()
-                }.store(in: &cancellables)
-            managementDialogModel.codeToDisplay = syncService.account?.recoveryCode
-            presentDialog(for: .syncAnotherDevice)
-        }
     }
 
     @MainActor
@@ -295,11 +274,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         presentDialog(for: .deviceSynced(syncedDevices, shouldShowOptions: shouldShowOptions))
     }
 
-//    @MainActor
-//    func turnOnSync() {
-//        presentDialog(for: .askToSyncAnotherDevice)
-//    }
-
     func turnOnSync() {
         Task { @MainActor in
             isCreatingAccount = true
@@ -340,22 +314,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         self.connector = nil
     }
 
-//    func dontSyncAnotherDeviceNow() {
-//        Task { @MainActor in
-//            isCreatingAccount = true
-//            defer {
-//                isCreatingAccount = false
-//            }
-//            do {
-//                let device = deviceInfo()
-//                try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
-//                confirmSetupComplete()
-//            } catch {
-//                managementDialogModel.errorMessage = String(describing: error)
-//            }
-//        }
-//    }
-
     func recoverDevice(using recoveryCode: String) {
         Task { @MainActor in
             do {
@@ -384,24 +342,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             }
         }
     }
-
-//    func presentSyncAnotherDeviceDialog() {
-//        Task { @MainActor in
-//            do {
-//                self.connector = try syncService.remoteConnect()
-//                managementDialogModel.codeToDisplay = connector?.code
-//                presentDialog(for: .syncAnotherDevice)
-//                if let recoveryKey = try await connector?.pollForRecoveryKey() {
-//                    try await loginAndShowPresentedDialog(recoveryKey)
-//                } else {
-//                    // Polling was likeley cancelled elsewhere (e.g. dialog closed)
-//                    return
-//                }
-//            } catch {
-//                managementDialogModel.errorMessage = String(describing: error)
-//            }
-//        }
-//    }
 
     @MainActor
     func presentDeleteAccount() {

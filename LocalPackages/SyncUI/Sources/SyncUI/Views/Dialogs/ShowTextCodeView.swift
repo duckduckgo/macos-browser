@@ -1,5 +1,5 @@
 //
-//  SyncAnotherDeviceView.swift
+//  ShowTextCodeView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,103 +18,6 @@
 
 import SwiftUI
 import SwiftUIExtensions
-
-struct SyncAnotherDeviceView: View {
-    @EnvironmentObject var model: ManagementDialogModel
-    @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
-
-    enum Mode: Hashable {
-        case showCode, enterCode
-    }
-
-    @State var selectedMode: Mode = .showCode
-
-    func submitRecoveryCode() {
-        if !recoveryCodeModel.recoveryCode.isEmpty {
-            model.delegate?.recoverDevice(using: recoveryCodeModel.recoveryCode)
-        }
-    }
-
-    var body: some View {
-        SyncDialog(spacing: 20.0) {
-            Text(UserText.syncNewDevice)
-                .font(.system(size: 17, weight: .bold))
-
-            Picker("", selection: $selectedMode) {
-                Text(UserText.showCode).tag(Mode.showCode)
-                Text(UserText.enterCode).tag(Mode.enterCode)
-            }
-            .pickerStyle(.segmented)
-
-            switch selectedMode {
-            case .showCode:
-                ShowCodeView().environmentObject(model)
-            case .enterCode:
-                EnterCodeView(
-                    instructions: UserText.syncNewDeviceEnterCodeInstructions,
-                    buttonCaption: UserText.pasteFromClipboard) {
-                        submitRecoveryCode()
-                    }.environmentObject(recoveryCodeModel)
-            }
-        } buttons: {
-            switch selectedMode {
-            case .showCode:
-                Button(UserText.cancel) {
-                    model.endFlow()
-                }
-            case .enterCode:
-                Button(UserText.cancel) {
-                    model.endFlow()
-                }
-                Button(UserText.submit) {
-                    submitRecoveryCode()
-                }
-                .buttonStyle(DefaultActionButtonStyle(enabled: !recoveryCodeModel.shouldDisableSubmitButton))
-                .disabled(recoveryCodeModel.shouldDisableSubmitButton)
-            }
-        }
-        .frame(width: 480, height: 432)
-    }
-
-}
-
-private struct ShowCodeView: View {
-    @EnvironmentObject var model: ManagementDialogModel
-
-    var body: some View {
-        VStack(spacing: 20) {
-            Text(UserText.syncNewDeviceShowCodeInstructions)
-                .multilineTextAlignment(.center)
-
-            HStack(alignment: .top, spacing: 20) {
-                QRCode(string: model.codeToDisplay ?? "", size: .init(width: 164, height: 164))
-
-                VStack {
-                    SyncKeyView(text: model.codeToDisplay ?? "")
-
-                    Spacer()
-
-                    HStack {
-                        Spacer()
-                        Button {
-                            NSPasteboard.general.clearContents()
-                            NSPasteboard.general.setString(model.codeToDisplay ?? "", forType: .string)
-                        } label: {
-                            HStack {
-                                Image("Copy")
-                                Text(UserText.copy)
-                            }
-                        }
-                        .buttonStyle(CopyPasteButtonStyle())
-                    }
-                }
-                .frame(maxHeight: .infinity)
-            }
-        }
-        .padding(20)
-        .roundedBorder()
-    }
-}
 
 struct ShowTextCodeView: View {
     @EnvironmentObject var model: ManagementDialogModel
@@ -175,12 +78,10 @@ struct ShowTextCodeView: View {
     }
 
     private func shareContent(_ sharedText: String) {
-        // Get the share button's frame in the global coordinate space
         guard let shareButtonSuperview = NSApp.keyWindow?.contentView,
               let shareButtonGlobalFrame = NSApp.keyWindow?.convertToScreen(shareButtonFrame) else {
             return
         }
-        // Create an NSSharingServicePicker
         let sharingPicker = NSSharingServicePicker(items: [sharedText])
 
         sharingPicker.show(relativeTo: shareButtonGlobalFrame, of: shareButtonSuperview, preferredEdge: .maxY)

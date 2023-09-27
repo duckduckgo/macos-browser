@@ -20,18 +20,14 @@ import Foundation
 import Combine
 
 public protocol ManagementDialogModelDelegate: AnyObject {
-    func turnOnSync()
-//    func dontSyncAnotherDeviceNow()
+    var isUnifiedFavoritesEnabled: Bool { get set }
+
     func recoverDevice(using recoveryCode: String)
-//    func presentSyncAnotherDeviceDialog()
-    func confirmSetupComplete()
     func saveRecoveryPDF()
     func turnOffSync()
     func updateDeviceName(_ name: String)
     func removeDevice(_ device: SyncDevice)
     func deleteAccount()
-    func presentSaveRecoveryPDF()
-    var isUnifiedFavoritesEnabled: Bool { get set }
 }
 
 public final class ManagementDialogModel: ObservableObject {

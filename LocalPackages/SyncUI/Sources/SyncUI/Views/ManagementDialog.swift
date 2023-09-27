@@ -19,11 +19,8 @@
 import SwiftUI
 
 public enum ManagementDialogKind: Equatable {
-    case enableSync
     case recoverAccount
     case deleteAccount(_ devices: [SyncDevice])
-//    case askToSyncAnotherDevice
-    case syncAnotherDevice
     case deviceSynced(_ devices: [SyncDevice], shouldShowOptions: Bool)
     case saveRecoveryPDF
     case turnOffSync
@@ -57,14 +54,10 @@ public struct ManagementDialog: View {
     @ViewBuilder var content: some View {
         Group {
             switch model.currentDialog {
-            case .enableSync:
-                EnableSyncView()
             case .recoverAccount:
                 RecoverAccountView(isRecovery: true)
             case .manuallyEnterCode:
                 RecoverAccountView(isRecovery: false)
-            case .syncAnotherDevice:
-                SyncAnotherDeviceView()
             case .deviceSynced(let devices, let shouldShowOptions):
                 DeviceSyncedView(devices: devices, shouldShowOptions: shouldShowOptions, isFirstDevice: false)
             case .firstDeviceSetup:
