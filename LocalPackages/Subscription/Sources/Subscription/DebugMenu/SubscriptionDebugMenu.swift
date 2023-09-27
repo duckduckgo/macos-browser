@@ -23,6 +23,7 @@ import Account
 public final class SubscriptionDebugMenu: NSMenuItem {
 
     var currentViewController: () -> NSViewController?
+    private let accountManager = AccountManager()
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -53,18 +54,16 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @objc
     func simulateSubscriptionActiveState() {
-        AccountManager().storeAccount(token: "fake-token", email: "fake@email.com", externalID: "fake-externalID")
+        accountManager.storeAccount(token: "fake-token", email: "fake@email.com", externalID: "fake-externalID")
     }
 
     @objc
     func signOut() {
-        AccountManager().signOut()
+        accountManager.signOut()
     }
 
     @objc
     func showAccountDetails() {
-        let accountManager = AccountManager()
-
         let title = accountManager.isSignedIn ? "Authenticated" : "Not Authenticated"
         let message = accountManager.isSignedIn ? ["Token: \(accountManager.token ?? "")",
                                                    "Email: \(accountManager.email ?? "")",
@@ -75,7 +74,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @objc
     func validateToken() {
         Task {
-            guard let token = AccountManager().token else { return }
+            guard let token = accountManager.token else { return }
             switch await AccountsService.validateToken(accessToken: token) {
             case .success(let response):
                 showAlert(title: "Validate token", message: "\(response)")
@@ -87,7 +86,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @objc
     func restorePurchases(_ sender: Any?) {
-        AccountManager().signInByRestoringPastPurchases()
+        accountManager.signInByRestoringPastPurchases()
     }
 
     @IBAction func showPurchaseView(_ sender: Any?) {

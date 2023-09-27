@@ -73,7 +73,6 @@ public class AccountManager {
         }
     }
 
-
     public var isSignedIn: Bool {
         return token != nil
     }
