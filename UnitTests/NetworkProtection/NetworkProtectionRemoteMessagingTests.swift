@@ -36,30 +36,27 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let mockRateLimitedOperation = MockRateLimitedOperation()
 
         let messaging = DefaultNetworkProtectionRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
             waitlistStorage: waitlistStorage,
             waitlistActivationDateStore: activationDateStorage,
-            rateLimitedOperation: mockRateLimitedOperation,
+            minimumRefreshInterval: 0,
             userDefaults: defaults
         )
 
         XCTAssertTrue(!waitlistStorage.isWaitlistUser)
 
         let expectation = expectation(description: "Remote Message Fetch")
-        expectation.isInverted = true
 
         messaging.fetchRemoteMessages {
             expectation.fulfill()
         }
 
-        wait(for: [expectation], timeout: 0.3)
+        wait(for: [expectation], timeout: 1.0)
 
         XCTAssertFalse(request.didFetchMessages)
-        XCTAssertFalse(mockRateLimitedOperation.operationRan)
     }
 
     func testWhenFetchingRemoteMessages_AndTheUserDidSignUpViaWaitlist_ButUserHasNotActivatedNetP_ThenMessagesAreNotFetched() {
@@ -67,7 +64,6 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let mockRateLimitedOperation = MockRateLimitedOperation()
 
         waitlistStorage.store(waitlistToken: "token")
         waitlistStorage.store(waitlistTimestamp: 123)
@@ -78,7 +74,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
             messageStorage: storage,
             waitlistStorage: waitlistStorage,
             waitlistActivationDateStore: activationDateStorage,
-            rateLimitedOperation: mockRateLimitedOperation,
+            minimumRefreshInterval: 0,
             userDefaults: defaults
         )
 
@@ -86,16 +82,14 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         XCTAssertNil(activationDateStorage.daysSinceActivation())
 
         let expectation = expectation(description: "Remote Message Fetch")
-        expectation.isInverted = true
 
         messaging.fetchRemoteMessages {
             expectation.fulfill()
         }
 
-        wait(for: [expectation], timeout: 0.3)
+        wait(for: [expectation], timeout: 1.0)
 
         XCTAssertFalse(request.didFetchMessages)
-        XCTAssertFalse(mockRateLimitedOperation.operationRan)
     }
 
     func testWhenFetchingRemoteMessages_AndWaitlistUserHasActivatedNetP_ThenMessagesAreFetched_AndMessagesAreStored() {
@@ -103,7 +97,6 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let mockRateLimitedOperation = MockRateLimitedOperation()
 
         let messages = [mockMessage(id: "123")]
 
@@ -118,7 +111,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
             messageStorage: storage,
             waitlistStorage: waitlistStorage,
             waitlistActivationDateStore: activationDateStorage,
-            rateLimitedOperation: mockRateLimitedOperation,
+            minimumRefreshInterval: 0,
             userDefaults: defaults
         )
 
@@ -135,7 +128,6 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
 
         XCTAssertTrue(request.didFetchMessages)
-        XCTAssertTrue(mockRateLimitedOperation.operationRan)
         XCTAssertEqual(storage.storedMessages(), messages)
     }
 
@@ -144,21 +136,20 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let mockRateLimitedOperation = MockRateLimitedOperation()
 
         waitlistStorage.store(waitlistToken: "token")
         waitlistStorage.store(waitlistTimestamp: 123)
         waitlistStorage.store(inviteCode: "ABCD1234")
         activationDateStorage.days = 10
 
-        mockRateLimitedOperation.shouldRunOperation = false
+        defaults.setValue(Date(), forKey: DefaultNetworkProtectionRemoteMessaging.Constants.lastRefreshDateKey)
 
         let messaging = DefaultNetworkProtectionRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
             waitlistStorage: waitlistStorage,
             waitlistActivationDateStore: activationDateStorage,
-            rateLimitedOperation: mockRateLimitedOperation,
+            minimumRefreshInterval: .days(7), // Use a large number to hit the refresh check
             userDefaults: defaults
         )
 
@@ -166,16 +157,14 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         XCTAssertNotNil(activationDateStorage.daysSinceActivation())
 
         let expectation = expectation(description: "Remote Message Fetch")
-        expectation.isInverted = true
 
         messaging.fetchRemoteMessages {
             expectation.fulfill()
         }
 
-        wait(for: [expectation], timeout: 0.3)
+        wait(for: [expectation], timeout: 1.0)
 
         XCTAssertFalse(request.didFetchMessages)
-        XCTAssertFalse(mockRateLimitedOperation.operationRan)
         XCTAssertEqual(storage.storedMessages(), [])
     }
 
@@ -184,7 +173,6 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let mockRateLimitedOperation = MockRateLimitedOperation()
 
         let dismissedMessage = mockMessage(id: "123")
         let activeMessage = mockMessage(id: "456")
@@ -196,7 +184,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
             messageStorage: storage,
             waitlistStorage: waitlistStorage,
             waitlistActivationDateStore: activationDateStorage,
-            rateLimitedOperation: mockRateLimitedOperation,
+            minimumRefreshInterval: 0,
             userDefaults: defaults
         )
 
@@ -212,7 +200,6 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
-        let mockRateLimitedOperation = MockRateLimitedOperation()
 
         let hiddenMessage = mockMessage(id: "123", daysSinceNetworkProtectionEnabled: 10)
         let activeMessage = mockMessage(id: "456")
@@ -224,7 +211,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
             messageStorage: storage,
             waitlistStorage: waitlistStorage,
             waitlistActivationDateStore: activationDateStorage,
-            rateLimitedOperation: mockRateLimitedOperation,
+            minimumRefreshInterval: 0,
             userDefaults: defaults
         )
 
@@ -290,23 +277,6 @@ private final class MockWaitlistActivationDateStore: WaitlistActivationDateStore
 
     func daysSinceActivation() -> Int? {
         days
-    }
-
-}
-
-private final class MockRateLimitedOperation: RateLimitedOperation {
-
-    var shouldRunOperation: Bool = true
-    var operationRan: Bool = false
-
-    func performRateLimitedOperation(operationName: String, operation: (@escaping RateLimitedOperationCompletion) -> Void) {
-        guard shouldRunOperation else {
-            return
-        }
-
-        operation {
-            self.operationRan = true
-        }
     }
 
 }

@@ -2058,9 +2058,6 @@
 		4BCF15F12ABBDC030083F6DF /* NetworkProtectionRemoteMessagingRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15DC2ABB8CFC0083F6DF /* NetworkProtectionRemoteMessagingRequest.swift */; };
 		4BD18F01283F0BC500058124 /* BookmarksBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD18EFF283F0BC500058124 /* BookmarksBarViewController.swift */; };
 		4BD18F05283F151F00058124 /* BookmarksBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BD18F04283F151F00058124 /* BookmarksBar.storyboard */; };
-		4BD57BFC2AC0EA1A00B580EE /* RateLimitedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57BFB2AC0EA1A00B580EE /* RateLimitedOperation.swift */; };
-		4BD57BFD2AC0EA1A00B580EE /* RateLimitedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57BFB2AC0EA1A00B580EE /* RateLimitedOperation.swift */; };
-		4BD57BFE2AC0EA1A00B580EE /* RateLimitedOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57BFB2AC0EA1A00B580EE /* RateLimitedOperation.swift */; };
 		4BD57C012AC0FF7500B580EE /* NetworkProtectionRemoteMessagingStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57BFF2AC0FC4E00B580EE /* NetworkProtectionRemoteMessagingStorageTests.swift */; };
 		4BD57C042AC112DF00B580EE /* NetworkProtectionRemoteMessagingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57C032AC112DF00B580EE /* NetworkProtectionRemoteMessagingTests.swift */; };
 		4BD57C052AC112DF00B580EE /* NetworkProtectionRemoteMessagingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57C032AC112DF00B580EE /* NetworkProtectionRemoteMessagingTests.swift */; };
@@ -3439,7 +3436,6 @@
 		4BCF15E92ABB99470083F6DF /* network-protection-messages.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "network-protection-messages.json"; sourceTree = "<group>"; };
 		4BD18EFF283F0BC500058124 /* BookmarksBarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksBarViewController.swift; sourceTree = "<group>"; };
 		4BD18F04283F151F00058124 /* BookmarksBar.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BookmarksBar.storyboard; sourceTree = "<group>"; };
-		4BD57BFB2AC0EA1A00B580EE /* RateLimitedOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RateLimitedOperation.swift; sourceTree = "<group>"; };
 		4BD57BFF2AC0FC4E00B580EE /* NetworkProtectionRemoteMessagingStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionRemoteMessagingStorageTests.swift; sourceTree = "<group>"; };
 		4BD57C032AC112DF00B580EE /* NetworkProtectionRemoteMessagingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionRemoteMessagingTests.swift; sourceTree = "<group>"; };
 		4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleableScrollView.swift; sourceTree = "<group>"; };
@@ -5420,7 +5416,6 @@
 				4BB88B4F25B7BA2B006F6B06 /* TabInstrumentation.swift */,
 				85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */,
 				4B7A94B329C16294000C7D4C /* ErrorWithParameters.swift */,
-				4BD57BFB2AC0EA1A00B580EE /* RateLimitedOperation.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -9455,7 +9450,6 @@
 				3192A1F42A4C4CFF0084EA89 /* CountryList.swift in Sources */,
 				3192A1F52A4C4CFF0084EA89 /* PreferencesSection.swift in Sources */,
 				3192A1F62A4C4CFF0084EA89 /* NetworkProtectionNavBarButtonModel.swift in Sources */,
-				4BD57BFE2AC0EA1A00B580EE /* RateLimitedOperation.swift in Sources */,
 				3192A1F72A4C4CFF0084EA89 /* AutoconsentManagement.swift in Sources */,
 				3192A1F82A4C4CFF0084EA89 /* UserText+NetworkProtection.swift in Sources */,
 				3192A1F92A4C4CFF0084EA89 /* WebViewContainerView.swift in Sources */,
@@ -9567,7 +9561,6 @@
 				3706FACF293F65D500E42796 /* AddEditFavoriteWindow.swift in Sources */,
 				7BFE95552A9DF2990081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */,
 				3706FAD1293F65D500E42796 /* VisitViewModel.swift in Sources */,
-				4BD57BFD2AC0EA1A00B580EE /* RateLimitedOperation.swift in Sources */,
 				3706FAD2293F65D500E42796 /* Atb.swift in Sources */,
 				3706FAD3293F65D500E42796 /* DownloadsViewController.swift in Sources */,
 				3706FAD4293F65D500E42796 /* DataExtension.swift in Sources */,
@@ -11204,7 +11197,6 @@
 				4B677442255DBEEA00025BD8 /* Database.swift in Sources */,
 				4BE5336E286915A10019DBFD /* HorizontallyCenteredLayout.swift in Sources */,
 				4B92928B26670D1700AD2C21 /* BookmarksOutlineView.swift in Sources */,
-				4BD57BFC2AC0EA1A00B580EE /* RateLimitedOperation.swift in Sources */,
 				4BF01C00272AE74C00884A61 /* CountryList.swift in Sources */,
 				37CD54CC27F2FDD100F1F7B9 /* PreferencesSection.swift in Sources */,
 				4B4D60B62A0C847D00BCD287 /* NetworkProtectionNavBarButtonModel.swift in Sources */,

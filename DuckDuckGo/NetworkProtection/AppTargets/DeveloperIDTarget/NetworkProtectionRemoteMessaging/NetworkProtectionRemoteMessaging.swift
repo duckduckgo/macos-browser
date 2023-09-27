@@ -30,29 +30,37 @@ protocol NetworkProtectionRemoteMessaging {
 final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging {
 
     enum Constants {
-        static let remoteMessagingRateLimitedOperationKey = "network-protection.remote-messaging.fetch"
+        static let lastRefreshDateKey = "network-protection.remote-messaging.last-refresh-date"
     }
 
     private let messageRequest: NetworkProtectionRemoteMessagingRequest
     private let messageStorage: NetworkProtectionRemoteMessagingStorage
     private let waitlistStorage: WaitlistStorage
     private let waitlistActivationDateStore: WaitlistActivationDateStore
-    private let rateLimitedOperation: RateLimitedOperation
+    private let minimumRefreshInterval: TimeInterval
     private let userDefaults: UserDefaults
+
+    convenience init() {
+        #if DEBUG || REVIEW
+        self.init(minimumRefreshInterval: .seconds(30))
+        #else
+        self.init(minimumRefreshInterval: .hours(1))
+        #endif
+    }
 
     init(
         messageRequest: NetworkProtectionRemoteMessagingRequest = DefaultNetworkProtectionRemoteMessagingRequest(),
         messageStorage: NetworkProtectionRemoteMessagingStorage = DefaultNetworkProtectionRemoteMessagingStorage(),
         waitlistStorage: WaitlistStorage = WaitlistKeychainStore(waitlistIdentifier: "networkprotection"),
         waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(),
-        rateLimitedOperation: RateLimitedOperation = UserDefaultsRateLimitedOperation(debug: .seconds(30), release: .hours(8)),
+        minimumRefreshInterval: TimeInterval,
         userDefaults: UserDefaults = .standard
     ) {
         self.messageRequest = messageRequest
         self.messageStorage = messageStorage
         self.waitlistStorage = waitlistStorage
         self.waitlistActivationDateStore = waitlistActivationDateStore
-        self.rateLimitedOperation = rateLimitedOperation
+        self.minimumRefreshInterval = minimumRefreshInterval
         self.userDefaults = userDefaults
     }
 
@@ -61,33 +69,38 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
 
         // Don't fetch messages if the user hasn't used NetP or didn't sign up via the waitlist
         guard waitlistStorage.isWaitlistUser, waitlistActivationDateStore.daysSinceActivation() != nil else {
+            fetchCompletion?()
             return
         }
 
-        rateLimitedOperation.performRateLimitedOperation(operationName: Constants.remoteMessagingRateLimitedOperationKey) { operationCompletion in
-            self.messageRequest.fetchNetworkProtectionRemoteMessages { [weak self] result in
-                defer {
-                    operationCompletion()
-                    fetchCompletion?()
+        if let lastRefreshDate = lastRefreshDate(), lastRefreshDate.addingTimeInterval(minimumRefreshInterval) > Date() {
+            fetchCompletion?()
+            return
+        }
+
+        self.messageRequest.fetchNetworkProtectionRemoteMessages { [weak self] result in
+            defer {
+                fetchCompletion?()
+            }
+
+            guard let self else { return }
+
+            switch result {
+            case .success(let messages):
+                do {
+                    try self.messageStorage.store(messages: messages)
+                    self.updateLastRefreshDate() // Update last refresh date on success, otherwise let the app try again next time
+                } catch {
+                    Pixel.fire(.debug(event: .networkProtectionRemoteMessageStorageFailed, error: error))
+                }
+            case .failure(let error):
+                // Ignore 403 errors, those happen when a file can't be found on S3
+                if case APIRequest.Error.invalidStatusCode(403) = error {
+                    self.updateLastRefreshDate() // Avoid refreshing constantly when the file isn't available
+                    return
                 }
 
-                guard let self else { return }
-
-                switch result {
-                case .success(let messages):
-                    do {
-                        try self.messageStorage.store(messages: messages)
-                    } catch {
-                        Pixel.fire(.debug(event: .networkProtectionRemoteMessageStorageFailed, error: error))
-                    }
-                case .failure(let error):
-                    // Ignore 403 errors, those happen when a file can't be found on S3
-                    if case APIRequest.Error.invalidStatusCode(403) = error {
-                        return
-                    }
-
-                    Pixel.fire(.debug(event: .networkProtectionRemoteMessageFetchingFailed, error: error))
-                }
+                Pixel.fire(.debug(event: .networkProtectionRemoteMessageFetchingFailed, error: error))
             }
         }
 
@@ -132,6 +145,30 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
 #if NETWORK_PROTECTION
         messageStorage.dismissRemoteMessage(with: message.id)
 #endif
+    }
+
+    func resetLastRefreshTimestamp() {
+        userDefaults.removeObject(forKey: Constants.lastRefreshDateKey)
+    }
+
+    // MARK: - Private
+
+    private func lastRefreshDate() -> Date? {
+        guard let object = userDefaults.object(forKey: Constants.lastRefreshDateKey) else {
+            return nil
+        }
+
+        guard let date = object as? Date else {
+            assertionFailure("Got rate limited date, but couldn't convert it to Date")
+            userDefaults.removeObject(forKey: Constants.lastRefreshDateKey)
+            return nil
+        }
+
+        return date
+    }
+
+    private func updateLastRefreshDate() {
+        userDefaults.setValue(Date(), forKey: Constants.lastRefreshDateKey)
     }
 
 }
