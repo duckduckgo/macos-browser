@@ -20,9 +20,6 @@ import BrowserServicesKit
 import Cocoa
 import Common
 import WebKit
-import Account
-import Subscription
-import Purchase
 
 #if NETWORK_PROTECTION
 import NetworkProtection
