@@ -29,8 +29,9 @@ public enum ManagementDialogKind: Equatable {
     case turnOffSync
     case deviceDetails(_ device: SyncDevice)
     case removeDevice(_ device: SyncDevice)
-    case setUpAllSet
     case showTextCode
+    case manuallyEnterCode
+    case firstDeviceSetup
 }
 
 public struct ManagementDialog: View {
@@ -58,14 +59,16 @@ public struct ManagementDialog: View {
             switch model.currentDialog {
             case .enableSync:
                 EnableSyncView()
-//            case .askToSyncAnotherDevice:
-//                AskToSyncAnotherDeviceView()
             case .recoverAccount:
-                RecoverAccountView()
+                RecoverAccountView(isRecovery: true)
+            case .manuallyEnterCode:
+                RecoverAccountView(isRecovery: false)
             case .syncAnotherDevice:
                 SyncAnotherDeviceView()
             case .deviceSynced(let devices, let shouldShowOptions):
-                DeviceSyncedView(devices: devices, shouldShowOptions: shouldShowOptions)
+                DeviceSyncedView(devices: devices, shouldShowOptions: shouldShowOptions, isFirstDevice: false)
+            case .firstDeviceSetup:
+                DeviceSyncedView(devices: [], shouldShowOptions: true, isFirstDevice: true)
             case .saveRecoveryPDF:
                 SaveRecoveryPDFView()
             case .turnOffSync:
@@ -76,8 +79,6 @@ public struct ManagementDialog: View {
                 RemoveDeviceView(device: device)
             case .deleteAccount(let devices):
                 DeleteAccountView(devices: devices)
-            case .setUpAllSet:
-                SetUpAllSetView()
             case .showTextCode:
                 ShowTextCodeView()
 

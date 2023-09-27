@@ -45,4 +45,5 @@ public protocol ManagementViewModel: ObservableObject {
     func startPollingForRecoveryKey()
     func stopPollingForRecoveryKey()
     func presentShowTextCodeDialog()
+    func presentManuallyEnterCodeDialog()
 }

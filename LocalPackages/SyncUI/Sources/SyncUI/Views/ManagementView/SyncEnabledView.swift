@@ -26,47 +26,57 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         PreferencePaneSection {
             SyncStatusView<ViewModel>()
                 .environmentObject(model)
+                .frame(width: 513, alignment: .topLeading)
         }
 
         PreferencePaneSection {
             Text(UserText.syncedDevices)
                 .font(Const.Fonts.preferencePaneSectionHeader)
+                .padding(.horizontal, 16)
 
             SyncedDevicesView<ViewModel>()
                 .environmentObject(model)
+                .frame(width: 513, alignment: .topLeading)
         }
 
         PreferencePaneSection {
             Text(UserText.syncNewDevice)
                 .font(Const.Fonts.preferencePaneSectionHeader)
-
-            VStack(spacing: 0) {
-                SyncSetupSyncAnotherDeviceCardView<ViewModel>(isConnected: true)
-                    .environmentObject(model)
-
-                Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
-                    HStack {
-                        IconOnBackground(image: NSImage(imageLiteralResourceName: "SyncAllDevices"))
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Unified favorites")
-                                .font(Const.Fonts.preferencePaneOptionTitle)
-                            Text("Use the same favorites on all devices. Switch off to maintain separate favorites for mobile and desktop.")
-                                .font(Const.Fonts.preferencePaneCaption)
-                                .foregroundColor(Color("BlackWhite60"))
-                        }
-                        Spacer(minLength: 30)
-                    }
-                }
-                .toggleStyle(.switch)
                 .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .roundedBorder()
+
+            SyncSetupSyncAnotherDeviceCardView<ViewModel>(isConnected: true)
+                .environmentObject(model)
+
+        }
+
+        PreferencePaneSection {
+            Text("Settings")
+                .font(Const.Fonts.preferencePaneSectionHeader)
+                .padding(.horizontal, 16)
+            Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
+                HStack {
+                    IconOnBackground(image: NSImage(imageLiteralResourceName: "SyncAllDevices"))
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Share Favorites")
+                            .font(Const.Fonts.preferencePaneOptionTitle)
+                        Text("Use the same favorites on all devices. Leave off to keep mobile and desktop favorites separate.")
+                            .font(Const.Fonts.preferencePaneCaption)
+                            .foregroundColor(Color("BlackWhite60"))
+                    }
+                    Spacer(minLength: 30)
+                }
             }
+            .padding(.horizontal, 16)
+            .toggleStyle(.switch)
+            .padding(.vertical, 12)
+            .roundedBorder()
+            .frame(width: 513, alignment: .topLeading)
         }
 
         PreferencePaneSection {
             Text(UserText.recovery)
                 .font(Const.Fonts.preferencePaneSectionHeader)
+                .padding(.horizontal, 16)
 
             HStack(alignment: .top, spacing: 12) {
                 Text(UserText.recoveryInstructions)
@@ -76,6 +86,9 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                     model.saveRecoveryPDF()
                 }
             }
+            .padding(16)
+            .roundedBorder()
+            .frame(width: 513, alignment: .topLeading)
         }
 
         PreferencePaneSection {

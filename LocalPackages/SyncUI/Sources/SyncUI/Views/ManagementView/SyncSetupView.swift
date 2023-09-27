@@ -43,7 +43,7 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                                 }
                             SyncSetupStartCardView()
                             SyncSetupRecoverCardView()
-                            Text(UserText.syncAddDeviceCardExplanation)
+                            Text(UserText.syncSetUpFooter)
                                 .font(.system(size: 11))
                                 .foregroundColor(Color("GreyTextColor"))
                                 .padding(.horizontal, 16)
@@ -75,11 +75,7 @@ extension SyncSetupView {
                 Image("Sync-Desktop-New-96x96")
             }
             .padding(16)
-            .background(Color.black.opacity(0.01))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.0))
-            )
+            .roundedBorder()
         }
     }
 
@@ -94,11 +90,7 @@ extension SyncSetupView {
             }
             .padding(16)
             .frame(width: 512)
-            .background(Color.black.opacity(0.01))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.0))
-            )
+            .roundedBorder()
         }
     }
 }
@@ -115,45 +107,14 @@ struct QRCodeView: View {
         }
         .padding(.vertical, 16)
         .frame(width: 480)
-        background(ZStack {
+        .background(ZStack {
             RoundedRectangle(cornerRadius: 8)
                 .stroke(Color("BlackWhite10"), lineWidth: 1)
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color("BlackWhite1"))
+                .fill(Color("ClearColor"))
         })
     }
 }
-
-//        PreferencePaneSection {
-//            HStack(alignment: .top, spacing: 12) {
-//                Text(UserText.syncSetupExplanation)
-//                    .fixMultilineScrollableText()
-//                Spacer()
-//                Group {
-//                    if model.isCreatingAccount {
-//                        ProgressView()
-//                    } else {
-//                        Button(UserText.turnOnSyncWithEllipsis) {
-//                            model.presentEnableSyncDialog()
-//                        }
-//                    }
-//                }.frame(minWidth: 100)
-//            }
-//        }
-//
-//        PreferencePaneSection {
-//            HStack {
-//                Spacer()
-//                Image("SyncSetup")
-//                Spacer()
-//            }
-//        }
-//
-//        PreferencePaneSection {
-//            TextButton(UserText.recoverSyncedData) {
-//                model.presentRecoverSyncAccountDialog()
-//            }
-//        }
 
 struct SyncSetupSyncAnotherDeviceCardView<ViewModel>: View where ViewModel: ManagementViewModel {
     @EnvironmentObject var model: ViewModel
@@ -184,7 +145,7 @@ struct SyncSetupSyncAnotherDeviceCardView<ViewModel>: View where ViewModel: Mana
                         .fontWeight(.semibold)
                         .foregroundColor(Color("LinkBlueColor"))
                         .onTapGesture {
-                            model.presentRecoverSyncAccountDialog()
+                            model.presentManuallyEnterCodeDialog()
                         }
                 }
             }
@@ -193,11 +154,5 @@ struct SyncSetupSyncAnotherDeviceCardView<ViewModel>: View where ViewModel: Mana
         }
         .padding(16)
         .roundedBorder()
-//        .padding(16)
-//        .background(Color.black.opacity(0.01))
-//        .overlay(
-//            RoundedRectangle(cornerRadius: 12)
-//                .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.0))
-//        )
     }
 }

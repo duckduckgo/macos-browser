@@ -82,6 +82,11 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     }
 
     @MainActor
+    func presentManuallyEnterCodeDialog() {
+        presentDialog(for: .manuallyEnterCode)
+    }
+
+    @MainActor
     func presentShowTextCodeDialog() {
         managementDialogModel.codeToDisplay = self.codeToDisplay
         presentDialog(for: .showTextCode)
@@ -405,7 +410,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     @MainActor
     func confirmSetupComplete() {
-        presentDialog(for: .setUpAllSet)
+        presentDialog(for: .firstDeviceSetup)
     }
 
     @MainActor

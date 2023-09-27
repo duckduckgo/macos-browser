@@ -84,7 +84,8 @@ enum UserText {
     static let turnOnSyncExplanation2 = NSLocalizedString("preferences.sync.turn-on-explanation2", value: "The decryption key is stored on your device and cannot be read by DuckDuckGo.", comment: "Sync setup dialog content")
 
     static let recoverSyncedDataTitle = NSLocalizedString("preferences.sync.recover-synced-data", value: "Enter Text Code", comment: "Sync setup dialog title")
-    static let recoverSyncedDataExplanation = NSLocalizedString("preferences.sync.recover-synced-data-explanation", value: "Enter the code on your recovery PDF or another synced device below to recover your synced data.", comment: "Sync setup dialog content")
+    static let recoverSyncedDataExplanation = NSLocalizedString("preferences.sync.recover-synced-data-explanation", value: "Enter the code from your Recovery PDF.", comment: "Sync setup dialog content")
+    static let manuallyEnterCodeExplanation = NSLocalizedString("preferences.sync.manually-enter-code-explanation", value: "Enter the code from another synced device.", comment: "Sync setup dialog content")
 
     static let syncAnotherDeviceTitle = NSLocalizedString("preferences.sync.sync-another-device-question", value: "Sync Another Device?", comment: "Sync setup dialog title")
     static let syncAnotherDeviceExplanation1 = NSLocalizedString("preferences.sync.sync-another-device-explanation1", value: "Your bookmarks and Autofill logins will be backed up! Would you like to sync with another device now?", comment: "Sync setup dialog content")

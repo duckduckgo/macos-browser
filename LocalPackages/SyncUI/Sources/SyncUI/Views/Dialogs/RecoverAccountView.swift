@@ -22,6 +22,14 @@ import SwiftUIExtensions
 struct RecoverAccountView: View {
     @EnvironmentObject var model: ManagementDialogModel
     @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
+    let isRecovery: Bool
+    var instructionText: String {
+        if isRecovery {
+            return UserText.recoverSyncedDataExplanation
+        }
+        return UserText.manuallyEnterCodeExplanation
+
+    }
 
     func submitRecoveryCode() {
         model.delegate?.recoverDevice(using: recoveryCodeModel.recoveryCode)
@@ -33,7 +41,7 @@ struct RecoverAccountView: View {
                 .font(.system(size: 17, weight: .bold))
 
             EnterCodeView(
-                instructions: UserText.recoverSyncedDataExplanation,
+                instructions: instructionText,
                 buttonCaption: UserText.pasteFromClipboard) {
                     submitRecoveryCode()
                 }.environmentObject(recoveryCodeModel)

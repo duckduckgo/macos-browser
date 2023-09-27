@@ -23,25 +23,40 @@ struct DeviceSyncedView: View {
 
     let devices: [SyncDevice]
     let shouldShowOptions: Bool
+    let isFirstDevice: Bool
     var height: CGFloat {
+        if isFirstDevice {
+            return 450
+        }
         if shouldShowOptions {
             return 500
-        } else {
-            return min(450, 290 + (CGFloat(devices.count) * 44))
         }
+        return min(450, 290 + (CGFloat(devices.count) * 44))
+    }
+    var title: String {
+        if isFirstDevice {
+            return UserText.allSetDialogTitle
+        }
+        return UserText.deviceSynced
     }
 
     var body: some View {
         SyncDialog(spacing: 20.0) {
             VStack(spacing: 20) {
                 Image("Sync-setup-success")
-                Text(UserText.deviceSynced)
+                Text(title)
                     .font(.system(size: 17, weight: .bold))
-                Text(UserText.deviceSyncedExplanation)
-                    .multilineTextAlignment(.center)
+                if isFirstDevice {
+                    NewDeviceDescriptionView()
+                } else {
+                    Text(UserText.deviceSyncedExplanation)
+                        .multilineTextAlignment(.center)
+                }
 
-                ScrollView {
-                    SyncedDevicesList(devices: devices)
+                if !isFirstDevice {
+                    ScrollView {
+                        SyncedDevicesList(devices: devices)
+                    }
                 }
                 if shouldShowOptions {
                     OptionsView()
@@ -56,6 +71,20 @@ struct DeviceSyncedView: View {
         }
         .frame(width: 360,
                height: height)
+    }
+
+    struct NewDeviceDescriptionView: View {
+        var body: some View {
+            Text(UserText.allSetDialogCaption1)
+            +
+            Text(UserText.allSetDialogCaption2)
+                .fontWeight(.bold)
+            +
+            Text(UserText.allSetDialogCaption3)
+            +
+            Text(UserText.allSetDialogCaption4)
+                .fontWeight(.bold)
+        }
     }
 
     struct OptionsView: View {
