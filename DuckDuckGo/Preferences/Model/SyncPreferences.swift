@@ -113,12 +113,12 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         }
     }
 
-    init(syncService: DDGSyncing, apperancePreferences: AppearancePreferences = .shared) {
+    init(syncService: DDGSyncing, apperancePreferences: AppearancePreferences = .shared, managementDialogModel: ManagementDialogModel = ManagementDialogModel()) {
         self.syncService = syncService
 
         self.isUnifiedFavoritesEnabled = AppearancePreferences.shared.favoritesDisplayMode.isDisplayUnified
 
-        self.managementDialogModel = ManagementDialogModel()
+        self.managementDialogModel = managementDialogModel
         self.managementDialogModel.delegate = self
         self.managementDialogModel.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
 
@@ -198,6 +198,10 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         managementDialogModel.currentDialog = currentDialog
 
         guard shouldBeginSheet else {
+            return
+        }
+
+        if NSApp.isRunningUnitTests {
             return
         }
 
