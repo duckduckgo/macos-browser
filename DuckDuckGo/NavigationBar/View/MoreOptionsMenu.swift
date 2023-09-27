@@ -20,10 +20,13 @@ import Cocoa
 import Combine
 import Common
 import BrowserServicesKit
-import Account
 
 #if NETWORK_PROTECTION
 import NetworkProtection
+#endif
+
+#if SUBSCRIPTION
+import Account
 #endif
 
 protocol OptionsButtonMenuDelegate: AnyObject {
@@ -43,7 +46,9 @@ protocol OptionsButtonMenuDelegate: AnyObject {
 #if DBP
     func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu)
 #endif
+#if SUBSCRIPTION
     func optionsButtonMenuRequestedSubscriptionPreferences(_ menu: NSMenu)
+#endif
 }
 
 @MainActor
@@ -225,9 +230,11 @@ final class MoreOptionsMenu: NSMenu {
         actionDelegate?.optionsButtonMenuRequestedAppearancePreferences(self)
     }
 
+#if SUBSCRIPTION
     @objc func openSubscriptionPreferences(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedSubscriptionPreferences(self)
     }
+#endif
 
     @objc func findInPage(_ sender: NSMenuItem) {
         tabCollectionViewModel.selectedTabViewModel?.showFindInPage()
@@ -286,7 +293,11 @@ final class MoreOptionsMenu: NSMenu {
     private func addSubscriptionItems() {
         var items: [NSMenuItem] = []
 
+#if SUBSCRIPTION
         items.append(contentsOf: AccountManager().isSignedIn ? makeActiveSubscriptionItems() : makeInactiveSubscriptionItems())
+#else
+        items.append(contentsOf: makeActiveSubscriptionItems()) // this only adds NETP and DBP (if enabled)
+#endif
 
         if !items.isEmpty {
             items.forEach { addItem($0) }
@@ -318,6 +329,7 @@ final class MoreOptionsMenu: NSMenu {
         addItem(dataBrokerProtectionItem)
 #endif // DBP
 
+#if SUBSCRIPTION
         // TODO: Placeholders
         let item1  = NSMenuItem(title: "Placeholder A", action: #selector(openPreferences(_:)), keyEquivalent: "")
             .targetting(self)
@@ -328,10 +340,12 @@ final class MoreOptionsMenu: NSMenu {
             .targetting(self)
             .withImage(.image(for: .vpnIcon))
         items.append(item2)
+#endif
 
         return items
     }
 
+#if SUBSCRIPTION
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
         let privacyProItem = NSMenuItem(title: "",
                                         action: #selector(openSubscriptionPreferences(_:)),
@@ -352,6 +366,7 @@ final class MoreOptionsMenu: NSMenu {
 
         return [privacyProItem]
     }
+#endif
 
     private func addPageItems() {
         guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url else { return }

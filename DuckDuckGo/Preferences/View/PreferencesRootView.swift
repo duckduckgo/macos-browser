@@ -55,8 +55,10 @@ extension Preferences {
                                 AppearanceView(model: .shared)
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
+#if SUBSCRIPTION
                             case .subscription:
                                 makeSubscriptionView()
+#endif
                             case .autofill:
                                 AutofillView(model: AutofillPreferencesModel())
                             case .downloads:
@@ -85,6 +87,7 @@ extension Preferences {
             .background(Color("InterfaceBackgroundColor"))
         }
 
+#if SUBSCRIPTION
         private func makeSubscriptionView() -> some View {
             let actionHandler = PreferencesSubscriptionActionHandlers(openURL: { url in
                 WindowControllersManager.shared.show(url: url, newTab: true)
@@ -109,6 +112,7 @@ extension Preferences {
             let model = PreferencesSubscriptionModel(actionHandler: actionHandler, sheetActionHandler: sheetActionHandler)
             return Subscription.PreferencesSubscriptionView(model: model)
         }
+#endif
     }
 }
 
