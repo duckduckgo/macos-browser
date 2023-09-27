@@ -39,13 +39,14 @@ final class FaviconReferenceCache {
     private(set) var loaded = false
 
     nonisolated func loadReferences(completionHandler: (@MainActor (Error?) -> Void)? = nil) {
-        Task.run(operation: {
-            try await self.load()
-        }, completionHandler: completionHandler.map { completionHandler in
-            { result in // swiftlint:disable:this opening_brace
-                completionHandler(result.error)
+        Task {
+            do {
+                try await self.load()
+                await completionHandler?(nil)
+            } catch {
+                await completionHandler?(error)
             }
-        })
+        }
     }
 
     nonisolated func load() async throws {
@@ -152,9 +153,10 @@ final class FaviconReferenceCache {
     nonisolated func cleanOldExcept(fireproofDomains: FireproofDomains,
                                     bookmarkManager: BookmarkManager,
                                     completion: (@MainActor (()) -> Void)? = nil) {
-        Task.run(operation: {
+        Task {
             await self.cleanOld(except: fireproofDomains, bookmarkManager: bookmarkManager)
-        }, completionHandler: completion)
+            await completion?(())
+        }
     }
 
     func cleanOld(except fireproofDomains: FireproofDomains, bookmarkManager: BookmarkManager) async {
@@ -183,9 +185,10 @@ final class FaviconReferenceCache {
                                 bookmarkManager: BookmarkManager,
                                 savedLogins: Set<String>,
                                 completion: @escaping @MainActor () -> Void) {
-        Task.run(operation: {
+        Task {
             await self.burn(except: fireproofDomains, bookmarkManager: bookmarkManager, savedLogins: savedLogins)
-        }, completionHandler: completion)
+            await completion()
+        }
     }
 
     func burn(except fireproofDomains: FireproofDomains, bookmarkManager: BookmarkManager, savedLogins: Set<String>) async {
@@ -216,9 +219,10 @@ final class FaviconReferenceCache {
                                  exceptHistoryDomains history: Set<String>,
                                  tld: TLD,
                                  completion: @escaping @MainActor () -> Void) {
-        Task.run(operation: {
+        Task {
             await self.burnDomains(baseDomains, exceptBookmarks: bookmarkManager, exceptSavedLogins: logins, exceptHistoryDomains: history, tld: tld)
-        }, completionHandler: completion)
+            await completion()
+        }
     }
 
     func burnDomains(_ baseDomains: Set<String>,

@@ -124,7 +124,7 @@ final class FaviconManager: FaviconManagement {
     nonisolated func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink],
                                         documentUrl: URL,
                                         completion: @escaping @MainActor (Favicon?) -> Void) {
-        Task.run {
+        Task {
             // Manually add favicon.ico into links
             let faviconLinks = self.createFallbackLinksIfNeeded(faviconLinks, documentUrl: documentUrl)
 
@@ -148,10 +148,7 @@ final class FaviconManager: FaviconManagement {
                                                                           cachedFavicons: cachedFavicons ?? [],
                                                                           newFavicons: newFavicons)
 
-            return favicon
-
-        } completionHandler: { favicon in
-            completion(favicon)
+            await completion(favicon)
         }
     }
 

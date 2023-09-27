@@ -34,14 +34,15 @@ final class FaviconImageCache {
 
     private(set) var loaded = false
 
-    nonisolated func loadFavicons(completionHandler: ((Error?) -> Void)? = nil) {
-        Task.run(operation: {
-            try await self.load()
-        }, completionHandler: completionHandler.map { completionHandler in
-            { result in // swiftlint:disable:this opening_brace
-                completionHandler(result.error)
+    nonisolated func loadFavicons(completionHandler: (@MainActor (Error?) -> Void)? = nil) {
+        Task {
+            do {
+                try await self.load()
+                await completionHandler?(nil)
+            } catch {
+                await completionHandler?(error)
             }
-        })
+        }
     }
 
     func load() async throws {
@@ -101,9 +102,9 @@ final class FaviconImageCache {
 
     nonisolated func cleanOldExcept(fireproofDomains: FireproofDomains,
                                     bookmarkManager: BookmarkManager,
-                                    completion: @escaping () -> Void) {
+                                    completion: @escaping @MainActor () -> Void) {
         let bookmarkedHosts = bookmarkManager.allHosts()
-        Task.run(operation: {
+        Task {
             await self.removeFavicons(filter: { favicon in
                 guard let host = favicon.documentUrl.host else {
                     return false
@@ -112,7 +113,8 @@ final class FaviconImageCache {
                 !fireproofDomains.isFireproof(fireproofDomain: host) &&
                 !bookmarkedHosts.contains(host)
             })
-        }, completionHandler: completion)
+            await completion()
+        }
     }
 
     // MARK: - Burning
@@ -120,9 +122,9 @@ final class FaviconImageCache {
     nonisolated func burnExcept(fireproofDomains: FireproofDomains,
                                 bookmarkManager: BookmarkManager,
                                 savedLogins: Set<String>,
-                                completion: @escaping () -> Void) {
+                                completion: @escaping @MainActor () -> Void) {
         let bookmarkedHosts = bookmarkManager.allHosts()
-        Task.run(operation: {
+        Task {
             await self.removeFavicons(filter: { favicon in
                 guard let host = favicon.documentUrl.host else {
                     return false
@@ -132,7 +134,8 @@ final class FaviconImageCache {
                          savedLogins.contains(host)
                 )
             })
-        }, completionHandler: completion)
+            await completion()
+        }
     }
 
     nonisolated func burnDomains(_ baseDomains: Set<String>,
@@ -140,9 +143,9 @@ final class FaviconImageCache {
                                  exceptSavedLogins logins: Set<String>,
                                  exceptHistoryDomains history: Set<String>,
                                  tld: TLD,
-                                 completion: @escaping () -> Void) {
+                                 completion: @escaping @MainActor () -> Void) {
         let bookmarkedHosts = bookmarkManager.allHosts()
-        Task.run(operation: {
+        Task {
             await self.removeFavicons(filter: { favicon in
                 guard let host = favicon.documentUrl.host, let baseDomain = tld.eTLDplus1(host) else { return false }
                 return baseDomains.contains(baseDomain)
@@ -150,7 +153,8 @@ final class FaviconImageCache {
                     && !logins.contains(host)
                     && !history.contains(host)
             })
-        }, completionHandler: completion)
+            await completion()
+        }
     }
 
     // MARK: - Private
