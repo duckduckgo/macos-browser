@@ -102,7 +102,7 @@ jobs:
           ${{ runner.os }}-spm-${{ matrix.cache-key }}
 
     - name: Select Xcode
-      run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
+      run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer || (find /Applications -type d -name 'Xcode*.app' -maxdepth 1 && false)
 
     - name: Install xcbeautify
       continue-on-error: true
@@ -119,7 +119,8 @@ jobs:
           ENABLE_TESTABILITY=true \
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
           | tee ${{ matrix.flavor }}-xcodebuild.log \
-          | xcbeautify --report junit --report-path . --junit-report-filename ${{ matrix.flavor }}.xml
+          | xcbeautify --report junit --report-path . --junit-report-filename ${{ matrix.flavor }}.xml \
+          || { mv "$(grep -m 1 '.*\.xcresult' ${{ matrix.flavor }}-xcodebuild.log | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')" ./${{ matrix.flavor }}.xcresult && exit 1; }
 
     - name: Check private API usage
       id: private-api
@@ -173,6 +174,14 @@ jobs:
       with:
         name: ${{ matrix.flavor }}-xcodebuild.log
         path: ${{ matrix.flavor }}-xcodebuild.log
+        retention-days: 7
+    - name: Upload failed xcresult
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: ${{ matrix.flavor }}.xcresult
+        path: ${{ matrix.flavor }}.xcresult
+        retention-days: 7
 
   private-api:
     name: Private API Report
@@ -239,7 +248,7 @@ jobs:
           ${{ runner.os }}-spm-test-release-${{ matrix.cache-key }}
 
     - name: Select Xcode
-      run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
+      run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer || (find /Applications -type d -name 'Xcode*.app' -maxdepth 1 && false)
 
     - name: Install xcbeautify
       continue-on-error: true
@@ -261,6 +270,7 @@ jobs:
       with:
         name: release-xcodebuild.log
         path: release-xcodebuild.log
+        retention-days: 7
 
   verify-autoconsent-bundle:
     name: 'Verify autoconsent bundle'

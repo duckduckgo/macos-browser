@@ -103,8 +103,7 @@ final class DataBrokerProtectionProcessor {
             brokerUpdater.checkForUpdatesInBrokerJSONFiles()
         }
 
-        let profileId: Int64 = 1 // We assume one profile for now
-        let brokersProfileData = database.fetchAllBrokerProfileQueryData(for: profileId)
+        let brokersProfileData = database.fetchAllBrokerProfileQueryData()
         let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
                                                                                   operationType: operationType,
                                                                                   priorityDate: priorityDate,

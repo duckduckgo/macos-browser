@@ -132,7 +132,6 @@ extension Pixel.Event {
              .favoriteSectionHidden,
              .recentActivitySectionHidden,
              .continueSetUpSectionHidden,
-             .userHasPinnedTab,
              .fireButtonFirstBurn,
              .fireButton,
              .duckPlayerDailyUniqueView,

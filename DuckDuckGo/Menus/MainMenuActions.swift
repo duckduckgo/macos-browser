@@ -846,11 +846,6 @@ extension MainViewController: NSMenuItemValidation {
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
-        // Enable "Move to another Display" menu item (is there a better way?)
-        for item in menuItem.menu!.items where item.action == Selector(("_moveToDisplay:")) {
-            item.isEnabled = true
-        }
-
         switch menuItem.action {
         // Back/Forward
         case #selector(MainViewController.back(_:)):
