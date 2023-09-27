@@ -117,11 +117,11 @@ public class AccountManager {
         if #available(macOS 12.0, *) {
             Task {
                 // Fetch most recent purchase
-                guard let (payload, jwsRepresentation) = await PurchaseManager.mostRecentTransaction() else { return }
+                guard let jwsRepresentation = await PurchaseManager.mostRecentTransaction() else { return }
 
                 // Do the store login to get short-lived token
                 let shortLivedToken: String
-                switch await AuthService.storeLogin(payload: payload, signature: jwsRepresentation) {
+                switch await AuthService.storeLogin(signature: jwsRepresentation) {
                 case .success(let response):
                     print("\(response)")
                     shortLivedToken = response.authToken

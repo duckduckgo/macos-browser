@@ -162,7 +162,7 @@ public final class PurchaseManager: ObservableObject {
     }
 
     @MainActor
-    public static func mostRecentTransaction() async -> (String, String)? {
+    public static func mostRecentTransaction() async -> String? {
         print(" -- [PurchaseManager] updatePurchasedProducts()")
 
         var transactions: [VerificationResult<Transaction>] = []
@@ -191,15 +191,14 @@ public final class PurchaseManager: ObservableObject {
 
         guard let rawTransaction = transactions.first else { return nil }
 
-        guard let payload = String(data: rawTransaction.payloadData, encoding: .utf8) else { return nil}
-
+//        guard let payload = String(data: rawTransaction.payloadData, encoding: .utf8) else { return nil}
 
         print("External user ID: \(rawTransaction.unsafePayloadValue.appAccountToken)")
 //        let payload = rawTransaction.payloadData
 //        let signature = rawTransaction.signatureData
 
 
-        return (payload, rawTransaction.jwsRepresentation)
+        return rawTransaction.jwsRepresentation
     }
 
     @MainActor

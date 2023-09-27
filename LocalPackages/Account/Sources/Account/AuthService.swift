@@ -39,7 +39,7 @@ public struct AuthService {
     // MARK: -
 
     public static func getAccessToken(token: String) async -> Result<AccessTokenResponse, AuthService.Error> {
-        await executeAPICall(method: "GET", endpoint: "access-token", headers: ["Authorization": "Bearer " + token])
+        await executeAPICall(method: "GET", endpoint: "access-token", headers: makeAuthorizationHeader(for: token))
     }
 
     public struct AccessTokenResponse: Decodable {
@@ -49,7 +49,7 @@ public struct AuthService {
     // MARK: -
 
     public static func validateToken(accessToken: String) async -> Result<ValidateTokenResponse, AuthService.Error> {
-        await executeAPICall(method: "GET", endpoint: "validate-token", headers: ["Authorization": "Bearer " + accessToken])
+        await executeAPICall(method: "GET", endpoint: "validate-token", headers: makeAuthorizationHeader(for: accessToken))
     }
 
     // swiftlint:disable nesting
@@ -77,7 +77,7 @@ public struct AuthService {
     // MARK: -
 
     static func createAccount() async -> Result<CreateAccountResponse, AuthService.Error> {
-        await executeAPICall(method: "POST", endpoint: "account/create", headers: [:])
+        await executeAPICall(method: "POST", endpoint: "account/create")
     }
 
     struct CreateAccountResponse: Decodable {
@@ -92,20 +92,17 @@ public struct AuthService {
 
     // MARK: -
 
-    public static func storeLogin(payload: String, signature: String) async -> Result<StoreLoginResponse, AuthService.Error> {
-
+    public static func storeLogin(signature: String) async -> Result<StoreLoginResponse, AuthService.Error> {
         let bodyDict = ["signature": signature,
-//                        "signed_data": payload,
                         "store": "apple_app_store"]
 
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted
-        let bodyData = try! encoder.encode(bodyDict)
+//        let encoder = JSONEncoder()
+//        encoder.outputFormatting = .prettyPrinted
+//        let bodyData = try! encoder.encode(bodyDict)
 
-        let s = String(data: bodyData, encoding: .utf8)
-        print(s)
 
-        return await executeAPICall(method: "POST", endpoint: "store-login", headers: [:], body: bodyData)
+        let bodyData = try! JSONEncoder().encode(bodyDict)
+        return await executeAPICall(method: "POST", endpoint: "store-login", body: bodyData)
     }
 
     public struct StoreLoginResponse: Decodable {
@@ -122,7 +119,7 @@ public struct AuthService {
 
     // MARK: - Private API
 
-    private static func executeAPICall<T>(method: String, endpoint: String, headers: [String: String], body: Data? = nil) async -> Result<T, AuthService.Error> where T: Decodable {
+    private static func executeAPICall<T>(method: String, endpoint: String, headers: [String: String]? = nil, body: Data? = nil) async -> Result<T, AuthService.Error> where T: Decodable {
         let request = makeAPIRequest(method: method, endpoint: endpoint, headers: headers, body: body)
 
         do {
@@ -154,12 +151,16 @@ public struct AuthService {
         let error: String
     }
 
-    private static func makeAPIRequest(method: String, endpoint: String, headers: [String: String], body: Data?) -> URLRequest {
+    private static func makeAPIRequest(method: String, endpoint: String, headers: [String: String]?, body: Data?) -> URLRequest {
         let url = baseURL.appendingPathComponent(endpoint)
         var request = URLRequest(url: url)
-        request.allHTTPHeaderFields = headers
         request.httpMethod = method
-        request.httpBody = body
+        if let header = headers {
+            request.allHTTPHeaderFields = headers
+        }
+        if let body = body {
+            request.httpBody = body
+        }
 
         return request
     }
@@ -173,6 +174,10 @@ public struct AuthService {
 
     private static func printDebugInfo(method: String, endpoint: String, data: Data, response: URLResponse) {
         print("[\((response as? HTTPURLResponse)!.statusCode)] \(method) /\(endpoint) :: \(String(data: data, encoding: .utf8) ?? "")" )
+    }
+
+    private static func makeAuthorizationHeader(for token: String) -> [String: String] {
+        ["Authorization": "Bearer " + token]
     }
 }
 
