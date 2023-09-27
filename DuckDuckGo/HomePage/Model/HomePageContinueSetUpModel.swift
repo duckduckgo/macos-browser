@@ -189,17 +189,7 @@ extension HomePage.Models {
             case .surveyDay7:
                 visitSurvey(day: .day7)
             case .networkProtectionRemoteMessage(let message):
-                if let surveyURLString = message.surveyURL, let surveyURL = URL(string: surveyURLString) {
-                    let tab = Tab(content: .url(surveyURL), shouldLoadInBackground: true)
-                    tabCollectionViewModel.append(tab: tab)
-                    Pixel.fire(.networkProtectionRemoteMessageOpened(messageID: message.id))
-                } else {
-                    Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: message.id))
-                }
-
-                // Dismiss the message after the user opens the survey, even if they just close the tab immediately afterwards.
-                networkProtectionRemoteMessaging.dismiss(message: message)
-                refreshFeaturesMatrix()
+                handle(remoteMessage: message)
             }
         }
         // swiftlint:enable cyclomatic_complexity
@@ -396,6 +386,20 @@ extension HomePage.Models {
                     shouldShowSurveyDay7 = false
                 }
             }
+        }
+
+        @MainActor private func handle(remoteMessage: NetworkProtectionRemoteMessage) {
+            if let surveyURLString = remoteMessage.surveyURL, let surveyURL = URL(string: surveyURLString) {
+                let tab = Tab(content: .url(surveyURL), shouldLoadInBackground: true)
+                tabCollectionViewModel.append(tab: tab)
+                Pixel.fire(.networkProtectionRemoteMessageOpened(messageID: remoteMessage.id))
+            } else {
+                Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
+            }
+
+            // Dismiss the message after the user opens the survey, even if they just close the tab immediately afterwards.
+            networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
+            refreshFeaturesMatrix()
         }
     }
 
