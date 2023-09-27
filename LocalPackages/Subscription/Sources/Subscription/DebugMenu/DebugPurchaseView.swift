@@ -138,7 +138,7 @@ struct SubscriptionRow: View {
             .buttonStyle(BuyButtonStyle(isPurchased: isPurchased))
 
         }
-//        .disabled(isPurchased)
+        .disabled(isPurchased)
     }
 }
 

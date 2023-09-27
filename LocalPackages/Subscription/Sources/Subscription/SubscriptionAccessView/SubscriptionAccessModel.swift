@@ -18,7 +18,22 @@
 
 import Foundation
 
-public enum AccessChan: String, CaseIterable, Identifiable {
+private extension URL {
+
+    static var activateSubscriptionViaEmail: URL {
+        URL(string: "https://abrown.duckduckgo.com/subscriptions/activate")!
+    }
+
+    static var addEmailToSubscription: URL {
+        URL(string: "https://abrown.duckduckgo.com/subscriptions/add-email")!
+    }
+
+    static var manageSubscriptionEmail: URL {
+        URL(string: "https://abrown.duckduckgo.com/subscriptions/manage")!
+    }
+}
+
+public enum AccessChannel: String, CaseIterable, Identifiable {
     public var id: Self { self }
 
     case appleID, email, sync
@@ -47,21 +62,21 @@ public enum AccessChan: String, CaseIterable, Identifiable {
 }
 
 public protocol SubscriptionAccessModel {
-    var items: [AccessChan] { get }
+    var items: [AccessChannel] { get }
 
     var title: String { get }
     var description: String { get }
 
-    func descriptionHeader(for channel: AccessChan) -> String?
-    func description(for channel: AccessChan) -> String
-    func buttonTitle(for channel: AccessChan) -> String?
-    func handleAction(for channel: AccessChan)
+    func descriptionHeader(for channel: AccessChannel) -> String?
+    func description(for channel: AccessChannel) -> String
+    func buttonTitle(for channel: AccessChannel) -> String?
+    func handleAction(for channel: AccessChannel)
 }
 
 extension SubscriptionAccessModel {
-    public var items: [AccessChan] { AccessChan.allCases }
+    public var items: [AccessChannel] { AccessChannel.allCases }
 
-    public func descriptionHeader(for channel: AccessChan) -> String? { nil }
+    public func descriptionHeader(for channel: AccessChannel) -> String? { nil }
 }
 
 public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel {
@@ -73,7 +88,7 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel {
         self.actionHandlers = actionHandlers
     }
 
-    public func description(for channel: AccessChan) -> String {
+    public func description(for channel: AccessChannel) -> String {
         switch channel {
         case .appleID:
             return "Your subscription is automatically available on any device signed in to the same Apple ID."
@@ -84,7 +99,7 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel {
         }
     }
 
-    public func buttonTitle(for channel: AccessChan) -> String? {
+    public func buttonTitle(for channel: AccessChannel) -> String? {
         switch channel {
         case .appleID:
             return "Restore Purchases"
@@ -95,12 +110,12 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel {
         }
     }
 
-    public func handleAction(for channel: AccessChan) {
+    public func handleAction(for channel: AccessChannel) {
         switch channel {
         case .appleID:
             actionHandlers.restorePurchases()
         case .email:
-            actionHandlers.openURLHandler(URL(string: "https://abrown.duckduckgo.com/subscriptions/activate")!)
+            actionHandlers.openURLHandler(.activateSubscriptionViaEmail)
         case .sync:
             actionHandlers.goToSyncPreferences()
         }
@@ -120,11 +135,11 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
         self.email = email
     }
 
-    public func descriptionHeader(for channel: AccessChan) -> String? {
+    public func descriptionHeader(for channel: AccessChannel) -> String? {
         hasEmail && channel == .email ? email : nil
     }
 
-    public func description(for channel: AccessChan) -> String {
+    public func description(for channel: AccessChannel) -> String {
         switch channel {
         case .appleID:
             return "Your subscription is automatically available on any device signed in to the same Apple ID."
@@ -135,7 +150,7 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
         }
     }
 
-    public func buttonTitle(for channel: AccessChan) -> String? {
+    public func buttonTitle(for channel: AccessChannel) -> String? {
         switch channel {
         case .appleID:
             return nil
@@ -146,14 +161,12 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
         }
     }
 
-    public func handleAction(for channel: AccessChan) {
+    public func handleAction(for channel: AccessChannel) {
         switch channel {
         case .appleID:
             actionHandlers.restorePurchases()
         case .email:
-            let manageEmailURL = URL(string: "https://abrown.duckduckgo.com/subscriptions/manage")!
-            let addEmailURL = URL(string: "https://abrown.duckduckgo.com/subscriptions/add-email")!
-            actionHandlers.openURLHandler(hasEmail ? manageEmailURL : addEmailURL)
+            actionHandlers.openURLHandler(hasEmail ? .manageSubscriptionEmail : .addEmailToSubscription)
         case .sync:
             actionHandlers.goToSyncPreferences()
         }

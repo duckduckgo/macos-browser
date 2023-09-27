@@ -18,7 +18,17 @@
 
 import Foundation
 import Account
-//import AppKit
+
+private extension URL {
+
+    static var purchaseSubscription: URL {
+        URL(string: "https://duckduckgo.com/about")!
+    }
+
+    static var subscriptionFAQ: URL {
+        URL(string: "https://duckduckgo.com/about")!
+    }
+}
 
 public final class PreferencesSubscriptionModel: ObservableObject {
 
@@ -54,7 +64,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func learnMoreAction() {
-        actionHandler.openURL(URL(string: "https://duckduckgo.com/about")!)
+        actionHandler.openURL(.purchaseSubscription)
     }
 
     @MainActor
@@ -84,7 +94,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func openFAQ() {
-        actionHandler.openURL(URL(string: "https://duckduckgo.com/about")!)
+        actionHandler.openURL(.subscriptionFAQ)
     }
 }
 
