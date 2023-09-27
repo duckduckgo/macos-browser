@@ -57,7 +57,7 @@ public struct AuthService {
         public let account: Account
 
         public struct Account: Decodable {
-            public let email: String
+            public let email: String?
             let entitlements: [Entitlement]
             public let externalID: String
 
@@ -76,14 +76,14 @@ public struct AuthService {
 
     // MARK: -
 
-    static func createAccount() async -> Result<CreateAccountResponse, AuthService.Error> {
+    public static func createAccount() async -> Result<CreateAccountResponse, AuthService.Error> {
         await executeAPICall(method: "POST", endpoint: "account/create")
     }
 
-    struct CreateAccountResponse: Decodable {
-        let authToken: String
-        let externalID: String
-        let status: String
+    public struct CreateAccountResponse: Decodable {
+        public let authToken: String
+        public let externalID: String
+        public let status: String
 
         enum CodingKeys: String, CodingKey {
             case authToken = "authToken", externalID = "externalId", status // no underscores due to keyDecodingStrategy = .convertFromSnakeCase
