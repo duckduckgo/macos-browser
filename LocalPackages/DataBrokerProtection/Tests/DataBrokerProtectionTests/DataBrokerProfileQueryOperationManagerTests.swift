@@ -605,7 +605,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
         }
     }
 
-    func fetchAllBrokerProfileQueryData(for profileId: Int64) -> [BrokerProfileQueryData] {
+    func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
         wasFetchAllBrokerProfileQueryDataCalled = true
         return [BrokerProfileQueryData]()
     }

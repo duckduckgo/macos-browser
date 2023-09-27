@@ -81,7 +81,7 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
             return cache.brokerProfileQueryData
         }
 
-        let queryData = database.fetchAllBrokerProfileQueryData(for: 1) // We assume one profile for now
+        let queryData = database.fetchAllBrokerProfileQueryData()
         cache.brokerProfileQueryData = queryData
         return queryData
     }
