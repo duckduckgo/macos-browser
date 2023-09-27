@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
 import AppKit
 import Combine
+import Common
+import Foundation
 
 final class BookmarksBarViewController: NSViewController {
 
@@ -169,6 +170,20 @@ final class BookmarksBarViewController: NSViewController {
         menu.popUp(positioning: nil, at: location, in: sender)
     }
 
+    @IBAction func mouseClickViewMouseUp(_ sender: MouseClickView) {
+        // when collection view reloaded we may receive mouseUp event from a wrong bookmarks bar item
+        // get actual item based on the event coordinates
+        guard let indexPath = bookmarksBarCollectionView.withMouseLocationInViewCoordinates(convert: { point in
+            self.bookmarksBarCollectionView.indexPathForItem(at: point)
+        }),
+              let item = bookmarksBarCollectionView.item(at: indexPath.item) as? BookmarksBarCollectionViewItem else {
+            os_log("Item at mouseUp point not found.", type: .error)
+            return
+        }
+
+        viewModel.bookmarksBarCollectionViewItemClicked(item)
+    }
+
 }
 
 extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
@@ -254,6 +269,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
     private func bookmarkFolderMenu(items: [NSMenuItem]) -> NSMenu {
         let menu = NSMenu()
         menu.items = items.isEmpty ? [NSMenuItem.empty] : items
+        menu.autoenablesItems = false
         return menu
     }
 
