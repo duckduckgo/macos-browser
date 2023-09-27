@@ -56,13 +56,7 @@ extension Preferences {
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
                             case .privacyPro:
-                                SubscriptionView(actionHandler: .init(restorePurchases: {
-                                    AccountManager().signInByRestoringPastPurchases()
-                                }, openURLHandler: { url in
-                                    WindowControllersManager.shared.show(url: url, newTab: true)
-                                }, goToSyncPreferences: {
-                                    self.model.selectPane(.sync)
-                                }))
+                                makeSubscriptionView()
                             case .autofill:
                                 AutofillView(model: AutofillPreferencesModel())
                             case .downloads:
@@ -90,8 +84,32 @@ extension Preferences {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color("InterfaceBackgroundColor"))
         }
-    }
 
+        private func makeSubscriptionView() -> some View {
+            let actionHandler = PreferencesSubscriptionActionHandlers(openURL: { url in
+                WindowControllersManager.shared.show(url: url, newTab: true)
+            }, manageSubscriptionInAppStore: {
+                NSWorkspace.shared.open(URL(string: "macappstores://apps.apple.com/account/subscriptions")!)
+            }, openVPN: {
+                print("openVPN")
+            }, openPersonalInformationRemoval: {
+                print("openPersonalInformationRemoval")
+            }, openIdentityTheftRestoration: {
+                print("openIdentityTheftRestoration")
+            })
+
+            let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
+                AccountManager().signInByRestoringPastPurchases()
+            }, openURLHandler: { url in
+                WindowControllersManager.shared.show(url: url, newTab: true)
+            }, goToSyncPreferences: {
+                self.model.selectPane(.sync)
+            })
+
+            let model = PreferencesSubscriptionModel(actionHandler: actionHandler, sheetActionHandler: sheetActionHandler)
+            return Subscription.PreferencesSubscriptionView(model: model)
+        }
+    }
 }
 
 struct SyncView: View {
@@ -102,17 +120,6 @@ struct SyncView: View {
         } else {
             FailedAssertionView("Failed to initialize Sync Management View")
         }
-    }
-
-}
-
-struct SubscriptionView: View {
-
-    var actionHandler: SubscriptionAccessActionHandlers
-
-    var body: some View {
-        let model = PreferencesSubscriptionModel(sheetActionHandler: actionHandler)
-        Subscription.PreferencesSubscriptionView(model: model)
     }
 
 }

@@ -81,7 +81,8 @@ public struct PreferencesSubscriptionView: View {
                 SectionView(iconName: "vpn-service-icon",
                             title: "VPN",
                             description: "Full-device protection with the VPN built for speed and security.",
-                            buttonName: model.isSignedIn ? "Manage" : "")
+                            buttonName: model.isSignedIn ? "Manage" : nil,
+                            buttonAction: { model.openVPN() })
 
                 Divider()
                     .foregroundColor(Color.secondary)
@@ -89,7 +90,8 @@ public struct PreferencesSubscriptionView: View {
                 SectionView(iconName: "pir-service-icon",
                             title: "Personal Information Removal",
                             description: "Find and remove your personal information from sites that store and sell it.",
-                            buttonName: model.isSignedIn ? "View" : "")
+                            buttonName: model.isSignedIn ? "View" : nil,
+                            buttonAction: { model.openPersonalInformationRemoval() })
 
                 Divider()
                     .foregroundColor(Color.secondary)
@@ -97,7 +99,8 @@ public struct PreferencesSubscriptionView: View {
                 SectionView(iconName: "itr-service-icon",
                             title: "Identity Theft Restoration",
                             description: "Restore stolen accounts and financial losses in the event of identity theft.",
-                            buttonName: model.isSignedIn ? "View" : "")
+                            buttonName: model.isSignedIn ? "View" : nil,
+                            buttonAction: { model.openIdentityTheftRestoration() })
             }
             .padding(10)
             .roundedBorder()
@@ -147,13 +150,15 @@ public struct SectionView: View {
     public var iconName: String
     public var title: String
     public var description: String
-    public var buttonName: String
+    public var buttonName: String?
+    public var buttonAction: (() -> Void)?
 
-    public init(iconName: String, title: String, description: String, buttonName: String) {
+    public init(iconName: String, title: String, description: String, buttonName: String? = nil, buttonAction: (() -> Void)? = nil) {
         self.iconName = iconName
         self.title = title
         self.description = description
         self.buttonName = buttonName
+        self.buttonAction = buttonAction
     }
 
     public var body: some View {
@@ -178,8 +183,8 @@ public struct SectionView: View {
                             .foregroundColor(Color("TextSecondary", bundle: .module))
                     }
 
-                    if !buttonName.isEmpty {
-                        Button(buttonName) { }
+                    if let name = buttonName, !name.isEmpty, let action = buttonAction {
+                        Button(name) { action() }
                     }
                 }
             }

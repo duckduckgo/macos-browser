@@ -26,10 +26,12 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     var sheetModel: SubscriptionAccessModel
 
     private let accountManager: AccountManager
+    private var actionHandler: PreferencesSubscriptionActionHandlers
     private let sheetActionHandler: SubscriptionAccessActionHandlers
 
-    public init(accountManager: AccountManager = AccountManager(), sheetActionHandler: SubscriptionAccessActionHandlers) {
+    public init(accountManager: AccountManager = AccountManager(), actionHandler: PreferencesSubscriptionActionHandlers, sheetActionHandler: SubscriptionAccessActionHandlers) {
         self.accountManager = accountManager
+        self.actionHandler = actionHandler
         self.sheetActionHandler = sheetActionHandler
 
         let isSignedIn = accountManager.isSignedIn
@@ -51,18 +53,13 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    private func openURL(_ url: URL) {
-//        WindowControllersManager.shared.show(url: url, newTab: true)
-    }
-
-    @MainActor
     func learnMoreAction() {
-//        openURL(.aboutDuckDuckGo)
+        actionHandler.openURL(URL(string: "https://duckduckgo.com/about")!)
     }
 
     @MainActor
     func changePlanOrBillingAction() {
-//        NSWorkspace.shared.open(URL(string: "macappstores://apps.apple.com/account/subscriptions")!)
+        actionHandler.manageSubscriptionInAppStore()
     }
 
     @MainActor
@@ -71,8 +68,38 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    func openFAQ() {
-//        openURL(.aboutDuckDuckGo)
+    func openVPN() {
+        actionHandler.openVPN()
     }
 
+    @MainActor
+    func openPersonalInformationRemoval() {
+        actionHandler.openPersonalInformationRemoval()
+    }
+
+    @MainActor
+    func openIdentityTheftRestoration() {
+        actionHandler.openIdentityTheftRestoration()
+    }
+
+    @MainActor
+    func openFAQ() {
+        actionHandler.openURL(URL(string: "https://duckduckgo.com/about")!)
+    }
+}
+
+public final class PreferencesSubscriptionActionHandlers {
+    var openURL: (URL) -> Void
+    var manageSubscriptionInAppStore: () -> Void
+    var openVPN: () -> Void
+    var openPersonalInformationRemoval: () -> Void
+    var openIdentityTheftRestoration: () -> Void
+
+    public init(openURL: @escaping (URL) -> Void, manageSubscriptionInAppStore: @escaping () -> Void, openVPN: @escaping () -> Void, openPersonalInformationRemoval: @escaping () -> Void, openIdentityTheftRestoration: @escaping () -> Void) {
+        self.openURL = openURL
+        self.manageSubscriptionInAppStore = manageSubscriptionInAppStore
+        self.openVPN = openVPN
+        self.openPersonalInformationRemoval = openPersonalInformationRemoval
+        self.openIdentityTheftRestoration = openIdentityTheftRestoration
+    }
 }
