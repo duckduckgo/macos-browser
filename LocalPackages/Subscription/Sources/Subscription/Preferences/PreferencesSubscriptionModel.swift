@@ -19,7 +19,7 @@
 import Foundation
 import Account
 
-private extension URL {
+extension URL {
 
     static var purchaseSubscription: URL {
         URL(string: "https://duckduckgo.com/about")!
