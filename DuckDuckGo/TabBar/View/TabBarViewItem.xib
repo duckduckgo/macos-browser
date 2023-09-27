@@ -115,7 +115,7 @@
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
                 </customView>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="890-3t-v5O" customClass="MouseOverView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                <customView translatesAutoresizingMaskIntoConstraints="NO" id="890-3t-v5O" userLabel="Mouse Click View" customClass="MouseOverView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                     <rect key="frame" x="0.0" y="0.0" width="300" height="33"/>
                     <connections>
                         <outlet property="delegate" destination="4MN-w4-aCk" id="Fnb-31-k2v"/>
