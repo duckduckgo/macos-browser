@@ -57,9 +57,9 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                 HStack {
                     IconOnBackground(image: NSImage(imageLiteralResourceName: "SyncAllDevices"))
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Share Favorites")
+                        Text(UserText.shareFavoritesOptionTitle)
                             .font(Const.Fonts.preferencePaneOptionTitle)
-                        Text("Use the same favorites on all devices. Leave off to keep mobile and desktop favorites separate.")
+                        Text(UserText.shareFavoritesOptionCaption)
                             .font(Const.Fonts.preferencePaneCaption)
                             .foregroundColor(Color("BlackWhite60"))
                     }

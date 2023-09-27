@@ -95,9 +95,9 @@ struct DeviceSyncedView: View {
                 VStack {
                     Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Sync Favorites")
+                            Text(UserText.shareFavoritesOptionTitle)
                                 .font(Const.Fonts.preferencePaneOptionTitle)
-                            Text("Automatically fetch icons for synced bookmarks on your other devices.")
+                            Text(UserText.shareFavoritesOptionCaption)
                                 .font(Const.Fonts.preferencePaneCaption)
                                 .foregroundColor(Color("BlackWhite60"))
                         }

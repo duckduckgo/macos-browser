@@ -25,12 +25,11 @@ struct ShowTextCodeView: View {
 
     var body: some View {
         SyncDialog(spacing: 20.0) {
-            Text("Text Code")
+            Text(UserText.showTextCodeTitle)
                 .font(.system(size: 17, weight: .bold))
             VStack(alignment: .center, spacing: 20) {
-                Text("Use this code after choosing \"Enter Text Code\" during sync setup on another device")
+                Text(UserText.showTextCodeCaption)
                     .multilineTextAlignment(.leading)
-                    .frame(width: 280)
                 SyncKeyView(text: model.codeToDisplay ?? "")
                     .frame(width: 213)
                 HStack(alignment: .center, spacing: 10) {
@@ -41,7 +40,7 @@ struct ShowTextCodeView: View {
                     } label: {
                         HStack {
                             Image("Share")
-                            Text("Share")
+                            Text(UserText.share)
                         }
                     }
                     .buttonStyle(CopyPasteButtonStyle())
@@ -62,13 +61,9 @@ struct ShowTextCodeView: View {
                     .buttonStyle(CopyPasteButtonStyle())
                 }
             }
-            .frame(width: 320)
             .padding(20)
-            .background(Color.black.opacity(0.01))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color("HomeFavoritesGhostColor"), style: StrokeStyle(lineWidth: 1.0))
-            )
+            .frame(height: 256)
+            .roundedBorder()
         } buttons: {
             Button("Done") {
                 model.endFlow()

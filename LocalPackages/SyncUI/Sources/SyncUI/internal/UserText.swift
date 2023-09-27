@@ -26,6 +26,7 @@ enum UserText {
     static let submit = NSLocalizedString("submit", value: "Submit", comment: "Submit button")
     static let next = NSLocalizedString("next", value: "Next", comment: "Next button")
     static let copy = NSLocalizedString("copy", value: "Copy", comment: "Copy button")
+    static let share = NSLocalizedString("share", value: "Share", comment: "Share button")
     static let pasteFromClipboard = NSLocalizedString("paste-from-clipboard", value: "Paste from Clipboard", comment: "Paste button")
 
     static let sync = NSLocalizedString("preferences.sync", value: "Sync and Back Up", comment: "Show sync preferences")
@@ -73,6 +74,9 @@ enum UserText {
     static let recoveryInstructions = NSLocalizedString("prefrences.sync.recovery-instructions", value: "If you lose your device, you will need this recovery code to restore your synced data.", comment: "Instructions on how to restore synced data")
     static let saveRecoveryPDF = NSLocalizedString("prefrences.sync.save-recovery-pdf", value: "Save Recovery PDF", comment: "Caption for a button to save Sync recovery PDF")
 
+    static let showTextCodeTitle = NSLocalizedString("prefrences.sync.show-text-code-dialog-title", value: "Text Code", comment: "Title for show text code dialog")
+    static let showTextCodeCaption = NSLocalizedString("prefrences.sync.show-text-code-dialog-caption", value: "Use this code after choosing \"Enter Text Code\" during sync setup on another device", comment: "Caption for show text code dialog")
+
     static let allSetDialogTitle = NSLocalizedString("prefrences.sync.all-set-dyalog-title", value: "All Set!", comment: "Title for all set dialog title")
     static let allSetDialogCaption1 = NSLocalizedString("prefrences.all-set-dyalog-caption-1", value: "You can sync this device’s bookmarks and Logins with additional devices at any time from the ", comment: "Caption for all set dialog 1")
     static let allSetDialogCaption2 = NSLocalizedString("prefrences.all-set-dyalog-caption-2", value: "Sync & Back Up ", comment: "Caption for all set dialog 2")
@@ -111,4 +115,6 @@ enum UserText {
     static let deleteAccountMessage = NSLocalizedString("prefrences.sync.delete-account.message", value: "These devices will be disconnected and your synced data will be deleted from the server.", comment: "Message for delete account")
     static let deleteAccountButton = NSLocalizedString("prefrences.sync.delete-account.button", value: "Delete Data", comment: "Label for delete account button")
 
+    static let shareFavoritesOptionTitle = NSLocalizedString("prefrences.sync.share-favorite-option-title", value: "Share Favorites", comment: "Title for share favorite option")
+    static let shareFavoritesOptionCaption = NSLocalizedString("prefrences.sync.share-favorite-option-caption", value: "Use the same favorites on all devices. Leave off to keep mobile and desktop favorites separate.", comment: "Caption for share favorite option")
 }
