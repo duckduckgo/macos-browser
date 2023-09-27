@@ -269,6 +269,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
     private func bookmarkFolderMenu(items: [NSMenuItem]) -> NSMenu {
         let menu = NSMenu()
         menu.items = items.isEmpty ? [NSMenuItem.empty] : items
+        menu.autoenablesItems = false
         return menu
     }
 
