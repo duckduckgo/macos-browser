@@ -22,6 +22,7 @@ public struct AuthService {
 
     public enum Error: Swift.Error {
         case decodingError
+        case encodingError
         case serverError(description: String)
         case unknownServerError
         case connectionError
@@ -96,12 +97,7 @@ public struct AuthService {
         let bodyDict = ["signature": signature,
                         "store": "apple_app_store"]
 
-//        let encoder = JSONEncoder()
-//        encoder.outputFormatting = .prettyPrinted
-//        let bodyData = try! encoder.encode(bodyDict)
-
-
-        let bodyData = try! JSONEncoder().encode(bodyDict)
+        guard let bodyData = try? JSONEncoder().encode(bodyDict) else { return .failure(.encodingError) }
         return await executeAPICall(method: "POST", endpoint: "store-login", body: bodyData)
     }
 
