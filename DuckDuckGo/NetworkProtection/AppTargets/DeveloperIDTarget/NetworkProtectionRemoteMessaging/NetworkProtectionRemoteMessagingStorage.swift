@@ -83,4 +83,9 @@ final class DefaultNetworkProtectionRemoteMessagingStorage: NetworkProtectionRem
         return messages ?? []
     }
 
+    func removeStoredAndDismissedMessages() {
+        userDefaults.removeObject(forKey: Constants.dismissedMessageIdentifiersKey)
+        try? FileManager.default.removeItem(at: messagesURL)
+    }
+
 }

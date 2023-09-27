@@ -887,6 +887,12 @@ CQ
                                                             <action selector="removeSystemExtensionAndAgents:" target="Rah-lS-gno" id="1Yo-Qj-wxo"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Reset Remote Messages" id="i82-vX-K8b">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetNetworkProtectionRemoteMessages:" target="Ady-hI-5gd" id="e8y-2X-VAc"/>
+                                                        </connections>
+                                                    </menuItem>
                                                     <menuItem isSeparatorItem="YES" id="FSc-gX-vGh"/>
                                                     <menuItem title="Connect on Log In" id="fSA-hH-Vum" userLabel="Connect On Log In">
                                                         <modifierMask key="keyEquivalentModifierMask"/>

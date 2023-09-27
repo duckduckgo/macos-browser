@@ -784,6 +784,12 @@ extension MainViewController {
         overrideNetworkProtectionActivationDate(to: nil)
     }
 
+    @IBAction func resetNetworkProtectionRemoteMessages(_ sender: Any?) {
+        DefaultNetworkProtectionRemoteMessagingStorage().removeStoredAndDismissedMessages()
+        let operationName = DefaultNetworkProtectionRemoteMessaging.Constants.remoteMessagingRateLimitedOperationKey
+        UserDefaultsRateLimitedOperation(debug: 0, release: 0).resetTimestamp(forOperationName: operationName)
+    }
+
     @IBAction func overrideNetworkProtectionActivationDateToNow(_ sender: Any?) {
         overrideNetworkProtectionActivationDate(to: Date())
     }

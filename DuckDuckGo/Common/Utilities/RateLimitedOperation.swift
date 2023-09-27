@@ -88,4 +88,9 @@ final class UserDefaultsRateLimitedOperation: RateLimitedOperation {
         return "\(Constants.userDefaultsPreviewKey).\(operationName)"
     }
 
+    func resetTimestamp(forOperationName name: String) {
+        let key = userDefaultsKey(operationName: name)
+        userDefaults.removeObject(forKey: key)
+    }
+
 }

@@ -63,6 +63,9 @@ final class NetworkProtectionDebugUtilities {
         networkProtectionFeatureDisabler.disable(keepAuthToken: keepAuthToken, uninstallSystemExtension: true)
 
         NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
+        DefaultWaitlistActivationDateStore().removeActivationDate()
+        DefaultNetworkProtectionRemoteMessagingStorage().removeStoredAndDismissedMessages()
+
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
     }
