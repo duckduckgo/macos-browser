@@ -204,10 +204,6 @@ final class AddressBarButtonsViewController: NSViewController {
         setupButtons()
     }
 
-    override func viewDidAppear() {
-        super.viewDidAppear()
-    }
-
     func showBadgeNotification(_ type: NavigationBarBadgeAnimationView.AnimationType) {
         if !isAnyShieldAnimationPlaying {
             buttonsBadgeAnimator.showNotification(withType: type,
