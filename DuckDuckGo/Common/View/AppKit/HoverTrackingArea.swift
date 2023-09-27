@@ -30,7 +30,7 @@ final class HoverTrackingArea: NSTrackingArea {
         view.addTrackingArea(trackingArea)
 
         view.isMouseOver = view.isMouseLocationInsideBounds()
-        trackingArea.updateLayer()
+        trackingArea.updateLayer(animated: false)
     }
 
     // mouseEntered and mouseExited events will be received by the HoverTrackingArea itself
@@ -40,6 +40,20 @@ final class HoverTrackingArea: NSTrackingArea {
 
     private weak var view: Hoverable? {
         super.owner as? Hoverable
+    }
+
+    private var currentBackgroundColor: NSColor? {
+        guard let view else { return nil }
+
+        if (view as? NSControl)?.isEnabled == false {
+            return nil
+        } else if view.isMouseDown {
+            return view.mouseDownColor ?? view.mouseOverColor ?? view.backgroundColor
+        } else if view.isMouseOver {
+            return view.mouseOverColor ?? view.backgroundColor
+        } else {
+            return view.backgroundColor
+        }
     }
 
     private var observers: [NSKeyValueObservation]?
@@ -53,9 +67,9 @@ final class HoverTrackingArea: NSTrackingArea {
             owner.observe(\.mouseDownColor) { [weak self] _, _ in self?.updateLayer() },
             owner.observe(\.cornerRadius) { [weak self] _, _ in self?.updateLayer() },
             owner.observe(\.backgroundInset) { [weak self] _, _ in self?.updateLayer() },
-            (owner as? NSControl)?.observe(\.isEnabled) { [weak self] _, _ in self?.updateLayer() },
+            (owner as? NSControl)?.observe(\.isEnabled) { [weak self] _, _ in self?.updateLayer(animated: false) },
             owner.observe(\.isMouseDown) { [weak self] _, _ in self?.mouseDownDidChange() },
-            owner.observe(\.frame) { [weak self] _, _ in self?.viewFrameDidChange() },
+            owner.observe(\.window) { [weak self] _, _ in self?.viewWindowDidChange() },
         ].compactMap { $0 }
     }
 
@@ -67,32 +81,20 @@ final class HoverTrackingArea: NSTrackingArea {
         view?.backgroundLayer(createIfNeeded: createIfNeeded)
     }
 
-    func updateLayer() {
-        guard let view else { return }
-
-        let color: NSColor?
-        if (view as? NSControl)?.isEnabled == false {
-            color = .clear
-        } else if view.isMouseDown {
-            color = view.mouseDownColor ?? view.mouseOverColor ?? view.backgroundColor
-        } else if view.isMouseOver {
-            color = view.mouseOverColor ?? view.backgroundColor
-        } else {
-            color = view.backgroundColor
-        }
-
-        guard let color, color != .clear else {
-            layer(createIfNeeded: false)?.backgroundColor = .clear
-            return
-        }
-        guard let layer = layer(createIfNeeded: true) else { return }
+    func updateLayer(animated: Bool = true) {
+        let color = currentBackgroundColor ?? .clear
+        guard let view, let layer = layer(createIfNeeded: color != .clear) else { return }
 
         layer.cornerRadius = view.cornerRadius
         layer.frame = view.bounds.insetBy(dx: view.backgroundInset.x, dy: view.backgroundInset.y)
 
         NSAppearance.withAppAppearance {
             NSAnimationContext.runAnimationGroup { context in
-                if view.isMouseDown || view.isMouseOver {
+                context.allowsImplicitAnimation = true
+                // mousedown/over state should be applied instantly
+                // animation should be also disabled on view reuse
+                if !animated || view.isMouseDown || view.isMouseOver {
+                    layer.removeAllAnimations()
                     context.duration = 0.0
                 }
 
@@ -103,13 +105,13 @@ final class HoverTrackingArea: NSTrackingArea {
 
     @objc func mouseEntered(_ event: NSEvent) {
         view?.isMouseOver = true
-        updateLayer()
+        updateLayer(animated: false)
         view?.mouseEntered(with: event)
     }
 
     @objc func mouseExited(_ event: NSEvent) {
         view?.isMouseOver = false
-        updateLayer()
+        updateLayer(animated: true)
         view?.mouseExited(with: event)
     }
 
@@ -122,14 +124,14 @@ final class HoverTrackingArea: NSTrackingArea {
 
             mouseExited(event)
         } else {
-            updateLayer()
+            updateLayer(animated: false)
         }
     }
 
-    private func viewFrameDidChange() {
+    private func viewWindowDidChange() {
         guard let view else { return }
         view.isMouseOver = view.isMouseLocationInsideBounds()
-        updateLayer()
+        updateLayer(animated: false)
     }
 
 }
