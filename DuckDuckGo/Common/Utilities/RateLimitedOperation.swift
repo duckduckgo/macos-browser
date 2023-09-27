@@ -24,6 +24,10 @@ protocol RateLimitedOperation {
     func performRateLimitedOperation(operationName: String, operation: (@escaping RateLimitedOperationCompletion) -> Void)
 }
 
+/// This class defines a way to run a block of code no more frequently than the interval you specify. For example, you may want to have a function that fetches some remote resource occur no more
+/// frequently than every 8 hours.
+///
+/// - Note: This class does not yet support a way to indicate whether the operation succeeded. A future enhancement would be to add this, so that the operation can try again in the case of failure.
 final class UserDefaultsRateLimitedOperation: RateLimitedOperation {
 
     enum Constants {
