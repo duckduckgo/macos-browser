@@ -325,6 +325,7 @@ final class MoreOptionsMenu: NSMenu {
 
     }
 
+#if NETWORK_PROTECTION
     private func makeNetworkProtectionItem() -> NSMenuItem {
         let networkProtectionItem = NSMenuItem(title: "", action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
             .targetting(self)
@@ -343,6 +344,7 @@ final class MoreOptionsMenu: NSMenu {
 
         return networkProtectionItem
     }
+#endif
 
 }
 
