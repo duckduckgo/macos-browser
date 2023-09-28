@@ -57,32 +57,32 @@ public struct SubscriptionAccessRow: View {
             }
             .padding([.top, .bottom], 8)
             .drawingGroup()
-            
+
             if isExpanded {
                 VStack(alignment: .leading, spacing: 4) {
-                    
+
                     if let header = descriptionHeader, !header.isEmpty {
                         Text(header)
                             .bold()
                             .foregroundColor(Color("TextPrimary", bundle: .module))
                     }
-                    
+
                     Text(description)
                         .font(.system(size: 13, weight: .regular, design: .default))
                         .foregroundColor(Color("TextSecondary", bundle: .module))
                         .fixMultilineScrollableText()
-                    
+
                     if let title = buttonTitle, let action = buttonAction {
                         Spacer()
                             .frame(height: 8)
                         Button(title) { action() }
                             .buttonStyle(DefaultActionButtonStyle(enabled: true))
                     }
-                    
+
                     Spacer()
                         .frame(height: 4)
                 }
-                
+
                 .transition(.opacity)
             }
         }

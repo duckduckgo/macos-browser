@@ -167,7 +167,7 @@ public struct SectionView: View {
                 HStack(alignment: .center, spacing: 8) {
                     Image(iconName, bundle: .module)
                         .padding(4)
-                        .background(Color.black.opacity(0.06))
+                        .background(Color("BadgeBackground", bundle: .module))
                         .cornerRadius(4)
 
                     VStack (alignment: .leading) {
