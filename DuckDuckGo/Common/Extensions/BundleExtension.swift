@@ -37,7 +37,7 @@ extension Bundle {
 
 #if DBP
         static let dbpBackgroundAgentBundleId = "DBP_BACKGROUND_AGENT_BUNDLE_ID"
-        static let dbpBackgroundAgentProductName = "DBP_BACKGROUN_AGENT_PRODUCT_NAME"
+        static let dbpBackgroundAgentProductName = "DBP_BACKGROUND_AGENT_PRODUCT_NAME"
 #endif
     }
 
