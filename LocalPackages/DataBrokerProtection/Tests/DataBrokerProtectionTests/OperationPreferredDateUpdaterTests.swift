@@ -1,5 +1,5 @@
 //
-//  UpdateChildSitesScanPreferredRunDateUseCaseTests.swift
+//  OperationPreferredDateUpdaterTests.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import XCTest
 @testable import DataBrokerProtection
 
-final class UpdateChildSitesScanPreferredRunDateUseCaseTests: XCTestCase {
+final class OperationPreferredDateUpdaterTests: XCTestCase {
 
     private let databaseMock = MockDatabase()
 
@@ -28,7 +28,7 @@ final class UpdateChildSitesScanPreferredRunDateUseCaseTests: XCTestCase {
     }
 
     func testWhenParentBrokerHasChildSites_thenThoseSitesScanPreferredRunDateIsUpdatedWithConfirm() {
-        let sut = UpdateChildSitesScanPreferredRunDateUseCase(database: databaseMock)
+        let sut = OperationPreferredDateUpdaterUseCase(database: databaseMock)
         let confirmOptOutScanHours = 48
         let profileQueryId: Int64 = 11
         let expectedDate = Date().addingTimeInterval(confirmOptOutScanHours.hoursToSeconds)
@@ -45,7 +45,7 @@ final class UpdateChildSitesScanPreferredRunDateUseCaseTests: XCTestCase {
         )
         databaseMock.childBrokers = [childBroker]
 
-        sut.run(parentBroker: .mock, profileQueryId: profileQueryId)
+        sut.updateChildrenBrokerForParentBroker(.mock, profileQueryId: profileQueryId)
 
         XCTAssertTrue(databaseMock.wasUpdatedPreferredRunDateForScanCalled)
         XCTAssertEqual(databaseMock.lastParentBrokerWhereChildSitesWhereFetched, "Test broker")
@@ -54,9 +54,9 @@ final class UpdateChildSitesScanPreferredRunDateUseCaseTests: XCTestCase {
     }
 
     func testWhenParentBrokerHasNoChildsites_thenNoCallsToTheDatabaseAreDone() {
-        let sut = UpdateChildSitesScanPreferredRunDateUseCase(database: databaseMock)
+        let sut = OperationPreferredDateUpdaterUseCase(database: databaseMock)
 
-        sut.run(parentBroker: .mock, profileQueryId: 1)
+        sut.updateChildrenBrokerForParentBroker(.mock, profileQueryId: 1)
 
         XCTAssertFalse(databaseMock.wasDatabaseCalled)
     }

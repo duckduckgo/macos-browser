@@ -271,8 +271,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                     showWebView: showWebView,
                                     shouldRunNextStep: shouldRunNextStep)
 
-            let updater = UpdateChildSitesScanPreferredRunDateUseCase(database: database)
-            updater.run(parentBroker: brokerProfileQueryData.dataBroker, profileQueryId: profileQueryId)
+            let updater = OperationPreferredDateUpdaterUseCase(database: database)
+            updater.updateChildrenBrokerForParentBroker(brokerProfileQueryData.dataBroker,
+                                                        profileQueryId: profileQueryId)
 
             database.addAttempt(extractedProfileId: extractedProfileId,
                                 attemptUUID: stageDurationCalculator.attemptId,

@@ -26,6 +26,8 @@ protocol OperationPreferredDateUpdater {
                                   profileQueryId: Int64,
                                   extractedProfileId: Int64?,
                                   schedulingConfig: DataBrokerScheduleConfig) throws
+
+    func updateChildrenBrokerForParentBroker(_ parentBroker: DataBroker, profileQueryId: Int64)
 }
 
 struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
@@ -70,6 +72,21 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
                                        brokerId: brokerId,
                                        profileQueryId: profileQueryId,
                                        extractedProfileId: extractedProfileId)
+            }
+        }
+    }
+
+    /// 1, This method fetches scan operations with the profileQueryId and with child sites of parentBrokerId
+    /// 2. Then for each one it updates the preferredRunDate of the scan to its confirm scan
+    func updateChildrenBrokerForParentBroker(_ parentBroker: DataBroker, profileQueryId: Int64) {
+        let childBrokers = database.fetchChildBrokers(for: parentBroker.name)
+
+        childBrokers.forEach { childBroker in
+            if let childBrokerId = childBroker.id {
+                let confirmOptOutScanDate = Date().addingTimeInterval(childBroker.schedulingConfig.confirmOptOutScan.hoursToSeconds)
+                database.updatePreferredRunDate(confirmOptOutScanDate,
+                                                brokerId: childBrokerId,
+                                                profileQueryId: profileQueryId)
             }
         }
     }
