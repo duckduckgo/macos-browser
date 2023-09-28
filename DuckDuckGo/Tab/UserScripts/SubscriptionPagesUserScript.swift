@@ -48,7 +48,6 @@ public final class SubscriptionPagesUserScript: NSObject, UserScript, UserScript
     public let requiresRunInPageContentWorld = true
 }
 
-@available(macOS 11.0, iOS 14.0, *)
 extension SubscriptionPagesUserScript: WKScriptMessageHandlerWithReply {
     @MainActor
     public func userContentController(_ userContentController: WKUserContentController,

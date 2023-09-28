@@ -82,7 +82,6 @@ public struct SubscriptionAccessRow: View {
                     Spacer()
                         .frame(height: 4)
                 }
-
                 .transition(.opacity)
             }
         }
