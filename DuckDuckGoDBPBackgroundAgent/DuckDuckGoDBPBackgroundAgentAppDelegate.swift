@@ -21,19 +21,18 @@ import Combine
 import Common
 import ServiceManagement
 import DataBrokerProtection
+import BrowserServicesKit
 
 @objc(Application)
 final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
     private let _delegate = DuckDuckGoDBPBackgroundAgentAppDelegate()
 
     override init() {
-        // TODO logging
-        os_log("yaaaaaaaaaaaaay")
-        //os_log(.error, log: .networkProtection, "🟢 Status Bar Agent starting: %{public}d", NSRunningApplication.current.processIdentifier)
+        os_log(.error, log: .dbpBackgroundAgent, "🟢 DBP background Agent starting: %{public}d", NSRunningApplication.current.processIdentifier)
 
         // prevent agent from running twice
         if let anotherInstance = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!).first(where: { $0 != .current }) {
-            //os_log(.error, log: .networkProtection, "🔴 Stopping: another instance is running: %{public}d.", anotherInstance.processIdentifier)
+            os_log(.error, log: .dbpBackgroundAgent, "🔴 Stopping: another instance is running: %{public}d.", anotherInstance.processIdentifier)
             exit(0)
         }
 
@@ -49,11 +48,69 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
 @main
 final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDelegate {
 
+    let ipcConnection = DBPIPCConnection(log: .dbpBackgroundAgent, memoryManagementLog: .dbpBackgroundAgentMemoryManagement)
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // TODO logging
-        //os_log("DuckDuckGoAgent started", log: .networkProtectionLoginItemLog, type: .info)
+        os_log("DuckDuckGoAgent started", log: .dbpBackgroundAgent, type: .info)
+        ipcConnection.startListener()
 
         let manager = DataBrokerProtectionBackgroundManager.shared
         manager.runOperationsAndStartSchedulerIfPossible()
+        //TODO not this?
     }
 }
+
+extension DBPIPCConnection: MainAppToDBPBackgroundAgentCommunication {
+    public func register(_ completionHandler: @escaping (Bool) -> Void) {
+        os_log("App registered", log: .dbpBackgroundAgent, type: .debug)
+        completionHandler(true)
+    }
+
+    public func appDidStart() {
+        /*
+         TODO
+         Then running "RunQueuedOperations", and on the completion handler for that,
+         Starting the scheduler
+         */
+    }
+
+    public func profileModified() {
+        // TODO stop the scheduler
+    }
+
+    public func startScanPressed() {
+        /*
+         TODO
+         Initialising the agent (if it isn't already)
+         scheduler.stopScheduler(), and then
+         scheduler.scanAllBrokers
+         */
+    }
+
+    // MARK: Debug features
+
+    public func startScheduler(showWebView: Bool) {
+
+    }
+
+    public func stopScheduler() {
+
+    }
+
+    public func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+        
+    }
+
+    public func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+
+    }
+
+    public func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {
+
+    }
+
+    public func runAllOperations(showWebView: Bool) {
+
+    }
+}
+

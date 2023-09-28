@@ -72,11 +72,16 @@ public final class DataBrokerProtectionManager {
     public func runOperationsAndStartSchedulerIfPossible() {
         guard !redeemUseCase.shouldAskForInviteCode() else { return }
 
+        /*
+         // TODO make the background agent do it, for now, do nothing
         // If there's no saved profile we don't need to start the scheduler
         if dataManager.fetchProfile() != nil {
             scheduler.runQueuedOperations(showWebView: false) { [weak self] in
                 self?.scheduler.startScheduler()
             }
+
+            //scheduler.scanAllBrokers()
         }
+         */
     }
 }
