@@ -69,6 +69,7 @@ jobs:
 
     outputs:
       private-api-check-report: ${{ steps.private-api.outputs.report }}
+      commit_author: ${{ steps.fetch_commit_author.outputs.commit_author }}
 
     steps:
     - name: Register SSH keys for submodules access
@@ -102,7 +103,7 @@ jobs:
           ${{ runner.os }}-spm-${{ matrix.cache-key }}
 
     - name: Select Xcode
-      run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer || (find /Applications -type d -name 'Xcode*.app' -maxdepth 1 && false)
+      run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
     - name: Install xcbeautify
       continue-on-error: true
@@ -119,8 +120,7 @@ jobs:
           ENABLE_TESTABILITY=true \
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
           | tee ${{ matrix.flavor }}-xcodebuild.log \
-          | xcbeautify --report junit --report-path . --junit-report-filename ${{ matrix.flavor }}.xml \
-          || { mv "$(grep -m 1 '.*\.xcresult' ${{ matrix.flavor }}-xcodebuild.log | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')" ./${{ matrix.flavor }}.xcresult && exit 1; }
+          | xcbeautify --report junit --report-path . --junit-report-filename ${{ matrix.flavor }}.xml
 
     - name: Check private API usage
       id: private-api
@@ -174,14 +174,16 @@ jobs:
       with:
         name: ${{ matrix.flavor }}-xcodebuild.log
         path: ${{ matrix.flavor }}-xcodebuild.log
-        retention-days: 7
-    - name: Upload failed xcresult
-      uses: actions/upload-artifact@v3
-      if: failure()
-      with:
-        name: ${{ matrix.flavor }}.xcresult
-        path: ${{ matrix.flavor }}.xcresult
-        retention-days: 7
+
+    - name: Fetch latest commit author
+      if: always() && github.ref_name == 'develop'
+      id: fetch_commit_author
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        head_commit=$(git rev-parse HEAD)
+        author=$(gh api https://api.github.com/repos/${{ github.repository }}/commits/${head_commit} --jq .author.login)
+        echo "commit_author=${author}" >> $GITHUB_OUTPUT
 
   private-api:
     name: Private API Report
@@ -248,7 +250,7 @@ jobs:
           ${{ runner.os }}-spm-test-release-${{ matrix.cache-key }}
 
     - name: Select Xcode
-      run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer || (find /Applications -type d -name 'Xcode*.app' -maxdepth 1 && false)
+      run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
     - name: Install xcbeautify
       continue-on-error: true
@@ -270,7 +272,6 @@ jobs:
       with:
         name: release-xcodebuild.log
         path: release-xcodebuild.log
-        retention-days: 7
 
   verify-autoconsent-bundle:
     name: 'Verify autoconsent bundle'
@@ -291,24 +292,35 @@ jobs:
           git update-index --refresh 
           git diff-index --quiet HEAD --
 
-  asana:
+  create-asana-task:
     name: Create Asana Task
     needs: [swiftlint, tests, release-build, verify-autoconsent-bundle, private-api]
 
-    if: failure() && github.ref_name == 'develop'
-    
-    env:
-      WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-    
+    if: failure() && github.ref_name == 'develop' && github.run_attempt == 1
+
     runs-on: ubuntu-latest
 
     steps:
       - name: Create Asana Task
-        uses: malmstein/github-asana-action@master
+        uses: duckduckgo/BrowserServicesKit/.github/actions/asana-failed-pr-checks@main
         with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.APPLE_CI_FAILING_TESTS_PROJECT_ID }}
-          asana-section: ${{ vars.APPLE_CI_FAILING_TESTS_MACOS_POST_MERGE_SECTION_ID }}
-          asana-task-name: 'PR Check is failing on develop'
-          action: create-asana-task
-          asana-task-description: PR Checks conducted after merging have failed. See ${{ env.WORKFLOW_URL }}. Follow the steps on https://app.asana.com/0/1202500774821704/1205317064731691 to resolve this issue.
+          action: create-task
+          asana-access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-section-id: ${{ vars.APPLE_CI_FAILING_TESTS_MACOS_POST_MERGE_SECTION_ID }}
+          commit-author: ${{ needs.tests.outputs.commit_author }}
+
+  close-asana-task:
+    name: Close Asana Task
+    needs: [swiftlint, tests, release-build, verify-autoconsent-bundle, private-api]
+
+    if: success() && github.ref_name == 'develop' && github.run_attempt > 1
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Close Asana Task
+        uses: duckduckgo/BrowserServicesKit/.github/actions/asana-failed-pr-checks@main
+        with:
+          action: close-task
+          asana-access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-section-id: ${{ vars.APPLE_CI_FAILING_TESTS_MACOS_POST_MERGE_SECTION_ID }}
