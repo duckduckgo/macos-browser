@@ -134,6 +134,7 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
+        sendActiveNetworkProtectionWaitlistUserPixel()
     }
 
     func windowDidResignKey() {
@@ -411,6 +412,12 @@ final class MainViewController: NSViewController {
         }
 
         stopMenuItem.isEnabled = selectedTabViewModel.isLoading
+    }
+
+    private func sendActiveNetworkProtectionWaitlistUserPixel() {
+        if DefaultNetworkProtectionVisibility().waitlistIsOngoing {
+            DailyPixel.fire(pixel: .networkProtectionWaitlistUserActive, frequency: .dailyOnly, includeAppVersionParameter: true)
+        }
     }
 
     // MARK: - First responder
