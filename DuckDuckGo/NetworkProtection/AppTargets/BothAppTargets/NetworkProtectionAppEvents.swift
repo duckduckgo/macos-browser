@@ -38,7 +38,7 @@ final class NetworkProtectionAppEvents {
         migrateNetworkProtectionAuthTokenToSharedKeychainIfNecessary()
 
         let loginItemsManager = LoginItemsManager()
-        let keychainStore = NetworkProtectionKeychainTokenStore()
+        _ = NetworkProtectionKeychainTokenStore()
 
         guard featureVisibility.isNetworkProtectionVisible() else {
             featureVisibility.disableForAllUsers()
