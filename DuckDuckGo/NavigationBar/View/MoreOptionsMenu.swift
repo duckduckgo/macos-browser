@@ -329,18 +329,18 @@ final class MoreOptionsMenu: NSMenu {
         let networkProtectionItem = NSMenuItem(title: "", action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
             .targetting(self)
             .withImage(.image(for: .vpnIcon))
-        
+
         let attributedText = NSMutableAttributedString(string: UserText.networkProtection)
         attributedText.append (NSAttributedString(string: "  "))
-        
+
         let imageAttachment = NSTextAttachment()
-        imageAttachment.image = NSImage(named: "BetaLabel")
+        imageAttachment.image = NSImage(named: "NewLabel")
         imageAttachment.setImageHeight(height: 16, offset: .init(x: 0, y: -4))
-        
+
         attributedText.append(NSAttributedString(attachment: imageAttachment))
-        
+
         networkProtectionItem.attributedTitle = attributedText
-        
+
         return networkProtectionItem
     }
 
