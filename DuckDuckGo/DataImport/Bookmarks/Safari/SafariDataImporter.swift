@@ -64,6 +64,7 @@ final class SafariDataImporter: DataImporter {
         completion(result)
     }
 
+    @MainActor
     private func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) -> DataImportResult<DataImport.Summary> {
         var summary = DataImport.Summary()
 
