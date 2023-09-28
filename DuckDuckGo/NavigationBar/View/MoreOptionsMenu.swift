@@ -332,7 +332,7 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(.image(for: .vpnIcon))
 
         let attributedText = NSMutableAttributedString(string: UserText.networkProtection)
-        attributedText.append (NSAttributedString(string: "  "))
+        attributedText.append(NSAttributedString(string: "  "))
 
         let imageAttachment = NSTextAttachment()
         imageAttachment.image = NSImage(named: "NewLabel")
