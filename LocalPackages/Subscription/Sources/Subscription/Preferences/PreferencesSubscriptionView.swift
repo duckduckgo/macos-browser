@@ -18,10 +18,11 @@
 
 import SwiftUI
 import SwiftUIExtensions
-
+    
 public struct PreferencesSubscriptionView: View {
     @ObservedObject var model: PreferencesSubscriptionModel
     @State private var showingSheet = false
+    @State private var showingRemoveConfirmationDialog = false
 
     public init(model: PreferencesSubscriptionModel) {
         self.model = model
@@ -34,6 +35,30 @@ public struct PreferencesSubscriptionView: View {
             TextMenuTitle(text: "Privacy Pro")
                 .sheet(isPresented: $showingSheet) {
                     SubscriptionAccessView(model: model.sheetModel)
+                }
+                .sheet(isPresented: $showingRemoveConfirmationDialog) {
+                    Dialog(spacing: 20) {
+                        Image("Placeholder-96x64", bundle: .module)
+                        Text("Remove From This Device?")
+                            .font(.title2)
+                            .bold()
+                            .foregroundColor(Color("TextPrimary", bundle: .module))
+                        Text("You will no longer be able to access your Privacy Pro subscription on this device. This will not cancel your subscription, and it will remain active on your other devices.")
+                            .font(.body)
+                            .multilineTextAlignment(.center)
+                            .fixMultilineScrollableText()
+                            .foregroundColor(Color("TextPrimary", bundle: .module))
+                    } buttons: {
+                        Button("Cancel") { showingRemoveConfirmationDialog = false }
+                        Button(action: {
+                            showingRemoveConfirmationDialog = false
+                            model.removeFromThisDeviceAction()
+                        }, label: {
+                            Text("Remove Subscription")
+                                .foregroundColor(.red)
+                        })
+                    }
+                    .frame(width: 320)
                 }
 
             Spacer()
@@ -52,7 +77,9 @@ public struct PreferencesSubscriptionView: View {
 
                         Menu {
                             Button("Change Plan or Billing...", action: { model.changePlanOrBillingAction() })
-                            Button("Remove From This Device...", action: { model.removeFromThisDeviceAction() })
+                            Button("Remove From This Device...", action: {
+                                showingRemoveConfirmationDialog.toggle()
+                            })
                         } label: {
                             Text("Manage Subscription")
                         }
