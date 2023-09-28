@@ -55,7 +55,7 @@ public struct SubscriptionAccessView: View {
                                           name: item.title,
                                           descriptionHeader: model.descriptionHeader(for: item),
                                           description: model.description(for: item),
-                                          isExpanded: self.selection == item.id,
+                                          isExpanded: self.selection == item,
                                           buttonTitle: model.buttonTitle(for: item),
                                           buttonAction: {
                         dismiss {
@@ -64,7 +64,7 @@ public struct SubscriptionAccessView: View {
                     })
                         .contentShape(Rectangle())
                         .onTapGesture {
-                            self.selection = (selection == item) ? nil : item
+                            self.selection = item
                         }
                         .padding(.vertical, 10)
 
@@ -79,7 +79,6 @@ public struct SubscriptionAccessView: View {
             .animation(.easeOut(duration: 0.3))
 
             Spacer()
-                .frame(height: 110)
                 .frame(minHeight: 8)
 
             Divider()
