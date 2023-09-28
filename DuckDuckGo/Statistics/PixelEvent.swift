@@ -151,8 +151,10 @@ extension Pixel {
         case duckPlayerSettingBackToDefault
 
         // Network Protection Waitlist
+        case networkProtectionWaitlistUserActive
         case networkProtectionWaitlistEntryPointMenuItemDisplayed
         case networkProtectionWaitlistEntryPointToolbarButtonDisplayed
+        case networkProtectionWaitlistIntroDisplayed
         case networkProtectionWaitlistNotificationShown
         case networkProtectionWaitlistNotificationTapped
         case networkProtectionWaitlistTermsAndConditionsDisplayed
@@ -455,10 +457,14 @@ extension Pixel.Event {
         case .serpDay21to27:
             return "m.mac.search-day-21-27.initial"
 
+        case .networkProtectionWaitlistUserActive:
+            return "m_mac_netp_waitlist_user_active"
         case .networkProtectionWaitlistEntryPointMenuItemDisplayed:
             return "m_mac_netp_imp_settings_entry_menu_item"
         case .networkProtectionWaitlistEntryPointToolbarButtonDisplayed:
             return "m_mac_netp_imp_settings_entry_toolbar_button"
+        case .networkProtectionWaitlistIntroDisplayed:
+            return "m_mac_netp_imp_intro_screen"
         case .networkProtectionWaitlistNotificationShown:
             return "m_mac_netp_ev_waitlist_notification_shown"
         case .networkProtectionWaitlistNotificationTapped:
