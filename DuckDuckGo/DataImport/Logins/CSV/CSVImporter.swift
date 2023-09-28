@@ -77,6 +77,18 @@ final class CSVImporter: DataImporter {
 
     }
 
+    struct ImportError: DataImportError {
+        enum OperationType: Int {
+            case cannotReadFile
+            case cannotAccessSecureVault
+        }
+
+        var action: DataImportAction { .logins }
+        var source: DataImport.Source { .csv }
+        let type: OperationType
+        let underlyingError: Error?
+    }
+
     private let fileURL: URL
     private let loginImporter: LoginImporter?
     private let defaultColumnPositions: ColumnPositions?
@@ -126,13 +138,16 @@ final class CSVImporter: DataImporter {
     // This will change to return an array of DataImport.Summary objects, indicating the status of each import type that was requested.
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
-        guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else {
-            completion(.failure(.logins(.cannotReadFile)))
+                    completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
+        let fileContents: String
+        do {
+            fileContents = try String(contentsOf: fileURL, encoding: .utf8)
+        } catch {
+            completion(.failure(ImportError(type: .cannotReadFile, underlyingError: error)))
             return
         }
         guard let loginImporter = self.loginImporter else {
-            completion(.failure(.logins(.cannotAccessSecureVault)))
+            completion(.failure(ImportError(type: .cannotAccessSecureVault, underlyingError: nil)))
             return
         }
 
@@ -141,10 +156,13 @@ final class CSVImporter: DataImporter {
 
             do {
                 let result = try loginImporter.importLogins(loginCredentials)
-                DispatchQueue.main.async { completion(.success(.init(bookmarksResult: nil,
-                                                                     loginsResult: .completed(result)))) }
+                DispatchQueue.main.async {
+                    completion(.success(DataImport.Summary(bookmarksResult: nil, loginsResult: .completed(result))))
+                }
             } catch {
-                DispatchQueue.main.async { completion(.failure(.bookmarks(.cannotAccessSecureVault))) }
+                DispatchQueue.main.async {
+                    completion(.failure(LoginImporterError(source: .csv, error: error)))
+                }
             }
         }
     }
@@ -162,9 +180,7 @@ extension ImportedLoginCredential {
             return false
         }
 
-        if detector.numberOfMatches(in: self.url,
-                                    options: NSRegularExpression.MatchingOptions(rawValue: 0),
-                                    range: NSRange(location: 0, length: self.url.count)) > 0 {
+        if detector.numberOfMatches(in: self.url, options: [], range: self.url.fullRange) > 0 {
             return false
         }
 

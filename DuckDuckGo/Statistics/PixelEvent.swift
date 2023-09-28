@@ -92,8 +92,7 @@ extension Pixel {
         case serpInitial(cohort: String)
         case serpDay21to27(cohort: String)
 
-        case dataImportFailed(action: DataImportAction, source: DataImportSource)
-        case faviconImportFailed(source: DataImportSource)
+        case dataImportFailed(any DataImportError)
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
@@ -349,11 +348,10 @@ extension Pixel.Event {
         case .serp:
             return "m_mac_navigation_search"
 
-        case .dataImportFailed(action: let action, source: let source):
-            return "m_mac_data-import-failed_\(action)_\(source)"
-
-        case .faviconImportFailed(source: let source):
-            return "m_mac_favicon-import-failed_\(source)"
+        case .dataImportFailed(let error) where error.action == .favicons:
+            return "m_mac_favicon-import-failed_\(error.source)"
+        case .dataImportFailed(let error):
+            return "m_mac_data-import-failed_\(error.action)_\(error.source)"
 
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"

@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import SecureStorage
 
 final class FirefoxDataImporter: DataImporter {
 
@@ -36,13 +37,23 @@ final class FirefoxDataImporter: DataImporter {
         return [.logins, .bookmarks]
     }
 
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
-        guard let firefoxProfileURL = profile?.profileURL ?? Self.defaultFirefoxProfilePath() else {
-            completion(.failure(.generic(.cannotReadFile)))
-            return
+                    completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
+        let result = importData(types: types, from: profile)
+        completion(result)
+    }
+
+    private func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) -> DataImportResult<DataImport.Summary> {
+        let firefoxProfileURL: URL
+        do {
+            firefoxProfileURL = try profile?.profileURL ?? Self.defaultFirefoxProfilePath() ?? {
+                throw LoginImporterError(source: .firefox, error: nil, type: .defaultFirefoxProfilePathNotFound)
+            }()
+        } catch let error as LoginImporterError {
+            return .failure(error)
+        } catch {
+            return .failure(LoginImporterError(source: .firefox, error: error, type: .defaultFirefoxProfilePathNotFound))
         }
 
         var summary = DataImport.Summary()
@@ -54,23 +65,13 @@ final class FirefoxDataImporter: DataImporter {
             switch loginResult {
             case .success(let logins):
                 do {
-                    summary.loginsResult = .completed(try loginImporter.importLogins(logins))
+                    let result = try loginImporter.importLogins(logins)
+                    summary.loginsResult = .completed(result)
                 } catch {
-                    completion(.failure(.logins(.cannotAccessSecureVault)))
+                    return .failure(LoginImporterError(source: .firefox, error: error))
                 }
             case .failure(let error):
-                switch error {
-                case .requiresPrimaryPassword: completion(.failure(.logins(.needsLoginPrimaryPassword)))
-                case .databaseAccessFailed: completion(.failure(.logins(DataImportError.ImportErrorType.databaseAccessFailed)))
-                case .couldNotFindProfile: completion(.failure(.logins(.couldNotFindProfile)))
-                case .couldNotGetDecryptionKey: completion(.failure(.logins(.couldNotGetDecryptionKey)))
-                case .couldNotFindLoginsFile: completion(.failure(.logins(.cannotFindFile)))
-                case .couldNotReadLoginsFile: completion(.failure(.logins(.cannotReadFile)))
-                case .decryptionFailed: completion(.failure(.logins(.cannotDecryptFile)))
-                case .failedToTemporarilyCopyFile: completion(.failure(.logins(.failedToTemporarilyCopyFile)))
-                }
-
-                return
+                return .failure(error)
             }
         }
 
@@ -82,32 +83,13 @@ final class FirefoxDataImporter: DataImporter {
 
             switch bookmarkResult {
             case .success(let bookmarks):
-                do {
-                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(.firefox))
-                } catch {
-                    guard let error = error as? FirefoxBookmarksReader.ImportError else {
-                        completion(.failure(.bookmarks(.unexpectedBookmarksDatabaseFormat)))
-                        return
-                    }
-
-                    completion(.failure(.bookmarks(error)))
-                    return
-                }
+                summary.bookmarksResult = bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(.firefox))
             case .failure(let error):
-                completion(.failure(.bookmarks(error)))
-                return
+                return .failure(error)
             }
         }
 
-        completion(.success(summary))
-    }
-
-    func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) async -> Result<DataImport.Summary, DataImportError> {
-        return await withCheckedContinuation { continuation in
-            importData(types: types, from: profile) { result in
-                continuation.resume(returning: result)
-            }
-        }
+        return .success(summary)
     }
 
     private func importFavicons(from firefoxProfileURL: URL) {
@@ -131,13 +113,13 @@ final class FirefoxDataImporter: DataImporter {
                 }
             }
 
-        case .failure:
-            Pixel.fire(.faviconImportFailed(source: .firefox))
+        case .failure(let error):
+            Pixel.fire(.dataImportFailed(error))
         }
     }
 
     static func loginDatabaseRequiresPrimaryPassword(profileURL: URL?) -> Bool {
-        guard let firefoxProfileURL = profileURL ?? defaultFirefoxProfilePath() else {
+        guard let firefoxProfileURL = try? profileURL ?? defaultFirefoxProfilePath() else {
             return false
         }
 
@@ -145,15 +127,16 @@ final class FirefoxDataImporter: DataImporter {
         let loginResult = loginReader.readLogins(dataFormat: nil)
 
         switch loginResult {
-        case .success: return false
-        case .failure(let failure): return failure == .requiresPrimaryPassword
+        case .failure(let failure as FirefoxLoginReader.ImportError):
+            return failure.type == .requiresPrimaryPassword
+        default:
+            return false
         }
     }
 
-    static func defaultFirefoxProfilePath() -> URL? {
-        guard let potentialProfiles = try? FileManager.default.contentsOfDirectory(atPath: profilesDirectoryURL().path) else {
-            return nil
-        }
+    private static func defaultFirefoxProfilePath() throws -> URL? {
+        let profilesDirectory = URL.nonSandboxApplicationSupportDirectoryURL.appendingPathComponent("Firefox/Profiles")
+        let potentialProfiles = try FileManager.default.contentsOfDirectory(atPath: profilesDirectory.path)
 
         // This is the value used by Firefox in production releases. Use it by default, if no profile is selected.
         let profiles = potentialProfiles.filter { $0.hasSuffix(".default-release") }
@@ -162,12 +145,7 @@ final class FirefoxDataImporter: DataImporter {
             return nil
         }
 
-        return profilesDirectoryURL().appendingPathComponent(selectedProfile)
-    }
-
-    static func profilesDirectoryURL() -> URL {
-        let applicationSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        return applicationSupportURL.appendingPathComponent("Firefox/Profiles")
+        return profilesDirectory.appendingPathComponent(selectedProfile)
     }
 
 }
