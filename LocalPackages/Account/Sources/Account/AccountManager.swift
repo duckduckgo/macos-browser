@@ -56,6 +56,20 @@ public class AccountManager {
         }
     }
 
+    public var shortLivedToken: String? {
+        do {
+            return try storage.getShortLivedToken()
+        } catch {
+            if let error = error as? AccountKeychainAccessError {
+                delegate?.accountManagerKeychainAccessFailed(accessType: .getShortLivedToken, error: error)
+            } else {
+                assertionFailure("Expected AccountKeychainAccessError")
+            }
+
+            return nil
+        }
+    }
+
     public var email: String? {
         do {
             return try storage.getEmail()
@@ -81,6 +95,18 @@ public class AccountManager {
             }
 
             return nil
+        }
+    }
+
+    public func storeShortLivedToken(token: String) {
+        do {
+            try storage.store(shortLivedToken: token)
+        } catch {
+            if let error = error as? AccountKeychainAccessError {
+                delegate?.accountManagerKeychainAccessFailed(accessType: .storeToken, error: error)
+            } else {
+                assertionFailure("Expected AccountKeychainAccessError")
+            }
         }
     }
 
@@ -151,6 +177,7 @@ public class AccountManager {
                     return
                 }
 
+                storeShortLivedToken(token: shortLivedToken)
                 exchangeTokenAndRefreshEntitlements(with: shortLivedToken)
             }
         }
@@ -171,6 +198,7 @@ public class AccountManager {
             // Fetch entitlements and account details and store the data
             switch await AuthService.validateToken(accessToken: longLivedToken) {
             case .success(let response):
+                self.storeShortLivedToken(token: shortLivedToken)
                 self.storeAccount(token: longLivedToken,
                                   email: response.account.email,
                                   externalID: response.account.externalID)
