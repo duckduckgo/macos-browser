@@ -26,8 +26,6 @@ public struct AuthService {
         case serverError(description: String)
         case unknownServerError
         case connectionError
-
-        var description: String { return String(reflecting: self) }
     }
 
     private static let baseURL = URL(string: "https://quackdev.duckduckgo.com/api/auth")!
