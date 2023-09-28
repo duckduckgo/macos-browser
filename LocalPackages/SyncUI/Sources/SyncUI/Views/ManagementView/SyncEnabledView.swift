@@ -50,7 +50,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         }
 
         PreferencePaneSection {
-            Text("Settings")
+            Text(UserText.optionsSectionTitle)
                 .font(Const.Fonts.preferencePaneSectionHeader)
                 .padding(.horizontal, 16)
             Toggle(isOn: $model.isUnifiedFavoritesEnabled) {

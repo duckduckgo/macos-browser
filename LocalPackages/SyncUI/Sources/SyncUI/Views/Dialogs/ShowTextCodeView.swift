@@ -34,6 +34,16 @@ struct ShowTextCodeView: View {
                     .frame(width: 213)
                 HStack(alignment: .center, spacing: 10) {
                     Button {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(model.codeToDisplay ?? "", forType: .string)
+                    } label: {
+                        HStack {
+                            Image("Copy")
+                            Text(UserText.copy)
+                        }
+                    }
+                    .buttonStyle(CopyPasteButtonStyle())
+                    Button {
                         if let code = model.codeToDisplay {
                             shareContent(code)
                         }
@@ -45,24 +55,13 @@ struct ShowTextCodeView: View {
                     }
                     .buttonStyle(CopyPasteButtonStyle())
                     .background(GeometryReader { geometry in
-                                    Color.clear.onAppear {
-                                        shareButtonFrame = geometry.frame(in: .global)
-                                    }
-                                })
-                    Button {
-                        NSPasteboard.general.clearContents()
-                        NSPasteboard.general.setString(model.codeToDisplay ?? "", forType: .string)
-                    } label: {
-                        HStack {
-                            Image("Copy")
-                            Text(UserText.copy)
+                        Color.clear.onAppear {
+                            shareButtonFrame = geometry.frame(in: .global)
                         }
-                    }
-                    .buttonStyle(CopyPasteButtonStyle())
+                    })
                 }
             }
             .padding(20)
-            .frame(height: 256)
             .roundedBorder()
         } buttons: {
             Button("Done") {
