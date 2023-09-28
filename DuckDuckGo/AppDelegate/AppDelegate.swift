@@ -238,6 +238,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         NetworkProtectionAppEvents().applicationDidBecomeActive()
 #endif
+
+
+
+
+        
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
