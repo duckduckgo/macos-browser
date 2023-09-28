@@ -90,26 +90,26 @@ internal class ChromiumDataImporter: DataImporter {
         return .success(summary)
     }
 
+    @MainActor(unsafe)
     func importFavicons(from dataDirectoryURL: URL) {
         let faviconsReader = ChromiumFaviconsReader(chromiumDataDirectoryURL: dataDirectoryURL, source: source)
         let faviconsResult = faviconsReader.readFavicons()
 
         switch faviconsResult {
         case .success(let faviconsByURL):
-            for (pageURLString, fetchedFavicons) in faviconsByURL {
-                if let pageURL = URL(string: pageURLString) {
-                    let favicons = fetchedFavicons.map {
-                        Favicon(identifier: UUID(),
-                                url: pageURL,
-                                image: $0.image,
-                                relation: .icon,
-                                documentUrl: pageURL,
-                                dateCreated: Date())
-                    }
-
-                    faviconManager.handleFavicons(favicons, documentUrl: pageURL)
+            let faviconsByDocument = faviconsByURL.reduce(into: [URL: [Favicon]]()) { result, pair in
+                guard let pageURL = URL(string: pair.key) else { return }
+                let favicons = pair.value.map {
+                    Favicon(identifier: UUID(),
+                            url: pageURL,
+                            image: $0.image,
+                            relation: .icon,
+                            documentUrl: pageURL,
+                            dateCreated: Date())
                 }
+                result[pageURL] = favicons
             }
+            faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
 
         case .failure(let error):
             Pixel.fire(.dataImportFailed(error))

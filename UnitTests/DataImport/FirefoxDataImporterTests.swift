@@ -20,6 +20,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 class FirefoxDataImporterTests: XCTestCase {
 
     func testWhenImportingWithoutAnyDataTypes_ThenSummaryIsEmpty() async {

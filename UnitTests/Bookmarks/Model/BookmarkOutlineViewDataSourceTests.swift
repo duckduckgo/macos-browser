@@ -19,6 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 class BookmarkOutlineViewDataSourceTests: XCTestCase {
 
     func testWhenOutlineViewExpandsItem_ThenTheObjectIDIsAddedToExpandedItems() {
