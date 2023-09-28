@@ -137,9 +137,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         os_log("Extracted profile already exists in database: %@", log: .dataBrokerProtection, id.description)
                     } else {
                         // If it's a new found profile, we'd like to opt-out ASAP
-                        // If the broker needs a parent opt out, we set the preferred date to nil, because we do not want to run it.
+                        // If this broker has a parent opt out, we set the preferred date to nil, as we will only perform the operation within the parent.
                         let broker = brokerProfileQueryData.dataBroker
-                        let preferredRunOperation: Date? = broker.needParentOptOut() ? nil : Date()
+                        let preferredRunOperation: Date? = broker.performsOptOutWithinParent() ? nil : Date()
 
                         // If profile does not exist we insert the new profile and we create the opt-out operation
                         //

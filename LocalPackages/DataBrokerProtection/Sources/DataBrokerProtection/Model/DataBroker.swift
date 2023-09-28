@@ -92,7 +92,7 @@ struct DataBroker: Codable, Sendable {
         return optOutStep
     }
 
-    func needParentOptOut() -> Bool {
+    func performsOptOutWithinParent() -> Bool {
         guard let optOutStep = optOutStep(), let optOutType = optOutStep.optOutType else { return false }
 
         return optOutType == .parentSiteOptOut

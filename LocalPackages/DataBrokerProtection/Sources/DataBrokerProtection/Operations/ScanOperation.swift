@@ -44,7 +44,7 @@ final class ScanOperation: DataBrokerOperation {
          query: BrokerProfileQueryData,
          emailService: EmailServiceProtocol = EmailService(),
          captchaService: CaptchaServiceProtocol = CaptchaService(),
-         operationAwaitTime: TimeInterval = 4,
+         operationAwaitTime: TimeInterval = 1,
          shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
