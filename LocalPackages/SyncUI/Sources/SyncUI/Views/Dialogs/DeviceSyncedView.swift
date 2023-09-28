@@ -91,7 +91,7 @@ struct DeviceSyncedView: View {
         @EnvironmentObject var model: ManagementDialogModel
         var body: some View {
             VStack(spacing: 8) {
-                Text("Sync Options")
+                Text(UserText.optionsSectionDialogTitle)
                 VStack {
                     Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
                         VStack(alignment: .leading, spacing: 8) {

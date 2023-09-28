@@ -30,6 +30,8 @@ struct ShowTextCodeView: View {
             VStack(alignment: .center, spacing: 20) {
                 Text(UserText.showTextCodeCaption)
                     .multilineTextAlignment(.leading)
+                    .frame(width: 280)
+                    .fixedSize()
                 SyncKeyView(text: model.codeToDisplay ?? "")
                     .frame(width: 213)
                 HStack(alignment: .center, spacing: 10) {
@@ -64,7 +66,7 @@ struct ShowTextCodeView: View {
             .padding(20)
             .roundedBorder()
         } buttons: {
-            Button("Done") {
+            Button(UserText.done) {
                 model.endFlow()
             }
         }

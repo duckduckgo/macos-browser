@@ -28,6 +28,7 @@ enum UserText {
     static let copy = NSLocalizedString("copy", value: "Copy", comment: "Copy button")
     static let share = NSLocalizedString("share", value: "Share", comment: "Share button")
     static let pasteFromClipboard = NSLocalizedString("paste-from-clipboard", value: "Paste from Clipboard", comment: "Paste button")
+    static let done = NSLocalizedString("done", value: "Done", comment: "Done button")
 
     static let sync = NSLocalizedString("preferences.sync", value: "Sync and Back Up", comment: "Show sync preferences")
     static let syncSetupExplanation = NSLocalizedString("preferences.sync.setup-explanation", value: "Securely sync and back up your bookmarks and Logins.", comment: "Sync setup explanation")
@@ -96,6 +97,7 @@ enum UserText {
     static let deleteAccountMessage = NSLocalizedString("prefrences.sync.delete-account.message", value: "These devices will be disconnected and your synced data will be deleted from the server.", comment: "Message for delete account")
     static let deleteAccountButton = NSLocalizedString("prefrences.sync.delete-account.button", value: "Delete Data", comment: "Label for delete account button")
 
+    static let optionsSectionDialogTitle = NSLocalizedString("prefrences.sync.options-section-dialog-title", value: "Sync Options", comment: "Title for options settings in dialog")
     static let optionsSectionTitle = NSLocalizedString("prefrences.sync.options-section-title", value: "Settings", comment: "Title for options settings")
     static let shareFavoritesOptionTitle = NSLocalizedString("prefrences.sync.share-favorite-option-title", value: "Share Favorites", comment: "Title for share favorite option")
     static let shareFavoritesOptionCaption = NSLocalizedString("prefrences.sync.share-favorite-option-caption", value: "Use the same favorites on all devices. Leave off to keep mobile and desktop favorites separate.", comment: "Caption for share favorite option")
