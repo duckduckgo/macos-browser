@@ -30,7 +30,7 @@ struct PinnedTabsView: View {
                     .frame(maxHeight: PinnedTabView.Const.dimension)
             }
         }
-        .frame(minHeight: PinnedTabView.Const.dimension + 2)
+        .frame(minHeight: PinnedTabView.Const.dimension)
         .simultaneousGesture(dragGesture)
     }
 

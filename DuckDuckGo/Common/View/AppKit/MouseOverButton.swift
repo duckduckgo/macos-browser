@@ -18,33 +18,16 @@
 
 import Cocoa
 
-internal class MouseOverButton: NSButton {
+internal class MouseOverButton: NSButton, Hoverable {
 
-    let backgroundLayer = CALayer()
+    private var backgroundLayer: CALayer?
 
-    @IBInspectable var backgroundColor: NSColor? {
-        didSet {
-            updateLayer()
-        }
-    }
+    @IBInspectable dynamic var backgroundColor: NSColor?
+    @IBInspectable dynamic var mouseOverColor: NSColor?
+    @IBInspectable dynamic var mouseDownColor: NSColor?
 
-    @IBInspectable var mouseOverColor: NSColor? {
-        didSet {
-            updateLayer()
-        }
-    }
-
-    @IBInspectable var mouseDownColor: NSColor? {
-        didSet {
-            updateLayer()
-        }
-    }
-
-    var normalTintColor: NSColor? {
-        didSet {
-            updateTintColor()
-        }
-    }
+    @IBInspectable dynamic var cornerRadius: CGFloat = 0
+    @IBInspectable dynamic var backgroundInset: NSPoint = .zero
 
     @IBInspectable var mouseOverTintColor: NSColor? {
         didSet {
@@ -58,86 +41,49 @@ internal class MouseOverButton: NSButton {
         }
     }
 
-    @IBInspectable var cornerRadius: CGFloat = 0 {
+    var normalTintColor: NSColor? {
         didSet {
-            updateLayer()
+            updateTintColor()
         }
     }
 
-    @IBInspectable var contentInset: NSPoint = .zero {
-        didSet {
-            updateLayer()
-        }
-    }
+    func backgroundLayer(createIfNeeded: Bool) -> CALayer? {
+        guard backgroundLayer == nil, createIfNeeded else { return backgroundLayer }
 
-    override var isEnabled: Bool {
-        didSet {
-            updateLayer()
-        }
-    }
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-
-        configureLayers()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-
-        configureLayers()
-    }
-
-    private func configureLayers() {
         self.wantsLayer = true
         self.layerUsesCoreImageFilters = true
-        self.layer?.backgroundColor = NSColor.clear.cgColor
-        self.backgroundLayer.masksToBounds = true
-        self.layer?.addSublayer(backgroundLayer)
+        guard let layer else {
+            assertionFailure("no layer")
+            return nil
+        }
+
+        layer.backgroundColor = .clear
+
+        let backgroundLayer = CALayer()
+        backgroundLayer.masksToBounds = true
+        layer.addSublayer(backgroundLayer)
+        self.backgroundLayer = backgroundLayer
+
+        return backgroundLayer
     }
 
     override func awakeFromNib() {
         normalTintColor = self.contentTintColor
-        addTrackingArea()
     }
 
     override func viewWillMove(toWindow newWindow: NSWindow?) {
         isMouseDown = false
-        isMouseOver = false
     }
 
-    override func mouseEntered(with event: NSEvent) {
-        super.mouseEntered(with: event)
-        isMouseOver = true
-    }
-
-    override func mouseExited(with event: NSEvent) {
-        super.mouseExited(with: event)
-        isMouseOver = false
-    }
-
-    override func mouseDown(with event: NSEvent) {
-        isMouseDown = true
-        super.mouseDown(with: event)
-        isMouseDown = false
-        if isMouseOver,
-           window?.isKeyWindow != true || isMouseLocationInsideBounds(window?.mouseLocationOutsideOfEventStream) != true {
-
-            mouseExited(with: event)
+    @Published var isMouseOver = false {
+        didSet {
+            updateTintColor()
         }
     }
 
-    @Published private(set) var isMouseOver = false {
+    @objc dynamic var isMouseDown = false {
         didSet {
             updateTintColor()
-            updateLayer()
-        }
-    }
-
-    var isMouseDown = false {
-        didSet {
-            updateTintColor()
-            updateLayer()
         }
     }
 
@@ -153,33 +99,23 @@ internal class MouseOverButton: NSButton {
         }
     }
 
-    override func updateLayer() {
-        backgroundLayer.cornerRadius = cornerRadius
-        backgroundLayer.frame = layer!.bounds.insetBy(dx: contentInset.x, dy: contentInset.y)
-
-        guard isEnabled else {
-            backgroundLayer.backgroundColor = NSColor.clear.cgColor
-            return
-        }
-
-        NSAppearance.withAppAppearance {
-            NSAnimationContext.runAnimationGroup { context in
-                if isMouseDown {
-                    context.duration = 0.0
-                    backgroundLayer.backgroundColor = mouseDownColor?.cgColor ?? NSColor.clear.cgColor
-                } else if isMouseOver {
-                    context.duration = 0.0
-                    backgroundLayer.backgroundColor = mouseOverColor?.cgColor ?? NSColor.clear.cgColor
-                } else {
-                    backgroundLayer.backgroundColor = backgroundColor?.cgColor ?? NSColor.clear.cgColor
-                }
-            }
-        }
+    private var hoverTrackingArea: HoverTrackingArea? {
+        trackingAreas.lazy.compactMap { $0 as? HoverTrackingArea }.first
     }
 
-    private func addTrackingArea() {
-        let area = NSTrackingArea(rect: bounds, options: [.mouseEnteredAndExited, .activeInKeyWindow, .inVisibleRect], owner: self, userInfo: nil)
-        addTrackingArea(area)
+    override func updateLayer() {
+        hoverTrackingArea?.updateLayer()
+    }
+
+    override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+        HoverTrackingArea.updateTrackingAreas(in: self)
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        isMouseDown = true
+        super.mouseDown(with: event)
+        isMouseDown = false
     }
 
 }
