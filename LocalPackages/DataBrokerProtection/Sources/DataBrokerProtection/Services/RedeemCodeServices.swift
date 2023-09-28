@@ -130,7 +130,7 @@ public enum AuthenticationError: Error, Equatable {
 
 struct RedeemResponse: Codable {
     enum CodingKeys: String, CodingKey {
-        case accessToken = "access_token"
+        case accessToken = "accessToken"
         case message
     }
 
