@@ -19,6 +19,7 @@
 import Foundation
 import BrowserServicesKit
 import DataBrokerProtection
+import LoginItems
 
 public final class DataBrokerProtectionManager {
 
@@ -28,6 +29,8 @@ public final class DataBrokerProtectionManager {
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()
+
+    let loginItemsManager: LoginItemsManager = LoginItemsManager()
 
     lazy var dataManager: DataBrokerProtectionDataManager = {
         DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
@@ -63,6 +66,12 @@ public final class DataBrokerProtectionManager {
         self.redeemUseCase = RedeemUseCase(authenticationService: authenticationService,
                                            authenticationRepository: authenticationRepository)
 
+    }
+
+    public func startLoginItemIfPossible() {
+        guard !redeemUseCase.shouldAskForInviteCode() else { return }
+
+        loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
     }
 
     public func shouldAskForInviteCode() -> Bool {

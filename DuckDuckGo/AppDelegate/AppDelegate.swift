@@ -224,6 +224,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 #if DBP
 
+        DataBrokerProtectionManager.shared.startLoginItemIfPossible()
         // TODO defo gonna need to get the bundle ID dynamically
         ipcConnection.register(machServiceName: "com.duckduckgo.macos.DBP.backgroundAgent.debug", delegate: self) { success in
             DispatchQueue.main.async {
