@@ -76,6 +76,11 @@ public struct SubscriptionAccessRow: View {
                         .frame(height: 8)
                     Button(title) { action() }
                         .buttonStyle(DefaultActionButtonStyle(enabled: true))
+                        .transition(.offset(.zero))
+                        .transaction { t in
+//                            t.animation = nil
+                        }
+                        .opacity(isExpanded ? 1.0 : 0.0)
                 }
 
                 Spacer()
@@ -85,12 +90,11 @@ public struct SubscriptionAccessRow: View {
                 GeometryReader { proxy in
                     Color.clear.onAppear {
                         fullHeight = proxy.size.height
-                        print(fullHeight)
                     }
                 }
             )
             .transaction { t in
-                t.animation = nil
+//                t.animation = nil
             }
             .frame(maxHeight: isExpanded ? fullHeight : 0, alignment: .top)
             .clipped()
