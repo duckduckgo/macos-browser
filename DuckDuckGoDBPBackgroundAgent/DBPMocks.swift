@@ -21,71 +21,64 @@ import BrowserServicesKit
 import Combine
 
 final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
-    var currentConfig: Data = Data()
+
+    var data: Data {
+        let configString = """
+    {
+            "readme": "https://github.com/duckduckgo/privacy-configuration",
+            "version": 1693838894358,
+            "features": {
+                "brokerProtection": {
+                    "state": "enabled",
+                    "exceptions": [],
+                    "settings": {}
+                }
+            },
+            "unprotectedTemporary": []
+        }
+    """
+        let data = configString.data(using: .utf8)
+        return data!
+    }
+
+
+    var currentConfig: Data {
+        data
+    }
 
     var updatesPublisher: AnyPublisher<Void, Never> = .init(Just(()))
 
-    var privacyConfig: BrowserServicesKit.PrivacyConfiguration = PrivacyConfigurationMock()
+    var privacyConfig: BrowserServicesKit.PrivacyConfiguration {
+        let privacyConfigurationData = try! PrivacyConfigurationData(data: data)
+        let privacyConfig = privacyConfiguration(withData: privacyConfigurationData)
+        return privacyConfig
+    }
 
     func reload(etag: String?, data: Data?) -> PrivacyConfigurationManager.ReloadResult {
         .downloaded
     }
 }
 
-final class PrivacyConfigurationMock: PrivacyConfiguration {
-    var identifier: String = "mock"
+func privacyConfiguration(withData data: PrivacyConfigurationData) -> PrivacyConfiguration {
+    let domain = MockDomainsProtectionStore()
+    return AppPrivacyConfiguration(data: data,
+                                   identifier: UUID().uuidString,
+                                   localProtection: domain,
+                                   internalUserDecider: DefaultInternalUserDecider(store: InternalUserDeciderStoreMock()))
+}
 
-    var userUnprotectedDomains = [String]()
+final class MockDomainsProtectionStore: DomainsProtectionStore {
+    var unprotectedDomains = Set<String>()
 
-    var tempUnprotectedDomains = [String]()
-
-    var trackerAllowlist = BrowserServicesKit.PrivacyConfigurationData.TrackerAllowlist(entries: [String: [PrivacyConfigurationData.TrackerAllowlist.Entry]](), state: "mock")
-
-    func isEnabled(featureKey: BrowserServicesKit.PrivacyFeature, versionProvider: BrowserServicesKit.AppVersionProvider) -> Bool {
-        false
+    func disableProtection(forDomain domain: String) {
+        unprotectedDomains.insert(domain)
     }
 
-    func isSubfeatureEnabled(_ subfeature: any PrivacySubfeature, versionProvider: BrowserServicesKit.AppVersionProvider) -> Bool {
-        false
+    func enableProtection(forDomain domain: String) {
+        unprotectedDomains.remove(domain)
     }
+}
 
-    func exceptionsList(forFeature featureKey: BrowserServicesKit.PrivacyFeature) -> [String] {
-        [String]()
-    }
-
-    func isFeature(_ feature: BrowserServicesKit.PrivacyFeature, enabledForDomain: String?) -> Bool {
-        false
-    }
-
-    func isProtected(domain: String?) -> Bool {
-        false
-    }
-
-    func isUserUnprotected(domain: String?) -> Bool {
-        false
-    }
-
-    func isTempUnprotected(domain: String?) -> Bool {
-        false
-    }
-
-    func isInExceptionList(domain: String?, forFeature featureKey: BrowserServicesKit.PrivacyFeature) -> Bool {
-        false
-    }
-
-    func settings(for feature: BrowserServicesKit.PrivacyFeature) -> BrowserServicesKit.PrivacyConfigurationData.PrivacyFeature.FeatureSettings {
-        [String: Any]()
-    }
-
-    func userEnabledProtection(forDomain: String) {
-
-    }
-
-    func userDisabledProtection(forDomain: String) {
-
-    }
-
-    func isSubfeatureEnabled(_ subfeature: any BrowserServicesKit.PrivacySubfeature, versionProvider: BrowserServicesKit.AppVersionProvider, randomizer: (Range<Double>) -> Double) -> Bool {
-        false
-    }
+class InternalUserDeciderStoreMock: InternalUserStoring {
+    var isInternalUser: Bool = false
 }
