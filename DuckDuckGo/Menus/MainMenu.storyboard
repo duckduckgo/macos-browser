@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22154" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22154"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -1045,8 +1045,15 @@ CQ
                                                                         <action selector="simulateTunnelCrash:" target="iLs-sj-2Gd" id="VH7-WB-2dD"/>
                                                                     </connections>
                                                                 </menuItem>
+                                                                <menuItem title="Connection Interruption" id="EB1-Wd-0RU">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="simulateConnectionInterruption:" target="iLs-sj-2Gd" id="2aY-oD-Q2K"/>
+                                                                    </connections>
+                                                                </menuItem>
                                                             </items>
                                                             <connections>
+                                                                <outlet property="simulateConnectionInterruptionMenuItem" destination="EB1-Wd-0RU" id="ddO-Bf-ubT"/>
                                                                 <outlet property="simulateControllerFailureMenuItem" destination="xyA-ob-gEy" id="1VV-xV-wsB"/>
                                                                 <outlet property="simulateTunnelCrashMenuItem" destination="A5n-J7-hYk" id="gvK-di-vTP"/>
                                                                 <outlet property="simulateTunnelFailureMenuItem" destination="kVa-n8-UNx" id="3Ie-Ed-VtG"/>

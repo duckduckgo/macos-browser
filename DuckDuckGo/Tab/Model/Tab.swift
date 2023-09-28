@@ -964,6 +964,7 @@ protocol NewWindowPolicyDecisionMaker {
     @Published var favicon: NSImage?
     let faviconManagement: FaviconManagement
 
+    @MainActor(unsafe)
     private func handleFavicon(oldValue: TabContent? = nil) {
         guard content.isUrl, let url = content.urlForWebView else {
             favicon = nil
@@ -1014,6 +1015,7 @@ extension Tab: PageObserverUserScriptDelegate {
 
 extension Tab: FaviconUserScriptDelegate {
 
+    @MainActor(unsafe)
     func faviconUserScript(_ faviconUserScript: FaviconUserScript,
                            didFindFaviconLinks faviconLinks: [FaviconUserScript.FaviconLink],
                            for documentUrl: URL) {

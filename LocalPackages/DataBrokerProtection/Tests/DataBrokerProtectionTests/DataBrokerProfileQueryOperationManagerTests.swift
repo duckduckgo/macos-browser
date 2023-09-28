@@ -561,6 +561,9 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var lastPreferredRunDateOnOptOut: Date?
     var extractedProfileRemovedDate: Date?
     var extractedProfilesFromBroker = [ExtractedProfile]()
+    var childBrokers = [DataBroker]()
+    var lastParentBrokerWhereChildSitesWhereFetched: String?
+    var lastProfileQueryIdOnScanUpdatePreferredRunDate: Int64?
 
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
@@ -612,6 +615,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
 
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) {
         lastPreferredRunDateOnScan = date
+        lastProfileQueryIdOnScanUpdatePreferredRunDate = profileQueryId
         wasUpdatedPreferredRunDateForScanCalled = true
     }
 
@@ -659,6 +663,11 @@ final class MockDatabase: DataBrokerProtectionRepository {
     func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) {
     }
 
+    func fetchChildBrokers(for parentBroker: String) -> [DataBroker] {
+        lastParentBrokerWhereChildSitesWhereFetched = parentBroker
+        return childBrokers
+    }
+
     func clear() {
         wasSaveProfileCalled = false
         wasFetchProfileCalled = false
@@ -678,6 +687,9 @@ final class MockDatabase: DataBrokerProtectionRepository {
         lastPreferredRunDateOnOptOut = nil
         extractedProfileRemovedDate = nil
         extractedProfilesFromBroker.removeAll()
+        childBrokers.removeAll()
+        lastParentBrokerWhereChildSitesWhereFetched = nil
+        lastProfileQueryIdOnScanUpdatePreferredRunDate = nil
     }
 }
 
