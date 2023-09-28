@@ -2262,6 +2262,9 @@
 		98A50964294B691800D10880 /* Persistence in Frameworks */ = {isa = PBXBuildFile; productRef = 98A50963294B691800D10880 /* Persistence */; };
 		98A95D88299A2DF900B9B81A /* BookmarkMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98A95D87299A2DF900B9B81A /* BookmarkMigrationTests.swift */; };
 		98EB5D1027516A4800681FE6 /* AppPrivacyConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98EB5D0F27516A4800681FE6 /* AppPrivacyConfigurationTests.swift */; };
+		9D8837612AC5C92600C4B946 /* DuckDuckGoDBPBackgroundAgent.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 9D9AE8D12AAA39A70026E7DC /* DuckDuckGoDBPBackgroundAgent.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		9D8837622AC5C99F00C4B946 /* DuckDuckGoDBPBackgroundAgent.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 9D9AE8D12AAA39A70026E7DC /* DuckDuckGoDBPBackgroundAgent.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		9D8FA00C2AC5BDCE005DD0D0 /* LoginItem+DataBrokerProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8FA00B2AC5BDCE005DD0D0 /* LoginItem+DataBrokerProtection.swift */; };
 		9D9AE8692AA76CDC0026E7DC /* LoginItem+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE8682AA76CDC0026E7DC /* LoginItem+NetworkProtection.swift */; };
 		9D9AE86B2AA76CF90026E7DC /* LoginItemsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE86A2AA76CF90026E7DC /* LoginItemsManager.swift */; };
 		9D9AE86C2AA76D1B0026E7DC /* LoginItemsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE86A2AA76CF90026E7DC /* LoginItemsManager.swift */; };
@@ -2936,6 +2939,7 @@
 			dstPath = Contents/Library/LoginItems;
 			dstSubfolderSpec = 1;
 			files = (
+				9D8837612AC5C92600C4B946 /* DuckDuckGoDBPBackgroundAgent.app in Embed Login Items */,
 				3192A2612A4C4CFF0084EA89 /* DuckDuckGo Agent.app in Embed Login Items */,
 				3192A2622A4C4CFF0084EA89 /* DuckDuckGo Notifications.app in Embed Login Items */,
 			);
@@ -2961,6 +2965,7 @@
 			dstPath = Contents/Library/LoginItems;
 			dstSubfolderSpec = 1;
 			files = (
+				9D8837622AC5C99F00C4B946 /* DuckDuckGoDBPBackgroundAgent.app in Embed Login Items */,
 				4B2D065F2A11D2D700DE1F49 /* DuckDuckGo Agent.app in Embed Login Items */,
 				4B2D065E2A11D2D700DE1F49 /* DuckDuckGo Notifications.app in Embed Login Items */,
 			);
@@ -3608,6 +3613,7 @@
 		987799FF29999B64005D8EB6 /* Bookmark 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Bookmark 3.xcdatamodel"; sourceTree = "<group>"; };
 		98A95D87299A2DF900B9B81A /* BookmarkMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkMigrationTests.swift; sourceTree = "<group>"; };
 		98EB5D0F27516A4800681FE6 /* AppPrivacyConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPrivacyConfigurationTests.swift; sourceTree = "<group>"; };
+		9D8FA00B2AC5BDCE005DD0D0 /* LoginItem+DataBrokerProtection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LoginItem+DataBrokerProtection.swift"; sourceTree = "<group>"; };
 		9D9AE8682AA76CDC0026E7DC /* LoginItem+NetworkProtection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LoginItem+NetworkProtection.swift"; sourceTree = "<group>"; };
 		9D9AE86A2AA76CF90026E7DC /* LoginItemsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginItemsManager.swift; sourceTree = "<group>"; };
 		9D9AE8D12AAA39A70026E7DC /* DuckDuckGoDBPBackgroundAgent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGoDBPBackgroundAgent.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -4491,6 +4497,7 @@
 			children = (
 				3192EC872A4DCF21001E97A5 /* DBPHomeViewController.swift */,
 				3139A1512AA4B3C000969C7D /* DataBrokerProtectionManager.swift */,
+				9D8FA00B2AC5BDCE005DD0D0 /* LoginItem+DataBrokerProtection.swift */,
 			);
 			path = DBP;
 			sourceTree = "<group>";
@@ -8930,6 +8937,7 @@
 				37745AFB2A9E05260068533A /* SyncSettingsAdapter.swift in Sources */,
 				31929FBB2A4C4CFF0084EA89 /* WKProcessPool+DownloadDelegate.swift in Sources */,
 				31929FBC2A4C4CFF0084EA89 /* PermissionState.swift in Sources */,
+				9D8FA00C2AC5BDCE005DD0D0 /* LoginItem+DataBrokerProtection.swift in Sources */,
 				31929FBD2A4C4CFF0084EA89 /* FeedbackPresenter.swift in Sources */,
 				31929FBE2A4C4CFF0084EA89 /* NavigationProtectionTabExtension.swift in Sources */,
 				31929FBF2A4C4CFF0084EA89 /* UserAgent.swift in Sources */,
