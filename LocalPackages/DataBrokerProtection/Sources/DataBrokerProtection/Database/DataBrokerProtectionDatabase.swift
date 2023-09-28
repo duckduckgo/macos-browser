@@ -23,6 +23,8 @@ protocol DataBrokerProtectionRepository {
     func save(_ profile: DataBrokerProtectionProfile) async
     func fetchProfile() -> DataBrokerProtectionProfile?
 
+    func fetchChildBrokers(for parentBroker: String) -> [DataBroker]
+
     func saveOptOutOperation(optOut: OptOutOperationData, extractedProfile: ExtractedProfile) throws
 
     func brokerProfileQueryData(for brokerId: Int64, and profileQueryId: Int64) -> BrokerProfileQueryData?
@@ -132,6 +134,16 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         } catch {
             os_log("Database error: fetchProfile, error: %{public}@", log: .error, error.localizedDescription)
             return nil
+        }
+    }
+
+    func fetchChildBrokers(for parentBroker: String) -> [DataBroker] {
+        do {
+            let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            return try vault.fetchChildBrokers(for: parentBroker)
+        } catch {
+            os_log("Database error: fetchChildBrokers, error: %{public}@", log: .error, error.localizedDescription)
+            return [DataBroker]()
         }
     }
 

@@ -546,6 +546,10 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
     func hasMatches() throws -> Bool {
         false
     }
+
+    func fetchChildBrokers(for parentBroker: String) throws -> [DataBroker] {
+        return [DataBroker]()
+    }
 }
 
 public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
