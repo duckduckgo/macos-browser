@@ -130,10 +130,7 @@ final class MoreOptionsMenu: NSMenu {
 
 #if NETWORK_PROTECTION
         if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
-            addItem(withTitle: UserText.networkProtection, action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
-                .targetting(self)
-                .withImage(.image(for: .vpnIcon))
-
+            addItem(makeNetworkProtectionItem())
             DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
         } else {
             networkProtectionFeatureVisibility.disableForWaitlistUsers()
@@ -326,6 +323,25 @@ final class MoreOptionsMenu: NSMenu {
 
         addItem(NSMenuItem.separator())
 
+    }
+
+    private func makeNetworkProtectionItem() -> NSMenuItem {
+        let networkProtectionItem = NSMenuItem(title: "", action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
+            .targetting(self)
+            .withImage(.image(for: .vpnIcon))
+        
+        let attributedText = NSMutableAttributedString(string: UserText.networkProtection)
+        attributedText.append (NSAttributedString(string: "  "))
+        
+        let imageAttachment = NSTextAttachment()
+        imageAttachment.image = NSImage(named: "BetaLabel")
+        imageAttachment.setImageHeight(height: 16, offset: .init(x: 0, y: -4))
+        
+        attributedText.append(NSAttributedString(attachment: imageAttachment))
+        
+        networkProtectionItem.attributedTitle = attributedText
+        
+        return networkProtectionItem
     }
 
 }
