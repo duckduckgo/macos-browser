@@ -152,7 +152,7 @@ final public class DBPIPCConnection: NSObject {
 
     // MARK: App to Agent
 
-    func appDidStart() {
+    public func appDidStart() {
         currentAgentProxy?.appDidStart()
     }
 
