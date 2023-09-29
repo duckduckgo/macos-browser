@@ -117,3 +117,39 @@ extension DataBrokerProtectionManager: DBPBackgroundAgentToMainAppCommunication 
         os_log("Brokers scan completed called on main app")
     }
 }
+
+extension DataBrokerProtectionManager: DBPPackageToMainAppInterface {
+
+    public func profileModified() {
+        ipcConnection.profileModified()
+    }
+
+    public func startScanPressed() {
+        ipcConnection.startScanPressed()
+    }
+
+    public func startScheduler(showWebView: Bool) {
+        ipcConnection.startScheduler(showWebView: showWebView)
+    }
+
+    public func stopScheduler() {
+        ipcConnection.stopScheduler()
+    }
+
+    public func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+        ipcConnection.optOutAllBrokers(showWebView: showWebView, completion: completion)
+    }
+
+    public func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+        ipcConnection.scanAllBrokers(showWebView: showWebView, completion: completion)
+    }
+
+    public func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {
+        ipcConnection.runQueuedOperations(showWebView: showWebView, completion: completion)
+    }
+
+    public func runAllOperations(showWebView: Bool) {
+        ipcConnection.runAllOperations(showWebView: showWebView)
+    }
+
+}

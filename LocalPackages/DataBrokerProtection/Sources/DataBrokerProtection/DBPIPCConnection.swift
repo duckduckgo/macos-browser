@@ -21,7 +21,7 @@ import Network
 import NetworkExtension
 import Common
 
-/// App --> Provider IPC
+/// App --> Agent IPC
 @objc public protocol MainAppToDBPBackgroundAgentCommunication {
     func register(_ completionHandler: @escaping (Bool) -> Void)
 
@@ -38,7 +38,7 @@ import Common
     func runAllOperations(showWebView: Bool)
 }
 
-/// Provider --> App IPC
+/// Agent --> App IPC
 @objc public protocol DBPBackgroundAgentToMainAppCommunication {
     func brokersScanCompleted()
 }
@@ -156,36 +156,36 @@ final public class DBPIPCConnection: NSObject {
         currentAgentProxy?.appDidStart()
     }
 
-    func profileModified() {
+    public func profileModified() {
         currentAgentProxy?.profileModified()
     }
 
-    func startScanPressed() {
+    public func startScanPressed() {
         currentAgentProxy?.startScanPressed()
     }
 
     // Legacy function kept for debugging purposes. They should be deleted where possible
-    func startScheduler(showWebView: Bool) {
+    public func startScheduler(showWebView: Bool) {
         currentAgentProxy?.startScheduler(showWebView: showWebView)
     }
 
-    func stopScheduler() {
+    public func stopScheduler() {
         currentAgentProxy?.stopScheduler()
     }
 
-    func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) { // TODO can delete?
+    public func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) { // TODO can delete?
         currentAgentProxy?.optOutAllBrokers(showWebView: showWebView, completion: completion)
     }
 
-    func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+    public func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
         currentAgentProxy?.scanAllBrokers(showWebView: showWebView, completion: completion)
     }
 
-    func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {
+    public func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {
         currentAgentProxy?.runQueuedOperations(showWebView: showWebView, completion: completion)
     }
 
-    func runAllOperations(showWebView: Bool) {
+    public func runAllOperations(showWebView: Bool) {
         currentAgentProxy?.runAllOperations(showWebView: showWebView)
     }
 }
