@@ -30,6 +30,12 @@ struct RecoverAccountView: View {
         return UserText.manuallyEnterCodeExplanation
 
     }
+    var titleText: String {
+        if isRecovery {
+            return UserText.recoverSyncedDataTitle
+        }
+        return UserText.manuallyEnterCodeTitle
+    }
 
     func submitRecoveryCode() {
         model.delegate?.recoverDevice(using: recoveryCodeModel.recoveryCode)
@@ -37,7 +43,7 @@ struct RecoverAccountView: View {
 
     var body: some View {
         SyncDialog(spacing: 20.0) {
-            Text(UserText.recoverSyncedDataTitle)
+            Text(titleText)
                 .font(.system(size: 17, weight: .bold))
 
             EnterCodeView(
@@ -50,6 +56,7 @@ struct RecoverAccountView: View {
             Button(UserText.cancel) {
                 model.endFlow()
             }
+            .buttonStyle(DismissActionButtonStyle())
             Button(UserText.submit) {
                 submitRecoveryCode()
             }

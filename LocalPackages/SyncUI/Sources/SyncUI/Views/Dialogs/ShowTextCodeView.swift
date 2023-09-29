@@ -29,7 +29,7 @@ struct ShowTextCodeView: View {
                 .font(.system(size: 17, weight: .bold))
             VStack(alignment: .center, spacing: 20) {
                 Text(UserText.showTextCodeCaption)
-                    .multilineTextAlignment(.leading)
+                    .multilineTextAlignment(.center)
                     .frame(width: 280)
                     .fixedSize()
                 SyncKeyView(text: model.codeToDisplay ?? "")

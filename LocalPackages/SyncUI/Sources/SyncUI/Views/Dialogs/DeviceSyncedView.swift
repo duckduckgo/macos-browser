@@ -66,7 +66,11 @@ struct DeviceSyncedView: View {
             .padding(20)
         } buttons: {
             Button(UserText.next) {
-                model.endFlow()
+                if isFirstDevice {
+                    model.delegate?.presentSaveRecoveryPDF()
+                } else {
+                    model.endFlow()
+                }
             }
         }
         .frame(width: 360,
