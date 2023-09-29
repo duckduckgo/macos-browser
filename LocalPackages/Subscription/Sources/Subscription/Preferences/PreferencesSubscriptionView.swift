@@ -18,7 +18,7 @@
 
 import SwiftUI
 import SwiftUIExtensions
-    
+
 public struct PreferencesSubscriptionView: View {
     @ObservedObject var model: PreferencesSubscriptionModel
     @State private var showingSheet = false
@@ -31,30 +31,29 @@ public struct PreferencesSubscriptionView: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
 
-            // TITLE
-            TextMenuTitle(text: "Privacy Pro")
+            TextMenuTitle(text: UserText.preferencesTitle)
                 .sheet(isPresented: $showingSheet) {
                     SubscriptionAccessView(model: model.sheetModel)
                 }
                 .sheet(isPresented: $showingRemoveConfirmationDialog) {
                     Dialog(spacing: 20) {
                         Image("Placeholder-96x64", bundle: .module)
-                        Text("Remove From This Device?")
+                        Text(UserText.removeSubscriptionDialogTitle)
                             .font(.title2)
                             .bold()
                             .foregroundColor(Color("TextPrimary", bundle: .module))
-                        Text("You will no longer be able to access your Privacy Pro subscription on this device. This will not cancel your subscription, and it will remain active on your other devices.")
+                        Text(UserText.removeSubscriptionDialogDescription)
                             .font(.body)
                             .multilineTextAlignment(.center)
                             .fixMultilineScrollableText()
                             .foregroundColor(Color("TextPrimary", bundle: .module))
                     } buttons: {
-                        Button("Cancel") { showingRemoveConfirmationDialog = false }
+                        Button(UserText.removeSubscriptionDialogCancel) { showingRemoveConfirmationDialog = false }
                         Button(action: {
                             showingRemoveConfirmationDialog = false
                             model.removeFromThisDeviceAction()
                         }, label: {
-                            Text("Remove Subscription")
+                            Text(UserText.removeSubscriptionDialogConfirm)
                                 .foregroundColor(.red)
                         })
                     }
@@ -70,18 +69,18 @@ public struct PreferencesSubscriptionView: View {
                         Image("subscription-active-icon", bundle: .module)
                             .padding(4)
                     } content: {
-                        TextMenuItemHeader(text: "Privacy Pro is active on this device")
-                        TextMenuItemCaption(text: "Your monthly Privacy Pro subscription renews on April 20, 2027.")
+                        TextMenuItemHeader(text: UserText.preferencesSubscriptionActiveHeader)
+                        TextMenuItemCaption(text: UserText.preferencesSubscriptionActiveCaption)
                     } buttons: {
-                        Button("Add to Another Device…") { showingSheet.toggle() }
+                        Button(UserText.addToAnotherDeviceButton) { showingSheet.toggle() }
 
                         Menu {
-                            Button("Change Plan or Billing...", action: { model.changePlanOrBillingAction() })
-                            Button("Remove From This Device...", action: {
+                            Button(UserText.changePlanOrBillingButton, action: { model.changePlanOrBillingAction() })
+                            Button(UserText.removeFromThisDeviceButton, action: {
                                 showingRemoveConfirmationDialog.toggle()
                             })
                         } label: {
-                            Text("Manage Subscription")
+                            Text(UserText.manageSubscriptionButton)
                         }
                         .fixedSize()
                     }
@@ -92,12 +91,12 @@ public struct PreferencesSubscriptionView: View {
                             .background(Color.black.opacity(0.06))
                             .cornerRadius(4)
                     } content: {
-                        TextMenuItemHeader(text: "One subscription, three advanced protections")
-                        TextMenuItemCaption(text: "Get enhanced protection across all your devices and reduce your online footprint for as little as $9.99/mo.")
+                        TextMenuItemHeader(text: UserText.preferencesSubscriptionInactiveHeader)
+                        TextMenuItemCaption(text: UserText.preferencesSubscriptionInactiveCaption)
                     } buttons: {
-                        Button("Learn More") { model.learnMoreAction() }
+                        Button(UserText.learnMoreButton) { model.learnMoreAction() }
                             .buttonStyle(DefaultActionButtonStyle(enabled: true))
-                        Button("I Have a Subscription") { showingSheet.toggle() }
+                        Button(UserText.haveSubscriptionButton) { showingSheet.toggle() }
                     }
                 }
 
@@ -106,8 +105,8 @@ public struct PreferencesSubscriptionView: View {
                     .padding(.horizontal, -10)
 
                 SectionView(iconName: "vpn-service-icon",
-                            title: "VPN",
-                            description: "Full-device protection with the VPN built for speed and security.",
+                            title: UserText.vpnServiceTitle,
+                            description: UserText.vpnServiceDescription,
                             buttonName: model.isSignedIn ? "Manage" : nil,
                             buttonAction: { model.openVPN() })
 
@@ -115,8 +114,8 @@ public struct PreferencesSubscriptionView: View {
                     .foregroundColor(Color.secondary)
 
                 SectionView(iconName: "pir-service-icon",
-                            title: "Personal Information Removal",
-                            description: "Find and remove your personal information from sites that store and sell it.",
+                            title: UserText.personalInformationRemovalServiceTitle,
+                            description: UserText.personalInformationRemovalServiceDescription,
                             buttonName: model.isSignedIn ? "View" : nil,
                             buttonAction: { model.openPersonalInformationRemoval() })
 
@@ -124,20 +123,19 @@ public struct PreferencesSubscriptionView: View {
                     .foregroundColor(Color.secondary)
 
                 SectionView(iconName: "itr-service-icon",
-                            title: "Identity Theft Restoration",
-                            description: "Restore stolen accounts and financial losses in the event of identity theft.",
+                            title: UserText.identityTheftRestorationServiceTitle,
+                            description: UserText.identityTheftRestorationServiceDescription,
                             buttonName: model.isSignedIn ? "View" : nil,
                             buttonAction: { model.openIdentityTheftRestoration() })
             }
             .padding(10)
             .roundedBorder()
 
-            // Footer
             PreferencePaneSection {
-                TextMenuItemHeader(text: "Questions about Privacy Pro?")
+                TextMenuItemHeader(text: UserText.preferencesSubscriptionFooterTitle)
                 HStack(alignment: .top, spacing: 6) {
-                    TextMenuItemCaption(text: "Visit our Privacy Pro help pages for answers to frequently asked questions.")
-                    Button("View FAQs") { model.openFAQ() }
+                    TextMenuItemCaption(text: UserText.preferencesSubscriptionFooterCaption)
+                    Button(UserText.viewFaqsButton) { model.openFAQ() }
                 }
             }
         }

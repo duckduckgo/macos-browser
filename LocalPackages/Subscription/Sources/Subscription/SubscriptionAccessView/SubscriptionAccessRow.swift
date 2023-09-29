@@ -27,7 +27,7 @@ public struct SubscriptionAccessRow: View {
     let isExpanded: Bool
     let buttonTitle: String?
     let buttonAction: (() -> Void)?
-    
+
     public init(iconName: String, name: String, descriptionHeader: String? = nil, description: String, isExpanded: Bool, buttonTitle: String? = nil, buttonAction: (() -> Void)? = nil) {
         self.iconName = iconName
         self.name = name

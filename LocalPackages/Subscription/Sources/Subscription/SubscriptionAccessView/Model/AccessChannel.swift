@@ -26,11 +26,11 @@ public enum AccessChannel: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .appleID:
-            return "Apple ID"
+            return UserText.appleID
         case .email:
-            return "Email"
+            return UserText.email
         case .sync:
-            return "Sync"
+            return UserText.sync
         }
     }
 

@@ -27,8 +27,8 @@ extension URL {
 
 public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel {
     public var actionHandlers: SubscriptionAccessActionHandlers
-    public var title = "Activate your subscription on this device"
-    public var description = "Access your Privacy Pro subscription on this device via Sync, Apple ID or an email address."
+    public var title = UserText.activateModalTitle
+    public var description = UserText.activateModalDescription
 
     public init(actionHandlers: SubscriptionAccessActionHandlers) {
         self.actionHandlers = actionHandlers
@@ -37,22 +37,22 @@ public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel {
     public func description(for channel: AccessChannel) -> String {
         switch channel {
         case .appleID:
-            return "Your subscription is automatically available on any device signed in to the same Apple ID."
+            return UserText.activateModalAppleIDDescription
         case .email:
-            return "Use your email to access your subscription on this device."
+            return UserText.activateModalEmailDescription
         case .sync:
-            return "Privacy Pro is automatically available on your Synced devices. Manage your synced devices in Sync settings."
+            return UserText.activateModalSyncDescription
         }
     }
 
     public func buttonTitle(for channel: AccessChannel) -> String? {
         switch channel {
         case .appleID:
-            return "Restore Purchases"
+            return UserText.restorePurchasesButton
         case .email:
-            return "Enter Email"
+            return UserText.enterEmailButton
         case .sync:
-            return "Go to Sync Settings"
+            return UserText.goToSyncSettingsButton
         }
     }
 

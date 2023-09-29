@@ -30,11 +30,12 @@ extension URL {
 }
 
 public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
-    public var actionHandlers: SubscriptionAccessActionHandlers
-    public var title = "Use your subscription on all your devices"
-    public var description = "Access your Privacy Pro subscription on any of your devices via Sync, Apple ID or by adding an email address."
-    private var email: String?
+    public var title = UserText.shareModalTitle
+    public var description = UserText.shareModalDescription
 
+    private var actionHandlers: SubscriptionAccessActionHandlers
+
+    private var email: String?
     private var hasEmail: Bool { !(email?.isEmpty ?? true) }
 
     public init(actionHandlers: SubscriptionAccessActionHandlers, email: String?) {
@@ -49,11 +50,11 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
     public func description(for channel: AccessChannel) -> String {
         switch channel {
         case .appleID:
-            return "Your subscription is automatically available on any device signed in to the same Apple ID."
+            return UserText.shareModalAppleIDDescription
         case .email:
-            return hasEmail ? "You can use this email to activate your subscription on your other devices." : "Add an email address to access your subscription on your other devices. We’ll only use this address to verify your subscription."
+            return hasEmail ? UserText.shareModalNoEmailDescription : UserText.shareModalHasEmailDescription
         case .sync:
-            return "Privacy Pro is automatically available on your Synced devices. Manage your synced devices in Sync settings."
+            return UserText.shareModalSyncDescription
         }
     }
 
@@ -62,9 +63,9 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
         case .appleID:
             return nil
         case .email:
-            return hasEmail ? "Manage" : "Enter Email"
+            return hasEmail ? UserText.manageEmailButton : UserText.enterEmailButton
         case .sync:
-            return "Go to Sync Settings"
+            return UserText.goToSyncSettingsButton
         }
     }
 
