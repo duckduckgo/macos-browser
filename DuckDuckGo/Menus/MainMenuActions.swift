@@ -768,6 +768,7 @@ extension MainViewController {
             guard let textField = alert.accessoryView as? NSTextField,
                   let newConfigurationUrl = URL(string: textField.stringValue) else {
                 os_log("Failed to set custom configuration URL", type: .error)
+                return
             }
 
             let configurationProvider = AppConfigurationURLProvider(customPrivacyConfiguration: newConfigurationUrl)
