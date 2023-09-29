@@ -20,6 +20,11 @@ import Foundation
 import BrowserServicesKit
 import Combine
 
+/*
+ This mock is a hack for now
+ We ideally should refactor the privacy config out of the main app
+ Into a local package, so that it can be be used here
+ */
 final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
 
     var data: Data {

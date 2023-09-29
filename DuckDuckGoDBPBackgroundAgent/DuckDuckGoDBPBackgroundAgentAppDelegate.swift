@@ -56,61 +56,63 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
 
         let manager = DataBrokerProtectionBackgroundManager.shared
         manager.runOperationsAndStartSchedulerIfPossible()
-        //TODO not this?
+        //TODO remove this?
+        // Although if app is not running we should run anyway
+        // Does anything go wrong if we run runQueuedOperations twice? Does it matter?
     }
 }
 
 extension DBPIPCConnection: MainAppToDBPBackgroundAgentCommunication {
+
+    var manager: DataBrokerProtectionBackgroundManager { DataBrokerProtectionBackgroundManager.shared // We really should change this
+    }
+
     public func register(_ completionHandler: @escaping (Bool) -> Void) {
         os_log("App registered", log: .dbpBackgroundAgent, type: .debug)
         completionHandler(true)
+        //App will then call appDidStart if appropriate
     }
 
     public func appDidStart() {
-        /*
-         TODO
-         Then running "RunQueuedOperations", and on the completion handler for that,
-         Starting the scheduler
-         */
+        manager.runOperationsAndStartSchedulerIfPossible()
     }
 
     public func profileModified() {
-        // TODO stop the scheduler
+        manager.stopScheduler() // TODO what do we do if they edit, but don't press start scan?
     }
 
     public func startScanPressed() {
-        /*
-         TODO
-         Initialising the agent (if it isn't already)
-         scheduler.stopScheduler(), and then
-         scheduler.scanAllBrokers
-         */
+        manager.scheduler.stopScheduler()
+        manager.scanAllBrokers()
+        // TODO do we not need to start the scheduelr here?
     }
 
     // MARK: Debug features
+    // Since they are debug features, we call the scheduler directly
+    // rather than corrupting another interface
 
     public func startScheduler(showWebView: Bool) {
-
+        manager.scheduler.startScheduler(showWebView: showWebView)
     }
 
     public func stopScheduler() {
-
+        manager.scheduler.stopScheduler()
     }
 
     public func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
-        
+        manager.scheduler.optOutAllBrokers(showWebView: showWebView, completion: completion)
     }
 
     public func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
-
+        manager.scheduler.scanAllBrokers(showWebView: showWebView, completion: completion)
     }
 
     public func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {
-
+        manager.scheduler.runQueuedOperations(showWebView: showWebView, completion: completion)
     }
 
     public func runAllOperations(showWebView: Bool) {
-
+        manager.scheduler.runAllOperations(showWebView: showWebView)
     }
 }
 

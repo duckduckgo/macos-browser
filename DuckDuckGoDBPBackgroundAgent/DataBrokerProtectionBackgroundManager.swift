@@ -48,7 +48,6 @@ public final class DataBrokerProtectionBackgroundManager {
                                                   thirdPartyCredentialsProvider: false)
 
         let sessionKey = UUID().uuidString
-        // Does the gpcEnabled flag actually matter?
         let prefs = ContentScopeProperties.init(gpcEnabled: false,
                                                 sessionKey: sessionKey,
                                                 featureToggles: features)
@@ -67,14 +66,7 @@ public final class DataBrokerProtectionBackgroundManager {
 
     }
 
-    public func shouldAskForInviteCode() -> Bool {
-        redeemUseCase.shouldAskForInviteCode()
-    }
-
     public func runOperationsAndStartSchedulerIfPossible() {
-        //TODO deal with authenticating later
-        //Do we even need to in the agent? Might be worth a TD or asana task
-        //guard !redeemUseCase.shouldAskForInviteCode() else { return }
 
         // If there's no saved profile we don't need to start the scheduler
         if dataManager.fetchProfile() != nil {
@@ -84,6 +76,18 @@ public final class DataBrokerProtectionBackgroundManager {
 
             scheduler.scanAllBrokers()
         }
+    }
+
+    public func startScheduler(showWebView: Bool = false) {
+        scheduler.startScheduler(showWebView: showWebView)
+    }
+
+    public func stopScheduler() {
+        scheduler.stopScheduler()
+    }
+
+    public func scanAllBrokers() {
+        scheduler.scanAllBrokers()
     }
 }
 
