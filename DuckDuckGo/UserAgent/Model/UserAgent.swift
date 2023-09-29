@@ -53,6 +53,11 @@ enum UserAgent {
         "AppleWebKit/\(webKitVersion) (KHTML, like Gecko) " +
         "Version/\(safariVersion) " +
         "Safari/\(webKitVersion)"
+    static let safari16 = "Mozilla/5.0 " +
+        "(Macintosh; Intel Mac OS X 10_15_7) " +
+        "AppleWebKit/605.1.15 (KHTML, like Gecko) " +
+        "Version/16.5 " +
+        "Safari/605.1.15"
     static let chrome = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " +
         "AppleWebKit/537.36 (KHTML, like Gecko) " +
         "Chrome/91.0.4472.101 " +
@@ -65,7 +70,9 @@ enum UserAgent {
         regex("https://duckduckgo\\.com/[^?]*\\.pdf"): UserAgent.safari,
 
         // use default WKWebView user agent for duckduckgo domain to remove CTA
-        regex("https://duckduckgo\\.com/.*"): UserAgent.webViewDefault
+        regex("https://duckduckgo\\.com/.*"): UserAgent.webViewDefault,
+
+        regex("https://github\\.com/.*"): UserAgent.safari16
     ]
 
     static func duckDuckGoUserAgent(appVersion: String = AppVersion.shared.versionNumber,
