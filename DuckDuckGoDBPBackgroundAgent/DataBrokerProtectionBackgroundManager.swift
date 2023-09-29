@@ -20,6 +20,7 @@ import Foundation
 import Common
 import BrowserServicesKit
 import DataBrokerProtection
+import PixelKit
 
 public final class DataBrokerProtectionBackgroundManager {
 
