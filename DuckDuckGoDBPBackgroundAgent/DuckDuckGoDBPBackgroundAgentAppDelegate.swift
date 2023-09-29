@@ -56,7 +56,7 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
 
         let manager = DataBrokerProtectionBackgroundManager.shared
         manager.runOperationsAndStartSchedulerIfPossible()
-        //TODO remove this?
+        // TODO remove this?
         // Although if app is not running we should run anyway
         // Does anything go wrong if we run runQueuedOperations twice? Does it matter?
     }
@@ -83,7 +83,9 @@ extension DBPIPCConnection: MainAppToDBPBackgroundAgentCommunication {
 
     public func startScanPressed() {
         manager.scheduler.stopScheduler()
-        manager.scanAllBrokers()
+        manager.scanAllBrokers() {
+            self.brokersScanCompleted()
+        }
         // TODO do we not need to start the scheduelr here?
     }
 
@@ -104,7 +106,10 @@ extension DBPIPCConnection: MainAppToDBPBackgroundAgentCommunication {
     }
 
     public func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
-        manager.scheduler.scanAllBrokers(showWebView: showWebView, completion: completion)
+        manager.scheduler.scanAllBrokers(showWebView: showWebView) {
+            self.brokersScanCompleted()
+            completion?()
+        }
     }
 
     public func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {

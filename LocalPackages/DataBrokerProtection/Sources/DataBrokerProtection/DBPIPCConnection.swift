@@ -133,7 +133,7 @@ final public class DBPIPCConnection: NSObject {
 
     // MARK: Agent to App
 
-    func brokersScanCompleted() {
+    public func brokersScanCompleted() {
         guard let connection = currentConnection else {
             os_log("The app isn't registered for the IPCConnection", log: log, type: .error)
             return
