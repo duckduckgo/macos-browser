@@ -230,7 +230,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             DispatchQueue.main.async {
                 if success {
                     os_log("IPC connection with agent succeeded")
-                    ipcConnection.appDidStart()
+                    self.ipcConnection.appDidStart()
                 } else {
                     os_log("IPC connection with agent failed")
                 }
