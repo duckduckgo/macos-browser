@@ -86,8 +86,8 @@ public final class DataBrokerProtectionBackgroundManager {
         scheduler.stopScheduler()
     }
 
-    public func scanAllBrokers() {
-        scheduler.scanAllBrokers()
+    public func scanAllBrokers(showWebView: Bool = false, completion: (() -> Void)?) {
+        scheduler.scanAllBrokers(showWebView: showWebView, completion: completion)
     }
 }
 

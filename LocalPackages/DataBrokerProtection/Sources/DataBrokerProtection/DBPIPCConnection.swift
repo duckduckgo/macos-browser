@@ -50,6 +50,7 @@ final public class DBPIPCConnection: NSObject {
 
     var listener: NSXPCListener?
     var currentConnection: NSXPCConnection?
+    var currentAgentProxy: MainAppToDBPBackgroundAgentCommunication? // TODO should we store this? Idk
     let log: OSLog
     let memoryManagementLog: OSLog
     weak var delegate: DBPBackgroundAgentToMainAppCommunication?
@@ -71,12 +72,6 @@ final public class DBPIPCConnection: NSObject {
     // MARK: - Methods
 
     public func startListener() {
-
-        // from the docs
-        // Use this if listening on name advertised in a launchd.plist For example, an agent with a launchd.plist in ~/Library/LaunchAgents, or a daemon with a launchd.plist in /Library/LaunchDaemons.
-        // I'm unclear if that applies
-
-        let appGroup = "NETP_APP_GROUP"
 
         // TODO defo need to get the bundle ID dynamically
         let machServiceName = "com.duckduckgo.macos.DBP.backgroundAgent.debug"
@@ -122,32 +117,55 @@ final public class DBPIPCConnection: NSObject {
         currentConnection = newConnection
         newConnection.resume()
 
-        guard let providerProxy = newConnection.remoteObjectProxyWithErrorHandler({ registerError in
-            os_log("Failed to register with the provider: %{public}@", log: self.log, type: .error, registerError.localizedDescription)
+        guard let agentProxy = newConnection.remoteObjectProxyWithErrorHandler({ registerError in
+            os_log("Failed to register with the agent: %{public}@", log: self.log, type: .error, registerError.localizedDescription)
             self.currentConnection?.invalidate()
             self.currentConnection = nil
             completionHandler(false)
         }) as? MainAppToDBPBackgroundAgentCommunication else {
-            os_log("Failed to create a remote object proxy for the provider", log: log, type: .error)
-            fatalError("Failed to create a remote object proxy for the provider")
+            os_log("Failed to create a remote object proxy for the agent", log: log, type: .error)
+            fatalError("Failed to create a remote object proxy for the agent")
         }
 
-        providerProxy.register(completionHandler)
+        currentAgentProxy = agentProxy
+        agentProxy.register(completionHandler)
     }
 
-    public func test() {
-        guard let connection = currentConnection else {
-            os_log("The app isn't registered for the IPCConnection", log: log, type: .error)
-            return
-        }
+    func appDidStart() {
+        currentAgentProxy?.appDidStart()
+    }
 
-        guard let appProxy = connection.remoteObjectProxyWithErrorHandler({ promptError in
-            os_log("IPCConnection error: %@", log: self.log, type: .error, promptError.localizedDescription)
-            self.currentConnection = nil
-        }) as? DBPBackgroundAgentToMainAppCommunication else {
-            os_log("Failed to create a remote object proxy for the app", log: log, type: .error)
-            fatalError("Failed to create a remote object proxy for the app")
-        }
+    func profileModified() {
+        currentAgentProxy?.profileModified()
+    }
+
+    func startScanPressed() {
+        currentAgentProxy?.startScanPressed()
+    }
+
+    // Legacy function kept for debugging purposes. They should be deleted where possible
+    func startScheduler(showWebView: Bool) {
+        currentAgentProxy?.startScheduler(showWebView: showWebView)
+    }
+
+    func stopScheduler() {
+        currentAgentProxy?.stopScheduler()
+    }
+
+    func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) { // TODO can delete?
+        currentAgentProxy?.optOutAllBrokers(showWebView: showWebView, completion: completion)
+    }
+
+    func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+        currentAgentProxy?.scanAllBrokers(showWebView: showWebView, completion: completion)
+    }
+
+    func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {
+        currentAgentProxy?.runQueuedOperations(showWebView: showWebView, completion: completion)
+    }
+
+    func runAllOperations(showWebView: Bool) {
+        currentAgentProxy?.runAllOperations(showWebView: showWebView)
     }
 }
 
