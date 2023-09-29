@@ -49,10 +49,11 @@ extension PixelKit {
 
 extension PixelKit {
     public static func fire(_ event: NetworkProtectionPixelKitEvent,
-                     withAdditionalParameters parameters: [String: String]? = nil,
-                     allowedQueryReservedCharacters: CharacterSet? = nil,
-                     includeAppVersionParameter: Bool = true,
-                     onComplete: @escaping (Error?) -> Void = {_ in }) {
+                            frequency: PixelKit.Frequency,
+                            withAdditionalParameters parameters: [String: String]? = nil,
+                            allowedQueryReservedCharacters: CharacterSet? = nil,
+                            includeAppVersionParameter: Bool = true,
+                            onComplete: @escaping (Error?) -> Void = {_ in }) {
         let newParams: [String: String]?
         switch (event.parameters, parameters) {
         case (.some(let parameters), .none):
@@ -66,6 +67,7 @@ extension PixelKit {
         }
 
         PixelKit.shared?.fire(event,
+                              frequency: frequency,
                               withAdditionalParameters: newParams,
                               allowedQueryReservedCharacters: allowedQueryReservedCharacters,
                               includeAppVersionParameter: includeAppVersionParameter,

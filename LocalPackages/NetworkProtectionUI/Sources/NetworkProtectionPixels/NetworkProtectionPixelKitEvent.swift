@@ -252,19 +252,4 @@ public enum NetworkProtectionPixelKitEvent: PixelKitEvent {
             return nil
         }
     }
-
-    public var frequency: PixelKit.Frequency {
-        switch self {
-        case .networkProtectionActiveUser:
-            return .dailyOnly
-        case .networkProtectionLatency:
-            return .standard
-        case .networkProtectionRekeyCompleted:
-            return .dailyAndContinuous
-        case .networkProtectionSystemExtensionUnknownActivationResult:
-            return .standard
-        default:
-            return .standard
-        }
-    }
 }

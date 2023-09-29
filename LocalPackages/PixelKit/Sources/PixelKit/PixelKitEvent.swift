@@ -23,7 +23,6 @@ import Foundation
 public protocol PixelKitEvent {
     var name: String { get }
     var parameters: [String: String]? { get }
-    var frequency: PixelKit.Frequency { get }
 }
 
 /// Implementation of ``PixelKitEvent`` with specific logic for debug events.
@@ -85,14 +84,5 @@ public final class DebugEvent: PixelKitEvent {
         }
 
         return params
-    }
-
-    public var frequency: PixelKit.Frequency {
-        switch eventType {
-        case .assertionFailure:
-            return .standard
-        case .custom(let event):
-            return event.frequency
-        }
     }
 }

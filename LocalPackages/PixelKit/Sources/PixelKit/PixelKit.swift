@@ -161,6 +161,7 @@ public final class PixelKit {
     }
 
     public func fire(_ event: Event,
+                     frequency: Frequency,
                      withHeaders headers: [String: String]? = nil,
                      withAdditionalParameters params: [String: String]? = nil,
                      allowedQueryReservedCharacters: CharacterSet? = nil,
@@ -170,7 +171,7 @@ public final class PixelKit {
 
         let pixelName = prefixedName(for: event)
 
-        if event.frequency == .dailyOnly, pixelHasBeenFiredToday(pixelName, dailyPixelStorage: defaults, calendar: self.pixelCalendar) {
+        if frequency == .dailyOnly, pixelHasBeenFiredToday(pixelName, dailyPixelStorage: defaults, calendar: self.pixelCalendar) {
             onComplete(nil)
             return
         }
@@ -188,7 +189,7 @@ public final class PixelKit {
         }
 
         fire(pixelNamed: pixelName,
-             frequency: event.frequency,
+             frequency: frequency,
              withHeaders: headers,
              withAdditionalParameters: newParams,
              allowedQueryReservedCharacters: allowedQueryReservedCharacters,
@@ -198,6 +199,7 @@ public final class PixelKit {
     }
 
     public static func fire(_ event: Event,
+                            frequency: Frequency,
                             withHeaders headers: [String: String],
                             withAdditionalParameters parameters: [String: String]? = nil,
                             allowedQueryReservedCharacters: CharacterSet? = nil,
@@ -205,6 +207,7 @@ public final class PixelKit {
                             onComplete: @escaping (Error?) -> Void = {_ in }) {
 
         Self.shared?.fire(event,
+                          frequency: frequency,
                           withHeaders: headers,
                           withAdditionalParameters: parameters,
                           allowedQueryReservedCharacters: allowedQueryReservedCharacters,
