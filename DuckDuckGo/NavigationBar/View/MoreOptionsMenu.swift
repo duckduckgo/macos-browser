@@ -330,7 +330,6 @@ final class MoreOptionsMenu: NSMenu {
 #endif // DBP
 
 #if SUBSCRIPTION
-        // TODO: Placeholders
         let item1  = NSMenuItem(title: "Placeholder A", action: #selector(openPreferences(_:)), keyEquivalent: "")
             .targetting(self)
             .withImage(.image(for: .vpnIcon))
