@@ -1,5 +1,5 @@
 //
-//  PixelKitEvent.swift
+//  NetworkProtectionPixelKitEvent.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -224,11 +224,10 @@ public enum NetworkProtectionPixelKitEvent: PixelKitEvent {
 
         case .networkProtectionWireguardErrorCannotStartWireguardBackend(code: let code):
             return [
-                Pixel.Parameters.errorCode: String(code)
+                PixelKit.Parameters.errorCode: String(code)
             ]
 
         case .networkProtectionSystemExtensionUnknownActivationResult,
-             .networkProtectionTunnelConfigurationNoServerRegistrationInfo,
              .networkProtectionTunnelConfigurationNoServerRegistrationInfo,
              .networkProtectionTunnelConfigurationCouldNotSelectClosestServer,
              .networkProtectionTunnelConfigurationCouldNotGetPeerPublicKey,
@@ -251,6 +250,21 @@ public enum NetworkProtectionPixelKitEvent: PixelKitEvent {
              .networkProtectionActiveUser:
 
             return nil
+        }
+    }
+
+    public var frequency: PixelKit.Frequency {
+        switch self {
+        case .networkProtectionActiveUser:
+            return .dailyOnly
+        case .networkProtectionLatency:
+            return .standard
+        case .networkProtectionRekeyCompleted:
+            return .dailyAndContinuous
+        case .networkProtectionSystemExtensionUnknownActivationResult:
+            return .standard
+        default:
+            return .standard
         }
     }
 }

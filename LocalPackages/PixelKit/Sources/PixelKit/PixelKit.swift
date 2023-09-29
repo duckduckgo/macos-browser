@@ -25,6 +25,21 @@ protocol ErrorWithParameters {
 
 public final class PixelKit {
 
+    /// The frequency with which a pixel is sent to our endpoint.
+    ///
+    public enum Frequency {
+        /// The default frequency for pixels. This fires pixels with the event names as-is.
+        case standard
+
+        /// Sent once per day. The last timestamp for this pixel is stored and compared to the current date. Pixels of this type will have `_d` appended to their name.
+        case dailyOnly
+
+        /// Sent once per day with a `_d` suffix, in addition to every time it is called with a `_c` suffix.
+        /// This means a pixel will get sent twice the first time it is called per-day, and subsequent calls that day will only send the `_c` variant.
+        /// This is useful in situations where pixels receive spikes in volume, as the daily pixel can be used to determine how many users are actually affected.
+        case dailyAndContinuous
+    }
+
     enum Header {
         static let acceptEncoding = "Accept-Encoding"
         static let acceptLanguage = "Accept-Language"
@@ -90,7 +105,7 @@ public final class PixelKit {
     }
 
     private func fire(pixelNamed pixelName: String,
-                      frequency: PixelKitEventFrequency,
+                      frequency: Frequency,
                       withHeaders headers: [String: String]? = nil,
                       withAdditionalParameters params: [String: String]? = nil,
                       allowedQueryReservedCharacters: CharacterSet? = nil,

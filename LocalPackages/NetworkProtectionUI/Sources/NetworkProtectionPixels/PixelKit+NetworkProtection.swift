@@ -49,7 +49,6 @@ extension PixelKit {
 
 extension PixelKit {
     public static func fire(_ event: NetworkProtectionPixelKitEvent,
-                     frequency: PixelKit.Frequency,
                      withAdditionalParameters parameters: [String: String]? = nil,
                      allowedQueryReservedCharacters: CharacterSet? = nil,
                      includeAppVersionParameter: Bool = true,
@@ -66,8 +65,7 @@ extension PixelKit {
             newParams = nil
         }
 
-        PixelKit.shared?.fire(pixelNamed: event.name,
-                              frequency: frequency,
+        PixelKit.shared?.fire(event,
                               withAdditionalParameters: newParams,
                               allowedQueryReservedCharacters: allowedQueryReservedCharacters,
                               includeAppVersionParameter: includeAppVersionParameter,

@@ -147,11 +147,11 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     private static var packetTunnelProviderEvents: EventMapping<PacketTunnelProvider.Event> = .init { event, _, _, _ in
         switch event {
         case .userBecameActive:
-            PixelKit.fire(.networkProtectionActiveUser, frequency: .dailyOnly, includeAppVersionParameter: true)
+            PixelKit.fire(.networkProtectionActiveUser, includeAppVersionParameter: true)
         case .reportLatency(ms: let ms, server: let server, networkType: let networkType):
-            PixelKit.fire(.networkProtectionLatency(ms: ms, server: server, networkType: networkType.description), frequency: .standard)
+            PixelKit.fire(.networkProtectionLatency(ms: ms, server: server, networkType: networkType.description))
         case .rekeyCompleted:
-            PixelKit.fire(.networkProtectionRekeyCompleted, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
+            PixelKit.fire(.networkProtectionRekeyCompleted, includeAppVersionParameter: true)
         }
     }
 

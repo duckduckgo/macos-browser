@@ -23,22 +23,7 @@ import Foundation
 public protocol PixelKitEvent {
     var name: String { get }
     var parameters: [String: String]? { get }
-    var frequency: PixelKitEventFrequency { get }
-}
-
-/// The frequency with which a pixel is sent to our endpoint.
-///
-public enum PixelKitEventFrequency {
-    /// The default frequency for pixels. This fires pixels with the event names as-is.
-    case standard
-
-    /// Sent once per day. The last timestamp for this pixel is stored and compared to the current date. Pixels of this type will have `_d` appended to their name.
-    case dailyOnly
-
-    /// Sent once per day with a `_d` suffix, in addition to every time it is called with a `_c` suffix.
-    /// This means a pixel will get sent twice the first time it is called per-day, and subsequent calls that day will only send the `_c` variant.
-    /// This is useful in situations where pixels receive spikes in volume, as the daily pixel can be used to determine how many users are actually affected.
-    case dailyAndContinuous
+    var frequency: PixelKit.Frequency { get }
 }
 
 /// Implementation of ``PixelKitEvent`` with specific logic for debug events.
@@ -102,7 +87,7 @@ public final class DebugEvent: PixelKitEvent {
         return params
     }
 
-    public var frequency: PixelKitEventFrequency {
+    public var frequency: PixelKit.Frequency {
         switch eventType {
         case .assertionFailure:
             return .standard
