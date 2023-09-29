@@ -420,6 +420,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 #if DBP
 
 // TODO goes without saying the AppDelegate should not be the delegate and we should move this
+// Clearly should move to the manager
 
 extension AppDelegate: DBPBackgroundAgentToMainAppCommunication {
     func brokersScanCompleted() {
