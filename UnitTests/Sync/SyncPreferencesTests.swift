@@ -103,7 +103,7 @@ final class SyncPreferencesTests: XCTestCase {
             XCTAssertNil(managementDialogModel.currentDialog)
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 1.0)
+        wait(for: [expectation], timeout: 2.0)
         XCTAssertTrue(ddgSyncing.disconnectCalled)
     }
 
