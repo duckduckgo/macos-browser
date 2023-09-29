@@ -88,7 +88,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.privacy
 #if SUBSCRIPTION
         case .subscription:
-            return "Privacy Pro"
+            return UserText.subscription
 #endif
         case .autofill:
             return UserText.autofill

@@ -353,7 +353,7 @@ final class MoreOptionsMenu: NSMenu {
             .targetting(self)
             .withImage(NSImage(named: "SubscriptionIcon"))
 
-        let attributedText = NSMutableAttributedString(string: UserText.privacyProOptionsMenuItem)
+        let attributedText = NSMutableAttributedString(string: UserText.subscriptionOptionsMenuItem)
         attributedText.append (NSAttributedString(string: "  "))
 
         let imageAttachment = NSTextAttachment()
