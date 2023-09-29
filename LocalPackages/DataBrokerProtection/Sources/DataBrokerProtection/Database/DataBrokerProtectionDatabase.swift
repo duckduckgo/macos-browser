@@ -23,10 +23,13 @@ protocol DataBrokerProtectionRepository {
     func save(_ profile: DataBrokerProtectionProfile) async
     func fetchProfile() -> DataBrokerProtectionProfile?
 
+    func fetchChildBrokers(for parentBroker: String) -> [DataBroker]
+
     func saveOptOutOperation(optOut: OptOutOperationData, extractedProfile: ExtractedProfile) throws
 
     func brokerProfileQueryData(for brokerId: Int64, and profileQueryId: Int64) -> BrokerProfileQueryData?
-    func fetchAllBrokerProfileQueryData(for profileId: Int64) -> [BrokerProfileQueryData]
+    func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData]
+    func fetchExtractedProfiles(for brokerId: Int64) -> [ExtractedProfile]
 
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64)
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64)
@@ -37,13 +40,18 @@ protocol DataBrokerProtectionRepository {
     func add(_ historyEvent: HistoryEvent)
     func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) -> HistoryEvent?
     func hasMatches() -> Bool
+
+    func fetchAttemptInformation(for extractedProfileId: Int64) -> AttemptInformation?
+    func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date)
 }
 
 final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
-    private let fakeBrokerFlag: FakeBrokerFlag
+    private static let profileId: Int64 = 1 // At the moment, we only support one profile for DBP.
+
+    private let fakeBrokerFlag: DataBrokerDebugFlag
     private let vault: (any DataBrokerProtectionSecureVault)?
 
-    init(fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults(), vault: (any DataBrokerProtectionSecureVault)? = nil) {
+    init(fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker(), vault: (any DataBrokerProtectionSecureVault)? = nil) {
         self.fakeBrokerFlag = fakeBrokerFlag
         self.vault = vault
     }
@@ -52,9 +60,8 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         do {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
             let profileQueries = profile.profileQueries
-            let profileId: Int64 = 1 // At the moment, we only support one profile for DBP.
 
-            if try vault.fetchProfile(with: profileId) != nil {
+            if try vault.fetchProfile(with: Self.profileId) != nil {
                 // There is a profile created.
                 // 1. We update the profile in the database
                 // 2. The database layer takes care of deleting the scans related to the old profile.
@@ -65,7 +72,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                 let brokerIDs = try vault.fetchAllBrokers().compactMap({ $0.id })
 
                 try intializeDatabaseForProfile(
-                    profileId: profileId,
+                    profileId: Self.profileId,
                     vault: vault,
                     brokerIDs: brokerIDs,
                     profileQueries: profileQueries
@@ -90,7 +97,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                     }
 
                     try intializeDatabaseForProfile(
-                        profileId: profileId,
+                        profileId: Self.profileId,
                         vault: vault,
                         brokerIDs: brokerIDs,
                         profileQueries: profileQueries
@@ -123,10 +130,20 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
     public func fetchProfile() -> DataBrokerProtectionProfile? {
         do {
             let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-            return try vault.fetchProfile(with: 1)
+            return try vault.fetchProfile(with: Self.profileId)
         } catch {
             os_log("Database error: fetchProfile, error: %{public}@", log: .error, error.localizedDescription)
             return nil
+        }
+    }
+
+    func fetchChildBrokers(for parentBroker: String) -> [DataBroker] {
+        do {
+            let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            return try vault.fetchChildBrokers(for: parentBroker)
+        } catch {
+            os_log("Database error: fetchChildBrokers, error: %{public}@", log: .error, error.localizedDescription)
+            return [DataBroker]()
         }
     }
 
@@ -159,6 +176,17 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         } catch {
             os_log("Database error: brokerProfileQueryData, error: %{public}@", log: .error, error.localizedDescription)
             return nil
+        }
+    }
+
+    func fetchExtractedProfiles(for brokerId: Int64) -> [ExtractedProfile] {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+
+            return try vault.fetchExtractedProfiles(for: brokerId)
+        } catch {
+            os_log("Database error: fetchExtractedProfiles for scan, error: %{public}@", log: .error, error.localizedDescription)
+            return [ExtractedProfile]()
         }
     }
 
@@ -236,12 +264,11 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         }
     }
 
-    func fetchAllBrokerProfileQueryData(for profileId: Int64) -> [BrokerProfileQueryData] {
+    func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
         do {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-
             let brokers = try vault.fetchAllBrokers()
-            let profileQueries = try vault.fetchAllProfileQueries(for: profileId)
+            let profileQueries = try vault.fetchAllProfileQueries(for: Self.profileId)
             var brokerProfileQueryDataList = [BrokerProfileQueryData]()
 
             for broker in brokers {
@@ -298,6 +325,29 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         } catch {
             os_log("Database error: wereThereAnyMatches, error: %{public}@", log: .error, error.localizedDescription)
             return false
+        }
+    }
+
+    func fetchAttemptInformation(for extractedProfileId: Int64) -> AttemptInformation? {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            return try vault.fetchAttemptInformation(for: extractedProfileId)
+        } catch {
+            os_log("Database error: fetchAttemptInformation, error: %{public}@", log: .error, error.localizedDescription)
+            return nil
+        }
+    }
+
+    func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) {
+        do {
+            let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            try vault.save(extractedProfileId: extractedProfileId,
+                           attemptUUID: attemptUUID,
+                           dataBroker: dataBroker,
+                           lastStageDate: lastStageDate,
+                           startTime: startTime)
+        } catch {
+            os_log("Database error: addAttempt, error: %{public}@", log: .error, error.localizedDescription)
         }
     }
 }

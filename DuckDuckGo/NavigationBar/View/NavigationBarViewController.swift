@@ -43,6 +43,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var optionsButton: NSButton!
     @IBOutlet weak var bookmarkListButton: MouseOverButton!
     @IBOutlet weak var passwordManagementButton: MouseOverButton!
+    @IBOutlet weak var homeButton: MouseOverButton!
     @IBOutlet weak var downloadsButton: MouseOverButton!
     @IBOutlet weak var networkProtectionButton: MouseOverButton!
     @IBOutlet weak var navigationButtons: NSView!
@@ -163,12 +164,14 @@ final class NavigationBarViewController: NSViewController {
         updateDownloadsButton()
         updatePasswordManagementButton()
         updateBookmarksButton()
+        updateHomeButton()
 
         if view.window?.isPopUpWindow == true {
             goBackButton.isHidden = true
             goForwardButton.isHidden = true
             refreshOrStopButton.isHidden = true
             optionsButton.isHidden = true
+            homeButton.isHidden = true
             addressBarTopConstraint.constant = 0
             addressBarBottomConstraint.constant = 0
             addressBarLeftToNavButtonsConstraint.isActive = false
@@ -241,6 +244,14 @@ final class NavigationBarViewController: NSViewController {
         } else {
             selectedTabViewModel.reload()
         }
+    }
+
+    @IBAction func homeButtonAction(_ sender: NSButton) {
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
+            os_log("%s: Selected tab view model is nil", type: .error, className)
+            return
+        }
+        selectedTabViewModel.tab.openHomePage()
     }
 
     // swiftlint:disable force_cast
@@ -333,6 +344,8 @@ final class NavigationBarViewController: NSViewController {
                     self.updateBookmarksButton()
                 case .downloads:
                     self.updateDownloadsButton(updatingFromPinnedViewsNotification: true)
+                case .homeButton:
+                    self.updateHomeButton()
                 case .networkProtection:
 #if NETWORK_PROTECTION
                     guard NetworkProtectionKeychainTokenStore().isFeatureActivated else {
@@ -598,6 +611,21 @@ final class NavigationBarViewController: NSViewController {
         popovers.passwordManagementDomain = domain
     }
 
+    private func updateHomeButton() {
+        let menu = NSMenu()
+        let title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .homeButton)
+        menu.addItem(withTitle: title, action: #selector(toggleHomeButtonPinning), keyEquivalent: "")
+
+        homeButton.menu = menu
+        homeButton.toolTip = UserText.homeButtonTooltip
+
+        if LocalPinningManager.shared.isPinned(.homeButton) {
+            homeButton.isHidden = false
+        } else {
+            homeButton.isHidden = true
+        }
+    }
+
     private func updateDownloadsButton(updatingFromPinnedViewsNotification: Bool = false) {
         let menu = NSMenu()
         let title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
@@ -761,6 +789,9 @@ extension NavigationBarViewController: NSMenuDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
+        let homeTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .homeButton)
+        menu.addItem(withTitle: homeTitle, action: #selector(toggleHomeButtonPinning), keyEquivalent: "Y")
+
         let autofillTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         menu.addItem(withTitle: autofillTitle, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "A")
 
@@ -798,6 +829,17 @@ extension NavigationBarViewController: NSMenuDelegate {
     @objc
     private func toggleNetworkProtectionPanelPinning(_ sender: NSMenuItem) {
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
+    }
+
+    @objc
+    private func toggleHomeButtonPinning(_ sender: NSMenuItem) {
+        LocalPinningManager.shared.togglePinning(for: .homeButton)
+        if LocalPinningManager.shared.isPinned(.homeButton) {
+            Pixel.fire(.enableHomeButton)
+        } else {
+            Pixel.fire(.disableHomeButton)
+        }
+
     }
 
     // MARK: - Network Protection
@@ -876,9 +918,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
     func optionsButtonMenuRequestedNetworkProtectionPopover(_ menu: NSMenu) {
 #if NETWORK_PROTECTION
-        if #available(macOS 11.4, *) {
-            toggleNetworkProtectionPopover()
-        }
+        toggleNetworkProtectionPopover()
 #else
         fatalError("Tried to open Network Protection when it was disabled")
 #endif

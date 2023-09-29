@@ -23,52 +23,36 @@ import Combine
 
 final class FaviconStoringMock: FaviconStoring {
 
-    func loadFavicons() -> Future<[Favicon], Error> {
-        return Future { promise in
-            promise(.success([]))
-        }
+    func loadFavicons() async throws -> [Favicon] {
+        []
     }
 
-    func save(favicon: Favicon) -> Future<Void, Error> {
-        return Future { promise in
-            promise(.success(()))
-        }
+    func save(_ favicons: [Favicon]) async throws {
+        ()
     }
 
-    func removeFavicons(_ favicons: [Favicon]) -> Future<Void, Error> {
-        return Future { promise in
-            promise(.success(()))
-        }
+    func removeFavicons(_ favicons: [Favicon]) async throws {
+        ()
     }
 
-    func loadFaviconReferences() -> Future<([FaviconHostReference], [FaviconUrlReference]), Error> {
-        return Future { promise in
-            promise(.success(([], [])))
-        }
+    func loadFaviconReferences() async throws -> ([FaviconHostReference], [FaviconUrlReference]) {
+        ([], [])
     }
 
-    func save(hostReference: FaviconHostReference) -> Future<Void, Error> {
-        return Future { promise in
-            promise(.success(()))
-        }
+    func save(hostReference: FaviconHostReference) async throws {
+        ()
     }
 
-    func save(urlReference: FaviconUrlReference) -> Future<Void, Error> {
-        return Future { promise in
-            promise(.success(()))
-        }
+    func save(urlReference: FaviconUrlReference) async throws {
+        ()
     }
 
-    func remove(hostReferences: [FaviconHostReference]) -> Future<Void, Error> {
-        return Future { promise in
-            promise(.success(()))
-        }
+    func remove(hostReferences: [FaviconHostReference]) async throws {
+        ()
     }
 
-    func remove(urlReferences: [FaviconUrlReference]) -> Future<Void, Error> {
-        return Future { promise in
-            promise(.success(()))
-        }
+    func remove(urlReferences: [FaviconUrlReference]) async throws {
+        ()
     }
 
 }

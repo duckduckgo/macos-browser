@@ -400,6 +400,11 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="Ucx-oU-4kc"/>
+                                        <menuItem title="Show Home Shortcut" keyEquivalent="Y" id="RnQ-KJ-UFS">
+                                            <connections>
+                                                <action selector="toggleHomeButton:" target="Ady-hI-5gd" id="y6x-ir-qWg"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Show Autofill Shortcut" keyEquivalent="A" id="ha5-uX-jTn">
                                             <connections>
                                                 <action selector="toggleAutofillShortcut:" target="Ady-hI-5gd" id="JGc-Ym-QWK"/>
@@ -1028,8 +1033,15 @@ CQ
                                                                         <action selector="simulateTunnelCrash:" target="iLs-sj-2Gd" id="VH7-WB-2dD"/>
                                                                     </connections>
                                                                 </menuItem>
+                                                                <menuItem title="Connection Interruption" id="EB1-Wd-0RU">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="simulateConnectionInterruption:" target="iLs-sj-2Gd" id="2aY-oD-Q2K"/>
+                                                                    </connections>
+                                                                </menuItem>
                                                             </items>
                                                             <connections>
+                                                                <outlet property="simulateConnectionInterruptionMenuItem" destination="EB1-Wd-0RU" id="ddO-Bf-ubT"/>
                                                                 <outlet property="simulateControllerFailureMenuItem" destination="xyA-ob-gEy" id="1VV-xV-wsB"/>
                                                                 <outlet property="simulateTunnelCrashMenuItem" destination="A5n-J7-hYk" id="gvK-di-vTP"/>
                                                                 <outlet property="simulateTunnelFailureMenuItem" destination="kVa-n8-UNx" id="3Ie-Ed-VtG"/>
@@ -1169,19 +1181,12 @@ CQ
                                                                         <action selector="toggleShouldExcludeLocalRoutes:" target="Rah-lS-gno" id="Wdd-D6-yWy"/>
                                                                     </connections>
                                                                 </menuItem>
-                                                                <menuItem title="enable Connection Tester" id="L06-y6-zv3">
-                                                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                                                    <connections>
-                                                                        <action selector="toggleConnectionTesterEnabled:" target="Rah-lS-gno" id="iei-t7-7pG"/>
-                                                                    </connections>
-                                                                </menuItem>
                                                             </items>
                                                         </menu>
                                                     </menuItem>
                                                 </items>
                                                 <connections>
                                                     <outlet property="connectOnLogInMenuItem" destination="fSA-hH-Vum" id="HSf-v8-MYh"/>
-                                                    <outlet property="connectionTesterEnabledMenuItem" destination="L06-y6-zv3" id="uhM-4n-eOm"/>
                                                     <outlet property="excludeLocalNetworksMenuItem" destination="Zak-JJ-7hc" id="vYu-wC-dTl"/>
                                                     <outlet property="exclusionsMenu" destination="j7y-fb-xa6" id="igE-bU-qW4"/>
                                                     <outlet property="mainMenuItem" destination="Dt6-sj-4hn" id="vwa-T8-0ak"/>
@@ -1270,6 +1275,7 @@ CQ
                             <outlet property="toggleBookmarksShortcutMenuItem" destination="bXm-yY-7AL" id="KjP-Tc-Hwo"/>
                             <outlet property="toggleDownloadsShortcutMenuItem" destination="3II-oR-MBb" id="lBF-XY-b4Z"/>
                             <outlet property="toggleFullscreenMenuItem" destination="4J7-dP-txa" id="lyl-pp-TR0"/>
+                            <outlet property="toggleHomeButtonMenuItem" destination="RnQ-KJ-UFS" id="7AC-U7-MkH"/>
                             <outlet property="toggleNetworkProtectionShortcutMenuItem" destination="UYq-tJ-SrY" id="9HV-Xs-n4f"/>
                             <outlet property="zoomInMenuItem" destination="lMK-tC-RJd" id="Ddo-RX-A6Z"/>
                             <outlet property="zoomOutMenuItem" destination="flw-Fc-cm6" id="1AB-0r-vvx"/>

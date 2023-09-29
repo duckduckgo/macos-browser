@@ -65,6 +65,7 @@ final class WKBackForwardListItemViewModel {
         }
     }
 
+    @MainActor(unsafe)
     var image: NSImage? {
         if case .error = backForwardListItem {
             return nil

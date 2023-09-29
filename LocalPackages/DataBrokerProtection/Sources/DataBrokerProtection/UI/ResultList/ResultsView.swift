@@ -93,15 +93,27 @@ private struct PendingProfilesView: View {
 
 private struct RemovedProfileRow: View {
     let removedProfile: ResultsViewModel.RemovedProfile
+    @State private var showModal = false
 
     var body: some View {
         HStack {
-            Label {
-                Text(removedProfile.dataBroker)
-            } icon: {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.green)
+            Button {
+                showModal = true
+            } label: {
+                Label {
+                    Text(removedProfile.dataBroker)
+                } icon: {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                }
             }
+            .buttonStyle(PlainButtonStyle())
+            .sheet(isPresented: $showModal) {
+
+                DebugModalView(optOutOperationData: removedProfile.operationData,
+                               showingModal: $showModal)
+            }
+
             Spacer()
 
             HStack {
@@ -281,6 +293,8 @@ private struct DebugModalView: View {
             return "Cancelled"
         case .solvingCaptchaWithCallbackError:
             return "Solving captcha with callback failed"
+        case .cantCalculatePreferredRunDate:
+            return "Can't calculate next run date"
         }
     }
 }

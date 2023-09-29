@@ -1,0 +1,58 @@
+{
+  "name": "clustrmaps.com",
+  "version": "0.1.0",
+  "parent": "neighbor.report",
+  "addedDatetime": 1692590400000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "1605ede5-2592-4733-a4a3-9a90062eabf4",
+          "url": "https://clustrmaps.com/persons/${firstName}-${lastName}/${stateFullCapitalize}/${cityHyphenated}"
+        },
+        {
+          "actionType": "extract",
+          "id": "82155f29-6d66-496f-b2e0-d6f8169349bf",
+          "selector": ".//div[@itemprop='Person']",
+          "profile": {
+            "name": {
+              "selector": "(.//a[@class='persons'])[1]"
+            },
+            "age": {
+              "selector": ".age"
+            },
+            "addressFull": {
+              "selector": ".//div[@class='mb-1 i_room']//a"
+            },
+            "addressCityState": {
+              "selector": ".//div[@class='person_city person_details i_home']"
+            },
+            "phone": {
+              "selector": ".i_phone"
+            },
+            "relativesList": {
+              "selector": ".i_people",
+              "afterText": "Associated persons:"
+            },
+            "profileUrl": {
+              "selector": ".persons"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}

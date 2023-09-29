@@ -17,6 +17,7 @@
 //
 
 import XCTest
+import BrowserServicesKit
 @testable import DataBrokerProtection
 
 final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
@@ -41,6 +42,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
@@ -61,6 +63,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id for broker")
@@ -80,6 +83,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertEqual(mockDatabase.eventsAdded.first?.type, .scanStarted)
@@ -99,6 +103,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .noMatchFound }))
@@ -109,6 +114,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
 
     func testWhenScannedProfileIsAlreadyInTheDatabase_noOptOutOperationIsCreated() async {
         do {
+            mockDatabase.extractedProfilesFromBroker = [.mockWithoutRemovedDate]
             mockWebOperationRunner.scanResults = [.mockWithoutRemovedDate]
             _ = try await sut.runScanOperation(
                 on: mockWebOperationRunner,
@@ -120,6 +126,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertFalse(mockDatabase.wasUpdateRemoveDateCalled)
@@ -132,6 +139,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
 
     func testWhenScannedProfileIsAlreadyInTheDatabaseAndWasRemoved_thenTheRemovedDateIsSetBackToNil() async {
         do {
+            mockDatabase.extractedProfilesFromBroker = [.mockWithRemovedDate]
             mockWebOperationRunner.scanResults = [.mockWithRemovedDate]
             _ = try await sut.runScanOperation(
                 on: mockWebOperationRunner,
@@ -143,6 +151,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.wasUpdateRemoveDateCalled)
@@ -165,6 +174,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.wasUpdateRemoveDateCalled)
@@ -187,6 +197,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.wasSaveOptOutOperationCalled)
@@ -208,12 +219,12 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutConfirmed }))
             XCTAssertTrue(mockDatabase.wasUpdateRemoveDateCalled)
             XCTAssertNotNil(mockDatabase.extractedProfileRemovedDate)
-            XCTAssertTrue(mockDatabase.wasUpdatedPreferredRunDateForOptOutCalled)
         } catch {
             XCTFail("Should not throw")
         }
@@ -232,6 +243,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutConfirmed }))
@@ -256,6 +268,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Should throw!")
@@ -283,6 +296,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
@@ -305,6 +319,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
@@ -327,6 +342,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
@@ -349,6 +365,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertFalse(mockDatabase.wasDatabaseCalled)
@@ -371,6 +388,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutStarted }))
@@ -392,6 +410,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutRequested }))
@@ -414,6 +433,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 ),
                 database: mockDatabase,
                 notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Should throw!")
@@ -426,78 +446,78 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
 
     // MARK: - Update operation dates tests
 
-    func testWhenUpdatingDatesOnOptOutAndLastEventIsError_thenWeSetPreferredRunDateWithRetryErrorDate() {
+    func testWhenUpdatingDatesOnOptOutAndLastEventIsError_thenWeSetPreferredRunDateWithRetryErrorDate() throws {
         let brokerId: Int64 = 1
         let profileQueryId: Int64 = 1
         let extractedProfileId: Int64 = 1
         mockDatabase.lastHistoryEventToReturn = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .error(error: .unknown("Test error")))
         let schedulingConfig = DataBrokerScheduleConfig(retryError: 1, confirmOptOutScan: 0, maintenanceScan: 0)
 
-        sut.updateOperationDataDates(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
+        try sut.updateOperationDataDates(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
 
         XCTAssertTrue(mockDatabase.wasUpdatedPreferredRunDateForOptOutCalled)
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: mockDatabase.lastPreferredRunDateOnOptOut, date2: Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)))
     }
 
-    func testWhenUpdatingDatesOnScanAndLastEventIsError_thenWeSetPreferredRunDateWithRetryErrorDate() {
+    func testWhenUpdatingDatesOnScanAndLastEventIsError_thenWeSetPreferredRunDateWithRetryErrorDate() throws {
         let brokerId: Int64 = 1
         let profileQueryId: Int64 = 1
         mockDatabase.lastHistoryEventToReturn = HistoryEvent(extractedProfileId: nil, brokerId: brokerId, profileQueryId: profileQueryId, type: .error(error: .unknown("Test error")))
         let schedulingConfig = DataBrokerScheduleConfig(retryError: 1, confirmOptOutScan: 0, maintenanceScan: 0)
 
-        sut.updateOperationDataDates(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: nil, schedulingConfig: schedulingConfig, database: mockDatabase)
+        try sut.updateOperationDataDates(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: nil, schedulingConfig: schedulingConfig, database: mockDatabase)
 
         XCTAssertTrue(mockDatabase.wasUpdatedPreferredRunDateForScanCalled)
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: mockDatabase.lastPreferredRunDateOnScan, date2: Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)))
     }
 
-    func testWhenUpdatingDatesAndLastEventIsOptOutRequested_thenWeSetScanPreferredRunDateWithConfirmOptOutDate() {
+    func testWhenUpdatingDatesAndLastEventIsOptOutRequested_thenWeSetScanPreferredRunDateWithConfirmOptOutDate() throws {
         let brokerId: Int64 = 1
         let profileQueryId: Int64 = 1
         let extractedProfileId: Int64 = 1
         mockDatabase.lastHistoryEventToReturn = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)
         let schedulingConfig = DataBrokerScheduleConfig(retryError: 0, confirmOptOutScan: 1, maintenanceScan: 0)
 
-        sut.updateOperationDataDates(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
+        try sut.updateOperationDataDates(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
 
         XCTAssertTrue(mockDatabase.wasUpdatedPreferredRunDateForScanCalled)
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: mockDatabase.lastPreferredRunDateOnScan, date2: Date().addingTimeInterval(schedulingConfig.confirmOptOutScan.hoursToSeconds)))
     }
 
-    func testWhenUpdatingDatesAndLastEventIsOptOutRequested_thenWeSetOptOutPreferredRunDateToNil() {
+    func testWhenUpdatingDatesAndLastEventIsOptOutRequested_thenWeSetOptOutPreferredRunDateToNil() throws {
         let brokerId: Int64 = 1
         let profileQueryId: Int64 = 1
         let extractedProfileId: Int64 = 1
         mockDatabase.lastHistoryEventToReturn = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)
         let schedulingConfig = DataBrokerScheduleConfig(retryError: 0, confirmOptOutScan: 1, maintenanceScan: 0)
 
-        sut.updateOperationDataDates(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
+        try sut.updateOperationDataDates(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
 
         XCTAssertTrue(mockDatabase.wasUpdatedPreferredRunDateForScanCalled)
         XCTAssertNil(mockDatabase.lastPreferredRunDateOnOptOut)
     }
 
-    func testWhenUpdatingDatesAndLastEventIsMatchesFound_thenWeSetScanPreferredDateToMaintanence() {
+    func testWhenUpdatingDatesAndLastEventIsMatchesFound_thenWeSetScanPreferredDateToMaintanence() throws {
         let brokerId: Int64 = 1
         let profileQueryId: Int64 = 1
         let extractedProfileId: Int64 = 1
         mockDatabase.lastHistoryEventToReturn = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .matchesFound)
         let schedulingConfig = DataBrokerScheduleConfig(retryError: 0, confirmOptOutScan: 0, maintenanceScan: 1)
 
-        sut.updateOperationDataDates(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
+        try sut.updateOperationDataDates(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
 
         XCTAssertTrue(mockDatabase.wasUpdatedPreferredRunDateForScanCalled)
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: mockDatabase.lastPreferredRunDateOnScan, date2: Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)))
     }
 
-    func testWhenUpdatingDatesAndLastEventIsOptOutStarted_thenNothingHappens() {
+    func testWhenUpdatingDatesAndLastEventIsOptOutStarted_thenNothingHappens() throws {
         let brokerId: Int64 = 1
         let profileQueryId: Int64 = 1
         let extractedProfileId: Int64 = 1
         mockDatabase.lastHistoryEventToReturn = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutStarted)
         let schedulingConfig = DataBrokerScheduleConfig(retryError: 0, confirmOptOutScan: 0, maintenanceScan: 1)
 
-        sut.updateOperationDataDates(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
+        try sut.updateOperationDataDates(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
 
         XCTAssertFalse(mockDatabase.wasUpdatedPreferredRunDateForScanCalled)
         XCTAssertFalse(mockDatabase.wasUpdatedPreferredRunDateForOptOutCalled)
@@ -505,14 +525,14 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         XCTAssertNil(mockDatabase.lastPreferredRunDateOnOptOut)
     }
 
-    func testWhenUpdatingDatesAndLastEventIsScanStarted_thenNothingHappens() {
+    func testWhenUpdatingDatesAndLastEventIsScanStarted_thenNothingHappens() throws {
         let brokerId: Int64 = 1
         let profileQueryId: Int64 = 1
         let extractedProfileId: Int64 = 1
         mockDatabase.lastHistoryEventToReturn = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .scanStarted)
         let schedulingConfig = DataBrokerScheduleConfig(retryError: 0, confirmOptOutScan: 0, maintenanceScan: 1)
 
-        sut.updateOperationDataDates(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
+        try sut.updateOperationDataDates(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
 
         XCTAssertFalse(mockDatabase.wasUpdatedPreferredRunDateForScanCalled)
         XCTAssertFalse(mockDatabase.wasUpdatedPreferredRunDateForOptOutCalled)
@@ -540,6 +560,10 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var lastPreferredRunDateOnScan: Date?
     var lastPreferredRunDateOnOptOut: Date?
     var extractedProfileRemovedDate: Date?
+    var extractedProfilesFromBroker = [ExtractedProfile]()
+    var childBrokers = [DataBroker]()
+    var lastParentBrokerWhereChildSitesWhereFetched: String?
+    var lastProfileQueryIdOnScanUpdatePreferredRunDate: Int64?
 
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
@@ -584,13 +608,14 @@ final class MockDatabase: DataBrokerProtectionRepository {
         }
     }
 
-    func fetchAllBrokerProfileQueryData(for profileId: Int64) -> [BrokerProfileQueryData] {
+    func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
         wasFetchAllBrokerProfileQueryDataCalled = true
         return [BrokerProfileQueryData]()
     }
 
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) {
         lastPreferredRunDateOnScan = date
+        lastProfileQueryIdOnScanUpdatePreferredRunDate = profileQueryId
         wasUpdatedPreferredRunDateForScanCalled = true
     }
 
@@ -627,6 +652,22 @@ final class MockDatabase: DataBrokerProtectionRepository {
         false
     }
 
+    func fetchExtractedProfiles(for brokerId: Int64) -> [ExtractedProfile] {
+        return extractedProfilesFromBroker
+    }
+
+    func fetchAttemptInformation(for extractedProfileId: Int64) -> AttemptInformation? {
+        return nil
+    }
+
+    func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) {
+    }
+
+    func fetchChildBrokers(for parentBroker: String) -> [DataBroker] {
+        lastParentBrokerWhereChildSitesWhereFetched = parentBroker
+        return childBrokers
+    }
+
     func clear() {
         wasSaveProfileCalled = false
         wasFetchProfileCalled = false
@@ -645,17 +686,22 @@ final class MockDatabase: DataBrokerProtectionRepository {
         lastPreferredRunDateOnScan = nil
         lastPreferredRunDateOnOptOut = nil
         extractedProfileRemovedDate = nil
+        extractedProfilesFromBroker.removeAll()
+        childBrokers.removeAll()
+        lastParentBrokerWhereChildSitesWhereFetched = nil
+        lastProfileQueryIdOnScanUpdatePreferredRunDate = nil
     }
 }
 
 final class MockWebOperationRunner: WebOperationRunner {
+
     var shouldScanThrow = false
     var shouldOptOutThrow = false
     var scanResults = [ExtractedProfile]()
     var wasScanCalled = false
     var wasOptOutCalled = false
 
-    func scan(_ profileQuery: BrokerProfileQueryData, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
+    func scan(_ profileQuery: BrokerProfileQueryData, stageCalculator: DataBrokerProtectionStageDurationCalculator, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
         wasScanCalled = true
 
         if shouldScanThrow {
@@ -665,7 +711,7 @@ final class MockWebOperationRunner: WebOperationRunner {
         }
     }
 
-    func optOut(profileQuery: DataBrokerProtection.BrokerProfileQueryData, extractedProfile: DataBrokerProtection.ExtractedProfile, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws {
+    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile, stageCalculator: DataBrokerProtectionStageDurationCalculator, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws {
         wasOptOutCalled = true
 
         if shouldOptOutThrow {

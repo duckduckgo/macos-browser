@@ -14,7 +14,7 @@ let package = Package(
         .library(name: "NetworkProtectionPixels", targets: ["NetworkProtectionPixels"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "78.2.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "80.3.0"),
         .package(path: "../PixelKit"),
         .package(path: "../SwiftUIExtensions")
     ],

@@ -179,7 +179,7 @@ struct CaptchaService: CaptchaServiceProtocol {
         request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
 
         let bodyObject: [String: Any] = [
-            "sitekey": captchaInfo.siteKey,
+            "siteKey": captchaInfo.siteKey,
             "url": captchaInfo.url,
             "type": captchaInfo.type
         ]

@@ -133,9 +133,6 @@ extension Pixel {
         case recentActivitySectionHidden
         case continueSetUpSectionHidden
 
-        // Pinned tabs
-        case userHasPinnedTab
-
         // Fire Button
         case fireButtonFirstBurn
         case fireButton(option: FireButtonOption)
@@ -158,6 +155,11 @@ extension Pixel {
         case networkProtectionWaitlistNotificationTapped
         case networkProtectionWaitlistTermsAndConditionsDisplayed
         case networkProtectionWaitlistTermsAndConditionsAccepted
+
+        // 28-day Home Button
+        case enableHomeButton
+        case disableHomeButton
+        case setnewHomePage
 
         case dailyPixel(Event, isFirst: Bool)
 
@@ -293,6 +295,24 @@ extension Pixel {
             case burnerTabMisplaced
 #if DBP
             case dataBrokerProtectionError
+
+            // SLO and SLI Pixels: https://app.asana.com/0/1203581873609357/1205337273100857/f
+
+            // Stage Pixels
+            case optOutStart
+            case optOutEmailGenerate
+            case optOutCaptchaParse
+            case optOutCaptchaSend
+            case optOutCaptchaSolve
+            case optOutSubmit
+            case optOutEmailReceive
+            case optOutEmailConfirm
+            case optOutValidate
+            case optOutFinish
+
+            // Process Pixels
+            case optOutSuccess
+            case optOutFailure
 #endif
         }
 
@@ -387,10 +407,6 @@ extension Pixel.Event {
         case .continueSetUpSectionHidden:
             return "m_mac.continue-setup-section-hidden"
 
-        // Pinned tabs
-        case .userHasPinnedTab:
-            return "m_mac_user_has_pinned_tab"
-
         // Fire Button
         case .fireButtonFirstBurn:
             return "m_mac_fire_button_first_burn"
@@ -436,8 +452,17 @@ extension Pixel.Event {
         case .networkProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_netp_ev_terms_accepted"
 
+        // 28-day Home Button
+        case .enableHomeButton:
+            return "m_mac_enable_home_button"
+        case .disableHomeButton:
+            return "m_mac_disable_home_button"
+        case .setnewHomePage:
+            return "m_mac_set_new_homepage"
+
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")
+
         }
 
     }
@@ -672,6 +697,21 @@ extension Pixel.Event.Debug {
 
 #if DBP
         case .dataBrokerProtectionError: return "data_broker_error"
+        // Stage Pixels
+        case .optOutStart: return "dbp.macos.optout.stage.start"
+        case .optOutEmailGenerate: return "dbp.macos.optout.stage.email-generate"
+        case .optOutCaptchaParse: return "dbp.macos.optout.stage.captcha-parse"
+        case .optOutCaptchaSend: return "dbp.macos.optout.stage.captcha-send"
+        case .optOutCaptchaSolve: return "dbp.macos.optout.stage.captcha-solve"
+        case .optOutSubmit: return "dbp.macos.optout.stage.submit"
+        case .optOutEmailReceive: return "dbp.macos.optout.stage.email-receive"
+        case .optOutEmailConfirm: return "dbp.macos.optout.stage.email-confirm"
+        case .optOutValidate: return "dbp.macos.optout.stage.validate"
+        case .optOutFinish: return "dbp.macos.optout.stage.finish"
+
+        // Process Pixels
+        case .optOutSuccess: return "dbp.macos.optout.process.success"
+        case .optOutFailure: return "dbp.macos.optout.process.failure"
 #endif
         }
     }

@@ -306,10 +306,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
         options[NetworkProtectionOptionKey.authToken] = try tokenStore.fetchToken() as NSString?
+
         // TODO: bring back support for this
         //options[NetworkProtectionOptionKey.selectedServer] = debugUtilities.selectedServerName() as NSString?
         //options[NetworkProtectionOptionKey.keyValidity] = debugUtilities.registrationKeyValidity.map(String.init(describing:)) as NSString?
-        options[NetworkProtectionOptionKey.connectionTesterEnabled] = await NSNumber(value: isConnectionTesterEnabled)
 
         if Self.simulationOptions.isEnabled(.tunnelFailure) {
             Self.simulationOptions.setEnabled(false, option: .tunnelFailure)
@@ -568,6 +568,16 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         } else {
             Self.simulationOptions.setEnabled(true, option: .crashFatalError)
             try await sendProviderMessageToActiveSession(.simulateTunnelFatalError)
+        }
+    }
+
+    @MainActor
+    func toggleShouldSimulateConnectionInterruption() async throws {
+        if Self.simulationOptions.isEnabled(.connectionInterruption) {
+            Self.simulationOptions.setEnabled(false, option: .connectionInterruption)
+        } else {
+            Self.simulationOptions.setEnabled(true, option: .connectionInterruption)
+            try await sendProviderMessageToActiveSession(.simulateConnectionInterruption)
         }
     }
 

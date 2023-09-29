@@ -37,6 +37,7 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
     @IBOutlet weak var simulateControllerFailureMenuItem: NSMenuItem!
     @IBOutlet weak var simulateTunnelFailureMenuItem: NSMenuItem!
     @IBOutlet weak var simulateTunnelCrashMenuItem: NSMenuItem!
+    @IBOutlet weak var simulateConnectionInterruptionMenuItem: NSMenuItem!
 
     private var simulationOptions: NetworkProtectionSimulationOptions {
         // TODO: fix this
@@ -67,6 +68,11 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
         //simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelFatalError)
     }
 
+    @IBAction
+    func simulateConnectionInterruption(_ menuItem: NSMenuItem) {
+        simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateConnectionInterruption)
+    }
+
     private func simulateFailure(_ simulationFunction: @escaping () async throws -> Void) {
         Task {
             do {
@@ -81,6 +87,7 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
         simulateControllerFailureMenuItem.state = simulationOptions.isEnabled(.controllerFailure) ? .on : .off
         simulateTunnelFailureMenuItem.state = simulationOptions.isEnabled(.tunnelFailure) ? .on : .off
         simulateTunnelCrashMenuItem.state = simulationOptions.isEnabled(.crashFatalError) ? .on : .off
+        simulateConnectionInterruptionMenuItem.state = simulationOptions.isEnabled(.connectionInterruption) ? .on : .off
     }
 }
 

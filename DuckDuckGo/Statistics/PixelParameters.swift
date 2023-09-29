@@ -131,7 +131,6 @@ extension Pixel.Event {
              .favoriteSectionHidden,
              .recentActivitySectionHidden,
              .continueSetUpSectionHidden,
-             .userHasPinnedTab,
              .fireButtonFirstBurn,
              .fireButton,
              .duckPlayerDailyUniqueView,
@@ -148,7 +147,10 @@ extension Pixel.Event {
              .networkProtectionWaitlistNotificationShown,
              .networkProtectionWaitlistNotificationTapped,
              .networkProtectionWaitlistTermsAndConditionsDisplayed,
-             .networkProtectionWaitlistTermsAndConditionsAccepted:
+             .networkProtectionWaitlistTermsAndConditionsAccepted,
+             .enableHomeButton,
+             .disableHomeButton,
+             .setnewHomePage:
             return nil
         }
     }
