@@ -69,7 +69,7 @@ final public class DBPIPCConnection: NSObject {
         os_log("[-] %{public}@", log: memoryManagementLog, type: .debug, Self.className())
     }
 
-    // MARK: - Methods
+    // MARK: - Listening and Registration
 
     public func startListener() {
 
@@ -130,6 +130,27 @@ final public class DBPIPCConnection: NSObject {
         currentAgentProxy = agentProxy
         agentProxy.register(completionHandler)
     }
+
+    // MARK: Agent to App
+
+    func brokersScanCompleted() {
+        guard let connection = currentConnection else {
+            os_log("The app isn't registered for the IPCConnection", log: log, type: .error)
+            return
+        }
+
+        guard let appProxy = connection.remoteObjectProxyWithErrorHandler({ promptError in
+            os_log("IPCConnection error: %@", log: self.log, type: .error, promptError.localizedDescription)
+            self.currentConnection = nil
+        }) as? DBPBackgroundAgentToMainAppCommunication else {
+            os_log("Failed to create a remote object proxy for the app", log: log, type: .error)
+            fatalError("Failed to create a remote object proxy for the app")
+        }
+
+        appProxy.brokersScanCompleted()
+    }
+
+    // MARK: App to Agent
 
     func appDidStart() {
         currentAgentProxy?.appDidStart()
