@@ -73,8 +73,6 @@ public final class DataBrokerProtectionBackgroundManager {
             scheduler.runQueuedOperations(showWebView: false) { [weak self] in
                 self?.scheduler.startScheduler()
             }
-
-            scheduler.scanAllBrokers()
         }
     }
 
