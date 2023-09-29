@@ -20,6 +20,7 @@ import Foundation
 import BrowserServicesKit
 import DataBrokerProtection
 import LoginItems
+import Common
 
 public final class DataBrokerProtectionManager {
 
@@ -29,6 +30,7 @@ public final class DataBrokerProtectionManager {
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()
+    private let ipcConnection = DBPIPCConnection(log: .dbpBackgroundAgent, memoryManagementLog: .dbpBackgroundAgentMemoryManagement)
 
     let loginItemsManager: LoginItemsManager = LoginItemsManager()
 
@@ -68,10 +70,25 @@ public final class DataBrokerProtectionManager {
 
     }
 
+    public func appDidStart() {
+        startLoginItemIfPossible()
+    }
+
     public func startLoginItemIfPossible() {
         guard !redeemUseCase.shouldAskForInviteCode() else { return }
 
-        loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
+        //loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
+        // TODO defo gonna need to get the bundle ID dynamically
+        ipcConnection.register(machServiceName: "com.duckduckgo.macos.DBP.backgroundAgent.debug", delegate: self) { success in
+            DispatchQueue.main.async {
+                if success {
+                    os_log("IPC connection with agent succeeded")
+                    self.ipcConnection.appDidStart()
+                } else {
+                    os_log("IPC connection with agent failed")
+                }
+            }
+        }
     }
 
     public func shouldAskForInviteCode() -> Bool {
@@ -92,5 +109,11 @@ public final class DataBrokerProtectionManager {
             //scheduler.scanAllBrokers()
         }
          */
+    }
+}
+
+extension DataBrokerProtectionManager: DBPBackgroundAgentToMainAppCommunication {
+    public func brokersScanCompleted() {
+        os_log("Brokers scan completed called on main app")
     }
 }

@@ -223,25 +223,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
 #if DBP
-
-        //DataBrokerProtectionManager.shared.startLoginItemIfPossible()
-        // TODO defo gonna need to get the bundle ID dynamically
-        ipcConnection.register(machServiceName: "com.duckduckgo.macos.DBP.backgroundAgent.debug", delegate: self) { success in
-            DispatchQueue.main.async {
-                if success {
-                    os_log("IPC connection with agent succeeded")
-                    self.ipcConnection.appDidStart()
-                } else {
-                    os_log("IPC connection with agent failed")
-                }
-            }
-        }
+        DataBrokerProtectionManager.shared.appDidStart()
 #endif
     }
-
-#if DBP
-    let ipcConnection = DBPIPCConnection(log: .dbpBackgroundAgent, memoryManagementLog: .dbpBackgroundAgentMemoryManagement)
-#endif
 
     func applicationDidBecomeActive(_ notification: Notification) {
         syncService?.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
@@ -413,19 +397,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         completionHandler()
     }
 
-}
-
-#endif
-
-#if DBP
-
-// TODO goes without saying the AppDelegate should not be the delegate and we should move this
-// Clearly should move to the manager
-
-extension AppDelegate: DBPBackgroundAgentToMainAppCommunication {
-    func brokersScanCompleted() {
-        os_log("Brokers scan completed called on main app")
-    }
 }
 
 #endif
