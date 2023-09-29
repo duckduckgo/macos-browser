@@ -28,7 +28,7 @@ protocol DBPUICommunicationDelegate: AnyObject {
     func addNameToCurrentUserProfile(_ name: DBPUIUserProfileName) -> Bool
     func setNameAtIndexInCurrentUserProfile(_ payload: DBPUINameAtIndex) -> Bool
     func removeNameAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool
-    func setBirthYearForCurrentUserProfile(_ year: DBPUIBirthYear)
+    func setBirthYearForCurrentUserProfile(_ year: DBPUIBirthYear) -> Bool
     func addAddressToCurrentUserProfile(_ address: DBPUIUserProfileAddress) -> Bool
     func setAddressAtIndexInCurrentUserProfile(_ payload: DBPUIAddressAtIndex) -> Bool
     func removeAddressAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool
@@ -175,9 +175,11 @@ struct DBPUICommunicationLayer: Subfeature {
             throw DBPUIError.malformedRequest
         }
 
-        delegate?.setBirthYearForCurrentUserProfile(result)
+        if delegate?.setBirthYearForCurrentUserProfile(result) == true {
+            return DBPUIStandardResponse(version: Constants.version, success: true)
+        }
 
-        return nil
+        return DBPUIStandardResponse(version: Constants.version, success: false)
     }
 
     func addAddressToCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {

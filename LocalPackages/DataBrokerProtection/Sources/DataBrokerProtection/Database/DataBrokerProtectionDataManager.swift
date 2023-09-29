@@ -205,10 +205,12 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
         return false
     }
 
-    func setBirthYearForCurrentUserProfile(_ year: DBPUIBirthYear) {
+    func setBirthYearForCurrentUserProfile(_ year: DBPUIBirthYear) -> Bool {
         let profile = profile ?? emptyProfile
 
         self.profile = DataBrokerProtectionProfile(names: profile.names, addresses: profile.addresses, phones: profile.phones, birthYear: year.year)
+
+        return true
     }
 
     func addAddressToCurrentUserProfile(_ address: DBPUIUserProfileAddress) -> Bool {
