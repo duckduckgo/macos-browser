@@ -79,7 +79,7 @@ public struct SubscriptionAccessView: View {
             .animation(.easeOut(duration: 0.3))
 
             Spacer()
-                .frame(minHeight: 8)
+                .frame(minHeight: 4, idealHeight: 60)
 
             Divider()
 

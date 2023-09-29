@@ -27,9 +27,7 @@ public struct SubscriptionAccessRow: View {
     let isExpanded: Bool
     let buttonTitle: String?
     let buttonAction: (() -> Void)?
-
-    @State var fullHeight: CGFloat = 0.0
-
+    
     public init(iconName: String, name: String, descriptionHeader: String? = nil, description: String, isExpanded: Bool, buttonTitle: String? = nil, buttonAction: (() -> Void)? = nil) {
         self.iconName = iconName
         self.name = name
@@ -82,8 +80,20 @@ public struct SubscriptionAccessRow: View {
                     Spacer()
                         .frame(height: 4)
                 }
-                .transition(.opacity)
+                .transition(.asymmetric(insertion: .opacity.animation(.easeIn(duration: Constants.Animation.contentShowingDuration).delay(Constants.Animation.contentShowingDelay)),
+                                        removal: .opacity.animation(.easeOut(duration: Constants.Animation.contentHidingDuration))))
             }
         }
+        .animation(.easeOut(duration: Constants.Animation.duration), value: isExpanded)
+    }
+}
+
+private enum Constants {
+
+    enum Animation {
+        static let duration: CGFloat = 0.3
+        static let contentHidingDuration = duration * 0.6
+        static let contentShowingDuration = duration
+        static let contentShowingDelay = duration * 0.3
     }
 }
