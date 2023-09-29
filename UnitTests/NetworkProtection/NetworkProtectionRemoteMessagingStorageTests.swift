@@ -58,14 +58,19 @@ final class NetworkProtectionRemoteMessagingStorageTests: XCTestCase {
     }
 
     private func mockMessage(id: String) -> NetworkProtectionRemoteMessage {
-        NetworkProtectionRemoteMessage(
-            id: id,
-            cardTitle: "Title",
-            cardDescription: "Desc",
-            cardAction: "Action",
-            daysSinceNetworkProtectionEnabled: 0,
-            surveyURL: nil
-        )
+        let remoteMessageJSON = """
+        {
+            "id": "\(id)",
+            "daysSinceNetworkProtectionEnabled": 0,
+            "cardTitle": "Title",
+            "cardDescription": "Description",
+            "cardAction": "Action",
+            "surveyURL": "https://duckduckgo.com/"
+        }
+        """
+
+        let decoder = JSONDecoder()
+        return try! decoder.decode(NetworkProtectionRemoteMessage.self, from: remoteMessageJSON.data(using: .utf8)!)
     }
 
 }

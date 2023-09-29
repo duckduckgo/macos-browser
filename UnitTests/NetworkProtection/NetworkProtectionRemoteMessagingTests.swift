@@ -104,7 +104,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         waitlistStorage.store(waitlistToken: "token")
         waitlistStorage.store(waitlistTimestamp: 123)
         waitlistStorage.store(inviteCode: "ABCD1234")
-        activationDateStorage.days = 10
+        activationDateStorage._daysSinceActivation = 10
 
         let messaging = DefaultNetworkProtectionRemoteMessaging(
             messageRequest: request,
@@ -140,7 +140,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         waitlistStorage.store(waitlistToken: "token")
         waitlistStorage.store(waitlistTimestamp: 123)
         waitlistStorage.store(inviteCode: "ABCD1234")
-        activationDateStorage.days = 10
+        activationDateStorage._daysSinceActivation = 10
 
         defaults.setValue(Date(), forKey: DefaultNetworkProtectionRemoteMessaging.Constants.lastRefreshDateKey)
 
@@ -177,7 +177,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let dismissedMessage = mockMessage(id: "123")
         let activeMessage = mockMessage(id: "456")
         try? storage.store(messages: [dismissedMessage, activeMessage])
-        activationDateStorage.days = 10
+        activationDateStorage._daysSinceActivation = 10
 
         let messaging = DefaultNetworkProtectionRemoteMessaging(
             messageRequest: request,
@@ -204,7 +204,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let hiddenMessage = mockMessage(id: "123", daysSinceNetworkProtectionEnabled: 10)
         let activeMessage = mockMessage(id: "456")
         try? storage.store(messages: [hiddenMessage, activeMessage])
-        activationDateStorage.days = 5
+        activationDateStorage._daysSinceActivation = 5
 
         let messaging = DefaultNetworkProtectionRemoteMessaging(
             messageRequest: request,
@@ -220,14 +220,19 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
     }
 
     private func mockMessage(id: String, daysSinceNetworkProtectionEnabled: Int = 0) -> NetworkProtectionRemoteMessage {
-        NetworkProtectionRemoteMessage(
-            id: id,
-            cardTitle: "Title",
-            cardDescription: "Desc",
-            cardAction: "Action",
-            daysSinceNetworkProtectionEnabled: daysSinceNetworkProtectionEnabled,
-            surveyURL: nil
-        )
+        let remoteMessageJSON = """
+        {
+            "id": "\(id)",
+            "daysSinceNetworkProtectionEnabled": \(daysSinceNetworkProtectionEnabled),
+            "cardTitle": "Title",
+            "cardDescription": "Description",
+            "cardAction": "Action",
+            "surveyURL": "https://duckduckgo.com/"
+        }
+        """
+
+        let decoder = JSONDecoder()
+        return try! decoder.decode(NetworkProtectionRemoteMessage.self, from: remoteMessageJSON.data(using: .utf8)!)
     }
 
 }
@@ -271,12 +276,17 @@ private final class MockNetworkProtectionRemoteMessagingStorage: NetworkProtecti
 
 }
 
-private final class MockWaitlistActivationDateStore: WaitlistActivationDateStore {
+final class MockWaitlistActivationDateStore: WaitlistActivationDateStore {
 
-    var days: Int?
+    var _daysSinceActivation: Int?
+    var _daysSinceLastActive: Int?
 
     func daysSinceActivation() -> Int? {
-        days
+        _daysSinceActivation
+    }
+
+    func daysSinceLastActive() -> Int? {
+        _daysSinceLastActive
     }
 
 }

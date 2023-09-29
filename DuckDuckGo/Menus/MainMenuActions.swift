@@ -811,7 +811,7 @@ extension MainViewController {
         if let date {
             store.updateActivationDate(date)
         } else {
-            store.removeActivationDate()
+            store.removeDates()
         }
     }
 

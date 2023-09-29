@@ -38,7 +38,7 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
         XCTAssertEqual(firstMessage.cardTitle, "Title 1")
         XCTAssertEqual(firstMessage.cardDescription, "Description 1")
         XCTAssertEqual(firstMessage.cardAction, "Action 1")
-        XCTAssertNil(firstMessage.surveyURL)
+        XCTAssertNil(firstMessage.presentableSurveyURL())
         XCTAssertNil(firstMessage.daysSinceNetworkProtectionEnabled)
 
         guard let secondMessage = decodedMessages.first(where: { $0.id == "456"}) else {
@@ -50,7 +50,7 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
         XCTAssertEqual(secondMessage.cardTitle, "Title 2")
         XCTAssertEqual(secondMessage.cardDescription, "Description 2")
         XCTAssertEqual(secondMessage.cardAction, "Action 2")
-        XCTAssertNil(firstMessage.surveyURL)
+        XCTAssertNil(firstMessage.presentableSurveyURL())
 
         guard let thirdMessage = decodedMessages.first(where: { $0.id == "789"}) else {
             XCTFail("Failed to find expected message")
@@ -61,7 +61,42 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
         XCTAssertEqual(thirdMessage.cardTitle, "Title 3")
         XCTAssertEqual(thirdMessage.cardDescription, "Description 3")
         XCTAssertEqual(thirdMessage.cardAction, "Action 3")
-        XCTAssertEqual(thirdMessage.surveyURL, "https://duckduckgo.com/")
+        XCTAssertEqual(thirdMessage.presentableSurveyURL()?.absoluteString, "https://duckduckgo.com/")
+    }
+
+    func testWhenGettingSurveyURL_AndSurveyURLHasParameters_ThenParametersAreReplaced() {
+        let remoteMessageJSON = """
+        {
+            "id": "1",
+            "daysSinceNetworkProtectionEnabled": 0,
+            "cardTitle": "Title",
+            "cardDescription": "Description",
+            "cardAction": "Action",
+            "surveyURL": "https://duckduckgo.com/"
+        }
+        """
+
+        let decoder = JSONDecoder()
+        let message = try! decoder.decode(NetworkProtectionRemoteMessage.self, from: remoteMessageJSON.data(using: .utf8)!)
+
+        let mockStatisticsStore = MockStatisticsStore()
+        mockStatisticsStore.atb = "atb-123"
+        mockStatisticsStore.variant = "variant"
+
+        let mockActivationDateStore = MockWaitlistActivationDateStore()
+        mockActivationDateStore._daysSinceActivation = 2
+        mockActivationDateStore._daysSinceLastActive = 1
+
+        let presentableSurveyURL = message.presentableSurveyURL(
+            statisticsStore: mockStatisticsStore,
+            activationDateStore: mockActivationDateStore,
+            operatingSystemVersion: "1.2.3",
+            appVersion: "4.5.6",
+            hardwareModel: "MacBookPro,123"
+        )
+
+        let expectedURL = "https://duckduckgo.com/?atb=atb-123&var=variant&delta=2&mv=1.2.3&ddgv=4.5.6&mo=MacBookPro%252C123&da=1"
+        XCTAssertEqual(presentableSurveyURL!.absoluteString, expectedURL)
     }
 
     private func mockMessagesURL() -> URL {

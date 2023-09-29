@@ -63,7 +63,7 @@ final class NetworkProtectionDebugUtilities {
         networkProtectionFeatureDisabler.disable(keepAuthToken: keepAuthToken, uninstallSystemExtension: true)
 
         NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
-        DefaultWaitlistActivationDateStore().removeActivationDate()
+        DefaultWaitlistActivationDateStore().removeDates()
         DefaultNetworkProtectionRemoteMessagingStorage().removeStoredAndDismissedMessages()
 
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)

@@ -389,7 +389,7 @@ extension HomePage.Models {
         }
 
         @MainActor private func handle(remoteMessage: NetworkProtectionRemoteMessage) {
-            if let surveyURLString = remoteMessage.surveyURL, let surveyURL = URL(string: surveyURLString) {
+            if let surveyURL = remoteMessage.presentableSurveyURL() {
                 let tab = Tab(content: .url(surveyURL), shouldLoadInBackground: true)
                 tabCollectionViewModel.append(tab: tab)
                 Pixel.fire(.networkProtectionRemoteMessageOpened(messageID: remoteMessage.id))

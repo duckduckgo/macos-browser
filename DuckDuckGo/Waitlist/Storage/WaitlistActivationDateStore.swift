@@ -21,6 +21,7 @@ import Foundation
 protocol WaitlistActivationDateStore {
 
     func daysSinceActivation() -> Int?
+    func daysSinceLastActive() -> Int?
 
 }
 
@@ -28,6 +29,7 @@ struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
 
     private enum Constants {
         static let networkProtectionActivationDateKey = "com.duckduckgo.network-protection.activation-date"
+        static let networkProtectionLastActiveDateKey = "com.duckduckgo.network-protection.last-active-date"
     }
 
     private let userDefaults: UserDefaults
@@ -52,18 +54,40 @@ struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
         }
 
         let activationDate = Date(timeIntervalSinceReferenceDate: timestamp)
-        let currentDate = Date()
-
-        let numberOfDays = Calendar.current.dateComponents([.day], from: activationDate, to: currentDate)
-        return numberOfDays.day
+        return daysSince(date: activationDate)
     }
 
-    func removeActivationDate() {
+    func updateLastActiveDate() {
+        userDefaults.set(Date(), forKey: Constants.networkProtectionLastActiveDateKey)
+    }
+
+    func daysSinceLastActive() -> Int? {
+        let timestamp = userDefaults.double(forKey: Constants.networkProtectionLastActiveDateKey)
+
+        if timestamp == 0 {
+            return nil
+        }
+
+        let activationDate = Date(timeIntervalSinceReferenceDate: timestamp)
+        return daysSince(date: activationDate)
+    }
+
+    // MARK: - Resetting
+
+    func removeDates() {
         userDefaults.removeObject(forKey: Constants.networkProtectionActivationDateKey)
+        userDefaults.removeObject(forKey: Constants.networkProtectionLastActiveDateKey)
     }
+
+    // MARK: - Updating
 
     func updateActivationDate(_ date: Date) {
         userDefaults.set(date.timeIntervalSinceReferenceDate, forKey: Constants.networkProtectionActivationDateKey)
+    }
+
+    private func daysSince(date storedDate: Date) -> Int? {
+        let numberOfDays = Calendar.current.dateComponents([.day], from: storedDate, to: Date())
+        return numberOfDays.day
     }
 
 }
