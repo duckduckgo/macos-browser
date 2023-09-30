@@ -71,10 +71,8 @@ final public class DBPIPCConnection: NSObject {
 
     // MARK: - Listening and Registration
 
-    public func startListener() {
+    public func startListener(machServiceName: String) {
 
-        // TODO defo need to get the bundle ID dynamically
-        let machServiceName = "com.duckduckgo.macos.DBP.backgroundAgent.debug"
         os_log("Starting IPC listener: %{public}@", log: log, type: .debug, machServiceName)
 
         let newListener = NSXPCListener(machServiceName: machServiceName)

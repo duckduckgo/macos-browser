@@ -78,8 +78,7 @@ public final class DataBrokerProtectionManager {
         guard !redeemUseCase.shouldAskForInviteCode() else { return }
 
         //loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
-        // TODO defo gonna need to get the bundle ID dynamically
-        ipcConnection.register(machServiceName: "com.duckduckgo.macos.DBP.backgroundAgent.debug", delegate: self) { success in
+        ipcConnection.register(machServiceName: Bundle.main.dbpBackgroundAgentBundleId, delegate: self) { success in
             DispatchQueue.main.async {
                 if success {
                     os_log("IPC connection with agent succeeded")
