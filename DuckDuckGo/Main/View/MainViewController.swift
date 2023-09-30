@@ -20,6 +20,8 @@ import Cocoa
 import Carbon.HIToolbox
 import Combine
 import Common
+import Account
+import NetworkProtection
 
 final class MainViewController: NSViewController {
 
@@ -77,6 +79,7 @@ final class MainViewController: NSViewController {
         subscribeToSelectedTabViewModel()
         subscribeToAppSettingsNotifications()
         findInPageContainerView.applyDropShadow()
+        listenToAccountDidSignInEvents()
 
         view.registerForDraggedTypes([.URL, .fileURL])
     }
@@ -84,6 +87,25 @@ final class MainViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         registerForBookmarkBarPromptNotifications()
+    }
+
+    private func listenToAccountDidSignInEvents() {
+        NotificationCenter.default.addObserver(self, selector: #selector(registerAccessToken), name: .accountDidSignIn, object: nil)
+    }
+
+    @objc
+    private func registerAccessToken() {
+        print("DEBUG: Registering!")
+        Task {
+            let accountManager = AccountManager()
+            let redemption = NetworkProtectionCodeRedemptionCoordinator()
+            do {
+                try await redemption.exchange(accessToken: accountManager.token!)
+                print("DEBUG: Redemption success!")
+            } catch {
+                print("DEBUG: Error \(error)")
+            }
+        }
     }
 
     var bookmarkBarPromptObserver: Any?
