@@ -69,7 +69,6 @@ DEPLOYMENT_LOCATION[config=Debug] = YES;
 DSTROOT[config=Debug] = ${BUILT_PRODUCTS_DIR}
 INSTALL_PATH[config=Debug] = Applications/DEBUG
 
-INFOPLIST_FILE = DuckDuckGo/DuckDuckGoPrivacyProInfo.plist
 PRODUCT_NAME = $(PRODUCT_NAME_PREFIX) Privacy Pro
 
 #include? "../../LocalOverrides.xcconfig"
