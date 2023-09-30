@@ -56,6 +56,8 @@ struct DataBrokerProtectionContainerView: View {
                             viewModel: profileViewModel,
                             scanButtonClicked: {
                                 navigationViewModel.updateNavigation(.scanStarted)
+                                containerViewModel.startScanPressed()
+                                /*
                                 containerViewModel.scanAfterProfileCreation { scanResult in
                                     if navigationViewModel.bodyViewType != .scanStarted {
                                         return
@@ -69,8 +71,10 @@ struct DataBrokerProtectionContainerView: View {
                                         containerViewModel.runQueuedOperationsAndStartScheduler()
                                     }
                                 }
+                                 */
                             }, backToDashboardClicked: {
-                                containerViewModel.runQueuedOperationsAndStartScheduler()
+                                // TODO
+                                //containerViewModel.runQueuedOperationsAndStartScheduler()
                                 navigationViewModel.updateNavigation(.results)
                             })
                         .frame(width: 670)
@@ -138,7 +142,7 @@ struct DataBrokerProtectionContainerView: View {
                     shouldShowDebugUI.toggle()
                 },
                                     editProfileClicked: {
-                    containerViewModel.stopAllOperations()
+                    containerViewModel.editProfilePressed()
                     navigationViewModel.updateNavigation(.createProfile)
                 })
                 .frame(height: 300)
@@ -165,7 +169,7 @@ struct DataBrokerProtectionContainerView_Previews: PreviewProvider {
         let navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
         let profileViewModel = ProfileViewModel(dataManager: dataManager)
         let resultsViewModel = ResultsViewModel(dataManager: dataManager)
-        let containerViewModel = ContainerViewModel(scheduler: PreviewScheduler(), dataManager: dataManager)
+        let containerViewModel = ContainerViewModel(mainAppInterface: PreviewDBPPackageToMainAppInterface(), dataManager: dataManager)
 
         DataBrokerProtectionContainerView(containerViewModel: containerViewModel,
                                           navigationViewModel: navigationViewModel,

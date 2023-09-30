@@ -25,7 +25,7 @@ final class ContainerViewModel: ObservableObject {
         case results
     }
 
-    private let scheduler: DataBrokerProtectionScheduler
+    private let mainAppInterface: DBPPackageToMainAppInterface
     private let dataManager: DataBrokerProtectionDataManaging
     private var cancellables = Set<AnyCancellable>()
 
@@ -33,9 +33,9 @@ final class ContainerViewModel: ObservableObject {
     @Published var showWebView = false
     @Published var useFakeBroker = false
 
-    internal init(scheduler: DataBrokerProtectionScheduler,
+    internal init(mainAppInterface: DBPPackageToMainAppInterface,
                   dataManager: DataBrokerProtectionDataManaging) {
-        self.scheduler = scheduler
+        self.mainAppInterface = mainAppInterface
         self.dataManager = dataManager
 
         restoreFakeBrokerStatus()
@@ -43,7 +43,7 @@ final class ContainerViewModel: ObservableObject {
     }
 
     private func setupCancellable() {
-        scheduler.statusPublisher
+        /*scheduler.statusPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
 
@@ -61,7 +61,7 @@ final class ContainerViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { value in
                 FakeBrokerUserDefaults().setFakeBrokerFlag(value)
-            }.store(in: &cancellables)
+            }.store(in: &cancellables)*/
 
     }
 
@@ -69,23 +69,20 @@ final class ContainerViewModel: ObservableObject {
         useFakeBroker = FakeBrokerUserDefaults().isFakeBrokerFlagOn()
     }
 
-    func runQueuedOperationsAndStartScheduler() {
-        scheduler.runQueuedOperations(showWebView: showWebView) { [weak self] in
-            guard let self = self else { return }
-            self.scheduler.startScheduler(showWebView: self.showWebView)
-        }
-    }
+//    func runQueuedOperationsAndStartScheduler() {
+//        scheduler.runQueuedOperations(showWebView: showWebView) { [weak self] in
+//            guard let self = self else { return }
+//            self.scheduler.startScheduler(showWebView: self.showWebView)
+//        }
+//    }
 
     func forceSchedulerRun() {
-        scheduler.runAllOperations(showWebView: showWebView)
+        mainAppInterface.runAllOperations(showWebView: showWebView)
     }
 
-    func stopAllOperations() {
-        scheduler.stopScheduler()
-    }
-
-    func scanAfterProfileCreation(completion: @escaping (ScanResult) -> Void) {
-        scheduler.stopScheduler()
+    func startScanPressed() {
+        mainAppInterface.startScanPressed()
+        /*scheduler.stopScheduler()
 
         scheduler.scanAllBrokers(showWebView: showWebView) { [weak self] in
             guard let self = self else { return }
@@ -98,6 +95,27 @@ final class ContainerViewModel: ObservableObject {
                 } else {
                     completion(.noResults)
                 }
+            }
+        }*/
+    }
+
+    func editProfilePressed() {
+        mainAppInterface.profileModified()
+    }
+}
+
+extension ContainerViewModel: MainAppToDBPPackageInterface {
+
+    func brokersScanCompleted() {
+        DispatchQueue.main.async {
+            let hasResults = self.dataManager.hasMatches()
+
+            if hasResults {
+                //TODO view needs a thing for this.
+                //in general have no idea  how we're gonna deal with its state
+                //completion(.results)
+            } else {
+                //completion(.noResults)
             }
         }
     }

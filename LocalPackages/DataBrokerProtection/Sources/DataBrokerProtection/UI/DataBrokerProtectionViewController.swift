@@ -25,15 +25,12 @@ final public class DataBrokerProtectionViewController: NSViewController {
     private let dataManager: DataBrokerProtectionDataManaging
     private let resultsViewModel: ResultsViewModel
     private let containerViewModel: ContainerViewModel
-    private let scheduler: DataBrokerProtectionScheduler
     private let notificationCenter: NotificationCenter
     private let mainAppInterface: DBPPackageToMainAppInterface
 
-    public init(scheduler: DataBrokerProtectionScheduler,
-                dataManager: DataBrokerProtectionDataManaging,
+    public init(dataManager: DataBrokerProtectionDataManaging,
                 mainAppInterface: DBPPackageToMainAppInterface,
                 notificationCenter: NotificationCenter = .default) {
-        self.scheduler = scheduler
         self.dataManager = dataManager
         self.mainAppInterface = mainAppInterface
         self.notificationCenter = notificationCenter
@@ -44,7 +41,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
         resultsViewModel = ResultsViewModel(dataManager: dataManager,
                                             notificationCenter: notificationCenter)
 
-        containerViewModel = ContainerViewModel(scheduler: scheduler,
+        containerViewModel = ContainerViewModel(mainAppInterface: mainAppInterface,
                                                 dataManager: dataManager)
 
         super.init(nibName: nil, bundle: nil)
@@ -68,4 +65,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
         }
     }
 
+    public func getMainAppDelegate() -> MainAppToDBPPackageInterface {
+        return containerViewModel
+    }
 }

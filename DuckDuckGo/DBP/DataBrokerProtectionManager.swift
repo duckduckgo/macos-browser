@@ -31,6 +31,7 @@ public final class DataBrokerProtectionManager {
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()
     private let ipcConnection = DBPIPCConnection(log: .dbpBackgroundAgent, memoryManagementLog: .dbpBackgroundAgentMemoryManagement)
+    var mainAppToDBPPackageDelegate: MainAppToDBPPackageInterface?
 
     let loginItemsManager: LoginItemsManager = LoginItemsManager()
 
@@ -74,6 +75,10 @@ public final class DataBrokerProtectionManager {
         startLoginItemIfPossible()
     }
 
+    public func shouldAskForInviteCode() -> Bool {
+        redeemUseCase.shouldAskForInviteCode()
+    }
+
     public func startLoginItemIfPossible() {
         guard !redeemUseCase.shouldAskForInviteCode() else { return }
 
@@ -89,31 +94,12 @@ public final class DataBrokerProtectionManager {
             }
         }
     }
-
-    public func shouldAskForInviteCode() -> Bool {
-        redeemUseCase.shouldAskForInviteCode()
-    }
-
-    public func runOperationsAndStartSchedulerIfPossible() {
-        guard !redeemUseCase.shouldAskForInviteCode() else { return }
-
-        /*
-         // TODO make the background agent do it, for now, do nothing
-        // If there's no saved profile we don't need to start the scheduler
-        if dataManager.fetchProfile() != nil {
-            scheduler.runQueuedOperations(showWebView: false) { [weak self] in
-                self?.scheduler.startScheduler()
-            }
-
-            //scheduler.scanAllBrokers()
-        }
-         */
-    }
 }
 
 extension DataBrokerProtectionManager: DBPBackgroundAgentToMainAppCommunication {
     public func brokersScanCompleted() {
         os_log("Brokers scan completed called on main app")
+        mainAppToDBPPackageDelegate?.brokersScanCompleted()
     }
 }
 

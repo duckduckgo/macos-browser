@@ -31,9 +31,10 @@ final class DBPHomeViewController: NSViewController {
     private let dataBrokerProtectionManager: DataBrokerProtectionManager
 
     lazy var dataBrokerProtectionViewController: DataBrokerProtectionViewController = {
-        DataBrokerProtectionViewController(scheduler: dataBrokerProtectionManager.scheduler,
-                                           dataManager: dataBrokerProtectionManager.dataManager,
+        let vc = DataBrokerProtectionViewController(dataManager: dataBrokerProtectionManager.dataManager, mainAppInterface: dataBrokerProtectionManager,
                                            notificationCenter: NotificationCenter.default)
+        dataBrokerProtectionManager.mainAppToDBPPackageDelegate = vc.getMainAppDelegate()
+        return vc
     }()
 
     init(dataBrokerProtectionManager: DataBrokerProtectionManager) {

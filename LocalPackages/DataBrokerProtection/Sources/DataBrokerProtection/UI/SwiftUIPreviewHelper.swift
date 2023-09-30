@@ -18,13 +18,17 @@
 
 import Foundation
 
-final class PreviewScheduler: DataBrokerProtectionScheduler {
-    @Published public var status: DataBrokerProtectionSchedulerStatus = .stopped
-    public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { $status}
+final class PreviewDBPPackageToMainAppInterface: DBPPackageToMainAppInterface {
+    func profileModified() { }
 
-    internal init() {
-        self.status = .idle
-    }
+    func startScanPressed() { }
+
+//    @Published public var status: DataBrokerProtectionSchedulerStatus = .stopped
+//    public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { $status}
+//
+//    internal init() {
+//        self.status = .idle
+//    }
     func startScheduler(showWebView: Bool) { }
     func stopScheduler() { }
     func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) { }
