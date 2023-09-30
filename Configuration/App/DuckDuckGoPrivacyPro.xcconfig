@@ -1,4 +1,7 @@
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//
+//  DuckDuckGoPrivacyPro.xcconfig
+//
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -13,6 +16,9 @@
 //  limitations under the License.
 //
 
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
 #include "AppTargetsBase.xcconfig"
 #include "../NetworkProtectionDeveloperID.xcconfig"
 
@@ -26,7 +32,7 @@ CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
-FEATURE_FLAGS = FEEDBACK NETWORK_PROTECTION SPARKLE
+FEATURE_FLAGS = FEEDBACK NETWORK_PROTECTION SPARKLE SUBSCRIPTION // DBP
 
 PRODUCT_NAME_PREFIX = DuckDuckGo
 
@@ -62,5 +68,7 @@ SYSEX_BUNDLE_ID[config=Release][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).systemextension
 DEPLOYMENT_LOCATION[config=Debug] = YES;
 DSTROOT[config=Debug] = ${BUILT_PRODUCTS_DIR}
 INSTALL_PATH[config=Debug] = Applications/DEBUG
+
+INFOPLIST_FILE = DuckDuckGo/DuckDuckGoPrivacyProInfo.plist
 
 #include? "../../LocalOverrides.xcconfig"
