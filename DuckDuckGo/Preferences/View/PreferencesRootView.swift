@@ -19,10 +19,10 @@
 import SwiftUI
 import SwiftUIExtensions
 import SyncUI
-import Account
-import Purchase
 
 #if SUBSCRIPTION
+import Account
+import Purchase
 import Subscription
 #endif
 
