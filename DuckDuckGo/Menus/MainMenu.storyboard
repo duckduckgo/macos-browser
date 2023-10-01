@@ -721,6 +721,12 @@ CQ
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Debug" systemMenu="help" autoenablesItems="NO" id="y0w-AM-Bho">
                                     <items>
+                                        <menuItem title="Trigger Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="triggerFatalError:" target="Ady-hI-5gd" id="pS0-iQ-TPe"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Reset Data" id="Yxs-rU-Pbe">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Reset Data" id="DVQ-kv-udm">
@@ -832,6 +838,7 @@ CQ
                                                 </items>
                                             </menu>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="q5h-kB-Q82"/>
                                         <menuItem title="Remote Configuration" id="Vu8-iE-7RS">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Remote Configuration" id="z0p-D5-iYh">
@@ -849,26 +856,6 @@ CQ
                                                         </connections>
                                                     </menuItem>
                                                 </items>
-                                            </menu>
-                                        </menuItem>
-                                        <menuItem title="Sync" id="8rI-iH-wNC">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Sync" id="Kw4-67-mit" customClass="SyncDebugMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
-                                                <items>
-                                                    <menuItem title="Environment" id="qD7-Gw-s2h">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Environment" id="lRd-Ih-n5j">
-                                                            <items>
-                                                                <menuItem title="Item" id="amC-1R-0QS">
-                                                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                                                </menuItem>
-                                                            </items>
-                                                        </menu>
-                                                    </menuItem>
-                                                </items>
-                                                <connections>
-                                                    <outlet property="environmentMenu" destination="lRd-Ih-n5j" id="xxg-yh-bfI"/>
-                                                </connections>
                                             </menu>
                                         </menuItem>
                                         <menuItem title="User Scripts" id="HVq-9X-6hx">
@@ -898,6 +885,28 @@ CQ
                                                 </items>
                                             </menu>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="5CA-kn-1sX"/>
+                                        <menuItem title="Sync" id="8rI-iH-wNC">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="Sync" id="Kw4-67-mit" customClass="SyncDebugMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                                <items>
+                                                    <menuItem title="Environment" id="qD7-Gw-s2h">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Environment" id="lRd-Ih-n5j">
+                                                            <items>
+                                                                <menuItem title="Item" id="amC-1R-0QS">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                </menuItem>
+                                                            </items>
+                                                        </menu>
+                                                    </menuItem>
+                                                </items>
+                                                <connections>
+                                                    <outlet property="environmentMenu" destination="lRd-Ih-n5j" id="xxg-yh-bfI"/>
+                                                </connections>
+                                            </menu>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="aYT-Uy-kev"/>
                                         <menuItem title="Network Protection" id="Dt6-sj-4hn">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="Network Protection" id="Rah-lS-gno" customClass="NetworkProtectionDebugMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
@@ -1227,12 +1236,7 @@ CQ
                                                 </connections>
                                             </menu>
                                         </menuItem>
-                                        <menuItem title="Trigger Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="triggerFatalError:" target="Ady-hI-5gd" id="pS0-iQ-TPe"/>
-                                            </connections>
-                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="iVd-TD-QhJ"/>
                                     </items>
                                 </menu>
                             </menuItem>
