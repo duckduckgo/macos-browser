@@ -87,6 +87,7 @@ final class MainMenu: NSMenu {
     // MARK: - Debug
 
     @IBOutlet weak var debugMenuItem: NSMenuItem?
+    @IBOutlet weak var userAgentMenuItem: NSMenuItem?
 
     @IBOutlet weak var debugNetworkProtectionWaitlistTokenItem: NSMenuItem?
     @IBOutlet weak var debugNetworkProtectionWaitlistTimestampItem: NSMenuItem?
@@ -163,6 +164,7 @@ final class MainMenu: NSMenu {
         shareMenuItem.submenu = sharingMenu
         setupHelpMenuItem()
         setupDebugMenuItem(with: featureFlagger)
+        setupUserAgentMenuItem()
         subscribeToBookmarkList()
         subscribeToFavicons()
     }
@@ -348,6 +350,16 @@ final class MainMenu: NSMenu {
         }
     }
 
+    private func setupUserAgentMenuItem() {
+        guard debugMenuItem != nil else { return }
+
+        for (name, userAgent) in UserAgent.userAgentList {
+            let item = NSMenuItem(title: name, action: #selector(setUserAgent(_:)), target: self)
+            item.representedObject = userAgent
+            userAgentMenuItem?.submenu?.insertItem(item, at: 0)
+        }
+    }
+
 #if NETWORK_PROTECTION
     private func updateNetworkProtectionItems() {
         let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: NetworkProtectionWaitlist.identifier)
@@ -445,5 +457,28 @@ final class MainMenu: NSMenu {
         } catch {
             NSAlert(error: error).runModal()
         }
+    }
+
+    @objc private func setUserAgent(_ sender: NSMenuItem?) {
+        guard (NSApp.delegate as? AppDelegate)?.internalUserDecider?.isInternalUser == true else {
+            os_log("Can't set user agent because user is not internal", type: .error)
+            return
+        }
+
+        guard let userAgent = sender?.representedObject as? String else {
+            os_log("No user agent in the represented object", type: .error)
+            return
+        }
+
+        setCustomUserAgent(userAgent)
+    }
+
+    private func setCustomUserAgent(_ userAgent: String) {
+        guard (NSApp.delegate as? AppDelegate)?.internalUserDecider?.isInternalUser == true else {
+            os_log("Can't remove user scripts because user is not internal", type: .error)
+            return
+        }
+
+        UserAgent.userAgentForDebugging = userAgent
     }
 }

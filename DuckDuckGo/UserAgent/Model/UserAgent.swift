@@ -60,6 +60,14 @@ enum UserAgent {
     static let `default` = UserAgent.safari
     static let webViewDefault = ""
 
+    static var userAgentList: [String: String] {
+        return [
+            "Safari": safari,
+            "Chrome": chrome,
+            "Webview": webViewDefault
+        ]
+    }
+
     static var userAgentForDebugging: String?
 
     static let localUserAgentConfiguration: KeyValuePairs<RegEx, String> = [

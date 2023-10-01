@@ -888,24 +888,6 @@ CQ
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <menu key="submenu" title="User Agent" id="IiZ-t2-Thq">
                                                 <items>
-                                                    <menuItem title="Webview Default" id="MwE-m5-HEt">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="setWebviewDefaultUserAgent:" target="Ady-hI-5gd" id="sqL-d8-ZNv"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Safari" id="b8t-LB-8dI">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="setSafariUserAgent:" target="Ady-hI-5gd" id="nCQ-T8-YCV"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Chrome" id="ecG-04-6mF">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="setChromeUserAgent:" target="Ady-hI-5gd" id="2Pm-av-sk4"/>
-                                                        </connections>
-                                                    </menuItem>
                                                     <menuItem isSeparatorItem="YES" id="7Oe-yu-NUo"/>
                                                     <menuItem title="Reset" id="gla-Io-I7Y">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
@@ -1321,6 +1303,7 @@ CQ
                             <outlet property="toggleFullscreenMenuItem" destination="4J7-dP-txa" id="lyl-pp-TR0"/>
                             <outlet property="toggleHomeButtonMenuItem" destination="RnQ-KJ-UFS" id="7AC-U7-MkH"/>
                             <outlet property="toggleNetworkProtectionShortcutMenuItem" destination="UYq-tJ-SrY" id="9HV-Xs-n4f"/>
+                            <outlet property="userAgentMenuItem" destination="FVv-iA-a7M" id="bYy-wT-lqd"/>
                             <outlet property="zoomInMenuItem" destination="lMK-tC-RJd" id="Ddo-RX-A6Z"/>
                             <outlet property="zoomOutMenuItem" destination="flw-Fc-cm6" id="1AB-0r-vvx"/>
                         </connections>
