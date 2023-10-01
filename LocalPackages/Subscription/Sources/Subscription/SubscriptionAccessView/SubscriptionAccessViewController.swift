@@ -44,7 +44,6 @@ public final class SubscriptionAccessViewController: NSViewController {
         let model = ActivateSubscriptionAccessModel(actionHandlers: actionHandlers)
 //        let model = ShareSubscriptionAccessModel(actionHandlers: actionHandlers)
 
-
         let subscriptionAccessView = SubscriptionAccessView(model: model,
                                                             dismiss: { [weak self] in
                 guard let self = self else { return }
