@@ -88,7 +88,7 @@ struct DeviceSyncedView: View {
                     Text("\(devices.count + 1) ")
                         .fontWeight(.bold)
                     +
-                    Text("devices")
+                    Text(UserText.devicesWord)
                         .fontWeight(.bold)
                 }
             } else {

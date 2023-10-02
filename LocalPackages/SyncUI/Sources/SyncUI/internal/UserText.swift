@@ -84,6 +84,7 @@ enum UserText {
     static let deviceSynced = NSLocalizedString("prefrences.sync.device-synced", value: "Device Synced!", comment: "Sync setup dialog title")
     static let deviceSyncedExplanation = NSLocalizedString("prefrences.sync.device-synced-explanation", value: "Your bookmarks and Logins are now syncing with", comment: "Sync setup completion confirmation")
     static let multipleDeviceSyncedExplanation = NSLocalizedString("prefrences.sync.multiple-device-synced-explanation", value: "Your bookmarks and Logins are now syncing on", comment: "Sync setup completion confirmation")
+    static let devicesWord = NSLocalizedString("prefrences.sync.multiple-device-synced-explanation-device word", value: "devices", comment: "Sync setup completion confirmation device word")
 
     static let recoveryPDFExplanation1 = NSLocalizedString("prefrences.sync.recovery-pdf-explanation1", value: "If you lose access to your devices, you will need this code to recover your synced data. You can save this code to your device as a PDF.", comment: "Sync recovery PDF explanation 2")
     static let recoveryPDFExplanation2 = NSLocalizedString("prefrences.sync.recovery-pdf-explanation2", value: "Anyone with access to this code can access your synced data, so please keep it in a safe place.", comment: "Sync recovery PDF explanation")
