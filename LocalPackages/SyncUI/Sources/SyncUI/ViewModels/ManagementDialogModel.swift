@@ -21,7 +21,7 @@ import Combine
 
 public protocol ManagementDialogModelDelegate: AnyObject {
     var isUnifiedFavoritesEnabled: Bool { get set }
-    
+
     func recoverDevice(using recoveryCode: String)
     func saveRecoveryPDF()
     func turnOffSync()
@@ -30,7 +30,6 @@ public protocol ManagementDialogModelDelegate: AnyObject {
     func deleteAccount()
     func presentSaveRecoveryPDF()
 }
-
 
 public final class ManagementDialogModel: ObservableObject {
 

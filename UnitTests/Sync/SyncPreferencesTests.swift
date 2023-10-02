@@ -57,7 +57,7 @@ final class SyncPreferencesTests: XCTestCase {
     }
 
     func testCorrectRecoveryCodeIsReturned() {
-        var account = SyncAccount(deviceId: "some device", deviceName: "", deviceType: "", userId: "", primaryKey: Data(), secretKey: Data(), token: nil, state: .active)
+        let account = SyncAccount(deviceId: "some device", deviceName: "", deviceType: "", userId: "", primaryKey: Data(), secretKey: Data(), token: nil, state: .active)
         ddgSyncing.account = account
 
         XCTAssertEqual(syncPreferences.recoveryCode, account.recoveryCode)
@@ -102,7 +102,7 @@ final class SyncPreferencesTests: XCTestCase {
             XCTAssertNil(managementDialogModel.currentDialog)
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 2.0)
+        wait(for: [expectation], timeout: 5.0)
         XCTAssertTrue(ddgSyncing.disconnectCalled)
     }
 

@@ -116,13 +116,13 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     init(syncService: DDGSyncing, apperancePreferences: AppearancePreferences = .shared, managementDialogModel: ManagementDialogModel = ManagementDialogModel()) {
         self.syncService = syncService
 
-        self.isUnifiedFavoritesEnabled = AppearancePreferences.shared.favoritesDisplayMode.isDisplayUnified
+        self.isUnifiedFavoritesEnabled = apperancePreferences.favoritesDisplayMode.isDisplayUnified
 
         self.managementDialogModel = managementDialogModel
         self.managementDialogModel.delegate = self
         self.managementDialogModel.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
 
-        AppearancePreferences.shared.$favoritesDisplayMode
+        apperancePreferences.$favoritesDisplayMode
             .map(\.isDisplayUnified)
             .sink { [weak self] isUnifiedFavoritesEnabled in
                 guard let self else {
