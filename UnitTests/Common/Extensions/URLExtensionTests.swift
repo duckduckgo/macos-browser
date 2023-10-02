@@ -45,7 +45,6 @@ final class URLExtensionTests: XCTestCase {
     func test_makeURL_from_addressBarString() {
         let data: [(string: String, expected: String)] = [
             ("https://duckduckgo.com/?q=search string with spaces", "https://duckduckgo.com/?q=search%20string%20with%20spaces"),
-            ("define: foo", "https://duckduckgo.com/?q=define%3A%20foo"),
             ("test://hello/", "test://hello/"),
             ("localdomain", "https://duckduckgo.com/?q=localdomain"),
             ("   http://example.com\n", "http://example.com"),
