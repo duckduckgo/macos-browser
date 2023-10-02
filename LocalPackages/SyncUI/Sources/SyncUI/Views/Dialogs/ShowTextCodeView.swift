@@ -69,7 +69,6 @@ struct ShowTextCodeView: View {
                 model.endFlow()
             }
         }
-        .padding(.horizontal, 20)
     }
 
     private func shareContent(_ sharedText: String) {

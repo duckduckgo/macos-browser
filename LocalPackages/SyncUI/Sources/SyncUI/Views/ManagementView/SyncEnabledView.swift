@@ -23,33 +23,30 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
     @EnvironmentObject var model: ViewModel
 
     var body: some View {
-        PreferencePaneSection {
+        PreferencePaneSection(vericalPadding: 12) {
             SyncStatusView<ViewModel>()
                 .environmentObject(model)
                 .frame(width: 513, alignment: .topLeading)
         }
 
-        PreferencePaneSection {
+        PreferencePaneSection(vericalPadding: 12) {
             Text(UserText.syncedDevices)
                 .font(Const.Fonts.preferencePaneSectionHeader)
                 .padding(.horizontal, 16)
-
             SyncedDevicesView<ViewModel>()
                 .environmentObject(model)
                 .frame(width: 513, alignment: .topLeading)
         }
 
-        PreferencePaneSection {
+        PreferencePaneSection(vericalPadding: 12) {
             Text(UserText.syncNewDevice)
                 .font(Const.Fonts.preferencePaneSectionHeader)
                 .padding(.horizontal, 16)
-
             SyncSetupSyncAnotherDeviceCardView<ViewModel>(code: model.recoveryCode ?? "")
                 .environmentObject(model)
-
         }
 
-        PreferencePaneSection {
+        PreferencePaneSection(vericalPadding: 12) {
             Text(UserText.optionsSectionTitle)
                 .font(Const.Fonts.preferencePaneSectionHeader)
                 .padding(.horizontal, 16)
@@ -73,28 +70,28 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             .frame(width: 513, alignment: .topLeading)
         }
 
-        PreferencePaneSection {
-            Text(UserText.recovery)
-                .font(Const.Fonts.preferencePaneSectionHeader)
-                .padding(.horizontal, 16)
-
-            HStack(alignment: .top, spacing: 12) {
-                Text(UserText.recoveryInstructions)
-                    .fixMultilineScrollableText()
-                Spacer()
-                Button(UserText.saveRecoveryPDF) {
-                    model.saveRecoveryPDF()
+        PreferencePaneSection(vericalPadding: 12) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(UserText.recovery)
+                    .font(Const.Fonts.preferencePaneSectionHeader)
+                HStack(alignment: .top, spacing: 12) {
+                    Text(UserText.recoveryInstructions)
+                        .fixMultilineScrollableText()
+                    Spacer()
+                    Button(UserText.saveRecoveryPDF) {
+                        model.saveRecoveryPDF()
+                    }
                 }
             }
-            .padding(16)
-            .roundedBorder()
+            .padding(.horizontal, 16)
             .frame(width: 513, alignment: .topLeading)
         }
 
-        PreferencePaneSection {
+        PreferencePaneSection(vericalPadding: 12) {
             Button(UserText.turnOffAndDeleteServerData) {
                 model.presentDeleteAccount()
             }
+            .padding(16)
         }
     }
 }

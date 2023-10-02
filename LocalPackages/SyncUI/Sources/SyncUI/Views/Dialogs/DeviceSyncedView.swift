@@ -25,13 +25,11 @@ struct DeviceSyncedView: View {
     let shouldShowOptions: Bool
     let isFirstDevice: Bool
     var height: CGFloat {
-        if isFirstDevice {
-            return 450
-        }
         if shouldShowOptions {
-            return 500
+            return 400
+        } else {
+            return 250
         }
-        return min(450, 290 + (CGFloat(devices.count) * 44))
     }
     var title: String {
         if isFirstDevice {
@@ -42,20 +40,15 @@ struct DeviceSyncedView: View {
 
     var body: some View {
         SyncDialog(spacing: 20.0) {
-            VStack(spacing: 20) {
+            VStack(alignment: .center, spacing: 20) {
                 Image("Sync-setup-success")
                 Text(title)
                     .font(.system(size: 17, weight: .bold))
-                if isFirstDevice {
-                    NewDeviceDescriptionView()
-                } else {
-                    Text(UserText.deviceSyncedExplanation)
-                        .multilineTextAlignment(.center)
-                }
-
-                if !isFirstDevice {
-                    ScrollView {
-                        SyncedDevicesList(devices: devices)
+                VStack(alignment: .center) {
+                    if isFirstDevice {
+                        SingleDeviceSetTextView()
+                    } else {
+                        NewDeviceSyncedView(devices: devices)
                     }
                 }
                 if shouldShowOptions {
@@ -63,7 +56,6 @@ struct DeviceSyncedView: View {
                 }
             }
             .frame(width: 320)
-            .padding(20)
         } buttons: {
             Button(UserText.next) {
                 if isFirstDevice {
@@ -73,21 +65,39 @@ struct DeviceSyncedView: View {
                 }
             }
         }
+        .padding(.vertical, 20)
         .frame(width: 360,
                height: height)
     }
 
-    struct NewDeviceDescriptionView: View {
+    struct SingleDeviceSetTextView: View {
         var body: some View {
-            Text(UserText.allSetDialogCaption1)
-            +
-            Text(UserText.allSetDialogCaption2)
-                .fontWeight(.bold)
-            +
-            Text(UserText.allSetDialogCaption3)
-            +
-            Text(UserText.allSetDialogCaption4)
-                .fontWeight(.bold)
+            Text(UserText.allSetDialogCaption)
+                .frame(width: 320, alignment: .center)
+                .multilineTextAlignment(.center)
+                .fixedSize()
+        }
+    }
+
+    struct NewDeviceSyncedView: View {
+        let devices: [SyncDevice]
+        var body: some View {
+            if devices.count > 1 {
+                VStack(alignment: .center) {
+                    Text(UserText.multipleDeviceSyncedExplanation)
+                    Text("\(devices.count + 1) ")
+                        .fontWeight(.bold)
+                    +
+                    Text("devices")
+                        .fontWeight(.bold)
+                }
+            } else {
+                VStack(alignment: .center) {
+                    Text(UserText.deviceSyncedExplanation)
+                    Text("\(devices[0].name)")
+                        .fontWeight(.bold)
+                }
+            }
         }
     }
 
@@ -96,25 +106,32 @@ struct DeviceSyncedView: View {
         var body: some View {
             VStack(spacing: 8) {
                 Text(UserText.optionsSectionDialogTitle)
+                    .font(.system(size: 11))
+                    .foregroundColor(Color("BlackWhite60"))
                 VStack {
                     Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
-                        VStack(alignment: .leading, spacing: 8) {
+                        VStack(alignment: .leading, spacing: 2) {
                             Text(UserText.shareFavoritesOptionTitle)
-                                .font(Const.Fonts.preferencePaneOptionTitle)
+                                .font(.system(size: 13))
+                                .foregroundColor(Color("BlackWhite80"))
                             Text(UserText.shareFavoritesOptionCaption)
-                                .font(Const.Fonts.preferencePaneCaption)
+                                .font(.system(size: 11))
                                 .foregroundColor(Color("BlackWhite60"))
+                                .frame(width: 254)
+                                .fixedSize()
                         }
                         .frame(width: 254)
                     }
+                    .padding(.bottom, 13)
+                    .padding(.top, 7)
+                    .padding(.horizontal, 16)
                     .frame(height: 65)
                     .toggleStyle(.switch)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
                     .roundedBorder()
                 }
                 .frame(width: 320)
             }
+            .padding(.top, 32)
         }
     }
 }

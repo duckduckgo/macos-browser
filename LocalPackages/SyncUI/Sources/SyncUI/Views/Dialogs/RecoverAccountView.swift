@@ -51,19 +51,15 @@ struct RecoverAccountView: View {
                 buttonCaption: UserText.pasteFromClipboard) {
                     submitRecoveryCode()
                 }.environmentObject(recoveryCodeModel)
+                .frame(height: 256)
 
         } buttons: {
             Button(UserText.cancel) {
                 model.endFlow()
             }
             .buttonStyle(DismissActionButtonStyle())
-            Button(UserText.submit) {
-                submitRecoveryCode()
-            }
-            .buttonStyle(DefaultActionButtonStyle(enabled: !recoveryCodeModel.shouldDisableSubmitButton))
-            .disabled(recoveryCodeModel.shouldDisableSubmitButton)
         }
-        .frame(width: 480, height: 432)
+        .frame(width: 480, height: 390)
     }
 
 }
