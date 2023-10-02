@@ -580,6 +580,8 @@ public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProte
                 print("PIXEL: optOutValidate")
             case .optOutFinish:
                 print("PIXEL: optOutFinish")
+            case .optOutSubmitSuccess:
+                print("PIXEL: optOutSubmitSuccess")
             case .optOutSuccess:
                 print("PIXEL: optOutSuccess")
             case .optOutFailure:

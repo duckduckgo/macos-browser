@@ -156,6 +156,22 @@ extension Pixel.Event {
              .disableHomeButton,
              .setnewHomePage:
             return nil
+#if DBP
+        case .optOutStart,
+            .optOutEmailGenerate,
+            .optOutCaptchaParse,
+            .optOutCaptchaSend,
+            .optOutCaptchaSolve,
+            .optOutSubmit,
+            .optOutEmailReceive,
+            .optOutEmailConfirm,
+            .optOutValidate,
+            .optOutFinish,
+            .optOutSubmitSuccess,
+            .optOutSuccess,
+            .optOutFailure:
+          return nil
+#endif
         }
     }
 
