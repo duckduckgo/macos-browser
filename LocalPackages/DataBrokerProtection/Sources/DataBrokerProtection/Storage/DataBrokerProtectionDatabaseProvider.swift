@@ -241,6 +241,12 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
+    static func migrateV3(database: Database) throws {
+        try database.alter(table: ProfileQueryDB.databaseTableName) {
+            $0.add(column: ProfileQueryDB.Columns.deprecated.name, .boolean).notNull().defaults(to: false)
+        }
+    }
+
     func saveProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {
         try db.write { db in
             // The schema currently supports multiple profiles, but we are going to start with one
