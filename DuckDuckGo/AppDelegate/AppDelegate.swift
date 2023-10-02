@@ -33,10 +33,6 @@ import UserNotifications
 import NetworkProtection
 #endif
 
-#if DBP
-import DataBrokerProtection
-#endif
-
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
 
