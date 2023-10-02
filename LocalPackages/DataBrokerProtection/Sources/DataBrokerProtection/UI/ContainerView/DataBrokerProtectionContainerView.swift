@@ -73,8 +73,6 @@ struct DataBrokerProtectionContainerView: View {
                                 }
                                  */
                             }, backToDashboardClicked: {
-                                // TODO
-                                //containerViewModel.runQueuedOperationsAndStartScheduler()
                                 navigationViewModel.updateNavigation(.results)
                             })
                         .frame(width: 670)
