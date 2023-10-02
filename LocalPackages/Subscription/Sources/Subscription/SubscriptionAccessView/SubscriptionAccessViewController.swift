@@ -40,7 +40,6 @@ public final class SubscriptionAccessViewController: NSViewController {
                 // go to sync
             })
 
-        // TODO: Support SubscriptionAccessModel states for the VC presentation
         let model = ActivateSubscriptionAccessModel(actionHandlers: actionHandlers)
 //        let model = ShareSubscriptionAccessModel(actionHandlers: actionHandlers)
 
