@@ -26,7 +26,7 @@ public enum ManagementDialogKind: Equatable {
     case turnOffSync
     case deviceDetails(_ device: SyncDevice)
     case removeDevice(_ device: SyncDevice)
-    case showTextCode
+    case showTextCode(_ code: String)
     case manuallyEnterCode
     case firstDeviceSetup
 }
@@ -72,8 +72,8 @@ public struct ManagementDialog: View {
                 RemoveDeviceView(device: device)
             case .deleteAccount(let devices):
                 DeleteAccountView(devices: devices)
-            case .showTextCode:
-                ShowTextCodeView()
+            case .showTextCode(let code):
+                ShowTextCodeView(code: code)
 
             default:
                 EmptyView()

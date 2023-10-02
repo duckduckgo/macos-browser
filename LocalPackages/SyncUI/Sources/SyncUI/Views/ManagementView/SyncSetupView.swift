@@ -32,8 +32,8 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                     if model.isCreatingAccount {
                         ProgressView()
                     } else {
-                        VStack(spacing: 24) {
-                            SyncSetupSyncAnotherDeviceCardView<ViewModel>(isConnected: false)
+                        VStack(alignment: .leading, spacing: 24) {
+                            SyncSetupSyncAnotherDeviceCardView<ViewModel>(code: model.codeToDisplay ?? "")
                                 .environmentObject(model)
                                 .onAppear {
                                     model.startPollingForRecoveryKey()
@@ -63,10 +63,12 @@ extension SyncSetupView {
         var body: some View {
             HStack(alignment: .top, spacing: 8) {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text(UserText.syncFirstDeviceSetUpCardTitle)
-                        .fontWeight(.semibold)
-                    Text(UserText.syncFirstDeviceSetUpCardExplanation)
-                        .foregroundColor(Color("GreyTextColor"))
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(UserText.syncFirstDeviceSetUpCardTitle)
+                            .fontWeight(.semibold)
+                        Text(UserText.syncFirstDeviceSetUpCardExplanation)
+                            .foregroundColor(Color("GreyTextColor"))
+                    }
                     Button(UserText.syncFirstDeviceSetUpActionTitle) {
                         model.turnOnSync()
                     }
@@ -101,7 +103,7 @@ struct QRCodeView: View {
 
     var body: some View {
         VStack(alignment: .center) {
-            QRCode(string: recoveryCode, size: .init(width: 256, height: 256))
+            QRCode(string: recoveryCode, size: .init(width: 160, height: 160))
             Text("Scan this QR code with another device")
                 .foregroundColor(Color("GreyTextColor"))
         }
@@ -118,13 +120,7 @@ struct QRCodeView: View {
 
 struct SyncSetupSyncAnotherDeviceCardView<ViewModel>: View where ViewModel: ManagementViewModel {
     @EnvironmentObject var model: ViewModel
-    let isConnected: Bool
-    var code: String {
-        if isConnected {
-            return model.recoveryCode ?? ""
-        }
-        return model.codeToDisplay ?? ""
-    }
+    let code: String
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {

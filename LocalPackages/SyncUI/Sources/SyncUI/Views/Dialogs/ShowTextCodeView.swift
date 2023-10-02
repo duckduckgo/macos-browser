@@ -22,6 +22,7 @@ import SwiftUIExtensions
 struct ShowTextCodeView: View {
     @EnvironmentObject var model: ManagementDialogModel
     @State private var shareButtonFrame: CGRect = .zero // Store the frame of the share button
+    let code: String
 
     var body: some View {
         SyncDialog(spacing: 20.0) {
@@ -32,12 +33,12 @@ struct ShowTextCodeView: View {
                     .multilineTextAlignment(.center)
                     .frame(width: 280)
                     .fixedSize()
-                SyncKeyView(text: model.codeToDisplay ?? "")
+                SyncKeyView(text: code)
                     .frame(width: 213)
                 HStack(alignment: .center, spacing: 10) {
                     Button {
                         NSPasteboard.general.clearContents()
-                        NSPasteboard.general.setString(model.codeToDisplay ?? "", forType: .string)
+                        NSPasteboard.general.setString(code, forType: .string)
                     } label: {
                         HStack {
                             Image("Copy")
@@ -46,9 +47,7 @@ struct ShowTextCodeView: View {
                     }
                     .buttonStyle(CopyPasteButtonStyle())
                     Button {
-                        if let code = model.codeToDisplay {
-                            shareContent(code)
-                        }
+                        shareContent(code)
                     } label: {
                         HStack {
                             Image("Share")

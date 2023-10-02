@@ -83,8 +83,8 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     @MainActor
     func presentShowTextCodeDialog() {
-        managementDialogModel.codeToDisplay = self.codeToDisplay
-        presentDialog(for: .showTextCode)
+        let code: String = recoveryCode ?? codeToDisplay ?? ""
+        presentDialog(for: .showTextCode(code))
     }
 
     @MainActor

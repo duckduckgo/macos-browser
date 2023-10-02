@@ -44,7 +44,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                 .font(Const.Fonts.preferencePaneSectionHeader)
                 .padding(.horizontal, 16)
 
-            SyncSetupSyncAnotherDeviceCardView<ViewModel>(isConnected: true)
+            SyncSetupSyncAnotherDeviceCardView<ViewModel>(code: model.recoveryCode ?? "")
                 .environmentObject(model)
 
         }

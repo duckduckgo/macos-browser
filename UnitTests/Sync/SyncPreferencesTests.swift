@@ -79,8 +79,7 @@ final class SyncPreferencesTests: XCTestCase {
         syncPreferences.codeToDisplay = "adfasdf"
         syncPreferences.presentShowTextCodeDialog()
 
-        XCTAssertEqual(managementDialogModel.codeToDisplay, syncPreferences.codeToDisplay)
-        XCTAssertEqual(managementDialogModel.currentDialog, .showTextCode)
+        XCTAssertEqual(managementDialogModel.currentDialog, .showTextCode(syncPreferences.codeToDisplay ?? ""))
     }
 
     @MainActor func testOnPresentTurnOffSyncConfirmDialogThenTurnOffSyncShown() {

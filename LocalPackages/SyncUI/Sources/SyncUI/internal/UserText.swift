@@ -36,7 +36,7 @@ enum UserText {
     static let syncAddDeviceCardExplanation = NSLocalizedString("preferences.sync.add-device-explanation", value: "To sync with another device, open the DuckDuckGo app on that device. Navigate to Settings > Sync & Back Up and scan the QR code below.", comment: "Sync add device explanation")
     static let syncAddDeviceCardActionsExplanation = NSLocalizedString("preferences.sync.add-device-actions-explanation", value: "Can't scan the QR code? Copy and paste the text code instead.", comment: "Sync add device actions explanation")
     static let syncAddDeviceShowTextActionTitle = NSLocalizedString("preferences.sync.add-device-show-text-action-title", value: "Show Text Code", comment: "Sync add device show text action title")
-    static let syncAddDeviceEnterCodeActionTitle = NSLocalizedString("preferences.sync.add-device-enter-code-action-title", value: "Manually Enter Code", comment: "Sync add device enter code action title")
+    static let syncAddDeviceEnterCodeActionTitle = NSLocalizedString("preferences.sync.add-device-enter-code-action-title", value: "Enter Text Code", comment: "Sync add device enter code action title")
 
     static let syncFirstDeviceSetUpCardTitle = NSLocalizedString("preferences.sync.first-device-setup-title", value: "Single-Device Setup", comment: "Sync first device setup title")
     static let syncFirstDeviceSetUpCardExplanation = NSLocalizedString("preferences.sync.first-device-setup-explanation", value: "Set up this device now, sync with other devices later.", comment: "Sync add device enter code action explanation")
