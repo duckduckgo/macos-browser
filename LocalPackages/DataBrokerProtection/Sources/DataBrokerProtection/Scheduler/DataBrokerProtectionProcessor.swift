@@ -55,7 +55,13 @@ final class DataBrokerProtectionProcessor {
                       showWebView: showWebView) {
             os_log("Scans done", log: .dataBrokerProtection)
             completion?()
+            self.calculateMisMatches()
         }
+    }
+
+    private func calculateMisMatches() {
+        let mismatchUseCase = MismatchCalculatorUseCase(database: database, pixelHandler: pixelHandler)
+        mismatchUseCase.calculateMisMatches()
     }
 
     func runAllOptOutOperations(showWebView: Bool = false, completion: (() -> Void)? = nil) {
