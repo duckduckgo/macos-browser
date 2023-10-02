@@ -1,6 +1,5 @@
 //
 //  DebugPurchaseViewController.swift
-//  DuckDuckGo
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -70,9 +69,9 @@ public final class DebugPurchaseViewController: NSViewController {
             print(" -- got combineLatest - availableProducts: \(availableProducts.map { $0.id }.joined(separator: ","))")
             print(" -- got combineLatest - purchasedProducts: \(purchasedProductIDs.joined(separator: ","))")
             print(" -- got combineLatest -     purchaseQueue: \(purchaseQueue.joined(separator: ","))")
-            
+
             let sortedProducts = availableProducts.sorted(by: { $0.price > $1.price })
-            
+
             self?.model.subscriptions = sortedProducts.map { SubscriptionRowModel(product: $0,
                                                                                   isPurchased: purchasedProductIDs.contains($0.id),
                                                                                   isBeingPurchased: purchaseQueue.contains($0.id)) }

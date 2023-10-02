@@ -15,6 +15,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+
+#if SUBSCRIPTION
+
 import BrowserServicesKit
 import Common
 import Combine
@@ -139,3 +142,5 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
         return nil
     }
 }
+
+#endif

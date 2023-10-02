@@ -1,5 +1,5 @@
 //
-//  AccountTests.swift
+//  DuckDuckGoPrivacyPro.xcconfig
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,14 +16,10 @@
 //  limitations under the License.
 //
 
-import XCTest
-@testable import Account
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
 
-final class AccountTests: XCTestCase {
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-        XCTAssertEqual(Account().text, "Hello, World!")
-    }
-}
+#include "DuckDuckGo.xcconfig"
+
+FEATURE_FLAGS = FEEDBACK NETWORK_PROTECTION SPARKLE SUBSCRIPTION
+PRODUCT_NAME = $(PRODUCT_NAME_PREFIX) Privacy Pro
