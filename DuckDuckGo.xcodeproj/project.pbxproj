@@ -80,6 +80,12 @@
 		1E0C72072ABC63BD00802009 /* SubscriptionPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E0C72052ABC63BD00802009 /* SubscriptionPagesUserScript.swift */; };
 		1E0C72082ABC63BD00802009 /* SubscriptionPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E0C72052ABC63BD00802009 /* SubscriptionPagesUserScript.swift */; };
 		1E25269C28F8741A00E44DFA /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 1E25269B28F8741A00E44DFA /* Common */; };
+		1E2AE4C72ACB215900684E0A /* NetworkProtectionRemoteMessaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D62ABB8A110083F6DF /* NetworkProtectionRemoteMessaging.swift */; };
+		1E2AE4C82ACB216B00684E0A /* HoverTrackingArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B140872ABDBCC1004F8E85 /* HoverTrackingArea.swift */; };
+		1E2AE4C92ACB217800684E0A /* NetworkProtectionRemoteMessagingStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15DA2ABB8CED0083F6DF /* NetworkProtectionRemoteMessagingStorage.swift */; };
+		1E2AE4CA2ACB21A000684E0A /* NetworkProtectionRemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D82ABB8A7F0083F6DF /* NetworkProtectionRemoteMessage.swift */; };
+		1E2AE4CB2ACB21C800684E0A /* HardwareModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9579202AC687170062CA31 /* HardwareModel.swift */; };
+		1E2AE4CC2ACB224A00684E0A /* NetworkProtectionRemoteMessagingRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15DC2ABB8CFC0083F6DF /* NetworkProtectionRemoteMessagingRequest.swift */; };
 		1E3ED4FD2AC1E0290075F60F /* Purchase in Frameworks */ = {isa = PBXBuildFile; productRef = 1E3ED4FC2AC1E0290075F60F /* Purchase */; };
 		1E7E2E9029029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E8F29029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift */; };
 		1E7E2E9229029F9B00C01B54 /* WebsiteBreakageReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E9129029F9B00C01B54 /* WebsiteBreakageReporter.swift */; };
@@ -11625,6 +11631,7 @@
 			files = (
 				4B9579462AC7AE700062CA31 /* FaviconUserScript.swift in Sources */,
 				4B9579472AC7AE700062CA31 /* BWResponse.swift in Sources */,
+				1E2AE4C72ACB215900684E0A /* NetworkProtectionRemoteMessaging.swift in Sources */,
 				4B9579482AC7AE700062CA31 /* LottieAnimationCache.swift in Sources */,
 				4B9579492AC7AE700062CA31 /* WaitlistDialogView.swift in Sources */,
 				4B95794A2AC7AE700062CA31 /* TabIndex.swift in Sources */,
@@ -11861,6 +11868,7 @@
 				4B957A312AC7AE700062CA31 /* MainViewController.swift in Sources */,
 				4B957A322AC7AE700062CA31 /* DuckPlayer.swift in Sources */,
 				4B957A332AC7AE700062CA31 /* Favicon.swift in Sources */,
+				1E2AE4CA2ACB21A000684E0A /* NetworkProtectionRemoteMessage.swift in Sources */,
 				4B957A342AC7AE700062CA31 /* SuggestionContainerViewModel.swift in Sources */,
 				4B957A352AC7AE700062CA31 /* FirePopoverWrapperViewController.swift in Sources */,
 				4B957A362AC7AE700062CA31 /* NSPasteboardItemExtension.swift in Sources */,
@@ -11897,6 +11905,7 @@
 				4B957A552AC7AE700062CA31 /* EncryptionKeyStore.swift in Sources */,
 				4B957A562AC7AE700062CA31 /* TabExtensionsBuilder.swift in Sources */,
 				4B957A572AC7AE700062CA31 /* CookieConsentPopoverManager.swift in Sources */,
+				1E2AE4C82ACB216B00684E0A /* HoverTrackingArea.swift in Sources */,
 				4B957A582AC7AE700062CA31 /* PasswordManagementIdentityItemView.swift in Sources */,
 				4B957A592AC7AE700062CA31 /* ProgressExtension.swift in Sources */,
 				4B957A5A2AC7AE700062CA31 /* CSVParser.swift in Sources */,
@@ -11905,6 +11914,7 @@
 				4B957A5D2AC7AE700062CA31 /* AppearancePreferences.swift in Sources */,
 				4B957A5E2AC7AE700062CA31 /* DownloadListCoordinator.swift in Sources */,
 				4B957A5F2AC7AE700062CA31 /* AdClickAttributionTabExtension.swift in Sources */,
+				1E2AE4CC2ACB224A00684E0A /* NetworkProtectionRemoteMessagingRequest.swift in Sources */,
 				4B957A602AC7AE700062CA31 /* NSNotificationName+Debug.swift in Sources */,
 				4B957A612AC7AE700062CA31 /* NavigationBarBadgeAnimationView.swift in Sources */,
 				4B957A622AC7AE700062CA31 /* AddressBarButton.swift in Sources */,
@@ -12205,6 +12215,7 @@
 				4B957B892AC7AE700062CA31 /* ToggleableScrollView.swift in Sources */,
 				4B957B8A2AC7AE700062CA31 /* TabCleanupPreparer.swift in Sources */,
 				4B957B8B2AC7AE700062CA31 /* NetworkProtectionOptionKeyExtension.swift in Sources */,
+				1E2AE4CB2ACB21C800684E0A /* HardwareModel.swift in Sources */,
 				4B957B8C2AC7AE700062CA31 /* UserScripts.swift in Sources */,
 				4B957B8D2AC7AE700062CA31 /* NSWorkspaceExtension.swift in Sources */,
 				4B957B8E2AC7AE700062CA31 /* AutofillTabExtension.swift in Sources */,
@@ -12253,6 +12264,7 @@
 				4B957BB92AC7AE700062CA31 /* SyncErrorHandler.swift in Sources */,
 				4B957BBA2AC7AE700062CA31 /* URLExtension.swift in Sources */,
 				4B957BBB2AC7AE700062CA31 /* Tab+UIDelegate.swift in Sources */,
+				1E2AE4C92ACB217800684E0A /* NetworkProtectionRemoteMessagingStorage.swift in Sources */,
 				4B957BBC2AC7AE700062CA31 /* CookieConsentAnimationView.swift in Sources */,
 				4B957BBD2AC7AE700062CA31 /* NSStoryboardExtension.swift in Sources */,
 				4B957BBE2AC7AE700062CA31 /* PreferencesViewController.swift in Sources */,
