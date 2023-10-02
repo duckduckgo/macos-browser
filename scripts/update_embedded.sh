@@ -3,7 +3,7 @@
 set -eo pipefail
 
 TDS_URL="https://staticcdn.duckduckgo.com/trackerblocking/v5/current/macos-tds.json"
-CONFIG_URL="https://staticcdn.duckduckgo.com/trackerblocking/config/v2/macos-config.json"
+CONFIG_URL="https://staticcdn.duckduckgo.com/trackerblocking/config/v3/macos-config.json"
 
 # If -c is passed, then check the URLs in the Configuration files are correct.
 if [ "$1" == "-c" ]; then

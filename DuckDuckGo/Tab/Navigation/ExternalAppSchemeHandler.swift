@@ -80,6 +80,7 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         navigationAction.targetFrame?.webView?.removeFocusFromWebView()
 
         if let targetSecurityOrigin = navigationAction.targetFrame?.securityOrigin,
+           !targetSecurityOrigin.host.isEmpty,
            navigationAction.sourceFrame.securityOrigin != targetSecurityOrigin {
             return .cancel
         }

@@ -88,7 +88,7 @@ final class BookmarksBarViewModel: NSObject {
         return calculationLabel
     }()
 
-    private var bookmarksBarItems: [BookmarksBarItem] = [] {
+    private(set) var bookmarksBarItems: [BookmarksBarItem] = [] {
         didSet {
             let itemsWidth = bookmarksBarItems.reduce(CGFloat(0)) { total, item in
                 if total == 0 {

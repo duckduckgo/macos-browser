@@ -95,7 +95,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertEqual(moreOptionMenu.items[12].title, UserText.emailOptionsMenuItem)
 
 #if NETWORK_PROTECTION
-        XCTAssertEqual(moreOptionMenu.items[13].title, UserText.networkProtection)
+        XCTAssertTrue(moreOptionMenu.items[13].title.hasPrefix(UserText.networkProtection))
         XCTAssertTrue(moreOptionMenu.items[14].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[15].title, UserText.settings)
 #else

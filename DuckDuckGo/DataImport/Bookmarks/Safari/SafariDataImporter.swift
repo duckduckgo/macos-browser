@@ -56,6 +56,7 @@ internal class SafariDataImporter: DataImporter {
         return [.bookmarks]
     }
 
+    @MainActor(unsafe)
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
                     completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
@@ -70,20 +71,19 @@ internal class SafariDataImporter: DataImporter {
 
             switch faviconsResult {
             case .success(let faviconsByURL):
-                for (pageURLString, fetchedFavicons) in faviconsByURL {
-                    if let pageURL = URL(string: pageURLString) {
-                        let favicons = fetchedFavicons.map {
-                            Favicon(identifier: UUID(),
-                                    url: pageURL,
-                                    image: $0.image,
-                                    relation: .icon,
-                                    documentUrl: pageURL,
-                                    dateCreated: Date())
-                        }
-
-                        faviconManager.handleFavicons(favicons, documentUrl: pageURL)
+                let faviconsByDocument = faviconsByURL.reduce(into: [URL: [Favicon]]()) { result, pair in
+                    guard let pageURL = URL(string: pair.key) else { return }
+                    let favicons = pair.value.map {
+                        Favicon(identifier: UUID(),
+                                url: pageURL,
+                                image: $0.image,
+                                relation: .icon,
+                                documentUrl: pageURL,
+                                dateCreated: Date())
                     }
+                    result[pageURL] = favicons
                 }
+                faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
 
             case .failure:
                 Pixel.fire(.faviconImportFailed(source: .safari))

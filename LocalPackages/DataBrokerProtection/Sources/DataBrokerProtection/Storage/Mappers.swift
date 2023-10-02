@@ -170,7 +170,8 @@ struct MapperToModel {
             name: decodedBroker.name,
             steps: decodedBroker.steps,
             version: decodedBroker.version,
-            schedulingConfig: decodedBroker.schedulingConfig
+            schedulingConfig: decodedBroker.schedulingConfig,
+            parent: decodedBroker.parent
         )
     }
 

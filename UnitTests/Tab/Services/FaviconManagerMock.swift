@@ -31,7 +31,7 @@ final class FaviconManagerMock: FaviconManagement {
         completion(nil)
     }
 
-    func handleFavicons(_ favicons: [Favicon], documentUrl: URL) {
+    func handleFaviconsByDocumentUrl(_ faviconsByDocumentUrl: [URL: [Favicon]]) {
         // no-op
     }
 
@@ -51,6 +51,7 @@ final class FaviconManagerMock: FaviconManagement {
         completion()
     }
 
+    // swiftlint:disable:next function_parameter_count
     func burnDomains(_ domains: Set<String>, exceptBookmarks bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, exceptSavedLogins: Set<String>, exceptExistingHistory history: DuckDuckGo_Privacy_Browser.History, tld: Common.TLD, completion: @escaping () -> Void) {
         completion()
     }

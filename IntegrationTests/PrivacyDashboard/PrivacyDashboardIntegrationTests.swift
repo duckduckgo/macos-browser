@@ -64,7 +64,7 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
             .promise()
 
         // load the test page
-        let url = URL(string: "http://privacy-test-pages.glitch.me/tracker-reporting/1major-via-script.html")!
+        let url = URL(string: "http://privacy-test-pages.site/tracker-reporting/1major-via-script.html")!
         _=await tab.setUrl(url, userEntered: nil)?.value?.result
 
         let trackersCount = try await trackersCountPromise.value
