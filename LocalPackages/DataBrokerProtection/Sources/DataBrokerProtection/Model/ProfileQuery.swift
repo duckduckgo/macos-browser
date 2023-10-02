@@ -53,7 +53,7 @@ struct ProfileQuery: Encodable, Sendable {
                 zipCode: String? = nil,
                 phone: String? = nil,
                 birthYear: Int,
-                deprecated: Bool) {
+                deprecated: Bool = false) {
         self.id = id
         self.firstName = firstName
         self.lastName = lastName
