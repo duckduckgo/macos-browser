@@ -134,7 +134,11 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
+
+#if NETWORK_PROTECTION
+        sendActiveNetworkProtectionWaitlistUserPixel()
         refreshNetworkProtectionMessages()
+#endif
     }
 
     func windowDidResignKey() {
@@ -156,11 +160,13 @@ final class MainViewController: NSViewController {
         }
     }
 
+#if NETWORK_PROTECTION
     private let networkProtectionMessaging = DefaultNetworkProtectionRemoteMessaging()
 
     func refreshNetworkProtectionMessages() {
         networkProtectionMessaging.fetchRemoteMessages()
     }
+#endif
 
     override func encodeRestorableState(with coder: NSCoder) {
         fatalError("Default AppKit State Restoration should not be used")
@@ -419,6 +425,14 @@ final class MainViewController: NSViewController {
 
         stopMenuItem.isEnabled = selectedTabViewModel.isLoading
     }
+
+#if NETWORK_PROTECTION
+    private func sendActiveNetworkProtectionWaitlistUserPixel() {
+        if DefaultNetworkProtectionVisibility().waitlistIsOngoing {
+            DailyPixel.fire(pixel: .networkProtectionWaitlistUserActive, frequency: .dailyOnly, includeAppVersionParameter: true)
+        }
+    }
+#endif
 
     // MARK: - First responder
 
