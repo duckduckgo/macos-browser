@@ -130,7 +130,17 @@ final class MoreOptionsMenu: NSMenu {
 
 #if NETWORK_PROTECTION
         if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
-            addItem(makeNetworkProtectionItem())
+            let isWaitlistUser = NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
+            let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
+
+            // If the user can see the Network Protection option but they haven't joined the waitlist or don't have an auth token, show the "New"
+            // badge to bring it to their attention.
+            if !isWaitlistUser && !hasAuthToken {
+                addItem(makeNetworkProtectionItem(showNewLabel: true))
+            } else {
+                addItem(makeNetworkProtectionItem(showNewLabel: false))
+            }
+
             DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
         } else {
             networkProtectionFeatureVisibility.disableForWaitlistUsers()
@@ -326,21 +336,25 @@ final class MoreOptionsMenu: NSMenu {
     }
 
 #if NETWORK_PROTECTION
-    private func makeNetworkProtectionItem() -> NSMenuItem {
+    private func makeNetworkProtectionItem(showNewLabel: Bool) -> NSMenuItem {
         let networkProtectionItem = NSMenuItem(title: "", action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
             .targetting(self)
             .withImage(.image(for: .vpnIcon))
 
-        let attributedText = NSMutableAttributedString(string: UserText.networkProtection)
-        attributedText.append(NSAttributedString(string: "  "))
+        if showNewLabel {
+            let attributedText = NSMutableAttributedString(string: UserText.networkProtection)
+            attributedText.append(NSAttributedString(string: "  "))
 
-        let imageAttachment = NSTextAttachment()
-        imageAttachment.image = NSImage(named: "NewLabel")
-        imageAttachment.setImageHeight(height: 16, offset: .init(x: 0, y: -4))
+            let imageAttachment = NSTextAttachment()
+            imageAttachment.image = NSImage(named: "NewLabel")
+            imageAttachment.setImageHeight(height: 16, offset: .init(x: 0, y: -4))
 
-        attributedText.append(NSAttributedString(attachment: imageAttachment))
+            attributedText.append(NSAttributedString(attachment: imageAttachment))
 
-        networkProtectionItem.attributedTitle = attributedText
+            networkProtectionItem.attributedTitle = attributedText
+        } else {
+            networkProtectionItem.title = UserText.networkProtection
+        }
 
         return networkProtectionItem
     }
