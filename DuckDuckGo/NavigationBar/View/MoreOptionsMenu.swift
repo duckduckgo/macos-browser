@@ -316,9 +316,9 @@ final class MoreOptionsMenu: NSMenu {
             // If the user can see the Network Protection option but they haven't joined the waitlist or don't have an auth token, show the "New"
             // badge to bring it to their attention.
             if !isWaitlistUser && !hasAuthToken {
-                addItem(makeNetworkProtectionItem(showNewLabel: true))
+                items.append(makeNetworkProtectionItem(showNewLabel: true))
             } else {
-                addItem(makeNetworkProtectionItem(showNewLabel: false))
+                items.append(makeNetworkProtectionItem(showNewLabel: false))
             }
 
             DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
@@ -333,7 +333,7 @@ final class MoreOptionsMenu: NSMenu {
                                                   keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "BurnerWindowIcon2")) // PLACEHOLDER: Change it once we have the final icon
-        addItem(dataBrokerProtectionItem)
+        items.append(dataBrokerProtectionItem)
 #endif // DBP
 
 #if SUBSCRIPTION
