@@ -195,7 +195,7 @@ final class FirefoxBookmarksReader {
             moz_bookmarks.parent
         FROM
             moz_bookmarks
-        LEFT JOIN
+        INNER JOIN
             moz_places
         ON
             moz_bookmarks.fk = moz_places.id
