@@ -21,12 +21,11 @@
 import Common
 import Foundation
 import NetworkProtection
-import NetworkProtectionPixels
 import PixelKit
 
 extension EventMapping where Event == NetworkProtectionError {
     static var networkProtectionAppDebugEvents: EventMapping<NetworkProtectionError> = .init { event, _, _, _ in
-
+/*
         let domainEvent: NetworkProtectionPixelKitEvent
 
         switch event {
@@ -83,6 +82,7 @@ extension EventMapping where Event == NetworkProtectionError {
 
         let debugEvent = DebugEvent(eventType: .custom(domainEvent))
         PixelKit.fire(debugEvent, frequency: .standard, withHeaders: [:])
+ */
     }
 }
 

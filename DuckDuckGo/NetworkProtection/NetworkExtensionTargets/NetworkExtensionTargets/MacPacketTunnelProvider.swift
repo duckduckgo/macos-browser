@@ -20,7 +20,6 @@ import Foundation
 import Combine
 import Common
 import NetworkProtection
-import NetworkProtectionPixels
 import NetworkExtension
 import Networking
 import PixelKit
@@ -62,6 +61,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     // swiftlint:disable:next cyclomatic_complexity function_body_length
     private static func networkProtectionDebugEvents(controllerErrorStore: NetworkProtectionTunnelErrorStore) -> EventMapping<NetworkProtectionError>? {
         return EventMapping { event, _, _, _ in
+            // TODO: fix this
+            /*
             let domainEvent: NetworkProtectionPixelKitEvent
 #if DEBUG
             // Makes sure we see the error in the yellow NetP alert.
@@ -136,7 +137,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
             }
 
-            PixelKit.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
+            PixelKit.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)*/
         }
     }
 
@@ -145,6 +146,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     // MARK: - PacketTunnelProvider.Event reporting
 
     private static var packetTunnelProviderEvents: EventMapping<PacketTunnelProvider.Event> = .init { event, _, _, _ in
+
+        // TODO: fix this
+        /*
         switch event {
         case .userBecameActive:
             PixelKit.fire(.networkProtectionActiveUser, frequency: .dailyOnly, includeAppVersionParameter: true)
@@ -152,7 +156,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             PixelKit.fire(.networkProtectionLatency(ms: ms, server: server, networkType: networkType.description), frequency: .standard)
         case .rekeyCompleted:
             PixelKit.fire(.networkProtectionRekeyCompleted, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
-        }
+        }*/
     }
 
     static var tokenServiceName: String {

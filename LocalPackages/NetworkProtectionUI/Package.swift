@@ -10,12 +10,10 @@ let package = Package(
         .macOS("11.4")
     ],
     products: [
-        .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"]),
-        .library(name: "NetworkProtectionPixels", targets: ["NetworkProtectionPixels"])
+        .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"])
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "80.3.0"),
-        .package(path: "../PixelKit"),
         .package(path: "../SwiftUIExtensions")
     ],
     targets: [
@@ -33,13 +31,6 @@ let package = Package(
             dependencies: [
                 "NetworkProtectionUI",
                 .product(name: "NetworkProtectionTestUtils", package: "BrowserServicesKit")
-            ]),
-
-        .target(
-            name: "NetworkProtectionPixels",
-            dependencies: [
-                .product(name: "PixelKit", package: "PixelKit")
-            ],
-            resources: []),
+            ])
     ]
 )

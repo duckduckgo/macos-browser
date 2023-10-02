@@ -70,7 +70,8 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
 
     @IBAction
     func simulateConnectionInterruption(_ menuItem: NSMenuItem) {
-        simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateConnectionInterruption)
+        // TODO: fix this
+        // simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateConnectionInterruption)
     }
 
     private func simulateFailure(_ simulationFunction: @escaping () async throws -> Void) {

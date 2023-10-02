@@ -86,7 +86,8 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     func disableSystemExtension() async throws {
 #if NETP_SYSTEM_EXTENSION
         do {
-            try await SystemExtensionManager().deactivate()
+            // TODO: Fix this
+            //try await SystemExtensionManager().deactivate()
             userDefaults.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
         } catch OSSystemExtensionError.extensionNotFound {
             // This is an intentional no-op to silence this type of error
