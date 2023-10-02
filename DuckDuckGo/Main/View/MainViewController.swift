@@ -160,11 +160,13 @@ final class MainViewController: NSViewController {
         }
     }
 
+#if NETWORK_PROTECTION
     private let networkProtectionMessaging = DefaultNetworkProtectionRemoteMessaging()
 
     func refreshNetworkProtectionMessages() {
         networkProtectionMessaging.fetchRemoteMessages()
     }
+#endif
 
     override func encodeRestorableState(with coder: NSCoder) {
         fatalError("Default AppKit State Restoration should not be used")
