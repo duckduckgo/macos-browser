@@ -171,7 +171,8 @@ extension Pixel.Event {
             .optOutFinish,
             .optOutSubmitSuccess,
             .optOutSuccess,
-            .optOutFailure:
+            .optOutFailure,
+            .parentChildMatches:
           return nil
 #endif
         }

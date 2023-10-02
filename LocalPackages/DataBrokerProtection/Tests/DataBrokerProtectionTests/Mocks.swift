@@ -560,6 +560,8 @@ public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProte
             switch event {
             case .error(let error, _):
                 print("PIXEL: Error: \(error)")
+            case .parentChildMatches:
+                print("PIXEL: parentChildMatches")
             case .optOutStart:
                 print("PIXEL: optOutStart")
             case .optOutEmailGenerate:

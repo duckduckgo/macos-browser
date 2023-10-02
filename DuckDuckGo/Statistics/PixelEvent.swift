@@ -170,6 +170,7 @@ extension Pixel {
 
         case dailyPixel(Event, isFirst: Bool)
 #if DBP
+        case parentChildMatches
         // SLO and SLI Pixels: https://app.asana.com/0/1203581873609357/1205337273100857/f
 
         // Stage Pixels
@@ -500,6 +501,7 @@ extension Pixel.Event {
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")
 #if DBP
+        case .parentChildMatches: return "dbp_macos_parent-child-broker-matches"
             // Stage Pixels
         case .optOutStart: return "dbp_macos_optout_stage_start"
         case .optOutEmailGenerate: return "dbp_macos_optout_stage_email-generate"
