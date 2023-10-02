@@ -108,6 +108,8 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
                 appTargets.append(target)
             case .application where target.displayName == "DuckDuckGo DBP": // To be removed after the DBP target is deleted
                 appTargets.append(target)
+            case .application where target.displayName == "DuckDuckGo Privacy Pro": // To be removed after the target is deleted
+                appTargets.append(target)
             case .other("com.apple.product-type.bundle.unit-test"):
                 if target.displayName.starts(with: "Unit Tests") {
                     unitTestsTargets.append(target)
