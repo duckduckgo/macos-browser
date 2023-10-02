@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "shane/catalina-fixes",
-        "revision" : "94406792cdead6c117bd5c0036b84272d5fca68e"
+        "revision" : "2bed3ed259ca7bde33f3d41424345acfeff8031d",
+        "version" : "80.3.0"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "74b6142c016be354144f28551de41b50c4864b1f",
-        "version" : "4.37.0"
+        "revision" : "8def15fe8a4c2fb76730f640507e9fd1d6c1f8a7",
+        "version" : "4.32.0"
       }
     },
     {
