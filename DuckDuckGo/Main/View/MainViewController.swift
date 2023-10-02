@@ -137,6 +137,7 @@ final class MainViewController: NSViewController {
 
 #if NETWORK_PROTECTION
         sendActiveNetworkProtectionWaitlistUserPixel()
+        refreshNetworkProtectionMessages()
 #endif
     }
 
@@ -157,6 +158,12 @@ final class MainViewController: NSViewController {
         DispatchQueue.main.async {
             self.bookmarksBarViewController.showBookmarksBarPrompt()
         }
+    }
+
+    private let networkProtectionMessaging = DefaultNetworkProtectionRemoteMessaging()
+
+    func refreshNetworkProtectionMessages() {
+        networkProtectionMessaging.fetchRemoteMessages()
     }
 
     override func encodeRestorableState(with coder: NSCoder) {

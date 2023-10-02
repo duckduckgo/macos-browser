@@ -159,6 +159,9 @@ extension Pixel {
         case networkProtectionWaitlistNotificationTapped
         case networkProtectionWaitlistTermsAndConditionsDisplayed
         case networkProtectionWaitlistTermsAndConditionsAccepted
+        case networkProtectionRemoteMessageDisplayed(messageID: String)
+        case networkProtectionRemoteMessageDismissed(messageID: String)
+        case networkProtectionRemoteMessageOpened(messageID: String)
 
         // 28-day Home Button
         case enableHomeButton
@@ -330,6 +333,9 @@ extension Pixel {
 
             case burnerTabMisplaced
 
+            case networkProtectionRemoteMessageFetchingFailed
+            case networkProtectionRemoteMessageStorageFailed
+
 #if DBP
             case dataBrokerProtectionError
 #endif
@@ -476,6 +482,12 @@ extension Pixel.Event {
             return "m_mac_netp_imp_terms"
         case .networkProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_netp_ev_terms_accepted"
+        case .networkProtectionRemoteMessageDisplayed(let messageID):
+            return "m_mac_netp_remote_message_displayed_\(messageID)"
+        case .networkProtectionRemoteMessageDismissed(let messageID):
+            return "m_mac_netp_remote_message_dismissed_\(messageID)"
+        case .networkProtectionRemoteMessageOpened(let messageID):
+            return "m_mac_netp_remote_message_opened_\(messageID)"
 
         // 28-day Home Button
         case .enableHomeButton:
@@ -758,6 +770,10 @@ extension Pixel.Event.Debug {
         case .invalidPayload(let configuration): return "m_d_\(configuration.rawValue)_invalid_payload".lowercased()
 
         case .burnerTabMisplaced: return "burner_tab_misplaced"
+
+        case .networkProtectionRemoteMessageFetchingFailed: return "netp_remote_message_fetching_failed"
+        case .networkProtectionRemoteMessageStorageFailed: return "netp_remote_message_storage_failed"
+
 #if DBP
         case .dataBrokerProtectionError: return "data_broker_error"
 #endif
