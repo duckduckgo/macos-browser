@@ -57,11 +57,6 @@ struct RecoverAccountView: View {
                 model.endFlow()
             }
             .buttonStyle(DismissActionButtonStyle())
-            Button(UserText.submit) {
-                submitRecoveryCode()
-            }
-            .buttonStyle(DefaultActionButtonStyle(enabled: !recoveryCodeModel.shouldDisableSubmitButton))
-            .disabled(recoveryCodeModel.shouldDisableSubmitButton)
         }
         .frame(width: 480, height: 432)
     }
