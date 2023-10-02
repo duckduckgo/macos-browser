@@ -81,6 +81,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         try super.init(file: file, key: key, writerType: .queue) { migrator in
             migrator.registerMigration("v1", migrate: Self.migrateV1(database:))
             migrator.registerMigration("v2", migrate: Self.migrateV2(database:))
+            migrator.registerMigration("v3", migrate: Self.migrateV3(database:))
         }
     }
 
