@@ -154,7 +154,6 @@ extension Pixel.Event {
              .networkProtectionRemoteMessageDisplayed,
              .networkProtectionRemoteMessageDismissed,
              .networkProtectionRemoteMessageOpened,
-
              .enableHomeButton,
              .disableHomeButton,
              .setnewHomePage:
