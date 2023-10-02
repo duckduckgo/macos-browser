@@ -132,7 +132,6 @@ extension Pixel.Event {
              .favoriteSectionHidden,
              .recentActivitySectionHidden,
              .continueSetUpSectionHidden,
-             .userHasPinnedTab,
              .fireButtonFirstBurn,
              .fireButton,
              .duckPlayerDailyUniqueView,
@@ -150,10 +149,31 @@ extension Pixel.Event {
              .networkProtectionWaitlistNotificationTapped,
              .networkProtectionWaitlistTermsAndConditionsDisplayed,
              .networkProtectionWaitlistTermsAndConditionsAccepted,
+             .networkProtectionWaitlistUserActive,
+             .networkProtectionWaitlistIntroDisplayed,
+             .networkProtectionRemoteMessageDisplayed,
+             .networkProtectionRemoteMessageDismissed,
+             .networkProtectionRemoteMessageOpened,
              .enableHomeButton,
              .disableHomeButton,
              .setnewHomePage:
             return nil
+#if DBP
+        case .optOutStart,
+            .optOutEmailGenerate,
+            .optOutCaptchaParse,
+            .optOutCaptchaSend,
+            .optOutCaptchaSolve,
+            .optOutSubmit,
+            .optOutEmailReceive,
+            .optOutEmailConfirm,
+            .optOutValidate,
+            .optOutFinish,
+            .optOutSubmitSuccess,
+            .optOutSuccess,
+            .optOutFailure:
+          return nil
+#endif
         }
     }
 

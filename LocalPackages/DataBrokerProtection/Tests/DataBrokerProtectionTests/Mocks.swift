@@ -546,6 +546,10 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
     func hasMatches() throws -> Bool {
         false
     }
+
+    func fetchChildBrokers(for parentBroker: String) throws -> [DataBroker] {
+        return [DataBroker]()
+    }
 }
 
 public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
@@ -576,6 +580,8 @@ public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProte
                 print("PIXEL: optOutValidate")
             case .optOutFinish:
                 print("PIXEL: optOutFinish")
+            case .optOutSubmitSuccess:
+                print("PIXEL: optOutSubmitSuccess")
             case .optOutSuccess:
                 print("PIXEL: optOutSuccess")
             case .optOutFailure:

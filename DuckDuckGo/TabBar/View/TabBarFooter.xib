@@ -13,7 +13,7 @@
             <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <button translatesAutoresizingMaskIntoConstraints="NO" id="SoA-RN-wcO" userLabel="Add Button" customClass="LongPressButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                <button translatesAutoresizingMaskIntoConstraints="NO" id="SoA-RN-wcO" userLabel="Add Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                     <rect key="frame" x="6" y="3" width="28" height="28"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="28" id="JZ3-zG-Blg"/>

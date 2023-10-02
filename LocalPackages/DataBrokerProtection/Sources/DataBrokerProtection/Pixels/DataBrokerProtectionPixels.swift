@@ -45,13 +45,13 @@ final class DataBrokerProtectionStageDurationCalculator {
         let durationSinceLastStage = now.timeIntervalSince(lastStateTime) * 1000
         self.lastStateTime = now
 
-        return durationSinceLastStage
+        return durationSinceLastStage.rounded(.towardZero)
     }
 
     /// Returned in milliseconds
     func durationSinceStartTime() -> Double {
         let now = Date()
-        return now.timeIntervalSince(startTime) * 1000
+        return (now.timeIntervalSince(startTime) * 1000).rounded(.towardZero)
     }
 
     func fireOptOutStart() {
@@ -90,6 +90,10 @@ final class DataBrokerProtectionStageDurationCalculator {
         handler.fire(.optOutValidate(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
     }
 
+    func fireOptOutSubmitSuccess() {
+        handler.fire(.optOutSubmitSuccess(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
+    }
+
     func fireOptOutFailure() {
         handler.fire(.optOutFailure(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceStartTime()))
     }
@@ -118,6 +122,7 @@ public enum DataBrokerProtectionPixels {
     case optOutFinish(dataBroker: String, attemptId: UUID, duration: Double)
 
     // Process Pixels
+    case optOutSubmitSuccess(dataBroker: String, attemptId: UUID, duration: Double)
     case optOutSuccess(dataBroker: String, attemptId: UUID, duration: Double)
     case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double)
 }
@@ -125,16 +130,6 @@ public enum DataBrokerProtectionPixels {
 public extension DataBrokerProtectionPixels {
 
     var params: [String: String] {
-        var pixelParams = internalParams
-
-        if let appVersion = AppVersionProvider().appVersion() {
-            pixelParams[Consts.appVersionParamKey] = appVersion
-        }
-
-        return pixelParams
-    }
-
-    private var internalParams: [String: String] {
         switch self {
         case .error(let error, let dataBroker):
             if case let .actionFailed(actionID, message) = error {
@@ -164,6 +159,8 @@ public extension DataBrokerProtectionPixels {
         case .optOutValidate(let dataBroker, let attemptId, let duration):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
         case .optOutFinish(let dataBroker, let attemptId, let duration):
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
+        case .optOutSubmitSuccess(let dataBroker, let attemptId, let duration):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
         case .optOutSuccess(let dataBroker, let attemptId, let duration):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]

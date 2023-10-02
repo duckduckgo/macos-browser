@@ -756,7 +756,7 @@ protocol NewWindowPolicyDecisionMaker {
         userInteractionDialog = nil
 
         // In the case of an error only reload web URLs to prevent uxss attacks via redirecting to javascript://
-        if let error = error, let failingUrl = error.failingUrl, (failingUrl.isHttp || failingUrl.isHttps) {
+        if let error = error, let failingUrl = error.failingUrl, failingUrl.isHttp || failingUrl.isHttps {
             webView.load(URLRequest(url: failingUrl, cachePolicy: .reloadIgnoringLocalCacheData))
             return
         }
@@ -820,7 +820,7 @@ protocol NewWindowPolicyDecisionMaker {
     private func shouldReload(_ url: URL, shouldLoadInBackground: Bool) -> Bool {
         // don‘t reload in background unless shouldLoadInBackground
         guard url.isValid,
-              (webView.superview != nil || shouldLoadInBackground),
+              webView.superview != nil || shouldLoadInBackground,
               // don‘t reload when already loaded
               webView.url != url,
               webView.url != (content.isUrl ? content.urlForWebView : nil)
@@ -964,6 +964,7 @@ protocol NewWindowPolicyDecisionMaker {
     @Published var favicon: NSImage?
     let faviconManagement: FaviconManagement
 
+    @MainActor(unsafe)
     private func handleFavicon(oldValue: TabContent? = nil) {
         guard content.isUrl, let url = content.urlForWebView else {
             favicon = nil
@@ -1014,6 +1015,7 @@ extension Tab: PageObserverUserScriptDelegate {
 
 extension Tab: FaviconUserScriptDelegate {
 
+    @MainActor(unsafe)
     func faviconUserScript(_ faviconUserScript: FaviconUserScript,
                            didFindFaviconLinks faviconLinks: [FaviconUserScript.FaviconLink],
                            for documentUrl: URL) {

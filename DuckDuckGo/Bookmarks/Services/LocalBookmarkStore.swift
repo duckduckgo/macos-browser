@@ -182,7 +182,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 let processedErrors = CoreDataErrorsParser.parse(error: innerError as NSError)
 
                 Pixel.fire(.debug(event: .bookmarksSaveFailed, error: error),
-                               withAdditionalParameters: processedErrors.errorPixelParameters)
+                           withAdditionalParameters: processedErrors.errorPixelParameters)
             } else {
                 Pixel.fire(.debug(event: .bookmarksSaveFailed, error: localError))
             }
@@ -191,7 +191,7 @@ final class LocalBookmarkStore: BookmarkStore {
             let processedErrors = CoreDataErrorsParser.parse(error: error)
 
             Pixel.fire(.debug(event: .bookmarksSaveFailed, error: error),
-                           withAdditionalParameters: processedErrors.errorPixelParameters)
+                       withAdditionalParameters: processedErrors.errorPixelParameters)
         }
     }
 
