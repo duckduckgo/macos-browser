@@ -942,6 +942,12 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
         WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .appearance)
     }
 
+#if SUBSCRIPTION
+    func optionsButtonMenuRequestedSubscriptionPreferences(_ menu: NSMenu) {
+        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .subscription)
+    }
+#endif
+
 }
 
 // MARK: - NSPopoverDelegate
