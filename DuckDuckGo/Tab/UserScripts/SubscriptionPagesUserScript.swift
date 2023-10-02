@@ -133,8 +133,6 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
     }
 
     func backToSettings(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        print(">>> 'backToSettings' was called from the subscriptions web front-end")
-
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)
         }

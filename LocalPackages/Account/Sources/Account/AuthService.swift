@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Common
 
 public struct AuthService {
 
@@ -136,7 +137,7 @@ public struct AuthService {
                 }
             }
         } catch {
-            print("Error: \(error)")
+            os_log("AuthService error: %{public}@", log: .error, error.localizedDescription)
             return .failure(.connectionError)
         }
     }
@@ -149,7 +150,7 @@ public struct AuthService {
         let url = baseURL.appendingPathComponent(endpoint)
         var request = URLRequest(url: url)
         request.httpMethod = method
-        if let header = headers {
+        if let headers = headers {
             request.allHTTPHeaderFields = headers
         }
         if let body = body {
@@ -167,7 +168,9 @@ public struct AuthService {
     }
 
     private static func printDebugInfo(method: String, endpoint: String, data: Data, response: URLResponse) {
-        print("[\((response as? HTTPURLResponse)!.statusCode)] \(method) /\(endpoint) :: \(String(data: data, encoding: .utf8) ?? "")" )
+        let statusCode = (response as? HTTPURLResponse)!.statusCode
+        let stringData = String(data: data, encoding: .utf8) ?? ""
+        os_log("[%d] %{public}@ /%{public}@ :: %{public}@", log: .authService, statusCode, method, endpoint, stringData)
     }
 
     private static func makeAuthorizationHeader(for token: String) -> [String: String] {

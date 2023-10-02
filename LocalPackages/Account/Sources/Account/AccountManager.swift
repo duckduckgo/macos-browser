@@ -18,6 +18,7 @@
 
 import Foundation
 import Purchase
+import Common
 
 public extension Notification.Name {
     static let accountDidSignIn = Notification.Name("com.duckduckgo.browserServicesKit.AccountDidSignIn")
@@ -110,7 +111,7 @@ public class AccountManager {
     }
 
     public func storeAccount(token: String, email: String?, externalID: String?) {
-        print("[[AccountManager]] storeAccount token: \(token) email: \(email)")
+        os_log("AccountManager: storeAccount token: %@ email: %@ externalID:%@", log: .account, token, email ?? "nil", externalID ?? "nil")
         do {
             try storage.store(token: token)
         } catch {
@@ -172,7 +173,7 @@ public class AccountManager {
                 case .success(let response):
                     shortLivedToken = response.authToken
                 case .failure(let error):
-                    print("Error: \(error)")
+                    os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
                     return
                 }
 
@@ -190,7 +191,7 @@ public class AccountManager {
             case .success(let response):
                 longLivedToken = response.accessToken
             case .failure(let error):
-                print("Error: \(error)")
+                os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
                 return
             }
 
@@ -203,7 +204,7 @@ public class AccountManager {
                                   externalID: response.account.externalID)
 
             case .failure(let error):
-                print("Error: \(error)")
+                os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
                 return
             }
         }
