@@ -35,7 +35,7 @@ final class DailyPixel {
         case alreadyFired
     }
 
-    private enum Constant {
+    enum Constant {
         static let dailyPixelStorageIdentifier = "com.duckduckgo.daily.pixel.storage"
     }
 

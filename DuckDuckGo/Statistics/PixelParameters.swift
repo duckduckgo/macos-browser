@@ -149,6 +149,9 @@ extension Pixel.Event {
              .networkProtectionWaitlistNotificationTapped,
              .networkProtectionWaitlistTermsAndConditionsDisplayed,
              .networkProtectionWaitlistTermsAndConditionsAccepted,
+             .networkProtectionRemoteMessageDisplayed,
+             .networkProtectionRemoteMessageDismissed,
+             .networkProtectionRemoteMessageOpened,
              .enableHomeButton,
              .disableHomeButton,
              .setnewHomePage:
