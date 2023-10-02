@@ -23,68 +23,75 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
     @EnvironmentObject var model: ViewModel
 
     var body: some View {
-        PreferencePaneSection {
+        PreferencePaneSection(vericalPadding: 12) {
             SyncStatusView<ViewModel>()
                 .environmentObject(model)
+                .frame(width: 513, alignment: .topLeading)
         }
 
-        PreferencePaneSection {
+        PreferencePaneSection(vericalPadding: 12) {
             Text(UserText.syncedDevices)
                 .font(Const.Fonts.preferencePaneSectionHeader)
-
+                .padding(.horizontal, 16)
             SyncedDevicesView<ViewModel>()
                 .environmentObject(model)
+                .frame(width: 513, alignment: .topLeading)
         }
 
-        PreferencePaneSection {
+        PreferencePaneSection(vericalPadding: 12) {
             Text(UserText.syncNewDevice)
                 .font(Const.Fonts.preferencePaneSectionHeader)
-
-            SyncNewDeviceView<ViewModel>()
+                .padding(.horizontal, 16)
+            SyncSetupSyncAnotherDeviceCardView<ViewModel>(code: model.recoveryCode ?? "")
                 .environmentObject(model)
         }
 
-        PreferencePaneSection {
-            Text("Options")
+        PreferencePaneSection(vericalPadding: 12) {
+            Text(UserText.optionsSectionTitle)
                 .font(Const.Fonts.preferencePaneSectionHeader)
-
+                .padding(.horizontal, 16)
             Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
                 HStack {
                     IconOnBackground(image: NSImage(imageLiteralResourceName: "SyncAllDevices"))
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Unified favorites")
+                        Text(UserText.shareFavoritesOptionTitle)
                             .font(Const.Fonts.preferencePaneOptionTitle)
-                        Text("Use the same favorites on all devices. Switch off to maintain separate favorites for mobile and desktop.")
+                        Text(UserText.shareFavoritesOptionCaption)
                             .font(Const.Fonts.preferencePaneCaption)
                             .foregroundColor(Color("BlackWhite60"))
                     }
                     Spacer(minLength: 30)
                 }
             }
-            .toggleStyle(.switch)
             .padding(.horizontal, 16)
+            .toggleStyle(.switch)
             .padding(.vertical, 12)
             .roundedBorder()
+            .frame(width: 513, alignment: .topLeading)
         }
 
-        PreferencePaneSection {
-            Text(UserText.recovery)
-                .font(Const.Fonts.preferencePaneSectionHeader)
-
-            HStack(alignment: .top, spacing: 12) {
-                Text(UserText.recoveryInstructions)
-                    .fixMultilineScrollableText()
-                Spacer()
-                Button(UserText.saveRecoveryPDF) {
-                    model.saveRecoveryPDF()
+        PreferencePaneSection(vericalPadding: 12) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(UserText.recovery)
+                    .font(Const.Fonts.preferencePaneSectionHeader)
+                HStack(alignment: .top, spacing: 12) {
+                    Text(UserText.recoveryInstructions)
+                        .fixMultilineScrollableText()
+                    Spacer()
+                    Button(UserText.saveRecoveryPDF) {
+                        model.saveRecoveryPDF()
+                    }
                 }
             }
+            .padding(.horizontal, 16)
+            .frame(width: 513, alignment: .topLeading)
         }
 
-        PreferencePaneSection {
+        PreferencePaneSection(vericalPadding: 12) {
             Button(UserText.turnOffAndDeleteServerData) {
                 model.presentDeleteAccount()
             }
+            .padding(16)
         }
     }
 }

@@ -19,16 +19,16 @@
 import SwiftUI
 
 public enum ManagementDialogKind: Equatable {
-    case enableSync
     case recoverAccount
     case deleteAccount(_ devices: [SyncDevice])
-    case askToSyncAnotherDevice
-    case syncAnotherDevice
-    case deviceSynced(_ devices: [SyncDevice])
+    case deviceSynced(_ devices: [SyncDevice], shouldShowOptions: Bool)
     case saveRecoveryPDF
     case turnOffSync
     case deviceDetails(_ device: SyncDevice)
     case removeDevice(_ device: SyncDevice)
+    case showTextCode(_ code: String)
+    case manuallyEnterCode
+    case firstDeviceSetup
 }
 
 public struct ManagementDialog: View {
@@ -54,16 +54,14 @@ public struct ManagementDialog: View {
     @ViewBuilder var content: some View {
         Group {
             switch model.currentDialog {
-            case .enableSync:
-                EnableSyncView()
-            case .askToSyncAnotherDevice:
-                AskToSyncAnotherDeviceView()
             case .recoverAccount:
-                RecoverAccountView()
-            case .syncAnotherDevice:
-                SyncAnotherDeviceView()
-            case .deviceSynced(let devices):
-                SyncSetupCompleteView(devices: devices)
+                RecoverAccountView(isRecovery: true)
+            case .manuallyEnterCode:
+                RecoverAccountView(isRecovery: false)
+            case .deviceSynced(let devices, let shouldShowOptions):
+                DeviceSyncedView(devices: devices, shouldShowOptions: shouldShowOptions, isFirstDevice: false)
+            case .firstDeviceSetup:
+                DeviceSyncedView(devices: [], shouldShowOptions: true, isFirstDevice: true)
             case .saveRecoveryPDF:
                 SaveRecoveryPDFView()
             case .turnOffSync:
@@ -74,6 +72,8 @@ public struct ManagementDialog: View {
                 RemoveDeviceView(device: device)
             case .deleteAccount(let devices):
                 DeleteAccountView(devices: devices)
+            case .showTextCode(let code):
+                ShowTextCodeView(code: code)
 
             default:
                 EmptyView()
