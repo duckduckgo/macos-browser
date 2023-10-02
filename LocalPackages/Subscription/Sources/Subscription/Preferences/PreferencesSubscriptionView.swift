@@ -265,14 +265,3 @@ struct TextMenuItemCaption: View {
             .foregroundColor(Color("GreyTextColor"))
     }
 }
-
-struct ToggleMenuItem: View {
-    let title: String
-    let isOn: Binding<Bool>
-
-    var body: some View {
-        Toggle(title, isOn: isOn)
-            .fixMultilineScrollableText()
-            .toggleStyle(.checkbox)
-    }
-}
