@@ -21,12 +21,16 @@ import Foundation
 public struct HistoryEvent: Identifiable, Sendable {
     public enum EventType: Codable, Equatable, Sendable {
         case noMatchFound
-        case matchesFound
+        case matchesFound(count: Int)
         case error(error: DataBrokerProtectionError)
         case optOutStarted
         case optOutRequested
         case optOutConfirmed
         case scanStarted
+
+        /// TODO: Probably I need to implement decoding here so if there are old
+        /// entries without the `count` param on `matchesFound` we can default to `0`
+        /// or can we just use `count: Int?`
     }
 
     public let extractedProfileId: Int64?
