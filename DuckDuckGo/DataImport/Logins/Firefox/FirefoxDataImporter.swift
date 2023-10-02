@@ -110,26 +110,26 @@ final class FirefoxDataImporter: DataImporter {
         }
     }
 
+    @MainActor(unsafe)
     private func importFavicons(from firefoxProfileURL: URL) {
         let faviconsReader = FirefoxFaviconsReader(firefoxDataDirectoryURL: firefoxProfileURL)
         let faviconsResult = faviconsReader.readFavicons()
 
         switch faviconsResult {
         case .success(let faviconsByURL):
-            for (pageURLString, fetchedFavicons) in faviconsByURL {
-                if let pageURL = URL(string: pageURLString) {
-                    let favicons = fetchedFavicons.map {
-                        Favicon(identifier: UUID(),
-                                url: pageURL,
-                                image: $0.image,
-                                relation: .icon,
-                                documentUrl: pageURL,
-                                dateCreated: Date())
-                    }
-
-                    faviconManager.handleFavicons(favicons, documentUrl: pageURL)
+            let faviconsByDocument = faviconsByURL.reduce(into: [URL: [Favicon]]()) { result, pair in
+                guard let pageURL = URL(string: pair.key) else { return }
+                let favicons = pair.value.map {
+                    Favicon(identifier: UUID(),
+                            url: pageURL,
+                            image: $0.image,
+                            relation: .icon,
+                            documentUrl: pageURL,
+                            dateCreated: Date())
                 }
+                result[pageURL] = favicons
             }
+            faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
 
         case .failure:
             Pixel.fire(.faviconImportFailed(source: .firefox))

@@ -37,14 +37,12 @@ final class NetworkProtectionAppEvents {
     func applicationDidFinishLaunching() {
         migrateNetworkProtectionAuthTokenToSharedKeychainIfNecessary()
 
-        let loginItemsManager = LoginItemsManager()
-        let keychainStore = NetworkProtectionKeychainTokenStore()
-
         guard featureVisibility.isNetworkProtectionVisible() else {
             featureVisibility.disableForAllUsers()
             return
         }
 
+        let loginItemsManager = LoginItemsManager()
         restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
         refreshNetworkProtectionServers()
     }

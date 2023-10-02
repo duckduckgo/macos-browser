@@ -144,7 +144,7 @@ final class HomePageViewController: NSViewController {
     }
 
     func createFeatureModel() -> HomePage.Models.ContinueSetUpModel {
-        let vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: SystemDefaultBrowserProvider(), dataImportProvider: BookmarksAndPasswordsImportStatusProvider(), tabCollectionViewModel: tabCollectionViewModel, duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor())
+        let vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: SystemDefaultBrowserProvider(), dataImportProvider: BookmarksAndPasswordsImportStatusProvider(), tabCollectionViewModel: tabCollectionViewModel, duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor(), networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging())
         vm.delegate = self
         return vm
     }

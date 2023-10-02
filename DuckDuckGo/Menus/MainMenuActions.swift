@@ -628,6 +628,11 @@ extension MainViewController {
         UserDefaultsWrapper<Bool>.clear(.grammarCheckEnabledOnce)
     }
 
+    @IBAction func openAppContainerInFinder(_ sender: Any?) {
+        let containerURL = URL.sandboxApplicationSupportURL
+        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: containerURL.path)
+    }
+
     @IBAction func triggerFatalError(_ sender: Any?) {
         fatalError("Fatal error triggered from the Debug menu")
     }
@@ -686,6 +691,10 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay0.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay7.rawValue)
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
+    }
+
+    @IBAction func resetDailyPixels(_ sender: Any?) {
+        UserDefaults.standard.removePersistentDomain(forName: DailyPixel.Constant.dailyPixelStorageIdentifier)
     }
 
     @IBAction func changeInstallDateToToday(_ sender: Any?) {
@@ -809,6 +818,37 @@ extension MainViewController {
 #if NETWORK_PROTECTION
         NetworkProtectionWaitlist().sendInviteCodeAvailableNotification()
 #endif
+    }
+
+    @IBAction func resetNetworkProtectionActivationDate(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: nil)
+    }
+
+    @IBAction func resetNetworkProtectionRemoteMessages(_ sender: Any?) {
+        DefaultNetworkProtectionRemoteMessagingStorage().removeStoredAndDismissedMessages()
+        DefaultNetworkProtectionRemoteMessaging(minimumRefreshInterval: 0).resetLastRefreshTimestamp()
+    }
+
+    @IBAction func overrideNetworkProtectionActivationDateToNow(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: Date())
+    }
+
+    @IBAction func overrideNetworkProtectionActivationDateTo5DaysAgo(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: Date.daysAgo(5))
+    }
+
+    @IBAction func overrideNetworkProtectionActivationDateTo10DaysAgo(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: Date.daysAgo(10))
+    }
+
+    private func overrideNetworkProtectionActivationDate(to date: Date?) {
+        let store = DefaultWaitlistActivationDateStore()
+
+        if let date {
+            store.updateActivationDate(date)
+        } else {
+            store.removeDates()
+        }
     }
 
     // MARK: - Developer Tools
