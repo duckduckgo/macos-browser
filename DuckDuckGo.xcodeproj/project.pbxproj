@@ -2215,7 +2215,7 @@
 		4B957A4D2AC7AE700062CA31 /* TemporaryFileHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBF0914282DD40100EE1418 /* TemporaryFileHandler.swift */; };
 		4B957A4E2AC7AE700062CA31 /* URL+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B602E8152A1E2570006D261F /* URL+NetworkProtection.swift */; };
 		4B957A4F2AC7AE700062CA31 /* PrivacyFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB6BCDF827C6BEFF00CC76DC /* PrivacyFeatures.swift */; };
-		4B957A502AC7AE700062CA31 /* MouseClickView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693953F26F04BE80015B914 /* MouseClickView.swift */; };
+		4B957A502AC7AE700062CA31 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		4B957A512AC7AE700062CA31 /* View+RoundedCorners.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378F44EA29B4C73E00899924 /* View+RoundedCorners.swift */; };
 		4B957A522AC7AE700062CA31 /* AVCaptureDevice+SwizzledAuthState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DB3CF826A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift */; };
 		4B957A532AC7AE700062CA31 /* SubscriptionPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E0C72052ABC63BD00802009 /* SubscriptionPagesUserScript.swift */; };
@@ -4156,6 +4156,7 @@
 		4B9292D62667124000AD2C21 /* NSPopUpButtonExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPopUpButtonExtension.swift; sourceTree = "<group>"; };
 		4B9292D82667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkListTreeControllerDataSource.swift; sourceTree = "<group>"; };
 		4B9292DA2667125D00AD2C21 /* ContextualMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContextualMenu.swift; sourceTree = "<group>"; };
+		4B9579202AC687170062CA31 /* HardwareModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardwareModel.swift; sourceTree = "<group>"; };
 		4B957C412AC7AE700062CA31 /* DuckDuckGo Privacy Pro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Privacy Pro.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B957C432AC7AF190062CA31 /* DuckDuckGoPrivacyPro.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoPrivacyPro.xcconfig; sourceTree = "<group>"; };
 		4B980E202817604000282EE1 /* NSNotificationName+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotificationName+Debug.swift"; sourceTree = "<group>"; };
@@ -11888,7 +11889,7 @@
 				4B957A4D2AC7AE700062CA31 /* TemporaryFileHandler.swift in Sources */,
 				4B957A4E2AC7AE700062CA31 /* URL+NetworkProtection.swift in Sources */,
 				4B957A4F2AC7AE700062CA31 /* PrivacyFeatures.swift in Sources */,
-				4B957A502AC7AE700062CA31 /* MouseClickView.swift in Sources */,
+				4B957A502AC7AE700062CA31 /* (null) in Sources */,
 				4B957A512AC7AE700062CA31 /* View+RoundedCorners.swift in Sources */,
 				4B957A522AC7AE700062CA31 /* AVCaptureDevice+SwizzledAuthState.swift in Sources */,
 				4B957A532AC7AE700062CA31 /* SubscriptionPagesUserScript.swift in Sources */,
@@ -14193,8 +14194,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = exactVersion;
-				kind = 80.4.2;
+				kind = exactVersion;
+				version = 80.3.0;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
