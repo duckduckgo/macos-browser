@@ -65,7 +65,7 @@ read_command_line_arguments() {
 			configuration="Release"
 			;;
 		subscription)
-			app_name="DuckDuckGo"
+			app_name="DuckDuckGo Privacy Pro"
 			scheme="DuckDuckGo Privacy Pro"
 			configuration="Release"
 			;;
