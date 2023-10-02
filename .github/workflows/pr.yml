@@ -253,6 +253,10 @@ jobs:
 
     name: Make Release Build
 
+    strategy:
+      matrix:
+        scheme: [ "DuckDuckGo Privacy Browser", "DuckDuckGo Privacy Pro" ]
+
     runs-on: macos-13
     timeout-minutes: 30
 
@@ -316,7 +320,7 @@ jobs:
       run: |
         export OS_ACTIVITY_MODE=debug
         set -o pipefail && xcodebuild \
-          -scheme "DuckDuckGo Privacy Browser" \
+          -scheme "${{ matrix.scheme }}" \
           -derivedDataPath "DerivedData" \
           -configuration "Release" \
           | tee release-xcodebuild.log \
