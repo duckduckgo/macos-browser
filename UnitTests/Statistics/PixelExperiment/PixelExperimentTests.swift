@@ -198,9 +198,9 @@ class PixelExperimentTests: XCTestCase {
         now = Calendar.current.date(byAdding: .day, value: 20, to: start)!
         PixelExperiment.fireDay21To27SerpPixel()
 
-        // should fire after 26 days
+        // should fire after 24 days
         e = expectation(description: "27d pixel fired")
-        now = Calendar.current.date(byAdding: .day, value: 27, to: start)!
+        now = Calendar.current.date(byAdding: .day, value: 24, to: start)!
         PixelExperiment.fireDay21To27SerpPixel()
         waitForExpectations(timeout: 0)
 
