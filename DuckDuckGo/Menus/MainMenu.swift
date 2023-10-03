@@ -460,25 +460,12 @@ final class MainMenu: NSMenu {
     }
 
     @objc private func setUserAgent(_ sender: NSMenuItem?) {
-        guard (NSApp.delegate as? AppDelegate)?.internalUserDecider?.isInternalUser == true else {
-            os_log("Can't set user agent because user is not internal", type: .error)
-            return
-        }
-
         guard let userAgent = sender?.representedObject as? String else {
             os_log("No user agent in the represented object", type: .error)
             return
         }
 
-        setCustomUserAgent(userAgent)
-    }
-
-    private func setCustomUserAgent(_ userAgent: String) {
-        guard (NSApp.delegate as? AppDelegate)?.internalUserDecider?.isInternalUser == true else {
-            os_log("Can't remove user scripts because user is not internal", type: .error)
-            return
-        }
-
         UserAgent.userAgentForDebugging = userAgent
     }
+
 }

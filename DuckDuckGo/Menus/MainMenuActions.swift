@@ -740,10 +740,6 @@ extension MainViewController {
     }
 
     @IBAction func removeUserScripts(_ sender: Any?) {
-        guard (NSApp.delegate as? AppDelegate)?.internalUserDecider?.isInternalUser == true else {
-            os_log("Can't remove user scripts because user is not internal", type: .error)
-            return
-        }
         tabCollectionViewModel.selectedTab?.userContentController?.cleanUpBeforeClosing()
         tabCollectionViewModel.selectedTab?.reload()
         os_log("User scripts removed from the current tab", type: .info)
@@ -762,11 +758,6 @@ extension MainViewController {
     }
 
     @IBAction func setCustomConfigurationURL(_ sender: Any?) {
-        guard (NSApp.delegate as? AppDelegate)?.internalUserDecider?.isInternalUser == true else {
-            os_log("Can't set custom user agent because user is not internal", type: .error)
-            return
-        }
-
         let alert = NSAlert.customConfigurationAlert()
         if alert.runModal() != .cancel {
             guard let textField = alert.accessoryView as? NSTextField,
