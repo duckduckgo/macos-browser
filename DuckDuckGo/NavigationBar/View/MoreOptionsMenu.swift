@@ -336,18 +336,6 @@ final class MoreOptionsMenu: NSMenu {
         items.append(dataBrokerProtectionItem)
 #endif // DBP
 
-#if SUBSCRIPTION
-        let item1  = NSMenuItem(title: "Placeholder A", action: #selector(openPreferences(_:)), keyEquivalent: "")
-            .targetting(self)
-            .withImage(.image(for: .vpnIcon))
-        items.append(item1)
-
-        let item2  = NSMenuItem(title: "Placeholder B", action: #selector(openPreferences(_:)), keyEquivalent: "")
-            .targetting(self)
-            .withImage(.image(for: .vpnIcon))
-        items.append(item2)
-#endif
-
         return items
     }
 
