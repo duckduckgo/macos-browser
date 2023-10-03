@@ -27,9 +27,8 @@ final class ContainerViewModel: ObservableObject {
 
     private let mainAppInterface: DBPPackageToMainAppInterface
     private let dataManager: DataBrokerProtectionDataManaging
-    private var cancellables = Set<AnyCancellable>()
 
-    @Published var schedulerStatus = ""
+    @Published var scanResults: ScanResult?
     @Published var showWebView = false
     @Published var useFakeBroker = false
     @Published var preventSchedulerStart = false
@@ -40,42 +39,6 @@ final class ContainerViewModel: ObservableObject {
         self.dataManager = dataManager
 
         restoreFakeBrokerStatus()
-        setupCancellable()
-    }
-
-    private func setupCancellable() {
-        /*scheduler.statusPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-
-                switch status {
-                case .idle:
-                    self?.schedulerStatus = "🟠 Idle"
-                case .running:
-                    self?.schedulerStatus = "🟢 Running"
-                case .stopped:
-                    self?.schedulerStatus = "🔴 Stopped"
-                }
-            }.store(in: &cancellables)
-
-        $useFakeBroker
-            .receive(on: DispatchQueue.main)
-            .sink { value in
-                DataBrokerDebugFlagFakeBroker().setFlag(value)
-            }.store(in: &cancellables)
-
-        $preventSchedulerStart
-            .receive(on: DispatchQueue.main)
-            .sink { value in
-                DataBrokerDebugFlagBlockScheduler().setFlag(value)
-            }.store(in: &cancellables)
-
-        $showWebView
-            .receive(on: DispatchQueue.main)
-            .sink { value in
-                DataBrokerDebugFlagShowWebView().setFlag(value)
-            }.store(in: &cancellables)
-         */
     }
 
     private func restoreFakeBrokerStatus() {
@@ -83,13 +46,6 @@ final class ContainerViewModel: ObservableObject {
         preventSchedulerStart = DataBrokerDebugFlagBlockScheduler().isFlagOn()
         showWebView = DataBrokerDebugFlagShowWebView().isFlagOn()
     }
-
-//    func runQueuedOperationsAndStartScheduler() {
-//        scheduler.runQueuedOperations(showWebView: showWebView) { [weak self] in
-//            guard let self = self else { return }
-//            self.scheduler.startScheduler(showWebView: self.showWebView)
-//        }
-//    }
 
     func forceSchedulerRun() {
         mainAppInterface.runAllOperations(showWebView: showWebView)
@@ -100,15 +56,12 @@ final class ContainerViewModel: ObservableObject {
     }
 
     func forceRunScans(completion: @escaping (ScanResult) -> Void) {
-        scanAndUpdateUI(completion: completion)
+        mainAppInterface.stopScheduler()
+        mainAppInterface.scanAllBrokers(showWebView: false, completion: nil)
     }
 
     func forceRunOptOuts() {
-        scheduler.optOutAllBrokers(showWebView: showWebView, completion: {})
-    }
-
-    func stopAllOperations() {
-        scheduler.stopScheduler()
+        mainAppInterface.optOutAllBrokers(showWebView: showWebView, completion: nil)
     }
 
     func cleanData() {
@@ -124,28 +77,6 @@ final class ContainerViewModel: ObservableObject {
         exit(0)
     }
 
-    func scanAfterProfileCreation(completion: @escaping (ScanResult) -> Void) {
-        scanAndUpdateUI(completion: completion)
-    }
-
-    private func scanAndUpdateUI(completion: @escaping (ScanResult) -> Void) {
-        scheduler.stopScheduler()
-
-        scheduler.scanAllBrokers(showWebView: showWebView) { [weak self] in
-            guard let self = self else { return }
-
-            DispatchQueue.main.async {
-                let hasResults = self.dataManager.hasMatches()
-
-                if hasResults {
-                    completion(.results)
-                } else {
-                    completion(.noResults)
-                }
-            }
-        }*/
-    }
-
     func editProfilePressed() {
         mainAppInterface.profileModified()
     }
@@ -154,15 +85,13 @@ final class ContainerViewModel: ObservableObject {
 extension ContainerViewModel: MainAppToDBPPackageInterface {
 
     func brokersScanCompleted() {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [self] in
             let hasResults = self.dataManager.hasMatches()
 
             if hasResults {
-                //TODO view needs a thing for this.
-                //in general have no idea  how we're gonna deal with its state
-                //completion(.results)
+                self.scanResults = .results
             } else {
-                //completion(.noResults)
+                self.scanResults = .noResults
             }
         }
     }

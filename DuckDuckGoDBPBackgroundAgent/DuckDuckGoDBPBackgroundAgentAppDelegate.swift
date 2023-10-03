@@ -59,9 +59,6 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
         // TODO remove this?
         // Although if app is not running we should run anyway
         // Does anything go wrong if we run runQueuedOperations twice? Does it matter?
-
-        ipcConnection.scanAllBrokers(showWebView: true, completion: nil)
-        //TODO this is only here for testing
     }
 }
 

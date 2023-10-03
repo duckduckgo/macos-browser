@@ -107,8 +107,6 @@ struct DataBrokerProtectionContainerView: View {
     @ViewBuilder
     private func debugUI() -> some View {
         VStack(alignment: .leading) {
-            Text("Scheduler status: \(containerViewModel.schedulerStatus)")
-
             Toggle("Use Fake Broker", isOn: $containerViewModel.useFakeBroker)
 
             Toggle("Display WebViews", isOn: $containerViewModel.showWebView)
