@@ -1877,6 +1877,7 @@
 		4B67854A2AA8DE75008A5004 /* NetworkProtectionFeatureVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD8679A2A9E9E000063B9F7 /* NetworkProtectionFeatureVisibility.swift */; };
 		4B67854B2AA8DE76008A5004 /* NetworkProtectionFeatureVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD8679A2A9E9E000063B9F7 /* NetworkProtectionFeatureVisibility.swift */; };
 		4B67854C2AA8DE78008A5004 /* NetworkProtectionFeatureVisibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD8679A2A9E9E000063B9F7 /* NetworkProtectionFeatureVisibility.swift */; };
+		4B68DDFF2ACBA14100FB0973 /* FileLineError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B696AFFA2AC5924800C93203 /* FileLineError.swift */; };
 		4B70C00127B0793D000386ED /* DuckDuckGo-ExampleCrash.ips in Resources */ = {isa = PBXBuildFile; fileRef = 4B70BFFF27B0793D000386ED /* DuckDuckGo-ExampleCrash.ips */; };
 		4B70C00227B0793D000386ED /* CrashReportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B70C00027B0793D000386ED /* CrashReportTests.swift */; };
 		4B723E0526B0003E00E14D75 /* DataImportMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DFF26B0003E00E14D75 /* DataImportMocks.swift */; };
@@ -12240,6 +12241,7 @@
 				4B957B9A2AC7AE700062CA31 /* PixelDataRecord.swift in Sources */,
 				4B957B9B2AC7AE700062CA31 /* PageObserverUserScript.swift in Sources */,
 				4B957B9C2AC7AE700062CA31 /* SecureVaultErrorReporter.swift in Sources */,
+				4B68DDFF2ACBA14100FB0973 /* FileLineError.swift in Sources */,
 				4B957B9D2AC7AE700062CA31 /* NSImageExtensions.swift in Sources */,
 				4B957B9E2AC7AE700062CA31 /* WaitlistKeychainStorage.swift in Sources */,
 				4B957B9F2AC7AE700062CA31 /* PasswordManagementViewController.swift in Sources */,
