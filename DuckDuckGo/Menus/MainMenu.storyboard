@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22154" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22154"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -1291,12 +1291,6 @@ CQ
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="openAppContainerInFinder:" target="Ady-hI-5gd" id="Wub-im-mcf"/>
-                                            </connections>
-                                        </menuItem>
-                                        <menuItem title="Trigger Fatal Error" id="FeS-hb-rvM">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="triggerFatalError:" target="Ady-hI-5gd" id="pS0-iQ-TPe"/>
                                             </connections>
                                         </menuItem>
                                     </items>
