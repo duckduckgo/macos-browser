@@ -20,11 +20,12 @@ import XCTest
 import Combine
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 class FaviconManagerTests: XCTestCase {
 
     func testWhenFaviconManagerIsInMemory_ThenItMustInitNullStore() {
         let faviconManager = FaviconManager(cacheType: .inMemory)
         XCTAssertNotNil(faviconManager.store as? FaviconNullStore)
     }
-    
+
 }

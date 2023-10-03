@@ -1,7 +1,7 @@
 //
-//  StringExtensionTests.swift
+//  AttemptInformation.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,15 +17,11 @@
 //
 
 import Foundation
-import XCTest
-@testable import DuckDuckGo_Privacy_Browser
 
-final class StringExtensionTests: XCTestCase {
-
-    // MARK: - General
-
-    func testWhenNsRangeIsCalledWithoutParameter_ThenFullRangeIsReturened() {
-        XCTAssertEqual("".nsRange(), NSRange(location: 0, length: 0))
-        XCTAssertEqual("š".nsRange(), NSRange(location: 0, length: 1))
-    }
+struct AttemptInformation {
+    let extractedProfileId: Int64
+    let dataBroker: String
+    let attemptId: String
+    let lastStageDate: Date
+    let startDate: Date
 }

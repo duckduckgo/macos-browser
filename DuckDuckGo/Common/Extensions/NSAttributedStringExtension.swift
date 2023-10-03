@@ -48,3 +48,12 @@ extension NSMutableAttributedString {
     }
 
 }
+
+extension NSTextAttachment {
+    func setImageHeight(height: CGFloat, offset: CGPoint = .zero) {
+        guard let image = image else { return }
+        let ratio = image.size.width / image.size.height
+
+        bounds = CGRect(x: bounds.origin.x + offset.x, y: bounds.origin.y + offset.y, width: ratio * height, height: height)
+    }
+}

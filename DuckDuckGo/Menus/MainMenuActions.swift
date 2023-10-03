@@ -34,7 +34,7 @@ extension AppDelegate {
     // MARK: - DuckDuckGo
 
     @IBAction func checkForUpdates(_ sender: Any?) {
-#if !APPSTORE && !DBP
+#if SPARKLE
         updateController.checkForUpdates(sender)
 #endif
     }
@@ -186,11 +186,7 @@ extension AppDelegate {
             accessoryContainer.frame.size = accessoryContainer.fittingSize
 
             savePanel.accessoryView = accessoryContainer
-            if #available(macOS 11.0, *) {
-                savePanel.allowedContentTypes = [.commaSeparatedText]
-            } else {
-                savePanel.allowedFileTypes = ["csv"]
-            }
+            savePanel.allowedContentTypes = [.commaSeparatedText]
 
             savePanel.beginSheetModal(for: window) { response in
                 guard response == .OK, let selectedURL = savePanel.url else { return }
@@ -214,12 +210,7 @@ extension AppDelegate {
 
         let savePanel = NSSavePanel()
         savePanel.nameFieldStringValue = "DuckDuckGo \(UserText.exportBookmarksFileNameSuffix)"
-
-        if #available(macOS 11.0, *) {
-            savePanel.allowedContentTypes = [.html]
-        } else {
-            savePanel.allowedFileTypes = ["html"]
-        }
+        savePanel.allowedContentTypes = [.html]
 
         savePanel.beginSheetModal(for: window) { response in
             guard response == .OK, let selectedURL = savePanel.url else { return }
@@ -305,6 +296,13 @@ extension MainViewController {
         // instead of closing a pinned tab we select the first regular tab
         // (this is in line with Safari behavior)
         // If there are no regular tabs, we close the window.
+        var isHandlingKeyDownEvent: Bool {
+            guard sender is NSMenuItem,
+                  let currentEvent = NSApp.currentEvent,
+                  case .keyDown = currentEvent.type,
+                  currentEvent.modifierFlags.contains(.command) else { return false }
+             return true
+        }
         if isHandlingKeyDownEvent, tab.isPinned {
             if tabCollectionViewModel.tabCollection.tabs.isEmpty {
                 view.window?.performClose(sender)
@@ -386,6 +384,15 @@ extension MainViewController {
 
     @IBAction func toggleNetworkProtectionShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
+    }
+
+    @IBAction func toggleHomeButton(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .homeButton)
+        if LocalPinningManager.shared.isPinned(.homeButton) {
+            Pixel.fire(.enableHomeButton)
+        } else {
+            Pixel.fire(.disableHomeButton)
+        }
     }
 
     // MARK: - History
@@ -577,13 +584,21 @@ extension MainViewController {
 
     @IBAction func mergeAllWindows(_ sender: Any?) {
         guard let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
-        let otherWindowControllers = WindowControllersManager.shared.mainWindowControllers.filter { $0 !== mainWindowController }
+        assert(!self.isBurner)
+
+        let otherWindowControllers = WindowControllersManager.shared.mainWindowControllers.filter {
+            $0 !== mainWindowController && $0.mainViewController.isBurner == false
+        }
+        let excludedWindowControllers = WindowControllersManager.shared.mainWindowControllers.filter {
+            $0 === mainWindowController || $0.mainViewController.isBurner == true
+        }
+
         let otherMainViewControllers = otherWindowControllers.compactMap { $0.mainViewController }
         let otherTabCollectionViewModels = otherMainViewControllers.map { $0.tabCollectionViewModel }
         let otherTabs = otherTabCollectionViewModels.flatMap { $0.tabCollection.tabs }
         let otherLocalHistoryOfRemovedTabs = Set(otherTabCollectionViewModels.flatMap { $0.tabCollection.localHistoryOfRemovedTabs })
 
-        WindowsManager.closeWindows(except: view.window)
+        WindowsManager.closeWindows(except: excludedWindowControllers.compactMap(\.window))
 
         tabCollectionViewModel.append(tabs: otherTabs)
         tabCollectionViewModel.tabCollection.localHistoryOfRemovedTabs += otherLocalHistoryOfRemovedTabs
@@ -610,6 +625,11 @@ extension MainViewController {
     @IBAction func resetDefaultGrammarChecks(_ sender: Any?) {
         UserDefaultsWrapper<Bool>.clear(.spellingCheckEnabledOnce)
         UserDefaultsWrapper<Bool>.clear(.grammarCheckEnabledOnce)
+    }
+
+    @IBAction func openAppContainerInFinder(_ sender: Any?) {
+        let containerURL = URL.sandboxApplicationSupportURL
+        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: containerURL.path)
     }
 
     @IBAction func triggerFatalError(_ sender: Any?) {
@@ -672,18 +692,27 @@ extension MainViewController {
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
     }
 
+    @IBAction func resetDailyPixels(_ sender: Any?) {
+        UserDefaults.standard.removePersistentDomain(forName: DailyPixel.Constant.dailyPixelStorageIdentifier)
+    }
+
     @IBAction func changeInstallDateToToday(_ sender: Any?) {
         UserDefaults.standard.set(Date(), forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @IBAction func changeInstallDateToLessThanAWeekAgo(_ sender: Any?) {
-        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())
-        UserDefaults.standard.set(yesterday, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @IBAction func changeInstallDateToLessThan21DaysAgo(_ sender: Any?) {
+        let lessThanTwentyOneDaysAgo = Calendar.current.date(byAdding: .day, value: -20, to: Date())
+        UserDefaults.standard.set(lessThanTwentyOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @IBAction func changeInstallDateToMoreThanAWeekAgo(_ sender: Any?) {
-        let aWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())
-        UserDefaults.standard.set(aWeekAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    @IBAction func changeInstallDateToMoreThan21DaysAgoButLessThan27(_ sender: Any?) {
+        let twentyOneDaysAgo = Calendar.current.date(byAdding: .day, value: -21, to: Date())
+        UserDefaults.standard.set(twentyOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
+    }
+
+    @IBAction func changeInstallDateToMoreThan27DaysAgo(_ sender: Any?) {
+        let twentyEightDaysAgo = Calendar.current.date(byAdding: .day, value: -28, to: Date())
+        UserDefaults.standard.set(twentyEightDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
     @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
@@ -755,6 +784,37 @@ extension MainViewController {
 #endif
     }
 
+    @IBAction func resetNetworkProtectionActivationDate(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: nil)
+    }
+
+    @IBAction func resetNetworkProtectionRemoteMessages(_ sender: Any?) {
+        DefaultNetworkProtectionRemoteMessagingStorage().removeStoredAndDismissedMessages()
+        DefaultNetworkProtectionRemoteMessaging(minimumRefreshInterval: 0).resetLastRefreshTimestamp()
+    }
+
+    @IBAction func overrideNetworkProtectionActivationDateToNow(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: Date())
+    }
+
+    @IBAction func overrideNetworkProtectionActivationDateTo5DaysAgo(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: Date.daysAgo(5))
+    }
+
+    @IBAction func overrideNetworkProtectionActivationDateTo10DaysAgo(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: Date.daysAgo(10))
+    }
+
+    private func overrideNetworkProtectionActivationDate(to date: Date?) {
+        let store = DefaultWaitlistActivationDateStore()
+
+        if let date {
+            store.updateActivationDate(date)
+        } else {
+            store.removeDates()
+        }
+    }
+
     // MARK: - Developer Tools
 
     @IBAction func toggleDeveloperTools(_ sender: Any?) {
@@ -785,11 +845,6 @@ extension MainViewController: NSMenuItemValidation {
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
-        // Enable "Move to another Display" menu item (is there a better way?)
-        for item in menuItem.menu!.items where item.action == Selector(("_moveToDisplay:")) {
-            item.isEnabled = true
-        }
-
         switch menuItem.action {
         // Back/Forward
         case #selector(MainViewController.back(_:)):
@@ -856,7 +911,7 @@ extension MainViewController: NSMenuItemValidation {
 
         // Merge all windows
         case #selector(MainViewController.mergeAllWindows(_:)):
-            return WindowControllersManager.shared.mainWindowControllers.count > 1
+            return WindowControllersManager.shared.mainWindowControllers.filter({ !$0.mainViewController.isBurner }).count > 1 && !self.isBurner
 
         // Move Tab to New Window, Select Next/Prev Tab
         case #selector(MainViewController.moveTabToNewWindow(_:)):

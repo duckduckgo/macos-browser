@@ -41,7 +41,6 @@ extension Pixel {
 
         // Pixel experiments
         static let experimentCohort = "cohort"
-
     }
 
     enum Values {
@@ -89,6 +88,18 @@ extension Pixel.Event {
 
             return params
 
+        case .launchInitial(let cohort):
+            return [Pixel.Parameters.experimentCohort: cohort]
+        case .serpInitial(let cohort):
+            return [Pixel.Parameters.experimentCohort: cohort]
+        case .serpDay21to27(let cohort):
+            return [Pixel.Parameters.experimentCohort: cohort, "isDefault": DefaultBrowserPreferences().isDefault.description]
+        case .setAsDefaultInitial(let cohort):
+            return [Pixel.Parameters.experimentCohort: cohort]
+
+        case .dailyPixel(let pixel, isFirst: _):
+            return pixel.parameters
+
         // Don't use default to force new items to be thought about
         case .crash,
              .brokenSiteReport,
@@ -115,14 +126,12 @@ extension Pixel.Event {
              .emailEnabledInitial,
              .cookieManagementEnabledInitial,
              .watchInDuckPlayerInitial,
-             .setAsDefaultInitial,
              .importDataInitial,
              .newTabInitial,
              .networkProtectionSystemExtensionUnknownActivationResult,
              .favoriteSectionHidden,
              .recentActivitySectionHidden,
              .continueSetUpSectionHidden,
-             .userHasPinnedTab,
              .fireButtonFirstBurn,
              .fireButton,
              .duckPlayerDailyUniqueView,
@@ -139,8 +148,32 @@ extension Pixel.Event {
              .networkProtectionWaitlistNotificationShown,
              .networkProtectionWaitlistNotificationTapped,
              .networkProtectionWaitlistTermsAndConditionsDisplayed,
-             .networkProtectionWaitlistTermsAndConditionsAccepted:
+             .networkProtectionWaitlistTermsAndConditionsAccepted,
+             .networkProtectionWaitlistUserActive,
+             .networkProtectionWaitlistIntroDisplayed,
+             .networkProtectionRemoteMessageDisplayed,
+             .networkProtectionRemoteMessageDismissed,
+             .networkProtectionRemoteMessageOpened,
+             .enableHomeButton,
+             .disableHomeButton,
+             .setnewHomePage:
             return nil
+#if DBP
+        case .optOutStart,
+            .optOutEmailGenerate,
+            .optOutCaptchaParse,
+            .optOutCaptchaSend,
+            .optOutCaptchaSolve,
+            .optOutSubmit,
+            .optOutEmailReceive,
+            .optOutEmailConfirm,
+            .optOutValidate,
+            .optOutFinish,
+            .optOutSubmitSuccess,
+            .optOutSuccess,
+            .optOutFailure:
+          return nil
+#endif
         }
     }
 

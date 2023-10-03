@@ -29,7 +29,7 @@ public final class DataBrokerProtectionManager {
     private let authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData()
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
-    private let fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()
+    private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
     private let ipcConnection = DBPIPCConnection(log: .dbpBackgroundAgent, memoryManagementLog: .dbpBackgroundAgentMemoryManagement)
     var mainAppToDBPPackageDelegate: MainAppToDBPPackageInterface?
 
@@ -61,7 +61,7 @@ public final class DataBrokerProtectionManager {
                                                   contentScopeProperties: prefs,
                                                   dataManager: dataManager,
                                                   notificationCenter: NotificationCenter.default,
-                                                  errorHandler: DataBrokerProtectionErrorHandling(),
+                                                  pixelHandler: DataBrokerProtectionPixelsHandler(),
                                                   redeemUseCase: redeemUseCase)
     }()
 
@@ -80,7 +80,7 @@ public final class DataBrokerProtectionManager {
     }
 
     public func startLoginItemIfPossible() {
-        guard !redeemUseCase.shouldAskForInviteCode() else { return }
+        guard !redeemUseCase.shouldAskForInviteCode() && !DataBrokerDebugFlagBlockScheduler().isFlagOn() else { return }
 
         //loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
         ipcConnection.register(machServiceName: Bundle.main.dbpBackgroundAgentBundleId, delegate: self) { success in

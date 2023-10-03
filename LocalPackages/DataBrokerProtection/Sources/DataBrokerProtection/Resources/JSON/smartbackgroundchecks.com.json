@@ -1,0 +1,57 @@
+{
+  "name": "smartbackgroundchecks.com",
+  "version": "0.1.0",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1678078800000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "768ee7a9-b743-413f-88c8-69fc7dd39d21",
+          "url": "https://www.smartbackgroundchecks.com/people/${firstName}-${lastName}/${city}/${state}"
+        },
+        {
+          "actionType": "extract",
+          "id": "def6f046-efe7-4fbb-9453-da7d3b0f9d59",
+          "selector": ".card-block",
+          "profile": {
+            "name": {
+              "selector": ".name-list-title",
+              "beforeText": "- "
+            },
+            "age": {
+              "selector": ".name-list-title",
+              "afterText": "- Age"
+            },
+            "addressCityState": {
+              "selector": ".name-list-title",
+              "beforeText": "- Age",
+              "afterText": "-"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[@class='p-1 w-100 lh-20px']",
+              "afterText": "Used to live in:",
+              "beforeText": "Relatives and Associates"
+            },
+            "profileUrl": {
+              "selector": ".//h2//a"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}

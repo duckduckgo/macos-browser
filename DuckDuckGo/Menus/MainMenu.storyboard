@@ -7,12 +7,12 @@
         <!--Application-->
         <scene sceneID="JPo-4y-FX3">
             <objects>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="DuckDuckGo_DBP" customModuleProvider="target"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <customObject id="WIK-gq-Ncg" customClass="CopyHandler" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target"/>
+                <customObject id="WIK-gq-Ncg" customClass="CopyHandler" customModule="DuckDuckGo_DBP" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <application id="hnw-xV-0zn" sceneMemberID="viewController">
-                    <menu key="mainMenu" title="Main Menu" systemMenu="main" id="AYu-sK-qS6" customClass="MainMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                    <menu key="mainMenu" title="Main Menu" systemMenu="main" id="AYu-sK-qS6" customClass="MainMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                         <items>
                             <menuItem title="DuckDuckGo" id="1Xt-HY-uBw">
                                 <modifierMask key="keyEquivalentModifierMask"/>
@@ -400,6 +400,11 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="Ucx-oU-4kc"/>
+                                        <menuItem title="Show Home Shortcut" keyEquivalent="Y" id="RnQ-KJ-UFS">
+                                            <connections>
+                                                <action selector="toggleHomeButton:" target="Ady-hI-5gd" id="y6x-ir-qWg"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Show Autofill Shortcut" keyEquivalent="A" id="ha5-uX-jTn">
                                             <connections>
                                                 <action selector="toggleAutofillShortcut:" target="Ady-hI-5gd" id="JGc-Ym-QWK"/>
@@ -480,7 +485,7 @@
                             </menuItem>
                             <menuItem title="History" id="aVY-po-b3d">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="History" id="SLT-Z6-mh7" customClass="HistoryMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                <menu key="submenu" title="History" id="SLT-Z6-mh7" customClass="HistoryMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                     <items>
                                         <menuItem title="Back" enabled="NO" keyEquivalent="[" id="VWV-vB-Mtc">
                                             <connections>
@@ -769,19 +774,25 @@ CQ
                                                                 <menuItem title="Today" keyEquivalent="N" id="0lm-tL-hli">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="changeInstallDateToToday:" target="Ady-hI-5gd" id="Lsi-xW-usu"/>
+                                                                        <action selector="changeInstallDateToToday:" target="Ady-hI-5gd" id="K8Z-Av-gjf"/>
                                                                     </connections>
                                                                 </menuItem>
-                                                                <menuItem title="Less Than a Week Ago" id="KhK-Zf-YHA">
+                                                                <menuItem title="Less Than a 21 days Ago" id="KhK-Zf-YHA">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="changeInstallDateToLessThanAWeekAgo:" target="Ady-hI-5gd" id="J0j-gf-bhG"/>
+                                                                        <action selector="changeInstallDateToLessThan21DaysAgo:" target="Ady-hI-5gd" id="Bj7-ao-Qhw"/>
                                                                     </connections>
                                                                 </menuItem>
-                                                                <menuItem title="More Than a Week Ago" id="mYW-2j-Ckg">
+                                                                <menuItem title="More Than 21 Days Ago" id="mYW-2j-Ckg">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="changeInstallDateToMoreThanAWeekAgo:" target="Ady-hI-5gd" id="Ygn-GW-JkY"/>
+                                                                        <action selector="changeInstallDateToMoreThan21DaysAgoButLessThan27:" target="Ady-hI-5gd" id="UVq-Pb-JKM"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="More Than 27 Days Ago" id="M8x-GE-Z7r">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="changeInstallDateToMoreThan27DaysAgo:" target="Ady-hI-5gd" id="NH6-ku-op3"/>
                                                                     </connections>
                                                                 </menuItem>
                                                             </items>
@@ -791,6 +802,12 @@ CQ
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="resetEmailProtectionInContextPrompt:" target="Ady-hI-5gd" id="bRN-Eo-xL1"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Reset Daily Pixels" id="Tyu-AZ-Y2g">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetDailyPixels:" target="Ady-hI-5gd" id="Bqp-wC-pao"/>
                                                         </connections>
                                                     </menuItem>
                                                 </items>
@@ -834,9 +851,29 @@ CQ
                                                 </items>
                                             </menu>
                                         </menuItem>
+                                        <menuItem title="Sync" id="8rI-iH-wNC">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <menu key="submenu" title="Sync" id="Kw4-67-mit" customClass="SyncDebugMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                                <items>
+                                                    <menuItem title="Environment" id="qD7-Gw-s2h">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Environment" id="lRd-Ih-n5j">
+                                                            <items>
+                                                                <menuItem title="Item" id="amC-1R-0QS">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                </menuItem>
+                                                            </items>
+                                                        </menu>
+                                                    </menuItem>
+                                                </items>
+                                                <connections>
+                                                    <outlet property="environmentMenu" destination="lRd-Ih-n5j" id="xxg-yh-bfI"/>
+                                                </connections>
+                                            </menu>
+                                        </menuItem>
                                         <menuItem title="Network Protection" id="Dt6-sj-4hn">
                                             <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Network Protection" id="Rah-lS-gno" customClass="NetworkProtectionDebugMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                            <menu key="submenu" title="Network Protection" id="Rah-lS-gno" customClass="NetworkProtectionDebugMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                                 <items>
                                                     <menuItem title="Reset All State Keeping Invite" id="Mqz-Le-LgQ">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
@@ -854,6 +891,12 @@ CQ
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="removeSystemExtensionAndAgents:" target="Rah-lS-gno" id="1Yo-Qj-wxo"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Reset Remote Messages" id="i82-vX-K8b">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetNetworkProtectionRemoteMessages:" target="Ady-hI-5gd" id="e8y-2X-VAc"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem isSeparatorItem="YES" id="FSc-gX-vGh"/>
@@ -897,7 +940,7 @@ CQ
                                                     </menuItem>
                                                     <menuItem title="Onboarding" id="xu6-z0-age">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Onboarding" id="L82-We-Wwv" customClass="NetworkProtectionOnboardingMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                        <menu key="submenu" title="Onboarding" id="L82-We-Wwv" customClass="NetworkProtectionOnboardingMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                                             <items>
                                                                 <menuItem title="Reset Onboarding Status" id="gfc-0G-Ujy">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -982,7 +1025,7 @@ CQ
                                                     </menuItem>
                                                     <menuItem title="Simulate Failure" id="K5h-D4-For">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Simulate Failure" id="iLs-sj-2Gd" customClass="NetworkProtectionSimulateFailureMenu" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                                        <menu key="submenu" title="Simulate Failure" id="iLs-sj-2Gd" customClass="NetworkProtectionSimulateFailureMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                                             <items>
                                                                 <menuItem title="Enable NetP &gt; Controller Failure" id="xyA-ob-gEy" userLabel="Controller Failure">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -1002,12 +1045,50 @@ CQ
                                                                         <action selector="simulateTunnelCrash:" target="iLs-sj-2Gd" id="VH7-WB-2dD"/>
                                                                     </connections>
                                                                 </menuItem>
+                                                                <menuItem title="Connection Interruption" id="EB1-Wd-0RU">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="simulateConnectionInterruption:" target="iLs-sj-2Gd" id="2aY-oD-Q2K"/>
+                                                                    </connections>
+                                                                </menuItem>
                                                             </items>
                                                             <connections>
+                                                                <outlet property="simulateConnectionInterruptionMenuItem" destination="EB1-Wd-0RU" id="ddO-Bf-ubT"/>
                                                                 <outlet property="simulateControllerFailureMenuItem" destination="xyA-ob-gEy" id="1VV-xV-wsB"/>
                                                                 <outlet property="simulateTunnelCrashMenuItem" destination="A5n-J7-hYk" id="gvK-di-vTP"/>
                                                                 <outlet property="simulateTunnelFailureMenuItem" destination="kVa-n8-UNx" id="3Ie-Ed-VtG"/>
                                                             </connections>
+                                                        </menu>
+                                                    </menuItem>
+                                                    <menuItem title="Override NetP Activation Date" id="1gh-1t-gP3">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Override NetP Activation Date" id="eU6-PJ-6Kx">
+                                                            <items>
+                                                                <menuItem title="Reset Activation Date" id="STc-AS-sXb">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="resetNetworkProtectionActivationDate:" target="Ady-hI-5gd" id="m9x-mw-hqK"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="Set Activation Date to Now" id="Wv8-wW-iVa">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="overrideNetworkProtectionActivationDateToNow:" target="Ady-hI-5gd" id="gEW-vP-EQc"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="Set Activation Date to 5 Days Ago" id="fkt-Z6-tdp">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="overrideNetworkProtectionActivationDateTo5DaysAgo:" target="Ady-hI-5gd" id="cy3-fK-Ld1"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="Set Activation Date to 10 Days Ago" id="ofD-Xp-Idm">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="overrideNetworkProtectionActivationDateTo10DaysAgo:" target="Ady-hI-5gd" id="lNr-gR-7kh"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                            </items>
                                                         </menu>
                                                     </menuItem>
                                                     <menuItem title="NetP Waitlist" id="iSU-Wj-V9c">
@@ -1143,19 +1224,12 @@ CQ
                                                                         <action selector="toggleShouldExcludeLocalRoutes:" target="Rah-lS-gno" id="Wdd-D6-yWy"/>
                                                                     </connections>
                                                                 </menuItem>
-                                                                <menuItem title="enable Connection Tester" id="L06-y6-zv3">
-                                                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                                                    <connections>
-                                                                        <action selector="toggleConnectionTesterEnabled:" target="Rah-lS-gno" id="iei-t7-7pG"/>
-                                                                    </connections>
-                                                                </menuItem>
                                                             </items>
                                                         </menu>
                                                     </menuItem>
                                                 </items>
                                                 <connections>
                                                     <outlet property="connectOnLogInMenuItem" destination="fSA-hH-Vum" id="HSf-v8-MYh"/>
-                                                    <outlet property="connectionTesterEnabledMenuItem" destination="L06-y6-zv3" id="uhM-4n-eOm"/>
                                                     <outlet property="excludeLocalNetworksMenuItem" destination="Zak-JJ-7hc" id="vYu-wC-dTl"/>
                                                     <outlet property="exclusionsMenu" destination="j7y-fb-xa6" id="igE-bU-qW4"/>
                                                     <outlet property="mainMenuItem" destination="Dt6-sj-4hn" id="vwa-T8-0ak"/>
@@ -1170,7 +1244,13 @@ CQ
                                                 </connections>
                                             </menu>
                                         </menuItem>
-                                        <menuItem title="Trigger Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">
+                                        <menuItem title="Open App Container in Finder" id="rUh-SZ-Ens">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="openAppContainerInFinder:" target="Ady-hI-5gd" id="Wub-im-mcf"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Trigger Fatal Error" id="FeS-hb-rvM">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="triggerFatalError:" target="Ady-hI-5gd" id="pS0-iQ-TPe"/>
@@ -1244,6 +1324,7 @@ CQ
                             <outlet property="toggleBookmarksShortcutMenuItem" destination="bXm-yY-7AL" id="KjP-Tc-Hwo"/>
                             <outlet property="toggleDownloadsShortcutMenuItem" destination="3II-oR-MBb" id="lBF-XY-b4Z"/>
                             <outlet property="toggleFullscreenMenuItem" destination="4J7-dP-txa" id="lyl-pp-TR0"/>
+                            <outlet property="toggleHomeButtonMenuItem" destination="RnQ-KJ-UFS" id="7AC-U7-MkH"/>
                             <outlet property="toggleNetworkProtectionShortcutMenuItem" destination="UYq-tJ-SrY" id="9HV-Xs-n4f"/>
                             <outlet property="zoomInMenuItem" destination="lMK-tC-RJd" id="Ddo-RX-A6Z"/>
                             <outlet property="zoomOutMenuItem" destination="flw-Fc-cm6" id="1AB-0r-vvx"/>

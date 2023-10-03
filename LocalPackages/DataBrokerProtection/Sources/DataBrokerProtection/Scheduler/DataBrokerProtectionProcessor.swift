@@ -30,20 +30,20 @@ final class DataBrokerProtectionProcessor {
     private let operationRunnerProvider: OperationRunnerProvider
     private let notificationCenter: NotificationCenter
     private let operationQueue: OperationQueue
-    private var errorHandler: EventMapping<DataBrokerProtectionOperationError>?
+    private var pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
     init(database: DataBrokerProtectionRepository,
          config: SchedulerConfig,
          operationRunnerProvider: OperationRunnerProvider,
          notificationCenter: NotificationCenter = NotificationCenter.default,
-         errorHandler: EventMapping<DataBrokerProtectionOperationError>? = nil) {
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
 
         self.database = database
         self.config = config
         self.operationRunnerProvider = operationRunnerProvider
         self.notificationCenter = notificationCenter
         self.operationQueue = OperationQueue()
-        self.errorHandler = errorHandler
+        self.pixelHandler = pixelHandler
         self.operationQueue.maxConcurrentOperationCount = config.concurrentOperationsDifferentBrokers
     }
 
@@ -103,8 +103,7 @@ final class DataBrokerProtectionProcessor {
             brokerUpdater.checkForUpdatesInBrokerJSONFiles()
         }
 
-        let profileId: Int64 = 1 // We assume one profile for now
-        let brokersProfileData = database.fetchAllBrokerProfileQueryData(for: profileId)
+        let brokersProfileData = database.fetchAllBrokerProfileQueryData()
         let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
                                                                                   operationType: operationType,
                                                                                   priorityDate: priorityDate,
@@ -139,7 +138,7 @@ final class DataBrokerProtectionProcessor {
                                                                 priorityDate: priorityDate,
                                                                 notificationCenter: notificationCenter,
                                                                 runner: operationRunnerProvider.getOperationRunner(),
-                                                                errorHandler: errorHandler,
+                                                                pixelHandler: pixelHandler,
                                                                 showWebView: showWebView)
                 collections.append(collection)
 

@@ -80,7 +80,7 @@ final class TabBarViewController: NSViewController {
             let pinnedTabsView = PinnedTabsView(model: pinnedTabsViewModel)
             self.pinnedTabsViewModel = pinnedTabsViewModel
             self.pinnedTabsView = pinnedTabsView
-            self.pinnedTabsHostingView = .init(rootView: pinnedTabsView)
+            self.pinnedTabsHostingView = PinnedTabsHostingView(rootView: pinnedTabsView)
         } else {
             self.pinnedTabsViewModel = nil
             self.pinnedTabsView = nil
@@ -381,7 +381,8 @@ final class TabBarViewController: NSViewController {
     }
 
     private func moveToNewWindow(from index: Int, droppingPoint: NSPoint? = nil, burner: Bool) {
-        guard tabCollectionViewModel.tabCollection.tabs.count > 1 else { return }
+        // only allow dragging Tab out when there‘s tabs (or pinned tabs) left
+        guard tabCollectionViewModel.tabCollection.tabs.count > 1 || pinnedTabsViewModel?.items.isEmpty == false else { return }
         guard let tabViewModel = tabCollectionViewModel.tabViewModel(at: index) else {
             assertionFailure("TabBarViewController: Failed to get tab view model")
             return

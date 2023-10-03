@@ -134,6 +134,11 @@ final class MainViewController: NSViewController {
         updateReloadMenuItem()
         updateStopMenuItem()
         browserTabViewController.windowDidBecomeKey()
+
+#if NETWORK_PROTECTION
+        sendActiveNetworkProtectionWaitlistUserPixel()
+        refreshNetworkProtectionMessages()
+#endif
     }
 
     func windowDidResignKey() {
@@ -141,8 +146,6 @@ final class MainViewController: NSViewController {
     }
 
     func showBookmarkPromptIfNeeded() {
-        guard #available(macOS 11, *) else { return }
-
         guard !bookmarksBarViewController.bookmarksBarPromptShown else { return }
         if bookmarksBarIsVisible {
             // Don't show this to users who obviously know about the bookmarks bar already
@@ -156,6 +159,14 @@ final class MainViewController: NSViewController {
             self.bookmarksBarViewController.showBookmarksBarPrompt()
         }
     }
+
+#if NETWORK_PROTECTION
+    private let networkProtectionMessaging = DefaultNetworkProtectionRemoteMessaging()
+
+    func refreshNetworkProtectionMessages() {
+        networkProtectionMessaging.fetchRemoteMessages()
+    }
+#endif
 
     override func encodeRestorableState(with coder: NSCoder) {
         fatalError("Default AppKit State Restoration should not be used")
@@ -415,6 +426,14 @@ final class MainViewController: NSViewController {
         stopMenuItem.isEnabled = selectedTabViewModel.isLoading
     }
 
+#if NETWORK_PROTECTION
+    private func sendActiveNetworkProtectionWaitlistUserPixel() {
+        if DefaultNetworkProtectionVisibility().waitlistIsOngoing {
+            DailyPixel.fire(pixel: .networkProtectionWaitlistUserActive, frequency: .dailyOnly, includeAppVersionParameter: true)
+        }
+    }
+#endif
+
     // MARK: - First responder
 
     func adjustFirstResponder() {
@@ -424,8 +443,10 @@ final class MainViewController: NSViewController {
         }
 
         switch selectedTabViewModel.tab.content {
-        case .homePage, .onboarding:
+        case .homePage:
             navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+        case .onboarding:
+            self.view.makeMeFirstResponder()
         case .url:
             browserTabViewController.makeWebViewFirstResponder()
         case .preferences:
@@ -451,8 +472,6 @@ final class MainViewController: NSViewController {
         shouldAdjustFirstResponderOnContentChange = false
         adjustFirstResponder()
     }
-
-    private(set) var isHandlingKeyDownEvent: Bool = false
 
 }
 extension MainViewController: NSDraggingDestination {
@@ -494,12 +513,8 @@ extension MainViewController {
     }
 
     func customKeyDown(with event: NSEvent) -> Bool {
-        isHandlingKeyDownEvent = true
-        defer {
-            isHandlingKeyDownEvent = false
-        }
-       guard let locWindow = self.view.window,
-          NSApplication.shared.keyWindow === locWindow else { return false }
+        guard let locWindow = self.view.window,
+              NSApplication.shared.keyWindow === locWindow else { return false }
 
         let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
             .subtracting(.capsLock)

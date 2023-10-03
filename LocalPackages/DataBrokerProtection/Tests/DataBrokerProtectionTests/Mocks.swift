@@ -19,6 +19,7 @@
 import Foundation
 import Combine
 import BrowserServicesKit
+import Common
 import SecureStorage
 import GRDB
 @testable import DataBrokerProtection
@@ -142,7 +143,6 @@ extension ContentScopeFeatureToggles {
 }
 
 final class WebViewHandlerMock: NSObject, WebViewHandler {
-
     var wasInitializeWebViewCalled = false
     var wasLoadCalledWithURL: URL?
     var wasWaitForWebViewLoadCalled = false
@@ -150,6 +150,7 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
     var wasExecuteCalledForExtractedProfile = false
     var wasExecuteCalledForProfileData = false
     var wasExecuteCalledForSolveCaptcha = false
+    var wasExecuteJavascriptCalled = false
 
     func initializeWebView(showWebView: Bool) async {
         wasInitializeWebViewCalled = true
@@ -184,6 +185,10 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         }
     }
 
+    func evaluateJavaScript(_ javaScript: String) async throws {
+        wasExecuteJavascriptCalled = true
+    }
+
     func reset() {
         wasInitializeWebViewCalled = false
         wasLoadCalledWithURL = nil
@@ -192,6 +197,7 @@ final class WebViewHandlerMock: NSObject, WebViewHandler {
         wasExecuteCalledForExtractedProfile = false
         wasExecuteCalledForSolveCaptcha = false
         wasExecuteCalledForProfileData = false
+        wasExecuteJavascriptCalled = false
     }
 }
 
@@ -395,6 +401,13 @@ final class SecureStorageDatabaseProviderMock: SecureStorageDatabaseProvider {
 }
 
 final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault {
+    func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation? {
+        return nil
+    }
+
+    func save(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) throws {
+    }
+
     var shouldReturnOldVersionBroker = false
     var shouldReturnNewVersionBroker = false
     var wasBrokerUpdateCalled = false
@@ -523,10 +536,61 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
         return [ExtractedProfile]()
     }
 
+    func fetchExtractedProfiles(for brokerId: Int64) throws -> [ExtractedProfile] {
+        return [ExtractedProfile]()
+    }
+
     func updateRemovedDate(for extractedProfileId: Int64, with date: Date?) throws {
     }
 
     func hasMatches() throws -> Bool {
         false
+    }
+
+    func fetchChildBrokers(for parentBroker: String) throws -> [DataBroker] {
+        return [DataBroker]()
+    }
+}
+
+public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
+
+    // swiftlint:disable:next cyclomatic_complexity
+    public init() {
+        super.init { event, _, _, _ in
+            switch event {
+            case .error(let error, _):
+                print("PIXEL: Error: \(error)")
+            case .optOutStart:
+                print("PIXEL: optOutStart")
+            case .optOutEmailGenerate:
+                print("PIXEL: optOutEmailGenerate")
+            case .optOutCaptchaParse:
+                print("PIXEL: optOutCaptchaParse")
+            case .optOutCaptchaSend:
+                print("PIXEL: optOutCaptchaSend")
+            case .optOutCaptchaSolve:
+                print("PIXEL: optOutCaptchaSolve")
+            case .optOutSubmit:
+                print("PIXEL: optOutSubmit")
+            case .optOutEmailReceive:
+                print("PIXEL: optOutEmailReceive")
+            case .optOutEmailConfirm:
+                print("PIXEL: optOutEmailConfirm")
+            case .optOutValidate:
+                print("PIXEL: optOutValidate")
+            case .optOutFinish:
+                print("PIXEL: optOutFinish")
+            case .optOutSubmitSuccess:
+                print("PIXEL: optOutSubmitSuccess")
+            case .optOutSuccess:
+                print("PIXEL: optOutSuccess")
+            case .optOutFailure:
+                print("PIXEL: optOutFailure")
+            }
+        }
+    }
+
+    override init(mapping: @escaping EventMapping<DataBrokerProtectionPixels>.Mapping) {
+        fatalError("Use init()")
     }
 }

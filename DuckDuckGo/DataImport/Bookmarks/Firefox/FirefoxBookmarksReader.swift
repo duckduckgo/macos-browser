@@ -25,6 +25,14 @@ final class FirefoxBookmarksReader {
         static let placesDatabaseName = "places.sqlite"
     }
 
+    private enum BookmarkGUID {
+        static let root = "root________"
+        static let menu = "menu________"
+        static let toolbar = "toolbar_____"
+        static let tags = "tags________"
+        static let unfiled = "unfiled_____"
+    }
+
     enum ImportError: Error {
         case noBookmarksFileFound
         case failedToTemporarilyCopyFile
@@ -61,23 +69,18 @@ final class FirefoxBookmarksReader {
                 assert(rootEntries.count == 1, "moz_bookmarks should only have one root entry")
 
                 let topLevelFolders = try FolderRow.fetchAll(database, sql: foldersWithParentQuery(), arguments: [rootEntry.id])
-                let tagsFolder = topLevelFolders.first { $0.title == "tags" }
+                let tagsFolder = topLevelFolders.first { $0.guid == BookmarkGUID.tags }
 
                 let allBookmarks = try BookmarkRow.fetchAll(database, sql: allBookmarksQuery())
+                    .filter { !($0.url.hasPrefix("place:") || $0.url.hasPrefix("about:")) }
                 let allFolders = try FolderRow.fetchAll(database, sql: allFoldersQuery(), arguments: [tagsFolder?.id ?? 0])
 
                 let foldersByParent: [Int: [FolderRow]] = allFolders.reduce(into: [:]) { result, folder in
-                    var children: [FolderRow] = result[folder.parent] ?? []
-                    children.append(folder)
-
-                    result[folder.parent] = children
+                    result[folder.parent, default: []].append(folder)
                 }
 
                 let bookmarksByFolder: [Int: [BookmarkRow]] = allBookmarks.reduce(into: [:]) { result, bookmark in
-                    var children: [BookmarkRow] = result[bookmark.parent] ?? []
-                    children.append(bookmark)
-
-                    result[bookmark.parent] = children
+                    result[bookmark.parent, default: []].append(bookmark)
                 }
 
                 return DatabaseBookmarks(topLevelFolders: topLevelFolders, foldersByParent: foldersByParent, bookmarksByFolder: bookmarksByFolder)
@@ -108,11 +111,13 @@ final class FirefoxBookmarksReader {
         let id: Int
         let title: String
         let parent: Int
+        let guid: String
 
         init(row: Row) {
             id = row["id"]
             title = row["title"]
             parent = row["parent"]
+            guid = row["guid"]
         }
     }
 
@@ -131,9 +136,9 @@ final class FirefoxBookmarksReader {
     }
 
     private func mapDatabaseBookmarksToImportedBookmarks(_ databaseBookmarks: DatabaseBookmarks) -> ImportedBookmarks {
-        let menu = databaseBookmarks.topLevelFolders.first(where: { $0.title == "menu" })
-        let toolbar = databaseBookmarks.topLevelFolders.first(where: { $0.title == "toolbar" })
-        let unfiled = databaseBookmarks.topLevelFolders.first(where: { $0.title == "unfiled" })
+        let menu = databaseBookmarks.topLevelFolders.first(where: { $0.guid == BookmarkGUID.menu })
+        let toolbar = databaseBookmarks.topLevelFolders.first(where: { $0.guid == BookmarkGUID.toolbar })
+        let unfiled = databaseBookmarks.topLevelFolders.first(where: { $0.guid == BookmarkGUID.unfiled })
 
         let menuBookmarksAndFolders = children(parentID: menu?.id, bookmarks: databaseBookmarks)
         let toolbarBookmarksAndFolders = children(parentID: toolbar?.id, bookmarks: databaseBookmarks)
@@ -174,11 +179,11 @@ final class FirefoxBookmarksReader {
     // MARK: - Database Queries
 
     func rootEntryQuery() -> String {
-        return "SELECT id,type,title,parent FROM moz_bookmarks WHERE guid = 'root________';"
+        return "SELECT id,type,title,parent,guid FROM moz_bookmarks WHERE guid = '\(BookmarkGUID.root)';"
     }
 
     func foldersWithParentQuery() -> String {
-        return "SELECT id,type,title,parent FROM moz_bookmarks WHERE parent = ?;"
+        return "SELECT id,type,title,parent,guid FROM moz_bookmarks WHERE parent = ?;"
     }
 
     func allBookmarksQuery() -> String {
@@ -205,7 +210,8 @@ final class FirefoxBookmarksReader {
         SELECT
             id,
             title,
-            parent
+            parent,
+            guid
         FROM
             moz_bookmarks
         WHERE

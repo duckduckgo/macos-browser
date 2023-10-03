@@ -50,7 +50,7 @@
                                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                 <real key="value" value="4"/>
                                             </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="point" keyPath="contentInset">
+                                            <userDefinedRuntimeAttribute type="point" keyPath="backgroundInset">
                                                 <point key="value" x="2" y="2"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
@@ -79,7 +79,7 @@
                                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                 <real key="value" value="4"/>
                                             </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="point" keyPath="contentInset">
+                                            <userDefinedRuntimeAttribute type="point" keyPath="backgroundInset">
                                                 <point key="value" x="2" y="2"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
@@ -162,7 +162,7 @@
                                                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                                                     <real key="value" value="4"/>
                                                                                 </userDefinedRuntimeAttribute>
-                                                                                <userDefinedRuntimeAttribute type="point" keyPath="contentInset">
+                                                                                <userDefinedRuntimeAttribute type="point" keyPath="backgroundInset">
                                                                                     <point key="value" x="2" y="2"/>
                                                                                 </userDefinedRuntimeAttribute>
                                                                             </userDefinedRuntimeAttributes>
@@ -187,7 +187,7 @@
                                                                                 <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
                                                                                     <color key="value" name="ButtonMouseDownColor"/>
                                                                                 </userDefinedRuntimeAttribute>
-                                                                                <userDefinedRuntimeAttribute type="point" keyPath="contentInset">
+                                                                                <userDefinedRuntimeAttribute type="point" keyPath="backgroundInset">
                                                                                     <point key="value" x="2" y="2"/>
                                                                                 </userDefinedRuntimeAttribute>
                                                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -218,7 +218,7 @@
                                                                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                                                                     <real key="value" value="4"/>
                                                                                 </userDefinedRuntimeAttribute>
-                                                                                <userDefinedRuntimeAttribute type="point" keyPath="contentInset">
+                                                                                <userDefinedRuntimeAttribute type="point" keyPath="backgroundInset">
                                                                                     <point key="value" x="2" y="2"/>
                                                                                 </userDefinedRuntimeAttribute>
                                                                             </userDefinedRuntimeAttributes>

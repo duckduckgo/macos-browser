@@ -32,7 +32,6 @@ import LoginItems
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
-@available(macOS 11.4, *)
 final class NetworkProtectionTunnelController: NetworkProtection.TunnelController {
 
     // MARK: - Debug Helpers
@@ -160,8 +159,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             protocolConfiguration.providerConfiguration = [
                 NetworkProtectionOptionKey.defaultPixelHeaders: APIRequest.Headers().httpHeaders,
                 NetworkProtectionOptionKey.excludedRoutes: excludedRoutes().map(\.stringRepresentation) as NSArray,
-                NetworkProtectionOptionKey.includedRoutes: includedRoutes().map(\.stringRepresentation) as NSArray,
-                NetworkProtectionOptionKey.connectionTesterEnabled: NSNumber(value: isConnectionTesterEnabled)
+                NetworkProtectionOptionKey.includedRoutes: includedRoutes().map(\.stringRepresentation) as NSArray
             ]
 
             // always-on
@@ -319,12 +317,12 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
         if Self.simulationOptions.isEnabled(.tunnelFailure) {
             Self.simulationOptions.setEnabled(false, option: .tunnelFailure)
-            options[NetworkProtectionOptionKey.tunnelFailureSimulation] = NetworkProtectionOptionValue.true
+            options[NetworkProtectionOptionKey.tunnelFailureSimulation] = NSNumber(value: true)
         }
 
         if Self.simulationOptions.isEnabled(.crashFatalError) {
             Self.simulationOptions.setEnabled(false, option: .crashFatalError)
-            options[NetworkProtectionOptionKey.tunnelFatalErrorCrashSimulation] = NetworkProtectionOptionValue.true
+            options[NetworkProtectionOptionKey.tunnelFatalErrorCrashSimulation] = NSNumber(value: true)
         }
 
         if Self.simulationOptions.isEnabled(.controllerFailure) {
@@ -571,6 +569,16 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         } else {
             Self.simulationOptions.setEnabled(true, option: .crashFatalError)
             try await sendProviderMessageToActiveSession(.simulateTunnelFatalError)
+        }
+    }
+
+    @MainActor
+    func toggleShouldSimulateConnectionInterruption() async throws {
+        if Self.simulationOptions.isEnabled(.connectionInterruption) {
+            Self.simulationOptions.setEnabled(false, option: .connectionInterruption)
+        } else {
+            Self.simulationOptions.setEnabled(true, option: .connectionInterruption)
+            try await sendProviderMessageToActiveSession(.simulateConnectionInterruption)
         }
     }
 

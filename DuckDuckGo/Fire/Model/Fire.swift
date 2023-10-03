@@ -113,13 +113,7 @@ final class Fire {
         self.syncDataProviders = syncDataProviders ?? (NSApp.delegate as? AppDelegate)?.syncDataProviders
         self.secureVaultFactory = secureVaultFactory
         self.tld = tld
-
-        if #available(macOS 11, *), autoconsentManagement == nil {
-            self.autoconsentManagement = AutoconsentManagement.shared
-        } else {
-            self.autoconsentManagement = autoconsentManagement
-        }
-
+        self.autoconsentManagement = autoconsentManagement ?? AutoconsentManagement.shared
         if let stateRestorationManager = stateRestorationManager {
             self.stateRestorationManager = stateRestorationManager
         } else if let appDelegate = NSApp.delegate as? AppDelegate {
@@ -210,7 +204,7 @@ final class Fire {
 
             group.enter()
             self.burnTabs(burningEntity: .allWindows(mainWindowControllers: windowControllers, selectedDomains: Set())) {
-                Task {
+                Task { @MainActor in
                     await self.burnWebCache()
                     self.burnHistory {
                         self.burnPermissions {
@@ -396,6 +390,7 @@ final class Fire {
         return Set(accounts.compactMap { $0.domain })
     }
 
+    @MainActor
     private func burnFavicons(completion: @escaping () -> Void) {
         let autofillDomains = autofillDomains()
         self.faviconManagement.burnExcept(fireproofDomains: FireproofDomains.shared,
@@ -404,6 +399,7 @@ final class Fire {
                                           completion: completion)
     }
 
+    @MainActor
     private func burnFavicons(for baseDomains: Set<String>, completion: @escaping () -> Void) {
         let autofillDomains = autofillDomains()
         self.faviconManagement.burnDomains(baseDomains,
@@ -499,9 +495,7 @@ final class Fire {
     // MARK: - Autoconsent visit cache
 
     private func burnAutoconsentCache() {
-        if #available(macOS 11, *), self.autoconsentManagement != nil {
-            self.autoconsentManagement!.clearCache()
-        }
+        self.autoconsentManagement?.clearCache()
     }
 
     // MARK: - Last Session State

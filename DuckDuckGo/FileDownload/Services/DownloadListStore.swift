@@ -19,6 +19,7 @@
 import Foundation
 import CoreData
 import Combine
+import UniformTypeIdentifiers
 
 protocol DownloadListStoring {
 
@@ -205,7 +206,7 @@ extension DownloadListItem {
               let modified = managedObject.modified,
               let url = managedObject.urlEncrypted as? URL
         else {
-            Pixel.fire(.debug(event: .downloadListItemDecryptionFailedUnique), limitToOnceADay: true)
+            Pixel.fire(.debug(event: .downloadListItemDecryptionFailedUnique), limitTo: .dailyFirst)
             assertionFailure("DownloadListItem: Failed to init from ManagedObject")
             return nil
         }
@@ -219,7 +220,7 @@ extension DownloadListItem {
                   url: url,
                   websiteURL: managedObject.websiteURLEncrypted as? URL,
                   isBurner: false,
-                  fileType: managedObject.fileType.map { UTType(rawValue: $0 as CFString) },
+                  fileType: managedObject.fileType.flatMap(UTType.init(_:)),
                   destinationURL: managedObject.destinationURLEncrypted as? URL,
                   tempURL: managedObject.tempURLEncrypted as? URL,
                   error: error)
@@ -241,7 +242,7 @@ extension DownloadManagedObject {
         urlEncrypted = item.url as NSURL
         websiteURLEncrypted = item.websiteURL as NSURL?
         modified = item.modified
-        fileType = item.fileType?.rawValue as String?
+        fileType = item.fileType?.identifier
         destinationURLEncrypted = item.destinationURL as NSURL?
         tempURLEncrypted = item.tempURL as NSURL?
         errorEncrypted = item.error as NSError?

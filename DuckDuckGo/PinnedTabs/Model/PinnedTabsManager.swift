@@ -97,12 +97,6 @@ final class PinnedTabsManager {
             }
     }
 
-    func reportUsage() {
-        if !tabCollection.tabs.isEmpty {
-            Pixel.fire(.userHasPinnedTab)
-        }
-    }
-
     // MARK: - Private
 
     private let didUnpinTabSubject = PassthroughSubject<Int, Never>()
