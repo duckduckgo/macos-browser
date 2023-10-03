@@ -844,6 +844,12 @@ CQ
                                                 </items>
                                             </menu>
                                         </menuItem>
+                                        <menuItem title="Open App Container in Finder" id="rUh-SZ-Ens">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="openAppContainerInFinder:" target="Ady-hI-5gd" id="Wub-im-mcf"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem isSeparatorItem="YES" id="q5h-kB-Q82"/>
                                         <menuItem title="Remote Configuration" id="Vu8-iE-7RS">
                                             <modifierMask key="keyEquivalentModifierMask"/>
@@ -1287,12 +1293,6 @@ CQ
                                             </menu>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="iVd-TD-QhJ"/>
-                                        <menuItem title="Open App Container in Finder" id="rUh-SZ-Ens">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="openAppContainerInFinder:" target="Ady-hI-5gd" id="Wub-im-mcf"/>
-                                            </connections>
-                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
