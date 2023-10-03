@@ -99,7 +99,7 @@ final class DataBrokerProtectionStageDurationCalculator {
     }
 }
 
-public enum DataBrokerProtectionPixels {
+public enum DataBrokerProtectionPixels: Equatable {
     struct Consts {
         static let dataBrokerParamKey = "data_broker"
         static let appVersionParamKey = "app_version"
