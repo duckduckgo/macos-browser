@@ -289,9 +289,8 @@ final class NavigationBarPopovers {
 #if NETWORK_PROTECTION
     func showNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         let popover = networkProtectionPopover ?? {
-            // TODO: implement an IPC controller
-            let controller = NoOpController()
-            //let controller = NetworkProtectionTunnelController()
+            let controller = NetworkProtectionIPCTunnelController()
+
             let statusObserver = ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
                                                                         platformDidWakeNotification: NSWorkspace.didWakeNotification)
             let statusInfoObserver = ConnectionServerInfoObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,

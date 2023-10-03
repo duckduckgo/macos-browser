@@ -1,5 +1,5 @@
 //
-//  DuckDuckGoAgentAppDelegate.swift
+//  DuckDuckGoVPNAppDelegate.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -21,12 +21,13 @@ import Combine
 import Common
 import NetworkExtension
 import NetworkProtection
+import NetworkProtectionIPC
 import NetworkProtectionUI
 import ServiceManagement
 
 @objc(Application)
-final class DuckDuckGoAgentApplication: NSApplication {
-    private let _delegate = DuckDuckGoAgentAppDelegate()
+final class DuckDuckGoVPNApplication: NSApplication {
+    private let _delegate = DuckDuckGoVPNAppDelegate()
 
     override init() {
         os_log(.error, log: .networkProtection, "🟢 Status Bar Agent starting: %{public}d", NSRunningApplication.current.processIdentifier)
@@ -47,7 +48,7 @@ final class DuckDuckGoAgentApplication: NSApplication {
 }
 
 @main
-final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
+final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     /// when enabled VPN connection will be automatically initiated on launch even if disconnected manually (Always On rule disabled)
     @UserDefaultsWrapper(key: .networkProtectionConnectOnLogIn, defaultValue: NetworkProtectionUserDefaultsConstants.shouldConnectOnLogIn, defaults: .shared)
@@ -71,6 +72,16 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
     private lazy var tunnelController: FeatureProtectingTunnelController = {
         FeatureProtectingTunnelController(appLauncher: appLauncher, bouncer: bouncer)
     }()*/
+
+    /// An IPC server that provides access to the tunnel controller.
+    ///
+    /// This is used by our main app to control the tunnel through the VPN login item.
+    ///
+    private lazy var tunnelControllerIPCServer: TunnelControllerIPCServer = {
+        let ipcServer = TunnelControllerIPCServer(tunnelController: tunnelController)
+        ipcServer.activate()
+        return ipcServer
+    }()
 
     /// The status bar NetworkProtection menu
     ///
@@ -103,10 +114,12 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
     }()
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        os_log("DuckDuckGoAgent started", log: .networkProtectionLoginItemLog, type: .info)
+        os_log("DuckDuckGoVPN started", log: .networkProtectionLoginItemLog, type: .info)
         networkProtectionMenu.show()
 
         bouncer.requireAuthTokenOrKillApp()
+
+        _ = tunnelControllerIPCServer
 
         // Connect on Log In
         if shouldAutoConnect,

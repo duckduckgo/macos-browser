@@ -30,6 +30,7 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("PFMoveApplication.m", .source),
     .init("NetworkProtectionBundle.swift", .source),
     .init("NetworkProtectionAppEvents.swift", .source),
+    .init("NetworkProtectionIPCTunnelController.swift", .source),
     .init("KeychainType+ClientDefault.swift", .source)
 ]
 

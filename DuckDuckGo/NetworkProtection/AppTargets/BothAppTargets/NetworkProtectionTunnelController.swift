@@ -85,7 +85,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     @UserDefaultsWrapper(key: .networkProtectionShouldExcludeLocalRoutes, defaultValue: NetworkProtectionUserDefaultsConstants.shouldExcludeLocalRoutes)
     private(set) var shouldExcludeLocalRoutes: Bool
 
-    /// When enabled VPN connection will be automatically initiated by DuckDuckGoAgentAppDelegate on launch even if disconnected manually (Always On rule disabled)
+    /// When enabled VPN connection will be automatically initiated by DuckDuckGoVPNAppDelegate on launch even if disconnected manually (Always On rule disabled)
     @MainActor
     @UserDefaultsWrapper(key: .networkProtectionConnectOnLogIn, defaultValue: NetworkProtectionUserDefaultsConstants.shouldConnectOnLogIn, defaults: .shared)
     private(set) var shouldAutoConnectOnLogIn: Bool

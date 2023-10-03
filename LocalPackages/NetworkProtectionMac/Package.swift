@@ -4,12 +4,13 @@
 import PackageDescription
 
 let package = Package(
-    name: "NetworkProtectionUI",
+    name: "NetworkProtectionMac",
     platforms: [
         .iOS("14.0"),
         .macOS("11.4")
     ],
     products: [
+        .library(name: "NetworkProtectionIPC", targets: ["NetworkProtectionIPC"]),
         .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"])
     ],
     dependencies: [
@@ -17,6 +18,21 @@ let package = Package(
         .package(path: "../SwiftUIExtensions")
     ],
     targets: [
+        // MARK: - NetworkProtectionIPC
+
+        .target(
+            name: "NetworkProtectionIPC",
+            dependencies: [
+                .product(name: "NetworkProtection", package: "BrowserServicesKit")
+            ]),
+        .testTarget(
+            name: "NetworkProtectionIPCTests",
+            dependencies: [
+                "NetworkProtectionIPC"
+            ]),
+
+        // MARK: - NetworkProtectionUI
+
         .target(
             name: "NetworkProtectionUI",
             dependencies: [
