@@ -62,7 +62,11 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
     private let appLauncher = AppLauncher()
     private let bouncer = NetworkProtectionBouncer()
 
-    private lazy var tunnelController = NetworkProtectionTunnelController()
+    var networkExtensionBundleID: String {
+        Bundle.main.networkExtensionBundleID
+    }
+
+    private lazy var tunnelController = NetworkProtectionTunnelController(networkExtensionBundleID: networkExtensionBundleID)
     /*
     private lazy var tunnelController: FeatureProtectingTunnelController = {
         FeatureProtectingTunnelController(appLauncher: appLauncher, bouncer: bouncer)

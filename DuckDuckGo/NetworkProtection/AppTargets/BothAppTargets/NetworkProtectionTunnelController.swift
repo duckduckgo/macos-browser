@@ -61,6 +61,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     // TODO: replace this with a shared store
     //private let debugUtilities = NetworkProtectionDebugUtilities()
 
+    private let networkExtensionBundleID: String
+
+    // MARK: - User Defaults
+
     /// Kill Switch: Enable enforceRoutes flag
     ///
     /// Applies enforceRoutes setting, sets up excludedRoutes in MacPacketTunnelProvider and disables disconnect on failure
@@ -104,7 +108,12 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// a VPN-access popup to the user.
     ///
     private func loadTunnelManager() async -> NETunnelProviderManager? {
-        try? await NETunnelProviderManager.loadAllFromPreferences().first
+        let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
+        print(tunnels)
+        return tunnels?.first {
+            ($0.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == networkExtensionBundleID
+        }
+        //try? await NETunnelProviderManager.loadAllFromPreferences().first
     }
 
     private func loadOrMakeTunnelManager() async throws -> NETunnelProviderManager {
@@ -128,11 +137,13 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///         - notificationCenter: (meant for testing) the notification center that this object will use.
     ///         - logger: (meant for testing) the logger that this object will use.
     ///
-    init(notificationCenter: NotificationCenter = .default,
+    init(networkExtensionBundleID: String,
+         notificationCenter: NotificationCenter = .default,
          tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
 
         self.logger = logger
+        self.networkExtensionBundleID = networkExtensionBundleID
         self.tokenStore = tokenStore
     }
 

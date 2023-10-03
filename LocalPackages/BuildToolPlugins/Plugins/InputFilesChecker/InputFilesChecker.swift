@@ -25,7 +25,7 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("BWEncryptionOutput.m", .source),
     .init("BWManager.swift", .source),
     .init("UpdateController.swift", .source),
-    .init("DuckDuckGo Agent.app", .unknown),
+    .init("DuckDuckGo VPN.app", .unknown),
     .init("DuckDuckGo Notifications.app", .unknown),
     .init("PFMoveApplication.m", .source),
     .init("NetworkProtectionBundle.swift", .source),

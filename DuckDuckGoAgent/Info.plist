@@ -6,7 +6,7 @@
 	<string>$(DISTRIBUTED_NOTIFICATIONS_PREFIX)</string>
 	<key>NETP_APP_GROUP</key>
 	<string>$(NETP_APP_GROUP)</string>
-	<key>LSApplicationCategoryType</key>
-	<string>public.app-category.productivity</string>
+	<key>SYSEX_BUNDLE_ID</key>
+	<string>$(SYSEX_BUNDLE_ID)</string>
 </dict>
 </plist>
