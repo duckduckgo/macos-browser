@@ -24,7 +24,7 @@ extension NSAlert {
         return (accessoryView as? NSTextField)?.stringValue
     }
 
-    static func importFailedAlert(source: DataImport.Source, linkDelegate: NSTextViewDelegate) -> NSAlert {
+    static func importFailedAlert(linkDelegate: NSTextViewDelegate) -> NSAlert {
         let alert = NSAlert()
 
         let linkText = UserText.dataImportSubmitFeedback

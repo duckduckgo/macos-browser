@@ -40,6 +40,17 @@ final class DataImportViewController: NSViewController {
         case completedImport(DataImport.Summary)
     }
 
+    private struct ImportError: DataImportError {
+        enum OperationType: Int {
+            case secureVaultError
+        }
+
+        let source: DataImport.Source
+        let action: DataImportAction
+        let type: OperationType
+        let underlyingError: Error?
+    }
+
     private struct ViewState: Equatable {
         var selectedImportSource: DataImport.Source
         var interactionState: InteractionState
@@ -222,7 +233,7 @@ final class DataImportViewController: NSViewController {
             }
         } catch {
             os_log("dataImporter initialization failed: %{public}s", type: .error, error.localizedDescription)
-            self.presentAlert(for: .generic(.cannotAccessSecureVault))
+            self.presentAlert(for: ImportError(source: viewState.selectedImportSource, action: .generic, type: .secureVaultError, underlyingError: error))
         }
     }
 
@@ -412,23 +423,19 @@ final class DataImportViewController: NSViewController {
 
                 NotificationCenter.default.post(name: .dataImportComplete, object: nil)
             case .failure(let error):
-                os_log("import failed: %{public}s", type: .error, error.localizedDescription)
-                switch error.errorType {
-                case .needsLoginPrimaryPassword:
-                    self.presentAlert(for: error)
-                default:
+                if (error as? FirefoxLoginReader.ImportError)?.type != .requiresPrimaryPassword {
+                    os_log("import failed: %{public}s", type: .error, error.localizedDescription)
                     self.viewState.interactionState = .failedToImport
-                    self.presentAlert(for: error)
                 }
+                self.presentAlert(for: error)
             }
         }
     }
 
-    private func presentAlert(for error: DataImportError) {
+    private func presentAlert(for error: any DataImportError) {
         guard let window = view.window else { return }
 
-        switch error.errorType {
-        case .needsLoginPrimaryPassword:
+        if case .requiresPrimaryPassword = (error as? FirefoxLoginReader.ImportError)?.type {
             let alert = NSAlert.passwordRequiredAlert(source: viewState.selectedImportSource)
             let response = alert.runModal()
 
@@ -439,17 +446,13 @@ final class DataImportViewController: NSViewController {
 
                 completeImport()
             }
-        default:
-            let pixel = Pixel.Event.dataImportFailed(
-                action: error.actionType.pixelEventAction,
-                source: viewState.selectedImportSource.pixelEventSource
-            )
-
-            Pixel.fire(pixel, withAdditionalParameters: error.errorType.errorParameters)
-
-            let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource, linkDelegate: self)
-            alert.beginSheetModal(for: window, completionHandler: nil)
+            return
         }
+
+        Pixel.fire(.dataImportFailed(error))
+
+        let alert = NSAlert.importFailedAlert(linkDelegate: self)
+        alert.beginSheetModal(for: window, completionHandler: nil)
     }
 
     private func requestSync() {
@@ -492,7 +495,7 @@ extension DataImportViewController: FileImportViewControllerDelegate {
         } catch {
             os_log("file import failed: %{public}s", type: .error, error.localizedDescription)
             self.viewState.interactionState = .unableToImport
-            self.presentAlert(for: .logins(.cannotAccessSecureVault))
+            self.presentAlert(for: ImportError(source: self.viewState.selectedImportSource, action: .logins, type: .secureVaultError, underlyingError: error))
         }
     }
 

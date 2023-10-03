@@ -38,19 +38,17 @@ struct Cryptography {
         }
     }
 
-    static func decryptPBKDF2(password: EncodedString, salt: Data, keyByteCount: Int, rounds: Int, kdf: KDF) -> Data? {
-        let passwordData: Data?
+    static let kCCErrorDomain = "CommonCryptoError"
 
-        switch password {
-        case .base64(let string):
-            passwordData = Data(base64Encoded: string)
-        case .utf8(let string):
-            passwordData = string.data(using: .utf8)
-        }
-
-        guard let passwordData = passwordData else {
-            return nil
-        }
+    static func decryptPBKDF2(password: EncodedString, salt: Data, keyByteCount: Int, rounds: Int, kdf: KDF) throws -> Data {
+        let passwordData = try {
+            switch password {
+            case .base64(let string):
+                return try Data(base64Encoded: string) ?? { throw NSError(domain: kCCErrorDomain, code: kCCDecodeError) }()
+            case .utf8(let string):
+                return string.utf8data
+            }
+        }()
 
         let passwordDataArray: [Int8] = passwordData.map { Int8(bitPattern: $0) }
 
@@ -82,18 +80,20 @@ struct Cryptography {
             }
         }
 
-        return derivationStatus == kCCSuccess ? derivedKeyData : nil
+        guard derivationStatus == kCCSuccess else { throw NSError(domain: kCCErrorDomain, code: Int(derivationStatus)) }
+
+        return derivedKeyData
     }
 
-    static func decryptAESCBC(data: Data, key: Data, iv: Data) -> Data? {
-        return decrypt(with: CCAlgorithm(kCCAlgorithmAES128), data: data, key: key, iv: iv)
+    static func decryptAESCBC(data: Data, key: Data, iv: Data) throws -> Data {
+        return try decrypt(with: CCAlgorithm(kCCAlgorithmAES128), data: data, key: key, iv: iv)
     }
 
-    static func decrypt3DES(data: Data, key: Data, iv: Data) -> Data? {
-        return decrypt(with: CCAlgorithm(kCCAlgorithm3DES), data: data, key: key, iv: iv)
+    static func decrypt3DES(data: Data, key: Data, iv: Data) throws -> Data {
+        return try decrypt(with: CCAlgorithm(kCCAlgorithm3DES), data: data, key: key, iv: iv)
     }
 
-    static func decrypt(with algorithm: CCAlgorithm, data: Data, key: Data, iv: Data) -> Data? {
+    static func decrypt(with algorithm: CCAlgorithm, data: Data, key: Data, iv: Data) throws -> Data {
         var outLength: Int = 0
         var outBytes = [UInt8](repeating: 0, count: data.count)
         var status = CCCryptorStatus(kCCSuccess)
@@ -122,9 +122,7 @@ struct Cryptography {
             }
         }
 
-        guard status == kCCSuccess else {
-            return nil
-        }
+        guard status == kCCSuccess else { throw NSError(domain: kCCErrorDomain, code: Int(status)) }
 
         return Data(bytes: &outBytes, count: outLength)
     }

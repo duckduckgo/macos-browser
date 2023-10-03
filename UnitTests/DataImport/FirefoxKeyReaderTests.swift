@@ -52,10 +52,12 @@ class FirefoxKeyReaderTests: XCTestCase {
         let reader = FirefoxEncryptionKeyReader()
         let result = reader.getEncryptionKey(key3DatabaseURL: databaseURL, primaryPassword: "invalid-password")
 
-        if case let .failure(error) = result {
-            XCTAssertEqual(error, .decryptionFailed)
-        } else {
-            XCTFail("Did not expect to get valid decryption key")
+        switch result {
+        case .failure(let error as FirefoxLoginReader.ImportError):
+            XCTAssertEqual(error.type, .key3readerStage2)
+            XCTAssertTrue(error.underlyingError is ASN1Parser.ParserError)
+        default:
+            XCTFail("Received unexpected \(result)")
         }
     }
 
@@ -64,10 +66,12 @@ class FirefoxKeyReaderTests: XCTestCase {
         let reader = FirefoxEncryptionKeyReader()
         let result = reader.getEncryptionKey(key3DatabaseURL: databaseURL, primaryPassword: "")
 
-        if case let .failure(error) = result {
-            XCTAssertEqual(error, FirefoxLoginReader.ImportError.decryptionFailed)
-        } else {
-            XCTFail("Did not expect to read decryption key")
+        switch result {
+        case .failure(let error as FirefoxLoginReader.ImportError):
+            XCTAssertEqual(error.type, .key3readerStage1)
+            XCTAssertTrue(error.underlyingError is FirefoxEncryptionKeyReader.KeyReaderFileLineError)
+        default:
+            XCTFail("Received unexpected \(result)")
         }
     }
 
@@ -112,10 +116,11 @@ class FirefoxKeyReaderTests: XCTestCase {
         let reader = FirefoxEncryptionKeyReader()
         let result = reader.getEncryptionKey(key4DatabaseURL: databaseURL, primaryPassword: "")
 
-        if case let .failure(error) = result {
-            XCTAssertEqual(error, .requiresPrimaryPassword)
-        } else {
-            XCTFail("Failed to read decryption key")
+        switch result {
+        case .failure(let error as FirefoxLoginReader.ImportError):
+            XCTAssertEqual(error.type, .requiresPrimaryPassword)
+        default:
+            XCTFail("Received unexpected \(result)")
         }
     }
 
