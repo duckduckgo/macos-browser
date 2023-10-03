@@ -153,21 +153,21 @@ class PixelExperimentTests: XCTestCase {
         waitForExpectations(timeout: 0)
 
         // shouldn‘t fire after 20 days
-        now = Calendar.current.date(byAdding: .day, value: 20, to: start)!
+        now = start.adding(.days(20))
         PixelExperiment.fireDay21To27SerpPixel()
 
         // should fire after 21 days
         e = expectation(description: "21d pixel fired")
-        now = Calendar.current.date(byAdding: .day, value: 21, to: start)!
+        now = start.adding(.days(21))
         PixelExperiment.fireDay21To27SerpPixel()
         waitForExpectations(timeout: 0)
 
         // shouldn‘t fire after 26 days (only initial)
-        now = Calendar.current.date(byAdding: .day, value: 26, to: start)!
+        now = start.adding(.days(26))
         PixelExperiment.fireDay21To27SerpPixel()
 
         // shouldn‘t fire after 27 days
-        now = Calendar.current.date(byAdding: .day, value: 27, to: start)!
+        now = start.adding(.days(27))
         PixelExperiment.fireDay21To27SerpPixel()
     }
 
@@ -195,17 +195,17 @@ class PixelExperimentTests: XCTestCase {
         waitForExpectations(timeout: 0)
 
         // shouldn‘t fire after 20 days
-        now = Calendar.current.date(byAdding: .day, value: 20, to: start)!
+        now = start.adding(.days(20))
         PixelExperiment.fireDay21To27SerpPixel()
 
-        // should fire after 24 days
+        // should fire after 27 days
         e = expectation(description: "27d pixel fired")
-        now = Calendar.current.date(byAdding: .day, value: 24, to: start)!
+        now = start.adding(.days(27))
         PixelExperiment.fireDay21To27SerpPixel()
         waitForExpectations(timeout: 0)
 
-        // shouldn‘t fire after 27 days
-        now = Calendar.current.date(byAdding: .day, value: 28, to: start)!
+        // shouldn‘t fire after 28 days
+        now = start.adding(.days(28))
         PixelExperiment.fireDay21To27SerpPixel()
     }
 
@@ -230,7 +230,7 @@ class PixelExperimentTests: XCTestCase {
         waitForExpectations(timeout: 0)
 
         // shouldn‘t fire after 28 days
-        now = Calendar.current.date(byAdding: .day, value: 28, to: start)!
+        now = start.adding(.days(28))
         PixelExperiment.fireDay21To27SerpPixel()
     }
 
