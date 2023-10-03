@@ -92,29 +92,6 @@ extension Pixel.Event {
         case identity
     }
 
-    enum DataImportAction: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case importBookmarks = "bookmarks"
-        case importLogins = "logins"
-        case generic = "generic"
-    }
-
-    enum DataImportSource: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case brave = "source-brave"
-        case chrome = "source-chrome"
-        case csv = "source-csv"
-        case lastPass = "source-lastpass"
-        case onePassword7 = "source-1password"
-        case onePassword8 = "source-1password-8"
-        case edge = "source-edge"
-        case firefox = "source-firefox"
-        case safari = "source-safari"
-        case bookmarksHTML = "source-bookmarks-html"
-    }
-
     public enum CompileRulesListType: String, CustomStringConvertible {
 
         public var description: String { rawValue }
@@ -133,5 +110,33 @@ extension Pixel.Event {
         case tab
         case window
         case allSites = "all-sites"
+    }
+}
+
+extension DataImportAction: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .bookmarks: return "bookmarks"
+        case .logins: return "logins"
+        case .favicons: return "favicons"
+        case .generic: return "generic"
+        }
+    }
+}
+
+extension DataImport.Source: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .brave: return "source-brave"
+        case .chrome: return "source-chrome"
+        case .csv: return "source-csv"
+        case .lastPass: return "source-lastpass"
+        case .onePassword7: return "source-1password"
+        case .onePassword8: return "source-1password-8"
+        case .edge: return "source-edge"
+        case .firefox: return "source-firefox"
+        case .safari: return "source-safari"
+        case .bookmarksHTML: return "source-bookmarks-html"
+        }
     }
 }

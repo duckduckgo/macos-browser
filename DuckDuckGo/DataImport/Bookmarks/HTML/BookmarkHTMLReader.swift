@@ -25,73 +25,95 @@ struct HTMLImportedBookmarks {
 
 final class BookmarkHTMLReader {
 
-    enum ImportError: Error {
-        case unexpectedBookmarksFileFormat
+    struct ImportError: DataImportError {
+        enum OperationType: Int {
+            case parseXml
+            case validationBody
+            case validationH1
+            case findTopLevelFolder
+            case proceedToTopLevelFolder
+            case readFolder
+            case bookmarkRead
+            case unknown
+        }
+
+        var action: DataImportAction { .bookmarks }
+        var source: DataImport.Source { .bookmarksHTML }
+        let type: OperationType
+        let underlyingError: Error?
     }
+
+    private var currentOperationType: ImportError.OperationType = .parseXml
 
     init(bookmarksFileURL: URL) {
         self.bookmarksFileURL = bookmarksFileURL
     }
 
-    func readBookmarks() -> Result<HTMLImportedBookmarks, ImportError> {
+    func readBookmarks() -> DataImportResult<HTMLImportedBookmarks> {
         do {
-            //
-            // Bookmarks HTML is not a valid HTML and needs to be fixed before parsing, hence `.documentTidyHTML`.
-            // This, however, has a side effect of wrapping any `<p></p>` tags (otherwise irrelevant to
-            // the bookmarks structure) in `<dd></dd>` tags, that need to be handled while parsing.
-            // More info:
-            //  * https://social.msdn.microsoft.com/Forums/en-US/42547a38-7f65-432e-a40b-821b99aebdbb/intelligent-xmlhtml-parsing-firefoxnetscape-bookmarkshtml-format
-            //  * https://www.w3schools.com/TAgs/tag_dd.asp
-            //
-            let document = try XMLDocument(contentsOf: bookmarksFileURL, options: [.documentTidyHTML])
-
-            var cursor = try validateHTMLBookmarksDocument(document)
-            let importSource = try determineImportSource(&cursor)
-
-            let firstFolder = try readFolder(cursor)
-
-            var other = [ImportedBookmarks.BookmarkOrFolder]()
-            if importSource == .duckduckgoWebKit {
-                if firstFolder.name.isEmpty {
-                    other.append(contentsOf: firstFolder.children ?? [])
-                } else {
-                    other.append(firstFolder)
-                }
-            }
-
-            while cursor != nil {
-                let itemType: XMLNode.BookmarkItemType?
-                if importSource?.supportsSafariBookmarksHTMLFormat == true {
-                    itemType = findNextItemInSafariFormat(&cursor)
-                } else {
-                    itemType = findNextItem(&cursor)
-                }
-
-                guard let itemType = itemType else {
-                    break
-                }
-
-                let items = try readItem(itemType, at: cursor)
-                other.append(contentsOf: items)
-            }
-
-            let bookmarkBar: ImportedBookmarks.BookmarkOrFolder
-            if importSource == .duckduckgoWebKit {
-                // DDG does not have a "Bookmarks Bar" so let's fake it with an empty folder that will not be imported
-                bookmarkBar = .folder(name: "", children: [])
-            } else {
-                bookmarkBar = firstFolder
-            }
-
-            let otherBookmarks = ImportedBookmarks.BookmarkOrFolder.folder(name: "other", children: other)
-            let allBookmarks = ImportedBookmarks(topLevelFolders: .init(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks))
-            let result = HTMLImportedBookmarks(source: importSource, bookmarks: allBookmarks)
-
+            let result = try reallyReadBookmarks()
             return .success(result)
-
+        } catch let error as ImportError {
+            return .failure(error)
         } catch {
-            return .failure(.unexpectedBookmarksFileFormat)
+            return .failure(ImportError(type: currentOperationType, underlyingError: error))
         }
+    }
+
+    private func reallyReadBookmarks() throws -> HTMLImportedBookmarks {
+        //
+        // Bookmarks HTML is not a valid HTML and needs to be fixed before parsing, hence `.documentTidyHTML`.
+        // This, however, has a side effect of wrapping any `<p></p>` tags (otherwise irrelevant to
+        // the bookmarks structure) in `<dd></dd>` tags, that need to be handled while parsing.
+        // More info:
+        //  * https://social.msdn.microsoft.com/Forums/en-US/42547a38-7f65-432e-a40b-821b99aebdbb/intelligent-xmlhtml-parsing-firefoxnetscape-bookmarkshtml-format
+        //  * https://www.w3schools.com/TAgs/tag_dd.asp
+        //
+        currentOperationType = .parseXml
+        let document = try XMLDocument(contentsOf: bookmarksFileURL, options: [.documentTidyHTML])
+        currentOperationType = .unknown // further operations should throw ImportError
+
+        var cursor = try validateHTMLBookmarksDocument(document)
+        let importSource = try determineImportSource(&cursor)
+
+        let firstFolder = try readFolder(cursor)
+
+        var other = [ImportedBookmarks.BookmarkOrFolder]()
+        if importSource == .duckduckgoWebKit {
+            if firstFolder.name.isEmpty {
+                other.append(contentsOf: firstFolder.children ?? [])
+            } else {
+                other.append(firstFolder)
+            }
+        }
+
+        while cursor != nil {
+            let itemType: XMLNode.BookmarkItemType?
+            if importSource?.supportsSafariBookmarksHTMLFormat == true {
+                itemType = findNextItemInSafariFormat(&cursor)
+            } else {
+                itemType = findNextItem(&cursor)
+            }
+
+            guard let itemType else { break }
+
+            let items = try readItem(itemType, at: cursor)
+            other.append(contentsOf: items)
+        }
+
+        let bookmarkBar: ImportedBookmarks.BookmarkOrFolder
+        if importSource == .duckduckgoWebKit {
+            // DDG does not have a "Bookmarks Bar" so let's fake it with an empty folder that will not be imported
+            bookmarkBar = .folder(name: "", children: [])
+        } else {
+            bookmarkBar = firstFolder
+        }
+
+        let otherBookmarks = ImportedBookmarks.BookmarkOrFolder.folder(name: "other", children: other)
+        let allBookmarks = ImportedBookmarks(topLevelFolders: .init(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks))
+        let result = HTMLImportedBookmarks(source: importSource, bookmarks: allBookmarks)
+
+        return result
     }
 
     // MARK: - Private
@@ -116,14 +138,10 @@ final class BookmarkHTMLReader {
 
     private func validateHTMLBookmarksDocument(_ document: XMLDocument) throws -> XMLNode? {
         let root = document.rootElement()
-        guard let body = root?.child(at: 1) else {
-            throw ImportError.unexpectedBookmarksFileFormat
-        }
+        guard let body = root?.child(at: 1) else { throw ImportError(type: .validationBody, underlyingError: nil) }
 
         let cursor = body.child(at: 0)
-        guard cursor?.htmlTag == .h1 else {
-            throw ImportError.unexpectedBookmarksFileFormat
-        }
+        guard cursor?.htmlTag == .h1 else { throw ImportError(type: .validationH1, underlyingError: nil) }
 
         return cursor
     }
@@ -142,7 +160,7 @@ final class BookmarkHTMLReader {
         case .h3:
             isInSafariFormat = true
         default:
-            throw ImportError.unexpectedBookmarksFileFormat
+            throw ImportError(type: .findTopLevelFolder, underlyingError: nil)
         }
 
         return isInSafariFormat
@@ -160,7 +178,7 @@ final class BookmarkHTMLReader {
                     cursor = originalCursorValue
                     throw ReaderError.noTopLevelFolder
                 } else {
-                    throw ImportError.unexpectedBookmarksFileFormat
+                    throw ImportError(type: .proceedToTopLevelFolder, underlyingError: nil)
                 }
             }
             if cursor?.child(at: 0)?.htmlTag == .h3 {
@@ -219,9 +237,7 @@ final class BookmarkHTMLReader {
             cursor = cursor?.nextSibling
         }
 
-        guard cursor?.htmlTag == .dl else {
-            throw ImportError.unexpectedBookmarksFileFormat
-        }
+        guard cursor?.htmlTag == .dl else { throw ImportError(type: .readFolder, underlyingError: nil) }
 
         let children = try readFolderContents(cursor)
         return .folder(name: folderName, children: children)
@@ -251,9 +267,7 @@ final class BookmarkHTMLReader {
     }
 
     private func readBookmark(_ node: XMLNode?) throws -> ImportedBookmarks.BookmarkOrFolder {
-        guard let bookmark = node?.bookmark else {
-            throw ImportError.unexpectedBookmarksFileFormat
-        }
+        guard let bookmark = node?.bookmark else { throw ImportError(type: .bookmarkRead, underlyingError: nil) }
         return bookmark
     }
 

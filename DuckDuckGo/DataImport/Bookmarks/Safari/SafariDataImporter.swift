@@ -18,7 +18,7 @@
 
 import Foundation
 
-internal class SafariDataImporter: DataImporter {
+final class SafariDataImporter: DataImporter {
 
     static func canReadBookmarksFile() -> Bool {
         return FileManager.default.isReadableFile(atPath: safariDataDirectoryURL.path)
@@ -56,9 +56,16 @@ internal class SafariDataImporter: DataImporter {
         return [.bookmarks]
     }
 
+    @MainActor(unsafe)
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
+                    completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
+        let result = importData(types: types, from: profile)
+        completion(result)
+    }
+
+    @MainActor
+    private func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) -> DataImportResult<DataImport.Summary> {
         var summary = DataImport.Summary()
 
         if types.contains(.bookmarks) {
@@ -70,36 +77,29 @@ internal class SafariDataImporter: DataImporter {
 
             switch faviconsResult {
             case .success(let faviconsByURL):
-                for (pageURLString, fetchedFavicons) in faviconsByURL {
-                    if let pageURL = URL(string: pageURLString) {
-                        let favicons = fetchedFavicons.map {
-                            Favicon(identifier: UUID(),
-                                    url: pageURL,
-                                    image: $0.image,
-                                    relation: .icon,
-                                    documentUrl: pageURL,
-                                    dateCreated: Date())
-                        }
-
-                        faviconManager.handleFavicons(favicons, documentUrl: pageURL)
+                let faviconsByDocument = faviconsByURL.reduce(into: [URL: [Favicon]]()) { result, pair in
+                    guard let pageURL = URL(string: pair.key) else { return }
+                    let favicons = pair.value.map {
+                        Favicon(identifier: UUID(),
+                                url: pageURL,
+                                image: $0.image,
+                                relation: .icon,
+                                documentUrl: pageURL,
+                                dateCreated: Date())
                     }
+                    result[pageURL] = favicons
                 }
+                faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
 
-            case .failure:
-                Pixel.fire(.faviconImportFailed(source: .safari))
+            case .failure(let error):
+                Pixel.fire(.dataImportFailed(error))
             }
 
             switch bookmarkResult {
             case .success(let bookmarks):
-                do {
-                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(.safari))
-                } catch {
-                    completion(.failure(.bookmarks(.cannotAccessCoreData)))
-                    return
-                }
+                summary.bookmarksResult = bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(.safari))
             case .failure(let error):
-                completion(.failure(.bookmarks(error)))
-                return
+                return .failure(error)
             }
         }
 
@@ -107,7 +107,7 @@ internal class SafariDataImporter: DataImporter {
             summary.loginsResult = .awaited
         }
 
-        completion(.success(summary))
+        return .success(summary)
     }
 
 }

@@ -25,6 +25,10 @@ import BrowserServicesKit
 import NetworkProtection
 #endif
 
+#if SUBSCRIPTION
+import Account
+#endif
+
 protocol OptionsButtonMenuDelegate: AnyObject {
 
     func optionsButtonMenuRequestedBookmarkThisPage(_ sender: NSMenuItem)
@@ -41,6 +45,9 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedAppearancePreferences(_ menu: NSMenu)
 #if DBP
     func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu)
+#endif
+#if SUBSCRIPTION
+    func optionsButtonMenuRequestedSubscriptionPreferences(_ menu: NSMenu)
 #endif
 }
 
@@ -105,16 +112,16 @@ final class MoreOptionsMenu: NSMenu {
 
     private func setupMenuItems() {
 
-        #if FEEDBACK
+#if FEEDBACK
 
         addItem(withTitle: "Send Feedback", action: #selector(AppDelegate.openFeedback(_:)), keyEquivalent: "")
-        #if !APPSTORE
+#if !APPSTORE
             .withImage(NSImage(named: "BetaLabel"))
-        #endif // !APPSTORE
+#endif // !APPSTORE
 
         addItem(NSMenuItem.separator())
 
-        #endif // FEEDBACK
+#endif // FEEDBACK
 
         addWindowItems()
 
@@ -128,28 +135,9 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "OptionsButtonMenuEmail"))
             .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
-#if NETWORK_PROTECTION
-        if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
-            addItem(withTitle: UserText.networkProtection, action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
-                .targetting(self)
-                .withImage(.image(for: .vpnIcon))
-
-            DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
-        } else {
-            networkProtectionFeatureVisibility.disableForWaitlistUsers()
-        }
-#endif // NETWORK_PROTECTION
-
-#if DBP
-        let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
-                                                  action: #selector(openDataBrokerProtection),
-                                                  keyEquivalent: "")
-            .targetting(self)
-            .withImage(NSImage(named: "BurnerWindowIcon2")) // PLACEHOLDER: Change it once we have the final icon
-        addItem(dataBrokerProtectionItem)
-#endif // DBP
-
         addItem(NSMenuItem.separator())
+
+        addSubscriptionItems()
 
         addPageItems()
 
@@ -242,6 +230,12 @@ final class MoreOptionsMenu: NSMenu {
         actionDelegate?.optionsButtonMenuRequestedAppearancePreferences(self)
     }
 
+#if SUBSCRIPTION
+    @objc func openSubscriptionPreferences(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedSubscriptionPreferences(self)
+    }
+#endif
+
     @objc func findInPage(_ sender: NSMenuItem) {
         tabCollectionViewModel.selectedTabViewModel?.showFindInPage()
     }
@@ -296,6 +290,90 @@ final class MoreOptionsMenu: NSMenu {
         addItem(NSMenuItem.separator())
     }
 
+    private func addSubscriptionItems() {
+        var items: [NSMenuItem] = []
+
+#if SUBSCRIPTION
+        items.append(contentsOf: AccountManager().isSignedIn ? makeActiveSubscriptionItems() : makeInactiveSubscriptionItems())
+#else
+        items.append(contentsOf: makeActiveSubscriptionItems()) // this only adds NETP and DBP (if enabled)
+#endif
+
+        if !items.isEmpty {
+            items.forEach { addItem($0) }
+            addItem(NSMenuItem.separator())
+        }
+    }
+
+    private func makeActiveSubscriptionItems() -> [NSMenuItem] {
+        var items: [NSMenuItem] = []
+
+#if NETWORK_PROTECTION
+        if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
+            let isWaitlistUser = NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
+            let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
+
+            // If the user can see the Network Protection option but they haven't joined the waitlist or don't have an auth token, show the "New"
+            // badge to bring it to their attention.
+            if !isWaitlistUser && !hasAuthToken {
+                items.append(makeNetworkProtectionItem(showNewLabel: true))
+            } else {
+                items.append(makeNetworkProtectionItem(showNewLabel: false))
+            }
+
+            DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
+        } else {
+            networkProtectionFeatureVisibility.disableForWaitlistUsers()
+        }
+#endif // NETWORK_PROTECTION
+
+#if DBP
+        let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
+                                                  action: #selector(openDataBrokerProtection),
+                                                  keyEquivalent: "")
+            .targetting(self)
+            .withImage(NSImage(named: "BurnerWindowIcon2")) // PLACEHOLDER: Change it once we have the final icon
+        items.append(dataBrokerProtectionItem)
+#endif // DBP
+
+#if SUBSCRIPTION
+        let item1  = NSMenuItem(title: "Placeholder A", action: #selector(openPreferences(_:)), keyEquivalent: "")
+            .targetting(self)
+            .withImage(.image(for: .vpnIcon))
+        items.append(item1)
+
+        let item2  = NSMenuItem(title: "Placeholder B", action: #selector(openPreferences(_:)), keyEquivalent: "")
+            .targetting(self)
+            .withImage(.image(for: .vpnIcon))
+        items.append(item2)
+#endif
+
+        return items
+    }
+
+#if SUBSCRIPTION
+    private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
+        let privacyProItem = NSMenuItem(title: "",
+                                        action: #selector(openSubscriptionPreferences(_:)),
+                                        keyEquivalent: "")
+            .targetting(self)
+            .withImage(NSImage(named: "SubscriptionIcon"))
+
+        let attributedText = NSMutableAttributedString(string: UserText.subscriptionOptionsMenuItem)
+        attributedText.append (NSAttributedString(string: "  "))
+
+        let imageAttachment = NSTextAttachment()
+        imageAttachment.image = NSImage(named: "NewLabel")
+        imageAttachment.setImageHeight(height: 16, offset: .init(x: 0, y: -4))
+
+        attributedText.append(NSAttributedString(attachment: imageAttachment))
+
+        privacyProItem.attributedTitle = attributedText
+
+        return [privacyProItem]
+    }
+#endif
+
     private func addPageItems() {
         guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url else { return }
 
@@ -327,6 +405,31 @@ final class MoreOptionsMenu: NSMenu {
         addItem(NSMenuItem.separator())
 
     }
+
+#if NETWORK_PROTECTION
+    private func makeNetworkProtectionItem(showNewLabel: Bool) -> NSMenuItem {
+        let networkProtectionItem = NSMenuItem(title: "", action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
+            .targetting(self)
+            .withImage(.image(for: .vpnIcon))
+
+        if showNewLabel {
+            let attributedText = NSMutableAttributedString(string: UserText.networkProtection)
+            attributedText.append(NSAttributedString(string: "  "))
+
+            let imageAttachment = NSTextAttachment()
+            imageAttachment.image = NSImage(named: "NewLabel")
+            imageAttachment.setImageHeight(height: 16, offset: .init(x: 0, y: -4))
+
+            attributedText.append(NSAttributedString(attachment: imageAttachment))
+
+            networkProtectionItem.attributedTitle = attributedText
+        } else {
+            networkProtectionItem.title = UserText.networkProtection
+        }
+
+        return networkProtectionItem
+    }
+#endif
 
 }
 

@@ -43,6 +43,7 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
     func fetchBroker(with id: Int64) throws -> DataBroker?
     func fetchBroker(with name: String) throws -> DataBroker?
     func fetchAllBrokers() throws -> [DataBroker]
+    func fetchChildBrokers(for parentBroker: String) throws -> [DataBroker]
 
     func save(profileQuery: ProfileQuery, profileId: Int64) throws -> Int64
     func fetchProfileQuery(with id: Int64) throws -> ProfileQuery?
@@ -134,6 +135,13 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         let mapper = MapperToModel(mechanism: l2Decrypt(data:))
 
         return try self.providers.database.fetchAllBrokers().map(mapper.mapToModel(_:))
+    }
+
+    func fetchChildBrokers(for parentBroker: String) throws -> [DataBroker] {
+        let mapper = MapperToModel(mechanism: l2Decrypt(data:))
+        let brokers = try self.providers.database.fetchAllBrokers().map(mapper.mapToModel(_:))
+
+        return brokers.filter { $0.parent == parentBroker }
     }
 
     func save(profileQuery: ProfileQuery, profileId: Int64) throws -> Int64 {

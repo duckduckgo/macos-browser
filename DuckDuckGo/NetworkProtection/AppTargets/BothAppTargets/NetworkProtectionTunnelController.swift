@@ -573,6 +573,16 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     @MainActor
+    func toggleShouldSimulateConnectionInterruption() async throws {
+        if Self.simulationOptions.isEnabled(.connectionInterruption) {
+            Self.simulationOptions.setEnabled(false, option: .connectionInterruption)
+        } else {
+            Self.simulationOptions.setEnabled(true, option: .connectionInterruption)
+            try await sendProviderMessageToActiveSession(.simulateConnectionInterruption)
+        }
+    }
+
+    @MainActor
     private func sendProviderMessageToActiveSession(_ message: ExtensionMessage) async throws {
         guard await isConnected,
               let activeSession = try await ConnectionSessionUtilities.activeSession() else { return }

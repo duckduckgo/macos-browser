@@ -19,7 +19,7 @@
 import Foundation
 import Common
 
-final public class BrokerProfileQueryData: Sendable {
+public struct BrokerProfileQueryData: Sendable {
     let dataBroker: DataBroker
     let profileQuery: ProfileQuery
     let scanOperationData: ScanOperationData

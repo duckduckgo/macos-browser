@@ -293,6 +293,8 @@ private struct DebugModalView: View {
             return "Cancelled"
         case .solvingCaptchaWithCallbackError:
             return "Solving captcha with callback failed"
+        case .cantCalculatePreferredRunDate:
+            return "Can't calculate next run date"
         }
     }
 }

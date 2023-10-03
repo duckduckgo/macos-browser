@@ -212,6 +212,8 @@ extension DataBrokerProtectionError {
             return (title: genericTitle, subtitle: "Missing step")
         case .cancelled:
             return (title: genericTitle, subtitle: "Cancelled")
+        case .cantCalculatePreferredRunDate:
+            return (title: genericTitle, subtitle: "Can't calculate next run date")
         case .solvingCaptchaWithCallbackError:
             return (title: genericTitle, subtitle: "Solving captcha with callback failed")
         case .captchaServiceError(let captchaError):
