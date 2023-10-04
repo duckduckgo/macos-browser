@@ -193,6 +193,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
                           references: ProfileQueryDB.databaseTableName,
                           onDelete: .cascade)
 
+            // TODO: This should be a FK but a migration will need to be considered
             $0.column(ExtractedProfileDB.Columns.profileQueryId.name, .integer).notNull()
             $0.column(ExtractedProfileDB.Columns.brokerId.name, .integer).notNull()
             $0.column(ExtractedProfileDB.Columns.profile.name, .text).notNull()
