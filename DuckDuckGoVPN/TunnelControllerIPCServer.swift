@@ -37,7 +37,7 @@ final class TunnelControllerIPCServer {
     }
 }
 
-extension TunnelControllerIPCServer: TunnelControllerIPCServerDelegate {
+extension TunnelControllerIPCServer: TunnelControllerIPCServerInterface {
     func register(completion: (Error) -> Void) {
         completion(NSError(domain: "vpn", code: 0))
     }

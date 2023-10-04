@@ -50,13 +50,24 @@ public final class StatusBarMenu {
                 iconProvider: IconProvider,
                 menuItems: [MenuItem]) {
 
+        let statusObserver = ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
+                                                                    platformDidWakeNotification: NSWorkspace.didWakeNotification)
+
+        let statusReporter = statusReporter ?? DefaultNetworkProtectionStatusReporter(
+            statusObserver: statusObserver,
+            serverInfoObserver: ConnectionServerInfoObserverThroughDistributedNotifications(),
+            connectionErrorObserver: ConnectionErrorObserverThroughDistributedNotifications(),
+            connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
+            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
+        )
+/*
         let statusReporter = statusReporter ?? DefaultNetworkProtectionStatusReporter(
             statusObserver: ConnectionStatusObserverThroughDistributedNotifications(),
             serverInfoObserver: ConnectionServerInfoObserverThroughDistributedNotifications(),
             connectionErrorObserver: ConnectionErrorObserverThroughDistributedNotifications(),
             connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
             controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
-        )
+        )*/
 
         self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter, iconProvider: iconProvider)

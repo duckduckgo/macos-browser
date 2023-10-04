@@ -17,13 +17,14 @@
 //
 
 import Foundation
+import NetworkProtection
 import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
 /// This protocol describes the client-side IPC interface for controlling the tunnel
 ///
 @objc
 public protocol TunnelControllerIPCClientInterface {
-
+    func statusChanged(payload: Data)
 }
 
 /// An IPC client for controlling the tunnel
@@ -31,13 +32,14 @@ public protocol TunnelControllerIPCClientInterface {
 public final class TunnelControllerIPCClient {
 
     typealias IPCClientInterface = TunnelControllerIPCClientInterface
-    typealias IPCServerInterface = TunnelControllerIPCServerDelegate
+    typealias IPCServerInterface = TunnelControllerIPCServerInterface
 
     public enum ConnectionError: Error {
         case noRemoteObjectProxy
     }
 
     private let machServiceName: String
+    private let log: OSLog
 
     /// The internal connection, which may still not have been created.
     ///
@@ -55,8 +57,15 @@ public final class TunnelControllerIPCClient {
         return internalConnection
     }
 
+    // MARK: - Observers offered
+
+    public var connectionStatusObserver = ConnectionStatusObserverThroughIPC()
+
+    // MARK: - Initialization
+
     public init(machServiceName: String, log: OSLog = .disabled) {
         self.machServiceName = machServiceName
+        self.log = log
     }
 
     deinit {
@@ -92,8 +101,8 @@ public final class TunnelControllerIPCClient {
     /// It's important to not store the object returned by this method, because calling this method ensures a
     /// normalized handling of connection issues and reconnection logic.
     ///
-    func serverProxy(attemptCount: Int = 0) throws -> TunnelControllerIPCServerDelegate {
-        guard let proxy = connection.remoteObjectProxy as? TunnelControllerIPCServerDelegate else {
+    func serverProxy() throws -> TunnelControllerIPCServerInterface {
+        guard let proxy = connection.remoteObjectProxy as? TunnelControllerIPCServerInterface else {
             throw ConnectionError.noRemoteObjectProxy
         }
 
@@ -107,7 +116,7 @@ public final class TunnelControllerIPCClient {
 ///
 extension TunnelControllerIPCClient {
     public func start(completion: (Bool) -> Void) {
-        let serverProxy: TunnelControllerIPCServerDelegate
+        let serverProxy: TunnelControllerIPCServerInterface
 
         do {
             serverProxy = try self.serverProxy()
@@ -131,5 +140,12 @@ extension TunnelControllerIPCClient {
 /// This extension implements the IPC client interface
 ///
 extension TunnelControllerIPCClient: TunnelControllerIPCClientInterface {
+    public func statusChanged(payload: Data) {
+        guard let status = try? JSONDecoder().decode(ConnectionStatus.self, from: payload) else {
+            os_log("statusChanged failed to decode JSON payload", log: log, type: .error)
+            return
+        }
 
+        connectionStatusObserver.publish(status)
+    }
 }
