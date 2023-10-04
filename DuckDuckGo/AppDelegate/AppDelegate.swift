@@ -70,6 +70,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var bookmarksSyncErrorCancellable: AnyCancellable?
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
+    private let networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
 
     private var didFinishLaunching = false
 
@@ -214,6 +215,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         subscribeToDataImportCompleteNotification()
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
+
+#if SUBSCRIPTION
+        networkProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
+#endif
 
 #if NETWORK_PROTECTION
         NetworkProtectionAppEvents().applicationDidFinishLaunching()

@@ -2807,6 +2807,9 @@
 		4BBF09232830812900EE1418 /* FileSystemDSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBF09222830812900EE1418 /* FileSystemDSL.swift */; };
 		4BBF0925283083EC00EE1418 /* FileSystemDSLTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BBF0924283083EC00EE1418 /* FileSystemDSLTests.swift */; };
 		4BC2621D293996410087A482 /* PixelEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC2621C293996410087A482 /* PixelEventTests.swift */; };
+		4BCE5B642ACCE6990036DA61 /* NetworkProtectionSubscriptionEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCE5B632ACCE6990036DA61 /* NetworkProtectionSubscriptionEventHandler.swift */; };
+		4BCE5B652ACCE6990036DA61 /* NetworkProtectionSubscriptionEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCE5B632ACCE6990036DA61 /* NetworkProtectionSubscriptionEventHandler.swift */; };
+		4BCE5B662ACCE6990036DA61 /* NetworkProtectionSubscriptionEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCE5B632ACCE6990036DA61 /* NetworkProtectionSubscriptionEventHandler.swift */; };
 		4BCF15D72ABB8A110083F6DF /* NetworkProtectionRemoteMessaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D62ABB8A110083F6DF /* NetworkProtectionRemoteMessaging.swift */; };
 		4BCF15D92ABB8A7F0083F6DF /* NetworkProtectionRemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D82ABB8A7F0083F6DF /* NetworkProtectionRemoteMessage.swift */; };
 		4BCF15DB2ABB8CED0083F6DF /* NetworkProtectionRemoteMessagingStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15DA2ABB8CED0083F6DF /* NetworkProtectionRemoteMessagingStorage.swift */; };
@@ -4235,6 +4238,8 @@
 		4BBF09222830812900EE1418 /* FileSystemDSL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemDSL.swift; sourceTree = "<group>"; };
 		4BBF0924283083EC00EE1418 /* FileSystemDSLTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemDSLTests.swift; sourceTree = "<group>"; };
 		4BC2621C293996410087A482 /* PixelEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelEventTests.swift; sourceTree = "<group>"; };
+		4BCE5B622ACCD7350036DA61 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
+		4BCE5B632ACCE6990036DA61 /* NetworkProtectionSubscriptionEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionSubscriptionEventHandler.swift; sourceTree = "<group>"; };
 		4BCF15D62ABB8A110083F6DF /* NetworkProtectionRemoteMessaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionRemoteMessaging.swift; sourceTree = "<group>"; };
 		4BCF15D82ABB8A7F0083F6DF /* NetworkProtectionRemoteMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionRemoteMessage.swift; sourceTree = "<group>"; };
 		4BCF15DA2ABB8CED0083F6DF /* NetworkProtectionRemoteMessagingStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionRemoteMessagingStorage.swift; sourceTree = "<group>"; };
@@ -5787,6 +5792,7 @@
 			children = (
 				4BCF15D52ABB83D70083F6DF /* NetworkProtectionRemoteMessaging */,
 				4B4D60622A0B29FA00BCD287 /* SystemExtensionManager.swift */,
+				4BCE5B632ACCE6990036DA61 /* NetworkProtectionSubscriptionEventHandler.swift */,
 			);
 			path = DeveloperIDTarget;
 			sourceTree = "<group>";
@@ -6930,6 +6936,7 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
+				4BCE5B622ACCD7350036DA61 /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -10116,6 +10123,7 @@
 				3192A0682A4C4CFF0084EA89 /* BWCommunicator.swift in Sources */,
 				B696AFFD2AC5924800C93203 /* FileLineError.swift in Sources */,
 				3192A0692A4C4CFF0084EA89 /* HomePageRecentlyVisitedModel.swift in Sources */,
+				4BCE5B652ACCE6990036DA61 /* NetworkProtectionSubscriptionEventHandler.swift in Sources */,
 				3192A06A2A4C4CFF0084EA89 /* NavigationBarPopovers.swift in Sources */,
 				3192A06B2A4C4CFF0084EA89 /* CancellableExtension.swift in Sources */,
 				3192A06C2A4C4CFF0084EA89 /* PinnedTabsHostingView.swift in Sources */,
@@ -11747,6 +11755,7 @@
 				4B9579B02AC7AE700062CA31 /* Feedback.swift in Sources */,
 				4B9579B12AC7AE700062CA31 /* RequestFilePermissionViewController.swift in Sources */,
 				4B9579B22AC7AE700062CA31 /* FirefoxFaviconsReader.swift in Sources */,
+				4BCE5B662ACCE6990036DA61 /* NetworkProtectionSubscriptionEventHandler.swift in Sources */,
 				4B9579B32AC7AE700062CA31 /* CopyHandler.swift in Sources */,
 				4B9579B42AC7AE700062CA31 /* ContentBlockingRulesUpdateObserver.swift in Sources */,
 				4B9579B52AC7AE700062CA31 /* FirefoxLoginReader.swift in Sources */,
@@ -12935,6 +12944,7 @@
 				B626A75A29921FAA00053070 /* NavigationActionPolicyExtension.swift in Sources */,
 				B603FD9E2A02712E00F3FCA9 /* CIImageExtension.swift in Sources */,
 				AA6EF9B3250785D5004754E6 /* NSMenuExtension.swift in Sources */,
+				4BCE5B642ACCE6990036DA61 /* NetworkProtectionSubscriptionEventHandler.swift in Sources */,
 				AA7412B524D1536B00D22FE0 /* MainWindowController.swift in Sources */,
 				AA9FF95924A1ECF20039E328 /* Tab.swift in Sources */,
 				4BBDEE9228FC14760092FAA6 /* ConnectBitwardenView.swift in Sources */,
