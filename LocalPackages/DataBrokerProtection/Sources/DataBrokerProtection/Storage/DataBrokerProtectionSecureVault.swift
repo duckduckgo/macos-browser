@@ -47,6 +47,7 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
     func fetchChildBrokers(for parentBroker: String) throws -> [DataBroker]
 
     func save(profileQuery: ProfileQuery, profileId: Int64) throws -> Int64
+    func delete(profileQuery: ProfileQuery, profileId: Int64) throws
     func fetchProfileQuery(with id: Int64) throws -> ProfileQuery?
     func fetchAllProfileQueries(for profileId: Int64) throws -> [ProfileQuery]
 
@@ -152,6 +153,11 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
     func save(profileQuery: ProfileQuery, profileId: Int64) throws -> Int64 {
         let mapper = MapperToDB(mechanism: l2Encrypt(data:))
         return try self.providers.database.save(mapper.mapToDB(profileQuery, relatedTo: profileId))
+    }
+
+    func delete(profileQuery: ProfileQuery, profileId: Int64) throws {
+        let mapper = MapperToDB(mechanism: l2Encrypt(data:))
+        return try self.providers.database.delete(mapper.mapToDB(profileQuery, relatedTo: profileId))
     }
 
     func fetchProfileQuery(with id: Int64) throws -> ProfileQuery? {
