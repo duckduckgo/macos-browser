@@ -61,31 +61,35 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
             let newProfileQueries = profile.profileQueries
 
+            var profileQueriesToCreate = [ProfileQuery]()
+            var profileQueriesToRemove = [ProfileQuery]()
+
             if try vault.fetchProfile(with: Self.profileId) != nil {
                 let databaseBrokerProfileQueryData = fetchAllBrokerProfileQueryData()
                 let databaseProfileQueries = databaseBrokerProfileQueryData.map { $0.profileQuery }
-
                 // Create hash for profileQuery: brokerProfileQuery to make the search easier/faster
 
                 for profileQuery in newProfileQueries {
                     if databaseProfileQueries.contains(profileQuery) {
-                        // Set deprecatedFlag to false if its true else dont do anything
-                        // Set operation dates
+                        // If the DB contains this profileQuery, it means the user is adding the same name back again
+                        // In this case we remove the deprecated flag
+                        let reAddedProfileQuery = profileQuery.withDeprecationFlag(deprecated: false)
+                        profileQueriesToCreate.append(reAddedProfileQuery)
                     } else {
-                        // do nothing, db will create it
+                        profileQueriesToCreate.append(profileQuery)
                     }
                 }
 
                 for profileQuery in databaseProfileQueries {
                     if !newProfileQueries.contains(profileQuery) {
                         if let brokerProfileQueryData = databaseBrokerProfileQueryData.filter({ $0.profileQuery == profileQuery }).first, !brokerProfileQueryData.extractedProfiles.isEmpty {
-                            // set deprecatedFlag to true
+                            let deprecatedProfileQuery = brokerProfileQueryData.profileQuery.withDeprecationFlag(deprecated: true)
+                            profileQueriesToCreate.append(deprecatedProfileQuery)
                         } else {
-                            // set to removal
+                            profileQueriesToRemove.append(profileQuery)
                         }
                     }
                 }
-
 
 
                 // There is a profile created.
@@ -94,7 +98,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                 // 3. We fetch the list of brokers
                 // 4. We save each profile query into the database
                 // 5. We initialize the scan operations (related to a profile query and a broker)
-                _ = try vault.save(profile: profile)
+                _ = try vault.update(profile: profile)
                 let brokerIDs = try vault.fetchAllBrokers().compactMap({ $0.id })
 
                 try initializeDatabaseForProfile(

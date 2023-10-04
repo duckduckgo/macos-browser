@@ -94,3 +94,21 @@ extension Address: Equatable {
                lhs.state.lowercased() == rhs.state.lowercased()
     }
 }
+
+//Returns a copy of the same instance but with the deprecated flag parameter
+extension ProfileQuery {
+    func withDeprecationFlag(deprecated: Bool) -> ProfileQuery {
+         return ProfileQuery(id: id,
+                             firstName: firstName,
+                             lastName: lastName,
+                             middleName: middleName,
+                             suffix: suffix,
+                             city: city,
+                             state: state,
+                             street: street,
+                             zipCode: zip,
+                             phone: phone,
+                             birthYear: birthYear,
+                             deprecated: deprecated)
+     }
+}

@@ -27,6 +27,7 @@ enum DataBrokerProtectionDatabaseErrors: Error {
 
 protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func saveProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64
+    func updateProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64
     func fetchProfile(with id: Int64) throws -> FullProfileDB?
 
     func save(_ broker: BrokerDB) throws -> Int64
@@ -239,6 +240,10 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             $0.column(OptOutAttemptDB.Columns.lastStageDate.name, .date).notNull()
             $0.column(OptOutAttemptDB.Columns.startDate.name, .date).notNull()
         }
+    }
+
+    func updateProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {
+        
     }
 
     func saveProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {

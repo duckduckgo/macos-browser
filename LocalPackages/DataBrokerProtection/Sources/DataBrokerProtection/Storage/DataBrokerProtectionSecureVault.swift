@@ -36,6 +36,7 @@ let DataBrokerProtectionSecureVaultFactory: DataBrokerProtectionVaultFactory = S
 
 protocol DataBrokerProtectionSecureVault: SecureVault {
     func save(profile: DataBrokerProtectionProfile) throws -> Int64
+    func update(profile: DataBrokerProtectionProfile) throws -> Int64
     func fetchProfile(with id: Int64) throws -> DataBrokerProtectionProfile?
 
     func save(broker: DataBroker) throws -> Int64
@@ -92,6 +93,10 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         return try self.providers.database.saveProfile(profile: profile, mapperToDB: MapperToDB(mechanism: l2Encrypt(data:)))
     }
 
+    func update(profile: DataBrokerProtectionProfile) throws -> Int64 {
+        return try self.providers.database.updateProfile(profile: profile, mapperToDB: MapperToDB(mechanism: l2Encrypt(data:)))
+    }
+    
     func fetchProfile(with id: Int64) throws -> DataBrokerProtectionProfile? {
         let profile = try self.providers.database.fetchProfile(with: id)
 
