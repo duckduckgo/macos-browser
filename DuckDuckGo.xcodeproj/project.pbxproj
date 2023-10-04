@@ -4238,7 +4238,6 @@
 		4BBF09222830812900EE1418 /* FileSystemDSL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemDSL.swift; sourceTree = "<group>"; };
 		4BBF0924283083EC00EE1418 /* FileSystemDSLTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemDSLTests.swift; sourceTree = "<group>"; };
 		4BC2621C293996410087A482 /* PixelEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelEventTests.swift; sourceTree = "<group>"; };
-		4BCE5B622ACCD7350036DA61 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		4BCE5B632ACCE6990036DA61 /* NetworkProtectionSubscriptionEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionSubscriptionEventHandler.swift; sourceTree = "<group>"; };
 		4BCF15D62ABB8A110083F6DF /* NetworkProtectionRemoteMessaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionRemoteMessaging.swift; sourceTree = "<group>"; };
 		4BCF15D82ABB8A7F0083F6DF /* NetworkProtectionRemoteMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionRemoteMessage.swift; sourceTree = "<group>"; };
@@ -6936,7 +6935,6 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
-				4BCE5B622ACCD7350036DA61 /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -14226,8 +14224,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 80.3.0;
+				branch = "sam/add-netp-subscription-auth-support";
+				kind = branch;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
