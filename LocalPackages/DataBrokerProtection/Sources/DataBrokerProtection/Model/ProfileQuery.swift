@@ -71,29 +71,3 @@ struct ProfileQuery: Encodable, Sendable {
         self.deprecated = deprecated
     }
 }
-
-extension ProfileQuery: Equatable {
-    static func == (lhs: ProfileQuery, rhs: ProfileQuery) -> Bool {
-        return lhs.id == rhs.id &&
-            lhs.firstName.lowercased() == rhs.firstName.lowercased() &&
-            lhs.lastName.lowercased() == rhs.lastName.lowercased() &&
-            lhs.middleName?.lowercased() == rhs.middleName?.lowercased() &&
-            lhs.suffix?.lowercased() == rhs.suffix?.lowercased() &&
-            lhs.city.lowercased() == rhs.city.lowercased() &&
-            lhs.state.lowercased() == rhs.state.lowercased() &&
-            lhs.street?.lowercased() == rhs.street?.lowercased() &&
-            lhs.zip?.lowercased() == rhs.zip?.lowercased() &&
-            lhs.birthYear == rhs.birthYear &&
-            lhs.phone?.lowercased() == rhs.phone?.lowercased() &&
-            lhs.fullName.lowercased() == rhs.fullName.lowercased() &&
-            lhs.age == rhs.age &&
-            lhs.addresses == rhs.addresses
-    }
-}
-
-extension Address: Equatable {
-    static func == (lhs: Address, rhs: Address) -> Bool {
-        return lhs.city.lowercased() == rhs.city.lowercased() &&
-               lhs.state.lowercased() == rhs.state.lowercased()
-    }
-}
