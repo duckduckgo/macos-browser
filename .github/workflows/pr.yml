@@ -96,7 +96,8 @@ jobs:
             ENABLE_TESTABILITY=true \
             ONLY_ACTIVE_ARCH=NO \
             | tee DataBrokerProtectionTests-xcodebuild.log \
-            | xcbeautify --report junit --report-path . --junit-report-filename DataBrokerProtectionTests.xml
+            | xcbeautify --report junit --report-path . --junit-report-filename DataBrokerProtectionTests.xml \
+          || { mv "$(grep -m 1 '.*\.xcresult' ${{ matrix.flavor }}-xcodebuild.log | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')" ./${{ matrix.flavor }}.xcresult && exit 1; }
 
   tests:
     name: Test
@@ -228,6 +229,15 @@ jobs:
       with:
         name: ${{ matrix.flavor }}-xcodebuild.log
         path: ${{ matrix.flavor }}-xcodebuild.log
+        retention-days: 7
+
+    - name: Upload failed xcresult
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: ${{ matrix.flavor }}.xcresult
+        path: ${{ matrix.flavor }}.xcresult
+        retention-days: 7
 
     - name: Fetch latest commit author
       if: always() && github.ref_name == 'develop'
@@ -330,6 +340,7 @@ jobs:
       with:
         name: release-xcodebuild.log
         path: release-xcodebuild.log
+        retention-days: 7
 
   verify-autoconsent-bundle:
     name: 'Verify autoconsent bundle'
