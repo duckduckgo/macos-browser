@@ -140,8 +140,10 @@ struct DBPUIBirthYear: Codable {
 /// and addresses that were matched
 struct DBPUIDataBrokerProfileMatch: Codable {
     let dataBroker: DBPUIDataBroker
-    let names: [DBPUIUserProfileName]
+    let name: String
     let addresses: [DBPUIUserProfileAddress]
+    let alternativeNames: [String]
+    let relatives: [String]
 }
 
 /// Protocol to represent a message that can be passed from the host to the UI
@@ -157,4 +159,24 @@ struct DBPUIScanAndOptOutState: DBPUISendableMessage {
     let status: DBPUIScanAndOptOutStatus
     let inProgressOptOuts: [DBPUIDataBrokerProfileMatch]
     let completedOptOuts: [DBPUIDataBrokerProfileMatch]
+}
+
+/// Data representing the initial scan progress
+struct DBPUIScanProgress: DBPUISendableMessage {
+    let currentScans: Int
+    let totalScans: Int
+}
+
+/// Data to represent the intial scan state
+/// It will show the current scans + total, and the results found
+struct DBPUIInitialScanState: DBPUISendableMessage {
+    let inProgressScans: [DBPUIDataBrokerProfileMatch]
+    let scanProgress: DBPUIScanProgress
+}
+
+extension DBPUIInitialScanState {
+    static var empty: DBPUIInitialScanState {
+        .init(inProgressScans: [DBPUIDataBrokerProfileMatch](),
+              scanProgress: DBPUIScanProgress(currentScans: 0, totalScans: 0))
+    }
 }

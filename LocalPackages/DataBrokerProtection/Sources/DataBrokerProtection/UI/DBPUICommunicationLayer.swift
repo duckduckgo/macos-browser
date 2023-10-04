@@ -34,6 +34,7 @@ protocol DBPUICommunicationDelegate: AnyObject {
     func setAddressAtIndexInCurrentUserProfile(_ payload: DBPUIAddressAtIndex) -> Bool
     func removeAddressAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool
     func startScanAndOptOut() -> Bool
+    func getInitialScanState() async -> DBPUIInitialScanState?
 }
 
 enum DBPUIReceivedMethodName: String {
@@ -49,6 +50,7 @@ enum DBPUIReceivedMethodName: String {
     case setAddressAtIndexInCurrentUserProfile
     case removeAddressAtIndexFromCurrentUserProfile
     case startScanAndOptOut
+    case initialScanStatus
 }
 
 enum DBPUISendableMethodName: String {
@@ -87,6 +89,7 @@ struct DBPUICommunicationLayer: Subfeature {
         case .setAddressAtIndexInCurrentUserProfile: return setAddressAtIndexInCurrentUserProfile
         case .removeAddressAtIndexFromCurrentUserProfile: return removeAddressAtIndexFromCurrentUserProfile
         case .startScanAndOptOut: return startScanAndOptOut
+        case .initialScanStatus: return initialScanStatus
         }
 
     }
@@ -238,6 +241,14 @@ struct DBPUICommunicationLayer: Subfeature {
         }
 
         return DBPUIStandardResponse(version: Constants.version, success: false)
+    }
+
+    func initialScanStatus(params: Any, origin: WKScriptMessage) async throws -> Encodable? {
+        guard let initialScanState = await delegate?.getInitialScanState() else {
+            return DBPUIStandardResponse(version: Constants.version, success: false, id: "NOT_FOUND", message: "No initial scan data found")
+        }
+
+        return initialScanState
     }
 
     func sendMessageToUI(method: DBPUISendableMethodName, params: DBPUISendableMessage, into webView: WKWebView) {

@@ -269,4 +269,31 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
     func startScanAndOptOut() -> Bool {
         return scanDelegate?.startScan() ?? false
     }
+
+    func getInitialScanState() async -> DBPUIInitialScanState? {
+        await scanDelegate?.updateCacheWithCurrentScans()
+
+        /// In the future we need to take into account mirror sites when counting for the total scans
+        /// Tech design: https://app.asana.com/0/481882893211075/1205594901067225/f
+        let totalScans = brokerProfileQueryData.count
+        let currentScans = brokerProfileQueryData.filter { $0.scanOperationData.lastRunDate != nil }.count
+        let scanProgress = DBPUIScanProgress(currentScans: currentScans, totalScans: totalScans)
+        let matches = brokerProfileQueryData.compactMap {
+            for extractedProfile in $0.extractedProfiles {
+                return DBPUIDataBrokerProfileMatch(
+                    dataBroker: DBPUIDataBroker(name: $0.dataBroker.name),
+                    name: extractedProfile.fullName ?? "No name",
+                    addresses: extractedProfile.addresses?.map {
+                        DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state, zipCode: nil)
+                    } ?? [],
+                    alternativeNames: extractedProfile.alternativeNames ?? [String](),
+                    relatives: extractedProfile.relatives ?? [String]()
+                )
+            }
+
+            return nil
+        }
+
+        return .init(inProgressScans: matches, scanProgress: scanProgress)
+    }
 }

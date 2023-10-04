@@ -23,6 +23,7 @@ import BrowserServicesKit
 
 protocol DBPUIScanOps: AnyObject {
     func startScan() -> Bool
+    func updateCacheWithCurrentScans() async
 }
 
 final class DBPUIViewModel {
@@ -106,19 +107,23 @@ final class DBPUIViewModel {
                         // Add as a pending removal profile
                         inProgress.append(DBPUIDataBrokerProfileMatch(
                             dataBroker: DBPUIDataBroker(name: profileQueryData.dataBroker.name),
-                            names: [DBPUIUserProfileName(first: optOutOperationData.extractedProfile.fullName ?? "", middle: nil, last: "", suffix: nil)],
+                            name: optOutOperationData.extractedProfile.fullName ?? "No name",
                             addresses: optOutOperationData.extractedProfile.addresses?.map {
                                 DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state, zipCode: nil)
-                            } ?? []
+                            } ?? [],
+                            alternativeNames: optOutOperationData.extractedProfile.alternativeNames ?? [String](),
+                            relatives: optOutOperationData.extractedProfile.relatives ?? [String]()
                         ))
                     } else {
                         // else add as removed profile
                         completed.append(DBPUIDataBrokerProfileMatch(
                             dataBroker: DBPUIDataBroker(name: profileQueryData.dataBroker.name),
-                            names: [DBPUIUserProfileName(first: optOutOperationData.extractedProfile.fullName ?? "", middle: nil, last: "", suffix: nil)],
+                            name: optOutOperationData.extractedProfile.fullName ?? "No name",
                             addresses: optOutOperationData.extractedProfile.addresses?.map {
                                 DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state, zipCode: nil)
-                            } ?? []
+                            } ?? [],
+                            alternativeNames: optOutOperationData.extractedProfile.alternativeNames ?? [String](),
+                            relatives: optOutOperationData.extractedProfile.relatives ?? [String]()
                         ))
                     }
                 }
@@ -139,5 +144,9 @@ extension DBPUIViewModel: DBPUIScanOps {
     func startScan() -> Bool {
         scheduler.scanAllBrokers()
         return true
+    }
+
+    func updateCacheWithCurrentScans() async {
+        _ = await dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
     }
 }
