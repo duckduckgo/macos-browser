@@ -4170,7 +4170,7 @@
 		4B9292D82667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkListTreeControllerDataSource.swift; sourceTree = "<group>"; };
 		4B9292DA2667125D00AD2C21 /* ContextualMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContextualMenu.swift; sourceTree = "<group>"; };
 		4B9579202AC687170062CA31 /* HardwareModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardwareModel.swift; sourceTree = "<group>"; };
-		4B957C412AC7AE700062CA31 /* DuckDuckGo Privacy Pro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Privacy Pro.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B957C412AC7AE700062CA31 /* DuckDuckGo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B957C432AC7AF190062CA31 /* DuckDuckGoPrivacyPro.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoPrivacyPro.xcconfig; sourceTree = "<group>"; };
 		4B980E202817604000282EE1 /* NSNotificationName+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotificationName+Debug.swift"; sourceTree = "<group>"; };
 		4B98D27928D95F1A003C2B6F /* ChromiumFaviconsReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumFaviconsReaderTests.swift; sourceTree = "<group>"; };
@@ -6974,7 +6974,7 @@
 				4B5F14E12A1476BD0060320F /* stopVPN.app */,
 				7B736E5F2A4A22B700F9922A /* enableOnDemand.app */,
 				3192A26E2A4C4CFF0084EA89 /* DuckDuckGoDBP.app */,
-				4B957C412AC7AE700062CA31 /* DuckDuckGo Privacy Pro.app */,
+				4B957C412AC7AE700062CA31 /* DuckDuckGo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -8827,7 +8827,7 @@
 				4B9579422AC7AE700062CA31 /* Purchase */,
 			);
 			productName = DuckDuckGo;
-			productReference = 4B957C412AC7AE700062CA31 /* DuckDuckGo Privacy Pro.app */;
+			productReference = 4B957C412AC7AE700062CA31 /* DuckDuckGo.app */;
 			productType = "com.apple.product-type.application";
 		};
 		7B4CE8D926F02108009134B1 /* UI Tests */ = {
