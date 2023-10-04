@@ -552,15 +552,10 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
     }
 }
 
-public class LastFiredPixel {
-
-}
-
 public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
 
     static var lastPixelFired: DataBrokerProtectionPixels?
 
-    // swiftlint:disable:next cyclomatic_complexity
     public init() {
         super.init { event, _, _, _ in
             MockDataBrokerProtectionPixelsHandler.lastPixelFired = event
