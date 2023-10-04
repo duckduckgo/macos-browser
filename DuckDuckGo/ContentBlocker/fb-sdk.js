@@ -173,7 +173,8 @@
                 parse: function (n) {
                     parseCalls.push(n)
                 }
-            }
+            },
+            isSurrogate: true
         }
         if (document.readyState === 'complete') {
             init()
