@@ -24,22 +24,9 @@ import LoginItems
 /// 
 final class LoginItemsManager {
 
-    /// Save agent last launch time to distinguish between system launch at Log In and Main App launch
-    /// Used for the Connect On Log In feature to prevent connection when started by the Main App
-    /// Ideally we should remove this to make this class completely generic
-    @UserDefaultsWrapper(key: .netpMenuAgentLaunchTime, defaults: .shared)
-    private var netpMenuAgentLaunchTime: Date?
-
     // MARK: - Main Interactions
 
     func enableLoginItems(_ items: Set<LoginItem>, log: OSLog) {
-
-#if NETWORK_PROTECTION
-        if items.contains(.vpnMenu) {
-            netpMenuAgentLaunchTime = Date()
-        }
-#endif
-
         updateLoginItems(items, whatAreWeDoing: "enable", using: LoginItem.enable)
         ensureLoginItemsAreRunning(items, log: log)
     }

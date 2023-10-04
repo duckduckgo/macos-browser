@@ -50,14 +50,6 @@ final class DuckDuckGoVPNApplication: NSApplication {
 @main
 final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
-    /// when enabled VPN connection will be automatically initiated on launch even if disconnected manually (Always On rule disabled)
-    @UserDefaultsWrapper(key: .networkProtectionConnectOnLogIn, defaultValue: NetworkProtectionUserDefaultsConstants.shouldConnectOnLogIn, defaults: .shared)
-    private var shouldAutoConnect: Bool
-
-    /// Agent launch time saved by the main app to distinguish between Log In launch and Main App launch to prevent connection when started by the Main App
-    @UserDefaultsWrapper(key: .netpMenuAgentLaunchTime, defaultValue: .distantPast, defaults: .shared)
-    private var netpMenuAgentLaunchTime: Date
-
     private static let recentThreshold: TimeInterval = 5.0
 
     private let appLauncher = AppLauncher()
@@ -68,10 +60,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private lazy var tunnelController = NetworkProtectionTunnelController(networkExtensionBundleID: networkExtensionBundleID)
-    /*
-    private lazy var tunnelController: FeatureProtectingTunnelController = {
-        FeatureProtectingTunnelController(appLauncher: appLauncher, bouncer: bouncer)
-    }()*/
 
     /// An IPC server that provides access to the tunnel controller.
     ///
@@ -119,16 +107,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
         bouncer.requireAuthTokenOrKillApp()
 
+        // Initialize the IPC server
         _ = tunnelControllerIPCServer
-
-        // Connect on Log In
-        if shouldAutoConnect,
-           // are we launched by the system?
-           netpMenuAgentLaunchTime.addingTimeInterval(Self.recentThreshold) > Date() {
-            Task {
-                await appLauncher.launchApp(withCommand: .startVPN)
-            }
-        }
     }
 }
 

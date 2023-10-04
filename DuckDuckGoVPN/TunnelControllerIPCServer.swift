@@ -22,21 +22,22 @@ import NetworkProtectionIPC
 
 final class TunnelControllerIPCServer {
     private let tunnelController: TunnelController
-    private let listener: NetworkProtectionIPC.TunnelControllerIPCListener
+    private let server: NetworkProtectionIPC.TunnelControllerIPCServer
 
     init(tunnelController: TunnelController) {
         self.tunnelController = tunnelController
-        listener = .init(machServiceName: Bundle.main.bundleIdentifier!, log: .networkProtectionIPCLog)
+        server = .init(machServiceName: Bundle.main.bundleIdentifier!,
+                       log: .networkProtectionIPCLog)
 
-        listener.server = self
+        server.delegate = self
     }
 
     public func activate() {
-        listener.activate()
+        server.activate()
     }
 }
 
-extension TunnelControllerIPCServer: TunnelControllerIPCServerInterface {
+extension TunnelControllerIPCServer: TunnelControllerIPCServerDelegate {
     func register(completion: (Error) -> Void) {
         completion(NSError(domain: "vpn", code: 0))
     }

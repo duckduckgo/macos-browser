@@ -27,8 +27,6 @@ import NetworkProtection
 import NetworkProtectionUI
 import SystemExtensions
 import Networking
-// TODO: this should be removed cleanly
-//import LoginItems
 
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
@@ -84,11 +82,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     @MainActor
     @UserDefaultsWrapper(key: .networkProtectionShouldExcludeLocalRoutes, defaultValue: NetworkProtectionUserDefaultsConstants.shouldExcludeLocalRoutes)
     private(set) var shouldExcludeLocalRoutes: Bool
-
-    /// When enabled VPN connection will be automatically initiated by DuckDuckGoVPNAppDelegate on launch even if disconnected manually (Always On rule disabled)
-    @MainActor
-    @UserDefaultsWrapper(key: .networkProtectionConnectOnLogIn, defaultValue: NetworkProtectionUserDefaultsConstants.shouldConnectOnLogIn, defaults: .shared)
-    private(set) var shouldAutoConnectOnLogIn: Bool
 
     @MainActor
     @UserDefaultsWrapper(key: .networkProtectionConnectionTesterEnabled, defaultValue: NetworkProtectionUserDefaultsConstants.isConnectionTesterEnabled, defaults: .shared)
@@ -254,10 +247,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// Starts the VPN connection used for Network Protection
     ///
     func start() async {
-        await start(enableLoginItems: true)
-    }
-
-    func start(enableLoginItems: Bool) async {
         controllerErrorStore.lastErrorMessage = nil
 
         do {
@@ -546,11 +535,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             try await activeSession.sendProviderMessage(.setIncludedRoutes(includedRoutes()))
             try await activeSession.sendProviderMessage(.setExcludedRoutes(excludedRoutes()))
         }
-    }
-
-    @MainActor
-    func toggleShouldAutoConnectOnLogIn() {
-        shouldAutoConnectOnLogIn.toggle()
     }
 
     @MainActor

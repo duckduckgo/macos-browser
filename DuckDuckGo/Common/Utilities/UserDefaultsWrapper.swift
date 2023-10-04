@@ -144,11 +144,7 @@ public struct UserDefaultsWrapper<T> {
         case networkProtectionShouldExcludeLocalRoutes = "netp.exclude-local-routes"
         case networkProtectionConnectionTesterEnabled = "netp.connection-tester-enabled"
 
-        case networkProtectionConnectOnLogIn = "netp.connect-on-login"
-
         case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
-
-        case netpMenuAgentLaunchTime = "netp.agent.launch-time"
 
         case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
 

@@ -1,5 +1,5 @@
 //
-//  TunnelControllerIPCListener.swift
+//  TunnelControllerIPCServer.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,7 @@ import os.log // swiftlint:disable:this enforce_os_log_wrapper
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
 @objc
-public protocol TunnelControllerIPCServerInterface {
+public protocol TunnelControllerIPCServerDelegate {
     func start()
     func stop()
 }
@@ -30,10 +30,10 @@ public protocol TunnelControllerIPCServerInterface {
 /// An IPC client for controlling the tunnel
 ///
 @objc
-public final class TunnelControllerIPCListener: NSObject {
+public final class TunnelControllerIPCServer: NSObject {
 
     typealias IPCClientInterface = TunnelControllerIPCClientInterface
-    typealias IPCServerInterface = TunnelControllerIPCServerInterface
+    typealias IPCServerInterface = TunnelControllerIPCServerDelegate
 
     /// The active connections
     ///
@@ -43,9 +43,9 @@ public final class TunnelControllerIPCListener: NSObject {
     ///
     private let listener: NSXPCListener
 
-    /// The actual server.
+    /// The delegate.
     ///
-    public weak var server: TunnelControllerIPCServerInterface?
+    public weak var delegate: TunnelControllerIPCServerDelegate?
 
     public init(machServiceName: String, log: OSLog = .disabled) {
 
@@ -69,11 +69,11 @@ public final class TunnelControllerIPCListener: NSObject {
 
 /// This extension implements listening for new connections through our NSXPCListener
 ///
-extension TunnelControllerIPCListener: NSXPCListenerDelegate {
+extension TunnelControllerIPCServer: NSXPCListenerDelegate {
     public func listener(_ listener: NSXPCListener, shouldAcceptNewConnection newConnection: NSXPCConnection) -> Bool {
 
         newConnection.exportedInterface = NSXPCInterface(with: IPCServerInterface.self)
-        newConnection.exportedObject = server
+        newConnection.exportedObject = delegate
         newConnection.remoteObjectInterface = NSXPCInterface(with: IPCClientInterface.self)
 
         let closeConnection = { [weak self, weak newConnection] in

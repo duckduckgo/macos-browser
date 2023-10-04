@@ -17,7 +17,7 @@
 //
 
 import Foundation
-import os.log
+import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
 /// This protocol describes the client-side IPC interface for controlling the tunnel
 ///
@@ -31,7 +31,7 @@ public protocol TunnelControllerIPCClientInterface {
 public final class TunnelControllerIPCClient {
 
     typealias IPCClientInterface = TunnelControllerIPCClientInterface
-    typealias IPCServerInterface = TunnelControllerIPCServerInterface
+    typealias IPCServerInterface = TunnelControllerIPCServerDelegate
 
     public enum ConnectionError: Error {
         case noRemoteObjectProxy
@@ -92,8 +92,8 @@ public final class TunnelControllerIPCClient {
     /// It's important to not store the object returned by this method, because calling this method ensures a
     /// normalized handling of connection issues and reconnection logic.
     ///
-    func serverProxy(attemptCount: Int = 0) throws -> TunnelControllerIPCServerInterface {
-        guard let proxy = connection.remoteObjectProxy as? TunnelControllerIPCServerInterface else {
+    func serverProxy(attemptCount: Int = 0) throws -> TunnelControllerIPCServerDelegate {
+        guard let proxy = connection.remoteObjectProxy as? TunnelControllerIPCServerDelegate else {
             throw ConnectionError.noRemoteObjectProxy
         }
 
@@ -107,7 +107,7 @@ public final class TunnelControllerIPCClient {
 ///
 extension TunnelControllerIPCClient {
     public func start(completion: (Bool) -> Void) {
-        let serverProxy: TunnelControllerIPCServerInterface
+        let serverProxy: TunnelControllerIPCServerDelegate
 
         do {
             serverProxy = try self.serverProxy()

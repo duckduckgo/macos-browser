@@ -36,7 +36,7 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
     func start() async {
         enableLoginItems()
 
-       ipcClient.start(completion: { result in
+        ipcClient.start(completion: { result in
            print("Done!")
         })
     }
