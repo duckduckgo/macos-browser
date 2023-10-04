@@ -277,7 +277,8 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             for phone in profile.phones {
                 try mapperToDB.mapToDB(phone, relatedTo: profileId).insert(db)
             }
-
+// delete n-n tables
+            // update profile 
             return profileId
         }
     }

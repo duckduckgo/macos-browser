@@ -59,9 +59,35 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
     func save(_ profile: DataBrokerProtectionProfile) async {
         do {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-            let profileQueries = profile.profileQueries
+            let newProfileQueries = profile.profileQueries
 
             if try vault.fetchProfile(with: Self.profileId) != nil {
+                let databaseBrokerProfileQueryData = fetchAllBrokerProfileQueryData()
+                let databaseProfileQueries = databaseBrokerProfileQueryData.map { $0.profileQuery }
+
+                // Create hash for profileQuery: brokerProfileQuery to make the search easier/faster
+
+                for profileQuery in newProfileQueries {
+                    if databaseProfileQueries.contains(profileQuery) {
+                        // Set deprecatedFlag to false if its true else dont do anything
+                        // Set operation dates
+                    } else {
+                        // do nothing, db will create it
+                    }
+                }
+
+                for profileQuery in databaseProfileQueries {
+                    if !newProfileQueries.contains(profileQuery) {
+                        if let brokerProfileQueryData = databaseBrokerProfileQueryData.filter({ $0.profileQuery == profileQuery }).first, !brokerProfileQueryData.extractedProfiles.isEmpty {
+                            // set deprecatedFlag to true
+                        } else {
+                            // set to removal
+                        }
+                    }
+                }
+
+
+
                 // There is a profile created.
                 // 1. We update the profile in the database
                 // 2. The database layer takes care of deleting the scans related to the old profile.
@@ -71,11 +97,11 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                 _ = try vault.save(profile: profile)
                 let brokerIDs = try vault.fetchAllBrokers().compactMap({ $0.id })
 
-                try intializeDatabaseForProfile(
+                try initializeDatabaseForProfile(
                     profileId: Self.profileId,
                     vault: vault,
                     brokerIDs: brokerIDs,
-                    profileQueries: profileQueries
+                    profileQueries: newProfileQueries
                 )
             } else {
                 // There is no profile in the database. We need to insert it.
@@ -96,11 +122,11 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                         brokerIDs.append(brokerId)
                     }
 
-                    try intializeDatabaseForProfile(
+                    try initializeDatabaseForProfile(
                         profileId: Self.profileId,
                         vault: vault,
                         brokerIDs: brokerIDs,
-                        profileQueries: profileQueries
+                        profileQueries: newProfileQueries
                     )
                 }
             }
@@ -109,7 +135,7 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         }
     }
 
-    private func intializeDatabaseForProfile(profileId: Int64,
+    private func initializeDatabaseForProfile(profileId: Int64,
                                              vault: any (DataBrokerProtectionSecureVault),
                                              brokerIDs: [Int64],
                                              profileQueries: [ProfileQuery]) throws {
