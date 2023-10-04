@@ -82,6 +82,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         try super.init(file: file, key: key, writerType: .queue) { migrator in
             migrator.registerMigration("v1", migrate: Self.migrateV1(database:))
             migrator.registerMigration("v2", migrate: Self.migrateV2(database:))
+            migrator.registerMigration("v3", migrate: Self.migrateV3(database:))
         }
     }
 
@@ -242,8 +243,14 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
+    static func migrateV3(database: Database) throws {
+        try database.alter(table: ProfileQueryDB.databaseTableName) {
+            $0.add(column: ProfileQueryDB.Columns.deprecated.name, .boolean).notNull().defaults(to: false)
+        }
+    }
+
     func updateProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {
-        
+        return 1
     }
 
     func saveProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {
