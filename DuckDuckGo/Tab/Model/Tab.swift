@@ -252,7 +252,7 @@ protocol NewWindowPolicyDecisionMaker {
         let statisticsLoader = statisticsLoader
             ?? (NSApp.runType.shouldLoadEnvironment ? StatisticsLoader.shared : nil)
         let privacyFeatures = privacyFeatures ?? PrivacyFeatures
-        let internalUserDecider = (NSApp.delegate as? AppDelegate)?.internalUserDecider
+        let internalUserDecider = NSApp.delegateTyped.internalUserDecider
         var faviconManager = faviconManagement
         if burnerMode.isBurner {
             faviconManager = FaviconManager(cacheType: .inMemory)

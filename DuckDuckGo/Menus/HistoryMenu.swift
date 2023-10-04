@@ -304,7 +304,7 @@ extension HistoryMenu {
 private extension NSApplication {
 
     var canRestoreLastSessionState: Bool {
-        (delegate as? AppDelegate)?.stateRestorationManager?.canRestoreLastSessionState ?? false
+        delegateTyped.stateRestorationManager?.canRestoreLastSessionState ?? false
     }
 
 }
