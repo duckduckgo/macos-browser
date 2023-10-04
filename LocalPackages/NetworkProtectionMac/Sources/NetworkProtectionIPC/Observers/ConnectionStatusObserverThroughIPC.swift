@@ -26,9 +26,9 @@ public final class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver 
 
     // MARK: - ConnectionStatusObserver
 
-    public lazy var publisher: AnyPublisher<NetworkProtection.ConnectionStatus, Never> = subject.eraseToAnyPublisher()
+    public lazy var publisher = subject.eraseToAnyPublisher()
 
-    public var recentValue: NetworkProtection.ConnectionStatus {
+    public var recentValue: ConnectionStatus {
         subject.value
     }
 

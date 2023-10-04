@@ -24,6 +24,7 @@ import AppKit
 import Combine
 import NetworkProtection
 import NetworkProtectionUI
+import NetworkProtectionIPC
 #endif
 
 final class NavigationBarPopovers {
@@ -289,10 +290,13 @@ final class NavigationBarPopovers {
 #if NETWORK_PROTECTION
     func showNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
         let popover = networkProtectionPopover ?? {
-            let controller = NetworkProtectionIPCTunnelController()
+            // TODO: The code in this method is excessively detailed and should be abstracted elsewhere.
+            let vpnBundleID = Bundle.main.vpnMenuAgentBundleId
+            let ipcClient = TunnelControllerIPCClient(machServiceName: vpnBundleID, log: .networkProtectionIPCLog)
 
-            let statusObserver = ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                        platformDidWakeNotification: NSWorkspace.didWakeNotification)
+            let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
+
+            let statusObserver = ipcClient.connectionStatusObserver
             let statusInfoObserver = ConnectionServerInfoObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
                                                                                 platformDidWakeNotification: NSWorkspace.didWakeNotification)
             let connectionErrorObserver = ConnectionErrorObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,

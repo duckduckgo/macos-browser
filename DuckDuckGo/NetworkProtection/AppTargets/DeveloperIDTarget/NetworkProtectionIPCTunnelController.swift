@@ -23,14 +23,13 @@ import NetworkProtectionIPC
 final class NetworkProtectionIPCTunnelController: TunnelController {
 
     private let loginItemsManager: LoginItemsManager
-    private let ipcClient: NetworkProtectionIPC.TunnelControllerIPCClient
+    private let ipcClient: TunnelControllerIPCClient
 
     init(loginItemsManager: LoginItemsManager = LoginItemsManager(),
-         vpnBundleID: String = Bundle.main.vpnMenuAgentBundleId) {
+         ipcClient: TunnelControllerIPCClient) {
 
         self.loginItemsManager = loginItemsManager
-
-        ipcClient = NetworkProtectionIPC.TunnelControllerIPCClient(machServiceName: vpnBundleID, log: .networkProtectionIPCLog)
+        self.ipcClient = ipcClient
     }
 
     func start() async {

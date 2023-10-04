@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
@@ -23,17 +24,31 @@ import NetworkProtectionIPC
 final class TunnelControllerIPCServer {
     private let tunnelController: TunnelController
     private let server: NetworkProtectionIPC.TunnelControllerIPCServer
+    private let statusReporter: NetworkProtectionStatusReporter
+    private var cancellables = Set<AnyCancellable>()
 
-    init(tunnelController: TunnelController) {
+    init(tunnelController: TunnelController, statusReporter: NetworkProtectionStatusReporter) {
         self.tunnelController = tunnelController
         server = .init(machServiceName: Bundle.main.bundleIdentifier!,
                        log: .networkProtectionIPCLog)
+        self.statusReporter = statusReporter
+
+        subscribeToStatusUpdates()
 
         server.delegate = self
     }
 
     public func activate() {
         server.activate()
+    }
+
+    private func subscribeToStatusUpdates() {
+        statusReporter.statusObserver.publisher
+            .subscribe(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                self?.server.statusChanged(newStatus: status)
+            }
+            .store(in: &cancellables)
     }
 }
 

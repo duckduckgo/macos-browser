@@ -45,29 +45,10 @@ public final class StatusBarMenu {
     @MainActor
     public init(statusItem: NSStatusItem? = nil,
                 onboardingStatusPublisher: OnboardingStatusPublisher,
-                statusReporter: NetworkProtectionStatusReporter? = nil,
+                statusReporter: NetworkProtectionStatusReporter,
                 controller: TunnelController,
                 iconProvider: IconProvider,
                 menuItems: [MenuItem]) {
-
-        let statusObserver = ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                    platformDidWakeNotification: NSWorkspace.didWakeNotification)
-
-        let statusReporter = statusReporter ?? DefaultNetworkProtectionStatusReporter(
-            statusObserver: statusObserver,
-            serverInfoObserver: ConnectionServerInfoObserverThroughDistributedNotifications(),
-            connectionErrorObserver: ConnectionErrorObserverThroughDistributedNotifications(),
-            connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
-            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
-        )
-/*
-        let statusReporter = statusReporter ?? DefaultNetworkProtectionStatusReporter(
-            statusObserver: ConnectionStatusObserverThroughDistributedNotifications(),
-            serverInfoObserver: ConnectionServerInfoObserverThroughDistributedNotifications(),
-            connectionErrorObserver: ConnectionErrorObserverThroughDistributedNotifications(),
-            connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
-            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
-        )*/
 
         self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter, iconProvider: iconProvider)

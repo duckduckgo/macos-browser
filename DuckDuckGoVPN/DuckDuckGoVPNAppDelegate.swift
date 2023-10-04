@@ -66,9 +66,23 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     /// This is used by our main app to control the tunnel through the VPN login item.
     ///
     private lazy var tunnelControllerIPCServer: TunnelControllerIPCServer = {
-        let ipcServer = TunnelControllerIPCServer(tunnelController: tunnelController)
+        let ipcServer = TunnelControllerIPCServer(tunnelController: tunnelController,
+                                                  statusReporter: statusReporter)
         ipcServer.activate()
         return ipcServer
+    }()
+
+    private lazy var statusReporter: NetworkProtectionStatusReporter = {
+        let statusObserver = ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
+                                                                    platformDidWakeNotification: NSWorkspace.didWakeNotification)
+
+        return DefaultNetworkProtectionStatusReporter(
+            statusObserver: statusObserver,
+            serverInfoObserver: ConnectionServerInfoObserverThroughDistributedNotifications(),
+            connectionErrorObserver: ConnectionErrorObserverThroughDistributedNotifications(),
+            connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
+            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
+        )
     }()
 
     /// The status bar NetworkProtection menu
@@ -98,7 +112,12 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             OnboardingStatus(rawValue: rawValue) ?? .default
         }.eraseToAnyPublisher()
 
-        return StatusBarMenu(onboardingStatusPublisher: onboardingStatusPublisher, controller: tunnelController, iconProvider: iconProvider, menuItems: menuItems)
+        return StatusBarMenu(
+            onboardingStatusPublisher: onboardingStatusPublisher,
+            statusReporter: statusReporter,
+            controller: tunnelController,
+            iconProvider: iconProvider,
+            menuItems: menuItems)
     }()
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {

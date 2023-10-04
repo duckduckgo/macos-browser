@@ -135,8 +135,15 @@ extension TunnelControllerIPCServer {
 
     /// Sends a statusChanged IPC message to all connections, through the proxy objects.
     ///
-    public func statusChanged(newStatus: ConnectionStatus) throws {
-        let payload = try JSONEncoder().encode(newStatus)
+    public func statusChanged(newStatus: ConnectionStatus) {
+        let payload: Data
+
+        do {
+            payload = try JSONEncoder().encode(newStatus)
+        } catch {
+            os_log("statusChanged failed to encode JSON payload", log: log, type: .error)
+            return
+        }
 
         forEachProxy { proxy in
             proxy.statusChanged(payload: payload)
