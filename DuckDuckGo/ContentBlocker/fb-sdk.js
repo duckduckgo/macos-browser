@@ -121,10 +121,9 @@
         }
     }
 
-    delete window.FB
     if (!window.FB) {
         window.FB = {
-            api: function () {},
+            api: function (url, cb) { cb() },
             init: function (obj) {
                 if (obj) {
                     initData = obj
@@ -134,18 +133,20 @@
                     })
                 }
             },
-            ui: function (obj, cbx) {
+            ui: function (obj, cb) {
                 if (obj.method && obj.method === 'share') {
                     const shareLink = 'https://www.facebook.com/sharer/sharer.php?u=' + obj.href
                     window.open(shareLink, 'share-facebook', 'width=550,height=235')
                 }
-                cbx({ })
+                // eslint-disable-next-line node/no-callback-literal
+                cb({})
             },
             getAccessToken: function () {},
             getAuthResponse: function () {
                 return { status: '' }
             },
-            getLoginStatus: function (cbx) { cbx({ status: '' }) },
+            // eslint-disable-next-line node/no-callback-literal
+            getLoginStatus: function (callback) { callback({ status: 'unknown' }) },
             getUserID: function () {},
             login: function (cb, params) {
                 fbLogin.callback = cb
@@ -172,8 +173,7 @@
                 parse: function (n) {
                     parseCalls.push(n)
                 }
-            },
-            isSurrogate: true
+            }
         }
         if (document.readyState === 'complete') {
             init()
