@@ -37,7 +37,7 @@ struct PreferencesSection: Hashable, Identifiable {
 #else
             var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
 
-            if (NSApp.delegate as? AppDelegate)?.internalUserDecider?.isInternalUser == true {
+            if NSApp.delegateTyped.internalUserDecider.isInternalUser {
                 panes.insert(.sync, at: 1)
             }
 #endif

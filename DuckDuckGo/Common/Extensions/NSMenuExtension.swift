@@ -18,14 +18,59 @@
 
 import Cocoa
 
+@resultBuilder
+struct MenuBuilder {
+    static func buildBlock(_ components: [NSMenuItem]...) -> [NSMenuItem] {
+        return components.flatMap { $0 }
+    }
+
+    static func buildOptional(_ components: [NSMenuItem]?) -> [NSMenuItem] {
+        return components ?? []
+    }
+
+    static func buildEither(first component: [NSMenuItem]) -> [NSMenuItem] {
+        component
+    }
+
+    static func buildEither(second component: [NSMenuItem]) -> [NSMenuItem] {
+        component
+    }
+
+    static func buildLimitedAvailability(_ component: [NSMenuItem]) -> [NSMenuItem] {
+        component
+    }
+
+    static func buildArray(_ components: [[NSMenuItem]]) -> [NSMenuItem] {
+        components.flatMap { $0 }
+    }
+
+    static func buildExpression(_ expression: [NSMenuItem]) -> [NSMenuItem] {
+        return expression
+    }
+    static func buildExpression(_ expression: NSMenuItem) -> [NSMenuItem] {
+        return [expression]
+    }
+    static func buildExpression(_ expression: Void) -> [NSMenuItem] {
+        return []
+    }
+
+}
+
 extension NSMenu {
 
-    convenience init(items: [NSMenuItem]) {
-        self.init()
+    convenience init(title: String = "", items: [NSMenuItem]) {
+        self.init(title: title)
+        self.items = items
+    }
 
-        items.forEach { item in
-            addItem(item)
-        }
+    convenience init(title string: String = "", @MenuBuilder items: () -> [NSMenuItem]) {
+        self.init(title: string, items: items())
+    }
+
+    @discardableResult
+    func buildItems(@MenuBuilder items: () -> [NSMenuItem]) -> NSMenu {
+        self.items = items()
+        return self
     }
 
     func indexOfItem(withIdentifier id: String) -> Int? {

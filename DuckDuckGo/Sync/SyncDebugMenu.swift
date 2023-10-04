@@ -22,10 +22,19 @@ import DDGSync
 @objc @MainActor
 final class SyncDebugMenu: NSMenu {
 
-    @IBOutlet private weak var environmentMenu: NSMenu! {
-        didSet {
-            populateEnvironmentMenu()
+    private let environmentMenu = NSMenu()
+
+    init() {
+        super.init(title: "")
+
+        buildItems {
+            NSMenuItem(title: "Environment")
+                .submenu(environmentMenu)
         }
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
     override func update() {

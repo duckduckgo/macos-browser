@@ -16,28 +16,41 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import AppKit
 import Foundation
-
-#if !NETWORK_PROTECTION
-
-@objc
-final class NetworkProtectionSimulateFailureMenu: NSMenu {
-}
-
-#else
-
 import NetworkProtection
+import SwiftUI
 
 /// Implements the logic for Network Protection's simulate failures menu.
 ///
 @objc
 @MainActor
 final class NetworkProtectionSimulateFailureMenu: NSMenu {
-    @IBOutlet weak var simulateControllerFailureMenuItem: NSMenuItem!
-    @IBOutlet weak var simulateTunnelFailureMenuItem: NSMenuItem!
-    @IBOutlet weak var simulateTunnelCrashMenuItem: NSMenuItem!
-    @IBOutlet weak var simulateConnectionInterruptionMenuItem: NSMenuItem!
+
+    private let simulateControllerFailureMenuItem = NSMenuItem(title: "Enable NetP &gt; Controller Failure",
+                                                               action: #selector(NetworkProtectionSimulateFailureMenu.simulateControllerFailure))
+    private let simulateTunnelFailureMenuItem = NSMenuItem(title: "Tunnel Failure",
+                                                           action: #selector(NetworkProtectionSimulateFailureMenu.simulateTunnelFailure))
+    private let simulateTunnelCrashMenuItem = NSMenuItem(title: "Tunnel Crash",
+                                                         action: #selector(NetworkProtectionSimulateFailureMenu.simulateTunnelCrash))
+    private let simulateConnectionInterruptionMenuItem = NSMenuItem(title: "Connection Interruption",
+                                                                    action: #selector(NetworkProtectionSimulateFailureMenu.simulateConnectionInterruption))
+
+    init() {
+        super.init(title: "")
+        buildItems {
+            simulateControllerFailureMenuItem.targetting(self)
+            simulateTunnelFailureMenuItem.targetting(self)
+            simulateTunnelCrashMenuItem.targetting(self)
+            simulateConnectionInterruptionMenuItem.targetting(self)
+        }
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     private var simulationOptions: NetworkProtectionSimulationOptions {
         NetworkProtectionTunnelController.simulationOptions
@@ -45,27 +58,23 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
 
     /// Simulates a controller failure the next time Network Protection is started.
     ///
-    @IBAction
-    func simulateControllerFailure(_ menuItem: NSMenuItem) {
+    @objc func simulateControllerFailure(_ menuItem: NSMenuItem) {
         simulationOptions.setEnabled(menuItem.state == .off, option: .controllerFailure)
     }
 
     /// Simulates a tunnel failure the next time Network Protection is started.
     ///
-    @IBAction
-    func simulateTunnelFailure(_ menuItem: NSMenuItem) {
+    @objc func simulateTunnelFailure(_ menuItem: NSMenuItem) {
         simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelFailure)
     }
 
     /// Simulates a fatal error on the tunnel the next time Network Protection is started.
     ///
-    @IBAction
-    func simulateTunnelCrash(_ menuItem: NSMenuItem) {
+    @objc func simulateTunnelCrash(_ menuItem: NSMenuItem) {
         simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelFatalError)
     }
 
-    @IBAction
-    func simulateConnectionInterruption(_ menuItem: NSMenuItem) {
+    @objc func simulateConnectionInterruption(_ menuItem: NSMenuItem) {
         simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateConnectionInterruption)
     }
 

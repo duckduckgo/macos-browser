@@ -25,9 +25,8 @@ final class SecureVaultErrorReporter: SecureVaultErrorReporting {
     private init() {}
 
     func secureVaultInitFailed(_ error: SecureStorageError) {
-#if DEBUG
-        guard !NSApp.isRunningUnitTests else { return }
-#endif
+        guard NSApp.runType.shouldLoadEnvironment else { return }
+
         switch error {
         case .initFailed, .failedToOpenDatabase:
             Pixel.fire(.debug(event: .secureVaultInitError, error: error))

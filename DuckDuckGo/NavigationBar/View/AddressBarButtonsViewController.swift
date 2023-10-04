@@ -547,11 +547,11 @@ final class AddressBarButtonsViewController: NSViewController {
             animationView?.removeFromSuperview()
 
             let newAnimationView: AnimationView
-            if NSApp.isRunningUnitTests {
-                newAnimationView = AnimationView()
-            } else {
-                // For unknown reason, this caused infinite execution of various unit tests.
+            // For unknown reason, this caused infinite execution of various unit tests.
+            if NSApp.runType.shouldLoadEnvironment {
                 newAnimationView = getAnimationView(for: animationName) ?? AnimationView()
+            } else {
+                newAnimationView = AnimationView()
             }
             animationWrapperView.addAndLayout(newAnimationView)
             newAnimationView.isHidden = true
@@ -641,7 +641,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func subscribePrivacyDashboardPendingUpdates(privacyDashboardPopover: PrivacyDashboardPopover) {
         privacyDashboadPendingUpdatesCancellable?.cancel()
-        guard !NSApp.isRunningUnitTests else { return }
+        guard NSApp.runType.shouldLoadEnvironment else { return }
 
         privacyDashboadPendingUpdatesCancellable = privacyDashboardPopover.viewController.rulesUpdateObserver
             .$pendingUpdates.dropFirst().receive(on: DispatchQueue.main).sink { [weak privacyDashboardPopover] _ in
@@ -759,7 +759,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func updatePrivacyEntryPointIcon() {
-        guard !NSApp.isRunningUnitTests else { return }
+        guard NSApp.runType.shouldLoadEnvironment else { return }
         privacyEntryPointButton.image = nil
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {

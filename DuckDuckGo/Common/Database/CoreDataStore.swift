@@ -60,7 +60,7 @@ internal class CoreDataStore<ManagedObject: ValueRepresentableManagedObject> {
     private var readContext: NSManagedObjectContext? {
         if case .none = _readContext {
 #if DEBUG
-            if NSApp.isRunningUnitTests {
+            guard NSApp.runType.shouldLoadEnvironment else {
                 _readContext = .some(.none)
                 return .none
             }

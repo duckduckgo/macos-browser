@@ -248,9 +248,9 @@ protocol NewWindowPolicyDecisionMaker {
     ) {
 
         let duckPlayer = duckPlayer
-            ?? (NSApp.isRunningUnitTests ? DuckPlayer.mock(withMode: .enabled) : DuckPlayer.shared)
+            ?? (NSApp.runType.shouldLoadEnvironment ? DuckPlayer.shared : DuckPlayer.mock(withMode: .enabled))
         let statisticsLoader = statisticsLoader
-            ?? (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)
+            ?? (NSApp.runType.shouldLoadEnvironment ? StatisticsLoader.shared : nil)
         let privacyFeatures = privacyFeatures ?? PrivacyFeatures
         let internalUserDecider = (NSApp.delegate as? AppDelegate)?.internalUserDecider
         var faviconManager = faviconManagement
@@ -867,7 +867,7 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     private func addHomePageToWebViewIfNeeded() {
-        guard !NSApp.isRunningUnitTests else { return }
+        guard NSApp.runType.shouldLoadEnvironment else { return }
         if content == .homePage && webView.url == nil {
             webView.load(URLRequest(url: .homePage))
         }

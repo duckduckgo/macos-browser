@@ -20,9 +20,9 @@ import BrowserServicesKit
 import Combine
 import Common
 import Foundation
-@testable import DuckDuckGo_Privacy_Browser
 
-@objc(ContentBlockingMock)
+#if DEBUG
+
 final class ContentBlockingMock: NSObject, ContentBlockingProtocol, AdClickAttributionDependencies {
 
     struct EDP: EmbeddedDataProvider {
@@ -61,7 +61,6 @@ final class ContentBlockingMock: NSObject, ContentBlockingProtocol, AdClickAttri
     }
 }
 
-@objc(HTTPSUpgradeStoreMock)
 final class HTTPSUpgradeStoreMock: NSObject, HTTPSUpgradeStore {
 
     var bloomFilter: BloomFilterWrapper?
@@ -138,3 +137,5 @@ final class MockAttributionRulesProvider: AdClickAttributionRulesProviding {
     }
 
 }
+
+#endif
