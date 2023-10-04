@@ -26,6 +26,10 @@ import NetworkProtection
 import NetworkProtectionUI
 #endif
 
+#if SUBSCRIPTION
+import Account
+#endif
+
 // swiftlint:disable:next type_body_length
 final class NavigationBarViewController: NSViewController {
 
@@ -294,6 +298,16 @@ final class NavigationBarViewController: NSViewController {
             LocalPinningManager.shared.unpin(.networkProtection)
             return
         }
+
+        #if SUBSCRIPTION
+        let accountManager = AccountManager()
+        let networkProtectionTokenStorage = NetworkProtectionKeychainTokenStore()
+
+        if accountManager.token != nil && (try? networkProtectionTokenStorage.fetchToken()) == nil {
+            print("[NetP Subscription] Got access token but not auth token, meaning token exchange failed")
+            return
+        }
+        #endif
 
         // 1. If the user is on the waitlist but hasn't been invited or accepted terms and conditions, show the waitlist screen.
         // 2. If the user has no waitlist state but has an auth token, show the NetP popover.
