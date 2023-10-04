@@ -31,7 +31,7 @@ final class HistoryMenu: NSMenu {
     private let reopenAllWindowsFromLastSessionMenuItem = NSMenuItem(title: UserText.reopenAllWindowsFromLastSession,
                                                                      action: #selector(AppDelegate.reopenAllWindowsFromLastSession))
     private let clearAllHistoryMenuItem = NSMenuItem(title: UserText.mainMenuHistoryClearAllHistory,
-                                                     action: #selector(MainViewController.clearAllHistory), 
+                                                     action: #selector(MainViewController.clearAllHistory),
                                                      keyEquivalent: [.command, .shift, .backspace])
     private let clearAllHistorySeparator = NSMenuItem.separator()
 
