@@ -108,4 +108,9 @@ extension Date {
         Int(self.timeIntervalSinceReferenceDate / TimeInterval.day)
     }
 
+    @inlinable
+    func adding(_ timeInterval: TimeInterval) -> Date {
+        addingTimeInterval(timeInterval)
+    }
+
 }

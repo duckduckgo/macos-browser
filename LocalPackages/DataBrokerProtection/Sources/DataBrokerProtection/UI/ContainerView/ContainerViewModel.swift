@@ -27,11 +27,11 @@ final class ContainerViewModel: ObservableObject {
 
     private let mainAppInterface: DBPPackageToMainAppInterface
     private let dataManager: DataBrokerProtectionDataManaging
-    private var cancellables = Set<AnyCancellable>()
 
-    @Published var schedulerStatus = ""
+    @Published var scanResults: ScanResult?
     @Published var showWebView = false
     @Published var useFakeBroker = false
+    @Published var preventSchedulerStart = false
 
     internal init(mainAppInterface: DBPPackageToMainAppInterface,
                   dataManager: DataBrokerProtectionDataManaging) {
@@ -39,42 +39,13 @@ final class ContainerViewModel: ObservableObject {
         self.dataManager = dataManager
 
         restoreFakeBrokerStatus()
-        setupCancellable()
-    }
-
-    private func setupCancellable() {
-        /*scheduler.statusPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-
-                switch status {
-                case .idle:
-                    self?.schedulerStatus = "🟠 Idle"
-                case .running:
-                    self?.schedulerStatus = "🟢 Running"
-                case .stopped:
-                    self?.schedulerStatus = "🔴 Stopped"
-                }
-            }.store(in: &cancellables)
-
-        $useFakeBroker
-            .receive(on: DispatchQueue.main)
-            .sink { value in
-                FakeBrokerUserDefaults().setFakeBrokerFlag(value)
-            }.store(in: &cancellables)*/
-
     }
 
     private func restoreFakeBrokerStatus() {
-        useFakeBroker = FakeBrokerUserDefaults().isFakeBrokerFlagOn()
+        useFakeBroker = DataBrokerDebugFlagFakeBroker().isFlagOn()
+        preventSchedulerStart = DataBrokerDebugFlagBlockScheduler().isFlagOn()
+        showWebView = DataBrokerDebugFlagShowWebView().isFlagOn()
     }
-
-//    func runQueuedOperationsAndStartScheduler() {
-//        scheduler.runQueuedOperations(showWebView: showWebView) { [weak self] in
-//            guard let self = self else { return }
-//            self.scheduler.startScheduler(showWebView: self.showWebView)
-//        }
-//    }
 
     func forceSchedulerRun() {
         mainAppInterface.runAllOperations(showWebView: showWebView)
@@ -82,21 +53,28 @@ final class ContainerViewModel: ObservableObject {
 
     func startScanPressed() {
         mainAppInterface.startScanPressed()
-        /*scheduler.stopScheduler()
+    }
 
-        scheduler.scanAllBrokers(showWebView: showWebView) { [weak self] in
-            guard let self = self else { return }
+    func forceRunScans(completion: @escaping (ScanResult) -> Void) {
+        mainAppInterface.stopScheduler()
+        mainAppInterface.scanAllBrokers(showWebView: false, completion: nil)
+    }
 
-            DispatchQueue.main.async {
-                let hasResults = self.dataManager.hasMatches()
+    func forceRunOptOuts() {
+        mainAppInterface.optOutAllBrokers(showWebView: showWebView, completion: nil)
+    }
 
-                if hasResults {
-                    completion(.results)
-                } else {
-                    completion(.noResults)
-                }
-            }
-        }*/
+    func cleanData() {
+        let fileManager = FileManager.default
+        // Not the best way to hardcode this, but it's just for the debug UI
+        let filePath = NSHomeDirectory() + "/Library/Containers/com.duckduckgo.macos.browser.dbp.debug/Data/Library/Application Support/DBP/Vault.db"
+
+        do {
+            try fileManager.removeItem(atPath: filePath)
+        } catch {
+            print("Error removing file: \(error.localizedDescription)")
+        }
+        exit(0)
     }
 
     func editProfilePressed() {
@@ -107,15 +85,13 @@ final class ContainerViewModel: ObservableObject {
 extension ContainerViewModel: MainAppToDBPPackageInterface {
 
     func brokersScanCompleted() {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [self] in
             let hasResults = self.dataManager.hasMatches()
 
             if hasResults {
-                //TODO view needs a thing for this.
-                //in general have no idea  how we're gonna deal with its state
-                //completion(.results)
+                self.scanResults = .results
             } else {
-                //completion(.noResults)
+                self.scanResults = .noResults
             }
         }
     }

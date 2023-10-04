@@ -71,7 +71,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
 
-#if !APPSTORE
+    private var didFinishLaunching = false
+
+#if SPARKLE
     var updateController: UpdateController!
 #endif
 
@@ -151,7 +153,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                                                privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
         NSApp.mainMenuTyped.setup(with: featureFlagger)
 
-#if !APPSTORE
+#if SPARKLE
         updateController = UpdateController(internalUserDecider: internalUserDecider)
         stateRestorationManager.subscribeToAutomaticAppRelaunching(using: updateController.willRelaunchAppPublisher)
 #endif
@@ -161,11 +163,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard !NSApp.isRunningUnitTests else { return }
+        defer {
+            didFinishLaunching = true
+        }
 
         HistoryCoordinator.shared.loadHistory()
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
         bookmarksManager.loadBookmarks()
-        FaviconManager.shared.loadFavicons()
+        if case .normal = NSApp.runType {
+            FaviconManager.shared.loadFavicons()
+        }
         ConfigurationManager.shared.start()
         FileDownloadManager.shared.delegate = self
         _ = DownloadListCoordinator.shared
@@ -174,12 +181,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         if LocalStatisticsStore().atb == nil {
             Pixel.firstLaunchDate = Date()
             // MARK: Enable pixel experiments here
+            PixelExperiment.install()
         }
-        PixelExperiment.cleanup()
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
             // MARK: perform first time launch logic here
         }
+
+        let statisticsLoader = (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)
+        statisticsLoader?.load()
 
         startupSync()
 
@@ -206,15 +216,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
 #if NETWORK_PROTECTION
-        if #available(macOS 11.4, *) {
-            /// Once we drop support for macOS versions below 11.4, we can turn `NetworkProtectionAppEvents`
-            /// into a property.  Right now it's easier to avoid it since we can't place macOS version conditions on properties.
-            ///
-            /// In any case this is not going to happen on a high frequency and should not affect performance in any relevant
-            /// way.
-            NetworkProtectionAppEvents().applicationDidFinishLaunching()
-        }
-
+        NetworkProtectionAppEvents().applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
 #endif
 
@@ -224,7 +226,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
-        syncService?.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
+        guard didFinishLaunching else { return }
+
+        syncService?.initializeIfNeeded()
         syncService?.scheduler.notifyAppLifecycleEvent()
 
 #if NETWORK_PROTECTION
@@ -232,14 +236,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             // Do nothing when code fetching fails, as the app will try again later
         }
 
-        if #available(macOS 11.4, *) {
-            /// Once we drop support for macOS versions below 11.4, we can turn `NetworkProtectionAppEvents`
-            /// into a property.  Right now it's easier to avoid it since we can't place macOS version conditions on properties.
-            ///
-            /// In any case this is not going to happen on a high frequency and should not affect performance in any relevant
-            /// way.
-            NetworkProtectionAppEvents().applicationDidBecomeActive()
-        }
+        NetworkProtectionAppEvents().applicationDidBecomeActive()
 #endif
     }
 
@@ -302,9 +299,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     // MARK: - Sync
 
     private func startupSync() {
+#if DEBUG
+        let defaultEnvironment = ServerEnvironment.development
+#else
+        let defaultEnvironment = ServerEnvironment.production
+#endif
+
+#if DEBUG || REVIEW
+        let environment = ServerEnvironment(
+            UserDefaultsWrapper(
+                key: .syncEnvironment,
+                defaultValue: defaultEnvironment.description
+            ).wrappedValue
+        ) ?? defaultEnvironment
+#else
+        let environment = defaultEnvironment
+#endif
         let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
-        let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync)
-        syncService.initializeIfNeeded(isInternalUser: internalUserDecider?.isInternalUser ?? false)
+        let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync, environment: environment)
+        syncService.initializeIfNeeded()
         syncDataProviders.setUpDatabaseCleaners(syncService: syncService)
 
         // This is also called in applicationDidBecomeActive, but we're also calling it here, since
@@ -375,7 +388,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler(.alert)
+        completionHandler(.banner)
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter,

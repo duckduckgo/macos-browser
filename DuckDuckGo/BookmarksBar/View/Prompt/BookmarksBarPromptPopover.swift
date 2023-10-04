@@ -57,10 +57,6 @@ extension BookmarksBarPromptPopover: NSPopoverDelegate {
 
 final class BookmarksBarPromptViewController: NSHostingController<BookmarksBarPromptView> {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
-
     static func create() -> BookmarksBarPromptViewController {
         let controller = BookmarksBarPromptViewController(rootView: BookmarksBarPromptView())
         controller.rootView.model.delegate = controller

@@ -20,6 +20,7 @@ import XCTest
 import Carbon
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 class PixelArgumentsTests: XCTestCase {
 
     var bookmarkStore: BookmarkStoreMock!

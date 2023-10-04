@@ -29,8 +29,8 @@ class MockBookmarkManager: BookmarkManager {
         return false
     }
 
-    func isHostInBookmarks(host: String) -> Bool {
-        return false
+    func allHosts() -> Set<String> {
+        return []
     }
 
     func getBookmark(for url: URL) -> DuckDuckGo_Privacy_Browser.Bookmark? {

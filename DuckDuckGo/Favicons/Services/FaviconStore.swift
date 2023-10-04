@@ -23,15 +23,15 @@ import Common
 
 protocol FaviconStoring {
 
-    func loadFavicons() -> Future<[Favicon], Error>
-    func save(favicon: Favicon) -> Future<Void, Error>
-    func removeFavicons(_ favicons: [Favicon]) -> Future<Void, Error>
+    func loadFavicons() async throws -> [Favicon]
+    func save(_ favicons: [Favicon]) async throws
+    func removeFavicons(_ favicons: [Favicon]) async throws
 
-    func loadFaviconReferences() -> Future<([FaviconHostReference], [FaviconUrlReference]), Error>
-    func save(hostReference: FaviconHostReference) -> Future<Void, Error>
-    func save(urlReference: FaviconUrlReference) -> Future<Void, Error>
-    func remove(hostReferences: [FaviconHostReference]) -> Future<Void, Error>
-    func remove(urlReferences: [FaviconUrlReference]) -> Future<Void, Error>
+    func loadFaviconReferences() async throws -> ([FaviconHostReference], [FaviconUrlReference])
+    func save(hostReference: FaviconHostReference) async throws
+    func save(urlReference: FaviconUrlReference) async throws
+    func remove(hostReferences: [FaviconHostReference]) async throws
+    func remove(urlReferences: [FaviconUrlReference]) async throws
 
 }
 
@@ -39,91 +39,82 @@ final class FaviconStore: FaviconStoring {
 
     enum FaviconStoreError: Error {
         case notLoadedYet
-        case storeDeallocated
         case savingFailed
     }
 
-    private lazy var context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "Favicons")
+    private let context: NSManagedObjectContext
 
-    init() {}
+    init() {
+        context = Database.shared.makeContext(concurrencyType: .privateQueueConcurrencyType, name: "Favicons")
+    }
 
     init(context: NSManagedObjectContext) {
         self.context = context
     }
 
-    func loadFavicons() -> Future<[Favicon], Error> {
-        return Future { [weak self] promise in
-            self?.context.perform {
-                guard let self = self else {
-                    promise(.failure(FaviconStoreError.storeDeallocated))
-                    return
-                }
-
+    func loadFavicons() async throws -> [Favicon] {
+        try await withCheckedThrowingContinuation { [context] continuation in
+            context.perform {
                 let fetchRequest = FaviconManagedObject.fetchRequest() as NSFetchRequest<FaviconManagedObject>
                 fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(FaviconManagedObject.dateCreated), ascending: true)]
                 fetchRequest.returnsObjectsAsFaults = false
                 do {
-                    let faviconMOs = try self.context.fetch(fetchRequest)
+                    let faviconMOs = try context.fetch(fetchRequest)
                     os_log("%d favicons loaded ", log: .favicons, faviconMOs.count)
                     let favicons = faviconMOs.compactMap { Favicon(faviconMO: $0) }
-                    promise(.success(favicons))
+
+                    continuation.resume(returning: favicons)
                 } catch {
-                    promise(.failure(error))
+                    continuation.resume(throwing: error)
                 }
             }
         }
     }
 
-    func removeFavicons(_ favicons: [Favicon]) -> Future<Void, Error> {
+    func removeFavicons(_ favicons: [Favicon]) async throws {
         let identifiers = favicons.map { $0.identifier }
-        return remove(identifiers: identifiers, entityName: FaviconManagedObject.className())
+        return try await remove(identifiers: identifiers, entityName: FaviconManagedObject.className())
     }
 
-    func save(favicon: Favicon) -> Future<Void, Error> {
-        return Future { [weak self] promise in
-            self?.context.perform { [weak self] in
-                guard let self = self else {
-                    promise(.failure(FaviconStoreError.storeDeallocated))
-                    return
-                }
-
-                let insertedObject = NSEntityDescription.insertNewObject(forEntityName: FaviconManagedObject.className(), into: self.context)
-                guard let faviconMO = insertedObject as? FaviconManagedObject else {
-                    promise(.failure(FaviconStoreError.savingFailed))
-                    return
-                }
-                faviconMO.update(favicon: favicon)
-
+    func save(_ favicons: [Favicon]) async throws {
+        try await withCheckedThrowingContinuation { [context] continuation in
+            context.perform {
                 do {
-                    try self.context.save()
-                } catch {
-                    promise(.failure(FaviconStoreError.savingFailed))
-                    return
-                }
+                    for favicon in favicons {
+                        guard let faviconMO = NSEntityDescription
+                            .insertNewObject(forEntityName: FaviconManagedObject.className(), into: context) as? FaviconManagedObject else {
+                            assertionFailure("FaviconStore savingFailed")
+                            throw FaviconStoreError.savingFailed
+                        }
+                        faviconMO.update(favicon: favicon)
+                    }
 
-                promise(.success(()))
+                    try context.save()
+
+                    continuation.resume()
+
+                } catch let error as FaviconStoreError {
+                    continuation.resume(throwing: error)
+                } catch {
+                    continuation.resume(throwing: FaviconStoreError.savingFailed)
+                }
             }
         }
     }
 
-    func loadFaviconReferences() -> Future<([FaviconHostReference], [FaviconUrlReference]), Error> {
-        return Future { [weak self] promise in
-            self?.context.perform {
-                guard let self = self else {
-                    promise(.failure(FaviconStoreError.storeDeallocated))
-                    return
-                }
-
+    func loadFaviconReferences() async throws -> ([FaviconHostReference], [FaviconUrlReference]) {
+        try await withCheckedThrowingContinuation { [context] continuation in
+            context.perform {
                 let hostFetchRequest = FaviconHostReferenceManagedObject.fetchRequest() as NSFetchRequest<FaviconHostReferenceManagedObject>
                 hostFetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(FaviconHostReferenceManagedObject.dateCreated), ascending: true)]
                 hostFetchRequest.returnsObjectsAsFaults = false
                 let faviconHostReferences: [FaviconHostReference]
                 do {
-                    let faviconHostReferenceMOs = try self.context.fetch(hostFetchRequest)
+                    let faviconHostReferenceMOs = try context.fetch(hostFetchRequest)
                     os_log("%d favicon host references loaded ", log: .favicons, faviconHostReferenceMOs.count)
                     faviconHostReferences = faviconHostReferenceMOs.compactMap { FaviconHostReference(faviconHostReferenceMO: $0) }
                 } catch {
-                    promise(.failure(error))
+                    continuation.resume(throwing: error)
                     return
                 }
 
@@ -131,57 +122,48 @@ final class FaviconStore: FaviconStoring {
                 urlFetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(FaviconUrlReferenceManagedObject.dateCreated), ascending: true)]
                 urlFetchRequest.returnsObjectsAsFaults = false
                 do {
-                    let faviconUrlReferenceMOs = try self.context.fetch(urlFetchRequest)
+                    let faviconUrlReferenceMOs = try context.fetch(urlFetchRequest)
                     os_log("%d favicon url references loaded ", log: .favicons, faviconUrlReferenceMOs.count)
                     let faviconUrlReferences = faviconUrlReferenceMOs.compactMap { FaviconUrlReference(faviconUrlReferenceMO: $0) }
-                    promise(.success((faviconHostReferences, faviconUrlReferences)))
+                    continuation.resume(returning: (faviconHostReferences, faviconUrlReferences))
                 } catch {
-                    promise(.failure(error))
+                    continuation.resume(throwing: error)
                 }
             }
         }
     }
 
-    func save(hostReference: FaviconHostReference) -> Future<Void, Error> {
-        return Future { [weak self] promise in
-            self?.context.perform { [weak self] in
-                guard let self = self else {
-                    promise(.failure(FaviconStoreError.storeDeallocated))
-                    return
-                }
+    func save(hostReference: FaviconHostReference) async throws {
+        return try await withCheckedThrowingContinuation { [context] continuation in
+            context.perform {
 
-                let insertedObject = NSEntityDescription.insertNewObject(forEntityName: FaviconHostReferenceManagedObject.className(),
-                                                                         into: self.context)
+                let insertedObject = NSEntityDescription.insertNewObject(forEntityName: FaviconHostReferenceManagedObject.className(), into: context)
                 guard let faviconHostReferenceMO = insertedObject as? FaviconHostReferenceManagedObject else {
-                    promise(.failure(FaviconStoreError.savingFailed))
+                    continuation.resume(throwing: FaviconStoreError.savingFailed)
                     return
                 }
                 faviconHostReferenceMO.update(hostReference: hostReference)
 
                 do {
-                    try self.context.save()
+                    try context.save()
                 } catch {
-                    promise(.failure(FaviconStoreError.savingFailed))
+                    continuation.resume(throwing: FaviconStoreError.savingFailed)
                     return
                 }
 
-                promise(.success(()))
+                continuation.resume()
             }
         }
     }
 
-    func save(urlReference: FaviconUrlReference) -> Future<Void, Error> {
-        return Future { [weak self] promise in
-            self?.context.perform { [weak self] in
-                guard let self = self else {
-                    promise(.failure(FaviconStoreError.storeDeallocated))
-                    return
-                }
+    func save(urlReference: FaviconUrlReference) async throws {
+        return try await withCheckedThrowingContinuation { [context] continuation in
+            context.perform {
 
                 let insertedObject = NSEntityDescription.insertNewObject(forEntityName: FaviconUrlReferenceManagedObject.className(),
                                                                          into: self.context)
                 guard let faviconUrlReferenceMO = insertedObject as? FaviconUrlReferenceManagedObject else {
-                    promise(.failure(FaviconStoreError.savingFailed))
+                    continuation.resume(throwing: FaviconStoreError.savingFailed)
                     return
                 }
                 faviconUrlReferenceMO.update(urlReference: urlReference)
@@ -189,34 +171,30 @@ final class FaviconStore: FaviconStoring {
                 do {
                     try self.context.save()
                 } catch {
-                    promise(.failure(FaviconStoreError.savingFailed))
+                    continuation.resume(throwing: FaviconStoreError.savingFailed)
                     return
                 }
 
-                promise(.success(()))
+                continuation.resume()
             }
         }
     }
 
-    func remove(hostReferences: [FaviconHostReference]) -> Future<Void, Error> {
+    func remove(hostReferences: [FaviconHostReference]) async throws {
         let identifiers = hostReferences.map { $0.identifier }
-        return remove(identifiers: identifiers, entityName: FaviconHostReferenceManagedObject.className())
+        return try await remove(identifiers: identifiers, entityName: FaviconHostReferenceManagedObject.className())
     }
 
-    func remove(urlReferences: [FaviconUrlReference]) -> Future<Void, Error> {
+    func remove(urlReferences: [FaviconUrlReference]) async throws {
         let identifiers = urlReferences.map { $0.identifier }
-        return remove(identifiers: identifiers, entityName: FaviconUrlReferenceManagedObject.className())
+        return try await remove(identifiers: identifiers, entityName: FaviconUrlReferenceManagedObject.className())
     }
 
     // MARK: - Private
 
-    private func remove(identifiers: [UUID], entityName: String) -> Future<Void, Error> {
-        return Future { [weak self] promise in
-            self?.context.perform {
-                guard let self = self else {
-                    promise(.failure(FaviconStoreError.storeDeallocated))
-                    return
-                }
+    private func remove(identifiers: [UUID], entityName: String) async throws {
+        return try await withCheckedThrowingContinuation { [context] continuation in
+            context.perform {
 
                 // To avoid long predicate, execute multiple times
                 let chunkedIdentifiers = identifiers.chunked(into: 100)
@@ -234,10 +212,10 @@ final class FaviconStore: FaviconStoring {
                         NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self.context])
                         os_log("%d entries of %s removed", log: .favicons, deletedObjects.count, entityName)
                     } catch {
-                        promise(.failure(error))
+                        continuation.resume(throwing: error)
                     }
                 }
-                promise(.success(()))
+                continuation.resume()
             }
         }
     }
@@ -252,7 +230,7 @@ fileprivate extension Favicon {
               let documentUrl = faviconMO.documentUrlEncrypted as? URL,
               let dateCreated = faviconMO.dateCreated,
               let relation = Favicon.Relation(rawValue: Int(faviconMO.relation)) else {
-            Pixel.fire(.debug(event: .faviconDecryptionFailedUnique), limitToOnceADay: true)
+            Pixel.fire(.debug(event: .faviconDecryptionFailedUnique), limitTo: .dailyFirst)
             assertionFailure("Favicon: Failed to init Favicon from FaviconManagedObject")
             return nil
         }

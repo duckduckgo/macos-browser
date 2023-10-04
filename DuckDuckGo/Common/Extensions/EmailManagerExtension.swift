@@ -21,6 +21,16 @@ import BrowserServicesKit
 
 extension EmailManager {
 
+    @UserDefaultsWrapper(key: .emailKeychainMigration, defaultValue: false)
+    private static var emailKeychainMigrationDone: Bool
+
+    convenience init() {
+        defer {
+            Self.emailKeychainMigrationDone = true
+        }
+        self.init(storage: EmailKeychainManager(needsMigration: !Self.emailKeychainMigrationDone))
+    }
+
     var emailPixelParameters: [String: String] {
         var pixelParameters: [String: String] = [:]
 

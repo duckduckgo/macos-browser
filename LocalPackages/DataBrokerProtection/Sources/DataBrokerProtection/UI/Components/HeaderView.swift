@@ -18,7 +18,6 @@
 
 import SwiftUI
 
-@available(macOS 11.0, *)
 struct HeaderView: View {
     let title: String
     let subtitle: String
@@ -41,7 +40,6 @@ struct HeaderView: View {
     }
 }
 
-@available(macOS 11.0, *)
 struct HeaderView_Previews: PreviewProvider {
     static var previews: some View {
 

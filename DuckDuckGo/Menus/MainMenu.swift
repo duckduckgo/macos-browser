@@ -82,6 +82,7 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var toggleBookmarksShortcutMenuItem: NSMenuItem?
     @IBOutlet weak var toggleDownloadsShortcutMenuItem: NSMenuItem?
     @IBOutlet weak var toggleNetworkProtectionShortcutMenuItem: NSMenuItem?
+    @IBOutlet weak var toggleHomeButtonMenuItem: NSMenuItem?
 
     // MARK: - Debug
 
@@ -127,7 +128,7 @@ final class MainMenu: NSMenu {
 #endif
     }
 
-    let sharingMenu = SharingMenu()
+    let sharingMenu = SharingMenu(title: UserText.shareMenuItem)
 
     // MARK: - Lifecycle
 
@@ -139,14 +140,6 @@ final class MainMenu: NSMenu {
         if NSApplication.shared.helpMenu != helpMenuItem?.submenu {
             NSApplication.shared.helpMenu = helpMenuItem?.submenu
         }
-
-        if !WKWebView.supportsPrinting {
-            printMenuItem?.removeFromParent()
-            printSeparatorItem?.removeFromParent()
-        }
-
-        sharingMenu.title = shareMenuItem.title
-        shareMenuItem.submenu = sharingMenu
 
         // To be safe, hide the NetP shortcut menu item by default.
         toggleNetworkProtectionShortcutMenuItem?.isHidden = true
@@ -162,13 +155,12 @@ final class MainMenu: NSMenu {
 
     @MainActor
     func setup(with featureFlagger: FeatureFlagger) {
-        self.delegate = self
-
-#if APPSTORE || DBP
+#if !SPARKLE
         checkForUpdatesMenuItem?.removeFromParent()
         checkForUpdatesSeparatorItem?.removeFromParent()
 #endif
 
+        shareMenuItem.submenu = sharingMenu
         setupHelpMenuItem()
         setupDebugMenuItem(with: featureFlagger)
         subscribeToBookmarkList()
@@ -298,9 +290,10 @@ final class MainMenu: NSMenu {
         toggleAutofillShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         toggleBookmarksShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
         toggleDownloadsShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
+        toggleHomeButtonMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .homeButton)
 
 #if NETWORK_PROTECTION
-        if #available(macOS 11.4, *), NetworkProtectionKeychainTokenStore().isFeatureActivated {
+        if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             toggleNetworkProtectionShortcutMenuItem?.isHidden = false
             toggleNetworkProtectionShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
         } else {
@@ -452,20 +445,5 @@ final class MainMenu: NSMenu {
         } catch {
             NSAlert(error: error).runModal()
         }
-    }
-}
-
-extension MainMenu: NSMenuDelegate {
-
-    func menuHasKeyEquivalent(_ menu: NSMenu,
-                              for event: NSEvent,
-                              target: AutoreleasingUnsafeMutablePointer<AnyObject?>,
-                              action: UnsafeMutablePointer<Selector?>) -> Bool {
-#if DEBUG
-        if NSApp.isRunningUnitTests { return false }
-#endif
-        sharingMenu.update()
-        shareMenuItem.submenu = sharingMenu
-        return false
     }
 }

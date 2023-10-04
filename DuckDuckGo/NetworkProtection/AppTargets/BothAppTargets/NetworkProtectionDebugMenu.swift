@@ -42,16 +42,9 @@ import NetworkProtection
 
 /// Controller for the Network Protection debug menu.
 ///
-@available(macOS 11.4, *)
 @objc
 @MainActor
 final class NetworkProtectionDebugMenu: NSMenu {
-
-    override func awakeFromNib() {
-        if #unavailable(macOS 11.4) {
-            mainMenuItem?.removeFromParent()
-        }
-    }
 
     // MARK: - Outlets: Menus
 
@@ -90,8 +83,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     @IBOutlet weak var excludeDDGRouteMenuItem: NSMenuItem!
     @IBOutlet weak var excludeLocalNetworksMenuItem: NSMenuItem!
-
-    @IBOutlet weak var connectionTesterEnabledMenuItem: NSMenuItem!
 
     // MARK: - Debug Logic
 
@@ -220,11 +211,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
             return
         }
         NetworkProtectionTunnelController().setExcludedRoute(addressRange, enabled: sender.state == .off)
-    }
-
-    @IBAction
-    func toggleConnectionTesterEnabled(_ sender: Any) {
-        NetworkProtectionTunnelController().toggleConnectionTesterEnabled()
     }
 
     // MARK: Populating Menu Items
@@ -400,11 +386,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
         connectOnLogInMenuItem.state = controller.shouldAutoConnectOnLogIn ? .on : .off
 
         excludeLocalNetworksMenuItem.state = controller.shouldExcludeLocalRoutes ? .on : .off
-        connectionTesterEnabledMenuItem.state = controller.isConnectionTesterEnabled ? .on : .off
     }
 
 }
-@available(macOS 11.4, *)
 extension NetworkProtectionDebugMenu: NSMenuDelegate {
 
     func menuNeedsUpdate(_ menu: NSMenu) {

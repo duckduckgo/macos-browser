@@ -206,6 +206,8 @@ protocol NewWindowPolicyDecisionMaker {
 
     private let webViewConfiguration: WKWebViewConfiguration
 
+    let startupPreferences: StartupPreferences
+
     private var extensions: TabExtensions
     // accesing TabExtensions‘ Public Protocols projecting tab.extensions.extensionName to tab.extensionName
     // allows extending Tab functionality while maintaining encapsulation
@@ -241,7 +243,8 @@ protocol NewWindowPolicyDecisionMaker {
                      shouldLoadFromCache: Bool = false,
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,
-                     webViewSize: CGSize = CGSize(width: 1024, height: 768)
+                     webViewSize: CGSize = CGSize(width: 1024, height: 768),
+                     startupPreferences: StartupPreferences = StartupPreferences.shared
     ) {
 
         let duckPlayer = duckPlayer
@@ -280,7 +283,8 @@ protocol NewWindowPolicyDecisionMaker {
                   shouldLoadFromCache: shouldLoadFromCache,
                   canBeClosedWithBack: canBeClosedWithBack,
                   lastSelectedAt: lastSelectedAt,
-                  webViewSize: webViewSize)
+                  webViewSize: webViewSize,
+                  startupPreferences: startupPreferences)
     }
 
     @MainActor
@@ -310,7 +314,8 @@ protocol NewWindowPolicyDecisionMaker {
          shouldLoadFromCache: Bool,
          canBeClosedWithBack: Bool,
          lastSelectedAt: Date?,
-         webViewSize: CGSize
+         webViewSize: CGSize,
+         startupPreferences: StartupPreferences
     ) {
 
         self.content = content
@@ -325,6 +330,7 @@ protocol NewWindowPolicyDecisionMaker {
         self._canBeClosedWithBack = canBeClosedWithBack
         self.interactionState = (interactionStateData != nil || shouldLoadFromCache) ? .loadCachedFromTabContent(interactionStateData) : .none
         self.lastSelectedAt = lastSelectedAt
+        self.startupPreferences = startupPreferences
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
@@ -387,6 +393,7 @@ protocol NewWindowPolicyDecisionMaker {
             }
 
         addDeallocationChecks(for: webView)
+
     }
 
 #if DEBUG
@@ -733,7 +740,12 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     func openHomePage() {
-        content = .homePage
+        if startupPreferences.launchToCustomHomePage,
+           let customURL = URL(string: startupPreferences.formattedCustomHomePageURL) {
+            webView.load(URLRequest(url: customURL))
+        } else {
+            content = .homePage
+        }
     }
 
     func startOnboarding() {
@@ -744,7 +756,7 @@ protocol NewWindowPolicyDecisionMaker {
         userInteractionDialog = nil
 
         // In the case of an error only reload web URLs to prevent uxss attacks via redirecting to javascript://
-        if let error = error, let failingUrl = error.failingUrl, (failingUrl.isHttp || failingUrl.isHttps) {
+        if let error = error, let failingUrl = error.failingUrl, failingUrl.isHttp || failingUrl.isHttps {
             webView.load(URLRequest(url: failingUrl, cachePolicy: .reloadIgnoringLocalCacheData))
             return
         }
@@ -808,7 +820,7 @@ protocol NewWindowPolicyDecisionMaker {
     private func shouldReload(_ url: URL, shouldLoadInBackground: Bool) -> Bool {
         // don‘t reload in background unless shouldLoadInBackground
         guard url.isValid,
-              (webView.superview != nil || shouldLoadInBackground),
+              webView.superview != nil || shouldLoadInBackground,
               // don‘t reload when already loaded
               webView.url != url,
               webView.url != (content.isUrl ? content.urlForWebView : nil)
@@ -952,6 +964,7 @@ protocol NewWindowPolicyDecisionMaker {
     @Published var favicon: NSImage?
     let faviconManagement: FaviconManagement
 
+    @MainActor(unsafe)
     private func handleFavicon(oldValue: TabContent? = nil) {
         guard content.isUrl, let url = content.urlForWebView else {
             favicon = nil
@@ -1002,6 +1015,7 @@ extension Tab: PageObserverUserScriptDelegate {
 
 extension Tab: FaviconUserScriptDelegate {
 
+    @MainActor(unsafe)
     func faviconUserScript(_ faviconUserScript: FaviconUserScript,
                            didFindFaviconLinks faviconLinks: [FaviconUserScript.FaviconLink],
                            for documentUrl: URL) {

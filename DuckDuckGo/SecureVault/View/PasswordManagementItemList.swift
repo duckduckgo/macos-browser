@@ -39,7 +39,6 @@ struct PasswordManagementItemListView: View {
     @EnvironmentObject var model: PasswordManagementItemListModel
     @State var autoSelected = false
 
-    @available(macOS 11.0, *)
     private func selectItem(id: String, proxy: ScrollViewProxy) {
         // Selection/scroll wont work until list is fully rendered
         // so give it a few milis before auto-selecting
@@ -63,20 +62,14 @@ struct PasswordManagementItemListView: View {
 
             Divider()
 
-            if #available(macOS 11.0, *) {
-                ScrollView {
-                    ScrollViewReader { proxy in
-                        PasswordManagementItemListStackView()
-                            .onChange(of: model.selected?.id) { itemId in
-                                if let id = itemId {
-                                    selectItem(id: id, proxy: proxy)
-                                }
-                            }
-                    }
-                }
-            } else {
-                ScrollView {
+            ScrollView {
+                ScrollViewReader { proxy in
                     PasswordManagementItemListStackView()
+                        .onChange(of: model.selected?.id) { itemId in
+                            if let id = itemId {
+                                selectItem(id: id, proxy: proxy)
+                            }
+                        }
                 }
             }
         }
@@ -147,17 +140,9 @@ struct PasswordManagementItemListStackView: View {
     @EnvironmentObject var model: PasswordManagementItemListModel
 
     var body: some View {
-
-        if #available(macOS 11.0, *) {
-            LazyVStack(alignment: .leading) {
-                PasswordManagementItemStackContentsView()
-            }
-        } else {
-            VStack(alignment: .leading) {
-                PasswordManagementItemStackContentsView()
-            }
+        LazyVStack(alignment: .leading) {
+            PasswordManagementItemStackContentsView()
         }
-
     }
 
 }

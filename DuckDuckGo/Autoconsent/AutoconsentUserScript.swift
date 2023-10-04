@@ -31,7 +31,6 @@ protocol UserScriptWithAutoconsent: UserScript {
     var delegate: AutoconsentUserScriptDelegate? { get set }
 }
 
-@available(macOS 11, *)
 final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, UserScriptWithAutoconsent {
     var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     var forMainFrameOnly: Bool { false }
@@ -79,7 +78,6 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
     }
 }
 
-@available(macOS 11, *)
 extension AutoconsentUserScript {
     enum MessageName: String, CaseIterable {
         case `init`
@@ -157,7 +155,6 @@ extension AutoconsentUserScript {
     }
 }
 
-@available(macOS 11, *)
 extension AutoconsentUserScript {
     @MainActor
     func handleMessage(replyHandler: @escaping (Any?, String?) -> Void,

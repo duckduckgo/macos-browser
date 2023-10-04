@@ -33,16 +33,6 @@ struct MockWaitlistRequest: WaitlistRequest {
                                    inviteCodeResult: .failure(.noData))
     }
 
-    init(
-        joinResult: WaitlistJoinResult,
-        statusResult: Result<WaitlistResponse.Status, WaitlistResponse.StatusError>,
-        inviteCodeResult: Result<WaitlistResponse.InviteCode, WaitlistResponse.InviteCodeError>
-    ) {
-        self.joinResult = joinResult
-        self.statusResult = statusResult
-        self.inviteCodeResult = inviteCodeResult
-    }
-
     let joinResult: WaitlistJoinResult
     let statusResult: Result<WaitlistResponse.Status, WaitlistResponse.StatusError>
     let inviteCodeResult: Result<WaitlistResponse.InviteCode, WaitlistResponse.InviteCodeError>

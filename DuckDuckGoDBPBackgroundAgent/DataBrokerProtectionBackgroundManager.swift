@@ -29,7 +29,7 @@ public final class DataBrokerProtectionBackgroundManager {
     private let authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData()
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
-    private let fakeBrokerFlag: FakeBrokerFlag = FakeBrokerUserDefaults()
+    private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
 
     lazy var dataManager: DataBrokerProtectionDataManager = {
         DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
@@ -56,7 +56,7 @@ public final class DataBrokerProtectionBackgroundManager {
                                                   contentScopeProperties: prefs,
                                                   dataManager: dataManager,
                                                   notificationCenter: NotificationCenter.default,
-                                                  errorHandler: DataBrokerProtectionErrorHandling(),
+                                                  pixelHandler: DataBrokerProtectionPixelsHandler(),
                                                   redeemUseCase: redeemUseCase)
     }()
 
@@ -89,15 +89,15 @@ public final class DataBrokerProtectionBackgroundManager {
     }
 }
 
-public class DataBrokerProtectionErrorHandling: EventMapping<DataBrokerProtectionOperationError> {
+public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
 
     public init() {
         super.init { event, _, _, _ in
-            //Pixel.fire(.debug(event: .dataBrokerProtectionError, error: event.error), withAdditionalParameters: event.params)
+            
         }
     }
 
-    override init(mapping: @escaping EventMapping<DataBrokerProtectionOperationError>.Mapping) {
+    override init(mapping: @escaping EventMapping<DataBrokerProtectionPixels>.Mapping) {
         fatalError("Use init()")
     }
 }

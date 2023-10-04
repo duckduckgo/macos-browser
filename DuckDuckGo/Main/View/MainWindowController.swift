@@ -169,7 +169,7 @@ final class MainWindowController: NSWindowController {
             .leading: .leading(),
             .trailing: .trailing(),
             .top: .top(),
-            .height: .const(40.0)
+            .height: .const(tabBarViewController.view.frame.height)
         ])
         NSLayoutConstraint.activate(constraints)
     }
@@ -193,6 +193,7 @@ final class MainWindowController: NSWindowController {
 extension MainWindowController: NSWindowDelegate {
 
     func windowDidBecomeKey(_ notification: Notification) {
+        NotificationCenter.default.post(name: .windowDidBecomeKey, object: nil)
         mainViewController.windowDidBecomeMain()
 
         if (notification.object as? NSWindow)?.isPopUpWindow == false {
@@ -322,5 +323,11 @@ fileprivate extension NavigationBarViewController {
                 addressBarViewController?.passiveTextField
         ]
     }
+
+}
+
+extension Notification.Name {
+
+    static let windowDidBecomeKey = Notification.Name(rawValue: "windowDidBecomeKey")
 
 }

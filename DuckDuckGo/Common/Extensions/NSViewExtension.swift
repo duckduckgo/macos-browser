@@ -22,6 +22,34 @@ import Common
 
 extension NSView {
 
+    private static var swizzleVisibleRectOnce: Void = {
+        guard #available(macOS 14.0, *) else { return }
+        let originalVisibleRect = class_getInstanceMethod(NSView.self, #selector(getter: NSView.visibleRect))!
+        let swizzledVisibleRect = class_getInstanceMethod(NSView.self, #selector(NSView.swizzledVisibleRect))!
+        method_exchangeImplementations(originalVisibleRect, swizzledVisibleRect)
+    }()
+    // Sonoma has a weird bug with broken visibleRect
+    @objc dynamic private func swizzledVisibleRect() -> NSRect {
+        var visibleRect = self.swizzledVisibleRect() // call the original
+        let bounds = self.bounds
+        guard visibleRect.origin.x < 0 || visibleRect.origin.y < 0
+                || visibleRect.size.width > bounds.size.width || visibleRect.size.height > bounds.size.height,
+              let superview else { return visibleRect }
+
+        let frame = self.frame
+        visibleRect = frame
+
+        if superview.isFlipped != isFlipped {
+            visibleRect.origin.y = superview.bounds.height - visibleRect.origin.y - visibleRect.height
+        }
+
+        visibleRect = visibleRect.intersection(superview.visibleRect)
+        visibleRect.origin.x -= frame.origin.x
+        visibleRect.origin.y -= frame.origin.y
+
+        return visibleRect
+    }
+
     func setCornerRadius(_ radius: CGFloat) {
         wantsLayer = true
         layer?.masksToBounds = true
@@ -64,7 +92,7 @@ extension NSView {
 
     func applyDropShadow() {
         wantsLayer = true
-        layer?.shadowColor = NSColor.controlShadowColor.cgColor
+        layer?.shadowColor = NSColor.black.withAlphaComponent(0.2).cgColor
         layer?.shadowOpacity = 1.0
         layer?.masksToBounds = false
     }
@@ -119,6 +147,8 @@ extension NSView {
     }
 
     func withMouseLocationInViewCoordinates<T>(_ point: NSPoint? = nil, convert: (NSPoint) -> T?) -> T? {
+        _=Self.swizzleVisibleRectOnce
+
         guard let mouseLocation = point ?? window?.mouseLocationOutsideOfEventStream else { return nil }
         let locationInView = self.convert(mouseLocation, from: nil)
 
@@ -144,32 +174,6 @@ extension NSView {
     func applyFaviconStyle() {
         wantsLayer = true
         layer?.cornerRadius = 3.0
-    }
-
-    // MARK: - Appearance updates
-
-    /**
-     * Sets current app appearance to the view and subscribes for subsequent updates.
-     *
-     * This is needed on Catalina for views displayed in popovers that have custom, opaque backgrounds.
-     * Presentation in popover overrides view appearance to `.vibrantLight` or `.vibrantDark`, which
-     * makes subviews such as `NSTextField` and `NSButton` draw their backgrounds with vibrancy effect,
-     * which in turn removes opaque background locally. Calling this method on the top-level view seems
-     * to be solving the issue.
-     *
-     * See [](https://app.asana.com/0/1177771139624306/1202121324275642/f) for an example screenshot.
-     */
-    func subscribeForAppApperanceUpdates() -> AnyCancellable? {
-        if #available(macOS 11.0, *) {
-            return nil
-        }
-
-        appearance = NSApp.effectiveAppearance
-
-        return NSApp
-            .publisher(for: \.effectiveAppearance)
-            .map { $0 as NSAppearance? }
-            .assign(to: \.appearance, onWeaklyHeld: self)
     }
 
 }

@@ -38,6 +38,7 @@ struct FaviconView: View {
         self.size = size
     }
 
+    @MainActor(unsafe)
     func refreshImage() {
         if let duckPlayerImage = DuckPlayer.shared.image(for: self) {
             image = duckPlayerImage
