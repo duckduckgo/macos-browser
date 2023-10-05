@@ -106,7 +106,7 @@ final class Pixel {
         case .initial:
             if repetition() != .initial { return }
         case .dailyFirst:
-            if repetition() == .repetitive { return } // Pixel alredy fired today
+            if repetition() == .repetitive { return } // Pixel already fired today
         case .repetitive: break
         }
 
@@ -138,6 +138,9 @@ final class Pixel {
                      allowedQueryReservedCharacters: CharacterSet? = nil,
                      includeAppVersionParameter: Bool = true,
                      onComplete: @escaping (Error?) -> Void = {_ in }) {
+        if Self.shared.isNil {
+            assertionFailure("Attempted to fire Pixel with no shared instance")
+        }
 
         Self.shared?.fire(event,
                           limitTo: limit,
