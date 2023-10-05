@@ -34,19 +34,29 @@ final class TunnelControllerIPCServer {
         self.statusReporter = statusReporter
 
         subscribeToStatusUpdates()
+        subscribeToServerChanges()
 
-        server.delegate = self
+        server.serverDelegate = self
     }
 
     public func activate() {
         server.activate()
     }
 
+    private func subscribeToServerChanges() {
+        statusReporter.serverInfoObserver.publisher
+            .subscribe(on: DispatchQueue.main)
+            .sink { [weak self] serverInfo in
+                self?.server.serverInfoChanged(serverInfo)
+            }
+            .store(in: &cancellables)
+    }
+
     private func subscribeToStatusUpdates() {
         statusReporter.statusObserver.publisher
             .subscribe(on: DispatchQueue.main)
             .sink { [weak self] status in
-                self?.server.statusChanged(newStatus: status)
+                self?.server.statusChanged(status)
             }
             .store(in: &cancellables)
     }

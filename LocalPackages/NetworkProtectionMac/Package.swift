@@ -15,6 +15,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "80.3.0"),
+        .package(path: "../Intercom"),
         .package(path: "../SwiftUIExtensions")
     ],
     targets: [
@@ -23,7 +24,8 @@ let package = Package(
         .target(
             name: "NetworkProtectionIPC",
             dependencies: [
-                .product(name: "NetworkProtection", package: "BrowserServicesKit")
+                .product(name: "NetworkProtection", package: "BrowserServicesKit"),
+                .product(name: "Intercom", package: "Intercom")
             ]),
         .testTarget(
             name: "NetworkProtectionIPCTests",

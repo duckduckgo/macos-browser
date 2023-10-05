@@ -17,136 +17,92 @@
 //
 
 import Foundation
+import Intercom
 import NetworkProtection
 import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
-@objc
-public protocol TunnelControllerIPCServerInterface {
+public protocol TunnelControllerIPCServerInterface: AnyObject {
     func start()
     func stop()
 }
 
-/// An IPC client for controlling the tunnel
-///
 @objc
-public final class TunnelControllerIPCServer: NSObject {
+protocol XPCServerInterface {
+    func start()
+    func stop()
+}
 
-    typealias IPCClientInterface = TunnelControllerIPCClientInterface
-    typealias IPCServerInterface = TunnelControllerIPCServerInterface
-
-    public enum ConnectionError: Error {
-        case noRemoteObjectProxy
-    }
-
-    /// The active connections
-    ///
-    private var connections = Set<NSXPCConnection>()
-
-    /// The new-connections listener
-    ///
-    private let listener: NSXPCListener
-
-    private let log: OSLog
+public final class TunnelControllerIPCServer {
+    let xpc: XPCServer<XPCClientInterface, XPCServerInterface>
 
     /// The delegate.
     ///
-    public weak var delegate: TunnelControllerIPCServerInterface?
+    public weak var serverDelegate: TunnelControllerIPCServerInterface?
 
     public init(machServiceName: String, log: OSLog = .disabled) {
+        let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
+        let serverInterface = NSXPCInterface(with: XPCServerInterface.self)
 
-        self.listener = NSXPCListener(machServiceName: machServiceName)
-        self.log = log
+        xpc = XPCServer(
+            machServiceName: machServiceName,
+            clientInterface: clientInterface,
+            serverInterface: serverInterface)
 
-        super.init()
-
-        listener.delegate = self
-    }
-
-    deinit {
-        listener.invalidate()
+        xpc.delegate = self
     }
 
     public func activate() {
-        listener.activate()
+        xpc.activate()
     }
 }
 
-// MARK: - NSXPCListenerDelegate
+// MARK: - Outgoing communication to the clients
 
-/// This extension implements listening for new connections through our NSXPCListener
-///
-extension TunnelControllerIPCServer: NSXPCListenerDelegate {
-    public func listener(_ listener: NSXPCListener, shouldAcceptNewConnection newConnection: NSXPCConnection) -> Bool {
+extension TunnelControllerIPCServer: TunnelControllerIPCClientInterface {
 
-        newConnection.exportedInterface = NSXPCInterface(with: IPCServerInterface.self)
-        newConnection.exportedObject = delegate
-        newConnection.remoteObjectInterface = NSXPCInterface(with: IPCClientInterface.self)
+    public func serverInfoChanged(_ serverInfo: NetworkProtectionStatusServerInfo) {
+        let payload: Data
 
-        let closeConnection = { [weak self, weak newConnection] in
-           guard let self,
-                 let newConnection else {
-               return
-           }
-
-           self.connections.remove(newConnection)
+        do {
+            payload = try JSONEncoder().encode(serverInfo)
+        } catch {
+            //os_log("statusChanged failed to encode JSON payload", log: log, type: .error)
+            return
         }
 
-        newConnection.interruptionHandler = closeConnection
-        newConnection.invalidationHandler = closeConnection
-        connections.insert(newConnection)
-        newConnection.activate()
-
-        return true
-    }
-}
-
-// MARK: - IPC Communication to the client
-
-/// This extension implements the interface for sending IPC messages to all connected clients.
-///
-extension TunnelControllerIPCServer {
-
-    /// Returns a proxy for the client object.
-    ///
-    private func proxy(for connection: NSXPCConnection) throws -> TunnelControllerIPCClientInterface {
-        guard let proxy = connection.remoteObjectProxy as? TunnelControllerIPCClientInterface else {
-            throw ConnectionError.noRemoteObjectProxy
-        }
-
-        return proxy
-    }
-
-    private func forEachProxy(do callback: @escaping (TunnelControllerIPCClientInterface) -> Void) {
-        for connection in connections {
-            let proxy: TunnelControllerIPCClientInterface
-
-            do {
-                proxy = try self.proxy(for: connection)
-            } catch {
-                os_log("statusChanged failed to encode JSON payload", log: log, type: .error)
-                continue
-            }
-
-            callback(proxy)
+        xpc.forEachClient { client in
+            client.serverInfoChanged(payload: payload)
         }
     }
 
     /// Sends a statusChanged IPC message to all connections, through the proxy objects.
     ///
-    public func statusChanged(newStatus: ConnectionStatus) {
+    public func statusChanged(_ status: ConnectionStatus) {
         let payload: Data
 
         do {
-            payload = try JSONEncoder().encode(newStatus)
+            payload = try JSONEncoder().encode(status)
         } catch {
-            os_log("statusChanged failed to encode JSON payload", log: log, type: .error)
+            //os_log("statusChanged failed to encode JSON payload", log: log, type: .error)
             return
         }
 
-        forEachProxy { proxy in
-            proxy.statusChanged(payload: payload)
+        xpc.forEachClient { client in
+            client.statusChanged(payload: payload)
         }
+    }
+}
+
+// MARK: - Incoming communication from a client
+
+extension TunnelControllerIPCServer: XPCServerInterface {
+    func start() {
+        serverDelegate?.start()
+    }
+
+    func stop() {
+        serverDelegate?.stop()
     }
 }

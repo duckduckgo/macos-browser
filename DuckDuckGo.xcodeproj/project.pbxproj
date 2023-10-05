@@ -3454,6 +3454,7 @@
 		7B2DDD082A93C2440039D884 /* AppLauncher+DefaultInitializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppLauncher+DefaultInitializer.swift"; sourceTree = "<group>"; };
 		7B2E52242A5FEC09000C6D39 /* NetworkProtectionAgentNotificationsPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionAgentNotificationsPresenter.swift; sourceTree = "<group>"; };
 		7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionSimulateFailureMenu.swift; sourceTree = "<group>"; };
+		7B4574B22ACDBA7B00901137 /* Intercom */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Intercom; sourceTree = "<group>"; };
 		7B4CE8DA26F02108009134B1 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B4CE8DE26F02108009134B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B4CE8E626F02134009134B1 /* TabBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarTests.swift; sourceTree = "<group>"; };
@@ -4575,6 +4576,7 @@
 			children = (
 				3192A2702A4C4E330084EA89 /* DataBrokerProtection */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
+				7B4574B22ACDBA7B00901137 /* Intercom */,
 				9DB6E7222AA0DA7A00A17F3C /* LoginItems */,
 				7BA8FBD22ACC0E560065728E /* NetworkProtectionMac */,
 				4BE15DB12A0B0DD500898243 /* PixelKit */,

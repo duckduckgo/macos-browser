@@ -296,14 +296,11 @@ final class NavigationBarPopovers {
 
             let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
 
-            let statusObserver = ipcClient.connectionStatusObserver
-            let statusInfoObserver = ConnectionServerInfoObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                                platformDidWakeNotification: NSWorkspace.didWakeNotification)
             let connectionErrorObserver = ConnectionErrorObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
                                                                                 platformDidWakeNotification: NSWorkspace.didWakeNotification)
             let statusReporter = DefaultNetworkProtectionStatusReporter(
-                statusObserver: statusObserver,
-                serverInfoObserver: statusInfoObserver,
+                statusObserver: ipcClient.connectionStatusObserver,
+                serverInfoObserver: ipcClient.serverInfoObserver,
                 connectionErrorObserver: connectionErrorObserver,
                 connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
                 controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()

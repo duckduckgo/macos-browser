@@ -35,22 +35,13 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
     func start() async {
         enableLoginItems()
 
-        ipcClient.start(completion: { result in
-           print("Done!")
-        })
+        ipcClient.start()
     }
 
     func stop() async {
         enableLoginItems()
 
-        do {
-            try await ipcClient.stop()
-        } catch {
-            print(error)
-            return
-        }
-
-        print("done")
+        ipcClient.stop()
     }
 
     // MARK: - Login Items Manager

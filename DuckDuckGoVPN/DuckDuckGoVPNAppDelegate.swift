@@ -73,12 +73,17 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     }()
 
     private lazy var statusReporter: NetworkProtectionStatusReporter = {
-        let statusObserver = ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                    platformDidWakeNotification: NSWorkspace.didWakeNotification)
+        let statusObserver = ConnectionStatusObserverThroughSession(
+            platformNotificationCenter: NSWorkspace.shared.notificationCenter,
+            platformDidWakeNotification: NSWorkspace.didWakeNotification)
+
+        let serverInfoObserver = ConnectionServerInfoObserverThroughSession(
+            platformNotificationCenter: NSWorkspace.shared.notificationCenter,
+            platformDidWakeNotification: NSWorkspace.didWakeNotification)
 
         return DefaultNetworkProtectionStatusReporter(
             statusObserver: statusObserver,
-            serverInfoObserver: ConnectionServerInfoObserverThroughDistributedNotifications(),
+            serverInfoObserver: serverInfoObserver,
             connectionErrorObserver: ConnectionErrorObserverThroughDistributedNotifications(),
             connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
             controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()

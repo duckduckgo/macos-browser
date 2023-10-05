@@ -1,5 +1,5 @@
 //
-//  ConnectionStatusObserverThroughIPC.swift
+//  ConnectionServerInfoObserverThroughIPC.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,25 +16,24 @@
 //  limitations under the License.
 //
 
-import Combine
 import Foundation
+import Combine
 import NetworkProtection
 
-public final class ConnectionStatusObserverThroughIPC: ConnectionStatusObserver {
-
-    private let subject = CurrentValueSubject<ConnectionStatus, Never>(.disconnected)
+public final class ConnectionServerInfoObserverThroughIPC: ConnectionServerInfoObserver {
+    private let subject = CurrentValueSubject<NetworkProtectionStatusServerInfo, Never>(.unknown)
 
     // MARK: - ConnectionStatusObserver
 
     public lazy var publisher = subject.eraseToAnyPublisher()
 
-    public var recentValue: ConnectionStatus {
+    public var recentValue: NetworkProtectionStatusServerInfo {
         subject.value
     }
 
     // MARK: - Publishing Updates
 
-    func publish(_ status: ConnectionStatus) {
+    func publish(_ status: NetworkProtectionStatusServerInfo) {
         subject.send(status)
     }
 }
