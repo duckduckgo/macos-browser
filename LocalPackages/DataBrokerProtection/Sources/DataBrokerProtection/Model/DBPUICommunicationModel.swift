@@ -170,13 +170,13 @@ struct DBPUIScanProgress: DBPUISendableMessage {
 /// Data to represent the intial scan state
 /// It will show the current scans + total, and the results found
 struct DBPUIInitialScanState: DBPUISendableMessage {
-    let inProgressScans: [DBPUIDataBrokerProfileMatch]
+    let resultsFound: [DBPUIDataBrokerProfileMatch]
     let scanProgress: DBPUIScanProgress
 }
 
 extension DBPUIInitialScanState {
     static var empty: DBPUIInitialScanState {
-        .init(inProgressScans: [DBPUIDataBrokerProfileMatch](),
+        .init(resultsFound: [DBPUIDataBrokerProfileMatch](),
               scanProgress: DBPUIScanProgress(currentScans: 0, totalScans: 0))
     }
 }

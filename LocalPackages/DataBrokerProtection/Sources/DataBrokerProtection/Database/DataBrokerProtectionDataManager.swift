@@ -294,6 +294,6 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
             return nil
         }
 
-        return .init(inProgressScans: matches, scanProgress: scanProgress)
+        return .init(resultsFound: matches, scanProgress: scanProgress)
     }
 }
