@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="9LP-fh-BRf">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22154" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="9LP-fh-BRf">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22154"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -10,22 +9,22 @@
         <!--Find In Page View Controller-->
         <scene sceneID="M7q-cp-Vdi">
             <objects>
-                <viewController id="9LP-fh-BRf" customClass="FindInPageViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="9LP-fh-BRf" customClass="FindInPageViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="lqG-TU-Rhn">
                         <rect key="frame" x="0.0" y="0.0" width="400" height="40"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="Iy0-Pd-g9N" userLabel="Close Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="Iy0-Pd-g9N" userLabel="Close Button" customClass="MouseOverButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                 <rect key="frame" x="4" y="8" width="32" height="24"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="32" id="YEe-St-HMj"/>
-                                    <constraint firstAttribute="height" constant="24" id="k0z-Fd-kbt"/>
-                                </constraints>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Close-Large" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="Gs5-tF-RjC">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <color key="contentTintColor" name="ButtonColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="32" id="YEe-St-HMj"/>
+                                    <constraint firstAttribute="height" constant="24" id="k0z-Fd-kbt"/>
+                                </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                         <color key="value" name="ButtonMouseOverColor"/>
@@ -41,17 +40,17 @@
                                     <action selector="findInPageDone:" target="9LP-fh-BRf" id="oa9-ca-SvK"/>
                                 </connections>
                             </button>
-                            <button tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="hWE-T9-Lya" userLabel="Previous Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <button tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="hWE-T9-Lya" userLabel="Previous Button" customClass="MouseOverButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                 <rect key="frame" x="328" y="8" width="32" height="24"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="32" id="6Ze-Oq-voa"/>
-                                    <constraint firstAttribute="height" constant="24" id="VBe-gx-zVv"/>
-                                </constraints>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Find-Previous" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="AOy-SC-evd">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <color key="contentTintColor" name="ButtonColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="32" id="6Ze-Oq-voa"/>
+                                    <constraint firstAttribute="height" constant="24" id="VBe-gx-zVv"/>
+                                </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                         <color key="value" name="ButtonMouseOverColor"/>
@@ -67,17 +66,17 @@
                                     <action selector="findInPagePrevious:" target="IxF-RD-3w4" id="EnM-6C-z7Q"/>
                                 </connections>
                             </button>
-                            <button tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="jPH-qk-BNq" userLabel="Next Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <button tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="jPH-qk-BNq" userLabel="Next Button" customClass="MouseOverButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                 <rect key="frame" x="364" y="8" width="32" height="24"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="24" id="U1y-O1-eRL"/>
-                                    <constraint firstAttribute="width" constant="32" id="nmQ-ju-a8J"/>
-                                </constraints>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Find-Next" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="Adc-BN-gUM">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <color key="contentTintColor" name="ButtonColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="24" id="U1y-O1-eRL"/>
+                                    <constraint firstAttribute="width" constant="32" id="nmQ-ju-a8J"/>
+                                </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                         <color key="value" name="ButtonMouseOverColor"/>
@@ -93,30 +92,22 @@
                                     <action selector="findInPageNext:" target="IxF-RD-3w4" id="Sct-DV-I3a"/>
                                 </connections>
                             </button>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="eF3-lr-LQv" customClass="FocusRingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="eF3-lr-LQv" customClass="FocusRingView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                 <rect key="frame" x="40" y="3" width="284" height="34"/>
                                 <subviews>
-                                    <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oQw-Lh-sP0">
-                                        <rect key="frame" x="34" y="9" width="194" height="16"/>
-                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" placeholderString="Find in page" drawsBackground="YES" id="QFu-vZ-FS1">
-                                            <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="ClearColor"/>
-                                        </textFieldCell>
-                                    </textField>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="jgj-T1-zyO" userLabel="Search Image">
                                         <rect key="frame" x="12" y="10" width="14" height="14"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="14" id="KXB-7a-62O"/>
-                                            <constraint firstAttribute="width" constant="14" id="LpJ-Ae-T4i"/>
-                                        </constraints>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Find-Search" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="vwK-jg-8Gw">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
                                         <color key="contentTintColor" name="ButtonColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="14" id="KXB-7a-62O"/>
+                                            <constraint firstAttribute="width" constant="14" id="LpJ-Ae-T4i"/>
+                                        </constraints>
                                     </button>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gfp-ph-eKn" userLabel="Status Label">
+                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gfp-ph-eKn" userLabel="Status Label">
                                         <rect key="frame" x="234" y="9" width="40" height="16"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="0 of 0" id="Pst-71-jYN">
                                             <font key="font" metaFont="system"/>
@@ -124,12 +115,18 @@
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
+                                    <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lBS-Ba-gev">
+                                        <rect key="frame" x="34" y="7" width="194" height="18"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" placeholderString="Find in page" drawsBackground="YES" id="kE5-dw-KfY" customClass="FindInPageTextFieldCell" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="ClearColor"/>
+                                        </textFieldCell>
+                                    </textField>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="oQw-Lh-sP0" firstAttribute="leading" secondItem="jgj-T1-zyO" secondAttribute="trailing" constant="8" symbolic="YES" id="0ec-dh-Z2r"/>
                                     <constraint firstItem="jgj-T1-zyO" firstAttribute="centerY" secondItem="eF3-lr-LQv" secondAttribute="centerY" id="GkN-9R-dPw"/>
-                                    <constraint firstItem="oQw-Lh-sP0" firstAttribute="centerY" secondItem="eF3-lr-LQv" secondAttribute="centerY" id="T68-XF-xRy"/>
-                                    <constraint firstItem="gfp-ph-eKn" firstAttribute="leading" secondItem="oQw-Lh-sP0" secondAttribute="trailing" constant="8" symbolic="YES" id="Y7b-h4-qrz"/>
                                     <constraint firstAttribute="height" constant="34" id="dOz-re-sAM"/>
                                     <constraint firstItem="jgj-T1-zyO" firstAttribute="leading" secondItem="eF3-lr-LQv" secondAttribute="leading" constant="12" id="jtO-xw-N5s"/>
                                     <constraint firstItem="gfp-ph-eKn" firstAttribute="centerY" secondItem="eF3-lr-LQv" secondAttribute="centerY" id="s01-G8-bAW"/>
@@ -159,11 +156,11 @@
                     </view>
                     <connections>
                         <outlet property="closeButton" destination="Iy0-Pd-g9N" id="hK4-Dl-2pN"/>
-                        <outlet property="focusRingView" destination="eF3-lr-LQv" id="64I-mq-2Xf"/>
+                        <outlet property="focusRingView" destination="eF3-lr-LQv" id="pfj-kF-WMx"/>
                         <outlet property="nextButton" destination="jPH-qk-BNq" id="Ywa-3x-FBx"/>
                         <outlet property="previousButton" destination="hWE-T9-Lya" id="mOj-iU-mGV"/>
                         <outlet property="statusField" destination="gfp-ph-eKn" id="bPp-WQ-w62"/>
-                        <outlet property="textField" destination="oQw-Lh-sP0" id="woI-aY-Ilk"/>
+                        <outlet property="textField" destination="lBS-Ba-gev" id="V18-2b-zx5"/>
                     </connections>
                 </viewController>
                 <customObject id="IxF-RD-3w4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
