@@ -342,6 +342,7 @@ extension DataBrokerProtectionDatabase {
         let newProfileQueries = profile.profileQueries
 
         var profileQueriesToCreate = [ProfileQuery]()
+        var profileQueriesToUpdate = [ProfileQuery]()
         var profileQueriesToRemove = [ProfileQuery]()
 
         let databaseBrokerProfileQueryData = fetchAllBrokerProfileQueryData()
@@ -353,7 +354,7 @@ extension DataBrokerProtectionDatabase {
                 // If the DB contains this profileQuery, it means the user is adding the same name back again
                 // In this case we remove the deprecated flag
                 let reAddedProfileQuery = profileQuery.withDeprecationFlag(deprecated: false)
-                profileQueriesToCreate.append(reAddedProfileQuery)
+                profileQueriesToUpdate.append(reAddedProfileQuery)
             } else {
                 profileQueriesToCreate.append(profileQuery)
             }
@@ -362,7 +363,7 @@ extension DataBrokerProtectionDatabase {
         for profileQuery in databaseProfileQueries where !newProfileQueries.contains(profileQuery) {
             if let brokerProfileQueryData = databaseBrokerProfileQueryData.filter({ $0.profileQuery == profileQuery }).first, !brokerProfileQueryData.extractedProfiles.isEmpty {
                 let deprecatedProfileQuery = brokerProfileQueryData.profileQuery.withDeprecationFlag(deprecated: true)
-                profileQueriesToCreate.append(deprecatedProfileQuery)
+                profileQueriesToUpdate.append(deprecatedProfileQuery)
             } else {
                 profileQueriesToRemove.append(profileQuery)
             }
@@ -371,19 +372,35 @@ extension DataBrokerProtectionDatabase {
         let profileID = try vault.update(profile: profile)
         let brokerIDs = try vault.fetchAllBrokers().compactMap({ $0.id })
 
-        try deleteProfileQueries(profileQueriesToRemove, profileID: profileID, vault: vault)
-        // Update profileQueries
-        // Create profileQueries
+        // Delete
+        try deleteProfileQueries(profileQueriesToRemove, 
+                                 profileID: profileID,
+                                 vault: vault)
 
+        // Update profileQueries
+        try updateProfileQueries(profileQueriesToUpdate,
+                                 profileID: profileID,
+                                 vault: vault)
+
+        // Create
         try initializeDatabaseForProfile(
             profileId: Self.profileId,
             vault: vault,
             brokerIDs: brokerIDs,
-            profileQueries: newProfileQueries
+            profileQueries: profileQueriesToRemove
         )
     }
 
     private func deleteProfileQueries(_ profileQueries: [ProfileQuery],
+                                      profileID: Int64,
+                                      vault: any DataBrokerProtectionSecureVault) throws {
+
+        for profile in profileQueries {
+            try vault.delete(profileQuery: profile, profileId: profileID)
+        }
+    }
+
+    private func updateProfileQueries(_ profileQueries: [ProfileQuery],
                                       profileID: Int64,
                                       vault: any DataBrokerProtectionSecureVault) throws {
 
