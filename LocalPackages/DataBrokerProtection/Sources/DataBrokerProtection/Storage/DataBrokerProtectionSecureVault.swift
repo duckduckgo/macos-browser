@@ -98,7 +98,7 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
     func update(profile: DataBrokerProtectionProfile) throws -> Int64 {
         return try self.providers.database.updateProfile(profile: profile, mapperToDB: MapperToDB(mechanism: l2Encrypt(data:)))
     }
-    
+
     func fetchProfile(with id: Int64) throws -> DataBrokerProtectionProfile? {
         let profile = try self.providers.database.fetchProfile(with: id)
 
