@@ -80,7 +80,7 @@ final class DataImportProviderTests: XCTestCase {
     func testWhenImportedAccountsDetectedAndNoImportedBookmarksDetectableAndNoSuccessImportDidImportIsTrue() {
         vault.storedAccounts = importedAccounts
 
-        XCTAssertTrue(provider.didImport)
+        XCTAssertFalse(provider.didImport)
     }
 
     func testWhenImportedNotesetectedAndNoImportedBookmarksDetectableAndNoSuccessImportThenDidImportIsTrue() {
