@@ -21,31 +21,6 @@ import PixelKit
 import NetworkProtection
 
 extension Pixel {
-
-    enum Parameters {
-        static let duration = "duration"
-        static let test = "test"
-        static let appVersion = "appVersion"
-
-        static let keychainFieldName = "fieldName"
-        static let errorCode = "e"
-        static let errorDesc = "d"
-        static let errorCount = "c"
-
-        static let function = "function"
-        static let line = "line"
-
-        static let latency = "latency"
-        static let server = "server"
-        static let networkType = "net_type"
-    }
-
-    enum Values {
-        static let test = "1"
-    }
-}
-
-extension Pixel {
     static func fire(_ event: NetworkProtectionPixelEvent,
                      frequency: PixelFrequency,
                      withAdditionalParameters parameters: [String: String]? = nil,

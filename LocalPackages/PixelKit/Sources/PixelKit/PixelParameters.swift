@@ -18,26 +18,46 @@
 
 import Foundation
 
-extension Pixel {
+public extension Pixel {
 
     enum Parameters {
-        static let duration = "duration"
-        static let test = "test"
-        static let appVersion = "appVersion"
+        public static let duration = "duration"
+        public static let test = "test"
+        public static let appVersion = "appVersion"
 
-        static let keychainFieldName = "fieldName"
-        static let errorCode = "e"
-        static let errorDesc = "d"
-        static let errorCount = "c"
-        static let underlyingErrorCode = "ue"
-        static let underlyingErrorDesc = "ud"
-        static let underlyingErrorSQLiteCode = "sqlrc"
-        static let underlyingErrorSQLiteExtendedCode = "sqlerc"
+        public static let errorCode = "e"
+        public static let errorDesc = "d"
+        public static let errorCount = "c"
+        public static let underlyingErrorCode = "ue"
+        public static let underlyingErrorDesc = "ud"
+        public static let underlyingErrorSQLiteCode = "sqlrc"
+        public static let underlyingErrorSQLiteExtendedCode = "sqlerc"
+
+        public static let keychainFieldName = "fieldName"
+        public static let keychainErrorCode = "keychain_error_code"
+
+        public static let emailCohort = "cohort"
+        public static let emailLastUsed = "duck_address_last_used"
+
+        public static let assertionMessage = "message"
+        public static let assertionFile = "file"
+        public static let assertionLine = "line"
+
+        public static let function = "function"
+        public static let line = "line"
+
+        public static let latency = "latency"
+        public static let server = "server"
+        public static let networkType = "net_type"
+
+        // Pixel experiments
+        public static let experimentCohort = "cohort"
     }
 
     enum Values {
-        static let test = "1"
+        public static let test = "1"
     }
+
 }
 
 extension Error {
