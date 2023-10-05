@@ -19,10 +19,12 @@
 import Cocoa
 import Combine
 import Common
+import Networking
 import NetworkExtension
 import NetworkProtection
 import NetworkProtectionUI
 import ServiceManagement
+import PixelKit
 
 @objc(Application)
 final class DuckDuckGoAgentApplication: NSApplication {
@@ -109,6 +111,20 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
                 await appLauncher.launchApp(withCommand: .startVPN)
             }
         }
+
+        PixelKit.Pixel.setUp(dryRun: false, appVersion: AppVersion.shared.versionNumber, defaultHeaders: [:], log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
+
+            let url = URL.pixelUrl(forPixelNamed: pixelName)
+            let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
+            let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
+            let request = APIRequest(configuration: configuration)
+
+            request.fetch { _, error in
+                onComplete(error)
+            }
+        }
+
+        PixelKit.Pixel.fire(NetworkProtectionPixelEvent.networkProtectionTestPixel, frequency: .standard, withHeaders: [:])
     }
 }
 
