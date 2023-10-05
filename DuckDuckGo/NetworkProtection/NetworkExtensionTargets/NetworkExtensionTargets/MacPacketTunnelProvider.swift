@@ -134,7 +134,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             case .unhandledError(function: let function, line: let line, error: let error):
                 domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
             }
-            Pixel.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
+
+            PixelKit.Pixel.fire(domainEvent, frequency: .dailyAndContinuous, withHeaders: [:])
         }
     }
 
@@ -145,11 +146,27 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     private static var packetTunnelProviderEvents: EventMapping<PacketTunnelProvider.Event> = .init { event, _, _, _ in
         switch event {
         case .userBecameActive:
-            Pixel.fire(.networkProtectionActiveUser, frequency: .dailyOnly, includeAppVersionParameter: true)
+            Pixel.fire(
+                NetworkProtectionPixelEvent.networkProtectionActiveUser,
+                frequency: .dailyOnly,
+                withHeaders: [:],
+                includeAppVersionParameter: true
+            )
         case .reportLatency(ms: let ms, server: let server, networkType: let networkType):
-            Pixel.fire(.networkProtectionLatency(ms: ms, server: server, networkType: networkType), frequency: .standard)
+            Pixel.fire(
+                NetworkProtectionPixelEvent.networkProtectionLatency(
+                    ms: ms,
+                    server: server,
+                    networkType: networkType
+                ), frequency: .standard, withHeaders: [:]
+            )
         case .rekeyCompleted:
-            Pixel.fire(.networkProtectionRekeyCompleted, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
+            Pixel.fire(
+                NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
+                frequency: .dailyAndContinuous,
+                withHeaders: [:],
+                includeAppVersionParameter: true
+            )
         }
     }
 

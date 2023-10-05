@@ -68,8 +68,6 @@ public final class Pixel {
         _ callBackOnMainThread: Bool,
         _ onComplete: @escaping (Error?) -> Void) -> Void
 
-    public typealias Event = PixelEvent
-
     static let duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 
     private static let storage: UserDefaults = UserDefaults.standard
@@ -162,7 +160,7 @@ public final class Pixel {
         }
     }
 
-    public static func fire(_ event: Pixel.Event,
+    public static func fire(_ event: PixelEvent,
                             frequency: PixelFrequency,
                             withHeaders headers: [String: String],
                             withAdditionalParameters parameters: [String: String]? = nil,

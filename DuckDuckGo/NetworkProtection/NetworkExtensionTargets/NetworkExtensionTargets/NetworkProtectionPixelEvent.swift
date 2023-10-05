@@ -20,35 +20,7 @@ import Foundation
 import PixelKit
 import NetworkProtection
 
-extension Pixel {
-    static func fire(_ event: NetworkProtectionPixelEvent,
-                     frequency: PixelFrequency,
-                     withAdditionalParameters parameters: [String: String]? = nil,
-                     allowedQueryReservedCharacters: CharacterSet? = nil,
-                     includeAppVersionParameter: Bool = true,
-                     onComplete: @escaping (Error?) -> Void = {_ in }) {
-        let newParams: [String: String]?
-        switch (event.parameters, parameters) {
-        case (.some(let parameters), .none):
-            newParams = parameters
-        case (.none, .some(let parameters)):
-            newParams = parameters
-        case (.some(let params1), .some(let params2)):
-            newParams = params1.merging(params2) { $1 }
-        case (.none, .none):
-            newParams = nil
-        }
-
-        Pixel.shared?.fire(pixelNamed: event.name,
-                           frequency: frequency,
-                           withAdditionalParameters: newParams,
-                           allowedQueryReservedCharacters: allowedQueryReservedCharacters,
-                           includeAppVersionParameter: includeAppVersionParameter,
-                           onComplete: onComplete)
-    }
-}
-
-enum NetworkProtectionPixelEvent {
+enum NetworkProtectionPixelEvent: PixelEvent {
     case networkProtectionActiveUser
 
     case networkProtectionTunnelConfigurationNoServerRegistrationInfo
