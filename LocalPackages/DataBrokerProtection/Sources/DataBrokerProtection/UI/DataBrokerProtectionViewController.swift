@@ -69,6 +69,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
                 <input type="button" value="Get Profile" onclick="getProfile()">
                 <input type="button" value="Start Scan" onclick="startScan()">
                 <input type="button" value="Initial Scan Data" onclick="initialScanStatus()">
+                <input type="button" value="Maintanence Scan Data" onclick="maintenanceScanStatus()">
             </form>
 >>>>>>> deefb7ee (Add InitialScanStatus communication)
 
@@ -172,6 +173,17 @@ final public class DataBrokerProtectionViewController: NSViewController {
                         "context": "dbpui",
                         "featureName": "dbpuiCommunication",
                         "method": "initialScanStatus",
+                        "id": "abc123",
+                    }).then(data => {
+                        document.getElementById('output').textContent = JSON.stringify(data, null, 4)
+                    })
+                }
+
+                function maintenanceScanStatus() {
+                    window.webkit.messageHandlers.dbpui.postMessage({
+                        "context": "dbpui",
+                        "featureName": "dbpuiCommunication",
+                        "method": "maintenanceScanStatus",
                         "id": "abc123",
                     }).then(data => {
                         document.getElementById('output').textContent = JSON.stringify(data, null, 4)

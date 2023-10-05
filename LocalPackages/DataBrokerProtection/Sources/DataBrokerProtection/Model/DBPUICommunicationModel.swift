@@ -161,6 +161,17 @@ struct DBPUIScanAndOptOutState: DBPUISendableMessage {
     let completedOptOuts: [DBPUIDataBrokerProfileMatch]
 }
 
+/// Message representing the state of any scans and opt outs without state and grouping removed profiles by broker
+struct DBPUIScanAndOptOutMaintenanceState: DBPUISendableMessage {
+    let inProgressOptOuts: [DBPUIDataBrokerProfileMatch]
+    let completedOptOuts: [DBPUIOptOutMatch]
+}
+
+struct DBPUIOptOutMatch: DBPUISendableMessage {
+    let dataBroker: DBPUIDataBroker
+    let matches: Int
+}
+
 /// Data representing the initial scan progress
 struct DBPUIScanProgress: DBPUISendableMessage {
     let currentScans: Int

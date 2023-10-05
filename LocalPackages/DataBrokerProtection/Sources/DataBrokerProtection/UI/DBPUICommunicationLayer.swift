@@ -35,6 +35,7 @@ protocol DBPUICommunicationDelegate: AnyObject {
     func removeAddressAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool
     func startScanAndOptOut() -> Bool
     func getInitialScanState() async -> DBPUIInitialScanState?
+    func getMaintananceScanState() async -> DBPUIScanAndOptOutMaintenanceState?
 }
 
 enum DBPUIReceivedMethodName: String {
@@ -51,6 +52,7 @@ enum DBPUIReceivedMethodName: String {
     case removeAddressAtIndexFromCurrentUserProfile
     case startScanAndOptOut
     case initialScanStatus
+    case maintenanceScanStatus
 }
 
 enum DBPUISendableMethodName: String {
@@ -90,6 +92,7 @@ struct DBPUICommunicationLayer: Subfeature {
         case .removeAddressAtIndexFromCurrentUserProfile: return removeAddressAtIndexFromCurrentUserProfile
         case .startScanAndOptOut: return startScanAndOptOut
         case .initialScanStatus: return initialScanStatus
+        case .maintenanceScanStatus: return maintenanceScanStatus
         }
 
     }
@@ -249,6 +252,14 @@ struct DBPUICommunicationLayer: Subfeature {
         }
 
         return initialScanState
+    }
+
+    func maintenanceScanStatus(params: Any, origin: WKScriptMessage) async throws -> Encodable? {
+        guard let maintenanceScanStatus = await delegate?.getMaintananceScanState() else {
+            return DBPUIStandardResponse(version: Constants.version, success: false, id: "NOT_FOUND", message: "No maintenance data found")
+        }
+
+        return maintenanceScanStatus
     }
 
     func sendMessageToUI(method: DBPUISendableMethodName, params: DBPUISendableMessage, into webView: WKWebView) {

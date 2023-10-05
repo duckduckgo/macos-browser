@@ -296,4 +296,36 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
 
         return .init(resultsFound: matches, scanProgress: scanProgress)
     }
+
+    func getMaintananceScanState() async -> DBPUIScanAndOptOutMaintenanceState? {
+        await scanDelegate?.updateCacheWithCurrentScans()
+        var inProgressOptOuts = [DBPUIDataBrokerProfileMatch]()
+        var removedProfiles = [DBPUIDataBrokerProfileMatch]()
+
+        brokerProfileQueryData.forEach {
+            for extractedProfile in $0.extractedProfiles {
+                let profileMatch = DBPUIDataBrokerProfileMatch(
+                    dataBroker: DBPUIDataBroker(name: $0.dataBroker.name),
+                    name: extractedProfile.fullName ?? "No name",
+                    addresses: extractedProfile.addresses?.map {
+                        DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state, zipCode: nil)
+                    } ?? [],
+                    alternativeNames: extractedProfile.alternativeNames ?? [String](),
+                    relatives: extractedProfile.relatives ?? [String]()
+                )
+                if extractedProfile.removedDate == nil {
+                    inProgressOptOuts.append(profileMatch)
+                } else {
+                    removedProfiles.append(profileMatch)
+                }
+            }
+        }
+
+        let completedOptOutsDictionary = Dictionary.init(grouping: removedProfiles, by: { $0.dataBroker.name })
+        let completedOptOuts = completedOptOutsDictionary.map { (key: String, value: [DBPUIDataBrokerProfileMatch]) in
+            DBPUIOptOutMatch(dataBroker: DBPUIDataBroker(name: key), matches: value.count)
+        }
+
+        return DBPUIScanAndOptOutMaintenanceState(inProgressOptOuts: inProgressOptOuts, completedOptOuts: completedOptOuts)
+    }
 }
