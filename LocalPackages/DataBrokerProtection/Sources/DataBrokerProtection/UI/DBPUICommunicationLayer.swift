@@ -23,7 +23,7 @@ import UserScript
 import Common
 
 protocol DBPUICommunicationDelegate: AnyObject {
-    func setState()
+    func setState() async
     func getUserProfile() -> DBPUIUserProfile?
     func deleteProfileData()
     func addNameToCurrentUserProfile(_ name: DBPUIUserProfileName) -> Bool
@@ -122,7 +122,7 @@ struct DBPUICommunicationLayer: Subfeature {
 
         os_log("Web UI requested new state: \(result.state.rawValue)", log: .dataBrokerProtection)
 
-        delegate?.setState()
+        await delegate?.setState()
 
         return nil
     }
