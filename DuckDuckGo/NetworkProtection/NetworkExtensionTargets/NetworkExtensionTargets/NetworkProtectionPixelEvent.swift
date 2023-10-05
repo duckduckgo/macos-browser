@@ -161,6 +161,7 @@ enum NetworkProtectionPixelEvent: PixelEvent {
 
         case .networkProtectionLatency:
             return "m_mac_netp_latency"
+
         case .networkProtectionUnhandledError:
             return "m_mac_netp_unhandled_error"
         }
@@ -180,12 +181,12 @@ enum NetworkProtectionPixelEvent: PixelEvent {
         case .networkProtectionKeychainWriteError(let field, let status):
             return [
                 PixelKit.Pixel.Parameters.keychainFieldName: field,
-                Pixel.Parameters.errorCode: String(status)
+                PixelKit.Pixel.Parameters.errorCode: String(status)
             ]
 
         case .networkProtectionKeychainDeleteError(let status):
             return [
-                Pixel.Parameters.errorCode: String(status)
+                PixelKit.Pixel.Parameters.errorCode: String(status)
             ]
 
         case .networkProtectionServerListStoreFailedToWriteServerList(let error):

@@ -1860,6 +1860,16 @@
 		4B5F14F42A14824F0060320F /* startVPN.app in Embed NetP Controller Apps */ = {isa = PBXBuildFile; fileRef = 4B5F14CB2A14702C0060320F /* startVPN.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4B5F14F52A1482530060320F /* stopVPN.app in Embed NetP Controller Apps */ = {isa = PBXBuildFile; fileRef = 4B5F14E12A1476BD0060320F /* stopVPN.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4B5F32B42ACF4C5100CFEABA /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B5F32B32ACF4C5100CFEABA /* PixelKit */; };
+		4B5F32B52ACF75B800CFEABA /* NetworkProtectionPixelEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60832A0B29FA00BCD287 /* NetworkProtectionPixelEvent.swift */; };
+		4B5F32B72ACF75BB00CFEABA /* NetworkProtectionPixelEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60832A0B29FA00BCD287 /* NetworkProtectionPixelEvent.swift */; };
+		4B5F32B82ACF75C100CFEABA /* NetworkProtectionPixelEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60832A0B29FA00BCD287 /* NetworkProtectionPixelEvent.swift */; };
+		4B5F32B92ACF75C200CFEABA /* NetworkProtectionPixelEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60832A0B29FA00BCD287 /* NetworkProtectionPixelEvent.swift */; };
+		4B5F32BA2ACF761D00CFEABA /* EventMapping+NetworkProtectionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60722A0B29FA00BCD287 /* EventMapping+NetworkProtectionError.swift */; };
+		4B5F32BB2ACF761D00CFEABA /* EventMapping+NetworkProtectionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60722A0B29FA00BCD287 /* EventMapping+NetworkProtectionError.swift */; };
+		4B5F32BC2ACF762A00CFEABA /* NetworkProtectionPixelEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60832A0B29FA00BCD287 /* NetworkProtectionPixelEvent.swift */; };
+		4B5F32BD2ACF762B00CFEABA /* NetworkProtectionPixelEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60832A0B29FA00BCD287 /* NetworkProtectionPixelEvent.swift */; };
+		4B5F32BF2ACF763F00CFEABA /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B5F32BE2ACF763F00CFEABA /* PixelKit */; };
+		4B5F32C12ACF764300CFEABA /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B5F32C02ACF764300CFEABA /* PixelKit */; };
 		4B5FF67826B602B100D42879 /* FirefoxDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5FF67726B602B100D42879 /* FirefoxDataImporter.swift */; };
 		4B65143E263924B5005B46EB /* EmailUrlExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B65143D263924B5005B46EB /* EmailUrlExtensions.swift */; };
 		4B677432255DBEB800025BD8 /* httpsMobileV2BloomSpec.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B677427255DBEB800025BD8 /* httpsMobileV2BloomSpec.json */; };
@@ -4965,6 +4975,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B5F32BF2ACF763F00CFEABA /* PixelKit in Frameworks */,
 				EE7295ED2A545C0A008C0991 /* NetworkProtection in Frameworks */,
 				4B2D064F2A11D0D000DE1F49 /* NetworkProtectionUI in Frameworks */,
 			);
@@ -4974,6 +4985,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B5F32C12ACF764300CFEABA /* PixelKit in Frameworks */,
 				EE7295EF2A545C12008C0991 /* NetworkProtection in Frameworks */,
 				4B2D067F2A1334D700DE1F49 /* NetworkProtectionUI in Frameworks */,
 			);
@@ -8661,6 +8673,7 @@
 			packageProductDependencies = (
 				4B2D064E2A11D0D000DE1F49 /* NetworkProtectionUI */,
 				EE7295EC2A545C0A008C0991 /* NetworkProtection */,
+				4B5F32BE2ACF763F00CFEABA /* PixelKit */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 4B2D06392A11CFBB00DE1F49 /* DuckDuckGo Agent.app */;
@@ -8683,6 +8696,7 @@
 			packageProductDependencies = (
 				4B2D067E2A1334D700DE1F49 /* NetworkProtectionUI */,
 				EE7295EE2A545C12008C0991 /* NetworkProtection */,
+				4B5F32C02ACF764300CFEABA /* PixelKit */,
 			);
 			productName = DuckDuckGoAgentAppStore;
 			productReference = 4B2D06692A13318400DE1F49 /* DuckDuckGo Agent App Store.app */;
@@ -10100,6 +10114,7 @@
 				3192A0642A4C4CFF0084EA89 /* PasswordManagerCoordinator.swift in Sources */,
 				3192A0652A4C4CFF0084EA89 /* PasswordManagementIdentityModel.swift in Sources */,
 				3192A0662A4C4CFF0084EA89 /* UserDefaultsWrapper.swift in Sources */,
+				4B5F32B82ACF75C100CFEABA /* NetworkProtectionPixelEvent.swift in Sources */,
 				3192A0672A4C4CFF0084EA89 /* PasswordManagementPopover.swift in Sources */,
 				4BCF15DE2ABB970D0083F6DF /* NetworkProtectionRemoteMessage.swift in Sources */,
 				3192A0682A4C4CFF0084EA89 /* BWCommunicator.swift in Sources */,
@@ -10689,6 +10704,7 @@
 				3706FEC0293F6EFF00E42796 /* BWRequest.swift in Sources */,
 				3706FAF7293F65D500E42796 /* FireproofDomainsViewController.swift in Sources */,
 				3706FAF8293F65D500E42796 /* URLEventHandler.swift in Sources */,
+				4B5F32B72ACF75BB00CFEABA /* NetworkProtectionPixelEvent.swift in Sources */,
 				37197EA72942443D00394917 /* AuthenticationAlert.swift in Sources */,
 				3706FEC3293F6F0600E42796 /* BWCommunicator.swift in Sources */,
 				3706FAFA293F65D500E42796 /* CleanThisHistoryMenuItem.swift in Sources */,
@@ -11537,8 +11553,10 @@
 				7B2DDCFA2A93B25F0039D884 /* KeychainType+ClientDefault.swift in Sources */,
 				7B2DDD072A93C17D0039D884 /* UserText.swift in Sources */,
 				B6F92BAC2A6937B3002ABA6B /* OptionalExtension.swift in Sources */,
+				4B5F32BA2ACF761D00CFEABA /* EventMapping+NetworkProtectionError.swift in Sources */,
 				7BFE95562A9DF29B0081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */,
 				7B2DDD092A93C2440039D884 /* AppLauncher+DefaultInitializer.swift in Sources */,
+				4B5F32BC2ACF762A00CFEABA /* NetworkProtectionPixelEvent.swift in Sources */,
 				B6F92BAA2A691A44002ABA6B /* NetworkProtectionUserDefaultsConstants.swift in Sources */,
 				EEC589DB2A4F1CE700BCD60C /* AppLauncher.swift in Sources */,
 				B65DA5EF2A77CC3A00CBEE8D /* Bundle+NetworkProtectionExtensions.swift in Sources */,
@@ -11555,9 +11573,11 @@
 				B6F92BA32A691583002ABA6B /* UserDefaultsWrapper.swift in Sources */,
 				4B2D067C2A13340900DE1F49 /* Logging.swift in Sources */,
 				4B2D067A2A1333EF00DE1F49 /* DuckDuckGoAgentAppDelegate.swift in Sources */,
+				4B5F32BB2ACF761D00CFEABA /* EventMapping+NetworkProtectionError.swift in Sources */,
 				B6F92BAD2A6937B5002ABA6B /* OptionalExtension.swift in Sources */,
 				B6F92BAB2A691A44002ABA6B /* NetworkProtectionUserDefaultsConstants.swift in Sources */,
 				EEC589DC2A4F1CE800BCD60C /* AppLauncher.swift in Sources */,
+				4B5F32BD2ACF762B00CFEABA /* NetworkProtectionPixelEvent.swift in Sources */,
 				7BFE95592A9DF2AF0081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */,
 				7B2DDD032A93BBEC0039D884 /* NetworkProtectionBouncer.swift in Sources */,
 				B65DA5F02A77CC3C00CBEE8D /* Bundle+NetworkProtectionExtensions.swift in Sources */,
@@ -12256,6 +12276,7 @@
 				4B957BB72AC7AE700062CA31 /* PinnedTabsView.swift in Sources */,
 				4B957BB82AC7AE700062CA31 /* FireproofInfoViewController.swift in Sources */,
 				4B957BB92AC7AE700062CA31 /* SyncErrorHandler.swift in Sources */,
+				4B5F32B92ACF75C200CFEABA /* NetworkProtectionPixelEvent.swift in Sources */,
 				4B957BBA2AC7AE700062CA31 /* URLExtension.swift in Sources */,
 				4B957BBB2AC7AE700062CA31 /* Tab+UIDelegate.swift in Sources */,
 				1E2AE4C92ACB217800684E0A /* NetworkProtectionRemoteMessagingStorage.swift in Sources */,
@@ -12653,6 +12674,7 @@
 				B6830963274CDEC7004B46BB /* FireproofDomainsStore.swift in Sources */,
 				7B430EA12A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */,
 				1E7E2E942902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift in Sources */,
+				4B5F32B52ACF75B800CFEABA /* NetworkProtectionPixelEvent.swift in Sources */,
 				AA9FF95F24A1FB690039E328 /* TabCollectionViewModel.swift in Sources */,
 				AAC5E4D125D6A709007F5990 /* BookmarkManager.swift in Sources */,
 				37CD54CD27F2FDD100F1F7B9 /* AboutModel.swift in Sources */,
@@ -14502,6 +14524,14 @@
 			productName = "plugin:InputFilesChecker";
 		};
 		4B5F32B32ACF4C5100CFEABA /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		4B5F32BE2ACF763F00CFEABA /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		4B5F32C02ACF764300CFEABA /* PixelKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PixelKit;
 		};

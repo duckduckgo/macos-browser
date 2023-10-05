@@ -20,12 +20,13 @@
 
 import Foundation
 import NetworkProtection
+import PixelKit
 import Common
 
 extension EventMapping where Event == NetworkProtectionError {
     static var networkProtectionAppDebugEvents: EventMapping<NetworkProtectionError> = .init { event, _, _, _ in
 
-        let domainEvent: Pixel.Event.Debug
+        let domainEvent: NetworkProtectionPixelEvent
 
         switch event {
         case .failedToEncodeRedeemRequest:
@@ -78,7 +79,8 @@ extension EventMapping where Event == NetworkProtectionError {
 
             return
         }
-        Pixel.fire(.debug(event: domainEvent))
+
+        PixelKit.Pixel.fire(domainEvent, frequency: .standard, withHeaders: [:])
     }
 }
 
