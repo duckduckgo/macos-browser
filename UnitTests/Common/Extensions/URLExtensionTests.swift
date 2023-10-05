@@ -45,8 +45,7 @@ final class URLExtensionTests: XCTestCase {
     func test_makeURL_from_addressBarString() {
         let data: [(string: String, expected: String)] = [
             ("https://duckduckgo.com/?q=search string with spaces", "https://duckduckgo.com/?q=search%20string%20with%20spaces"),
-            // Following test case will be addressed separately. See https://app.asana.com/0/1148564399326804/1205638643093186/f
-//            ("define: foo", "https://duckduckgo.com/?q=define%3A%20foo"),
+            ("define: foo", "https://duckduckgo.com/?q=define%3A%20foo"),
             ("test://hello/", "test://hello/"),
             ("localdomain", "https://duckduckgo.com/?q=localdomain"),
             ("   http://example.com\n", "http://example.com"),
