@@ -25,15 +25,12 @@ public protocol PixelEvent {
 }
 
 extension URL {
-    // MARK: Pixel
 
     static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]
 
     public static func pixelUrl(forPixelNamed pixelName: String) -> URL {
         let urlString = "\(Self.pixelBase)/t/\(pixelName)"
         let url = URL(string: urlString)!
-        // url = url.addParameter(name: \"atb\", value: statisticsStore.atbWithVariant ?? \"\")")
-        // https://app.asana.com/0/1177771139624306/1199951074455863/f
         return url
     }
 }
