@@ -350,10 +350,11 @@ extension DataBrokerProtectionDatabase {
         // Create hash for profileQuery: brokerProfileQuery to make the search easier/faster
 
         for profileQuery in newProfileQueries {
-            if databaseProfileQueries.contains(profileQuery) {
+
+            if let databaseProfileQuery = databaseProfileQueries.filter({ $0 == profileQuery }).first {
                 // If the DB contains this profileQuery, it means the user is adding the same name back again
                 // In this case we remove the deprecated flag
-                let reAddedProfileQuery = profileQuery.withDeprecationFlag(deprecated: false)
+                let reAddedProfileQuery = databaseProfileQuery.withDeprecationFlag(deprecated: false)
                 profileQueriesToUpdate.append(reAddedProfileQuery)
             } else {
                 profileQueriesToCreate.append(profileQuery)
@@ -388,7 +389,7 @@ extension DataBrokerProtectionDatabase {
             profileId: Self.profileId,
             vault: vault,
             brokerIDs: brokerIDs,
-            profileQueries: profileQueriesToRemove
+            profileQueries: profileQueriesToCreate
         )
     }
 

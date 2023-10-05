@@ -73,8 +73,11 @@ struct ProfileQuery: Encodable, Sendable {
 }
 
 extension ProfileQuery: Equatable {
+
+    // We're intentionally not comparing IDs since we want to verify only the attributes
+    // when we're searching for a potential match in the database
     static func == (lhs: ProfileQuery, rhs: ProfileQuery) -> Bool {
-        return lhs.id == rhs.id &&
+        return
             lhs.firstName.lowercased() == rhs.firstName.lowercased() &&
             lhs.lastName.lowercased() == rhs.lastName.lowercased() &&
             lhs.middleName?.lowercased() == rhs.middleName?.lowercased() &&
