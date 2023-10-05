@@ -374,23 +374,29 @@ extension DataBrokerProtectionDatabase {
         let brokerIDs = try vault.fetchAllBrokers().compactMap({ $0.id })
 
         // Delete
-        try deleteProfileQueries(profileQueriesToRemove,
-                                 profileID: profileID,
-                                 vault: vault)
+        if !profileQueriesToRemove.isEmpty {
+            try deleteProfileQueries(profileQueriesToRemove,
+                                     profileID: profileID,
+                                     vault: vault)
+        }
 
         // Update profileQueries
-        try updateProfileQueries(profileQueriesToUpdate,
-                                 profileID: profileID,
-                                 brokerIDs: brokerIDs,
-                                 vault: vault)
+        if !profileQueriesToUpdate.isEmpty {
+            try updateProfileQueries(profileQueriesToUpdate,
+                                     profileID: profileID,
+                                     brokerIDs: brokerIDs,
+                                     vault: vault)
+        }
 
         // Create
-        try initializeDatabaseForProfile(
-            profileId: Self.profileId,
-            vault: vault,
-            brokerIDs: brokerIDs,
-            profileQueries: profileQueriesToCreate
-        )
+        if !profileQueriesToCreate.isEmpty {
+            try initializeDatabaseForProfile(
+                profileId: Self.profileId,
+                vault: vault,
+                brokerIDs: brokerIDs,
+                profileQueries: profileQueriesToCreate
+            )
+        }
     }
 
     private func deleteProfileQueries(_ profileQueries: [ProfileQuery],
