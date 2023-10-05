@@ -61,7 +61,7 @@ final class DataBrokerProtectionProcessor {
 
     private func calculateMisMatches() {
         let mismatchUseCase = MismatchCalculatorUseCase(database: database, pixelHandler: pixelHandler)
-        mismatchUseCase.calculateMisMatches()
+        mismatchUseCase.calculateMismatches()
     }
 
     func runAllOptOutOperations(showWebView: Bool = false, completion: (() -> Void)? = nil) {

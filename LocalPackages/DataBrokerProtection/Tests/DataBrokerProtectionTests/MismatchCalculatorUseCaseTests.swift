@@ -45,7 +45,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
             pixelHandler: pixelHandler
         )
 
-        sut.calculateMisMatches()
+        sut.calculateMismatches()
 
         XCTAssertEqual(
             MockDataBrokerProtectionPixelsHandler.lastPixelFired,
@@ -71,7 +71,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
             pixelHandler: pixelHandler
         )
 
-        sut.calculateMisMatches()
+        sut.calculateMismatches()
 
         XCTAssertEqual(
             MockDataBrokerProtectionPixelsHandler.lastPixelFired,
@@ -97,7 +97,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
             pixelHandler: pixelHandler
         )
 
-        sut.calculateMisMatches()
+        sut.calculateMismatches()
 
         XCTAssertEqual(
             MockDataBrokerProtectionPixelsHandler.lastPixelFired,
@@ -123,7 +123,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
             pixelHandler: pixelHandler
         )
 
-        sut.calculateMisMatches()
+        sut.calculateMismatches()
 
         XCTAssertEqual(
             MockDataBrokerProtectionPixelsHandler.lastPixelFired,
@@ -145,7 +145,7 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
             pixelHandler: pixelHandler
         )
 
-        sut.calculateMisMatches()
+        sut.calculateMismatches()
 
         XCTAssertNil(MockDataBrokerProtectionPixelsHandler.lastPixelFired)
     }
