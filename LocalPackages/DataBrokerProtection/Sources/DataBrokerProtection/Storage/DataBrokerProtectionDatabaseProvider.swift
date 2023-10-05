@@ -38,6 +38,8 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
 
     func save(_ profileQuery: ProfileQueryDB) throws -> Int64
     func delete(_ profileQuery: ProfileQueryDB) throws
+    func update(_ profileQuery: ProfileQueryDB) throws -> Int64
+
     func fetchProfileQuery(with id: Int64) throws -> ProfileQueryDB?
     func fetchAllProfileQueries(for profileId: Int64) throws -> [ProfileQueryDB]
 
@@ -209,10 +211,10 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             ])
 
             $0.foreignKey([OptOutDB.Columns.brokerId.name], references: BrokerDB.databaseTableName)
-            $0.foreignKey([OptOutDB.Columns.profileQueryId.name], 
+            $0.foreignKey([OptOutDB.Columns.profileQueryId.name],
                           references: ProfileQueryDB.databaseTableName,
                           onDelete: .cascade)
-            
+
             $0.foreignKey([OptOutDB.Columns.extractedProfileId.name], references: ExtractedProfileDB.databaseTableName)
 
             $0.column(OptOutDB.Columns.profileQueryId.name, .integer).notNull()
@@ -354,6 +356,13 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     func save(_ profileQuery: ProfileQueryDB) throws -> Int64 {
         try db.write { db in
             try profileQuery.insert(db)
+            return db.lastInsertedRowID
+        }
+    }
+
+    func update(_ profileQuery: ProfileQueryDB) throws -> Int64 {
+        try db.write { db in
+            try profileQuery.upsert(db)
             return db.lastInsertedRowID
         }
     }

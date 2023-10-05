@@ -48,6 +48,7 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
 
     func save(profileQuery: ProfileQuery, profileId: Int64) throws -> Int64
     func delete(profileQuery: ProfileQuery, profileId: Int64) throws
+    func updateProfileQueryDeprecatedStatus(profileQuery: ProfileQuery, brokerIDs: [Int64], profileId: Int64) throws
     func fetchProfileQuery(with id: Int64) throws -> ProfileQuery?
     func fetchAllProfileQueries(for profileId: Int64) throws -> [ProfileQuery]
 
@@ -158,6 +159,19 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
     func delete(profileQuery: ProfileQuery, profileId: Int64) throws {
         let mapper = MapperToDB(mechanism: l2Encrypt(data:))
         return try self.providers.database.delete(mapper.mapToDB(profileQuery, relatedTo: profileId))
+    }
+
+    func updateProfileQueryDeprecatedStatus(profileQuery: ProfileQuery, brokerIDs: [Int64], profileId: Int64) throws {
+        let mapper = MapperToDB(mechanism: l2Encrypt(data:))
+        let profileQueryDB = try mapper.mapToDB(profileQuery, relatedTo: profileId)
+
+        let profileQueryID = try self.providers.database.update(profileQueryDB)
+
+        if !profileQueryDB.deprecated {
+            for brokerID in brokerIDs {
+                try updatePreferredRunDate(Date(), brokerId: brokerID, profileQueryId: profileQueryID)
+            }
+        }
     }
 
     func fetchProfileQuery(with id: Int64) throws -> ProfileQuery? {

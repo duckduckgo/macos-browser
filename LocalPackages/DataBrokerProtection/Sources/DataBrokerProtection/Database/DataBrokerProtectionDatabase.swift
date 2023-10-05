@@ -373,13 +373,14 @@ extension DataBrokerProtectionDatabase {
         let brokerIDs = try vault.fetchAllBrokers().compactMap({ $0.id })
 
         // Delete
-        try deleteProfileQueries(profileQueriesToRemove, 
+        try deleteProfileQueries(profileQueriesToRemove,
                                  profileID: profileID,
                                  vault: vault)
 
         // Update profileQueries
         try updateProfileQueries(profileQueriesToUpdate,
                                  profileID: profileID,
+                                 brokerIDs: brokerIDs,
                                  vault: vault)
 
         // Create
@@ -402,10 +403,13 @@ extension DataBrokerProtectionDatabase {
 
     private func updateProfileQueries(_ profileQueries: [ProfileQuery],
                                       profileID: Int64,
+                                      brokerIDs: [Int64],
                                       vault: any DataBrokerProtectionSecureVault) throws {
 
         for profile in profileQueries {
-            try vault.delete(profileQuery: profile, profileId: profileID)
+            try vault.updateProfileQueryDeprecatedStatus(profileQuery: profile,
+                                                         brokerIDs: brokerIDs,
+                                                         profileId: profileID)
         }
     }
 }
