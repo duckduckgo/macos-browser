@@ -197,17 +197,17 @@ enum NetworkProtectionPixelEvent {
     var parameters: [String: String]? {
         switch self {
         case .networkProtectionKeychainErrorFailedToCastKeychainValueToData(let field):
-            return [Pixel.Parameters.keychainFieldName: field]
+            return [PixelKit.Pixel.Parameters.keychainFieldName: field]
 
         case .networkProtectionKeychainReadError(let field, let status):
             return [
-                Pixel.Parameters.keychainFieldName: field,
-                Pixel.Parameters.errorCode: String(status)
+                PixelKit.Pixel.Parameters.keychainFieldName: field,
+                PixelKit.Pixel.Parameters.errorCode: String(status)
             ]
 
         case .networkProtectionKeychainWriteError(let field, let status):
             return [
-                Pixel.Parameters.keychainFieldName: field,
+                PixelKit.Pixel.Parameters.keychainFieldName: field,
                 Pixel.Parameters.errorCode: String(status)
             ]
 
@@ -233,15 +233,15 @@ enum NetworkProtectionPixelEvent {
 
         case .networkProtectionUnhandledError(let function, let line, let error):
             var parameters = error.pixelParameters
-            parameters[Pixel.Parameters.function] = function
-            parameters[Pixel.Parameters.line] = String(line)
+            parameters[PixelKit.Pixel.Parameters.function] = function
+            parameters[PixelKit.Pixel.Parameters.line] = String(line)
             return parameters
 
         case .networkProtectionLatency(ms: let latency, server: let server, networkType: let networkType):
             return [
-                Pixel.Parameters.latency: String(latency),
-                Pixel.Parameters.server: server,
-                Pixel.Parameters.networkType: networkType.description
+                PixelKit.Pixel.Parameters.latency: String(latency),
+                PixelKit.Pixel.Parameters.server: server,
+                PixelKit.Pixel.Parameters.networkType: networkType.description
             ]
 
         case .networkProtectionWireguardErrorCannotSetNetworkSettings(error: let error):
@@ -249,7 +249,7 @@ enum NetworkProtectionPixelEvent {
 
         case .networkProtectionWireguardErrorCannotStartWireguardBackend(code: let code):
             return [
-                Pixel.Parameters.errorCode: String(code)
+                PixelKit.Pixel.Parameters.errorCode: String(code)
             ]
 
         case .networkProtectionTunnelConfigurationNoServerRegistrationInfo,

@@ -19,6 +19,7 @@
 import Foundation
 import Networking
 import Common
+import PixelKit
 
 final class Pixel {
 
@@ -123,10 +124,10 @@ final class Pixel {
         }
 
         if includeAppVersionParameter {
-            newParams[Parameters.appVersion] = AppVersion.shared.versionNumber
+            newParams[PixelKit.Pixel.Parameters.appVersion] = AppVersion.shared.versionNumber
         }
 #if DEBUG
-        newParams[Parameters.test] = Values.test
+        newParams[PixelKit.Pixel.Parameters.test] = PixelKit.Pixel.Values.test
 #endif
 
         sendRequest(event, newParams, allowedQueryReservedCharacters, headers, onComplete)

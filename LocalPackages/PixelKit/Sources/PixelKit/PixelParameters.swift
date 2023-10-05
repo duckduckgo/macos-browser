@@ -60,28 +60,40 @@ public extension Pixel {
 
 }
 
-extension Error {
+public protocol ErrorWithPixelParameters {
 
-    public var pixelParameters: [String: String] {
-        var parameters = [String: String]()
+    var errorParameters: [String: String] { get }
+
+}
+
+public extension Error {
+
+    var pixelParameters: [String: String] {
+        var params = [String: String]()
+
+        if let errorWithUserInfo = self as? ErrorWithPixelParameters {
+            params = errorWithUserInfo.errorParameters
+        }
+
         let nsError = self as NSError
 
-        parameters[Pixel.Parameters.errorCode] = "\(nsError.code)"
-        parameters[Pixel.Parameters.errorDesc] = nsError.domain
-        if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
-            parameters[Pixel.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
-            parameters[Pixel.Parameters.underlyingErrorDesc] = underlyingError.domain
+        params[PixelKit.Pixel.Parameters.errorCode] = "\(nsError.code)"
+        params[PixelKit.Pixel.Parameters.errorDesc] = nsError.domain
+
+        if let underlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError {
+            params[PixelKit.Pixel.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
+            params[PixelKit.Pixel.Parameters.underlyingErrorDesc] = underlyingError.domain
         }
 
         if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {
-            parameters[Pixel.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
+            params[PixelKit.Pixel.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
         }
 
         if let sqlExtendedErrorCode = nsError.userInfo["SQLiteExtendedResultCode"] as? NSNumber {
-            parameters[Pixel.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
+            params[PixelKit.Pixel.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
         }
 
-        return parameters
+        return params
     }
 
 }

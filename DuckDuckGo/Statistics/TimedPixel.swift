@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import PixelKit
 
 struct TimedPixel {
 
@@ -32,7 +33,7 @@ struct TimedPixel {
         let duration = String(format: "%.1f", fireTime - self.time)
         var newParams = pixel.parameters ?? [:]
         newParams.merge(params, uniquingKeysWith: { $1 })
-        newParams[Pixel.Parameters.duration] = duration
+        newParams[PixelKit.Pixel.Parameters.duration] = duration
         Pixel.shared?.fire(pixel, withAdditionalParameters: newParams)
     }
 

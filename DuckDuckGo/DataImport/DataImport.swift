@@ -18,6 +18,7 @@
 
 import AppKit
 import SecureStorage
+import PixelKit
 
 enum DataImport {
 
@@ -264,7 +265,7 @@ enum DataImportAction {
     case generic
 }
 
-protocol DataImportError: Error, CustomNSError, ErrorWithParameters {
+protocol DataImportError: Error, CustomNSError, ErrorWithPixelParameters {
     associatedtype OperationType: RawRepresentable where OperationType.RawValue == Int
 
     var source: DataImport.Source { get }
