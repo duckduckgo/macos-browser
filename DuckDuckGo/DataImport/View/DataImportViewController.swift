@@ -43,6 +43,7 @@ final class DataImportViewController: NSViewController {
     private struct ImportError: DataImportError {
         enum OperationType: Int {
             case secureVaultError
+            case selectProfile
         }
 
         let source: DataImport.Source
@@ -58,7 +59,7 @@ final class DataImportViewController: NSViewController {
         static func defaultState() -> ViewState {
             if let firstInstalledBrowser = ThirdPartyBrowser.installedBrowsers.first {
                 return ViewState(selectedImportSource: firstInstalledBrowser.importSource,
-                                 interactionState: firstInstalledBrowser.importSource == .safari ? .ableToImport : .moreInfoAvailable)
+                                 interactionState: [.safari, .safariTechnologyPreview].contains(firstInstalledBrowser.importSource) ? .ableToImport : .moreInfoAvailable)
             } else {
                 return ViewState(selectedImportSource: .csv, interactionState: .ableToImport)
             }
@@ -120,14 +121,14 @@ final class DataImportViewController: NSViewController {
     @IBAction func actionButtonClicked(_ sender: Any) {
         switch viewState.interactionState {
         // Import click on first screen with Bookmarks checkmark: Can't read bookmarks: request permission
-        case .ableToImport where viewState.selectedImportSource == .safari
+        case .ableToImport where [.safari, .safariTechnologyPreview].contains(viewState.selectedImportSource)
                 && selectedImportOptions.contains(.bookmarks)
-                && !SafariDataImporter.canReadBookmarksFile():
+                && (dataImporter as? DataDirectoryPermissionAuthorization)?.canReadBookmarksFile() == false:
 
             self.viewState = ViewState(selectedImportSource: viewState.selectedImportSource, interactionState: .permissionsRequired([.bookmarks]))
 
         // Import click on first screen with Passwords bookmark or Next click on Bookmarks Import Done screen: show CSV Import
-        case .ableToImport where viewState.selectedImportSource == .safari
+        case .ableToImport where [.safari, .safariTechnologyPreview].contains(viewState.selectedImportSource)
                 && selectedImportOptions.contains(.logins)
                 && (dataImporter is CSVImporter || selectedImportOptions == [.logins])
                 && !(currentChildViewController is FileImportViewController):
@@ -182,10 +183,12 @@ final class DataImportViewController: NSViewController {
         case .csv, .lastPass, .onePassword7, .onePassword8, .bookmarksHTML:
             self.viewState = ViewState(selectedImportSource: source, interactionState: .unableToImport)
 
-        case .chrome, .firefox, .brave, .edge, .safari:
+        case .chrome, .firefox, .brave, .edge, .safari, .safariTechnologyPreview:
             let interactionState: InteractionState
             switch (source, loginsSelected) {
-            case (.safari, _), (_, false):
+            case (.safari, _),
+                 (.safariTechnologyPreview, _),
+                 (_, false):
                 interactionState = .ableToImport
             case (.firefox, _):
                 if FirefoxDataImporter.loginDatabaseRequiresPrimaryPassword(profileURL: selectedProfile?.profileURL) {
@@ -220,13 +223,23 @@ final class DataImportViewController: NSViewController {
                 self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(),
                                                             bookmarkImporter: bookmarkImporter,
                                                             faviconManager: FaviconManager.shared)
-            case .safari where !(currentChildViewController is FileImportViewController):
-                self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter, faviconManager: FaviconManager.shared)
+            case .safari, .safariTechnologyPreview:
+                guard !(currentChildViewController is FileImportViewController) else {
+                    if !(self.dataImporter is CSVImporter) {
+                        self.dataImporter = nil
+                    }
+                    break
+                }
+                guard let profile = ThirdPartyBrowser.browser(for: viewState.selectedImportSource)?.browserProfiles()?.defaultProfile else {
+                    throw ImportError(source: viewState.selectedImportSource, action: .generic, type: .selectProfile, underlyingError: nil)
+                }
+
+                self.dataImporter = SafariDataImporter(safariDataDirectoryUrl: profile.profileURL, bookmarkImporter: bookmarkImporter, faviconManager: FaviconManager.shared)
             case .bookmarksHTML:
                 if !(self.dataImporter is BookmarkHTMLImporter) {
                     self.dataImporter = nil
                 }
-            case .csv, .onePassword7, .onePassword8, .lastPass, .safari /* csv only */:
+            case .csv, .onePassword7, .onePassword8, .lastPass:
                 if !(self.dataImporter is CSVImporter) {
                     self.dataImporter = nil
                 }
@@ -297,7 +310,7 @@ final class DataImportViewController: NSViewController {
 
     private func newChildViewController(for importSource: DataImport.Source, interactionState: InteractionState) -> NSViewController? {
         switch importSource {
-        case .safari:
+        case .safari, .safariTechnologyPreview:
             if case .permissionsRequired([.logins]) = interactionState {
                 let viewController = FileImportViewController.create(importSource: .safari)
                 viewController.delegate = self
@@ -305,7 +318,7 @@ final class DataImportViewController: NSViewController {
                 return viewController
             } else if case .ableToImport = interactionState,
                       let fileImportViewController = currentChildViewController as? FileImportViewController,
-                      fileImportViewController.importSource == .safari {
+                      [.safari, .safariTechnologyPreview].contains(fileImportViewController.importSource) {
                 fileImportViewController.importSource = importSource
 
                 return nil
@@ -316,7 +329,12 @@ final class DataImportViewController: NSViewController {
             if case let .completedImport(summary) = interactionState {
                 return BrowserImportSummaryViewController.create(importSummary: summary)
             } else if case let .permissionsRequired(types) = interactionState {
-                let filePermissionViewController =  RequestFilePermissionViewController.create(importSource: importSource, permissionsRequired: types)
+                guard let safariDataImporter = dataImporter as? DataDirectoryPermissionAuthorization else {
+                    assertionFailure("Unexpected data importer kind: \(dataImporter.map(String.init(describing:)) ?? "<nil>")")
+                    return nil
+                }
+
+                let filePermissionViewController =  RequestFilePermissionViewController.create(importSource: importSource, permissionsRequired: types, permissionAuthorization: safariDataImporter)
                 filePermissionViewController.delegate = self
                 return filePermissionViewController
             } else if browserImportViewController?.browser == importSource {
@@ -536,7 +554,7 @@ extension DataImportViewController: BrowserImportViewControllerDelegate {
 extension DataImportViewController: RequestFilePermissionViewControllerDelegate {
 
     func requestFilePermissionViewControllerDidReceivePermission(_ viewController: RequestFilePermissionViewController) {
-        if viewState.selectedImportSource == .safari
+        if [.safari, .safariTechnologyPreview].contains(viewState.selectedImportSource)
             && selectedImportOptions.contains(.bookmarks) {
 
             self.completeImport()
