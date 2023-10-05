@@ -27,11 +27,6 @@ let package = Package(
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "Intercom", package: "Intercom")
             ]),
-        .testTarget(
-            name: "NetworkProtectionIPCTests",
-            dependencies: [
-                "NetworkProtectionIPC"
-            ]),
 
         // MARK: - NetworkProtectionUI
 
