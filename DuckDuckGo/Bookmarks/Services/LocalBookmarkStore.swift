@@ -828,7 +828,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
     }
 
-    func resetBookmarks() {
+    func resetBookmarks(completionHandler: @escaping (Error?) -> Void) {
         applyChangesAndSave { context in
             let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: BookmarkEntity.className())
             let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
@@ -839,9 +839,13 @@ final class LocalBookmarkStore: BookmarkStore {
 
         } onError: { error in
             assertionFailure("Failed to reset bookmarks: \(error)")
+            DispatchQueue.main.async {
+                completionHandler(error)
+            }
         } onDidSave: { [self] in
             DispatchQueue.main.async {
                 self.cacheReadOnlyTopLevelBookmarksFolders()
+                completionHandler(nil)
             }
         }
     }
