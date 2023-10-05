@@ -209,44 +209,46 @@ final class DataImportViewController: NSViewController {
     }
 
     private func refreshDataImporter() {
-        let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
-
         do {
-            switch viewState.selectedImportSource {
-            case .brave:
-                self.dataImporter = try BraveDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
-            case .chrome:
-                self.dataImporter = try ChromeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
-            case .edge:
-                self.dataImporter = try EdgeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
-            case .firefox:
-                self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(),
-                                                            bookmarkImporter: bookmarkImporter,
-                                                            faviconManager: FaviconManager.shared)
-            case .safari, .safariTechnologyPreview:
-                guard !(currentChildViewController is FileImportViewController) else {
-                    if !(self.dataImporter is CSVImporter) {
-                        self.dataImporter = nil
-                    }
-                    break
-                }
-                guard let profile = ThirdPartyBrowser.browser(for: viewState.selectedImportSource)?.browserProfiles()?.defaultProfile else {
-                    throw ImportError(source: viewState.selectedImportSource, action: .generic, type: .selectProfile, underlyingError: nil)
-                }
-
-                self.dataImporter = SafariDataImporter(safariDataDirectoryUrl: profile.profileURL, bookmarkImporter: bookmarkImporter, faviconManager: FaviconManager.shared)
-            case .bookmarksHTML:
-                if !(self.dataImporter is BookmarkHTMLImporter) {
-                    self.dataImporter = nil
-                }
-            case .csv, .onePassword7, .onePassword8, .lastPass:
-                if !(self.dataImporter is CSVImporter) {
-                    self.dataImporter = nil
-                }
-            }
+            try throwingRefreshDataImporter()
         } catch {
             os_log("dataImporter initialization failed: %{public}s", type: .error, error.localizedDescription)
             self.presentAlert(for: ImportError(source: viewState.selectedImportSource, action: .generic, type: .secureVaultError, underlyingError: error))
+        }
+    }
+
+    private func throwingRefreshDataImporter() throws {
+        let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
+
+        switch viewState.selectedImportSource {
+        case .brave:
+            self.dataImporter = try BraveDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+        case .chrome:
+            self.dataImporter = try ChromeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+        case .edge:
+            self.dataImporter = try EdgeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+        case .firefox:
+            self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(),
+                                                        bookmarkImporter: bookmarkImporter,
+                                                        faviconManager: FaviconManager.shared)
+        case .safari where !(currentChildViewController is FileImportViewController),
+             .safariTechnologyPreview where !(currentChildViewController is FileImportViewController):
+
+            self.dataImporter = try SafariDataImporter(importSource: viewState.selectedImportSource,
+                                                       bookmarkImporter: bookmarkImporter,
+                                                       faviconManager: FaviconManager.shared) ?? {
+                throw ImportError(source: viewState.selectedImportSource, action: .generic, type: .selectProfile, underlyingError: nil)
+            }()
+
+        case .bookmarksHTML:
+            if !(self.dataImporter is BookmarkHTMLImporter) {
+                self.dataImporter = nil
+            }
+        case .csv, .onePassword7, .onePassword8, .lastPass,
+             .safari, .safariTechnologyPreview /* csv only */:
+            if !(self.dataImporter is CSVImporter) {
+                self.dataImporter = nil
+            }
         }
     }
 

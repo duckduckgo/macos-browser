@@ -51,6 +51,12 @@ final class SafariDataImporter: DataImporter, DataDirectoryPermissionAuthorizati
         self.faviconManager = faviconManager
     }
 
+    convenience init?(importSource: DataImport.Source, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
+        guard let profile = ThirdPartyBrowser.browser(for: importSource)?.browserProfiles()?.defaultProfile else { return nil }
+
+        self.init(safariDataDirectoryUrl: profile.profileURL, bookmarkImporter: bookmarkImporter, faviconManager: faviconManager)
+    }
+
     func importableTypes() -> [DataImport.DataType] {
         return [.bookmarks]
     }
