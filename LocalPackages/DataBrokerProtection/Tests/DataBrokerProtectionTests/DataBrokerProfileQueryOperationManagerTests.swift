@@ -275,7 +275,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         } catch {
             XCTAssertTrue(mockDatabase.wasAddHistoryEventCalled)
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .error(error: .unknown("Test error")) }))
-            XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .matchesFound }))
+            XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .matchesFound(count: 1) }))
             XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .noMatchFound }))
             XCTAssertFalse(mockDatabase.wasSaveOptOutOperationCalled)
         }
@@ -501,7 +501,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         let brokerId: Int64 = 1
         let profileQueryId: Int64 = 1
         let extractedProfileId: Int64 = 1
-        mockDatabase.lastHistoryEventToReturn = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .matchesFound)
+        mockDatabase.lastHistoryEventToReturn = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .matchesFound(count: 0))
         let schedulingConfig = DataBrokerScheduleConfig(retryError: 0, confirmOptOutScan: 0, maintenanceScan: 1)
 
         try sut.updateOperationDataDates(brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId, schedulingConfig: schedulingConfig, database: mockDatabase)
@@ -538,158 +538,6 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         XCTAssertFalse(mockDatabase.wasUpdatedPreferredRunDateForOptOutCalled)
         XCTAssertNil(mockDatabase.lastPreferredRunDateOnScan)
         XCTAssertNil(mockDatabase.lastPreferredRunDateOnOptOut)
-    }
-}
-
-final class MockDatabase: DataBrokerProtectionRepository {
-    var wasSaveProfileCalled = false
-    var wasFetchProfileCalled = false
-    var wasSaveOptOutOperationCalled = false
-    var wasBrokerProfileQueryDataCalled = false
-    var wasFetchAllBrokerProfileQueryDataCalled = false
-    var wasUpdatedPreferredRunDateForScanCalled = false
-    var wasUpdatedPreferredRunDateForOptOutCalled = false
-    var wasUpdateLastRunDateForScanCalled = false
-    var wasUpdateLastRunDateForOptOutCalled = false
-    var wasUpdateRemoveDateCalled = false
-    var wasAddHistoryEventCalled = false
-    var wasFetchLastHistoryEventCalled = false
-
-    var eventsAdded = [HistoryEvent]()
-    var lastHistoryEventToReturn: HistoryEvent?
-    var lastPreferredRunDateOnScan: Date?
-    var lastPreferredRunDateOnOptOut: Date?
-    var extractedProfileRemovedDate: Date?
-    var extractedProfilesFromBroker = [ExtractedProfile]()
-    var childBrokers = [DataBroker]()
-    var lastParentBrokerWhereChildSitesWhereFetched: String?
-    var lastProfileQueryIdOnScanUpdatePreferredRunDate: Int64?
-
-    lazy var callsList: [Bool] = [
-        wasSaveProfileCalled,
-        wasFetchProfileCalled,
-        wasSaveOptOutOperationCalled,
-        wasBrokerProfileQueryDataCalled,
-        wasFetchAllBrokerProfileQueryDataCalled,
-        wasUpdatedPreferredRunDateForScanCalled,
-        wasUpdatedPreferredRunDateForOptOutCalled,
-        wasUpdateLastRunDateForScanCalled,
-        wasUpdateLastRunDateForOptOutCalled,
-        wasUpdateRemoveDateCalled,
-        wasAddHistoryEventCalled,
-        wasFetchLastHistoryEventCalled]
-
-    var wasDatabaseCalled: Bool {
-        callsList.filter { $0 }.count > 0 // If one value is true. The database was called
-    }
-
-    func save(_ profile: DataBrokerProtectionProfile) {
-        wasSaveProfileCalled = true
-    }
-
-    func fetchProfile() -> DataBrokerProtectionProfile? {
-        wasFetchProfileCalled = true
-        return nil
-    }
-
-    func saveOptOutOperation(optOut: OptOutOperationData, extractedProfile: ExtractedProfile) throws {
-        wasSaveOptOutOperationCalled = true
-    }
-
-    func brokerProfileQueryData(for brokerId: Int64, and profileQueryId: Int64) -> BrokerProfileQueryData? {
-        wasBrokerProfileQueryDataCalled = true
-
-        if let lastHistoryEventToReturn = self.lastHistoryEventToReturn {
-            let scanOperationData = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, historyEvents: [lastHistoryEventToReturn])
-
-            return BrokerProfileQueryData(dataBroker: .mock, profileQuery: .mock, scanOperationData: scanOperationData)
-        } else {
-            return nil
-        }
-    }
-
-    func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
-        wasFetchAllBrokerProfileQueryDataCalled = true
-        return [BrokerProfileQueryData]()
-    }
-
-    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) {
-        lastPreferredRunDateOnScan = date
-        lastProfileQueryIdOnScanUpdatePreferredRunDate = profileQueryId
-        wasUpdatedPreferredRunDateForScanCalled = true
-    }
-
-    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) {
-        lastPreferredRunDateOnOptOut = date
-        wasUpdatedPreferredRunDateForOptOutCalled = true
-    }
-
-    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) {
-        wasUpdateLastRunDateForScanCalled = true
-    }
-
-    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) {
-        wasUpdateLastRunDateForOptOutCalled = true
-    }
-
-    func updateRemovedDate(_ date: Date?, on extractedProfileId: Int64) {
-        extractedProfileRemovedDate = date
-        wasUpdateRemoveDateCalled = true
-    }
-
-    func add(_ historyEvent: HistoryEvent) {
-        wasAddHistoryEventCalled = true
-        eventsAdded.append(historyEvent)
-    }
-
-    func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) -> HistoryEvent? {
-        wasFetchLastHistoryEventCalled = true
-
-        return lastHistoryEventToReturn
-    }
-
-    func hasMatches() -> Bool {
-        false
-    }
-
-    func fetchExtractedProfiles(for brokerId: Int64) -> [ExtractedProfile] {
-        return extractedProfilesFromBroker
-    }
-
-    func fetchAttemptInformation(for extractedProfileId: Int64) -> AttemptInformation? {
-        return nil
-    }
-
-    func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) {
-    }
-
-    func fetchChildBrokers(for parentBroker: String) -> [DataBroker] {
-        lastParentBrokerWhereChildSitesWhereFetched = parentBroker
-        return childBrokers
-    }
-
-    func clear() {
-        wasSaveProfileCalled = false
-        wasFetchProfileCalled = false
-        wasSaveOptOutOperationCalled = false
-        wasBrokerProfileQueryDataCalled = false
-        wasFetchAllBrokerProfileQueryDataCalled = false
-        wasUpdatedPreferredRunDateForScanCalled = false
-        wasUpdatedPreferredRunDateForOptOutCalled = false
-        wasUpdateLastRunDateForScanCalled = false
-        wasUpdateLastRunDateForOptOutCalled = false
-        wasUpdateRemoveDateCalled = false
-        wasAddHistoryEventCalled = false
-        wasFetchLastHistoryEventCalled = false
-        eventsAdded.removeAll()
-        lastHistoryEventToReturn = nil
-        lastPreferredRunDateOnScan = nil
-        lastPreferredRunDateOnOptOut = nil
-        extractedProfileRemovedDate = nil
-        extractedProfilesFromBroker.removeAll()
-        childBrokers.removeAll()
-        lastParentBrokerWhereChildSitesWhereFetched = nil
-        lastProfileQueryIdOnScanUpdatePreferredRunDate = nil
     }
 }
 
