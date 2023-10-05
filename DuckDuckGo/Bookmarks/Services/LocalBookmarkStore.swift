@@ -832,6 +832,7 @@ final class LocalBookmarkStore: BookmarkStore {
         let context = makeContext()
         context.performAndWait {
             let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: BookmarkEntity.className())
+            fetchRequest.predicate = NSPredicate(format: "%K <> %@", #keyPath(BookmarkEntity.uuid), BookmarkEntity.Constants.rootFolderID)
             let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
 
             do {
