@@ -23,7 +23,7 @@ struct DeviceSyncedView: View {
 
     let devices: [SyncDevice]
     let shouldShowOptions: Bool
-    let isFirstDevice: Bool
+    let isSingleDevice: Bool
     var height: CGFloat {
         if shouldShowOptions {
             return 400
@@ -32,7 +32,7 @@ struct DeviceSyncedView: View {
         }
     }
     var title: String {
-        if isFirstDevice {
+        if isSingleDevice {
             return UserText.allSetDialogTitle
         }
         return UserText.deviceSynced
@@ -45,7 +45,7 @@ struct DeviceSyncedView: View {
                 Text(title)
                     .font(.system(size: 17, weight: .bold))
                 VStack(alignment: .center) {
-                    if isFirstDevice {
+                    if isSingleDevice {
                         SingleDeviceSetTextView()
                     } else {
                         NewDeviceSyncedView(devices: devices)
@@ -58,7 +58,7 @@ struct DeviceSyncedView: View {
             .frame(width: 320)
         } buttons: {
             Button(UserText.next) {
-                if isFirstDevice {
+                if isSingleDevice {
                     model.delegate?.presentSaveRecoveryPDF()
                 } else {
                     model.endFlow()
