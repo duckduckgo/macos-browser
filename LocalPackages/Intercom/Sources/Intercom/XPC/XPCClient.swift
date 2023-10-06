@@ -81,13 +81,12 @@ public final class XPCClient<ClientInterface: AnyObject, ServerInterface: AnyObj
         connection.exportedObject = delegate
         connection.remoteObjectInterface = serverInterface
 
-        let closeConnection = {
-            [weak self] in
-               guard let self else {
-                   return
-               }
+        let closeConnection = { [weak self] in
+           guard let self else {
+               return
+           }
 
-               self.internalConnection = nil
+           self.internalConnection = nil
         }
 
         connection.interruptionHandler = closeConnection

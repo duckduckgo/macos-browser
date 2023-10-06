@@ -66,6 +66,10 @@ public final class TunnelControllerIPCClient {
 // MARK: - Outgoing communication to the server
 
 extension TunnelControllerIPCClient: TunnelControllerIPCServerInterface {
+    public func register() {
+        try? xpc.server().register()
+    }
+
     public func start() {
         try? xpc.server().start()
     }

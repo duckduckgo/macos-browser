@@ -293,6 +293,7 @@ final class NavigationBarPopovers {
             // TODO: The code in this method is excessively detailed and should be abstracted elsewhere.
             let vpnBundleID = Bundle.main.vpnMenuAgentBundleId
             let ipcClient = TunnelControllerIPCClient(machServiceName: vpnBundleID, log: .networkProtectionIPCLog)
+            ipcClient.register()
 
             let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
 

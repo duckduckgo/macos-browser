@@ -63,8 +63,10 @@ final class TunnelControllerIPCServer {
 }
 
 extension TunnelControllerIPCServer: TunnelControllerIPCServerInterface {
-    func register(completion: (Error) -> Void) {
-        completion(NSError(domain: "vpn", code: 0))
+    func register() {
+        // TODO: consider adding support for this type of thing directly in the status reporter
+        server.serverInfoChanged(statusReporter.serverInfoObserver.recentValue)
+        server.statusChanged(statusReporter.statusObserver.recentValue)
     }
 
     func start() {

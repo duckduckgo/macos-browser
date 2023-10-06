@@ -24,13 +24,40 @@ import os.log // swiftlint:disable:this enforce_os_log_wrapper
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
 public protocol TunnelControllerIPCServerInterface: AnyObject {
+    /// Registers a connection with the server.
+    ///
+    /// This is the point where the server will start sending status updates to the client.
+    ///
+    func register()
+
+    /// Start the VPN tunnel.
+    ///
     func start()
+
+    /// Stop the VPN tunnel.
+    ///
     func stop()
 }
 
+/// This protocol describes the server-side XPC interface.
+///
+/// The object that implements this interface takes care of unpacking any encoded data and forwarding
+/// calls to the IPC interface when appropriate.
+///
 @objc
 protocol XPCServerInterface {
+    /// Registers a connection with the server.
+    ///
+    /// This is the point where the server will start sending status updates to the client.
+    ///
+    func register()
+
+    /// Start the VPN tunnel.
+    ///
     func start()
+
+    /// Stop the VPN tunnel.
+    ///
     func stop()
 }
 
@@ -98,6 +125,10 @@ extension TunnelControllerIPCServer: TunnelControllerIPCClientInterface {
 // MARK: - Incoming communication from a client
 
 extension TunnelControllerIPCServer: XPCServerInterface {
+    func register() {
+        serverDelegate?.register()
+    }
+
     func start() {
         serverDelegate?.start()
     }
