@@ -100,9 +100,15 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
 
     // MARK: - Presenting user notifications
 
-    func showReconnectedNotification() {
+    func showConnectedNotification(serverLocation: String?) {
+        let subtitle: String
+        if let serverLocation {
+            subtitle = UserText.networkProtectionConnectionSuccessNotificationSubtitle(serverLocation: serverLocation)
+        } else {
+            subtitle = UserText.networkProtectionConnectionSuccessNotificationSubtitle
+        }
         let content = notificationContent(title: UserText.networkProtectionConnectionSuccessNotificationTitle,
-                                          subtitle: UserText.networkProtectionConnectionSuccessNotificationSubtitle)
+                                          subtitle: subtitle)
         showNotification(content)
     }
 
