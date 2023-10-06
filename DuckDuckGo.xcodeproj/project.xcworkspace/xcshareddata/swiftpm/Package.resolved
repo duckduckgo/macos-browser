@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "hotfix/80.3.0-1-url-parsing",
-        "revision" : "f7e5561ada63800a2aa54ef25b1a85354c9c6094"
+        "revision" : "9d53e0a45f60ec6aebe8f6488e48cd16eb60b3be",
+        "version" : "80.3.0-1"
       }
     },
     {
