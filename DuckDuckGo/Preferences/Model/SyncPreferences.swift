@@ -192,10 +192,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         }
     }
 
-    func updateOptions() {
-        syncService.scheduler.requestSyncImmediately()
-    }
-
     @MainActor
     private func presentDialog(for currentDialog: ManagementDialogKind) {
         let shouldBeginSheet = managementDialogModel.currentDialog == nil
