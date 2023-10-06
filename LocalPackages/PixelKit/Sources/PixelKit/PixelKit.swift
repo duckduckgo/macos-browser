@@ -19,10 +19,6 @@
 import Foundation
 import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
-protocol ErrorWithParameters {
-    var errorParameters: [String: String] { get }
-}
-
 public final class PixelKit {
 
     /// The frequency with which a pixel is sent to our endpoint.

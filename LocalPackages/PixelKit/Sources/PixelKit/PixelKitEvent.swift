@@ -53,7 +53,7 @@ public final class DebugEvent: PixelKitEvent {
     public var parameters: [String: String]? {
         var params = [String: String]()
 
-        if let errorWithUserInfo = error as? ErrorWithParameters {
+        if let errorWithUserInfo = error as? ErrorWithPixelParameters {
             params = errorWithUserInfo.errorParameters
         }
 
