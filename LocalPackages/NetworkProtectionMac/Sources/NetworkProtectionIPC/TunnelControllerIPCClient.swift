@@ -24,6 +24,7 @@ import os.log // swiftlint:disable:this enforce_os_log_wrapper
 /// This protocol describes the client-side IPC interface for controlling the tunnel
 ///
 public protocol IPCClientInterface: AnyObject {
+    func errorChanged(_ error: String?)
     func serverInfoChanged(_ serverInfo: NetworkProtectionStatusServerInfo)
     func statusChanged(_ status: ConnectionStatus)
 }
@@ -31,6 +32,7 @@ public protocol IPCClientInterface: AnyObject {
 /// This is the XPC interface with parameters that can be packed properly
 @objc
 protocol XPCClientInterface {
+    func errorChanged(error: String?)
     func serverInfoChanged(payload: Data)
     func statusChanged(payload: Data)
 }
@@ -44,6 +46,7 @@ public final class TunnelControllerIPCClient {
     // MARK: - Observers offered
 
     public var serverInfoObserver = ConnectionServerInfoObserverThroughIPC()
+    public var connectionErrorObserver = ConnectionErrorObserverThroughIPC()
     public var connectionStatusObserver = ConnectionStatusObserverThroughIPC()
 
     /// The delegate.
@@ -82,6 +85,11 @@ extension TunnelControllerIPCClient: IPCServerInterface {
 // MARK: - Incoming communication from the server
 
 extension TunnelControllerIPCClient: XPCClientInterface {
+
+    func errorChanged(error: String?) {
+        connectionErrorObserver.publish(error)
+        clientDelegate?.errorChanged(error)
+    }
 
     func serverInfoChanged(payload: Data) {
         guard let serverInfo = try? JSONDecoder().decode(NetworkProtectionStatusServerInfo.self, from: payload) else {

@@ -102,11 +102,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     private func loadTunnelManager() async -> NETunnelProviderManager? {
         let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
-        print(tunnels)
         return tunnels?.first {
             ($0.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == networkExtensionBundleID
         }
-        //try? await NETunnelProviderManager.loadAllFromPreferences().first
     }
 
     private func loadOrMakeTunnelManager() async throws -> NETunnelProviderManager {

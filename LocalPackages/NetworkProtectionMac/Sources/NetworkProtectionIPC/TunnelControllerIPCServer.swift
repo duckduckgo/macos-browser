@@ -89,6 +89,12 @@ public final class TunnelControllerIPCServer {
 
 extension TunnelControllerIPCServer: IPCClientInterface {
 
+    public func errorChanged(_ error: String?) {
+        xpc.forEachClient { client in
+            client.errorChanged(error: error)
+        }
+    }
+
     public func serverInfoChanged(_ serverInfo: NetworkProtectionStatusServerInfo) {
         let payload: Data
 

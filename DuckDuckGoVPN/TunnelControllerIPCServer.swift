@@ -33,6 +33,7 @@ final class TunnelControllerIPCServer {
                        log: .networkProtectionIPCLog)
         self.statusReporter = statusReporter
 
+        subscribeToErrorChanges()
         subscribeToStatusUpdates()
         subscribeToServerChanges()
 
@@ -41,6 +42,15 @@ final class TunnelControllerIPCServer {
 
     public func activate() {
         server.activate()
+    }
+
+    private func subscribeToErrorChanges() {
+        statusReporter.connectionErrorObserver.publisher
+            .subscribe(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.server.errorChanged(error)
+            }
+            .store(in: &cancellables)
     }
 
     private func subscribeToServerChanges() {
