@@ -101,14 +101,10 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
     // MARK: - Presenting user notifications
 
     func showConnectedNotification(serverLocation: String?) {
-        let subtitle: String
-        if let serverLocation {
-            subtitle = UserText.networkProtectionConnectionSuccessNotificationSubtitle(serverLocation: serverLocation)
-        } else {
-            subtitle = UserText.networkProtectionConnectionSuccessNotificationSubtitle
-        }
+        // Should include the serverLocation in the subtitle, but due to a bug with the current server in the PacketTunnelProvider
+        // this is not currently working on macOS. Add the necessary copy as on iOS when this is fixed.
         let content = notificationContent(title: UserText.networkProtectionConnectionSuccessNotificationTitle,
-                                          subtitle: subtitle)
+                                          subtitle: UserText.networkProtectionConnectionSuccessNotificationSubtitle)
         showNotification(content)
     }
 
