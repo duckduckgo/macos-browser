@@ -61,9 +61,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     // swiftlint:disable:next cyclomatic_complexity function_body_length
     private static func networkProtectionDebugEvents(controllerErrorStore: NetworkProtectionTunnelErrorStore) -> EventMapping<NetworkProtectionError>? {
         return EventMapping { event, _, _, _ in
-            // TODO: fix this
-            /*
-            let domainEvent: NetworkProtectionPixelKitEvent
+            let domainEvent: NetworkProtectionPixelEvent
 #if DEBUG
             // Makes sure we see the error in the yellow NetP alert.
             controllerErrorStore.lastErrorMessage = "[Debug] Error event: \(event.localizedDescription)"
@@ -137,7 +135,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
             }
 
-            PixelKit.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)*/
+            PixelKit.fire(domainEvent, frequency: .dailyAndContinuous, withHeaders: [:])
         }
     }
 
@@ -147,16 +145,29 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     private static var packetTunnelProviderEvents: EventMapping<PacketTunnelProvider.Event> = .init { event, _, _, _ in
 
-        // TODO: fix this
-        /*
         switch event {
         case .userBecameActive:
-            PixelKit.fire(.networkProtectionActiveUser, frequency: .dailyOnly, includeAppVersionParameter: true)
+            PixelKit.fire(
+                NetworkProtectionPixelEvent.networkProtectionActiveUser,
+                frequency: .dailyOnly,
+                withHeaders: [:],
+                includeAppVersionParameter: true
+            )
         case .reportLatency(ms: let ms, server: let server, networkType: let networkType):
-            PixelKit.fire(.networkProtectionLatency(ms: ms, server: server, networkType: networkType.description), frequency: .standard)
+            PixelKit.fire(
+                NetworkProtectionPixelEvent.networkProtectionLatency(ms: ms, server: server, networkType: networkType),
+                frequency: .standard,
+                withHeaders: [:],
+                includeAppVersionParameter: true
+            )
         case .rekeyCompleted:
-            PixelKit.fire(.networkProtectionRekeyCompleted, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
-        }*/
+            PixelKit.fire(
+                NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
+                frequency: .dailyAndContinuous,
+                withHeaders: [:],
+                includeAppVersionParameter: true
+            )
+        }
     }
 
     static var tokenServiceName: String {
