@@ -18,54 +18,82 @@
 
 import Foundation
 
-extension PixelKit {
+public extension PixelKit {
 
     enum Parameters {
-        static let duration = "duration"
-        static let test = "test"
-        static let appVersion = "appVersion"
+        public static let duration = "duration"
+        public static let test = "test"
+        public static let appVersion = "appVersion"
 
-        static let keychainFieldName = "fieldName"
-        static let errorCode = "e"
-        static let errorDesc = "d"
-        static let errorCount = "c"
-        static let underlyingErrorCode = "ue"
-        static let underlyingErrorDesc = "ud"
-        static let underlyingErrorSQLiteCode = "sqlrc"
-        static let underlyingErrorSQLiteExtendedCode = "sqlerc"
+        public static let errorCode = "e"
+        public static let errorDesc = "d"
+        public static let errorCount = "c"
+        public static let underlyingErrorCode = "ue"
+        public static let underlyingErrorDesc = "ud"
+        public static let underlyingErrorSQLiteCode = "sqlrc"
+        public static let underlyingErrorSQLiteExtendedCode = "sqlerc"
 
-        static let assertionMessage = "message"
-        static let assertionFile = "file"
-        static let assertionLine = "line"
+        public static let keychainFieldName = "fieldName"
+        public static let keychainErrorCode = "keychain_error_code"
+
+        public static let emailCohort = "cohort"
+        public static let emailLastUsed = "duck_address_last_used"
+
+        public static let assertionMessage = "message"
+        public static let assertionFile = "file"
+        public static let assertionLine = "line"
+
+        public static let function = "function"
+        public static let line = "line"
+
+        public static let latency = "latency"
+        public static let server = "server"
+        public static let networkType = "net_type"
+
+        // Pixel experiments
+        public static let experimentCohort = "cohort"
     }
 
     enum Values {
-        static let test = "1"
+        public static let test = "1"
     }
+
 }
 
-extension Error {
+public protocol ErrorWithPixelParameters {
 
-    public var pixelParameters: [String: String] {
-        var parameters = [String: String]()
+    var errorParameters: [String: String] { get }
+
+}
+
+public extension Error {
+
+    var pixelParameters: [String: String] {
+        var params = [String: String]()
+
+        if let errorWithUserInfo = self as? ErrorWithPixelParameters {
+            params = errorWithUserInfo.errorParameters
+        }
+
         let nsError = self as NSError
 
-        parameters[PixelKit.Parameters.errorCode] = "\(nsError.code)"
-        parameters[PixelKit.Parameters.errorDesc] = nsError.domain
-        if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
-            parameters[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
-            parameters[PixelKit.Parameters.underlyingErrorDesc] = underlyingError.domain
+        params[PixelKit.Parameters.errorCode] = "\(nsError.code)"
+        params[PixelKit.Parameters.errorDesc] = nsError.domain
+
+        if let underlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError {
+            params[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
+            params[PixelKit.Parameters.underlyingErrorDesc] = underlyingError.domain
         }
 
         if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {
-            parameters[PixelKit.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
+            params[PixelKit.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
         }
 
         if let sqlExtendedErrorCode = nsError.userInfo["SQLiteExtendedResultCode"] as? NSNumber {
-            parameters[PixelKit.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
+            params[PixelKit.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
         }
 
-        return parameters
+        return params
     }
 
 }

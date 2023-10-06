@@ -2046,6 +2046,12 @@
 		4BE65481271FCD4D008D1D63 /* PasswordManagementNoteModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6547D271FCD4D008D1D63 /* PasswordManagementNoteModel.swift */; };
 		4BE65485271FCD7B008D1D63 /* LoginFaviconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65484271FCD7B008D1D63 /* LoginFaviconView.swift */; };
 		4BF01C00272AE74C00884A61 /* CountryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE65482271FCD53008D1D63 /* CountryList.swift */; };
+		4BF0E4F72AD0BEC400FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF0E4F62AD0BEC400FFEC9E /* NetworkProtectionPixelEvent.swift */; };
+		4BF0E4F82AD0BEC400FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF0E4F62AD0BEC400FFEC9E /* NetworkProtectionPixelEvent.swift */; };
+		4BF0E4F92AD0BEC400FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF0E4F62AD0BEC400FFEC9E /* NetworkProtectionPixelEvent.swift */; };
+		4BF0E4FA2AD0BEC400FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF0E4F62AD0BEC400FFEC9E /* NetworkProtectionPixelEvent.swift */; };
+		4BF0E4FB2AD0BEC400FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF0E4F62AD0BEC400FFEC9E /* NetworkProtectionPixelEvent.swift */; };
+		4BF0E4FD2AD0BFD800FFEC9E /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4BF0E4FC2AD0BFD800FFEC9E /* PixelKit */; };
 		4BF4951826C08395000547B8 /* ThirdPartyBrowserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */; };
 		4BF4EA5027C71F26004E57C4 /* PasswordManagementListSectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4EA4F27C71F26004E57C4 /* PasswordManagementListSectionTests.swift */; };
 		4BF6961D28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF6961C28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift */; };
@@ -3423,6 +3429,7 @@
 		4BE6547D271FCD4D008D1D63 /* PasswordManagementNoteModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementNoteModel.swift; sourceTree = "<group>"; };
 		4BE65482271FCD53008D1D63 /* CountryList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountryList.swift; sourceTree = "<group>"; };
 		4BE65484271FCD7B008D1D63 /* LoginFaviconView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginFaviconView.swift; sourceTree = "<group>"; };
+		4BF0E4F62AD0BEC400FFEC9E /* NetworkProtectionPixelEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionPixelEvent.swift; sourceTree = "<group>"; };
 		4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyBrowserTests.swift; sourceTree = "<group>"; };
 		4BF4EA4F27C71F26004E57C4 /* PasswordManagementListSectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementListSectionTests.swift; sourceTree = "<group>"; };
 		4BF6961C28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyVisitedSiteModelTests.swift; sourceTree = "<group>"; };
@@ -4185,6 +4192,7 @@
 			files = (
 				B6F7128129F681EB00594A45 /* QuickLookUI.framework in Frameworks */,
 				9DB6E7242AA0DC5800A17F3C /* LoginItems in Frameworks */,
+				4BF0E4FD2AD0BFD800FFEC9E /* PixelKit in Frameworks */,
 				7B6B5C082ACAC7B200ADFCC6 /* NetworkProtectionUI in Frameworks */,
 				7BA8FBD42ACC1FD40065728E /* NetworkProtectionIPC in Frameworks */,
 				EE7295E32A545B9A008C0991 /* NetworkProtection in Frameworks */,
@@ -7523,6 +7531,7 @@
 				B6F92BA42A691A44002ABA6B /* NetworkProtectionUserDefaultsConstants.swift */,
 				7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */,
 				7BFE95532A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift */,
+				4BF0E4F62AD0BEC400FFEC9E /* NetworkProtectionPixelEvent.swift */,
 			);
 			path = AppAndExtensionAndAgentTargets;
 			sourceTree = "<group>";
@@ -7867,6 +7876,7 @@
 				9DB6E7232AA0DC5800A17F3C /* LoginItems */,
 				7B6B5C072ACAC7B200ADFCC6 /* NetworkProtectionUI */,
 				7BA8FBD32ACC1FD40065728E /* NetworkProtectionIPC */,
+				4BF0E4FC2AD0BFD800FFEC9E /* PixelKit */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -8642,6 +8652,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				31929F992A4C4CFF0084EA89 /* FaviconUserScript.swift in Sources */,
+				4BF0E4FB2AD0BEC400FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				31929F9A2A4C4CFF0084EA89 /* BWResponse.swift in Sources */,
 				31929F9B2A4C4CFF0084EA89 /* LottieAnimationCache.swift in Sources */,
 				31929F9C2A4C4CFF0084EA89 /* TabIndex.swift in Sources */,
@@ -9577,6 +9588,7 @@
 				4B67854B2AA8DE76008A5004 /* NetworkProtectionFeatureVisibility.swift in Sources */,
 				37CBCA9B2A8966E60050218F /* SyncSettingsAdapter.swift in Sources */,
 				3706FB75293F65D500E42796 /* WebsiteBreakageSender.swift in Sources */,
+				4BF0E4F82AD0BEC400FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				3707C72A294B5D2900682A9F /* URLExtension.swift in Sources */,
 				3706FB76293F65D500E42796 /* ASN1Parser.swift in Sources */,
 				37FD78122A29EBD100B36DB1 /* SyncErrorHandler.swift in Sources */,
@@ -10288,6 +10300,7 @@
 				B65DA5EF2A77CC3A00CBEE8D /* Bundle+NetworkProtectionExtensions.swift in Sources */,
 				7B05D89C2ABB31D200D1C863 /* EventMapping+NetworkProtectionError.swift in Sources */,
 				7BA8FBD92ACC26BB0065728E /* TunnelControllerIPCServer.swift in Sources */,
+				4BF0E4F92AD0BEC400FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				7B6556CC2AB9B7E000F1A374 /* NetworkProtectionTunnelController.swift in Sources */,
 				7B5E1F912AB9CC3B00DA1172 /* NetworkProtectionOptionKeyExtension.swift in Sources */,
 				7B2DDD022A93BAA60039D884 /* NetworkProtectionBouncer.swift in Sources */,
@@ -10315,6 +10328,7 @@
 				7B5E1F7E2AB9C66A00DA1172 /* NetworkProtectionTunnelController.swift in Sources */,
 				7B5E1F842AB9C8FA00DA1172 /* NetworkProtection+ConvenienceInitializers.swift in Sources */,
 				7BA8FBDA2ACC26C40065728E /* TunnelControllerIPCServer.swift in Sources */,
+				4BF0E4FA2AD0BEC400FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				B65DA5F02A77CC3C00CBEE8D /* Bundle+NetworkProtectionExtensions.swift in Sources */,
 				7B5E1F802AB9C71200DA1172 /* NetworkProtectionControllerErrorStore.swift in Sources */,
 				7B05D89D2ABB31D300D1C863 /* EventMapping+NetworkProtectionError.swift in Sources */,
@@ -10770,6 +10784,7 @@
 				AAE7527C263B056C00B973F8 /* HistoryStore.swift in Sources */,
 				AAE246F32709EF3B00BEEAEE /* FirePopoverCollectionViewItem.swift in Sources */,
 				AA61C0D22727F59B00E6B681 /* ArrayExtension.swift in Sources */,
+				4BF0E4F72AD0BEC400FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				4B4D60CC2A0C849600BCD287 /* NetworkProtectionInviteCodeViewModel.swift in Sources */,
 				AAC30A2C268F1ECD00D2D9CD /* CrashReportSender.swift in Sources */,
 				373A1AB02842C4EA00586521 /* BookmarkHTMLImporter.swift in Sources */,
@@ -12354,6 +12369,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Common;
+		};
+		4BF0E4FC2AD0BFD800FFEC9E /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
 		};
 		7B0C226A2ABC52DE00BDCA23 /* NetworkProtectionUI */ = {
 			isa = XCSwiftPackageProductDependency;
