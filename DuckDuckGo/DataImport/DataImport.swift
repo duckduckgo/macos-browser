@@ -28,6 +28,7 @@ enum DataImport {
         case edge
         case firefox
         case safari
+        case safariTechnologyPreview
         case onePassword8
         case onePassword7
         case lastPass
@@ -48,6 +49,8 @@ enum DataImport {
                 return "Firefox"
             case .safari:
                 return "Safari"
+            case .safariTechnologyPreview:
+                return "Safari Technology Preview"
             case .lastPass:
                 return "LastPass"
             case .onePassword7:
@@ -71,8 +74,12 @@ enum DataImport {
             }
 
             switch self {
-            case .csv, .onePassword8, .onePassword7, .lastPass, .bookmarksHTML: return true // Users can always import from exported files
-            case .brave, .chrome, .edge, .firefox, .safari: return false // Users can't import from browsers unless they're installed
+            case .csv, .onePassword8, .onePassword7, .lastPass, .bookmarksHTML:
+                // Users can always import from exported files
+                return true
+            case .brave, .chrome, .edge, .firefox, .safari, .safariTechnologyPreview:
+                // Users can't import from browsers unless they're installed
+                return false
             }
         }
 
@@ -130,14 +137,10 @@ enum DataImport {
                 let sortedProfiles = filteredProfiles.sorted()
 
                 self.profiles = sortedProfiles
-            case .firefox:
-                self.profiles = profileURLs.map({
-                    BrowserProfile.for(browser: .firefox, profileURL: $0)
-                }).sorted()
-            case .safari:
-                self.profiles = profileURLs.map({
-                    BrowserProfile.for(browser: .safari, profileURL: $0)
-                }).sorted()
+            case .firefox, .safari, .safariTechnologyPreview:
+                self.profiles = profileURLs.map {
+                    BrowserProfile.for(browser: browser, profileURL: $0)
+                }.sorted()
             case .lastPass, .onePassword7, .onePassword8:
                 self.profiles = []
             }
@@ -153,8 +156,8 @@ enum DataImport {
                 return profiles.first { $0.profileName == "Default" } ?? profiles.first
             case .firefox:
                 return profiles.first { $0.profileName == "default-release" } ?? profiles.first
-            case .safari, .lastPass, .onePassword7, .onePassword8:
-                return nil
+            case .safari, .safariTechnologyPreview, .lastPass, .onePassword7, .onePassword8:
+                return profiles.first
             }
         }
     }
