@@ -67,6 +67,16 @@ internal class MouseOverButton: NSButton, Hoverable {
         return backgroundLayer
     }
 
+    override init(frame: NSRect) {
+        super.init(frame: frame)
+        clipsToBounds = true
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        clipsToBounds = true
+    }
+
     override func awakeFromNib() {
         normalTintColor = self.contentTintColor
     }
