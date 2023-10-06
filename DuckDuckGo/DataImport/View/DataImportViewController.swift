@@ -36,7 +36,6 @@ final class DataImportViewController: NSViewController {
         case permissionsRequired([DataImport.DataType])
         case ableToImport
         case moreInfoAvailable
-        case failedToImport
         case completedImport(DataImport.Summary)
     }
 
@@ -134,7 +133,7 @@ final class DataImportViewController: NSViewController {
             // Only Safari Passwords selected, switch to CSV select
             self.viewState = .init(selectedImportSource: viewState.selectedImportSource, interactionState: .permissionsRequired([.logins]))
 
-        case .ableToImport, .failedToImport:
+        case .ableToImport:
             completeImport()
         case .completedImport(let summary) where summary.loginsResult == .awaited:
             // Safari bookmarks import finished, switch to CSV select
@@ -287,11 +286,6 @@ final class DataImportViewController: NSViewController {
             importButton.title = UserText.doneImporting
             importButton.isEnabled = true
             cancelButton.isHidden = true
-        case .failedToImport:
-            importSourcePopUpButton.isHidden = false
-            importButton.title = UserText.initiateImport
-            importButton.isEnabled = true
-            cancelButton.isHidden = false
         }
     }
 
@@ -425,7 +419,7 @@ final class DataImportViewController: NSViewController {
             case .failure(let error):
                 if (error as? FirefoxLoginReader.ImportError)?.type != .requiresPrimaryPassword {
                     os_log("import failed: %{public}s", type: .error, error.localizedDescription)
-                    self.viewState.interactionState = .failedToImport
+                    self.viewState.interactionState = .ableToImport
                 }
                 self.presentAlert(for: error)
             }
