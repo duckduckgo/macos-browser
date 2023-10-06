@@ -22,7 +22,7 @@ final class UserText {
 
     // MARK: - Network Protection Notifications
 
-    static let networkProtectionConnectionSuccessNotificationTitle = NSLocalizedString("network.protection.success.notification.title", value: "Network Protection is On", comment: "The title of the notification shown when Network Protection reconnects successfully")
+    static let networkProtectionConnectionSuccessNotificationTitle = NSLocalizedString("network.protection.success.notification.title", value: "Network Protection is On", comment: "The title of the notification shown when Network Protection connects successfully")
     static let networkProtectionConnectionSuccessNotificationSubtitle = NSLocalizedString("network.protection.success.notification.subtitle", value: "Your location and online activity are protected.", comment: "The subtitle of the notification shown when Network Protection reconnects successfully")
 
     static let networkProtectionConnectionInterruptedNotificationTitle = NSLocalizedString("network.protection.interrupted.notification.title", value: "Network Protection was interrupted", comment: "The title of the notification shown when Network Protection's connection is interrupted")
