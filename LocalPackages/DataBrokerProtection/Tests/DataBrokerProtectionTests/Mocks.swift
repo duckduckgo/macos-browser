@@ -412,6 +412,8 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
     var shouldReturnNewVersionBroker = false
     var wasBrokerUpdateCalled = false
     var wasBrokerSavedCalled = false
+    var lastPreferredRunDateOnScan: Date?
+    var profileQueries = [ProfileQuery]()
 
     typealias DatabaseProvider = SecureStorageDatabaseProviderMock
 
@@ -423,6 +425,8 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
         shouldReturnNewVersionBroker = false
         wasBrokerUpdateCalled = false
         wasBrokerSavedCalled = false
+        lastPreferredRunDateOnScan = nil
+        profileQueries.removeAll()
     }
 
     func save(profile: DataBrokerProtectionProfile) throws -> Int64 {
@@ -469,11 +473,11 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
     }
 
     func fetchAllProfileQueries(for profileId: Int64) throws -> [ProfileQuery] {
-        return [ProfileQuery]()
+        return profileQueries
     }
 
     func save(brokerId: Int64, profileQueryId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws {
-
+        lastPreferredRunDateOnScan = preferredRunDate
     }
 
     func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws {
