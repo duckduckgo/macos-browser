@@ -21,6 +21,7 @@ import PixelKit
 import NetworkProtection
 
 enum NetworkProtectionPixelEvent: PixelKitEvent {
+    // TODO: Remove
     case networkProtectionTestPixel
 
     case networkProtectionActiveUser
@@ -63,6 +64,8 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
     case networkProtectionRekeyCompleted
 
     case networkProtectionLatency(ms: Int, server: String, networkType: NetworkConnectionType)
+
+    case networkProtectionSystemExtensionUnknownActivationResult
 
     case networkProtectionUnhandledError(function: String, line: Int, error: Error)
 
@@ -167,6 +170,9 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
         case .networkProtectionLatency:
             return "m_mac_netp_latency"
 
+        case .networkProtectionSystemExtensionUnknownActivationResult:
+            return "m_mac_netp_system_extension_unknown_activation_result"
+
         case .networkProtectionUnhandledError:
             return "m_mac_netp_unhandled_error"
         }
@@ -254,6 +260,7 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
              .networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor,
              .networkProtectionWireguardErrorInvalidState,
              .networkProtectionWireguardErrorFailedDNSResolution,
+             .networkProtectionSystemExtensionUnknownActivationResult,
              .networkProtectionActiveUser:
 
             return nil

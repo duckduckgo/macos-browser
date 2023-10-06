@@ -164,8 +164,12 @@ extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
         @unknown default:
             // Not much we can do about this, so let's assume it's a good result and not show any errors
             continuation?.yield(.activated)
-            // TODO: Need to re-enable
-            //PixelKit.fire(.networkProtectionSystemExtensionUnknownActivationResult)
+            PixelKit.fire(
+                NetworkProtectionPixelEvent.networkProtectionSystemExtensionUnknownActivationResult,
+                frequency: .standard,
+                withHeaders: [:],
+                includeAppVersionParameter: true
+            )
         }
 
         continuation?.finish()
