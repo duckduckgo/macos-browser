@@ -23,7 +23,7 @@ import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
-public protocol TunnelControllerIPCServerInterface: AnyObject {
+public protocol IPCServerInterface: AnyObject {
     /// Registers a connection with the server.
     ///
     /// This is the point where the server will start sending status updates to the client.
@@ -66,7 +66,7 @@ public final class TunnelControllerIPCServer {
 
     /// The delegate.
     ///
-    public weak var serverDelegate: TunnelControllerIPCServerInterface?
+    public weak var serverDelegate: IPCServerInterface?
 
     public init(machServiceName: String, log: OSLog = .disabled) {
         let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
@@ -87,7 +87,7 @@ public final class TunnelControllerIPCServer {
 
 // MARK: - Outgoing communication to the clients
 
-extension TunnelControllerIPCServer: TunnelControllerIPCClientInterface {
+extension TunnelControllerIPCServer: IPCClientInterface {
 
     public func serverInfoChanged(_ serverInfo: NetworkProtectionStatusServerInfo) {
         let payload: Data
