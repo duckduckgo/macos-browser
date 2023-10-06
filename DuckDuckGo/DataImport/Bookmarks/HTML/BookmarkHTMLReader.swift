@@ -277,10 +277,21 @@ final class BookmarkHTMLReader {
 private extension BookmarkImportSource {
     var supportsSafariBookmarksHTMLFormat: Bool {
         switch self {
-        case .duckduckgoWebKit:
+        case .duckduckgoWebKit,
+             .thirdPartyBrowser(.safari),
+             .thirdPartyBrowser(.safariTechnologyPreview):
             return true
-        case .thirdPartyBrowser(let browser):
-            return browser == .safari
+
+        case .thirdPartyBrowser(.brave),
+             .thirdPartyBrowser(.chrome),
+             .thirdPartyBrowser(.edge),
+             .thirdPartyBrowser(.firefox),
+             .thirdPartyBrowser(.onePassword8),
+             .thirdPartyBrowser(.onePassword7),
+             .thirdPartyBrowser(.lastPass),
+             .thirdPartyBrowser(.csv),
+             .thirdPartyBrowser(.bookmarksHTML):
+            return false
         }
     }
 }

@@ -67,7 +67,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
             HistoryEvent(extractedProfileId: 1,
                          brokerId: 1,
                          profileQueryId: 1,
-                         type: .matchesFound)]
+                         type: .matchesFound(count: 1))]
 
         let calculator = OperationPreferredDateCalculator()
 
@@ -90,7 +90,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
             HistoryEvent(extractedProfileId: 1,
                          brokerId: 1,
                          profileQueryId: 1,
-                         type: .matchesFound)]
+                         type: .matchesFound(count: 1))]
 
         let calculator = OperationPreferredDateCalculator()
 
@@ -235,7 +235,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
             HistoryEvent(extractedProfileId: 1,
                          brokerId: 1,
                          profileQueryId: 1,
-                         type: .matchesFound)]
+                         type: .matchesFound(count: 1))]
 
         let calculator = OperationPreferredDateCalculator()
 
@@ -258,7 +258,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
             HistoryEvent(extractedProfileId: 1,
                          brokerId: 1,
                          profileQueryId: 1,
-                         type: .matchesFound)]
+                         type: .matchesFound(count: 1))]
 
         let calculator = OperationPreferredDateCalculator()
 
@@ -400,7 +400,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
             HistoryEvent(extractedProfileId: 1,
                          brokerId: 1,
                          profileQueryId: 1,
-                         type: .matchesFound)]
+                         type: .matchesFound(count: 1))]
 
         let calculator = OperationPreferredDateCalculator()
 
@@ -423,7 +423,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
             HistoryEvent(extractedProfileId: 1,
                          brokerId: 1,
                          profileQueryId: 1,
-                         type: .matchesFound)]
+                         type: .matchesFound(count: 1))]
 
         let calculator = OperationPreferredDateCalculator()
 
@@ -566,7 +566,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
             HistoryEvent(extractedProfileId: 1,
                          brokerId: 1,
                          profileQueryId: 1,
-                         type: .matchesFound)]
+                         type: .matchesFound(count: 1))]
 
         let calculator = OperationPreferredDateCalculator()
 
@@ -589,7 +589,7 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
             HistoryEvent(extractedProfileId: 1,
                          brokerId: 1,
                          profileQueryId: 1,
-                         type: .matchesFound)]
+                         type: .matchesFound(count: 1))]
 
         let calculator = OperationPreferredDateCalculator()
 

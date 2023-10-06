@@ -99,7 +99,7 @@ final class DataBrokerProtectionStageDurationCalculator {
     }
 }
 
-public enum DataBrokerProtectionPixels {
+public enum DataBrokerProtectionPixels: Equatable {
     struct Consts {
         static let dataBrokerParamKey = "data_broker"
         static let appVersionParamKey = "app_version"
@@ -108,6 +108,7 @@ public enum DataBrokerProtectionPixels {
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
+    case parentChildMatches(parent: String, child: String, value: Int)
 
     // Stage Pixels
     case optOutStart(dataBroker: String, attemptId: UUID)
@@ -140,6 +141,8 @@ public extension DataBrokerProtectionPixels {
             } else {
                 return ["dataBroker": dataBroker, "name": error.name]
             }
+        case .parentChildMatches(let parent, let child, let value):
+            return ["parent": parent, "child": child, "value": String(value)]
         case .optOutStart(let dataBroker, let attemptId):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString]
         case .optOutEmailGenerate(let dataBroker, let attemptId, let duration):

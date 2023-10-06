@@ -114,6 +114,8 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             switch event {
             case .error(let error, _):
                 Pixel.fire(.debug(event: .dataBrokerProtectionError, error: error), withAdditionalParameters: event.params)
+            case .parentChildMatches:
+                Pixel.fire(.parentChildMatches, withAdditionalParameters: event.params)
             case .optOutStart:
                 Pixel.fire(.optOutStart, withAdditionalParameters: event.params)
             case .optOutEmailGenerate:
