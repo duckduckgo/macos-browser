@@ -34,12 +34,12 @@
                                 </constraints>
                             </visualEffectView>
                             <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8kJ-Ja-bmu">
-                                <rect key="frame" x="749" y="-3" width="96" height="41"/>
+                                <rect key="frame" x="749" y="0.0" width="96" height="38"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="96" id="CLi-Qs-wE3"/>
-                                    <constraint firstAttribute="height" constant="41" id="Yzj-6H-7vS"/>
+                                    <constraint firstAttribute="height" constant="38" id="Ls6-Rv-hTz"/>
                                 </constraints>
-                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" image="BurnerWindowGraphic" id="Hjo-W6-Cql"/>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageAlignment="bottom" image="BurnerWindowGraphic" id="Hjo-W6-Cql"/>
                             </imageView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="efe-Pc-ueP" userLabel="Window Dragging View" customClass="WindowDraggingView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="845" height="38"/>
@@ -263,10 +263,10 @@
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="8Av-Au-VBq" secondAttribute="trailing" id="04T-2h-lX4"/>
+                            <constraint firstAttribute="bottom" secondItem="8kJ-Ja-bmu" secondAttribute="bottom" id="4LZ-ju-y1V"/>
                             <constraint firstItem="efe-Pc-ueT" firstAttribute="leading" secondItem="O0X-yp-zLn" secondAttribute="leading" priority="250" id="5k3-uY-xby"/>
                             <constraint firstAttribute="trailing" secondItem="yvS-k9-opP" secondAttribute="trailing" id="5ph-Hy-ZaL"/>
                             <constraint firstItem="1Zn-JZ-2g3" firstAttribute="trailing" secondItem="G3c-kC-Gu9" secondAttribute="trailing" id="6rJ-2P-FZy"/>
-                            <constraint firstItem="8kJ-Ja-bmu" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="9c1-aQ-lfw"/>
                             <constraint firstAttribute="bottom" secondItem="O0X-yp-zLn" secondAttribute="bottom" id="9nu-uZ-CjI"/>
                             <constraint firstItem="u4N-Qc-LMf" firstAttribute="trailing" secondItem="O0X-yp-zLn" secondAttribute="trailing" id="Bd1-0P-xDt"/>
                             <constraint firstItem="zsA-or-9Xo" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="CKr-JO-cA6"/>
@@ -284,6 +284,7 @@
                             <constraint firstItem="G3d-9f-GhJ" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="QP4-i8-VXO"/>
                             <constraint firstAttribute="bottom" secondItem="efe-Pc-ueT" secondAttribute="bottom" priority="750" id="Si3-u3-31S"/>
                             <constraint firstAttribute="trailing" secondItem="dN1-y1-5Xe" secondAttribute="trailing" constant="12" id="SiM-7u-jTo"/>
+                            <constraint firstItem="8kJ-Ja-bmu" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="Tz0-ka-OKv"/>
                             <constraint firstItem="efe-Pc-ueP" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="UBO-rv-mb4"/>
                             <constraint firstItem="8Av-Au-VBq" firstAttribute="top" secondItem="JQD-ov-FCr" secondAttribute="top" id="UNA-xd-vb7"/>
                             <constraint firstItem="yvS-k9-opP" firstAttribute="leading" secondItem="JQD-ov-FCr" secondAttribute="leading" id="ZFo-Ez-Mb7"/>
