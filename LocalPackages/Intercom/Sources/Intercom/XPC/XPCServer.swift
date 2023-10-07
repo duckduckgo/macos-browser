@@ -58,7 +58,7 @@ fileprivate class XPCConnectionsManager: NSObject, NSXPCListenerDelegate {
     }
 }
 
-/// An IPC client for controlling the tunnel
+/// An XPC server.
 ///
 public final class XPCServer<ClientInterface: AnyObject, ServerInterface: AnyObject> {
 
