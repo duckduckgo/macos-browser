@@ -18,7 +18,7 @@
 
 import Foundation
 
-/// An IPC client
+/// An XPC client
 ///
 public final class XPCClient<ClientInterface: AnyObject, ServerInterface: AnyObject> {
 
