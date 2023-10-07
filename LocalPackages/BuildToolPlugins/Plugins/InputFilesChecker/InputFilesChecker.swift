@@ -54,9 +54,14 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("DataBrokerProtectionManager.swift", .source)
     ]),
 
+    "DuckDuckGo Privacy Pro": nonSandboxedExtraInputFiles,
+
     "Unit Tests": [
         .init("BWEncryptionTests.swift", .source),
-        .init("WKWebViewPrivateMethodsAvailabilityTests.swift", .source)
+        .init("WKWebViewPrivateMethodsAvailabilityTests.swift", .source),
+        .init("NetworkProtectionRemoteMessageTests.swift", .source),
+        .init("NetworkProtectionRemoteMessagingStorageTests.swift", .source),
+        .init("network-protection-messages.json", .resource)
     ],
 
     "Integration Tests": []
@@ -99,6 +104,8 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
             case .application where target.displayName.starts(with: "DuckDuckGo Privacy Browser"):
                 appTargets.append(target)
             case .application where target.displayName == "DuckDuckGo DBP": // To be removed after the DBP target is deleted
+                appTargets.append(target)
+            case .application where target.displayName == "DuckDuckGo Privacy Pro": // To be removed after the target is deleted
                 appTargets.append(target)
             case .other("com.apple.product-type.bundle.unit-test"):
                 if target.displayName.starts(with: "Unit Tests") {

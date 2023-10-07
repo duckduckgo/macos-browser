@@ -92,8 +92,7 @@ extension Pixel {
         case serpInitial(cohort: String)
         case serpDay21to27(cohort: String)
 
-        case dataImportFailed(action: DataImportAction, source: DataImportSource)
-        case faviconImportFailed(source: DataImportSource)
+        case dataImportFailed(any DataImportError)
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
@@ -149,12 +148,17 @@ extension Pixel {
         case duckPlayerSettingBackToDefault
 
         // Network Protection Waitlist
+        case networkProtectionWaitlistUserActive
         case networkProtectionWaitlistEntryPointMenuItemDisplayed
         case networkProtectionWaitlistEntryPointToolbarButtonDisplayed
+        case networkProtectionWaitlistIntroDisplayed
         case networkProtectionWaitlistNotificationShown
         case networkProtectionWaitlistNotificationTapped
         case networkProtectionWaitlistTermsAndConditionsDisplayed
         case networkProtectionWaitlistTermsAndConditionsAccepted
+        case networkProtectionRemoteMessageDisplayed(messageID: String)
+        case networkProtectionRemoteMessageDismissed(messageID: String)
+        case networkProtectionRemoteMessageOpened(messageID: String)
 
         // 28-day Home Button
         case enableHomeButton
@@ -162,6 +166,27 @@ extension Pixel {
         case setnewHomePage
 
         case dailyPixel(Event, isFirst: Bool)
+#if DBP
+        case parentChildMatches
+        // SLO and SLI Pixels: https://app.asana.com/0/1203581873609357/1205337273100857/f
+
+        // Stage Pixels
+        case optOutStart
+        case optOutEmailGenerate
+        case optOutCaptchaParse
+        case optOutCaptchaSend
+        case optOutCaptchaSolve
+        case optOutSubmit
+        case optOutEmailReceive
+        case optOutEmailConfirm
+        case optOutValidate
+        case optOutFinish
+
+        // Process Pixels
+        case optOutSubmitSuccess
+        case optOutSuccess
+        case optOutFailure
+#endif
 
         enum Debug {
 
@@ -293,26 +318,12 @@ extension Pixel {
             case invalidPayload(Configuration)
 
             case burnerTabMisplaced
+
+            case networkProtectionRemoteMessageFetchingFailed
+            case networkProtectionRemoteMessageStorageFailed
+
 #if DBP
             case dataBrokerProtectionError
-
-            // SLO and SLI Pixels: https://app.asana.com/0/1203581873609357/1205337273100857/f
-
-            // Stage Pixels
-            case optOutStart
-            case optOutEmailGenerate
-            case optOutCaptchaParse
-            case optOutCaptchaSend
-            case optOutCaptchaSolve
-            case optOutSubmit
-            case optOutEmailReceive
-            case optOutEmailConfirm
-            case optOutValidate
-            case optOutFinish
-
-            // Process Pixels
-            case optOutSuccess
-            case optOutFailure
 #endif
         }
 
@@ -335,11 +346,10 @@ extension Pixel.Event {
         case .serp:
             return "m_mac_navigation_search"
 
-        case .dataImportFailed(action: let action, source: let source):
-            return "m_mac_data-import-failed_\(action)_\(source)"
-
-        case .faviconImportFailed(source: let source):
-            return "m_mac_favicon-import-failed_\(source)"
+        case .dataImportFailed(let error) where error.action == .favicons:
+            return "m_mac_favicon-import-failed_\(error.source)"
+        case .dataImportFailed(let error):
+            return "m_mac_data-import-failed_\(error.action)_\(error.source)"
 
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"
@@ -439,10 +449,14 @@ extension Pixel.Event {
         case .serpDay21to27:
             return "m.mac.search-day-21-27.initial"
 
+        case .networkProtectionWaitlistUserActive:
+            return "m_mac_netp_waitlist_user_active"
         case .networkProtectionWaitlistEntryPointMenuItemDisplayed:
             return "m_mac_netp_imp_settings_entry_menu_item"
         case .networkProtectionWaitlistEntryPointToolbarButtonDisplayed:
             return "m_mac_netp_imp_settings_entry_toolbar_button"
+        case .networkProtectionWaitlistIntroDisplayed:
+            return "m_mac_netp_imp_intro_screen"
         case .networkProtectionWaitlistNotificationShown:
             return "m_mac_netp_ev_waitlist_notification_shown"
         case .networkProtectionWaitlistNotificationTapped:
@@ -451,6 +465,12 @@ extension Pixel.Event {
             return "m_mac_netp_imp_terms"
         case .networkProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_netp_ev_terms_accepted"
+        case .networkProtectionRemoteMessageDisplayed(let messageID):
+            return "m_mac_netp_remote_message_displayed_\(messageID)"
+        case .networkProtectionRemoteMessageDismissed(let messageID):
+            return "m_mac_netp_remote_message_dismissed_\(messageID)"
+        case .networkProtectionRemoteMessageOpened(let messageID):
+            return "m_mac_netp_remote_message_opened_\(messageID)"
 
         // 28-day Home Button
         case .enableHomeButton:
@@ -462,9 +482,26 @@ extension Pixel.Event {
 
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")
+#if DBP
+        case .parentChildMatches: return "dbp_macos_parent-child-broker-matches"
+            // Stage Pixels
+        case .optOutStart: return "dbp_macos_optout_stage_start"
+        case .optOutEmailGenerate: return "dbp_macos_optout_stage_email-generate"
+        case .optOutCaptchaParse: return "dbp_macos_optout_stage_captcha-parse"
+        case .optOutCaptchaSend: return "dbp_macos_optout_stage_captcha-send"
+        case .optOutCaptchaSolve: return "dbp_macos_optout_stage_captcha-solve"
+        case .optOutSubmit: return "dbp_macos_optout_stage_submit"
+        case .optOutEmailReceive: return "dbp_macos_optout_stage_email-receive"
+        case .optOutEmailConfirm: return "dbp_macos_optout_stage_email-confirm"
+        case .optOutValidate: return "dbp_macos_optout_stage_validate"
+        case .optOutFinish: return "dbp_macos_optout_stage_finish"
 
+            // Process Pixels
+        case .optOutSubmitSuccess: return "dbp_macos_optout_process_submit-success"
+        case .optOutSuccess: return "dbp_macos_optout_process_success"
+        case .optOutFailure: return "dbp_macos_optout_process_failure"
+#endif
         }
-
     }
 }
 
@@ -695,23 +732,11 @@ extension Pixel.Event.Debug {
 
         case .burnerTabMisplaced: return "burner_tab_misplaced"
 
+        case .networkProtectionRemoteMessageFetchingFailed: return "netp_remote_message_fetching_failed"
+        case .networkProtectionRemoteMessageStorageFailed: return "netp_remote_message_storage_failed"
+
 #if DBP
         case .dataBrokerProtectionError: return "data_broker_error"
-        // Stage Pixels
-        case .optOutStart: return "dbp.macos.optout.stage.start"
-        case .optOutEmailGenerate: return "dbp.macos.optout.stage.email-generate"
-        case .optOutCaptchaParse: return "dbp.macos.optout.stage.captcha-parse"
-        case .optOutCaptchaSend: return "dbp.macos.optout.stage.captcha-send"
-        case .optOutCaptchaSolve: return "dbp.macos.optout.stage.captcha-solve"
-        case .optOutSubmit: return "dbp.macos.optout.stage.submit"
-        case .optOutEmailReceive: return "dbp.macos.optout.stage.email-receive"
-        case .optOutEmailConfirm: return "dbp.macos.optout.stage.email-confirm"
-        case .optOutValidate: return "dbp.macos.optout.stage.validate"
-        case .optOutFinish: return "dbp.macos.optout.stage.finish"
-
-        // Process Pixels
-        case .optOutSuccess: return "dbp.macos.optout.process.success"
-        case .optOutFailure: return "dbp.macos.optout.process.failure"
 #endif
         }
     }

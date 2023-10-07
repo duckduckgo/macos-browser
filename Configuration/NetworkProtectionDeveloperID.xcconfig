@@ -57,7 +57,7 @@ NOTIFICATIONS_AGENT_BUNDLE_ID[config=Review][sdk=*] = $(DEVELOPMENT_TEAM).com.du
 
 AGENT_BUNDLE_ID_BASE[sdk=*] = com.duckduckgo.macos.vpn
 
-AGENT_BUNDLE_ID[sdk=*] = $(AGENT_BUNDLE_ID_BASE).vpn
+AGENT_BUNDLE_ID[sdk=*] = $(AGENT_BUNDLE_ID_BASE)
 AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
 AGENT_BUNDLE_ID[config=CI][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
 AGENT_BUNDLE_ID[config=Review][sdk=*] = $(AGENT_BUNDLE_ID_BASE).review

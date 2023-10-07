@@ -114,30 +114,34 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             switch event {
             case .error(let error, _):
                 Pixel.fire(.debug(event: .dataBrokerProtectionError, error: error), withAdditionalParameters: event.params)
+            case .parentChildMatches:
+                Pixel.fire(.parentChildMatches, withAdditionalParameters: event.params)
             case .optOutStart:
-                Pixel.fire(.debug(event: .optOutStart), withAdditionalParameters: event.params)
+                Pixel.fire(.optOutStart, withAdditionalParameters: event.params)
             case .optOutEmailGenerate:
-                Pixel.fire(.debug(event: .optOutEmailGenerate), withAdditionalParameters: event.params)
+                Pixel.fire(.optOutEmailGenerate, withAdditionalParameters: event.params)
             case .optOutCaptchaParse:
-                Pixel.fire(.debug(event: .optOutCaptchaParse), withAdditionalParameters: event.params)
+                Pixel.fire(.optOutCaptchaParse, withAdditionalParameters: event.params)
             case .optOutCaptchaSend:
-                Pixel.fire(.debug(event: .optOutCaptchaSend), withAdditionalParameters: event.params)
+                Pixel.fire(.optOutCaptchaSend, withAdditionalParameters: event.params)
             case .optOutCaptchaSolve:
-                Pixel.fire(.debug(event: .optOutCaptchaSolve), withAdditionalParameters: event.params)
+                Pixel.fire(.optOutCaptchaSolve, withAdditionalParameters: event.params)
             case .optOutSubmit:
-                Pixel.fire(.debug(event: .optOutSubmit), withAdditionalParameters: event.params)
+                Pixel.fire(.optOutSubmit, withAdditionalParameters: event.params)
             case .optOutEmailReceive:
-                Pixel.fire(.debug(event: .optOutEmailReceive), withAdditionalParameters: event.params)
+                Pixel.fire(.optOutEmailReceive, withAdditionalParameters: event.params)
             case .optOutEmailConfirm:
-                Pixel.fire(.debug(event: .optOutEmailConfirm), withAdditionalParameters: event.params)
+                Pixel.fire(.optOutEmailConfirm, withAdditionalParameters: event.params)
             case .optOutValidate:
-                Pixel.fire(.debug(event: .optOutValidate), withAdditionalParameters: event.params)
+                Pixel.fire(.optOutValidate, withAdditionalParameters: event.params)
             case .optOutFinish:
-                Pixel.fire(.debug(event: .optOutFinish), withAdditionalParameters: event.params)
+                Pixel.fire(.optOutFinish, withAdditionalParameters: event.params)
+            case .optOutSubmitSuccess:
+                Pixel.fire(.optOutSubmitSuccess, withAdditionalParameters: event.params)
             case .optOutSuccess:
-                Pixel.fire(.debug(event: .optOutSuccess), withAdditionalParameters: event.params)
+                Pixel.fire(.optOutSuccess, withAdditionalParameters: event.params)
             case .optOutFailure:
-                Pixel.fire(.debug(event: .optOutFailure), withAdditionalParameters: event.params)
+                Pixel.fire(.optOutFailure, withAdditionalParameters: event.params)
             }
         }
     }

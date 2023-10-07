@@ -804,6 +804,12 @@ CQ
                                                             <action selector="resetEmailProtectionInContextPrompt:" target="Ady-hI-5gd" id="bRN-Eo-xL1"/>
                                                         </connections>
                                                     </menuItem>
+                                                    <menuItem title="Reset Daily Pixels" id="Tyu-AZ-Y2g">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetDailyPixels:" target="Ady-hI-5gd" id="Bqp-wC-pao"/>
+                                                        </connections>
+                                                    </menuItem>
                                                 </items>
                                             </menu>
                                         </menuItem>
@@ -885,6 +891,12 @@ CQ
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <connections>
                                                             <action selector="removeSystemExtensionAndAgents:" target="Rah-lS-gno" id="1Yo-Qj-wxo"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Reset Remote Messages" id="i82-vX-K8b">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <connections>
+                                                            <action selector="resetNetworkProtectionRemoteMessages:" target="Ady-hI-5gd" id="e8y-2X-VAc"/>
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem isSeparatorItem="YES" id="FSc-gX-vGh"/>
@@ -1048,6 +1060,37 @@ CQ
                                                             </connections>
                                                         </menu>
                                                     </menuItem>
+                                                    <menuItem title="Override NetP Activation Date" id="1gh-1t-gP3">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                        <menu key="submenu" title="Override NetP Activation Date" id="eU6-PJ-6Kx">
+                                                            <items>
+                                                                <menuItem title="Reset Activation Date" id="STc-AS-sXb">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="resetNetworkProtectionActivationDate:" target="Ady-hI-5gd" id="m9x-mw-hqK"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="Set Activation Date to Now" id="Wv8-wW-iVa">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="overrideNetworkProtectionActivationDateToNow:" target="Ady-hI-5gd" id="gEW-vP-EQc"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="Set Activation Date to 5 Days Ago" id="fkt-Z6-tdp">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="overrideNetworkProtectionActivationDateTo5DaysAgo:" target="Ady-hI-5gd" id="cy3-fK-Ld1"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem title="Set Activation Date to 10 Days Ago" id="ofD-Xp-Idm">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="overrideNetworkProtectionActivationDateTo10DaysAgo:" target="Ady-hI-5gd" id="lNr-gR-7kh"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                            </items>
+                                                        </menu>
+                                                    </menuItem>
                                                     <menuItem title="NetP Waitlist" id="iSU-Wj-V9c">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                         <menu key="submenu" title="NetP Waitlist" id="FmX-fq-tGP">
@@ -1201,7 +1244,13 @@ CQ
                                                 </connections>
                                             </menu>
                                         </menuItem>
-                                        <menuItem title="Trigger Fatal Error" id="FeS-hb-rvM" userLabel="Reset Default Browser Prompt">
+                                        <menuItem title="Open App Container in Finder" id="rUh-SZ-Ens">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="openAppContainerInFinder:" target="Ady-hI-5gd" id="Wub-im-mcf"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Trigger Fatal Error" id="FeS-hb-rvM">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="triggerFatalError:" target="Ady-hI-5gd" id="pS0-iQ-TPe"/>

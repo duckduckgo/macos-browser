@@ -45,13 +45,13 @@ final class DataBrokerProtectionStageDurationCalculator {
         let durationSinceLastStage = now.timeIntervalSince(lastStateTime) * 1000
         self.lastStateTime = now
 
-        return durationSinceLastStage
+        return durationSinceLastStage.rounded(.towardZero)
     }
 
     /// Returned in milliseconds
     func durationSinceStartTime() -> Double {
         let now = Date()
-        return now.timeIntervalSince(startTime) * 1000
+        return (now.timeIntervalSince(startTime) * 1000).rounded(.towardZero)
     }
 
     func fireOptOutStart() {
@@ -90,12 +90,16 @@ final class DataBrokerProtectionStageDurationCalculator {
         handler.fire(.optOutValidate(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
     }
 
+    func fireOptOutSubmitSuccess() {
+        handler.fire(.optOutSubmitSuccess(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
+    }
+
     func fireOptOutFailure() {
         handler.fire(.optOutFailure(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceStartTime()))
     }
 }
 
-public enum DataBrokerProtectionPixels {
+public enum DataBrokerProtectionPixels: Equatable {
     struct Consts {
         static let dataBrokerParamKey = "data_broker"
         static let appVersionParamKey = "app_version"
@@ -104,6 +108,7 @@ public enum DataBrokerProtectionPixels {
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
+    case parentChildMatches(parent: String, child: String, value: Int)
 
     // Stage Pixels
     case optOutStart(dataBroker: String, attemptId: UUID)
@@ -118,6 +123,7 @@ public enum DataBrokerProtectionPixels {
     case optOutFinish(dataBroker: String, attemptId: UUID, duration: Double)
 
     // Process Pixels
+    case optOutSubmitSuccess(dataBroker: String, attemptId: UUID, duration: Double)
     case optOutSuccess(dataBroker: String, attemptId: UUID, duration: Double)
     case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double)
 }
@@ -125,16 +131,6 @@ public enum DataBrokerProtectionPixels {
 public extension DataBrokerProtectionPixels {
 
     var params: [String: String] {
-        var pixelParams = internalParams
-
-        if let appVersion = AppVersionProvider().appVersion() {
-            pixelParams[Consts.appVersionParamKey] = appVersion
-        }
-
-        return pixelParams
-    }
-
-    private var internalParams: [String: String] {
         switch self {
         case .error(let error, let dataBroker):
             if case let .actionFailed(actionID, message) = error {
@@ -145,6 +141,8 @@ public extension DataBrokerProtectionPixels {
             } else {
                 return ["dataBroker": dataBroker, "name": error.name]
             }
+        case .parentChildMatches(let parent, let child, let value):
+            return ["parent": parent, "child": child, "value": String(value)]
         case .optOutStart(let dataBroker, let attemptId):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString]
         case .optOutEmailGenerate(let dataBroker, let attemptId, let duration):
@@ -164,6 +162,8 @@ public extension DataBrokerProtectionPixels {
         case .optOutValidate(let dataBroker, let attemptId, let duration):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
         case .optOutFinish(let dataBroker, let attemptId, let duration):
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
+        case .optOutSubmitSuccess(let dataBroker, let attemptId, let duration):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
         case .optOutSuccess(let dataBroker, let attemptId, let duration):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]

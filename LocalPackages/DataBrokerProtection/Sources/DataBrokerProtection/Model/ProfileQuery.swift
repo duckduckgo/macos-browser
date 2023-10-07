@@ -40,6 +40,7 @@ struct ProfileQuery: Encodable, Sendable {
     let phone: String?
     let fullName: String
     let age: Int
+    let deprecated: Bool
 
     public init(id: Int64? = nil,
                 firstName: String,
@@ -51,7 +52,8 @@ struct ProfileQuery: Encodable, Sendable {
                 street: String? = nil,
                 zipCode: String? = nil,
                 phone: String? = nil,
-                birthYear: Int) {
+                birthYear: Int,
+                deprecated: Bool = false) {
         self.id = id
         self.firstName = firstName
         self.lastName = lastName
@@ -66,5 +68,6 @@ struct ProfileQuery: Encodable, Sendable {
         self.addresses = [Address(city: city, state: state)]
         self.fullName = "\(firstName) \(lastName)"
         self.age = Self.currentYear - birthYear
+        self.deprecated = deprecated
     }
 }

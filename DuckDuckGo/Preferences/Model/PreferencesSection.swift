@@ -26,13 +26,25 @@ struct PreferencesSection: Hashable, Identifiable {
     @MainActor
     static func defaultSections(includingDuckPlayer: Bool) -> [PreferencesSection] {
         let regularPanes: [PreferencePaneIdentifier] = {
-            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
-            if includingDuckPlayer {
-                panes.append(.duckPlayer)
+#if SUBSCRIPTION
+            var panes: [PreferencePaneIdentifier] = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
+
+            if (NSApp.delegate as? AppDelegate)?.internalUserDecider?.isInternalUser == true {
+                if let generalIndex = panes.firstIndex(of: .general) {
+                    panes.insert(.sync, at: generalIndex + 1)
+                }
             }
+#else
+            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
+
             if (NSApp.delegate as? AppDelegate)?.internalUserDecider?.isInternalUser == true {
                 panes.insert(.sync, at: 1)
             }
+#endif
+            if includingDuckPlayer {
+                panes.append(.duckPlayer)
+            }
+
             return panes
         }()
 
@@ -53,6 +65,9 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case sync
     case appearance
     case privacy
+#if SUBSCRIPTION
+    case subscription
+#endif
     case autofill
     case downloads
     case duckPlayer = "duckplayer"
@@ -78,6 +93,10 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.appearance
         case .privacy:
             return UserText.privacy
+#if SUBSCRIPTION
+        case .subscription:
+            return UserText.subscription
+#endif
         case .autofill:
             return UserText.autofill
         case .downloads:
@@ -99,6 +118,10 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return "Appearance"
         case .privacy:
             return "Privacy"
+#if SUBSCRIPTION
+        case .subscription:
+            return "Privacy"
+#endif
         case .autofill:
             return "Autofill"
         case .downloads:
