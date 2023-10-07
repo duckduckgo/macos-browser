@@ -17,7 +17,6 @@
 //
 
 import Foundation
-import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
 /// An IPC client
 ///
@@ -30,7 +29,6 @@ public final class XPCClient<ClientInterface: AnyObject, ServerInterface: AnyObj
     private let machServiceName: String
     private let clientInterface: NSXPCInterface
     private let serverInterface: NSXPCInterface
-    private let log: OSLog
 
     /// The internal connection, which may still not have been created.
     ///
@@ -60,13 +58,11 @@ public final class XPCClient<ClientInterface: AnyObject, ServerInterface: AnyObj
 
     public init(machServiceName: String,
                 clientInterface: NSXPCInterface,
-                serverInterface: NSXPCInterface,
-                log: OSLog = .disabled) {
+                serverInterface: NSXPCInterface) {
 
         self.machServiceName = machServiceName
         self.clientInterface = clientInterface
         self.serverInterface = serverInterface
-        self.log = log
     }
 
     deinit {

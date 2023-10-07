@@ -17,9 +17,9 @@
 //
 
 import Foundation
-import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
 @objc
+// swiftlint:disable:next private_over_fileprivate
 fileprivate class XPCConnectionsManager: NSObject, NSXPCListenerDelegate {
 
     private let clientInterface: NSXPCInterface
@@ -75,8 +75,6 @@ public final class XPCServer<ClientInterface: AnyObject, ServerInterface: AnyObj
     ///
     private let listener: NSXPCListener
 
-    private let log: OSLog
-
     /// The delegate.
     ///
     public weak var delegate: ServerInterface? {
@@ -91,13 +89,11 @@ public final class XPCServer<ClientInterface: AnyObject, ServerInterface: AnyObj
 
     public init(machServiceName: String,
                 clientInterface: NSXPCInterface,
-                serverInterface: NSXPCInterface,
-                log: OSLog = .disabled) {
+                serverInterface: NSXPCInterface) {
 
         listener = NSXPCListener(machServiceName: machServiceName)
         self.clientInterface = clientInterface
         self.serverInterface = serverInterface
-        self.log = log
 
         connectionsManager = XPCConnectionsManager(clientInterface: clientInterface, serverInterface: serverInterface)
 
@@ -136,7 +132,6 @@ extension XPCServer {
             do {
                 client = try self.client(for: connection)
             } catch {
-                os_log("statusChanged failed to encode JSON payload", log: log, type: .error)
                 continue
             }
 

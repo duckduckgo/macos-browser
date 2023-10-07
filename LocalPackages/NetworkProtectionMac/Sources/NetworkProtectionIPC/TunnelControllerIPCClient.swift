@@ -19,7 +19,6 @@
 import Foundation
 import Intercom
 import NetworkProtection
-import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
 /// This protocol describes the client-side IPC interface for controlling the tunnel
 ///
@@ -53,7 +52,7 @@ public final class TunnelControllerIPCClient {
     ///
     public weak var clientDelegate: IPCClientInterface?
 
-    public init(machServiceName: String, log: OSLog = .disabled) {
+    public init(machServiceName: String) {
         let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
         let serverInterface = NSXPCInterface(with: XPCServerInterface.self)
 
@@ -93,7 +92,6 @@ extension TunnelControllerIPCClient: XPCClientInterface {
 
     func serverInfoChanged(payload: Data) {
         guard let serverInfo = try? JSONDecoder().decode(NetworkProtectionStatusServerInfo.self, from: payload) else {
-            //os_log("statusChanged failed to decode JSON payload", log: log, type: .error)
             return
         }
 
@@ -103,7 +101,6 @@ extension TunnelControllerIPCClient: XPCClientInterface {
 
     func statusChanged(payload: Data) {
         guard let status = try? JSONDecoder().decode(ConnectionStatus.self, from: payload) else {
-            //os_log("statusChanged failed to decode JSON payload", log: log, type: .error)
             return
         }
 
