@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-#if SUBSCRIPTION
+#if NETWORK_PROTECTION && SUBSCRIPTION
 
 import Foundation
 import Account
