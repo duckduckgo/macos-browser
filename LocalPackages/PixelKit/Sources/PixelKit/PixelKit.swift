@@ -19,10 +19,6 @@
 import Foundation
 import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
-protocol ErrorWithParameters {
-    var errorParameters: [String: String] { get }
-}
-
 public final class PixelKit {
 
     /// The frequency with which a pixel is sent to our endpoint.
@@ -153,6 +149,10 @@ public final class PixelKit {
     }
 
     private func prefixedName(for event: Event) -> String {
+        if event.name.hasPrefix("m_mac_") {
+            return event.name
+        }
+
         if let debugEvent = event as? DebugEvent {
             return "m_mac_debug_\(debugEvent.name)"
         } else {
@@ -200,7 +200,7 @@ public final class PixelKit {
 
     public static func fire(_ event: Event,
                             frequency: Frequency,
-                            withHeaders headers: [String: String],
+                            withHeaders headers: [String: String] = [:],
                             withAdditionalParameters parameters: [String: String]? = nil,
                             allowedQueryReservedCharacters: CharacterSet? = nil,
                             includeAppVersionParameter: Bool = true,

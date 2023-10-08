@@ -1,5 +1,5 @@
 //
-//  PixelKitStorage.swift
+//  DuckDuckGoUserAgent.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -17,10 +17,14 @@
 //
 
 import Foundation
+import Common
 
-/// Storage for persistable pixel events information.
-///
-protocol PixelKitStorage {
-    func lastFireDate(for event: PixelKitEvent) -> Date?
-    func updateLastFireDate(for event: PixelKitEvent)
+enum UserAgent {
+
+    static func duckDuckGoUserAgent(appVersion: String = AppVersion.shared.versionNumber,
+                                    appID: String = AppVersion.shared.identifier,
+                                    systemVersion: String = ProcessInfo.processInfo.operatingSystemVersionString) -> String {
+        return "ddg_mac/\(appVersion) (\(appID); macOS \(systemVersion))"
+    }
+
 }
