@@ -149,6 +149,10 @@ public final class PixelKit {
     }
 
     private func prefixedName(for event: Event) -> String {
+        if event.name.hasPrefix("m_mac_") {
+            return event.name
+        }
+
         if let debugEvent = event as? DebugEvent {
             return "m_mac_debug_\(debugEvent.name)"
         } else {
