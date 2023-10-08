@@ -27,14 +27,23 @@ final class MockNetworkProtectionCodeRedeemer: NetworkProtectionCodeRedeeming {
         case error
     }
 
-    var redeemedCode: String?
     var throwError: Bool = false
 
+    var redeemedCode: String?
     func redeem(_ code: String) async throws {
         if throwError {
             throw MockNetworkProtectionCodeRedeemerError.error
         } else {
             redeemedCode = code
+        }
+    }
+
+    var redeemedAccessToken: String?
+    func exchange(accessToken: String) async throws {
+        if throwError {
+            throw MockNetworkProtectionCodeRedeemerError.error
+        } else {
+            redeemedAccessToken = accessToken
         }
     }
 
