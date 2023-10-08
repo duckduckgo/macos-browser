@@ -2831,6 +2831,7 @@
 		4BF0E5152AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF0E5112AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift */; };
 		4BF0E5162AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF0E5112AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift */; };
 		4BF0E5172AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF0E5112AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift */; };
+		4BF0E5192AD3001A00FFEC9E /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4BF0E5182AD3001A00FFEC9E /* PixelKit */; };
 		4BF4951826C08395000547B8 /* ThirdPartyBrowserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */; };
 		4BF4EA5027C71F26004E57C4 /* PasswordManagementListSectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4EA4F27C71F26004E57C4 /* PasswordManagementListSectionTests.swift */; };
 		4BF6961D28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF6961C28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift */; };
@@ -4891,6 +4892,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BF0E5192AD3001A00FFEC9E /* PixelKit in Frameworks */,
 				B6F7128229F6820A00594A45 /* QuickLookUI.framework in Frameworks */,
 				984FD3BF299ACF35007334DD /* Bookmarks in Frameworks */,
 				37A5E2F0298AA1B20047046B /* Persistence in Frameworks */,
@@ -8514,6 +8516,7 @@
 				B6EC37FE29B8D915001ACE79 /* Configuration */,
 				37DF000629F9C061002B7D3E /* SyncDataProviders */,
 				9DC70B192AA1FA5B005A844B /* LoginItems */,
+				4BF0E5182AD3001A00FFEC9E /* PixelKit */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -14346,6 +14349,10 @@
 			productName = Purchase;
 		};
 		4BF0E50D2AD2555D00FFEC9E /* PixelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKit;
+		};
+		4BF0E5182AD3001A00FFEC9E /* PixelKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PixelKit;
 		};
