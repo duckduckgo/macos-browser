@@ -36,6 +36,10 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
     private let privacyConfigurationManager: PrivacyConfigurationManaging
 
+    var waitlistIsOngoing: Bool {
+        isWaitlistEnabled && isWaitlistBetaActive
+    }
+
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
          featureOverrides: WaitlistBetaOverriding = DefaultWaitlistBetaOverrides(),
@@ -74,10 +78,6 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     ///
     private var isWaitlistUser: Bool {
         NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
-    }
-
-    private var waitlistIsOngoing: Bool {
-        isWaitlistEnabled && isWaitlistBetaActive
     }
 
     private var isWaitlistBetaActive: Bool {

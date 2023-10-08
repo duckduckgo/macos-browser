@@ -301,10 +301,12 @@ final class NavigationBarViewController: NSViewController {
 
         if NetworkProtectionWaitlist().shouldShowWaitlistViewController {
             WaitlistModalViewController.show()
+            DailyPixel.fire(pixel: .networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
         } else if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
         } else {
             WaitlistModalViewController.show()
+            DailyPixel.fire(pixel: .networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
         }
     }
 #endif
@@ -939,6 +941,12 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     func optionsButtonMenuRequestedAppearancePreferences(_ menu: NSMenu) {
         WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .appearance)
     }
+
+#if SUBSCRIPTION
+    func optionsButtonMenuRequestedSubscriptionPreferences(_ menu: NSMenu) {
+        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .subscription)
+    }
+#endif
 
 }
 
