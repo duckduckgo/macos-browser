@@ -24,6 +24,8 @@ import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
 import ServiceManagement
+import PixelKit
+import Networking
 
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
