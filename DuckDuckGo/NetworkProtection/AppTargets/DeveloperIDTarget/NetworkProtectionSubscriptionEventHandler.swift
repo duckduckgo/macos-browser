@@ -23,7 +23,7 @@ import Account
 import NetworkProtection
 
 final class NetworkProtectionSubscriptionEventHandler {
-    
+
     private let accountManager: Account.AccountManaging
     private let networkProtectionRedemptionCoordinator: NetworkProtectionCodeRedeeming
     private let networkProtectionTokenStorage: NetworkProtectionTokenStore
