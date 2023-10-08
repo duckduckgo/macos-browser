@@ -80,7 +80,7 @@ extension EventMapping where Event == NetworkProtectionError {
         }
 
         let debugEvent = DebugEvent(eventType: .custom(domainEvent))
-        PixelKit.fire(debugEvent, frequency: .standard, withHeaders: [:])
+        PixelKit.fire(debugEvent, frequency: .standard, includeAppVersionParameter: true)
     }
 }
 

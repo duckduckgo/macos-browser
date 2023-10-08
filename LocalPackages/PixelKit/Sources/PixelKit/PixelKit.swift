@@ -200,7 +200,7 @@ public final class PixelKit {
 
     public static func fire(_ event: Event,
                             frequency: Frequency,
-                            withHeaders headers: [String: String],
+                            withHeaders headers: [String: String] = [:],
                             withAdditionalParameters parameters: [String: String]? = nil,
                             allowedQueryReservedCharacters: CharacterSet? = nil,
                             includeAppVersionParameter: Bool = true,

@@ -154,7 +154,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
-        PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionTestPixel, frequency: .standard, withHeaders: [:])
+        PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionTestPixel, frequency: .standard, includeAppVersionParameter: true)
     }
 }
 

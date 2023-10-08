@@ -167,7 +167,6 @@ extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
             PixelKit.fire(
                 NetworkProtectionPixelEvent.networkProtectionSystemExtensionUnknownActivationResult,
                 frequency: .standard,
-                withHeaders: [:],
                 includeAppVersionParameter: true
             )
         }
