@@ -81,6 +81,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         try super.init(file: file, key: key, writerType: .queue) { migrator in
             migrator.registerMigration("v1", migrate: Self.migrateV1(database:))
             migrator.registerMigration("v2", migrate: Self.migrateV2(database:))
+            migrator.registerMigration("v3", migrate: Self.migrateV3(database:))
         }
     }
 
@@ -238,6 +239,12 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             $0.column(OptOutAttemptDB.Columns.attemptId.name, .text).notNull()
             $0.column(OptOutAttemptDB.Columns.lastStageDate.name, .date).notNull()
             $0.column(OptOutAttemptDB.Columns.startDate.name, .date).notNull()
+        }
+    }
+
+    static func migrateV3(database: Database) throws {
+        try database.alter(table: ProfileQueryDB.databaseTableName) {
+            $0.add(column: ProfileQueryDB.Columns.deprecated.name, .boolean).notNull().defaults(to: false)
         }
     }
 

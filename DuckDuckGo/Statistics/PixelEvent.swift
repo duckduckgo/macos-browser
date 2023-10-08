@@ -92,8 +92,7 @@ extension Pixel {
         case serpInitial(cohort: String)
         case serpDay21to27(cohort: String)
 
-        case dataImportFailed(action: DataImportAction, source: DataImportSource)
-        case faviconImportFailed(source: DataImportSource)
+        case dataImportFailed(any DataImportError)
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
@@ -170,6 +169,7 @@ extension Pixel {
 
         case dailyPixel(Event, isFirst: Bool)
 #if DBP
+        case parentChildMatches
         // SLO and SLI Pixels: https://app.asana.com/0/1203581873609357/1205337273100857/f
 
         // Stage Pixels
@@ -360,11 +360,10 @@ extension Pixel.Event {
         case .serp:
             return "m_mac_navigation_search"
 
-        case .dataImportFailed(action: let action, source: let source):
-            return "m_mac_data-import-failed_\(action)_\(source)"
-
-        case .faviconImportFailed(source: let source):
-            return "m_mac_favicon-import-failed_\(source)"
+        case .dataImportFailed(let error) where error.action == .favicons:
+            return "m_mac_favicon-import-failed_\(error.source)"
+        case .dataImportFailed(let error):
+            return "m_mac_data-import-failed_\(error.action)_\(error.source)"
 
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"
@@ -500,6 +499,7 @@ extension Pixel.Event {
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")
 #if DBP
+        case .parentChildMatches: return "dbp_macos_parent-child-broker-matches"
             // Stage Pixels
         case .optOutStart: return "dbp_macos_optout_stage_start"
         case .optOutEmailGenerate: return "dbp_macos_optout_stage_email-generate"

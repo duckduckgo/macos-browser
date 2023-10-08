@@ -27,6 +27,10 @@ import WebKit
 import NetworkProtection
 #endif
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 @MainActor
 final class MainMenu: NSMenu {
 
@@ -106,6 +110,12 @@ final class MainMenu: NSMenu {
             self.debugMenuItem = nil
             return
         }
+#endif
+
+#if SUBSCRIPTION
+        debugMenuItem.submenu!.addItem(SubscriptionDebugMenu(currentViewController: {
+            WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+        }))
 #endif
 
         if debugMenuItem.submenu?.items.contains(loggingMenuItem) == false {

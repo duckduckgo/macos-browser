@@ -36,14 +36,10 @@ struct BookmarkImportErrorMock: Error {}
 
 struct MockBookmarkImporter: BookmarkImporter {
 
-    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) throws -> BookmarkImportResult {
-        if let error = throwableError {
-            throw error
-        }
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult {
         return importBookmarks(bookmarks, source)
     }
 
-    var throwableError: Error?
     var importBookmarks: (ImportedBookmarks, BookmarkImportSource) -> BookmarkImportResult
 
 }

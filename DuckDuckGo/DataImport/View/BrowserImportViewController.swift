@@ -106,7 +106,7 @@ final class BrowserImportViewController: NSViewController {
         }
 
         switch browser {
-        case .safari:
+        case .safari, .safariTechnologyPreview:
             bookmarksCheckbox.title = UserText.bookmarkImportBookmarksAndFavorites
             guard let safariMajorVersion = SafariVersionReader.getMajorVersion() else {
                 assertionFailure("Failed to get version of Safari")

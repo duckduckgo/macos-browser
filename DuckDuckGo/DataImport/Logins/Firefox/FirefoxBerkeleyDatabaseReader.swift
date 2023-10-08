@@ -18,22 +18,12 @@
 
 import Foundation
 
-enum FirefoxBerkeleyDatabaseReaderError: Error {
-    case failedToOpenDatabase
-}
-
 enum FirefoxBerkeleyDatabaseReader {
 
-    static func readDatabase(at databasePath: String) throws -> [String: Data]? {
-        let path = databasePath.cString(using: .utf8)
-
-        let db = path?.withUnsafeBufferPointer({ pathPointer in
-            return dbopen(pathPointer.baseAddress, O_RDONLY, O_RDONLY, DB_HASH, nil)
-        })
-
-        guard let db else {
-            throw FirefoxBerkeleyDatabaseReaderError.failedToOpenDatabase
-        }
+    static func readDatabase(at databasePath: String) throws -> [String: Data] {
+        guard let db = databasePath.withCString({ pathPointer in
+            dbopen(pathPointer, O_RDONLY, O_RDONLY, DB_HASH, nil)
+        }) else { throw NSError(domain: "FirefoxBerkeleyDatabaseReaderError", code: Int(errno)) }
 
         var results: [String: Data] = [:]
 

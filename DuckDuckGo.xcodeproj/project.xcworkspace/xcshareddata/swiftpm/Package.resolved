@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "anya/autofill-on-default-flag",
-        "revision" : "321222e576c23868c67a4f7a690f54b7a45feca7"
+        "revision" : "43fd829917f61f605fc110b68bb1bf1841276b3c",
+        "version" : "81.1.0"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "8def15fe8a4c2fb76730f640507e9fd1d6c1f8a7",
-        "version" : "4.32.0"
+        "revision" : "74b6142c016be354144f28551de41b50c4864b1f",
+        "version" : "4.37.0"
       }
     },
     {

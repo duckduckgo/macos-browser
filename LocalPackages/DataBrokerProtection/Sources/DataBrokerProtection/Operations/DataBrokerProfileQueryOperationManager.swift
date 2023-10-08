@@ -118,7 +118,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             os_log("Extracted profiles: %@", log: .dataBrokerProtection, extractedProfiles)
 
             if !extractedProfiles.isEmpty {
-                let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .matchesFound)
+                let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .matchesFound(count: extractedProfiles.count))
                 database.add(event)
 
                 for extractedProfile in extractedProfiles {
