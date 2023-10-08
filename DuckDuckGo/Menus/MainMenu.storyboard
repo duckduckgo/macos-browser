@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22154" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22154"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -1137,12 +1137,12 @@ CQ
                                                     </menuItem>
                                                     <menuItem title="NetP Waitlist Feature Flag Overrides" id="xot-uM-W8R">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="NetP Waitlist Feature Flag Overrides" id="M1G-na-mOc" customClass="NetworkProtectionWaitlistMenu" customModule="DuckDuckGo_Privacy_Browser">
+                                                        <menu key="submenu" title="NetP Waitlist Feature Flag Overrides" id="M1G-na-mOc" customClass="NetworkProtectionWaitlistMenu" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                                             <items>
                                                                 <menuItem title="Reset Waitlist Overrides" id="soP-sz-xwK">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                                     <connections>
-                                                                        <action selector="waitlistResetFeatureOverridesWithSender:" target="M1G-na-mOc" id="UyM-sh-9EK"/>
+                                                                        <action selector="waitlistResetFeatureOverridesWithSender:" target="M1G-na-mOc" id="1ZK-8m-Jh7"/>
                                                                     </connections>
                                                                 </menuItem>
                                                                 <menuItem isSeparatorItem="YES" id="2l6-pe-Pcq"/>
