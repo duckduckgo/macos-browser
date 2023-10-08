@@ -135,7 +135,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
             }
 
-            PixelKit.fire(domainEvent, frequency: .dailyAndContinuous, withHeaders: [:])
+            PixelKit.fire(domainEvent, frequency: .dailyAndContinuous, withHeaders: [:], includeAppVersionParameter: true)
         }
     }
 
