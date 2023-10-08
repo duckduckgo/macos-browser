@@ -857,4 +857,8 @@ struct UserText {
     static let bookmarksBarPromptDismiss = NSLocalizedString("bookmarks.bar.prompt.dismiss", value: "Hide", comment: "Dismiss button label on bookmarks bar prompt")
     static let bookmarksBarPromptAccept = NSLocalizedString("bookmarks.bar.prompt.accept", value: "Show", comment: "Accept button label on bookmarks bar prompt")
 
+#if SUBSCRIPTION
+    static let subscriptionOptionsMenuItem = NSLocalizedString("subscription.menu.item", value: "Privacy Pro", comment: "Title for Subscription item in the options menu")
+    static let subscription = NSLocalizedString("preferences.subscription", value: "Privacy Pro", comment: "Show subscription preferences")
+#endif
 }

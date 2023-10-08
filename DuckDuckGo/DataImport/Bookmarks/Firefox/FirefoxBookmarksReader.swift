@@ -33,64 +33,83 @@ final class FirefoxBookmarksReader {
         static let unfiled = "unfiled_____"
     }
 
-    enum ImportError: Error {
-        case noBookmarksFileFound
-        case failedToTemporarilyCopyFile
-        case unexpectedBookmarksDatabaseFormat
+    struct ImportError: DataImportError {
+        enum OperationType: Int {
+            case dbOpen
+
+            case fetchRootEntries
+            case noRootEntries
+            case fetchTopLevelFolders
+            case fetchAllBookmarks
+            case fetchAllFolders
+
+            case copyTemporaryFile
+        }
+
+        var action: DataImportAction { .bookmarks }
+        var source: DataImport.Source { .firefox }
+        let type: OperationType
+        let underlyingError: Error?
     }
 
     private let firefoxPlacesDatabaseURL: URL
+    private var currentOperationType: ImportError.OperationType = .copyTemporaryFile
 
     init(firefoxDataDirectoryURL: URL) {
         self.firefoxPlacesDatabaseURL = firefoxDataDirectoryURL.appendingPathComponent(Constants.placesDatabaseName)
     }
 
-    func readBookmarks() -> Result<ImportedBookmarks, FirefoxBookmarksReader.ImportError> {
+    func readBookmarks() -> DataImportResult<ImportedBookmarks> {
         do {
+            currentOperationType = .copyTemporaryFile
             return try firefoxPlacesDatabaseURL.withTemporaryFile { temporaryDatabaseURL in
-                return readBookmarks(fromDatabaseURL: temporaryDatabaseURL)
+                let bookmarks = try readBookmarks(fromDatabaseURL: temporaryDatabaseURL)
+                return .success(bookmarks)
             }
+        } catch let error as ImportError {
+            return .failure(error)
         } catch {
-            return .failure(.failedToTemporarilyCopyFile)
+            return .failure(ImportError(type: currentOperationType, underlyingError: error))
         }
     }
 
     // MARK: - Private
 
-    private func readBookmarks(fromDatabaseURL databaseURL: URL) -> Result<ImportedBookmarks, FirefoxBookmarksReader.ImportError> {
-        do {
-            let queue = try DatabaseQueue(path: databaseURL.path)
+    private func readBookmarks(fromDatabaseURL databaseURL: URL) throws -> ImportedBookmarks {
+        currentOperationType = .dbOpen
+        let queue = try DatabaseQueue(path: databaseURL.path)
 
-            let bookmarks: DatabaseBookmarks = try queue.read { database in
-                guard let rootEntries = try? FolderRow.fetchAll(database, sql: rootEntryQuery()), let rootEntry = rootEntries.first else {
-                    throw ImportError.unexpectedBookmarksDatabaseFormat
-                }
+        let bookmarks: DatabaseBookmarks = try queue.read { database in
+            currentOperationType = .fetchRootEntries
+            let rootEntries = try FolderRow.fetchAll(database, sql: rootEntryQuery())
+            guard let rootEntry = rootEntries.first else { throw ImportError(type: .noRootEntries, underlyingError: nil) }
 
-                assert(rootEntries.count == 1, "moz_bookmarks should only have one root entry")
+            assert(rootEntries.count == 1, "moz_bookmarks should only have one root entry")
 
-                let topLevelFolders = try FolderRow.fetchAll(database, sql: foldersWithParentQuery(), arguments: [rootEntry.id])
-                let tagsFolder = topLevelFolders.first { $0.guid == BookmarkGUID.tags }
+            currentOperationType = .fetchTopLevelFolders
+            let topLevelFolders = try FolderRow.fetchAll(database, sql: foldersWithParentQuery(), arguments: [rootEntry.id])
+            let tagsFolder = topLevelFolders.first { $0.guid == BookmarkGUID.tags }
 
-                let allBookmarks = try BookmarkRow.fetchAll(database, sql: allBookmarksQuery())
+            currentOperationType = .fetchAllBookmarks
+            let allBookmarks = try BookmarkRow.fetchAll(database, sql: allBookmarksQuery())
                     .filter { !($0.url.hasPrefix("place:") || $0.url.hasPrefix("about:")) }
-                let allFolders = try FolderRow.fetchAll(database, sql: allFoldersQuery(), arguments: [tagsFolder?.id ?? 0])
 
-                let foldersByParent: [Int: [FolderRow]] = allFolders.reduce(into: [:]) { result, folder in
-                    result[folder.parent, default: []].append(folder)
-                }
+            currentOperationType = .fetchAllFolders
+            let allFolders = try FolderRow.fetchAll(database, sql: allFoldersQuery(), arguments: [tagsFolder?.id ?? 0])
 
-                let bookmarksByFolder: [Int: [BookmarkRow]] = allBookmarks.reduce(into: [:]) { result, bookmark in
-                    result[bookmark.parent, default: []].append(bookmark)
-                }
-
-                return DatabaseBookmarks(topLevelFolders: topLevelFolders, foldersByParent: foldersByParent, bookmarksByFolder: bookmarksByFolder)
+            let foldersByParent: [Int: [FolderRow]] = allFolders.reduce(into: [:]) { result, folder in
+                result[folder.parent, default: []].append(folder)
             }
 
-            let importedBookmarks = mapDatabaseBookmarksToImportedBookmarks(bookmarks)
-            return .success(importedBookmarks)
-        } catch {
-            return .failure(.unexpectedBookmarksDatabaseFormat)
+            let bookmarksByFolder: [Int: [BookmarkRow]] = allBookmarks.reduce(into: [:]) { result, bookmark in
+                result[bookmark.parent, default: []].append(bookmark)
+            }
+
+            return DatabaseBookmarks(topLevelFolders: topLevelFolders, foldersByParent: foldersByParent, bookmarksByFolder: bookmarksByFolder)
         }
+
+        let importedBookmarks = mapDatabaseBookmarksToImportedBookmarks(bookmarks)
+        return importedBookmarks
     }
 
     fileprivate class DatabaseBookmarks {
@@ -156,9 +175,7 @@ final class FirefoxBookmarksReader {
     }
 
     private func children(parentID: Int?, bookmarks: DatabaseBookmarks) -> [ImportedBookmarks.BookmarkOrFolder] {
-        guard let parentID = parentID else {
-            return []
-        }
+        guard let parentID else { return [] }
 
         let childFolders = bookmarks.foldersByParent[parentID] ?? []
         let childBookmarks = bookmarks.bookmarksByFolder[parentID] ?? []

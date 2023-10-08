@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Common
 import CryptoKit
 import GRDB
 
@@ -26,10 +27,17 @@ final class SafariFaviconsReader {
         static let faviconsDatabaseName = "TouchIconCacheSettings.db"
     }
 
-    enum ImportError: Error {
-        case noFaviconsDatabaseFound
-        case failedToTemporarilyCopyFile
-        case unexpectedFaviconsDatabaseFormat
+    struct ImportError: DataImportError {
+        enum OperationType: Int {
+            case copyTemporaryFile
+            case dbOpen
+            case fetchAllFavicons
+        }
+
+        var action: DataImportAction { .favicons }
+        var source: DataImport.Source { .safari }
+        let type: OperationType
+        let underlyingError: Error?
     }
 
     fileprivate final class SafariFaviconRecord: FetchableRecord {
@@ -71,6 +79,7 @@ final class SafariFaviconsReader {
     }
 
     private let safariFaviconsDatabaseURL: URL
+    private var currentOperationType: ImportError.OperationType = .copyTemporaryFile
 
     init(safariDataDirectoryURL: URL) {
         self.safariFaviconsDatabaseURL = safariDataDirectoryURL
@@ -78,55 +87,51 @@ final class SafariFaviconsReader {
             .appendingPathComponent(Constants.faviconsDatabaseName)
     }
 
-    func readFavicons() -> Result<[String: [SafariFavicon]], SafariFaviconsReader.ImportError> {
+    func readFavicons() -> DataImportResult<[String: [SafariFavicon]]> {
         do {
+            currentOperationType = .copyTemporaryFile
             return try safariFaviconsDatabaseURL.withTemporaryFile { temporaryDatabaseURL in
-                return readFavicons(fromDatabaseURL: temporaryDatabaseURL)
+                let favicons = try readFavicons(fromDatabaseURL: temporaryDatabaseURL)
+                return .success(favicons)
             }
+        } catch let error as ImportError {
+            return .failure(error)
         } catch {
-            return .failure(.failedToTemporarilyCopyFile)
+            return .failure(ImportError(type: currentOperationType, underlyingError: error))
         }
     }
 
     // MARK: - Private
 
-    private func readFavicons(fromDatabaseURL databaseURL: URL) -> Result<[String: [SafariFavicon]], SafariFaviconsReader.ImportError> {
-        do {
-            let queue = try DatabaseQueue(path: databaseURL.path)
+    private func readFavicons(fromDatabaseURL databaseURL: URL) throws -> [String: [SafariFavicon]] {
+        currentOperationType = .dbOpen
+        let queue = try DatabaseQueue(path: databaseURL.path)
 
-            let faviconRecords: [SafariFaviconRecord] = try queue.read { database in
-                guard let records = try? SafariFaviconRecord.fetchAll(database, sql: allFaviconsQuery()) else {
-                    throw ImportError.unexpectedFaviconsDatabaseFormat
-                }
-
-                return records
-            }
-
-            let favicons: [SafariFavicon] = faviconRecords.compactMap { record in
-                guard let imageData = fetchImageData(with: record.host) else {
-                    return nil
-                }
-
-                guard let formattedHost = record.formattedHost else {
-                    return nil
-                }
-
-                return SafariFavicon(host: formattedHost, imageData: imageData)
-            }
-
-            let faviconsByURL = Dictionary(grouping: favicons, by: { $0.host })
-
-            return .success(faviconsByURL)
-        } catch {
-            return .failure(.unexpectedFaviconsDatabaseFormat)
+        currentOperationType = .fetchAllFavicons
+        let faviconRecords: [SafariFaviconRecord] = try queue.read { database in
+            try SafariFaviconRecord.fetchAll(database, sql: allFaviconsQuery())
         }
+
+        let favicons: [SafariFavicon] = faviconRecords.compactMap { record in
+            let imageData: Data
+            do {
+                imageData = try readImageData(with: record.host)
+            } catch {
+                os_log(.error, log: .dataImportExport, "could not read image data for \(record.host)")
+                return nil
+            }
+            guard let formattedHost = record.formattedHost else { return nil }
+
+            return SafariFavicon(host: formattedHost, imageData: imageData)
+        }
+
+        let faviconsByURL = Dictionary(grouping: favicons, by: { $0.host })
+
+        return faviconsByURL
     }
 
-    private func fetchImageData(with host: String) -> Data? {
-        guard let hostData = host.data(using: .utf8) else {
-            return nil
-        }
-
+    private func readImageData(with host: String) throws -> Data {
+        let hostData = host.utf8data
         let imageUUID = CryptoKit.Insecure.MD5.hash(data: hostData)
         let hash = imageUUID.map {
             String(format: "%02hhx", $0)
@@ -135,7 +140,7 @@ final class SafariFaviconsReader {
         let faviconsDirectoryURL = safariFaviconsDatabaseURL.deletingLastPathComponent()
         let faviconURL = faviconsDirectoryURL.appendingPathComponent("Images").appendingPathComponent(hash).appendingPathExtension("png")
 
-        return try? Data(contentsOf: faviconURL)
+        return try Data(contentsOf: faviconURL)
     }
 
     // MARK: - Database Queries
