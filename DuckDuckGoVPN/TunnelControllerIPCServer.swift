@@ -29,8 +29,7 @@ final class TunnelControllerIPCServer {
 
     init(tunnelController: TunnelController, statusReporter: NetworkProtectionStatusReporter) {
         self.tunnelController = tunnelController
-        server = .init(machServiceName: Bundle.main.bundleIdentifier!,
-                       log: .networkProtectionIPCLog)
+        server = .init(machServiceName: Bundle.main.bundleIdentifier!)
         self.statusReporter = statusReporter
 
         subscribeToErrorChanges()

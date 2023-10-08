@@ -261,7 +261,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             // start the tunnel at once, and instead require that the user enables the toggle.
             //
             if onboardingStatusRawValue == OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue {
-                onboardingStatusRawValue = OnboardingStatus.completed.rawValue
+                onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
                 return
             }
 #endif

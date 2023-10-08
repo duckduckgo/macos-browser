@@ -4250,6 +4250,8 @@
 		7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayPopover.swift; sourceTree = "<group>"; };
 		7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ContentOverlay.storyboard; sourceTree = "<group>"; };
 		7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayViewController.swift; sourceTree = "<group>"; };
+		7B25FE312AD12C950012AFAB /* Intercom */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Intercom; sourceTree = "<group>"; };
+		7B25FE322AD12C990012AFAB /* NetworkProtectionMac */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = NetworkProtectionMac; sourceTree = "<group>"; };
 		7B2DDCF72A93A8BB0039D884 /* NetworkProtectionAppEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionAppEvents.swift; sourceTree = "<group>"; };
 		7B2E52242A5FEC09000C6D39 /* NetworkProtectionAgentNotificationsPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionAgentNotificationsPresenter.swift; sourceTree = "<group>"; };
 		7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionSimulateFailureMenu.swift; sourceTree = "<group>"; };
@@ -5422,10 +5424,11 @@
 			isa = PBXGroup;
 			children = (
 				1E862A852A9FBD7000F84D4B /* Account */,
-				3192A2702A4C4E330084EA89 /* DataBrokerProtection */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
+				3192A2702A4C4E330084EA89 /* DataBrokerProtection */,
+				7B25FE312AD12C950012AFAB /* Intercom */,
 				9DB6E7222AA0DA7A00A17F3C /* LoginItems */,
-				7BA7CC0A2AD11CAE0042E5CE /* NetworkProtectionMac */,
+				7B25FE322AD12C990012AFAB /* NetworkProtectionMac */,
 				4BE15DB12A0B0DD500898243 /* PixelKit */,
 				1EC88CA22AC1DE82003A4471 /* Purchase */,
 				378F44E229B4B7B600899924 /* SwiftUIExtensions */,
