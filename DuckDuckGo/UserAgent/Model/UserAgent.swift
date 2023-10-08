@@ -20,7 +20,7 @@ import Foundation
 import BrowserServicesKit
 import Common
 
-enum UserAgent {
+extension UserAgent {
 
     // MARK: - Fallback versions
 
@@ -67,12 +67,6 @@ enum UserAgent {
         // use default WKWebView user agent for duckduckgo domain to remove CTA
         regex("https://duckduckgo\\.com/.*"): UserAgent.webViewDefault
     ]
-
-    static func duckDuckGoUserAgent(appVersion: String = AppVersion.shared.versionNumber,
-                                    appID: String = AppVersion.shared.identifier,
-                                    systemVersion: String = ProcessInfo.processInfo.operatingSystemVersionString) -> String {
-        return "ddg_mac/\(appVersion) (\(appID); macOS \(systemVersion))"
-    }
 
     static func `for`(_ url: URL?,
                       privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> String {

@@ -2825,6 +2825,12 @@
 		4BF0E50B2AD2552200FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF0E5042AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift */; };
 		4BF0E50C2AD2552300FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF0E5042AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift */; };
 		4BF0E50E2AD2555D00FFEC9E /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4BF0E50D2AD2555D00FFEC9E /* PixelKit */; };
+		4BF0E5122AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF0E5112AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift */; };
+		4BF0E5132AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF0E5112AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift */; };
+		4BF0E5142AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF0E5112AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift */; };
+		4BF0E5152AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF0E5112AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift */; };
+		4BF0E5162AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF0E5112AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift */; };
+		4BF0E5172AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF0E5112AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift */; };
 		4BF4951826C08395000547B8 /* ThirdPartyBrowserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */; };
 		4BF4EA5027C71F26004E57C4 /* PasswordManagementListSectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4EA4F27C71F26004E57C4 /* PasswordManagementListSectionTests.swift */; };
 		4BF6961D28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF6961C28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift */; };
@@ -4227,6 +4233,7 @@
 		4BE65482271FCD53008D1D63 /* CountryList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountryList.swift; sourceTree = "<group>"; };
 		4BE65484271FCD7B008D1D63 /* LoginFaviconView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginFaviconView.swift; sourceTree = "<group>"; };
 		4BF0E5042AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionPixelEvent.swift; sourceTree = "<group>"; };
+		4BF0E5112AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckDuckGoUserAgent.swift; sourceTree = "<group>"; };
 		4BF4951726C08395000547B8 /* ThirdPartyBrowserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirdPartyBrowserTests.swift; sourceTree = "<group>"; };
 		4BF4EA4F27C71F26004E57C4 /* PasswordManagementListSectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementListSectionTests.swift; sourceTree = "<group>"; };
 		4BF6961C28BE911100D402D4 /* RecentlyVisitedSiteModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyVisitedSiteModelTests.swift; sourceTree = "<group>"; };
@@ -6819,6 +6826,7 @@
 			isa = PBXGroup;
 			children = (
 				14505A07256084EF00272CC6 /* UserAgent.swift */,
+				4BF0E5112AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -10217,6 +10225,7 @@
 				3192A1642A4C4CFF0084EA89 /* OnboardingFlow.swift in Sources */,
 				3192A1652A4C4CFF0084EA89 /* PasswordManagementLoginModel.swift in Sources */,
 				BB5CB0A12A7AD59D00B312D1 /* NetworkProtectionDebugUtilities.swift in Sources */,
+				4BF0E5162AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
 				3192A1662A4C4CFF0084EA89 /* TabViewModel.swift in Sources */,
 				B6676BE32AA986A700525A21 /* AddressBarTextEditor.swift in Sources */,
 				3192A1672A4C4CFF0084EA89 /* TabDragAndDropManager.swift in Sources */,
@@ -10993,6 +11002,7 @@
 				3706FC76293F65D500E42796 /* PixelDataRecord.swift in Sources */,
 				7BFE955A2A9DF4550081ABE9 /* NetworkProtectionWaitlistMenu.swift in Sources */,
 				3706FC77293F65D500E42796 /* PageObserverUserScript.swift in Sources */,
+				4BF0E5132AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
 				3706FC78293F65D500E42796 /* SecureVaultErrorReporter.swift in Sources */,
 				3706FC79293F65D500E42796 /* NSImageExtensions.swift in Sources */,
 				3706FEBD293F6EFF00E42796 /* BWCommand.swift in Sources */,
@@ -11395,6 +11405,7 @@
 				4BF0E5072AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				7BA7CC522AD11F9A0042E5CE /* SystemExtensionManager.swift in Sources */,
 				7BA7CC442AD11E490042E5CE /* UserText.swift in Sources */,
+				4BF0E5142AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
 				7BA7CC422AD11E420042E5CE /* NetworkProtectionBouncer.swift in Sources */,
 				B65DA5F12A77D2BC00CBEE8D /* BundleExtension.swift in Sources */,
 			);
@@ -11420,6 +11431,7 @@
 				7BA7CC4B2AD11EC60042E5CE /* NetworkProtectionControllerErrorStore.swift in Sources */,
 				7BA7CC512AD11F9A0042E5CE /* SystemExtensionManager.swift in Sources */,
 				7BA7CC492AD11EA00042E5CE /* NetworkProtectionTunnelController.swift in Sources */,
+				4BF0E5152AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
 				7BFE95592A9DF2AF0081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */,
 				7BA7CC5C2AD120C30042E5CE /* EventMapping+NetworkProtectionError.swift in Sources */,
 				B65DA5F02A77CC3C00CBEE8D /* Bundle+NetworkProtectionExtensions.swift in Sources */,
@@ -11782,6 +11794,7 @@
 				4B957A752AC7AE700062CA31 /* ASN1Parser.swift in Sources */,
 				4B957A762AC7AE700062CA31 /* FileDownloadManager.swift in Sources */,
 				4B957A772AC7AE700062CA31 /* BookmarkImport.swift in Sources */,
+				4BF0E5172AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
 				4B957A782AC7AE700062CA31 /* KeySetDictionary.swift in Sources */,
 				4B957A792AC7AE700062CA31 /* HistoryTabExtension.swift in Sources */,
 				4B957A7A2AC7AE700062CA31 /* FireCoordinator.swift in Sources */,
@@ -12201,6 +12214,7 @@
 				37AFCE8527DA2D3900471A10 /* PreferencesSidebar.swift in Sources */,
 				B6C00ED5292FB21E009C73A6 /* HoveredLinkTabExtension.swift in Sources */,
 				AA5C8F5E2590EEE800748EB7 /* NSPointExtension.swift in Sources */,
+				4BF0E5122AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
 				AA6EF9AD25066F42004754E6 /* WindowsManager.swift in Sources */,
 				1D43EB3A292B63B00065E5D6 /* BWRequest.swift in Sources */,
 				B68458CD25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift in Sources */,
