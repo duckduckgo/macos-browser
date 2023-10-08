@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import Foundation
 import PixelKit
 import NetworkProtection
@@ -258,3 +260,5 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
         }
     }
 }
+
+#endif
