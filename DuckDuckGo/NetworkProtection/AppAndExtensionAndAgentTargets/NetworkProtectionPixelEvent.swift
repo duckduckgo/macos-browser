@@ -21,8 +21,6 @@ import PixelKit
 import NetworkProtection
 
 enum NetworkProtectionPixelEvent: PixelKitEvent {
-    // TODO: Remove
-    case networkProtectionTestPixel
 
     case networkProtectionActiveUser
 
@@ -71,8 +69,6 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
 
     var name: String {
         switch self {
-        case .networkProtectionTestPixel:
-            return "m_mac_netp_test_pixel"
 
         case .networkProtectionActiveUser:
             return "m_mac_netp_daily_active"
@@ -234,11 +230,6 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
         case .networkProtectionWireguardErrorCannotStartWireguardBackend(code: let code):
             return [
                 PixelKit.Parameters.errorCode: String(code)
-            ]
-
-        case .networkProtectionTestPixel:
-            return [
-                "testing": "parameters"
             ]
 
         case .networkProtectionTunnelConfigurationNoServerRegistrationInfo,
