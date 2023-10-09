@@ -9627,7 +9627,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/NetworkProtectionUI_NetworkProtectionUI.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
+			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/NetworkProtectionMac_NetworkProtectionUI.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
 		};
 		4B2D067D2A13341200DE1F49 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -9644,7 +9644,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/NetworkProtectionUI_NetworkProtectionUI.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
+			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/NetworkProtectionMac_NetworkProtectionUI.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
 		};
 		4B5F14F62A14825A0060320F /* Replace VPN Controllers with Symlinks */ = {
 			isa = PBXShellScriptBuildPhase;
