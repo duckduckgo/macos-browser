@@ -339,7 +339,7 @@ extension DataBrokerProtectionDatabase {
 
     // https://app.asana.com/0/481882893211075/1205574642847432/f
     private func updateProfile(_ profile: DataBrokerProtectionProfile, vault: any DataBrokerProtectionSecureVault) async throws {
-       
+
         let newProfileQueries = profile.profileQueries
 
         let databaseBrokerProfileQueryData = fetchAllBrokerProfileQueryData()
