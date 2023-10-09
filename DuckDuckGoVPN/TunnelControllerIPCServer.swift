@@ -79,7 +79,6 @@ final class TunnelControllerIPCServer {
 extension TunnelControllerIPCServer: IPCServerInterface {
 
     func register() {
-        // TODO: consider adding support for this type of thing directly in the status reporter
         server.serverInfoChanged(statusReporter.serverInfoObserver.recentValue)
         server.statusChanged(statusReporter.statusObserver.recentValue)
     }
