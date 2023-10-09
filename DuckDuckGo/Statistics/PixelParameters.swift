@@ -54,11 +54,8 @@ extension Pixel.Event {
     var parameters: [String: String]? {
         switch self {
         case .debug(event: let debugEvent, error: let error):
-            var params = [String: String]()
 
-            if let errorWithUserInfo = error as? ErrorWithParameters {
-                params = errorWithUserInfo.errorParameters
-            }
+            var params = error?.pixelParameters ?? [:]
 
             if case let .assertionFailure(message, file, line) = debugEvent {
                 params[Pixel.Parameters.assertionMessage] = message
@@ -66,27 +63,10 @@ extension Pixel.Event {
                 params[Pixel.Parameters.assertionLine] = String(line)
             }
 
-            if let error = error {
-                let nsError = error as NSError
-
-                params[Pixel.Parameters.errorCode] = "\(nsError.code)"
-                params[Pixel.Parameters.errorDesc] = nsError.domain
-
-                if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
-                    params[Pixel.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
-                    params[Pixel.Parameters.underlyingErrorDesc] = underlyingError.domain
-                }
-
-                if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {
-                    params[Pixel.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
-                }
-
-                if let sqlExtendedErrorCode = nsError.userInfo["SQLiteExtendedResultCode"] as? NSNumber {
-                    params[Pixel.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
-                }
-            }
-
             return params
+
+        case .dataImportFailed(let error):
+            return error.pixelParameters
 
         case .launchInitial(let cohort):
             return [Pixel.Parameters.experimentCohort: cohort]
@@ -105,8 +85,6 @@ extension Pixel.Event {
              .brokenSiteReport,
              .compileRulesWait,
              .serp,
-             .dataImportFailed,
-             .faviconImportFailed,
              .formAutofilled,
              .autofillItemSaved,
              .bitwardenPasswordAutofilled,
@@ -132,7 +110,6 @@ extension Pixel.Event {
              .favoriteSectionHidden,
              .recentActivitySectionHidden,
              .continueSetUpSectionHidden,
-             .userHasPinnedTab,
              .fireButtonFirstBurn,
              .fireButton,
              .duckPlayerDailyUniqueView,
@@ -150,11 +127,65 @@ extension Pixel.Event {
              .networkProtectionWaitlistNotificationTapped,
              .networkProtectionWaitlistTermsAndConditionsDisplayed,
              .networkProtectionWaitlistTermsAndConditionsAccepted,
+             .networkProtectionWaitlistUserActive,
+             .networkProtectionWaitlistIntroDisplayed,
+             .networkProtectionRemoteMessageDisplayed,
+             .networkProtectionRemoteMessageDismissed,
+             .networkProtectionRemoteMessageOpened,
              .enableHomeButton,
              .disableHomeButton,
              .setnewHomePage:
             return nil
+#if DBP
+        case .optOutStart,
+            .optOutEmailGenerate,
+            .optOutCaptchaParse,
+            .optOutCaptchaSend,
+            .optOutCaptchaSolve,
+            .optOutSubmit,
+            .optOutEmailReceive,
+            .optOutEmailConfirm,
+            .optOutValidate,
+            .optOutFinish,
+            .optOutSubmitSuccess,
+            .optOutSuccess,
+            .optOutFailure,
+            .parentChildMatches:
+          return nil
+#endif
         }
+    }
+
+}
+
+extension Error {
+
+    var pixelParameters: [String: String] {
+        var params = [String: String]()
+
+        if let errorWithUserInfo = self as? ErrorWithParameters {
+            params = errorWithUserInfo.errorParameters
+        }
+
+        let nsError = self as NSError
+
+        params[Pixel.Parameters.errorCode] = "\(nsError.code)"
+        params[Pixel.Parameters.errorDesc] = nsError.domain
+
+        if let underlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError {
+            params[Pixel.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
+            params[Pixel.Parameters.underlyingErrorDesc] = underlyingError.domain
+        }
+
+        if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {
+            params[Pixel.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
+        }
+
+        if let sqlExtendedErrorCode = nsError.userInfo["SQLiteExtendedResultCode"] as? NSNumber {
+            params[Pixel.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
+        }
+
+        return params
     }
 
 }

@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import SecureStorage
 
 enum DataImport {
 
@@ -27,6 +28,7 @@ enum DataImport {
         case edge
         case firefox
         case safari
+        case safariTechnologyPreview
         case onePassword8
         case onePassword7
         case lastPass
@@ -47,6 +49,8 @@ enum DataImport {
                 return "Firefox"
             case .safari:
                 return "Safari"
+            case .safariTechnologyPreview:
+                return "Safari Technology Preview"
             case .lastPass:
                 return "LastPass"
             case .onePassword7:
@@ -70,25 +74,15 @@ enum DataImport {
             }
 
             switch self {
-            case .csv, .onePassword8, .onePassword7, .lastPass, .bookmarksHTML: return true // Users can always import from exported files
-            case .brave, .chrome, .edge, .firefox, .safari: return false // Users can't import from browsers unless they're installed
+            case .csv, .onePassword8, .onePassword7, .lastPass, .bookmarksHTML:
+                // Users can always import from exported files
+                return true
+            case .brave, .chrome, .edge, .firefox, .safari, .safariTechnologyPreview:
+                // Users can't import from browsers unless they're installed
+                return false
             }
         }
 
-        var pixelEventSource: Pixel.Event.DataImportSource {
-            switch self {
-            case .brave: return .brave
-            case .chrome: return .chrome
-            case .edge: return .edge
-            case .firefox: return .firefox
-            case .safari: return .safari
-            case .onePassword7: return .onePassword7
-            case .onePassword8: return .onePassword8
-            case .lastPass: return .lastPass
-            case .csv: return .csv
-            case .bookmarksHTML: return .bookmarksHTML
-            }
-        }
     }
 
     enum DataType {
@@ -143,14 +137,10 @@ enum DataImport {
                 let sortedProfiles = filteredProfiles.sorted()
 
                 self.profiles = sortedProfiles
-            case .firefox:
-                self.profiles = profileURLs.map({
-                    BrowserProfile.for(browser: .firefox, profileURL: $0)
-                }).sorted()
-            case .safari:
-                self.profiles = profileURLs.map({
-                    BrowserProfile.for(browser: .safari, profileURL: $0)
-                }).sorted()
+            case .firefox, .safari, .safariTechnologyPreview:
+                self.profiles = profileURLs.map {
+                    BrowserProfile.for(browser: browser, profileURL: $0)
+                }.sorted()
             case .lastPass, .onePassword7, .onePassword8:
                 self.profiles = []
             }
@@ -166,8 +156,8 @@ enum DataImport {
                 return profiles.first { $0.profileName == "Default" } ?? profiles.first
             case .firefox:
                 return profiles.first { $0.profileName == "default-release" } ?? profiles.first
-            case .safari, .lastPass, .onePassword7, .onePassword8:
-                return nil
+            case .safari, .safariTechnologyPreview, .lastPass, .onePassword7, .onePassword8:
+                return profiles.first
             }
         }
     }
@@ -252,8 +242,8 @@ enum DataImport {
 
             if profileDirectoryContents.contains(Constants.chromiumPreferencesFileName),
                let chromePreferenceData = fileStore.loadData(at: profileURL.appendingPathComponent(Constants.chromiumPreferencesFileName)),
-               let chromePreferences = try? JSONDecoder().decode(ChromePreferences.self, from: chromePreferenceData) {
-                return chromePreferences.profile.name
+               let chromePreferences = try? ChromePreferences(from: chromePreferenceData) {
+                return chromePreferences.profileName
             }
 
             return nil
@@ -270,129 +260,38 @@ enum DataImport {
 
 }
 
-struct DataImportError: Error, Equatable {
+enum DataImportAction {
+    case bookmarks
+    case logins
+    case favicons
+    case generic
+}
 
-    enum ImportErrorAction {
-        case bookmarks
-        case logins
-        case generic
+protocol DataImportError: Error, CustomNSError, ErrorWithParameters {
+    associatedtype OperationType: RawRepresentable where OperationType.RawValue == Int
 
-        var pixelEventAction: Pixel.Event.DataImportAction {
-            switch self {
-            case .bookmarks: return .importBookmarks
-            case .logins: return .importLogins
-            case .generic: return .generic
-            }
-        }
+    var source: DataImport.Source { get }
+    var action: DataImportAction { get }
+    var type: OperationType { get }
+    var underlyingError: Error? { get }
+
+}
+extension DataImportError /* : CustomNSError */ {
+    var errorCode: Int {
+        type.rawValue
     }
 
-    enum ImportErrorType: Equatable {
-        case noFileFound
-        case cannotFindFile
-        case cannotReadFile
-        case userDeniedKeychainPrompt
-        case couldNotFindProfile
-        case needsLoginPrimaryPassword
-        case cannotAccessSecureVault
-        case cannotAccessCoreData
-        case couldNotGetDecryptionKey
-        case couldNotAccessKeychain(OSStatus)
-        case cannotDecryptFile
-        case failedToTemporarilyCopyFile
-        case databaseAccessFailed
-
-        var stringValue: String {
-            switch self {
-            case .couldNotAccessKeychain: return "couldNotAccessKeychain"
-            case .noFileFound,
-                    .cannotFindFile,
-                    .cannotReadFile,
-                    .userDeniedKeychainPrompt,
-                    .couldNotFindProfile,
-                    .needsLoginPrimaryPassword,
-                    .cannotAccessSecureVault,
-                    .cannotAccessCoreData,
-                    .couldNotGetDecryptionKey,
-                    .cannotDecryptFile,
-                    .failedToTemporarilyCopyFile,
-                    .databaseAccessFailed: return String(describing: self)
-            }
-        }
-
-        var errorParameters: [String: String] {
-            var parameters = ["error": stringValue]
-
-            switch self {
-            case .couldNotAccessKeychain(let status): parameters["keychainErrorCode"] = String(status)
-            case .noFileFound,
-                    .cannotFindFile,
-                    .cannotReadFile,
-                    .userDeniedKeychainPrompt,
-                    .couldNotFindProfile,
-                    .needsLoginPrimaryPassword,
-                    .cannotAccessSecureVault,
-                    .cannotAccessCoreData,
-                    .couldNotGetDecryptionKey,
-                    .cannotDecryptFile,
-                    .failedToTemporarilyCopyFile,
-                    .databaseAccessFailed: break
-            }
-
-            return parameters
-        }
+    var errorUserInfo: [String: Any] {
+        guard let underlyingError else { return [:] }
+        return [
+            NSUnderlyingErrorKey: underlyingError
+        ]
     }
-
-    static func generic(_ errorType: ImportErrorType) -> DataImportError {
-        return DataImportError(actionType: .generic, errorType: errorType)
+}
+extension DataImportError /* : ErrorWithParameters */ {
+    var errorParameters: [String: String] {
+        underlyingError?.pixelParameters ?? [:]
     }
-
-    // MARK: Bookmark Error Types
-
-    static func bookmarks(_ errorType: ImportErrorType) -> DataImportError {
-        return DataImportError(actionType: .bookmarks, errorType: errorType)
-    }
-
-    static func bookmarks(_ errorType: FirefoxBookmarksReader.ImportError) -> DataImportError {
-        switch errorType {
-        case .noBookmarksFileFound: return DataImportError(actionType: .bookmarks, errorType: .noFileFound)
-        case .unexpectedBookmarksDatabaseFormat: return DataImportError(actionType: .bookmarks, errorType: .cannotReadFile)
-        case .failedToTemporarilyCopyFile: return DataImportError(actionType: .bookmarks, errorType: .failedToTemporarilyCopyFile)
-        }
-    }
-
-    static func bookmarks(_ errorType: SafariBookmarksReader.ImportError) -> DataImportError {
-        switch errorType {
-        case .unexpectedBookmarksFileFormat: return DataImportError(actionType: .bookmarks, errorType: .cannotReadFile)
-        }
-    }
-
-    static func bookmarks(_ errorType: BookmarkHTMLReader.ImportError) -> DataImportError {
-        switch errorType {
-        case .unexpectedBookmarksFileFormat: return DataImportError(actionType: .bookmarks, errorType: .cannotReadFile)
-        }
-    }
-
-    // MARK: Login Error Types
-
-    static func logins(_ errorType: ImportErrorType) -> DataImportError {
-        return DataImportError(actionType: .logins, errorType: errorType)
-    }
-
-    static func logins(_ errorType: ChromiumLoginReader.ImportError) -> DataImportError {
-        switch errorType {
-        case .decryptionKeyAccessFailed(let status): return DataImportError(actionType: .logins, errorType: .couldNotAccessKeychain(status))
-        case .databaseAccessFailed: return DataImportError(actionType: .logins, errorType: .databaseAccessFailed)
-        case .couldNotFindLoginData: return DataImportError(actionType: .logins, errorType: .noFileFound)
-        case .failedToTemporarilyCopyDatabase: return DataImportError(actionType: .logins, errorType: .failedToTemporarilyCopyFile)
-        case .decryptionFailed: return DataImportError(actionType: .logins, errorType: .cannotReadFile)
-        case .failedToDecodePasswordData: return DataImportError(actionType: .logins, errorType: .cannotReadFile)
-        case .userDeniedKeychainPrompt: return DataImportError(actionType: .logins, errorType: .userDeniedKeychainPrompt)
-        }
-    }
-
-    let actionType: ImportErrorAction
-    let errorType: ImportErrorType
-
 }
 
 /// Represents an object able to import data from an outside source. The outside source may be capable of importing multiple types of data.
@@ -405,6 +304,76 @@ protocol DataImporter {
 
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void)
+                    completion: @escaping (DataImportResult<DataImport.Summary>) -> Void)
+
+}
+
+enum DataImportResult<T> {
+    case success(T)
+    case failure(any DataImportError)
+
+    func get() throws -> T {
+        switch self {
+        case .success(let value):
+            return value
+        case .failure(let error):
+            throw error
+        }
+    }
+}
+
+struct LoginImporterError: DataImportError {
+
+    private let error: Error?
+    private let _type: OperationType?
+
+    var action: DataImportAction { .logins }
+    let source: DataImport.Source
+
+    init(source: DataImport.Source, error: Error?, type: OperationType? = nil) {
+        self.source = source
+        self.error = error
+        self._type = type
+    }
+
+    struct OperationType: RawRepresentable {
+        let rawValue: Int
+
+        static let defaultFirefoxProfilePathNotFound = OperationType(rawValue: -1)
+    }
+
+    var type: OperationType {
+        _type ?? OperationType(rawValue: (error as NSError?)?.code ?? 0)
+    }
+
+    var underlyingError: Error? {
+        switch error {
+        case let secureStorageError as SecureStorageError:
+            switch secureStorageError {
+            case .initFailed(let error),
+                 .authError(let error),
+                 .failedToOpenDatabase(let error),
+                 .databaseError(let error):
+                return error
+
+            case .keystoreError(let status):
+                return NSError(domain: "KeyStoreError", code: Int(status))
+
+            case .secError(let status):
+                return NSError(domain: "secError", code: Int(status))
+
+            case .authRequired,
+                 .invalidPassword,
+                 .noL1Key,
+                 .noL2Key,
+                 .duplicateRecord,
+                 .generalCryptoError,
+                 .encodingFailed:
+                return secureStorageError
+            }
+        default:
+            return error
+        }
+    }
 
 }

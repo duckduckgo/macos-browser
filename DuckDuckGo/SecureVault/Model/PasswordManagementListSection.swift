@@ -30,7 +30,11 @@ struct PasswordManagementListSection {
 
     struct DateMetadata: Equatable, Hashable, Comparable {
         static func < (lhs: PasswordManagementListSection.DateMetadata, rhs: PasswordManagementListSection.DateMetadata) -> Bool {
-            return (lhs.month, lhs.year) < (rhs.month, rhs.year)
+            if lhs.year != rhs.year {
+                return lhs.year < rhs.year
+            } else {
+                return (lhs.month, lhs.year) < (rhs.month, rhs.year)
+            }
         }
 
         static let unknown = DateMetadata(title: "#", month: 0, year: 0)

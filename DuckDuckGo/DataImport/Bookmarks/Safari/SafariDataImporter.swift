@@ -18,15 +18,20 @@
 
 import Foundation
 
-internal class SafariDataImporter: DataImporter {
+protocol DataDirectoryPermissionAuthorization {
+    func canReadBookmarksFile() -> Bool
+    func requestDataDirectoryPermission() -> URL?
+}
 
-    static func canReadBookmarksFile() -> Bool {
-        return FileManager.default.isReadableFile(atPath: safariDataDirectoryURL.path)
+final class SafariDataImporter: DataImporter, DataDirectoryPermissionAuthorization {
+
+    func canReadBookmarksFile() -> Bool {
+        return FileManager.default.isReadableFile(atPath: safariDataDirectoryUrl.path)
     }
 
-    static func requestSafariDataDirectoryPermission() -> URL? {
+    func requestDataDirectoryPermission() -> URL? {
         let openPanel = NSOpenPanel()
-        openPanel.directoryURL = safariDataDirectoryURL
+        openPanel.directoryURL = safariDataDirectoryUrl
         openPanel.message = UserText.bookmarkImportSafariRequestPermissionButtonTitle
         openPanel.allowsOtherFileTypes = false
         openPanel.canChooseFiles = false
@@ -36,70 +41,73 @@ internal class SafariDataImporter: DataImporter {
         return openPanel.urls.first
     }
 
-    static private var safariDataDirectoryURL: URL {
-        return URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("Safari/")
-    }
-
-    static private var bookmarksFileURL: URL {
-        return safariDataDirectoryURL.appendingPathComponent("Bookmarks.plist")
-    }
-
+    private let safariDataDirectoryUrl: URL
     private let bookmarkImporter: BookmarkImporter
     private let faviconManager: FaviconManagement
 
-    init(bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
+    init(safariDataDirectoryUrl: URL, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
+        self.safariDataDirectoryUrl = safariDataDirectoryUrl
         self.bookmarkImporter = bookmarkImporter
         self.faviconManager = faviconManager
+    }
+
+    convenience init?(importSource: DataImport.Source, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
+        guard let profile = ThirdPartyBrowser.browser(for: importSource)?.browserProfiles()?.defaultProfile else { return nil }
+
+        self.init(safariDataDirectoryUrl: profile.profileURL, bookmarkImporter: bookmarkImporter, faviconManager: faviconManager)
     }
 
     func importableTypes() -> [DataImport.DataType] {
         return [.bookmarks]
     }
 
+    @MainActor(unsafe)
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
+                    completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
+        let result = importData(types: types, from: profile)
+        completion(result)
+    }
+
+    static private let bookmarksFileName = "Bookmarks.plist"
+
+    @MainActor
+    private func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) -> DataImportResult<DataImport.Summary> {
         var summary = DataImport.Summary()
 
         if types.contains(.bookmarks) {
-            let bookmarkReader = SafariBookmarksReader(safariBookmarksFileURL: Self.bookmarksFileURL)
+            let fileUrl = safariDataDirectoryUrl.appendingPathComponent(Self.bookmarksFileName)
+            let bookmarkReader = SafariBookmarksReader(safariBookmarksFileURL: fileUrl)
             let bookmarkResult = bookmarkReader.readBookmarks()
 
-            let faviconsReader = SafariFaviconsReader(safariDataDirectoryURL: Self.safariDataDirectoryURL)
+            let faviconsReader = SafariFaviconsReader(safariDataDirectoryURL: safariDataDirectoryUrl)
             let faviconsResult = faviconsReader.readFavicons()
 
             switch faviconsResult {
             case .success(let faviconsByURL):
-                for (pageURLString, fetchedFavicons) in faviconsByURL {
-                    if let pageURL = URL(string: pageURLString) {
-                        let favicons = fetchedFavicons.map {
-                            Favicon(identifier: UUID(),
-                                    url: pageURL,
-                                    image: $0.image,
-                                    relation: .icon,
-                                    documentUrl: pageURL,
-                                    dateCreated: Date())
-                        }
-
-                        faviconManager.handleFavicons(favicons, documentUrl: pageURL)
+                let faviconsByDocument = faviconsByURL.reduce(into: [URL: [Favicon]]()) { result, pair in
+                    guard let pageURL = URL(string: pair.key) else { return }
+                    let favicons = pair.value.map {
+                        Favicon(identifier: UUID(),
+                                url: pageURL,
+                                image: $0.image,
+                                relation: .icon,
+                                documentUrl: pageURL,
+                                dateCreated: Date())
                     }
+                    result[pageURL] = favicons
                 }
+                faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
 
-            case .failure:
-                Pixel.fire(.faviconImportFailed(source: .safari))
+            case .failure(let error):
+                Pixel.fire(.dataImportFailed(error))
             }
 
             switch bookmarkResult {
             case .success(let bookmarks):
-                do {
-                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(.safari))
-                } catch {
-                    completion(.failure(.bookmarks(.cannotAccessCoreData)))
-                    return
-                }
+                summary.bookmarksResult = bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(.safari))
             case .failure(let error):
-                completion(.failure(.bookmarks(error)))
-                return
+                return .failure(error)
             }
         }
 
@@ -107,7 +115,7 @@ internal class SafariDataImporter: DataImporter {
             summary.loginsResult = .awaited
         }
 
-        completion(.success(summary))
+        return .success(summary)
     }
 
 }

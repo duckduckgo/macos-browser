@@ -22,6 +22,34 @@ import Common
 
 extension NSView {
 
+    private static var swizzleVisibleRectOnce: Void = {
+        guard #available(macOS 14.0, *) else { return }
+        let originalVisibleRect = class_getInstanceMethod(NSView.self, #selector(getter: NSView.visibleRect))!
+        let swizzledVisibleRect = class_getInstanceMethod(NSView.self, #selector(NSView.swizzledVisibleRect))!
+        method_exchangeImplementations(originalVisibleRect, swizzledVisibleRect)
+    }()
+    // Sonoma has a weird bug with broken visibleRect
+    @objc dynamic private func swizzledVisibleRect() -> NSRect {
+        var visibleRect = self.swizzledVisibleRect() // call the original
+        let bounds = self.bounds
+        guard visibleRect.origin.x < 0 || visibleRect.origin.y < 0
+                || visibleRect.size.width > bounds.size.width || visibleRect.size.height > bounds.size.height,
+              let superview else { return visibleRect }
+
+        let frame = self.frame
+        visibleRect = frame
+
+        if superview.isFlipped != isFlipped {
+            visibleRect.origin.y = superview.bounds.height - visibleRect.origin.y - visibleRect.height
+        }
+
+        visibleRect = visibleRect.intersection(superview.visibleRect)
+        visibleRect.origin.x -= frame.origin.x
+        visibleRect.origin.y -= frame.origin.y
+
+        return visibleRect
+    }
+
     func setCornerRadius(_ radius: CGFloat) {
         wantsLayer = true
         layer?.masksToBounds = true
@@ -119,6 +147,8 @@ extension NSView {
     }
 
     func withMouseLocationInViewCoordinates<T>(_ point: NSPoint? = nil, convert: (NSPoint) -> T?) -> T? {
+        _=Self.swizzleVisibleRectOnce
+
         guard let mouseLocation = point ?? window?.mouseLocationOutsideOfEventStream else { return nil }
         let locationInView = self.convert(mouseLocation, from: nil)
 

@@ -72,7 +72,7 @@ final class BrowserImportViewController: NSViewController {
             return profileList.validImportableProfiles.first
         }
 
-        return profileList.validImportableProfiles.first { $0.profileName == selectedProfile.title }
+        return profileList.validImportableProfiles.first { $0.profileURL == selectedProfile.representedObject as? URL }
     }
 
     let browser: DataImport.Source
@@ -106,7 +106,7 @@ final class BrowserImportViewController: NSViewController {
         }
 
         switch browser {
-        case .safari:
+        case .safari, .safariTechnologyPreview:
             bookmarksCheckbox.title = UserText.bookmarkImportBookmarksAndFavorites
             guard let safariMajorVersion = SafariVersionReader.getMajorVersion() else {
                 assertionFailure("Failed to get version of Safari")
@@ -142,9 +142,17 @@ extension NSPopUpButton {
         var selectedSourceIndex: Int?
 
         for (index, profile) in validProfiles.enumerated() {
-            addItem(withTitle: profile.profileName)
+            // Duplicate profile names won‘t be added to the Popup: need to deduplicate
+            var profileName: String
+            var i = 0
+            repeat {
+                profileName = profile.profileName + (i > 0 ? " - \(i)" : "")
+                i += 1
+            } while itemTitles.contains(profileName)
 
-            if profile.profileName == defaultProfile?.profileName {
+            addItem(withTitle: profileName, representedObject: profile.profileURL)
+
+            if profile.profileURL == defaultProfile?.profileURL {
                 selectedSourceIndex = index
             }
         }

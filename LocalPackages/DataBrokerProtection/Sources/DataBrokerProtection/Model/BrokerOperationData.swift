@@ -26,7 +26,7 @@ protocol BrokerOperationData {
     var historyEvents: [HistoryEvent] { get }
 }
 
-final class ScanOperationData: BrokerOperationData, Sendable {
+struct ScanOperationData: BrokerOperationData, Sendable {
     let brokerId: Int64
     let profileQueryId: Int64
     let preferredRunDate: Date?
@@ -47,7 +47,7 @@ final class ScanOperationData: BrokerOperationData, Sendable {
 
 }
 
-final class OptOutOperationData: BrokerOperationData, Sendable {
+struct OptOutOperationData: BrokerOperationData, Sendable {
     let brokerId: Int64
     let profileQueryId: Int64
     let preferredRunDate: Date?

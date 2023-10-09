@@ -21,7 +21,9 @@ import Cocoa
 extension NSMenuItem {
 
     static var empty: NSMenuItem {
-        return NSMenuItem(title: UserText.bookmarksBarFolderEmpty, action: nil, target: nil, keyEquivalent: "")
+        let item = NSMenuItem(title: UserText.bookmarksBarFolderEmpty, action: nil, target: nil, keyEquivalent: "")
+        item.isEnabled = false
+        return item
     }
 
     convenience init(title string: String, action selector: Selector?, target: AnyObject?, keyEquivalent charCode: String = "", representedObject: Any? = nil) {

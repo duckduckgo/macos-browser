@@ -354,7 +354,7 @@
                                                     <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
                                                         <color key="value" name="ButtonMouseDownColorLight"/>
                                                     </userDefinedRuntimeAttribute>
-                                                    <userDefinedRuntimeAttribute type="point" keyPath="contentInset">
+                                                    <userDefinedRuntimeAttribute type="point" keyPath="backgroundInset">
                                                         <point key="value" x="-6" y="0.0"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>

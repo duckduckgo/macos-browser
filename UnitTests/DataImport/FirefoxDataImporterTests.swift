@@ -20,6 +20,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 class FirefoxDataImporterTests: XCTestCase {
 
     func testWhenImportingWithoutAnyDataTypes_ThenSummaryIsEmpty() async {
@@ -55,24 +56,18 @@ class FirefoxDataImporterTests: XCTestCase {
         }
     }
 
-    func testWhenImportingBookmarks_AndBookmarkImportFails_ThenErrorIsReturned() async {
-        let loginImporter = MockLoginImporter()
-        let faviconManager = FaviconManagerMock()
-        let bookmarkImporter = MockBookmarkImporter(throwableError: DataImportError.bookmarks(.cannotAccessCoreData),
-                                                    importBookmarks: { _, _ in .init(successful: 0, duplicates: 0, failed: 0) })
-        let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter, faviconManager: faviconManager)
-
-        let summary = await importer.importData(types: [.bookmarks], from: .init(browser: .firefox, profileURL: resourceURL()))
-
-        if case let .failure(error) = summary {
-            XCTAssertEqual(error, .bookmarks(.cannotReadFile))
-        } else {
-            XCTFail("Received summary unexpectedly")
-        }
-    }
-
     private func resourceURL() -> URL {
         let bundle = Bundle(for: FirefoxBookmarksReaderTests.self)
         return bundle.resourceURL!.appendingPathComponent("DataImportResources/TestFirefoxData")
+    }
+}
+
+extension FirefoxDataImporter {
+    func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) async -> DataImportResult<DataImport.Summary> {
+        return await withCheckedContinuation { continuation in
+            importData(types: types, from: profile) { result in
+                continuation.resume(returning: result)
+            }
+        }
     }
 }

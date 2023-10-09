@@ -118,7 +118,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             os_log("Extracted profiles: %@", log: .dataBrokerProtection, extractedProfiles)
 
             if !extractedProfiles.isEmpty {
-                let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .matchesFound)
+                let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .matchesFound(count: extractedProfiles.count))
                 database.add(event)
 
                 for extractedProfile in extractedProfiles {
@@ -136,6 +136,11 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
                         os_log("Extracted profile already exists in database: %@", log: .dataBrokerProtection, id.description)
                     } else {
+                        // If it's a new found profile, we'd like to opt-out ASAP
+                        // If this broker has a parent opt out, we set the preferred date to nil, as we will only perform the operation within the parent.
+                        let broker = brokerProfileQueryData.dataBroker
+                        let preferredRunOperation: Date? = broker.performsOptOutWithinParent() ? nil : Date()
+
                         // If profile does not exist we insert the new profile and we create the opt-out operation
                         //
                         // This is done inside a transaction on the database side. We insert the extracted profile and then
@@ -143,11 +148,13 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         // causing the extracted profile to be orphan.
                         let optOutOperationData = OptOutOperationData(brokerId: brokerId,
                                                                       profileQueryId: profileQueryId,
-                                                                      preferredRunDate: Date(), // If it's a new found profile, we'd like to opt-out ASAP
+                                                                      preferredRunDate: preferredRunOperation,
                                                                       historyEvents: [HistoryEvent](),
                                                                       extractedProfile: extractedProfile)
-                        os_log("Creating new opt-out operation data for: %@", log: .dataBrokerProtection, String(describing: extractedProfile.name))
+
                         try database.saveOptOutOperation(optOut: optOutOperationData, extractedProfile: extractedProfile)
+
+                        os_log("Creating new opt-out operation data for: %@", log: .dataBrokerProtection, String(describing: extractedProfile.name))
                     }
                 }
             } else {
@@ -169,7 +176,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         database.add(event)
                         database.updateRemovedDate(Date(), on: extractedProfileId)
 
-                        updateOperationDataDates(
+                        try updateOperationDataDates(
                             brokerId: brokerId,
                             profileQueryId: profileQueryId,
                             extractedProfileId: extractedProfileId,
@@ -190,7 +197,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                     }
                 }
             } else {
-                updateOperationDataDates(
+                try updateOperationDataDates(
                     brokerId: brokerId,
                     profileQueryId: profileQueryId,
                     extractedProfileId: nil,
@@ -208,7 +215,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             throw error
         }
     }
-
+    // swiftlint:disable:next function_body_length
     internal func runOptOutOperation(for extractedProfile: ExtractedProfile,
                                      on runner: WebOperationRunner,
                                      brokerProfileQueryData: BrokerProfileQueryData,
@@ -235,13 +242,23 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             os_log("Finished opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 
             database.updateLastRunDate(Date(), brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
-            updateOperationDataDates(
-                brokerId: brokerId,
-                profileQueryId: profileQueryId,
-                extractedProfileId: extractedProfileId,
-                schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig,
-                database: database
-            )
+            do {
+                try updateOperationDataDates(
+                    brokerId: brokerId,
+                    profileQueryId: profileQueryId,
+                    extractedProfileId: extractedProfileId,
+                    schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig,
+                    database: database
+                )
+            } catch {
+                handleOperationError(
+                    brokerId: brokerId,
+                    profileQueryId: profileQueryId,
+                    extractedProfileId: extractedProfileId,
+                    error: error,
+                    database: database
+                )
+            }
             notificationCenter.post(name: DataBrokerProtectionNotifications.didFinishOptOut, object: brokerProfileQueryData.dataBroker.name)
         }
 
@@ -253,6 +270,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                     stageCalculator: stageDurationCalculator,
                                     showWebView: showWebView,
                                     shouldRunNextStep: shouldRunNextStep)
+
+            let updater = OperationPreferredDateUpdaterUseCase(database: database)
+            updater.updateChildrenBrokerForParentBroker(brokerProfileQueryData.dataBroker,
+                                                        profileQueryId: profileQueryId)
 
             database.addAttempt(extractedProfileId: extractedProfileId,
                                 attemptUUID: stageDurationCalculator.attemptId,
@@ -273,121 +294,18 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
     }
 
-    // https://app.asana.com/0/0/1204834439855281/f
-    // swiftlint:disable:next function_body_length
     internal func updateOperationDataDates(
         brokerId: Int64,
         profileQueryId: Int64,
         extractedProfileId: Int64?,
         schedulingConfig: DataBrokerScheduleConfig,
-        database: DataBrokerProtectionRepository
-    ) {
-        let maintenanceScanDate = Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
+        database: DataBrokerProtectionRepository) throws {
 
-        if let brokerProfileQuery = database.brokerProfileQueryData(for: brokerId, and: profileQueryId),
-           let lastHistoryEvent = brokerProfileQuery.events.last {
-            switch lastHistoryEvent.type {
-            case .error:
-                let retryOperationDate = Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
-                updatePreferredRunDate(
-                    retryOperationDate,
-                    brokerId: brokerId,
-                    profileQueryId: profileQueryId,
-                    extractedProfileId: extractedProfileId,
-                    database: database
-                )
-            case .optOutRequested:
-                let confirmOptOutDate = Date().addingTimeInterval(schedulingConfig.confirmOptOutScan.hoursToSeconds)
-
-                // We set extractedProfileId to nil because we want to update the scan operation
-                updatePreferredRunDate(
-                    confirmOptOutDate,
-                    brokerId: brokerId,
-                    profileQueryId: profileQueryId,
-                    extractedProfileId: nil,
-                    database: database
-                )
-                // For the optOut operation we set it to nil. We do not want to run it again
-                updatePreferredRunDate(
-                    nil,
-                    brokerId: brokerId,
-                    profileQueryId: profileQueryId,
-                    extractedProfileId: extractedProfileId,
-                    database: database
-                )
-            case .matchesFound:
-                updatePreferredRunDate(
-                    maintenanceScanDate,
-                    brokerId: brokerId,
-                    profileQueryId: profileQueryId,
-                    extractedProfileId: nil,
-                    database: database
-                )
-
-                if let extractedProfileId = extractedProfileId,
-                   shouldScheduleNewOptOut(
-                    events: brokerProfileQuery.events,
-                    extractedProfileId: extractedProfileId,
-                    schedulingConfig: schedulingConfig
-                   ) {
-                    updatePreferredRunDate(
-                        Date(),
-                        brokerId: brokerId,
-                        profileQueryId: profileQueryId,
-                        extractedProfileId: extractedProfileId,
-                        database: database
-                    )
-                } else {
-                    if extractedProfileId == nil {
-                        updatePreferredRunDate(
-                            maintenanceScanDate,
-                            brokerId: brokerId,
-                            profileQueryId: profileQueryId,
-                            extractedProfileId: nil,
-                            database: database
-                        )
-                    }
-                }
-            case .noMatchFound, .optOutConfirmed:
-                // We set extractedProfileId to nil because we want to update the scan operation
-                updatePreferredRunDate(
-                    maintenanceScanDate,
-                    brokerId: brokerId,
-                    profileQueryId: profileQueryId,
-                    extractedProfileId: nil,
-                    database: database
-                )
-
-                // We make sure the optOut operation is set to nil. It should be nil from the optOutRequested.
-                updatePreferredRunDate(
-                    nil,
-                    brokerId: brokerId,
-                    profileQueryId: profileQueryId,
-                    extractedProfileId: extractedProfileId,
-                    database: database
-                )
-            case .optOutStarted, .scanStarted:
-                // We don't need to update the dates when we have these statuses
-                // This is added to ensure that the compiler can detect any new enums added in the future
-                break
-            }
-        }
-    }
-
-    private func updatePreferredRunDate(
-        _ date: Date?,
-        brokerId: Int64,
-        profileQueryId: Int64,
-        extractedProfileId: Int64?,
-        database: DataBrokerProtectionRepository
-    ) {
-        if let extractedProfileId = extractedProfileId {
-            database.updatePreferredRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
-        } else {
-            database.updatePreferredRunDate(date, brokerId: brokerId, profileQueryId: profileQueryId)
-        }
-
-        os_log("Updating preferredRunDate on operation with brokerId %{public}@ and profileQueryId %{public}@", log: .dataBrokerProtection, brokerId.description, profileQueryId.description)
+            let dateUpdater = OperationPreferredDateUpdaterUseCase(database: database)
+            try dateUpdater.updateOperationDataDates(brokerId: brokerId,
+                                                 profileQueryId: profileQueryId,
+                                                 extractedProfileId: extractedProfileId,
+                                                 schedulingConfig: schedulingConfig)
     }
 
     private func handleOperationError(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64?, error: Error, database: DataBrokerProtectionRepository) {
@@ -410,16 +328,5 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         database.add(event)
 
         os_log("Error on operation : %{public}@", log: .dataBrokerProtection, error.localizedDescription)
-    }
-
-    // If the last time we removed the profile has a bigger time difference than the current date + maintenance we should schedule for a new optout
-    private func shouldScheduleNewOptOut(events: [HistoryEvent],
-                                         extractedProfileId: Int64,
-                                         schedulingConfig: DataBrokerScheduleConfig) -> Bool {
-        guard let lastRemovalEvent = events.last(where: { $0.type == .optOutRequested && $0.extractedProfileId == extractedProfileId }) else {
-            return false
-        }
-
-        return lastRemovalEvent.date.addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds) < Date()
     }
 }
