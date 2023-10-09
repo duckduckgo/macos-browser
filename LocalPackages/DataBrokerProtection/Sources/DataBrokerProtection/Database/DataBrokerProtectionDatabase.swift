@@ -367,7 +367,6 @@ extension DataBrokerProtectionDatabase {
             }
         }
 
-
         let profileID = try vault.update(profile: profile)
         let brokerIDs = try vault.fetchAllBrokers().compactMap({ $0.id })
 
