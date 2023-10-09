@@ -242,8 +242,8 @@ enum DataImport {
 
             if profileDirectoryContents.contains(Constants.chromiumPreferencesFileName),
                let chromePreferenceData = fileStore.loadData(at: profileURL.appendingPathComponent(Constants.chromiumPreferencesFileName)),
-               let chromePreferences = try? JSONDecoder().decode(ChromePreferences.self, from: chromePreferenceData) {
-                return chromePreferences.profile.name
+               let chromePreferences = try? ChromePreferences(from: chromePreferenceData) {
+                return chromePreferences.profileName
             }
 
             return nil
