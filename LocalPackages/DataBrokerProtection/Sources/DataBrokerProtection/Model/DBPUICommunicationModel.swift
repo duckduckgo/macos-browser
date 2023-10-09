@@ -126,8 +126,12 @@ struct DBPUIAddressAtIndex: Codable {
 }
 
 /// Message Object representing a data broker
-struct DBPUIDataBroker: Codable {
+struct DBPUIDataBroker: Codable, Hashable {
     let name: String
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+    }
 }
 
 /// Message Object representing a requested change to the user profile's brith year
@@ -165,6 +169,8 @@ struct DBPUIScanAndOptOutState: DBPUISendableMessage {
 struct DBPUIScanAndOptOutMaintenanceState: DBPUISendableMessage {
     let inProgressOptOuts: [DBPUIDataBrokerProfileMatch]
     let completedOptOuts: [DBPUIOptOutMatch]
+    let scanSchedule: DBPUIScanSchedule
+    let scanHistory: DBPUIScanHistory
 }
 
 struct DBPUIOptOutMatch: DBPUISendableMessage {
@@ -183,6 +189,21 @@ struct DBPUIScanProgress: DBPUISendableMessage {
 struct DBPUIInitialScanState: DBPUISendableMessage {
     let resultsFound: [DBPUIDataBrokerProfileMatch]
     let scanProgress: DBPUIScanProgress
+}
+
+struct DBUIScanDate: DBPUISendableMessage {
+    let date: Date
+    let dataBrokers: [DBPUIDataBroker]
+}
+
+struct DBPUIScanSchedule: DBPUISendableMessage {
+    let lastScan: DBUIScanDate
+    let nextScan: DBUIScanDate
+}
+
+struct DBPUIScanHistory: DBPUISendableMessage {
+    let sitesScanned: Int
+    let scansCompleted: Int
 }
 
 extension DBPUIInitialScanState {

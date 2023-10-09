@@ -112,6 +112,7 @@ public protocol InMemoryDataCacheDelegate: AnyObject {
 public final class InMemoryDataCache {
     var profile: DataBrokerProtectionProfile?
     var brokerProfileQueryData = [BrokerProfileQueryData]()
+    private let mapper = MapperToUI()
 
     weak var delegate: InMemoryDataCacheDelegate?
     weak var scanDelegate: DBPUIScanOps?
@@ -277,15 +278,7 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
         let scanProgress = DBPUIScanProgress(currentScans: currentScans, totalScans: totalScans)
         let matches = brokerProfileQueryData.compactMap {
             for extractedProfile in $0.extractedProfiles {
-                return DBPUIDataBrokerProfileMatch(
-                    dataBroker: DBPUIDataBroker(name: $0.dataBroker.name),
-                    name: extractedProfile.fullName ?? "No name",
-                    addresses: extractedProfile.addresses?.map {
-                        DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state, zipCode: nil)
-                    } ?? [],
-                    alternativeNames: extractedProfile.alternativeNames ?? [String](),
-                    relatives: extractedProfile.relatives ?? [String]()
-                )
+                return mapper.mapToUI($0.dataBroker, extractedProfile: extractedProfile)
             }
 
             return nil
@@ -299,17 +292,15 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
         var inProgressOptOuts = [DBPUIDataBrokerProfileMatch]()
         var removedProfiles = [DBPUIDataBrokerProfileMatch]()
 
+        let scansThatRanAtLeastOnce = brokerProfileQueryData.filter { $0.scanOperationData.lastRunDate != nil }
+        let sitesScanned = Dictionary.init(grouping: scansThatRanAtLeastOnce, by: { $0.dataBroker.name }).count
+        let scansCompleted = brokerProfileQueryData.reduce(0) { result, queryData in
+            return result + queryData.scanOperationData.historyEvents.filter { $0.type == .scanStarted }.count
+        }
+
         brokerProfileQueryData.forEach {
             for extractedProfile in $0.extractedProfiles {
-                let profileMatch = DBPUIDataBrokerProfileMatch(
-                    dataBroker: DBPUIDataBroker(name: $0.dataBroker.name),
-                    name: extractedProfile.fullName ?? "No name",
-                    addresses: extractedProfile.addresses?.map {
-                        DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state, zipCode: nil)
-                    } ?? [],
-                    alternativeNames: extractedProfile.alternativeNames ?? [String](),
-                    relatives: extractedProfile.relatives ?? [String]()
-                )
+                let profileMatch = mapper.mapToUI($0.dataBroker, extractedProfile: extractedProfile)
                 if extractedProfile.removedDate == nil {
                     inProgressOptOuts.append(profileMatch)
                 } else {
@@ -318,11 +309,78 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
             }
         }
 
-        let completedOptOutsDictionary = Dictionary.init(grouping: removedProfiles, by: { $0.dataBroker.name })
-        let completedOptOuts = completedOptOutsDictionary.map { (key: String, value: [DBPUIDataBrokerProfileMatch]) in
-            DBPUIOptOutMatch(dataBroker: DBPUIDataBroker(name: key), matches: value.count)
+        let completedOptOutsDictionary = Dictionary.init(grouping: removedProfiles, by: { $0.dataBroker })
+        let completedOptOuts = completedOptOutsDictionary.map { (key: DBPUIDataBroker, value: [DBPUIDataBrokerProfileMatch]) in
+            DBPUIOptOutMatch(dataBroker: key, matches: value.count)
         }
+        let lastScans = getLastScanInformation(brokerProfileQueryData: brokerProfileQueryData)
+        let nextScans = getNextScansInformation(brokerProfileQueryData: brokerProfileQueryData)
 
-        return DBPUIScanAndOptOutMaintenanceState(inProgressOptOuts: inProgressOptOuts, completedOptOuts: completedOptOuts)
+        return DBPUIScanAndOptOutMaintenanceState(
+            inProgressOptOuts: inProgressOptOuts,
+            completedOptOuts: completedOptOuts,
+            scanSchedule: DBPUIScanSchedule(lastScan: lastScans, nextScan: nextScans),
+            scanHistory: DBPUIScanHistory(sitesScanned: sitesScanned, scansCompleted: scansCompleted)
+        )
+    }
+
+    private func getLastScanInformation(brokerProfileQueryData: [BrokerProfileQueryData],
+                                        currentDate: Date = Date(),
+                                        format: String = "dd/MM/yyyy") -> DBUIScanDate {
+        let scansGroupedByLastRunDate = Dictionary.init(grouping: brokerProfileQueryData, by: { $0.scanOperationData.lastRunDate?.toFormat(format) })
+        let closestScansBeforeToday = scansGroupedByLastRunDate
+            .filter { $0.key != nil && $0.key!.toDate(using: format) < currentDate }
+            .sorted { $0.key! < $1.key! }
+            .flatMap { [$0.key?.toDate(using: format): $0.value] }
+            .last
+
+        return scanDate(element: closestScansBeforeToday)
+    }
+
+    private func getNextScansInformation(brokerProfileQueryData: [BrokerProfileQueryData],
+                                         currentDate: Date = Date(),
+                                         format: String = "dd/MM/yyyy") -> DBUIScanDate {
+        let scansGroupedByPreferredRunDate = Dictionary.init(grouping: brokerProfileQueryData, by: { $0.scanOperationData.preferredRunDate?.toFormat(format) })
+        let closestScansAfterToday = scansGroupedByPreferredRunDate
+            .filter { $0.key != nil && $0.key!.toDate(using: format) > currentDate }
+            .sorted { $0.key! < $1.key! }
+            .flatMap { [$0.key?.toDate(using: format): $0.value] }
+            .first
+
+        return scanDate(element: closestScansAfterToday)
+    }
+
+    private func scanDate(element: Dictionary<Date?, [BrokerProfileQueryData]>.Element?) -> DBUIScanDate {
+        if let element = element, let date = element.key {
+            return DBUIScanDate(
+                date: date,
+                dataBrokers: element.value.map { DBPUIDataBroker(name: $0.dataBroker.name)}
+            )
+        } else {
+            return DBUIScanDate(date: Date(), dataBrokers: [DBPUIDataBroker]())
+        }
+    }
+}
+
+extension Date {
+
+    func toFormat(_ format: String) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = format
+        return dateFormatter.string(from: self)
+    }
+}
+
+extension String {
+
+    func toDate(using format: String) -> Date {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = format
+
+        if let date = dateFormatter.date(from: self) {
+            return date
+        } else {
+            fatalError("String should be on the correct date format")
+        }
     }
 }
