@@ -118,3 +118,28 @@ extension ProfileQuery {
                              deprecated: deprecated)
      }
 }
+
+extension ProfileQuery: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(firstName.lowercased())
+        hasher.combine(lastName.lowercased())
+        hasher.combine(middleName?.lowercased())
+        hasher.combine(suffix?.lowercased())
+        hasher.combine(city.lowercased())
+        hasher.combine(state.lowercased())
+        hasher.combine(street?.lowercased())
+        hasher.combine(zip?.lowercased())
+        hasher.combine(birthYear)
+        hasher.combine(phone?.lowercased())
+        hasher.combine(fullName.lowercased())
+        hasher.combine(age)
+        hasher.combine(addresses)
+    }
+}
+
+extension Address: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(city.lowercased())
+        hasher.combine(state.lowercased())
+    }
+}

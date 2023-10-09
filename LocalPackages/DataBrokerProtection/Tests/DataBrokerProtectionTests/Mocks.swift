@@ -401,6 +401,7 @@ final class SecureStorageDatabaseProviderMock: SecureStorageDatabaseProvider {
 }
 
 final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault {
+
     var shouldReturnOldVersionBroker = false
     var shouldReturnNewVersionBroker = false
     var wasBrokerUpdateCalled = false
@@ -569,8 +570,9 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
         wasDeleteProfileQueryCalled = true
     }
 
-    func updateProfileQueryDeprecatedStatus(profileQuery: DataBrokerProtection.ProfileQuery, brokerIDs: [Int64], profileId: Int64) throws {
+    func update(_ profileQuery: DataBrokerProtection.ProfileQuery, brokerIDs: [Int64], profileId: Int64) throws -> Int64 {
         wasUpdateProfileQueryCalled = true
+        return 1
     }
 
     func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation? {

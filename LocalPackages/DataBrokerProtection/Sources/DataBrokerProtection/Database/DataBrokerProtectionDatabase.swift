@@ -339,49 +339,48 @@ extension DataBrokerProtectionDatabase {
 
     // https://app.asana.com/0/481882893211075/1205574642847432/f
     private func updateProfile(_ profile: DataBrokerProtectionProfile, vault: any DataBrokerProtectionSecureVault) async throws {
+       
         let newProfileQueries = profile.profileQueries
-
-        var profileQueriesToCreate = [ProfileQuery]()
-        var profileQueriesToUpdate = [ProfileQuery]()
-        var profileQueriesToRemove = [ProfileQuery]()
 
         let databaseBrokerProfileQueryData = fetchAllBrokerProfileQueryData()
         let databaseProfileQueries = databaseBrokerProfileQueryData.map { $0.profileQuery }
 
-        for profileQuery in newProfileQueries {
+        // The queries we need to create are the one that exist on the new ones but not in the database
+        let profileQueriesToCreate = Set(newProfileQueries).subtracting(Set(databaseProfileQueries))
 
-            if let databaseProfileQuery = databaseProfileQueries.first(where: { $0 == profileQuery }) {
-                // If the DB contains this profileQuery, it means the user is adding the same name back again
-                // In this case we remove the deprecated flag
-                let reAddedProfileQuery = databaseProfileQuery.with(deprecated: false)
-                profileQueriesToUpdate.append(reAddedProfileQuery)
-            } else {
-                profileQueriesToCreate.append(profileQuery)
-            }
+        // The queries that need update exist in both the new and the database
+        // We assume updated queries will be not deprecated
+        var profileQueriesToUpdate = Array(Set(databaseProfileQueries).intersection(Set(newProfileQueries))).map {
+            $0.with(deprecated: false)
         }
+        // The ones that we need to remove are the ones that exist in the database but not in the new ones
+        var profileQueriesToRemove = Set(databaseProfileQueries).subtracting(Set(newProfileQueries))
 
-        for profileQuery in databaseProfileQueries where !newProfileQueries.contains(profileQuery) {
-            if let brokerProfileQueryData = databaseBrokerProfileQueryData.filter({ $0.profileQuery == profileQuery }).first, !brokerProfileQueryData.extractedProfiles.isEmpty {
+        // For the profile queries we are going to remove. We need to check if they have extracted profiles.
+        // If the profile query has matches, we need to set it as deprecated and add it to the updates profile
+        // we also need to remove it from the profile queries to remove.
+        for brokerProfileQueryData in databaseBrokerProfileQueryData where profileQueriesToRemove.contains(brokerProfileQueryData.profileQuery) {
+            if brokerProfileQueryData.hasMatches {
                 let deprecatedProfileQuery = brokerProfileQueryData.profileQuery.with(deprecated: true)
                 profileQueriesToUpdate.append(deprecatedProfileQuery)
-            } else {
-                profileQueriesToRemove.append(profileQuery)
+                profileQueriesToRemove.remove(brokerProfileQueryData.profileQuery)
             }
         }
+
 
         let profileID = try vault.update(profile: profile)
         let brokerIDs = try vault.fetchAllBrokers().compactMap({ $0.id })
 
         // Delete
         if !profileQueriesToRemove.isEmpty {
-            try deleteProfileQueries(profileQueriesToRemove,
+            try deleteProfileQueries(Array(profileQueriesToRemove),
                                      profileID: profileID,
                                      vault: vault)
         }
 
         // Update profileQueries
         if !profileQueriesToUpdate.isEmpty {
-            try updateProfileQueries(profileQueriesToUpdate,
+            try updateProfileQueries(Array(profileQueriesToUpdate),
                                      profileID: profileID,
                                      brokerIDs: brokerIDs,
                                      vault: vault)
@@ -393,7 +392,7 @@ extension DataBrokerProtectionDatabase {
                 profileId: Self.profileId,
                 vault: vault,
                 brokerIDs: brokerIDs,
-                profileQueries: profileQueriesToCreate
+                profileQueries: Array(profileQueriesToCreate)
             )
         }
     }
@@ -413,9 +412,15 @@ extension DataBrokerProtectionDatabase {
                                       vault: any DataBrokerProtectionSecureVault) throws {
 
         for profile in profileQueries {
-            try vault.updateProfileQueryDeprecatedStatus(profileQuery: profile,
-                                                         brokerIDs: brokerIDs,
-                                                         profileId: profileID)
+            let profileQueryID = try vault.update(profile,
+                                                  brokerIDs: brokerIDs,
+                                                  profileId: profileID)
+
+            if !profile.deprecated {
+                for brokerID in brokerIDs where !profile.deprecated {
+                    updatePreferredRunDate(Date(), brokerId: brokerID, profileQueryId: profileQueryID)
+                }
+            }
         }
     }
 }
