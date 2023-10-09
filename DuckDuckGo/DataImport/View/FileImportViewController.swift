@@ -148,7 +148,7 @@ final class FileImportViewController: NSViewController {
             onePassword7InfoView.isHidden = true
             onePassword8InfoView.isHidden = true
             bitwardenInfoView.isHidden = true
-            selectFileButton.title = UserText.importLoginsSelect1PasswordCSVFile
+            selectFileButton.title = UserText.importLoginsSelectLastPassCSVFile
 
         case .brave, .chrome, .edge, .firefox:
             assertionFailure("CSV Import not supported for \(importSource)")
