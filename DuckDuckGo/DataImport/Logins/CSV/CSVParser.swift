@@ -78,12 +78,11 @@ struct CSVParser {
             case (.start, .delimiter, _):
                 flushField()
                 delimiter = character
-
             case (.start, .whitespace, _):
                 return // trim leading whitespaces
             case (.start, .newline, _):
                 nextLine()
-            case (.start, _, _):
+            case (.start, .payload, _):
                 state = .field
                 currentField.append(character)
 
@@ -98,7 +97,6 @@ struct CSVParser {
             case (.enquotedField, .delimiter, precedingQuote: true):
                 flushField()
                 delimiter = character
-
             case (.enquotedField, .newline, precedingQuote: true):
                 nextLine()
             case (.enquotedField, .whitespace, precedingQuote: true):
@@ -113,11 +111,10 @@ struct CSVParser {
             case (.field, .delimiter, _):
                 flushField()
                 delimiter = character
-
-            case (.field, _, _) where character.isNewline:
+            case (.field, .newline, _):
                 nextLine()
 
-            case (_, _, precedingQuote: false):
+            default:
                 currentField.append(character)
             }
         }
@@ -133,7 +130,7 @@ private extension Character {
     case newline
     case whitespace
     case unsupported
-    case other
+    case payload
     }
 
     func kind(delimiter: Character?) -> Kind {
@@ -148,7 +145,7 @@ private extension Character {
         } else if self == delimiter || (delimiter == nil && CharacterSet.delimiters.contains(unicodeScalars.first!)) {
             .delimiter
         } else {
-            .other
+            .payload
         }
     }
 

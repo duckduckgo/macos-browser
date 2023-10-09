@@ -253,11 +253,11 @@ extension CSVImporter.ColumnPositions {
             // User Name:username
             // Password:password
             guard let lines = row[safe: usernameIndex]?.components(separatedBy: "\n"),
-                  let usernameLine = lines.firstIndex(where: { $0.hasPrefix("User Name:") }),
-                  let passwordLine = lines.firstIndex(where: { $0.hasPrefix("Password:") }) else { return nil }
+                  let usernameLine = lines.first(where: { $0.hasPrefix("User Name:") }),
+                  let passwordLine = lines.first(where: { $0.hasPrefix("Password:") }) else { return nil }
 
-            username = lines[usernameLine].dropping(prefix: "User Name:")
-            password = lines[passwordLine].dropping(prefix: "Password:")
+            username = usernameLine.dropping(prefix: "User Name:")
+            password = passwordLine.dropping(prefix: "Password:")
 
         } else if let user = row[safe: usernameIndex],
                   let pass = row[safe: passwordIndex] {
