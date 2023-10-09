@@ -49,10 +49,10 @@ final class BrowserImportMoreInfoViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         switch source {
-        case .chrome, .edge, .brave:
+        case .chrome, .chromium, .coccoc, .edge, .brave, .opera, .operaGX, .vivaldi, .yandex:
             label.stringValue = UserText.importFromChromiumMoreInfo
 
-        case .firefox:
+        case .firefox, .tor:
             label.stringValue = UserText.importFromFirefoxMoreInfo
 
         case .safari, .safariTechnologyPreview, .csv, .lastPass, .onePassword7, .onePassword8, .bookmarksHTML:

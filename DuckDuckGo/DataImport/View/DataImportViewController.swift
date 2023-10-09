@@ -182,7 +182,7 @@ final class DataImportViewController: NSViewController {
         case .csv, .lastPass, .onePassword7, .onePassword8, .bookmarksHTML:
             self.viewState = ViewState(selectedImportSource: source, interactionState: .unableToImport)
 
-        case .chrome, .firefox, .brave, .edge, .safari, .safariTechnologyPreview:
+        case .chrome, .chromium, .coccoc, .firefox, .brave, .edge, .opera, .operaGX, .safari, .safariTechnologyPreview, .tor, .vivaldi, .yandex:
             let interactionState: InteractionState
             switch (source, loginsSelected) {
             case (.safari, _),
@@ -216,6 +216,7 @@ final class DataImportViewController: NSViewController {
         }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private func throwingRefreshDataImporter() throws {
         let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
 
@@ -224,9 +225,21 @@ final class DataImportViewController: NSViewController {
             self.dataImporter = try BraveDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
         case .chrome:
             self.dataImporter = try ChromeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+        case .chromium:
+            self.dataImporter = try ChromiumDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+        case .coccoc:
+            self.dataImporter = try CoccocDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
         case .edge:
             self.dataImporter = try EdgeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
-        case .firefox:
+        case .opera, .operaGX:
+            self.dataImporter = try OperaDataImporter(loginImporter: secureVaultImporter(),
+                                                      bookmarkImporter: bookmarkImporter,
+                                                      gx: viewState.selectedImportSource == .operaGX)
+        case .vivaldi:
+            self.dataImporter = try VivaldiDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+        case .yandex:
+            self.dataImporter = try YandexDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+        case .firefox, .tor:
             self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(),
                                                         bookmarkImporter: bookmarkImporter,
                                                         faviconManager: FaviconManager.shared)
@@ -321,7 +334,7 @@ final class DataImportViewController: NSViewController {
             }
 
             fallthrough
-        case .brave, .chrome, .edge, .firefox:
+        case .brave, .chrome, .chromium, .coccoc, .edge, .firefox, .opera, .operaGX, .tor, .vivaldi, .yandex:
             if case let .completedImport(summary) = interactionState {
                 return BrowserImportSummaryViewController.create(importSummary: summary)
             } else if case let .permissionsRequired(types) = interactionState {

@@ -70,7 +70,8 @@ final class CSVImporter: DataImporter {
             switch source {
             case .onePassword7, .onePassword8:
                 self.init(titleIndex: 3, urlIndex: 5, usernameIndex: 6, passwordIndex: 2, maximumIndex: 7)
-            case .lastPass, .firefox, .edge, .chrome, .brave, .safari, .safariTechnologyPreview, .csv, .bookmarksHTML:
+            case .lastPass, .firefox, .edge, .chrome, .chromium, .coccoc, .brave, .opera, .operaGX,
+                 .safari, .safariTechnologyPreview, .tor, .vivaldi, .yandex, .csv, .bookmarksHTML:
                 return nil
             }
         }

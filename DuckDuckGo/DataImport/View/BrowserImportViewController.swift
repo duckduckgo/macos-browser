@@ -113,8 +113,11 @@ final class BrowserImportViewController: NSViewController {
                 passwordsWarningLabel.isHidden = false
                 return
             }
-
             passwordsWarningLabel.isHidden = safariMajorVersion >= 15
+        case .yandex, .tor:
+            passwordsCheckbox.isHidden = true
+            bookmarksCheckbox.title = UserText.bookmarkImportBookmarks
+            passwordsWarningLabel.isHidden = true
         default:
             bookmarksCheckbox.title = UserText.bookmarkImportBookmarks
             passwordsWarningLabel.isHidden = true

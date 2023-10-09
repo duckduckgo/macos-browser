@@ -19,7 +19,7 @@
 import Foundation
 import SecureStorage
 
-final class FirefoxDataImporter: DataImporter {
+internal class FirefoxDataImporter: DataImporter {
 
     var primaryPassword: String?
 

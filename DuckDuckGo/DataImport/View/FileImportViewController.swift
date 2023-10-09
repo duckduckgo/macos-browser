@@ -107,13 +107,13 @@ final class FileImportViewController: NSViewController {
 
     private func renderAwaitingFileSelectionState() {
         switch importSource {
-        case .safari, .safariTechnologyPreview:
+        case .safari, .safariTechnologyPreview, .yandex:
             descriptionLabel.isHidden = true
             safariInfoView.isHidden = false
             lastPassInfoView.isHidden = true
             onePassword7InfoView.isHidden = true
             onePassword8InfoView.isHidden = true
-            selectFileButton.title = UserText.importLoginsSelectSafariCSVFile
+            selectFileButton.title = UserText.importLoginsSelectBrowserCSVFile
         case .onePassword7:
             descriptionLabel.isHidden = true
             safariInfoView.isHidden = true
@@ -136,7 +136,7 @@ final class FileImportViewController: NSViewController {
             onePassword8InfoView.isHidden = true
             selectFileButton.title = UserText.importLoginsSelectLastPassCSVFile
 
-        case .brave, .chrome, .edge, .firefox:
+        case .brave, .chrome, .chromium, .coccoc, .edge, .firefox, .opera, .operaGX, .tor, .vivaldi:
             assertionFailure("CSV Import not supported for \(importSource)")
             fallthrough
         case .csv:
@@ -208,9 +208,9 @@ final class FileImportViewController: NSViewController {
                 switch importSource {
                 case .bookmarksHTML:
                     delegate?.fileImportViewController(self, didSelectBookmarksFileWithURL: selectedURL)
-                case .csv, .onePassword8, .onePassword7, .lastPass, .safari, .safariTechnologyPreview:
+                case .csv, .onePassword8, .onePassword7, .lastPass, .safari, .safariTechnologyPreview, .yandex:
                     delegate?.fileImportViewController(self, didSelectCSVFileWithURL: selectedURL)
-                case .brave, .chrome, .edge, .firefox:
+                case .brave, .chrome, .chromium, .coccoc, .edge, .firefox, .opera, .operaGX, .tor, .vivaldi:
                     break
                 }
             } else {

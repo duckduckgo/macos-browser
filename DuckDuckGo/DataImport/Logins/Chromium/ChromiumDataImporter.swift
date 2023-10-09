@@ -21,11 +21,11 @@ import Foundation
 internal class ChromiumDataImporter: DataImporter {
 
     var processName: String {
-        fatalError("Subclasses must provide their own process name")
+        "Chromium"
     }
 
     var source: DataImport.Source {
-        fatalError("Subclasses must return a source")
+        .chromium
     }
 
     private let applicationDataDirectoryURL: URL
@@ -38,6 +38,16 @@ internal class ChromiumDataImporter: DataImporter {
         self.loginImporter = loginImporter
         self.bookmarkImporter = bookmarkImporter
         self.faviconManager = faviconManager
+    }
+
+    convenience init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
+        let applicationSupport = URL.nonSandboxApplicationSupportDirectoryURL
+        let defaultDataURL = applicationSupport.appendingPathComponent("Chromium/Default/")
+
+        self.init(applicationDataDirectoryURL: defaultDataURL,
+                  loginImporter: loginImporter,
+                  bookmarkImporter: bookmarkImporter,
+                  faviconManager: FaviconManager.shared)
     }
 
     func importableTypes() -> [DataImport.DataType] {
