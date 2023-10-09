@@ -90,6 +90,7 @@ struct DBPUIUserProfileName: Codable {
     let first: String
     let middle: String?
     let last: String
+    let suffix: String?
 }
 
 /// Message Object representing a user profile address

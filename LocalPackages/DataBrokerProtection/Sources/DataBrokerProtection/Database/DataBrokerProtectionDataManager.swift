@@ -131,7 +131,7 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
     }
 
     private func indexForName(matching name: DBPUIUserProfileName, in profile: DataBrokerProtectionProfile) -> Int? {
-        if let idx = profile.names.firstIndex(where: { $0.firstName == name.first && $0.lastName == name.last && $0.middleName == name.middle }) {
+        if let idx = profile.names.firstIndex(where: { $0.firstName == name.first && $0.lastName == name.last && $0.middleName == name.middle && $0.suffix == name.suffix }) {
             return idx
         }
 
@@ -139,7 +139,7 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
     }
 
     private func indexForAddress(matching address: DBPUIUserProfileAddress, in profile: DataBrokerProtectionProfile) -> Int? {
-        if let idx = profile.addresses.firstIndex(where: { $0.street == address.street && $0.state == address.state && $0.city == address.city }) {
+        if let idx = profile.addresses.firstIndex(where: { $0.street == address.street && $0.state == address.state && $0.city == address.city && $0.zipCode == address.zipCode}) {
             return idx
         }
 
@@ -147,17 +147,17 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
     }
 
     private func isNameEmpty(_ name: DBPUIUserProfileName) -> Bool {
-        return name.first.isEmpty || name.last.isEmpty
+        return name.first.isBlank || name.last.isBlank
     }
 
     private func addressIsEmpty(_ address: DBPUIUserProfileAddress) -> Bool {
-        return address.city.isEmpty || address.state.isEmpty
+        return address.city.isBlank || address.state.isBlank
     }
 
     func getUserProfile() -> DBPUIUserProfile? {
         let profile = profile ?? emptyProfile
 
-        let names = profile.names.map { DBPUIUserProfileName(first: $0.firstName, middle: $0.middleName, last: $0.lastName) }
+        let names = profile.names.map { DBPUIUserProfileName(first: $0.firstName, middle: $0.middleName, last: $0.lastName, suffix: $0.suffix) }
         let addresses = profile.addresses.map { DBPUIUserProfileAddress(street: $0.street, city: $0.city, state: $0.state, zipCode: $0.zipCode) }
 
         return DBPUIUserProfile(names: names, birthYear: profile.birthYear, addresses: addresses)
@@ -172,7 +172,7 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
         guard indexForName(matching: name, in: profile) == nil else { return false }
 
         var names = profile.names
-        names.append(DataBrokerProtectionProfile.Name(firstName: name.first, lastName: name.last, middleName: name.middle))
+        names.append(DataBrokerProtectionProfile.Name(firstName: name.first, lastName: name.last, middleName: name.middle, suffix: name.suffix))
 
         self.profile = DataBrokerProtectionProfile(names: names, addresses: profile.addresses, phones: profile.phones, birthYear: profile.birthYear)
 
@@ -184,7 +184,7 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
 
         var names = profile.names
         if payload.index < names.count {
-            names[payload.index] = DataBrokerProtectionProfile.Name(firstName: payload.name.first, lastName: payload.name.last, middleName: payload.name.middle)
+            names[payload.index] = DataBrokerProtectionProfile.Name(firstName: payload.name.first, lastName: payload.name.last, middleName: payload.name.middle, suffix: payload.name.suffix)
             self.profile = DataBrokerProtectionProfile(names: names, addresses: profile.addresses, phones: profile.phones, birthYear: profile.birthYear)
             return true
         }
@@ -222,7 +222,7 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
         guard indexForAddress(matching: address, in: profile) == nil else { return false }
 
         var addresses = profile.addresses
-        addresses.append(DataBrokerProtectionProfile.Address(city: address.city, state: address.state, street: address.street))
+        addresses.append(DataBrokerProtectionProfile.Address(city: address.city, state: address.state, street: address.street, zipCode: address.zipCode))
 
         self.profile = DataBrokerProtectionProfile(names: profile.names, addresses: addresses, phones: profile.phones, birthYear: profile.birthYear)
 

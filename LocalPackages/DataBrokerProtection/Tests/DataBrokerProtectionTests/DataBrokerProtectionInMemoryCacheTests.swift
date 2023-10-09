@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-
 import XCTest
 @testable import DataBrokerProtection
 
@@ -24,7 +23,7 @@ final class DataBrokerProtectionInMemoryCacheTests: XCTestCase {
 
     func testCacheStoresNewName() throws {
         let cache = InMemoryDataCache()
-        let result = cache.addNameToCurrentUserProfile(DBPUIUserProfileName(first: "John", middle: "Jacob", last: "JingleHeimerSchmidt"))
+        let result = cache.addNameToCurrentUserProfile(DBPUIUserProfileName(first: "John", middle: "Jacob", last: "JingleHeimerSchmidt", suffix: nil))
 
         XCTAssert(result, "Adding name to profile cache failed")
         XCTAssert(cache.profile?.names.count == 1, "There should be 1 name in the profile")
@@ -33,17 +32,17 @@ final class DataBrokerProtectionInMemoryCacheTests: XCTestCase {
 
     func testCacheDoesNotStoreDuplicateNames() throws {
         let cache = InMemoryDataCache()
-        var result = cache.addNameToCurrentUserProfile(DBPUIUserProfileName(first: "John", middle: "Jacob", last: "JingleHeimerSchmidt"))
+        var result = cache.addNameToCurrentUserProfile(DBPUIUserProfileName(first: "John", middle: "Jacob", last: "JingleHeimerSchmidt", suffix: nil))
 
         XCTAssert(result, "Adding name to profile cache failed")
 
-        result = cache.addNameToCurrentUserProfile(DBPUIUserProfileName(first: "John", middle: "Jacob", last: "JingleHeimerSchmidt"))
+        result = cache.addNameToCurrentUserProfile(DBPUIUserProfileName(first: "John", middle: "Jacob", last: "JingleHeimerSchmidt", suffix: nil))
         XCTAssertFalse(result, "Result of adding duplicate name should be `false`")
     }
 
     func testCacheDoesNotStoreEmptyNames() throws {
         let cache = InMemoryDataCache()
-        var result = cache.addNameToCurrentUserProfile(DBPUIUserProfileName(first: "", middle: "Jacob", last: "JingleHeimerSchmidt"))
+        var result = cache.addNameToCurrentUserProfile(DBPUIUserProfileName(first: "", middle: "Jacob", last: "JingleHeimerSchmidt", suffix: nil))
 
         XCTAssertFalse(result, "Result of adding empty name should be `false`")
     }
@@ -76,14 +75,15 @@ final class DataBrokerProtectionInMemoryCacheTests: XCTestCase {
 
     func testCacheSetBirthYear() throws {
         let cache = InMemoryDataCache()
-        cache.setBirthYearForCurrentUserProfile(DBPUIBirthYear(year: 1990))
+        let result = cache.setBirthYearForCurrentUserProfile(DBPUIBirthYear(year: 1990))
 
+        XCTAssert(result, "Setting birth year was not succcessful")
         XCTAssert(cache.profile?.birthYear == 1990, "Birth year not set correctly")
     }
 
     func testCacheRemoveNameFromIndex() throws {
         let cache = InMemoryDataCache()
-        var result = cache.addNameToCurrentUserProfile(DBPUIUserProfileName(first: "John", middle: "Jacob", last: "JingleHeimerSchmidt"))
+        var result = cache.addNameToCurrentUserProfile(DBPUIUserProfileName(first: "John", middle: "Jacob", last: "JingleHeimerSchmidt", suffix: nil))
 
         XCTAssert(result, "Adding name to profile cache failed")
         XCTAssert(cache.profile?.names.count == 1, "There should be 1 name in the profile")
