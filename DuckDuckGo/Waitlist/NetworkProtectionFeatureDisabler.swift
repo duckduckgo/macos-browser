@@ -125,7 +125,7 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
 
     private func resetUserDefaults() {
         selectedServerUserDefaultsStore.reset()
-        userDefaults.networkProtectionOnboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
+        userDefaults.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
     }
 }
 
