@@ -23,12 +23,17 @@ import NetworkProtectionIPC
 
 final class TunnelControllerIPCServer {
     private let tunnelController: TunnelController
+    private let networkExtensionController: NetworkExtensionController
     private let server: NetworkProtectionIPC.TunnelControllerIPCServer
     private let statusReporter: NetworkProtectionStatusReporter
     private var cancellables = Set<AnyCancellable>()
 
-    init(tunnelController: TunnelController, statusReporter: NetworkProtectionStatusReporter) {
+    init(tunnelController: TunnelController,
+         networkExtensionController: NetworkExtensionController,
+         statusReporter: NetworkProtectionStatusReporter) {
+
         self.tunnelController = tunnelController
+        self.networkExtensionController = networkExtensionController
         server = .init(machServiceName: Bundle.main.bundleIdentifier!)
         self.statusReporter = statusReporter
 
@@ -72,6 +77,7 @@ final class TunnelControllerIPCServer {
 }
 
 extension TunnelControllerIPCServer: IPCServerInterface {
+
     func register() {
         // TODO: consider adding support for this type of thing directly in the status reporter
         server.serverInfoChanged(statusReporter.serverInfoObserver.recentValue)
@@ -88,5 +94,9 @@ extension TunnelControllerIPCServer: IPCServerInterface {
         Task {
             await tunnelController.stop()
         }
+    }
+
+    func resetAll(uninstallSystemExtension: Bool) async {
+        try? await networkExtensionController.deactivateSystemExtension()
     }
 }

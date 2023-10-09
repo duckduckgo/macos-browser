@@ -61,7 +61,11 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         Bundle.main.networkExtensionBundleID
     }
 
-    private lazy var tunnelController = NetworkProtectionTunnelController(networkExtensionBundleID: networkExtensionBundleID)
+    private lazy var networkExtensionController = NetworkExtensionController(extensionBundleID: networkExtensionBundleID)
+
+    private lazy var tunnelController = NetworkProtectionTunnelController(
+        networkExtensionBundleID: networkExtensionBundleID,
+        networkExtensionController: networkExtensionController)
 
     /// An IPC server that provides access to the tunnel controller.
     ///
@@ -69,6 +73,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     ///
     private lazy var tunnelControllerIPCServer: TunnelControllerIPCServer = {
         let ipcServer = TunnelControllerIPCServer(tunnelController: tunnelController,
+                                                  networkExtensionController: networkExtensionController,
                                                   statusReporter: statusReporter)
         ipcServer.activate()
         return ipcServer

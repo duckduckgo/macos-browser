@@ -71,8 +71,8 @@ final class NetworkProtectionDebugUtilities {
     }
 
     func removeSystemExtensionAndAgents() async throws {
+        await networkProtectionFeatureDisabler.resetAllStateForVPNApp(uninstallSystemExtension: true)
         networkProtectionFeatureDisabler.disableLoginItems()
-        try await networkProtectionFeatureDisabler.disableSystemExtension()
     }
 
     func sendTestNotificationRequest() async throws {

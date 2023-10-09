@@ -22,6 +22,7 @@ import BrowserServicesKit
 import Common
 import NetworkExtension
 import NetworkProtection
+import NetworkProtectionIPC
 import NetworkProtectionUI
 import SystemExtensions
 
@@ -35,11 +36,13 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     private let pinningManager: LocalPinningManager
     private let selectedServerUserDefaultsStore: NetworkProtectionSelectedServerUserDefaultsStore
     private let userDefaults: UserDefaults
+    private let ipcClient: TunnelControllerIPCClient
 
     init(loginItemsManager: LoginItemsManager = LoginItemsManager(),
          pinningManager: LocalPinningManager = .shared,
          userDefaults: UserDefaults = .shared,
          selectedServerUserDefaultsStore: NetworkProtectionSelectedServerUserDefaultsStore = NetworkProtectionSelectedServerUserDefaultsStore(),
+         ipcClient: TunnelControllerIPCClient = TunnelControllerIPCClient(machServiceName: Bundle.main.vpnMenuAgentBundleId),
          log: OSLog = .networkProtection) {
 
         self.log = log
@@ -47,6 +50,7 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         self.pinningManager = pinningManager
         self.selectedServerUserDefaultsStore = selectedServerUserDefaultsStore
         self.userDefaults = userDefaults
+        self.ipcClient = ipcClient
     }
 
     /// This method disables Network Protection and clear all of its state.
@@ -58,6 +62,11 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) {
         Task {
             unpinNetworkProtection()
+
+            if uninstallSystemExtension {
+                await resetAllStateForVPNApp(uninstallSystemExtension: uninstallSystemExtension)
+            }
+
             disableLoginItems()
 
             await resetNetworkExtensionState()
@@ -72,10 +81,6 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
             if !keepAuthToken {
                 try? removeAppAuthToken()
             }
-
-            if uninstallSystemExtension {
-                try? await disableSystemExtension()
-            }
         }
     }
 
@@ -83,17 +88,11 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         loginItemsManager.disableLoginItems(LoginItemsManager.networkProtectionLoginItems)
     }
 
-    func disableSystemExtension() async throws {
+    func resetAllStateForVPNApp(uninstallSystemExtension: Bool) async {
+        await ipcClient.resetAll(uninstallSystemExtension: uninstallSystemExtension)
+
 #if NETP_SYSTEM_EXTENSION
-        do {
-            // TODO: Fix this
-            //try await SystemExtensionManager().deactivate()
-            userDefaults.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
-        } catch OSSystemExtensionError.extensionNotFound {
-            // This is an intentional no-op to silence this type of error
-        } catch {
-            throw error
-        }
+        userDefaults.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
 #endif
     }
 

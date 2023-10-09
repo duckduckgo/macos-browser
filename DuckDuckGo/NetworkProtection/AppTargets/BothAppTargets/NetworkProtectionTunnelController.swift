@@ -27,6 +27,7 @@ import NetworkProtection
 import NetworkProtectionUI
 import SystemExtensions
 import Networking
+import PixelKit
 
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
@@ -60,6 +61,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     //private let debugUtilities = NetworkProtectionDebugUtilities()
 
     private let networkExtensionBundleID: String
+    private let networkExtensionController: NetworkExtensionController
 
     // MARK: - User Defaults
 
@@ -129,12 +131,14 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///         - logger: (meant for testing) the logger that this object will use.
     ///
     init(networkExtensionBundleID: String,
+         networkExtensionController: NetworkExtensionController,
          notificationCenter: NotificationCenter = .default,
          tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
 
         self.logger = logger
         self.networkExtensionBundleID = networkExtensionBundleID
+        self.networkExtensionController = networkExtensionController
         self.tokenStore = tokenStore
     }
 
@@ -200,25 +204,47 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     // MARK: - Ensure things are working
 
 #if NETP_SYSTEM_EXTENSION
-    /// - Returns: `true` if the system extension and the background agent were activated successfully
+    /// Ensures that the system extension is activated if necessary.
     ///
-    private func ensureSystemExtensionIsActivated() async throws -> Bool {
-        var activated = false
+    private func activateSystemExtension(waitingForUserApproval: @escaping () -> Void) async throws {
+        do {
+            try await networkExtensionController.activateSystemExtension(
+                waitingForUserApproval: waitingForUserApproval)
+        } catch {
+            switch error {
+            case OSSystemExtensionError.requestSuperseded:
+                // Even if the installation request is superseded we want to show the message that tells the user
+                // to go to System Settings to allow the extension
+                controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
+            case SystemExtensionRequest.RequestError.unknownRequestResult:
+                controllerErrorStore.lastErrorMessage = UserText.networkProtectionUnknownActivationError
 
-        for try await event in SystemExtensionManager().activate() {
-            switch event {
-            case .waitingForUserApproval:
-                onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue
-            case .activated:
-                self.controllerErrorStore.lastErrorMessage = nil
-                activated = true
-            case .willActivateAfterReboot:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionSystemExtensionUnknownActivationResult,
+                    frequency: .standard,
+                    includeAppVersionParameter: true)
+            case SystemExtensionRequest.RequestError.willActivateAfterReboot:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseReboot
+            default:
+                controllerErrorStore.lastErrorMessage = error.localizedDescription
             }
+
+            return
         }
 
-        try? await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
-        return activated
+        self.controllerErrorStore.lastErrorMessage = nil
+
+        // We'll only update to completed if we were showing the onboarding step to
+        // allow the system extension.  Otherwise we may override the allow-VPN
+        // onboarding step.
+        //
+        // Additionally if the onboarding step was allowing the system extension, we won't
+        // start the tunnel at once, and instead require that the user enables the toggle.
+        //
+        if onboardingStatusRawValue == OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue {
+            onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
+            return
+        }
     }
 #endif
 
@@ -247,25 +273,21 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     func start() async {
         controllerErrorStore.lastErrorMessage = nil
 
-        do {
 #if NETP_SYSTEM_EXTENSION
-            guard try await ensureSystemExtensionIsActivated() else {
-                return
+        do {
+            try await activateSystemExtension { [weak self] in
+                // If we're waiting for user approval we wanna make sure the
+                // onboarding step is set correctly.  This can be useful to
+                // help prevent the value from being de-synchronized.
+                self?.onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue
             }
-
-            // We'll only update to completed if we were showing the onboarding step to
-            // allow the system extension.  Otherwise we may override the allow-VPN
-            // onboarding step.
-            //
-            // Additionally if the onboarding step was allowing the system extension, we won't
-            // start the tunnel at once, and instead require that the user enables the toggle.
-            //
-            if onboardingStatusRawValue == OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue {
-                onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
-                return
-            }
+        } catch {
+            await stop()
+            return
+        }
 #endif
 
+        do {
             let tunnelManager: NETunnelProviderManager
 
             do {
@@ -288,11 +310,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             default:
                 try await start(tunnelManager)
             }
-        } catch OSSystemExtensionError.requestSuperseded {
-            await stop()
-            // Even if the installation request is superseded we want to show the message that tells the user
-            // to go to System Settings to allow the extension
-            controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
         } catch {
             await stop()
             controllerErrorStore.lastErrorMessage = error.localizedDescription

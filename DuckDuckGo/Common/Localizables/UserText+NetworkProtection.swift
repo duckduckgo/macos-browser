@@ -52,6 +52,7 @@ extension UserText {
         }
     }
 
+    static let networkProtectionUnknownActivationError = NSLocalizedString("network.protection.system.extension.unknown.activation.error", value: "There as an unexpected error.  Please try again.", comment: "Message shown to users when they try to enable NetP and there is an unexpected activation error.")
     static let networkProtectionPleaseReboot = NSLocalizedString("network.protection.system.extension.please.reboot", value: "Please reboot to activate Network Protection", comment: "Message shown to users when they try to enable NetP and they need to reboot the computer to complete the installation")
 
 }

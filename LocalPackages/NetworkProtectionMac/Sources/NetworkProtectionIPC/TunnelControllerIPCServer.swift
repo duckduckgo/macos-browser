@@ -36,6 +36,10 @@ public protocol IPCServerInterface: AnyObject {
     /// Stop the VPN tunnel.
     ///
     func stop()
+
+    /// Resets all of Network Protection's state that's handled by the server
+    ///
+    func resetAll(uninstallSystemExtension: Bool) async
 }
 
 /// This protocol describes the server-side XPC interface.
@@ -58,6 +62,10 @@ protocol XPCServerInterface {
     /// Stop the VPN tunnel.
     ///
     func stop()
+
+    /// Resets all of Network Protection's state that's handled by the server
+    ///
+    func resetAll(uninstallSystemExtension: Bool) async
 }
 
 public final class TunnelControllerIPCServer {
@@ -138,5 +146,9 @@ extension TunnelControllerIPCServer: XPCServerInterface {
 
     func stop() {
         serverDelegate?.stop()
+    }
+
+    func resetAll(uninstallSystemExtension: Bool) async {
+        await serverDelegate?.resetAll(uninstallSystemExtension: uninstallSystemExtension)
     }
 }
