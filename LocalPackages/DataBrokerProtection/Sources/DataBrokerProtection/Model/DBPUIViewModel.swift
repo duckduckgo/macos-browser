@@ -106,7 +106,7 @@ final class DBPUIViewModel {
                         // Add as a pending removal profile
                         inProgress.append(DBPUIDataBrokerProfileMatch(
                             dataBroker: DBPUIDataBroker(name: profileQueryData.dataBroker.name),
-                            names: [DBPUIUserProfileName(first: optOutOperationData.extractedProfile.fullName ?? "", middle: nil, last: "")],
+                            names: [DBPUIUserProfileName(first: optOutOperationData.extractedProfile.fullName ?? "", middle: nil, last: "", suffix: nil)],
                             addresses: optOutOperationData.extractedProfile.addresses?.map {
                                 DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state, zipCode: nil)
                             } ?? []
@@ -115,7 +115,7 @@ final class DBPUIViewModel {
                         // else add as removed profile
                         completed.append(DBPUIDataBrokerProfileMatch(
                             dataBroker: DBPUIDataBroker(name: profileQueryData.dataBroker.name),
-                            names: [DBPUIUserProfileName(first: optOutOperationData.extractedProfile.fullName ?? "", middle: nil, last: "")],
+                            names: [DBPUIUserProfileName(first: optOutOperationData.extractedProfile.fullName ?? "", middle: nil, last: "", suffix: nil)],
                             addresses: optOutOperationData.extractedProfile.addresses?.map {
                                 DBPUIUserProfileAddress(street: $0.fullAddress, city: $0.city, state: $0.state, zipCode: nil)
                             } ?? []
@@ -125,7 +125,7 @@ final class DBPUIViewModel {
             }
 
             let message = DBPUIScanAndOptOutState(
-                status: DBPUIScanAndOptOutStatus.from(schedulerStatus: lastSchedulerStatus),
+                status: DBPUIScanAndOptOutStatus.from(schedulerStatus: self.lastSchedulerStatus),
                 inProgressOptOuts: inProgress,
                 completedOptOuts: completed
             )
