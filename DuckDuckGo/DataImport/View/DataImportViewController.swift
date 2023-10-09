@@ -179,7 +179,7 @@ final class DataImportViewController: NSViewController {
         let source = validSources.first(where: { $0.importSourceName == item.title })!
 
         switch source {
-        case .csv, .lastPass, .onePassword7, .onePassword8, .bookmarksHTML:
+        case .csv, .bitwarden, .lastPass, .onePassword7, .onePassword8, .bookmarksHTML:
             self.viewState = ViewState(selectedImportSource: source, interactionState: .unableToImport)
 
         case .chrome, .firefox, .brave, .edge, .safari, .safariTechnologyPreview:
@@ -243,7 +243,7 @@ final class DataImportViewController: NSViewController {
             if !(self.dataImporter is BookmarkHTMLImporter) {
                 self.dataImporter = nil
             }
-        case .csv, .onePassword7, .onePassword8, .lastPass,
+        case .csv, .bitwarden, .onePassword7, .onePassword8, .lastPass,
              .safari, .safariTechnologyPreview /* csv only */:
             if !(self.dataImporter is CSVImporter) {
                 self.dataImporter = nil
@@ -340,7 +340,7 @@ final class DataImportViewController: NSViewController {
                 return browserImportViewController
             }
 
-        case .csv, .onePassword7, .onePassword8, .lastPass, .bookmarksHTML:
+        case .csv, .bitwarden, .onePassword7, .onePassword8, .lastPass, .bookmarksHTML:
             if case let .completedImport(summary) = interactionState {
                 return BrowserImportSummaryViewController.create(importSummary: summary)
             } else {

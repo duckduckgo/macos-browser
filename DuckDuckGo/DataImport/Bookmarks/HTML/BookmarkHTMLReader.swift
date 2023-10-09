@@ -286,6 +286,7 @@ private extension BookmarkImportSource {
              .thirdPartyBrowser(.chrome),
              .thirdPartyBrowser(.edge),
              .thirdPartyBrowser(.firefox),
+             .thirdPartyBrowser(.bitwarden),
              .thirdPartyBrowser(.onePassword8),
              .thirdPartyBrowser(.onePassword7),
              .thirdPartyBrowser(.lastPass),

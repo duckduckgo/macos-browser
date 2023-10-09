@@ -130,6 +130,7 @@ extension DataImport.Source: CustomStringConvertible {
         case .brave: return "source-brave"
         case .chrome: return "source-chrome"
         case .csv: return "source-csv"
+        case .bitwarden: return "source-bitwarden"
         case .lastPass: return "source-lastpass"
         case .onePassword7: return "source-1password"
         case .onePassword8: return "source-1password-8"
