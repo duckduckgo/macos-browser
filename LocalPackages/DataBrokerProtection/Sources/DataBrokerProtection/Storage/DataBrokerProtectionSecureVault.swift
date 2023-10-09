@@ -385,16 +385,14 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
     }
 
     private func l2Encrypt(data: Data) throws -> Data {
-        return data
-//        let password = try passwordInUse()
-//        let l2Key = try l2KeyFrom(password: password)
-//        return try providers.crypto.encrypt(data, withKey: l2Key)
+        let password = try passwordInUse()
+        let l2Key = try l2KeyFrom(password: password)
+        return try providers.crypto.encrypt(data, withKey: l2Key)
     }
 
     private func l2Decrypt(data: Data) throws -> Data {
-        return data
-//        let password = try passwordInUse()
-//        let l2Key = try l2KeyFrom(password: password)
-//        return try providers.crypto.decrypt(data, withKey: l2Key)
+        let password = try passwordInUse()
+        let l2Key = try l2KeyFrom(password: password)
+        return try providers.crypto.decrypt(data, withKey: l2Key)
     }
 }
