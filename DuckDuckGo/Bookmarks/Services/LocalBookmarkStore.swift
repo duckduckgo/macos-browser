@@ -172,7 +172,7 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
-    private func commonOnSaveErrorHandler(_ error: Error, source: String) {
+    private func commonOnSaveErrorHandler(_ error: Error, source: String = #function) {
         guard !NSApp.isRunningUnitTests else { return }
 
         assertionFailure("LocalBookmarkStore: Saving of context failed")
@@ -301,7 +301,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
             bookmarkMO.uuid = bookmark.id
         }, onError: { [weak self] error in
-            self?.commonOnSaveErrorHandler(error, source: #function)
+            self?.commonOnSaveErrorHandler(error)
             DispatchQueue.main.async { completion(false, error) }
         }, onDidSave: {
             DispatchQueue.main.async { completion(true, nil) }
@@ -326,7 +326,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 object.markPendingDeletion()
             }
         }, onError: { [weak self] error in
-            self?.commonOnSaveErrorHandler(error, source: #function)
+            self?.commonOnSaveErrorHandler(error)
             DispatchQueue.main.async { completion(false, error) }
         }, onDidSave: {
             DispatchQueue.main.async { completion(true, nil) }
@@ -354,7 +354,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
         } catch {
             let error = error as NSError
-            commonOnSaveErrorHandler(error, source: #function)
+            commonOnSaveErrorHandler(error)
         }
     }
 
@@ -374,7 +374,7 @@ final class LocalBookmarkStore: BookmarkStore {
             })
         } catch {
             let error = error as NSError
-            commonOnSaveErrorHandler(error, source: #function)
+            commonOnSaveErrorHandler(error)
         }
     }
 
@@ -411,7 +411,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
             }
         }, onError: { [weak self] error in
-            self?.commonOnSaveErrorHandler(error, source: #function)
+            self?.commonOnSaveErrorHandler(error)
             DispatchQueue.main.async { completion(error) }
         }, onDidSave: {
             DispatchQueue.main.async { completion(nil) }
@@ -442,7 +442,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
             }
         }, onError: { [weak self] error in
-            self?.commonOnSaveErrorHandler(error, source: #function)
+            self?.commonOnSaveErrorHandler(error)
             DispatchQueue.main.async { completion(error) }
         }, onDidSave: {
             DispatchQueue.main.async { completion(nil) }
@@ -475,7 +475,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
             bookmarkMO.uuid = folder.id
         }, onError: { [weak self] error in
-            self?.commonOnSaveErrorHandler(error, source: #function)
+            self?.commonOnSaveErrorHandler(error)
             DispatchQueue.main.async { completion(false, error) }
         }, onDidSave: {
             DispatchQueue.main.async { completion(true, nil) }
@@ -568,7 +568,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
             }
         }, onError: { [weak self] error in
-            self?.commonOnSaveErrorHandler(error, source: #function)
+            self?.commonOnSaveErrorHandler(error)
             DispatchQueue.main.async { completion(error) }
         }, onDidSave: {
             DispatchQueue.main.async { completion(nil) }
@@ -649,7 +649,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 }
             }
         }, onError: { [weak self] error in
-            self?.commonOnSaveErrorHandler(error, source: #function)
+            self?.commonOnSaveErrorHandler(error)
             DispatchQueue.main.async { completion(error) }
         }, onDidSave: {
             DispatchQueue.main.async { completion(nil) }
@@ -826,7 +826,7 @@ final class LocalBookmarkStore: BookmarkStore {
                 Pixel.fire(.debug(event: .removedInvalidBookmarkManagedObjects))
             }
         } onError: { [weak self] error in
-            self?.commonOnSaveErrorHandler(error, source: #function)
+            self?.commonOnSaveErrorHandler(error)
 
             os_log("Failed to remove invalid bookmark entities", type: .error)
         } onDidSave: {}
