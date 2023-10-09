@@ -26,7 +26,7 @@ struct ChromePreferences: Decodable {
     }
     struct Profile: Decodable {
         let name: String
-        let createdByBersion: String?
+        let createdByVersion: String?
     }
 
     let accountInfo: [AccountInfo]?
