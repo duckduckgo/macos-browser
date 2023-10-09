@@ -136,6 +136,7 @@ extension DataImport.Source: CustomStringConvertible {
         case .edge: return "source-edge"
         case .firefox: return "source-firefox"
         case .safari: return "source-safari"
+        case .safariTechnologyPreview: return "source-safari-technology-preview"
         case .bookmarksHTML: return "source-bookmarks-html"
         }
     }

@@ -70,7 +70,7 @@ final class CSVImporter: DataImporter {
             switch source {
             case .onePassword7, .onePassword8:
                 self.init(titleIndex: 3, urlIndex: 5, usernameIndex: 6, passwordIndex: 2, maximumIndex: 7)
-            case .lastPass, .firefox, .edge, .chrome, .brave, .safari, .csv, .bookmarksHTML:
+            case .lastPass, .firefox, .edge, .chrome, .brave, .safari, .safariTechnologyPreview, .csv, .bookmarksHTML:
                 return nil
             }
         }
@@ -100,16 +100,11 @@ final class CSVImporter: DataImporter {
     }
 
     func totalValidLogins() -> Int {
-        guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else {
-            return 0
-        }
-
-        var seen: [String: Bool] = [:]
+        guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else { return 0 }
 
         let logins = Self.extractLogins(from: fileContents, defaultColumnPositions: self.defaultColumnPositions)
-        let uniqueLogins = logins.filter { seen.updateValue(true, forKey: "\($0.url)-\($0.username)") == nil }
 
-        return uniqueLogins.count
+        return logins.count
     }
 
     static func extractLogins(from fileContents: String,

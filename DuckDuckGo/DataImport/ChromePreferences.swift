@@ -18,12 +18,40 @@
 
 import AppKit
 
-struct ChromePreferences: Codable {
+struct ChromePreferences: Decodable {
 
-    struct ChromeProfile: Codable {
+    struct AccountInfo: Decodable {
+        let email: String?
+        let fullName: String?
+    }
+    struct Profile: Decodable {
         let name: String
+        let createdByVersion: String?
     }
 
-    let profile: ChromeProfile
+    let accountInfo: [AccountInfo]?
+    let profile: Profile
+
+    init(from data: Data) throws {
+        var decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+
+        self = try decoder.decode(Self.self, from: data)
+    }
+
+    var profileName: String {
+        for account in accountInfo ?? [] {
+            switch (account.fullName, account.email) {
+            case (.some(let fullName), .some(let email)):
+                return "\(fullName) (\(email))"
+            case (.some(let fullName), .none):
+                return fullName
+            case (.none, .some(let email)):
+                return email
+            case (.none, .none): continue
+            }
+        }
+        return profile.name
+    }
 
 }
