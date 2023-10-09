@@ -70,24 +70,6 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         }
     }
 
-    private func initializeDatabaseForProfile(profileId: Int64,
-                                              vault: any (DataBrokerProtectionSecureVault),
-                                              brokerIDs: [Int64],
-                                              profileQueries: [ProfileQuery]) throws {
-        var profileQueryIDs = [Int64]()
-
-        for profileQuery in profileQueries {
-            let profileQueryId = try vault.save(profileQuery: profileQuery, profileId: profileId)
-            profileQueryIDs.append(profileQueryId)
-        }
-
-        for brokerId in brokerIDs {
-            for profileQueryId in profileQueryIDs {
-                try vault.save(brokerId: brokerId, profileQueryId: profileQueryId, lastRunDate: nil, preferredRunDate: nil)
-            }
-        }
-    }
-
     public func fetchProfile() -> DataBrokerProtectionProfile? {
         do {
             let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
@@ -316,6 +298,24 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
 // Private Methods
 extension DataBrokerProtectionDatabase {
 
+    private func initializeDatabaseForProfile(profileId: Int64,
+                                              vault: any (DataBrokerProtectionSecureVault),
+                                              brokerIDs: [Int64],
+                                              profileQueries: [ProfileQuery]) throws {
+        var profileQueryIDs = [Int64]()
+
+        for profileQuery in profileQueries {
+            let profileQueryId = try vault.save(profileQuery: profileQuery, profileId: profileId)
+            profileQueryIDs.append(profileQueryId)
+        }
+
+        for brokerId in brokerIDs {
+            for profileQueryId in profileQueryIDs {
+                try vault.save(brokerId: brokerId, profileQueryId: profileQueryId, lastRunDate: nil, preferredRunDate: nil)
+            }
+        }
+    }
+
     private func saveNewProfile(_ profile: DataBrokerProtectionProfile, vault: any DataBrokerProtectionSecureVault) async throws {
         let newProfileQueries = profile.profileQueries
         _ = try vault.save(profile: profile)
@@ -347,14 +347,13 @@ extension DataBrokerProtectionDatabase {
 
         let databaseBrokerProfileQueryData = fetchAllBrokerProfileQueryData()
         let databaseProfileQueries = databaseBrokerProfileQueryData.map { $0.profileQuery }
-        // Create hash for profileQuery: brokerProfileQuery to make the search easier/faster
 
         for profileQuery in newProfileQueries {
 
-            if let databaseProfileQuery = databaseProfileQueries.filter({ $0 == profileQuery }).first {
+            if let databaseProfileQuery = databaseProfileQueries.first(where: { $0 == profileQuery }) {
                 // If the DB contains this profileQuery, it means the user is adding the same name back again
                 // In this case we remove the deprecated flag
-                let reAddedProfileQuery = databaseProfileQuery.withDeprecationFlag(deprecated: false)
+                let reAddedProfileQuery = databaseProfileQuery.with(deprecated: false)
                 profileQueriesToUpdate.append(reAddedProfileQuery)
             } else {
                 profileQueriesToCreate.append(profileQuery)
@@ -363,7 +362,7 @@ extension DataBrokerProtectionDatabase {
 
         for profileQuery in databaseProfileQueries where !newProfileQueries.contains(profileQuery) {
             if let brokerProfileQueryData = databaseBrokerProfileQueryData.filter({ $0.profileQuery == profileQuery }).first, !brokerProfileQueryData.extractedProfiles.isEmpty {
-                let deprecatedProfileQuery = brokerProfileQueryData.profileQuery.withDeprecationFlag(deprecated: true)
+                let deprecatedProfileQuery = brokerProfileQueryData.profileQuery.with(deprecated: true)
                 profileQueriesToUpdate.append(deprecatedProfileQuery)
             } else {
                 profileQueriesToRemove.append(profileQuery)

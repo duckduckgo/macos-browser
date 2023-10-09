@@ -103,7 +103,7 @@ extension Address: Equatable {
 
 // Returns a copy of the same instance but with the deprecated flag parameter
 extension ProfileQuery {
-    func withDeprecationFlag(deprecated: Bool) -> ProfileQuery {
+    func with(deprecated: Bool) -> ProfileQuery {
          return ProfileQuery(id: id,
                              firstName: firstName,
                              lastName: lastName,
