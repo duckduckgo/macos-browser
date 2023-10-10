@@ -50,6 +50,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
             <input type="button" value="Set State" onclick="handshake()">
             <input type="button" value="Get Profile" onclick="getProfile()">
             <input type="button" value="Start Scan" onclick="startScan()">
+            <input type="button" value="Remove All Data" onclick="removeAllData()">
         </form>
 
         <p id="output"></p>
@@ -99,6 +100,14 @@ final public class DataBrokerProtectionViewController: NSViewController {
                     "context": "dbpui",
                     "featureName": "dbpuiCommunication",
                     "method": "startScanAndOptOut"
+                })
+            }
+
+            function removeAllData() {
+                window.webkit.messageHandlers.dbpui.postMessage({
+                    "context": "dbpui",
+                    "featureName": "dbpuiCommunication",
+                    "method": "deleteUserProfileData"
                 })
             }
 
