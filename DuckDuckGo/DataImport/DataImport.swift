@@ -304,8 +304,14 @@ protocol DataImporter {
 
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
+                    modalWindow: NSWindow?,
                     completion: @escaping (DataImportResult<DataImport.Summary>) -> Void)
 
+}
+extension DataImporter {
+    func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?, completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
+        self.importData(types: types, from: profile, modalWindow: nil, completion: completion)
+    }
 }
 
 enum DataImportResult<T> {

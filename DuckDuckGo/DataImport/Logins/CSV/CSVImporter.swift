@@ -133,6 +133,7 @@ final class CSVImporter: DataImporter {
     // This will change to return an array of DataImport.Summary objects, indicating the status of each import type that was requested.
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
+                    modalWindow: NSWindow?,
                     completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
         let fileContents: String
         do {
