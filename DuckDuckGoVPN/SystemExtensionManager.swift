@@ -124,10 +124,6 @@ final class SystemExtensionRequest: NSObject {
         super.init()
     }
 
-    deinit {
-        print("asD")
-    }
-
     static func activationRequest(forExtensionWithIdentifier bundleId: String, manager: OSSystemExtensionManager, waitingForUserApproval: (() -> Void)?) -> Self {
         self.init(request: .activationRequest(forExtensionWithIdentifier: bundleId, queue: .global()), manager: manager, waitingForUserApproval: waitingForUserApproval)
     }

@@ -22,7 +22,6 @@ import Common
 import Networking
 import NetworkExtension
 import NetworkProtection
-import NetworkProtectionControllers
 import NetworkProtectionIPC
 import NetworkProtectionUI
 import ServiceManagement

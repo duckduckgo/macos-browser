@@ -19,7 +19,6 @@
 import Combine
 import Foundation
 import NetworkProtection
-import NetworkProtectionControllers
 import NetworkProtectionIPC
 
 final class TunnelControllerIPCServer {
