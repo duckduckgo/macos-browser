@@ -169,6 +169,7 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
     }
 
     func deleteProfileData() {
+        profile = emptyProfile
         delegate?.removeAllData()
     }
 

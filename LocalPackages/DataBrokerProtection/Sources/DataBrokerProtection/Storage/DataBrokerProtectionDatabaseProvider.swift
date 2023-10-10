@@ -323,21 +323,27 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 
     func deleteProfileData() throws {
         try db.write { db in
-            try ProfileDB
+            try ScanHistoryEventDB
                 .deleteAll(db)
-            try ProfileQueryDB
+            try OptOutHistoryEventDB
                 .deleteAll(db)
-            try BrokerDB
+            try ExtractedProfileDB
                 .deleteAll(db)
             try ScanDB
                 .deleteAll(db)
             try OptOutDB
                 .deleteAll(db)
-            try ExtractedProfileDB
+            try BrokerDB
                 .deleteAll(db)
-            try ScanHistoryEventDB
+            try ProfileQueryDB
                 .deleteAll(db)
-            try OptOutHistoryEventDB
+            try NameDB
+                .deleteAll(db)
+            try AddressDB
+                .deleteAll(db)
+            try PhoneDB
+                .deleteAll(db)
+            try ProfileDB
                 .deleteAll(db)
         }
     }
