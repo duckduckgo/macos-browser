@@ -98,10 +98,15 @@ extension DataBrokerProtectionDataManager: InMemoryDataCacheDelegate {
         guard let profile = profile else { return }
         await saveProfile(profile)
     }
+
+    public func removeAllData() {
+        database.deleteProfileData()
+    }
 }
 
 public protocol InMemoryDataCacheDelegate: AnyObject {
     func flushCache(profile: DataBrokerProtectionProfile?) async
+    func removeAllData()
 }
 
 public final class InMemoryDataCache {
@@ -161,6 +166,10 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
         let addresses = profile.addresses.map { DBPUIUserProfileAddress(street: $0.street, city: $0.city, state: $0.state, zipCode: $0.zipCode) }
 
         return DBPUIUserProfile(names: names, birthYear: profile.birthYear, addresses: addresses)
+    }
+
+    func deleteProfileData() {
+        delegate?.removeAllData()
     }
 
     func addNameToCurrentUserProfile(_ name: DBPUIUserProfileName) -> Bool {

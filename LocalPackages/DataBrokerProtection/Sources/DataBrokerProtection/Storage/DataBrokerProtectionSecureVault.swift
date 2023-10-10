@@ -38,6 +38,7 @@ protocol DataBrokerProtectionSecureVault: SecureVault {
     func save(profile: DataBrokerProtectionProfile) throws -> Int64
     func update(profile: DataBrokerProtectionProfile) throws -> Int64
     func fetchProfile(with id: Int64) throws -> DataBrokerProtectionProfile?
+    func deleteProfileData() throws
 
     func save(broker: DataBroker) throws -> Int64
     func update(_ broker: DataBroker, with id: Int64) throws
@@ -108,6 +109,10 @@ final class DefaultDataBrokerProtectionSecureVault<T: DataBrokerProtectionDataba
         } else {
             return nil // Profile not found
         }
+    }
+
+    func deleteProfileData() throws {
+        try self.providers.database.deleteProfileData()
     }
 
     func save(broker: DataBroker) throws -> Int64 {
