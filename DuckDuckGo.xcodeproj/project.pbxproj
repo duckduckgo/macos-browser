@@ -2880,6 +2880,8 @@
 		7B31FD8C2AD125620086AA24 /* NetworkProtectionIPC in Frameworks */ = {isa = PBXBuildFile; productRef = 7B31FD8B2AD125620086AA24 /* NetworkProtectionIPC */; };
 		7B31FD8E2AD125760086AA24 /* NetworkProtectionIPC in Frameworks */ = {isa = PBXBuildFile; productRef = 7B31FD8D2AD125760086AA24 /* NetworkProtectionIPC */; };
 		7B31FD902AD1257B0086AA24 /* NetworkProtectionIPC in Frameworks */ = {isa = PBXBuildFile; productRef = 7B31FD8F2AD1257B0086AA24 /* NetworkProtectionIPC */; };
+		7B3F76372AD5B77C00ABF11B /* SystemExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 7B3F76362AD5B77C00ABF11B /* SystemExtension */; };
+		7B3F76392AD5B78300ABF11B /* SystemExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 7B3F76382AD5B78300ABF11B /* SystemExtension */; };
 		7B430EA12A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */; };
 		7B430EA22A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */; };
 		7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4CE8E626F02134009134B1 /* TabBarTests.swift */; };
@@ -2925,7 +2927,6 @@
 		7BB108592A43375D000AB95F /* PFMoveApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BB108582A43375D000AB95F /* PFMoveApplication.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		7BBD45B12A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */; };
 		7BBD45B22A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */; };
-		7BD1688C2AD4A4BC00D24876 /* SystemExtensionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD1688B2AD4A4BC00D24876 /* SystemExtensionManager.swift */; };
 		7BD1688E2AD4A4C400D24876 /* NetworkExtensionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */; };
 		7BD3AF5D2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */; };
 		7BE146072A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */; };
@@ -4260,12 +4261,14 @@
 		7B25FE322AD12C990012AFAB /* NetworkProtectionMac */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = NetworkProtectionMac; sourceTree = "<group>"; };
 		7B2DDCF72A93A8BB0039D884 /* NetworkProtectionAppEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionAppEvents.swift; sourceTree = "<group>"; };
 		7B2E52242A5FEC09000C6D39 /* NetworkProtectionAgentNotificationsPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionAgentNotificationsPresenter.swift; sourceTree = "<group>"; };
+		7B3F76352AD5B6BC00ABF11B /* SystemExtension */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SystemExtension; sourceTree = "<group>"; };
 		7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionSimulateFailureMenu.swift; sourceTree = "<group>"; };
 		7B4CE8DA26F02108009134B1 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B4CE8DE26F02108009134B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B4CE8E626F02134009134B1 /* TabBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarTests.swift; sourceTree = "<group>"; };
 		7B5291882A1697680022E406 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B5291892A169BC90022E406 /* NetworkProtectionDeveloperID.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionDeveloperID.xcconfig; sourceTree = "<group>"; };
+		7B540A322AD5D3CF006047E9 /* XPC */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = XPC; sourceTree = "<group>"; };
 		7B934C3D2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionOnboardingMenu.swift; sourceTree = "<group>"; };
 		7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaults+NetworkProtectionShared.swift"; sourceTree = "<group>"; };
 		7BA7CC0B2AD11D1E0042E5CE /* DuckDuckGoVPNAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoVPNAppStore.xcconfig; sourceTree = "<group>"; };
@@ -4287,9 +4290,6 @@
 		7BB108572A43375D000AB95F /* PFMoveApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFMoveApplication.h; sourceTree = "<group>"; };
 		7BB108582A43375D000AB95F /* PFMoveApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFMoveApplication.m; sourceTree = "<group>"; };
 		7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionDebugUtilities.swift; sourceTree = "<group>"; };
-		7BC794FF2AD5B5280031120B /* SystemExtensionManager */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SystemExtensionManager; sourceTree = "<group>"; };
-		7BC795002AD5B5370031120B /* XPC */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = XPC; sourceTree = "<group>"; };
-		7BD1688B2AD4A4BC00D24876 /* SystemExtensionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SystemExtensionManager.swift; sourceTree = "<group>"; };
 		7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkExtensionController.swift; sourceTree = "<group>"; };
 		7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeychainType+ClientDefault.swift"; sourceTree = "<group>"; };
 		7BD8679A2A9E9E000063B9F7 /* NetworkProtectionFeatureVisibility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionFeatureVisibility.swift; sourceTree = "<group>"; };
@@ -4961,6 +4961,7 @@
 				7BEEA5162AD1236E00A9E72B /* NetworkProtectionUI in Frameworks */,
 				EE7295ED2A545C0A008C0991 /* NetworkProtection in Frameworks */,
 				7B31FD882AD124620086AA24 /* PixelKit in Frameworks */,
+				7B3F76372AD5B77C00ABF11B /* SystemExtension in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4973,6 +4974,7 @@
 				EE7295EF2A545C12008C0991 /* NetworkProtection in Frameworks */,
 				4B2D067F2A1334D700DE1F49 /* NetworkProtectionUI in Frameworks */,
 				7B31FD8A2AD124680086AA24 /* PixelKit in Frameworks */,
+				7B3F76392AD5B78300ABF11B /* SystemExtension in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5443,8 +5445,8 @@
 				378F44E229B4B7B600899924 /* SwiftUIExtensions */,
 				37BA812B29B3CB8A0053F1A3 /* SyncUI */,
 				1E862A882A9FC01200F84D4B /* Subscription */,
-				7BC794FF2AD5B5280031120B /* SystemExtensionManager */,
-				7BC795002AD5B5370031120B /* XPC */,
+				7B3F76352AD5B6BC00ABF11B /* SystemExtension */,
+				7B540A322AD5D3CF006047E9 /* XPC */,
 			);
 			path = LocalPackages;
 			sourceTree = "<group>";
@@ -6415,7 +6417,6 @@
 				7BA7CC192AD11DC80042E5CE /* FeatureProtectedTunnelController.swift */,
 				7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */,
 				7BA7CC152AD11DC80042E5CE /* NetworkProtectionBouncer.swift */,
-				7BD1688B2AD4A4BC00D24876 /* SystemExtensionManager.swift */,
 				7BA7CC112AD11DC80042E5CE /* TunnelControllerIPCServer.swift */,
 				7BA7CC172AD11DC80042E5CE /* UserText.swift */,
 				7BA7CC122AD11DC80042E5CE /* Assets.xcassets */,
@@ -8635,6 +8636,7 @@
 				7BEEA5112AD1235B00A9E72B /* NetworkProtectionIPC */,
 				7BEEA5152AD1236E00A9E72B /* NetworkProtectionUI */,
 				7B31FD872AD124620086AA24 /* PixelKit */,
+				7B3F76362AD5B77C00ABF11B /* SystemExtension */,
 			);
 			productName = DuckDuckGoAgent;
 			productReference = 4B2D06392A11CFBB00DE1F49 /* DuckDuckGo VPN.app */;
@@ -8660,6 +8662,7 @@
 				7BA7CC602AD1211C0042E5CE /* Networking */,
 				7BEEA5132AD1236300A9E72B /* NetworkProtectionIPC */,
 				7B31FD892AD124680086AA24 /* PixelKit */,
+				7B3F76382AD5B78300ABF11B /* SystemExtension */,
 			);
 			productName = DuckDuckGoAgentAppStore;
 			productReference = 4B2D06692A13318400DE1F49 /* DuckDuckGo VPN App Store.app */;
@@ -11401,7 +11404,6 @@
 				B6F92BAC2A6937B3002ABA6B /* OptionalExtension.swift in Sources */,
 				7BA7CC532AD11FCE0042E5CE /* NetworkProtectionBundle.swift in Sources */,
 				7BA7CC3C2AD11E330042E5CE /* Bundle+Configuration.swift in Sources */,
-				7BD1688C2AD4A4BC00D24876 /* SystemExtensionManager.swift in Sources */,
 				7BFE95562A9DF29B0081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */,
 				7BA7CC5D2AD120C30042E5CE /* EventMapping+NetworkProtectionError.swift in Sources */,
 				7BA7CC462AD11E4C0042E5CE /* FeatureProtectedTunnelController.swift in Sources */,
@@ -14379,6 +14381,14 @@
 		7B31FD8F2AD1257B0086AA24 /* NetworkProtectionIPC */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = NetworkProtectionIPC;
+		};
+		7B3F76362AD5B77C00ABF11B /* SystemExtension */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SystemExtension;
+		};
+		7B3F76382AD5B78300ABF11B /* SystemExtension */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SystemExtension;
 		};
 		7BA7CC5E2AD1210C0042E5CE /* Networking */ = {
 			isa = XCSwiftPackageProductDependency;

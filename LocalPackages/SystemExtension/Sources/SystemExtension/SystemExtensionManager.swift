@@ -20,10 +20,8 @@ import Foundation
 import Cocoa
 import Combine
 @preconcurrency import SystemExtensions
-import NetworkProtectionUI
-import PixelKit
 
-struct SystemExtensionManager {
+public struct SystemExtensionManager {
 
     private static let systemSettingsSecurityURL = "x-apple.systempreferences:com.apple.preference.security?Security"
 
@@ -31,7 +29,7 @@ struct SystemExtensionManager {
     private let manager: OSSystemExtensionManager
     private let workspace: NSWorkspace
 
-    init(extensionBundleID: String,
+    public init(extensionBundleID: String,
          manager: OSSystemExtensionManager = .shared,
          workspace: NSWorkspace = .shared) {
 
@@ -40,7 +38,7 @@ struct SystemExtensionManager {
         self.workspace = workspace
     }
 
-    func activate(waitingForUserApproval: @escaping () -> Void) async throws {
+    public func activate(waitingForUserApproval: @escaping () -> Void) async throws {
         /// Documenting a workaround for the issue discussed in https://app.asana.com/0/0/1205275221447702/f
         ///     Background: For a lot of users, the system won't show the system-extension-blocked alert if there's a previous request
         ///         to activate the extension.  You can see active requests in your console using command `systemextensionsctl list`.
@@ -65,7 +63,7 @@ struct SystemExtensionManager {
         .submit()
     }
 
-    func deactivate() async throws {
+    public func deactivate() async throws {
         try await SystemExtensionRequest.deactivationRequest(
             forExtensionWithIdentifier: extensionBundleID,
             manager: manager)
@@ -104,8 +102,8 @@ struct SystemExtensionManager {
     }
 }
 
-final class SystemExtensionRequest: NSObject {
-    enum RequestError: Error {
+public final class SystemExtensionRequest: NSObject {
+    public enum RequestError: Error {
         case unknownRequestResult
         case willActivateAfterReboot
     }
