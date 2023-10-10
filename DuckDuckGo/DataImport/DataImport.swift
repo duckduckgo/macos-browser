@@ -242,8 +242,8 @@ enum DataImport {
 
             if profileDirectoryContents.contains(Constants.chromiumPreferencesFileName),
                let chromePreferenceData = fileStore.loadData(at: profileURL.appendingPathComponent(Constants.chromiumPreferencesFileName)),
-               let chromePreferences = try? JSONDecoder().decode(ChromePreferences.self, from: chromePreferenceData) {
-                return chromePreferences.profile.name
+               let chromePreferences = try? ChromePreferences(from: chromePreferenceData) {
+                return chromePreferences.profileName
             }
 
             return nil
@@ -304,8 +304,14 @@ protocol DataImporter {
 
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
+                    modalWindow: NSWindow?,
                     completion: @escaping (DataImportResult<DataImport.Summary>) -> Void)
 
+}
+extension DataImporter {
+    func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?, completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
+        self.importData(types: types, from: profile, modalWindow: nil, completion: completion)
+    }
 }
 
 enum DataImportResult<T> {

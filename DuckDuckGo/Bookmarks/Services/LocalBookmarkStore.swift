@@ -172,7 +172,7 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
-    private func commonOnSaveErrorHandler(_ error: Error) {
+    private func commonOnSaveErrorHandler(_ error: Error, source: String = #function) {
         guard !NSApp.isRunningUnitTests else { return }
 
         assertionFailure("LocalBookmarkStore: Saving of context failed")
@@ -181,17 +181,22 @@ final class LocalBookmarkStore: BookmarkStore {
             if case BookmarkStoreError.saveLoopError(let innerError) = localError, let innerError {
                 let processedErrors = CoreDataErrorsParser.parse(error: innerError as NSError)
 
+                var params = processedErrors.errorPixelParameters
+                params[Pixel.Parameters.errorSource] = source
                 Pixel.fire(.debug(event: .bookmarksSaveFailed, error: error),
-                           withAdditionalParameters: processedErrors.errorPixelParameters)
+                           withAdditionalParameters: params)
             } else {
-                Pixel.fire(.debug(event: .bookmarksSaveFailed, error: localError))
+                Pixel.fire(.debug(event: .bookmarksSaveFailed, error: localError),
+                           withAdditionalParameters: [Pixel.Parameters.errorSource: source])
             }
         } else {
             let error = error as NSError
             let processedErrors = CoreDataErrorsParser.parse(error: error)
 
+            var params = processedErrors.errorPixelParameters
+            params[Pixel.Parameters.errorSource] = source
             Pixel.fire(.debug(event: .bookmarksSaveFailed, error: error),
-                       withAdditionalParameters: processedErrors.errorPixelParameters)
+                       withAdditionalParameters: params)
         }
     }
 
