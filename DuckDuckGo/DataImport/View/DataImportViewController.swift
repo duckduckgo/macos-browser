@@ -211,6 +211,9 @@ final class DataImportViewController: NSViewController {
     private func refreshDataImporter() {
         do {
             try throwingRefreshDataImporter()
+        } catch let error as ImportError {
+            os_log("dataImporter initialization failed: %{public}s", type: .error, error.localizedDescription)
+            self.presentAlert(for: error)
         } catch {
             os_log("dataImporter initialization failed: %{public}s", type: .error, error.localizedDescription)
             self.presentAlert(for: ImportError(source: viewState.selectedImportSource, action: .generic, type: .secureVaultError, underlyingError: error))
