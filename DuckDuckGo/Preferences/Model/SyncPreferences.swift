@@ -267,15 +267,16 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
     @MainActor
-    private func loginAndShowPresentedDialog(_ recoveryKey: SyncCode.RecoveryKey, shouldShowOptions: Bool) async throws {
+    private func loginAndShowPresentedDialog(_ recoveryKey: SyncCode.RecoveryKey, isActiveDevice: Bool) async throws {
         let device = deviceInfo()
         let knownDevices = Set(self.devices.map { $0.id })
         let devices = try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
         mapDevices(devices)
         let syncedDevices = self.devices.filter { !knownDevices.contains($0.id) && !$0.isCurrent }
+        let isSecondDevice = syncedDevices.count == 1
 
         managementDialogModel.endFlow()
-        presentDialog(for: .deviceSynced(syncedDevices, shouldShowOptions: shouldShowOptions))
+        presentDialog(for: .deviceSynced(syncedDevices, shouldShowOptions: isActiveDevice && isSecondDevice))
     }
 
     func turnOnSync() {
@@ -300,7 +301,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 self.connector = try syncService.remoteConnect()
                 self.codeToDisplay = connector?.code
                 if let recoveryKey = try await connector?.pollForRecoveryKey() {
-                    try await loginAndShowPresentedDialog(recoveryKey, shouldShowOptions: false)
+                    try await loginAndShowPresentedDialog(recoveryKey, isActiveDevice: false)
                 } else {
                     // Polling was likeley cancelled elsewhere (e.g. dialog closed)
                     return
@@ -318,7 +319,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         self.connector = nil
     }
 
-    func recoverDevice(using recoveryCode: String) {
+    func recoverDevice(using recoveryCode: String, isActiveDevice: Bool) {
         Task { @MainActor in
             do {
                 guard let syncCode = try? SyncCode.decodeBase64String(recoveryCode) else {
@@ -327,7 +328,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 }
                 if let recoveryKey = syncCode.recovery {
                     // This will error if the account already exists, we don't have good UI for this just now
-                    try await loginAndShowPresentedDialog(recoveryKey, shouldShowOptions: true)
+                    try await loginAndShowPresentedDialog(recoveryKey, isActiveDevice: isActiveDevice)
                 } else if let connectKey = syncCode.connect {
                     if syncService.account == nil {
                         let device = deviceInfo()
@@ -335,6 +336,21 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     }
 
                     try await syncService.transmitRecoveryKey(connectKey)
+                    self.$devices
+                        .removeDuplicates()
+                        .dropFirst()
+                        .prefix(1)
+                        .sink { [weak self] devices in
+                            guard let self else { return }
+                            let thisDeviceName = deviceInfo().name
+                            var syncedDevices: [SyncDevice] = []
+                            for device in devices where device.name != thisDeviceName {
+                                syncedDevices.append(device)
+                            }
+
+                            self.managementDialogModel.endFlow()
+                            presentDialog(for: .deviceSynced(syncedDevices, shouldShowOptions: devices.count == 2))
+                        }.store(in: &cancellables)
 
                     // The UI will update when the devices list changes.
                 } else {
