@@ -17,8 +17,8 @@
 //
 
 import Foundation
-import Intercom
 import NetworkProtection
+import XPC
 
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
