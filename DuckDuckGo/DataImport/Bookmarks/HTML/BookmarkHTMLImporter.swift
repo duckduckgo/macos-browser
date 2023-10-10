@@ -39,6 +39,7 @@ final class BookmarkHTMLImporter: DataImporter {
     func importData(
         types: [DataImport.DataType],
         from profile: DataImport.BrowserProfile?,
+        modalWindow: NSWindow?,
         completion: @escaping (DataImportResult<DataImport.Summary>) -> Void
     ) {
         DispatchQueue.global(qos: .userInitiated).async {

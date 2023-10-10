@@ -31,9 +31,9 @@ let package = Package(
         .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "81.0.0"),
-        .package(path: "../XPC"),
-        .package(path: "../SwiftUIExtensions"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "81.1.0"),
+        .package(path: "../XPCHelper"),
+        .package(path: "../SwiftUIExtensions")
     ],
     targets: [
         // MARK: - NetworkProtectionIPC
@@ -42,7 +42,7 @@ let package = Package(
             name: "NetworkProtectionIPC",
             dependencies: [
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
-                .product(name: "XPC", package: "XPC")
+                .product(name: "XPCHelper", package: "XPCHelper")
             ]),
 
         // MARK: - NetworkProtectionUI

@@ -21,6 +21,11 @@ import Cocoa
 import Combine
 @preconcurrency import SystemExtensions
 
+public enum SystemExtensionRequestError: Error {
+    case unknownRequestResult
+    case willActivateAfterReboot
+}
+
 public struct SystemExtensionManager {
 
     private static let systemSettingsSecurityURL = "x-apple.systempreferences:com.apple.preference.security?Security"
@@ -102,11 +107,7 @@ public struct SystemExtensionManager {
     }
 }
 
-public final class SystemExtensionRequest: NSObject {
-    public enum RequestError: Error {
-        case unknownRequestResult
-        case willActivateAfterReboot
-    }
+final class SystemExtensionRequest: NSObject {
 
     private let request: OSSystemExtensionRequest
     private let manager: OSSystemExtensionManager
@@ -160,12 +161,12 @@ extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
         case .completed:
             continuation?.resume()
         case .willCompleteAfterReboot:
-            continuation?.resume(throwing: RequestError.willActivateAfterReboot)
+            continuation?.resume(throwing: SystemExtensionRequestError.willActivateAfterReboot)
             return
         @unknown default:
             // Not much we can do about this, so we just let the owning app decide
             // what to do about this.
-            continuation?.resume(throwing: RequestError.unknownRequestResult)
+            continuation?.resume(throwing: SystemExtensionRequestError.unknownRequestResult)
             return
         }
     }

@@ -17,8 +17,9 @@
 //
 
 import Foundation
-import SystemExtensions
 import NetworkProtectionUI
+import SystemExtensionManager
+import SystemExtensions
 
 /// Network Protection's network extension session object.
 ///
@@ -30,10 +31,6 @@ final class NetworkExtensionController {
 
     init(extensionBundleID: String) {
         systemExtensionManager = SystemExtensionManager(extensionBundleID: extensionBundleID)
-    }
-
-    private func sendProviderMessage() {
-        
     }
 }
 

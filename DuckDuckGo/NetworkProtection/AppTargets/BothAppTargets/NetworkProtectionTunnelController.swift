@@ -25,6 +25,7 @@ import Common
 import NetworkExtension
 import NetworkProtection
 import NetworkProtectionUI
+import SystemExtensionManager
 import SystemExtensions
 import Networking
 import PixelKit
@@ -216,14 +217,14 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 // Even if the installation request is superseded we want to show the message that tells the user
                 // to go to System Settings to allow the extension
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
-            case SystemExtensionRequest.RequestError.unknownRequestResult:
+            case SystemExtensionRequestError.unknownRequestResult:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionUnknownActivationError
 
                 PixelKit.fire(
                     NetworkProtectionPixelEvent.networkProtectionSystemExtensionUnknownActivationResult,
                     frequency: .standard,
                     includeAppVersionParameter: true)
-            case SystemExtensionRequest.RequestError.willActivateAfterReboot:
+            case SystemExtensionRequestError.willActivateAfterReboot:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseReboot
             default:
                 controllerErrorStore.lastErrorMessage = error.localizedDescription
