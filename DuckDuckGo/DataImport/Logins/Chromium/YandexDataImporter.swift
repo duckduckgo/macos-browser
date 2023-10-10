@@ -28,14 +28,27 @@ final class YandexDataImporter: ChromiumDataImporter {
         return .yandex
     }
 
-    init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
+    init(bookmarkImporter: BookmarkImporter) {
         let applicationSupport = URL.nonSandboxApplicationSupportDirectoryURL
         let defaultDataURL = applicationSupport.appendingPathComponent("Yandex/YandexBrowser/Default/")
 
         super.init(applicationDataDirectoryURL: defaultDataURL,
-                   loginImporter: loginImporter,
+                   loginImporter: nil,
                    bookmarkImporter: bookmarkImporter,
                    faviconManager: FaviconManager.shared)
+    }
+
+    override func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) -> DataImportResult<DataImport.Summary> {
+        var result = super.importData(types: types.filter { $0 != .logins }, from: profile)
+
+        if case .success(var summary) = result,
+           types.contains(.logins) {
+
+            summary.loginsResult = .awaited
+            result = .success(summary)
+        }
+
+        return result
     }
 
 }

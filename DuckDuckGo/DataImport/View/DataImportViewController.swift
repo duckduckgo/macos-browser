@@ -127,7 +127,7 @@ final class DataImportViewController: NSViewController {
             self.viewState = ViewState(selectedImportSource: viewState.selectedImportSource, interactionState: .permissionsRequired([.bookmarks]))
 
         // Import click on first screen with Passwords bookmark or Next click on Bookmarks Import Done screen: show CSV Import
-        case .ableToImport where [.safari, .safariTechnologyPreview].contains(viewState.selectedImportSource)
+        case .ableToImport where [.safari, .safariTechnologyPreview, .yandex].contains(viewState.selectedImportSource)
                 && selectedImportOptions.contains(.logins)
                 && (dataImporter is CSVImporter || selectedImportOptions == [.logins])
                 && !(currentChildViewController is FileImportViewController):
@@ -187,6 +187,7 @@ final class DataImportViewController: NSViewController {
             switch (source, loginsSelected) {
             case (.safari, _),
                  (.safariTechnologyPreview, _),
+                 (.yandex, _),
                  (_, false):
                 interactionState = .ableToImport
             case (.firefox, _):
@@ -237,8 +238,7 @@ final class DataImportViewController: NSViewController {
                                                       gx: viewState.selectedImportSource == .operaGX)
         case .vivaldi:
             self.dataImporter = try VivaldiDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
-        case .yandex:
-            self.dataImporter = try YandexDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+
         case .firefox, .tor:
             self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(),
                                                         bookmarkImporter: bookmarkImporter,
@@ -252,12 +252,15 @@ final class DataImportViewController: NSViewController {
                 throw ImportError(source: viewState.selectedImportSource, action: .generic, type: .selectProfile, underlyingError: nil)
             }()
 
+        case .yandex where !(currentChildViewController is FileImportViewController):
+            self.dataImporter = YandexDataImporter(bookmarkImporter: bookmarkImporter)
+
         case .bookmarksHTML:
             if !(self.dataImporter is BookmarkHTMLImporter) {
                 self.dataImporter = nil
             }
         case .csv, .onePassword7, .onePassword8, .lastPass,
-             .safari, .safariTechnologyPreview /* csv only */:
+             .safari, .safariTechnologyPreview, .yandex /* csv only */:
             if !(self.dataImporter is CSVImporter) {
                 self.dataImporter = nil
             }
@@ -319,22 +322,22 @@ final class DataImportViewController: NSViewController {
 
     private func newChildViewController(for importSource: DataImport.Source, interactionState: InteractionState) -> NSViewController? {
         switch importSource {
-        case .safari, .safariTechnologyPreview:
+        case .safari, .safariTechnologyPreview, .yandex:
             if case .permissionsRequired([.logins]) = interactionState {
-                let viewController = FileImportViewController.create(importSource: .safari)
+                let viewController = FileImportViewController.create(importSource: importSource)
                 viewController.delegate = self
 
                 return viewController
             } else if case .ableToImport = interactionState,
                       let fileImportViewController = currentChildViewController as? FileImportViewController,
-                      [.safari, .safariTechnologyPreview].contains(fileImportViewController.importSource) {
+                      [.safari, .safariTechnologyPreview, .yandex].contains(fileImportViewController.importSource) {
                 fileImportViewController.importSource = importSource
 
                 return nil
             }
 
             fallthrough
-        case .brave, .chrome, .chromium, .coccoc, .edge, .firefox, .opera, .operaGX, .tor, .vivaldi, .yandex:
+        case .brave, .chrome, .chromium, .coccoc, .edge, .firefox, .opera, .operaGX, .tor, .vivaldi:
             if case let .completedImport(summary) = interactionState {
                 return BrowserImportSummaryViewController.create(importSummary: summary)
             } else if case let .permissionsRequired(types) = interactionState {

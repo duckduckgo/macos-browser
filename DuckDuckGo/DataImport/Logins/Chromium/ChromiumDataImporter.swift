@@ -30,17 +30,17 @@ internal class ChromiumDataImporter: DataImporter {
 
     private let applicationDataDirectoryURL: URL
     private let bookmarkImporter: BookmarkImporter
-    private let loginImporter: LoginImporter
+    private let loginImporter: LoginImporter?
     private let faviconManager: FaviconManagement
 
-    init(applicationDataDirectoryURL: URL, loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
+    init(applicationDataDirectoryURL: URL, loginImporter: LoginImporter?, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
         self.applicationDataDirectoryURL = applicationDataDirectoryURL
         self.loginImporter = loginImporter
         self.bookmarkImporter = bookmarkImporter
         self.faviconManager = faviconManager
     }
 
-    convenience init(loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter) {
+    convenience init(loginImporter: LoginImporter?, bookmarkImporter: BookmarkImporter) {
         let applicationSupport = URL.nonSandboxApplicationSupportDirectoryURL
         let defaultDataURL = applicationSupport.appendingPathComponent("Chromium/Default/")
 
@@ -54,18 +54,18 @@ internal class ChromiumDataImporter: DataImporter {
         return [.logins, .bookmarks]
     }
 
-    func importData(types: [DataImport.DataType],
-                    from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
+    final func importData(types: [DataImport.DataType],
+                          from profile: DataImport.BrowserProfile?,
+                          completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
         let result = importData(types: types, from: profile)
         completion(result)
     }
 
-    private func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) -> DataImportResult<DataImport.Summary> {
+    func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) -> DataImportResult<DataImport.Summary> {
         var summary = DataImport.Summary()
         let dataDirectoryURL = profile?.profileURL ?? applicationDataDirectoryURL
 
-        if types.contains(.logins) {
+        if types.contains(.logins), let loginImporter {
             let loginReader = ChromiumLoginReader(chromiumDataDirectoryURL: dataDirectoryURL, source: source, processName: processName)
             let loginResult = loginReader.readLogins()
 
