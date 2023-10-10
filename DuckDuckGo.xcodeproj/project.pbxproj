@@ -461,7 +461,7 @@
 		3192A0FC2A4C4CFF0084EA89 /* ChromiumLoginReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023926B35F3600489384 /* ChromiumLoginReader.swift */; };
 		3192A0FD2A4C4CFF0084EA89 /* NSAlert+PasswordManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D885B226A5A9DE0077C374 /* NSAlert+PasswordManager.swift */; };
 		3192A0FE2A4C4CFF0084EA89 /* UserContentUpdating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 983DFB2428B67036006B7E34 /* UserContentUpdating.swift */; };
-		3192A0FF2A4C4CFF0084EA89 /* ChromePreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A57CE279A4EF300B1C70E /* ChromePreferences.swift */; };
+		3192A0FF2A4C4CFF0084EA89 /* ChromiumPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A57CE279A4EF300B1C70E /* ChromiumPreferences.swift */; };
 		3192A1002A4C4CFF0084EA89 /* FirePopoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6AD95A2704B6DB00159F8A /* FirePopoverViewController.swift */; };
 		3192A1012A4C4CFF0084EA89 /* SavePaymentMethodPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE4005227CF3DC3007D3161 /* SavePaymentMethodPopover.swift */; };
 		3192A1022A4C4CFF0084EA89 /* FindInPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */; };
@@ -1108,7 +1108,7 @@
 		3706FBB3293F65D500E42796 /* ChromiumLoginReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023926B35F3600489384 /* ChromiumLoginReader.swift */; };
 		3706FBB4293F65D500E42796 /* NSAlert+PasswordManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D885B226A5A9DE0077C374 /* NSAlert+PasswordManager.swift */; };
 		3706FBB5293F65D500E42796 /* UserContentUpdating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 983DFB2428B67036006B7E34 /* UserContentUpdating.swift */; };
-		3706FBB6293F65D500E42796 /* ChromePreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A57CE279A4EF300B1C70E /* ChromePreferences.swift */; };
+		3706FBB6293F65D500E42796 /* ChromiumPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A57CE279A4EF300B1C70E /* ChromiumPreferences.swift */; };
 		3706FBB7293F65D500E42796 /* FirePopoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6AD95A2704B6DB00159F8A /* FirePopoverViewController.swift */; };
 		3706FBB8293F65D500E42796 /* SavePaymentMethodPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE4005227CF3DC3007D3161 /* SavePaymentMethodPopover.swift */; };
 		3706FBB9293F65D500E42796 /* FindInPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */; };
@@ -1898,7 +1898,7 @@
 		4B723E1926B000DC00E14D75 /* TemporaryFileCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */; };
 		4B7534CC2A1FD7EA00158A99 /* NetworkProtectionInviteDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D606C2A0B29FA00BCD287 /* NetworkProtectionInviteDialog.swift */; };
 		4B78A86B26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B78A86A26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift */; };
-		4B7A57CF279A4EF300B1C70E /* ChromePreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A57CE279A4EF300B1C70E /* ChromePreferences.swift */; };
+		4B7A57CF279A4EF300B1C70E /* ChromiumPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A57CE279A4EF300B1C70E /* ChromiumPreferences.swift */; };
 		4B7A60A1273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */; };
 		4B7A94B429C16294000C7D4C /* ErrorWithParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A94B329C16294000C7D4C /* ErrorWithParameters.swift */; };
 		4B7A94B529C16294000C7D4C /* ErrorWithParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A94B329C16294000C7D4C /* ErrorWithParameters.swift */; };
@@ -2333,7 +2333,7 @@
 		4B957ABC2AC7AE700062CA31 /* ChromiumLoginReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B59023926B35F3600489384 /* ChromiumLoginReader.swift */; };
 		4B957ABD2AC7AE700062CA31 /* NSAlert+PasswordManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D885B226A5A9DE0077C374 /* NSAlert+PasswordManager.swift */; };
 		4B957ABE2AC7AE700062CA31 /* UserContentUpdating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 983DFB2428B67036006B7E34 /* UserContentUpdating.swift */; };
-		4B957ABF2AC7AE700062CA31 /* ChromePreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A57CE279A4EF300B1C70E /* ChromePreferences.swift */; };
+		4B957ABF2AC7AE700062CA31 /* ChromiumPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A57CE279A4EF300B1C70E /* ChromiumPreferences.swift */; };
 		4B957AC02AC7AE700062CA31 /* FirePopoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6AD95A2704B6DB00159F8A /* FirePopoverViewController.swift */; };
 		4B957AC12AC7AE700062CA31 /* SavePaymentMethodPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE4005227CF3DC3007D3161 /* SavePaymentMethodPopover.swift */; };
 		4B957AC22AC7AE700062CA31 /* FindInPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A0116825AF1D8900FA6A0C /* FindInPageViewController.swift */; };
@@ -4130,7 +4130,7 @@
 		4B723E0426B0003E00E14D75 /* CSVLoginExporterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVLoginExporterTests.swift; sourceTree = "<group>"; };
 		4B723E1726B000DC00E14D75 /* TemporaryFileCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemporaryFileCreator.swift; sourceTree = "<group>"; };
 		4B78A86A26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserImportSummaryViewController.swift; sourceTree = "<group>"; };
-		4B7A57CE279A4EF300B1C70E /* ChromePreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromePreferences.swift; sourceTree = "<group>"; };
+		4B7A57CE279A4EF300B1C70E /* ChromiumPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumPreferences.swift; sourceTree = "<group>"; };
 		4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKWebsiteDataStoreExtension.swift; sourceTree = "<group>"; };
 		4B7A94B329C16294000C7D4C /* ErrorWithParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorWithParameters.swift; sourceTree = "<group>"; };
 		4B85A47F28821CC500FC4C39 /* NSPasteboardItemExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPasteboardItemExtension.swift; sourceTree = "<group>"; };
@@ -6004,7 +6004,7 @@
 				4B723DEB26B0002B00E14D75 /* DataImport.swift */,
 				4B5A4F4B27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift */,
 				4B59024726B3673600489384 /* ThirdPartyBrowser.swift */,
-				4B7A57CE279A4EF300B1C70E /* ChromePreferences.swift */,
+				4B7A57CE279A4EF300B1C70E /* ChromiumPreferences.swift */,
 				4BB99CF326FE191E001E4761 /* Bookmarks */,
 				4B723DF126B0002B00E14D75 /* Logins */,
 				4B723DEC26B0002B00E14D75 /* View */,
@@ -10300,7 +10300,7 @@
 				3192A0FC2A4C4CFF0084EA89 /* ChromiumLoginReader.swift in Sources */,
 				3192A0FD2A4C4CFF0084EA89 /* NSAlert+PasswordManager.swift in Sources */,
 				3192A0FE2A4C4CFF0084EA89 /* UserContentUpdating.swift in Sources */,
-				3192A0FF2A4C4CFF0084EA89 /* ChromePreferences.swift in Sources */,
+				3192A0FF2A4C4CFF0084EA89 /* ChromiumPreferences.swift in Sources */,
 				3192A1002A4C4CFF0084EA89 /* FirePopoverViewController.swift in Sources */,
 				31278FCE2A974B59003153EC /* NetworkProtectionAppEvents.swift in Sources */,
 				3192A1012A4C4CFF0084EA89 /* SavePaymentMethodPopover.swift in Sources */,
@@ -10964,7 +10964,7 @@
 				1D6A492129CF7A490011DF74 /* NSPopoverExtension.swift in Sources */,
 				3706FBB5293F65D500E42796 /* UserContentUpdating.swift in Sources */,
 				4B4D60B72A0C847D00BCD287 /* NetworkProtectionNavBarButtonModel.swift in Sources */,
-				3706FBB6293F65D500E42796 /* ChromePreferences.swift in Sources */,
+				3706FBB6293F65D500E42796 /* ChromiumPreferences.swift in Sources */,
 				3706FBB7293F65D500E42796 /* FirePopoverViewController.swift in Sources */,
 				3706FBB8293F65D500E42796 /* SavePaymentMethodPopover.swift in Sources */,
 				4BCF15EF2ABBDBFF0083F6DF /* NetworkProtectionRemoteMessaging.swift in Sources */,
@@ -12052,7 +12052,7 @@
 				4B957ABC2AC7AE700062CA31 /* ChromiumLoginReader.swift in Sources */,
 				4B957ABD2AC7AE700062CA31 /* NSAlert+PasswordManager.swift in Sources */,
 				4B957ABE2AC7AE700062CA31 /* UserContentUpdating.swift in Sources */,
-				4B957ABF2AC7AE700062CA31 /* ChromePreferences.swift in Sources */,
+				4B957ABF2AC7AE700062CA31 /* ChromiumPreferences.swift in Sources */,
 				4B957AC02AC7AE700062CA31 /* FirePopoverViewController.swift in Sources */,
 				4B957AC12AC7AE700062CA31 /* SavePaymentMethodPopover.swift in Sources */,
 				4B957AC22AC7AE700062CA31 /* FindInPageViewController.swift in Sources */,
@@ -12740,7 +12740,7 @@
 				4B59023E26B35F3600489384 /* ChromiumLoginReader.swift in Sources */,
 				85D885B326A5A9DE0077C374 /* NSAlert+PasswordManager.swift in Sources */,
 				983DFB2528B67036006B7E34 /* UserContentUpdating.swift in Sources */,
-				4B7A57CF279A4EF300B1C70E /* ChromePreferences.swift in Sources */,
+				4B7A57CF279A4EF300B1C70E /* ChromiumPreferences.swift in Sources */,
 				AA6AD95B2704B6DB00159F8A /* FirePopoverViewController.swift in Sources */,
 				4BE4005327CF3DC3007D3161 /* SavePaymentMethodPopover.swift in Sources */,
 				85A0116925AF1D8900FA6A0C /* FindInPageViewController.swift in Sources */,
