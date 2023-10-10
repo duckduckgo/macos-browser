@@ -73,9 +73,18 @@ internal class MouseOverView: NSControl, Hoverable {
 
     private var eventTypeMask: NSEvent.EventTypeMask = .leftMouseUp
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
+    override init(frame: NSRect) {
+        super.init(frame: frame)
+
         isEnabled = true
+        clipsToBounds = true
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+
+        isEnabled = true
+        clipsToBounds = true
     }
 
     @discardableResult
