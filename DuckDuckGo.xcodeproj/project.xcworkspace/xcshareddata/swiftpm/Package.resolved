@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "43fd829917f61f605fc110b68bb1bf1841276b3c",
-        "version" : "81.1.0"
+        "branch" : "dominik/sync-ignore-ffs-favorites",
+        "revision" : "7b323bdde3f5c9a863f84d8faaec93d3a2b89272"
       }
     },
     {
