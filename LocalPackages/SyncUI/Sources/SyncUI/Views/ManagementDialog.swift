@@ -59,9 +59,9 @@ public struct ManagementDialog: View {
             case .manuallyEnterCode:
                 RecoverAccountView(isRecovery: false)
             case .deviceSynced(let devices, let shouldShowOptions):
-                DeviceSyncedView(devices: devices, shouldShowOptions: shouldShowOptions, isFirstDevice: false)
+                DeviceSyncedView(devices: devices, shouldShowOptions: shouldShowOptions, isSingleDevice: false)
             case .firstDeviceSetup:
-                DeviceSyncedView(devices: [], shouldShowOptions: true, isFirstDevice: true)
+                DeviceSyncedView(devices: [], shouldShowOptions: false, isSingleDevice: true)
             case .saveRecoveryPDF:
                 SaveRecoveryPDFView()
             case .turnOffSync:
