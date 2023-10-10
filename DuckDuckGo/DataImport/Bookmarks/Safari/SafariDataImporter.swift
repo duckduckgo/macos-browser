@@ -64,6 +64,7 @@ final class SafariDataImporter: DataImporter, DataDirectoryPermissionAuthorizati
     @MainActor(unsafe)
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
+                    modalWindow: NSWindow?,
                     completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
         let result = importData(types: types, from: profile)
         completion(result)
