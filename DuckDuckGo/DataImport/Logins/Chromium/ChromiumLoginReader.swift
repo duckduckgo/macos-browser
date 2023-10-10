@@ -79,7 +79,7 @@ final class ChromiumLoginReader {
         self.source = source
     }
 
-    func readLogins(modalWindow: NSWindow?) -> DataImportResult<[ImportedLoginCredential]> {
+    func readLogins(modalWindow: NSWindow? = nil) -> DataImportResult<[ImportedLoginCredential]> {
         let key: String
 
         if let decryptionKey = decryptionKey {
