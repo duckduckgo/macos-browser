@@ -23,7 +23,8 @@ struct OperationPreferredDateCalculator {
     func dateForScanOperation(currentPreferredRunDate: Date?,
                               historyEvents: [HistoryEvent],
                               extractedProfileID: Int64?,
-                              schedulingConfig: DataBrokerScheduleConfig) throws -> Date? {
+                              schedulingConfig: DataBrokerScheduleConfig,
+                              isDeprecated: Bool = false) throws -> Date? {
 
         var newDate: Date?
         guard let lastEvent = historyEvents.last else {
@@ -32,7 +33,13 @@ struct OperationPreferredDateCalculator {
 
         switch lastEvent.type {
 
-        case .noMatchFound, .matchesFound, .optOutConfirmed:
+        case .optOutConfirmed:
+            if isDeprecated {
+                return nil
+            } else {
+                newDate = Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
+            }
+        case .noMatchFound, .matchesFound:
             newDate = Date().addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
         case .error:
             newDate = Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)

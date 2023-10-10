@@ -176,13 +176,19 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         database.add(event)
                         database.updateRemovedDate(Date(), on: extractedProfileId)
 
-                        try updateOperationDataDates(
-                            brokerId: brokerId,
-                            profileQueryId: profileQueryId,
-                            extractedProfileId: extractedProfileId,
-                            schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig,
-                            database: database
-                        )
+                        // If the profileQuery is deprecated we want set the scan date to nil
+                        if brokerProfileQueryData.profileQuery.deprecated {
+
+                        } else {
+                            try updateOperationDataDates(
+                                brokerId: brokerId,
+                                profileQueryId: profileQueryId,
+                                extractedProfileId: extractedProfileId,
+                                schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig,
+                                database: database
+                            )
+                        }
+
 
                         os_log("Profile removed from optOutsData: %@", log: .dataBrokerProtection, String(describing: removedProfile))
 

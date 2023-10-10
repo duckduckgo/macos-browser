@@ -34,7 +34,6 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
     let database: DataBrokerProtectionRepository
     private let calculator = OperationPreferredDateCalculator()
 
-    // It would probably be good to break this into 2 methods, for scan and opt-out
     func updateOperationDataDates(brokerId: Int64,
                                   profileQueryId: Int64,
                                   extractedProfileId: Int64?,
@@ -43,36 +42,19 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
         guard let brokerProfileQuery = database.brokerProfileQueryData(for: brokerId,
                                                                        and: profileQueryId) else { return }
 
-        let currentScanPreferredRunDate = brokerProfileQuery.scanOperationData.preferredRunDate
-
-        let newScanPreferredRunDate = try calculator.dateForScanOperation(currentPreferredRunDate: currentScanPreferredRunDate,
-                                                                          historyEvents: brokerProfileQuery.events,
-                                                                          extractedProfileID: extractedProfileId,
-                                                                          schedulingConfig: schedulingConfig)
-
-        if newScanPreferredRunDate != currentScanPreferredRunDate {
-            updatePreferredRunDate(newScanPreferredRunDate,
-                                   brokerId: brokerId,
-                                   profileQueryId: profileQueryId,
-                                   extractedProfileId: nil)
-        }
+        try updateScanOperationDataDates(brokerId: brokerId,
+                                         profileQueryId: profileQueryId,
+                                         extractedProfileId: extractedProfileId,
+                                         schedulingConfig: schedulingConfig,
+                                         brokerProfileQuery: brokerProfileQuery)
 
         // We only need to update the optOut date if we have an extracted profile ID
         if let extractedProfileId = extractedProfileId {
-            let optOutOperation = brokerProfileQuery.optOutOperationsData.filter { $0.extractedProfile.id == extractedProfileId }.first
-            let currentOptOutPreferredRunDate = optOutOperation?.preferredRunDate
-
-            let newOptOutPreferredDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: currentOptOutPreferredRunDate,
-                                                                               historyEvents: brokerProfileQuery.events,
-                                                                               extractedProfileID: extractedProfileId,
-                                                                               schedulingConfig: schedulingConfig)
-
-            if newOptOutPreferredDate != currentOptOutPreferredRunDate {
-                updatePreferredRunDate(newOptOutPreferredDate,
-                                       brokerId: brokerId,
-                                       profileQueryId: profileQueryId,
-                                       extractedProfileId: extractedProfileId)
-            }
+            try updateOptOutOperationDataDates(brokerId: brokerId,
+                                               profileQueryId: profileQueryId,
+                                               extractedProfileId: extractedProfileId,
+                                               schedulingConfig: schedulingConfig,
+                                               brokerProfileQuery: brokerProfileQuery)
         }
     }
 
@@ -88,6 +70,50 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
                                                 brokerId: childBrokerId,
                                                 profileQueryId: profileQueryId)
             }
+        }
+    }
+
+    private func updateScanOperationDataDates(brokerId: Int64,
+                                  profileQueryId: Int64,
+                                  extractedProfileId: Int64?,
+                                  schedulingConfig: DataBrokerScheduleConfig,
+                                              brokerProfileQuery: BrokerProfileQueryData) throws {
+
+        let currentScanPreferredRunDate = brokerProfileQuery.scanOperationData.preferredRunDate
+
+        let newScanPreferredRunDate = try calculator.dateForScanOperation(currentPreferredRunDate: currentScanPreferredRunDate,
+                                                                          historyEvents: brokerProfileQuery.events,
+                                                                          extractedProfileID: extractedProfileId,
+                                                                          schedulingConfig: schedulingConfig,
+                                                                          isDeprecated: brokerProfileQuery.profileQuery.deprecated)
+
+        if newScanPreferredRunDate != currentScanPreferredRunDate {
+            updatePreferredRunDate(newScanPreferredRunDate,
+                                   brokerId: brokerId,
+                                   profileQueryId: profileQueryId,
+                                   extractedProfileId: nil)
+        }
+    }
+
+    private func updateOptOutOperationDataDates(brokerId: Int64,
+                                                profileQueryId: Int64,
+                                                extractedProfileId: Int64?,
+                                                schedulingConfig: DataBrokerScheduleConfig,
+                                                brokerProfileQuery: BrokerProfileQueryData) throws {
+
+        let optOutOperation = brokerProfileQuery.optOutOperationsData.filter { $0.extractedProfile.id == extractedProfileId }.first
+        let currentOptOutPreferredRunDate = optOutOperation?.preferredRunDate
+
+        let newOptOutPreferredDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: currentOptOutPreferredRunDate,
+                                                                           historyEvents: brokerProfileQuery.events,
+                                                                           extractedProfileID: extractedProfileId,
+                                                                           schedulingConfig: schedulingConfig)
+
+        if newOptOutPreferredDate != currentOptOutPreferredRunDate {
+            updatePreferredRunDate(newOptOutPreferredDate,
+                                   brokerId: brokerId,
+                                   profileQueryId: profileQueryId,
+                                   extractedProfileId: extractedProfileId)
         }
     }
 
