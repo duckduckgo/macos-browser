@@ -53,7 +53,7 @@ final class BrowserImportMoreInfoViewController: NSViewController {
             label.stringValue = UserText.importFromChromiumMoreInfo
 
         case .firefox, .tor:
-            label.stringValue = UserText.importFromFirefoxMoreInfo
+            label.stringValue = UserText.importMoreInfo(fromFirefoxBasedBrowserNamed: source.importSourceName)
 
         case .safari, .safariTechnologyPreview, .yandex, .csv, .lastPass, .onePassword7, .onePassword8, .bookmarksHTML:
             fatalError("Unsupported source for more info")

@@ -191,7 +191,9 @@ final class DataImportViewController: NSViewController {
                  (_, false):
                 interactionState = .ableToImport
             case (.firefox, _):
-                if FirefoxDataImporter.loginDatabaseRequiresPrimaryPassword(profileURL: selectedProfile?.profileURL) {
+                if FirefoxDataImporter.loginDatabaseRequiresPrimaryPassword(source: source,
+                                                                            profileURL: selectedProfile?.profileURL,
+                                                                            sourceBrowserVersion: selectedProfile?.browserVersion) {
                     interactionState = .moreInfoAvailable
                 } else {
                     interactionState = .ableToImport
@@ -379,14 +381,14 @@ final class DataImportViewController: NSViewController {
             return
         }
 
-        if let currentChildViewController = currentChildViewController {
-            addChild(newChildViewController)
-            transition(from: currentChildViewController, to: newChildViewController, options: [])
-        } else {
-            addChild(newChildViewController)
+        let oldChildViewController = currentChildViewController
+        currentChildViewController = newChildViewController
+
+        addChild(newChildViewController)
+        if let oldChildViewController {
+            transition(from: oldChildViewController, to: newChildViewController, options: [])
         }
 
-        currentChildViewController = newChildViewController
         containerView.addSubview(newChildViewController.view)
 
         newChildViewController.view.translatesAutoresizingMaskIntoConstraints = false

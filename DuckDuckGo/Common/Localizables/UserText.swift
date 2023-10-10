@@ -554,9 +554,22 @@ struct UserText {
     static let onboardingSetDefaultButton = NSLocalizedString("onboarding.setdefault.button", value: "Let's Do It!", comment: "Launch the set default UI")
     static let onboardingNotNowButton = NSLocalizedString("onboarding.notnow.button", value: "Maybe Later", comment: "Skip a step of the onboarding flow")
 
-    static let importFromChromiumMoreInfo = NSLocalizedString("import.from.chromium.info", value: "You'll be asked to enter your Keychain password.\n\nDuckDuckGo won’t see your Keychain password, but macOS needs it to access and import passwords into DuckDuckGo.\n\nImported passwords are encrypted and only stored on this computer.", comment: "More info when importing from Chromium")
+    static let importFromChromiumMoreInfo = NSLocalizedString("import.from.chromium.info", value: """
+        You'll be asked to enter your Keychain password.
 
-    static let importFromFirefoxMoreInfo = NSLocalizedString("import.from.firefox.info", value: "You'll be asked to enter your Primary Password for Firefox.\n\nImported passwords are encrypted and only stored on this computer.", comment: "More info when importing from Firefox")
+        DuckDuckGo won’t see your Keychain password, but macOS needs it to access and import passwords into DuckDuckGo.
+
+        Imported passwords are encrypted and only stored on this computer.
+        """, comment: "More info when importing from Chromium")
+
+    static func importMoreInfo(fromFirefoxBasedBrowserNamed sourceName: String) -> String {
+        let localized = NSLocalizedString("import.from.firefox.info", value: """
+        You'll be asked to enter your Primary Password for %@.
+
+        Imported passwords are encrypted and only stored on this computer.
+        """, comment: "More info when importing from Firefox")
+        return String(format: localized, sourceName)
+    }
 
     static let moreOrLessCollapse = NSLocalizedString("more.or.less.collapse", value: "Show Less", comment: "For collapsing views to show less.")
     static let moreOrLessExpand = NSLocalizedString("more.or.less.expand", value: "Show More", comment: "For expanding views to show more.")
