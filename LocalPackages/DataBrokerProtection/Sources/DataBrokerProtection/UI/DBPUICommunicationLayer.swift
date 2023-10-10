@@ -57,7 +57,6 @@ enum DBPUIReceivedMethodName: String {
 
 enum DBPUISendableMethodName: String {
     case setState
-    case scanAndOptOutStatusChanged
 }
 
 struct DBPUICommunicationLayer: Subfeature {

@@ -65,26 +65,6 @@ struct DBPUISetState: Codable {
     let state: DBPUIState
 }
 
-/// Enum representing possible scan and opt out states
-enum DBPUIScanAndOptOutStatus: String, Codable {
-    case notRunning
-    case quickScan
-    case noProfileMatch
-    case removingProfile
-    case complete
-
-    static func from(schedulerStatus status: DataBrokerProtectionSchedulerStatus) -> DBPUIScanAndOptOutStatus {
-        switch status {
-        case .idle:
-            return .notRunning
-        case .running:
-            return .removingProfile
-        case .stopped:
-            return .complete
-        }
-    }
-}
-
 /// Message Object representing a user profile name
 struct DBPUIUserProfileName: Codable {
     let first: String
@@ -156,13 +136,6 @@ protocol DBPUISendableMessage: Codable {}
 /// Message to set the UI state. Sent from the host to the UI
 struct DBPUIWebSetState: DBPUISendableMessage {
     let state: DBPUIState
-}
-
-/// Message representing the state of any scans and opt outs
-struct DBPUIScanAndOptOutState: DBPUISendableMessage {
-    let status: DBPUIScanAndOptOutStatus
-    let inProgressOptOuts: [DBPUIDataBrokerProfileMatch]
-    let completedOptOuts: [DBPUIDataBrokerProfileMatch]
 }
 
 /// Message representing the state of any scans and opt outs without state and grouping removed profiles by broker

@@ -242,12 +242,6 @@ final public class DataBrokerProtectionViewController: NSViewController {
         webView?.loadHTMLString(debugPage, baseURL: nil)
         // Uncomment this line and add your dev URL 👇
 //        webView?.load(URL(string: "https://<your url>")!)
-
-        let button = NSButton(title: "Set State", target: self, action: #selector(webUIViewModel.reloadData))
-        button.setButtonType(.momentaryLight)
-        button.contentTintColor = .black
-        button.frame = CGRect(x: 10, y: 100, width: 100, height: 50)
-        view.addSubview(button)
     }
 
 }
