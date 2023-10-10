@@ -62,7 +62,7 @@ struct MapperToDB {
 
     func mapToDB(_ profileQuery: ProfileQuery, relatedTo profileId: Int64) throws -> ProfileQueryDB {
         .init(
-            id: nil,
+            id: profileQuery.id,
             profileId: profileId,
             first: try mechanism(profileQuery.firstName.encoded),
             last: try mechanism(profileQuery.lastName.encoded),

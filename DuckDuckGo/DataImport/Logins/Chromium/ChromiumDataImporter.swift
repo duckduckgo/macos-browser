@@ -54,20 +54,21 @@ internal class ChromiumDataImporter: DataImporter {
         return [.logins, .bookmarks]
     }
 
-    final func importData(types: [DataImport.DataType],
-                          from profile: DataImport.BrowserProfile?,
-                          completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
-        let result = importData(types: types, from: profile)
+    func importData(types: [DataImport.DataType],
+                    from profile: DataImport.BrowserProfile?,
+                    modalWindow: NSWindow? = nil,
+                    completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
+        let result = importData(types: types, from: profile, modalWindow: modalWindow)
         completion(result)
     }
 
-    func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) -> DataImportResult<DataImport.Summary> {
+    func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?, modalWindow: NSWindow?) -> DataImportResult<DataImport.Summary> {
         var summary = DataImport.Summary()
         let dataDirectoryURL = profile?.profileURL ?? applicationDataDirectoryURL
 
         if types.contains(.logins), let loginImporter {
             let loginReader = ChromiumLoginReader(chromiumDataDirectoryURL: dataDirectoryURL, source: source, processName: processName)
-            let loginResult = loginReader.readLogins()
+            let loginResult = loginReader.readLogins(modalWindow: modalWindow)
 
             switch loginResult {
             case .success(let logins):

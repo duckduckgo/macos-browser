@@ -154,7 +154,7 @@ struct DataBrokerProtectionBrokerUpdater {
         let profileQueryIDs = profileQueries.compactMap({ $0.id })
 
         for profileQueryId in profileQueryIDs {
-            try vault.save(brokerId: brokerId, profileQueryId: profileQueryId, lastRunDate: nil, preferredRunDate: nil)
+            try vault.save(brokerId: brokerId, profileQueryId: profileQueryId, lastRunDate: nil, preferredRunDate: Date())
         }
     }
 

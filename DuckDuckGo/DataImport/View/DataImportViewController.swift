@@ -191,9 +191,7 @@ final class DataImportViewController: NSViewController {
                  (_, false):
                 interactionState = .ableToImport
             case (.firefox, _):
-                if FirefoxDataImporter.loginDatabaseRequiresPrimaryPassword(source: source,
-                                                                            profileURL: selectedProfile?.profileURL,
-                                                                            sourceBrowserVersion: selectedProfile?.browserVersion) {
+                if FirefoxDataImporter.loginDatabaseRequiresPrimaryPassword(profileURL: selectedProfile?.profileURL) {
                     interactionState = .moreInfoAvailable
                 } else {
                     interactionState = .ableToImport
@@ -444,7 +442,13 @@ final class DataImportViewController: NSViewController {
         let profile = selectedProfile
         let importTypes = selectedImportOptions
 
-        importer.importData(types: importTypes, from: profile) { result in
+        self.importButton.isEnabled = false
+        self.cancelButton.isEnabled = false
+
+        importer.importData(types: importTypes, from: profile, modalWindow: view.window) { result in
+            self.importButton.isEnabled = true
+            self.cancelButton.isEnabled = true
+
             switch result {
             case .success(let summary):
                 self.successfulImportHappened = true
@@ -457,6 +461,14 @@ final class DataImportViewController: NSViewController {
                 }
 
                 NotificationCenter.default.post(name: .dataImportComplete, object: nil)
+
+            case .failure(let error as ChromiumLoginReader.ImportError) where error.type == .userDeniedKeychainPrompt:
+                // user denied Keychain prompt: keep current screen
+                Pixel.fire(.dataImportFailed(error))
+
+            case .failure(let error as FirefoxLoginReader.ImportError) where error.type == .requiresPrimaryPassword:
+                self.requestPrimaryPassword()
+
             case .failure(let error):
                 if (error as? FirefoxLoginReader.ImportError)?.type != .requiresPrimaryPassword {
                     os_log("import failed: %{public}s", type: .error, error.localizedDescription)
@@ -467,22 +479,21 @@ final class DataImportViewController: NSViewController {
         }
     }
 
+    private func requestPrimaryPassword() {
+        let alert = NSAlert.passwordRequiredAlert(source: viewState.selectedImportSource)
+        let response = alert.runModal()
+
+        if response == .alertFirstButtonReturn {
+            // Assume Firefox, as it's the only supported option that uses a password
+            let password = (alert.accessoryView as? NSSecureTextField)?.stringValue
+            (dataImporter as? FirefoxDataImporter)?.primaryPassword = password
+
+            completeImport()
+        }
+    }
+
     private func presentAlert(for error: any DataImportError) {
         guard let window = view.window else { return }
-
-        if case .requiresPrimaryPassword = (error as? FirefoxLoginReader.ImportError)?.type {
-            let alert = NSAlert.passwordRequiredAlert(source: viewState.selectedImportSource)
-            let response = alert.runModal()
-
-            if response == .alertFirstButtonReturn {
-                // Assume Firefox, as it's the only supported option that uses a password
-                let password = (alert.accessoryView as? NSSecureTextField)?.stringValue
-                (dataImporter as? FirefoxDataImporter)?.primaryPassword = password
-
-                completeImport()
-            }
-            return
-        }
 
         Pixel.fire(.dataImportFailed(error))
 

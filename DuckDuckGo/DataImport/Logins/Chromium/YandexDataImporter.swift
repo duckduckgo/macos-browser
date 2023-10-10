@@ -38,8 +38,8 @@ final class YandexDataImporter: ChromiumDataImporter {
                    faviconManager: FaviconManager.shared)
     }
 
-    override func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) -> DataImportResult<DataImport.Summary> {
-        var result = super.importData(types: types.filter { $0 != .logins }, from: profile)
+    override func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?, modalWindow: NSWindow?) -> DataImportResult<DataImport.Summary> {
+        var result = super.importData(types: types.filter { $0 != .logins }, from: profile, modalWindow: modalWindow)
 
         if case .success(var summary) = result,
            types.contains(.logins) {
