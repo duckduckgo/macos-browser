@@ -19,13 +19,14 @@
 import Cocoa
 import Combine
 import Common
+import Networking
 import NetworkExtension
 import NetworkProtection
+import NetworkProtectionControllers
 import NetworkProtectionIPC
 import NetworkProtectionUI
 import ServiceManagement
 import PixelKit
-import Networking
 
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
@@ -61,7 +62,9 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         Bundle.main.networkExtensionBundleID
     }
 
+#if NETP_SYSTEM_EXTENSION
     private lazy var networkExtensionController = NetworkExtensionController(extensionBundleID: networkExtensionBundleID)
+#endif
 
     private lazy var tunnelController = NetworkProtectionTunnelController(
         networkExtensionBundleID: networkExtensionBundleID,

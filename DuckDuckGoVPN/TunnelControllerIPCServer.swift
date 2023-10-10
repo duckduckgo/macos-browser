@@ -19,6 +19,7 @@
 import Combine
 import Foundation
 import NetworkProtection
+import NetworkProtectionControllers
 import NetworkProtectionIPC
 
 final class TunnelControllerIPCServer {
@@ -97,5 +98,9 @@ extension TunnelControllerIPCServer: IPCServerInterface {
 
     func resetAll(uninstallSystemExtension: Bool) async {
         try? await networkExtensionController.deactivateSystemExtension()
+    }
+
+    func setSelectedServer(_ server: String) async {
+        // TODO: set the selected server
     }
 }

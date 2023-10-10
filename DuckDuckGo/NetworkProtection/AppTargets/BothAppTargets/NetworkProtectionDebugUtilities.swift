@@ -25,6 +25,7 @@ import NetworkProtectionUI
 import NetworkExtension
 import SystemExtensions
 import LoginItems
+import NetworkProtectionIPC
 
 /// Utility code to help implement our debug menu options for Network Protection.
 ///
@@ -41,7 +42,8 @@ final class NetworkProtectionDebugUtilities {
         }
     }
 
-    private let networkProtectionFeatureDisabler = NetworkProtectionFeatureDisabler()
+    private let ipcClient: TunnelControllerIPCClient
+    private let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabler
 
     // MARK: - Login Items Management
 
@@ -55,6 +57,11 @@ final class NetworkProtectionDebugUtilities {
 
     init(loginItemsManager: LoginItemsManager = .init()) {
         self.loginItemsManager = loginItemsManager
+
+        let ipcClient = TunnelControllerIPCClient(machServiceName: Bundle.main.vpnMenuAgentBundleId)
+
+        self.ipcClient = ipcClient
+        self.networkProtectionFeatureDisabler = NetworkProtectionFeatureDisabler(ipcClient: ipcClient)
     }
 
     // MARK: - Debug commands for the extension

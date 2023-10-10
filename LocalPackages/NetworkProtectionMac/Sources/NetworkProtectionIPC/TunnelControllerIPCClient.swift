@@ -83,6 +83,10 @@ extension TunnelControllerIPCClient: IPCServerInterface {
     public func resetAll(uninstallSystemExtension: Bool) async {
         try? await xpc.server().resetAll(uninstallSystemExtension: uninstallSystemExtension)
     }
+
+    public func setSelectedServer(_ server: String) async {
+        try? await xpc.server().setSelectedServer(server)
+    }
 }
 
 // MARK: - Incoming communication from the server
