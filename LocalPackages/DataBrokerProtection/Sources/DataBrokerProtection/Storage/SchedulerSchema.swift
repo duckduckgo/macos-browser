@@ -34,6 +34,7 @@ struct ProfileQueryDB: Codable {
     let zipCode: Data?
     let phone: Data?
     let birthYear: Data
+    let deprecated: Bool
 }
 
 extension ProfileQueryDB: PersistableRecord, FetchableRecord {
@@ -52,6 +53,7 @@ extension ProfileQueryDB: PersistableRecord, FetchableRecord {
         case zipCode
         case phone
         case birthYear
+        case deprecated
     }
 
     init(row: Row) throws {
@@ -67,6 +69,7 @@ extension ProfileQueryDB: PersistableRecord, FetchableRecord {
         zipCode = row[Columns.zipCode]
         phone = row[Columns.phone]
         birthYear = row[Columns.birthYear]
+        deprecated = row[Columns.deprecated]
     }
 
     func encode(to container: inout PersistenceContainer) throws {
@@ -82,6 +85,7 @@ extension ProfileQueryDB: PersistableRecord, FetchableRecord {
         container[Columns.zipCode] = zipCode
         container[Columns.phone] = phone
         container[Columns.birthYear] = birthYear
+        container[Columns.deprecated] = deprecated
     }
 }
 

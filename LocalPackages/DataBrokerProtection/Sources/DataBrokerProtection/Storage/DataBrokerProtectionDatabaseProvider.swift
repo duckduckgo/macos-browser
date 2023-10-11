@@ -27,6 +27,7 @@ enum DataBrokerProtectionDatabaseErrors: Error {
 
 protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func saveProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64
+    func updateProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64
     func fetchProfile(with id: Int64) throws -> FullProfileDB?
 
     func save(_ broker: BrokerDB) throws -> Int64
@@ -36,6 +37,9 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func fetchAllBrokers() throws -> [BrokerDB]
 
     func save(_ profileQuery: ProfileQueryDB) throws -> Int64
+    func delete(_ profileQuery: ProfileQueryDB) throws
+    func update(_ profileQuery: ProfileQueryDB) throws -> Int64
+
     func fetchProfileQuery(with id: Int64) throws -> ProfileQueryDB?
     func fetchAllProfileQueries(for profileId: Int64) throws -> [ProfileQueryDB]
 
@@ -81,6 +85,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         try super.init(file: file, key: key, writerType: .pool) { migrator in
             migrator.registerMigration("v1", migrate: Self.migrateV1(database:))
             migrator.registerMigration("v2", migrate: Self.migrateV2(database:))
+            migrator.registerMigration("v3", migrate: Self.migrateV3(database:))
         }
     }
 
@@ -154,7 +159,9 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             $0.primaryKey([ScanDB.Columns.brokerId.name, ScanDB.Columns.profileQueryId.name])
 
             $0.foreignKey([ScanDB.Columns.brokerId.name], references: BrokerDB.databaseTableName)
-            $0.foreignKey([ScanDB.Columns.profileQueryId.name], references: ProfileQueryDB.databaseTableName)
+            $0.foreignKey([ScanDB.Columns.profileQueryId.name],
+                          references: ProfileQueryDB.databaseTableName,
+                          onDelete: .cascade)
 
             $0.column(ScanDB.Columns.profileQueryId.name, .integer).notNull()
             $0.column(ScanDB.Columns.brokerId.name, .integer).notNull()
@@ -171,7 +178,9 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             ])
 
             $0.foreignKey([ScanDB.Columns.brokerId.name], references: BrokerDB.databaseTableName)
-            $0.foreignKey([ScanDB.Columns.profileQueryId.name], references: ProfileQueryDB.databaseTableName)
+            $0.foreignKey([ScanDB.Columns.profileQueryId.name],
+                          references: ProfileQueryDB.databaseTableName,
+                          onDelete: .cascade)
 
             $0.column(ScanDB.Columns.profileQueryId.name, .integer).notNull()
             $0.column(ScanDB.Columns.brokerId.name, .integer).notNull()
@@ -183,8 +192,11 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             $0.autoIncrementedPrimaryKey(ExtractedProfileDB.Columns.id.name)
 
             $0.foreignKey([ExtractedProfileDB.Columns.brokerId.name], references: BrokerDB.databaseTableName)
-            $0.foreignKey([ExtractedProfileDB.Columns.profileQueryId.name], references: ProfileQueryDB.databaseTableName)
+            $0.foreignKey([ExtractedProfileDB.Columns.profileQueryId.name],
+                          references: ProfileQueryDB.databaseTableName,
+                          onDelete: .cascade)
 
+            //  This should be a FK but a migration will need to be considered
             $0.column(ExtractedProfileDB.Columns.profileQueryId.name, .integer).notNull()
             $0.column(ExtractedProfileDB.Columns.brokerId.name, .integer).notNull()
             $0.column(ExtractedProfileDB.Columns.profile.name, .text).notNull()
@@ -199,7 +211,10 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             ])
 
             $0.foreignKey([OptOutDB.Columns.brokerId.name], references: BrokerDB.databaseTableName)
-            $0.foreignKey([OptOutDB.Columns.profileQueryId.name], references: ProfileQueryDB.databaseTableName)
+            $0.foreignKey([OptOutDB.Columns.profileQueryId.name],
+                          references: ProfileQueryDB.databaseTableName,
+                          onDelete: .cascade)
+
             $0.foreignKey([OptOutDB.Columns.extractedProfileId.name], references: ExtractedProfileDB.databaseTableName)
 
             $0.column(OptOutDB.Columns.profileQueryId.name, .integer).notNull()
@@ -241,20 +256,18 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 
-    func saveProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {
+    static func migrateV3(database: Database) throws {
+        try database.alter(table: ProfileQueryDB.databaseTableName) {
+            $0.add(column: ProfileQueryDB.Columns.deprecated.name, .boolean).notNull().defaults(to: false)
+        }
+    }
+
+    func updateProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {
         try db.write { db in
-            // The schema currently supports multiple profiles, but we are going to start with one
-            // We need to keep only one row in the profile screen, so an update of a profile
-            // is an upsert, and for the multi-attributed columns we just delete everything and
-            // insert the new data.
+
+            // The schema currently supports multiple profiles, but we are going to start with a single one
             let profileId: Int64 = 1
             try mapperToDB.mapToDB(id: profileId, profile: profile).upsert(db)
-
-            // We need to delete all scans and opt-outs related to a possible old user
-            try ScanDB.deleteAll(db)
-            try ScanHistoryEventDB.deleteAll(db)
-            try OptOutDB.deleteAll(db)
-            try OptOutHistoryEventDB.deleteAll(db)
 
             try NameDB.deleteAll(db)
             for name in profile.names {
@@ -267,6 +280,29 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             }
 
             try PhoneDB.deleteAll(db)
+            for phone in profile.phones {
+                try mapperToDB.mapToDB(phone, relatedTo: profileId).insert(db)
+            }
+
+            return profileId
+        }
+    }
+
+    func saveProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {
+        try db.write { db in
+
+            // The schema currently supports multiple profiles, but we are going to start with a single one
+            let profileId: Int64 = 1
+            try mapperToDB.mapToDB(id: profileId, profile: profile).insert(db)
+
+            for name in profile.names {
+                try mapperToDB.mapToDB(name, relatedTo: profileId).insert(db)
+            }
+
+            for address in profile.addresses {
+                try mapperToDB.mapToDB(address, relatedTo: profileId).insert(db)
+            }
+
             for phone in profile.phones {
                 try mapperToDB.mapToDB(phone, relatedTo: profileId).insert(db)
             }
@@ -321,6 +357,22 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         try db.write { db in
             try profileQuery.insert(db)
             return db.lastInsertedRowID
+        }
+    }
+
+    func update(_ profileQuery: ProfileQueryDB) throws -> Int64 {
+        try db.write { db in
+            try profileQuery.upsert(db)
+            return db.lastInsertedRowID
+        }
+    }
+
+    func delete(_ profileQuery: ProfileQueryDB) throws {
+        guard let profileQueryID = profileQuery.id else { throw DataBrokerProtectionDatabaseErrors.elementNotFound }
+        try db.write { db in
+            try ProfileQueryDB
+                .filter(Column(ProfileQueryDB.Columns.id.name) == profileQueryID)
+                .deleteAll(db)
         }
     }
 

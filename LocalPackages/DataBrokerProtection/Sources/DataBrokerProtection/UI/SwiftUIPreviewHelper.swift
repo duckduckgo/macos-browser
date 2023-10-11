@@ -40,6 +40,8 @@ final class PreviewDBPPackageToMainAppInterface: DBPPackageToMainAppInterface {
 final class PreviewDataManager: DataBrokerProtectionDataManaging {
     var delegate: DataBrokerProtectionDataManagerDelegate?
 
+    let cache = InMemoryDataCache()
+
     init(fakeBrokerFlag: DataBrokerDebugFlag) { }
 
     init() { }

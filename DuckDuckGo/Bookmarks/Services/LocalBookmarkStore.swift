@@ -172,7 +172,7 @@ final class LocalBookmarkStore: BookmarkStore {
         }
     }
 
-    private func commonOnSaveErrorHandler(_ error: Error) {
+    private func commonOnSaveErrorHandler(_ error: Error, source: String = #function) {
         guard !NSApp.isRunningUnitTests else { return }
 
         assertionFailure("LocalBookmarkStore: Saving of context failed")
@@ -181,17 +181,22 @@ final class LocalBookmarkStore: BookmarkStore {
             if case BookmarkStoreError.saveLoopError(let innerError) = localError, let innerError {
                 let processedErrors = CoreDataErrorsParser.parse(error: innerError as NSError)
 
+                var params = processedErrors.errorPixelParameters
+                params[Pixel.Parameters.errorSource] = source
                 Pixel.fire(.debug(event: .bookmarksSaveFailed, error: error),
-                               withAdditionalParameters: processedErrors.errorPixelParameters)
+                           withAdditionalParameters: params)
             } else {
-                Pixel.fire(.debug(event: .bookmarksSaveFailed, error: localError))
+                Pixel.fire(.debug(event: .bookmarksSaveFailed, error: localError),
+                           withAdditionalParameters: [Pixel.Parameters.errorSource: source])
             }
         } else {
             let error = error as NSError
             let processedErrors = CoreDataErrorsParser.parse(error: error)
 
+            var params = processedErrors.errorPixelParameters
+            params[Pixel.Parameters.errorSource] = source
             Pixel.fire(.debug(event: .bookmarksSaveFailed, error: error),
-                           withAdditionalParameters: processedErrors.errorPixelParameters)
+                       withAdditionalParameters: params)
         }
     }
 
@@ -828,20 +833,26 @@ final class LocalBookmarkStore: BookmarkStore {
 
     }
 
-    func resetBookmarks() {
-        let context = makeContext()
-        context.performAndWait {
+    func resetBookmarks(completionHandler: @escaping (Error?) -> Void) {
+        applyChangesAndSave { context in
             let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: BookmarkEntity.className())
             let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
 
-            do {
-                try context.execute(deleteRequest)
-            } catch {
-                assertionFailure("Failed to reset bookmarks")
+            try context.execute(deleteRequest)
+
+            BookmarkUtils.prepareFoldersStructure(in: context)
+
+        } onError: { error in
+            assertionFailure("Failed to reset bookmarks: \(error)")
+            DispatchQueue.main.async {
+                completionHandler(error)
+            }
+        } onDidSave: { [self] in
+            DispatchQueue.main.async {
+                self.cacheReadOnlyTopLevelBookmarksFolders()
+                completionHandler(nil)
             }
         }
-
-        cacheReadOnlyTopLevelBookmarksFolders()
     }
 
     // MARK: - Concurrency

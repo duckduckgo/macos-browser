@@ -31,11 +31,14 @@ final class RequestFilePermissionViewController: NSViewController {
         static let identifier = "RequestFilePermissionViewController"
     }
 
-    static func create(importSource: DataImport.Source, permissionsRequired: [DataImport.DataType]) -> RequestFilePermissionViewController {
+    static func create(importSource: DataImport.Source, permissionsRequired: [DataImport.DataType], permissionAuthorization: DataDirectoryPermissionAuthorization) -> RequestFilePermissionViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
-        return storyboard.instantiateController(identifier: Constants.identifier) { (coder) -> RequestFilePermissionViewController? in
-            return RequestFilePermissionViewController(coder: coder, importSource: importSource, permissionsRequired: permissionsRequired)
+        return storyboard.instantiateController(identifier: Constants.identifier) { coder in
+            RequestFilePermissionViewController(coder: coder,
+                                                importSource: importSource,
+                                                permissionsRequired: permissionsRequired,
+                                                permissionAuthorization: permissionAuthorization)
         }
     }
 
@@ -46,10 +49,12 @@ final class RequestFilePermissionViewController: NSViewController {
 
     private let importSource: DataImport.Source
     private let permissionsRequired: [DataImport.DataType]
+    private let permissionAuthorization: DataDirectoryPermissionAuthorization
 
-    init?(coder: NSCoder, importSource: DataImport.Source, permissionsRequired: [DataImport.DataType]) {
+    init?(coder: NSCoder, importSource: DataImport.Source, permissionsRequired: [DataImport.DataType], permissionAuthorization: DataDirectoryPermissionAuthorization) {
         self.importSource = importSource
         self.permissionsRequired = permissionsRequired
+        self.permissionAuthorization = permissionAuthorization
 
         super.init(coder: coder)
     }
@@ -66,7 +71,9 @@ final class RequestFilePermissionViewController: NSViewController {
     }
 
     @IBAction private func presentBookmarksOpenPanel(_ sender: AnyObject) {
-        if SafariDataImporter.requestSafariDataDirectoryPermission() != nil, SafariDataImporter.canReadBookmarksFile() {
+        if permissionAuthorization.requestDataDirectoryPermission() != nil,
+           permissionAuthorization.canReadBookmarksFile() {
+
             delegate?.requestFilePermissionViewControllerDidReceivePermission(self)
         }
     }

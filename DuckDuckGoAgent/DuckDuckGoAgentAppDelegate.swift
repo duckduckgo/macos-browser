@@ -67,10 +67,20 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
         FeatureProtectingTunnelController(appLauncher: appLauncher, bouncer: bouncer)
     }()
 
+    private lazy var statusReporter: NetworkProtectionStatusReporter = {
+        DefaultNetworkProtectionStatusReporter(
+            statusObserver: ConnectionStatusObserverThroughDistributedNotifications(),
+            serverInfoObserver: ConnectionServerInfoObserverThroughDistributedNotifications(),
+            connectionErrorObserver: ConnectionErrorObserverThroughDistributedNotifications(),
+            connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
+            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications())
+    }()
+
     /// The status bar NetworkProtection menu
     ///
     /// For some reason the App will crash if this is initialized right away, which is why it was changed to be lazy.
     ///
+    @MainActor
     private lazy var networkProtectionMenu: StatusBarMenu = {
         #if DEBUG
         let iconProvider = DebugMenuIconProvider()
@@ -93,7 +103,7 @@ final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
             OnboardingStatus(rawValue: rawValue) ?? .default
         }.eraseToAnyPublisher()
 
-        return StatusBarMenu(onboardingStatusPublisher: onboardingStatusPublisher, controller: tunnelController, iconProvider: iconProvider, menuItems: menuItems)
+        return StatusBarMenu(onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, controller: tunnelController, iconProvider: iconProvider, menuItems: menuItems)
     }()
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {

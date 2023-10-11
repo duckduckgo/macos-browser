@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1695811101316,
+    "version": 1696606289110,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -313,70 +313,10 @@
                 {
                     "domain": "roll20.net",
                     "reason": "Performance issue for too many fields."
-                },
-                {
-                    "domain": "amazon.ca",
-                    "reason": "Performance issue, infinite loop."
-                },
-                {
-                    "domain": "amazon.cn",
-                    "reason": "Performance issue, infinite loop."
-                },
-                {
-                    "domain": "amazon.co.jp",
-                    "reason": "Performance issue, infinite loop."
-                },
-                {
-                    "domain": "amazon.com",
-                    "reason": "Performance issue, infinite loop."
-                },
-                {
-                    "domain": "amazon.com.au",
-                    "reason": "Performance issue, infinite loop."
-                },
-                {
-                    "domain": "amazon.com.mx",
-                    "reason": "Performance issue, infinite loop."
-                },
-                {
-                    "domain": "amazon.co.uk",
-                    "reason": "Performance issue, infinite loop."
-                },
-                {
-                    "domain": "amazon.de",
-                    "reason": "Performance issue, infinite loop."
-                },
-                {
-                    "domain": "amazon.es",
-                    "reason": "Performance issue, infinite loop."
-                },
-                {
-                    "domain": "amazon.eu",
-                    "reason": "Performance issue, infinite loop."
-                },
-                {
-                    "domain": "amazon.fr",
-                    "reason": "Performance issue, infinite loop."
-                },
-                {
-                    "domain": "amazon.in",
-                    "reason": "Performance issue, infinite loop."
-                },
-                {
-                    "domain": "amazon.it",
-                    "reason": "Performance issue, infinite loop."
-                },
-                {
-                    "domain": "amazon.nl",
-                    "reason": "Performance issue, infinite loop."
-                },
-                {
-                    "domain": "amazon.sa",
-                    "reason": "Performance issue, infinite loop."
                 }
             ],
             "state": "enabled",
-            "hash": "2c000369279a9265b5247070e841be2d"
+            "hash": "59c4bd9b8cee343c81da98bfe5d77928"
         },
         "clickToLoad": {
             "exceptions": [
@@ -1329,12 +1269,16 @@
                     {
                         "domain": "accounts.google.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1295"
+                    },
+                    {
+                        "domain": "flysas.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1347"
                     }
                 ]
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "febf94b6d0edcb2e3718b4217c004512"
+            "hash": "d757f6509e9a9a20140c755ed0f21ea2"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -1653,6 +1597,10 @@
                         "type": "hide-empty"
                     },
                     {
+                        "selector": ".top-ad",
+                        "type": "hide-empty"
+                    },
+                    {
                         "selector": ".ad-banner-container",
                         "type": "hide-empty"
                     },
@@ -1898,6 +1846,7 @@
                     "advertisements",
                     "advertisment",
                     "advertisementclose",
+                    "advertisementadvertisement",
                     "advertisementcontinue reading the main story",
                     "advertisement\ncontinue reading the main story",
                     "advertisement\n\ncontinue reading the main story",
@@ -1916,6 +1865,7 @@
                     "sponsored",
                     "sponsorisé",
                     "story continues below advertisement",
+                    "story continues below advertisementadvertisement",
                     "publicité",
                     "publicidade",
                     "reklama",
@@ -2836,6 +2786,15 @@
                         ]
                     },
                     {
+                        "domain": "refinery29.com",
+                        "rules": [
+                            {
+                                "selector": ".section-ad",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "reuters.com",
                         "rules": [
                             {
@@ -2917,6 +2876,15 @@
                         "rules": [
                             {
                                 "selector": "[data-format='leaderboard']",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "slate.com",
+                        "rules": [
+                            {
+                                "selector": ".slate-ad",
                                 "type": "hide-empty"
                             }
                         ]
@@ -3171,6 +3139,10 @@
                             {
                                 "selector": ".darla",
                                 "type": "closest-empty"
+                            },
+                            {
+                                "selector": "[data-content='Advertisement']",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -3309,7 +3281,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "8d80829a474c5d6ca9ca80ce87e477be"
+            "hash": "aa722bbbb538407bc698eba7231199d9"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4285,6 +4257,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1158"
                 },
                 {
+                    "domain": "amica.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1336"
+                },
+                {
                     "domain": "earth.google.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1099"
                 },
@@ -4301,7 +4277,7 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1085"
                 }
             ],
-            "hash": "8de33b0e54940edad6504523c8db58ff"
+            "hash": "22b055005a4ea3a5f5d387000c4b838b"
         },
         "incontextSignup": {
             "exceptions": [],
@@ -4361,23 +4337,40 @@
             "hash": "002c32fcc15897c2ffae8045ac0bdcb3"
         },
         "networkProtection": {
-            "state": "disabled",
+            "state": "enabled",
             "features": {
+                "waitlistBetaActive": {
+                    "state": "enabled"
+                },
                 "waitlist": {
-                    "state": "disabled"
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1
+                            },
+                            {
+                                "percent": 5
+                            },
+                            {
+                                "percent": 15
+                            }
+                        ]
+                    }
                 }
             },
             "exceptions": [],
-            "hash": "bf4c9cd751a7626bd89136f6cc98ccf1"
+            "minSupportedVersion": "1.57.1",
+            "hash": "2f9f0e90459f1c9a93277a1681f0eab1"
         },
         "newTabContinueSetUp": {
             "exceptions": [],
             "state": "enabled",
             "settings": {
-                "surveyCardDay0": "enabled",
-                "surveyCardDay7": "enabled"
+                "surveyCardDay0": "disabled",
+                "surveyCardDay7": "disabled"
             },
-            "hash": "967581d96a32e2871b03715f718f60a6"
+            "hash": "2904635973a1cc6e9521cec3c29b93ea"
         },
         "nonTracking3pCookies": {
             "settings": {
@@ -5041,6 +5034,48 @@
                     "connatix.com": {
                         "rules": [
                             {
+                                "rule": "cd.connatix.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/768"
+                            },
+                            {
+                                "rule": "cds.connatix.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/768"
+                            },
+                            {
+                                "rule": "cdn.connatix.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/768"
+                            },
+                            {
+                                "rule": "capi.connatix.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/768"
+                            },
+                            {
+                                "rule": "vid.connatix.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/768"
+                            },
+                            {
+                                "rule": "img.connatix.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/768"
+                            },
+                            {
                                 "rule": "connatix.com",
                                 "domains": [
                                     "accuweather.com",
@@ -5314,6 +5349,17 @@
                                     "seatosummit.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/535"
+                            }
+                        ]
+                    },
+                    "eccmp.com": {
+                        "rules": [
+                            {
+                                "rule": "eccmp.com/sts/scripts/conversen-SDK.js",
+                                "domains": [
+                                    "pch.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1344"
                             }
                         ]
                     },
@@ -6770,6 +6816,17 @@
                             }
                         ]
                     },
+                    "rokt.com": {
+                        "rules": [
+                            {
+                                "rule": "rokt.com/wsdk/integrations/snippet.js",
+                                "domains": [
+                                    "pch.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1344"
+                            }
+                        ]
+                    },
                     "rumble.com": {
                         "rules": [
                             {
@@ -7004,6 +7061,27 @@
                                     "royalcaribbean.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1255"
+                            },
+                            {
+                                "rule": "tags.tiqcdn.com/utag/lbg/",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1334"
+                            },
+                            {
+                                "rule": "tags.tiqcdn.com/utag/pch/",
+                                "domains": [
+                                    "pch.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1344"
+                            },
+                            {
+                                "rule": "tags.tiqcdn.com/utag/tiqapp/utag.v.js",
+                                "domains": [
+                                    "oracle.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1353"
                             }
                         ]
                     },
@@ -7252,6 +7330,17 @@
                             }
                         ]
                     },
+                    "zopim.com": {
+                        "rules": [
+                            {
+                                "rule": "widget-mediator.zopim.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1360"
+                            }
+                        ]
+                    },
                     "citi.com": {
                         "rules": [
                             {
@@ -7334,7 +7423,7 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1085"
                 }
             ],
-            "hash": "97820a352738dfdbe29fae6073a000aa"
+            "hash": "9685e73a5b4d001384c942e4e211f3e5"
         },
         "trackingCookies1p": {
             "settings": {

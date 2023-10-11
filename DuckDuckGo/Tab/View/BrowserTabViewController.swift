@@ -122,6 +122,13 @@ final class BrowserTabViewController: NSViewController {
                                                name: .dbpDidClose,
                                                object: nil)
 #endif
+
+#if SUBSCRIPTION
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onCloseSubscriptionPage),
+                                               name: .subscriptionPageCloseAndOpenPreferences,
+                                               object: nil)
+#endif
     }
 
     @objc
@@ -167,6 +174,21 @@ final class BrowserTabViewController: NSViewController {
             self.previouslySelectedTab = nil
         }
     }
+
+#if SUBSCRIPTION
+    @objc
+    private func onCloseSubscriptionPage(_ notification: Notification) {
+        guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab else { return }
+        self.closeTab(activeTab)
+
+        if let previouslySelectedTab = self.previouslySelectedTab {
+            tabCollectionViewModel.select(tab: previouslySelectedTab)
+            self.previouslySelectedTab = nil
+        }
+
+        openNewTab(with: .preferences(pane: .subscription))
+    }
+#endif
 
     private func subscribeToSelectedTabViewModel() {
         tabCollectionViewModel.$selectedTabViewModel

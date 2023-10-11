@@ -20,31 +20,42 @@ import Foundation
 
 final class ChromiumBookmarksReader {
 
-    enum ImportError: Error {
-        case noBookmarksFileFound
-        case bookmarksFileDecodingFailed
-    }
-
     enum Constants {
         static let defaultBookmarksFileName = "Bookmarks"
     }
 
-    private let chromiumBookmarksFileURL: URL
-
-    init(chromiumDataDirectoryURL: URL, bookmarksFileName: String = Constants.defaultBookmarksFileName) {
-        self.chromiumBookmarksFileURL = chromiumDataDirectoryURL.appendingPathComponent(bookmarksFileName)
-    }
-
-    func readBookmarks() -> Result<ImportedBookmarks, ChromiumBookmarksReader.ImportError> {
-        guard let bookmarksFileData = try? Data(contentsOf: chromiumBookmarksFileURL) else {
-            return .failure(.noBookmarksFileFound)
+    struct ImportError: DataImportError {
+        enum OperationType: Int {
+            case fileRead
+            case decodeJson
         }
 
+        var action: DataImportAction { .bookmarks }
+        let source: DataImport.Source
+        let type: OperationType
+        let underlyingError: Error?
+    }
+    func importError(type: ImportError.OperationType, underlyingError: Error) -> ImportError {
+        ImportError(source: source, type: type, underlyingError: underlyingError)
+    }
+
+    private let chromiumBookmarksFileURL: URL
+    private let source: DataImport.Source
+
+    init(chromiumDataDirectoryURL: URL, source: DataImport.Source, bookmarksFileName: String = Constants.defaultBookmarksFileName) {
+        self.chromiumBookmarksFileURL = chromiumDataDirectoryURL.appendingPathComponent(bookmarksFileName)
+        self.source = source
+    }
+
+    func readBookmarks() -> DataImportResult<ImportedBookmarks> {
+        var currentOperationType: ImportError.OperationType = .fileRead
         do {
+            let bookmarksFileData = try Data(contentsOf: chromiumBookmarksFileURL)
+            currentOperationType = .decodeJson
             let decodedBookmarks = try JSONDecoder().decode(ImportedBookmarks.self, from: bookmarksFileData)
             return .success(decodedBookmarks)
         } catch {
-            return .failure(.bookmarksFileDecodingFailed)
+            return .failure(importError(type: currentOperationType, underlyingError: error))
         }
     }
 

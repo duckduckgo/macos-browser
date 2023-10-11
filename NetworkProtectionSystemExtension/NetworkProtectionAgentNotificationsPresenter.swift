@@ -32,8 +32,9 @@ final class NetworkProtectionAgentNotificationsPresenter: NetworkProtectionNotif
 
     // MARK: - Presenting user notifications
 
-    func showReconnectedNotification() {
-        notificationCenter.post(.showIssuesResolvedNotification)
+    func showConnectedNotification(serverLocation: String?) {
+        let userInfo = serverLocation.flatMap { [NetworkProtectionNotification.UserInfoKey.connectedServerLocation: $0] as [AnyHashable: Any] }
+        notificationCenter.post(.showConnectedNotification, userInfo: userInfo)
     }
 
     func showReconnectingNotification() {
