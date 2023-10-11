@@ -72,20 +72,33 @@ enum DBPUIScanAndOptOutStatus: String, Codable {
     case noProfileMatch
     case removingProfile
     case complete
+
+    static func from(schedulerStatus status: DataBrokerProtectionSchedulerStatus) -> DBPUIScanAndOptOutStatus {
+        switch status {
+        case .idle:
+            return .notRunning
+        case .running:
+            return .removingProfile
+        case .stopped:
+            return .complete
+        }
+    }
 }
 
 /// Message Object representing a user profile name
 struct DBPUIUserProfileName: Codable {
     let first: String
-    let middle: String
+    let middle: String?
     let last: String
+    let suffix: String?
 }
 
 /// Message Object representing a user profile address
 struct DBPUIUserProfileAddress: Codable {
-    let street: String
+    let street: String?
     let city: String
     let state: String
+    let zipCode: String?
 }
 
 /// Message Object representing a user profile containing one or more names and addresses
@@ -100,6 +113,16 @@ struct DBPUIUserProfile: Codable {
 /// address that should be removed from a user profile
 struct DBPUIIndex: Codable {
     let index: Int
+}
+
+struct DBPUINameAtIndex: Codable {
+    let index: Int
+    let name: DBPUIUserProfileName
+}
+
+struct DBPUIAddressAtIndex: Codable {
+    let index: Int
+    let address: DBPUIUserProfileAddress
 }
 
 /// Message Object representing a data broker
@@ -130,7 +153,7 @@ struct DBPUIWebSetState: DBPUISendableMessage {
 }
 
 /// Message representing the state of any scans and opt outs
-struct ScanAndOptOutState: DBPUISendableMessage {
+struct DBPUIScanAndOptOutState: DBPUISendableMessage {
     let status: DBPUIScanAndOptOutStatus
     let inProgressOptOuts: [DBPUIDataBrokerProfileMatch]
     let completedOptOuts: [DBPUIDataBrokerProfileMatch]

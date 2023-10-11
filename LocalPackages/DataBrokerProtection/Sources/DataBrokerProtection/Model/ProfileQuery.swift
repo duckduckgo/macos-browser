@@ -71,3 +71,75 @@ struct ProfileQuery: Encodable, Sendable {
         self.deprecated = deprecated
     }
 }
+
+extension ProfileQuery: Equatable {
+
+    // We're intentionally not comparing IDs since we want to verify only the attributes
+    // when we're searching for a potential match in the database
+    static func == (lhs: ProfileQuery, rhs: ProfileQuery) -> Bool {
+        return
+            lhs.firstName.lowercased() == rhs.firstName.lowercased() &&
+            lhs.lastName.lowercased() == rhs.lastName.lowercased() &&
+            lhs.middleName?.lowercased() == rhs.middleName?.lowercased() &&
+            lhs.suffix?.lowercased() == rhs.suffix?.lowercased() &&
+            lhs.city.lowercased() == rhs.city.lowercased() &&
+            lhs.state.lowercased() == rhs.state.lowercased() &&
+            lhs.street?.lowercased() == rhs.street?.lowercased() &&
+            lhs.zip?.lowercased() == rhs.zip?.lowercased() &&
+            lhs.birthYear == rhs.birthYear &&
+            lhs.phone?.lowercased() == rhs.phone?.lowercased() &&
+            lhs.fullName.lowercased() == rhs.fullName.lowercased() &&
+            lhs.age == rhs.age &&
+            lhs.addresses == rhs.addresses
+    }
+}
+
+extension Address: Equatable {
+    static func == (lhs: Address, rhs: Address) -> Bool {
+        return lhs.city.lowercased() == rhs.city.lowercased() &&
+               lhs.state.lowercased() == rhs.state.lowercased()
+    }
+}
+
+// Returns a copy of the same instance but with the deprecated flag parameter
+extension ProfileQuery {
+    func with(deprecated: Bool) -> ProfileQuery {
+         return ProfileQuery(id: id,
+                             firstName: firstName,
+                             lastName: lastName,
+                             middleName: middleName,
+                             suffix: suffix,
+                             city: city,
+                             state: state,
+                             street: street,
+                             zipCode: zip,
+                             phone: phone,
+                             birthYear: birthYear,
+                             deprecated: deprecated)
+     }
+}
+
+extension ProfileQuery: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(firstName.lowercased())
+        hasher.combine(lastName.lowercased())
+        hasher.combine(middleName?.lowercased())
+        hasher.combine(suffix?.lowercased())
+        hasher.combine(city.lowercased())
+        hasher.combine(state.lowercased())
+        hasher.combine(street?.lowercased())
+        hasher.combine(zip?.lowercased())
+        hasher.combine(birthYear)
+        hasher.combine(phone?.lowercased())
+        hasher.combine(fullName.lowercased())
+        hasher.combine(age)
+        hasher.combine(addresses)
+    }
+}
+
+extension Address: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(city.lowercased())
+        hasher.combine(state.lowercased())
+    }
+}

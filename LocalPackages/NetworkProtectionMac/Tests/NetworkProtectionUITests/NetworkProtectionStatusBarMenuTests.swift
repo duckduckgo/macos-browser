@@ -36,6 +36,7 @@ final class StatusBarMenuTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testShowStatusBarMenu() {
         let item = NSStatusItem()
         let menu = StatusBarMenu(
@@ -51,6 +52,7 @@ final class StatusBarMenuTests: XCTestCase {
         XCTAssertTrue(item.isVisible)
     }
 
+    @MainActor
     func testHideStatusBarMenu() {
         let item = NSStatusItem()
         let menu = StatusBarMenu(
