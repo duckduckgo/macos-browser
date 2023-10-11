@@ -22,6 +22,7 @@ import AppKit
 import Combine
 import Foundation
 import NetworkProtection
+import NetworkProtectionIPC
 import NetworkProtectionUI
 
 /// Model for managing the NetP button in the Nav Bar.
@@ -72,16 +73,14 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
          statusReporter: NetworkProtectionStatusReporter? = nil,
          iconProvider: IconProvider = NavigationBarIconProvider()) {
 
-        let statusObserver = ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                    platformDidWakeNotification: NSWorkspace.didWakeNotification)
-        let statusInfoObserver = ConnectionServerInfoObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                            platformDidWakeNotification: NSWorkspace.didWakeNotification)
-        let connectionErrorObserver = ConnectionErrorObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                            platformDidWakeNotification: NSWorkspace.didWakeNotification)
+        let vpnBundleID = Bundle.main.vpnMenuAgentBundleId
+        let ipcClient = TunnelControllerIPCClient(machServiceName: vpnBundleID)
+        ipcClient.register()
+
         self.networkProtectionStatusReporter = statusReporter ?? DefaultNetworkProtectionStatusReporter(
-            statusObserver: statusObserver,
-            serverInfoObserver: statusInfoObserver,
-            connectionErrorObserver: connectionErrorObserver,
+            statusObserver: ipcClient.connectionStatusObserver,
+            serverInfoObserver: ipcClient.serverInfoObserver,
+            connectionErrorObserver: ipcClient.connectionErrorObserver,
             connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
             controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
         )
