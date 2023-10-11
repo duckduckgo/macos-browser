@@ -55,9 +55,9 @@ public struct ManagementDialog: View {
         Group {
             switch model.currentDialog {
             case .recoverAccount:
-                RecoverAccountView(isRecovery: true)
+                RecoverAccountView(isRecovery: true, isActiveDevice: false)
             case .manuallyEnterCode:
-                RecoverAccountView(isRecovery: false)
+                RecoverAccountView(isRecovery: false, isActiveDevice: true)
             case .deviceSynced(let devices, let shouldShowOptions):
                 DeviceSyncedView(devices: devices, shouldShowOptions: shouldShowOptions, isSingleDevice: false)
             case .firstDeviceSetup:

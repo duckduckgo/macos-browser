@@ -23,6 +23,7 @@ struct RecoverAccountView: View {
     @EnvironmentObject var model: ManagementDialogModel
     @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
     let isRecovery: Bool
+    let isActiveDevice: Bool
     var instructionText: String {
         if isRecovery {
             return UserText.recoverSyncedDataExplanation
@@ -38,7 +39,7 @@ struct RecoverAccountView: View {
     }
 
     func submitRecoveryCode() {
-        model.delegate?.recoverDevice(using: recoveryCodeModel.recoveryCode)
+        model.delegate?.recoverDevice(using: recoveryCodeModel.recoveryCode, isActiveDevice: isActiveDevice)
     }
 
     var body: some View {
