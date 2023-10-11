@@ -167,7 +167,7 @@ public final class PixelKit {
                      allowedQueryReservedCharacters: CharacterSet? = nil,
                      includeAppVersionParameter: Bool = true,
                      dailyPixelCalendar: Calendar? = nil,
-                      onComplete: @escaping (Error?) -> Void = {_ in }) {
+                     onComplete: @escaping (Error?) -> Void = {_ in }) {
 
         let pixelName = prefixedName(for: event)
 
