@@ -74,9 +74,9 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
     }
 
     private func updateScanOperationDataDates(brokerId: Int64,
-                                  profileQueryId: Int64,
-                                  extractedProfileId: Int64?,
-                                  schedulingConfig: DataBrokerScheduleConfig,
+                                              profileQueryId: Int64,
+                                              extractedProfileId: Int64?,
+                                              schedulingConfig: DataBrokerScheduleConfig,
                                               brokerProfileQuery: BrokerProfileQueryData) throws {
 
         let currentScanPreferredRunDate = brokerProfileQuery.scanOperationData.preferredRunDate
