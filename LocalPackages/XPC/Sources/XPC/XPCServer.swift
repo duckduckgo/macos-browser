@@ -19,7 +19,6 @@
 import Foundation
 
 @objc
-// swiftlint:disable:next private_over_fileprivate
 private class XPCConnectionsManager: NSObject, NSXPCListenerDelegate {
 
     private let clientInterface: NSXPCInterface
