@@ -22,6 +22,7 @@ import Common
 protocol DataBrokerProtectionRepository {
     func save(_ profile: DataBrokerProtectionProfile) async
     func fetchProfile() -> DataBrokerProtectionProfile?
+    func deleteProfileData()
 
     func fetchChildBrokers(for parentBroker: String) -> [DataBroker]
 
@@ -77,6 +78,16 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         } catch {
             os_log("Database error: fetchProfile, error: %{public}@", log: .error, error.localizedDescription)
             return nil
+        }
+    }
+
+    public func deleteProfileData() {
+        do {
+            let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            try vault.deleteProfileData()
+        } catch {
+            os_log("Database error: removeProfileData, error: %{public}@", log: .error, error.localizedDescription)
+            return
         }
     }
 

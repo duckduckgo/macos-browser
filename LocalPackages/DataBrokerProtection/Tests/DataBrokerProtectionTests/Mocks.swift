@@ -445,6 +445,10 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
         profile
     }
 
+    func deleteProfileData() throws {
+        return
+    }
+
     func save(broker: DataBroker) throws -> Int64 {
         wasBrokerSavedCalled = true
         return 1
@@ -607,6 +611,7 @@ public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProte
 final class MockDatabase: DataBrokerProtectionRepository {
     var wasSaveProfileCalled = false
     var wasFetchProfileCalled = false
+    var wasDeleteProfileDataCalled = false
     var wasSaveOptOutOperationCalled = false
     var wasBrokerProfileQueryDataCalled = false
     var wasFetchAllBrokerProfileQueryDataCalled = false
@@ -632,6 +637,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
         wasFetchProfileCalled,
+        wasDeleteProfileDataCalled,
         wasSaveOptOutOperationCalled,
         wasBrokerProfileQueryDataCalled,
         wasFetchAllBrokerProfileQueryDataCalled,
@@ -654,6 +660,10 @@ final class MockDatabase: DataBrokerProtectionRepository {
     func fetchProfile() -> DataBrokerProtectionProfile? {
         wasFetchProfileCalled = true
         return nil
+    }
+
+    func deleteProfileData() {
+        wasDeleteProfileDataCalled = true
     }
 
     func saveOptOutOperation(optOut: OptOutOperationData, extractedProfile: ExtractedProfile) throws {

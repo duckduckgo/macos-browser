@@ -303,10 +303,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
             let dateUpdater = OperationPreferredDateUpdaterUseCase(database: database)
             try dateUpdater.updateOperationDataDates(brokerId: brokerId,
-                                                 profileQueryId: profileQueryId,
-                                                 extractedProfileId: extractedProfileId,
-                                                 schedulingConfig: schedulingConfig)
-    }
+                                                     profileQueryId: profileQueryId,
+                                                     extractedProfileId: extractedProfileId,
+                                                     schedulingConfig: schedulingConfig)
+        }
 
     private func handleOperationError(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64?, error: Error, database: DataBrokerProtectionRepository) {
         let event: HistoryEvent
