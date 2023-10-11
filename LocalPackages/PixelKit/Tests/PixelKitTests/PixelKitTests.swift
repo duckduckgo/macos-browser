@@ -40,7 +40,7 @@ final class PixelKitTests: XCTestCase {
             rawValue
         }
 
-        var parameters: [String : String]? {
+        var parameters: [String: String]? {
             switch self {
             case .testEvent, .dailyEvent, .dailyAndContinuousEvent:
                 return [
@@ -99,7 +99,7 @@ final class PixelKitTests: XCTestCase {
                                 defaultHeaders: headers,
                                 log: log,
                                 dailyPixelCalendar: nil,
-                                defaults: userDefaults) { firedPixelName, firedHeaders, parameters, allowedQueryReservedCharacters, callBackOnMainThread, onComplete in
+                                defaults: userDefaults) { firedPixelName, firedHeaders, parameters, _, _, _ in
 
             fireCallbackCalled.fulfill()
 
@@ -142,7 +142,7 @@ final class PixelKitTests: XCTestCase {
                                 defaultHeaders: headers,
                                 log: log,
                                 dailyPixelCalendar: nil,
-                                defaults: userDefaults) { firedPixelName, firedHeaders, parameters, allowedQueryReservedCharacters, callBackOnMainThread, onComplete in
+                                defaults: userDefaults) { firedPixelName, firedHeaders, parameters, _, _, _ in
 
             fireCallbackCalled.fulfill()
 
@@ -186,7 +186,7 @@ final class PixelKitTests: XCTestCase {
                                 defaultHeaders: headers,
                                 log: log,
                                 dailyPixelCalendar: nil,
-                                defaults: userDefaults) { firedPixelName, firedHeaders, parameters, allowedQueryReservedCharacters, callBackOnMainThread, onComplete in
+                                defaults: userDefaults) { firedPixelName, firedHeaders, parameters, _, _, _ in
 
             fireCallbackCalled.fulfill()
 
