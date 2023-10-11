@@ -176,19 +176,13 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         database.add(event)
                         database.updateRemovedDate(Date(), on: extractedProfileId)
 
-                        // If the profileQuery is deprecated we want set the scan date to nil
-                        if brokerProfileQueryData.profileQuery.deprecated {
-
-                        } else {
-                            try updateOperationDataDates(
-                                brokerId: brokerId,
-                                profileQueryId: profileQueryId,
-                                extractedProfileId: extractedProfileId,
-                                schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig,
-                                database: database
-                            )
-                        }
-
+                        try updateOperationDataDates(
+                            brokerId: brokerId,
+                            profileQueryId: profileQueryId,
+                            extractedProfileId: extractedProfileId,
+                            schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig,
+                            database: database
+                        )
 
                         os_log("Profile removed from optOutsData: %@", log: .dataBrokerProtection, String(describing: removedProfile))
 
@@ -309,10 +303,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
             let dateUpdater = OperationPreferredDateUpdaterUseCase(database: database)
             try dateUpdater.updateOperationDataDates(brokerId: brokerId,
-                                                 profileQueryId: profileQueryId,
-                                                 extractedProfileId: extractedProfileId,
-                                                 schedulingConfig: schedulingConfig)
-    }
+                                                     profileQueryId: profileQueryId,
+                                                     extractedProfileId: extractedProfileId,
+                                                     schedulingConfig: schedulingConfig)
+        }
 
     private func handleOperationError(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64?, error: Error, database: DataBrokerProtectionRepository) {
         let event: HistoryEvent
