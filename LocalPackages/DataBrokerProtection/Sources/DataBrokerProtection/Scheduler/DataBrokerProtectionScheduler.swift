@@ -28,7 +28,6 @@ public enum DataBrokerProtectionSchedulerStatus {
 }
 
 public protocol DataBrokerProtectionScheduler {
-    // TODO: The status publisher is going to be removed from this interface once the new UI is in place
     var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { get }
     var status: DataBrokerProtectionSchedulerStatus { get }
 

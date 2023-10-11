@@ -34,8 +34,8 @@ protocol DBPUICommunicationDelegate: AnyObject {
     func setAddressAtIndexInCurrentUserProfile(_ payload: DBPUIAddressAtIndex) -> Bool
     func removeAddressAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool
     func startScanAndOptOut() -> Bool
-    func getInitialScanState() async -> DBPUIInitialScanState?
-    func getMaintananceScanState() async -> DBPUIScanAndOptOutMaintenanceState?
+    func getInitialScanState() async -> DBPUIInitialScanState
+    func getMaintananceScanState() async -> DBPUIScanAndOptOutMaintenanceState
 }
 
 enum DBPUIReceivedMethodName: String {

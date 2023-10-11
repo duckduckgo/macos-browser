@@ -36,24 +36,6 @@ final public class DataBrokerProtectionViewController: NSViewController {
 
     private let debugPage: String = """
     <!DOCTYPE html>
-<<<<<<< HEAD
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Document</title>
-    </head>
-    <body>
-        <form>
-            <input type="button" value="Add Name" onclick="addName()">
-            <input type="button" value="Add Address" onclick="addAddress()">
-            <input type="button" value="Set Birth Year" onclick="setBirthYear()">
-            <input type="button" value="Set State" onclick="handshake()">
-            <input type="button" value="Get Profile" onclick="getProfile()">
-            <input type="button" value="Start Scan" onclick="startScan()">
-            <input type="button" value="Remove All Data" onclick="removeAllData()">
-        </form>
-=======
         <html lang="en">
         <head>
             <meta charset="UTF-8">
@@ -69,9 +51,8 @@ final public class DataBrokerProtectionViewController: NSViewController {
                 <input type="button" value="Get Profile" onclick="getProfile()">
                 <input type="button" value="Start Scan" onclick="startScan()">
                 <input type="button" value="Initial Scan Data" onclick="initialScanStatus()">
-                <input type="button" value="Maintanence Scan Data" onclick="maintenanceScanStatus()">
+                <input type="button" value="Remove All Data" onclick="removeAllData()">
             </form>
->>>>>>> deefb7ee (Add InitialScanStatus communication)
 
             <p id="output"></p>
 
@@ -123,27 +104,14 @@ final public class DataBrokerProtectionViewController: NSViewController {
                     })
                 }
 
-<<<<<<< HEAD
-            function removeAllData() {
-                window.webkit.messageHandlers.dbpui.postMessage({
-                    "context": "dbpui",
-                    "featureName": "dbpuiCommunication",
-                    "method": "deleteUserProfileData"
-                })
-            }
+                function removeAllData() {
+                    window.webkit.messageHandlers.dbpui.postMessage({
+                        "context": "dbpui",
+                        "featureName": "dbpuiCommunication",
+                        "method": "deleteUserProfileData"
+                    })
+                }
 
-            function handshake() {
-                window.webkit.messageHandlers.dbpui.postMessage({
-                    "context": "dbpui",
-                    "featureName": "dbpuiCommunication",
-                    "method": "setState",
-                    "id": "abc123",
-                    "params": {
-                        "state": "ProfileReview"
-                    }
-                })
-            }
-=======
                 function handshake() {
                     window.webkit.messageHandlers.dbpui.postMessage({
                         "context": "dbpui",
@@ -155,7 +123,18 @@ final public class DataBrokerProtectionViewController: NSViewController {
                         }
                     })
                 }
->>>>>>> deefb7ee (Add InitialScanStatus communication)
+
+                function handshake() {
+                    window.webkit.messageHandlers.dbpui.postMessage({
+                        "context": "dbpui",
+                        "featureName": "dbpuiCommunication",
+                        "method": "setState",
+                        "id": "abc123",
+                        "params": {
+                            "state": "ProfileReview"
+                        }
+                    })
+                }
 
                 function getProfile() {
                     window.webkit.messageHandlers.dbpui.postMessage({
@@ -173,17 +152,6 @@ final public class DataBrokerProtectionViewController: NSViewController {
                         "context": "dbpui",
                         "featureName": "dbpuiCommunication",
                         "method": "initialScanStatus",
-                        "id": "abc123",
-                    }).then(data => {
-                        document.getElementById('output').textContent = JSON.stringify(data, null, 4)
-                    })
-                }
-
-                function maintenanceScanStatus() {
-                    window.webkit.messageHandlers.dbpui.postMessage({
-                        "context": "dbpui",
-                        "featureName": "dbpuiCommunication",
-                        "method": "maintenanceScanStatus",
                         "id": "abc123",
                     }).then(data => {
                         document.getElementById('output').textContent = JSON.stringify(data, null, 4)
