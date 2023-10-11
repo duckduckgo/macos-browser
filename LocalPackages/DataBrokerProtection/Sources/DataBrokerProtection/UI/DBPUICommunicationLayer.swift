@@ -25,6 +25,7 @@ import Common
 protocol DBPUICommunicationDelegate: AnyObject {
     func setState()
     func getUserProfile() -> DBPUIUserProfile?
+    func deleteProfileData()
     func addNameToCurrentUserProfile(_ name: DBPUIUserProfileName) -> Bool
     func setNameAtIndexInCurrentUserProfile(_ payload: DBPUINameAtIndex) -> Bool
     func removeNameAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool
@@ -39,6 +40,7 @@ enum DBPUIReceivedMethodName: String {
     case handshake
     case setState
     case getCurrentUserProfile
+    case deleteUserProfileData
     case addNameToCurrentUserProfile
     case setNameAtIndexInCurrentUserProfile
     case removeNameAtIndexFromCurrentUserProfile
@@ -76,6 +78,7 @@ struct DBPUICommunicationLayer: Subfeature {
         case .handshake: return handshake
         case .setState: return setState
         case .getCurrentUserProfile: return getCurrentUserProfile
+        case .deleteUserProfileData: return deleteUserProfileData
         case .addNameToCurrentUserProfile: return addNameToCurrentUserProfile
         case .setNameAtIndexInCurrentUserProfile: return setNameAtIndexInCurrentUserProfile
         case .removeNameAtIndexFromCurrentUserProfile: return removeNameAtIndexFromCurrentUserProfile
@@ -124,6 +127,11 @@ struct DBPUICommunicationLayer: Subfeature {
         }
 
         return profile
+    }
+
+    func deleteUserProfileData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        delegate?.deleteProfileData()
+        return DBPUIStandardResponse(version: Constants.version, success: true)
     }
 
     func addNameToCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
