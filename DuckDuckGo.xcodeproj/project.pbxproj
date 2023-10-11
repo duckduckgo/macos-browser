@@ -12715,8 +12715,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "elle/secure-vault-app-group-support";
-				kind = branch;
+				kind = revision;
+				revision = e0b0bb70ac027e385dbb537e4090420da7b44529;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
