@@ -25,7 +25,7 @@ protocol BookmarkManager: AnyObject {
 
     func isUrlBookmarked(url: URL) -> Bool
     func isUrlFavorited(url: URL) -> Bool
-    func isHostInBookmarks(host: String) -> Bool
+    func allHosts() -> Set<String>
     func getBookmark(for url: URL) -> Bookmark?
     func getBookmark(forUrl url: String) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
@@ -122,13 +122,8 @@ final class LocalBookmarkManager: BookmarkManager {
         return list?[url.absoluteString]?.isFavorite == true
     }
 
-    func isHostInBookmarks(host: String) -> Bool {
-        return list?.allBookmarkURLsOrdered.contains(where: { bookmark in
-            if let url = bookmark.urlObject {
-                return url.host == host
-            }
-            return false
-        }) ?? false
+    func allHosts() -> Set<String> {
+        Set(list?.allBookmarkURLsOrdered.compactMap(\.urlObject?.host) ?? [])
     }
 
     func getBookmark(for url: URL) -> Bookmark? {
@@ -305,6 +300,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Favicons
 
+    @MainActor(unsafe)
     private func favicon(for host: String?) -> NSImage? {
         if let host = host {
             return faviconManagement.getCachedFavicon(for: host, sizeCategory: .small)?.image
@@ -346,8 +342,9 @@ final class LocalBookmarkManager: BookmarkManager {
             return
         }
 
-        store.resetBookmarks()
-        loadBookmarks()
-        requestSync()
+        store.resetBookmarks { [self] _ in
+            self.loadBookmarks()
+            self.requestSync()
+        }
     }
 }

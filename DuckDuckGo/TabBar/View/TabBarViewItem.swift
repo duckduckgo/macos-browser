@@ -97,7 +97,6 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var closeButton: MouseOverButton!
     @IBOutlet weak var rightSeparatorView: ColorView!
     @IBOutlet weak var mouseOverView: MouseOverView!
-    @IBOutlet weak var mouseClickView: MouseClickView!
     @IBOutlet weak var faviconWrapperView: NSView!
     @IBOutlet weak var faviconWrapperViewCenterConstraint: NSLayoutConstraint!
     @IBOutlet weak var faviconWrapperViewLeadingConstraint: NSLayoutConstraint!
@@ -319,9 +318,6 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func setupView() {
-        mouseOverView.delegate = self
-        mouseClickView.delegate = self
-
         view.wantsLayer = true
         view.layer?.cornerRadius = 7
         view.layer?.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
@@ -517,17 +513,13 @@ extension TabBarViewItem: NSMenuDelegate {
 
 }
 
-extension TabBarViewItem: MouseOverViewDelegate {
+extension TabBarViewItem: MouseClickViewDelegate {
 
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
         delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
         self.isMouseOver = isMouseOver
         view.needsLayout = true
     }
-
-}
-
-extension TabBarViewItem: MouseClickViewDelegate {
 
     func mouseClickView(_ mouseClickView: MouseClickView, otherMouseDownEvent: NSEvent) {
         // close on middle-click

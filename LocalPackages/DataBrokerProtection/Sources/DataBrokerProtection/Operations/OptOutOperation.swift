@@ -71,26 +71,22 @@ final class OptOutOperation: DataBrokerOperation {
                                  isFakeBroker: query.dataBroker.isFakeBroker,
                                  showWebView: showWebView)
 
-                do {
-                    if let optOutStep = try query.dataBroker.optOutStep() {
-                        if let actionsHandler = actionsHandler {
-                            self.actionsHandler = actionsHandler
-                        } else {
-                            self.actionsHandler = ActionsHandler(step: optOutStep)
-                        }
-
-                        if self.shouldRunNextStep() {
-                            await executeNextStep()
-                        } else {
-                            failed(with: DataBrokerProtectionError.cancelled)
-                        }
-
+                if let optOutStep = query.dataBroker.optOutStep() {
+                    if let actionsHandler = actionsHandler {
+                        self.actionsHandler = actionsHandler
                     } else {
-                        // If we try to run an optout on a broker without an optout step, we throw.
-                        failed(with: .noOptOutStep)
+                        self.actionsHandler = ActionsHandler(step: optOutStep)
                     }
-                } catch {
-                    failed(with: DataBrokerProtectionError.unknown(error.localizedDescription))
+
+                    if self.shouldRunNextStep() {
+                        await executeNextStep()
+                    } else {
+                        failed(with: DataBrokerProtectionError.cancelled)
+                    }
+
+                } else {
+                    // If we try to run an optout on a broker without an optout step, we throw.
+                    failed(with: .noOptOutStep)
                 }
             }
         }
@@ -109,6 +105,7 @@ final class OptOutOperation: DataBrokerOperation {
         } else {
             await webViewHandler?.finish() // If we executed all steps we release the web view
             stageCalculator?.fireOptOutValidate()
+            stageCalculator?.fireOptOutSubmitSuccess()
             complete(())
         }
     }

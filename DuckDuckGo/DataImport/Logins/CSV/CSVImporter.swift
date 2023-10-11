@@ -70,11 +70,23 @@ final class CSVImporter: DataImporter {
             switch source {
             case .onePassword7, .onePassword8:
                 self.init(titleIndex: 3, urlIndex: 5, usernameIndex: 6, passwordIndex: 2, maximumIndex: 7)
-            case .lastPass, .firefox, .edge, .chrome, .brave, .safari, .csv, .bookmarksHTML:
+            case .lastPass, .firefox, .edge, .chrome, .brave, .safari, .safariTechnologyPreview, .csv, .bookmarksHTML:
                 return nil
             }
         }
 
+    }
+
+    struct ImportError: DataImportError {
+        enum OperationType: Int {
+            case cannotReadFile
+            case cannotAccessSecureVault
+        }
+
+        var action: DataImportAction { .logins }
+        var source: DataImport.Source { .csv }
+        let type: OperationType
+        let underlyingError: Error?
     }
 
     private let fileURL: URL
@@ -88,16 +100,11 @@ final class CSVImporter: DataImporter {
     }
 
     func totalValidLogins() -> Int {
-        guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else {
-            return 0
-        }
-
-        var seen: [String: Bool] = [:]
+        guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else { return 0 }
 
         let logins = Self.extractLogins(from: fileContents, defaultColumnPositions: self.defaultColumnPositions)
-        let uniqueLogins = logins.filter { seen.updateValue(true, forKey: "\($0.url)-\($0.username)") == nil }
 
-        return uniqueLogins.count
+        return logins.count
     }
 
     static func extractLogins(from fileContents: String,
@@ -126,13 +133,17 @@ final class CSVImporter: DataImporter {
     // This will change to return an array of DataImport.Summary objects, indicating the status of each import type that was requested.
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
-        guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else {
-            completion(.failure(.logins(.cannotReadFile)))
+                    modalWindow: NSWindow?,
+                    completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
+        let fileContents: String
+        do {
+            fileContents = try String(contentsOf: fileURL, encoding: .utf8)
+        } catch {
+            completion(.failure(ImportError(type: .cannotReadFile, underlyingError: error)))
             return
         }
         guard let loginImporter = self.loginImporter else {
-            completion(.failure(.logins(.cannotAccessSecureVault)))
+            completion(.failure(ImportError(type: .cannotAccessSecureVault, underlyingError: nil)))
             return
         }
 
@@ -141,10 +152,13 @@ final class CSVImporter: DataImporter {
 
             do {
                 let result = try loginImporter.importLogins(loginCredentials)
-                DispatchQueue.main.async { completion(.success(.init(bookmarksResult: nil,
-                                                                     loginsResult: .completed(result)))) }
+                DispatchQueue.main.async {
+                    completion(.success(DataImport.Summary(bookmarksResult: nil, loginsResult: .completed(result))))
+                }
             } catch {
-                DispatchQueue.main.async { completion(.failure(.bookmarks(.cannotAccessSecureVault))) }
+                DispatchQueue.main.async {
+                    completion(.failure(LoginImporterError(source: .csv, error: error)))
+                }
             }
         }
     }
@@ -162,9 +176,7 @@ extension ImportedLoginCredential {
             return false
         }
 
-        if detector.numberOfMatches(in: self.url,
-                                    options: NSRegularExpression.MatchingOptions(rawValue: 0),
-                                    range: NSRange(location: 0, length: self.url.count)) > 0 {
+        if detector.numberOfMatches(in: self.url, options: [], range: self.url.fullRange) > 0 {
             return false
         }
 

@@ -121,6 +121,7 @@ final class DataBrokerProtectionUpdaterTests: XCTestCase {
             let sut = DataBrokerProtectionBrokerUpdater(repository: repository, resources: resources, vault: vault)
             repository.lastRunDate = nil
             resources.brokersList = [.init(id: 1, name: "Broker", steps: [Step](), version: "1.0.0", schedulingConfig: .mock)]
+            vault.profileQueries = [.mock]
 
             sut.checkForUpdatesInBrokerJSONFiles()
 
@@ -128,6 +129,10 @@ final class DataBrokerProtectionUpdaterTests: XCTestCase {
             XCTAssertTrue(resources.wasFetchBrokerFromResourcesFilesCalled)
             XCTAssertFalse(vault.wasBrokerUpdateCalled)
             XCTAssertTrue(vault.wasBrokerSavedCalled)
+            XCTAssertTrue(areDatesEqualIgnoringSeconds(
+                date1: Date(),
+                date2: vault.lastPreferredRunDateOnScan)
+            )
         } else {
             XCTFail("Mock vault issue")
         }

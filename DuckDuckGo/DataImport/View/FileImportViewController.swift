@@ -107,7 +107,7 @@ final class FileImportViewController: NSViewController {
 
     private func renderAwaitingFileSelectionState() {
         switch importSource {
-        case .safari:
+        case .safari, .safariTechnologyPreview:
             descriptionLabel.isHidden = true
             safariInfoView.isHidden = false
             lastPassInfoView.isHidden = true
@@ -208,7 +208,7 @@ final class FileImportViewController: NSViewController {
                 switch importSource {
                 case .bookmarksHTML:
                     delegate?.fileImportViewController(self, didSelectBookmarksFileWithURL: selectedURL)
-                case .csv, .onePassword8, .onePassword7, .lastPass, .safari:
+                case .csv, .onePassword8, .onePassword7, .lastPass, .safari, .safariTechnologyPreview:
                     delegate?.fileImportViewController(self, didSelectCSVFileWithURL: selectedURL)
                 case .brave, .chrome, .edge, .firefox:
                     break

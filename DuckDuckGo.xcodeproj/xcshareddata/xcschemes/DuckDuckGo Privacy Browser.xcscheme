@@ -167,7 +167,7 @@
                BlueprintIdentifier = "NetworkProtectionUITests"
                BuildableName = "NetworkProtectionUITests"
                BlueprintName = "NetworkProtectionUITests"
-               ReferencedContainer = "container:LocalPackages/NetworkProtectionUI">
+               ReferencedContainer = "container:LocalPackages/NetworkProtectionMac">
             </BuildableReference>
          </TestableReference>
       </Testables>

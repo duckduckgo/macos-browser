@@ -91,10 +91,12 @@ class BookmarksHTMLReaderTests: XCTestCase {
         let result = reader.readBookmarks()
 
         XCTAssertThrowsError(try result.get(), "", { error in
-            guard case BookmarkHTMLReader.ImportError.unexpectedBookmarksFileFormat = error else {
+            guard let error = error as? BookmarkHTMLReader.ImportError else {
                 XCTFail("Unexpected error type: \(String(reflecting: error))")
                 return
             }
+            XCTAssertEqual(error.type, .parseXml)
+            XCTAssertEqual((error.underlyingError as NSError?)?.domain, XMLParser.errorDomain)
         })
     }
 }

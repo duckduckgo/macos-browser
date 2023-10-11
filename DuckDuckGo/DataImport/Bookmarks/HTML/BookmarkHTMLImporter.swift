@@ -39,32 +39,26 @@ final class BookmarkHTMLImporter: DataImporter {
     func importData(
         types: [DataImport.DataType],
         from profile: DataImport.BrowserProfile?,
-        completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void
+        modalWindow: NSWindow?,
+        completion: @escaping (DataImportResult<DataImport.Summary>) -> Void
     ) {
         DispatchQueue.global(qos: .userInitiated).async {
-
             switch self.bookmarkReaderResult {
             case let .success(importedData):
-                do {
-                    let source: BookmarkImportSource = importedData.source ?? .thirdPartyBrowser(.bookmarksHTML)
-                    let bookmarksResult = try self.bookmarkImporter.importBookmarks(importedData.bookmarks, source: source)
-                    DispatchQueue.main.async {
-                        completion(.success(.init(bookmarksResult: bookmarksResult)))
-                    }
-                } catch {
-                    DispatchQueue.main.async {
-                        completion(.failure(.bookmarks(.cannotAccessCoreData)))
-                    }
+                let source: BookmarkImportSource = importedData.source ?? .thirdPartyBrowser(.bookmarksHTML)
+                let bookmarksResult = self.bookmarkImporter.importBookmarks(importedData.bookmarks, source: source)
+                DispatchQueue.main.async {
+                    completion(.success(DataImport.Summary(bookmarksResult: bookmarksResult)))
                 }
             case let .failure(error):
                 DispatchQueue.main.async {
-                    completion(.failure(.bookmarks(error)))
+                    completion(.failure(error))
                 }
             }
         }
     }
 
-    private lazy var bookmarkReaderResult: Result<HTMLImportedBookmarks, BookmarkHTMLReader.ImportError> = {
+    private lazy var bookmarkReaderResult: DataImportResult<HTMLImportedBookmarks> = {
         let bookmarkReader = BookmarkHTMLReader(bookmarksFileURL: self.fileURL)
         return bookmarkReader.readBookmarks()
     }()

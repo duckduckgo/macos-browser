@@ -65,7 +65,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         let tab = Tab(content: .none, extensionsBuilder: extensionsBuilder)
         window = WindowsManager.openNewWindow(with: tab)!
 
-        let url = URL(string: "https://privacy-test-pages.glitch.me/privacy-protections/amp/")!
+        let url = URL(string: "https://privacy-test-pages.site/privacy-protections/amp/")!
         _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
 
         let itemsCount = try await tab.webView.evaluateJavaScript("document.getElementsByTagName('li').length") as? Int ?? 0
@@ -148,7 +148,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         let tab = Tab(content: .none, extensionsBuilder: extensionsBuilder)
         window = WindowsManager.openNewWindow(with: tab)!
 
-        let url = URL(string: "https://privacy-test-pages.glitch.me/privacy-protections/referrer-trimming/")!
+        let url = URL(string: "https://privacy-test-pages.site/privacy-protections/referrer-trimming/")!
         _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
 
         // run test
@@ -188,9 +188,9 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         XCTAssertTrue(results.count > 0)
         for result in results {
             if result.id.hasPrefix("1p") {
-                XCTAssertEqual(result.value?.string, "https://privacy-test-pages.glitch.me/privacy-protections/referrer-trimming/", result.id)
+                XCTAssertEqual(result.value?.string, "https://privacy-test-pages.site/privacy-protections/referrer-trimming/", result.id)
             } else {
-                XCTAssertEqual(result.value?.string, "https://privacy-test-pages.glitch.me/", result.id)
+                XCTAssertEqual(result.value?.string, "https://privacy-test-pages.site/", result.id)
             }
         }
     }
@@ -201,7 +201,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         window = WindowsManager.openNewWindow(with: tab)!
         let tabViewModel = (window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
 
-        let url = URL(string: "https://privacy-test-pages.glitch.me/privacy-protections/gpc/")!
+        let url = URL(string: "https://privacy-test-pages.site/privacy-protections/gpc/")!
         // disable GPC redirects
         PrivacySecurityPreferences.shared.gpcEnabled = false
         _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()

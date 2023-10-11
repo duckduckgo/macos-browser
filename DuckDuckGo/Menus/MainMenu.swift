@@ -27,6 +27,10 @@ import WebKit
 import NetworkProtection
 #endif
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 @MainActor
 final class MainMenu: NSMenu {
 
@@ -82,6 +86,7 @@ final class MainMenu: NSMenu {
     @IBOutlet weak var toggleBookmarksShortcutMenuItem: NSMenuItem?
     @IBOutlet weak var toggleDownloadsShortcutMenuItem: NSMenuItem?
     @IBOutlet weak var toggleNetworkProtectionShortcutMenuItem: NSMenuItem?
+    @IBOutlet weak var toggleHomeButtonMenuItem: NSMenuItem?
 
     // MARK: - Debug
 
@@ -105,6 +110,12 @@ final class MainMenu: NSMenu {
             self.debugMenuItem = nil
             return
         }
+#endif
+
+#if SUBSCRIPTION
+        debugMenuItem.submenu!.addItem(SubscriptionDebugMenu(currentViewController: {
+            WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+        }))
 #endif
 
         if debugMenuItem.submenu?.items.contains(loggingMenuItem) == false {
@@ -289,6 +300,7 @@ final class MainMenu: NSMenu {
         toggleAutofillShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         toggleBookmarksShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
         toggleDownloadsShortcutMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
+        toggleHomeButtonMenuItem?.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .homeButton)
 
 #if NETWORK_PROTECTION
         if NetworkProtectionKeychainTokenStore().isFeatureActivated {

@@ -82,10 +82,11 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
                 self?.showReconnectingNotification()
             }.store(in: &cancellables)
 
-        distributedNotificationCenter.publisher(for: .showIssuesResolvedNotification)
+        distributedNotificationCenter.publisher(for: .showConnectedNotification)
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.showReconnectedNotification()
+            .sink { [weak self] notification in
+                let serverLocation = notification.userInfo?[NetworkProtectionNotification.UserInfoKey.connectedServerLocation] as? String
+                self?.showConnectedNotification(serverLocation: serverLocation)
             }.store(in: &cancellables)
 
         distributedNotificationCenter.publisher(for: .showIssuesNotResolvedNotification)
@@ -118,9 +119,9 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
 
     // MARK: - Showing Notifications
 
-    func showReconnectedNotification() {
+    func showConnectedNotification(serverLocation: String?) {
         os_log("Presenting reconnected notification", log: .networkProtection, type: .info)
-        notificationsPresenter.showReconnectedNotification()
+        notificationsPresenter.showConnectedNotification(serverLocation: serverLocation)
     }
 
     func showReconnectingNotification() {

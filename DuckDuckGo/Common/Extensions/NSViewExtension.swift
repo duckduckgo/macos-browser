@@ -22,6 +22,25 @@ import Common
 
 extension NSView {
 
+    // Since macOS 14 Sonoma view has clipsToBound == false by default
+    func visibleRectClampedToBounds() -> NSRect {
+        var visibleRect = self.visibleRect
+
+        guard !clipsToBounds, let superview else { return visibleRect }
+        let frame = self.frame
+        visibleRect = frame
+
+        if superview.isFlipped != isFlipped {
+            visibleRect.origin.y = superview.bounds.height - visibleRect.origin.y - visibleRect.height
+        }
+
+        visibleRect = visibleRect.intersection(superview.visibleRect)
+        visibleRect.origin.x -= frame.origin.x
+        visibleRect.origin.y -= frame.origin.y
+
+        return visibleRect
+    }
+
     func setCornerRadius(_ radius: CGFloat) {
         wantsLayer = true
         layer?.masksToBounds = true
@@ -127,7 +146,7 @@ extension NSView {
 
     func mouseLocationInsideBounds(_ point: NSPoint?) -> NSPoint? {
         withMouseLocationInViewCoordinates(point) { locationInView in
-            guard self.visibleRect.contains(locationInView) else { return nil }
+            guard self.visibleRectClampedToBounds().contains(locationInView) else { return nil }
             return locationInView
         }
     }

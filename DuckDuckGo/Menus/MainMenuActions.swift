@@ -386,6 +386,15 @@ extension MainViewController {
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
     }
 
+    @IBAction func toggleHomeButton(_ sender: Any) {
+        LocalPinningManager.shared.togglePinning(for: .homeButton)
+        if LocalPinningManager.shared.isPinned(.homeButton) {
+            Pixel.fire(.enableHomeButton)
+        } else {
+            Pixel.fire(.disableHomeButton)
+        }
+    }
+
     // MARK: - History
 
     @IBAction func back(_ sender: Any?) {
@@ -618,6 +627,11 @@ extension MainViewController {
         UserDefaultsWrapper<Bool>.clear(.grammarCheckEnabledOnce)
     }
 
+    @IBAction func openAppContainerInFinder(_ sender: Any?) {
+        let containerURL = URL.sandboxApplicationSupportURL
+        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: containerURL.path)
+    }
+
     @IBAction func triggerFatalError(_ sender: Any?) {
         fatalError("Fatal error triggered from the Debug menu")
     }
@@ -676,6 +690,10 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay0.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay7.rawValue)
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
+    }
+
+    @IBAction func resetDailyPixels(_ sender: Any?) {
+        UserDefaults.standard.removePersistentDomain(forName: DailyPixel.Constant.dailyPixelStorageIdentifier)
     }
 
     @IBAction func changeInstallDateToToday(_ sender: Any?) {
@@ -766,6 +784,37 @@ extension MainViewController {
 #endif
     }
 
+    @IBAction func resetNetworkProtectionActivationDate(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: nil)
+    }
+
+    @IBAction func resetNetworkProtectionRemoteMessages(_ sender: Any?) {
+        DefaultNetworkProtectionRemoteMessagingStorage().removeStoredAndDismissedMessages()
+        DefaultNetworkProtectionRemoteMessaging(minimumRefreshInterval: 0).resetLastRefreshTimestamp()
+    }
+
+    @IBAction func overrideNetworkProtectionActivationDateToNow(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: Date())
+    }
+
+    @IBAction func overrideNetworkProtectionActivationDateTo5DaysAgo(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: Date.daysAgo(5))
+    }
+
+    @IBAction func overrideNetworkProtectionActivationDateTo10DaysAgo(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: Date.daysAgo(10))
+    }
+
+    private func overrideNetworkProtectionActivationDate(to date: Date?) {
+        let store = DefaultWaitlistActivationDateStore()
+
+        if let date {
+            store.updateActivationDate(date)
+        } else {
+            store.removeDates()
+        }
+    }
+
     // MARK: - Developer Tools
 
     @IBAction func toggleDeveloperTools(_ sender: Any?) {
@@ -796,11 +845,6 @@ extension MainViewController: NSMenuItemValidation {
     // swiftlint:disable cyclomatic_complexity
     // swiftlint:disable function_body_length
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
-        // Enable "Move to another Display" menu item (is there a better way?)
-        for item in menuItem.menu!.items where item.action == Selector(("_moveToDisplay:")) {
-            item.isEnabled = true
-        }
-
         switch menuItem.action {
         // Back/Forward
         case #selector(MainViewController.back(_:)):

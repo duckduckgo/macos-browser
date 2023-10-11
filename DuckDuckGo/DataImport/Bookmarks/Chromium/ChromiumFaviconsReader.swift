@@ -25,10 +25,20 @@ final class ChromiumFaviconsReader {
         static let faviconsDatabaseName = "Favicons"
     }
 
-    enum ImportError: Error {
-        case noFaviconsDatabaseFound
-        case failedToTemporarilyCopyFile
-        case unexpectedFaviconsDatabaseFormat
+    struct ImportError: DataImportError {
+        enum OperationType: Int {
+            case copyTemporaryFile
+            case dbOpen
+            case fetchAllFavicons
+        }
+
+        var action: DataImportAction { .favicons }
+        let source: DataImport.Source
+        let type: OperationType
+        let underlyingError: Error?
+    }
+    func importError(type: ImportError.OperationType, underlyingError: Error) -> ImportError {
+        ImportError(source: source, type: type, underlyingError: underlyingError)
     }
 
     final class ChromiumFavicon: FetchableRecord {
@@ -50,41 +60,42 @@ final class ChromiumFaviconsReader {
     }
 
     private let chromiumFaviconsDatabaseURL: URL
+    private var currentOperationType: ImportError.OperationType = .copyTemporaryFile
+    private let source: DataImport.Source
 
-    init(chromiumDataDirectoryURL: URL) {
+    init(chromiumDataDirectoryURL: URL, source: DataImport.Source) {
         self.chromiumFaviconsDatabaseURL = chromiumDataDirectoryURL.appendingPathComponent(Constants.faviconsDatabaseName)
+        self.source = source
     }
 
-    func readFavicons() -> Result<[String: [ChromiumFavicon]], ChromiumFaviconsReader.ImportError> {
+    func readFavicons() -> DataImportResult<[String: [ChromiumFavicon]]> {
         do {
+            currentOperationType = .copyTemporaryFile
             return try chromiumFaviconsDatabaseURL.withTemporaryFile { temporaryDatabaseURL in
-                return readFavicons(fromDatabaseURL: temporaryDatabaseURL)
+                let favicons = try readFavicons(fromDatabaseURL: temporaryDatabaseURL)
+                return .success(favicons)
             }
+        } catch let error as ImportError {
+            return .failure(error)
         } catch {
-            return .failure(.failedToTemporarilyCopyFile)
+            return .failure(importError(type: currentOperationType, underlyingError: error))
         }
     }
 
     // MARK: - Private
 
-    private func readFavicons(fromDatabaseURL databaseURL: URL) -> Result<[String: [ChromiumFavicon]], ChromiumFaviconsReader.ImportError> {
-        do {
-            let queue = try DatabaseQueue(path: databaseURL.path)
+    private func readFavicons(fromDatabaseURL databaseURL: URL) throws -> [String: [ChromiumFavicon]] {
+        currentOperationType = .dbOpen
+        let queue = try DatabaseQueue(path: databaseURL.path)
 
-            let favicons: [ChromiumFavicon] = try queue.read { database in
-                guard let favicons = try? ChromiumFavicon.fetchAll(database, sql: allFaviconsQuery()) else {
-                    throw ImportError.unexpectedFaviconsDatabaseFormat
-                }
-
-                return favicons
-            }
-
-            let faviconsByURL = Dictionary(grouping: favicons, by: { $0.pageURL })
-
-            return .success(faviconsByURL)
-        } catch {
-            return .failure(.unexpectedFaviconsDatabaseFormat)
+        currentOperationType = .fetchAllFavicons
+        let favicons: [ChromiumFavicon] = try queue.read { database in
+            try ChromiumFavicon.fetchAll(database, sql: allFaviconsQuery())
         }
+
+        let faviconsByURL = Dictionary(grouping: favicons, by: { $0.pageURL })
+
+        return faviconsByURL
     }
 
     // MARK: - Database Queries

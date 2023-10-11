@@ -21,6 +21,12 @@ import SwiftUI
 import SwiftUIExtensions
 import SyncUI
 
+#if SUBSCRIPTION
+import Account
+import Purchase
+import Subscription
+#endif
+
 fileprivate extension Preferences.Const {
     static let sidebarWidth: CGFloat = 256
     static let paneContentWidth: CGFloat = 524
@@ -46,13 +52,17 @@ extension Preferences {
 
                             switch model.selectedPane {
                             case .general:
-                                GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences())
+                                GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences.shared)
                             case .sync:
                                 SyncView()
                             case .appearance:
                                 AppearanceView(model: .shared)
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
+#if SUBSCRIPTION
+                            case .subscription:
+                                makeSubscriptionView()
+#endif
                             case .autofill:
                                 AutofillView(model: AutofillPreferencesModel())
                             case .downloads:
@@ -80,8 +90,34 @@ extension Preferences {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color("InterfaceBackgroundColor"))
         }
-    }
 
+#if SUBSCRIPTION
+        private func makeSubscriptionView() -> some View {
+            let actionHandler = PreferencesSubscriptionActionHandlers(openURL: { url in
+                WindowControllersManager.shared.show(url: url, newTab: true)
+            }, manageSubscriptionInAppStore: {
+                NSWorkspace.shared.open(URL(string: "macappstores://apps.apple.com/account/subscriptions")!)
+            }, openVPN: {
+                print("openVPN")
+            }, openPersonalInformationRemoval: {
+                print("openPersonalInformationRemoval")
+            }, openIdentityTheftRestoration: {
+                print("openIdentityTheftRestoration")
+            })
+
+            let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
+                AccountManager().signInByRestoringPastPurchases()
+            }, openURLHandler: { url in
+                WindowControllersManager.shared.show(url: url, newTab: true)
+            }, goToSyncPreferences: {
+                self.model.selectPane(.sync)
+            })
+
+            let model = PreferencesSubscriptionModel(actionHandler: actionHandler, sheetActionHandler: sheetActionHandler)
+            return Subscription.PreferencesSubscriptionView(model: model)
+        }
+#endif
+    }
 }
 
 struct SyncView: View {

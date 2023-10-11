@@ -25,10 +25,17 @@ final class FirefoxFaviconsReader {
         static let faviconsDatabaseName = "favicons.sqlite"
     }
 
-    enum ImportError: Error {
-        case noFaviconsDatabaseFound
-        case failedToTemporarilyCopyFile
-        case unexpectedFaviconsDatabaseFormat
+    struct ImportError: DataImportError {
+        enum OperationType: Int {
+            case copyTemporaryFile
+            case dbOpen
+            case fetchAllFavicons
+        }
+
+        var action: DataImportAction { .favicons }
+        var source: DataImport.Source { .firefox }
+        let type: OperationType
+        let underlyingError: Error?
     }
 
     final class FirefoxFavicon: FetchableRecord {
@@ -50,41 +57,41 @@ final class FirefoxFaviconsReader {
     }
 
     private let firefoxFaviconsDatabaseURL: URL
+    private var currentOperationType: ImportError.OperationType = .copyTemporaryFile
 
     init(firefoxDataDirectoryURL: URL) {
         self.firefoxFaviconsDatabaseURL = firefoxDataDirectoryURL.appendingPathComponent(Constants.faviconsDatabaseName)
     }
 
-    func readFavicons() -> Result<[String: [FirefoxFavicon]], FirefoxFaviconsReader.ImportError> {
+    func readFavicons() -> DataImportResult<[String: [FirefoxFavicon]]> {
         do {
+            currentOperationType = .copyTemporaryFile
             return try firefoxFaviconsDatabaseURL.withTemporaryFile { temporaryDatabaseURL in
-                return readFavicons(fromDatabaseURL: temporaryDatabaseURL)
+                let favicons = try readFavicons(fromDatabaseURL: temporaryDatabaseURL)
+                return .success(favicons)
             }
+        } catch let error as ImportError {
+            return .failure(error)
         } catch {
-            return .failure(.failedToTemporarilyCopyFile)
+            return .failure(ImportError(type: currentOperationType, underlyingError: error))
         }
     }
 
     // MARK: - Private
 
-    private func readFavicons(fromDatabaseURL databaseURL: URL) -> Result<[String: [FirefoxFavicon]], FirefoxFaviconsReader.ImportError> {
-        do {
-            let queue = try DatabaseQueue(path: databaseURL.path)
+    private func readFavicons(fromDatabaseURL databaseURL: URL) throws -> [String: [FirefoxFavicon]] {
+        currentOperationType = .dbOpen
 
-            let favicons: [FirefoxFavicon] = try queue.read { database in
-                guard let favicons = try? FirefoxFavicon.fetchAll(database, sql: allFaviconsQuery()) else {
-                    throw ImportError.unexpectedFaviconsDatabaseFormat
-                }
+        let queue = try DatabaseQueue(path: databaseURL.path)
 
-                return favicons
-            }
-
-            let faviconsByURL = Dictionary(grouping: favicons, by: { $0.pageURL })
-
-            return .success(faviconsByURL)
-        } catch {
-            return .failure(.unexpectedFaviconsDatabaseFormat)
+        currentOperationType = .fetchAllFavicons
+        let favicons: [FirefoxFavicon] = try queue.read { database in
+            try FirefoxFavicon.fetchAll(database, sql: allFaviconsQuery())
         }
+
+        let faviconsByURL = Dictionary(grouping: favicons, by: { $0.pageURL })
+
+        return faviconsByURL
     }
 
     // MARK: - Database Queries

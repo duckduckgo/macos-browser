@@ -21,6 +21,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 final class LocalBookmarkManagerTests: XCTestCase {
 
     enum BookmarkManagerError: Error {
@@ -160,6 +161,7 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
 fileprivate extension LocalBookmarkManager {
 
+    @MainActor(unsafe)
     static var aManager: (LocalBookmarkManager, BookmarkStoreMock) {
         let bookmarkStoreMock = BookmarkStoreMock()
         let faviconManagerMock = FaviconManagerMock()

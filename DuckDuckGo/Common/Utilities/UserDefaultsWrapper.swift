@@ -74,6 +74,8 @@ public struct UserDefaultsWrapper<T> {
         case fireInfoPresentedOnce = "fire.info.presented.once"
 
         case restorePreviousSession = "preferences.startup.restore-previous-session"
+        case launchToCustomHomePage = "preferences.startup.launch-to-custom-home-page"
+        case customHomePageURL = "preferences.startup.customHomePageURL"
         case currentThemeName = "com.duckduckgo.macos.currentThemeNameKey"
         case showFullURL = "preferences.appearance.show-full-url"
         case showAutocompleteSuggestions = "preferences.appearance.show-autocomplete-suggestions"
@@ -112,7 +114,6 @@ public struct UserDefaultsWrapper<T> {
         case homePageIsContinueSetupVisible = "home.page.is.continue.setup.visible"
         case homePageIsRecentActivityVisible = "home.page.is.recent.activity.visible"
         case homePageIsFirstSession = "home.page.is.first.session"
-        case homePageShowNetworkProtectionBetaEndedNotice = "home.page.network-protection.show-beta-ended-notice"
 
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 
@@ -175,6 +176,7 @@ public struct UserDefaultsWrapper<T> {
     enum RemovedKeys: String, CaseIterable {
         case passwordManagerDoNotPromptDomains = "com.duckduckgo.passwordmanager.do-not-prompt-domains"
         case incrementalFeatureFlagTestHasSentPixel = "network-protection.incremental-feature-flag-test.has-sent-pixel"
+        case homePageShowNetworkProtectionBetaEndedNotice = "home.page.network-protection.show-beta-ended-notice"
     }
 
     private let key: Key

@@ -265,7 +265,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             // start the tunnel at once, and instead require that the user enables the toggle.
             //
             if onboardingStatusRawValue == OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue {
-                onboardingStatusRawValue = OnboardingStatus.completed.rawValue
+                onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
                 return
             }
 #endif
@@ -569,6 +569,16 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         } else {
             Self.simulationOptions.setEnabled(true, option: .crashFatalError)
             try await sendProviderMessageToActiveSession(.simulateTunnelFatalError)
+        }
+    }
+
+    @MainActor
+    func toggleShouldSimulateConnectionInterruption() async throws {
+        if Self.simulationOptions.isEnabled(.connectionInterruption) {
+            Self.simulationOptions.setEnabled(false, option: .connectionInterruption)
+        } else {
+            Self.simulationOptions.setEnabled(true, option: .connectionInterruption)
+            try await sendProviderMessageToActiveSession(.simulateConnectionInterruption)
         }
     }
 

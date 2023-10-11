@@ -55,7 +55,13 @@ final class DataBrokerProtectionProcessor {
                       showWebView: showWebView) {
             os_log("Scans done", log: .dataBrokerProtection)
             completion?()
+            self.calculateMisMatches()
         }
+    }
+
+    private func calculateMisMatches() {
+        let mismatchUseCase = MismatchCalculatorUseCase(database: database, pixelHandler: pixelHandler)
+        mismatchUseCase.calculateMismatches()
     }
 
     func runAllOptOutOperations(showWebView: Bool = false, completion: (() -> Void)? = nil) {
@@ -103,8 +109,7 @@ final class DataBrokerProtectionProcessor {
             brokerUpdater.checkForUpdatesInBrokerJSONFiles()
         }
 
-        let profileId: Int64 = 1 // We assume one profile for now
-        let brokersProfileData = database.fetchAllBrokerProfileQueryData(for: profileId)
+        let brokersProfileData = database.fetchAllBrokerProfileQueryData()
         let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
                                                                                   operationType: operationType,
                                                                                   priorityDate: priorityDate,
