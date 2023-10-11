@@ -1,5 +1,5 @@
 //
-//  ErrorWithParameters.swift
+//  String+StaticString.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,8 +18,10 @@
 
 import Foundation
 
-protocol ErrorWithParameters {
-
-    var errorParameters: [String: String] { get }
-
+extension String {
+    init(_ staticString: StaticString) {
+        self = staticString.withUTF8Buffer {
+            String(decoding: $0, as: UTF8.self)
+        }
+    }
 }

@@ -23,6 +23,7 @@ import DDGSync
 import Bookmarks
 import Cocoa
 import Persistence
+import PixelKit
 
 // swiftlint:disable:next type_body_length
 final class LocalBookmarkStore: BookmarkStore {
@@ -182,19 +183,19 @@ final class LocalBookmarkStore: BookmarkStore {
                 let processedErrors = CoreDataErrorsParser.parse(error: innerError as NSError)
 
                 var params = processedErrors.errorPixelParameters
-                params[Pixel.Parameters.errorSource] = source
+                params[PixelKit.Parameters.errorSource] = source
                 Pixel.fire(.debug(event: .bookmarksSaveFailed, error: error),
                            withAdditionalParameters: params)
             } else {
                 Pixel.fire(.debug(event: .bookmarksSaveFailed, error: localError),
-                           withAdditionalParameters: [Pixel.Parameters.errorSource: source])
+                           withAdditionalParameters: [PixelKit.Parameters.errorSource: source])
             }
         } else {
             let error = error as NSError
             let processedErrors = CoreDataErrorsParser.parse(error: error)
 
             var params = processedErrors.errorPixelParameters
-            params[Pixel.Parameters.errorSource] = source
+            params[PixelKit.Parameters.errorSource] = source
             Pixel.fire(.debug(event: .bookmarksSaveFailed, error: error),
                        withAdditionalParameters: params)
         }
