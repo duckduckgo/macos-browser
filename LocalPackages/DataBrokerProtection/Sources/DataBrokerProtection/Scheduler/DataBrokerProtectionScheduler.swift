@@ -21,16 +21,16 @@ import Common
 import BrowserServicesKit
 import Combine
 
-public enum DataBrokerProtectionSchedulerStatus {
+public enum DataBrokerProtectionSchedulerStatus: Codable {
     case stopped
     case idle
     case running
 }
 
 public protocol DataBrokerProtectionScheduler {
-    
-    //var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { get }
-    //var status: DataBrokerProtectionSchedulerStatus { get }
+
+    var status: DataBrokerProtectionSchedulerStatus { get }
+    var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { get }
 
     func startScheduler(showWebView: Bool)
     func stopScheduler()
@@ -76,7 +76,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
     @Published public var status: DataBrokerProtectionSchedulerStatus = .stopped
 
-    public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { $status}
+    public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { $status }
 
     private lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 

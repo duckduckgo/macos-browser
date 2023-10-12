@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Combine
 import Common
 
 /// A scheduler that works through IPC to request the scheduling to a different process
@@ -29,9 +30,17 @@ public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionSchedul
         self.ipcClient = ipcClient
     }
 
+    public var status: DataBrokerProtectionSchedulerStatus {
+        ipcClient.schedulerStatus
+    }
+
+    public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher {
+        ipcClient.schedulerStatusPublisher
+    }
+
     public func profileModified() {
         //ipcConnection.profileModified()
-        ipcClient.restart()
+        ipcClient.restartScheduler()
     }
 /*
     public func startScan() {
@@ -40,12 +49,12 @@ public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionSchedul
 */
     public func startScheduler(showWebView: Bool) {
         //ipcConnection.startScheduler(showWebView: showWebView)
-        ipcClient.start()
+        ipcClient.startScheduler()
     }
 
     public func stopScheduler() {
         //ipcConnection.stopScheduler()
-        ipcClient.stop()
+        ipcClient.stopScheduler()
     }
 
     public func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
@@ -54,7 +63,7 @@ public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionSchedul
 
     public func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
         //ipcConnection.scanAllBrokers(showWebView: showWebView, completion: completion)
-        ipcClient.start()
+        ipcClient.startScheduler()
     }
 
     public func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {

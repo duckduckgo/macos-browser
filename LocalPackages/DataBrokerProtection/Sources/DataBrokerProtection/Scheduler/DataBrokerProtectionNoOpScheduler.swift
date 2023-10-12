@@ -23,6 +23,15 @@ import Foundation
 /// Do not use this for any production code.
 ///
 final class DataBrokerProtectionNoOpScheduler: DataBrokerProtectionScheduler {
+
+    private(set) public var status: DataBrokerProtectionSchedulerStatus = .idle
+
+    private var internalStatusPublisher: Published<DataBrokerProtectionSchedulerStatus> = .init(initialValue: .idle)
+
+    public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher {
+        internalStatusPublisher.projectedValue
+    }
+
     func profileModified() { }
     //func startScanPressed() { }
     func startScheduler(showWebView: Bool) { }

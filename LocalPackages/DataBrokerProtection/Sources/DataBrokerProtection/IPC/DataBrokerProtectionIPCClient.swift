@@ -16,18 +16,21 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 import NetworkProtection
 import XPCHelper
 
-/// This protocol describes the client-side IPC interface for controlling the tunnel
+/// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
 public protocol IPCClientInterface: AnyObject {
+    func schedulerStatusChanges(_ status: DataBrokerProtectionSchedulerStatus)
 }
 
 /// This is the XPC interface with parameters that can be packed properly
 @objc
 protocol XPCClientInterface {
+    func schedulerStatusChanged(_ payload: Data)
 }
 
 public final class DataBrokerProtectionIPCClient {
@@ -36,9 +39,16 @@ public final class DataBrokerProtectionIPCClient {
 
     let xpc: XPCClient<XPCClientInterface, XPCServerInterface>
 
-    /// The delegate.
-    ///
-    public weak var clientDelegate: IPCClientInterface?
+    // MARK: - Scheduler Status
+
+    @Published
+    private(set) public var schedulerStatus: DataBrokerProtectionSchedulerStatus = .idle
+
+    public var schedulerStatusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher {
+        $schedulerStatus
+    }
+
+    // MARK: - Initializers
 
     public init(machServiceName: String) {
         let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
@@ -60,43 +70,28 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         try? xpc.server().register()
     }
 
-    public func start() {
-        try? xpc.server().start()
+    public func startScheduler() {
+        try? xpc.server().startScheduler()
     }
 
-    public func stop() {
-        try? xpc.server().stop()
+    public func stopScheduler() {
+        try? xpc.server().stopScheduler()
     }
 
-    public func restart() {
-        try? xpc.server().restart()
+    public func restartScheduler() {
+        try? xpc.server().restartScheduler()
     }
 }
 
 // MARK: - Incoming communication from the server
 
 extension DataBrokerProtectionIPCClient: XPCClientInterface {
-/*
-    func errorChanged(error: String?) {
-        connectionErrorObserver.publish(error)
-        clientDelegate?.errorChanged(error)
-    }
+    func schedulerStatusChanged(_ payload: Data) {
+        guard let status = try? JSONDecoder().decode(DataBrokerProtectionSchedulerStatus.self, from: payload) else {
 
-    func serverInfoChanged(payload: Data) {
-        guard let serverInfo = try? JSONDecoder().decode(NetworkProtectionStatusServerInfo.self, from: payload) else {
             return
         }
 
-        serverInfoObserver.publish(serverInfo)
-        clientDelegate?.serverInfoChanged(serverInfo)
+        schedulerStatus = status
     }
-
-    func statusChanged(payload: Data) {
-        guard let status = try? JSONDecoder().decode(ConnectionStatus.self, from: payload) else {
-            return
-        }
-
-        connectionStatusObserver.publish(status)
-        clientDelegate?.statusChanged(status)
-    }*/
 }

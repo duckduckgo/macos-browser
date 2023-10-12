@@ -29,17 +29,19 @@ public protocol IPCServerInterface: AnyObject {
     ///
     func register()
 
+    // MARK: - Scheduler
+
     /// Start the scheduler
     ///
-    func start()
+    func startScheduler()
 
     /// Stop the scheduler
     ///
-    func stop()
+    func stopScheduler()
 
     /// Restart the scheduler
     ///
-    func restart()
+    func restartScheduler()
 }
 
 /// This protocol describes the server-side XPC interface.
@@ -55,17 +57,19 @@ protocol XPCServerInterface {
     ///
     func register()
 
+    // MARK: - Scheduler
+
     /// Start the scheduler
     ///
-    func start()
+    func startScheduler()
 
     /// Stop the scheduler
     ///
-    func stop()
+    func stopScheduler()
 
     /// Restart the scheduler
     ///
-    func restart()
+    func restartScheduler()
 }
 
 public final class DataBrokerProtectionIPCServer {
@@ -95,30 +99,8 @@ public final class DataBrokerProtectionIPCServer {
 // MARK: - Outgoing communication to the clients
 
 extension DataBrokerProtectionIPCServer: IPCClientInterface {
-/*
-    public func errorChanged(_ error: String?) {
-        xpc.forEachClient { client in
-            client.errorChanged(error: error)
-        }
-    }
-
-    public func serverInfoChanged(_ serverInfo: NetworkProtectionStatusServerInfo) {
-        let payload: Data
-
-        do {
-            payload = try JSONEncoder().encode(serverInfo)
-        } catch {
-            return
-        }
-
-        xpc.forEachClient { client in
-            client.serverInfoChanged(payload: payload)
-        }
-    }
-
-    /// Sends a statusChanged IPC message to all connections, through the proxy objects.
-    ///
-    public func statusChanged(_ status: ConnectionStatus) {
+    
+    public func schedulerStatusChanges(_ status: DataBrokerProtectionSchedulerStatus) {
         let payload: Data
 
         do {
@@ -128,9 +110,9 @@ extension DataBrokerProtectionIPCServer: IPCClientInterface {
         }
 
         xpc.forEachClient { client in
-            client.statusChanged(payload: payload)
+            client.schedulerStatusChanged(payload)
         }
-    }*/
+    }
 }
 
 // MARK: - Incoming communication from a client
@@ -140,15 +122,15 @@ extension DataBrokerProtectionIPCServer: XPCServerInterface {
         serverDelegate?.register()
     }
 
-    func start() {
-        serverDelegate?.start()
+    func startScheduler() {
+        serverDelegate?.startScheduler()
     }
 
-    func stop() {
-        serverDelegate?.stop()
+    func stopScheduler() {
+        serverDelegate?.stopScheduler()
     }
 
-    func restart() {
-        serverDelegate?.restart()
+    func restartScheduler() {
+        serverDelegate?.restartScheduler()
     }
 }

@@ -88,6 +88,7 @@ final class LoginItemsManager {
 
     /// Ensures that the login items are running.  If an item that's supposed to be running is not, this method launches it manually.
     ///
+    ///
     func ensureLoginItemsAreRunning(_ items: Set<LoginItem>, log: OSLog, condition: LoginItemCheckCondition = .none, after interval: TimeInterval = .seconds(5)) {
 
         Task {

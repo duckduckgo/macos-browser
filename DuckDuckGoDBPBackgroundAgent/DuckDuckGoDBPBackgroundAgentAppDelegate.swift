@@ -58,7 +58,7 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
         // Does anything go wrong if we run runQueuedOperations twice? Does it matter?
     }
 }
-
+/*
 extension DBPIPCConnection: MainAppToDBPBackgroundAgentCommunication {
 
     var manager: DataBrokerProtectionBackgroundManager { DataBrokerProtectionBackgroundManager.shared // We really should change this
@@ -117,4 +117,5 @@ extension DBPIPCConnection: MainAppToDBPBackgroundAgentCommunication {
         manager.scheduler.runAllOperations(showWebView: showWebView)
     }
 }
+ */
 

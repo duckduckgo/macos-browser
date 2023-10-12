@@ -35,13 +35,15 @@ public final class DataBrokerProtectionManager {
     private let ipcClient = DataBrokerProtectionIPCClient(machServiceName: Bundle.main.dbpBackgroundAgentBundleId)
     var mainAppToDBPPackageDelegate: MainAppToDBPPackageInterface?
 
-    let loginItemsManager: LoginItemsManager = LoginItemsManager()
+    private let loginItemsManager = LoginItemsManager()
 
     lazy var dataManager: DataBrokerProtectionDataManager = {
-        DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
+        let dataManager = DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
+        dataManager.delegate = self
+        return dataManager
     }()
 
-    lazy var scheduler: DataBrokerProtectionScheduler = DataBrokerProtectionIPCScheduler(ipcClient: ipcClient)
+    lazy var scheduler = DataBrokerProtectionIPCScheduler(ipcClient: ipcClient)
 
 /*
     lazy var scheduler: DataBrokerProtectionScheduler = {
@@ -100,6 +102,18 @@ public final class DataBrokerProtectionManager {
                 }
             }
         }*/
+    }
+}
+
+extension DataBrokerProtectionManager: DataBrokerProtectionDataManagerDelegate {
+    public func dataBrokerProtectionDataManagerDidUpdateData() {
+        startLoginItemIfPossible()
+        scheduler.startScheduler()
+    }
+
+    public func dataBrokerProtectionDataManagerDidDeleteData() {
+        scheduler.stopScheduler()
+        loginItemsManager.disableLoginItems([.dbpBackgroundAgent])
     }
 }
 

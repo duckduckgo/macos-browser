@@ -31,7 +31,7 @@ public final class DataBrokerProtectionBackgroundManager {
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
 
-    private lazy var IPCServiceManager = IPCServiceManager(scheduler: scheduler)
+    private lazy var ipcService = IPCServiceManager(scheduler: scheduler)
 
     lazy var dataManager: DataBrokerProtectionDataManager = {
         DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
@@ -77,7 +77,7 @@ public final class DataBrokerProtectionBackgroundManager {
             }
         }
     }
-
+/*
     public func startScheduler(showWebView: Bool = false) {
         scheduler.startScheduler(showWebView: showWebView)
     }
@@ -88,7 +88,7 @@ public final class DataBrokerProtectionBackgroundManager {
 
     public func scanAllBrokers(showWebView: Bool = false, completion: (() -> Void)?) {
         scheduler.scanAllBrokers(showWebView: showWebView, completion: completion)
-    }
+    }*/
 }
 
 public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
