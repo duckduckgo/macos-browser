@@ -2910,7 +2910,7 @@
 		7BBD45B12A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */; };
 		7BBD45B22A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */; };
 		7BD01C152AD820310088B32E /* XPCHelper in Frameworks */ = {isa = PBXBuildFile; productRef = 7BD01C142AD820310088B32E /* XPCHelper */; };
-		7BD01C192AD8319C0088B32E /* IPCService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD01C182AD8319C0088B32E /* IPCService.swift */; };
+		7BD01C192AD8319C0088B32E /* IPCServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD01C182AD8319C0088B32E /* IPCServiceManager.swift */; };
 		7BD3AF5D2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */; };
 		7BE146072A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */; };
 		7BE146082A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */; };
@@ -4331,7 +4331,7 @@
 		7BB108572A43375D000AB95F /* PFMoveApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFMoveApplication.h; sourceTree = "<group>"; };
 		7BB108582A43375D000AB95F /* PFMoveApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFMoveApplication.m; sourceTree = "<group>"; };
 		7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionDebugUtilities.swift; sourceTree = "<group>"; };
-		7BD01C182AD8319C0088B32E /* IPCService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPCService.swift; sourceTree = "<group>"; };
+		7BD01C182AD8319C0088B32E /* IPCServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPCServiceManager.swift; sourceTree = "<group>"; };
 		7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeychainType+ClientDefault.swift"; sourceTree = "<group>"; };
 		7BD8679A2A9E9E000063B9F7 /* NetworkProtectionFeatureVisibility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionFeatureVisibility.swift; sourceTree = "<group>"; };
 		7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionDebugMenu.swift; sourceTree = "<group>"; };
@@ -6895,7 +6895,7 @@
 			children = (
 				9D9AE9152AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift */,
 				9D9AE9282AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift */,
-				7BD01C182AD8319C0088B32E /* IPCService.swift */,
+				7BD01C182AD8319C0088B32E /* IPCServiceManager.swift */,
 				9D9AE92B2AAB84FF0026E7DC /* DBPMocks.swift */,
 				9D9AE9172AAA3B450026E7DC /* UserText.swift */,
 				9D9AE9162AAA3B450026E7DC /* Assets.xcassets */,
@@ -12470,7 +12470,7 @@
 				9D9AE9292AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift in Sources */,
 				9D9AE91D2AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift in Sources */,
 				9D9AE9212AAA3B450026E7DC /* UserText.swift in Sources */,
-				7BD01C192AD8319C0088B32E /* IPCService.swift in Sources */,
+				7BD01C192AD8319C0088B32E /* IPCServiceManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

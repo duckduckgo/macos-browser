@@ -31,7 +31,7 @@ public final class DataBrokerProtectionBackgroundManager {
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
 
-    private lazy var ipcService = IPCService(scheduler: scheduler)
+    private lazy var IPCServiceManager = IPCServiceManager(scheduler: scheduler)
 
     lazy var dataManager: DataBrokerProtectionDataManager = {
         DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)

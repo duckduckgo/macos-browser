@@ -19,7 +19,9 @@
 import Foundation
 import DataBrokerProtection
 
-final class IPCService {
+/// Manages the IPC service for the Agent app
+///
+final class IPCServiceManager {
     private let ipcServer: DataBrokerProtectionIPCServer
     private let scheduler: DataBrokerProtectionScheduler
 
@@ -33,19 +35,19 @@ final class IPCService {
     }
 }
 
-extension IPCService: IPCServerInterface {
+extension IPCServiceManager: IPCServerInterface {
     func register() {
-        // no-op
+        // no-op for now, but here we should send any initial status updates for the main app
     }
-    
+
     func start() {
         scheduler.startScheduler()
     }
-    
+
     func stop() {
         scheduler.stopScheduler()
     }
-    
+
     func restart() {
         scheduler.stopScheduler()
         scheduler.startScheduler()
