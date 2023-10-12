@@ -41,7 +41,7 @@ final class SecureVaultLoginImporter: LoginImporter {
         try vault.inDatabaseTransaction { database in
             for login in logins {
                 let title = login.title
-                let account = SecureVaultModels.WebsiteAccount(title: title, username: login.username, domain: login.url)
+                let account = SecureVaultModels.WebsiteAccount(title: title, username: login.username, domain: login.url, notes: login.notes)
                 let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: login.password.data(using: .utf8)!)
                 let importSummaryValue: String
 

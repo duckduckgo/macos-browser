@@ -21,57 +21,18 @@ import BrowserServicesKit
 
 struct ImportedLoginCredential: Equatable {
 
-    private enum RowFormatWithTitle: Int {
-        case title = 0
-        case url
-        case username
-        case password
-    }
-
-    private enum RowFormatWithoutTitle: Int {
-        case url = 0
-        case username
-        case password
-    }
-
     let title: String?
-    let url: String
+    let url: String?
     let username: String
     let password: String
+    let notes: String?
 
-    init(title: String? = nil, url: String, username: String, password: String) {
+    init(title: String? = nil, url: String?, username: String, password: String, notes: String? = nil) {
         self.title = title
-        self.url = URL(string: url)?.host ?? url // Try to use the host if possible, as the Secure Vault saves credentials using the host.
+        self.url = url.flatMap(URL.init(string:))?.host ?? url // Try to use the host if possible, as the Secure Vault saves credentials using the host.
         self.username = username
         self.password = password
-    }
-
-    init?(row: [String], inferredColumnPositions: CSVImporter.ColumnPositions? = nil) {
-        if let inferredPositions = inferredColumnPositions {
-            guard row.count > inferredPositions.maximumIndex else { return nil }
-
-            var title: String?
-
-            if let titleIndex = inferredPositions.titleIndex {
-                title = row[titleIndex]
-            }
-
-            self.init(title: title,
-                      url: row[inferredPositions.urlIndex],
-                      username: row[inferredPositions.usernameIndex],
-                      password: row[inferredPositions.passwordIndex])
-        } else if row.count >= 4 {
-            self.init(title: row[RowFormatWithTitle.title.rawValue],
-                      url: row[RowFormatWithTitle.url.rawValue],
-                      username: row[RowFormatWithTitle.username.rawValue],
-                      password: row[RowFormatWithTitle.password.rawValue])
-        } else if row.count >= 3 {
-            self.init(url: row[RowFormatWithoutTitle.url.rawValue],
-                      username: row[RowFormatWithoutTitle.username.rawValue],
-                      password: row[RowFormatWithoutTitle.password.rawValue])
-        } else {
-            return nil
-        }
+        self.notes = notes
     }
 
 }

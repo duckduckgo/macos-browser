@@ -213,11 +213,7 @@ final class ChromiumLoginReader {
                 return nil
             }
 
-            return ImportedLoginCredential(
-                url: row.url,
-                username: row.username,
-                password: decryptedPassword
-            )
+            return ImportedLoginCredential(url: row.url, username: row.username, password: decryptedPassword)
         }
         if result.isEmpty, let lastError {
             throw lastError

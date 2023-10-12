@@ -43,6 +43,8 @@ enum ThirdPartyBrowser: CaseIterable {
     case tor
     case vivaldi
     case yandex
+
+    case bitwarden
     case lastPass
     case onePassword7
     case onePassword8
@@ -67,6 +69,7 @@ enum ThirdPartyBrowser: CaseIterable {
         case .tor: return .tor
         case .vivaldi: return .vivaldi
         case .yandex: return .yandex
+        case .bitwarden: return .bitwarden
         case .lastPass: return .lastPass
         case .onePassword7: return .onePassword7
         case .onePassword8: return .onePassword8
@@ -102,6 +105,7 @@ enum ThirdPartyBrowser: CaseIterable {
         case .tor: return .tor
         case .vivaldi: return .vivaldi
         case .yandex: return .yandex
+        case .bitwarden: return .bitwarden
         case .onePassword7: return .onePassword7
         case .onePassword8: return .onePassword8
         case .lastPass: return .lastPass
@@ -161,6 +165,7 @@ enum ThirdPartyBrowser: CaseIterable {
         case .tor: return BundleIdentifiers(productionBundleID: "org.torproject.torbrowser", relatedBundleIDs: [])
         case .vivaldi: return BundleIdentifiers(productionBundleID: "com.vivaldi.Vivaldi", relatedBundleIDs: [])
         case .yandex: return BundleIdentifiers(productionBundleID: "ru.yandex.desktop.yandex-browser", relatedBundleIDs: [])
+        case .bitwarden: return BundleIdentifiers(productionBundleID: "com.bitwarden.desktop", relatedBundleIDs: [])
         case .onePassword7: return BundleIdentifiers(productionBundleID: "com.agilebits.onepassword7", relatedBundleIDs: [
             "com.agilebits.onepassword",
             "com.agilebits.onepassword4"
@@ -229,7 +234,7 @@ enum ThirdPartyBrowser: CaseIterable {
         case .tor: return applicationSupportURL.appendingPathComponent("TorBrowser-Data/Browser/")
         case .vivaldi: return applicationSupportURL.appendingPathComponent("Vivaldi/")
         case .yandex: return applicationSupportURL.appendingPathComponent("Yandex/YandexBrowser/")
-        case .lastPass, .onePassword7, .onePassword8: return nil
+        case .bitwarden, .lastPass, .onePassword7, .onePassword8: return nil
         }
     }
 

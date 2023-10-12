@@ -146,3 +146,11 @@ class CSVImporterTests: XCTestCase {
     }
 
 }
+
+extension CSVImporter.ColumnPositions {
+
+    init?(csvValues: [String]) {
+        self.init(csv: [csvValues, Array.init(repeating: "", count: csvValues.count)])
+    }
+
+}

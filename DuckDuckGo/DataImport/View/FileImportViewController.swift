@@ -57,6 +57,7 @@ final class FileImportViewController: NSViewController {
     @IBOutlet var lastPassInfoView: NSView!
     @IBOutlet var onePassword7InfoView: NSView!
     @IBOutlet var onePassword8InfoView: NSView!
+    @IBOutlet var bitwardenInfoView: NSView!
 
     @IBOutlet var safariSettingsTextField: NSTextField!
 
@@ -116,6 +117,7 @@ final class FileImportViewController: NSViewController {
             lastPassInfoView.isHidden = true
             onePassword7InfoView.isHidden = true
             onePassword8InfoView.isHidden = true
+            bitwardenInfoView.isHidden = true
             selectFileButton.title = UserText.importLoginsSelectBrowserCSVFile
         case .yandex:
             descriptionLabel.isHidden = true
@@ -132,6 +134,7 @@ final class FileImportViewController: NSViewController {
             lastPassInfoView.isHidden = true
             onePassword7InfoView.isHidden = false
             onePassword8InfoView.isHidden = true
+            bitwardenInfoView.isHidden = true
             selectFileButton.title = UserText.importLoginsSelect1PasswordCSVFile
         case .onePassword8:
             descriptionLabel.isHidden = true
@@ -140,7 +143,16 @@ final class FileImportViewController: NSViewController {
             lastPassInfoView.isHidden = true
             onePassword7InfoView.isHidden = true
             onePassword8InfoView.isHidden = false
+            bitwardenInfoView.isHidden = true
             selectFileButton.title = UserText.importLoginsSelect1PasswordCSVFile
+        case .bitwarden:
+            descriptionLabel.isHidden = true
+            safariInfoView.isHidden = true
+            lastPassInfoView.isHidden = true
+            onePassword7InfoView.isHidden = true
+            onePassword8InfoView.isHidden = true
+            bitwardenInfoView.isHidden = false
+            selectFileButton.title = UserText.importLoginsSelectBitwardenCSVFile
         case .lastPass:
             descriptionLabel.isHidden = true
             safariInfoView.isHidden = true
@@ -148,6 +160,7 @@ final class FileImportViewController: NSViewController {
             lastPassInfoView.isHidden = false
             onePassword7InfoView.isHidden = true
             onePassword8InfoView.isHidden = true
+            bitwardenInfoView.isHidden = true
             selectFileButton.title = UserText.importLoginsSelectLastPassCSVFile
 
         case .brave, .chrome, .chromium, .coccoc, .edge, .firefox, .opera, .operaGX, .tor, .vivaldi:
@@ -160,6 +173,7 @@ final class FileImportViewController: NSViewController {
             lastPassInfoView.isHidden = true
             onePassword7InfoView.isHidden = true
             onePassword8InfoView.isHidden = true
+            bitwardenInfoView.isHidden = true
             selectFileButton.title = UserText.importLoginsSelectCSVFile
         case .bookmarksHTML:
             descriptionLabel.isHidden = true
@@ -168,6 +182,7 @@ final class FileImportViewController: NSViewController {
             lastPassInfoView.isHidden = true
             onePassword7InfoView.isHidden = true
             onePassword8InfoView.isHidden = true
+            bitwardenInfoView.isHidden = true
             selectFileButton.title = UserText.importBookmarksSelectHTMLFile
         }
     }
@@ -224,7 +239,7 @@ final class FileImportViewController: NSViewController {
                 switch importSource {
                 case .bookmarksHTML:
                     delegate?.fileImportViewController(self, didSelectBookmarksFileWithURL: selectedURL)
-                case .csv, .onePassword8, .onePassword7, .lastPass, .safari, .safariTechnologyPreview, .yandex:
+                case .csv, .bitwarden, .onePassword8, .onePassword7, .lastPass, .safari, .safariTechnologyPreview, .yandex:
                     delegate?.fileImportViewController(self, didSelectCSVFileWithURL: selectedURL)
                 case .brave, .chrome, .chromium, .coccoc, .edge, .firefox, .opera, .operaGX, .tor, .vivaldi:
                     break
