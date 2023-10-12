@@ -48,15 +48,12 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
 @main
 final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDelegate {
 
-    let ipcConnection = DBPIPCConnection(log: .dbpBackgroundAgent, memoryManagementLog: .dbpBackgroundAgentMemoryManagement)
-
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         os_log("DuckDuckGoAgent started", log: .dbpBackgroundAgent, type: .info)
-        ipcConnection.startListener(machServiceName: Bundle.main.bundleIdentifier!)
 
         let manager = DataBrokerProtectionBackgroundManager.shared
         manager.runOperationsAndStartSchedulerIfPossible()
-        // TODO remove this?
+        // TODO: remove this?
         // Although if app is not running we should run anyway
         // Does anything go wrong if we run runQueuedOperations twice? Does it matter?
     }

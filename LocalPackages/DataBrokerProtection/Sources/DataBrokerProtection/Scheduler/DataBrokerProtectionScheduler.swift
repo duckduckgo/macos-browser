@@ -28,6 +28,7 @@ public enum DataBrokerProtectionSchedulerStatus {
 }
 
 public protocol DataBrokerProtectionScheduler {
+    
     //var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { get }
     //var status: DataBrokerProtectionSchedulerStatus { get }
 

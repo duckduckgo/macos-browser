@@ -30,7 +30,9 @@ public final class DataBrokerProtectionManager {
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
-    private let ipcConnection = DBPIPCConnection(log: .dbpBackgroundAgent, memoryManagementLog: .dbpBackgroundAgentMemoryManagement)
+    // TODO: fully remove this
+    //private let ipcConnection = DBPIPCConnection(log: .dbpBackgroundAgent, memoryManagementLog: .dbpBackgroundAgentMemoryManagement)
+    private let ipcClient = DataBrokerProtectionIPCClient(machServiceName: Bundle.main.dbpBackgroundAgentBundleId)
     var mainAppToDBPPackageDelegate: MainAppToDBPPackageInterface?
 
     let loginItemsManager: LoginItemsManager = LoginItemsManager()
@@ -39,7 +41,7 @@ public final class DataBrokerProtectionManager {
         DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
     }()
 
-    lazy var scheduler: DataBrokerProtectionScheduler = DataBrokerProtectionIPCScheduler(ipcConnection: ipcConnection)
+    lazy var scheduler: DataBrokerProtectionScheduler = DataBrokerProtectionIPCScheduler(ipcClient: ipcClient)
 
 /*
     lazy var scheduler: DataBrokerProtectionScheduler = {
@@ -85,7 +87,9 @@ public final class DataBrokerProtectionManager {
     public func startLoginItemIfPossible() {
         guard !redeemUseCase.shouldAskForInviteCode() && !DataBrokerDebugFlagBlockScheduler().isFlagOn() else { return }
 
-        //loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
+        loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
+        // TODO: this should be handled already
+        /*
         ipcConnection.register(machServiceName: Bundle.main.dbpBackgroundAgentBundleId, delegate: self) { success in
             DispatchQueue.main.async {
                 if success {
@@ -95,7 +99,7 @@ public final class DataBrokerProtectionManager {
                     os_log("IPC connection with agent failed")
                 }
             }
-        }
+        }*/
     }
 }
 

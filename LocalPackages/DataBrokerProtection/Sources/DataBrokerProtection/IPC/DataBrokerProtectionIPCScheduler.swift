@@ -23,14 +23,15 @@ import Common
 ///
 public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionScheduler {
 
-    private let ipcConnection: DBPIPCConnection
+    private let ipcClient: DataBrokerProtectionIPCClient
 
-    public init(ipcConnection: DBPIPCConnection) {
-        self.ipcConnection = ipcConnection
+    public init(ipcClient: DataBrokerProtectionIPCClient) {
+        self.ipcClient = ipcClient
     }
 
     public func profileModified() {
-        ipcConnection.profileModified()
+        //ipcConnection.profileModified()
+        ipcClient.restart()
     }
 /*
     public func startScan() {
@@ -38,27 +39,30 @@ public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionSchedul
     }
 */
     public func startScheduler(showWebView: Bool) {
-        ipcConnection.startScheduler(showWebView: showWebView)
+        //ipcConnection.startScheduler(showWebView: showWebView)
+        ipcClient.start()
     }
 
     public func stopScheduler() {
-        ipcConnection.stopScheduler()
+        //ipcConnection.stopScheduler()
+        ipcClient.stop()
     }
 
     public func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
-        ipcConnection.optOutAllBrokers(showWebView: showWebView, completion: completion)
+        //ipcConnection.optOutAllBrokers(showWebView: showWebView, completion: completion)
     }
 
     public func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
-        ipcConnection.scanAllBrokers(showWebView: showWebView, completion: completion)
+        //ipcConnection.scanAllBrokers(showWebView: showWebView, completion: completion)
+        ipcClient.start()
     }
 
     public func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {
-        ipcConnection.runQueuedOperations(showWebView: showWebView, completion: completion)
+        //ipcConnection.runQueuedOperations(showWebView: showWebView, completion: completion)
     }
 
     public func runAllOperations(showWebView: Bool) {
-        ipcConnection.runAllOperations(showWebView: showWebView)
+        //ipcConnection.runAllOperations(showWebView: showWebView)
     }
 }
 
