@@ -572,6 +572,19 @@ struct UserText {
         return String(format: localized, sourceName)
     }
 
+    static let requiresSafari15warning = NSLocalizedString("requires.safari.15.or.later", value: "Requires Safari 15 or later", comment: "Warning label about browser data import feature requiring Safari v.15 or later")
+
+    static let torImportPasswordsUnavailable = NSLocalizedString("tor.import.passwords.unavailable", value: "Tor Browser does not support storing passwords", comment: "Warning label about Tor Browser passwords import not available since it doesn‘t store passwords")
+
+    static func browserDataFileNotFound(atPath path: String) -> String {
+        let localized = NSLocalizedString("import.unavailable.file.not.found", value: "File not found at %@", comment: "Logins or Bookmarks Import not available because logins or bookmarks file not found at path %@")
+        return String(format: localized, path)
+    }
+    static func browserProfileDataFileNotFound(atPath path: String) -> String {
+        let localized = NSLocalizedString("import.unavailable.profile.dir.not.found", value: "Profile directory not found at %@", comment: "Logins or Bookmarks Import not available because profile directory is not available at path %@")
+        return String(format: localized, path)
+    }
+
     static let moreOrLessCollapse = NSLocalizedString("more.or.less.collapse", value: "Show Less", comment: "For collapsing views to show less.")
     static let moreOrLessExpand = NSLocalizedString("more.or.less.expand", value: "Show More", comment: "For expanding views to show more.")
 

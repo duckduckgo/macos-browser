@@ -33,11 +33,11 @@ final class BrowserImportViewController: NSViewController {
         static let browserWarningBarHeight: CGFloat = 32.0
     }
 
-    static func create(with browser: DataImport.Source, profileList: DataImport.BrowserProfileList) -> BrowserImportViewController {
+    static func create(with browser: ThirdPartyBrowser) -> BrowserImportViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
         return storyboard.instantiateController(identifier: Constants.identifier) { (coder) -> BrowserImportViewController? in
-            return BrowserImportViewController(coder: coder, browser: browser, profileList: profileList)
+            return BrowserImportViewController(coder: coder, browser: browser)
         }
     }
 
@@ -47,6 +47,7 @@ final class BrowserImportViewController: NSViewController {
     @IBOutlet var profileSelectionPopUpButton: NSPopUpButton!
 
     @IBOutlet var bookmarksCheckbox: NSButton!
+    @IBOutlet var bookmarksWarningLabel: NSTextField!
     @IBOutlet var passwordsCheckbox: NSButton!
     @IBOutlet var passwordsWarningLabel: NSTextField!
 
@@ -69,18 +70,18 @@ final class BrowserImportViewController: NSViewController {
     var selectedProfile: DataImport.BrowserProfile? {
         guard let selectedProfile = profileSelectionPopUpButton.selectedItem else {
             // If there is no selected item, there should only be one item in the list.
-            return profileList.validImportableProfiles.first
+            return profileList?.validImportableProfiles.first
         }
 
-        return profileList.validImportableProfiles.first { $0.profileURL == selectedProfile.representedObject as? URL }
+        return profileList?.validImportableProfiles.first { $0.profileURL == selectedProfile.representedObject as? URL }
     }
 
-    let browser: DataImport.Source
-    let profileList: DataImport.BrowserProfileList
+    let browser: ThirdPartyBrowser
+    let profileList: DataImport.BrowserProfileList?
 
-    init?(coder: NSCoder, browser: DataImport.Source, profileList: DataImport.BrowserProfileList) {
+    init?(coder: NSCoder, browser: ThirdPartyBrowser) {
         self.browser = browser
-        self.profileList = profileList
+        self.profileList = browser.browserProfiles()
 
         super.init(coder: coder)
     }
@@ -92,19 +93,21 @@ final class BrowserImportViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Update the profile picker:
-
         importOptionsStackView.setCustomSpacing(18, after: profileSelectionPopUpButton)
 
-        if profileList.showProfilePicker {
-            profileSelectionPopUpButton.displayBrowserProfiles(profiles: profileList.validImportableProfiles,
-                                                               defaultProfile: profileList.defaultProfile)
+        // Update the profile picker:
+        if let profileList, profileList.shouldShowProfilePicker {
+            profileSelectionPopUpButton.displayBrowserProfiles(profiles: profileList.validImportableProfiles, defaultProfile: profileList.defaultProfile)
         } else {
             profileSelectionLabel.isHidden = true
             profileSelectionPopUpButton.isHidden = true
             profileSelectionPopUpButton.removeAllItems()
         }
 
+        updateImportOptions()
+    }
+
+    private func updateImportOptions() {
         switch browser {
         case .safari, .safariTechnologyPreview:
             bookmarksCheckbox.title = UserText.bookmarkImportBookmarksAndFavorites
@@ -113,15 +116,77 @@ final class BrowserImportViewController: NSViewController {
                 passwordsWarningLabel.isHidden = false
                 return
             }
+            passwordsWarningLabel.stringValue = UserText.requiresSafari15warning
             passwordsWarningLabel.isHidden = safariMajorVersion >= 15
+            bookmarksWarningLabel.isHidden = true
+
         case .tor:
-            passwordsCheckbox.isHidden = true
             bookmarksCheckbox.title = UserText.bookmarkImportBookmarks
-            passwordsWarningLabel.isHidden = true
-        default:
+
+            guard validateProfileData() else { break }
+            passwordsCheckbox.state = .off
+            passwordsCheckbox.isEnabled = false
+
+            passwordsWarningLabel.stringValue = UserText.torImportPasswordsUnavailable
+            passwordsWarningLabel.isHidden = false
+
+        case .brave, .chrome, .chromium, .coccoc, .edge, .firefox, .opera, .operaGX, .vivaldi, .yandex,
+             .bitwarden, .lastPass, .onePassword7, .onePassword8:
+
             bookmarksCheckbox.title = UserText.bookmarkImportBookmarks
-            passwordsWarningLabel.isHidden = true
+
+            validateProfileData()
         }
+
+        selectedImportOptionsChanged(nil)
+    }
+
+    @discardableResult
+    private func validateProfileData() -> Bool {
+        guard let result = selectedProfile?.validateProfileData() else {
+            passwordsCheckbox.isEnabled = false
+            passwordsCheckbox.state = .off
+            bookmarksCheckbox.isEnabled = false
+            bookmarksCheckbox.state = .off
+            bookmarksWarningLabel.isHidden = true
+
+            guard let profileURL = selectedProfile?.profileURL ?? browser.profilesDirectory() else {
+                passwordsWarningLabel.isHidden = true
+                return false
+            }
+            passwordsWarningLabel.stringValue = UserText.browserProfileDataFileNotFound(atPath: profileURL.path.abbreviatingWithTildeInPath)
+            passwordsWarningLabel.isHidden = false
+
+            return false
+        }
+
+        switch result.logins {
+        case .available, .unsupported:
+            passwordsCheckbox.isEnabled = true
+            passwordsCheckbox.state = .on
+            passwordsWarningLabel.isHidden = true
+
+        case .unavailable(path: let path):
+            passwordsCheckbox.isEnabled = false
+            passwordsCheckbox.state = .off
+            passwordsWarningLabel.isHidden = false
+            passwordsWarningLabel.stringValue = UserText.browserDataFileNotFound(atPath: path.abbreviatingWithTildeInPath)
+        }
+
+        switch result.bookmarks {
+        case .available, .unsupported:
+            bookmarksCheckbox.isEnabled = true
+            bookmarksCheckbox.state = .on
+            bookmarksWarningLabel.isHidden = true
+
+        case .unavailable(path: let path):
+            bookmarksCheckbox.isEnabled = false
+            bookmarksCheckbox.state = .off
+            bookmarksWarningLabel.isHidden = false
+            bookmarksWarningLabel.stringValue = UserText.browserDataFileNotFound(atPath: path.abbreviatingWithTildeInPath)
+        }
+
+        return true
     }
 
     override func viewWillAppear() {
@@ -129,7 +194,11 @@ final class BrowserImportViewController: NSViewController {
         delegate?.browserImportViewControllerRequestedParentViewRefresh(self)
     }
 
-    @IBAction func selectedImportOptionsChanged(_ sender: NSButton) {
+    @IBAction func profileSelectionPopUpAction(_ sender: NSPopUpButton) {
+        updateImportOptions()
+    }
+
+    @IBAction func selectedImportOptionsChanged(_ sender: Any?) {
         delegate?.browserImportViewController(self, didChangeSelectedImportOptions: selectedImportOptions)
     }
 
@@ -140,11 +209,9 @@ extension NSPopUpButton {
     fileprivate func displayBrowserProfiles(profiles: [DataImport.BrowserProfile], defaultProfile: DataImport.BrowserProfile?) {
         removeAllItems()
 
-        let validProfiles = profiles.filter { $0.hasBrowserData }
-
         var selectedSourceIndex: Int?
 
-        for (index, profile) in validProfiles.enumerated() {
+        for (index, profile) in profiles.enumerated() {
             // Duplicate profile names won‘t be added to the Popup: need to deduplicate
             var profileName: String
             var i = 0

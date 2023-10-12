@@ -183,6 +183,12 @@ final class DataImportViewController: NSViewController {
             self.viewState = ViewState(selectedImportSource: source, interactionState: .unableToImport)
 
         case .chrome, .chromium, .coccoc, .firefox, .brave, .edge, .opera, .operaGX, .safari, .safariTechnologyPreview, .tor, .vivaldi, .yandex:
+            if let browserImportViewController = self.currentChildViewController as? BrowserImportViewController,
+               browserImportViewController.selectedImportOptions.isEmpty {
+                self.viewState = ViewState(selectedImportSource: source, interactionState: .unableToImport)
+                break
+            }
+
             let interactionState: InteractionState
             switch (source, loginsSelected) {
             case (.safari, _),
@@ -352,7 +358,7 @@ final class DataImportViewController: NSViewController {
                 let filePermissionViewController =  RequestFilePermissionViewController.create(importSource: importSource, permissionsRequired: types, permissionAuthorization: safariDataImporter)
                 filePermissionViewController.delegate = self
                 return filePermissionViewController
-            } else if browserImportViewController?.browser == importSource {
+            } else if browserImportViewController?.browser.importSource == importSource {
                 return browserImportViewController
             } else {
                 browserImportViewController = createBrowserImportViewController(for: importSource)
@@ -397,15 +403,16 @@ final class DataImportViewController: NSViewController {
     }
 
     private func createBrowserImportViewController(for source: DataImport.Source) -> BrowserImportViewController? {
-        // Prevent transitioning to the same view controller.
-        if let viewController = currentChildViewController as? BrowserImportViewController, viewController.browser == source { return nil }
-
-        guard let browser = ThirdPartyBrowser.browser(for: viewState.selectedImportSource), let profileList = browser.browserProfiles() else {
+        guard let browser = ThirdPartyBrowser.browser(for: viewState.selectedImportSource) else {
             assertionFailure("Attempted to create BrowserImportViewController without a valid browser selected")
             return nil
         }
 
-        let browserImportViewController = BrowserImportViewController.create(with: source, profileList: profileList)
+        // Prevent transitioning to the same view controller.
+        if let viewController = currentChildViewController as? BrowserImportViewController,
+           viewController.browser == browser { return nil }
+
+        let browserImportViewController = BrowserImportViewController.create(with: browser)
         browserImportViewController.delegate = self
 
         return browserImportViewController

@@ -79,11 +79,7 @@ enum ThirdPartyBrowser: CaseIterable {
     }
 
     var isInstalled: Bool {
-        if applicationPath != nil,
-           browserProfiles()?.profiles.isEmpty == false {
-            return true
-        }
-        return false
+        return applicationPath != nil
     }
 
     var isRunning: Bool {
@@ -185,9 +181,7 @@ enum ThirdPartyBrowser: CaseIterable {
         }
     }
 
-    func browserProfiles(supportDirectoryURL: URL? = nil) -> DataImport.BrowserProfileList? {
-        let applicationSupportURL = supportDirectoryURL ?? URL.nonSandboxApplicationSupportDirectoryURL
-
+    func browserProfiles(applicationSupportURL: URL? = nil) -> DataImport.BrowserProfileList? {
         // Safari is an exception, as it may need permissions granted before being able to read the contents of the profile path. To be safe,
         // return the profile anyway and check the file system permissions when preparing to import.
         if [.safari, .safariTechnologyPreview].contains(self),
@@ -219,7 +213,8 @@ enum ThirdPartyBrowser: CaseIterable {
 
     // Returns the URL to the profiles for a given browser. This directory will contain a list of directories, each representing a profile.
     // swiftlint:disable:next cyclomatic_complexity
-    private func profilesDirectory(applicationSupportURL: URL) -> URL? {
+    func profilesDirectory(applicationSupportURL: URL? = nil) -> URL? {
+        let applicationSupportURL = applicationSupportURL ?? URL.nonSandboxApplicationSupportDirectoryURL
         switch self {
         case .brave: return applicationSupportURL.appendingPathComponent("BraveSoftware/Brave-Browser/")
         case .chrome: return applicationSupportURL.appendingPathComponent("Google/Chrome/")

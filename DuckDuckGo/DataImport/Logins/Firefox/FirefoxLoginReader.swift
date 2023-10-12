@@ -56,10 +56,10 @@ final class FirefoxLoginReader {
         case version3
         case version2
 
-        var formatFileNames: (databaseName: String, loginFileName: String) {
+        var formatFileNames: (databaseName: String, loginsFileName: String) {
             switch self {
-            case .version3: return (databaseName: "key4.db", loginFileName: "logins.json")
-            case .version2: return (databaseName: "key3.db", loginFileName: "logins.json")
+            case .version3: return (databaseName: "key4.db", loginsFileName: "logins.json")
+            case .version2: return (databaseName: "key3.db", loginsFileName: "logins.json")
             }
         }
     }
@@ -114,7 +114,7 @@ final class FirefoxLoginReader {
         guard let detectedFormat else { throw ImportError(type: .couldNotFindLoginsFile, underlyingError: nil) }
 
         let databaseURL = firefoxProfileURL.appendingPathComponent(detectedFormat.formatFileNames.databaseName)
-        let loginsFileURL = firefoxProfileURL.appendingPathComponent(detectedFormat.formatFileNames.loginFileName)
+        let loginsFileURL = firefoxProfileURL.appendingPathComponent(detectedFormat.formatFileNames.loginsFileName)
 
         // If there isn't a file where logins are expected, consider it a successful import of 0 logins
         // to avoid showing an error state.
@@ -142,7 +142,7 @@ final class FirefoxLoginReader {
 
         for potentialFormat in DataFormat.allCases {
             let potentialDatabaseURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.databaseName)
-            let potentialLoginsFileURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.loginFileName)
+            let potentialLoginsFileURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.loginsFileName)
 
             if FileManager.default.fileExists(atPath: potentialDatabaseURL.path) {
                 if FileManager.default.fileExists(atPath: potentialLoginsFileURL.path) {

@@ -145,7 +145,7 @@ enum DataImport {
         let profiles: [BrowserProfile]
 
         var validImportableProfiles: [BrowserProfile] {
-            return profiles.filter(\.hasBrowserData)
+            return profiles.filter { $0.validateProfileData()?.containsValidData == true }
         }
 
         init(browser: ThirdPartyBrowser, profileURLs: [URL]) {
@@ -176,7 +176,7 @@ enum DataImport {
             }
         }
 
-        var showProfilePicker: Bool {
+        var shouldShowProfilePicker: Bool {
             return validImportableProfiles.count > 1
         }
 
@@ -218,34 +218,79 @@ enum DataImport {
             self.chromiumPreferences = Self.getChromiumProfilePreferences(at: profileURL, fileStore: fileStore)
         }
 
-        var hasBrowserData: Bool {
-            guard let profileDirectoryContents = try? fileStore.directoryContents(at: profileURL.path) else {
+        enum ProfileDataItemValidationResult {
+            case available
+            case unavailable(path: String)
+            case unsupported
+        }
+        struct ProfileDataValidationResult {
+            let logins: ProfileDataItemValidationResult
+            let bookmarks: ProfileDataItemValidationResult
+
+            var containsValidData: Bool {
+                if case .available = logins { return true }
+                if case .available = bookmarks { return true }
                 return false
             }
+        }
+
+        func validateProfileData() -> ProfileDataValidationResult? {
+            guard let profileDirectoryContents = try? fileStore.directoryContents(at: profileURL.path) else { return nil }
 
             let profileDirectoryContentsSet = Set(profileDirectoryContents)
 
+            return .init(logins: validateLoginsData(profileDirectoryContents: profileDirectoryContentsSet),
+                    bookmarks: validateBookmarksData(profileDirectoryContents: profileDirectoryContentsSet))
+        }
+
+        private func validateLoginsData(profileDirectoryContents: Set<String>) -> ProfileDataItemValidationResult {
             switch browser {
             case .brave, .chrome, .chromium, .coccoc, .edge, .opera, .operaGX, .vivaldi:
                 let hasChromiumLogins = ChromiumLoginReader.LoginDataFileName.allCases.contains { loginFileName in
-                    return profileDirectoryContentsSet.contains(loginFileName.rawValue)
+                    return profileDirectoryContents.contains(loginFileName.rawValue)
                 }
 
-                let hasChromiumBookmarks = profileDirectoryContentsSet.contains(ChromiumBookmarksReader.Constants.defaultBookmarksFileName)
+                return hasChromiumLogins ? .available
+                    : .unavailable(path: profileURL.appendingPathComponent(ChromiumLoginReader.LoginDataFileName.allCases.first!.rawValue).path)
 
-                return hasChromiumLogins || hasChromiumBookmarks
+            case .firefox:
+                guard let firefoxLoginsFormat = FirefoxLoginReader.DataFormat.allCases.first(where: { dataFormat in
+                    profileDirectoryContents.contains(dataFormat.formatFileNames.databaseName)
+                }) else {
+                    return .unavailable(path: profileURL .appendingPathComponent(FirefoxLoginReader.DataFormat.allCases.last!.formatFileNames.databaseName).path)
+                }
+                let hasFirefoxLogins = profileDirectoryContents.contains(firefoxLoginsFormat.formatFileNames.loginsFileName)
+
+                return hasFirefoxLogins ? .available
+                    : .unavailable(path: profileURL.appendingPathComponent(firefoxLoginsFormat.formatFileNames.loginsFileName).path)
+
+            case .tor:
+                return .unsupported
+
+            case .safari, .safariTechnologyPreview, .yandex, .bitwarden, .lastPass, .onePassword7, .onePassword8:
+                return .available
+            }
+        }
+
+        private func validateBookmarksData(profileDirectoryContents: Set<String>) -> ProfileDataItemValidationResult {
+            switch browser {
+            case .brave, .chrome, .chromium, .coccoc, .edge, .opera, .operaGX, .vivaldi, .yandex:
+                let hasChromiumBookmarks = profileDirectoryContents.contains(ChromiumBookmarksReader.Constants.defaultBookmarksFileName)
+
+                return hasChromiumBookmarks ? .available
+                : .unavailable(path: profileURL.appendingPathComponent(ChromiumBookmarksReader.Constants.defaultBookmarksFileName).path)
+
             case .firefox, .tor:
-                let hasFirefoxLogins = FirefoxLoginReader.DataFormat.allCases.contains { dataFormat in
-                    let (databaseName, loginFileName) = dataFormat.formatFileNames
+                let hasFirefoxBookmarks = profileDirectoryContents.contains(FirefoxBookmarksReader.Constants.placesDatabaseName)
 
-                    return profileDirectoryContentsSet.contains(databaseName) && profileDirectoryContentsSet.contains(loginFileName)
-                }
+                return hasFirefoxBookmarks ? .available
+                : .unavailable(path: profileURL.appendingPathComponent(FirefoxBookmarksReader.Constants.placesDatabaseName).path)
 
-                let hasFirefoxBookmarks = profileDirectoryContentsSet.contains(FirefoxBookmarksReader.Constants.placesDatabaseName)
+            case .safari, .safariTechnologyPreview:
+                return .available
 
-                return hasFirefoxLogins || hasFirefoxBookmarks
-            default:
-                return false
+            case .bitwarden, .lastPass, .onePassword7, .onePassword8:
+                return .unsupported
             }
         }
 

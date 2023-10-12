@@ -72,6 +72,20 @@ extension String {
         (self as NSString).pathExtension
     }
 
+    var abbreviatingWithTildeInPath: String {
+        if NSApp.isSandboxed {
+            let homeDirectory = URL.nonSandboxHomeDirectory.path.dropping(suffix: "/")
+            guard self.hasPrefix(homeDirectory + "/") else {
+                if self == homeDirectory {
+                    return "~/"
+                }
+                return self
+            }
+            return "~" + self.dropping(prefix: homeDirectory)
+        }
+        return (self as NSString).abbreviatingWithTildeInPath
+    }
+
     // MARK: - Mutating
 
     @inlinable mutating func prepend(_ string: String) {
