@@ -118,7 +118,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             os_log("Extracted profiles: %@", log: .dataBrokerProtection, extractedProfiles)
 
             if !extractedProfiles.isEmpty {
-                let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .matchesFound)
+                let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .matchesFound(count: extractedProfiles.count))
                 database.add(event)
 
                 for extractedProfile in extractedProfiles {
@@ -303,10 +303,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
             let dateUpdater = OperationPreferredDateUpdaterUseCase(database: database)
             try dateUpdater.updateOperationDataDates(brokerId: brokerId,
-                                                 profileQueryId: profileQueryId,
-                                                 extractedProfileId: extractedProfileId,
-                                                 schedulingConfig: schedulingConfig)
-    }
+                                                     profileQueryId: profileQueryId,
+                                                     extractedProfileId: extractedProfileId,
+                                                     schedulingConfig: schedulingConfig)
+        }
 
     private func handleOperationError(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64?, error: Error, database: DataBrokerProtectionRepository) {
         let event: HistoryEvent

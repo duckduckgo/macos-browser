@@ -21,12 +21,43 @@ import Foundation
 public struct HistoryEvent: Identifiable, Sendable {
     public enum EventType: Codable, Equatable, Sendable {
         case noMatchFound
-        case matchesFound
+        case matchesFound(count: Int)
         case error(error: DataBrokerProtectionError)
         case optOutStarted
         case optOutRequested
         case optOutConfirmed
         case scanStarted
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: HistoryEvent.EventType.CodingKeys.self)
+            var allKeys = ArraySlice(container.allKeys)
+            guard let onlyKey = allKeys.popFirst(), allKeys.isEmpty else {
+                throw DecodingError.typeMismatch(HistoryEvent.EventType.self, DecodingError.Context.init(codingPath: container.codingPath, debugDescription: "Invalid number of keys found, expected one.", underlyingError: nil))
+            }
+            switch onlyKey {
+            case .noMatchFound:
+                let nestedContainer = try container.nestedContainer(keyedBy: HistoryEvent.EventType.NoMatchFoundCodingKeys.self, forKey: HistoryEvent.EventType.CodingKeys.noMatchFound)
+                self = HistoryEvent.EventType.noMatchFound
+            case .matchesFound:
+                let nestedContainer = try container.nestedContainer(keyedBy: HistoryEvent.EventType.MatchesFoundCodingKeys.self, forKey: HistoryEvent.EventType.CodingKeys.matchesFound)
+                self = HistoryEvent.EventType.matchesFound(count: try nestedContainer.decodeIfPresent(Int.self, forKey: HistoryEvent.EventType.MatchesFoundCodingKeys.count) ?? 0)
+            case .error:
+                let nestedContainer = try container.nestedContainer(keyedBy: HistoryEvent.EventType.ErrorCodingKeys.self, forKey: HistoryEvent.EventType.CodingKeys.error)
+                self = HistoryEvent.EventType.error(error: try nestedContainer.decode(DataBrokerProtectionError.self, forKey: HistoryEvent.EventType.ErrorCodingKeys.error))
+            case .optOutStarted:
+                let nestedContainer = try container.nestedContainer(keyedBy: HistoryEvent.EventType.OptOutStartedCodingKeys.self, forKey: HistoryEvent.EventType.CodingKeys.optOutStarted)
+                self = HistoryEvent.EventType.optOutStarted
+            case .optOutRequested:
+                let nestedContainer = try container.nestedContainer(keyedBy: HistoryEvent.EventType.OptOutRequestedCodingKeys.self, forKey: HistoryEvent.EventType.CodingKeys.optOutRequested)
+                self = HistoryEvent.EventType.optOutRequested
+            case .optOutConfirmed:
+                let nestedContainer = try container.nestedContainer(keyedBy: HistoryEvent.EventType.OptOutConfirmedCodingKeys.self, forKey: HistoryEvent.EventType.CodingKeys.optOutConfirmed)
+                self = HistoryEvent.EventType.optOutConfirmed
+            case .scanStarted:
+                let nestedContainer = try container.nestedContainer(keyedBy: HistoryEvent.EventType.ScanStartedCodingKeys.self, forKey: HistoryEvent.EventType.CodingKeys.scanStarted)
+                self = HistoryEvent.EventType.scanStarted
+            }
+        }
     }
 
     public let extractedProfileId: Int64?

@@ -65,17 +65,47 @@ class BrowserProfileListTests: XCTestCase {
         XCTAssertEqual(profile.profileName, "Profile")
     }
 
+    func testWhenGettingProfileName_AndProfileHasAccountName_AccountNameIsUsed() {
+        let profileURL = profile(named: "Default")
+        let fileStore = FileStoreMock()
+
+        let json = """
+        {
+            "account_info": [
+            {
+                "email": "profile@duck.com",
+                "full_name": "User Name",
+            }
+            ],
+            "profile": {
+                "name": "Profile 1"
+            }
+        }
+        """
+
+        fileStore.storage["Preferences"] = json.utf8data
+        fileStore.directoryStorage[profileURL.absoluteString] = ["Preferences"]
+
+        let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
+
+        XCTAssertEqual(profile.profileName, "User Name (profile@duck.com)")
+        XCTAssertTrue(profile.hasNonDefaultProfileName)
+    }
+
     func testWhenGettingProfileName_AndProfileHasNoDetectedChromiumName_ThenDetectedNameIsUsed() {
         let profileURL = profile(named: "DirectoryName")
         let fileStore = FileStoreMock()
 
-        let chromiumPreferences = ChromePreferences(profile: .init(name: "ChromeProfile"))
-        guard let chromiumPreferencesData = try? JSONEncoder().encode(chromiumPreferences) else {
-            XCTFail("Failed to encode Chromium preferences object")
-            return
+        let json = """
+        {
+            "account_info": [],
+            "profile": {
+                "name": "ChromeProfile"
+            }
         }
+        """
 
-        fileStore.storage["Preferences"] = chromiumPreferencesData
+        fileStore.storage["Preferences"] = json.utf8data
         fileStore.directoryStorage[profileURL.absoluteString] = ["Preferences"]
 
         let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
@@ -88,13 +118,15 @@ class BrowserProfileListTests: XCTestCase {
         let profileURL = profile(named: "System Profile")
         let fileStore = FileStoreMock()
 
-        let chromiumPreferences = ChromePreferences(profile: .init(name: "ChromeProfile"))
-        guard let chromiumPreferencesData = try? JSONEncoder().encode(chromiumPreferences) else {
-            XCTFail("Failed to encode Chromium preferences object")
-            return
+        let json = """
+        {
+            "profile": {
+                "name": "ChromeProfile"
+            }
         }
+        """
 
-        fileStore.storage["Preferences"] = chromiumPreferencesData
+        fileStore.storage["Preferences"] = json.utf8data
         fileStore.directoryStorage[profileURL.absoluteString] = ["Preferences"]
 
         let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
