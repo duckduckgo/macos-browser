@@ -49,13 +49,13 @@ final class BrowserImportMoreInfoViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         switch source {
-        case .chrome, .edge, .brave:
+        case .chrome, .chromium, .coccoc, .edge, .brave, .opera, .operaGX, .vivaldi:
             label.stringValue = UserText.importFromChromiumMoreInfo
 
-        case .firefox:
-            label.stringValue = UserText.importFromFirefoxMoreInfo
+        case .firefox, .tor:
+            label.stringValue = UserText.importMoreInfo(fromFirefoxBasedBrowserNamed: source.importSourceName)
 
-        case .safari, .safariTechnologyPreview, .csv, .lastPass, .onePassword7, .onePassword8, .bookmarksHTML:
+        case .safari, .safariTechnologyPreview, .yandex, .csv, .lastPass, .onePassword7, .onePassword8, .bookmarksHTML:
             fatalError("Unsupported source for more info")
         }
     }

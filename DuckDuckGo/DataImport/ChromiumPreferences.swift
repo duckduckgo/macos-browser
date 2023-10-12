@@ -1,5 +1,5 @@
 //
-//  ChromePreferences.swift
+//  ChromiumPreferences.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,14 +18,14 @@
 
 import AppKit
 
-struct ChromePreferences: Decodable {
+struct ChromiumPreferences: Decodable {
 
     struct AccountInfo: Decodable {
         let email: String?
         let fullName: String?
     }
     struct Profile: Decodable {
-        let name: String
+        let name: String?
         let createdByVersion: String?
     }
 
@@ -33,13 +33,13 @@ struct ChromePreferences: Decodable {
     let profile: Profile
 
     init(from data: Data) throws {
-        var decoder = JSONDecoder()
+        let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
 
         self = try decoder.decode(Self.self, from: data)
     }
 
-    var profileName: String {
+    var profileName: String? {
         for account in accountInfo ?? [] {
             switch (account.fullName, account.email) {
             case (.some(let fullName), .some(let email)):

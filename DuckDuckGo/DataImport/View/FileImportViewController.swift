@@ -53,6 +53,7 @@ final class FileImportViewController: NSViewController {
     @IBOutlet var totalValidLoginsLabel: NSTextField!
 
     @IBOutlet var safariInfoView: NSView!
+    @IBOutlet var yandexInfoView: NSView!
     @IBOutlet var lastPassInfoView: NSView!
     @IBOutlet var onePassword7InfoView: NSView!
     @IBOutlet var onePassword8InfoView: NSView!
@@ -105,18 +106,29 @@ final class FileImportViewController: NSViewController {
         render(state: currentImportState)
     }
 
+    // swiftlint:disable:next function_body_length
     private func renderAwaitingFileSelectionState() {
         switch importSource {
         case .safari, .safariTechnologyPreview:
             descriptionLabel.isHidden = true
             safariInfoView.isHidden = false
+            yandexInfoView.isHidden = true
             lastPassInfoView.isHidden = true
             onePassword7InfoView.isHidden = true
             onePassword8InfoView.isHidden = true
-            selectFileButton.title = UserText.importLoginsSelectSafariCSVFile
+            selectFileButton.title = UserText.importLoginsSelectBrowserCSVFile
+        case .yandex:
+            descriptionLabel.isHidden = true
+            safariInfoView.isHidden = true
+            yandexInfoView.isHidden = false
+            lastPassInfoView.isHidden = true
+            onePassword7InfoView.isHidden = true
+            onePassword8InfoView.isHidden = true
+            selectFileButton.title = UserText.importLoginsSelectBrowserCSVFile
         case .onePassword7:
             descriptionLabel.isHidden = true
             safariInfoView.isHidden = true
+            yandexInfoView.isHidden = true
             lastPassInfoView.isHidden = true
             onePassword7InfoView.isHidden = false
             onePassword8InfoView.isHidden = true
@@ -124,6 +136,7 @@ final class FileImportViewController: NSViewController {
         case .onePassword8:
             descriptionLabel.isHidden = true
             safariInfoView.isHidden = true
+            yandexInfoView.isHidden = true
             lastPassInfoView.isHidden = true
             onePassword7InfoView.isHidden = true
             onePassword8InfoView.isHidden = false
@@ -131,17 +144,19 @@ final class FileImportViewController: NSViewController {
         case .lastPass:
             descriptionLabel.isHidden = true
             safariInfoView.isHidden = true
+            yandexInfoView.isHidden = true
             lastPassInfoView.isHidden = false
             onePassword7InfoView.isHidden = true
             onePassword8InfoView.isHidden = true
             selectFileButton.title = UserText.importLoginsSelectLastPassCSVFile
 
-        case .brave, .chrome, .edge, .firefox:
+        case .brave, .chrome, .chromium, .coccoc, .edge, .firefox, .opera, .operaGX, .tor, .vivaldi:
             assertionFailure("CSV Import not supported for \(importSource)")
             fallthrough
         case .csv:
             descriptionLabel.isHidden = false
             safariInfoView.isHidden = true
+            yandexInfoView.isHidden = true
             lastPassInfoView.isHidden = true
             onePassword7InfoView.isHidden = true
             onePassword8InfoView.isHidden = true
@@ -149,6 +164,7 @@ final class FileImportViewController: NSViewController {
         case .bookmarksHTML:
             descriptionLabel.isHidden = true
             safariInfoView.isHidden = true
+            yandexInfoView.isHidden = true
             lastPassInfoView.isHidden = true
             onePassword7InfoView.isHidden = true
             onePassword8InfoView.isHidden = true
@@ -208,9 +224,9 @@ final class FileImportViewController: NSViewController {
                 switch importSource {
                 case .bookmarksHTML:
                     delegate?.fileImportViewController(self, didSelectBookmarksFileWithURL: selectedURL)
-                case .csv, .onePassword8, .onePassword7, .lastPass, .safari, .safariTechnologyPreview:
+                case .csv, .onePassword8, .onePassword7, .lastPass, .safari, .safariTechnologyPreview, .yandex:
                     delegate?.fileImportViewController(self, didSelectCSVFileWithURL: selectedURL)
-                case .brave, .chrome, .edge, .firefox:
+                case .brave, .chrome, .chromium, .coccoc, .edge, .firefox, .opera, .operaGX, .tor, .vivaldi:
                     break
                 }
             } else {

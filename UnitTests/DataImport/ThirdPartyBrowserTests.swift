@@ -81,9 +81,9 @@ class ThirdPartyBrowserTests: XCTestCase {
             return
         }
 
-        XCTAssertEqual(list.profiles.count, 2)
+        let validProfiles = list.profiles.filter { $0.hasBrowserData }
+        XCTAssertEqual(validProfiles.count, 2)
         XCTAssertEqual(list.defaultProfile?.profileName, "default-release")
-        XCTAssertTrue(list.profiles.allSatisfy { profile in return profile.hasBrowserData })
     }
 
     func testWhenGettingBrowserProfiles_AndFirefoxProfileOnlyHasBookmarksData_ThenFirefoxProfileIsReturned() throws {
@@ -107,9 +107,9 @@ class ThirdPartyBrowserTests: XCTestCase {
             return
         }
 
-        XCTAssertEqual(list.profiles.count, 1)
+        let validProfiles = list.profiles.filter { $0.hasBrowserData }
+        XCTAssertEqual(validProfiles.count, 1)
         XCTAssertEqual(list.defaultProfile?.profileName, "default-release")
-        XCTAssertTrue(list.profiles.allSatisfy { profile in return profile.hasBrowserData })
     }
 
     private func key4DatabaseURL() -> URL {

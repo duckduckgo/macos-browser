@@ -32,10 +32,17 @@ enum ThirdPartyBrowser: CaseIterable {
 
     case brave
     case chrome
+    case chromium
+    case coccoc
     case edge
     case firefox
+    case opera
+    case operaGX
     case safari
     case safariTechnologyPreview
+    case tor
+    case vivaldi
+    case yandex
     case lastPass
     case onePassword7
     case onePassword8
@@ -49,10 +56,17 @@ enum ThirdPartyBrowser: CaseIterable {
         switch source {
         case .brave: return .brave
         case .chrome: return .chrome
+        case .chromium: return .chromium
+        case .coccoc: return .coccoc
         case .edge: return .edge
         case .firefox: return .firefox
+        case .opera: return .opera
+        case .operaGX: return .operaGX
         case .safari: return .safari
         case .safariTechnologyPreview: return .safariTechnologyPreview
+        case .tor: return .tor
+        case .vivaldi: return .vivaldi
+        case .yandex: return .yandex
         case .lastPass: return .lastPass
         case .onePassword7: return .onePassword7
         case .onePassword8: return .onePassword8
@@ -62,10 +76,11 @@ enum ThirdPartyBrowser: CaseIterable {
     }
 
     var isInstalled: Bool {
-        let detectedApplicationPath = applicationPath != nil
-        let detectedBrowserProfiles = !(browserProfiles()?.profiles.isEmpty ?? false)
-
-        return detectedApplicationPath && detectedBrowserProfiles
+        if applicationPath != nil,
+           browserProfiles()?.profiles.isEmpty == false {
+            return true
+        }
+        return false
     }
 
     var isRunning: Bool {
@@ -76,10 +91,17 @@ enum ThirdPartyBrowser: CaseIterable {
         switch self {
         case .brave: return .brave
         case .chrome: return .chrome
+        case .chromium: return .chromium
+        case .coccoc: return .coccoc
         case .edge: return .edge
         case .firefox: return .firefox
+        case .opera: return .opera
+        case .operaGX: return .operaGX
         case .safari: return .safari
         case .safariTechnologyPreview: return .safariTechnologyPreview
+        case .tor: return .tor
+        case .vivaldi: return .vivaldi
+        case .yandex: return .yandex
         case .onePassword7: return .onePassword7
         case .onePassword8: return .onePassword8
         case .lastPass: return .lastPass
@@ -120,14 +142,25 @@ enum ThirdPartyBrowser: CaseIterable {
     private var bundleIdentifiers: BundleIdentifiers {
         switch self {
         case .brave: return BundleIdentifiers(productionBundleID: "com.brave.Browser", relatedBundleIDs: ["com.brave.Browser.nightly"])
-        case .chrome: return BundleIdentifiers(productionBundleID: "com.google.Chrome", relatedBundleIDs: ["com.google.Chrome.canary"])
+        case .chrome: return BundleIdentifiers(productionBundleID: "com.google.Chrome", relatedBundleIDs: [
+            "com.google.Chrome.canary",
+            "com.google.Chrome.beta",
+            "com.google.Chrome.dev"
+        ])
+        case .chromium: return BundleIdentifiers(productionBundleID: "org.chromium.Chromium", relatedBundleIDs: [])
+        case .coccoc: return  BundleIdentifiers(productionBundleID: "com.coccoc.Coccoc", relatedBundleIDs: [])
         case .edge: return BundleIdentifiers(productionBundleID: "com.microsoft.edgemac", relatedBundleIDs: [])
         case .firefox: return BundleIdentifiers(productionBundleID: "org.mozilla.firefox", relatedBundleIDs: [
             "org.mozilla.nightly",
             "org.mozilla.firefoxdeveloperedition"
         ])
+        case .opera: return BundleIdentifiers(productionBundleID: "com.operasoftware.Opera", relatedBundleIDs: [])
+        case .operaGX: return BundleIdentifiers(productionBundleID: "com.operasoftware.OperaGX", relatedBundleIDs: [])
         case .safari: return BundleIdentifiers(productionBundleID: "com.apple.safari", relatedBundleIDs: [])
         case .safariTechnologyPreview: return BundleIdentifiers(productionBundleID: "com.apple.SafariTechnologyPreview", relatedBundleIDs: [])
+        case .tor: return BundleIdentifiers(productionBundleID: "org.torproject.torbrowser", relatedBundleIDs: [])
+        case .vivaldi: return BundleIdentifiers(productionBundleID: "com.vivaldi.Vivaldi", relatedBundleIDs: [])
+        case .yandex: return BundleIdentifiers(productionBundleID: "ru.yandex.desktop.yandex-browser", relatedBundleIDs: [])
         case .onePassword7: return BundleIdentifiers(productionBundleID: "com.agilebits.onepassword7", relatedBundleIDs: [
             "com.agilebits.onepassword",
             "com.agilebits.onepassword4"
@@ -158,11 +191,12 @@ enum ThirdPartyBrowser: CaseIterable {
         }
 
         guard let profilePath = profilesDirectory(applicationSupportURL: applicationSupportURL),
-              let potentialProfileURLs = try? FileManager.default.contentsOfDirectory(at: profilePath,
+              var potentialProfileURLs = try? FileManager.default.contentsOfDirectory(at: profilePath,
                                                                                       includingPropertiesForKeys: nil,
                                                                                       options: [.skipsHiddenFiles]).filter(\.hasDirectoryPath) else {
             return nil
         }
+        potentialProfileURLs.append(profilePath)
 
         return DataImport.BrowserProfileList(browser: self, profileURLs: potentialProfileURLs)
     }
@@ -179,14 +213,22 @@ enum ThirdPartyBrowser: CaseIterable {
     }
 
     // Returns the URL to the profiles for a given browser. This directory will contain a list of directories, each representing a profile.
+    // swiftlint:disable:next cyclomatic_complexity
     private func profilesDirectory(applicationSupportURL: URL) -> URL? {
         switch self {
         case .brave: return applicationSupportURL.appendingPathComponent("BraveSoftware/Brave-Browser/")
         case .chrome: return applicationSupportURL.appendingPathComponent("Google/Chrome/")
+        case .chromium: return applicationSupportURL.appendingPathComponent("Chromium/")
+        case .coccoc: return  applicationSupportURL.appendingPathComponent("Coccoc/")
         case .edge: return applicationSupportURL.appendingPathComponent("Microsoft Edge/")
         case .firefox: return applicationSupportURL.appendingPathComponent("Firefox/Profiles/")
+        case .opera: return applicationSupportURL.appendingPathComponent("com.operasoftware.Opera/")
+        case .operaGX: return applicationSupportURL.appendingPathComponent("com.operasoftware.OperaGX/")
         case .safari: return URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("Safari/")
         case .safariTechnologyPreview: return URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("SafariTechnologyPreview/")
+        case .tor: return applicationSupportURL.appendingPathComponent("TorBrowser-Data/Browser/")
+        case .vivaldi: return applicationSupportURL.appendingPathComponent("Vivaldi/")
+        case .yandex: return applicationSupportURL.appendingPathComponent("Yandex/YandexBrowser/")
         case .lastPass, .onePassword7, .onePassword8: return nil
         }
     }
