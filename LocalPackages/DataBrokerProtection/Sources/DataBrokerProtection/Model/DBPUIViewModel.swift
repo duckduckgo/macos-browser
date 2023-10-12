@@ -64,12 +64,14 @@ final class DBPUIViewModel {
     }
 
     private func setupCancellable() {
+        /* TODO: implement this
         scheduler.statusPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
                 self?.lastSchedulerStatus = status
                 self?.reloadData()
             }.store(in: &cancellables)
+         */
     }
 
     @MainActor func setupCommunicationLayer() -> WKWebViewConfiguration? {

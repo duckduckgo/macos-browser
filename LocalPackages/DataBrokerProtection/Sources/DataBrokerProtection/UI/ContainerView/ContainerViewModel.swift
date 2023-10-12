@@ -25,7 +25,7 @@ final class ContainerViewModel: ObservableObject {
         case results
     }
 
-    private let mainAppInterface: DBPPackageToMainAppInterface
+    private let scheduler: DataBrokerProtectionScheduler
     private let dataManager: DataBrokerProtectionDataManaging
 
     @Published var scanResults: ScanResult?
@@ -33,9 +33,9 @@ final class ContainerViewModel: ObservableObject {
     @Published var useFakeBroker = false
     @Published var preventSchedulerStart = false
 
-    internal init(mainAppInterface: DBPPackageToMainAppInterface,
+    internal init(scheduler: DataBrokerProtectionScheduler,
                   dataManager: DataBrokerProtectionDataManaging) {
-        self.mainAppInterface = mainAppInterface
+        self.scheduler = scheduler
         self.dataManager = dataManager
 
         restoreFakeBrokerStatus()
@@ -48,20 +48,22 @@ final class ContainerViewModel: ObservableObject {
     }
 
     func forceSchedulerRun() {
-        mainAppInterface.runAllOperations(showWebView: showWebView)
+        scheduler.runAllOperations(showWebView: showWebView)
     }
 
-    func startScanPressed() {
-        mainAppInterface.startScanPressed()
+    func startScan() {
+        // TODO: decide what to do
+        //scheduler.startScan()
+        scheduler.startScheduler()
     }
 
     func forceRunScans(completion: @escaping (ScanResult) -> Void) {
-        mainAppInterface.stopScheduler()
-        mainAppInterface.scanAllBrokers(showWebView: false, completion: nil)
+        scheduler.stopScheduler()
+        scheduler.scanAllBrokers(showWebView: false, completion: nil)
     }
 
     func forceRunOptOuts() {
-        mainAppInterface.optOutAllBrokers(showWebView: showWebView, completion: nil)
+        scheduler.optOutAllBrokers(showWebView: showWebView, completion: nil)
     }
 
     func cleanData() {
@@ -78,7 +80,8 @@ final class ContainerViewModel: ObservableObject {
     }
 
     func editProfilePressed() {
-        mainAppInterface.profileModified()
+        scheduler.stopScheduler()
+        scheduler.startScheduler()
     }
 }
 

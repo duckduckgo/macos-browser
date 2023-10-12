@@ -30,7 +30,6 @@ final public class DataBrokerProtectionViewController: NSViewController {
     private let containerViewModel: ContainerViewModel
     private let scheduler: DataBrokerProtectionScheduler
     private let notificationCenter: NotificationCenter
-    private let mainAppInterface: DBPPackageToMainAppInterface
 
     private var webView: WKWebView?
 
@@ -132,13 +131,11 @@ final public class DataBrokerProtectionViewController: NSViewController {
     """
 
     public init(scheduler: DataBrokerProtectionScheduler,
-                mainAppInterface: DBPPackageToMainAppInterface,
                 dataManager: DataBrokerProtectionDataManaging,
                 notificationCenter: NotificationCenter = .default,
                 privacyConfig: PrivacyConfigurationManaging? = nil, prefs: ContentScopeProperties? = nil) {
         self.scheduler = scheduler
         self.dataManager = dataManager
-        self.mainAppInterface = mainAppInterface
         self.notificationCenter = notificationCenter
 
         self.webUIViewModel = DBPUIViewModel(dataManager: dataManager, scheduler: scheduler, privacyConfig: privacyConfig, prefs: prefs, webView: webView)
@@ -149,7 +146,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
         resultsViewModel = ResultsViewModel(dataManager: dataManager,
                                             notificationCenter: notificationCenter)
 
-        containerViewModel = ContainerViewModel(mainAppInterface: mainAppInterface,
+        containerViewModel = ContainerViewModel(scheduler: scheduler,
                                                 dataManager: dataManager)
 
         dataManager.fetchProfile(ignoresCache: true)

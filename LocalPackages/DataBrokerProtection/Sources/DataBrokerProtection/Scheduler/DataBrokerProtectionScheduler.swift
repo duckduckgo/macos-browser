@@ -28,8 +28,8 @@ public enum DataBrokerProtectionSchedulerStatus {
 }
 
 public protocol DataBrokerProtectionScheduler {
-    var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { get }
-    var status: DataBrokerProtectionSchedulerStatus { get }
+    //var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { get }
+    //var status: DataBrokerProtectionSchedulerStatus { get }
 
     func startScheduler(showWebView: Bool)
     func stopScheduler()

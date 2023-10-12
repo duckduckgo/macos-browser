@@ -49,12 +49,12 @@ final class DBPHomeViewController: NSViewController {
                                                 sessionKey: sessionKey,
                                                 featureToggles: features)
 
-        let vc = DataBrokerProtectionViewController(scheduler: dataBrokerProtectionManager.scheduler,
-                                                    mainAppInterface: dataBrokerProtectionManager,
-                                                    dataManager: dataBrokerProtectionManager.dataManager,
-                                                    notificationCenter: NotificationCenter.default,
-                                                    privacyConfig: privacyConfigurationManager,
-                                                    prefs: prefs)
+        let vc = DataBrokerProtectionViewController(
+            scheduler: dataBrokerProtectionManager.scheduler,
+            dataManager: dataBrokerProtectionManager.dataManager,
+            notificationCenter: NotificationCenter.default,
+            privacyConfig: privacyConfigurationManager,
+            prefs: prefs)
         dataBrokerProtectionManager.mainAppToDBPPackageDelegate = vc.getMainAppDelegate()
         return vc
     }()

@@ -55,7 +55,7 @@ struct DataBrokerProtectionContainerView: View {
                             viewModel: profileViewModel,
                             scanButtonClicked: {
                                 navigationViewModel.updateNavigation(.scanStarted)
-                                containerViewModel.startScanPressed()
+                                containerViewModel.startScan()
                                 /*
                                 containerViewModel.scanAfterProfileCreation { scanResult in
                                     updateUIWithScanResult(scanResult: scanResult)
@@ -191,7 +191,7 @@ struct DataBrokerProtectionContainerView_Previews: PreviewProvider {
         let navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
         let profileViewModel = ProfileViewModel(dataManager: dataManager)
         let resultsViewModel = ResultsViewModel(dataManager: dataManager)
-        let containerViewModel = ContainerViewModel(mainAppInterface: PreviewDBPPackageToMainAppInterface(), dataManager: dataManager)
+        let containerViewModel = ContainerViewModel(scheduler: DataBrokerProtectionNoOpScheduler(), dataManager: dataManager)
 
         DataBrokerProtectionContainerView(containerViewModel: containerViewModel,
                                           navigationViewModel: navigationViewModel,

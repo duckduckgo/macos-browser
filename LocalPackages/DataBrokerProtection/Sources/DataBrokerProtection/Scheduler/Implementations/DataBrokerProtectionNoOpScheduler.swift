@@ -18,26 +18,17 @@
 
 import Foundation
 
-final class PreviewDataManager: DataBrokerProtectionDataManaging {
-    var delegate: DataBrokerProtectionDataManagerDelegate?
-
-    let cache = InMemoryDataCache()
-
-    init(fakeBrokerFlag: DataBrokerDebugFlag) { }
-
-    init() { }
-
-    func saveProfile(_ profile: DataBrokerProtectionProfile) { }
-
-    func fetchProfile(ignoresCache: Bool) -> DataBrokerProtectionProfile? {
-        return nil
-    }
-
-    func fetchBrokerProfileQueryData(ignoresCache: Bool) -> [BrokerProfileQueryData] {
-        [BrokerProfileQueryData]()
-    }
-
-    func hasMatches() -> Bool {
-        return false
-    }
+/// Convenience class for SwiftUI previews.
+///
+/// Do not use this for any production code.
+///
+final class DataBrokerProtectionNoOpScheduler: DataBrokerProtectionScheduler {
+    func profileModified() { }
+    //func startScanPressed() { }
+    func startScheduler(showWebView: Bool) { }
+    func stopScheduler() { }
+    func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) { }
+    func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) { }
+    func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) { }
+    func runAllOperations(showWebView: Bool) { }
 }
