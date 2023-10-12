@@ -21,31 +21,46 @@
 import PackageDescription
 
 let package = Package(
-    name: "DataBrokerProtection",
-    platforms: [ .macOS(.v11) ],
+    name: "NetworkProtectionMac",
+    platforms: [
+        .iOS("14.0"),
+        .macOS("11.4")
+    ],
     products: [
-        .library(
-            name: "DataBrokerProtection",
-            targets: ["DataBrokerProtection"])
+        .library(name: "NetworkProtectionIPC", targets: ["NetworkProtectionIPC"]),
+        .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"])
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "81.3.0"),
+        .package(path: "../XPC"),
         .package(path: "../SwiftUIExtensions")
     ],
     targets: [
+        // MARK: - NetworkProtectionIPC
+
         .target(
-            name: "DataBrokerProtection",
+            name: "NetworkProtectionIPC",
             dependencies: [
-                .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
+                .product(name: "NetworkProtection", package: "BrowserServicesKit"),
+                .product(name: "XPC", package: "XPC")
+            ]),
+
+        // MARK: - NetworkProtectionUI
+
+        .target(
+            name: "NetworkProtectionUI",
+            dependencies: [
+                .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
             ],
-            resources: [.process("Resources")]
-        ),
+            resources: [
+                .copy("Resources/Assets.xcassets")
+            ]),
         .testTarget(
-            name: "DataBrokerProtectionTests",
+            name: "NetworkProtectionUITests",
             dependencies: [
-                "DataBrokerProtection",
-                "BrowserServicesKit"
+                "NetworkProtectionUI",
+                .product(name: "NetworkProtectionTestUtils", package: "BrowserServicesKit")
             ])
     ]
 )

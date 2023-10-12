@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 5.8
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 //
 //  Package.swift
@@ -21,31 +21,24 @@
 import PackageDescription
 
 let package = Package(
-    name: "DataBrokerProtection",
-    platforms: [ .macOS(.v11) ],
+    name: "XPC",
+    platforms: [
+        .iOS("14.0"),
+        .macOS("11.4")
+    ],
     products: [
-        .library(
-            name: "DataBrokerProtection",
-            targets: ["DataBrokerProtection"])
+        // Products define the executables and libraries a package produces, and make them visible to other packages.
+        .library(name: "XPC", targets: ["XPC"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "81.3.0"),
-        .package(path: "../SwiftUIExtensions")
+        // Dependencies declare other packages that this package depends on.
+        // .package(url: /* package url */, from: "1.0.0"),
     ],
     targets: [
+        // Targets are the basic building blocks of a package. A target can define a module or a test suite.
+        // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
-            name: "DataBrokerProtection",
-            dependencies: [
-                .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
-                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
-            ],
-            resources: [.process("Resources")]
-        ),
-        .testTarget(
-            name: "DataBrokerProtectionTests",
-            dependencies: [
-                "DataBrokerProtection",
-                "BrowserServicesKit"
-            ])
+            name: "XPC",
+            dependencies: [])
     ]
 )
