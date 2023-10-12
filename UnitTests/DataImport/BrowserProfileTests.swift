@@ -29,7 +29,7 @@ class BrowserProfileListTests: XCTestCase {
         let fileStore = FileStoreMock()
         let profile = DataImport.BrowserProfile(browser: .firefox, profileURL: profileURL, fileStore: fileStore)
 
-        XCTAssertFalse(profile.hasBrowserData)
+        XCTAssertTrue(profile.validateProfileData()?.containsValidData == false)
     }
 
     func testWhenBrowserProfileHasURLWithChromiumLoginData_ThenHasLoginDataIsTrue() {
@@ -39,7 +39,7 @@ class BrowserProfileListTests: XCTestCase {
 
         fileStore.directoryStorage[profileURL.absoluteString] = ["Login Data"]
 
-        XCTAssertTrue(profile.hasBrowserData)
+        XCTAssertTrue(profile.validateProfileData()?.containsValidData == true)
     }
 
     func testWhenBrowserProfileHasURLWithFirefoxLoginData_ThenHasLoginDataIsTrue() {
@@ -48,13 +48,13 @@ class BrowserProfileListTests: XCTestCase {
         let profile = DataImport.BrowserProfile(browser: .firefox, profileURL: profileURL, fileStore: fileStore)
 
         fileStore.directoryStorage[profileURL.absoluteString] = ["key4.db"]
-        XCTAssertFalse(profile.hasBrowserData)
+        XCTAssertTrue(profile.validateProfileData()?.containsValidData == false)
 
         fileStore.directoryStorage[profileURL.absoluteString] = ["logins.json"]
-        XCTAssertFalse(profile.hasBrowserData)
+        XCTAssertTrue(profile.validateProfileData()?.containsValidData == false)
 
         fileStore.directoryStorage[profileURL.absoluteString] = ["logins.json", "key4.db"]
-        XCTAssertTrue(profile.hasBrowserData)
+        XCTAssertTrue(profile.validateProfileData()?.containsValidData == true)
     }
 
     func testWhenGettingProfileName_AndProfileHasNoDetectedName_ThenTheDirectoryNameIsUsed() {

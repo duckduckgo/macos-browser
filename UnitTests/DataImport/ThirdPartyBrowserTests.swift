@@ -76,12 +76,12 @@ class ThirdPartyBrowserTests: XCTestCase {
         let mockApplicationSupportDirectoryURL = FileManager.default.temporaryDirectory.appendingPathComponent(mockApplicationSupportDirectoryName)
         try mockApplicationSupportDirectory.writeToTemporaryDirectory()
 
-        guard let list = ThirdPartyBrowser.firefox.browserProfiles(supportDirectoryURL: mockApplicationSupportDirectoryURL) else {
+        guard let list = ThirdPartyBrowser.firefox.browserProfiles(applicationSupportURL: mockApplicationSupportDirectoryURL) else {
             XCTFail("Failed to get profile list")
             return
         }
 
-        let validProfiles = list.profiles.filter { $0.hasBrowserData }
+        let validProfiles = list.profiles.filter { $0.validateProfileData()?.containsValidData == true }
         XCTAssertEqual(validProfiles.count, 2)
         XCTAssertEqual(list.defaultProfile?.profileName, "default-release")
     }
@@ -102,12 +102,12 @@ class ThirdPartyBrowserTests: XCTestCase {
         let mockApplicationSupportDirectoryURL = FileManager.default.temporaryDirectory.appendingPathComponent(mockApplicationSupportDirectoryName)
         try mockApplicationSupportDirectory.writeToTemporaryDirectory()
 
-        guard let list = ThirdPartyBrowser.firefox.browserProfiles(supportDirectoryURL: mockApplicationSupportDirectoryURL) else {
+        guard let list = ThirdPartyBrowser.firefox.browserProfiles(applicationSupportURL: mockApplicationSupportDirectoryURL) else {
             XCTFail("Failed to get profile list")
             return
         }
 
-        let validProfiles = list.profiles.filter { $0.hasBrowserData }
+        let validProfiles = list.profiles.filter { $0.validateProfileData()?.containsValidData == true }
         XCTAssertEqual(validProfiles.count, 1)
         XCTAssertEqual(list.defaultProfile?.profileName, "default-release")
     }
