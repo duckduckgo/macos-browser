@@ -18,7 +18,7 @@
 
 import XCTest
 @testable import DataBrokerProtection
-
+// swiftlint:disable type_body_length
 // https://app.asana.com/0/1204586965688315/1204834439855281/f
 
 final class OperationPreferredDateCalculatorTests: XCTestCase {
@@ -50,6 +50,23 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
     }
 
+    func testOptOutConfirmedOnDeprecatedProfile_thenScanDateIsNil() throws {
+        let historyEvents = [
+            HistoryEvent(extractedProfileId: 1,
+                         brokerId: 1,
+                         profileQueryId: 1,
+                         type: .optOutConfirmed)]
+
+        let calculator = OperationPreferredDateCalculator()
+
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: nil,
+                                                                 historyEvents: historyEvents,
+                                                                 extractedProfileID: nil,
+                                                                 schedulingConfig: schedulingConfig,
+                                                                 isDeprecated: true)
+
+        XCTAssertNil(actualScanDate)
+    }
     /*
      If the time elapsed since the last profile removal exceeds the current date plus maintenance period (expired), we should proceed with scheduling a new opt-out request as the broker has failed to honor the previous one.
      */
@@ -696,3 +713,4 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 }
+// swiftlint:enable type_body_length
