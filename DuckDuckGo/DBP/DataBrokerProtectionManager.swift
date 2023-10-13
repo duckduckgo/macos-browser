@@ -75,10 +75,11 @@ extension DataBrokerProtectionManager: DataBrokerProtectionDataManagerDelegate {
         loginItemsManager.disableLoginItems([.dbpBackgroundAgent])
     }
 }
-
+/*
 extension DataBrokerProtectionManager: DBPBackgroundAgentToMainAppCommunication {
     public func brokersScanCompleted() {
         os_log("Brokers scan completed called on main app")
         mainAppToDBPPackageDelegate?.brokersScanCompleted()
     }
 }
+*/
